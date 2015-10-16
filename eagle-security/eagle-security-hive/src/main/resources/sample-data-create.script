@@ -1,0 +1,38 @@
+##### create table:  hive resource sensitivity metadata to define what type of sensitivity one hive resource contains
+create 'hiveResourceSensitivity', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
+
+##### create hive resource sensitivity data
+##### POST
+http://localhost:38080/eagle-service/rest/entities?serviceName=HiveResourceSensitivityService
+[
+ {
+  "prefix": "hiveResourceSensitivity",
+  "tags":{
+     "hiveResource" : "xademo.customer_details.phone_number"
+  },
+   "sensitivityType" : "PHONE_NUMBER"
+ }
+]
+
+
+#### create hive alert definitions
+#### POST
+http://localhost:38080/eagle-service/rest/entities?serviceName=AlertDefinitionService
+[
+ {
+  "prefix": "alertdef",
+  "tags":{
+     "site" : "sandbox",
+     "dataSource" : "hiveQueryLog",
+     "alertExecutorId" : "hiveAccessAlertByJobHistory",
+     "policyId" : "accessSensitiveResource",
+     "policyType" : "siddhiCEPEngine"
+  },
+  "desc": "alert when some users access sensitive hive resource",
+  "policyDef": "{\"type\":\"siddhiCEPEngine\",\"expression\":\"from hiveAccessLogStream[user=='user1' and sensitivityType=='PHONE_NUMBER'] select user, timestamp, resource, sensitivityType insert into outputStream ;\",\"alertContext\":{\"description\":\"access hive sensitive resource\"}}",
+  "dedupeDef": "",
+  "notificationDef": "",
+  "remediationDef": "",
+  "enabled": true
+ }
+]

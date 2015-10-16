@@ -1,0 +1,1 @@
+[ { "prefix": "streamMetadata", "tags":{ "site" : "sandbox", "dataSource":"userProfile", "streamName" : "userActivity", "attrName" : "user" }, "attrType": "string", "category": "", "attrValueResolver" : "" } ]

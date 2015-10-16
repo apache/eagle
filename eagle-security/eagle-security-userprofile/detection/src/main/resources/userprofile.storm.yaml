@@ -1,0 +1,14 @@
+### topology.* configs are for specific executing storms
+topology.enable.message.timeouts: true
+topology.debug: false
+topology.workers: 1
+topology.acker.executors: 10
+topology.tasks: null
+# maximum amount of time a message has to complete before it's considered failed
+topology.message.timeout.secs: 60000
+topology.receiver.buffer.size: 8
+topology.transfer.buffer.size: 1024
+topology.executor.receive.buffer.size: 16384
+topology.executor.send.buffer.size: 16384
+storm.zookeeper.session.timeout: 600000
+storm.zookeeper.connection.timeout: 90000

@@ -1,0 +1,105 @@
+#**
+@author xudshen
+@version 1
+*#
+#parse("header.vm")
+<table cellpadding="0" cellspacing="0" border="0" align="left" width="800" style="">
+  <tr>
+    <td class="head" width="800">
+      <span style="color: #091D42">Eagle Service <small style="color: #999999;">$startTime ~ $endTime</small></span>
+    </td>
+  </tr>
+  <tr>
+    <td class="head2" width="800">
+      <span>
+        Statistics
+      </span>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top" style="padding: 0.5em 0em 0.5em 0em;">
+      <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" class="table-border">
+        <thead>
+        <tr>
+          <th class="table-border-th" style="width: 25%">type</th>
+          <th class="table-border-th" style="width: 25%">count</th>
+          <th class="table-border-th" style="width: 25%">type</th>
+          <th class="table-border-th" style="width: 25%">count</th>
+        </tr>
+        </thead>
+        <tbody>
+        #foreach($key in $statistics.keySet())
+          #if( $foreach.count % 2 == 1 )
+          <tr>
+          #end
+            <td class="table-border-td">$key</td>
+            <td class="table-border-td">$statistics.get($key)</td>
+          #if( $foreach.count % 2 == 0)
+          </tr>
+          #end
+          #if( $foreach.count % 2 == 1 && !$foreach.hasNext )
+          	<td class="table-border-td"></td>
+            <td class="table-border-td"></td>
+          </tr>
+          #end
+       	#end
+        </tbody>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td class="head2" width="800">
+      <span>
+        Detail Info
+      </span>
+    </td>
+  </tr>
+  <tr>
+    <td class="info" width="800">
+      <span>
+          These are the alerts that we can not find its hostname.
+      </span>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top" style="padding: 0.5em 0em 0.5em 0em;">
+      <table cellpadding="0" cellspacing="0" border="0" align="left" width="800" class="table-border">
+        <thead>
+          <tr>
+            <th class="table-border-th">hostname</th>
+            <th class="table-border-th">date_reception</th>
+            <th class="table-border-th">type</th>
+            <th class="table-border-th">origin</th>
+            <th class="table-border-th">msg</th>
+          </tr>
+        </thead>
+        <tbody>
+        #foreach($entry in $noHostnameItems)
+          <tr>
+            <td class="table-border-td">$entry.hostname</td>
+            <td class="table-border-td">$entry.date_reception</td>
+            <td class="table-border-td">$entry.type</td>
+            <td class="table-border-td">$entry.origin</td>
+            <td class="table-border-td">$entry.msg</td>
+          </tr>
+       	#end
+        </tbody>
+      </table>
+    </td>
+  </tr>
+    <tr>
+        <td>
+            <img src="cid:$cid.get("chart.png")"/>
+        </td>
+    </tr>
+  <tr>
+    <td class="foot" width="800">
+      <span class="outlook">
+         Copyright &copy; 2013 <a href="http://123.dc1.xyz.com:9090/eagle-web/ui/eagle.html"
+                  target ="_blank" title="Hadoop Eagle">Hadoop Eagle</a>
+      </span>
+    </td>
+  </tr>
+</table>
+
+#parse("footer.vm")

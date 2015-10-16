@@ -1,0 +1,50 @@
+/**
+ * Compile: protoc -I ~/Workspace/hbase/hbase-protocol/src/main/protobuf/ -I src/main/protobuf --java_out=src/main/java src/main/protobuf/AggregateProtocol.proto
+ */
+option java_package = "eagle.storage.hbase.query.coprocessor.generated";
+option java_outer_classname = "AggregateProtos";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
+
+/**
+ * HBase Client.proto
+ */
+import "Client.proto";
+
+//
+//message ScanWrapper{
+//    required bytes byte_array = 1;
+//}
+
+message EntityDefinition {
+    required bytes byte_array = 1;
+}
+
+message AggregateResult {
+    required bytes byte_array = 1;
+}
+
+message AggregateRequest {
+    required EntityDefinition entity_definition = 1;
+    required Scan scan = 2;
+    repeated string groupby_fields= 3;
+    repeated bytes aggregate_func_types = 4;
+    repeated string aggregated_fields = 5;
+}
+
+message TimeSeriesAggregateRequest {
+    required EntityDefinition entity_definition = 1;
+    required Scan scan = 2;
+    repeated string groupby_fields= 3;
+    repeated bytes aggregate_func_types = 4;
+    repeated string aggregated_fields = 5;
+    required int64 start_time = 6;
+    required int64 end_time = 7;
+    required int64 interval_min = 8;
+}
+
+service AggregateProtocol {
+    rpc aggregate(AggregateRequest) returns (AggregateResult);
+    rpc timeseriesAggregate(TimeSeriesAggregateRequest) returns (AggregateResult);
+}

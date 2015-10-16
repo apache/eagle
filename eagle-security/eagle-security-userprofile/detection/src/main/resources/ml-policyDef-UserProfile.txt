@@ -1,0 +1,33 @@
+{
+   "type":"MachineLearning",
+   "fileTypes":[
+      {
+         "type":"CSV",
+         "containsHeader":"true",
+         "fileParserClass":"eagle.ml.CSVFileFormatParser"
+      }
+   ],
+   "alertContext":{
+      "site":"sandbox",
+      "component":"testComponent",
+      "description":"ML based user profile anomaly detection",
+      "severity":"WARNING",
+      "notificationByEmail":"true"
+   },
+   "algorithms":[
+      {
+         "name":"eagle.security.userprofile.util.EigenBasedAnomalyDetection",
+         "description":"EigenBasedAnomalyDetection",
+         "modelPath":"/models/",
+         "featureSet":"getfileinfo, open, listStatus, setTimes, setPermission, rename, mkdirs, create, setReplication, contentSummary, delete, setOwner, fsck",
+         "type":"CSV"
+      },
+      {
+         "name":"eagle.security.userprofile.util.KDEBasedAnomalyDetection",
+         "description":"DensityBasedAnomalyDetection",
+         "modelPath":"/models/",
+         "featureSet":"getfileinfo, open, listStatus, setTimes, setPermission, rename, mkdirs, create, setReplication, contentSummary, delete, setOwner, fsck",
+         "type":"CSV"
+      }
+   ]
+}

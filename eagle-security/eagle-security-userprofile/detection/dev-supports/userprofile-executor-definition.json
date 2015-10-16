@@ -1,0 +1,1 @@
+[ { "prefix": "alertExecutor", "tags":{ "site":"sandbox", "dataSource":"userProfile", "alertExecutorId" : "userProfileAnomalyDetectionExecutor", "streamName":"userActivity" }, "desc": "user activity data source" } ]
