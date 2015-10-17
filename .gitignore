@@ -43,7 +43,7 @@ pom.xml.next
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
-**/bin/*
+###**/bin/*
 eagle-security/eagle-security-mltraining/src/test/resources/outputDir/
 eagle-security/eagle-security-userprofile/src/test/resources/models/
 
