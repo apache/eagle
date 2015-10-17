@@ -2,7 +2,7 @@
   <content>
 # Eagle : Securing Hadoop Data in Realtime
 
-Eagle is an open source real time data activity monitoring product to identify access to sensitive data, recognize attacks, malicious activities and block access.
+Eagle is an Open Source Monitoring solution for Hadoop to instantly identify access to sensitive data, recognize attacks, malicious activities in hadoop and take actions
 
 ## Use Cases
 
