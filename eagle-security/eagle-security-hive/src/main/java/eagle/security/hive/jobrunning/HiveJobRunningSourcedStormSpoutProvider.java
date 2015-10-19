@@ -70,7 +70,7 @@ public class HiveJobRunningSourcedStormSpoutProvider {
 		}
 		catch(Exception ex){
 			LOG.error("failing find job id partitioner class " + config.getString("dataSourceConfig.partitionerCls"));
-			throw new IllegalStateException("jobId partitioner class does not exsit " + config.getString("dataSourceConfig.partitionerCls"));
+			throw new IllegalStateException("jobId partitioner class does not exist " + config.getString("dataSourceConfig.partitionerCls"));
 		}
 		
 		JobRunningSpout spout = new JobRunningSpout(crawlConfig);

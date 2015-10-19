@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileSensitivityDataJoinExecutor extends JavaStormStreamExecutor2<String, Map> {
@@ -60,14 +61,14 @@ public class FileSensitivityDataJoinExecutor extends JavaStormStreamExecutor2<St
         if (LOG.isDebugEnabled()) {
             LOG.debug("Receive map: " + map + "event: " + event);
         }
-        /**
-         * Regex support for file directory.
-         */
+
         String src = (String)event.get("src");
         if(map != null && src != null) {
             String simplifiedPath = new SimplifyPath().build(src);
             for (String fileDir : map.keySet()) {
-                boolean isMatched = Pattern.matches(fileDir, simplifiedPath);
+                Pattern pattern = Pattern.compile(simplifiedPath,Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(fileDir);
+                boolean isMatched = matcher.matches();
                 if (isMatched) {
                     e = map.get(fileDir);
                     break;

@@ -82,9 +82,9 @@ public class TestSiddhiEngine {
     }
 
     @Test
-    public void Test1() throws Exception {
+    public void TestRegexp() throws Exception {
         SiddhiManager siddhiManager = new SiddhiManager();
-        
+
         String cseEventStream = "" +
                 "@config(async = 'true') " +
                 "define stream typeStream (str string, other string, num double) ;";
@@ -125,16 +125,16 @@ public class TestSiddhiEngine {
         Thread.sleep(100);
         executionPlanRuntime.shutdown();
     }
-    
+
     @Test
-    public void Test2() throws Exception {
-        SiddhiManager siddhiManager = new SiddhiManager();        
-        String cseEventStream = "" +
-                "@config(async = 'true') " +
-                "define stream hiveAccessLogStream (user string, timestamp long, resource string, sensitivityType string) ;";
-        String queryString = "@info(name = 'query1') " +
-                "from hiveAccessLogStream[user=='userxyz' and sensitivityType=='PHONE_NUMBER'] " +
-                "select user, timestamp, resource, sensitivityType " +
+    public void TestStrEqualsIgnoreCase() throws Exception {
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        String cseEventStream = "define stream typeStream (cmd string, src string, dst string) ;";
+        String queryString = "" +
+                "@info(name = 'query1') " +
+                "from typeStream[(cmd == 'rename') and (src == '/tmp/pii') and (str:equalsIgnoreCase(dst,'/user/hdfs/.TRAsh/current/TMP/PII')==true)] " +
+                "select cmd, src, dst " +
                 "insert into outputStream ;";
 
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(cseEventStream + queryString);
@@ -142,35 +142,103 @@ public class TestSiddhiEngine {
         QueryCallback callback = new QueryCallback() {
             @Override
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                System.out.println("caught alert !!!!!");
                 EventPrinter.print(timeStamp, inEvents, removeEvents);
             }
         };
-        
+
         executionPlanRuntime.addCallback("query1", callback);
-        
+
+        Field field = QueryCallback.class.getDeclaredField("query");
+        field.setAccessible(true);
+        Query query = (Query)field.get(callback);
+
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("typeStream");
+        executionPlanRuntime.start();
+        inputHandler.send(new Object[]{"rename", "/tmp/pii", "/user/HDFS/.Trash/Current/TMP/pii"}); // match case
+        inputHandler.send(new Object[]{"rename", "/tmp/pii", "/user/HDFS/.Trash///Current/TMP/pii"}); //non-match case
+        Thread.sleep(100);
+        executionPlanRuntime.shutdown();
+    }
+
+    @Test
+    public void TestStrContainsIgnoreCase() throws Exception {
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        String cseEventStream = "define stream typeStream (cmd string, src string, dst string) ;";
+        String queryString = "" +
+                "@info(name = 'query1') " +
+                "from typeStream[(cmd == 'rename') and (src == '/tmp/pii') and (str:containsIgnoreCase(dst,'.TRASH/CURRENT/tMp/pII')==true)] " +
+                "select cmd, src, dst " +
+                "insert into outputStream ;";
+
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(cseEventStream + queryString);
+
+        QueryCallback callback = new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+            }
+        };
+
+        executionPlanRuntime.addCallback("query1", callback);
+
+        Field field = QueryCallback.class.getDeclaredField("query");
+        field.setAccessible(true);
+        Query query = (Query)field.get(callback);
+
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("typeStream");
+        executionPlanRuntime.start();
+        inputHandler.send(new Object[]{"rename", "/tmp/pii", "/user/hdfs/.Trash/Current/TMP/pii"}); // match case
+        inputHandler.send(new Object[]{"rename", "/tmp/pii", "/user/hdfs/.Trash///Current/TMP/pii"}); //non-match case
+        Thread.sleep(100);
+        executionPlanRuntime.shutdown();
+    }
+
+    @Test
+    public void TestRegexpIgnoreCase() throws Exception {
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        String cseEventStream = "define stream typeStream (str string, other string, num double) ;";
+        String queryString = "" +
+                "@info(name = 'query1') " +
+                "from typeStream " +
+                "select str as str1, other as other1 , num as num1, count(num) as number " +
+                "having str:regexpIgnoreCase(str1, '/usr/DATA/[0-9]+/[0-9]+/[0-9]+') == true " +
+                "insert into outputStream ;";
+
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(cseEventStream + queryString);
+
+        QueryCallback callback = new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+            }
+        };
+
+        executionPlanRuntime.addCallback("query1", callback);
+
         Field field = QueryCallback.class.getDeclaredField("query");
         field.setAccessible(true);
         Query query = (Query)field.get(callback);
         List<OutputAttribute> list = query.getSelector().getSelectionList();
         for (OutputAttribute output : list) {
-        	Expression expression = output.getExpression();
-        	if (expression instanceof Variable) {
-        		Variable variable = (Variable)expression;
-        		String attribute = variable.getAttributeName();
-        		System.out.println(output.getRename() + " " + attribute);
-        	}        	        	
-        }       
+            Expression expression = output.getExpression();
+            if (expression instanceof Variable) {
+                Variable variable = (Variable)expression;
+                String attribute = variable.getAttributeName();
+                System.out.println(output.getRename() + " " + attribute);
+            }
+        }
 
-        InputHandler inputHandler = executionPlanRuntime.getInputHandler("hiveAccessLogStream");
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("typeStream");
         executionPlanRuntime.start();
-        inputHandler.send(new Object[]{"userxyz",System.currentTimeMillis(), "", "PHONE_NUMBER", });
+        inputHandler.send(new Object[]{"/USR/data/000/001/002", "other", 1.0});
         Thread.sleep(100);
-        siddhiManager.getExecutionPlanRuntime(executionPlanRuntime.getName()).shutdown();;
+        executionPlanRuntime.shutdown();
     }
     
     @Test
-    public void Test3() throws Exception {
+    public void TestDataObject() throws Exception {
         SiddhiManager siddhiManager = new SiddhiManager();
         
         String cseEventStream = "" +
@@ -213,52 +281,6 @@ public class TestSiddhiEngine {
         InputHandler inputHandler = executionPlanRuntime.getInputHandler("typeStream");
         executionPlanRuntime.start();
         inputHandler.send(new Object[]{new AlertExecutor(queryString, null, 0, 1, null, null), "/usr/data/000/001/002", "second"});
-        Thread.sleep(100);
-        executionPlanRuntime.shutdown();
-    }
-    
-    @Test
-    public void Test4() throws Exception {
-        SiddhiManager siddhiManager = new SiddhiManager();
-        
-        String cseEventStream = "" +
-                "@config(async = 'true') " +
-                "define stream typeStream (str string) ;" + 
-        	    "define stream typeStream2 (str string) ;";
-        String queryString = "" +
-                "@info(name = 'query1') " +
-                "from typeStream " +
-                "select str " +
-                "having str:contains(str, 'WSO2') == true " + 
-                "insert into outputStream ;";
-
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(cseEventStream + queryString);
-
-        QueryCallback callback = new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                EventPrinter.print(timeStamp, inEvents, removeEvents);
-            }
-        };
-        
-        executionPlanRuntime.addCallback("query1", callback);
-        
-        Field field = QueryCallback.class.getDeclaredField("query");
-        field.setAccessible(true);
-        Query query = (Query)field.get(callback);
-        List<OutputAttribute> list = query.getSelector().getSelectionList();
-        for (OutputAttribute output : list) {
-        	Expression expression = output.getExpression();
-        	if (expression instanceof Variable) {
-        		Variable variable = (Variable)expression;
-        		String attribute = variable.getAttributeName();
-        		System.out.println(output.getRename() + " " + attribute);
-        	}        	        	
-        }       
-
-        InputHandler inputHandler = executionPlanRuntime.getInputHandler("typeStream");
-        executionPlanRuntime.start();
-        inputHandler.send(new Object[]{"..123."});
         Thread.sleep(100);
         executionPlanRuntime.shutdown();
     }

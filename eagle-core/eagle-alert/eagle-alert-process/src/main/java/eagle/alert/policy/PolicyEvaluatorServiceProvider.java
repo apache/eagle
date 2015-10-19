@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.Module;
  *
  */
 public interface PolicyEvaluatorServiceProvider {
-	public String getPolicyType();
-	public Class<? extends PolicyEvaluator> getPolicyEvaluator();
-	public List<Module> getBindingModules();
+	String getPolicyType();
+	Class<? extends PolicyEvaluator> getPolicyEvaluator();
+	List<Module> getBindingModules();
 }
