@@ -20,5 +20,5 @@ package eagle.alert.policy;
  * parse policy definition json string and convert to an object
  */
 public interface PolicyDefinitionParser {
-	public Object parse(String policyDefinition);
+	Object parse(String policyDefinition);
 }

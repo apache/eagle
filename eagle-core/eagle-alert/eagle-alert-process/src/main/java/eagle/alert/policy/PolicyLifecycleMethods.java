@@ -21,7 +21,7 @@ import java.util.Map;
 import eagle.alert.entity.AlertDefinitionAPIEntity;
 
 public interface PolicyLifecycleMethods {
-	public void onPolicyCreated(Map<String, AlertDefinitionAPIEntity> added);
-	public void onPolicyChanged(Map<String, AlertDefinitionAPIEntity> changed);
-	public void onPolicyDeleted(Map<String, AlertDefinitionAPIEntity> deleted);
+	void onPolicyCreated(Map<String, AlertDefinitionAPIEntity> added);
+	void onPolicyChanged(Map<String, AlertDefinitionAPIEntity> changed);
+	void onPolicyDeleted(Map<String, AlertDefinitionAPIEntity> deleted);
 }

@@ -18,5 +18,5 @@ package eagle.metric;
 
 public interface MetricOperator {
 
-	public double update(double value);
+	double update(double value);
 }

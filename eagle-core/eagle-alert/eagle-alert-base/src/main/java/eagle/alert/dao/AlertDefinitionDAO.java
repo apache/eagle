@@ -27,7 +27,7 @@ public interface AlertDefinitionDAO extends Serializable{
 	 * find list of active alert definitions for one specific site and dataSource
 	 * @return
 	 */
-	public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) throws Exception;
+	List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) throws Exception;
 	
 	/**
 	 * find map from alertExecutorId to map from policy Id to alert definition for one specific site and dataSource
@@ -35,5 +35,5 @@ public interface AlertDefinitionDAO extends Serializable{
        (site,dataSource) => Map[alertExecutorId,Map[policyId,alertDefinition]]
 	 * @return
 	 */
-	public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception;
+	Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception;
 }
