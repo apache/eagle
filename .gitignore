@@ -17,3 +17,56 @@
 #
 # See: https://github.com/github/gitignore/
 
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+.cache-main
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# Maven
+target/
+target/*
+*/target/*
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+**/bin/*
+eagle-security/eagle-security-mltraining/src/test/resources/outputDir/
+eagle-security/eagle-security-userprofile/src/test/resources/models/
+
+# IntelliJ IDEA
+.idea/
+.metadata/
+**.iml
+**.eml
+**.patch
+mobile.userlibraries
+
+# Eclipse
+build
+.metadata
+.classpath
+.project
+.settings
+.externalToolBuilders
+classes
+# bin
+
+# Temporary files
+logs/
+*.log*
+# Mac files
+.DS_Store
