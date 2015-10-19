@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExecutor2<String, Map> {
@@ -63,24 +64,19 @@ public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExec
                         .getInstance()
                         .getJobResult(HiveResourceSensitivityPollingJob.class);
         LOG.info(">>>> event: " + event + " >>>> map: " + map);
-        /**
-         * Regex support for file directory.
-         */
 
-        /*
-         * Split resource into a list.
-         */
         String resource = (String)event.get("resource");
         List<String> resourceList = Arrays.asList(resource.split("\\s*,\\s*"));
         HiveResourceSensitivityAPIEntity sensitivityEntity = null;
-        /*
-         * Check if hive resource contains sensitive data.
-         */
+
+        // Check if hive resource contains sensitive data.
         for (String s : resourceList) {
             if (map != null) {
                 sensitivityEntity = null;
                 for (String r : map.keySet()) {
-                    boolean isMatched = Pattern.matches(r, s);
+                    Pattern pattern = Pattern.compile(r,Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(s);
+                    boolean isMatched = matcher.matches();
                     if (isMatched) {
                         sensitivityEntity = map.get(r);
                         break;
@@ -97,7 +93,6 @@ public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExec
             LOG.info("After hive resource sensitivity lookup: " + newEvent);
             outputCollector.collect(new Tuple2(
                     newEvent.get("user"),
-//                    "hiveAccessLogStream",
                     newEvent));
         }
     }

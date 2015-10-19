@@ -22,5 +22,5 @@ import java.util.List;
 
 public interface SiddhiAlertHandler {
 
-	public void onAlerts(EagleAlertContext context, List<AlertAPIEntity> alerts);
+	void onAlerts(EagleAlertContext context, List<AlertAPIEntity> alerts);
 }

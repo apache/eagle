@@ -134,11 +134,6 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor1< Map> {
         /* Remove the last prefix: "," */
         resources.setLength(resources.length() - 1);
 
-//        /* Format timestamp. */
-//        Date date = new Date(timestamp);
-//        Format f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        String time = f.format(date);
-
         /* <event> has to be SortedMap. */
         Map<String, Object> event = new TreeMap<String, Object>();
         event.put("user", userName);
