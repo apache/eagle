@@ -58,7 +58,6 @@ public class IPZoneDataJoinExecutor extends JavaStormStreamExecutor2<String, Map
         }
         event.put("securityZone",  e == null ? "NA" : e.getSecurityZone());
         if(LOG.isDebugEnabled()) LOG.debug("After IP zone lookup: " + event);
-//        outputCollector.collect(new Tuple3(event.get("user"), "hdfsAuditLogEventStream", event));
         outputCollector.collect(new Tuple2(event.get("user"), event));
     }
 }
