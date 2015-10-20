@@ -27,11 +27,11 @@ import junit.framework.Assert;
 import eagle.alert.entity.AlertStreamSchemaEntity;
 import eagle.alert.siddhi.SiddhiStreamMetadataUtils;
 import eagle.alert.siddhi.StreamMetadataManager;
+import org.junit.Test;
 
 public class TestSiddhiStreamMetadataUtils {
-	//@Test
+	@Test
 	public void test() throws Exception{
-		System.setProperty("config.resource", "/application.conf.1");
         Config config = ConfigFactory.load();
 		StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAO(){
 			@Override
@@ -43,7 +43,7 @@ public class TestSiddhiStreamMetadataUtils {
 			}
 		});
 		String siddhiStreamDef = SiddhiStreamMetadataUtils.convertToStreamDef("testStreamName");
-		Assert.assertEquals("define stream " + "testStreamName" + "(attrName1 string,attrName2 long)", siddhiStreamDef);
+		Assert.assertEquals("define stream " + "testStreamName" + "(eagleAlertContext object,attrName1 string,attrName2 long);", siddhiStreamDef);
 	}
 	
 	private AlertStreamSchemaEntity generateStreamMetadataAPIEntity(final String attrName, String attrType){
