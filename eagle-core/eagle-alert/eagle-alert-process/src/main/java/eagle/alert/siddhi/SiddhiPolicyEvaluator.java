@@ -86,12 +86,8 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 	
 	public void init(AbstractPolicyDefinition policyDef){			
 		siddhiRuntime = createSiddhiRuntime((SiddhiPolicyDefinition)policyDef);
-	}	
-	
-	public SiddhiRuntime getSiddhiRuntime() {
-		return siddhiRuntime;
 	}
-	
+
 	public static String addContextFieldIfNotExist(String expression) {		
 		// select fieldA, fieldB --> select eagleAlertContext, fieldA, fieldB
 		int pos = expression.indexOf("select ") + 7;
@@ -161,15 +157,12 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 		return runtime;
 	}
 	
-	public void addAlert(AlertAPIEntity entity) {
-		queue.add(entity);
-	}
-	
 	/**
-	 * 1. input has 2 fields, one is streamName, the other is map of attribute name/value
+	 * 1. input has 3 fields, first is siddhi context, second is streamName, the last one is map of attribute name/value
 	 * 2. runtime check for input data (This is very expensive, so we ignonre for now)
 	 *     the size of input map should be equal to size of attributes which stream metadata defines
 	 *     the attribute names should be equal to attribute names which stream metadata defines
+	 *     the input field cannot be null
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
@@ -183,7 +176,6 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 			//insert siddhiAlertContext into the first field
 			List<Object> input = new ArrayList<Object>();
 			input.add(siddhiAlertContext);
-/*			input.addAll(map.values());*/
 			putAttrsIntoInputStream(input, streamName, map);
 			siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
 		}

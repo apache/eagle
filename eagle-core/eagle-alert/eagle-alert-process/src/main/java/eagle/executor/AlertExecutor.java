@@ -16,7 +16,6 @@
  */
 package eagle.executor;
 
-import com.typesafe.config.ConfigObject;
 import eagle.alert.common.AlertConstants;
 import eagle.alert.config.AbstractPolicyDefinition;
 import eagle.alert.dao.AlertDefinitionDAO;

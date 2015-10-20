@@ -27,10 +27,10 @@ import eagle.log.base.taggedlog.TaggedLogAPIEntity;
  */
 public interface EntityDeduplicator<T extends TaggedLogAPIEntity> {
 	
-	public EntityDeduplicator<T> setDedupIntervalMin(long intervalMin);
+	EntityDeduplicator<T> setDedupIntervalMin(long intervalMin);
 	
-	public long getDedupIntervalMin();
+	long getDedupIntervalMin();
 	
-	public List<T> dedup(List<T> list);
+	List<T> dedup(List<T> list);
 
 }
