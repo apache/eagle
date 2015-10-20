@@ -36,7 +36,6 @@ import com.fasterxml.jackson.databind.Module;
  *   - use zookeeper to balance. eaglePolicies/${alertExecutorId}/${alertExecutorInstanceId} => list of policies
  * 
  * policy evaluator business features:
- * - register mapping between policy type and PolicyDefinitionParser
  * - register mapping between policy type and PolicyEvaluator
  * - create evaluator engine runtime when configuration is changed
  *
