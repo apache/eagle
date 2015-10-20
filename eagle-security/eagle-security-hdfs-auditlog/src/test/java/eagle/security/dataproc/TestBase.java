@@ -29,7 +29,7 @@ public class TestBase {
 	@BeforeClass
 	public static void startup() throws Exception {
 		hbase = EmbeddedHbase.getInstance();
-		String webappDirLocation = "../eagle-security-webservice/target/eagle-service";
+		String webappDirLocation = "../../eagle-webservice/target/eagle-service";
 		server = EmbeddedServer.getInstance(webappDirLocation);
 	}
 }
