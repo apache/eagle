@@ -91,37 +91,30 @@ public class AlertEmailGenerator{
 	public String getTplFile() {
 		return tplFile;
 	}
-
-
+	
 	public void setTplFile(String tplFile) {
 		this.tplFile = tplFile;
 	}
-
 
 	public String getSender() {
 		return sender;
 	}
 
-
 	public void setSender(String sender) {
 		this.sender = sender;
 	}
-
 
 	public String getRecipients() {
 		return recipients;
 	}
 
-
 	public void setRecipients(String recipients) {
 		this.recipients = recipients;
 	}
 
-
 	public String getSubject() {
 		return subject;
 	}
-
 
 	public void setSubject(String subject) {
 		this.subject = subject;
