@@ -159,7 +159,7 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 	
 	/**
 	 * 1. input has 3 fields, first is siddhi context, second is streamName, the last one is map of attribute name/value
-	 * 2. runtime check for input data (This is very expensive, so we ignonre for now)
+	 * 2. runtime check for input data (This is very expensive, so we ignore for now)
 	 *     the size of input map should be equal to size of attributes which stream metadata defines
 	 *     the attribute names should be equal to attribute names which stream metadata defines
 	 *     the input field cannot be null
@@ -195,8 +195,10 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 	}
 
 	private void putAttrsIntoInputStream(List<Object> input, String streamName, SortedMap map) {
-		if(!needValidation)
+		if(!needValidation) {
+			input.addAll(map.values());
 			return;
+		}
 		for (Object key : map.keySet()) {
 			Object value = map.get(key);
 			if (value == null) {
