@@ -1,12 +1,6 @@
 ##### create alert related tables
 create 'eagle_metric', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
-
-create 'actiondetail', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
 create 'alertdetail', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
-create 'alertgroup', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
-create 'alertmeta', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
-create 'alertMetaEntity', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
-
 
 create 'alertDataSource', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
 create 'alertStream', {NAME => 'f', VERSIONS => '3', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}

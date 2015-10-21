@@ -16,33 +16,64 @@
  */
 package eagle.alert.cep;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import eagle.alert.dao.AlertStreamSchemaDAO;
-import eagle.alert.dao.AlertStreamSchemaDAOImpl;
-import eagle.alert.siddhi.SiddhiPolicyEvaluator;
-import eagle.alert.siddhi.StreamMetadataManager;
-import eagle.common.config.EagleConfigConstants;
-import org.junit.Test;
-
-import eagle.alert.siddhi.SiddhiPolicyDefinition;
-import eagle.dataproc.core.ValuesArray;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import eagle.alert.dao.AlertDefinitionDAO;
+import eagle.alert.dao.AlertDefinitionDAOImpl;
+import eagle.alert.dao.AlertStreamSchemaDAO;
+import eagle.alert.dao.AlertStreamSchemaDAOImpl;
+import eagle.alert.entity.AlertAPIEntity;
+import eagle.alert.entity.AlertDefinitionAPIEntity;
+import eagle.alert.entity.AlertStreamSchemaEntity;
+import eagle.alert.siddhi.EagleAlertContext;
+import eagle.alert.siddhi.SiddhiPolicyDefinition;
+import eagle.alert.siddhi.SiddhiPolicyEvaluator;
+import eagle.alert.siddhi.StreamMetadataManager;
+import eagle.dataproc.core.ValuesArray;
+import eagle.datastream.Collector;
+import eagle.datastream.Tuple2;
+import eagle.executor.AlertExecutor;
+import junit.framework.Assert;
+import org.junit.Test;
 
-public class TestSiddhiEvaluator {//extends AlertTestBase {
-	
+import java.util.*;
+
+public class TestSiddhiEvaluator {
+
+	int alertCount = 0;
+
+	public AlertStreamSchemaEntity createStreamMetaEntity(String attrName, String type) {
+		AlertStreamSchemaEntity entity = new AlertStreamSchemaEntity();
+		Map<String, String> tags = new HashMap<String, String>();
+		tags.put("dataSource", "hdfsAuditLog");
+		tags.put("streamName", "hdfsAuditLogEventStream");
+		tags.put("attrName", attrName);
+		entity.setTags(tags);
+		entity.setAttrType(type);
+		return entity;
+	}
+
 	@Test
 	public void test() throws Exception{
-		//hbase.createTable("streamMetadata", "f");
         Config config = ConfigFactory.load("unittest.conf");
-		                       
-		String eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-		int eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-		AlertStreamSchemaDAO dao = new AlertStreamSchemaDAOImpl(eagleServiceHost, eagleServicePort);
-		StreamMetadataManager.getInstance().init(config, dao);
-		
+		AlertStreamSchemaDAO streamDao = new AlertStreamSchemaDAOImpl(null, null) {
+			@Override
+			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception {
+				List<AlertStreamSchemaEntity> list = new ArrayList<AlertStreamSchemaEntity>();
+				list.add(createStreamMetaEntity("cmd", "string"));
+				list.add(createStreamMetaEntity("dst", "string"));
+				list.add(createStreamMetaEntity("src", "string"));
+				list.add(createStreamMetaEntity("host", "string"));
+				list.add(createStreamMetaEntity("user", "string"));
+				list.add(createStreamMetaEntity("timestamp", "long"));
+				list.add(createStreamMetaEntity("securityZone", "string"));
+				list.add(createStreamMetaEntity("sensitivityType", "string"));
+				list.add(createStreamMetaEntity("allowed", "string"));
+				return list;
+			}
+		};
+		StreamMetadataManager.getInstance().init(config, streamDao);
+
 		Map<String, Object> data1 =  new TreeMap<String, Object>(){{
 			put("cmd", "open");
 			put("dst", "");
@@ -54,21 +85,43 @@ public class TestSiddhiEvaluator {//extends AlertTestBase {
 			put("sensitivityType", "");
 			put("allowed", "true");
 		}};
-		
-        SiddhiPolicyDefinition policyDef = new SiddhiPolicyDefinition();
+        final SiddhiPolicyDefinition policyDef = new SiddhiPolicyDefinition();
         policyDef.setType("SiddhiCEPEngine");
         String expression = "from hdfsAuditLogEventStream[cmd=='open'] " +
-                "select * " +
-                "insert into outputStream ;";
-        policyDef.setExpression(expression);        
+							"select * " +
+							"insert into outputStream ;";
+        policyDef.setExpression(expression);
         SiddhiPolicyEvaluator evaluator = new SiddhiPolicyEvaluator(config, "testPolicy", policyDef, new String[]{"hdfsAuditLogEventStream"});
-		
-		evaluator.evaluate(new ValuesArray("hdfsAuditLogEventStream", data1));		
-		
-//		List<AlertAPIEntity> list = evaluator.fetchAlerts();
-//		Assert.assertTrue(list.size() == 1);
-//		for (AlertAPIEntity entity : list) {
-//			System.out.println(entity.getAlertContext().toString());
-//		}	
+		EagleAlertContext context = new EagleAlertContext();
+
+		AlertDefinitionDAO alertDao = new AlertDefinitionDAOImpl(null, null) {
+			@Override
+			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception {
+				return null;
+			}
+		};
+
+		context.alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {
+			@Override
+			public Map<String, String> getDimensions(String policyId) {
+				return new HashMap<String, String>();
+			}
+
+			@Override
+			public void runMetricReporter() {}
+		};
+		context.alertExecutor.prepareConfig(config);
+		context.alertExecutor.init();
+		context.evaluator = evaluator;
+		context.policyId = "testPolicy";
+		context.outputCollector = new Collector<Tuple2<String, AlertAPIEntity>> () {
+			@Override
+			public void collect(Tuple2<String, AlertAPIEntity> stringAlertAPIEntityTuple2) {
+				alertCount++;
+			}
+		};
+		evaluator.evaluate(new ValuesArray(context, "hdfsAuditLogEventStream", data1));
+		Thread.sleep(2 * 1000);
+		Assert.assertEquals(alertCount, 1);
 	}
 }
