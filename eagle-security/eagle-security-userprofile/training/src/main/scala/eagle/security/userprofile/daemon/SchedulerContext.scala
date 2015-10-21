@@ -59,6 +59,10 @@ object SchedulerContext {
   val UserProfileConfigKey_AggIntervalSeconds="eagle.userprofile.detection-interval-seconds"
   val UserProfileConfigKey_AggInitialDelaySeconds="eagle.userprofile.detection-initial-delay-seconds"
   val UserProfileConfigKey_SyncIntervalSeconds="eagle.userprofile.sync-interval-seconds"
+  // ======================================================================================
+  // End of Configuration Keys
+  // ======================================================================================
+  // }
 
   object COMMAND_TYPE extends Enumeration {
     type TYPE = Value
@@ -70,9 +74,9 @@ object SchedulerContext {
     val SCHEDULED, ONETIME  = Value
   }
 
-  // ======================================================================================
-  // }
-
+  /**
+   * Load scheduler context from configuration
+   */
   def load:SchedulerContext={
     val config:Config = ConfigFactory.load()
     var site = ""
@@ -135,53 +139,39 @@ case class SchedulerContext(
   var dryRun:Boolean = true,
   var features:String = null,
   var period:String = "PT1m", // changing to 1m aggregation
-
-  /*
-  var serviceHost:String = "localhost",
-  var servicePort:Int = 9099,
-  var username:String = "admin",
-  var password:String = "secure",
-  */
   var eagleServiceContext: EagleServiceContext=new EagleServiceContext(),
-
   var jobJar: String = SchedulerContext.UserProfileTrainingJarFilePath,
   var driverShell: String = "spark-submit",
   var driverClasspath: String = null,
-
   var sparkMaster:String = "local[10]",
   var sparkMode:String = "client",
-
   var trainingAuditPath:String = null,
   var trainingIntervalSeconds:Long = 60,
   var trainingInitialDelaySeconds:Long = 0,
-
   /**
    * Detection audit file input path
    */
   var detectionAuditPath:String = null,
-
   /**
    * Detection output kafka broker hosts
    */
   var detectionKafkaBrokers:String = "localhost:6667",
-
   /**
    * Detection output kafka topic name
    */
   var detectionKafkaTopic:String = "hdfs_audit_agg",
-
   /**
    * Detection interval seconds
    */
   var detectionIntervalSeconds:Long = 30,
-
   /**
    * Detection initial delay seconds
    */
   var detectionInitialDelaySeconds:Long = 0,
-
+  /**
+   * Detection sync commands interval in seconds
+   */
   var syncIntervalSeconds:Long = 5,
-
   /**
    * Training program schedule policy
    */

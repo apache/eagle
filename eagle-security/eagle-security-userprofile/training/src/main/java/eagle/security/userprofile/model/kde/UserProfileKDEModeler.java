@@ -24,17 +24,15 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.collection.immutable.$colon$colon;
-import scala.collection.immutable.List;
-import scala.collection.immutable.List$;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
-public class UserProfileKDEModeler implements UserProfileModeler<UserProfileKDEModel,UserProfileContext> {
+public class UserProfileKDEModeler extends JavaUserProfileModeler<UserProfileKDEModel,UserProfileContext> {
 
     private final String[] cmdTypes;
-//    private java.util.List<CmdsStatistics> statistics;
     private UserCommandStatistics[] statistics;
     private RealMatrix finalMatrixWithoutLowVariantCmds;
     private RealMatrix covarianceMatrix;
@@ -94,20 +92,12 @@ public class UserProfileKDEModeler implements UserProfileModeler<UserProfileKDEM
             for(int j=0; j < inputMat.getColumnDimension(); j++){
                 if(statistics[j].getStddev() > 0){
                     double stddev = statistics[j].getStddev();
-                    //LOG.info("stddev: " + stddev);
                     double mean = statistics[j].getMean();
-                    //LOG.info("mean: " + mean);
                     double sqrt2PI = Math.sqrt(2.0*Math.PI);
-                    //LOG.info("sqrt2PI: " + sqrt2PI);
                     double denominatorFirstPart = sqrt2PI*stddev;
-                    //LOG.info("denominatorFirstPart: " + denominatorFirstPart);
                     double squareMeanNormal = Math.pow((inputMat.getEntry(i, j) - mean), 2);
-                    //LOG.info("squareMeanNormal: " + squareMeanNormal);
                     double twoPowStandardDev = Math.pow(stddev, 2);
-                    //LOG.info("twoPowStandardDev: " + twoPowStandardDev);
                     double twoTimesTwoPowStandardDev = 2.0*twoPowStandardDev;
-                    //LOG.info("twoTimesTwoPowStandardDev: " + twoTimesTwoPowStandardDev);
-
                     probabilityEstimation[i] *= ((1.00/denominatorFirstPart)
                             *(Math.exp(-(squareMeanNormal/twoTimesTwoPowStandardDev))));
                 }
@@ -125,7 +115,6 @@ public class UserProfileKDEModeler implements UserProfileModeler<UserProfileKDEM
         for(double d:listProb)
             probabilityEstimation[i++]=d;
 
-        // compute 95 percentile of probability density estimation
         minProbabilityEstimate = probabilityEstimation[probabilityEstimation.length -1];
         maxProbabilityEstimate = probabilityEstimation[0];
 
@@ -140,19 +129,12 @@ public class UserProfileKDEModeler implements UserProfileModeler<UserProfileKDEM
     }
 
     @Override
-    public List<UserProfileKDEModel> build(String site,String user, RealMatrix matrix) {
+    public List<UserProfileKDEModel> generate(String site, String user, RealMatrix matrix) {
         LOG.info(String.format("Receive aggregated user activity matrix: %s size: %s x %s",user,matrix.getRowDimension(),matrix.getColumnDimension()));
-
-        List<UserProfileKDEModel> models = List$.MODULE$.empty();
-
         computeStats(matrix);
-
         computeProbabilityDensityEstimation(matrix);
-
-        UserProfileKDEModel userprofileKDEModel = UserProfileKDEModel$.MODULE$.apply(System.currentTimeMillis(),site,user, statistics, minProbabilityEstimate, maxProbabilityEstimate, nintyFivePercentileEstimate, medianProbabilityEstimate);
-        //UserProfileKDEModel userprofileKDEModel = UserProfileKDEModel$.MODULE$.apply(user, statistics.t, minProbabilityEstimate, maxProbabilityEstimate, nintyFivePercentileEstimate, medianProbabilityEstimate);
-        models = new $colon$colon(userprofileKDEModel, models);
-        return models;
+        UserProfileKDEModel userprofileKDEModel = new UserProfileKDEModel(System.currentTimeMillis(),site,user, statistics, minProbabilityEstimate, maxProbabilityEstimate, nintyFivePercentileEstimate, medianProbabilityEstimate);
+        return Arrays.asList(userprofileKDEModel);
     }
 
     @Override

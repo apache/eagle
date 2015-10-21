@@ -26,7 +26,6 @@ import scala.util.{Failure, Success, Try}
 /**
  * @since  9/10/15
  */
-
 trait Executable[T]{
   def execute:(SchedulerContext => Try[T])
 }

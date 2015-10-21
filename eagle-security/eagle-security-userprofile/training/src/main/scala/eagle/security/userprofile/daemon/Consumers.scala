@@ -26,7 +26,6 @@ import scala.util.{Failure, Success}
 /**
  * @since  9/10/15
  */
-
 abstract class CommandConsumer extends UntypedActor with ActorLogging{
   @volatile var dao:UserProfileCommandDao = null
   @volatile var config:SchedulerContext=null
