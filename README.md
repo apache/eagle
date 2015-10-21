@@ -2,7 +2,7 @@
 
 >  Secure Hadoop Data in Real Time
 
-Eagle is an Open Source Monitoring solution for Hadoop to instantly identify access to sensitive data, recognize attacks, malicious activities in hadoop and take actions. 
+Eagle is an Open Source Monitoring solution, contributed by eBay Inc, to instantly identify access to sensitive data, recognize attacks, malicious activities in Hadoop and take actions in real time. 
 
 For more details, see the website [http://goeagle.io](http://goeagle.io).
 
