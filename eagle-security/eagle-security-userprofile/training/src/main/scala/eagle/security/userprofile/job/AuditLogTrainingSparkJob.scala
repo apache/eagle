@@ -25,6 +25,16 @@ import org.joda.time.Period
 
 import scala.collection.mutable
 
+/**
+ * Audit Log UserProfileTrainingJob Implementation
+ *
+ * @param site site
+ * @param input input path
+ * @param master  spark master
+ * @param appName spark application name
+ * @param cmdTypes command features
+ * @param period model aggregation granularity
+ */
 case class AuditLogTrainingSparkJob(
     site:String = null,
     var input:String=null,

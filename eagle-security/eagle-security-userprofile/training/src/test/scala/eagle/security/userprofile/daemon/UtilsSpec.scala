@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eagle.security.userprofile.scheduler
+package eagle.security.userprofile.daemon
 
-import eagle.security.userprofile.daemon.Utils
 import eagle.common.DateTimeUtil
 import org.joda.time.Period
 import org.scalatest._
@@ -25,7 +24,7 @@ import org.scalatest._
  * @since  9/2/15
  */
 class UtilsSpec extends FlatSpec with Matchers{
-  import Utils._
+  import eagle.security.userprofile.daemon.Utils._
 
   it should "formatPathWithMilliseconds " in {
     formatPathWithMilliseconds("/tmp/path/to/log.${yyyy-MM-dd-hh}.gz")(DateTimeUtil.humanDateToMilliseconds("2015-09-02 10:32:17,000")) should be ("/tmp/path/to/log.2015-09-02-10.gz")

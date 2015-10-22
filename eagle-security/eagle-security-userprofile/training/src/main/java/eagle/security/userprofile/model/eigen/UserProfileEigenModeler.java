@@ -25,11 +25,11 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.collection.immutable.$colon$colon;
-import scala.collection.immutable.List;
-import scala.collection.immutable.List$;
 
-public class UserProfileEigenModeler implements UserProfileModeler<UserProfileEigenModel,UserProfileContext> {
+import java.util.Arrays;
+import java.util.List;
+
+public class UserProfileEigenModeler extends JavaUserProfileModeler<UserProfileEigenModel,UserProfileContext> {
 
     private final String[] cmdTypes;
     private UserCommandStatistics[] statistics;
@@ -237,16 +237,10 @@ public class UserProfileEigenModeler implements UserProfileModeler<UserProfileEi
         double minDistance = 0.0;
         RealVector p1 = null, p2 = null;
         if(LOG.isDebugEnabled()) LOG.debug("Training data transpose size: " + trainingDataTranspose.getRowDimension() + "x" + trainingDataTranspose.getColumnDimension());
-        //maximumL2Norm = new ArrayRealVector(size);
         for(int i = 0; i < trainingDataTranspose.getRowDimension(); i++){
             RealVector iRowVector = new ArrayRealVector(trainingDataTranspose.getRow(i));
-            //LOG.info("column training data vector : " + i + " " + trainingDataTranspose.getColumnVector(column).getEntry(i));
             RealVector transposePC1Vect = transposePC1.getRowVector(0);
-            //LOG.info("pc1 vector size: " + transposePC1Vect.getDimension());
-            //for(int p = i+1; p < trainingDataTranspose.getRowDimension();p++){
-            //RealVector iPlusOneRowVector = trainingDataTranspose.getRowVector(p);
             double distance = iRowVector.getDistance(transposePC1Vect);
-            //LOG.info("distance for row: " + i + " " + distance);
             if(distance > maxDistance){
                 maxDistance = distance;
                 p1 = iRowVector;
@@ -264,8 +258,7 @@ public class UserProfileEigenModeler implements UserProfileModeler<UserProfileEi
     }
 
     @Override
-    public List<UserProfileEigenModel> build(String site, String user, RealMatrix matrix) {
-        List<UserProfileEigenModel> models = List$.MODULE$.empty();
+    public List<UserProfileEigenModel> generate(String site, String user, RealMatrix matrix) {
         LOG.info(String.format("Receive aggregated user activity matrix: %s size: %s x %s",user,matrix.getRowDimension(),matrix.getColumnDimension()));
         computeStats(matrix);
         RealMatrix normalizedInputMatrix = normalizeData(matrix);
@@ -279,44 +272,21 @@ public class UserProfileEigenModeler implements UserProfileModeler<UserProfileEi
         if(normalizedInputMatrix.getColumnDimension() == lowVariantColumnCount){
             LOG.info("found user: " + user + " with all features being low variant. Nothing to do...");
             UserProfileEigenModel noopModel = UserProfileEigenModel$.MODULE$.apply(System.currentTimeMillis(),site,user,null,null,0,null,null,null,null,null,statistics);
-            return new $colon$colon(noopModel, models);
+            return Arrays.asList(noopModel);
         }
         else {
             computeCovarianceAndSVD(normalizedInputMatrix, lowVariantColumnCount);
             computeDimensionWithMaxVariance();
             computePrincipalComponents();
-            // LOG.info("principal components size: " + principalComponents.length);
             maximumL2Norm = new ArrayRealVector(principalComponents.length);
             minimumL2Norm = new ArrayRealVector(principalComponents.length);
 
             for (int i = 0; i < principalComponents.length; i++) {
                 RealMatrix trainingDataTranspose = computeMaxDistanceOnPCs(i);
-                //LOG.info("L2 Norm for dimension " + i + ":" + maximumL2Norm.getEntry(i));
             }
 
-        /*for(int i=0; i < uMatrix.getRowDimension(); i++){
-            for(int j=0; j < uMatrix.getColumnDimension(); j++){
-                LOG.info("uMatrix matrix: " + uMatrix.getEntry(i, j));
-            }
-        }*/
-
-            // LOG.info("dimension: " + dimension);
-            //		LOG.info("Eagle host: " + input.get(2));
-            //		LOG.info("Eagle port: " + input.get(3));
-            //		LOG.info("Eagle persist enabled: " + input.get(4));
-            //
-            //		String eagleServiceHost = (String)input.get(2);
-            //		String eagleServicePort = (String)input.get(3);
-            //		boolean eaglePersistEnabled = (Boolean)input.get(4);
-
-            // EigenTrainingModelResult eigenModelResult = new EigenTrainingModelResult(outputLocation, eagleServiceHost, eagleServicePort, eaglePersistEnabled);
-            // eigenModelResult.createModelJsonSerializer(user, ALGO, uMatrix, diagonalMatrix, dimension, minVector, maxVector, principalComponents, maximumL2Norm, minimumL2Norm, statistics);
-            // outputCollector.collect(new ValuesArray(user, uMatrix));
             UserProfileEigenModel userprofileEigenModel = UserProfileEigenModel$.MODULE$.apply(System.currentTimeMillis(),site,user, uMatrix, diagonalMatrix, dimension, minVector, maxVector, principalComponents, maximumL2Norm, minimumL2Norm, statistics);
-            //UserProfileKDEModel userprofileKDEModel = UserProfileKDEModel$.MODULE$.apply(user, statistics.t, minProbabilityEstimate, maxProbabilityEstimate, nintyFivePercentileEstimate, medianProbabilityEstimate);
-            models = new $colon$colon(userprofileEigenModel, models);
-
-            return models;
+            return Arrays.asList(userprofileEigenModel);
         }
     }
 

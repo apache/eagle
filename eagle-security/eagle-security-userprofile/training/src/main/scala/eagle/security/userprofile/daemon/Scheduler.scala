@@ -23,10 +23,14 @@ import eagle.dataproc.util.ConfigOptionParser
 import scala.concurrent.duration._
 
 /**
+ * User Profile Daemon Scheduler
+ *
  * @since  9/11/15
  */
-
 class Scheduler(config:SchedulerContext) {
+  /**
+   * Start Daemon Scheduler
+   */
   def start(): Unit = {
     val system = ActorSystem(SchedulerContext.SchedulerSystem)
 

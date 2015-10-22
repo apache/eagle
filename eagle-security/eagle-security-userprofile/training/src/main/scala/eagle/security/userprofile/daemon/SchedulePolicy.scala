@@ -22,9 +22,9 @@ import org.joda.time.{LocalDate, Period}
 import scala.collection.mutable
 
 /**
- * @since  9/5/15
- */
-/**
+ * User Profile Daemon Schedule Policy
+ * Configure scheduler by defining policy for managing status
+ *
  * @since  9/5/15
  */
 trait SchedulePolicy{

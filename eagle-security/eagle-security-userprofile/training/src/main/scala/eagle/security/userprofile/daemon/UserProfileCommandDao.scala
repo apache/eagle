@@ -29,12 +29,20 @@ import eagle.log.entity.GenericServiceAPIResponseEntity
 import eagle.service.client.impl.EagleServiceClientImpl
 
 /**
+ * User Profile Command Dao By Eagle Service
  * @since  9/11/15
  */
 class UserProfileCommandDao(host:String,port:Int,username:String,password:String,actor:UntypedActor){
   val client = new EagleServiceClientImpl(host,port,username,password)
   val log = Logging.getLogger(actor)
 
+  /**
+   * readNewInitializedCommandByType
+   *
+   * @param site eagle site name
+   * @param commandType command type
+   * @return Future
+   */
   def readNewInitializedCommandByType(site:String,commandType: COMMAND_TYPE.TYPE) = {
     Futures.future(new Callable[Option[java.util.List[ScheduleCommandEntity]]]{
       override def call(): Option[java.util.List[ScheduleCommandEntity]] = {
@@ -53,6 +61,14 @@ class UserProfileCommandDao(host:String,port:Int,username:String,password:String
     },actor.getContext().dispatcher)
   }
 
+  /**
+   * updateCommandStatus
+   *
+   * @param task task entity
+   * @param status task status
+   * @param message message string
+   * @return
+   */
   def updateCommandStatus(task:ScheduleCommandEntity,status:STATUS,message:String) ={
     Futures.future(new Callable[GenericServiceAPIResponseEntity[String]] {
       override def call(): GenericServiceAPIResponseEntity[String] = {

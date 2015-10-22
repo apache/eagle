@@ -22,6 +22,8 @@ import eagle.security.userprofile.sink.{UserActivityAggRDDSink, UserProfileModel
 import scala.collection.mutable
 
 /**
+ * User Profile Training Job Interface
+ *
  * @since  7/19/15
  */
 trait UserProfileTrainingJob {
