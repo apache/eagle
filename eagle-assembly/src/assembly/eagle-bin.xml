@@ -186,6 +186,13 @@
                 <include>eagle-security-userprofile-training-*-assembly.jar</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/lib/userprofile/data</directory>
+            <outputDirectory>lib/userprofile/data</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+        </fileSet>
 
         <fileSet>
             <directory>${project.basedir}/../eagle-security/eagle-security-userprofile/training/target/lib</directory>
