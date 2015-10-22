@@ -1,8 +1,6 @@
 language: java
 jdk:
     - oraclejdk7
-install:
-    - mvn install -DskipTests=true
 script:
     - mvn clean compile -DskipTests=true -Dmaven.javadoc.skip=true
 cache:
