@@ -123,5 +123,6 @@ public class TestSiddhiEvaluator {
 		evaluator.evaluate(new ValuesArray(context, "hdfsAuditLogEventStream", data1));
 		Thread.sleep(2 * 1000);
 		Assert.assertEquals(alertCount, 1);
+		StreamMetadataManager.getInstance().reset();
 	}
 }

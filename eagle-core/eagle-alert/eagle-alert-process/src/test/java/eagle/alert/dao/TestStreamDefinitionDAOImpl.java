@@ -33,7 +33,7 @@ import eagle.alert.siddhi.StreamMetadataManager;
 import eagle.service.client.IEagleServiceClient;
 import eagle.service.client.impl.EagleServiceClientImpl;
 
-public class TestStreamDefinitionDAOImpl extends AlertTestBase{
+public class TestStreamDefinitionDAOImpl {
 	
 	public AlertStreamSchemaEntity buildTestStreamDefEntity(String programId, String streamName, String attrName) {
 		AlertStreamSchemaEntity entity = new AlertStreamSchemaEntity();
@@ -50,31 +50,22 @@ public class TestStreamDefinitionDAOImpl extends AlertTestBase{
 	
 	@Test
 	public void test() throws Exception{
-		hbase.createTable("streamMetadata", "f");
-		System.setProperty("config.resource", "/application.conf");
-
         Config config = ConfigFactory.load();
-		String eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-		int eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-
-		AlertStreamSchemaDAO dao = new AlertStreamSchemaDAOImpl(eagleServiceHost, eagleServicePort);
-		
-		List<AlertStreamSchemaEntity> list = new ArrayList<AlertStreamSchemaEntity>();
-		String programId = "UnitTest";
-		list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr1"));
-		list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr2"));
-		list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr3"));
-		list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr4"));
-		IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort);
-		client.create(list);
-		
-		Thread.sleep(5000);
+		AlertStreamSchemaDAO dao = new AlertStreamSchemaDAOImpl(null, null) {
+			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception {
+				List<AlertStreamSchemaEntity> list = new ArrayList<AlertStreamSchemaEntity>();
+				String programId = "UnitTest";
+				list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr1"));
+				list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr2"));
+				list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr3"));
+				list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr4"));
+				return list;
+			}
+		};
 
 		StreamMetadataManager.getInstance().init(config, dao);
 		Map<String, List<AlertStreamSchemaEntity>> retMap = StreamMetadataManager.getInstance().getMetadataEntitiesForAllStreams();
 		Assert.assertTrue(retMap.get("TestStream").size() == 4);
-		
-		client.delete(list);
-		client.close();
+		StreamMetadataManager.getInstance().reset();
 	}
 }
