@@ -69,13 +69,13 @@ class UserProfileCommandConsumer extends CommandConsumer{
         log.info(s"Executed successfully, returned: $message")
         if (cmd.persistable)
           dao.updateCommandStatus(entity, STATUS.SUCCEEDED, message) recover {
-            case ex: Throwable => log.error(s"Failed to update status of [$entity] as SUCCEEDED, due to exception" + ex.getMessage, ex)
+            case ex: Throwable => log.error(ex, s"Failed to update status of [$entity] as SUCCEEDED, due to exception" + ex.getMessage)
           }
       case Failure(ex) =>
-        log.error(s"Failed to execute: ${cmd.shell},due to: ${ex.getMessage}", ex)
+        log.error(ex, s"Failed to execute: ${cmd.shell},due to: ${ex.getMessage}")
         if (cmd.persistable) {
           dao.updateCommandStatus(entity, STATUS.FAILED, EagleExceptionWrapper.wrap(ex.asInstanceOf[Exception])) recover {
-            case ex: Throwable => log.error(s"Failed to update status of [$entity]  as SUCCEEDED, due to exception: " + ex.getMessage, ex)
+            case ex: Throwable => log.error(ex, s"Failed to update status of [$entity]  as SUCCEEDED, due to exception: " + ex.getMessage)
         }
        }
     }

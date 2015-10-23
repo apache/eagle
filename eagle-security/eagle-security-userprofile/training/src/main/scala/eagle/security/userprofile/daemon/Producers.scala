@@ -94,15 +94,17 @@ class PersistedCommandProducer extends UntypedActor with ActorLogging{
                       log.error(s"Got exception to update status as PENDING for command:$entity, due to service exception: ${response.getException}")
                     }
                   case Failure(ex) =>
-                    log.error(s"Got exception to update status as PENDING for command:$entity, due to: ${ex.getMessage}",ex)
+                    log.error(ex, s"Got exception to update status as PENDING for command:$entity, due to: ${ex.getMessage}")
                 }
               }
             case None =>
-              if(log.isDebugEnabled) log.debug("Loaded 0 new $category commands")
+              if(log.isDebugEnabled) {
+                log.debug(s"Loaded 0 new $category commands")
+              }
           }
         case Failure(exception:Exception) => {
-          log.error(s"Failed to get commands for site = [$site] and category = [$category], due to ${exception.getMessage}",exception)
-      }
+          log.error(exception, s"Failed to get commands for site = [$site] and category = [$category], due to ${exception.getMessage}")
+        }
     }
   }
 
