@@ -44,6 +44,7 @@ public class TestSiddhiStreamMetadataUtils {
 		});
 		String siddhiStreamDef = SiddhiStreamMetadataUtils.convertToStreamDef("testStreamName");
 		Assert.assertEquals("define stream " + "testStreamName" + "(eagleAlertContext object,attrName1 string,attrName2 long);", siddhiStreamDef);
+		StreamMetadataManager.getInstance().reset();
 	}
 	
 	private AlertStreamSchemaEntity generateStreamMetadataAPIEntity(final String attrName, String attrType){

@@ -65,16 +65,14 @@ public class EmbeddedHbase {
 	    	util = new HBaseTestingUtility();
 	        Configuration conf= util.getConfiguration();
 	        conf.setInt("test.hbase.zookeeper.property.clientPort", port);
-	        //conf.setInt("hbase.zookeeper.property.clientPort", port);
 	        conf.set("zookeeper.znode.parent", znode);
 	        conf.setInt("hbase.zookeeper.property.maxClientCnxns", 100);
 	        conf.setInt("hbase.master.info.port", -1);//avoid port clobbering
-	        
 	        // start mini hbase cluster
 	        hBaseCluster = util.startMiniCluster();
 	        Configuration config = hBaseCluster.getConf();
 	        
-	        config.set("zookeeper.session.timeout", "1200000");
+	        config.set("zookeeper.session.timeout", "120000");
 	        config.set("hbase.zookeeper.property.tickTime", "6000");
 	        config.set(HConstants.HBASE_CLIENT_PAUSE, "3000");
 	        config.set(HConstants.HBASE_CLIENT_RETRIES_NUMBER, "1");
@@ -88,14 +86,13 @@ public class EmbeddedHbase {
 	        }); 
     	}
     	catch (Throwable t) {
-    		LOG.info("Got an exception, " + t , t.getCause());
+    		LOG.error("Got an exception: ",t);
     	}
     }
 
     public void shutdown() {    	
     	try {
             util.shutdownMiniCluster();
-            //testUtil.cleanupTestDir();
         }
     	catch (Throwable t) {
     		LOG.info("Got an exception, " + t , t.getCause());

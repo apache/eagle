@@ -32,12 +32,13 @@ import eagle.service.client.impl.EagleServiceClientImpl;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-public class TestAlertDefinitionDAOImpl extends AlertTestBase{
+public class TestAlertDefinitionDAOImpl {
 
-	public AlertDefinitionAPIEntity buildTestAlertDefEntity(String programId, String alertExecutorId, String policyId, String policyType) {
+	public AlertDefinitionAPIEntity buildTestAlertDefEntity(String site, String programId, String alertExecutorId, String policyId, String policyType) {
 		AlertDefinitionAPIEntity entity = new AlertDefinitionAPIEntity();
 		entity.setEnabled(true);
 		Map<String, String> tags = new HashMap<String, String>();
+		tags.put("site", site);
 		tags.put("programId", programId);
 		tags.put("alertExecutorId", alertExecutorId);
 		tags.put("policyId", policyId);
@@ -48,32 +49,28 @@ public class TestAlertDefinitionDAOImpl extends AlertTestBase{
 	
 	@Test
 	public void test() throws Exception{
-		hbase.createTable("alertdef", "f");
-		System.setProperty("config.resource", "/application.conf");
 		Config config = ConfigFactory.load();
 		String eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
 		int eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
 
-		List<AlertDefinitionAPIEntity> list = new ArrayList<AlertDefinitionAPIEntity>();
-        String site = "sandbox";
+		String site = "sandbox";
 		String dataSource = "UnitTest";
-		list.add(buildTestAlertDefEntity(dataSource, "TestExecutor1", "TestPolicyIDA", "TestPolicyTypeA"));
-		list.add(buildTestAlertDefEntity(dataSource, "TestExecutor1", "TestPolicyIDB", "TestPolicyTypeB"));
-		list.add(buildTestAlertDefEntity(dataSource, "TestExecutor2", "TestPolicyIDC", "TestPolicyTypeC"));
-		list.add(buildTestAlertDefEntity(dataSource, "TestExecutor2", "TestPolicyIDD", "TestPolicyTypeD"));
-		IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort);
-		client.create(list);
-		
-		AlertDefinitionDAO dao = new AlertDefinitionDAOImpl(eagleServiceHost, eagleServicePort);
-		dao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
-				
+		AlertDefinitionDAO dao = new AlertDefinitionDAOImpl(eagleServiceHost, eagleServicePort) {
+			@Override
+			public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) throws Exception {
+				List<AlertDefinitionAPIEntity> list = new ArrayList<AlertDefinitionAPIEntity>();
+				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor1", "TestPolicyIDA", "TestPolicyTypeA"));
+				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor1", "TestPolicyIDB", "TestPolicyTypeB"));
+				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor2", "TestPolicyIDC", "TestPolicyTypeC"));
+				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor2", "TestPolicyIDD", "TestPolicyTypeD"));
+				return list;
+			}
+		};
+
 		Map<String, Map<String, AlertDefinitionAPIEntity>> retMap = dao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
 		
 		Assert.assertEquals(2, retMap.size());
 		Assert.assertEquals(2, retMap.get("TestExecutor1").size());
 		Assert.assertEquals(2, retMap.get("TestExecutor2").size());
-		
-		client.delete(list);
-		client.close();
 	}
 }
