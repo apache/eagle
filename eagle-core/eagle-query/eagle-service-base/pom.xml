@@ -31,6 +31,12 @@
 	<name>eagle-service-base</name>
 
 	<dependencies>
+        <!-- put eagle-storage-base dependency at the top for using asm 4.0 jar !-->
+        <dependency>
+            <groupId>eagle</groupId>
+            <artifactId>eagle-storage-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
@@ -43,11 +49,6 @@
         <dependency>
             <groupId>eagle</groupId>
             <artifactId>eagle-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eagle</groupId>
-            <artifactId>eagle-storage-base</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
