@@ -32,6 +32,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>net.sf.extcos</groupId>
+			<artifactId>extcos</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>eagle</groupId>
 			<artifactId>eagle-common</artifactId>
             <version>${project.version}</version>
@@ -40,10 +44,6 @@
 			<groupId>eagle</groupId>
 			<artifactId>eagle-antlr</artifactId>
             <version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.extcos</groupId>
-			<artifactId>extcos</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hbase</groupId>
