@@ -79,7 +79,7 @@ public class EmbeddedServer {
 		} catch (Exception ex) {
 			LOG.error("Got an exception " + ex.getMessage());
 		}
-		
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -91,6 +91,11 @@ public class EmbeddedServer {
             	}
             }
         });
+		try {
+			Thread.sleep(10000000);
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
 	}
 	
 	public void shutdown() throws Throwable {

@@ -18,7 +18,7 @@ import eagle.service.security.hive.dao.HiveSensitivityMetadataDAOImpl;
 import org.junit.Test;
 
 public class TestHiveSensitivityDAO {
-    @Test
+    //@Test
     public void testHiveSensitivityDAO(){
         HiveSensitivityMetadataDAOImpl dao = new HiveSensitivityMetadataDAOImpl();
         System.out.println(dao.getAllHiveSensitivityMap());

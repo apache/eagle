@@ -22,7 +22,7 @@ import eagle.service.security.hdfs.rest.HDFSResourceWebResource;
 
 public class HDFSResourceWebTest {
 
-	@Test
+	//@Test
 	public void testWebHDFSResourceAPI()
 	{
 		HDFSResourceWebResource resource = new HDFSResourceWebResource();

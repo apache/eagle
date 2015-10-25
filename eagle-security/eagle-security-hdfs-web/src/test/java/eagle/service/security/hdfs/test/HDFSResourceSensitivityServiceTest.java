@@ -22,7 +22,7 @@ import eagle.service.security.hdfs.HDFSResourceSensitivityService;
 
 public class HDFSResourceSensitivityServiceTest {
 
-	@Test
+	//@Test
 	public void testgetAllFileSensitivityService()
 	{
 		HDFSResourceSensitivityService service  = new HDFSResourceSensitivityService();
@@ -30,7 +30,7 @@ public class HDFSResourceSensitivityServiceTest {
 		
 	}
 	
-	@Test
+	//@Test
 	public void testgetFileSensitivityBySite()
 	{
 		HDFSResourceSensitivityService service  = new HDFSResourceSensitivityService();

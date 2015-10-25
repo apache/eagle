@@ -16,21 +16,17 @@
  */
 package eagle.alert.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import eagle.alert.entity.AlertDefinitionAPIEntity;
 import eagle.common.config.EagleConfigConstants;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eagle.alert.base.AlertTestBase;
-import eagle.alert.entity.AlertDefinitionAPIEntity;
-import eagle.service.client.IEagleServiceClient;
-import eagle.service.client.impl.EagleServiceClientImpl;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TestAlertDefinitionDAOImpl {
 

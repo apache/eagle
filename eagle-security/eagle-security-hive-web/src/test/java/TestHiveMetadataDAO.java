@@ -22,7 +22,7 @@ import eagle.service.security.hive.dao.HiveMetadataDAO;
 import org.junit.Test;
 
 public class TestHiveMetadataDAO {
-    @Test
+   // @Test
     public void testHiveMetadataByMetastoreDB() throws Exception{
         HiveMetadataAccessConfig config = new HiveMetadataAccessConfig();
         config.setJdbcDriverClassName("com.mysql.jdbc.Driver");
@@ -35,7 +35,7 @@ public class TestHiveMetadataDAO {
         System.out.println(impl.getColumns("xademo", "call_detail_records"));
     }
 
-    @Test
+    //@Test
     public void testHiveMetadataByHiveServer2() throws Exception{
         HiveMetadataAccessConfig config = new HiveMetadataAccessConfig();
         config.setJdbcDriverClassName("org.apache.hive.jdbc.HiveDriver");
