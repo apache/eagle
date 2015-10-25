@@ -24,17 +24,18 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import eagle.alert.dao.AlertDefinitionDAO;
 import eagle.alert.entity.AlertDefinitionAPIEntity;
+import junit.framework.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestDynamicPolicyLoader {
 	private final static Logger LOG = LoggerFactory.getLogger(TestDynamicPolicyLoader.class);
-	
+
 	@Test
 	public void test() throws Exception{
-		System.setProperty("config.resource", "/application.conf");
-        Config config = ConfigFactory.load();
+		System.setProperty("config.resource", "/unittest.conf");
+		Config config = ConfigFactory.load();
 		Map<String, PolicyLifecycleMethods> policyChangeListeners = new HashMap<String, PolicyLifecycleMethods>();
 		policyChangeListeners.put("testAlertExecutorId", new PolicyLifecycleMethods() {
 			@Override
@@ -44,17 +45,18 @@ public class TestDynamicPolicyLoader {
 			
 			@Override
 			public void onPolicyCreated(Map<String, AlertDefinitionAPIEntity> added) {
+				Assert.assertTrue(added.size() == 1);
 				LOG.info("added : " + added);
 			}
 			
 			@Override
 			public void onPolicyChanged(Map<String, AlertDefinitionAPIEntity> changed) {
+				Assert.assertTrue(changed.size() == 1);
 				LOG.info("changed :" + changed);
 			}
 		});
 		
-		Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs = 
-				new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
+		Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
 		initialAlertDefs.put("testAlertExecutorId", new HashMap<String, AlertDefinitionAPIEntity>());
 		Map<String, AlertDefinitionAPIEntity> map = initialAlertDefs.get("testAlertExecutorId");
 		map.put("policyId_1", buildTestAlertDefEntity("testProgramId", "testAlertExecutorId", "policyId_1", "siddhi", "policyDef_1"));
@@ -64,8 +66,7 @@ public class TestDynamicPolicyLoader {
 			@Override
 			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(
 					String site, String dataSource) {
-				Map<String, Map<String, AlertDefinitionAPIEntity>> currentAlertDefs = 
-						new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
+				Map<String, Map<String, AlertDefinitionAPIEntity>> currentAlertDefs = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
 				currentAlertDefs.put("testAlertExecutorId", new HashMap<String, AlertDefinitionAPIEntity>());
 				Map<String, AlertDefinitionAPIEntity> map = currentAlertDefs.get("testAlertExecutorId");
 				map.put("policyId_1", buildTestAlertDefEntity("testProgramId", "testAlertExecutorId", "policyId_1", "siddhi", "policyDef_1_1"));
@@ -83,7 +84,7 @@ public class TestDynamicPolicyLoader {
 		loader.init(initialAlertDefs, dao, config);
 		
 		try{
-			Thread.sleep(100000);
+			Thread.sleep(5000);
 		}catch(Exception ex){
 			
 		}

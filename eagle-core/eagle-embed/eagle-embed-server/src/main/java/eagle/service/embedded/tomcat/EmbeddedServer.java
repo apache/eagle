@@ -91,11 +91,6 @@ public class EmbeddedServer {
             	}
             }
         });
-        try {
-            Thread.sleep(10000000);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
 	}
 	
 	public void shutdown() throws Throwable {

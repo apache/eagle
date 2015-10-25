@@ -89,7 +89,16 @@ public class StreamMetadataManager {
             LOG.info("Already initialized, skip");
         }
 	}
-	
+
+	// Only for unit test purpose
+	public void reset() {
+		synchronized (this) {
+			initialized = false;
+			map.clear();
+			map2.clear();
+		}
+	}
+
 	private void ensureInitialized(){
 		if(!initialized)
 			throw new IllegalStateException("StreamMetadataManager should be initialized before using it");

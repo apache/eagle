@@ -49,8 +49,8 @@ damControllers.controller('userProfileListCtrl', function(globalContent, Site, d
 				version: unit.version
 			};
 
-			// KDE
-			if(unit.tags.algorithm === "KDE") {
+			// DE
+			if(unit.tags.algorithm === "DE") {
 				var _statistics = common.parseJSON(unit.content);
 				_statistics = common.getValueByPath(_statistics, "statistics", []);
 				_user[unit.tags.algorithm].topCommands = $.map(common.array.top(_statistics, "mean"), function(command) {
@@ -182,14 +182,14 @@ damControllers.controller('userProfileDetailCtrl', function(globalContent, Site,
 			$scope.profiles[unit.tags.algorithm] = unit;
 		});
 
-		// KDE
-		if($scope.profiles.KDE) {
-			$scope.profiles.KDE._chart = {};
+		// DE
+		if($scope.profiles.DE) {
+			$scope.profiles.DE._chart = {};
 
-			$scope.profiles.KDE.estimates = {};
-			$.each($scope.profiles.KDE._content, function(key, value) {
+			$scope.profiles.DE.estimates = {};
+			$.each($scope.profiles.DE._content, function(key, value) {
 				if(key !== "statistics") {
-					$scope.profiles.KDE.estimates[key] = value;
+					$scope.profiles.DE.estimates[key] = value;
 				}
 			});
 
@@ -197,13 +197,13 @@ damControllers.controller('userProfileDetailCtrl', function(globalContent, Site,
 			var _stddevList = [];
 			var _categoryList = [];
 
-			$.each($scope.profiles.KDE._content.statistics, function(i, unit) {
+			$.each($scope.profiles.DE._content.statistics, function(i, unit) {
 				_meanList[i] = unit.mean;
 				_stddevList[i] = unit.stddev;
 
 				_categoryList[i] = unit.commandName;
 			});
-			$scope.profiles.KDE._chart.series = [
+			$scope.profiles.DE._chart.series = [
 				{
 					name: "mean",
 					data: _meanList
@@ -219,10 +219,10 @@ damControllers.controller('userProfileDetailCtrl', function(globalContent, Site,
 			];
 
 			// Percentage table list
-			$scope.profiles.KDE.meanList = [];
-			var _total = common.array.sum($scope.profiles.KDE._content.statistics, "mean");
-			$.each($scope.profiles.KDE._content.statistics, function(i, unit) {
-				$scope.profiles.KDE.meanList.push({
+			$scope.profiles.DE.meanList = [];
+			var _total = common.array.sum($scope.profiles.DE._content.statistics, "mean");
+			$.each($scope.profiles.DE._content.statistics, function(i, unit) {
+				$scope.profiles.DE.meanList.push({
 					command: unit.commandName,
 					percentage: unit.mean / _total
 				});
