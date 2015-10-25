@@ -42,7 +42,7 @@ import java.util.UUID;
 public class TestTorque {
     final static Logger LOG = LoggerFactory.getLogger(TestTorque.class);
 
-    @Before
+    //@Before
     public void setUp() throws TorqueException {
         Configuration configuration = new BaseConfiguration();
         configuration.addProperty("torque.database.default","eagle");

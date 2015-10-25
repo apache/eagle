@@ -111,7 +111,7 @@ public class TestHBaseLogReader2 {
 
 			// for timezone difference between UTC & localtime, enlarge the search range
 			queryStartTimestamp = timestamp1-24*60*60*1000;
-			queryEndTimestamp = timestamp2+60*60*1000+1000;  // eagle timestamp is rounded to seconds
+			queryEndTimestamp = timestamp2+24*60*60*1000;  // eagle timestamp is rounded to seconds
 			condition.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryStartTimestamp));
 			condition.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryEndTimestamp));
 			reader = new GenericEntityBatchReader(serviceName, condition); 
