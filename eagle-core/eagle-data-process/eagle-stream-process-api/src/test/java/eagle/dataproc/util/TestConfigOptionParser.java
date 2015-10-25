@@ -50,7 +50,7 @@ public class TestConfigOptionParser {
         Assert.assertEquals("value2", config.get("key2"));
         Assert.assertEquals("value3=something",config.get("key3"));
         Assert.assertEquals("",config.get("key4"));
-        Assert.assertEquals("\"having whitespace",config.get("key5"));
+        Assert.assertEquals("\"--param having whitespace",config.get("key5"));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class TestConfigOptionParser {
             new ConfigOptionParser().parseConfig(arguments);
             Assert.fail("Should throw ParseException");
         } catch (ParseException e) {
-            LOG.info("Expected exception",e);
+            LOG.info("Expected exception: " +e.getMessage());
         }
     }
 
@@ -99,7 +99,7 @@ public class TestConfigOptionParser {
             new ConfigOptionParser().parseConfig(arguments);
             Assert.fail("Should throw ParseException");
         } catch (ParseException e) {
-            LOG.info("Expected exception",e);
+            LOG.info("Expected exception: " + e.getMessage());
         }
     }
 }

@@ -16,12 +16,20 @@
  */
 package eagle.service.hbase;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 public class TestHBaseBase {
-    protected static EmbeddedHbase hbase = EmbeddedHbase.getInstance();
-    public void createTable(String tableName, String cf) {
-   		hbase.createTable(tableName, cf);
+    protected static EmbeddedHbase hbase;
+
+    @BeforeClass
+    public static void setUpHBase() {
+        hbase = EmbeddedHbase.getInstance();
     }
-    public void deleteTable(String tableName, String cf){
-   		hbase.deleteTable(tableName);
+
+    @Test
+    public void test() {
+
     }
+
 }

@@ -29,6 +29,7 @@ import org.apache.torque.util.BasePeerImpl;
 import org.apache.torque.util.ColumnValues;
 import org.apache.torque.util.JdbcTypedValue;
 import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,5 +111,10 @@ public class TestTorque {
         columnValues.put(new ColumnImpl("unittest_testtsentity","uuid"),new JdbcTypedValue(UUID.randomUUID().toString(),Types.VARCHAR));
         columnValues.put(new ColumnImpl("unittest_testtsentity","field1"),new JdbcTypedValue(34,Types.INTEGER));
         basePeer.doInsert(columnValues);
+    }
+
+    @Test
+    public void test() {
+
     }
 }

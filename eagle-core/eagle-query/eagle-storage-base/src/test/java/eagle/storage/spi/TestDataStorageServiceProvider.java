@@ -17,6 +17,7 @@
 package eagle.storage.spi;
 
 import eagle.storage.DataStorage;
+import org.junit.Test;
 
 /**
  * @since 3/20/15
@@ -32,5 +33,10 @@ public class TestDataStorageServiceProvider implements DataStorageServiceProvide
     @Override
     public DataStorage getStorage() {
         return new TestDataStorage();
+    }
+
+    @Test
+    public void test() {
+
     }
 }

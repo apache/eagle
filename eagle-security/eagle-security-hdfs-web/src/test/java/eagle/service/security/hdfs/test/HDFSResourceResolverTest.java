@@ -28,4 +28,9 @@ public class HDFSResourceResolverTest {
 		HDFSResourceResolver resolve = new HDFSResourceResolver();
 		System.out.println(resolve.resolve(request));
 	}
+
+	@Test
+	public void test() {
+
+	}
 }

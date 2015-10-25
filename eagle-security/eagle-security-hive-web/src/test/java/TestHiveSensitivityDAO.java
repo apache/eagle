@@ -24,4 +24,9 @@ public class TestHiveSensitivityDAO {
         System.out.println(dao.getAllHiveSensitivityMap());
         System.out.println(dao.getHiveSensitivityMap("sandbox"));
     }
+
+    @Test
+    public void test() {
+
+    }
 }

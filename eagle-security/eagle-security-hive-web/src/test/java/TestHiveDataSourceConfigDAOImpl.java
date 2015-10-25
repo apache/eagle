@@ -24,4 +24,9 @@ public class TestHiveDataSourceConfigDAOImpl {
         HiveMetadataAccessConfigDAOImpl daoImpl = new HiveMetadataAccessConfigDAOImpl();
         System.out.println(daoImpl.getAllConfigs());
     }
+
+    @Test
+    public void test() {
+
+    }
 }

@@ -23,10 +23,14 @@ import eagle.service.security.hdfs.rest.HDFSResourceWebResource;
 public class HDFSResourceWebTest {
 
 	//@Test
-	public void testWebHDFSResourceAPI()
-	{
+	public void testWebHDFSResourceAPI() {
 		HDFSResourceWebResource resource = new HDFSResourceWebResource();
 		System.out.println(resource.getHDFSResource("cluster1-dc1", "/user"));
 		
+	}
+
+	@Test
+	public void test() {
+
 	}
 }

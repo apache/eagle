@@ -26,4 +26,9 @@ public class HDFSResourceConfigAccessTest {
 	{
 		System.out.println(HDFSResourceUtils.getConfig("cluster1-dc1"));
 	}
+
+	@Test
+	public void test() {
+
+	}
 }

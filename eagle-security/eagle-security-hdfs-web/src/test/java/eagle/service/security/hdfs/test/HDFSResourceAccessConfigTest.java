@@ -23,9 +23,13 @@ import org.junit.Test;
 public class HDFSResourceAccessConfigTest {
 
 	//@Test
-	public void testHDFSResourceAccessConfig() throws Exception
-	{
+	public void testHDFSResourceAccessConfig() throws Exception {
 		HDFSResourceAccessConfig config = HDFSResourceUtils.getConfig("cluster1-dc1");
 		System.out.println(config);
+	}
+
+	@Test
+	public void test() {
+
 	}
 }

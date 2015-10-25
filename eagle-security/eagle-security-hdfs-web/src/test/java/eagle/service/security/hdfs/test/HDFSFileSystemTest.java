@@ -26,4 +26,9 @@ public class HDFSFileSystemTest {
 		HDFSFileSystem fileSystem = new HDFSFileSystem("hdfs://sandbox.hortonworks.com:8020");
 		System.out.println(fileSystem.browse("/"));
 	}
+
+	@Test
+	public void test() {
+
+	}
 }

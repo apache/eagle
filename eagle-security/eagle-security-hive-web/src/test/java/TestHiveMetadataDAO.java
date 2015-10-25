@@ -47,4 +47,9 @@ public class TestHiveMetadataDAO {
         System.out.println(impl.getTables("xademo"));
         System.out.println(impl.getColumns("xademo", "call_detail_records"));
     }
+
+    @Test
+    public void test() {
+
+    }
 }
