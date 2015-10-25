@@ -32,6 +32,11 @@
 	<name>eagle-client-base</name>
 
 	<dependencies>
+        <dependency>
+            <groupId>eagle</groupId>
+            <artifactId>eagle-entity-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>eagle</groupId>
 			<artifactId>eagle-embed-server</artifactId>
@@ -44,11 +49,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>eagle</groupId>
-			<artifactId>eagle-entity-base</artifactId>
-            <version>${project.version}</version>
-		</dependency>
 		<dependency>
    			<groupId>org.codehaus.jackson</groupId>
    			<artifactId>jackson-jaxrs</artifactId>

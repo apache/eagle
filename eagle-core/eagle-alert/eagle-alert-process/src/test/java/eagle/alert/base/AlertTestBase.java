@@ -23,13 +23,13 @@ import eagle.service.hbase.EmbeddedHbase;
 
 public class AlertTestBase {
 	
-	protected static EmbeddedHbase hbase;
-	protected static EmbeddedServer server;
+	//protected static EmbeddedHbase hbase;
+	//protected static EmbeddedServer server;
 
 	@BeforeClass
 	public static void startup() throws Exception {
-		hbase = EmbeddedHbase.getInstance();
-		String webappDirLocation = "../../../eagle-webservice/target/eagle-service";
-		server = EmbeddedServer.getInstance(webappDirLocation);
+		//hbase = EmbeddedHbase.getInstance();
+		//String webappDirLocation = "../../../eagle-webservice/target/eagle-service";
+		//server = EmbeddedServer.getInstance(webappDirLocation);
 	}
 }
