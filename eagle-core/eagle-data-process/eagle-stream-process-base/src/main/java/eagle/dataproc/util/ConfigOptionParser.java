@@ -21,9 +21,7 @@ import org.apache.commons.cli.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @since 8/23/15
- */
+
 public class ConfigOptionParser extends AbstractConfigOptionParser {
     private final static String CONFIG_OPT_FLAG = "D";
 

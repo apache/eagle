@@ -43,7 +43,6 @@ import java.util.*;
  *
  * TODO: 1) thread-safe? 2) Rewrite filter expression to evaluate once
  *
- * @since 2014/11/17
  */
 public class BooleanExpressionComparator implements WritableComparable<List<KeyValue>> {
     private final static Logger LOG = LoggerFactory.getLogger(BooleanExpressionComparator.class);
