@@ -489,7 +489,7 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 													_op = _regexMatch ? "regex" : "contains";
 													_conds = $scope.policy.__.conditions[_key] = $scope.policy.__.conditions[_key] || [];
 												} else {
-													_type = "regex";
+													_type = "bool";
 												}
 											} else {
 												_type = "number";
