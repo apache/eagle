@@ -33,6 +33,7 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DoubleWritable;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,7 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 
 	@Before
 	public void setUp(){
+		hbase.createTable("unittest", "f");
 		startTime = System.currentTimeMillis();
 		try {
 			rowkeys = prepareData(num);
@@ -73,7 +75,6 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 			Assert.fail(e.getMessage());
 		}
 		endTime = System.currentTimeMillis();
-		hbase.createTable("unittest", "f");
 		table = EagleConfigFactory.load().getHTable("unittest");
 		client = new AggregateClientImpl();
 		scan = new Scan();
@@ -91,6 +92,7 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 	@After
 	public void shutdown(){
 		try {
+			hbase.deleteTable("unittest");
 			new HTableFactory().releaseHTableInterface(table);
 		} catch (IOException e) {
 			LOG.error(e.getMessage(),e);

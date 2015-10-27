@@ -29,14 +29,14 @@ object testStreamUnionExpansion extends App{
   val tail1 = env.newSource(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
   val tail2 = env.newSource(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key1",a))
   tail1.streamUnion(List(tail2)).map1(a => "xyz")
-  env.execute
+  //env.execute
 }
 
 object testStreamGroupbyExpansion extends App{
   val config : Config = ConfigFactory.load;
   val env = new StormExecutionEnvironment(config)
   env.newSource(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).groupBy(1).map2(a => ("key1",a))
-  env.execute
+  //env.execute
 }
 
 object testStreamUnionAndGroupbyExpansion extends App{
@@ -45,7 +45,7 @@ object testStreamUnionAndGroupbyExpansion extends App{
   val tail1 = env.newSource(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a)).groupBy(1)
   val tail2 = env.newSource(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key1",a)).groupBy(0)
   tail1.streamUnion(List(tail2)).map1(a => "xyz")
-  env.execute
+  //env.execute
 }
 
 /**
@@ -60,7 +60,7 @@ object testAlertExpansion extends App{
   val tail1 = env.newSource(TestSpout()).withName("testSpout1")
                   .flatMap(WordPrependForAlertExecutor("test")).withName("prepend")
                   .alertWithConsumer("s1", "alert1")
-  env.execute
+  //env.execute
 }
 
 /**
@@ -76,5 +76,5 @@ object testAlertExpansionWithUnion extends App{
   val tail1 = env.newSource(TestSpout()).withName("testSpout1").flatMap(WordPrependForAlertExecutor("test")).withName("prepend") //.map2(a => ("key1",a))
   val tail2 = env.newSource(TestSpout()).flatMap(WordAppendForAlertExecutor("test")) //.map2(a => ("key1",a))
   tail1.streamUnion(List(tail2)).alert(util.Arrays.asList("s1","s2"), "alert1", true)
-  env.execute
+  //env.execute
 }

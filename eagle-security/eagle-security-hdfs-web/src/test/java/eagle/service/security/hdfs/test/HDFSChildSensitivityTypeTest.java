@@ -28,8 +28,7 @@ import org.junit.Test;
 public class HDFSChildSensitivityTypeTest {
 
 	@Test
-	public void testChildSensitivityTest() throws Exception
-	{
+	public void testChildSensitivityTest() throws Exception {
 		List<String> directoryList = new ArrayList<>();
 		directoryList.add("/usr");
 		directoryList.add("/usr/data");

@@ -22,5 +22,5 @@ import org.jsoup.nodes.Document;
 
 public interface JobConfParser {
 	
-	public Map<String, String> parse(Document doc);
+	Map<String, String> parse(Document doc);
 }

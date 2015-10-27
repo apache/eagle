@@ -31,6 +31,11 @@
 	<name>eagle-entity-base</name>
 
 	<dependencies>
+		<!-- put extcos dependency at the top for using asm 4.0 jar !-->
+		<dependency>
+			<groupId>net.sf.extcos</groupId>
+			<artifactId>extcos</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>eagle</groupId>
 			<artifactId>eagle-common</artifactId>
@@ -40,10 +45,6 @@
 			<groupId>eagle</groupId>
 			<artifactId>eagle-antlr</artifactId>
             <version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.extcos</groupId>
-			<artifactId>extcos</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hbase</groupId>

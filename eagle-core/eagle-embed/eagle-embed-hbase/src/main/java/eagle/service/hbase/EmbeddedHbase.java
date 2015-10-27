@@ -66,7 +66,7 @@ public class EmbeddedHbase {
 	        Configuration conf= util.getConfiguration();
 	        conf.setInt("test.hbase.zookeeper.property.clientPort", port);
 	        conf.set("zookeeper.znode.parent", znode);
-	        conf.setInt("hbase.zookeeper.property.maxClientCnxns", 100);
+	        conf.setInt("hbase.zookeeper.property.maxClientCnxns", 200);
 	        conf.setInt("hbase.master.info.port", -1);//avoid port clobbering
 	        // start mini hbase cluster
 	        hBaseCluster = util.startMiniCluster();
@@ -109,7 +109,7 @@ public class EmbeddedHbase {
     		util.createTable(tableName, cf);
     	}
     	catch (Exception ex) {
-    		LOG.warn("Create table failed, probably table already existed " + ex.getMessage());
+    		LOG.warn("Create table failed, probably table already existed, table name: " + tableName);
     	}
     }
     
@@ -118,7 +118,7 @@ public class EmbeddedHbase {
     		util.deleteTable(tableName);
     	}
     	catch (Exception ex) {
-    		LOG.warn("Delete table failed, probably table not existed " + ex.getMessage());
+    		LOG.warn("Delete table failed, probably table not existed, table name: " + tableName);
     	}
     }
 

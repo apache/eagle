@@ -16,22 +16,17 @@
  */
 package eagle.alert.dao;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import eagle.alert.entity.AlertStreamSchemaEntity;
+import eagle.alert.siddhi.StreamMetadataManager;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import eagle.alert.entity.AlertStreamSchemaEntity;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import eagle.common.config.EagleConfigConstants;
-import org.junit.Assert;
-import org.junit.Test;
-
-import eagle.alert.base.AlertTestBase;
-import eagle.alert.siddhi.StreamMetadataManager;
-import eagle.service.client.IEagleServiceClient;
-import eagle.service.client.impl.EagleServiceClientImpl;
 
 public class TestStreamDefinitionDAOImpl {
 	

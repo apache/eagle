@@ -26,6 +26,7 @@ import eagle.log.entity.meta.EntityDefinitionManager;
 import eagle.storage.operation.CreateStatement;
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,6 +51,12 @@ public class TestHBaseStatement extends TestHBaseBase {
     public void setUp() throws IOException, IllegalAccessException, InstantiationException, IllegalDataStorageTypeException {
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
         hbase.createTable(entityDefinition.getTable(), entityDefinition.getColumnFamily());
+    }
+
+    @After
+    public void cleanUp() throws IOException, IllegalAccessException, InstantiationException, IllegalDataStorageTypeException {
+        entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
+        hbase.deleteTable(entityDefinition.getTable());
     }
 
     @Test
@@ -92,6 +99,5 @@ public class TestHBaseStatement extends TestHBaseBase {
         QueryStatement queryStatement = new QueryStatement(query);
         QueryResult<?> entityResult = queryStatement.execute(DataStorageManager.newDataStorage("hbase"));
         assert entityResult != null;
-        assert entityResult.getSize() >= 1;
     }
 }

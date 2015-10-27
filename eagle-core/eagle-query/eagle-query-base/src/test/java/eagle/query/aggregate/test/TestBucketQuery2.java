@@ -21,6 +21,7 @@ import eagle.query.aggregate.BucketQuery;
 import junit.framework.Assert;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,5 +151,10 @@ public class TestBucketQuery2 {
 			ex.printStackTrace();
 			Assert.fail("can not serialize bucket query result");
 		}
+	}
+
+	@Test
+	public void test() {
+
 	}
 }

@@ -13,25 +13,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package eagle.security.dataproc;
+ *//*
 
-import java.util.HashMap;
-import java.util.Map;
+package eagle.security.dataproc;
 
 import eagle.common.config.EagleConfigConstants;
 import eagle.security.auditlog.timer.IPZonePollingJob;
 import eagle.security.util.ExternalDataJoiner;
-import org.junit.Before;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
-public class TestIPZonePollingJob extends TestBase{
+public class TestIPZonePollingJob {
 	private Map<String, Object> prop = new HashMap<String, Object>();
 
-	@Before
+	//@Before
 	public void setup(){
 		prop.put(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST, "localhost");
-		prop.put(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT, 8080);
+		prop.put(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT, 38080);
 	}
 	
 	//@Test
@@ -42,3 +42,4 @@ public class TestIPZonePollingJob extends TestBase{
 		joiner.stop();
 	}
 }
+*/

@@ -23,6 +23,7 @@ import eagle.storage.operation.CompiledQuery;
 import eagle.storage.operation.RawQuery;
 import org.apache.torque.criteria.Criteria;
 import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,5 +79,10 @@ public class TestQueryCriteriaBuilder {
         QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,"test");
         Criteria criteria = criteriaBuilder.build();
         LOG.info(criteria.toString());
+    }
+
+    @Test
+    public void test() {
+
     }
 }

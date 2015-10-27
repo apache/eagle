@@ -134,7 +134,7 @@ public class TestRawAggregator {
 		List<Map<String, byte[]>> entities = new ArrayList<Map<String, byte[]>>();
 		entities.add(createQualifiers("cluster1", "dc1", "rack123", 12, 2));
 		entities.add(createQualifiers("cluster1", "dc1", "rack123", 20, 1));
-		entities.add(createQualifiers("cluster1", "dc1", "rack128", 10, 0));
+		entities.add(createQualifiers("cluster1", "dc2", "rack128", 10, 0));
 		entities.add(createQualifiers("cluster2", "dc1", "rack125", 9, 2));
 		entities.add(createQualifiers("cluster2", "dc1", "rack126", 15, 2));
 		
@@ -176,7 +176,7 @@ public class TestRawAggregator {
 			double total2 = 0.0;
 			total2 += ByteUtil.bytesToInt(entities.get(2).get("numHosts"));
 			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), total1, 0.000000000000000000000000001);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), total2, 0.000000000000000000000000001);
+			Assert.assertEquals(result.get(Arrays.asList("dc2")).get(0), total2, 0.000000000000000000000000001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -221,7 +221,7 @@ public class TestRawAggregator {
 			double total2 = 0.0;
 			total2 += ByteUtil.bytesToLong(entities.get(2).get("numClusters"));
 			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), total1, 0.00000000000000000000000001);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), total2, 0.00000000000000000000000001);
+			Assert.assertEquals(result.get(Arrays.asList("dc2")).get(0), total2, 0.00000000000000000000000001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -236,7 +236,7 @@ public class TestRawAggregator {
 		entities.add(createQualifiers("cluster1", "dc1", "rack123", 20, 1));
 		entities.add(createQualifiers("cluster1", "dc1", "rack128", 10, 0));
 		entities.add(createQualifiers("cluster2", "dc1", "rack125", 9, 2));
-		entities.add(createQualifiers("cluster2", "dc1", "rack126", 15, 2));
+		entities.add(createQualifiers("cluster2", "dc2", "rack126", 15, 2));
 		
 		RawAggregator agg = new RawAggregator(Arrays.asList("cluster"), Arrays.asList(AggregateFunctionType.sum), Arrays.asList("numHosts"), ed);
 		try{
@@ -269,7 +269,7 @@ public class TestRawAggregator {
 			Map<List<String>, List<Double>> result = agg.result();
 			Assert.assertEquals(result.size(), 2);
 			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(4), 0.00000000000000000000001);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(1), 0.00000000000000000000001);
+			Assert.assertEquals(result.get(Arrays.asList("dc2")).get(0), (double)(1), 0.00000000000000000000001);
 		}catch(Exception ex){
 			LOG.error("can not aggregate", ex);
 			Assert.fail("can not aggregate");
@@ -292,15 +292,17 @@ public class TestRawAggregator {
 				agg.qualifierCreated(e);
 			}
 			Map<List<String>, List<Double>> result = agg.result();
-			Assert.assertEquals(4, result.size());
+			Assert.assertEquals(3, result.size());
 			double total = 0.0;
 			total += ByteUtil.bytesToInt(entities.get(0).get("numHosts"));
 			total += ByteUtil.bytesToInt(entities.get(1).get("numHosts"));
+			total += ByteUtil.bytesToInt(entities.get(2).get("numHosts"));
 			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), total, 0.00000000000000000000000001);
 			
 			total = 0.0;
-			total += ByteUtil.bytesToInt(entities.get(2).get("numHosts"));
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), total, 0.0000000000000000000000001);
+			total += ByteUtil.bytesToInt(entities.get(3).get("numHosts"));
+			total += ByteUtil.bytesToInt(entities.get(4).get("numHosts"));
+			Assert.assertEquals(result.get(Arrays.asList("cluster2", "dc1")).get(0), total, 0.0000000000000000000000001);
 			
 			total = 0.0;
 			total += ByteUtil.bytesToInt(entities.get(3).get("numHosts"));
@@ -360,9 +362,8 @@ public class TestRawAggregator {
 				agg.qualifierCreated(e);
 			}
 			Map<List<String>, List<Double>> result = agg.result();
-			Assert.assertEquals(4, result.size());
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(2), 0.00000000000000000000001);
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(1), 0.000000000000000000000001);
+			Assert.assertEquals(3, result.size());
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(3), 0.00000000000000000000001);
 			Assert.assertEquals(result.get(Arrays.asList("cluster2", "dc1")).get(0), (double)(2), 0.0000000000000000000000001);
 			Assert.assertEquals(result.get(Arrays.asList("cluster2", "unassigned")).get(0), (double)(1), 0.000000000000000000001);
 		}catch(Exception ex){
@@ -395,7 +396,7 @@ public class TestRawAggregator {
 		entities.add(createQualifiers("cluster1", "dc1", "rack123", 20, 1));
 		entities.add(createQualifiers("cluster1", "dc1", "rack128", 10, 0));
 		entities.add(createQualifiers("cluster2", "dc1", "rack125", 9, 2));
-		entities.add(createQualifiers("cluster2", "dc1", "rack126", 15, 2));
+		entities.add(createQualifiers("cluster2", "dc2", "rack126", 15, 2));
 		
 		RawAggregator agg = new RawAggregator(Arrays.asList("cluster"), Arrays.asList(AggregateFunctionType.sum, AggregateFunctionType.count), 
 				Arrays.asList("numHosts", "*"), ed);
@@ -431,14 +432,10 @@ public class TestRawAggregator {
 			double total = 0.0;
 			total += ByteUtil.bytesToInt(entities.get(0).get("numHosts"));
 			total += ByteUtil.bytesToInt(entities.get(1).get("numHosts"));
+			total += ByteUtil.bytesToInt(entities.get(2).get("numHosts"));
 			total += ByteUtil.bytesToInt(entities.get(3).get("numHosts"));
-			total += ByteUtil.bytesToInt(entities.get(4).get("numHosts"));
 			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(4), 0.00000000000000000000000001);
 			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), total, 0.00000000000000000000000001);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(1), 0.00000000000000000000000000001);
-			total = 0.0;
-			total += ByteUtil.bytesToInt(entities.get(2).get("numHosts"));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), total, 0.0000000000000000000000000001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -456,22 +453,22 @@ public class TestRawAggregator {
 			double total = 0.0;
 			total += ByteUtil.bytesToInt(entities.get(0).get("numHosts"));
 			total += ByteUtil.bytesToInt(entities.get(1).get("numHosts"));
+			total += ByteUtil.bytesToInt(entities.get(2).get("numHosts"));
 			total += ByteUtil.bytesToInt(entities.get(3).get("numHosts"));
-			total += ByteUtil.bytesToInt(entities.get(4).get("numHosts"));
 			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), total, 0.0000000000000000000000000000001);
 			total = 0.0;
 			total += ByteUtil.bytesToLong(entities.get(0).get("numClusters"));
 			total += ByteUtil.bytesToLong(entities.get(1).get("numClusters"));
-			total += ByteUtil.bytesToLong(entities.get(3).get("numClusters"));
-			total += ByteUtil.bytesToLong(entities.get(4).get("numClusters"));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(2), total, 0.00000000000000000000001);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(1), 0.000000000000000000001);
-			total = 0.0;
-			total += ByteUtil.bytesToInt(entities.get(2).get("numHosts"));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), total, 0.00000000000000000000000000001);
-			total = 0.0;
 			total += ByteUtil.bytesToLong(entities.get(2).get("numClusters"));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(2), total, 0.000000000000000000000001);
+			total += ByteUtil.bytesToLong(entities.get(3).get("numClusters"));
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(2), total, 0.00000000000000000000001);
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(4), 0.000000000000000000001);
+			total = 0.0;
+			total += ByteUtil.bytesToInt(entities.get(4).get("numHosts"));
+			Assert.assertEquals(result.get(Arrays.asList("dc2")).get(1), total, 0.00000000000000000000000000001);
+			total = 0.0;
+			total += ByteUtil.bytesToLong(entities.get(4).get("numClusters"));
+			Assert.assertEquals(result.get(Arrays.asList("dc2")).get(2), total, 0.000000000000000000000001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");

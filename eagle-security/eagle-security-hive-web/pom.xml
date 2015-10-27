@@ -29,8 +29,15 @@
   <url>http://maven.apache.org</url>
   <dependencies>
       <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-server</artifactId>
+          <groupId>eagle</groupId>
+          <artifactId>eagle-entity-base</artifactId>
+          <version>${project.version}</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.slf4j</groupId>
+                  <artifactId>log4j-over-slf4j</artifactId>
+              </exclusion>
+          </exclusions>
       </dependency>
       <dependency>
           <groupId>eagle</groupId>
@@ -44,20 +51,13 @@
           </exclusions>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
-          <artifactId>eagle-security-common</artifactId>
-          <version>${project.version}</version>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-server</artifactId>
       </dependency>
       <dependency>
           <groupId>eagle</groupId>
-          <artifactId>eagle-entity-base</artifactId>
+          <artifactId>eagle-security-common</artifactId>
           <version>${project.version}</version>
-          <exclusions>
-              <exclusion>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>log4j-over-slf4j</artifactId>
-              </exclusion>
-          </exclusions>
       </dependency>
       <dependency>
           <groupId>eagle</groupId>
