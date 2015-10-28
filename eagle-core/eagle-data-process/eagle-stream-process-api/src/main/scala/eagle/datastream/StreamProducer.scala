@@ -159,7 +159,9 @@ trait StreamProducer{
 
 case class FilterProducer(id: Int, fn : AnyRef => Boolean) extends StreamProducer
 
-case class FlatMapProducer[T, R](id: Int, var mapper: FlatMapper[T, R]) extends StreamProducer
+case class FlatMapProducer[T, R](id: Int, var mapper: FlatMapper[T, R]) extends StreamProducer {
+  override def toString() = mapper.toString() + "_" + id
+}
 
 case class MapProducer(id: Int, numOutputFields : Int, var fn : AnyRef => AnyRef) extends StreamProducer
 
