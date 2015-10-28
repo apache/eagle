@@ -28,6 +28,7 @@ trait JavaStormStreamExecutor[R <: EagleTuple] extends FlatMapper[java.util.List
   def prepareConfig(config : Config)
   def init
   def fields : Array[String]
+  override def toString() = this.getClass.getSimpleName
 }
 
 abstract class StormStreamExecutor1[T0] extends StormStreamExecutor[Tuple1[T0]] {

@@ -5,10 +5,7 @@ import eagle.dataproc.util.ConfigOptionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Chen, Hao (hchen9@ebay.com)
- * @since 9/30/15
- */
+
 public class UserProfileDetectionMain {
     private final static Logger LOG = LoggerFactory.getLogger(UserProfileDetectionMain.class);
     public final static String USERPROFILE_DETECTION_MODE_KEY="eagleProps.userProfileMode";
