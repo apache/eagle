@@ -57,9 +57,6 @@ public class UserProfileAnomalyEigenEvaluator extends AbstractUserProfileEigenEv
         }
 
         List<MLCallbackResult> mlCallbackResults = new ArrayList<MLCallbackResult>();
-
-        boolean[][] anomalyFeature = new boolean[inputData.getRowDimension()][inputData.getColumnDimension()];
-
         RealMatrix normalizedMat = normalizeData(inputData, aModel);
 
         UserCommandStatistics[] listStats = aModel.statistics();
