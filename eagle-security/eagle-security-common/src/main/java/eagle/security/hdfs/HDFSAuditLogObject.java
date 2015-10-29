@@ -22,7 +22,7 @@ package eagle.security.hdfs;
 public class HDFSAuditLogObject {
     public long timestamp;
     public String host;
-    public String allowed;
+    public Boolean allowed;
     public String user;
     public String cmd;
     public String src;
