@@ -81,7 +81,7 @@ public class TestUserProfileAnomalyEigenEvaluator {
             userCommandStatistics[i].setCommandName(testCmdType[i]);
             userCommandStatistics[i].setLowVariant(false);
             userCommandStatistics[i].setMean(1.0);
-            userCommandStatistics[i].setStddev(0.0);
+            userCommandStatistics[i].setStddev(1.0);
         }
 
         UserProfileEigenModel testEigenModel = new UserProfileEigenModel(testVersion,testSite,testUser,testUMat,testDiagonalMat,dimension, testMinVec, testMaxVec, testPCs, testMaxL2Norm, testMinL2Norm, userCommandStatistics);
@@ -89,11 +89,7 @@ public class TestUserProfileAnomalyEigenEvaluator {
         List<MLCallbackResult> testResults = eigenEvaluator.detect("test_user", "eigen", testAggModel, testEigenModel);
 
         Assert.assertEquals(testResults.size(), testMatrix.getRowDimension());
-        LOG.info("test result size: " + testResults.size());
         for(MLCallbackResult result: testResults){
-            LOG.info("anomalous features: ");
-            for(String feature: result.getFeature())
-                LOG.info("string: " + feature);
             Assert.assertEquals(result.isAnomaly(), true);
         }
     }
