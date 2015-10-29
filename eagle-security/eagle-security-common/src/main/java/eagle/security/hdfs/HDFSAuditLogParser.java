@@ -86,7 +86,7 @@ public final class HDFSAuditLogParser implements Serializable{
         entity.src = src;
         entity.dst = dst;
         entity.host = auditMaps.get(IP);
-        entity.allowed = auditMaps.get(ALLOWED);
+        entity.allowed = Boolean.valueOf(auditMaps.get(ALLOWED));
         entity.timestamp = DateTimeUtil.humanDateToMilliseconds(auditMaps.get(LOGDATE));
 
 		return entity;
