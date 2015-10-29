@@ -16,7 +16,6 @@
  */
 package eagle.security.userprofile.impl;
 
-import eagle.ml.MLConstants;
 import eagle.ml.model.MLCallbackResult;
 import eagle.security.userprofile.UserProfileConstants;
 import eagle.security.userprofile.model.UserActivityAggModel;
@@ -58,6 +57,9 @@ public class UserProfileAnomalyEigenEvaluator extends AbstractUserProfileEigenEv
         }
 
         List<MLCallbackResult> mlCallbackResults = new ArrayList<MLCallbackResult>();
+
+        boolean[][] anomalyFeature = new boolean[inputData.getRowDimension()][inputData.getColumnDimension()];
+
         RealMatrix normalizedMat = normalizeData(inputData, aModel);
 
         UserCommandStatistics[] listStats = aModel.statistics();
@@ -77,6 +79,7 @@ public class UserProfileAnomalyEigenEvaluator extends AbstractUserProfileEigenEv
         Map<Integer, String> lineNoWithVariantBasedAnomalyDetection = new HashMap<Integer, String>();
         for (int i = 0; i < normalizedMat.getRowDimension(); i++) {
             MLCallbackResult aResult = new MLCallbackResult();
+            aResult.setAnomaly(false);
             aResult.setContext(context);
 
             for (int j = 0; j < normalizedMat.getColumnDimension(); j++) {
@@ -96,14 +99,15 @@ public class UserProfileAnomalyEigenEvaluator extends AbstractUserProfileEigenEv
                             datapoints.add(rowVal+"");
                         aResult.setDatapoints(datapoints);
                         aResult.setId(user);
-                        mlCallbackResults.add(aResult);
-                    } else {
+                        //mlCallbackResults.add(aResult);
+                    } /*else {
                         aResult.setAnomaly(false);
                         aResult.setTimestamp(userActivity.timestamp());
                         mlCallbackResults.add(aResult);
-                    }
+                    }*/
                 }
             }
+            mlCallbackResults.add(i, aResult);
             //return results;
         }
 
@@ -131,8 +135,9 @@ public class UserProfileAnomalyEigenEvaluator extends AbstractUserProfileEigenEv
 
         for (int i = 0; i < finalMatWithoutLowVariantFeatures.getRowDimension(); i++) {
             if (lineNoWithVariantBasedAnomalyDetection.get(i) == null) {
-                MLCallbackResult result = new MLCallbackResult();
-                result.setContext(context);
+                //MLCallbackResult result = new MLCallbackResult();
+                MLCallbackResult result = mlCallbackResults.get(i);
+                //result.setContext(context);
                 for (int sz = 0; sz < pcs.length; sz++) {
                     double[] pc1 = pcs[sz].toArray();
                     RealMatrix pc1Mat = new Array2DRowRealMatrix(pc1);
@@ -161,7 +166,7 @@ public class UserProfileAnomalyEigenEvaluator extends AbstractUserProfileEigenEv
                         result.setId(user);
                     }
                 }
-                mlCallbackResults.add(result);
+                mlCallbackResults.set(i, result);
             }
         }
         return mlCallbackResults;
