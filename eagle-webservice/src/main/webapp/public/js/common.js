@@ -48,7 +48,8 @@ common.setValueByPath = function(unit, path, value) {
 	if(!unit || path == null || path === "") throw "Unit or path can't be empty!";
 
 	var _inArray = false;
-	var _end = _start = 0;
+	var _end = 0;
+	var _start = 0;
 	var _unit = unit;
 
 	function _nextPath(array) {
