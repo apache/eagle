@@ -59,11 +59,11 @@ damControllers.service('damContent', function(Entities) {
 			}, function(ret) {
 				if(ret) {
 					policy.enabled = status;
-					Entities.deleteEntity("AlertDefinitionService", policy);
-
-					if(callback) {
-						callback(policy);
-					}
+					Entities.deleteEntity("AlertDefinitionService", policy)._promise.finally(function() {
+						if(callback) {
+							callback(policy);
+						}
+					});
 				}
 			});
 		},
