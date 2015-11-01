@@ -25,30 +25,13 @@ import eagle.service.hbase.EmbeddedHbase;
 
 public class ClientTestBase {
 	
-	protected static EmbeddedServer server;
+	//protected static EmbeddedServer server;
 	protected static EmbeddedHbase hbase;
 
-	@BeforeClass
+	//@BeforeClass
 	public static void startup() throws Exception {
-		hbase = EmbeddedHbase.getInstance();
-		String webappDirLocation = "../../../eagle-webservice/target/eagle-service";
-		server = EmbeddedServer.getInstance(webappDirLocation);
+		//hbase = EmbeddedHbase.getInstance();
+		//String webappDirLocation = "../../../eagle-webservice/target/eagle-service";
+		//server = EmbeddedServer.getInstance(webappDirLocation);
 	}
-	
-//	//@AfterClass
-//	@After
-//	public static void teardown()  {
-//		try {
-//			server.stop();
-//			hbase.shutdown();
-//		} catch (Throwable t) {
-//			LOG.error("Got an throwable t, " + t.getMessage());
-//		}
-//		finally {
-//			try {
-//				Thread.sleep(3000);
-//			}
-//			catch (Exception ex) {}
-//		}
-//	}
 }

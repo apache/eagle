@@ -19,9 +19,14 @@ import eagle.service.security.hive.dao.HiveMetadataAccessConfigDAOImpl;
 import org.junit.Test;
 
 public class TestHiveDataSourceConfigDAOImpl {
-    @Test
+    //@Test
     public void testDataSourceConfigLoader() throws Exception{
         HiveMetadataAccessConfigDAOImpl daoImpl = new HiveMetadataAccessConfigDAOImpl();
         System.out.println(daoImpl.getAllConfigs());
+    }
+
+    @Test
+    public void test() {
+
     }
 }

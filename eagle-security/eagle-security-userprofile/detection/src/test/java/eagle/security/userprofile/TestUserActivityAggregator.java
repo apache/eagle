@@ -14,10 +14,7 @@ import org.junit.Test;
 import java.text.ParseException;
 import java.util.*;
 
-/**
- * @author Chen, Hao (hchen9@ebay.com)
- * @since 9/29/15
- */
+
 public class TestUserActivityAggregator {
     private UserActivityAggregator aggregator_0;
     private UserActivityAggregator aggregator_1;

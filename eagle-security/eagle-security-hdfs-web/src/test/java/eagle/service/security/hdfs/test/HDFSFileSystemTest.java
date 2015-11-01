@@ -21,9 +21,14 @@ import org.junit.Test;
 import eagle.service.security.hdfs.HDFSFileSystem;
 
 public class HDFSFileSystemTest {
-	@Test
+	//@Test
 	public void testHDFSFileSystem() throws Exception {
 		HDFSFileSystem fileSystem = new HDFSFileSystem("hdfs://sandbox.hortonworks.com:8020");
 		System.out.println(fileSystem.browse("/"));
+	}
+
+	@Test
+	public void test() {
+
 	}
 }

@@ -16,6 +16,8 @@
  */
 package eagle.service.generic;
 
+import eagle.common.ByteUtil;
+import eagle.common.DateTimeUtil;
 import eagle.log.entity.GenericEntityBatchReader;
 import eagle.log.entity.GenericEntityWriter;
 import eagle.log.entity.SearchCondition;
@@ -23,12 +25,9 @@ import eagle.log.entity.meta.EntityDefinition;
 import eagle.log.entity.meta.EntityDefinitionManager;
 import eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import eagle.query.ListQueryCompiler;
-import eagle.common.ByteUtil;
-import eagle.common.DateTimeUtil;
 import eagle.service.hbase.EmbeddedHbase;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +40,7 @@ import java.util.List;
 
 public class TestHBaseLogReader2 {
 	private final static Logger LOG = LoggerFactory.getLogger(TestHBaseLogReader2.class);
-    private EmbeddedHbase hbase;
-    @Before
-    public void setUp(){
-        this.hbase = EmbeddedHbase.getInstance();
-    }
+    private static EmbeddedHbase hbase = EmbeddedHbase.getInstance();
 	
 	@SuppressWarnings("serial")
 	@Test
@@ -72,7 +67,7 @@ public class TestHBaseLogReader2 {
 			entities.add(entity);
 			
 			entity = new TestTimeSeriesAPIEntity();
-			long timestamp2 = DateTimeUtil.humanDateToSeconds("2014-04-08 04:00:00")*1000;
+			long timestamp2 = DateTimeUtil.humanDateToSeconds("2014-05-08 04:00:00")*1000;
 			LOG.info("Second entity timestamp:" + timestamp2);
 			entity.setTimestamp(timestamp2);
 			entity.setTags(new HashMap<String, String>(){{
@@ -81,12 +76,11 @@ public class TestHBaseLogReader2 {
 			}});
 			entity.setField7("field7_2");
 			entities.add(entity);
-			
 			writer.write(entities);
-			
-			
-			long queryStartTimestamp = timestamp1;
-			long queryEndTimestamp = timestamp1+60*60*1000;
+
+			// for timezone difference between UTC & localtime, enlarge the search range
+			long queryStartTimestamp = timestamp1-24*60*60*1000;
+			long queryEndTimestamp = timestamp1+24*60*60*1000;
 			LOG.info("Query start timestamp:" + queryStartTimestamp);
 			LOG.info("Query end  timestamp:" + queryEndTimestamp);
 			
@@ -105,17 +99,19 @@ public class TestHBaseLogReader2 {
 
 			condition.setStartRowkey(null);
 			condition.setPageSize(Integer.MAX_VALUE);
-			condition.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryStartTimestamp));
+			condition.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(0));
 			condition.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryEndTimestamp));
 			
 			GenericEntityBatchReader reader = new GenericEntityBatchReader(serviceName, condition); 
 			List<TestTimeSeriesAPIEntity> list = reader.read();
+
 			Assert.assertEquals(1, list.size());
 			Assert.assertEquals(timestamp1, list.get(0).getTimestamp());
 			Assert.assertEquals("field7", list.get(0).getField7());
-			
-			queryStartTimestamp = timestamp1;
-			queryEndTimestamp = timestamp1+60*60*1000+1000;  // eagle timestamp is rounded to seconds
+
+			// for timezone difference between UTC & localtime, enlarge the search range
+			queryStartTimestamp = timestamp1-24*60*60*1000;
+			queryEndTimestamp = timestamp2+24*60*60*1000;  // eagle timestamp is rounded to seconds
 			condition.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryStartTimestamp));
 			condition.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(queryEndTimestamp));
 			reader = new GenericEntityBatchReader(serviceName, condition); 
@@ -129,6 +125,7 @@ public class TestHBaseLogReader2 {
 			reader = new GenericEntityBatchReader(serviceName, condition); 
 			list = reader.read();
 			Assert.assertEquals(0, list.size());
+			hbase.deleteTable(entityDefinition.getTable());
 		}catch(Exception ex){
 			LOG.error("error", ex);
 			Assert.fail();

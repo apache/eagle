@@ -98,9 +98,7 @@ public class TestGenericEntityIndexStreamReader extends TestHBaseBase {
 		hbase.deleteTable(entityDefinition.getTable());
 		Assert.assertNotNull(entities);
 		Assert.assertTrue(entities.isEmpty());
-
 	}
-	
 
 	@Test
 	public void testNonClusterIndexRead() throws Exception {

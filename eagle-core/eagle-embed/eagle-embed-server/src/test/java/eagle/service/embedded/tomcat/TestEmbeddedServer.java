@@ -21,6 +21,6 @@ public class TestEmbeddedServer {
 	//@Test
 	public void test() throws Throwable{
 		String webappDirLocation = "../../../eagle-webservice/target/eagle-service";
-		EmbeddedServer server = EmbeddedServer.getInstance(webappDirLocation);
+		EmbeddedServer.getInstance(webappDirLocation);
 	}
 }

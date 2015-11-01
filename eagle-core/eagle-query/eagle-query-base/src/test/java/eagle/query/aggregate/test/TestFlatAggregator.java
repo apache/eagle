@@ -126,7 +126,7 @@ public class TestFlatAggregator {
 		entities[1] = createEntity("cluster1", "dc1", "rack123", 20, 1);
 		entities[2] = createEntity("cluster1", "dc1", "rack128", 10, 0);
 		entities[3] = createEntity("cluster2", "dc1", "rack125", 9, 2);
-		entities[4] = createEntity("cluster2", "dc1", "rack126", 15, 2);
+		entities[4] = createEntity("cluster2", "dc2", "rack126", 15, 2);
 		
 		FlatAggregator agg = new FlatAggregator(Arrays.asList("cluster"), Arrays.asList(AggregateFunctionType.sum), Arrays.asList("numHosts"));
 		try{
@@ -149,8 +149,8 @@ public class TestFlatAggregator {
 			}
 			Map<List<String>, List<Double>> result = agg.result();
 			Assert.assertEquals(result.size(), 2);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[3].getNumHosts())+entities[4].getNumHosts());
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(entities[2].getNumHosts()));
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts())+entities[3].getNumHosts());
+			Assert.assertEquals(result.get(Arrays.asList("dc2")).get(0), (double)(entities[4].getNumHosts()));
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -177,8 +177,8 @@ public class TestFlatAggregator {
 			}
 			Map<List<String>, List<Double>> result = agg.result();
 			Assert.assertEquals(result.size(), 2);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(entities[0].getNumClusters()+entities[1].getNumClusters()+entities[3].getNumClusters())+entities[4].getNumClusters());
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(entities[2].getNumClusters()));
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(entities[0].getNumClusters()+entities[1].getNumClusters()+entities[2].getNumClusters())+entities[3].getNumClusters());
+			Assert.assertEquals(result.get(Arrays.asList("dc2")).get(0), (double)(entities[4].getNumClusters()));
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -193,7 +193,7 @@ public class TestFlatAggregator {
 		entities[1] = createEntity("cluster1", "dc1", "rack123", 20, 1);
 		entities[2] = createEntity("cluster1", "dc1", "rack128", 10, 0);
 		entities[3] = createEntity("cluster2", "dc1", "rack125", 9, 2);
-		entities[4] = createEntity("cluster2", "dc1", "rack126", 15, 2);
+		entities[4] = createEntity("cluster2", "dc2", "rack126", 15, 2);
 		
 		FlatAggregator agg = new FlatAggregator(Arrays.asList("cluster"), Arrays.asList(AggregateFunctionType.count), Arrays.asList("*"));
 		try{
@@ -217,7 +217,7 @@ public class TestFlatAggregator {
 			Map<List<String>, List<Double>> result = agg.result();
 			Assert.assertEquals(result.size(), 2);
 			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(4));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(1));
+			Assert.assertEquals(result.get(Arrays.asList("dc2")).get(0), (double)(1));
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -240,9 +240,8 @@ public class TestFlatAggregator {
 				agg.accumulate(e);
 			}
 			Map<List<String>, List<Double>> result = agg.result();
-			Assert.assertEquals(4, result.size());
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(entities[2].getNumHosts()));
+			Assert.assertEquals(3, result.size());
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()));
 			Assert.assertEquals(result.get(Arrays.asList("cluster2", "dc1")).get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()));
 			Assert.assertEquals(result.get(Arrays.asList("cluster2", "unassigned")).get(0), (double)(entities[5].getNumHosts()));
 		}catch(Exception ex){
@@ -284,9 +283,8 @@ public class TestFlatAggregator {
 				agg.accumulate(e);
 			}
 			Map<List<String>, List<Double>> result = agg.result();
-			Assert.assertEquals(4, result.size());
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(2));
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(1));
+			Assert.assertEquals(3, result.size());
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "dc1")).get(0), (double)(3));
 			Assert.assertEquals(result.get(Arrays.asList("cluster2", "dc1")).get(0), (double)(2));
 			Assert.assertEquals(result.get(Arrays.asList("cluster2", "unassigned")).get(0), (double)(1));
 		}catch(Exception ex){
@@ -344,11 +342,9 @@ public class TestFlatAggregator {
 				agg.accumulate(e);
 			}
 			Map<List<String>, List<Double>> result = agg.result();
-			Assert.assertEquals(result.size(), 2);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(4));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[3].getNumHosts())+entities[4].getNumHosts());
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(1));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), (double)(entities[2].getNumHosts()));
+			Assert.assertEquals(result.size(), 1);
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(5));
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()+entities[3].getNumHosts())+entities[4].getNumHosts());
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -361,13 +357,10 @@ public class TestFlatAggregator {
 				agg.accumulate(e);
 			}
 			Map<List<String>, List<Double>> result = agg.result();
-			Assert.assertEquals(result.size(), 2);
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(4));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[3].getNumHosts())+entities[4].getNumHosts());
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(2), (double)(entities[0].getNumClusters()+entities[1].getNumClusters()+entities[3].getNumClusters())+entities[4].getNumClusters());
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(1));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), (double)(entities[2].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(2), (double)(entities[2].getNumClusters()));
+			Assert.assertEquals(result.size(), 1);
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(0), (double)(5));
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(1), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()+entities[3].getNumHosts())+entities[4].getNumHosts());
+			Assert.assertEquals(result.get(Arrays.asList("dc1")).get(2), (double)(entities[0].getNumClusters()+entities[1].getNumClusters()+entities[2].getNumClusters()+entities[3].getNumClusters())+entities[4].getNumClusters());
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");

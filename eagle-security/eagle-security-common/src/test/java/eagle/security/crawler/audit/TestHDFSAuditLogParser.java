@@ -31,12 +31,10 @@ public class TestHDFSAuditLogParser {
         HDFSAuditLogObject entity =
                 parser.parse("2015-09-21 21:36:52,172 INFO FSNamesystem.audit: allowed=true   ugi=user1@APD.xyz.com (auth:SIMPLE)     ip=/10.0.2.15   cmd=getfileinfo src=/tmp/hive   dst=null        perm=null       proto=rpc\n");
         Assert.assertEquals("user1", entity.user);
-        Assert.assertEquals("true", entity.allowed);
+        Assert.assertEquals(new Boolean(true), entity.allowed);
 
-
-        entity =
-                parser.parse("2015-09-21 21:36:52,172 INFO FSNamesystem.audit: allowed=true ugi=hadoop/host123.xyz.com@APD.xyz.com (auth:SIMPLE)     ip=/10.0.2.15   cmd=getfileinfo src=/tmp/hive   dst=null        perm=null       proto=rpc\n");
+        entity = parser.parse("2015-09-21 21:36:52,172 INFO FSNamesystem.audit: allowed=true ugi=hadoop/host123.xyz.com@APD.xyz.com (auth:SIMPLE)     ip=/10.0.2.15   cmd=getfileinfo src=/tmp/hive   dst=null        perm=null       proto=rpc\n");
         Assert.assertEquals("hadoop", entity.user);
-        Assert.assertEquals("true", entity.allowed);
+        Assert.assertEquals(new Boolean(true), entity.allowed);
     }
 }

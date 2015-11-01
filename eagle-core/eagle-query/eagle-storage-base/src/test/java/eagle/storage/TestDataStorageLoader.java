@@ -34,7 +34,7 @@ public class TestDataStorageLoader {
         DataStorage dataStorage = DataStorageManager.newDataStorage("test");
         assert dataStorage instanceof TestDataStorage;
 
-        // get eagle.storage.type (value: test) from src/test/resources/config.properties
+        // get eagle.storage.type (value: test) from src/test/resources/application.conf
         DataStorage dataStorage2 = DataStorageManager.getDataStorageByEagleConfig();
         assert dataStorage2 instanceof TestDataStorage;
 

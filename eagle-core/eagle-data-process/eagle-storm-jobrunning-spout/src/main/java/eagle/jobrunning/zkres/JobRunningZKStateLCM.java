@@ -22,14 +22,14 @@ import eagle.jobrunning.common.JobConstants.ResourceType;
 
 public interface JobRunningZKStateLCM {
 	
-	public List<String> readProcessedJobs(ResourceType type);
+	List<String> readProcessedJobs(ResourceType type);
 	
-	public void addProcessedJob(ResourceType type, String jobID);
+	void addProcessedJob(ResourceType type, String jobID);
 
 	// date format e.g. "20150901"
-	public void truncateJobBefore(ResourceType type, String date);
+	void truncateJobBefore(ResourceType type, String date);
 		
-	public void truncateProcessedJob(ResourceType type, String jobID);
+	void truncateProcessedJob(ResourceType type, String jobID);
 	
-	public void truncateEverything();	
+	void truncateEverything();
 }

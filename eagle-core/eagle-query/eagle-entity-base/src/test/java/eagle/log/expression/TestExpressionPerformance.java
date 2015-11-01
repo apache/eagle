@@ -39,7 +39,7 @@ import java.util.Map.Entry;
 public class TestExpressionPerformance {
 
 	public interface ExpressionParser {
-		public double parse(String exprStr, Map<String, Double> tuple) throws Exception;		
+		double parse(String exprStr, Map<String, Double> tuple) throws Exception;
 	}
 	
 	public class ParsiiParser implements ExpressionParser{

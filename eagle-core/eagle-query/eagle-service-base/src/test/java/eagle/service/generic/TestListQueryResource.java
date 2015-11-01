@@ -31,6 +31,7 @@ import eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl;
 import eagle.common.DateTimeUtil;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Scan;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,6 +81,15 @@ public class TestListQueryResource extends TestHBaseBase {
 		scan.setFilter(compiler.filter());
 //		scan.setStartRow(EagleBase64Wrapper.decode(rowkeys.get(0)));
 //		scan.setStopRow(EagleBase64Wrapper.decode(rowkeys.get(rowkeys.size()-1)));
+	}
+
+	@After
+	public void cleanUp() throws IllegalAccessException, InstantiationException, IOException {
+		entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(GenericMetricEntity.class);
+		hbase.deleteTable(entityDefinition.getTable());
+
+		entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+		hbase.deleteTable(entityDefinition.getTable());
 	}
 
 	@SuppressWarnings("unused")
@@ -313,7 +323,7 @@ public class TestListQueryResource extends TestHBaseBase {
 		Assert.assertNotNull(response);
 		Assert.assertTrue(response.isSuccess());
 		
-		query = "TestLogAPIEntity[(@cluster=\"cluster1\" AND @datacenter=\"dc1\") OR (@cluster=\"cluster1\" AND @datacenter=\"dc1\")]{@cluster}";
+		query = "TestLogAPIEntity[(@cluster=\"cluster1\") OR (@cluster=\"cluster1\" AND @datacenter=\"dc1\")]{@cluster}";
 		response = resource.listQuery(query, startTime, endTime, 100, null, false, true, 1, 0, false, 0, null);
 		Assert.assertNotNull(response);
 		Assert.assertFalse(response.isSuccess());

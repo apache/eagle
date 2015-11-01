@@ -22,6 +22,7 @@ import eagle.log.entity.test.TestLogAPIEntity;
 import eagle.service.hbase.TestHBaseBase;
 import junit.framework.Assert;
 import org.apache.commons.lang.time.StopWatch;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -50,6 +51,12 @@ public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
 			Assert.fail(e.getMessage());
 		}
     }
+
+	@After
+	public void cleanUp() throws IllegalAccessException, InstantiationException, IOException {
+		EntityDefinition entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+		hbase.deleteTable(entityDefinition.getTable());
+	}
 
 	private List<String> writeEntities(int count){
 		GenericEntityWriter writer = null;

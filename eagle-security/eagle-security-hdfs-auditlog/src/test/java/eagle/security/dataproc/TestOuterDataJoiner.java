@@ -13,23 +13,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package eagle.security.dataproc;
+ *//*
 
-import java.util.HashMap;
-import java.util.Map;
+package eagle.security.dataproc;
 
 import eagle.security.util.ExternalDataJoiner;
 import junit.framework.Assert;
-
-import org.junit.Before;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.util.HashMap;
+import java.util.Map;
 
-public class TestOuterDataJoiner extends TestBase{
+
+public class TestOuterDataJoiner {
 	private Map<String, Object> prop = new HashMap<String, Object>();
 
 	public static class TestJob implements Job{
@@ -43,7 +42,7 @@ public class TestOuterDataJoiner extends TestBase{
 		}
 	}
 	
-	@Before
+	//@Before
 	public void setup(){
 		prop.put("key1", "a");
 		prop.put("key2", 25);
@@ -57,3 +56,4 @@ public class TestOuterDataJoiner extends TestBase{
 		joiner.stop();
 	}
 }
+*/

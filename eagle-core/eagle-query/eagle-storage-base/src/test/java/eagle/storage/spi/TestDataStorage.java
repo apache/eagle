@@ -22,6 +22,7 @@ import eagle.storage.DataStorageBase;
 import eagle.storage.operation.CompiledQuery;
 import eagle.storage.result.ModifyResult;
 import eagle.storage.result.QueryResult;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
@@ -73,6 +74,11 @@ public class TestDataStorage extends DataStorageBase {
 
     @Override
     public void close() throws IOException {
+
+    }
+
+    @Test
+    public void test() {
 
     }
 }

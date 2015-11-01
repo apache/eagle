@@ -30,6 +30,7 @@ import eagle.common.DateTimeUtil;
 import junit.framework.Assert;
 import org.apache.commons.lang.time.StopWatch;
 import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,5 +224,10 @@ public class TestJdbcStorage {
         }});
         instance.setTimestamp(System.currentTimeMillis());
         return instance;
+    }
+
+    @Test
+    public void test() {
+
     }
 }

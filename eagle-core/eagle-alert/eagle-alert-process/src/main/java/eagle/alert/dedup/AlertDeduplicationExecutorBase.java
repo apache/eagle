@@ -107,7 +107,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 					  else LOG.warn("The dedup interval is not set, alertDef: " + alertDef);
 					}
 					catch (Throwable t) {
-						LOG.error("Got an exceptoin when initial dedup config, probably dedup config is not set: " + t.getMessage() + "," + alertDef);
+						LOG.error("Got an exception when initial dedup config, probably dedup config is not set: " + t.getMessage() + "," + alertDef);
 					}
 			   	}
 		    }

@@ -29,13 +29,9 @@
   <name>eagle-security-hdfs-web</name>
   <url>http://maven.apache.org</url>
   <dependencies>
-    <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-server</artifactId>
-      </dependency>
       <dependency>
           <groupId>eagle</groupId>
-          <artifactId>eagle-service-base</artifactId>
+          <artifactId>eagle-entity-base</artifactId>
           <version>${project.version}</version>
           <exclusions>
               <exclusion>
@@ -45,8 +41,12 @@
           </exclusions>
       </dependency>
       <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-server</artifactId>
+      </dependency>
+      <dependency>
           <groupId>eagle</groupId>
-          <artifactId>eagle-entity-base</artifactId>
+          <artifactId>eagle-service-base</artifactId>
           <version>${project.version}</version>
           <exclusions>
               <exclusion>

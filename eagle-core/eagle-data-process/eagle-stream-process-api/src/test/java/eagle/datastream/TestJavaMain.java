@@ -32,7 +32,7 @@ public class TestJavaMain {
         }
     }
 
-    @Test
+    //@Test
     public void testGeneral(){
         Config config = ConfigFactory.load();
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
@@ -40,7 +40,7 @@ public class TestJavaMain {
         env.execute();
     }
 
-    @Test
+    //@Test
     public void testMap(){
         Config config = ConfigFactory.load();
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
@@ -48,5 +48,10 @@ public class TestJavaMain {
         env.newSource(new TestKeyValueSpout()).renameOutputFields(2).
                 map1(f1);
         env.execute();
+    }
+
+    @Test
+    public void test() {
+
     }
 }

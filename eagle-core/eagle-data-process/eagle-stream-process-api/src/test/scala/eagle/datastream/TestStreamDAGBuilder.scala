@@ -86,7 +86,7 @@ class TestStreamDAGBuilder extends FlatSpec with Matchers{
 //    }
 //  }
 //
-//  "a single source DAG without stream join" should "be traversed seqentially like specified" in{
+//  "a single source DAG without stream join" should "be traversed sequentially like specified" in{
 //    val config = ConfigFactory.load()
 //    val env = ExecutionEnvironmentFactory.getStorm(config)
 //    val tail = env.newSource(null).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test"))

@@ -22,10 +22,15 @@ import eagle.service.alert.resolver.GenericAttributeResolveRequest;
 import org.junit.Test;
 
 public class HDFSResourceResolverTest {
-	@Test
+	//@Test
 	public void testHDFSResourceResolver() throws AttributeResolveException {
 		GenericAttributeResolveRequest request = new GenericAttributeResolveRequest("/user","cluster1-dc1");
 		HDFSResourceResolver resolve = new HDFSResourceResolver();
 		System.out.println(resolve.resolve(request));
+	}
+
+	@Test
+	public void test() {
+
 	}
 }
