@@ -88,6 +88,7 @@ public class TestUserProfileAnomalyEigenEvaluator {
 
         List<MLCallbackResult> testResults = eigenEvaluator.detect("test_user", "eigen", testAggModel, testEigenModel);
 
+        Assert.assertEquals(testResults.size(), testMatrix.getRowDimension());
         for(MLCallbackResult result: testResults){
             Assert.assertEquals(result.isAnomaly(), true);
         }
