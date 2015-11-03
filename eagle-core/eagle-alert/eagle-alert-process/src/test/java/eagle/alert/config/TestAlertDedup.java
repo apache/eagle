@@ -33,16 +33,6 @@ public class TestAlertDedup {
 		alertDef = "null";
 		dedupConfig = JsonSerDeserUtils.deserialize(alertDef, DeduplicatorConfig.class);
 		Assert.assertEquals(dedupConfig, null);
-		
-//		alertDef = "{\"alertDedupIntervalMin\":\"720\"}";
-//		dedupConfig = JsonSerDeserUtils.deserialize(alertDef, AlertDefinitionConfig.DeduplicatorConfig.class);
-//		Assert.assertEquals(dedupConfig.getAlertDedupIntervalMin(), 720);
-//		Assert.assertEquals(dedupConfig.getEmailDedupIntervalMin(), 0);
-				
-//		alertDef = "";
-//		dedupConfig = JsonSerDeserUtils.deserialize(alertDef, AlertDefinitionConfig.DeduplicatorConfig.class);
-//		Assert.assertEquals(dedupConfig.getAlertDedupIntervalMin(), 0);
-//		Assert.assertEquals(dedupConfig.getAlertDedupIntervalMin(), 0);
 	}
 
 }
