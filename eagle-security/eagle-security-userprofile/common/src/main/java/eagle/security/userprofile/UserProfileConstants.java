@@ -29,7 +29,7 @@ public final class UserProfileConstants implements Serializable{
     public static final String USER_ACTIVITY_AGG_MODEL_SERVICE = "UserActivityAggModelService";
 
     public static final String EIGEN_DECOMPOSITION_ALGORITHM = "EigenDecomposition";
-    public static final String KDE_ALGORITHM = "KDE";
+    public static final String KDE_ALGORITHM = "DE";
 
     public static final String USER_TAG = "user";
     public static final String SITE_TAG = "site";
