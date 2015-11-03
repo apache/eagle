@@ -50,4 +50,6 @@ public final class EagleConfigConstants {
     public final static String USERNAME = "username";
     public final static String PASSWORD = "password";
 
+    public final static String SITE = "site";
+    public final static String DATA_SOURCE = "dataSource";
 }

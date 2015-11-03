@@ -22,6 +22,6 @@ import eagle.jobrunning.common.JobConstants.ResourceType;
 
 public interface ResourceFetcher {
 
-	public List<Object> getResource(ResourceType resoureType, Object... parameter) throws Exception;
+	List<Object> getResource(ResourceType resoureType, Object... parameter) throws Exception;
 
 }

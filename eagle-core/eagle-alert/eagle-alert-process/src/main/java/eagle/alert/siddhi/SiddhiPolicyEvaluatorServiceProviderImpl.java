@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import eagle.alert.common.AlertConstants;
 import eagle.alert.policy.PolicyEvaluator;
 import eagle.alert.policy.PolicyEvaluatorServiceProvider;
 import com.fasterxml.jackson.databind.Module;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 public class SiddhiPolicyEvaluatorServiceProviderImpl implements PolicyEvaluatorServiceProvider {
 	@Override
 	public String getPolicyType() {
-		return "siddhiCEPEngine";
+		return AlertConstants.policyType.siddhiCEPEngine.name();
 	}
 
 	@Override
@@ -39,7 +40,7 @@ public class SiddhiPolicyEvaluatorServiceProviderImpl implements PolicyEvaluator
 
 	@Override
 	public List<Module> getBindingModules() {
-		Module module1 = new SimpleModule("policyDefinition").registerSubtypes(new NamedType(SiddhiPolicyDefinition.class, getPolicyType()));
+		Module module1 = new SimpleModule(AlertConstants.POLICY_DEFINITION).registerSubtypes(new NamedType(SiddhiPolicyDefinition.class, getPolicyType()));
 		return Arrays.asList(module1);
 	}
 }

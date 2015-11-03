@@ -33,5 +33,5 @@ public interface RunningJobCallback extends Serializable{
 	 * @param type
 	 * @param objects
 	 */
-	public void onJobRunningInformation(JobContext jobContext, ResourceType type, List<Object> objects);
+	void onJobRunningInformation(JobContext jobContext, ResourceType type, List<Object> objects);
 }

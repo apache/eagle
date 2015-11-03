@@ -16,11 +16,13 @@
  */
 package eagle.executor;
 
+import eagle.alert.common.AlertConstants;
 import eagle.alert.dao.*;
 import eagle.alert.entity.AlertExecutorEntity;
 import eagle.alert.policy.PolicyPartitioner;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValue;
+import eagle.common.config.EagleConfigConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +52,7 @@ public class AlertExecutorCreationUtils {
 
     public static AlertExecutor[] createAlertExecutors(Config config, String alertExecutorId) throws Exception{
         // Read site and dataSource from configuration.
-        String dataSource = config.getString("eagleProps.dataSource");
+        String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
         LOG.info("Loading alerting definitions for dataSource: " + dataSource);
 
         // Get map from alertExecutorId to alert stream
@@ -59,7 +61,7 @@ public class AlertExecutorCreationUtils {
         AlertExecutorDAOImpl alertExecutorDAO = new AlertExecutorDAOImpl(config);
         List<AlertExecutorEntity> alertExecutorEntities = alertExecutorDAO.findAlertExecutor(dataSource, alertExecutorId);
         for(AlertExecutorEntity entity : alertExecutorEntities){
-            streamNames.add(entity.getTags().get("streamName"));
+            streamNames.add(entity.getTags().get(AlertConstants.STREAM_NAME));
         }
 
         if(streamNames.isEmpty()){
@@ -92,11 +94,11 @@ public class AlertExecutorCreationUtils {
 	public static AlertExecutor[] createAlertExecutors(Config config, AlertDefinitionDAO alertDefDAO,
 			List<String> streamNames, String alertExecutorId) throws Exception{
 		// Read `alertExecutorConfigs` from configuration and get config for this alertExecutorId
-		Map<String, ConfigValue> alertExecutorConfigs = config.getObject("alertExecutorConfigs");
+		Map<String, ConfigValue> alertExecutorConfigs = config.getObject(AlertConstants.ALERT_EXECUTOR_CONFIGS);
         Map<String, Object>  alertExecutorConfig = (Map<String, Object>)alertExecutorConfigs.get(alertExecutorId).unwrapped();
-        int parts = (int)(alertExecutorConfig.get("parallelism"));
+        int parts = (int)(alertExecutorConfig.get(AlertConstants.PARALLELISM));
 		int numPartitions = parts == 0 ? 1 : parts;
-        String partitionerCls = (String)alertExecutorConfig.get("partitioner");
+        String partitionerCls = (String)alertExecutorConfig.get(AlertConstants.PARTITIONER);
 
 		AlertExecutor[] alertExecutors = createAlertExecutors(alertDefDAO, streamNames, alertExecutorId, numPartitions, partitionerCls);
 		return alertExecutors;

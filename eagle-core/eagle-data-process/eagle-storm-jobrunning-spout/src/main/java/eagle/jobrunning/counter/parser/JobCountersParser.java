@@ -22,5 +22,5 @@ import org.jsoup.nodes.Document;
 
 public interface JobCountersParser {
 	
-	public Map<String, Long> parse(Document doc);
+	Map<String, Long> parse(Document doc);
 }

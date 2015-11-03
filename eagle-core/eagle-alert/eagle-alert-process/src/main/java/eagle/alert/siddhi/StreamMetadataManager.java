@@ -23,9 +23,11 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import eagle.alert.common.AlertConstants;
 import eagle.alert.entity.AlertStreamSchemaEntity;
 import com.typesafe.config.Config;
 import eagle.alert.dao.AlertStreamSchemaDAO;
+import eagle.common.config.EagleConfigConstants;
 import org.apache.commons.collections.map.UnmodifiableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,18 +52,18 @@ public class StreamMetadataManager {
 	
 	private void internalInit(Config config, AlertStreamSchemaDAO dao){
 		try{
-			String dataSource = config.getString("eagleProps.dataSource");
+			String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 			List<AlertStreamSchemaEntity> list = dao.findAlertStreamSchemaByDataSource(dataSource);
 			if(list == null)
 				return;
 			for (AlertStreamSchemaEntity entity : list) {
-				String streamName = entity.getTags().get("streamName");
+				String streamName = entity.getTags().get(AlertConstants.STREAM_NAME);
 				if (map.get(streamName) == null) {
 					map.put(streamName, new ArrayList<AlertStreamSchemaEntity>());
 					map2.put(streamName, new TreeMap<String, AlertStreamSchemaEntity>());
 				}
 				map.get(streamName).add(entity);
-				map2.get(streamName).put(entity.getTags().get("attrName"), entity);
+				map2.get(streamName).put(entity.getTags().get(AlertConstants.ATTR_NAME), entity);
 			}
 		}catch(Exception ex){
 			LOG.error("Fail building metadata manger", ex);
