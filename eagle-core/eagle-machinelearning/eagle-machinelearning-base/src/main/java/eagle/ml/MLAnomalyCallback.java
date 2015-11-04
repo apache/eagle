@@ -24,5 +24,5 @@ public interface MLAnomalyCallback {
      * @param callbackResult call-backed result
      * @param alertContext context
      */
-	public void receive(MLCallbackResult callbackResult,EagleAlertContext alertContext);
+	void receive(MLCallbackResult callbackResult,EagleAlertContext alertContext);
 }

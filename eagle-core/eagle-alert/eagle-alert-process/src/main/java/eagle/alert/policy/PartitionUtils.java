@@ -16,12 +16,13 @@
  */
 package eagle.alert.policy;
 
+import eagle.alert.common.AlertConstants;
 import eagle.alert.entity.AlertDefinitionAPIEntity;
 
 public class PartitionUtils {
 	
 	public static boolean accept(AlertDefinitionAPIEntity alertDef, PolicyPartitioner partitioner, int numPartitions, int partitionSeq){
-		int targetPartitionSeq = partitioner.partition(numPartitions, alertDef.getTags().get("policyType"), alertDef.getTags().get("policyId"));
+		int targetPartitionSeq = partitioner.partition(numPartitions, alertDef.getTags().get(AlertConstants.POLICY_TYPE), alertDef.getTags().get(AlertConstants.POLICY_ID));
 		if(targetPartitionSeq == partitionSeq)
 			return true;
 		return false;

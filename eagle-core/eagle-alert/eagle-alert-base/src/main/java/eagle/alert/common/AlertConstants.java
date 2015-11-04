@@ -30,18 +30,35 @@ public class AlertConstants {
 	public static final String ALERT_EMAIL_COUNT_PROPERTY = "count";
 	public static final String ALERT_EMAIL_ALERTLIST_PROPERTY = "alertList";
 
-    public static final String SITE_TAG = "site";
 	public static final String URL = "url";
-	public static final String MAX_VALUE = "maxValue";
 	public static final String ALERT_SOURCE = "alertSource";
 	public static final String ALERT_MESSAGE = "alertMessage";
 	public static final String SUBJECT = "subject";
 	public static final String ALERT_EXECUTOR_ID = "alertExecutorId";
 	public static final String POLICY_NAME = "policyName";
 	public static final String POLICY_ID = "policyId";
-	public static final String DATA_SOURCE = "dataSource";
     public static final String SOURCE_STREAMS = "sourceStreams";
     public static final String ALERT_EVENT = "alertEvent";
 	public static final String POLICY_DETAIL_URL = "policyDetailUrl";
 	public static final String ALERT_DETAIL_URL = "alertDetailUrl";
+
+	public static final String POLICY_DEFINITION = "policyDefinition";
+	public static final String POLICY_TYPE = "policyType";
+	public static final String STREAM_NAME = "streamName";
+	public static final String ATTR_NAME = "attrName";
+
+	public static final String ALERT_EXECUTOR_CONFIGS = "alertExecutorConfigs";
+	public static final String PARALLELISM = "parallelism";
+	public static final String PARTITIONER = "partitioner";
+	public static final String SOURCE = "source";
+	public static final String PARTITIONSEQ = "partitionSeq";
+
+	public enum policyType {
+		siddhiCEPEngine,
+		MachineLearning;
+
+		policyType() {
+		}
+	}
+
 }

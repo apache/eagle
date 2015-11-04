@@ -20,6 +20,7 @@ import eagle.alert.common.AlertConstants;
 import eagle.alert.entity.AlertAPIEntity;
 import eagle.alert.siddhi.EagleAlertContext;
 import eagle.common.DateTimeUtil;
+import eagle.common.config.EagleConfigConstants;
 import eagle.ml.MLAnomalyCallback;
 import eagle.ml.MLPolicyEvaluator;
 import eagle.ml.model.MLCallbackResult;
@@ -60,15 +61,15 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
 	}
 
     private AlertAPIEntity renderAlert(MLCallbackResult aResult,EagleAlertContext alertContext){
-        String site = config.getString("eagleProps.site");
-        String dataSource = config.getString("eagleProps.dataSource");
+        String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
+        String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 
         AlertAPIEntity entity = new AlertAPIEntity();
         entity.setDescription(aResult.toString());
 
         Map<String, String> tags = new HashMap<>();
-        tags.put(AlertConstants.SITE_TAG, site);
-        tags.put(AlertConstants.DATA_SOURCE, dataSource);
+        tags.put(EagleConfigConstants.SITE, site);
+        tags.put(EagleConfigConstants.DATA_SOURCE, dataSource);
         tags.put(AlertConstants.SOURCE_STREAMS, alertContext.evaluator.getAdditionalContext().get(AlertConstants.SOURCE_STREAMS));
         tags.put(AlertConstants.POLICY_ID, alertContext.policyId);
         tags.put(AlertConstants.ALERT_SOURCE, source);
@@ -89,14 +90,14 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
         try {
             site = config.getString("eagleProps.site");
             dataSource = config.getString("eagleProps.dataSource");
-            context.addProperty(AlertConstants.DATA_SOURCE, dataSource);
-            context.addProperty(AlertConstants.SITE_TAG, site);
+            context.addProperty(EagleConfigConstants.DATA_SOURCE, dataSource);
+            context.addProperty(EagleConfigConstants.SITE, site);
         } catch (Exception ex) {
             LOG.error("site, dataSource not set in config file, ", ex);
         }
 
-        context.addProperty(AlertConstants.DATA_SOURCE, dataSource);
-        context.addProperty(AlertConstants.SITE_TAG, site);
+        context.addProperty(EagleConfigConstants.DATA_SOURCE, dataSource);
+        context.addProperty(EagleConfigConstants.SITE, site);
         context.addProperty(AlertConstants.POLICY_NAME, alertContext.policyId);
 
         entity.setAlertContext(context);

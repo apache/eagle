@@ -52,7 +52,7 @@ public class SiddhiAlertAPIEntityRendner {
 			 List<AlertStreamSchemaEntity> list = StreamMetadataManager.getInstance().getMetadataEntitiesForStream(sourceStream.trim());
 			 for (AlertStreamSchemaEntity alertStream : list) {
 				 if (alertStream.getUsedAsTag() != null && alertStream.getUsedAsTag() == true) {
-					 String attrName = alertStream.getTags().get("attrName");
+					 String attrName = alertStream.getTags().get(AlertConstants.ATTR_NAME);
 					 tags.put(attrName, rets.get(attrRenameList.indexOf(attrName)));
 				 }				 
 			 }			 
@@ -72,20 +72,20 @@ public class SiddhiAlertAPIEntityRendner {
 		context.addAll(evaluator.getAdditionalContext());
 		String policyId = context.getProperty(AlertConstants.POLICY_ID); 
 		String alertMessage = "The Policy \"" + policyId + "\" has been detected with the below information: " + sb.toString() ;
-		String site = config.getString("eagleProps.site");
-		String dataSource = config.getString("eagleProps.dataSource");
+		String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
+		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 		String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
 		Integer port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
 
 		context.addProperty(AlertConstants.ALERT_EVENT, sb.toString());
 		context.addProperty(AlertConstants.ALERT_MESSAGE, alertMessage);
 		context.addProperty(AlertConstants.ALERT_TIMESTAMP_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds(System.currentTimeMillis()));
-		context.addProperty(AlertConstants.DATA_SOURCE, dataSource);
-		context.addProperty(AlertConstants.SITE_TAG, site);
+		context.addProperty(EagleConfigConstants.DATA_SOURCE, dataSource);
+		context.addProperty(EagleConfigConstants.SITE, site);
 		entity.setTimestamp(timestamp);
 		/** If we need to add severity tag, we should add severity filed in AbstractpolicyDefinition, and pass it down **/
-		tags.put(AlertConstants.SITE_TAG, site);
-		tags.put(AlertConstants.DATA_SOURCE, dataSource);
+		tags.put(EagleConfigConstants.SITE, site);
+		tags.put(EagleConfigConstants.DATA_SOURCE, dataSource);
 		tags.put(AlertConstants.SOURCE_STREAMS, context.getProperty(AlertConstants.SOURCE_STREAMS));		
 		tags.put(AlertConstants.POLICY_ID, context.getProperty(AlertConstants.POLICY_ID));		
 		tags.put(AlertConstants.ALERT_SOURCE, source);

@@ -22,6 +22,7 @@ import eagle.alert.dao.AlertDefinitionDAO;
 import eagle.alert.dao.AlertStreamSchemaDAOImpl;
 import eagle.alert.entity.AlertAPIEntity;
 import eagle.alert.entity.AlertDefinitionAPIEntity;
+import eagle.common.config.EagleConfig;
 import eagle.common.config.EagleConfigConstants;
 import eagle.datastream.Collector;
 import eagle.datastream.JavaStormStreamExecutor2;
@@ -125,12 +126,12 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		this.metricReport = new EagleSerivceMetricReport(eagleServiceHost, eagleServicePort, username, password);
 
 		metricMap = new ConcurrentHashMap<String, Metric>();
-		baseDimensions = new HashMap<String, String>();		
-		baseDimensions.put("alertExecutorId", alertExecutorId);
-		baseDimensions.put("partitionSeq", String.valueOf(partitionSeq));
-		baseDimensions.put("source", ManagementFactory.getRuntimeMXBean().getName());
-		baseDimensions.put(AlertConstants.DATA_SOURCE, config.getString("eagleProps.dataSource"));
-		baseDimensions.put(AlertConstants.SITE_TAG, config.getString("eagleProps.site"));
+		baseDimensions = new HashMap<String, String>();
+		baseDimensions.put(AlertConstants.ALERT_EXECUTOR_ID, alertExecutorId);
+		baseDimensions.put(AlertConstants.PARTITIONSEQ, String.valueOf(partitionSeq));
+		baseDimensions.put(AlertConstants.SOURCE, ManagementFactory.getRuntimeMXBean().getName());
+		baseDimensions.put(EagleConfigConstants.DATA_SOURCE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE));
+		baseDimensions.put(EagleConfigConstants.SITE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE));
 
 		dimensionsMap = new HashMap<String, Map<String, String>>();
 		this.metricReportThread = new Thread() {
@@ -150,8 +151,8 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		// for each AlertDefinition, to create a PolicyEvaluator
 		Map<String, PolicyEvaluator> tmpPolicyEvaluators = new HashMap<String, PolicyEvaluator>();
 		
-        String site = config.getString("eagleProps.site");
-		String dataSource = config.getString("eagleProps.dataSource");
+        String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
+		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 		try {
 			initialAlertDefs = alertDefinitionDao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
 		}
@@ -164,9 +165,9 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
         }
         else if (initialAlertDefs.get(alertExecutorId) != null) { 
 			for(AlertDefinitionAPIEntity alertDef : initialAlertDefs.get(alertExecutorId).values()){
-				int part = partitioner.partition(numPartitions, alertDef.getTags().get("policyType"), alertDef.getTags().get("policyId"));
+				int part = partitioner.partition(numPartitions, alertDef.getTags().get(AlertConstants.POLICY_TYPE), alertDef.getTags().get(AlertConstants.POLICY_ID));
 				if (part == partitionSeq) {
-					tmpPolicyEvaluators.put(alertDef.getTags().get("policyId"), createPolicyEvaluator(alertDef));
+					tmpPolicyEvaluators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), createPolicyEvaluator(alertDef));
 				}
 			}
 		}
@@ -191,7 +192,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
      * @return PolicyEvaluator instance
      */
 	private PolicyEvaluator createPolicyEvaluator(AlertDefinitionAPIEntity alertDef){
-		String policyType = alertDef.getTags().get("policyType");
+		String policyType = alertDef.getTags().get(AlertConstants.POLICY_TYPE);
 		Class<? extends PolicyEvaluator> evalCls = PolicyManager.getInstance().getPolicyEvaluator(policyType);
 		if(evalCls == null){
 			String msg = "No policy evaluator defined for policy type : " + policyType;
@@ -200,7 +201,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		}
 		
 		// check out whether strong incoming data validation is necessary
-        boolean needValidation = config.getBoolean("alertExecutorConfigs." + alertExecutorId + ".needValidation");
+        boolean needValidation = config.getBoolean(AlertConstants.ALERT_EXECUTOR_CONFIGS + "." + alertExecutorId + ".needValidation");
 
 		AbstractPolicyDefinition policyDef = null;
 		try {
@@ -233,7 +234,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
             }
             return false;
         }
-		int targetPartitionSeq = partitioner.partition(numPartitions, alertDef.getTags().get("policyType"), alertDef.getTags().get("policyId"));
+		int targetPartitionSeq = partitioner.partition(numPartitions, alertDef.getTags().get(AlertConstants.POLICY_TYPE), alertDef.getTags().get(AlertConstants.POLICY_ID));
 		if(targetPartitionSeq == partitionSeq)
 			return true;
 		return false;
@@ -353,7 +354,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 			PolicyEvaluator newEvaluator = createPolicyEvaluator(alertDef);
 			if(newEvaluator != null){
 				synchronized(this.policyEvaluators) {
-					policyEvaluators.put(alertDef.getTags().get("policyId"), newEvaluator);
+					policyEvaluators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), newEvaluator);
 				}
 			}
 		}
@@ -367,7 +368,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 				continue;
 			LOG.info(alertExecutorId + ", partition " + partitionSeq + " policy really changed " + alertDef);
 			synchronized(this.policyEvaluators) {
-				PolicyEvaluator pe = policyEvaluators.get(alertDef.getTags().get("policyId"));
+				PolicyEvaluator pe = policyEvaluators.get(alertDef.getTags().get(AlertConstants.POLICY_ID));
 				pe.onPolicyUpdate(alertDef);
 			}
 		}
@@ -380,10 +381,10 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 			if(!accept(alertDef))
 				continue;
 			LOG.info(alertExecutorId + ", partition " + partitionSeq + " policy really deleted " + alertDef);
-			String policyId = alertDef.getTags().get("policyId");
+			String policyId = alertDef.getTags().get(AlertConstants.POLICY_ID);
 			synchronized(this.policyEvaluators) {			
 				if (policyEvaluators.containsKey(policyId)) {
-					PolicyEvaluator pe = policyEvaluators.remove(alertDef.getTags().get("policyId"));
+					PolicyEvaluator pe = policyEvaluators.remove(alertDef.getTags().get(AlertConstants.POLICY_ID));
 					pe.onPolicyDelete();
 				}
 			}
