@@ -36,7 +36,10 @@ public class Tables {
         tables.add("alertExecutor");
         tables.add("alertStreamSchema");
         tables.add("alertdef");
+
+        // for security
         tables.add("hiveResourceSensitivity");
+        tables.add("fileSensitivity");
         tables.add("mlmodel");
         tables.add("userprofile");
     }
