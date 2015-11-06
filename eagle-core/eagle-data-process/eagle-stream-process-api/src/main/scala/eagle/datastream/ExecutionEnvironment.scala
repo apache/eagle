@@ -17,24 +17,29 @@
 package eagle.datastream
 
 import backtype.storm.topology.base.BaseRichSpout
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
+import eagle.dataproc.impl.storm.AbstractStormSpoutProvider
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 
 object ExecutionEnvironmentFactory{
-  def getStorm(config : Config)  = {
-    new StormExecutionEnvironment(config)
+
+  def getStorm(config : Config) = new StormExecutionEnvironment(config)
+  def getStorm:StormExecutionEnvironment = {
+    val config = ConfigFactory.load()
+    getStorm(config)
   }
 }
 
 abstract class ExecutionEnvironment(config : Config){
-  def execute
+  def execute()
 }
 
 class StormExecutionEnvironment(config: Config) extends ExecutionEnvironment(config){
   val LOG = LoggerFactory.getLogger(classOf[StormExecutionEnvironment])
   val dag = new DirectedAcyclicGraph[StreamProducer, StreamConnector](classOf[StreamConnector])
-  override def execute : Unit = {
+
+  override def execute() : Unit = {
     LOG.info("initial graph:\n")
     GraphPrinter.print(dag)
     new StreamAlertExpansion(config).expand(dag)
@@ -63,4 +68,6 @@ class StormExecutionEnvironment(config: Config) extends ExecutionEnvironment(con
     dag.addVertex(ret)
     ret
   }
+
+  def newSource(sourceProvider: AbstractStormSpoutProvider):StormSourceProducer = newSource(sourceProvider.getSpout(config))
 }

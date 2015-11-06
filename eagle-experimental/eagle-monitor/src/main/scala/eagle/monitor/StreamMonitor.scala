@@ -14,16 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eagle.dataproc.impl.storm;
+package eagle.monitor
 
-import backtype.storm.topology.base.BaseRichSpout;
-
-import com.typesafe.config.Config;
+import eagle.datastream.StormStreamApp
 
 /**
- * Normally storm spout is a special part of storm topology and it is implemented in underlying spout implementation
- * which can be retrieved from getSpout method.
+ * @since  11/6/15
  */
-public abstract class AbstractStormSpoutProvider{
-	public abstract BaseRichSpout getSpout(Config context);
+abstract class StreamMonitor extends StormStreamApp{
+  implicit val streamName = get[String]("eagle.stream.name","eventStream")
+  implicit val streamExecutorId = get[String]("eagle.stream.executor",s"${streamName}Executor")
 }

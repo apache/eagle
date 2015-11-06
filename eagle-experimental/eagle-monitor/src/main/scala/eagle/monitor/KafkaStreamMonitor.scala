@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eagle.dataproc.impl.storm;
+package eagle.monitor
 
-import backtype.storm.topology.base.BaseRichSpout;
-
-import com.typesafe.config.Config;
+import eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
 
 /**
- * Normally storm spout is a special part of storm topology and it is implemented in underlying spout implementation
- * which can be retrieved from getSpout method.
+ * @author Chen, Hao (hchen9@ebay.com)
+ * @since  11/6/15
  */
-public abstract class AbstractStormSpoutProvider{
-	public abstract BaseRichSpout getSpout(Config context);
+object KafkaStreamMonitor extends StreamMonitor{
+  set("dataSourceConfig.deserializerClass",classOf[JsonDeserializer])
+
+  source(new KafkaSourcedSpoutProvider).renameOutputFields(1).withName("kafkaEvent")
+    .alertWithConsumer(streamName, streamExecutorId)
 }

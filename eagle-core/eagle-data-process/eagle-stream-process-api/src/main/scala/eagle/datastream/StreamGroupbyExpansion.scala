@@ -25,6 +25,10 @@ import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
+/**
+ * Replace GroupByProducer(Vertex) with StreamConnector (Edge)
+ * @param config context configuration
+ */
 class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(config){
   val LOG = LoggerFactory.getLogger(classOf[StreamGroupbyExpansion])
 

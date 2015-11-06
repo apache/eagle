@@ -16,9 +16,15 @@
  */
 package eagle.alert.siddhi;
 
+/**
+ * @see org.wso2.siddhi.query.api.definition.Attribute.Type
+ */
 public enum AttributeType {
 	STRING,
 	LONG,
 	INTEGER,
-	BOOL
+	BOOL,
+    FLOAT,
+    DOUBLE
+//    , OBJECT
 }

@@ -41,7 +41,8 @@ public class SiddhiStreamMetadataUtils {
 	}
 
 	/**
-	 * make sure StreamMetadataManager.init is invoked before this method
+     * @see org.wso2.siddhi.query.api.definition.Attribute.Type
+     * make sure StreamMetadataManager.init is invoked before this method
 	 * @param streamName
 	 * @return
 	 */
@@ -62,7 +63,11 @@ public class SiddhiStreamMetadataUtils {
 				sb.append("long");
 			}else if(attrType.equalsIgnoreCase(AttributeType.BOOL.name())){
 				sb.append("bool");
-			}else{
+			}else if(attrType.equalsIgnoreCase(AttributeType.FLOAT.name())){
+                sb.append("float");
+            }else if(attrType.equalsIgnoreCase(AttributeType.DOUBLE.name())){
+                sb.append("double");
+            }else{
 				LOG.warn("AttrType is not recognized, ignore : " + attrType);
 			}
 			sb.append(",");
