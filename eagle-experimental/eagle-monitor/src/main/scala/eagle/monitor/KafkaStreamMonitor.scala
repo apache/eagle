@@ -19,7 +19,6 @@ package eagle.monitor
 import eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
 
 /**
- * @author Chen, Hao (hchen9@ebay.com)
  * @since  11/6/15
  */
 object KafkaStreamMonitor extends StreamMonitor{
