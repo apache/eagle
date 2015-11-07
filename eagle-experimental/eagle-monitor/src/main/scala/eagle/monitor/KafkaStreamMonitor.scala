@@ -24,6 +24,6 @@ import eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
 object KafkaStreamMonitor extends StreamMonitor{
   set("dataSourceConfig.deserializerClass",classOf[JsonDeserializer])
 
-  source(new KafkaSourcedSpoutProvider).renameOutputFields(1).withName("kafkaEvent")
+  source(new KafkaSourcedSpoutProvider).renameOutputFields(1).withName(streamName)
     .alertWithConsumer(streamName, streamExecutorId)
 }
