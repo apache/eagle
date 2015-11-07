@@ -1,6 +1,6 @@
 package eagle.datastream;
 
-import eagle.dataproc.impl.storm.kafka.KafkaStreamMonitorApp;
+import eagle.datastream.kafka.KafkaStreamMonitorApp;
 
 /**
  * @author Chen, Hao (hchen9@ebay.com)

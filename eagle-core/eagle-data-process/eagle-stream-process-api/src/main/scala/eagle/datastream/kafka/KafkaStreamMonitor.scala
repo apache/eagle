@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eagle.dataproc.impl.storm.kafka
+package eagle.datastream.kafka
 
+import eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
 import eagle.datastream.StormStreamApp
 
 /**
@@ -25,7 +26,7 @@ class KafkaStreamMonitorApp extends StormStreamApp{
   val streamName = get[String]("eagle.stream.name","eventStream")
   val streamExecutorId = get[String]("eagle.stream.executor",s"${streamName}Executor")
 
-  set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer])
+  set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
 
   source(new KafkaSourcedSpoutProvider).renameOutputFields(1).withName(streamName)
     .alertWithConsumer(streamName, streamExecutorId)

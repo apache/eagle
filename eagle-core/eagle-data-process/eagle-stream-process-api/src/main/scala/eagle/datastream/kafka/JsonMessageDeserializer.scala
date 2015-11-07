@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eagle.dataproc.impl.storm.kafka
+package eagle.datastream.kafka
 
 import java.io.IOException
 import java.util
 import java.util.Properties
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
