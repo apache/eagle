@@ -133,10 +133,6 @@ trait StreamProducer{
     alert(util.Arrays.asList(upStreamName), alertExecutorId, false)
   }
 
-//  def alert(withConsumer:Boolean=true)(implicit upStreamName: String, alertExecutorId : String): Unit ={
-//    alert(util.Arrays.asList(upStreamName), alertExecutorId, withConsumer)
-//  }
-
   def hookupDAG(graph: DirectedAcyclicGraph[StreamProducer, StreamConnector], current: StreamProducer, next: StreamProducer) = {
     current.getGraph.addVertex(next)
     current.getGraph.addEdge(current, next, StreamConnector(current, next))

@@ -14,32 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eagle.monitor
+package eagle.dataproc.impl.storm.kafka
 
-import java.io.IOException
-import java.util
-import java.util.Properties
-
-import com.fasterxml.jackson.databind.ObjectMapper
-import eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer
-import org.slf4j.{Logger, LoggerFactory}
+import eagle.datastream.StormStreamApp
 
 /**
  * @since  11/6/15
  */
-case class JsonDeserializer(props:Properties) extends SpoutKafkaMessageDeserializer{
-  private val objectMapper: ObjectMapper = new ObjectMapper
-  private val LOG: Logger = LoggerFactory.getLogger(classOf[JsonDeserializer])
+class KafkaStreamMonitorApp extends StormStreamApp{
+  val streamName = get[String]("eagle.stream.name","eventStream")
+  val streamExecutorId = get[String]("eagle.stream.executor",s"${streamName}Executor")
 
-  override def deserialize(bytes: Array[Byte]): AnyRef = {
-    var map: util.Map[String, _] = null
-    try {
-      map = objectMapper.readValue(bytes, classOf[util.TreeMap[String, _]])
-    } catch {
-      case e: IOException => {
-        LOG.error("Failed to deserialize json from: " + new String(bytes), e)
-      }
-    }
-    map
-  }
+  set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer])
+
+  source(new KafkaSourcedSpoutProvider).renameOutputFields(1).withName(streamName)
+    .alertWithConsumer(streamName, streamExecutorId)
 }
+
+object KafkaStreamMonitor extends KafkaStreamMonitorApp
