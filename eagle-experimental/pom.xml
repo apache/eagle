@@ -12,7 +12,6 @@
     <artifactId>eagle-experimental</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>eagle-mongodb</module>
         <module>eagle-monitor</module>
     </modules>
 
