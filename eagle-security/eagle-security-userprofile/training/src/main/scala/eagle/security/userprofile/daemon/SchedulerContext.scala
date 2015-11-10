@@ -54,10 +54,6 @@ object SchedulerContext {
   val UserProfileConfigKey_UserName="eagle.service.username"
   val UserProfileConfigKey_Password="eagle.service.password"
   val UserProfileConfigKey_AggAuditPath="eagle.userprofile.detection-audit-path"
-  val UserProfileConfigKey_AggKafkaBrokers="eagle.userprofile.detection-kafka-brokers"
-  val UserProfileConfigKey_AggKafkaTopic="eagle.userprofile.detection-kafka-topic"
-  val UserProfileConfigKey_AggIntervalSeconds="eagle.userprofile.detection-interval-seconds"
-  val UserProfileConfigKey_AggInitialDelaySeconds="eagle.userprofile.detection-initial-delay-seconds"
   val UserProfileConfigKey_SyncIntervalSeconds="eagle.userprofile.sync-interval-seconds"
   // ======================================================================================
   // End of Configuration Keys
@@ -66,12 +62,12 @@ object SchedulerContext {
 
   object COMMAND_TYPE extends Enumeration {
     type TYPE = Value
-    val USER_PROFILE_DETECTION, USER_PROFILE_TRAINING = Value
+    val USER_PROFILE_TRAINING = Value
   }
 
   object COMMAND_SOURCE extends Enumeration {
     type TYPE = Value
-    val SCHEDULED, ONETIME  = Value
+    val PERIODIC, ONDEMAND  = Value
   }
 
   /**
@@ -97,8 +93,8 @@ object SchedulerContext {
       throw new IllegalArgumentException(s"Config[$UserProfileConfigKey_ModelAuditPath] should not be null")
     }
 
-    if(config.hasPath(UserProfileConfigKey_ModelIntervalSeconds)) context.detectionIntervalSeconds = config.getLong(UserProfileConfigKey_ModelIntervalSeconds)
-    if(config.hasPath(UserProfileConfigKey_ModelInitialDelaySeconds)) context.detectionInitialDelaySeconds = config.getLong(UserProfileConfigKey_ModelInitialDelaySeconds)
+    if(config.hasPath(UserProfileConfigKey_ModelIntervalSeconds)) context.trainingIntervalSeconds = config.getLong(UserProfileConfigKey_ModelIntervalSeconds)
+    if(config.hasPath(UserProfileConfigKey_ModelInitialDelaySeconds)) context.trainingInitialDelaySeconds = config.getLong(UserProfileConfigKey_ModelInitialDelaySeconds)
 
     if(config.hasPath(UserProfileConfigKey_ServiceHost)) context.eagleServiceContext.serviceHost = config.getString(UserProfileConfigKey_ServiceHost)
     if(config.hasPath(UserProfileConfigKey_ServicePort)) context.eagleServiceContext.servicePort = config.getInt(UserProfileConfigKey_ServicePort)
@@ -111,10 +107,6 @@ object SchedulerContext {
     }else{
       throw new IllegalArgumentException(s"Config[$UserProfileConfigKey_AggAuditPath] should not be null")
     }
-    if(config.hasPath(UserProfileConfigKey_AggKafkaBrokers)) context.detectionKafkaBrokers = config.getString(UserProfileConfigKey_AggKafkaBrokers)
-    if(config.hasPath(UserProfileConfigKey_AggKafkaTopic)) context.detectionKafkaTopic = config.getString(UserProfileConfigKey_AggKafkaTopic)
-    if(config.hasPath(UserProfileConfigKey_AggIntervalSeconds)) context.detectionIntervalSeconds = config.getLong(UserProfileConfigKey_AggIntervalSeconds)
-    if(config.hasPath(UserProfileConfigKey_AggInitialDelaySeconds)) context.detectionInitialDelaySeconds = config.getLong(UserProfileConfigKey_AggInitialDelaySeconds)
     if(config.hasPath(UserProfileConfigKey_JobJarFilePath)) context.jobJar = config.getString(UserProfileConfigKey_JobJarFilePath)
 
     if(config.hasPath(UserProfileConfigKey_SparkMaster)) context.sparkMaster = config.getString(UserProfileConfigKey_SparkMaster)

@@ -99,33 +99,6 @@ case class UserProfileModelCommand(override val timestamp:Long,
   }
 }
 
-case class UserProfileAggCommand(override val timestamp:Long,
-                                   inputPath:String,
-                                   override val site:String,
-                                   override val status:ScheduleCommandEntity.STATUS,
-                                   source: COMMAND_SOURCE.TYPE,
-                                   createTime:Long,
-                                   override val updateTime:Long,
-                                   override val persistable:Boolean) extends UserProfileCommand(timestamp,inputPath,site,COMMAND_TYPE.USER_PROFILE_DETECTION,status,source,updateTime,persistable) {
-
-  override def shell = { context: SchedulerContext =>
-    var builder = Seq(
-      context.driverShell,
-      "--master",context.sparkMaster)
-    if(context.driverClasspath != null)
-      builder = builder ++ Seq("--driver-class-path",context.driverClasspath)
-    builder ++ Seq(
-      "--deploy-mode",context.sparkMode,
-      "--class",UserProfileTrainingCLIClass, context.jobJar,
-      "--master",context.sparkMaster,
-      "--site",context.site,
-      "--period",context.period,
-      "--input",this.inputPath,
-      "--kafka-props",s"topic=${context.detectionKafkaTopic},metadata.broker.list=${context.detectionKafkaBrokers}"
-    )
-  }
-}
-
 object Command{
   def asEntity(command:Command):ScheduleCommandEntity = {
     val entity = new ScheduleCommandEntity
