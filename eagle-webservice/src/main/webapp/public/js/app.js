@@ -610,6 +610,7 @@ eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent
 	window.globalContent = $scope.globalContent = globalContent;
 	window.site = $scope.site = Site;
 	window.auth = $scope.auth = Authorization;
+	window.entities = $scope.entities = Entities;
 	$scope.app = app;
 
 	// Clean up
