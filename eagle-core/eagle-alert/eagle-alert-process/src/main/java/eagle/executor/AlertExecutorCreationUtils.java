@@ -18,6 +18,7 @@ package eagle.executor;
 
 import eagle.alert.dao.*;
 import eagle.alert.entity.AlertExecutorEntity;
+import eagle.alert.policy.DefaultPolicyPartitioner;
 import eagle.alert.policy.PolicyPartitioner;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValue;
@@ -92,14 +93,21 @@ public class AlertExecutorCreationUtils {
 	public static AlertExecutor[] createAlertExecutors(Config config, AlertDefinitionDAO alertDefDAO,
 			List<String> streamNames, String alertExecutorId) throws Exception{
 		// Read `alertExecutorConfigs` from configuration and get config for this alertExecutorId
-		Map<String, ConfigValue> alertExecutorConfigs = config.getObject("alertExecutorConfigs");
-        Map<String, Object>  alertExecutorConfig = (Map<String, Object>)alertExecutorConfigs.get(alertExecutorId).unwrapped();
-        int parts = (int)(alertExecutorConfig.get("parallelism"));
-		int numPartitions = parts == 0 ? 1 : parts;
-        String partitionerCls = (String)alertExecutorConfig.get("partitioner");
+        int numPartitions =1;
+        String partitionerCls = DefaultPolicyPartitioner.class.getCanonicalName();
+        String alertExecutorConfigsKey = "alertExecutorConfigs";
+        if(config.hasPath(alertExecutorConfigsKey)) {
+            Map<String, ConfigValue> alertExecutorConfigs = config.getObject(alertExecutorConfigsKey);
+            if(alertExecutorConfigs !=null && alertExecutorConfigs.containsKey(alertExecutorConfigs)) {
+                Map<String, Object> alertExecutorConfig = (Map<String, Object>) alertExecutorConfigs.get(alertExecutorId).unwrapped();
+                int parts = 0;
+                if(alertExecutorConfig.containsKey("parallelism")) parts = (int) (alertExecutorConfig.get("parallelism"));
+                numPartitions = parts == 0 ? 1 : parts;
+                if(alertExecutorConfig.containsKey("partitioner")) partitionerCls = (String) alertExecutorConfig.get("partitioner");
+            }
+        }
 
-		AlertExecutor[] alertExecutors = createAlertExecutors(alertDefDAO, streamNames, alertExecutorId, numPartitions, partitionerCls);
-		return alertExecutors;
+        return createAlertExecutors(alertDefDAO, streamNames, alertExecutorId, numPartitions, partitionerCls);
 	}
 
     /**

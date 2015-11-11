@@ -1,7 +1,7 @@
 package eagle.datastream
 
 import backtype.storm.topology.base.BaseRichSpout
-import com.typesafe.config.{ConfigValue, ConfigObject, ConfigValueFactory, Config}
+import com.typesafe.config._
 import eagle.dataproc.impl.storm.AbstractStormSpoutProvider
 import eagle.dataproc.util.ConfigOptionParser
 
@@ -25,7 +25,7 @@ trait ConfigContext{
    * @tparam T return type
    * @return
    */
-  def get[T](key:String,default:T=null):T = {
+  def get[T](key:String,default:T=null)(implicit tag:TypeTag[T]):T = {
     if(config.hasPath(key)) {
       get(key)
     } else default
@@ -42,7 +42,6 @@ trait ConfigContext{
     case OBJECT_TYPE => config.getObject(key).asInstanceOf[T]
     case VALUE_TYPE => config.getValue(key).asInstanceOf[T]
     case ANY_REF_TYPE => config.getAnyRef(key).asInstanceOf[T]
-
     case INT_LIST_TYPE => config.getIntList(key).asInstanceOf[T]
     case DOUBLE_LIST_TYPE => config.getDoubleList(key).asInstanceOf[T]
     case BOOL_LIST_TYPE => config.getBooleanList(key).asInstanceOf[T]
@@ -66,36 +65,40 @@ trait ConfigContext{
  * @tparam E
  */
 trait StreamApp[+E<:ExecutionEnvironment] extends App with ConfigContext{
-  var _executed = false
-  var _config:Config = null
+  private var _executed = false
+  private var _config:Config = null
 
-  override def config:Config = {
-    if(_config == null) _config = new ConfigOptionParser().load(args)
-    _config
-  }
+  override def config:Config = _config
 
   override def set(config:Config) = _config = config
 
   def env:E
+
   def execute() {
     env.execute()
     _executed = true
   }
 
   override def main(args: Array[String]): Unit = {
+    _config = new ConfigOptionParser().load(args)
     super.main(args)
     if(!_executed) execute()
   }
 }
 
 trait StormStreamApp extends StreamApp[StormExecutionEnvironment]{
-  private val _env:StormExecutionEnvironment = ExecutionEnvironmentFactory.getStorm(config)
+  private var _env:StormExecutionEnvironment = null
   def source(sourceProvider: AbstractStormSpoutProvider) = {
     val spout = sourceProvider.getSpout(config)
-    _env.newSource(spout)
+    env.newSource(spout)
   }
 
-  def source(spout:BaseRichSpout) = _env.newSource(spout)
+  def source(spout:BaseRichSpout) = env.newSource(spout)
 
-  override def env = _env
+  override def env:StormExecutionEnvironment = {
+    if(_env == null){
+      _env = ExecutionEnvironmentFactory.getStorm(config)
+    }
+    _env
+  }
 }
