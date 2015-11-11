@@ -127,7 +127,7 @@ class PeriodicTrainingProducer extends UntypedActor with ActorLogging{
   import eagle.security.userprofile.daemon.CommandProducer._
 
   def checkTrainingProgramStatus(site: String,category:COMMAND_TYPE.TYPE,sender: ActorRef): Unit = {
-    checkProgramStatus(site,category,config.trainingSchedulePolicy,config.detectionAuditPath,sender,log) {(status,path) =>
+    checkProgramStatus(site,category,config.trainingSchedulePolicy,config.trainingAuditPath,sender,log) {(status,path) =>
       UserProfileModelCommand(status,path,site,STATUS.INITIALIZED,COMMAND_SOURCE.PERIODIC,System.currentTimeMillis(),System.currentTimeMillis(),persistable = false)
     }
   }
