@@ -53,6 +53,7 @@ public class HbaseMetadataDAOImpl {
         for(NamespaceDescriptor n : ns) {
             ret.add(n.getName());
         }
+        closeHbaseConnection(admin);
         return ret;
     }
 
@@ -64,6 +65,7 @@ public class HbaseMetadataDAOImpl {
         for(TableName tableName : tables) {
             ret.add(tableName.getNameAsString());
         }
+        closeHbaseConnection(admin);
         return ret;
     }
 
@@ -76,6 +78,17 @@ public class HbaseMetadataDAOImpl {
         for(HColumnDescriptor cf : cfs) {
             ret.add(cf.getNameAsString());
         }
+        closeHbaseConnection(admin);
         return ret;
+    }
+
+    private void closeHbaseConnection(HBaseAdmin admin) {
+        if(admin != null) {
+            try {
+                admin.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
