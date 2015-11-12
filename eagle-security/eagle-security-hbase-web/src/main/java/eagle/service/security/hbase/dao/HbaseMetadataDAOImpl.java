@@ -63,7 +63,7 @@ public class HbaseMetadataDAOImpl {
         TableName[] tables = admin.listTableNamesByNamespace(namespace);
 
         for(TableName tableName : tables) {
-            ret.add(tableName.getNameAsString());
+            ret.add(tableName.getQualifierAsString());
         }
         closeHbaseConnection(admin);
         return ret;
