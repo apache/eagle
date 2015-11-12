@@ -85,6 +85,12 @@ damControllers.controller('alertListCtrl', function(globalContent, Site, damCont
 	$scope.$on('$destroy',function(){
 		$interval.cancel(_loadInterval);
 	});
+
+	// UI
+	$scope.getMessageTime = function(alert) {
+		var _time = common.getValueByPath(alert, "alertContext.properties.timestamp");
+		return Number(_time);
+	};
 });
 
 // =============================================================
@@ -117,4 +123,10 @@ damControllers.controller('alertDetailCtrl', function(globalContent, Site, damCo
 			console.log($scope.alert);
 		}
 	});
+
+	// UI
+	$scope.getMessageTime = function(alert) {
+		var _time = common.getValueByPath(alert, "alertContext.properties.timestamp");
+		return Number(_time);
+	};
 });
