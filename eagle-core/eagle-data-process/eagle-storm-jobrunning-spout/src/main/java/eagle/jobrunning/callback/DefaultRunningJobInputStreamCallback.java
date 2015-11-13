@@ -47,12 +47,12 @@ public class DefaultRunningJobInputStreamCallback implements RunningJobCallback{
 			Map<String, String> config = (Map<String, String>) objects.get(0);
 			// the fist field is fixed as messageId
 			RunningJobMessageId messageId = new RunningJobMessageId(jobId, type, context.fetchedTime);
-			eagleCollector.collect(new ValuesArray(messageId, jobId, type, config));
+			eagleCollector.collect(new ValuesArray(messageId, context.user, jobId, type, config));
 		}
 		else if (type.equals(ResourceType.JOB_RUNNING_INFO) || type.equals(ResourceType.JOB_COMPLETE_INFO)) {
 			// Here timestamp is meaningless, set to null
 			RunningJobMessageId messageId = new RunningJobMessageId(jobId, type, null);
-			eagleCollector.collect(new ValuesArray(messageId, jobId, type, objects));
+			eagleCollector.collect(new ValuesArray(messageId, context.user, jobId, type, objects));
 		}
 	}
 }

@@ -55,7 +55,7 @@ public class FileSensitivityDataJoinExecutor extends JavaStormStreamExecutor2<St
 
     @Override
     public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
-        Map<String, Object> event = (Map<String, Object>)input.get(0);
+        Map<String, Object> event = (Map<String, Object>)input.get(1);
         Map<String, FileSensitivityAPIEntity> map = (Map<String, FileSensitivityAPIEntity>)ExternalDataCache.getInstance().getJobResult(FileSensitivityPollingJob.class);
         FileSensitivityAPIEntity e = null;
         if (LOG.isDebugEnabled()) {

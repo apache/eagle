@@ -55,14 +55,15 @@ public class JobConfigurationAdaptorExecutor extends JavaStormStreamExecutor2<St
 
     @Override
     public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
-        String jobId = (String)input.get(0);
-        ResourceType type = (ResourceType)input.get(1);
+		String user = (String)input.get(0);
+        String jobId = (String)input.get(1);
+        ResourceType type = (ResourceType)input.get(2);
         if (type.equals(ResourceType.JOB_CONFIGURATION)) {
-            Map<String, String> configs = (Map<String, String>)input.get(2);
+            Map<String, String> configs = (Map<String, String>)input.get(3);
             if (filter.acceptJobConf(configs)) {
                 LOG.info("Got a hive job, jobID: " + jobId + ", query: " + configs.get(JobConstants.HIVE_QUERY_STRING));
                 Map<String, Object> map = convertMap(configs);
-                outputCollector.collect(new Tuple2(input.get(0), map));
+                outputCollector.collect(new Tuple2(user, map));
             }
             else {
                 LOG.info("skip non hive job, jobId: " + jobId);
