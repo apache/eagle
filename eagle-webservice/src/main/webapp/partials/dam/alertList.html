@@ -46,7 +46,8 @@
 			<table class="table table-bordered" ng-non-bindable>
 				<thead>
 					<tr>
-						<th width="170" sortpath="timestamp">Time</th>
+						<th width="170" sortpath="timestamp">Alert Time</th>
+						<th width="170" sortpath="alertContext.properties.timestamp">Message Time</th>
 						<th width="105" sortpath="tags.dataSource">Data Source</th>
 						<!--th width="70" sortpath="severity">Type</th-->
 						<th width="150" sortpath="tags.policyId">Policy Name</th>
@@ -59,6 +60,7 @@
 				<tbody>
 					<tr ng-class="{info : item.__new}">
 						<td>{{common.format.date(item.timestamp)}}</td>
+						<td>{{common.format.date(_parent.getMessageTime(item))}}</td>
 						<td>{{item.tags.dataSource}}</td>
 						<!--td>{{item.severity}}</td-->
 						<td class="text-nowrap">

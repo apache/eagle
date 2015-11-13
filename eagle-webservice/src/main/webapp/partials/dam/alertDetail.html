@@ -31,8 +31,12 @@
 			<dl><dt>Data Source</dt><dd>{{alert.tags.dataSource}}</dd></dl>
 		</div>
 		<div class="inline-group">
-			<dl><dt>Severity</dt><dd>{{alert.alertContext.properties.severity}}</dd></dl>
+			<dl><dt>Alert Time</dt><dd>{{common.format.date(alert.timestamp)}}</dd></dl>
+			<dl><dt>Message Time</dt><dd>{{common.format.date(getMessageTime(alert.timestamp))}}</dd></dl>
 		</div>
+		<!--div class="inline-group">
+			<dl><dt>Severity</dt><dd>{{alert.alertContext.properties.severity}}</dd></dl>
+		</div-->
 		<div class="inline-group">
 			<dl><dt>Stream Name</dt><dd>{{alert.tags.sourceStreams}}</dd></dl>
 		</div>
@@ -40,10 +44,14 @@
 			<dl><dt>Alert Source</dt><dd>{{alert.tags.alertSource}}</dd></dl>
 		</div>
 		<div class="inline-group">
-			<dl><dt>Event</dt><dd>{{alert.alertContext.properties.event}}</dd></dl>
+			<dl><dt>User</dt><dd>{{alert.alertContext.properties.user}}</dd></dl>
+			<dl><dt>Host</dt><dd>{{alert.alertContext.properties.host}}</dd></dl>
 		</div>
 		<div class="inline-group">
-			<dl><dt>Message</dt><dd>{{alert.alertContext.properties.emailMessage}}</dd></dl>
+			<dl><dt>Event</dt><dd>{{alert.alertContext.properties.alertEvent}}</dd></dl>
+		</div>
+		<div class="inline-group">
+			<dl><dt>Message</dt><dd>{{alert.alertContext.properties.alertMessage}}</dd></dl>
 		</div>
 	</div><!-- /.box-body -->
 
