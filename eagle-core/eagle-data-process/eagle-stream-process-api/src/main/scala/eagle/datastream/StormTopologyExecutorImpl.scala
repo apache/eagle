@@ -39,9 +39,14 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
     else {
       val cluster: LocalCluster = new LocalCluster
       cluster.submitTopology(topologyName, conf, topology)
-      Utils.sleep(Integer.MAX_VALUE)
-      cluster.killTopology(topologyName)
-      cluster.shutdown
+      while(true) {
+        try {
+          Utils.sleep(Integer.MAX_VALUE)
+        }
+        catch {
+          case _ => () // Do nothing
+        }
+      }
     }
   }
 }
