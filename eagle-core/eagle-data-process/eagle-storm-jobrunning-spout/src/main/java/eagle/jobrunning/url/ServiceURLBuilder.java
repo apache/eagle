@@ -17,5 +17,5 @@
 package eagle.jobrunning.url;
 
 public interface ServiceURLBuilder {
-	public String build(String ... parameters);
+	String build(String ... parameters);
 }

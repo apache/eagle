@@ -23,5 +23,5 @@ import java.io.Serializable;
  *
  */
 public interface EagleOutputCollector extends Serializable{
-	public void collect(ValuesArray t);
+	void collect(ValuesArray t);
 }

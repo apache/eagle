@@ -16,6 +16,7 @@
  */
 package eagle.ml.impl;
 
+import eagle.alert.common.AlertConstants;
 import eagle.alert.policy.PolicyEvaluator;
 import eagle.alert.policy.PolicyEvaluatorServiceProvider;
 import eagle.ml.MLPolicyEvaluator;
@@ -29,9 +30,12 @@ import java.util.List;
 import java.util.Properties;
 
 public class MLPolicyEvaluatorServiceProviderImpl implements PolicyEvaluatorServiceProvider {
+
+	private final static String ALERT_CONTEXT = "alertContext";
+
 	@Override
 	public String getPolicyType() {
-		return "MachineLearning";
+		return AlertConstants.policyType.MachineLearning.name();
 	}
 
 	@Override
@@ -41,8 +45,8 @@ public class MLPolicyEvaluatorServiceProviderImpl implements PolicyEvaluatorServ
 
 	@Override
 	public List<Module> getBindingModules() {
-		Module module1 = new SimpleModule("machineLearningPolicyDefinition").registerSubtypes(new NamedType(MLPolicyDefinition.class, getPolicyType()));
-		Module module2 = new SimpleModule("alertContext").registerSubtypes(new NamedType(Properties.class, getPolicyType()));
-		return Arrays.asList(module1,module2);
+		Module module1 = new SimpleModule(AlertConstants.POLICY_DEFINITION).registerSubtypes(new NamedType(MLPolicyDefinition.class, getPolicyType()));
+		Module module2 = new SimpleModule(ALERT_CONTEXT).registerSubtypes(new NamedType(Properties.class, getPolicyType()));
+		return Arrays.asList(module1, module2);
 	}
 }

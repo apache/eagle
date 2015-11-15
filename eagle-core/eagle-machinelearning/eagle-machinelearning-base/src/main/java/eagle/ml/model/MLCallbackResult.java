@@ -65,8 +65,18 @@ public class MLCallbackResult {
 	public void setFeature(List<String> feature) {
 		this.feature = feature;
 	}
+
+	private boolean doesFeatureExist(String f){
+		boolean alreadyExist = false;
+		for(String s:feature){
+			if(s.equalsIgnoreCase(f))
+				alreadyExist = true;
+		}
+		return alreadyExist;
+	}
 	public void setFeature(String aFeature) {
-		feature.add(aFeature);
+		if(doesFeatureExist(aFeature) == false)
+			feature.add(aFeature);
 	}
 	public double getConfidence() {
 		return confidence;

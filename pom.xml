@@ -39,8 +39,6 @@
         <module>eagle-external</module>
         <module>eagle-assembly</module>
         <module>eagle-topology-assembly</module>
-
-        <module>eagle-experimental</module>
     </modules>
 
     <properties>

@@ -113,7 +113,7 @@ public class AlertEmailSender implements Runnable {
 				}
 				LOG.info("Env is: " + env);
 				final VelocityContext context = new VelocityContext();
-				generateCommonContext(context, env);
+				generateCommonContext(context);
 				LOG.info("After calling generateCommonContext...");
 				additionalContext(context, env);
 				
@@ -145,7 +145,7 @@ public class AlertEmailSender implements Runnable {
 		}
 	}
 	
-	private void generateCommonContext(VelocityContext context, String env) {
+	private void generateCommonContext(VelocityContext context) {
 		context.put(AlertConstants.ALERT_EMAIL_TIME_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds( System.currentTimeMillis() ));
 		context.put(AlertConstants.ALERT_EMAIL_COUNT_PROPERTY, alertContexts.size());
 		context.put(AlertConstants.ALERT_EMAIL_ALERTLIST_PROPERTY, alertContexts);

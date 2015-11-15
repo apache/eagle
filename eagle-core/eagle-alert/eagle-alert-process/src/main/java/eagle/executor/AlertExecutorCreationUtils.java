@@ -16,12 +16,14 @@
  */
 package eagle.executor;
 
+import eagle.alert.common.AlertConstants;
 import eagle.alert.dao.*;
 import eagle.alert.entity.AlertExecutorEntity;
 import eagle.alert.policy.DefaultPolicyPartitioner;
 import eagle.alert.policy.PolicyPartitioner;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValue;
+import eagle.common.config.EagleConfigConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,7 @@ public class AlertExecutorCreationUtils {
 
     public static AlertExecutor[] createAlertExecutors(Config config, String alertExecutorId) throws Exception{
         // Read site and dataSource from configuration.
-        String dataSource = config.getString("eagleProps.dataSource");
+        String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
         LOG.info("Loading alerting definitions for dataSource: " + dataSource);
 
         // Get map from alertExecutorId to alert stream
@@ -60,7 +62,7 @@ public class AlertExecutorCreationUtils {
         AlertExecutorDAOImpl alertExecutorDAO = new AlertExecutorDAOImpl(config);
         List<AlertExecutorEntity> alertExecutorEntities = alertExecutorDAO.findAlertExecutor(dataSource, alertExecutorId);
         for(AlertExecutorEntity entity : alertExecutorEntities){
-            streamNames.add(entity.getTags().get("streamName"));
+            streamNames.add(entity.getTags().get(AlertConstants.STREAM_NAME));
         }
 
         if(streamNames.isEmpty()){

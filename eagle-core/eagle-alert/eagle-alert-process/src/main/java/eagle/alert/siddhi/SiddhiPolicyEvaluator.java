@@ -130,13 +130,13 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 		executionPlanRuntime.start();
 
 		QueryCallback callback = new SiddhiQueryCallbackImpl(config, this);		
-				
+
 		LOG.info("Siddhi query: " + expression);
-		executionPlanRuntime.addCallback("query", callback);
-		
+		executionPlanRuntime.addCallback(EXECUTION_PLAN_NAME, callback);
+
 		List<String> outputFields = new ArrayList<String>();
 		try {
-	        Field field = QueryCallback.class.getDeclaredField("query");
+	        Field field = QueryCallback.class.getDeclaredField(EXECUTION_PLAN_NAME);
 	        field.setAccessible(true);
 	        Query query = (Query)field.get(callback);
 	        List<OutputAttribute> list = query.getSelector().getSelectionList();
@@ -213,7 +213,7 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 		AbstractPolicyDefinition policyDef = null;
 		try {
 			policyDef = JsonSerDeserUtils.deserialize(newAlertDef.getPolicyDef(), 
-					AbstractPolicyDefinition.class, PolicyManager.getInstance().getPolicyModules(newAlertDef.getTags().get("policyType")));
+					AbstractPolicyDefinition.class, PolicyManager.getInstance().getPolicyModules(newAlertDef.getTags().get(AlertConstants.POLICY_TYPE)));
 		}
 		catch (Exception ex) {
 			LOG.error("Initial policy def error, ", ex);
