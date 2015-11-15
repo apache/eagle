@@ -117,14 +117,18 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
         }
  	   
         if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
-            LOG.warn("No alert definitions was found for site: "+site+", dataSource: "+dataSource);
+            LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
         }
         else {
 		    for (String alertExecutorId: alertExecutorIdList) {
-			   for(AlertDefinitionAPIEntity alertDef : initialAlertDefs.get(alertExecutorId).values()){
-					List<AlertEmailGenerator> gens = createAlertEmailGenerator(alertDef);
-					tmpEmailGenerators.put(alertDef.getTags().get("policyId"), gens);
-			   }
+                if(initialAlertDefs.containsKey(alertExecutorId)) {
+                    for (AlertDefinitionAPIEntity alertDef : initialAlertDefs.get(alertExecutorId).values()) {
+                        List<AlertEmailGenerator> gens = createAlertEmailGenerator(alertDef);
+                        tmpEmailGenerators.put(alertDef.getTags().get("policyId"), gens);
+                    }
+                }else{
+                    LOG.info(String.format("No alert definitions found for site: %s, dataSource: %s, alertExecutorId: %s",site,dataSource,alertExecutorId));
+                }
 		    }
         }
 		
