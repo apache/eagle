@@ -22,37 +22,34 @@ import akka.actor.{Props, _}
  * @since  9/11/15
  */
 case class Initialized(context: SchedulerContext)
-case class DynamicLoadDataSourceConfig()
-case class CheckPersistedCommands(var site: String, var category: SchedulerContext.COMMAND_TYPE.TYPE)
-case class CheckScheduledStatus(var site: String, var category: SchedulerContext.COMMAND_TYPE.TYPE)
+case class CheckOndemandTrainingStatus(var site: String, var category: SchedulerContext.COMMAND_TYPE.TYPE)
+case class CheckPeriodicTrainingStatus(var site: String, var category: SchedulerContext.COMMAND_TYPE.TYPE)
 case class Terminated(context: SchedulerContext)
 
 class CommandCoordinator extends UntypedActor with ActorLogging{
   var consumer:ActorRef = null
-  var persistedCommandsProducer:ActorRef = null
-  var scheduledCommandsProducer:ActorRef = null
+  var ondemandTrainingProducer:ActorRef = null
+  var periodicTrainingProducer:ActorRef = null
 
   override def preStart(): Unit = {
     consumer = context.actorOf(Props[UserProfileCommandConsumer],"userprofile-command-consumer")
-    persistedCommandsProducer = context.actorOf(Props[PersistedCommandProducer],"persisted-command-producer")
-    scheduledCommandsProducer = context.actorOf(Props[ScheduledCommandProducer],"scheduled-command-producer")
+    ondemandTrainingProducer = context.actorOf(Props[OndemandTrainingProducer],"persisted-command-producer")
+    periodicTrainingProducer = context.actorOf(Props[PeriodicTrainingProducer],"scheduled-command-producer")
   }
 
   override def onReceive(message: Any): Unit = message match {
     case Initialized(config) =>
       log.info(s"Config updated: $config")
-      persistedCommandsProducer ! config
-      scheduledCommandsProducer ! config
+      ondemandTrainingProducer ! config
+      periodicTrainingProducer ! config
       consumer ! config
-    case request: CheckPersistedCommands =>
-      persistedCommandsProducer ! request
-    case request: CheckScheduledStatus =>
-      scheduledCommandsProducer ! request
+    case request: CheckOndemandTrainingStatus =>
+      ondemandTrainingProducer ! request
+    case request: CheckPeriodicTrainingStatus =>
+      periodicTrainingProducer ! request
     case command: Command =>
       log.info(s"*** NEW Command: $command ***")
       consumer ! command
-    case DynamicLoadDataSourceConfig =>
-    // TODO: Dynamically load data source config
     case Terminated(config) =>
       log.info("Coordinator exited")
     case _ =>

@@ -53,11 +53,6 @@ object SchedulerContext {
   val UserProfileConfigKey_ServicePort="eagle.service.port"
   val UserProfileConfigKey_UserName="eagle.service.username"
   val UserProfileConfigKey_Password="eagle.service.password"
-  val UserProfileConfigKey_AggAuditPath="eagle.userprofile.detection-audit-path"
-  val UserProfileConfigKey_AggKafkaBrokers="eagle.userprofile.detection-kafka-brokers"
-  val UserProfileConfigKey_AggKafkaTopic="eagle.userprofile.detection-kafka-topic"
-  val UserProfileConfigKey_AggIntervalSeconds="eagle.userprofile.detection-interval-seconds"
-  val UserProfileConfigKey_AggInitialDelaySeconds="eagle.userprofile.detection-initial-delay-seconds"
   val UserProfileConfigKey_SyncIntervalSeconds="eagle.userprofile.sync-interval-seconds"
   // ======================================================================================
   // End of Configuration Keys
@@ -66,12 +61,12 @@ object SchedulerContext {
 
   object COMMAND_TYPE extends Enumeration {
     type TYPE = Value
-    val USER_PROFILE_DETECTION, USER_PROFILE_TRAINING = Value
+    val USER_PROFILE_TRAINING = Value
   }
 
   object COMMAND_SOURCE extends Enumeration {
     type TYPE = Value
-    val SCHEDULED, ONETIME  = Value
+    val PERIODIC, ONDEMAND  = Value
   }
 
   /**
@@ -97,24 +92,14 @@ object SchedulerContext {
       throw new IllegalArgumentException(s"Config[$UserProfileConfigKey_ModelAuditPath] should not be null")
     }
 
-    if(config.hasPath(UserProfileConfigKey_ModelIntervalSeconds)) context.detectionIntervalSeconds = config.getLong(UserProfileConfigKey_ModelIntervalSeconds)
-    if(config.hasPath(UserProfileConfigKey_ModelInitialDelaySeconds)) context.detectionInitialDelaySeconds = config.getLong(UserProfileConfigKey_ModelInitialDelaySeconds)
+    if(config.hasPath(UserProfileConfigKey_ModelIntervalSeconds)) context.trainingIntervalSeconds = config.getLong(UserProfileConfigKey_ModelIntervalSeconds)
+    if(config.hasPath(UserProfileConfigKey_ModelInitialDelaySeconds)) context.trainingInitialDelaySeconds = config.getLong(UserProfileConfigKey_ModelInitialDelaySeconds)
 
     if(config.hasPath(UserProfileConfigKey_ServiceHost)) context.eagleServiceContext.serviceHost = config.getString(UserProfileConfigKey_ServiceHost)
     if(config.hasPath(UserProfileConfigKey_ServicePort)) context.eagleServiceContext.servicePort = config.getInt(UserProfileConfigKey_ServicePort)
     if(config.hasPath(UserProfileConfigKey_UserName)) context.eagleServiceContext.username = config.getString(UserProfileConfigKey_UserName)
     if(config.hasPath(UserProfileConfigKey_Password)) context.eagleServiceContext.password = config.getString(UserProfileConfigKey_Password)
 
-    // Aggregation configuration
-    if(config.hasPath(UserProfileConfigKey_AggAuditPath)){
-      context.detectionAuditPath = config.getString(UserProfileConfigKey_AggAuditPath)
-    }else{
-      throw new IllegalArgumentException(s"Config[$UserProfileConfigKey_AggAuditPath] should not be null")
-    }
-    if(config.hasPath(UserProfileConfigKey_AggKafkaBrokers)) context.detectionKafkaBrokers = config.getString(UserProfileConfigKey_AggKafkaBrokers)
-    if(config.hasPath(UserProfileConfigKey_AggKafkaTopic)) context.detectionKafkaTopic = config.getString(UserProfileConfigKey_AggKafkaTopic)
-    if(config.hasPath(UserProfileConfigKey_AggIntervalSeconds)) context.detectionIntervalSeconds = config.getLong(UserProfileConfigKey_AggIntervalSeconds)
-    if(config.hasPath(UserProfileConfigKey_AggInitialDelaySeconds)) context.detectionInitialDelaySeconds = config.getLong(UserProfileConfigKey_AggInitialDelaySeconds)
     if(config.hasPath(UserProfileConfigKey_JobJarFilePath)) context.jobJar = config.getString(UserProfileConfigKey_JobJarFilePath)
 
     if(config.hasPath(UserProfileConfigKey_SparkMaster)) context.sparkMaster = config.getString(UserProfileConfigKey_SparkMaster)
@@ -149,36 +134,11 @@ case class SchedulerContext(
   var trainingIntervalSeconds:Long = 60,
   var trainingInitialDelaySeconds:Long = 0,
   /**
-   * Detection audit file input path
-   */
-  var detectionAuditPath:String = null,
-  /**
-   * Detection output kafka broker hosts
-   */
-  var detectionKafkaBrokers:String = "localhost:6667",
-  /**
-   * Detection output kafka topic name
-   */
-  var detectionKafkaTopic:String = "hdfs_audit_agg",
-  /**
-   * Detection interval seconds
-   */
-  var detectionIntervalSeconds:Long = 30,
-  /**
-   * Detection initial delay seconds
-   */
-  var detectionInitialDelaySeconds:Long = 0,
-  /**
    * Detection sync commands interval in seconds
    */
   var syncIntervalSeconds:Long = 5,
   /**
    * Training program schedule policy
    */
-  trainingSchedulePolicy:SchedulePolicy = new MonthlySchedulePolicy(),
-
-  /**
-   * Detection program schedule policy
-   */
-  detectionSchedulePolicy:SchedulePolicy = new DefaultSchedulePolicy(Period.parse("PT1m"))
+  trainingSchedulePolicy:SchedulePolicy = new MonthlySchedulePolicy()
 )

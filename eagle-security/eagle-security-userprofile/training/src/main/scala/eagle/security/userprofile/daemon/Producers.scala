@@ -63,7 +63,7 @@ object CommandProducer{
   }
 }
 
-class PersistedCommandProducer extends UntypedActor with ActorLogging{
+class OndemandTrainingProducer extends UntypedActor with ActorLogging{
   @volatile var dao:UserProfileCommandDao=null
   @volatile var config:SchedulerContext=null
 
@@ -78,7 +78,7 @@ class PersistedCommandProducer extends UntypedActor with ActorLogging{
       }
       config = _config
       dao = new UserProfileCommandDao(config.eagleServiceContext.serviceHost,config.eagleServiceContext.servicePort,config.eagleServiceContext.username,config.eagleServiceContext.password,this)
-    case CheckPersistedCommands(site,category) =>
+    case CheckOndemandTrainingStatus(site,category) =>
       val _sender = sender()
       dao.readNewInitializedCommandByType(site,category) onComplete {
         case Success(optionalEntities) =>
@@ -114,32 +114,21 @@ class PersistedCommandProducer extends UntypedActor with ActorLogging{
         val policy = config.trainingSchedulePolicy
         val status = entity.getTimestamp
         val path = Utils.formatPathWithMilliseconds(config.trainingAuditPath)(status)
-        UserProfileModelCommand(entity.getTimestamp,path,site,STATUS.INITIALIZED,COMMAND_SOURCE.ONETIME,entity.getTimestamp,entity.getUpdateTime,persistable = true)
-      case COMMAND_TYPE.USER_PROFILE_DETECTION =>
-        val policy = config.detectionSchedulePolicy
-        val status = entity.getTimestamp
-        val path = Utils.formatPathWithMilliseconds(config.detectionAuditPath)(status)
-        UserProfileAggCommand(entity.getTimestamp,path,site,STATUS.INITIALIZED,COMMAND_SOURCE.ONETIME,entity.getTimestamp,entity.getUpdateTime,persistable = true)
+        UserProfileModelCommand(entity.getTimestamp,path,site,STATUS.INITIALIZED,COMMAND_SOURCE.ONDEMAND,entity.getTimestamp,entity.getUpdateTime,persistable = true)
       case _ => throw new IllegalArgumentException(s"Unknown type of command type: $category")
     }
   }
 }
 
-class ScheduledCommandProducer extends UntypedActor with ActorLogging{
+class PeriodicTrainingProducer extends UntypedActor with ActorLogging{
   @volatile var config:SchedulerContext = null
   @volatile var dao:UserProfileCommandDao=null
 
   import eagle.security.userprofile.daemon.CommandProducer._
 
   def checkTrainingProgramStatus(site: String,category:COMMAND_TYPE.TYPE,sender: ActorRef): Unit = {
-    checkProgramStatus(site,category,config.trainingSchedulePolicy,config.detectionAuditPath,sender,log) {(status,path) =>
-      UserProfileModelCommand(status,path,site,STATUS.INITIALIZED,COMMAND_SOURCE.SCHEDULED,System.currentTimeMillis(),System.currentTimeMillis(),persistable = false)
-    }
-  }
-
-  def checkDetectionProgramStatus(site: String,category:COMMAND_TYPE.TYPE,sender: ActorRef): Unit = {
-    checkProgramStatus(site,category,config.detectionSchedulePolicy,config.detectionAuditPath,sender,log) {(status,path) =>
-      UserProfileAggCommand(status,path,site,STATUS.INITIALIZED,COMMAND_SOURCE.SCHEDULED,System.currentTimeMillis(),System.currentTimeMillis(),persistable = false)
+    checkProgramStatus(site,category,config.trainingSchedulePolicy,config.trainingAuditPath,sender,log) {(status,path) =>
+      UserProfileModelCommand(status,path,site,STATUS.INITIALIZED,COMMAND_SOURCE.PERIODIC,System.currentTimeMillis(),System.currentTimeMillis(),persistable = false)
     }
   }
 
@@ -152,14 +141,11 @@ class ScheduledCommandProducer extends UntypedActor with ActorLogging{
       }
       config = _config
       dao = new UserProfileCommandDao(config.eagleServiceContext.serviceHost,config.eagleServiceContext.servicePort,config.eagleServiceContext.username,config.eagleServiceContext.password,this)
-    case CheckScheduledStatus(site,category) =>
+    case CheckPeriodicTrainingStatus(site,category) =>
       category match {
         case COMMAND_TYPE.USER_PROFILE_TRAINING =>
           log.debug("Checking training program status")
           checkTrainingProgramStatus(site,category,sender())
-        case COMMAND_TYPE.USER_PROFILE_DETECTION =>
-          log.debug("Checking detection program status")
-          checkDetectionProgramStatus(site,category,sender())
         case _ =>
           log.error(s"Unknown type of category: $category")
       }

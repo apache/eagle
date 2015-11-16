@@ -23,7 +23,7 @@ import eagle.dataproc.util.ConfigOptionParser
 import scala.concurrent.duration._
 
 /**
- * User Profile Daemon Scheduler
+ * User Profile Training Scheduler
  *
  * @since  9/11/15
  */
@@ -42,11 +42,9 @@ class Scheduler(config:SchedulerContext) {
     // Initialize when start
     system.scheduler.scheduleOnce(0.seconds,coordinator,Initialized(config))
 
-    system.scheduler.schedule(1.seconds,config.syncIntervalSeconds.seconds,coordinator,CheckPersistedCommands(config.site,COMMAND_TYPE.USER_PROFILE_TRAINING))
-    system.scheduler.schedule(1.seconds,config.syncIntervalSeconds.seconds,coordinator,CheckPersistedCommands(config.site,COMMAND_TYPE.USER_PROFILE_DETECTION))
+    system.scheduler.schedule(1.seconds,config.syncIntervalSeconds.seconds,coordinator,CheckOndemandTrainingStatus(config.site,COMMAND_TYPE.USER_PROFILE_TRAINING))
 
-    system.scheduler.schedule(config.trainingInitialDelaySeconds.seconds,config.trainingIntervalSeconds.seconds,coordinator,CheckScheduledStatus(config.site,COMMAND_TYPE.USER_PROFILE_TRAINING))
-    system.scheduler.schedule(config.detectionInitialDelaySeconds.seconds,config.detectionIntervalSeconds.seconds,coordinator,CheckScheduledStatus(config.site,COMMAND_TYPE.USER_PROFILE_DETECTION))
+    system.scheduler.schedule(config.trainingInitialDelaySeconds.seconds,config.trainingIntervalSeconds.seconds,coordinator,CheckPeriodicTrainingStatus(config.site,COMMAND_TYPE.USER_PROFILE_TRAINING))
 
     system.registerOnTermination(new Runnable {
       override def run(): Unit = {
