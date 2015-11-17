@@ -53,8 +53,19 @@ public class KafkaSourcedSpoutProvider extends AbstractStormSpoutProvider{
         //String realTopic = (site ==null)? topic : String.format("%s_%s",site,topic);
 
         LOG.info(String.format("Use topic id: %s",topic));
-		
-		BrokerHosts hosts = new ZkHosts(zkConnString);
+
+        String brokerZkPath = null;
+        if(context.hasPath("dataSourceConfig.brokerZkPath")) {
+            brokerZkPath = context.getString("dataSourceConfig.brokerZkPath");
+        }
+
+        BrokerHosts hosts;
+        if(brokerZkPath == null) {
+            hosts = new ZkHosts(zkConnString);
+        } else {
+            hosts = new ZkHosts(zkConnString, brokerZkPath);
+        }
+        
 		SpoutConfig spoutConfig = new SpoutConfig(hosts, 
 				topic,
 				zkRoot + "/" + topic,
