@@ -36,5 +36,6 @@
     <module>eagle-security-hive</module>
     <module>eagle-security-hive-web</module>
     <module>eagle-security-hdfs-web</module>
+    <module>eagle-security-hdfs-securitylog</module>
   </modules>
 </project>
