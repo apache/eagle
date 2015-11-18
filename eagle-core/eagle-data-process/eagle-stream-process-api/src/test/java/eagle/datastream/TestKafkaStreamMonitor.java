@@ -14,16 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eagle.dataproc.impl.storm;
+package eagle.datastream;
 
-import backtype.storm.topology.base.BaseRichSpout;
-
-import com.typesafe.config.Config;
+import eagle.datastream.kafka.KafkaStreamMonitorApp;
 
 /**
- * Normally storm spout is a special part of storm topology and it is implemented in underlying spout implementation
- * which can be retrieved from getSpout method.
+ * @since 11/7/15
  */
-public abstract class AbstractStormSpoutProvider{
-	public abstract BaseRichSpout getSpout(Config context);
+public class TestKafkaStreamMonitor {
+    public static void main(String[] args){
+        new KafkaStreamMonitorApp().main(args);
+    }
 }

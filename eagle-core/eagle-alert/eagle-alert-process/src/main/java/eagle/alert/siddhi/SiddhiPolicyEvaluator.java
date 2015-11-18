@@ -118,7 +118,7 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 			String streamDef = SiddhiStreamMetadataUtils.convertToStreamDef(sourceStream);
 			LOG.info("Siddhi stream definition : " + streamDef);
 			sb.append(streamDef);
-		}		
+		}
 		
 		String expression = addContextFieldIfNotExist(policyDef.getExpression());
 		String executionPlan = sb.toString() + " @info(name = '" + EXECUTION_PLAN_NAME + "') " +  expression;
@@ -126,7 +126,7 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 		
 		for(String sourceStream : sourceStreams){			
 			siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
-		}		
+		}
 		executionPlanRuntime.start();
 
 		QueryCallback callback = new SiddhiQueryCallbackImpl(config, this);		
@@ -174,7 +174,7 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 		validateEventInRuntime(streamName, map);
 		synchronized(siddhiRuntime){
 			//insert siddhiAlertContext into the first field
-			List<Object> input = new ArrayList<Object>();
+			List<Object> input = new ArrayList<>();
 			input.add(siddhiAlertContext);
 			putAttrsIntoInputStream(input, streamName, map);
 			siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));

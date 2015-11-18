@@ -787,7 +787,16 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 				$scope.policy.policyDef = JSON.stringify($scope.policy.__.policy);
 
 				// alertExecutorId
-				$scope.policy.tags.alertExecutorId = $scope._stream.alertExecutor.tags.alertExecutorId;
+				if($scope._stream.alertExecutor) {
+					$scope.policy.tags.alertExecutorId = $scope._stream.alertExecutor.tags.alertExecutorId;
+				} else {
+					$scope.lock = false;
+					$.dialog({
+						title: "OPS!",
+						content: "Alert Executor not defined! Please check 'AlertExecutorService'!"
+					});
+					return;
+				}
 
 				// site
 				$scope.policy.tags.site = $scope.policy.tags.site || Site.current().name;

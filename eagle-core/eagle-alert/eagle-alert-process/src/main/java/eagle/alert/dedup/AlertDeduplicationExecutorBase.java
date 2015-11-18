@@ -101,17 +101,21 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
             LOG.warn("No alert definitions was found for site: "+site+", dataSource: "+dataSource);
         } else {
 		    for (String alertExecutorId: alertExecutorIdList) {
-			   for(AlertDefinitionAPIEntity alertDef : initialAlertDefs.get(alertExecutorId).values()){
-				   try {
-				   	  DefaultDeduplicator<AlertAPIEntity> deduplicator = createAlertDedup(alertDef);
-					  if (deduplicator != null) 
-						  tmpDeduplicators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), deduplicator);
-					  else LOG.warn("The dedup interval is not set, alertDef: " + alertDef);
-					}
-					catch (Throwable t) {
-						LOG.error("Got an exception when initial dedup config, probably dedup config is not set: " + t.getMessage() + "," + alertDef);
-					}
-			   	}
+			    if(initialAlertDefs.containsKey(alertExecutorId)){
+                    for(AlertDefinitionAPIEntity alertDef : initialAlertDefs.get(alertExecutorId).values()){
+                       try {
+                          DefaultDeduplicator<AlertAPIEntity> deduplicator = createAlertDedup(alertDef);
+                          if (deduplicator != null)
+                              tmpDeduplicators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), deduplicator);
+                          else LOG.warn("The dedup interval is not set, alertDef: " + alertDef);
+                        }
+                        catch (Throwable t) {
+                            LOG.error("Got an exception when initial dedup config, probably dedup config is not set: " + t.getMessage() + "," + alertDef);
+                        }
+                    }
+                } else {
+                    LOG.info(String.format("No alert definitions found for site: %s, dataSource: %s, alertExecutorId: %s",site,dataSource,alertExecutorId));
+                }
 		    }
         }
 

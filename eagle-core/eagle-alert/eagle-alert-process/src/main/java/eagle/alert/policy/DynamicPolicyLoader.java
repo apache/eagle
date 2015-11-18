@@ -105,8 +105,8 @@ public class DynamicPolicyLoader {
 			public void handleEvent(EventType eventType, PollResult lastResult,
 					Throwable exception) {
 				if (lastResult == null) {
-					LOG.error("The lastRult is null, something must be wrong, probably the eagle service is dead!");
-					throw new RuntimeException("The lastRult is null, probably the eagle service is dead! ", exception);
+					LOG.error("The lastResult is null, something must be wrong, probably the eagle service is dead!");
+					throw new RuntimeException("The lastResult is null, probably the eagle service is dead! ", exception);
 				}
 				Map<String, Object> added = lastResult.getAdded();
 				Map<String, Object> changed = lastResult.getChanged();

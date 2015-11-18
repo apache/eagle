@@ -41,7 +41,7 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
         val spout = StormSpoutFactory.createSpout(config, from.asInstanceOf[StormSourceProducer])
         builder.setSpout(fromName, spout, from.parallelism)
         LOG.info("Spout name : " + fromName + " with parallelism " + from.parallelism)
-      }else{
+      } else {
         LOG.info("Bolt name:" + fromName)
       }
 
@@ -70,11 +70,11 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
         LOG.info("bolt connected " + fromName + "->" + toName + " with groupby fields " + sc.groupByFields)
       })
     }
-    new StormTopologyExecutorImpl(builder.createTopology, config);
+    new StormTopologyExecutorImpl(builder.createTopology, config)
   }
 
   def fields(fields : Seq[Int]): java.util.List[String] ={
-    var ret = new util.ArrayList[String]
+    val ret = new util.ArrayList[String]
     fields.map(n => ret.add(OutputFieldNameConst.FIELD_PREFIX + n))
     ret
   }
