@@ -17,9 +17,7 @@
 package eagle.security.hive.jobrunning;
 
 import com.typesafe.config.Config;
-import eagle.datastream.Collector;
-import eagle.datastream.JavaStormStreamExecutor1;
-import eagle.datastream.Tuple1;
+import eagle.datastream.*;
 import eagle.security.hive.ql.HiveQLParserContent;
 import eagle.security.hive.ql.Parser;
 import org.slf4j.Logger;
@@ -33,7 +31,7 @@ import java.util.TreeMap;
 /**
  * parse hive query log
  */
-public class HiveQueryParserExecutor extends JavaStormStreamExecutor1< Map> {
+public class HiveQueryParserExecutor extends JavaStormStreamExecutor2<String, Map> {
 	private static final long serialVersionUID = -5878930561335302957L;
 	private static final Logger LOG = LoggerFactory.getLogger(HiveQueryParserExecutor.class);
 
@@ -50,7 +48,7 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor1< Map> {
 	}
 
     @Override
-    public void flatMap(java.util.List<Object> input, Collector<Tuple1<Map>> outputCollector){
+    public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
         /**
          * hiveQueryLog includes the following key value pair
          * "hive.current.database" -> <database name>
@@ -58,6 +56,7 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor1< Map> {
          * "mapreduce.job.user.name" -> <user name>
          * TODO we need hive job start and end time
          */
+        String user = (String)input.get(0);
         @SuppressWarnings("unchecked")
         Map<String, Object> hiveQueryLog = (Map<String, Object>)input.get(1);
         LOG.info("Receive hive query log: " + hiveQueryLog);
@@ -142,6 +141,6 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor1< Map> {
         event.put("resource", resources.toString());
         LOG.info("HiveQL Parser event stream. " + event);
 
-        outputCollector.collect(new Tuple1(event));
+        outputCollector.collect(new Tuple2(user, event));
     }
 }

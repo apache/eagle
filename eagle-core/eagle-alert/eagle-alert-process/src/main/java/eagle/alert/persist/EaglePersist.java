@@ -49,22 +49,22 @@ public class EaglePersist {
 	
 	public boolean doPersist(List<? extends TaggedLogAPIEntity> list) {
 		if (list.isEmpty()) return false;
-		LOG.info("Going to persist entites, type: " + " " + list.get(0).getClass().getSimpleName() + ", list size: " + list.size());
+		LOG.info("Going to persist entities, type: " + " " + list.get(0).getClass().getSimpleName() + ", list size: " + list.size());
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
 			GenericServiceAPIResponseEntity<String> response = client.create(list);
 			client.close();
 			if (response.isSuccess()) {
-				LOG.info("Successfully create entites " + list.toString());
+				LOG.info("Successfully create entities " + list.toString());
 				return true;
 			}
 			else {
-				LOG.error("Fail to create entites");
+				LOG.error("Fail to create entities");
 				return false;
 			}
 		}
 		catch (Exception ex) {
-			LOG.error("Got an exception in persisting entites" + ex.getMessage(), ex);
+			LOG.error("Got an exception in persisting entities" + ex.getMessage(), ex);
 			return false;
 		}
 	}

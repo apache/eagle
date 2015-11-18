@@ -154,8 +154,8 @@ public class JobRunningSpout extends BaseRichSpout {
 				try {
 					readWriteLock.readLock().lock();
 					zkStateManager.addProcessedJob(type, messageId.jobID);
-					// Here timestamp is meaningless, set to null
-					crawler.removeFromProcessingList(type, new JobContext(messageId.jobID, null));
+					// Here username & timestamp is meaningless, set to null
+					crawler.removeFromProcessingList(type, new JobContext(messageId.jobID, null, null));
 				}
 				finally {
 					try {readWriteLock.readLock().unlock(); LOG.info("Read lock released");}
@@ -178,7 +178,8 @@ public class JobRunningSpout extends BaseRichSpout {
 		if (type.equals(ResourceType.JOB_COMPLETE_INFO) || type.equals(ResourceType.JOB_CONFIGURATION)) {
 			try {
 				readWriteLock.readLock().lock();
-				crawler.removeFromProcessingList(type, new JobContext(messageId.jobID, null));
+				// Here username in not used, set to null
+				crawler.removeFromProcessingList(type, new JobContext(messageId.jobID, null, null));
 			}
 			finally {
 				try {readWriteLock.readLock().unlock(); LOG.info("Read lock released");}

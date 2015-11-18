@@ -16,15 +16,15 @@
  */
 package eagle.dataproc.impl.storm.kafka;
 
+import backtype.storm.spout.Scheme;
+import backtype.storm.tuple.Fields;
+import com.typesafe.config.Config;
+
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-
-import backtype.storm.spout.Scheme;
-import backtype.storm.tuple.Fields;
-
-import com.typesafe.config.Config;
+import java.util.Map;
 
 /**
  * This scheme defines how a kafka message is deserialized and the output field name for storm stream
@@ -33,7 +33,7 @@ import com.typesafe.config.Config;
  * 2. output field declaration
  */
 public class KafkaSourcedSpoutScheme implements Scheme {
-	private SpoutKafkaMessageDeserializer deserializer;
+	protected SpoutKafkaMessageDeserializer deserializer;
 	
 	public KafkaSourcedSpoutScheme(String deserClsName, Config context){
 		try{
@@ -51,6 +51,7 @@ public class KafkaSourcedSpoutScheme implements Scheme {
 	@Override
 	public List<Object> deserialize(byte[] ser) {
 		Object tmp = deserializer.deserialize(ser);
+		Map<String, Object> map = (Map<String, Object>)tmp;
 		if(tmp == null)
 			return null;
 		// the following tasks are executed within the same process of kafka spout
