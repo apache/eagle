@@ -17,6 +17,7 @@
 package eagle.security.hdfs;
 
 import eagle.common.DateTimeUtil;
+import eagle.security.util.LogParseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,7 @@ public final class HDFSAuditLogParser implements Serializable{
 			LOG.warn("Ugi is null from audit log: " + logLine);
 		}
 
-		String user = parseUserFromUGI(ugi);
+		String user = LogParseUtil.parseUserFromUGI(ugi);
 
 		if(user == null){
 			LOG.warn("User is null from ugi" + ugi + ", audit log: " + logLine);
@@ -90,47 +91,6 @@ public final class HDFSAuditLogParser implements Serializable{
         entity.timestamp = DateTimeUtil.humanDateToMilliseconds(auditMaps.get(LOGDATE));
 
 		return entity;
-	}
-
-
-	/**
-	 * .e.g. hchen9@APD.xyz.com
-	 */
-	private final static Pattern UGI_PATTERN_DEFAULT = Pattern.compile("^([\\w\\d\\-]+)@.*");
-	/**
-	 * .e.g. hadoop/123.dc1.xyz.com@xyz.com (auth:KERBEROS)
-	 */
-	private final static Pattern UGI_PATTERN_SYSTEM = Pattern.compile("^([\\w\\d\\-]+)/[\\w\\d\\-.]+@.*");
-
-	/**
-	 * .e.g. hadoop/123.dc1.xyz.com@xyz.com (auth:KERBEROS)
-	 */
-	private final static Pattern UGI_PATTERN_WITHBLANK = Pattern.compile("^([\\w\\d.\\-_]+)[\\s(]+.*");
-
-	/**
-	 * @param ugi UGI field of audit log
-	 * @return resultToMetrics user from UGI field of audit log
-	 */
-	public static  String parseUserFromUGI(String ugi) {
-		if(ugi == null) return null;
-		String newugi = ugi.trim();
-
-		Matcher defaultMatcher = UGI_PATTERN_DEFAULT.matcher(newugi);
-		if(defaultMatcher.matches()){
-			return defaultMatcher.group(1);
-		}
-
-		Matcher sysMatcher = UGI_PATTERN_SYSTEM.matcher(newugi);
-		if(sysMatcher.matches()){
-			return sysMatcher.group(1);
-		}
-
-		Matcher viaMatcher = UGI_PATTERN_WITHBLANK.matcher(newugi);
-		if(viaMatcher.matches()){
-			return viaMatcher.group(1);
-		}
-
-		return newugi;
 	}
 
 	private static Map<String,String> parseAttribute(String attrs){
