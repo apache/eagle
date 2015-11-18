@@ -60,7 +60,7 @@
 				<tbody>
 					<tr ng-class="{info : item.__new}">
 						<td>{{common.format.date(item.timestamp)}}</td>
-						<td>{{common.format.date(_parent.getMessageTime(item))}}</td>
+						<td>{{common.format.date(item.alertContext.properties.timestamp)}}</td>
 						<td>{{item.tags.dataSource}}</td>
 						<!--td>{{item.severity}}</td-->
 						<td class="text-nowrap">

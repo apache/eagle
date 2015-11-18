@@ -32,7 +32,7 @@
 		</div>
 		<div class="inline-group">
 			<dl><dt>Alert Time</dt><dd>{{common.format.date(alert.timestamp)}}</dd></dl>
-			<dl><dt>Message Time</dt><dd>{{common.format.date(getMessageTime(alert.timestamp))}}</dd></dl>
+			<dl><dt>Message Time</dt><dd>{{common.format.date(alert.alertContext.properties.timestamp)}}</dd></dl>
 		</div>
 		<!--div class="inline-group">
 			<dl><dt>Severity</dt><dd>{{alert.alertContext.properties.severity}}</dd></dl>
