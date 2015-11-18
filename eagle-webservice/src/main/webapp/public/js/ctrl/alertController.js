@@ -85,12 +85,6 @@ damControllers.controller('alertListCtrl', function(globalContent, Site, damCont
 	$scope.$on('$destroy',function(){
 		$interval.cancel(_loadInterval);
 	});
-
-	// UI
-	$scope.getMessageTime = function(alert) {
-		var _time = common.getValueByPath(alert, "alertContext.properties.timestamp");
-		return Number(_time);
-	};
 });
 
 // =============================================================
