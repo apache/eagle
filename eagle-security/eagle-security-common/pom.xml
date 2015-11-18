@@ -48,6 +48,11 @@
           </exclusion>
         </exclusions>
   	</dependency>
+    <dependency>
+      <groupId>eagle</groupId>
+      <artifactId>eagle-alert-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 	<dependency>
 		<groupId>org.json</groupId>
 		<artifactId>json</artifactId>

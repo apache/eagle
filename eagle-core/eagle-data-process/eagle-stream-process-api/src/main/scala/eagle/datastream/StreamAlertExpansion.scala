@@ -26,8 +26,8 @@ import eagle.alert.dao.AlertDefinitionDAOImpl
 import eagle.executor.AlertExecutorCreationUtils
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
+
 import scala.collection.JavaConversions._
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -49,8 +49,8 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
 
   override def expand(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]): Unit ={
     val iter = dag.iterator()
-    var toBeAddedEdges = new ListBuffer[StreamConnector]
-    var toBeRemovedVertex = new ListBuffer[StreamProducer]
+    val toBeAddedEdges = new ListBuffer[StreamConnector]
+    val toBeRemovedVertex = new ListBuffer[StreamProducer]
     while(iter.hasNext) {
       val current = iter.next()
       dag.outgoingEdgesOf(current).foreach(edge => {
@@ -92,7 +92,10 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
           case _: MapProducer => {
             newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
           }
-          case _ => throw new IllegalStateException("Only StreamUnionProducer,FlatMapProducer and MapProducer can be put before AlertStreamSink")
+          case s: StreamProducer if dag.inDegreeOf(s) == 0 => {
+            newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+          }
+          case p@_ => throw new IllegalStateException(s"$p can not be put before AlertStreamSink, only StreamUnionProducer,FlatMapProducer and MapProducer are supported")
         }
 
         /**
@@ -151,10 +154,10 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
       case _: MapProducer => {
         val mapper = current.asInstanceOf[MapProducer].fn
         val newfun: (AnyRef => AnyRef) = {
-          a => (mapper(a) match {
+          a => mapper(a) match {
             case scala.Tuple2(x1, x2) => (x1, upStreamName, x2)
             case _ => throw new IllegalArgumentException
-          })
+          }
         }
         current match {
           case MapProducer(id, 2, fn) => newsp = MapProducer(UniqueId.incrementAndGetId(), 3, newfun)
@@ -165,6 +168,22 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         val outgoingEdges = dag.outgoingEdgesOf(current)
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp, e.to))
         toBeRemovedVertex += current
+      }
+      case s: StreamProducer if dag.inDegreeOf(s) == 0 => {
+        val fn:(AnyRef => AnyRef) = {
+          n => {
+            n match {
+              case scala.Tuple3 => n
+              case scala.Tuple2(x1,x2) => (x1,upStreamName,x2)
+              case scala.Tuple1(x1) => (if(x1 == null) null else x1.hashCode(),upStreamName,x1)
+              case _ => (if(n == null) null else n.hashCode(),upStreamName,n)
+            }
+          }
+        }
+        newsp = MapProducer(UniqueId.incrementAndGetId(),3,fn)
+        toBeAddedEdges += StreamConnector(current,newsp)
+        val outgoingEdges = dag.outgoingEdgesOf(current)
+        outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp,e.to))
       }
       case _ => throw new IllegalArgumentException("Only FlatMapProducer and MapProducer can be replaced before AlertStreamSink")
     }

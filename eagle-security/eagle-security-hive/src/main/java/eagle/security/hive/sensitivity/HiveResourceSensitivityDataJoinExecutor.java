@@ -56,8 +56,9 @@ public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExec
 
     @Override
     public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
+        String user = (String)input.get(0);
         @SuppressWarnings("unchecked")
-        Map<String, Object> event = (Map<String, Object>)input.get(0);
+        Map<String, Object> event = (Map<String, Object>)input.get(1);
         @SuppressWarnings("unchecked")
         Map<String, HiveResourceSensitivityAPIEntity> map =
                 (Map<String, HiveResourceSensitivityAPIEntity>) ExternalDataCache
@@ -92,7 +93,7 @@ public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExec
             }
             LOG.info("After hive resource sensitivity lookup: " + newEvent);
             outputCollector.collect(new Tuple2(
-                    newEvent.get("user"),
+                    user,
                     newEvent));
         }
     }

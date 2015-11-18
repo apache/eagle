@@ -19,7 +19,7 @@
 	<ul class="list-inline path">
 		<li>Path:</li>
 		<li ng-repeat="unit in pathUnitList">
-			<a href="javascript:void(0)" ng-click="updateItems(unit.path)" class="label bg-black">{{unit.name}}</a>
+			<a ng-click="updateItems(unit.path)" class="label bg-black">{{unit.name}}</a>
 		</li>
 	</ul>
 
@@ -52,7 +52,7 @@
 						<span class="fa fa-file"> </span>
 						{{getFileName(item)}}
 					</span>
-					<a ng-show="item.isdir" href="javascript:void(0)" ng-click="updateItems(item.resource)">
+					<a ng-show="item.isdir" ng-click="updateItems(item.resource)">
 						<span class="fa fa-folder"> </span>
 						{{getFileName(item)}}
 					</a>

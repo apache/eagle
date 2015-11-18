@@ -75,6 +75,8 @@ damControllers.controller('policyListCtrl', function(globalContent, Site, damCon
 // =                       Policy Detail                       =
 // =============================================================
 damControllers.controller('policyDetailCtrl', function(globalContent, Site, damContent, charts, $scope, $routeParams, Entities) {
+	var MAX_PAGESIZE = 10000;
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "Policy Detail";
 	globalContent.navPath = ["Policy View", "Polict List", "Polict Detail"];
@@ -133,6 +135,16 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 
 		// > eagle.alert.fail.count
 		$scope.alertFailSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+
+		// Alert list
+		$scope.alertList = Entities.queryEntities("AlertService", {
+			site: Site.current().name,
+			dataSource: policy.tags.dataSource,
+			policyId: policy.tags.policyId,
+			_pageSize: MAX_PAGESIZE,
+			_duration: 1000 * 60 * 60 * 24 * 30,
+			__ETD: 1000 * 60 * 60 * 24
+		});
 	});
 
 	// Function
@@ -787,7 +799,16 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 				$scope.policy.policyDef = JSON.stringify($scope.policy.__.policy);
 
 				// alertExecutorId
-				$scope.policy.tags.alertExecutorId = $scope._stream.alertExecutor.tags.alertExecutorId;
+				if($scope._stream.alertExecutor) {
+					$scope.policy.tags.alertExecutorId = $scope._stream.alertExecutor.tags.alertExecutorId;
+				} else {
+					$scope.lock = false;
+					$.dialog({
+						title: "OPS!",
+						content: "Alert Executor not defined! Please check 'AlertExecutorService'!"
+					});
+					return;
+				}
 
 				// site
 				$scope.policy.tags.site = $scope.policy.tags.site || Site.current().name;

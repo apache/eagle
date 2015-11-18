@@ -124,14 +124,14 @@
 						<ul class="nav navbar-nav">
 							<!-- Site -->
 							<li class="dropdown" ng-show="!globalContent.hideSite && !globalContent.lockSite">
-								<a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-server"></i>
 									{{site.current().name}}
 									<i class="fa fa-caret-down"></i>
 								</a>
 								<ul class="dropdown-menu">
 									<li ng-repeat="sites in site.list">
-										<a ng-click="site.current(sites);" href="javascript:void(0)">
+										<a ng-click="site.current(sites);">
 											<span class="fa fa-database"></span> {{sites.name}}
 										</a>
 									</li>
@@ -150,13 +150,13 @@
 
 							<!-- User -->
 							<li class="dropdown user user-menu" ng-hide="globalContent.hideUser">
-								<a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-user"></i>
 									{{auth.userProfile.username}}
 								</a>
 								<!--ul class="dropdown-menu">
 									<li>
-										<a ng-click="logout();" href="javascript:void(0)">
+										<a ng-click="logout();">
 											<span class="fa fa-sign-out"></span> Logout
 										</a>
 									</li>
@@ -177,7 +177,7 @@
 									<!-- Menu Footer-->
 									<li class="user-footer">
 										<div class="pull-right">
-											<a ng-click="logout();" href="javascript:void(0)" class="btn btn-default btn-flat">Sign out</a>
+											<a ng-click="logout();" class="btn btn-default btn-flat">Sign out</a>
 										</div>
 									</li>
 								</ul>

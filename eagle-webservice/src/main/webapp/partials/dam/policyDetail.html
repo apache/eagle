@@ -73,6 +73,9 @@
 		<li>
 			<a href="[data-id='statistics']" data-toggle="tab">Statistics</a>
 		</li>
+		<li>
+			<a href="[data-id='alerts']" data-toggle="tab">Alerts</a>
+		</li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" data-id="visualization">
@@ -91,6 +94,7 @@
 				</div>
 			</div>
 		</div><!-- /.tab-pane -->
+
 		<div class="tab-pane" data-id="statistics">
 			<div class="row">
 				<div class="col-xs-3">
@@ -135,5 +139,33 @@
 				</div>
 			</div>
 		</div><!-- /.tab-pane -->
+
+		<div class="tab-pane" data-id="alerts">
+			<div sorttable source="alertList" sort="-timestamp">
+				<table class="table table-bordered" ng-non-bindable>
+					<thead>
+						<tr>
+							<th width="170" sortpath="timestamp">Alert Time</th>
+							<th width="170" sortpath="alertContext.properties.timestamp">Message Time</th>
+							<th width="60" sortpath="alertContext.properties.user">User</th>
+							<th width="150" sortpath="alertContext.properties.host">Host</th>
+							<th sortpath="alertContext.properties.emailMessage">Description</th>
+							<th width="50"> </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-class="{info : item.__new}">
+							<td>{{common.format.date(item.timestamp)}}</td>
+							<td>{{common.format.date(item.alertContext.properties.timestamp)}}</td>
+							<td>{{item.alertContext.properties.user}}</td>
+							<td>{{item.alertContext.properties.host}}</td>
+							<td>{{item.alertContext.properties.alertMessage}}</td>
+							<td><a href="#/dam/alertDetail/{{item.encodedRowkey}}">Detail</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div><!-- /.tab-pane -->
+
 	</div><!-- /.tab-content -->
 </div>

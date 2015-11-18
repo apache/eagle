@@ -18,6 +18,7 @@ package eagle.jobrunning.crawler;
 
 public class JobContext {
 	public String jobId;
+	public String user;
 	public Long fetchedTime;
 	
 	public JobContext() {
@@ -26,11 +27,13 @@ public class JobContext {
 	
 	public JobContext(JobContext context) {
 		this.jobId = new String(context.jobId);
+		this.user = new String(context.user);
 		this.fetchedTime = new Long(context.fetchedTime);
 	}
 	
-	public JobContext(String jobId, Long fetchedTime) {
+	public JobContext(String jobId, String user, Long fetchedTime) {
 		this.jobId = jobId;
+		this.user = user;
 		this.fetchedTime = fetchedTime;
 	}
 	

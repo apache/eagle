@@ -16,8 +16,6 @@
  */
 package eagle.dataproc.impl.storm;
 
-import java.io.Serializable;
-
 import backtype.storm.topology.base.BaseRichSpout;
 
 import com.typesafe.config.Config;

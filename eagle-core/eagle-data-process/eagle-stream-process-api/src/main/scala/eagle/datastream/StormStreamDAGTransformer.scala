@@ -20,16 +20,21 @@
 package eagle.datastream
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
-
 import scala.collection.mutable
 
 /**
  * convert generic DAG data structure to Storm specific DAG data structure for easy topology compiler
  */
 object StormStreamDAGTransformer {
+  /**
+   * Transform DirectedAcyclicGraph[StreamProducer, StreamConnector] into StormStreamDAG
+   *
+   * @param dag DirectedAcyclicGraph[StreamProducer, StreamConnector]
+   * @return StormStreamDAG
+   */
   def transform(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]) : StormStreamDAG = {
     val stormDAG = new StormStreamDAG(dag)
-    var nodeMap = mutable.HashMap[String, StreamProducer]()
+    val nodeMap = mutable.HashMap[String, StreamProducer]()
     val iter = dag.iterator()
     while(iter.hasNext){
       val sp = iter.next()

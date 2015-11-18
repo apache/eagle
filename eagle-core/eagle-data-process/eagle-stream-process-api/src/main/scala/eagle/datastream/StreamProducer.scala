@@ -43,9 +43,9 @@ trait StreamProducer{
   private def incrementAndGetId() = UniqueId.incrementAndGetId()
 
   def setGraph(graph: DirectedAcyclicGraph[StreamProducer, StreamConnector]): Unit = this.graph = graph
-  def getGraph() : DirectedAcyclicGraph[StreamProducer, StreamConnector] = graph
+  def getGraph: DirectedAcyclicGraph[StreamProducer, StreamConnector] = graph
   def setConfig(config: Config) : Unit = this.config = config
-  def getConfig() : Config = config
+  def getConfig: Config = config
 
   def filter(fn : AnyRef => Boolean): StreamProducer ={
     val ret = FilterProducer(incrementAndGetId(), fn)
@@ -54,31 +54,31 @@ trait StreamProducer{
   }
 
   def flatMap[T, R](mapper : FlatMapper[T, R]) : StreamProducer = {
-    var ret = FlatMapProducer(incrementAndGetId(),mapper)
+    val ret = FlatMapProducer(incrementAndGetId(), mapper)
     hookupDAG(graph, this, ret)
     ret
   }
 
   def map1(fn : AnyRef => AnyRef) : StreamProducer = {
-    var ret = MapProducer(incrementAndGetId(),1, fn)
+    val ret = MapProducer(incrementAndGetId(), 1, fn)
     hookupDAG(graph, this, ret)
     ret
   }
 
   def map2(fn : AnyRef => AnyRef) : StreamProducer = {
-    var ret = MapProducer(incrementAndGetId(),2, fn)
+    val ret = MapProducer(incrementAndGetId(), 2, fn)
     hookupDAG(graph, this, ret)
     ret
   }
 
   def map3(fn : AnyRef => AnyRef) : StreamProducer = {
-    var ret = MapProducer(incrementAndGetId(),3, fn)
+    val ret = MapProducer(incrementAndGetId(), 3, fn)
     hookupDAG(graph, this, ret)
     ret
   }
 
   def map4(fn : AnyRef => AnyRef) : StreamProducer = {
-    var ret = MapProducer(incrementAndGetId(),4, fn)
+    val ret = MapProducer(incrementAndGetId(), 4, fn)
     hookupDAG(graph, this, ret)
     ret
   }
@@ -89,7 +89,7 @@ trait StreamProducer{
   def groupBy(fields : Int*) : StreamProducer = {
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
-    var ret = GroupByProducer(incrementAndGetId(),fields)
+    val ret = GroupByProducer(incrementAndGetId(), fields)
     hookupDAG(graph, this, ret)
     ret
   }
@@ -98,13 +98,13 @@ trait StreamProducer{
   def groupBy(fields : java.util.List[Integer]) : StreamProducer = {
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
-    var ret = GroupByProducer(incrementAndGetId(), fields.asScala.toSeq.asInstanceOf[Seq[Int]])
+    val ret = GroupByProducer(incrementAndGetId(), fields.asScala.toSeq.asInstanceOf[Seq[Int]])
     hookupDAG(graph, this, ret)
     ret
   }
 
   def streamUnion(others : Seq[StreamProducer]) : StreamProducer = {
-    var ret = StreamUnionProducer(incrementAndGetId(),others)
+    val ret = StreamUnionProducer(incrementAndGetId(), others)
     hookupDAG(graph, this, ret)
     ret
   }
@@ -121,7 +121,7 @@ trait StreamProducer{
   }
 
   def alert(upStreamNames: util.List[String], alertExecutorId : String, withConsumer: Boolean=true) = {
-    var ret = AlertStreamSink(incrementAndGetId(), upStreamNames, alertExecutorId, withConsumer)
+    val ret = AlertStreamSink(incrementAndGetId(), upStreamNames, alertExecutorId, withConsumer)
     hookupDAG(graph, this, ret)
   }
 
@@ -134,8 +134,8 @@ trait StreamProducer{
   }
 
   def hookupDAG(graph: DirectedAcyclicGraph[StreamProducer, StreamConnector], current: StreamProducer, next: StreamProducer) = {
-    current.getGraph().addVertex(next)
-    current.getGraph().addEdge(current, next, StreamConnector(current, next))
+    current.getGraph.addVertex(next)
+    current.getGraph.addEdge(current, next, StreamConnector(current, next))
     passOnContext(current, next)
   }
 
@@ -143,6 +143,7 @@ trait StreamProducer{
     next.graph = current.graph
     next.config = current.config
   }
+
   /**
    * can be set by programatically or by configuration
    */
@@ -160,7 +161,7 @@ trait StreamProducer{
 case class FilterProducer(id: Int, fn : AnyRef => Boolean) extends StreamProducer
 
 case class FlatMapProducer[T, R](id: Int, var mapper: FlatMapper[T, R]) extends StreamProducer {
-  override def toString() = mapper.toString() + "_" + id
+  override def toString() = mapper.toString + "_" + id
 }
 
 case class MapProducer(id: Int, numOutputFields : Int, var fn : AnyRef => AnyRef) extends StreamProducer

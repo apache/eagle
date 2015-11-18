@@ -32,6 +32,15 @@ import eagle.log.entity.meta.Table;
 import eagle.log.entity.meta.Tags;
 import eagle.log.entity.meta.TimeSeries;
 
+/**
+ * site: site name
+ * dataSource: data source name
+ *
+ * alertExecutorId: Group Policy by alertExecutorId, the policy definition with the sample ["site", "dataSource", "alertExecutorId"] should run on the sample alert executor
+ *
+ * policyId: policy name, should be unique
+ * policyType: policy engine implementation type
+ */
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("alertdef")
 @ColumnFamily("f")

@@ -24,13 +24,18 @@ import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 
 object StormSpoutFactory {
+  /**
+   * @param config context configuration
+   * @param sourceProducer source producer
+   * @return
+   */
   def createSpout(config: Config, sourceProducer: StormSourceProducer) : BaseRichSpout = {
     val numFields = sourceProducer.numFields
     if(numFields <= 0) {
       sourceProducer.source
     }else{
       var i = 0
-      var ret = new util.ArrayList[String]
+      val ret = new util.ArrayList[String]
       while(i < numFields){
         ret.add(OutputFieldNameConst.FIELD_PREFIX + i)
         i += 1

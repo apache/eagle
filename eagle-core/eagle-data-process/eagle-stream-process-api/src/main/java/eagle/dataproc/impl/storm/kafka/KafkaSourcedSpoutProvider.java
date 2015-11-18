@@ -33,6 +33,10 @@ import eagle.dataproc.impl.storm.AbstractStormSpoutProvider;
 public class KafkaSourcedSpoutProvider extends AbstractStormSpoutProvider{
     private final static Logger LOG = LoggerFactory.getLogger(KafkaSourcedSpoutProvider.class);
 
+	public SchemeAsMultiScheme getStreamScheme(String deserClsName, Config context) {
+		return new SchemeAsMultiScheme(new KafkaSourcedSpoutScheme(deserClsName, context));
+	}
+
 	@Override
 	public BaseRichSpout getSpout(Config context){
 		// Kafka topic
@@ -77,7 +81,7 @@ public class KafkaSourcedSpoutProvider extends AbstractStormSpoutProvider{
 			spoutConfig.forceFromStart = context.getBoolean("dataSourceConfig.forceFromStart");
 		}
 		
-		spoutConfig.scheme = new SchemeAsMultiScheme(new KafkaSourcedSpoutScheme(deserClsName, context));
+		spoutConfig.scheme = getStreamScheme(deserClsName, context);
 		KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
 		return kafkaSpout;
 	}

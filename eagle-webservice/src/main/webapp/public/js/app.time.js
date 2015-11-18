@@ -26,6 +26,11 @@
 			return app.time.offset();
 		},
 		offset: function(time) {
+			// Parse string number
+			if(typeof time === "string" && !isNaN(+time)) {
+				time = +time;
+			}
+
 			var _mom = new moment(time);
 			_mom.utcOffset(app.time.UTC_OFFSET);
 			return _mom;

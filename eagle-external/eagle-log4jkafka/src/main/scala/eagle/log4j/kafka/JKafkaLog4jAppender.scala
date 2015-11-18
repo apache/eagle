@@ -66,6 +66,12 @@ class JKafkaLog4jAppender extends AppenderSkeleton with Logging {
   def getTopicClass: String  = topicClass
   def setTopicClass(topicClass: String) { this.topicClass = topicClass }
 
+  var keyPattern: String = null
+
+  def getKeyPattern:String = keyPattern
+
+  def setKeyPattern(keyPattern: String) { this.keyPattern = keyPattern }
+
   override def activateOptions() {
     // check for config parameter validity
     val props = new Properties()
@@ -79,6 +85,8 @@ class JKafkaLog4jAppender extends AppenderSkeleton with Logging {
       throw new MissingConfigException("topic must be specified by the Kafka log4j appender")
 
     props.put("topic",topic)
+
+    if(keyPattern != null) props.put("keyPattern", keyPattern)
 
     if(compressionType != null) props.put(org.apache.kafka.clients.producer.ProducerConfig.COMPRESSION_TYPE_CONFIG, compressionType)
     if(requiredNumAcks != Int.MaxValue) props.put(org.apache.kafka.clients.producer.ProducerConfig.ACKS_CONFIG, requiredNumAcks.toString)

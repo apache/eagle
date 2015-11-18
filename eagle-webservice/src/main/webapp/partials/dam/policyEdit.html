@@ -55,7 +55,7 @@
 			<div ng-show="step === 2">
 				<div class="pull-right" ng-show="policy.__.advanced === undefined">
 					<span class="text-muted">or</span>
-					<a href="javascript:void(0);" ng-click="policy.__.advanced = true;">Advanced</a>
+					<a ng-click="policy.__.advanced = true;">Advanced</a>
 				</div>
 
 				<div class="form-group">
@@ -81,7 +81,7 @@
 				<!-- Criteria -->
 				<div>
 					<label>Match Criteria</label>
-					<a href="javascript:void(0);" ng-click="collapse('.panel-group')">expand / collapse all</a>
+					<a ng-click="collapse('.panel-group')">expand / collapse all</a>
 
 					<div class="panel-group panel-group-sm" role="tablist">
 						<div class="panel panel-default"
@@ -105,7 +105,7 @@
 								<div class="panel-body">
 									<ul ng-show="type !== 'bool'">
 										<li ng-repeat="cond in policy.__.conditions[meta.tags.attrName]">
-											[<a href="javascript:void(0);" ng-click="policy.__.conditions[meta.tags.attrName].splice($index, 1)">X</a>]
+											[<a ng-click="policy.__.conditions[meta.tags.attrName].splice($index, 1)">X</a>]
 											{{cond.toString()}}
 										</li>
 									</ul>
@@ -134,7 +134,7 @@
 									</div>
 
 									<!-- Number -->
-									<div ng-if="type == 'long' || type == 'integer' || type == 'number'">
+									<div ng-if="type == 'long' || type == 'integer' || type == 'number' || type == 'double' || type == 'float'">
 										<div class="input-group" style="max-width: 450px;">
 											<div class="input-group-btn">
 												<select class="form-control" ng-model="op">

@@ -107,5 +107,5 @@ public class AlertStreamSchemaEntity extends TaggedLogAPIEntity{
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
 		valueChanged("defaultValue");
-	}	
+	}
 }

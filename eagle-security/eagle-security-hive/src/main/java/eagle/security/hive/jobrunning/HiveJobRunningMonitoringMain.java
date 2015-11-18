@@ -27,6 +27,7 @@ import eagle.datastream.StormExecutionEnvironment;
 import eagle.security.hive.sensitivity.HiveResourceSensitivityDataJoinExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Arrays;
 
 public class HiveJobRunningMonitoringMain {
 	private static final Logger LOG = LoggerFactory.getLogger(HiveJobRunningMonitoringMain.class);
@@ -43,9 +44,9 @@ public class HiveJobRunningMonitoringMain {
         String spoutName = "msgConsumer";
         int parallelism = config.getInt("envContextConfig.parallelismConfig." + spoutName);
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new HiveJobRunningSourcedStormSpoutProvider().getSpout(config, parallelism)).renameOutputFields(3).withName(spoutName)
-                .flatMap(new JobConfigurationAdaptorExecutor())
-                .flatMap(new HiveQueryParserExecutor())
+        env.newSource(new HiveJobRunningSourcedStormSpoutProvider().getSpout(config, parallelism)).renameOutputFields(4).withName(spoutName).groupBy(Arrays.asList(0))
+                .flatMap(new JobConfigurationAdaptorExecutor()).groupBy(Arrays.asList(0))
+                .flatMap(new HiveQueryParserExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveResourceSensitivityDataJoinExecutor())
                 .alertWithConsumer("hiveAccessLogStream", "hiveAccessAlertByRunningJob");
         env.execute();

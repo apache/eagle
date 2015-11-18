@@ -22,6 +22,12 @@ import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.topology.base.BaseRichSpout
 import backtype.storm.tuple.Fields
 
+/**
+ * Declare delegated BaseRichSpout with given field names
+ *
+ * @param delegate delegated BaseRichSpout
+ * @param outputFields given field names
+ */
 case class SpoutProxy(delegate: BaseRichSpout, outputFields: java.util.List[String]) extends BaseRichSpout{
   def open(conf: java.util.Map[_, _], context: TopologyContext, collector: SpoutOutputCollector) {
     this.delegate.open(conf, context, collector)

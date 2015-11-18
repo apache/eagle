@@ -19,13 +19,9 @@
 
 package eagle.datastream
 
-import java.util.regex.Pattern
-
-import com.typesafe.config.{Config, ConfigObject, ConfigValue}
+import com.typesafe.config.Config
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
-
-import scala.collection.JavaConverters._
 
 /**
  * to set name for each StreamProducer

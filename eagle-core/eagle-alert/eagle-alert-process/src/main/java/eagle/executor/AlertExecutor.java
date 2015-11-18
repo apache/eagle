@@ -201,7 +201,10 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		}
 		
 		// check out whether strong incoming data validation is necessary
-        boolean needValidation = config.getBoolean(AlertConstants.ALERT_EXECUTOR_CONFIGS + "." + alertExecutorId + ".needValidation");
+        String needValidationConfigKey= AlertConstants.ALERT_EXECUTOR_CONFIGS + "." + alertExecutorId + ".needValidation";
+
+        // Default: true
+        boolean needValidation = !config.hasPath(needValidationConfigKey) || config.getBoolean(needValidationConfigKey);
 
 		AbstractPolicyDefinition policyDef = null;
 		try {

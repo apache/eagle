@@ -177,7 +177,7 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 				context = queueOfCompleteJobInfo.take();
 			} catch (InterruptedException ex) {
 			}
-			/** Delay an interval before fetch job complete info, for histroy url need some time to be accessible,
+			/** Delay an interval before fetch job complete info, for history url need some time to be accessible,
 			 *  The default interval is set as 5 min,
 			 *  Also need to consider if need multi thread to do this
 			 */
@@ -198,7 +198,7 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 		        	// the job remains in processing list, thus we will not do infructuous retry next round
 		        	// TODO need remove it from processing list when job finished to avoid memory leak 
 		        }
-		        else LOG.error("Got an exception when fetching resouce ", ex);
+		        else LOG.error("Got an exception when fetching resource ", ex);
 			}
 		}
 	}
@@ -214,7 +214,7 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 				}
 				@SuppressWarnings("unchecked")
 				List<AppInfo> apps = (List<AppInfo>)list.get(0);
-				Set<String> completedJobSet = new HashSet<String>();
+				Set<JobContext> completedJobSet = new HashSet<JobContext>();
 				for (AppInfo app : apps) {
 					//Only fetch MapReduce job
 					if (!YarnApplicationType.MAPREDUCE.name().equals(app.getApplicationType()) 
@@ -222,7 +222,7 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 						continue;
 					}
 					if (System.currentTimeMillis() - app.getFinishedTime() < controlConfig.completedJobOutofDateTimeInMin * DateUtils.MILLIS_PER_MINUTE) {
-						completedJobSet.add(JobUtils.getJobIDByAppID(app.getId()));
+						completedJobSet.add(new JobContext(JobUtils.getJobIDByAppID(app.getId()),app.getUser(), System.currentTimeMillis()));
 					}
 				}
 				
@@ -256,15 +256,15 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 		}
 	}
 	
-	public void addIntoProcessingQueueAndList(Set<String> jobIdSet, BlockingQueue<JobContext> queue, ResourceType type) {
+	public void addIntoProcessingQueueAndList(Set<JobContext> jobSet, BlockingQueue<JobContext> queue, ResourceType type) {
 		try {
 			readWriteLock.writeLock().lock();
 			LOG.info("Write lock acquired");
 			List<String> processingList = zkStateManager.readProcessedJobs(type);
 			processingList.addAll(extractJobList(type));
-			for (String jobId: jobIdSet) {				
+			for (JobContext context: jobSet) {
+				String jobId = context.jobId;
 				if (!processingList.contains(jobId)) {
-					JobContext context = new JobContext(jobId, System.currentTimeMillis());
 					addIntoProcessingList(type, context);
 					queue.add(context);
 				}
@@ -309,14 +309,14 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 		@SuppressWarnings("unchecked")
 		List<AppInfo> apps = (List<AppInfo>)list.get(0);
 		LOG.info("Current Running Job List size : " + apps.size());
-		Set<String> currentRunningJobSet = new HashSet<String>();
+		Set<JobContext> currentRunningJobSet = new HashSet<JobContext>();
 		for (AppInfo app : apps) {
 			//Only fetch MapReduce job
 			if (!YarnApplicationType.MAPREDUCE.name().equals(app.getApplicationType()) 
 			|| !jobFilter.accept(app.getUser())) {
 				continue;
 			}
-			currentRunningJobSet.add(JobUtils.getJobIDByAppID(app.getId()));
+			currentRunningJobSet.add(new JobContext(JobUtils.getJobIDByAppID(app.getId()), app.getUser(), System.currentTimeMillis()));
 		}
 		
 		if (controlConfig.jobConfigEnabled) {
@@ -325,10 +325,9 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 		
 		if (controlConfig.jobInfoEnabled) {			
 			// fetch job detail & jobcounters	
-			for (String jobId : currentRunningJobSet) {
+			for (JobContext context : currentRunningJobSet) {
 				try {
-					List<Object> objs = fetcher.getResource(ResourceType.JOB_RUNNING_INFO, JobUtils.getAppIDByJobID(jobId));
-					JobContext context = new JobContext(jobId, System.currentTimeMillis());
+					List<Object> objs = fetcher.getResource(ResourceType.JOB_RUNNING_INFO, JobUtils.getAppIDByJobID(context.jobId));
 					callback.onJobRunningInformation(context, ResourceType.JOB_RUNNING_INFO, objs);
 				}
 				catch (Exception ex) {
@@ -337,7 +336,7 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 			        	// the job remains in processing list, thus we will not do infructuous retry next round
 			        	// TODO need remove it from processing list when job finished to avoid memory leak 
 			        }
-			        else LOG.error("Got an exception when fetching resouce, jobId: " + jobId , ex);
+			        else LOG.error("Got an exception when fetching resource, jobId: " + context.jobId , ex);
 				}
 			}
 		}		

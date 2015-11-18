@@ -123,7 +123,7 @@
 								</td-->
 								<td ng-repeat="key in _parent._sensitivitySource.keys">{{item.tags[key] || item[key]}}</td>
 								<td>
-									<a href="javascript:void(0)" ng-click="_parent.deleteItem(item)">Delete</a>
+									<a ng-click="_parent.deleteItem(item)">Delete</a>
 								</td>
 							</tr>
 						</tbody>

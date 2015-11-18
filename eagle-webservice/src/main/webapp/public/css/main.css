@@ -44,6 +44,10 @@ body.no-sidebar .content-wrapper {
 }
 
 /* Common */
+a {
+	cursor: pointer;
+}
+
 .table.table-sm>tbody>tr>td,
 .table.table-sm>tbody>tr>th,
 .table.table-sm>tfoot>tr>td,
@@ -77,6 +81,32 @@ body.no-sidebar .content-wrapper {
 	margin-top: 0;
 }
 
+.table th.input-field,
+.table td.input-field {
+	padding: 0;
+	vertical-align: middle;
+}
+
+.table th.input-field > input,
+.table td.input-field > input,
+.table th.input-field > select,
+.table td.input-field > select {
+	border: none;
+	transition: border-color 0s;
+}
+
+.table th.input-field > input:focus,
+.table td.input-field > input:focus,
+.table th.input-field > select:focus,
+.table td.input-field > select:focus {
+	box-shadow: inset 1px 1px 0px #3c8dbc, inset -1px -1px 0px #3c8dbc;
+}
+
+.table th.input-field > input.has-warning,
+.table td.input-field > input.has-warning {
+	box-shadow: inset 1px 1px 0px #f39c12, inset -1px -1px 0px #f39c12;
+}
+
 /* Box */
 .small-box > a.inner {
 	color: #FFF;
@@ -97,12 +127,10 @@ body.no-sidebar .content-wrapper {
 .info-box a:hover {
 	color: #FFFFFF;
 	text-decoration: underline;
-	cursor: pointer;
 }
 
 .info-box-content a.config {
 	color: rgba(255,255,255,0.8);
-	cursor: pointer;
 }
 .info-box-content a.config:hover {
 	color: #FFFFFF;
@@ -287,9 +315,6 @@ td.text-ellipsis {
 }
 
 /* Drop Down */
-.dropdown-menu > li > a {
-	cursor: pointer;
-}
 .dropdown-menu > li.danger > a {
 	color: #dd4b39;
 }
@@ -326,7 +351,6 @@ ul.path li {
 }
 ul.path li a {
 	color: #FFFFFF;
-	cursor: pointer;
 }
 
 ul.tree {

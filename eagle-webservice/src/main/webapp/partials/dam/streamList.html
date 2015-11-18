@@ -15,6 +15,12 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
+<div class="page-fixed">
+	<button class="btn btn-primary"
+		ng-click="showStreamEditor()"
+	>+ New Stream</button>
+</div>
+
 <p ng-show="streamList._promise.$$state.status !== 1">
 	<span class="fa fa-refresh fa-spin"> </span>
 	Loading...
@@ -26,6 +32,9 @@
 		<div class="box-tools pull-right">
 			<button class="btn btn-box-tool" data-widget="collapse">
 				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" ng-click="showStreamEditor(stream)">
+				<i class="fa fa-wrench"></i>
 			</button>
 		</div>
 	</div>
@@ -86,4 +95,84 @@
 		</div>
 	</div><!-- /.box-body -->
 	<!-- Loading (remove the following to stop the loading)-->
+</div>
+
+
+
+
+
+
+<!-- Modal: Create / Edit stream -->
+<div class="modal fade" id="streamMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">{{!_streamEntity.srcStream ? 'Create' : 'Config'}} Stream</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<label>* Data Source</label>
+					<input type="text" class="form-control" placeholder="Data source..." ng-model="_streamEntity.dataSource"
+							ng-class="{'has-warning': !_streamEntity.dataSource}" ng-disabled="!!_streamEntity.srcStream" id="dataSource">
+				</div>
+
+				<div class="form-group">
+					<label>* Stream Name</label>
+					<input type="text" class="form-control" placeholder="Stream name..." ng-model="_streamEntity.streamName"
+							ng-class="{'has-warning': !_streamEntity.streamName}" ng-disabled="!!_streamEntity.srcStream">
+				</div>
+
+				<div class="form-group">
+					<label>Description</label>
+					<textarea class="form-control" placeholder="Description..." ng-model="_streamEntity.desc"></textarea>
+				</div>
+
+				<label>
+					* Data Source Schema
+				</label>
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th width="26"> </th>
+							<th width="15%">Attribute Name</th>
+							<th width="15%">Display Name</th>
+							<th width="15%">Type</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="meta in _streamEntity.metaList">
+							<td class="input-field text-center">
+								<a class="fa fa-trash-o text-danger" ng-click="deleteMeta(meta)"></a>
+							</td>
+							<td class="input-field"><input type="text" class="form-control" ng-class="{'has-warning': !meta.attrName}" ng-model="meta.attrName" /></td>
+							<td class="input-field"><input type="text" class="form-control" ng-model="meta.attrDisplayName" /></td>
+							<td class="input-field">
+								<select class="form-control" ng-model="meta.attrType">
+									<option ng-repeat="type in ['string','bool','long','integer','double','float']">{{type}}</option>
+								</select>
+							</td>
+							<td class="input-field"><input type="text" class="form-control" ng-model="meta.attrDescription" /></td>
+						</tr>
+					</tbody>
+				</table>
+				<a ng-click="_streamEntity.metaList.push({attrName: '', attrType: 'string'})">+ Add Schema Item</a>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger pull-left" ng-show="_streamEntity.srcStream" ng-click="confirmDeleteStream()" ng-disabled="!checkUpdateStream()">
+					Delete
+				</button>
+
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmUpateStream()" ng-disabled="!checkUpdateStream()">
+					{{!_streamEntity.srcStream ? 'Create' : 'Update'}}
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
