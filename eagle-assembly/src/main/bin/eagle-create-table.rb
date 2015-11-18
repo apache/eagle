@@ -47,7 +47,7 @@ createEagleTable(admin, 'alertExecutor')
 createEagleTable(admin, 'alertStream')
 createEagleTable(admin, 'alertStreamSchema')
 createEagleTable(admin, 'hiveResourceSensitivity')
-createEagleTable(admin, 'hiveResourceSensitivity')
+createEagleTable(admin, 'hbaseResourceSensitivity')
 createEagleTable(admin, 'mlmodel')
 createEagleTable(admin, 'userprofile')
 

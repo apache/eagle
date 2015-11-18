@@ -25,3 +25,8 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
 #### create hdfs sensitivity sample in sandbox
 echo "create hdfs sensitivity sample in sandbox... "
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FileSensitivityService" -d '[{"tags":{"site" : "sandbox", "filedir":"/tmp/private"}, "sensitivityType": "PRIVATE"}]'
+
+#### create hbase sensitivity sample in sandbox
+echo "create hdfs sensitivity sample in sandbox... "
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=HbaseResourceSensitivityService" -d '[{"tags":{"site":"sandbox","hbaseResource":"default:alertStreamSchema"},"sensitivityType":"PrivateTable"}]'
+

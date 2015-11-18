@@ -44,6 +44,11 @@
           <artifactId>eagle-security-userprofile-detection</artifactId>
           <version>${project.version}</version>
       </dependency>
+        <dependency>
+            <groupId>eagle</groupId>
+            <artifactId>eagle-security-hbase-securitylog</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

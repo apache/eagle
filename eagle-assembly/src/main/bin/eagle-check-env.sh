@@ -32,12 +32,12 @@ then
 	exit 1
 fi
 
-if [ -z "$(command -v kafka version)" ]
+if [ -z "$(command -v hadoop version)" ]
 then
-	echo 'please make sure the user has the privilege to run kafka'
+	echo 'please make sure the user has the privilege to run hadoop shell'
 	exit 1
 fi
 
-echo "Hbase & Storm & Kafka are installed!"
+echo "Hbase & Storm & Hadoop are installed!"
 
 

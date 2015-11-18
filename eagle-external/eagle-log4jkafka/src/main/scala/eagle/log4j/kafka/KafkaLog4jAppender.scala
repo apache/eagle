@@ -43,6 +43,12 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
 
   var batchSize:Int = 20
 
+  var keyPattern: String = null
+
+  def getKeyPattern:String = keyPattern
+
+  def setKeyPattern(keyPattern: String) { this.keyPattern = keyPattern }
+
   private var producer: Producer[String, String] = null
 
   def getTopic:String = topic
@@ -94,6 +100,8 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
 
     props.put("serializer.class", serializerClass)
     props.put("batch.num.messages",batchSize.toString)
+
+    if(keyPattern != null) props.put("keyPattern", keyPattern)
 
     //These have default values in ProducerConfig and AsyncProducerConfig. We don't care if they're not specified
     if(producerType != null) props.put("producer.type", producerType)
