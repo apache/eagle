@@ -16,7 +16,7 @@
  *
  */
 
-package eagle.security.util;
+package org.apache.eagle.security.util;
 
 
 import java.util.regex.Matcher;
