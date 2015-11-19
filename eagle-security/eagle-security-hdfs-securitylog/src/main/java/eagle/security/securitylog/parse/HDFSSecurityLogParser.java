@@ -19,8 +19,8 @@
 package eagle.security.securitylog.parse;
 
 
-import eagle.common.DateTimeUtil;
 import eagle.security.util.LogParseUtil;
+import org.apache.eagle.common.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

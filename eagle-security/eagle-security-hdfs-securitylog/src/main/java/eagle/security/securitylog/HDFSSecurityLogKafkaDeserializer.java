@@ -19,8 +19,8 @@
 package eagle.security.securitylog;
 
 
-import eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
 import eagle.security.securitylog.parse.HDFSSecurityLogObject;
+import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
 import eagle.security.securitylog.parse.HDFSSecurityLogParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

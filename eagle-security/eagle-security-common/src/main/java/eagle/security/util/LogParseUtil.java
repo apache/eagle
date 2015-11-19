@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 public class LogParseUtil {
     /**
-     * .e.g. hchen9@APD.xyz.com
+     * .e.g. user@APD.xyz.com
      */
     private final static Pattern UGI_PATTERN_DEFAULT = Pattern.compile("^([\\w\\d\\-]+)@.*");
     /**

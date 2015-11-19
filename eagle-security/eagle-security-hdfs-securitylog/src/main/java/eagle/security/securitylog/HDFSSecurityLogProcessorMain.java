@@ -22,10 +22,10 @@ package eagle.security.securitylog;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
-import eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
-import eagle.dataproc.util.ConfigOptionParser;
-import eagle.datastream.ExecutionEnvironmentFactory;
-import eagle.datastream.StormExecutionEnvironment;
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
+import org.apache.eagle.dataproc.util.ConfigOptionParser;
+import org.apache.eagle.datastream.ExecutionEnvironmentFactory;
+import org.apache.eagle.datastream.StormExecutionEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
