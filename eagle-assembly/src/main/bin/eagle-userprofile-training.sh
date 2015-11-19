@@ -19,7 +19,7 @@ function usage() {
 	echo "Usage: $0 --jar <jarName> --main <mainClass> --site <sitename> --input <inputschema> --output <outputschema>"
 	echo "--site <siteName>     Must be given"
 	echo "--jar <jarName>       Default is $EAGLE_HOME/lib/userprofile/eagle-security-userprofile-training-0.1.0-assembly.jar"
-    echo "--main <mainClass>    Default is eagle.security.userprofile.UserProfileTrainingCLI"
+    echo "--main <mainClass>    Default is org.apache.eagle.security.userprofile.UserProfileTrainingCLI"
     echo "--input               Default is /tmp/userprofile/hdfs-audit.log"
     echo "--output              Default is eagle://localhost:9099. When modelSink is hdfs, the value is hdfs:///tmp/userprofile/output"
 	echo "Example: $0 --jar <jarName> --main <mainClass> --site <sitename> --input <input> --output <output>"
@@ -96,7 +96,7 @@ if [ -z "$site" ];then
 fi
 
 if [ -z "$main" ] ; then
-  main="eagle.security.userprofile.UserProfileTrainingCLI"
+  main="org.apache.eagle.security.userprofile.UserProfileTrainingCLI"
 fi
 
 if [ -z "$jar" ] ; then

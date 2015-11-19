@@ -127,10 +127,10 @@ ${EAGLE_HOME}/examples/sample-sensitivity-resource-create.sh
 [ $? != 0 ] && exit 1
 ${EAGLE_HOME}/examples/sample-policy-create.sh
 [ $? != 0 ] && exit 1
-$eagle_bin/eagle-topology.sh --main eagle.security.auditlog.HdfsAuditLogProcessorMain --config ${EAGLE_HOME}/conf/sandbox-hdfsAuditLog-application.conf start
+$eagle_bin/eagle-topology.sh --main org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain --config ${EAGLE_HOME}/conf/sandbox-hdfsAuditLog-application.conf start
 [ $? != 0 ] && exit 1
-$eagle_bin/eagle-topology.sh --main eagle.security.hive.jobrunning.HiveJobRunningMonitoringMain --config ${EAGLE_HOME}/conf/sandbox-hiveQueryLog-application.conf start
+$eagle_bin/eagle-topology.sh --main org.apache.eagle.security.hive.jobrunning.HiveJobRunningMonitoringMain --config ${EAGLE_HOME}/conf/sandbox-hiveQueryLog-application.conf start
 [ $? != 0 ] && exit 1
-$eagle_bin/eagle-topology.sh --main eagle.security.userprofile.UserProfileDetectionMain --config ${EAGLE_HOME}/conf/sandbox-userprofile-topology.conf start
+$eagle_bin/eagle-topology.sh --main org.apache.eagle.security.userprofile.UserProfileDetectionMain --config ${EAGLE_HOME}/conf/sandbox-userprofile-topology.conf start
 [ $? != 0 ] && exit 1
 

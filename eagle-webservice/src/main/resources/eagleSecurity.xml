@@ -35,7 +35,7 @@
     </scr:http>
 
     <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
-    <bean id="logoutSuccessHandler" class="eagle.service.security.auth.LogoutSuccessHandlerImpl" />
+    <bean id="logoutSuccessHandler" class="org.apache.eagle.service.security.auth.LogoutSuccessHandlerImpl" />
     <bean id="unauthorisedEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
 
 	<beans profile="default">

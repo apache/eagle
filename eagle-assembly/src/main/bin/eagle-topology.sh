@@ -23,7 +23,7 @@ function print_help() {
 	echo "Usage: $0 options {start | stop | status}"
 	echo "Options:                       Description:"
 	echo "  --jar      <jar path>          Default is $EAGLE_HOME/lib/topology/eagle-topology-0.1.0-assembly.jar"
-	echo "  --main     <main class>        Default is eagle.security.auditlog.HdfsAuditLogProcessorMain"
+	echo "  --main     <main class>        Default is org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain"
 	echo "  --topology <topology name>     Default is sandbox-hdfsAuditLog-topology"
 	echo "  --config   <file path>         Default is $EAGLE_HOME/conf/sandbox-hdfsAuditLog-application.conf"
 	echo "  --storm-ui <storm ui url>      Execute through storm UI API, default: http://localhost:8744"
@@ -115,7 +115,7 @@ if [ -z "$jarName" ]; then
 fi
 
 if [ -z "$mainClass" ]; then
-    mainClass="eagle.security.auditlog.HdfsAuditLogProcessorMain"
+    mainClass="org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain"
 fi
 
 if [ -z "$topologyName" ]; then

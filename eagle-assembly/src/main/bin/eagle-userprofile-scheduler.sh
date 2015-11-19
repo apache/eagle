@@ -36,7 +36,7 @@ source $(dirname $0)/eagle-env.sh
 [ ! -e $EAGLE_HOME/temp ] && mkdir -p $EAGLE_HOME/temp
 
 SCHEDULER_JAR=$(ls $EAGLE_HOME/lib/userprofile/eagle-security-userprofile-training-*-assembly.jar)
-SCHEDULER_CLASS="eagle.security.userprofile.daemon.Scheduler"
+SCHEDULER_CLASS="org.apache.eagle.security.userprofile.daemon.Scheduler"
 SCHEDULER_JVM_OPTS="-server"
 SCHDULER_LOG_DIR=$(dirname $0)/logs/
 

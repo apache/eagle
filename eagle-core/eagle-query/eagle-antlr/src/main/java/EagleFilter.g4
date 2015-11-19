@@ -17,7 +17,7 @@
 grammar EagleFilter;
 
 @header{
-// package eagle.query.antlr.generated;
+// package org.apache.eagle.query.antlr.generated;
 }
 
 /*------------------------------------------------------------------

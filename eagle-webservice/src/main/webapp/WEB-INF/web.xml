@@ -89,7 +89,7 @@
 	</context-param>-->
     <context-param>
         <param-name>contextInitializerClasses</param-name>
-        <param-value>eagle.service.security.profile.EagleServiceProfileInitializer</param-value>
+        <param-value>org.apache.eagle.service.security.profile.EagleServiceProfileInitializer</param-value>
     </context-param>
     <filter>
         <filter-name>springSecurityFilterChain</filter-name>

@@ -199,7 +199,7 @@
                     <descriptor>src/assembly/assembly.xml</descriptor>
                     <archive>
                         <manifest>
-                            <mainClass>eagle.security.userprofile.UserProfileTrainingCLI</mainClass>
+                            <mainClass>org.apache.eagle.security.userprofile.UserProfileTrainingCLI</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

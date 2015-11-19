@@ -38,6 +38,6 @@
     http://www.springframework.org/schema/jdbc  
     http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
 
-	<context:component-scan base-package="eagle.service.security" />
+	<context:component-scan base-package="org.apache.eagle.service.security" />
 	<context:property-placeholder location="classpath:ldap.properties"/>
 </beans>

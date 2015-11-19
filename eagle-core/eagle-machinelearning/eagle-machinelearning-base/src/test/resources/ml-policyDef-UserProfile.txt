@@ -17,14 +17,14 @@
    },
    "algorithms":[
       {
-         "name":"eagle.security.userprofile.util.EigenBasedAnomalyDetection",
+         "name":"org.apache.eagle.security.userprofile.util.EigenBasedAnomalyDetection",
          "description":"EigenBasedAnomalyDetection",
          "modelPath":"/models/",
          "featureSet":"getfileinfo, open, listStatus, setTimes, setPermission, rename, mkdirs, create, setReplication, contentSummary, delete, setOwner, fsck",
          "type":"CSV"
       },
       {
-         "name":"eagle.security.userprofile.util.KDEBasedAnomalyDetection",
+         "name":"org.apache.eagle.security.userprofile.util.KDEBasedAnomalyDetection",
          "description":"DensityBasedAnomalyDetection",
          "modelPath":"/models/",
          "featureSet":"getfileinfo, open, listStatus, setTimes, setPermission, rename, mkdirs, create, setReplication, contentSummary, delete, setOwner, fsck",
