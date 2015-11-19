@@ -22,7 +22,7 @@
     <parent>
         <groupId>eagle</groupId>
         <artifactId>eagle-data-process-parent</artifactId>
-        <version>0.1.0</version>
+        <version>0.3.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

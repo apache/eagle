@@ -19,7 +19,7 @@
     <parent>
         <groupId>eagle</groupId>
         <artifactId>eagle-core</artifactId>
-        <version>0.1.0</version>
+        <version>0.3.0</version>
     </parent>
     <artifactId>eagle-data-process-parent</artifactId>
     <packaging>pom</packaging>
