@@ -34,6 +34,11 @@
           <artifactId>eagle-security-hdfs-auditlog</artifactId>
           <version>${project.version}</version>
       </dependency>
+        <dependency>
+            <groupId>eagle</groupId>
+            <artifactId>eagle-security-hdfs-securitylog</artifactId>
+            <version>${project.version}</version>
+        </dependency>
       <dependency>
           <groupId>eagle</groupId>
           <artifactId>eagle-security-hive</artifactId>
