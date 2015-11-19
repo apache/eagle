@@ -61,6 +61,7 @@
         <maven-scala.version>2.15.0</maven-scala.version>
         <maven-scalatest.version>1.0</maven-scalatest.version>
         <maven-tomcat7.version>2.2</maven-tomcat7.version>
+        <maven-apache-rat.version>0.11</maven-apache-rat.version>
 
         <!-- Environment Versions-->
         <hadoop.version>2.6.0.2.2.5.1-3</hadoop.version>
@@ -678,6 +679,15 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.rat</groupId>
+                    <artifactId>apache-rat-plugin</artifactId>
+                    <version>${maven-apache-rat.version}</version>
+                    <configuration>
+                        <useDefaultExcludes>true</useDefaultExcludes>
+                    </configuration>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.tomcat.maven</groupId>
                     <artifactId>tomcat7-maven-plugin</artifactId>

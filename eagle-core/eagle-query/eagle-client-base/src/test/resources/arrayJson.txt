@@ -1,6 +1,0 @@
-[
-   "cluster",
-   "datacenter",
-   "rack",
-   "hostname"
-]

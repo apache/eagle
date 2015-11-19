@@ -27,7 +27,7 @@
     </parent>
     <artifactId>eagle-webservice</artifactId>
 	<packaging>war</packaging>
-	<name>eagle-service</name>
+	<name>eagle-webservice</name>
 
 	<dependencies>
         <dependency>
