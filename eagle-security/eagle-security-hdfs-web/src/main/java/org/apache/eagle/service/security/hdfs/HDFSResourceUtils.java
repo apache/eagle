@@ -16,11 +16,9 @@
  */
 package org.apache.eagle.service.security.hdfs;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.eagle.service.generic.ListQueryResource;
-import org.apache.hadoop.fs.FileStatus;
 
 import org.apache.eagle.alert.entity.AlertDataSourceEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
@@ -60,44 +58,5 @@ public class HDFSResourceUtils {
 			
 		return false;
 	}
-	
-	/**
-	 * Filter Only directories 
-	 * @param fileStatuses
-	 * @return
-	 */
-	public static List<String> filterDirectories( List<FileStatus> fileStatuses)
-	{
-		List<String> directories  = new ArrayList<>();
-		for(FileStatus fileStatus : fileStatuses )
-		{
-			if( fileStatus.isDirectory() )
-				directories.add(fileStatus.getPath().toUri().getPath());
-			
-		}
-		return directories;
-	}
-	
-	
-	/**
-	 * Returns the filtered data by applyin RegExp
-	 * @param regExp
-	 * @param data
-	 * @return
-	 */
-	public static List<String> filterCollectionUsingRegEx( String regExp , List<String> data )
-	{
-		 // No regular expressions filtering needed
-        if (regExp == null || regExp.isEmpty()) {
-            return data;
-        }
-        
-        List<String> filteredElems = new ArrayList<String>();
-        for( String path : data )
-        {
-        	if( path.matches(regExp) )
-        			filteredElems.add(path);
-        }       
-		return filteredElems;
-	}
+
 }
