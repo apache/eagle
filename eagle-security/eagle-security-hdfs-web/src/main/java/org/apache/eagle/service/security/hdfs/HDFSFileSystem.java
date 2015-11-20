@@ -16,15 +16,10 @@
  */
 package org.apache.eagle.service.security.hdfs;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.eagle.security.hdfs.entity.HDFSFileSystemResponseEntity;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -91,67 +86,6 @@ public class HDFSFileSystem {
 		return Arrays.asList(listStatus);
 	}
 
-	
-	/**
-	 * Browse Resources of passed Path and its sub directories
-	 * Note :: Sub directories only to determine the Sensitivity Type of Root Directories
-	 * @param filePath
-	 * @return fileSystemResponseObj{ with SubDirectoryMap and ListOf FileStatus}
-	 * @throws Exception
-	 */
-	public HDFSFileSystemResponseEntity browseResources ( String filePath ) throws Exception
-	{
-		LOG.info("HDFS File Path   :  "+filePath +"   and EndPoint  : "+hdfsEndPoint);
-		FileSystem hdfsFileSystem = null;
-        FileStatus[]  listStatus;
-        HDFSFileSystemResponseEntity response = new HDFSFileSystemResponseEntity();
-        Map< String , List<String> > subdirectoriesMap = new HashMap< String , List<String> >();
-        try {
-			Configuration config = createConfig();
-			hdfsFileSystem = getFileSystem(config);
-			Path path  = new Path(filePath);
-			listStatus = hdfsFileSystem.listStatus( path );	
-			LOG.info(" Browsing Sub Directories .... ");
-			// Browse Sub- directories
-			for( FileStatus fileStatus : listStatus )
-			{
-				FileStatus[] fileStatusList = null;
-				if( fileStatus.isDirectory() )
-					fileStatusList = hdfsFileSystem.listStatus(new Path(fileStatus.getPath().toUri().getPath()) );
-				
-				if( fileStatusList != null && fileStatusList.length > 0 )
-					subdirectoriesMap.put(fileStatus.getPath().toUri().getPath(), /*  Key would be Parent */
-								          getSubDirectories( fileStatusList )  /*  Value Would be Child Paths */);
-			}			
-			response.setFileList(Arrays.asList(listStatus));
-			response.setSubDirectoriesMap(subdirectoriesMap);
-			
-		} catch ( Exception ex ) {
-			LOG.error(" Exception when browsing files for the path " +filePath , ex.getMessage() );
-			throw new Exception(" Exception When browsing Files/Directories in HDFS .. Message :  "+ex.getMessage());
-		} finally {
-			 //Close the file system
-			if( hdfsFileSystem != null ) hdfsFileSystem.close();
-		}        
-        return response;
-	}
-	
-	/**
-	 * Browse only Sub-directories 
-	 * @param listStatus
-	 * @return
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public List<String>  getSubDirectories(FileStatus[] listStatus) throws IOException {
-		List<String> list  = new ArrayList<>();
-		for( FileStatus fileStatus : listStatus )
-		{	
-			if( fileStatus.isDirectory() )
-				list.add(fileStatus.getPath().toUri().getPath());
-		}
-		return list;
-	}
 
 	/**
 	 * Create Config Object
@@ -163,28 +97,5 @@ public class HDFSFileSystem {
 		return config;
 	}
 
-	public static void main(String[] args) throws IOException {
-		Configuration config =  new Configuration();
-		config.set("fs.defaultFS", "hdfs://127.0.0.1:9000");
-		FileSystem hdfsFileSystem  = FileSystem.get(config);
-		Path filePath = new Path("hdfs://127.0.0.1:9000/user");
-		//FileStatus[]  listStatus = hdfsFileSystem.listStatus( filePath );
-		//System.out.println(status1);
-		//RemoteIterator<LocatedFileStatus> locatedFileStatus = hdfsFileSystem.listFiles(filePath, true);
-		/*RemoteIterator<LocatedFileStatus> locatedFileStatus = hdfsFileSystem.listLocatedStatus(filePath);
-		while( locatedFileStatus.hasNext() )
-		{
-			LocatedFileStatus status = locatedFileStatus.next();
-			System.out.println(status.getPath().toUri());
-			
-		}*/
-		
-		FileStatus[]  listStatus = hdfsFileSystem.listStatus( filePath );
-		for( FileStatus status : listStatus )
-		{
-			System.out.println(status.getPath().toUri().getPath());
-			//System.out.println(status.getPath().toUri().getPath());
-		}
-	}
 
 }

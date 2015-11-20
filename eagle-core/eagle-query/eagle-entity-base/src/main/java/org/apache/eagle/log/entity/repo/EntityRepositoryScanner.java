@@ -63,7 +63,7 @@ public final class EntityRepositoryScanner {
 
 		@Override
 		protected void query() {
-			select().from("eagle").returning(
+			select().from("org.apache.eagle").returning(
 			allExtending(EntityRepository.class));
 		}
 

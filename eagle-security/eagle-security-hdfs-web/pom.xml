@@ -60,16 +60,6 @@
           <artifactId>eagle-security-common</artifactId>
           <version>${project.version}</version>
       </dependency>
-      <dependency>
-          <groupId>eagle</groupId>
-          <artifactId>eagle-alert-process</artifactId>
-          <version>${project.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>eagle</groupId>
-          <artifactId>eagle-alert-service</artifactId>
-          <version>${project.version}</version>
-      </dependency>
   </dependencies>
 </project>
 

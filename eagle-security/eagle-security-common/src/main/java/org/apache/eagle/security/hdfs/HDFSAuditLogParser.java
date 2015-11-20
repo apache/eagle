@@ -16,8 +16,9 @@
  */
 package org.apache.eagle.security.hdfs;
 
-import eagle.security.util.LogParseUtil;
+
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.security.util.LogParseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

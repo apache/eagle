@@ -30,7 +30,7 @@ public class TestHDFSSecuritylogParser {
 
     @Test
     public void test() throws ParseException {
-        String msg = "2015-11-18 08:41:10,200 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization failed for hbase (auth:SIMPLE) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol";
+        String msg = "2015-11-18 08:41:10,200 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hbase (auth:SIMPLE) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol";
 
         HDFSSecurityLogParser parser = new HDFSSecurityLogParser();
         HDFSSecurityLogObject obj = parser.parse(msg);
