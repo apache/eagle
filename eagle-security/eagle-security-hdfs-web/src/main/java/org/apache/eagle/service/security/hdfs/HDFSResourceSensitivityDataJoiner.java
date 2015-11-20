@@ -68,58 +68,6 @@ public class HDFSResourceSensitivityDataJoiner {
 		}
 		return result;
 	}
-	
-	
-	/**
-	 * Checks if the file Path comes under Sensitivity Category if yes append the Sensitivity Type at the End
-	 * @param site
-	 * @return filePathListWithSensitivityTpe
-	 */
-	
-//	public List<FileStatusEntity>  joinFileSensitivity( String site , HDFSFileSystemResponseEntity response ) {
-//        List<FileStatusEntity> result = new ArrayList<>();
-//        List<FileStatus> fileStatuses = response.getFileList();
-//        HDFSResourceSensitivityService sensitivityService = new HDFSResourceSensitivityService();
-//        Map<String, String>  sensitivityMap = sensitivityService.getFileSensitivityMapBySite(site);
-//        LOG.info("Joining Resource with Sensitivity data ..");
-//        Map<String , List<String>>  subDirectories = response.getSubDirectoriesMap();
-//        for( FileStatus fileStatus : fileStatuses ) {
-//            String resource = fileStatus.getPath().toUri().getPath();
-//            FileStatusEntity entity;
-//			try {
-//				entity = new FileStatusEntity(fileStatus);
-//				entity.setResource(resource);
-//	            entity.setSensitiveType(sensitivityMap.get(resource));
-//	            if(subDirectories.containsKey(resource))
-//	            	entity.setChildSensitivityTypes(getChildSensitivityTypes(resource, subDirectories.get(resource) , sensitivityMap ));
-//			} catch (IOException e) {
-//				LOG.error(" Exception when joining FileSensitivity .. Error Message : "+e.getMessage());
-//			}
-//
-//		}
-//		return result;
-//	}
-
-	/**
-	 * Check the resource has any child , if it has child then Fetch the Sensitivity Type of Each Child
-	 *  
-	 * @param directory
-	 * @param fileStatuses
-	 * @param sensitivityMap
-	 * @return childSensitivityTypes
-	 */
-//	public Set<String>  getChildSensitivityTypes( String resource, List<String> directories  , Map<String,String> _sensitivityMap )
-//	{
-//		// Check the passed directory has any child directory
-//		Set<String>  childSensitivityTypes = new HashSet<String>();
-//		for(String directory : directories )
-//		{
-//			// Use String.startWith to determine the child directory
-//			if( _sensitivityMap.containsKey(directory) )
-//				childSensitivityTypes.add(_sensitivityMap.get(directory));
-//		}
-//		return childSensitivityTypes;
-//	}
 		
 	/**
 	 * Fetch the Sensitivity Types by applying RegExp Pattern 
