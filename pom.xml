@@ -15,22 +15,114 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>14</version>
+    </parent>
     <groupId>eagle</groupId>
     <artifactId>eagle-parent</artifactId>
     <version>0.3.0</version>
     <packaging>pom</packaging>
-    <name>eagle parent</name>
-    <description>Distributed Real-time Monitoring and Alerting Framework</description>
-
+    <name>Apache Eagle Parent</name>
+    <url>https://eagle.incubator.apache.org</url>
+    <inceptionYear>2015</inceptionYear>
+    <description>
+        Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize attacks, malicious activities in Hadoop and take actions in real time.
+    </description>
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://apache.org</url>
+    </organization>
     <licenses>
         <license>
-            <name>Apache License Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <name>Apache 2.0 License</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
+    <scm>
+        <connection>scm:git:git@github.com:apache/incubator-eagle.git</connection>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-eagle.git</developerConnection>
+        <url>scm:git:git@github.com:apache/incubator-eagle.git</url>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://issues.apache.org/jira/browse/EAGLE</url>
+    </issueManagement>
+    <prerequisites>
+        <maven>${maven.version}</maven>
+    </prerequisites>
+    <mailingLists>
+        <mailingList>
+            <name>Dev Mailing List</name>
+            <post>dev@eagle.incubator.apache.org</post>
+            <subscribe>dev-subscribe@eagle.incubator.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@eagle.incubator.apache.org</unsubscribe>
+            <archive>http://mail-archives.apache.org/mod_mbox/eagle-dev/</archive>
+        </mailingList>
+        <mailingList>
+            <name>User Mailing List</name>
+            <post>user@eagle.incubator.apache.org</post>
+            <subscribe>user-subscribe@eagle.incubator.apache.org</subscribe>
+            <unsubscribe>user-unsubscribe@eagle.incubator.apache.org</unsubscribe>
+            <archive>http://mail-archives.apache.org/mod_mbox/eagle-user/</archive>
+        </mailingList>
+        <mailingList>
+            <name>Commits Mailing List</name>
+            <post>commits@eagle.incubator.apache.org</post>
+            <subscribe>commits-subscribe@eagle.incubator.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@eagle.incubator.apache.org</unsubscribe>
+            <archive>http://mail-archives.apache.org/mod_mbox/eagle-commits/</archive>
+        </mailingList>
+    </mailingLists>
+    <developers>
+        <developer>
+            <id>yonzhang2012</id>
+            <name>Edward Zhang</name>
+            <email>yonzhang2012@apache.org</email>
+            <organization>Apache Software Foundation</organization>
+            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+        </developer>
+        <developer>
+            <id>hao</id>
+            <name>Hao Chen</name>
+            <email>hao@apache.org</email>
+            <organization>Apache Software Foundation</organization>
+            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+        </developer>
+        <developer>
+            <id>libsun</id>
+            <name>Libin Sun</name>
+            <email>libsun@apache.org</email>
+            <organization>Apache Software Foundation</organization>
+            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+        </developer>
+        <developer>
+            <id>jilin</id>
+            <name>Jilin Jiang</name>
+            <email>jilin@apache.org</email>
+            <organization>Apache Software Foundation</organization>
+            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+        </developer>
+        <developer>
+            <id>qingwzhao</id>
+            <name>Qingwen Zhao</name>
+            <email>qingwzhao@apache.org</email>
+            <organization>Apache Software Foundation</organization>
+            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+        </developer>
+        <developer>
+            <id>cgupta</id>
+            <name>Chaitali Gupta</name>
+            <email>cgupta@apache.org</email>
+            <organization>Apache Software Foundation</organization>
+            <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
+        </developer>
+    </developers>
 
     <modules>
         <module>eagle-core</module>
@@ -40,7 +132,6 @@
         <module>eagle-assembly</module>
         <module>eagle-topology-assembly</module>
     </modules>
-
     <properties>
         <!-- General Properties -->
         <java.version>1.7</java.version>
@@ -49,6 +140,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Maven Plugins Versions -->
+        <maven.version>3.3.3</maven.version>
         <maven-model.version>4.0.0</maven-model.version>
         <maven-release.version>2.5.1</maven-release.version>
         <maven-assembly.version>2.5.5</maven-assembly.version>
@@ -154,7 +246,6 @@
 
         <!-- sprint security -->
         <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
-
     </properties>
 
     <dependencyManagement>
@@ -701,7 +792,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.tomcat.maven</groupId>
                     <artifactId>tomcat7-maven-plugin</artifactId>
@@ -718,6 +808,9 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <encoding>UTF-8</encoding>
+                        <maxmem>2048m</maxmem>
+                        <fork>true</fork>
                     </configuration>
                 </plugin>
                 <plugin>

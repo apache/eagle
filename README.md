@@ -21,33 +21,26 @@ limitations under the License.
 
 >  Secure Hadoop Data in Real Time
 
-Apache Eagle is an Open Source Monitoring solution, contributed by eBay Inc, to instantly identify access to sensitive data, recognize attacks, malicious activities in Hadoop and take actions in real time. 
+Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize attacks, malicious activities in Hadoop and take actions in real time.
 
-Eagle has been accepted as an Apache Incubation Project on Oct 26, 2015.
+For more details, please visit [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org)
 
-For more details, see the website [http://goeagle.io](http://goeagle.io).
-
-## Use Cases
-* Anomalous access detection
-* Monitor data access traffic 
-* Discover intrusions and security breach
-* Discover and prevent sensitive data loss and leaks
+## Documentation
+You can find the latest Eagle documentation on the [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README) file only contains basic setup instructions.
 
 ## Getting Started
-Please refer to [http://goeagle.io/docs/deployment-in-sandbox.html](http://goeagle.io/docs/deployment-in-sandbox.html)
+Please refer to [https://eagle.incubator.apache.org/docs/deployment-in-sandbox.html](https://eagle.incubator.apache.org/docs/deployment-in-sandbox.html)
 
 ## Building Eagle
 Eagle is built using [Apache Maven](https://maven.apache.org/). To build Eagle, run:
 
     mvn -DskipTests clean package
 
-After successfully building, you will find eagle binary tarball under _[eagle-assembly](eagle-assembly/)/target/_
-
-## Documentation
-You can find the latest Eagle documentation on the [project documentation site](http://goeagle.io/docs) or [project wiki](https://github.com/eBay/Eagle/wiki). This [README](README) file only contains basic setup instructions.
+After successfully building, you will find eagle binary tarball under _eagle-assembly/target/_
 
 ## Get Help
-We are in the process of applying for apache incubation. Until then if you have any questions please reach out to Arun Manoharan [armanoharan at ebay dot com](mailto:armanoharan@ebay.com)
+The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.incubator.apache.org](mailto:dev@eagle.incubator.apache.org),
+and remember to subscribe our mail list via [dev-subscribe@eagle.incubator.apache.org](mailto:dev-subscribe@eagle.incubator.apache.org)
 
 ## License
 Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0). More details, please refer to [LICENSE](LICENSE) file.
