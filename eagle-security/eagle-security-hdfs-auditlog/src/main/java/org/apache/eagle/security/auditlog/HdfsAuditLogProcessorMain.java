@@ -41,7 +41,6 @@ public class HdfsAuditLogProcessorMain {
         Config config = new ConfigOptionParser().load(args);
 
         LOG.info("Config class: " + config.getClass().getCanonicalName());
-
         if(LOG.isDebugEnabled()) LOG.debug("Config content:"+config.root().render(ConfigRenderOptions.concise()));
 
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);

@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metric.report;
+package org.apache.eagle.dataproc.impl.storm.zookeeper;
 
-import java.util.List;
+import java.io.Serializable;
 
-import org.apache.eagle.metric.Metric;
-
-public interface MetricReport {
-	// The method should be thread safe
-	void emit(List<Metric> list);
+public class ZKStateConfig implements Serializable {
+    private static final long serialVersionUID = 1L;
+    public String zkQuorum;
+    public String zkRoot;
+    public int zkSessionTimeoutMs;
+    public int zkRetryTimes;
+    public int zkRetryInterval;
 }

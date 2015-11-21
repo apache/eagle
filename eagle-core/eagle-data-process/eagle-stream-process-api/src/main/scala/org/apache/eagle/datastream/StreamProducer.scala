@@ -103,6 +103,10 @@ trait StreamProducer{
     ret
   }
 
+  def streamUnion(others : util.List[StreamProducer]) : StreamProducer = {
+    streamUnion(others);
+  }
+
   def streamUnion(others : Seq[StreamProducer]) : StreamProducer = {
     val ret = StreamUnionProducer(incrementAndGetId(), others)
     hookupDAG(graph, this, ret)

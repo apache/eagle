@@ -51,10 +51,6 @@ public class KafkaSourcedSpoutProvider extends AbstractStormSpoutProvider{
 		String zkConnString = context.getString("dataSourceConfig.zkConnection");
 		// transaction zkRoot
 		String zkRoot = context.getString("dataSourceConfig.transactionZKRoot");
-		// Site
-		String site = context.getString("eagleProps.site");
-
-        //String realTopic = (site ==null)? topic : String.format("%s_%s",site,topic);
 
         LOG.info(String.format("Use topic id: %s",topic));
 

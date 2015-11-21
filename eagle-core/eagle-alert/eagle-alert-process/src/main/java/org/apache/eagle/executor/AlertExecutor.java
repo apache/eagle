@@ -28,7 +28,7 @@ import org.apache.eagle.datastream.JavaStormStreamExecutor2;
 import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.metric.CountingMetric;
 import org.apache.eagle.metric.Metric;
-import org.apache.eagle.metric.report.EagleSerivceMetricReport;
+import org.apache.eagle.metric.report.EagleServiceMetricReport;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.policy.*;
@@ -73,7 +73,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 	private Map<String, Map<String, String>> dimensionsMap; // cache it for performance
 	private Map<String, String> baseDimensions;
 	private Thread metricReportThread;
-	private EagleSerivceMetricReport metricReport;
+	private EagleServiceMetricReport metricReport;
 
 	public AlertExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
                          AlertDefinitionDAO alertDefinitionDao, String[] sourceStreams){
@@ -122,7 +122,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 				          config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) : null;
 		String password = config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) ?
 				          config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) : null;
-		this.metricReport = new EagleSerivceMetricReport(eagleServiceHost, eagleServicePort, username, password);
+		this.metricReport = new EagleServiceMetricReport(eagleServiceHost, eagleServicePort, username, password);
 
 		metricMap = new ConcurrentHashMap<String, Metric>();
 		baseDimensions = new HashMap<String, String>();
@@ -172,7 +172,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		}
 		
 		policyEvaluators = new CopyOnWriteHashMap<>();
-		// for efficency, we don't put single policy evaluator 
+		// for efficiency, we don't put single policy evaluator
 		policyEvaluators.putAll(tmpPolicyEvaluators);
 		DynamicPolicyLoader policyLoader = DynamicPolicyLoader.getInstance();
 		
@@ -258,7 +258,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 						long previous = metric.getTimestamp();
 						if (current > previous + MERITE_GRANULARITY) {
 							metricList.add(metric);
-							metricMap.put(name, new CountingMetric(trim(current, MERITE_GRANULARITY), metric.getDemensions(), metric.getMetricName()));
+							metricMap.put(name, new CountingMetric(trim(current, MERITE_GRANULARITY), metric.getDimensions(), metric.getMetricName()));
 						}
 					}
 				}
