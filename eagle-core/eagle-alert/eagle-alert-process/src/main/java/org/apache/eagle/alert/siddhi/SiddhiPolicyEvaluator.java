@@ -17,11 +17,7 @@
 package org.apache.eagle.alert.siddhi;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -182,16 +178,25 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 	}
 
 	/**
-	 * this is a heavy operation, we should avoid to use
-	 * @param sourceStream
-	 * @param data
+	 * This is a heavy operation, we should avoid to use.
+     *
+     * This validation method will skip invalid fields in event which are not declared in stream schema otherwise it will cause exception for siddhi engine.
+     *
+     * @see <a href="https://issues.apache.org/jira/browse/EAGLE-49">https://issues.apache.org/jira/browse/EAGLE-49</a>
+     *
+	 * @param sourceStream source steam id
+	 * @param data input event
 	 */
 	private void validateEventInRuntime(String sourceStream, SortedMap data){
 		if(!needValidation)
 			return;
 		SortedMap<String, AlertStreamSchemaEntity> map = StreamMetadataManager.getInstance().getMetadataEntityMapForStream(sourceStream);
-		if(!map.keySet().equals(data.keySet()))
-			throw new IllegalStateException("incoming data schema is different from supported data schema, incoming data: " + data.keySet() + ", schema: " + map.keySet());
+        if(!map.keySet().equals(data.keySet())){
+            Set<Object> badKeys = new TreeSet<>();
+            for(Object key:data.keySet()) if(!map.containsKey(key)) badKeys.add(key);
+            LOG.warn(String.format("Ignore invalid fields %s in event: %s from stream: %s, valid fields are: %s", badKeys.toString(),data.toString(), sourceStream,map.keySet().toString()));
+            for(Object key:badKeys) data.remove(key);
+        }
 	}
 
 	private void putAttrsIntoInputStream(List<Object> input, String streamName, SortedMap map) {
