@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# install Eagle on the Ambari server instance
+if [[ "$SERF_TAG_AMBARI_SERVER" == "true" ]] ;then
+  echo run eagle install script
+  nohup /usr/local/eagle/deploy.sh > /var/log/eagle-deploy.log
+fi
