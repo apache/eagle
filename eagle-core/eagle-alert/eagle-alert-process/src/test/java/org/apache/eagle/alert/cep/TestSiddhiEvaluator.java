@@ -34,6 +34,7 @@ import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.executor.AlertExecutor;
 import junit.framework.Assert;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Test;
 
 import java.util.*;
@@ -94,7 +95,7 @@ public class TestSiddhiEvaluator {
         SiddhiPolicyEvaluator evaluator = new SiddhiPolicyEvaluator(config, "testPolicy", policyDef, new String[]{"hdfsAuditLogEventStream"});
 		EagleAlertContext context = new EagleAlertContext();
 
-		AlertDefinitionDAO alertDao = new AlertDefinitionDAOImpl(null, null) {
+		AlertDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, null)) {
 			@Override
 			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception {
 				return null;

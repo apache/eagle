@@ -20,6 +20,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,7 +52,7 @@ public class TestAlertDefinitionDAOImpl {
 
 		String site = "sandbox";
 		String dataSource = "UnitTest";
-		AlertDefinitionDAO dao = new AlertDefinitionDAOImpl(eagleServiceHost, eagleServicePort) {
+		AlertDefinitionDAO dao = new AlertDefinitionDAOImpl(new EagleServiceConnector(eagleServiceHost, eagleServicePort)) {
 			@Override
 			public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) throws Exception {
 				List<AlertDefinitionAPIEntity> list = new ArrayList<AlertDefinitionAPIEntity>();

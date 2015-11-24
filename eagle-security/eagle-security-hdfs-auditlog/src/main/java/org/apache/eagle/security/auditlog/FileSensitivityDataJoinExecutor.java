@@ -25,10 +25,12 @@ import org.apache.eagle.security.auditlog.util.SimplifyPath;
 import org.apache.eagle.security.hdfs.entity.FileSensitivityAPIEntity;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.security.util.ExternalDataJoiner;
+import org.apache.storm.guava.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +57,8 @@ public class FileSensitivityDataJoinExecutor extends JavaStormStreamExecutor2<St
 
     @Override
     public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
-        Map<String, Object> event = (Map<String, Object>)input.get(1);
+        Map<String, Object> toBeCopied = (Map<String, Object>)input.get(1);
+        Map<String, Object> event = new TreeMap<String, Object>(toBeCopied);
         Map<String, FileSensitivityAPIEntity> map = (Map<String, FileSensitivityAPIEntity>) ExternalDataCache.getInstance().getJobResult(FileSensitivityPollingJob.class);
         FileSensitivityAPIEntity e = null;
         if (LOG.isDebugEnabled()) {
