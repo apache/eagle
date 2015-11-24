@@ -55,8 +55,7 @@ public class TestUserCommandReassembler {
         Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
             @Override
             public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2.f1().get("cmd");
-                Assert.assertEquals("user:appendToFile", cmd);
+                String cmd = (String)stringMapTuple2.f1().get("cmd");Assert.assertEquals("user:appendToFile", cmd);
                 System.out.println("assert passed!!!");
             }
         };
