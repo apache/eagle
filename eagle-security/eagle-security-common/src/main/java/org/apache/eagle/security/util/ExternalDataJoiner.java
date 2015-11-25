@@ -77,8 +77,9 @@ public class ExternalDataJoiner {
 	
 	public void start(){
 		// for job
-		JobDetail job = JobBuilder.newJob(jobCls) 
-		     .withIdentity(jobCls.getName() + ".job", QUARTZ_GROUP_NAME)
+		String group = String.format("%s.%s.%s", QUARTZ_GROUP_NAME, jobDataMap.getString("site"), jobDataMap.getString("dataSource"));
+		JobDetail job = JobBuilder.newJob(jobCls)
+		     .withIdentity(jobCls.getName() + ".job", group)
 		     .setJobData(jobDataMap)
 		     .build();
 		
