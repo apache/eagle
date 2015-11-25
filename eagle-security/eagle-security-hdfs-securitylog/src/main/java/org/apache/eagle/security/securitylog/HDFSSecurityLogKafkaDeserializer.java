@@ -16,12 +16,12 @@
  *
  */
 
-package eagle.security.securitylog;
+package org.apache.eagle.security.securitylog;
 
 
-import eagle.security.securitylog.parse.HDFSSecurityLogObject;
+import org.apache.eagle.security.securitylog.parse.HDFSSecurityLogObject;
 import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
-import eagle.security.securitylog.parse.HDFSSecurityLogParser;
+import org.apache.eagle.security.securitylog.parse.HDFSSecurityLogParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -16,7 +16,7 @@
  *
  */
 
-package eagle.security.securitylog;
+package org.apache.eagle.security.securitylog;
 
 
 import com.typesafe.config.Config;
@@ -33,9 +33,7 @@ public class HDFSSecurityLogProcessorMain {
     private static final Logger LOG = LoggerFactory.getLogger(HDFSSecurityLogProcessorMain.class);
 
     public static void main(String[] args) throws Exception{
-        new ConfigOptionParser().load(args);
-        System.setProperty("config.trace", "loads");
-        Config config = ConfigFactory.load();
+        Config config = new ConfigOptionParser().load(args);
 
         LOG.info("Config class: " + config.getClass().getCanonicalName());
 

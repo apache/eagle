@@ -16,9 +16,12 @@
  */
 package org.apache.eagle.datastream
 
+import java.io.{FileInputStream, File}
+
 import backtype.storm.generated.StormTopology
 import backtype.storm.utils.Utils
 import backtype.storm.{Config, LocalCluster, StormSubmitter}
+import org.yaml.snakeyaml.Yaml
 import storm.trident.spout.RichSpoutBatchExecutor
 
 case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesafe.config.Config) extends AbstractTopologyExecutor {
@@ -31,6 +34,20 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
     conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, Int.box(32))
     conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, Int.box(16384))
     conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, Int.box(16384))
+
+    if(config.hasPath("envContextConfig.stormConfigFile")) {
+      //val inputFileStream = {
+      //  StormTopologyExecutorImpl.getClass.getClassLoader.getResourceAsStream(config.getString("envContextConfig.stormConfigFile"))
+      //}
+      val file = new File(config.getString("envContextConfig.stormConfigFile"))
+      if(file.exists()) {
+        val inputFileStream = new FileInputStream(file)
+        val yaml = new Yaml()
+        val stormConf = yaml.load(inputFileStream).asInstanceOf[java.util.LinkedHashMap[String, Object]]
+        conf.putAll(stormConf)
+        inputFileStream.close()
+      }
+    }
 
     val topologyName = config.getString("envContextConfig.topologyName")
     if (!localMode) {
