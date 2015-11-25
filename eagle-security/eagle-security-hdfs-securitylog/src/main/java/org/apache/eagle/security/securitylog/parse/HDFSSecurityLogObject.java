@@ -16,7 +16,7 @@
  *
  */
 
-package eagle.security.securitylog.parse;
+package org.apache.eagle.security.securitylog.parse;
 
 
 public class HDFSSecurityLogObject {

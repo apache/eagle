@@ -16,7 +16,7 @@
  *
  */
 
-package eagle.security.securitylog;
+package org.apache.eagle.security.securitylog;
 
 
 import com.typesafe.config.Config;

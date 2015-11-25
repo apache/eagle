@@ -16,11 +16,11 @@
  *
  */
 
-package eagle.security;
+package org.apache.eagle.security;
 
 
-import eagle.security.securitylog.parse.HDFSSecurityLogObject;
-import eagle.security.securitylog.parse.HDFSSecurityLogParser;
+import org.apache.eagle.security.securitylog.parse.HDFSSecurityLogObject;
+import org.apache.eagle.security.securitylog.parse.HDFSSecurityLogParser;
 import org.junit.Assert;
 import org.junit.Test;
 

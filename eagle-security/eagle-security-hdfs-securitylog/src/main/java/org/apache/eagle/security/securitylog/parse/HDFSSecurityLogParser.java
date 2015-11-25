@@ -16,7 +16,7 @@
  *
  */
 
-package eagle.security.securitylog.parse;
+package org.apache.eagle.security.securitylog.parse;
 
 
 import org.apache.eagle.security.util.LogParseUtil;

@@ -111,7 +111,8 @@ done
 
 
 if [ -z "$jarName" ]; then
-     jarName="${EAGLE_HOME}/lib/topology/eagle-topology-0.1.0-assembly.jar"
+    echo "Error: jar file is not found"
+    exit 1
 fi
 
 if [ -z "$mainClass" ]; then
