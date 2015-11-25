@@ -38,9 +38,7 @@ public class HdfsAuditLogProcessorMain {
 	private static final Logger LOG = LoggerFactory.getLogger(HdfsAuditLogProcessorMain.class);
 
 	public static void main(String[] args) throws Exception{
-        new ConfigOptionParser().load(args);
-        System.setProperty("config.trace", "loads");
-        Config config = ConfigFactory.load();
+        Config config = new ConfigOptionParser().load(args);
 
         LOG.info("Config class: " + config.getClass().getCanonicalName());
 

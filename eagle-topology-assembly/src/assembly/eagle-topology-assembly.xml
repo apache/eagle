@@ -16,8 +16,8 @@
                 <excludes>
                     <exclude>**/application.conf</exclude>
                     <exclude>**/defaults.yaml</exclude>
-                    <exclude>**/storm.yaml</exclude>
-                    <exclude>**/storm.yaml.1</exclude>
+                    <exclude>**/*storm.yaml</exclude>
+                    <exclude>**/*storm.yaml.1</exclude>
                     <exclude>**/log4j.properties</exclude>
                 </excludes>
             </unpackOptions>
