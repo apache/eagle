@@ -8,7 +8,7 @@
 				"node_modules/jquery/dist/jquery.min.js",
 				"node_modules/jquery-slimscroll/jquery.slimscroll.min.js",
 				"node_modules/bootstrap/dist/js/bootstrap.min.js",
-				"app/public/assets/bootstrap-components/js/bootstrap-components.min.js",
+				"node_modules/zombiej-bootstrap-components/bootstrap-components/js/bootstrap-components.min.js",
 				"node_modules/moment/min/moment-with-locales.min.js",
 				"node_modules/moment-timezone/builds/moment-timezone-with-data.min.js",
 				"node_modules/admin-lte/dist/js/app.min.js",
@@ -33,7 +33,7 @@
 		"css": {
 			"src": [
 				"node_modules/bootstrap/dist/css/bootstrap.min.css",
-				"app/public/assets/bootstrap-components/css/bootstrap-components.min.css",
+				"node_modules/zombiej-bootstrap-components/bootstrap-components/css/bootstrap-components.min.css",
 				"node_modules/font-awesome/css/font-awesome.min.css",
 				"node_modules/admin-lte/dist/css/AdminLTE.min.css",
 				"node_modules/admin-lte/dist/css/skins/skin-blue.min.css",
