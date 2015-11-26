@@ -1,2 +1,5 @@
 /bin/
 /target/
+node_modules
+ui
+tmp

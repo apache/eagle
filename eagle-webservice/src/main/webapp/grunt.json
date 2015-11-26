@@ -1,0 +1,46 @@
+{
+	"concat": {
+		"js": {
+			"options": {
+				"separator": "\n"
+			},
+			"src": [
+				"node_modules/jquery/dist/jquery.min.js",
+				"node_modules/jquery-slimscroll/jquery.slimscroll.min.js",
+				"node_modules/bootstrap/dist/js/bootstrap.min.js",
+				"app/public/assets/bootstrap-components/js/bootstrap-components.min.js",
+				"node_modules/moment/min/moment-with-locales.min.js",
+				"node_modules/moment-timezone/builds/moment-timezone-with-data.min.js",
+				"node_modules/admin-lte/dist/js/app.min.js",
+				"node_modules/angular/angular.min.js",
+				"node_modules/angular-resource/angular-resource.min.js",
+				"node_modules/angular-route/angular-route.min.js",
+				"node_modules/angular-cookies/angular-cookies.min.js",
+				"node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.min.js",
+				"node_modules/Flot/jquery.flot.js",
+				"node_modules/Flot/jquery.flot.stack.js",
+				"node_modules/Flot/jquery.flot.pie.js",
+				"node_modules/Flot/jquery.flot.time.js",
+				"node_modules/Flot/jquery.flot.crosshair.js",
+				"app/public/assets/flot/jquery.flot.tooltip.js",
+				"app/public/assets/flot/jquery.flot.legend.js",
+				"node_modules/d3/d3.min.js",
+
+				"tmp/public/js/scripts.min.js"
+			],
+			"dest": "tmp/public/js/doc.js"
+		},
+		"css": {
+			"src": [
+				"node_modules/bootstrap/dist/css/bootstrap.min.css",
+				"app/public/assets/bootstrap-components/css/bootstrap-components.min.css",
+				"node_modules/font-awesome/css/font-awesome.min.css",
+				"node_modules/admin-lte/dist/css/AdminLTE.min.css",
+				"node_modules/admin-lte/dist/css/skins/skin-blue.min.css",
+
+				"tmp/public/css/styles.css"
+			],
+			"dest": "tmp/public/css/styles.min.css"
+		}
+	}
+}
