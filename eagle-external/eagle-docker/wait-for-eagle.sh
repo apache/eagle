@@ -20,4 +20,4 @@ while ! get-server-state | grep 200 &>/dev/null ; do
   sleep $SLEEP
 done
 [ $DEBUG -gt 0 ] && echo
-debug eagle web started: $EAGLE_HOST:9099/eagle
+debug eagle web started: $EAGLE_HOST:9099/eagle-service

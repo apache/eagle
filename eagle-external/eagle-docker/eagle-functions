@@ -1,8 +1,8 @@
 : ${NODE_PREFIX=eagle}
 : ${AMBARI_SERVER_NAME:=${NODE_PREFIX}-server}
 : ${MYDOMAIN:=apache.org}
-: ${IMAGE:="apache/eagle:latest"}
-: ${DOCKER_OPTS:="--dns 127.0.0.1 --entrypoint /usr/local/serf/bin/start-serf-agent.sh -e KEYCHAIN=$KEYCHAIN"}
+: ${IMAGE:="apache/eagle:0.1.0"}
+: ${DOCKER_OPTS:="--dns 127.0.0.1 --entrypoint /usr/local/serf/bin/start-serf-agent.sh -e KEYCHAIN=$KEYCHAIN --env EAGLE_SERVER_HOST=${AMBARI_SERVER_NAME}.${MYDOMAIN}"}
 : ${CLUSTER_SIZE:=1}
 : ${DEBUG:=1}
 : ${SLEEP_TIME:=2}

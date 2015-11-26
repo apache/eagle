@@ -21,19 +21,19 @@ echo "Eagle home folder path is $EAGLE_HOME"
 cd $EAGLE_HOME
 
 
-echo "Initializing Eagle Service ..."
+#Initializing Eagle Service ...
 sh ./bin/eagle-service-init.sh
 
 sleep 10
 
-echo "Starting Eagle Service ..."
+#Starting Eagle Service ...
 sh ./bin/eagle-service.sh start
 
 sleep 10
 
 echo "Creating kafka topics for eagle ... "
 KAFKA_HOME=/usr/hdp/current/kafka-broker
-EAGLE_ZOOKEEPER_QUORUM=localhost:2181
+EAGLE_ZOOKEEPER_QUORUM=$EAGLE_SERVER_HOST:2181
 topic=`${KAFKA_HOME}/bin/kafka-topics.sh --list --zookeeper $EAGLE_ZOOKEEPER_QUORUM --topic sandbox_hdfs_audit_log`
 if [ -z $topic ]; then
         $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper $EAGLE_ZOOKEEPER_QUORUM --replication-factor 1 --partitions 1 --topic sandbox_hdfs_audit_log
@@ -46,8 +46,8 @@ echo "==> Failed, exiting"
 exit 1
 fi
 
-EAGLE_NIMBUS_HOST=eagle-server.apache.org
-EAGLE_SERVICE_HOST=eagle-server.apache.org
+EAGLE_NIMBUS_HOST=$EAGLE_SERVER_HOST
+EAGLE_SERVICE_HOST=$EAGLE_SERVER_HOST
 EAGLE_TOPOLOGY_JAR=`ls ${EAGLE_HOME}/lib/topology/eagle-topology-*-assembly.jar`
 
 ${EAGLE_HOME}/bin/eagle-topology-init.sh
@@ -67,4 +67,4 @@ storm jar $EAGLE_TOPOLOGY_JAR eagle.security.userprofile.UserProfileDetectionMai
 
 echo "Eagle is deployed successfully!"
 
-echo "Please visit http://<your_sandbox_ip>:9099 to play with Eagle!"
+echo "Please visit http://<container_ip>:9099/eagle-service to play with Eagle!"

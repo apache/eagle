@@ -39,7 +39,7 @@ And this project is to build apache/eagle images and provide eagle-functions to 
 
 5. **Start to use Eagle**: Congratulations! You are able to start using Eagle now. Please open eagle ui at following address (username: ADMIN, password: secret by default)
 
-        http://{{container_ip}}:9099  
+        http://{{container_ip}}:9099/eagle-service  
 
 6. **Manage Eagle Cluster**: This step is about how to managing the eagle cluster though not must-have at starting. Eagle docker depends on Ambari to manage the cluster infrastructure of Eagle. Following are some helpful links:
 
