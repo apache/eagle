@@ -11,7 +11,7 @@ And this project is to build apache/eagle images and provide eagle-functions to 
 ## Installation & Usage
 1. **Build Image**: Go to the root directory where the [Dockerfile](Dockerfile) is in, build image with following command:
  
-        docker built -t apache/eagle . 
+        docker built -t apache/eagle:0.1.0 . 
  
     > The docker image is named `apache/eagle`. Eagle docker image is based on [`ambari:1.7.0`](https://github.com/sequenceiq/docker-ambari), it will install ganglia, hbase,hive,storm,kafka and so on in this image. Add startup script and buleprint file into image. 
 
