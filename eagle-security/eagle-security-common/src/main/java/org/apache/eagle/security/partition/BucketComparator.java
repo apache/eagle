@@ -17,28 +17,20 @@
  *
  */
 
-package org.apache.eagle.metric.kafka;
+package org.apache.eagle.security.partition;
 
-import org.apache.eagle.dataproc.impl.storm.zookeeper.ZKStateConfig;
-import org.apache.eagle.service.client.ServiceConfig;
+import java.util.Comparator;
 
-import java.io.Serializable;
+public class BucketComparator implements Comparator<Bucket> {
 
-public class KafkaOffsetCheckerConfig implements Serializable {
-    public static class KafkaConfig implements Serializable{
-        public String kafkaEndPoints;
-        public String topic;
-        public String site;
-        public String group;
-    }
-
-    public ZKStateConfig zkConfig;
-    public KafkaConfig kafkaConfig;
-    public ServiceConfig serviceConfig;
-
-    public KafkaOffsetCheckerConfig (ServiceConfig serviceConfig, ZKStateConfig zkConfig, KafkaConfig kafkaConfig) {
-        this.serviceConfig = serviceConfig;
-        this.zkConfig = zkConfig;
-        this.kafkaConfig = kafkaConfig;
+    @Override
+    public int compare(Bucket w1, Bucket w2) {
+        if (w1.value < w2.value) {
+            return -1;
+        }
+        if (w1.value > w2.value) {
+            return 1;
+        }
+        return 0;
     }
 }

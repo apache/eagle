@@ -20,9 +20,6 @@ import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
-import com.typesafe.config.Config;
-import org.apache.eagle.common.config.EagleConfigConstants;
-import org.apache.eagle.dataproc.impl.storm.zookeeper.ZKStateConfig;
 import org.apache.eagle.metric.CountingMetric;
 import org.apache.eagle.metric.Metric;
 import org.apache.eagle.metric.manager.EagleMetricReportManager;
@@ -62,8 +59,8 @@ public class KafkaOffsetSpout extends BaseRichSpout {
 		this.baseMetricDimension.put("group", config.kafkaConfig.group);
 		String eagleServiceHost = config.serviceConfig.serviceHost;
 		Integer eagleServicePort = config.serviceConfig.servicePort;
-		String username = config.serviceConfig.serviceHost;
-		String password = config.serviceConfig.serviceHost;
+		String username = config.serviceConfig.username;
+		String password = config.serviceConfig.password;
 		EagleServiceMetricReport report = new EagleServiceMetricReport(eagleServiceHost, eagleServicePort, username, password);
 		EagleMetricReportManager.getInstance().register("metricCollectServiceReport", report);
 	}
@@ -77,11 +74,16 @@ public class KafkaOffsetSpout extends BaseRichSpout {
 		return metric;
 	}
 
+	public long trimTimestamp(long currentTime, long granularity) {
+		return currentTime / granularity * granularity;
+	}
+
 	@Override
 	public void nextTuple() {
 		Long currentTime = System.currentTimeMillis();
 		if (currentTime - lastRoundTime > DEFAULT_ROUND_INTERVALS) {
 			try {
+				long trimedCurrentTime = trimTimestamp(currentTime, DEFAULT_ROUND_INTERVALS);
 				Map<String, Long> consumedOffset = consumerOffsetFetcher.fetch();
 				Map<Integer, Long> latestOffset = latestOffsetFetcher.fetch(config.kafkaConfig.topic, consumedOffset.size());
 				List<Metric> list = new ArrayList<>();
@@ -89,8 +91,9 @@ public class KafkaOffsetSpout extends BaseRichSpout {
 					String partition = entry.getKey();
 					Integer partitionNumber = Integer.valueOf(partition.split("_")[1]);
 					Long lag = latestOffset.get(partitionNumber) - entry.getValue();
-					list.add(constructMetric(currentTime, partition, lag));
+					list.add(constructMetric(trimedCurrentTime, partition, lag));
 				}
+				lastRoundTime = trimedCurrentTime;
 				EagleMetricReportManager.getInstance().emit(list);
 			} catch (Exception ex) {
 				LOG.error("Got an exception, ex: ", ex);

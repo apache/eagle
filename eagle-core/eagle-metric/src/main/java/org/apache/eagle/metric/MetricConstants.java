@@ -17,28 +17,8 @@
  *
  */
 
-package org.apache.eagle.metric.kafka;
+package org.apache.eagle.metric;
 
-import org.apache.eagle.dataproc.impl.storm.zookeeper.ZKStateConfig;
-import org.apache.eagle.service.client.ServiceConfig;
-
-import java.io.Serializable;
-
-public class KafkaOffsetCheckerConfig implements Serializable {
-    public static class KafkaConfig implements Serializable{
-        public String kafkaEndPoints;
-        public String topic;
-        public String site;
-        public String group;
-    }
-
-    public ZKStateConfig zkConfig;
-    public KafkaConfig kafkaConfig;
-    public ServiceConfig serviceConfig;
-
-    public KafkaOffsetCheckerConfig (ServiceConfig serviceConfig, ZKStateConfig zkConfig, KafkaConfig kafkaConfig) {
-        this.serviceConfig = serviceConfig;
-        this.zkConfig = zkConfig;
-        this.kafkaConfig = kafkaConfig;
-    }
+public class MetricConstants {
+    public static final String GENERIC_METRIC_ENTITY_ENDPOINT = "GenericMetricService";
 }

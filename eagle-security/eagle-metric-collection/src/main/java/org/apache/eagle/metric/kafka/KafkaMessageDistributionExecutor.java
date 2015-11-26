@@ -97,12 +97,14 @@ public class KafkaMessageDistributionExecutor extends JavaStormStreamExecutor1<S
 
     public void update(long currentMessageTime, String user) {
         if (eventMetrics.get(user) == null) {
-            LOG.info("Got metrics for new user: " + user);
+            LOG.info("A new user in the time interval, user: " + user + ", currentMessageTime: " + currentMessageTime);
             putNewMetric(currentMessageTime, user);
         }
         else {
             long latestMessageTime = eventMetrics.get(user).latestMessageTime;
             if (currentMessageTime > latestMessageTime + DEFAULT_METRIC_GRANULARITY) {
+                LOG.info("Going to emit a user metric, user: " + user + ", currentMessageTime: " + currentMessageTime
+                        + ", latestMessageTime: " + latestMessageTime);
                 EagleMetricReportManager.getInstance().emit(Arrays.asList(eventMetrics.remove(user).metric));
                 putNewMetric(currentMessageTime, user);
             }

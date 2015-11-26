@@ -32,6 +32,11 @@
   <dependencies>
       <dependency>
           <groupId>eagle</groupId>
+          <artifactId>eagle-metric</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>eagle</groupId>
           <artifactId>eagle-security-hdfs-auditlog</artifactId>
           <version>${project.version}</version>
       </dependency>
