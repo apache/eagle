@@ -22,14 +22,13 @@ TOPOLOGY_NAME_SET=0
 function print_help() {
 	echo "Usage: $0 options {start | stop | status}"
 	echo "Options:                       Description:"
-	echo "  --jar      <jar path>          Default is $EAGLE_HOME/lib/topology/eagle-topology-0.1.0-assembly.jar"
 	echo "  --main     <main class>        Default is org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain"
 	echo "  --topology <topology name>     Default is sandbox-hdfsAuditLog-topology"
 	echo "  --config   <file path>         Default is $EAGLE_HOME/conf/sandbox-hdfsAuditLog-application.conf"
 	echo "  --storm-ui <storm ui url>      Execute through storm UI API, default: http://localhost:8744"
 
 	echo "Command Examples:"
-	echo "  $0 [--jar <jarPath>] --main <mainClass> [--topology <topologyName>] --config <filePath> start"
+	echo "  $0 --main <mainClass> [--topology <topologyName>] --config <filePath> start"
 	echo "  $0 --topology <topologyName> stop"
 	echo "  $0 --topology <topologyName> status"
 }
@@ -64,14 +63,6 @@ case $1 in
         cmd=$1
         shift
         ;;
-    --jar)
-         if [ $# -lt 3 ]; then
-             print_help
-             exit 1
-         fi
-         jarName=$2
-         shift 2
-         ;;
     --main)
         if [ $# -lt 3 ]; then
             print_help
@@ -109,6 +100,8 @@ case $1 in
     esac
 done
 
+
+jarName=$(ls ${EAGLE_HOME}/lib/topology/eagle-topology-*-assembly.jar)
 
 if [ -z "$jarName" ]; then
     echo "Error: jar file is not found"
@@ -163,7 +156,7 @@ case $cmd in
 	    echo "Checking topology $topologyName status ..."
 	    output=`storm list  -c nimbus.host=$EAGLE_NIMBUS_HOST | grep $topologyName`
 	    if [ $? != 0 ];then
-	        echo "Topolog is not alive: $topologyName is not found"
+	        echo "Topology is not alive: $topologyName is not found"
 	        exit 1
 	    fi
 
