@@ -285,6 +285,11 @@ eagleApp.service('Authorization', function($http, $location, $cookies) {
 
 	var content = {
 		isLogin: true,	// Status mark. Work for UI status check, changed when eagle api return 403 authorization failure.
+		needLogin: function() {
+			_path = _path || $location.path();
+			content.isLogin = false;
+			$location.path("/dam/login");
+		},
 		login: function(username, password) {
 			var _hash = btoa(username + ':' + password);
 			return $http({
@@ -350,7 +355,7 @@ eagleApp.service('Authorization', function($http, $location, $cookies) {
 	return content;
 });
 
-eagleApp.service('Entities', function($http, $q, $rootScope, $location, Authorization) {
+eagleApp.service('Entities', function($http, $q, $rootScope, Authorization) {
 	// Query
 	function _query(name, kvs) {
 		kvs = kvs || {};
@@ -422,8 +427,7 @@ eagleApp.service('Entities', function($http, $q, $rootScope, $location, Authoriz
 
 		_list._promise.then(function() {}, function(data) {
 			if(data.status === 403) {
-				Authorization.isLogin = false;
-				$location.path("/dam/login");
+				Authorization.needLogin();
 			}
 		});
 
