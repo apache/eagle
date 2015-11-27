@@ -43,9 +43,14 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
       if(file.exists()) {
         val inputFileStream = new FileInputStream(file)
         val yaml = new Yaml()
-        val stormConf = yaml.load(inputFileStream).asInstanceOf[java.util.LinkedHashMap[String, Object]]
-        conf.putAll(stormConf)
-        inputFileStream.close()
+        try {
+          val stormConf = yaml.load(inputFileStream).asInstanceOf[java.util.LinkedHashMap[String, Object]]
+          if(stormConf != null) conf.putAll(stormConf)
+        } catch {
+          case _ => ()
+        } finally {
+          if(inputFileStream != null) inputFileStream.close()
+        }
       }
     }
 
