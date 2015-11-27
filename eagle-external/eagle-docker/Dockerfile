@@ -24,17 +24,14 @@ RUN curl -sL $EAGLE_DOWNLOAD_LINK | tar -xz -C /usr/hdp/current
 RUN cd /usr/hdp/current && ln -s ./eagle-0.1.0 eagle
 ENV EAGLE_HOME=/usr/hdp/current/eagle
 
-
 RUN yum install -y httpd ganglia ganglia-gmetad ganglia-gmond ganglia-web nagios kafka zookeeper storm hbase tez hadoop snappy snappy-devel hadoop-libhdfs ambari-log4j hive hive-hcatalog hive-webhcat webhcat-tar-hive webhcat-tar-pig mysql-connector-java mysql-server
 
-ADD serf /usr/local/serf
-
-ADD httpd /var/log/httpd
-
-ADD install-cluster.sh /tmp/
-ADD eagle-singlenode.json /tmp/
-ADD eagle-multinode.json /tmp/
-ADD wait-for-eagle.sh /tmp/
-ADD deploy-eagle.sh /usr/hdp/current/eagle/deploy.sh
+ADD resource/serf /usr/local/serf
+ADD resource/httpd /var/log/httpd
+ADD resource/install-cluster.sh /tmp/
+ADD resource/eagle-singlenode.json /tmp/
+ADD resource/eagle-multinode.json /tmp/
+ADD resource/wait-for-eagle.sh /tmp/
+ADD resource/deploy-eagle.sh /usr/hdp/current/eagle/deploy.sh
 
 EXPOSE 9099 8744
