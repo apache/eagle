@@ -63,6 +63,9 @@ function usage() {
 
 function deploy(){
 	check_env
+	if [ "$NODE_NUM" == "" ];then
+		NODE_NUM=1
+	fi 
 	eagle-deploy-cluster $NODE_NUM
 }
 
