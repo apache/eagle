@@ -71,11 +71,11 @@ ${EAGLE_HOME}/examples/sample-sensitivity-resource-create.sh
 [ $? != 0 ] && exit 1
 ${EAGLE_HOME}/examples/sample-policy-create.sh
 [ $? != 0 ] && exit 1
-storm jar $EAGLE_TOPOLOGY_JAR eagle.security.auditlog.HdfsAuditLogProcessorMain -D config.file=${EAGLE_HOME}/conf/sandbox-hdfsAuditLog-application.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
+storm jar $EAGLE_TOPOLOGY_JAR org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain -D config.file=${EAGLE_HOME}/conf/sandbox-hdfsAuditLog-application.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
 [ $? != 0 ] && exit 1
-storm jar $EAGLE_TOPOLOGY_JAR eagle.security.hive.jobrunning.HiveJobRunningMonitoringMain -D config.file=${EAGLE_HOME}/conf/sandbox-hiveQueryLog-application.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
+storm jar $EAGLE_TOPOLOGY_JAR org.apache.eagle.security.hive.jobrunning.HiveJobRunningMonitoringMain -D config.file=${EAGLE_HOME}/conf/sandbox-hiveQueryLog-application.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
 [ $? != 0 ] && exit 1
-storm jar $EAGLE_TOPOLOGY_JAR eagle.security.userprofile.UserProfileDetectionMain -D config.file=${EAGLE_HOME}/conf/sandbox-userprofile-topology.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
+storm jar $EAGLE_TOPOLOGY_JAR org.apache.eagle.security.userprofile.UserProfileDetectionMain -D config.file=${EAGLE_HOME}/conf/sandbox-userprofile-topology.conf  -D eagleProps.eagleService.host=$EAGLE_SERVICE_HOST
 [ $? != 0 ] && exit 1
 
 # TODO: More eagle start
