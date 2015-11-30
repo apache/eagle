@@ -54,12 +54,12 @@ function usage() {
 	echo "  stop            Stop eagle docker instance"
 	echo "  status          List eagle docker image and instance status"
 	echo "  clean           Clean docker image and instance"
-	echo "  shell 		Execute docker instance bash, default: eagle-sandbox"
-	echo "  boot       	Simply bootstrap eagle docker by building then deploying"
+	echo "  shell           Execute docker instance bash, default: eagle-sandbox"
+	echo "  boot            Simply bootstrap eagle docker by building then deploying"
 	echo ""
 	echo "Options:"
-	echo "  --node [number]         Docker instances node number, default is 1"
-	echo "  --help			Display eagle docker image usage information"
+	echo "  --node [num]    Docker instances node number, default is 1"
+	echo "  --help          Display eagle docker image usage information"
 	echo ""
 	exit 0
 }
