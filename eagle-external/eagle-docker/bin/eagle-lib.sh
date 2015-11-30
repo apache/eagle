@@ -16,9 +16,9 @@
 : ${VERSION:=latest}
 : ${IMAGE:="apacheeagle/sandbox:${VERSION}"}
 
-: ${NODE_PREFIX:=eagle-sandbox}
+: ${NODE_PREFIX:=sandbox}
 : ${AMBARI_SERVER_NAME:=${NODE_PREFIX}}
-: ${MYDOMAIN:=apache.org}
+: ${MYDOMAIN:=eagle.incubator.apache.org}
 : ${DOCKER_OPTS:="--dns 127.0.0.1 --entrypoint /usr/local/serf/bin/start-serf-agent.sh -e KEYCHAIN=$KEYCHAIN --env EAGLE_SERVER_HOST=${AMBARI_SERVER_NAME}.${MYDOMAIN}"}
 : ${CLUSTER_SIZE:=1}
 : ${DEBUG:=1}

@@ -202,7 +202,7 @@ function status(){
 	[[ $? == 0 ]] || echo "no images found for eagle"
 	echo ""
 
-	echo "[Eagle Docker Instances (All)]"	
+	echo "[Eagle Docker Instances]"	
 	echo ""
 	docker ps -a | grep $EAGLE_DOCKER_NAME 
 	[[ $? == 0 ]] || echo "no instances found eagle"
@@ -220,7 +220,7 @@ function clean(){
 	docker ps -a | grep $EAGLE_DOCKER_NAME |awk '{print $1}'| while read id; do echo "Removing instance $id";docker rm $id;done
 
 	echo "[3/4] Remove eagle images"
-	docker images | grep apacheeagle/standalone | awk '{print $3}' | while read id; do echo "Removing image $id"; docker rmi $id;done
+	docker images | grep $EAGLE_DOCKER_NAME | awk '{print $3}' | while read id; do echo "Removing image $id"; docker rmi $id;done
 
 	echo "[4/4] Clean temp files"
         [[ -e target/ ]] && rm -rf target/
@@ -235,14 +235,13 @@ function deploy(){
 	fi 
 	echo "Deploying $NODE_NUM nodes"
 	eagle-deploy-cluster $NODE_NUM
-	
-	status
 }
 
 function boot(){
 	check_env
 	build
 	deploy
+	status
 }
 
 function exec_bash(){
