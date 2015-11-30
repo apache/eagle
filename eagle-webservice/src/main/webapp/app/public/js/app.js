@@ -132,7 +132,7 @@ eagleApp.config(function($routeProvider) {
 			site: function(Site) {return Site._promise();},
 			auth: function(Authorization) {return Authorization._promise();},
 		},
-	}).when('/dam/sensitivity', {
+	}).when('/dam/sensitivity/:dataSrc', {
 		templateUrl : 'partials/dam/sensitivity.html',
 		controller : 'sensitivityCtrl',
 		reloadOnSearch: false,
