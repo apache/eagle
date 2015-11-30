@@ -31,8 +31,8 @@ You can find the latest Eagle documentation on the [https://eagle.incubator.apac
 ## Getting Started
 The fastest way to get started with Eagle is using [docker](https://github.com/docker/docker) (install docker environment firstly)
 
-        git clone https://github.com/apache/incubator-eagle.git
-        incubator-eagle/eagle-docker boot
+    git clone https://github.com/apache/incubator-eagle.git
+    incubator-eagle/eagle-docker boot
 
 As an alternative option, you could install eagle package in sandbox manualy (see [https://eagle.incubator.apache.org/docs/deployment-in-sandbox.html](https://eagle.incubator.apache.org/docs/deployment-in-sandbox.html))
 
