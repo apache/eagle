@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<html ng-app="eagleApp" ng-controller="MainCtrl">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta charset="UTF-8">
+		<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+		<link rel="shortcut icon" href="public/images/favicon.png">
+
+		<title>Eagle</title>
+		<link rel="shortcut icon" type="image/png" href="public/images/favicon.png">
+
+		<!-- ref:css public/css/styles.min.css -->
+		<link href="public/css/main.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="../node_modules/zombiej-bootstrap-components/bootstrap-components/css/bootstrap-components.min.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="../node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+		<link href="../node_modules/admin-lte/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
+		<link href="../node_modules/admin-lte/dist/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css" />
+		<!-- endref -->
+	</head>
+	<body class="skin-blue sidebar-mini" ng-class="{'no-sidebar' : globalContent.hideSidebar}">
+		<!-- Site wrapper -->
+		<div class="wrapper">
+			<header class="main-header">
+				<a href="#/" class="logo">
+					<span class="logo-mini">DAM</span>
+					<span class="logo-lg">Eagle <small>Data Activity Monitoring</small></span>
+				</a>
+				<!-- Header Navbar: style can be found in header.less -->
+				<nav class="navbar navbar-static-top" role="navigation">
+					<!-- Sidebar toggle button-->
+					<a href="#" ng-hide="globalContent.hideSidebar" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
+					<div class="navbar-custom-menu">
+						<ul class="nav navbar-nav">
+							<!-- Site -->
+							<li class="dropdown" ng-show="!globalContent.hideSite && !globalContent.lockSite">
+								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<i class="fa fa-server"></i>
+									{{site.current().name}}
+									<i class="fa fa-caret-down"></i>
+								</a>
+								<ul class="dropdown-menu">
+									<li ng-repeat="sites in site.list">
+										<a ng-click="site.current(sites);">
+											<span class="fa fa-database"></span> {{sites.name}}
+										</a>
+									</li>
+									<!--li role="separator" class="divider"></li>
+									<li>
+										<a href="#/dam/siteList"><span class="fa fa-cog"></span>Config Sites</a>
+									</li-->
+								</ul>
+							</li>
+							<li class="dropdown" ng-show="globalContent.lockSite">
+								<a>
+									<i class="fa fa-server"></i>
+									{{site.current().name}}
+								</a>
+							</li>
+
+							<!-- User -->
+							<li class="dropdown user user-menu" ng-hide="globalContent.hideUser">
+								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<i class="fa fa-user"></i>
+									{{auth.userProfile.username}}
+								</a>
+								<!--ul class="dropdown-menu">
+									<li>
+										<a ng-click="logout();">
+											<span class="fa fa-sign-out"></span> Logout
+										</a>
+									</li>
+								</ul-->
+								<ul class="dropdown-menu">
+									<!-- User image -->
+									<li class="user-header">
+										<span class="img-circle">
+											<span class="fa fa-user" alt="User Image"></span>
+										</span>
+										<p>
+											{{auth.userProfile.username}}
+											<small>
+												<span ng-repeat="role in auth.userProfile.authorities">{{role.authority}} </span>
+											</small>
+										</p>
+									</li>
+									<!-- Menu Footer-->
+									<li class="user-footer">
+										<div class="pull-right">
+											<a ng-click="logout();" class="btn btn-default btn-flat">Sign out</a>
+										</div>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</header>
+
+			<!-- =============================================== -->
+			<!-- Left side column. contains the side bar -->
+			<aside class="main-sidebar" ng-hide="globalContent.hideSidebar">
+				<!-- side bar: style can be found in sidebar.less -->
+				<section class="sidebar">
+					<ul class="sidebar-menu">
+						<li ng-repeat="page in globalContent.pageList" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
+							<a href="{{page.url}}">
+								<i class="fa fa-{{page.icon}}"></i> <span>{{page.title}}</span> 
+							</a>
+						</li>
+					</ul>
+				</section>
+				<!-- /.sidebar -->
+			</aside>
+
+			<!-- =============================================== -->
+			<!-- Right side column. Contains the navbar and content of the page -->
+			<div class="content-wrapper">
+				<!-- Content Header (Page header) -->
+				<section class="content-header" ng-hide="globalContent.hideSidebar">
+					<h1>
+						<span class="pageTitle">{{globalContent.pageTitle}}</span>
+						<small class="pageSubTitle">{{globalContent.pageSubTitle}}</small>
+					</h1>
+
+					<ol class="breadcrumb">
+						<li ng-repeat="nav in globalContent.navPath">
+							<a ng-href="{{$last ? '' : globalContent.navMapping[nav]}}">
+								<span class="fa fa-home" ng-show="$first"></span>
+								{{nav}}
+							</a>
+						</li>
+					</ol>
+				</section>
+
+				<!-- Main content -->
+				<section class="content">
+					<div id="content" ng-view></div>
+				</section><!-- /.content -->
+			</div><!-- /.content-wrapper -->
+		</div><!-- ./wrapper -->
+
+		<!-- ref:js public/js/doc.js -->
+		<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="../node_modules/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+		<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="../node_modules/zombiej-bootstrap-components/bootstrap-components/js/bootstrap-components.min.js"></script>
+		<script src="../node_modules/moment/min/moment-with-locales.min.js"></script>
+		<script src="../node_modules/moment-timezone/builds/moment-timezone-with-data.min.js"></script>
+		<script src="../node_modules/admin-lte/dist/js/app.min.js"></script>
+		<script src="../node_modules/angular/angular.min.js"></script>
+		<script src="../node_modules/angular-resource/angular-resource.min.js"></script>
+		<script src="../node_modules/angular-route/angular-route.min.js"></script>
+		<script src="../node_modules/angular-cookies/angular-cookies.min.js"></script>
+		<script src="../node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.min.js"></script>
+		<script src="../node_modules/Flot/jquery.flot.js"></script>
+		<script src="../node_modules/Flot/jquery.flot.stack.js"></script>
+		<script src="../node_modules/Flot/jquery.flot.pie.js"></script>
+		<script src="../node_modules/Flot/jquery.flot.time.js"></script>
+		<script src="../node_modules/Flot/jquery.flot.crosshair.js"></script>
+		<script src="public/assets/flot/jquery.flot.tooltip.js"></script>
+		<script src="public/assets/flot/jquery.flot.legend.js"></script>
+		<script src="../node_modules/d3/d3.min.js"></script>
+
+
+		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/app.ui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/app.time.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/app.config.js" type="text/javascript" charset="utf-8"></script>
+
+		<script src="public/js/common.js" type="text/javascript" charset="utf-8"></script>
+
+		<script src="public/js/components/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/sortTable.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/tabs.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/file.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/charts.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/charts/bar.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/charts/line3d.js" type="text/javascript" charset="utf-8"></script>
+
+
+		<script src="public/js/ctrl/damController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/policyController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/siteController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/streamController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/alertController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/sensitivityController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/userProfileController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/authController.js" type="text/javascript" charset="utf-8"></script>
+		<!-- endref -->
+	</body>
+</html>
