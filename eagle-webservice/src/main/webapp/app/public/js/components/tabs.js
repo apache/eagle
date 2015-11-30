@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
 eagleComponents.directive('tabs', function() {
+	'use strict';
+
 	return {
 		restrict : 'AE',
 		transclude : true,
@@ -54,7 +55,7 @@ eagleComponents.directive('tabs', function() {
 			};
 
 			this.addPane = function(pane) {
-				if (panes.length == 0 || ($attrs.selected && $scope.$parent[$attrs.selected] === pane.title)) {
+				if (panes.length === 0 || ($attrs.selected && $scope.$parent[$attrs.selected] === pane.title)) {
 					$scope.select(pane, false);
 				}
 				panes.push(pane);

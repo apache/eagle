@@ -16,60 +16,62 @@
  * limitations under the License.
  */
 
-"use strict";
+(function() {
+	'use strict';
 
-app.config = {
+	app.config = {
+		// ============================================================================
+		// =                                   URLs                                   =
+		// ============================================================================
+		urls: {
+			HOST: '..',
+
+			updateEntity: 'rest/entities?serviceName=${serviceName}',
+			queryEntity: 'rest/entities/rowkey?serviceName=${serviceName}&value=${encodedRowkey}',
+			queryEntities: 'rest/list?query=${serviceName}[${condition}]{${values}}&pageSize=100000',
+			deleteEntity: 'rest/entities/delete?serviceName=${serviceName}&byId=true',
+			deleteEntities: 'rest/entities?query=${serviceName}[${condition}]{*}&pageSize=100000',
+
+			queryGroup: 'rest/list?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000',
+			querySeries: 'rest/list?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000&timeSeries=true&intervalmin=${intervalmin}',
+
+			query: 'rest/',
+
+			userProfile: 'rest/authentication',
+			logout: 'logout',
+		},
+
+		// ============================================================================
+		// =                               Data Sources                               =
+		// ============================================================================
+		dataSource: {
+			uiInvisibleList: ["userProfile"],
+		},
+	};
+
 	// ============================================================================
 	// =                                   URLs                                   =
 	// ============================================================================
-	urls: {
-		HOST: '..',
+	app.getURL = function(name, kvs) {
+		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
+		var _path = app.config.urls[name];
+		if(!_path) throw "URL:'" + name + "' not exist!";
+		var _url = (_host ? _host + "/" : '') + _path;
+		if(kvs !== undefined) {
+			_url = common.template(_url, kvs);
+		}
+		return _url;
+	};
 
-		updateEntity: 'rest/entities?serviceName=${serviceName}',
-		queryEntity: 'rest/entities/rowkey?serviceName=${serviceName}&value=${encodedRowkey}',
-		queryEntities: 'rest/list?query=${serviceName}[${condition}]{${values}}&pageSize=100000',
-		deleteEntity: 'rest/entities/delete?serviceName=${serviceName}&byId=true',
-		deleteEntities: 'rest/entities?query=${serviceName}[${condition}]{*}&pageSize=100000',
-
-		queryGroup: 'rest/list?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000',
-		querySeries: 'rest/list?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000&timeSeries=true&intervalmin=${intervalmin}',
-
-		query: 'rest/',
-
-		userProfile: 'rest/authentication',
-		logout: 'logout',
-	},
-
-	// ============================================================================
-	// =                               Data Sources                               =
-	// ============================================================================
-	dataSource: {
-		uiInvisibleList: ["userProfile"],
-	},
-};
-
-// ============================================================================
-// =                                   URLs                                   =
-// ============================================================================
-app.getURL = function(name, kvs) {
-	var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
-	var _path = app.config.urls[name];
-	if(!_path) throw "URL:'" + name + "' not exist!";
-	var _url = (_host ? _host + "/" : '') + _path;
-	if(kvs !== undefined) {
-		_url = common.template(_url, kvs);
-	}
-	return _url;
-};
-
-app._Host = function(host) {
-	if(host) {
-		localStorage.setItem("HOST", host);
-		return app;
-	}
-	return localStorage.getItem("HOST");
-};
-app._Host.clear = function() {
-	localStorage.removeItem("HOST");
-};
-app._Host.sample = "http://localhost:9099/eagle-service";
+	app._Host = function(host) {
+		if(host) {
+			localStorage.setItem("HOST", host);
+			return app;
+		}
+		return localStorage.getItem("HOST");
+	};
+	app._Host.clear = function() {
+		localStorage.removeItem("HOST");
+	};
+	app._Host.sample = "http://localhost:9099/eagle-service";
+})();

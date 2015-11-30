@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-'use strict';
-
 // =============================================================
 // =                     User Profile List                     =
 // =============================================================
 damControllers.controller('userProfileListCtrl', function(globalContent, Site, damContent, $scope, $interval, Entities) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageSubTitle = Site.current().name;
 
@@ -166,6 +166,8 @@ damControllers.controller('userProfileListCtrl', function(globalContent, Site, d
 // =                    User Profile Detail                    =
 // =============================================================
 damControllers.controller('userProfileDetailCtrl', function(globalContent, Site, damContent, $scope, $routeParams, Entities) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "User Profile";
 	globalContent.pageSubTitle = Site.current().name;

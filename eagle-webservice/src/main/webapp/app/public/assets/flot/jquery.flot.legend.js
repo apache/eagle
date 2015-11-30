@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-"use strict";
-
 (function($) {
+	"use strict";
+
 	var defaultOptions = {
 		legend : {
 			clickSelect: false,
@@ -53,12 +53,12 @@
 					(_series.lines.show && _oriSeries.lines) || 
 					(_series.points.show && _oriSeries.points);
 		}
-		function show(index, show) {
+		function show(index, display) {
 			var _data = plot.getData();
 			var series = _data[index];
-			series.lines.show = show && _statusList[index].lines;
-			series.bars.show = show && _statusList[index].bars;
-			series.points.show = show && _statusList[index].points;
+			series.lines.show = display && _statusList[index].lines;
+			series.bars.show = display && _statusList[index].bars;
+			series.points.show = display && _statusList[index].points;
 		}
 
 		$cntr.off("click.legend").on("click.legend", ".legend table tbody tr", function() {

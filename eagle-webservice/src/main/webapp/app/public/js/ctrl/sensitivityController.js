@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-'use strict';
-
 damControllers.service('SensitivityConfig', function(Site) {
-	var config = {
+	'use strict';
+
+		var config = {
 		list: [
 			{
 				name: "HDFS",
@@ -78,6 +78,8 @@ damControllers.service('SensitivityConfig', function(Site) {
 // =                    Sensitivity Summary                    =
 // =============================================================
 damControllers.controller('sensitivitySummaryCtrl', function(globalContent, Site, damContent, $scope, Entities, SensitivityConfig) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "Data Classification";
 	globalContent.pageSubTitle = Site.current().name;
@@ -245,6 +247,8 @@ damControllers.controller('sensitivitySummaryCtrl', function(globalContent, Site
 // =                        Sensitivity                        =
 // =============================================================
 damControllers.controller('sensitivityCtrl', function(globalContent, Site, damContent, $scope, $routeParams, SensitivityConfig) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "Data Classification";
 	globalContent.pageSubTitle = Site.current().name;
@@ -267,6 +271,8 @@ damControllers.controller('sensitivityCtrl', function(globalContent, Site, damCo
 // =                    Sensitivity - Folder                    =
 // ==============================================================
 damControllers.controller('sensitivityViewFolderCtrl', function(globalContent, Site, damContent, $scope, $location, Entities, SensitivityConfig) {
+	'use strict';
+
 	$scope.path = $location.search().path || "/";
 	$scope.pathUnitList = [];
 	$scope.items = [];
@@ -279,7 +285,7 @@ damControllers.controller('sensitivityViewFolderCtrl', function(globalContent, S
 	// Path
 	function _refreshPathUnitList(_path) {
 		var _start,_current, _unitList = [];
-		var _path = _path + (_path.match(/\/$/) ? "" : "/");
+		_path = _path + (_path.match(/\/$/) ? "" : "/");
 		for(_current = _start = 0 ; _current < _path.length ; _current += 1) {
 			if(_path[_current] === "/") {
 				_unitList.push({
@@ -290,7 +296,7 @@ damControllers.controller('sensitivityViewFolderCtrl', function(globalContent, S
 			}
 		}
 		$scope.pathUnitList = _unitList;
-	};
+	}
 
 	// Item
 	$scope.updateItems = function(path) {
@@ -356,6 +362,8 @@ damControllers.controller('sensitivityViewFolderCtrl', function(globalContent, S
 // =                    Sensitivity - Table                    =
 // =============================================================
 damControllers.controller('sensitivityViewTableCtrl', function(globalContent, Site, damContent, $scope, $location, Entities, SensitivityConfig) {
+	'use strict';
+
 	$scope.table = null;
 
 	// Mark sensitivity

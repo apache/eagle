@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-"use strict";
-
 // Time Zone
 (function() {
+	"use strict";
+
 	app.time = {
 		UTC_OFFSET: 0,
 		now: function() {

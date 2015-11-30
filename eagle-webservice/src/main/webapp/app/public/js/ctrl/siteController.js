@@ -16,20 +16,20 @@
  * limitations under the License.
  */
 
-'use strict';
-
 // =============================================================
 // =                         Site List                         =
 // =============================================================
 damControllers.controller('siteListCtrl', function(globalContent, Site, damContent, $scope, $q, Entities) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.hideSite = true;
 
-	$scope._siteEntity;
-	$scope._siteEntityLock;
+	$scope._siteEntity = null;
+	$scope._siteEntityLock = false;
 
-	$scope._dataSrcEntity;
-	$scope._dataSrcEntityLock;
+	$scope._dataSrcEntity = null;
+	$scope._dataSrcEntityLock = false;
 
 	$scope.dataSrcList = Entities.queryGroup("AlertStreamService", '@dataSource=~".*"', "@dataSource", "count");
 
@@ -94,7 +94,7 @@ damControllers.controller('siteListCtrl', function(globalContent, Site, damConte
 		$scope._siteEntityLock = true;
 
 		if($scope._siteEntity.srcSite) {
-			var promiseList = [];
+			promiseList = [];
 			$.each($scope._siteEntity.dataSrcList, function(name, dataSrc) {
 				var _entity = {
 					enabled: dataSrc.enabled,
