@@ -19,6 +19,7 @@
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.partition.DataDistributionDao;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
@@ -35,6 +36,6 @@ public class TestDataDistributionDaoImpl {
         String password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
         String topic = config.getString("dataSourceConfig.topic");
         DataDistributionDao dao = new DataDistributionDaoImpl(eagleServiceHost, eagleServicePort, username, password, topic);
-        dao.fetchDataDistribution();
+        dao.fetchDataDistribution(System.currentTimeMillis() - 2 * DateUtils.MILLIS_PER_DAY, System.currentTimeMillis());
     }
 }

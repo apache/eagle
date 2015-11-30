@@ -19,8 +19,10 @@
 
 package org.apache.eagle.partition;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 
@@ -31,17 +33,20 @@ public class PartitionStrategyImpl implements PartitionStrategy {
     public Map<String, Integer> routingTable;
     public long lastRefreshTime;
     public long refreshInterval;
-    public static long DEFAULT_REFRESH_INTERVAL = 60 * 60 * 1000;
+    public long timeRange;
+    public static long DEFAULT_TIME_RANGE = 2 * DateUtils.MILLIS_PER_DAY;
+    public static long DEFAULT_REFRESH_INTERVAL = 2 * DateUtils.MILLIS_PER_HOUR;
     private final Logger LOG = LoggerFactory.getLogger(PartitionStrategyImpl.class);
 
-    public PartitionStrategyImpl(DataDistributionDao dao, PartitionAlgorithm algorithm, long refreshInterval) {
+    public PartitionStrategyImpl(DataDistributionDao dao, PartitionAlgorithm algorithm, long refreshInterval, long timeRange) {
         this.dao = dao;
         this.algorithm = algorithm;
         this.refreshInterval = refreshInterval;
+        this.timeRange = timeRange;
     }
 
     public PartitionStrategyImpl(DataDistributionDao dao, PartitionAlgorithm algorithm) {
-        this(dao, algorithm, DEFAULT_REFRESH_INTERVAL);
+        this(dao, algorithm, DEFAULT_REFRESH_INTERVAL, DEFAULT_TIME_RANGE);
     }
 
     public boolean needRefresh() {
@@ -54,7 +59,8 @@ public class PartitionStrategyImpl implements PartitionStrategy {
 
     public Map<String, Integer> generateRoutingTable(int buckNum) {
         try {
-            List<Weight> weights = dao.fetchDataDistribution();
+            long currentTime = System.currentTimeMillis();
+            List<Weight> weights = dao.fetchDataDistribution(currentTime - timeRange, currentTime);
             routingTable = algorithm.partition(weights, buckNum);
             return routingTable;
         }

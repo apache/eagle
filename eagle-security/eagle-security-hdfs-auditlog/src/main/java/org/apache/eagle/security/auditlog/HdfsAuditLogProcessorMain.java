@@ -21,6 +21,7 @@ package org.apache.eagle.security.auditlog;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigRenderOptions;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
@@ -51,7 +52,11 @@ public class HdfsAuditLogProcessorMain {
         String topic = config.getString("dataSourceConfig.topic");
         DataDistributionDao dao = new DataDistributionDaoImpl(host, port, username, password, topic);
         PartitionAlgorithm algorithm = new GreedyPartitionAlgorithm();
-        PartitionStrategy strategy = new PartitionStrategyImpl(dao, algorithm);
+        String key1 = EagleConfigConstants.EAGLE_PROPS + ".partitionRefreshIntervalInMin";
+        Integer partitionRefreshIntervalInMin = config.hasPath(key1) ? config.getInt(key1) : 60;
+        String key2 = EagleConfigConstants.EAGLE_PROPS + ".kafkaStatisticRangeInMin";
+        Integer kafkaStatisticRangeInMin =  config.hasPath(key2) ? config.getInt(key2) : 60;
+        PartitionStrategy strategy = new PartitionStrategyImpl(dao, algorithm, partitionRefreshIntervalInMin * DateUtils.MILLIS_PER_MINUTE, kafkaStatisticRangeInMin * DateUtils.MILLIS_PER_MINUTE);
         return strategy;
     }
 

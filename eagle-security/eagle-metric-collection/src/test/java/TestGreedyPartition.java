@@ -19,6 +19,7 @@
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.partition.DataDistributionDao;
 import org.apache.eagle.partition.PartitionAlgorithm;
@@ -39,6 +40,6 @@ public class TestGreedyPartition {
         String topic = config.getString("dataSourceConfig.topic");
         DataDistributionDao dao = new DataDistributionDaoImpl(host, port, username, password, topic);
         PartitionAlgorithm algorithm = new GreedyPartitionAlgorithm();
-        algorithm.partition(dao.fetchDataDistribution(), 4);
+        algorithm.partition(dao.fetchDataDistribution(System.currentTimeMillis() - 2 * DateUtils.MILLIS_PER_DAY, System.currentTimeMillis()), 4);
     }
 }

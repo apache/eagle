@@ -55,7 +55,7 @@ public class DataDistributionDaoImpl implements DataDistributionDao {
     }
 
     @Override
-    public List<Weight> fetchDataDistribution() throws Exception {
+    public List<Weight> fetchDataDistribution(long startTime, long endTime) throws Exception {
         IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password) {
             @Override
             public <T extends Object> GenericServiceAPIResponseEntity<T> search(EagleServiceSingleEntityQueryRequest request) throws EagleServiceClientException {
@@ -75,8 +75,6 @@ public class DataDistributionDaoImpl implements DataDistributionDao {
         };
         try {
             String query = MetricConstants.GENERIC_METRIC_ENTITY_ENDPOINT + "[@topic=\"" + topic + "\"]<@user>{sum(value)}.{sum(value) desc}";
-            long endTime = System.currentTimeMillis();
-            long startTime = endTime - 2 * DateUtils.MILLIS_PER_DAY;
             GenericServiceAPIResponseEntity<Map> response = client.search()
                     .startTime(startTime)
                     .endTime(endTime)

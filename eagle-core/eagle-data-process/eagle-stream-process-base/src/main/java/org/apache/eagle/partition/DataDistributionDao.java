@@ -24,5 +24,5 @@ import java.util.List;
 
 public interface DataDistributionDao extends Serializable {
 
-    List<Weight> fetchDataDistribution() throws Exception;
+    List<Weight> fetchDataDistribution(long startTime, long endTime) throws Exception;
 }
