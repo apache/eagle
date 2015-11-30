@@ -29,7 +29,7 @@ For more details, please visit [https://eagle.incubator.apache.org](https://eagl
 You can find the latest Eagle documentation on the [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README) file only contains basic setup instructions.
 
 ## Getting Started
-The fastest way to get started with Eagle is using [docker](https://github.com/docker/docker) (install docker environment firstly)
+The fastest way to get started with Eagle is using [eagle-docker](eagle-external/eagle-docker) (require docker environment)
 
     git clone https://github.com/apache/incubator-eagle.git
     incubator-eagle/eagle-docker boot
