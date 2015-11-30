@@ -14,12 +14,11 @@
 # limitations under the License.
 
 : ${VERSION:=latest}
-: ${IMAGE:="apacheeagle/standalone:${VERSION}"}
+: ${IMAGE:="apacheeagle/sandbox:${VERSION}"}
 
-# : ${NODE_PREFIX:=docker}
-# : ${AMBARI_SERVER_NAME:=${NODE_PREFIX}-master}
-: ${AMBARI_SERVER_NAME:=master}
-: ${MYDOMAIN:=eagle.apache.org}
+: ${NODE_PREFIX:=eagle-sandbox}
+: ${AMBARI_SERVER_NAME:=${NODE_PREFIX}}
+: ${MYDOMAIN:=apache.org}
 : ${DOCKER_OPTS:="--dns 127.0.0.1 --entrypoint /usr/local/serf/bin/start-serf-agent.sh -e KEYCHAIN=$KEYCHAIN --env EAGLE_SERVER_HOST=${AMBARI_SERVER_NAME}.${MYDOMAIN}"}
 : ${CLUSTER_SIZE:=1}
 : ${DEBUG:=1}
@@ -158,5 +157,5 @@ amb-start-node() {
     shift
     MORE_OPTIONS="$@"
   fi
-  run-command docker run $MORE_OPTIONS -e SERF_JOIN_IP=$AMBARI_SERVER_IP $DOCKER_OPTS --name ${NODE_PREFIX}$NUMBER -h ${NODE_PREFIX}${NUMBER}.$MYDOMAIN $IMAGE --log-level debug
+  run-command docker run $MORE_OPTIONS -e SERF_JOIN_IP=$AMBARI_SERVER_IP $DOCKER_OPTS --name ${NODE_PREFIX}_$NUMBER -h ${NODE_PREFIX}_${NUMBER}.$MYDOMAIN $IMAGE --log-level debug
 }

@@ -17,10 +17,11 @@
 
 # NOTICE: This script is developed and maintained by Apache Eagle community under Apache Softwarw Foundation but not from official Docker product or community.
 
-EAGLE_DOCKER_VERSION=0.3.0-snapshot
-EAGLE_DOCKER_NAME=apacheeagle/standalone
+EAGLE_DOCKER_VERSION=latest
+EAGLE_DOCKER_NAME=apacheeagle/sandbox
+EAGLE_DOCKER_PREFIX=eagle-sandbox
 
-NODE_NUM=1
+export NODE_NUM=1
 
 cd `dirname $0`/../
 source bin/eagle-lib.sh	
@@ -53,20 +54,14 @@ function usage() {
 	echo "  stop            Stop eagle docker instance"
 	echo "  status          List eagle docker image and instance status"
 	echo "  clean           Clean docker image and instance"
+	echo "  shell 		Execute docker instance bash, default: eagle-sandbox"
+	echo "  boot       	Simply bootstrap eagle docker by building then deploying"
 	echo ""
 	echo "Options:"
 	echo "  --node [number]         Docker instances node number, default is 1"
 	echo "  --help			Display eagle docker image usage information"
 	echo ""
 	exit 0
-}
-
-function deploy(){
-	check_env
-	if [ "$NODE_NUM" == "" ];then
-		NODE_NUM=1
-	fi 
-	eagle-deploy-cluster $NODE_NUM
 }
 
 function build(){
@@ -163,6 +158,7 @@ function build(){
 	fi
 }
 
+
 function start(){
 	check_env
 	docker ps -a | grep $EAGLE_DOCKER_NAME 1>/dev/null 
@@ -232,6 +228,26 @@ function clean(){
 	echo "Cleaning Done."
 }
 
+function deploy(){
+	check_env
+	if [ "$NODE_NUM" == "" ];then
+		export NODE_NUM=1
+	fi 
+	echo "Deploying $NODE_NUM nodes"
+	eagle-deploy-cluster $NODE_NUM
+	
+	status
+}
+
+function boot(){
+	check_env
+	build
+	deploy
+}
+
+function exec_bash(){
+	docker exec -it $EAGLE_DOCKER_PREFIX bash
+}
 
 case $1 in
 "--node")
@@ -250,6 +266,10 @@ case $1 in
         build	
 	exit
 	;;
+"boot")
+        boot	
+	exit
+	;;
 "status")
         status 
 	exit
@@ -264,6 +284,10 @@ case $1 in
 	;;
 "clean")	
 	clean	
+	exit
+	;;
+"shell")	
+	exec_bash
 	exit
 	;;
 *)
