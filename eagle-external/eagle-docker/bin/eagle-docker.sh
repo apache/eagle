@@ -19,7 +19,7 @@
 
 EAGLE_DOCKER_VERSION=latest
 EAGLE_DOCKER_NAME=apacheeagle/sandbox
-EAGLE_DOCKER_PREFIX=eagle-sandbox
+EAGLE_DOCKER_PREFIX=sandbox
 
 export NODE_NUM=1
 
