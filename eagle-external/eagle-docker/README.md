@@ -8,7 +8,28 @@ And this project is to build apache/eagle images and provide eagle-functions to 
 ## Prerequisite
 * Docker environment (see [https://www.docker.com](https://www.docker.com/)) 
 
-## Installation & Usage
+## CLI Usage ##
+Basic usage of the entry script of eagle-docker: [bin/eagle-docker.sh](bin/eagle-docker.sh)
+ 
+    Usage: ./eagle-docker [options] [command]
+    
+    Apache Eagle Docker Image : apacheeagle/sandbox:latest
+    
+    Commands:
+      build           Build eagle docker image
+      deploy          Deploy eagle docker image
+      start           Start eagle docker instance
+      stop            Stop eagle docker instance
+      status          List eagle docker image and instance status
+      clean           Clean docker image and instance
+      shell           Execute docker instance bash, default: eagle-sandbox
+      boot            Simply bootstrap eagle docker by building then deploying
+    
+    Options:
+      --node [num]    Docker instances node number, default is 1
+      --help          Display eagle docker image usage information
+
+## Advanced Commands
 1. **Build Image**: Go to the root directory where the [Dockerfile](Dockerfile) is in, build image with following command:
  
         docker built -t apache/eagle:0.1.0 . 
