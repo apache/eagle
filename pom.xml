@@ -526,7 +526,7 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>${goovy.version}</version>
+                <version>${groovy.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.scireum</groupId>
