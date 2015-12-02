@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.datastream
 
-case class NodeNameSelector(producer : StreamProducer) {
+case class NodeNameSelector(producer : StreamProducer[Any]) {
   def getName : String = {
     producer.name match {
       case null => producer.toString

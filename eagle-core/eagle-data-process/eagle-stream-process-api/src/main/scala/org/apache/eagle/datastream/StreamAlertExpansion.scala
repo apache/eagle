@@ -47,10 +47,10 @@ import scala.collection.mutable.ListBuffer
 class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
   val LOG = LoggerFactory.getLogger(classOf[StreamAlertExpansion])
 
-  override def expand(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]): Unit ={
+  override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit ={
     val iter = dag.iterator()
-    val toBeAddedEdges = new ListBuffer[StreamConnector]
-    val toBeRemovedVertex = new ListBuffer[StreamProducer]
+    val toBeAddedEdges = new ListBuffer[StreamConnector[Any,Any]]
+    val toBeRemovedVertex = new ListBuffer[StreamProducer[Any]]
     while(iter.hasNext) {
       val current = iter.next()
       dag.outgoingEdgesOf(current).foreach(edge => {
@@ -67,15 +67,15 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
     toBeRemovedVertex.foreach(v => dag.removeVertex(v))
   }
 
-  def onIteration(toBeAddedEdges: ListBuffer[StreamConnector], toBeRemovedVertex: ListBuffer[StreamProducer],
-               dag: DirectedAcyclicGraph[StreamProducer, StreamConnector], current: StreamProducer, child: StreamProducer): Unit = {
+  def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
+               dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], child: StreamProducer[Any]): Unit = {
     child match {
       case AlertStreamSink(id, upStreamNames, alertExecutorId, withConsumer) => {
         /**
          * step 1: wrapper previous StreamProducer with one more field "streamName"
          * for AlertStreamSink, we check previous StreamProducer and replace that
          */
-        val newStreamProducers = new ListBuffer[StreamProducer]
+        val newStreamProducers = new ListBuffer[StreamProducer[Any]]
         current match {
           case StreamUnionProducer(id, others) => {
             val incomingEdges = dag.incomingEdgesOf(current)
@@ -89,10 +89,10 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
           case _: FlatMapProducer[AnyRef, AnyRef] => {
             newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
           }
-          case _: MapProducer => {
+          case _: MapProducer[AnyRef,AnyRef] => {
             newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
           }
-          case s: StreamProducer if dag.inDegreeOf(s) == 0 => {
+          case s: StreamProducer[AnyRef] if dag.inDegreeOf(s) == 0 => {
             newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
           }
           case p@_ => throw new IllegalStateException(s"$p can not be put before AlertStreamSink, only StreamUnionProducer,FlatMapProducer and MapProducer are supported")
@@ -102,13 +102,13 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
          * step 2: partition alert executor by policy partitioner class
          */
         val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(config), upStreamNames, alertExecutorId)
-        var alertProducers = new scala.collection.mutable.MutableList[StreamProducer]
+        var alertProducers = new scala.collection.mutable.MutableList[StreamProducer[Any]]
         alertExecutors.foreach(exec => {
           val t = FlatMapProducer(UniqueId.incrementAndGetId(), exec).withName(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
           t.setConfig(config)
           t.setGraph(dag)
           alertProducers += t
-          newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp, t).groupBy(Seq(0)))
+          newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector[Any,Any](newsp, t).groupBy(Seq(0)))
         })
 
         // remove AlertStreamSink
@@ -123,9 +123,9 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
     }
   }
 
-  private def replace(toBeAddedEdges: ListBuffer[StreamConnector], toBeRemovedVertex: ListBuffer[StreamProducer],
-                      dag: DirectedAcyclicGraph[StreamProducer, StreamConnector], current: StreamProducer, upStreamName: String) : StreamProducer= {
-    var newsp: StreamProducer = null
+  private def replace(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
+                      dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], upStreamName: String) : StreamProducer[Any]= {
+    var newsp: StreamProducer[Any] = null
     current match {
       case _: FlatMapProducer[AnyRef, AnyRef] => {
         val mapper = current.asInstanceOf[FlatMapProducer[_, _]].mapper
@@ -151,9 +151,9 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp, e.to))
         toBeRemovedVertex += current
       }
-      case _: MapProducer => {
-        val mapper = current.asInstanceOf[MapProducer].fn
-        val newfun: (AnyRef => AnyRef) = {
+      case _: MapProducer[Any,Any] => {
+        val mapper = current.asInstanceOf[MapProducer[Any,Any]].fn
+        val newfun: (Any => Any) = {
           a => mapper(a) match {
             case scala.Tuple2(x1, x2) => (x1, upStreamName, x2)
             case _ => throw new IllegalArgumentException
@@ -169,7 +169,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp, e.to))
         toBeRemovedVertex += current
       }
-      case s: StreamProducer if dag.inDegreeOf(s) == 0 => {
+      case s: StreamProducer[Any] if dag.inDegreeOf(s) == 0 => {
         val fn:(AnyRef => AnyRef) = {
           n => {
             n match {

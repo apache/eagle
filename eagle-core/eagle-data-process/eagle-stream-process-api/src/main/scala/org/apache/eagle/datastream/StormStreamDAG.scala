@@ -26,42 +26,42 @@ import scala.collection.{JavaConversions, mutable}
 /**
  * wrapper of DAG, used for storm topology compiler
  */
-class StormStreamDAG(graph: DirectedAcyclicGraph[StreamProducer, StreamConnector]) extends AbstractStreamProducerGraph {
-  var nodeMap: mutable.Map[String, StreamProducer] = null
+class StormStreamDAG(graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) extends AbstractStreamProducerGraph {
+  var nodeMap: mutable.Map[String, StreamProducer[Any]] = null
 
-  override def addEdge(from: StreamProducer, to: StreamProducer, streamConnector: StreamConnector): Unit = {
+  override def addEdge(from: StreamProducer[Any], to: StreamProducer[Any], streamConnector: StreamConnector[Any,Any]): Unit = {
     graph.addEdge(from, to, streamConnector)
   }
 
-  override def addVertex(producer: StreamProducer): Unit = {
+  override def addVertex(producer: StreamProducer[Any]): Unit = {
     graph.addVertex(producer)
   }
 
-  override def iterator(): Iterator[StreamProducer] = {
+  override def iterator(): Iterator[StreamProducer[Any]] = {
     JavaConversions.asScalaIterator(graph.iterator())
   }
 
-  override def isSource(v: StreamProducer): Boolean = {
+  override def isSource(v: StreamProducer[Any]): Boolean = {
     graph.inDegreeOf(v) match {
       case 0 => true
       case _ => false
     }
   }
 
-  override def outgoingEdgesOf(v: StreamProducer): scala.collection.mutable.Set[StreamConnector] = {
+  override def outgoingEdgesOf(v: StreamProducer[Any]): scala.collection.mutable.Set[StreamConnector[Any,Any]] = {
     JavaConversions.asScalaSet(graph.outgoingEdgesOf(v))
   }
 
-  override def getNodeByName(name: String): Option[StreamProducer] = {
+  override def getNodeByName(name: String): Option[StreamProducer[Any]] = {
     nodeMap.get(name)
   }
 
-  def setNodeMap(nodeMap: mutable.Map[String, StreamProducer]): Unit = {
+  def setNodeMap(nodeMap: mutable.Map[String, StreamProducer[Any]]): Unit = {
     this.nodeMap = nodeMap
   }
 
-  override def incomingVertexOf(v: StreamProducer): scala.collection.mutable.Set[StreamProducer] = {
-    val set = mutable.Set[StreamProducer]()
+  override def incomingVertexOf(v: StreamProducer[Any]): scala.collection.mutable.Set[StreamProducer[Any]] = {
+    val set = mutable.Set[StreamProducer[Any]]()
     graph.incomingEdgesOf(v).asScala.foreach(e => set += graph.getEdgeSource(e))
     set
   }

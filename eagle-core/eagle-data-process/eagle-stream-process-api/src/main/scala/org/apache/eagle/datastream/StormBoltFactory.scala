@@ -22,7 +22,7 @@ import backtype.storm.topology.base.BaseRichBolt
 import com.typesafe.config.Config
 
 object StormBoltFactory {
-  def getBoltWrapper(graph: AbstractStreamProducerGraph, producer : StreamProducer, config : Config) : BaseRichBolt = {
+  def getBoltWrapper(graph: AbstractStreamProducerGraph, producer : StreamProducer[Any], config : Config) : BaseRichBolt = {
     producer match{
       case FlatMapProducer(id, worker) => {
         if(worker.isInstanceOf[JavaStormStreamExecutor[EagleTuple]]){
@@ -35,11 +35,11 @@ object StormBoltFactory {
           throw new UnsupportedOperationException
         }
       }
-      case FilterProducer(id, fn) => {
-        FilterBoltWrapper(fn)
+      case filter:FilterProducer[Any] => {
+        FilterBoltWrapper(filter.fn)
       }
-      case MapProducer(id, n, fn) => {
-        MapBoltWrapper(n, fn)
+      case mapper:MapProducer[Any,Any] => {
+        MapBoltWrapper(mapper.numOutputFields, mapper.fn)
       }
       case _ => throw new UnsupportedOperationException
     }

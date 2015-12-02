@@ -37,7 +37,7 @@ abstract class ExecutionEnvironment(config : Config){
 
 class StormExecutionEnvironment(config: Config) extends ExecutionEnvironment(config){
   val LOG = LoggerFactory.getLogger(classOf[StormExecutionEnvironment])
-  val dag = new DirectedAcyclicGraph[StreamProducer, StreamConnector](classOf[StreamConnector])
+  val dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
 
   override def execute() : Unit = {
     LOG.info("initial graph:\n")
@@ -61,13 +61,13 @@ class StormExecutionEnvironment(config: Config) extends ExecutionEnvironment(con
     StormTopologyCompiler(config, stormDag).buildTopology.execute
   }
 
-  def newSource(source: BaseRichSpout): StormSourceProducer ={
-    val ret = StormSourceProducer(UniqueId.incrementAndGetId(), source)
+  def newSource[T](source: BaseRichSpout): StormSourceProducer[T] ={
+    val ret = StormSourceProducer[T](UniqueId.incrementAndGetId(), source)
     ret.config = config
     ret.graph = dag
     dag.addVertex(ret)
     ret
   }
 
-  def newSource(sourceProvider: AbstractStormSpoutProvider):StormSourceProducer = newSource(sourceProvider.getSpout(config))
+  def newSource[T](sourceProvider: AbstractStormSpoutProvider):StormSourceProducer[T] = newSource(sourceProvider.getSpout(config))
 }

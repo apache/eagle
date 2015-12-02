@@ -32,16 +32,16 @@ import scala.collection.mutable.ListBuffer
 class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(config){
   val LOG = LoggerFactory.getLogger(classOf[StreamGroupbyExpansion])
 
-  override def expand(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]) = {
+  override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) = {
     val iter = dag.iterator()
-    var toBeAddedEdges = new ListBuffer[StreamConnector]
-    var toBeRemovedVertex = new ListBuffer[StreamProducer]
+    var toBeAddedEdges = new ListBuffer[StreamConnector[Any,Any]]
+    var toBeRemovedVertex = new ListBuffer[StreamProducer[Any]]
     while(iter.hasNext) {
       val current = iter.next()
       dag.outgoingEdgesOf(current).foreach(edge => {
         val child = edge.to
         child match {
-          case p : GroupByProducer => {
+          case p : GroupByProducer[Any] => {
             dag.outgoingEdgesOf(p).foreach(c2 => {
               toBeAddedEdges += StreamConnector(current, c2.to).groupBy(p.fields)
             })

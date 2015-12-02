@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory
 class StreamNameExpansion(config: Config) extends StreamDAGExpansion(config){
   val LOG = LoggerFactory.getLogger(classOf[StreamNameExpansion])
 
-  override def expand(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]) = {
+  override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) = {
     val iter = dag.iterator()
     while(iter.hasNext){
       val sp = iter.next()

@@ -24,7 +24,7 @@ import backtype.storm.topology.base.BaseRichBolt
 import backtype.storm.tuple.{Fields, Tuple}
 import org.slf4j.LoggerFactory
 
-case class FilterBoltWrapper[T](fn : T => Boolean) extends BaseRichBolt{
+case class FilterBoltWrapper[T](fn : AnyRef => Boolean) extends BaseRichBolt{
   val LOG = LoggerFactory.getLogger(FilterBoltWrapper.getClass)
   var _collector : OutputCollector = null
 
@@ -34,7 +34,7 @@ case class FilterBoltWrapper[T](fn : T => Boolean) extends BaseRichBolt{
 
   override def execute(input : Tuple): Unit = {
     input.getValue(0) match {
-      case v:T =>
+      case v@_ =>
         if(fn(v)){
           _collector.emit(input, input.getValues)
           _collector.ack(input)

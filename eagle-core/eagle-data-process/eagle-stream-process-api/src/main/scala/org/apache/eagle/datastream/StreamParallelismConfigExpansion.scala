@@ -29,7 +29,7 @@ import scala.collection.JavaConverters._
 class StreamParallelismConfigExpansion(config: Config) extends StreamDAGExpansion(config){
   val LOG = LoggerFactory.getLogger(classOf[StreamParallelismConfigExpansion])
 
-  override def expand(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]) = {
+  override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) = {
     val map = getParallelismMap(config)
     val iter = dag.iterator()
     while(iter.hasNext){

@@ -50,8 +50,8 @@ import scala.collection.mutable.ListBuffer
 object AlertExecutorConsumerUtils {
   private val LOG: Logger = LoggerFactory.getLogger(AlertExecutorConsumerUtils.getClass)
 
-  def setupAlertConsumers(toBeAddedEdges: ListBuffer[StreamConnector], alertStreamProducers: List[StreamProducer]): Unit = {
-    var alertExecutorIdList : java.util.List[String] = new util.ArrayList[String]()
+  def setupAlertConsumers(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], alertStreamProducers: List[StreamProducer[Any]]): Unit = {
+    val alertExecutorIdList: java.util.List[String] = new util.ArrayList[String]()
     alertStreamProducers.map(x =>
       alertExecutorIdList.add(x.asInstanceOf[FlatMapProducer[AnyRef, AnyRef]].mapper.asInstanceOf[AlertExecutor].getAlertExecutorId));
     val alertDefDao = alertStreamProducers.head.asInstanceOf[FlatMapProducer[AnyRef, AnyRef]].mapper.asInstanceOf[AlertExecutor].getAlertDefinitionDao

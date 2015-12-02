@@ -23,5 +23,5 @@ import com.typesafe.config.Config
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
 abstract class StreamDAGExpansion(config: Config) {
-  def expand(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector])
+  def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]])
 }

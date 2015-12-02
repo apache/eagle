@@ -25,7 +25,7 @@ import scala.collection.JavaConversions._
 
 object GraphPrinter {
   private val LOG = LoggerFactory.getLogger(GraphPrinter.getClass)
-  def print(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]): Unit ={
+  def print(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit ={
     val iter = dag.iterator()
     while(iter.hasNext) {
       val current = iter.next()

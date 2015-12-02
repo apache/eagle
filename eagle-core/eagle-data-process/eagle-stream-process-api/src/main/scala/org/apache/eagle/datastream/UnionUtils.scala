@@ -23,18 +23,18 @@ import java.util
 import scala.collection.JavaConverters._
 
 object UnionUtils {
-  def join(producers : StreamProducer*) : StreamProducer = {
+  def join[T1,T2](producers : StreamProducer[T1]*) : StreamProducer[T2] = {
     producers.head.streamUnion(producers.drop(1))
   }
 
-  def join(producers : java.util.List[StreamProducer]) : StreamProducer = {
+  def join[T1,T2](producers : java.util.List[StreamProducer[T1]]) : StreamProducer[T2] = {
     val newList = new util.ArrayList(producers)
     val head = newList.get(0)
     newList.remove(0)
     head.streamUnion(newList.asScala);
   }
 
-  def join(producers : List[StreamProducer]) : StreamProducer = {
+  def join[T1,T2](producers : List[StreamProducer[T1]]) : StreamProducer[T2] = {
     val head = producers.head
     head.streamUnion(producers.tail);
   }

@@ -19,11 +19,11 @@
 package org.apache.eagle.datastream
 
 trait AbstractStreamProducerGraph {
-  def addEdge(from: StreamProducer, to: StreamProducer, streamConnector: StreamConnector)
-  def addVertex(producer: StreamProducer)
-  def iterator() : Iterator[StreamProducer]
-  def isSource(v : StreamProducer) : Boolean
-  def outgoingEdgesOf(v : StreamProducer) : scala.collection.mutable.Set[StreamConnector]
-  def getNodeByName(name : String) : Option[StreamProducer]
-  def incomingVertexOf(v: StreamProducer) : scala.collection.mutable.Set[StreamProducer]
+  def addEdge(from: StreamProducer[Any], to: StreamProducer[Any], streamConnector: StreamConnector[Any,Any])
+  def addVertex(producer: StreamProducer[Any])
+  def iterator() : Iterator[StreamProducer[Any]]
+  def isSource(v : StreamProducer[Any]) : Boolean
+  def outgoingEdgesOf(v : StreamProducer[Any]) : scala.collection.mutable.Set[StreamConnector[Any,Any]]
+  def getNodeByName(name : String) : Option[StreamProducer[Any]]
+  def incomingVertexOf(v: StreamProducer[Any]) : scala.collection.mutable.Set[StreamProducer[Any]]
 }

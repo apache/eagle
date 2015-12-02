@@ -18,10 +18,10 @@
  */
 package org.apache.eagle.datastream
 
-case class StreamConnector(from: StreamProducer, to: StreamProducer) {
+case class StreamConnector[+T1 <: Any,+T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2]) {
   var groupByFields : Seq[Int] = Nil
 
-  def groupBy(fields : Seq[Int]) : StreamConnector = {
+  def groupBy(fields : Seq[Int]) : StreamConnector[T1,T2] = {
     groupByFields = fields
     this
   }

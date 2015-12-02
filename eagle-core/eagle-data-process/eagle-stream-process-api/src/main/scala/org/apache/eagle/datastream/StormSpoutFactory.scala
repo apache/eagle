@@ -29,7 +29,7 @@ object StormSpoutFactory {
    * @param sourceProducer source producer
    * @return
    */
-  def createSpout(config: Config, sourceProducer: StormSourceProducer) : BaseRichSpout = {
+  def createSpout(config: Config, sourceProducer: StormSourceProducer[Any]) : BaseRichSpout = {
     val numFields = sourceProducer.numFields
     if(numFields <= 0) {
       sourceProducer.source

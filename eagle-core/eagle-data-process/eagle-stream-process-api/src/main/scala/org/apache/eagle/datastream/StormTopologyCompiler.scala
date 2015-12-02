@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory
 
 case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGraph) extends AbstractTopologyCompiler{
   val LOG = LoggerFactory.getLogger(StormTopologyCompiler.getClass)
-  val boltCache = scala.collection.mutable.Map[StreamProducer, StormBoltWrapper]()
+  val boltCache = scala.collection.mutable.Map[StreamProducer[Any], StormBoltWrapper]()
 
   override def buildTopology: AbstractTopologyExecutor ={
     val builder = new TopologyBuilder();
@@ -38,7 +38,7 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
       val from = iter.next()
       val fromName = from.name
       if(graph.isSource(from)){
-        val spout = StormSpoutFactory.createSpout(config, from.asInstanceOf[StormSourceProducer])
+        val spout = StormSpoutFactory.createSpout(config, from.asInstanceOf[StormSourceProducer[Any]])
         builder.setSpout(fromName, spout, from.parallelism)
         LOG.info("Spout name : " + fromName + " with parallelism " + from.parallelism)
       } else {
@@ -87,7 +87,7 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
     }
   }
 
-  def createBoltIfAbsent(graph: AbstractStreamProducerGraph, producer : StreamProducer): BaseRichBolt ={
+  def createBoltIfAbsent(graph: AbstractStreamProducerGraph, producer : StreamProducer[Any]): BaseRichBolt ={
     boltCache.get(producer) match{
       case Some(bolt) => bolt
       case None => {

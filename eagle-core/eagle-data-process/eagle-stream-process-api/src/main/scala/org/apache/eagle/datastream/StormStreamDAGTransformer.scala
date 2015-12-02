@@ -32,9 +32,9 @@ object StormStreamDAGTransformer {
    * @param dag DirectedAcyclicGraph[StreamProducer, StreamConnector]
    * @return StormStreamDAG
    */
-  def transform(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]) : StormStreamDAG = {
+  def transform(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) : StormStreamDAG = {
     val stormDAG = new StormStreamDAG(dag)
-    val nodeMap = mutable.HashMap[String, StreamProducer]()
+    val nodeMap = mutable.HashMap[String, StreamProducer[Any]]()
     val iter = dag.iterator()
     while(iter.hasNext){
       val sp = iter.next()

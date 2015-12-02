@@ -31,10 +31,10 @@ import scala.collection.mutable.ListBuffer
 class StreamUnionExpansion(config: Config) extends StreamDAGExpansion(config){
   val LOG = LoggerFactory.getLogger(classOf[StreamUnionExpansion])
 
-  override def expand(dag: DirectedAcyclicGraph[StreamProducer, StreamConnector]) = {
+  override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) = {
     val iter = dag.iterator()
-    var toBeAddedEdges = new ListBuffer[StreamConnector]
-    var toBeRemovedVertex = new ListBuffer[StreamProducer]
+    var toBeAddedEdges = new ListBuffer[StreamConnector[Any,Any]]
+    var toBeRemovedVertex = new ListBuffer[StreamProducer[Any]]
     while(iter.hasNext) {
       val current = iter.next()
       dag.outgoingEdgesOf(current).foreach(edge => {

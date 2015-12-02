@@ -17,18 +17,23 @@
 package org.apache.eagle.datastream
 
 import com.typesafe.config.Config
+import scala.collection.JavaConverters._
 
-trait StormStreamExecutor[R <: EagleTuple] extends FlatMapper[Seq[AnyRef], R] {
+trait StormStreamExecutor[R <: EagleTuple] extends FlatMapper[R] {
   def prepareConfig(config : Config)
   def init
   def fields : Array[String]
 }
 
-trait JavaStormStreamExecutor[R <: EagleTuple] extends FlatMapper[java.util.List[AnyRef], R] {
+trait JavaStormStreamExecutor[R <: EagleTuple] extends FlatMapper[R] {
   def prepareConfig(config : Config)
   def init
   def fields : Array[String]
   override def toString() = this.getClass.getSimpleName
+
+  override def flatMap(input : Seq[AnyRef], collector : Collector[R]) = flatMap(input.asJava,collector)
+
+  def flatMap(input : java.util.List[AnyRef], collector : Collector[R])
 }
 
 abstract class StormStreamExecutor1[T0] extends StormStreamExecutor[Tuple1[T0]] {
