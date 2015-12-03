@@ -109,6 +109,10 @@ trait StreamProducer{
     ret
   }
 
+  def streamUnion(other : StreamProducer) : StreamProducer = {
+    streamUnion(Seq(other))
+  }
+
   /**
    * alert is always sink of data flow
    */

@@ -27,6 +27,7 @@ import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
 import org.apache.eagle.dataproc.util.ConfigOptionParser;
 import org.apache.eagle.datastream.ExecutionEnvironmentFactory;
 import org.apache.eagle.datastream.StormExecutionEnvironment;
+import org.apache.eagle.datastream.StreamProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +64,12 @@ public class HdfsAuditLogProcessorMain {
                         return new SchemeAsMultiScheme(scheme);
                 }
         };
-        env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").groupBy(Arrays.asList(0))
-                .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
-                .flatMap(new IPZoneDataJoinExecutor())
-                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
+        StreamProducer source = env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").groupBy(Arrays.asList(0));
+        StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
+        source.streamUnion(reassembler)
+              .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
+              .flatMap(new IPZoneDataJoinExecutor())
+              .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();
 	}
 }
