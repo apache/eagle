@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.metric;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -32,7 +33,7 @@ public abstract class Metric implements MetricOperator{
     
     public Metric(long timestamp, Map<String, String> dimensions, String metricName, AtomicDouble value) {
        this.timestamp = timestamp;
-       this.dimensions = dimensions;
+       this.dimensions = new HashMap<>(dimensions);
        this.metricName = metricName;
 	   this.value = value;
     }
@@ -45,7 +46,7 @@ public abstract class Metric implements MetricOperator{
         return timestamp;
      }
 
-     public Map<String, String> getDemensions() {
+     public Map<String, String> getDimensions() {
         return dimensions;
      }
    

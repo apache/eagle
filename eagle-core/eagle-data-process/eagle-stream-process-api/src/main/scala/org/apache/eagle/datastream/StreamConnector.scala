@@ -18,11 +18,19 @@
  */
 package org.apache.eagle.datastream
 
+import org.apache.eagle.partition.PartitionStrategy
+
 case class StreamConnector(from: StreamProducer, to: StreamProducer) {
   var groupByFields : Seq[Int] = Nil
+  var customGroupBy : PartitionStrategy = null
 
   def groupBy(fields : Seq[Int]) : StreamConnector = {
     groupByFields = fields
+    this
+  }
+
+  def customGroupBy(custom : PartitionStrategy) : StreamConnector = {
+    customGroupBy = custom
     this
   }
 }

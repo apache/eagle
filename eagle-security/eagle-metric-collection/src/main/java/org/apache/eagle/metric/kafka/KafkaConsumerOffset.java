@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metric.report;
+package org.apache.eagle.metric.kafka;
 
-import java.util.List;
+import java.util.Map;
 
-import org.apache.eagle.metric.Metric;
-
-public interface MetricReport {
-	// The method should be thread safe
-	void emit(List<Metric> list);
+public class KafkaConsumerOffset {
+    public Map<String, String> topology;
+    public Long offset;
+    public Long partition;
+    public Map<String, String> broker;
+    public String topic;
 }

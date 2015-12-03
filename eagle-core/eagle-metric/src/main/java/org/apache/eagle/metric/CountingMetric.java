@@ -25,16 +25,20 @@ import com.google.common.util.concurrent.AtomicDouble;
  */
 public class CountingMetric extends Metric{
 
+    public CountingMetric(long timestamp, Map<String, String> dimensions, String metricName, double value) {
+        super(timestamp, dimensions, metricName, new AtomicDouble(value));
+    }
+
     public CountingMetric(long timestamp, Map<String, String> dimensions, String metricName, AtomicDouble value) {
     	super(timestamp, dimensions, metricName, value);
     }
-  
+
     public CountingMetric(long timestamp, Map<String, String> dimensions, String metricName) {
 	   this(timestamp, dimensions, metricName, new AtomicDouble(0.0));
     }
 
     public CountingMetric(CountingMetric metric) {
-        this(metric.timestamp, new HashMap<String, String>(metric.dimensions), metric.metricName, metric.value);
+        this(metric.timestamp, new HashMap<>(metric.dimensions), metric.metricName, metric.value);
     }
 
     @Override
