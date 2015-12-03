@@ -47,7 +47,7 @@ public class TestUserCommandReassembler {
         String e1 = "2015-11-19 23:57:02,934 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
         String e2 = "2015-11-19 23:57:03,046 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=append src=/tmp/private dst=null perm=null proto=rpc";
         String e3 = "2015-11-19 23:57:03,118 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
-        UserCommandReassembler assembler = new UserCommandReassembler();
+        HdfsUserCommandReassembler assembler = new HdfsUserCommandReassembler();
         Config config = ConfigFactory.load();
         assembler.prepareConfig(config);
         assembler.init();
@@ -56,12 +56,80 @@ public class TestUserCommandReassembler {
             @Override
             public void collect(Tuple2<String, Map> stringMapTuple2) {
                 String cmd = (String)stringMapTuple2.f1().get("cmd");
-                Assert.assertEquals("append", cmd);
+                Assert.assertEquals("user:appendToFile", cmd);
+                System.out.println("assert passed!!!");
             }
         };
         assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);
+        // sleep for a while for Siddhi engine callback to be invoked
+        Thread.sleep(100);
+    }
+
+    /**
+     * 2015-11-19 23:47:28,922 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc
+     * 2015-11-19 23:47:29,026 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=open src=/tmp/private dst=null perm=null proto=rpc
+     */
+    @Test
+    public void testRead() throws Exception{
+        String e1 = "2015-11-19 23:47:28,922 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
+        String e2 = "2015-11-19 23:47:29,026 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=open src=/tmp/private dst=null perm=null proto=rpc";
+        HdfsUserCommandReassembler assembler = new HdfsUserCommandReassembler();
+        Config config = ConfigFactory.load();
+        assembler.prepareConfig(config);
+        assembler.init();
+
+        Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
+            @Override
+            public void collect(Tuple2<String, Map> stringMapTuple2) {
+                String cmd = (String)stringMapTuple2.f1().get("cmd");
+                Assert.assertEquals("user:read", cmd);
+                System.out.println("assert passed!!!");
+            }
+        };
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
+        // sleep for a while for Siddhi engine callback to be invoked
+        Thread.sleep(100);
+    }
+
+    /**
+     * 2015-11-20 00:06:47,090 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc
+     * 2015-11-20 00:06:47,185 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private._COPYING_ dst=null perm=null proto=rpc
+     * 2015-11-20 00:06:47,254 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=create src=/tmp/private._COPYING_ dst=null perm=root:hdfs:rw-r--r-- proto=rpc
+     * 2015-11-20 00:06:47,289 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private._COPYING_ dst=null perm=null proto=rpc
+     * 2015-11-20 00:06:47,609 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=delete src=/tmp/private dst=null perm=null proto=rpc
+     * 2015-11-20 00:06:47,624 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=rename src=/tmp/private._COPYING_ dst=/tmp/private perm=root:hdfs:rw-r--r-- proto=rpc
+     */
+    @Test
+    public void testCopyFromLocal() throws Exception{
+        String e1 = "2015-11-20 00:06:47,090 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
+        String e2 = "2015-11-20 00:06:47,185 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private._COPYING_ dst=null perm=null proto=rpc";
+        String e3 = "2015-11-20 00:06:47,254 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=create src=/tmp/private._COPYING_ dst=null perm=root:hdfs:rw-r--r-- proto=rpc";
+        String e4 = "2015-11-20 00:06:47,289 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private._COPYING_ dst=null perm=null proto=rpc";
+        String e5 = "2015-11-20 00:06:47,609 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=delete src=/tmp/private dst=null perm=null proto=rpc";
+        String e6 = "2015-11-20 00:06:47,624 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=rename src=/tmp/private._COPYING_ dst=/tmp/private perm=root:hdfs:rw-r--r-- proto=rpc";
+        HdfsUserCommandReassembler assembler = new HdfsUserCommandReassembler();
+        Config config = ConfigFactory.load();
+        assembler.prepareConfig(config);
+        assembler.init();
+
+        Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
+            @Override
+            public void collect(Tuple2<String, Map> stringMapTuple2) {
+                String cmd = (String)stringMapTuple2.f1().get("cmd");
+                Assert.assertEquals("user:copyFromLocal", cmd);
+                System.out.println("assert passed!!!");
+            }
+        };
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e4)), collector);
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e5)), collector);
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e6)), collector);
+
         // sleep for a while for Siddhi engine callback to be invoked
         Thread.sleep(100);
     }
