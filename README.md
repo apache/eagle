@@ -35,6 +35,12 @@ The fastest way to get started with Eagle is to run with [docker](https://github
 
         docker pull apacheeagle/sandbox
 
+  Deploy eagle in n-nodes (1 node by default) cluster
+  
+      wget https://raw.githubusercontent.com/apache/incubator-eagle/master/eagle-external/eagle-docker/bin/eagle-lib.sh
+      source eagle-lib.sh
+      eagle-deploy-cluster 1
+
 * Build eagle docker image from source code with [eagle-docker](eagle-external/eagle-docker) tool.
 
          git clone https://github.com/apache/incubator-eagle.git
