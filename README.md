@@ -29,12 +29,18 @@ For more details, please visit [https://eagle.incubator.apache.org](https://eagl
 You can find the latest Eagle documentation on the [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README) file only contains basic setup instructions.
 
 ## Getting Started
-The fastest way to get started with Eagle is using [eagle-docker](eagle-external/eagle-docker) (require docker environment)
+The fastest way to get started with Eagle is to run with [docker](https://github.com/docker/docker) by one of following options:
 
-    git clone https://github.com/apache/incubator-eagle.git
-    incubator-eagle/eagle-docker boot
+* Pull latest eagle docker image from [docker hub](https://hub.docker.com/r/apacheeagle/sandbox/) directly:
 
-As an alternative option, you could install eagle package in sandbox manualy (see [https://eagle.incubator.apache.org/docs/deployment-in-sandbox.html](https://eagle.incubator.apache.org/docs/deployment-in-sandbox.html))
+	  docker pull apacheeagle/sandbox
+
+* Build eagle docker image from source code with [eagle-docker](eagle-external/eagle-docker)
+
+      git clone https://github.com/apache/incubator-eagle.git
+      cd incubator-eagle && ./eagle-docker boot
+
+As another alternative option, you could [install eagle package in sandbox](https://eagle.incubator.apache.org/docs/deployment-in-sandbox.html) manualy as well.
 
 ## Building Eagle
 Eagle is built using [Apache Maven](https://maven.apache.org/). To build Eagle, run:
@@ -46,6 +52,9 @@ After successfully building, you will find eagle binary tarball under _eagle-ass
 ## Get Help
 The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.incubator.apache.org](mailto:dev@eagle.incubator.apache.org),
 and remember to subscribe our mail list via [dev-subscribe@eagle.incubator.apache.org](mailto:dev-subscribe@eagle.incubator.apache.org)
+
+## FAQ
+[https://cwiki.apache.org/confluence/display/EAG/FAQ](https://cwiki.apache.org/confluence/display/EAG/FAQ)
 
 ## License
 Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0). More details, please refer to [LICENSE](LICENSE) file.

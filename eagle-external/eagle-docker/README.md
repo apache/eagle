@@ -1,14 +1,50 @@
+<!--
+{% comment %}
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements.  See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to you under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+-->
+
 # Eagle in Docker
 
-> Docker image for Apache Eagle http://eagle.incubator.apache.org
+> Docker image for Apache Eagle https://hub.docker.com/r/apacheeagle/sandbox
 
 This is docker container for eagle to help users to have a quick preview about eagle features. 
 And this project is to build apache/eagle images and provide eagle-functions to start the containers of eagle.
 
 ## Prerequisite
-* Docker environment (see [https://www.docker.com](https://www.docker.com/)) 
+* [Apache Maven](https://maven.apache.org)
+* [NPM](https://www.npmjs.com)
+* [Docker](https://www.docker.com)
+ 	* [Mac OS X](http://docs.docker.com/mac/started)
+ 	* [Linux](http://docs.docker.com/linux/started)
+ 	* [Windows](http://docs.docker.com/windows/started)
 
-## CLI Usage ##
+## Getting Started
+The fastest way to get started with Eagle is to run with [docker](https://github.com/docker/docker) by one of following options:
+
+* Pull latest eagle docker image from [docker hub](https://hub.docker.com/r/apacheeagle/sandbox/) directly:
+
+	  docker pull apacheeagle/sandbox
+
+* Build eagle docker image from source code with [eagle-docker](eagle-external/eagle-docker)
+
+      git clone https://github.com/apache/incubator-eagle.git
+      cd incubator-eagle && ./eagle-docker boot
+
+## Usage ##
 Basic usage of the entry script of eagle-docker: [bin/eagle-docker.sh](bin/eagle-docker.sh)
  
     Usage: ./eagle-docker [options] [command]
@@ -29,18 +65,18 @@ Basic usage of the entry script of eagle-docker: [bin/eagle-docker.sh](bin/eagle
       --node [num]    Docker instances node number, default is 1
       --help          Display eagle docker image usage information
 
-## Advanced Commands
+## Advanced
 1. **Build Image**: Go to the root directory where the [Dockerfile](Dockerfile) is in, build image with following command:
  
-        docker built -t apache/eagle:0.1.0 . 
+        docker built -t apacheeagle/sandbox . 
  
-    > The docker image is named `apache/eagle`. Eagle docker image is based on [`ambari:1.7.0`](https://github.com/sequenceiq/docker-ambari), it will install ganglia, hbase,hive,storm,kafka and so on in this image. Add startup script and buleprint file into image. 
+    > The docker image is named `apacheeagle/sandbox`. Eagle docker image is based on [`ambari:1.7.0`](https://github.com/sequenceiq/docker-ambari), it will install ganglia, hbase,hive,storm,kafka and so on in this image. Add startup script and buleprint file into image. 
 
-2. **Verify Image**: After building the `apache/eagle` image successfully, verify the images and could find eagle image.
+2. **Verify Image**: After building the `apacheeagle/sandbox` image successfully, verify the images and could find eagle image.
 
         docker images
 
-3. **Deploy Image**: This project also provides helper functions in script [eagle-functions](eagle-functions) for convenience.
+3. **Deploy Image**: This project also provides helper functions in script [eagle-lib.sh](bin/eagle-lib.sh) for convenience.
   
         # Firstly, load the helper functions into context
         source eagle-functions
@@ -70,6 +106,9 @@ Basic usage of the entry script of eagle-docker: [bin/eagle-docker.sh](bin/eagle
 ## Get Help
 The fastest way to get response from eagle community is to send email to the mail list [dev@eagle.incubator.apache.org](mailto:dev@eagle.incubator.apache.org),
 and remember to subscribe our mail list via [dev-subscribe@eagle.incubator.apache.org](mailto:dev-subscribe@eagle.incubator.apache.org)
+
+## FAQ
+[https://cwiki.apache.org/confluence/display/EAG/FAQ#FAQ-EagleDocker](https://cwiki.apache.org/confluence/display/EAG/FAQ#FAQ-EagleDocker)
 
 ## License
 Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0). More details, please refer to [LICENSE](LICENSE) file.
