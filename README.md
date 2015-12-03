@@ -42,7 +42,6 @@ The fastest way to get started with Eagle is to run with [docker](https://github
         -e KEYCHAIN= --env EAGLE_SERVER_HOST=sandbox.eagle.incubator.apache.org --name sandbox \
         -h sandbox.eagle.incubator.apache.org --privileged=true apacheeagle/sandbox:latest \
         --tag ambari-server=true
-
       docker run -it --rm -e EXPECTED_HOST_COUNT=1 -e BLUEPRINT=hdp-singlenode-eagle --link sandbox:ambariserver\
         --entrypoint /bin/sh apacheeagle/sandbox:latest -c /tmp/install-cluster.sh
 
