@@ -76,7 +76,8 @@ public class Parser {
   private void parseQL(ASTNode ast) {
     switch (ast.getType()) {
     case HiveParser.TOK_QUERY:
-      visitSubtree(ast);
+      parseQueryClause(ast);
+      addTablesColumnsToMap(tableSet, columnSet);
       break;
 
     case HiveParser.TOK_UPDATE_TABLE:
@@ -85,14 +86,29 @@ public class Parser {
       break;
 
     case HiveParser.TOK_DELETE_FROM:
-      setOperation("DELETE FROM");
+      setOperation("DELETE");
+      visitSubtree(ast);
+      break;
+
+    case HiveParser.TOK_CREATETABLE:
+      setOperation("CREATE");
+      visitSubtree(ast);
+      break;
+
+    case HiveParser.TOK_DROPTABLE:
+      setOperation("DROP");
+      visitSubtree(ast);
+      break;
+
+    case HiveParser.TOK_ALTERTABLE:
+      setOperation("ALTER");
       visitSubtree(ast);
       break;
 
     default:
-      LOG.error("Unsupporting query operation " + ast.getType());
+      LOG.error("Unsupported query operation " + ast.getText());
       throw new IllegalStateException("Query operation is not supported "
-          + ast.getType());
+          + ast.getText());
     }
   }
 
@@ -102,51 +118,46 @@ public class Parser {
       for (Node n : ast.getChildren()) {
         ASTNode asn = (ASTNode)n;
         switch (asn.getToken().getType()) {
-        case HiveParser.TOK_TABNAME:
-          tableSet.add(ast.getChild(0).getChild(0).getText());
-          break;
-        case HiveParser.TOK_SET_COLUMNS_CLAUSE:
-          for (int i = 0; i < asn.getChildCount(); i++) {
-            addToColumnSet((ASTNode)asn.getChild(i).getChild(0));
-          }
-        case HiveParser.TOK_FROM:
-          parseFromClause((ASTNode)asn.getChild(0));
-          break;
-        case HiveParser.TOK_INSERT:
-          for (int i = 0; i < asn.getChildCount(); i++) {
-            parseInsertClause((ASTNode)asn.getChild(i));                           
-          }
-          break;
-        case HiveParser.TOK_UNIONTYPE: 
-          int childcount = asn.getChildCount();
-          for (int i = 0; i < childcount; i++) {    
-            parseQL((ASTNode)asn.getChild(i));
-          }
-          break;
+          case HiveParser.TOK_TABNAME:
+            //tableSet.add(ast.getChild(0).getChild(0).getText());
+            parserContent.getTableColumnMap().put(ast.getChild(0).getChild(0).getText(), new HashSet<>(columnSet));
+            break;
+          case HiveParser.TOK_SET_COLUMNS_CLAUSE:
+            for (int i = 0; i < asn.getChildCount(); i++) {
+              addToColumnSet((ASTNode) asn.getChild(i).getChild(0));
+            }
+            break;
+          case HiveParser.TOK_QUERY:
+            parseQueryClause(asn);
+            break;
+          case HiveParser.TOK_UNIONTYPE:
+          case HiveParser.TOK_UNIONALL:
+          case HiveParser.TOK_UNIONDISTINCT:
+            visitSubtree(asn);
+            break;
         }
       }
-
       // Add tableSet and columnSet to tableColumnMap
       addTablesColumnsToMap(tableSet, columnSet);
     }
   }
-  
-  private void parseSubQuery(ASTNode subQuery) {
 
-    int cc = 0;
-    int cp = 0;
-
-    switch (subQuery.getToken().getType()) {
-    case HiveParser.TOK_QUERY:
-      visitSubtree(subQuery);
-      break;
-    case HiveParser.TOK_UNIONTYPE: 
-      cc = subQuery.getChildCount();
-
-      for ( cp = 0; cp < cc; ++cp) {    
-        parseSubQuery((ASTNode)subQuery.getChild(cp));
+  private void parseQueryClause(ASTNode ast) {
+    int len = ast.getChildCount();
+    if (len > 0) {
+      for (Node n : ast.getChildren()) {
+        ASTNode asn = (ASTNode) n;
+        switch (asn.getToken().getType()) {
+          case HiveParser.TOK_FROM:
+            parseFromClause((ASTNode) asn.getChild(0));
+            break;
+          case HiveParser.TOK_INSERT:
+            for (int i = 0; i < asn.getChildCount(); i++) {
+              parseInsertClause((ASTNode) asn.getChild(i));
+            }
+            break;
+        }
       }
-      break;
     }
   }
 
@@ -168,7 +179,6 @@ public class Parser {
       setOperation("SELECT");
       parseSelectClause(ast);
       break;
-
     }
   }
 
@@ -188,7 +198,6 @@ public class Parser {
         String child_1 = qf.getChild(1).toString();
         tableAliasMap.put(child_1, child_0);
       }
-
       break;
 
     case HiveParser.TOK_LEFTOUTERJOIN:
@@ -207,31 +216,40 @@ public class Parser {
         ASTNode atm = (ASTNode)qf.getChild(cp);
         parseFromClause(atm);
       }
-      break;  
-    case HiveParser.TOK_SUBQUERY:
+      break;
 
-      parseSubQuery((ASTNode)qf.getChild(0));
-      break;   
+    case HiveParser.TOK_SUBQUERY:
+      visitSubtree(qf);
+      break;
+
     case HiveParser.TOK_LATERAL_VIEW:
+    case HiveParser.TOK_LATERAL_VIEW_OUTER:
       cc = qf.getChildCount();
       for ( cp = 0; cp < cc; ++cp) {    
         parseFromClause((ASTNode)qf.getChild(cp));
       }
-      break;                                                          
+      break;
     }
   }
   
   private void parseSelectClause(ASTNode ast) {
     for (int i = 0; i < ast.getChildCount(); i++) {
-      ASTNode astmp = (ASTNode)ast.getChild(i);
-      switch (astmp.getChild(0).getType()) {
+      ASTNode selectXpr = (ASTNode)ast.getChild(i);
+      for(int j = 0; j < selectXpr.getChildCount(); j++) {
+        parseSelectExpr((ASTNode)selectXpr.getChild(j));
+      }
+    }
+  }
+
+  private void parseSelectExpr(ASTNode asn) {
+    switch (asn.getType()) {
       case HiveParser.TOK_TABLE_OR_COL:
-        addToColumnSet(astmp);
+        addToColumnSet((ASTNode)asn.getParent());
         break;
 
       case HiveParser.TOK_ALLCOLREF:
         String tableName;
-        ASTNode node = (ASTNode)astmp.getChild(0).getChild(0);
+        ASTNode node = (ASTNode)asn.getChild(0);
         if (node != null && node.getType() == HiveParser.TOK_TABNAME) {
           String strTemp = node.getChild(0).getText();
           tableName = convAliasToReal(tableAliasMap, strTemp);
@@ -249,41 +267,46 @@ public class Parser {
 
       case HiveParser.TOK_FUNCTION:
         // Traverse children to get TOK_TABLE_OR_COL
-        Set<String> tempSet = new HashSet<String>();
-        parseTokFunction(ast, tempSet);
+        Set<String> tempSet = new HashSet<>();
+        parseTokFunction(asn, tempSet);
         columnSet.addAll(tempSet);
         break;
 
       case HiveParser.TOK_FUNCTIONSTAR:
         break;
 
+      case HiveParser.DOT:
+        String tbAlias = asn.getChild(0).getChild(0).getText();
+        tableName = convAliasToReal(tableAliasMap, tbAlias);
+        String strTemp = asn.getChild(1).getText();
+        String col = convAliasToReal(columnAliasMap, strTemp);
+        addTableColumnToMap(tableName, col);
+        break;
+
       default:
-        if(astmp.getChild(0).getText().equals(".")) {
-          String tbAlias = astmp.getChild(0).getChild(0).getChild(0).getText();
-          tableName = convAliasToReal(tableAliasMap, tbAlias);
-          String strTemp = astmp.getChild(0).getChild(1).getText();
-          String col = convAliasToReal(columnAliasMap, strTemp);
-          addTableColumnToMap(tableName, col);
+        if(asn.getChildCount() > 1) {
+          for(int i = 0; i < asn.getChildCount(); i++) {
+            parseSelectExpr((ASTNode)asn.getChild(i));
+          }
         }
-        else {
-          tempSet = new HashSet<String>();
-          parseTokFunction(astmp, tempSet);
-          columnSet.addAll(tempSet);
-        }
-      }
     }
+
   }
 
   private void parseTokFunction(ASTNode ast, Set<String> set) {
-    if (ast.getType() == HiveParser.TOK_TABLE_OR_COL) {
-      String colRealName = convAliasToReal(columnAliasMap, ast.getChild(0).getText());
-      set.add(colRealName);
-    }
-    for (int i = 0; i < ast.getChildCount(); i++) {
-      ASTNode n = (ASTNode)ast.getChild(i);
-      if (n != null) {
-          parseTokFunction(n, set);
-      }
+    switch(ast.getType()) {
+      case HiveParser.TOK_TABLE_OR_COL:
+        String colRealName = convAliasToReal(columnAliasMap, ast.getChild(0).getText());
+        set.add(colRealName);
+        break;
+      case HiveParser.TOK_FUNCTION:
+        for (int i = 0; i < ast.getChildCount(); i++) {
+          ASTNode n = (ASTNode)ast.getChild(i);
+          if (n != null) {
+            parseTokFunction(n, set);
+          }
+        }
+        break;
     }
   }
 
@@ -313,15 +336,11 @@ public class Parser {
   private void addTablesColumnsToMap(Set<String> tbs, Set<String> cols) {
     Map<String, Set<String>> map = parserContent.getTableColumnMap();
     for (String tb : tbs) {
-      if (map != null) {
+      if (map != null && map.get(tb) != null) {
         Set<String> temp = map.get(tb);
-        if (temp != null) {
-          Set<String> value = new HashSet<String>(temp);
-          value.addAll(cols);
-          map.put(tb, value);
-        } else {
-          map.put(tb, cols);
-        }
+        Set<String> value = new HashSet<>(temp);
+        value.addAll(cols);
+        map.put(tb, value);
       } else {
         map.put(tb, cols);
       }

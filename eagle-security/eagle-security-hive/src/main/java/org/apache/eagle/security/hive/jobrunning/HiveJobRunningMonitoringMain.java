@@ -34,8 +34,6 @@ public class HiveJobRunningMonitoringMain {
 
 	public static void main(String[] args) throws Exception{
         Config config = new ConfigOptionParser().load(args);
-        //System.setProperty("config.trace", "loads");
-        //Config config = ConfigFactory.load();
 
         LOG.info("Config class: " + config.getClass().getCanonicalName());
 
