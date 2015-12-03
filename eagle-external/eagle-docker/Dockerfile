@@ -45,4 +45,4 @@ ADD resource/eagle-multinode.json /tmp/
 ADD resource/wait-for-eagle.sh /tmp/
 ADD resource/deploy-eagle.sh /usr/hdp/current/eagle/deploy.sh
 
-EXPOSE 9099 8744
+EXPOSE 9099 8744 8080 2181 2888 6667 60020 60030 60010

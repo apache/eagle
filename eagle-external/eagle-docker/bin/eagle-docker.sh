@@ -248,50 +248,52 @@ function exec_bash(){
 	docker exec -it $EAGLE_DOCKER_PREFIX bash
 }
 
-case $1 in
-"--node")
-	if [ $# -lt 2 ]; then
-        usage
-        exit 1
-     fi
-	 NODE_NUM=$2
-     shift 2
-     ;;
-"deploy")
-        deploy 
-	exit
+while [[ -n $1 ]]; do
+	case $1 in
+	"--node")
+		if [ $# -lt 2 ]; then
+        	usage
+        	exit 1
+     		fi
+	 	NODE_NUM=$2
+     		shift
+     		;;
+	"deploy")
+        	deploy 
+		exit
+		;;
+	"build")
+        	build	
+		exit
+		;;
+	"boot")
+        	boot	
+		exit
+		;;
+	"status")
+        	status 
+		exit
+		;;
+	"start")
+ 		start	
+		exit
+		;;
+	"stop")
+ 		stop	
+		exit
+		;;
+	"clean")	
+		clean	
+		exit
+		;;
+	"shell")	
+		exec_bash
+		exit
+		;;
+	*)
+		usage
+		exit 1
 	;;
-"build")
-        build	
-	exit
-	;;
-"boot")
-        boot	
-	exit
-	;;
-"status")
-        status 
-	exit
-	;;
-"start")
- 	start	
-	exit
-	;;
-"stop")
- 	stop	
-	exit
-	;;
-"clean")	
-	clean	
-	exit
-	;;
-"shell")	
-	exec_bash
-	exit
-	;;
-*)
-	usage
-	exit 1
-	;;
-esac
-
+	esac
+	shift
+done
