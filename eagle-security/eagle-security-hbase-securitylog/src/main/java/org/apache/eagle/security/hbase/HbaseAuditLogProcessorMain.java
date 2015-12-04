@@ -19,7 +19,6 @@ package org.apache.eagle.security.hbase;
 
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.util.ConfigOptionParser;
@@ -40,7 +39,7 @@ public class HbaseAuditLogProcessorMain {
         if(LOG.isDebugEnabled()) LOG.debug("Config content:"+config.root().render(ConfigRenderOptions.concise()));
 
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1).withName("kafkaMsgConsumer")
+        env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1).name("kafkaMsgConsumer")
                 .flatMap(new HbaseResourceSensitivityDataJoinExecutor())
                 .alertWithConsumer("hbaseSecurityLogEventStream", "hbaseSecurityLogAlertExecutor");
         env.execute();

@@ -19,7 +19,6 @@
 package org.apache.eagle.security.hive.jobrunning;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.dataproc.util.ConfigOptionParser;
 import org.apache.eagle.datastream.ExecutionEnvironmentFactory;
@@ -44,7 +43,7 @@ public class HiveJobRunningMonitoringMain {
         String spoutName = "msgConsumer";
         int parallelism = config.getInt("envContextConfig.parallelismConfig." + spoutName);
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new HiveJobRunningSourcedStormSpoutProvider().getSpout(config, parallelism)).renameOutputFields(4).withName(spoutName).groupBy(Arrays.asList(0))
+        env.newSource(new HiveJobRunningSourcedStormSpoutProvider().getSpout(config, parallelism)).renameOutputFields(4).name(spoutName).groupBy(Arrays.asList(0))
                 .flatMap(new JobConfigurationAdaptorExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveQueryParserExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveResourceSensitivityDataJoinExecutor())

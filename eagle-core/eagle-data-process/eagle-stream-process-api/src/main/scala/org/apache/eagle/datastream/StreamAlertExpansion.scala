@@ -70,14 +70,14 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
   def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
                dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], child: StreamProducer[Any]): Unit = {
     child match {
-      case AlertStreamSink(id, upStreamNames, alertExecutorId, withConsumer) => {
+      case AlertStreamSink(upStreamNames, alertExecutorId, withConsumer) => {
         /**
          * step 1: wrapper previous StreamProducer with one more field "streamName"
          * for AlertStreamSink, we check previous StreamProducer and replace that
          */
         val newStreamProducers = new ListBuffer[StreamProducer[Any]]
         current match {
-          case StreamUnionProducer(id, others) => {
+          case StreamUnionProducer(others) => {
             val incomingEdges = dag.incomingEdgesOf(current)
             incomingEdges.foreach(e => newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, e.from, upStreamNames.get(0)))
             var i: Int = 1
@@ -104,7 +104,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(config), upStreamNames, alertExecutorId)
         var alertProducers = new scala.collection.mutable.MutableList[StreamProducer[Any]]
         alertExecutors.foreach(exec => {
-          val t = FlatMapProducer(UniqueId.incrementAndGetId(), exec).withName(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
+          val t = FlatMapProducer(exec).name(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
           t.setConfig(config)
           t.setGraph(dag)
           alertProducers += t
@@ -132,13 +132,13 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         mapper match {
           case a: JavaStormStreamExecutor[EagleTuple] => {
             val newmapper = new JavaStormExecutorForAlertWrapper(a.asInstanceOf[JavaStormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
-            newsp = FlatMapProducer(UniqueId.incrementAndGetId(), newmapper)
+            newsp = FlatMapProducer(newmapper)
             newsp.setGraph(dag)
             newsp.setConfig(config)
           }
           case b: StormStreamExecutor[EagleTuple] => {
             val newmapper = StormExecutorForAlertWrapper(b.asInstanceOf[StormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
-            newsp = FlatMapProducer(UniqueId.incrementAndGetId(), newmapper)
+            newsp = FlatMapProducer(newmapper)
             newsp.setGraph(dag)
             newsp.setConfig(config)
           }
@@ -160,7 +160,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
           }
         }
         current match {
-          case MapProducer(id, 2, fn) => newsp = MapProducer(UniqueId.incrementAndGetId(), 3, newfun)
+          case MapProducer(2, fn) => newsp = MapProducer(3, newfun)
           case _ => throw new IllegalArgumentException
         }
         val incomingEdges = dag.incomingEdgesOf(current)
@@ -180,7 +180,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
             }
           }
         }
-        newsp = MapProducer(UniqueId.incrementAndGetId(),3,fn)
+        newsp = MapProducer(3,fn)
         toBeAddedEdges += StreamConnector(current,newsp)
         val outgoingEdges = dag.outgoingEdgesOf(current)
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp,e.to))

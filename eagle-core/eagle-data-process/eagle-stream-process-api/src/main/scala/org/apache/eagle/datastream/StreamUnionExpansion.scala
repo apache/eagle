@@ -41,7 +41,7 @@ class StreamUnionExpansion(config: Config) extends StreamDAGExpansion(config){
         val child = edge.to
         val groupByFields = edge.groupByFields;
         child match {
-          case StreamUnionProducer(id, others) => {
+          case StreamUnionProducer(others) => {
             dag.outgoingEdgesOf(child).foreach(c2 => {
               toBeAddedEdges += StreamConnector(current, c2.to).groupBy(groupByFields)
               others.foreach(o => {

@@ -20,7 +20,6 @@ package org.apache.eagle.security.securitylog;
 
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.util.ConfigOptionParser;
@@ -41,7 +40,7 @@ public class HDFSSecurityLogProcessorMain {
 
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
 
-        env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1).withName("kafkaMsgConsumer")
+        env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1).name("kafkaMsgConsumer")
                 .alertWithConsumer("hdfsSecurityLogEventStream", "hdfsSecurityLogAlertExecutor");
         env.execute();
     }

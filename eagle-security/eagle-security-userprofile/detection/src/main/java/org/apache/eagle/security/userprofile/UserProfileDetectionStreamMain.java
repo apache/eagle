@@ -41,10 +41,10 @@ public class UserProfileDetectionStreamMain {
         if(LOG.isDebugEnabled()) LOG.debug("Config content:"+config.root().render(ConfigRenderOptions.concise()));
 
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1).withName("kafkaMsgConsumer")
-                .flatMap(new AuditLogTransformer()).withName("transformer")     // [user,map]
+        env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1).name("kafkaMsgConsumer")
+                .flatMap(new AuditLogTransformer()).name("transformer")     // [user,map]
                 .groupBy(Arrays.asList(0))                                      // group by [user]
-                .flatMap(new UserProfileAggregatorExecutor()).withName("aggregator")
+                .flatMap(new UserProfileAggregatorExecutor()).name("aggregator")
                 .alertWithConsumer(Arrays.asList(UserProfileDetectionConstants.USER_ACTIVITY_AGGREGATION_STREAM),
                         UserProfileDetectionConstants.USER_PROFILE_ANOMALY_DETECTION_EXECUTOR); // alert
                 ;

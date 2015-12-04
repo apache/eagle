@@ -36,7 +36,7 @@ public class TestJavaMain {
     public void testGeneral(){
         Config config = ConfigFactory.load();
         StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new TestKeyValueSpout()).renameOutputFields(2).groupBy(Arrays.asList(0)).flatMap(new GroupedEchoExecutor()).withParallelism(2);
+        env.newSource(new TestKeyValueSpout()).renameOutputFields(2).groupBy(Arrays.asList(0)).flatMap(new GroupedEchoExecutor()).parallelism(2);
         env.execute();
     }
 

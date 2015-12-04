@@ -34,7 +34,7 @@ object UnionForAlert extends App{
   val env = ExecutionEnvironmentFactory.getStorm(config)
   val tail1 = env.newSource(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
   val tail2 = env.newSource(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key2",a))
-  tail1.streamUnion(List(tail2)).alert(util.Arrays.asList("s1","s2"), "alert1", false)
+  tail1.union(List(tail2)).alert(util.Arrays.asList("s1","s2"), "alert1", false)
   //env.execute
 }
 
@@ -85,7 +85,7 @@ object StormRunnerWithUnion extends Application{
   val env = ExecutionEnvironmentFactory.getStorm(config)
   val tail1 = env.newSource(TestSpout()).flatMap(WordPrependExecutor("test"))
   val tail2 = env.newSource(TestSpout()).flatMap(WordAppendExecutor("test"))
-  tail1.streamUnion(List(tail2)).flatMap(PatternAlertExecutor(".*test.*"))
+  tail1.union(List(tail2)).flatMap(PatternAlertExecutor(".*test.*"))
   //env.execute
 }
 
@@ -110,13 +110,13 @@ object StormRunnerWithJavaExecutor extends Application{
 object StormRunnerWithKeyValueSpout extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironmentFactory.getStorm(config)
-  env.newSource(TestKeyValueSpout()).groupBy(1).flatMap(new GroupedEchoExecutor()).withParallelism(2)
+  env.newSource(TestKeyValueSpout()).groupBy(1).flatMap(new GroupedEchoExecutor()).parallelism(2)
   //env.execute
 }
 
 object StormRunnerWithKeyValueSpoutRenameOutputFields extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironmentFactory.getStorm(config)
-  env.newSource(TestKeyValueSpout()).renameOutputFields(2).groupBy(0).flatMap(new GroupedEchoExecutor()).withParallelism(2)
+  env.newSource(TestKeyValueSpout()).renameOutputFields(2).groupBy(0).flatMap(new GroupedEchoExecutor()).parallelism(2)
   //env.execute
 }

@@ -24,7 +24,7 @@ import com.typesafe.config.Config
 object StormBoltFactory {
   def getBoltWrapper(graph: AbstractStreamProducerGraph, producer : StreamProducer[Any], config : Config) : BaseRichBolt = {
     producer match{
-      case FlatMapProducer(id, worker) => {
+      case FlatMapProducer(worker) => {
         if(worker.isInstanceOf[JavaStormStreamExecutor[EagleTuple]]){
           worker.asInstanceOf[JavaStormStreamExecutor[EagleTuple]].prepareConfig(config)
           JavaStormBoltWrapper(worker.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])

@@ -28,7 +28,7 @@ class KafkaStreamMonitorApp extends StormStreamApp{
 
   set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
 
-  source(new KafkaSourcedSpoutProvider).renameOutputFields(1).withName(streamName)
+  source(new KafkaSourcedSpoutProvider).renameOutputFields(1).name(streamName)
     .alertWithConsumer(streamName, streamExecutorId)
 }
 

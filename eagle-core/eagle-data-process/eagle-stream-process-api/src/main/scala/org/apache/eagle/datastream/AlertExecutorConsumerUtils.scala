@@ -60,10 +60,10 @@ object AlertExecutorConsumerUtils {
     val notificationExecutor: AlertNotificationExecutor = new AlertNotificationExecutor(alertExecutorIdList, alertDefDao)
     val persistExecutor: AlertPersistExecutor = new AlertPersistExecutor
 
-    val entityDedupStreamProducer = FlatMapProducer(UniqueId.incrementAndGetId(),entityDedupExecutor)
-    val persistStreamProducer = FlatMapProducer(UniqueId.incrementAndGetId(),persistExecutor)
-    val emailDedupStreamProducer = FlatMapProducer(UniqueId.incrementAndGetId(),emailDedupExecutor)
-    val notificationStreamProducer = FlatMapProducer(UniqueId.incrementAndGetId(),notificationExecutor)
+    val entityDedupStreamProducer = FlatMapProducer(entityDedupExecutor)
+    val persistStreamProducer = FlatMapProducer(persistExecutor)
+    val emailDedupStreamProducer = FlatMapProducer(emailDedupExecutor)
+    val notificationStreamProducer = FlatMapProducer(notificationExecutor)
     toBeAddedEdges += StreamConnector(entityDedupStreamProducer, persistStreamProducer)
     toBeAddedEdges += StreamConnector(emailDedupStreamProducer, notificationStreamProducer)
 

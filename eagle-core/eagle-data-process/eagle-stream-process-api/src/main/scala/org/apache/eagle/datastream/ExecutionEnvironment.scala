@@ -62,7 +62,7 @@ class StormExecutionEnvironment(config: Config) extends ExecutionEnvironment(con
   }
 
   def newSource[T](source: BaseRichSpout): StormSourceProducer[T] ={
-    val ret = StormSourceProducer[T](UniqueId.incrementAndGetId(), source)
+    val ret = StormSourceProducer[T](source)
     ret.config = config
     ret.graph = dag
     dag.addVertex(ret)

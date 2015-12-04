@@ -47,7 +47,7 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
           val stormConf = yaml.load(inputFileStream).asInstanceOf[java.util.LinkedHashMap[String, Object]]
           if(stormConf != null) conf.putAll(stormConf)
         } catch {
-          case _ => ()
+          case _: Throwable => ()
         } finally {
           if(inputFileStream != null) inputFileStream.close()
         }
@@ -66,7 +66,7 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
           Utils.sleep(Integer.MAX_VALUE)
         }
         catch {
-          case _ => () // Do nothing
+          case _: Throwable => () // Do nothing
         }
       }
     }
