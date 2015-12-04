@@ -33,7 +33,7 @@ public class HiveJobRunningMonitoringMain {
         String spoutName = "msgConsumer";
         int parallelism = env.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
         env.from(new HiveJobRunningSourcedStormSpoutProvider().getSpout(env.getConfig(), parallelism))
-                .renameOutputFields(4).name(spoutName).groupBy(Arrays.asList(0))
+                .renameOutputFields(4).as(spoutName).groupBy(Arrays.asList(0))
                 .flatMap(new JobConfigurationAdaptorExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveQueryParserExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveResourceSensitivityDataJoinExecutor())

@@ -76,7 +76,7 @@ public class HdfsAuditLogProcessorMain {
     }
 
     public static void execWithDefaultPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
-        env.from(provider.getSpout(config)).renameOutputFields(2).name("kafkaMsgConsumer").groupBy(Arrays.asList(0))
+        env.from(provider.getSpout(config)).renameOutputFields(2).as("kafkaMsgConsumer").groupBy(Arrays.asList(0))
                 .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new IPZoneDataJoinExecutor())
                 .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
@@ -85,7 +85,7 @@ public class HdfsAuditLogProcessorMain {
 
     public static void execWithBalancedPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
         PartitionStrategy strategy = createStrategy(config);
-        env.from(provider).renameOutputFields(2).name("kafkaMsgConsumer").customGroupBy(strategy)
+        env.from(provider).renameOutputFields(2).as("kafkaMsgConsumer").customGroupBy(strategy)
                 .flatMap(new FileSensitivityDataJoinExecutor())
                 .customGroupBy(strategy)
                 .flatMap(new IPZoneDataJoinExecutor())

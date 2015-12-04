@@ -90,15 +90,14 @@ case class StormExecutionEnvironment(private val conf:Config) extends ExecutionE
     StormTopologyCompiler(config.get, dag).buildTopology.execute
   }
 
-  def from[T](source: BaseRichSpout): StormSourceProducer[T] = {
+  def from[T<:Any](source: BaseRichSpout): StormSourceProducer[T] = {
     val ret = StormSourceProducer[T](source)
     ret.config = config.get
     ret.graph = dag
     dag.addVertex(ret)
     ret
   }
-
-  def from[T](sourceProvider: StormSpoutProvider):StormSourceProducer[T] = from(sourceProvider.getSpout(config.get))
+  def from[T<:Any](sourceProvider: StormSpoutProvider):StormSourceProducer[T] = from(sourceProvider.getSpout(config.get))
 }
 
 /**

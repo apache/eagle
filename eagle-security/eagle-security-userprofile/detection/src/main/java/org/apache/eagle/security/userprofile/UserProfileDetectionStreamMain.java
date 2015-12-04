@@ -29,10 +29,10 @@ import java.util.Map;
 public class UserProfileDetectionStreamMain {
     public static void main(String[] args) throws Exception{
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
-        env.from(new KafkaSourcedSpoutProvider()).renameOutputFields(1).name("kafkaMsgConsumer")
-                .flatMap(new AuditLogTransformer()).name("transformer")     // [user,map]
+        env.from(new KafkaSourcedSpoutProvider()).renameOutputFields(1).as("kafkaMsgConsumer")
+                .flatMap(new AuditLogTransformer()).as("transformer")     // [user,map]
                 .groupBy(Arrays.asList(0))                                      // group by [user]
-                .flatMap(new UserProfileAggregatorExecutor()).name("aggregator")
+                .flatMap(new UserProfileAggregatorExecutor()).as("aggregator")
                 .alertWithConsumer(UserProfileDetectionConstants.USER_ACTIVITY_AGGREGATION_STREAM,
                         UserProfileDetectionConstants.USER_PROFILE_ANOMALY_DETECTION_EXECUTOR); // alert
         env.execute();

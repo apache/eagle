@@ -19,9 +19,7 @@
 
 package org.apache.eagle.datastream
 
-import java.util
-
-import com.typesafe.config.{ConfigFactory, Config}
+import com.typesafe.config.{Config, ConfigFactory}
 
 object testStreamUnionExpansion extends App{
   val config : Config = ConfigFactory.load;
@@ -52,13 +50,13 @@ object testStreamUnionAndGroupbyExpansion extends App{
  * 1. stream schema
  * curl -X POST -H 'Content-Type:application/json' "http://localhost:38080/eagle-service/rest/entities?serviceName=AlertStreamSchemaService" -d '[{"prefix":"alertStreamSchema","tags":{"dataSource":"ds1","streamName":"s1","attrName":"word"},"attrDescription":"word","attrType":"string","category":"","attrValueResolver":""}]'
  * 2. policy
- * curl -X POST -H 'Content-Type:application/json' "http://localhost:38080/eagle-service/rest/entities?serviceName=AlertDefinitionService" -d '[{"tags":{"site":"sandbox","dataSource":"ds1","alertExecutorId":"alert1","policyId":"testAlert","policyType":"siddhiCEPEngine"},"desc":"test alert","policyDef":"{\"type\":\"siddhiCEPEngine\",\"expression\":\"from s1 [(str:regexp(word,'\'.*test.*\'')==true)] select * insert into outputStream ;\"}","dedupeDef":"","notificationDef":"","remediationDef":"","enabled":"true"}]'
+ * curl -X POST -H 'Content-Type:application/json' "http://localhost:38080/eagle-service/rest/entities?serviceName=AlertDefinitionService" -d '[{"tags":{"site":"sandbox","dataSource":"ds1","alertExecutorId":"alert1","policyId":"testAlert","policyType":"siddhiCEPEngine"},"desc":"test alert","policyDef":"{\"type\":\"siddhiCEPEngine\",\"expression\":\"from s1 [(str:regexp(word,'\'.*test.*==true)] select * insert into outputStream ;\"}","dedupeDef":"","notificationDef":"","remediationDef":"","enabled":"true"}]'
  */
 object testAlertExpansion extends App{
   val config : Config = ConfigFactory.load;
   val env = new StormExecutionEnvironment(config)
-  val tail1 = env.from(TestSpout()).name("testSpout1")
-                  .flatMap(WordPrependForAlertExecutor("test")).name("prepend")
+  val tail1 = env.from(TestSpout()).as("testSpout1")
+                  .flatMap(WordPrependForAlertExecutor("test")).as("prepend")
                   .alertWithConsumer("s1", "alert1")
   //env.execute
 }
@@ -68,13 +66,13 @@ object testAlertExpansion extends App{
  * curl -X POST -H 'Content-Type:application/json' "http://localhost:38080/eagle-service/rest/entities?serviceName=AlertStreamSchemaService" -d '[{"prefix":"alertStreamSchema","tags":{"dataSource":"ds1","streamName":"s1","attrName":"word"},"attrDescription":"word","attrType":"string","category":"","attrValueResolver":""}]'
  * curl -X POST -H 'Content-Type:application/json' "http://localhost:38080/eagle-service/rest/entities?serviceName=AlertStreamSchemaService" -d '[{"prefix":"alertStreamSchema","tags":{"dataSource":"ds1","streamName":"s2","attrName":"word"},"attrDescription":"word","attrType":"string","category":"","attrValueResolver":""}]'
  * 2. policy
- * curl -X POST -H 'Content-Type:application/json' "http://localhost:38080/eagle-service/rest/entities?serviceName=AlertDefinitionService" -d '[{"tags":{"site":"sandbox","dataSource":"ds1","alertExecutorId":"alert1","policyId":"testAlert","policyType":"siddhiCEPEngine"},"desc":"test alert","policyDef":"{\"type\":\"siddhiCEPEngine\",\"expression\":\"from s1 [(str:regexp(word,'\'.*test.*\'')==true)] select * insert into outputStream ;\"}","dedupeDef":"","notificationDef":"","remediationDef":"","enabled":"true"}]'
+ * curl -X POST -H 'Content-Type:application/json' "http://localhost:38080/eagle-service/rest/entities?serviceName=AlertDefinitionService" -d '[{"tags":{"site":"sandbox","dataSource":"ds1","alertExecutorId":"alert1","policyId":"testAlert","policyType":"siddhiCEPEngine"},"desc":"test alert","policyDef":"{\"type\":\"siddhiCEPEngine\",\"expression\":\"from s1 [(str:regexp(word,'\'.*test.*\)==true)] select * insert into outputStream ;\"}","dedupeDef":"","notificationDef":"","remediationDef":"","enabled":"true"}]'
  */
 object testAlertExpansionWithUnion extends App{
   val config : Config = ConfigFactory.load;
   val env = new StormExecutionEnvironment(config)
-  val tail1 = env.from(TestSpout()).name("testSpout1").flatMap(WordPrependForAlertExecutor("test")).name("prepend") //.map2(a => ("key1",a))
+  val tail1 = env.from(TestSpout()).as("testSpout1").flatMap(WordPrependForAlertExecutor("test")).as("prepend") //.map2(a => ("key1",a))
   val tail2 = env.from(TestSpout()).flatMap(WordAppendForAlertExecutor("test")) //.map2(a => ("key1",a))
-  tail1.union(List(tail2)).alert(Seq("s1","s2"), "alert1", true)
+  tail1.union(List(tail2)).alert(Seq("s1","s2"), "alert1", consume = true)
   //env.execute
 }

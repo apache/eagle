@@ -34,7 +34,7 @@ import scala.collection.JavaConverters._
  *
  * @tparam T processed elements type
  */
-trait StreamProtocol[+T]{
+trait StreamProtocol[+T <: Any]{
   def flatMap[R](flatMapper : FlatMapper [R]) : StreamProducer[R]
 
   def filter(fn : T => Boolean): StreamProducer[T]
@@ -48,31 +48,35 @@ trait StreamProtocol[+T]{
 
   def groupBy(fields : java.util.List[Integer]) : StreamProducer[T]
 
-  def union[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3]
+  def union[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
 
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
 
   /**
    * Set processing element parallelism setting
-   * @param parallelism parallelism value
+   * @param parallelismNum parallelism value
    * @return
    */
-  def parallelism(parallelism : Int) : StreamProducer[T]
+  def parallelism(parallelismNum : Int) : StreamProducer[T]
 
   /**
    * Set component name
    *
-   * @param name
+   * @param componentName
    * @return
    */
-  def name(name : String) : StreamProducer[T]
+  def as(componentName : String) : StreamProducer[T]
 
   /**
    * Set stream name
-   * @param stream stream name in String
+   * @param streamId stream ID
    * @return
    */
-  def stream(stream: String): StreamProducer[T]
+  def stream(streamId: String): StreamProducer[T]
+
+  def ? (fn:T => Boolean):StreamProducer[T] = this.filter(fn)
+  def ~>[R](flatMapper : FlatMapper [R]):StreamProducer[R]= this.flatMap[R](flatMapper)
+  def ! (upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean = true,strategy: PartitionStrategy = null) = alert(upStreamNames, alertExecutorId, consume,strategy)
 }
 
 /**
@@ -89,7 +93,7 @@ trait StreamProtocol[+T]{
  * @param stream stream id
  * @tparam T processed elements type
  */
-abstract class StreamProducer[+T](val id:Int = UniqueId.incrementAndGetId(),var stream:String=null) extends StreamProtocol[T]{
+abstract class StreamProducer[+T <: Any](val id:Int = UniqueId.incrementAndGetId(),var stream:String=null) extends StreamProtocol[T]{
   /**
    * Component name
    */
@@ -184,7 +188,7 @@ abstract class StreamProducer[+T](val id:Int = UniqueId.incrementAndGetId(),var 
   /**
    * alert is always sink of data flow
    */
-  def alertconsume(upStreamNames: util.List[String], alertExecutorId : String) = {
+  def alertWithConsumer(upStreamNames: util.List[String], alertExecutorId : String) = {
     alert(upStreamNames.asScala, alertExecutorId,consume = true)
   }
 
@@ -232,8 +236,14 @@ abstract class StreamProducer[+T](val id:Int = UniqueId.incrementAndGetId(),var 
     this
   }
 
-  override def name(name : String) : StreamProducer[T] = {
-    this.name = name
+  /**
+   * Component name
+   * 
+   * @param componentName component name
+   * @return
+   */
+  override def as(componentName : String) : StreamProducer[T] = {
+    this.name = componentName
     this
   }
 }
