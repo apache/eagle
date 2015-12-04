@@ -25,6 +25,7 @@ import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
+import scala.collection.JavaConversions
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
@@ -49,7 +50,7 @@ trait StreamProtocol[+T]{
 
   def union[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3]
 
-  def alert(upStreamNames: util.List[String], alertExecutorId : String, consume: Boolean=true)
+  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean)
 
   /**
    * Set processing element parallelism setting
@@ -174,25 +175,25 @@ abstract class StreamProducer[+T](val id:Int = UniqueId.incrementAndGetId(),var 
    * alert is always sink of data flow
    */
   def alertWithConsumer(upStreamNames: util.List[String], alertExecutorId : String) = {
-    alert(upStreamNames, alertExecutorId, consume = true)
+    alert(upStreamNames.asScala, alertExecutorId, consume = true)
   }
 
   def alertWithoutConsumer(upStreamNames: util.List[String], alertExecutorId : String) = {
-    alert(upStreamNames, alertExecutorId, consume = false)
+    alert(upStreamNames.asScala, alertExecutorId, consume = false)
   }
 
-  override def alert(upStreamNames: util.List[String], alertExecutorId : String, consume: Boolean=true) = {
-    val ret = AlertStreamSink(upStreamNames, alertExecutorId, consume)
+  override def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean = true) = {
+    val ret = AlertStreamSink(JavaConversions.asJavaList(upStreamNames), alertExecutorId, consume)
     hookupDAG(this, ret)
     ret
   }
 
   def alertWithConsumer(upStreamName: String, alertExecutorId : String) ={
-    alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = true)
+    alert(Seq(upStreamName), alertExecutorId, consume = true)
   }
 
   def alertWithoutConsumer(upStreamName: String, alertExecutorId : String) ={
-    alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
+    alert(Seq(upStreamName), alertExecutorId, consume = false)
   }
 
   protected def hookupDAG[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2]) = {

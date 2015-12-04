@@ -18,10 +18,7 @@
  */
 package org.apache.eagle.security.hive.jobrunning;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigRenderOptions;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
-import org.apache.eagle.datastream.ExecutionEnvironmentFactory;
+import org.apache.eagle.datastream.ExecutionEnvironments;
 import org.apache.eagle.datastream.StormExecutionEnvironment;
 import org.apache.eagle.security.hive.sensitivity.HiveResourceSensitivityDataJoinExecutor;
 import org.slf4j.Logger;
@@ -32,22 +29,15 @@ public class HiveJobRunningMonitoringMain {
 	private static final Logger LOG = LoggerFactory.getLogger(HiveJobRunningMonitoringMain.class);
 
 	public static void main(String[] args) throws Exception{
-        Config config = new ConfigOptionParser().load(args);
-        //System.setProperty("config.trace", "loads");
-        //Config config = ConfigFactory.load();
-
-        LOG.info("Config class: " + config.getClass().getCanonicalName());
-
-        if(LOG.isDebugEnabled()) LOG.debug("Config content:"+config.root().render(ConfigRenderOptions.concise()));
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
 
         String spoutName = "msgConsumer";
-        int parallelism = config.getInt("envContextConfig.parallelismConfig." + spoutName);
-        StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new HiveJobRunningSourcedStormSpoutProvider().getSpout(config, parallelism)).renameOutputFields(4).name(spoutName).groupBy(Arrays.asList(0))
+        int parallelism = env.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
+        env.from(new HiveJobRunningSourcedStormSpoutProvider().getSpout(env.getConfig(), parallelism)).renameOutputFields(4).name(spoutName).groupBy(Arrays.asList(0))
                 .flatMap(new JobConfigurationAdaptorExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveQueryParserExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveResourceSensitivityDataJoinExecutor())
                 .alertWithConsumer("hiveAccessLogStream", "hiveAccessAlertByRunningJob");
         env.execute();
 	}
-};
+}

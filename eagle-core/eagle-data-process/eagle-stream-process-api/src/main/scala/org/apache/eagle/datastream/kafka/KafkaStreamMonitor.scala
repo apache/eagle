@@ -16,20 +16,22 @@
  */
 package org.apache.eagle.datastream.kafka
 
-import org.apache.eagle.datastream.StormStreamApp
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
+import org.apache.eagle.datastream.ExecutionEnvironments
 
-/**
- * @since  11/6/15
- */
-class KafkaStreamMonitorApp extends StormStreamApp{
-  val streamName = get[String]("eagle.stream.name","eventStream")
-  val streamExecutorId = get[String]("eagle.stream.executor",s"${streamName}Executor")
+class KafkaStreamMonitorApp extends App {
+  val env = ExecutionEnvironments.getStorm(args)
 
-  set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
+  val streamName = env.config.get[String]("eagle.stream.name","eventStream")
+  val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")
 
-  source(new KafkaSourcedSpoutProvider).renameOutputFields(1).name(streamName)
-    .alertWithConsumer(streamName, streamExecutorId)
+  env.config.set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
+
+  env.from(new KafkaSourcedSpoutProvider())
+      .renameOutputFields(1)
+      .name(streamName)
+      .alert(Seq(streamName),streamExecutorId)
+  env.execute()
 }
 
 object KafkaStreamMonitor extends KafkaStreamMonitorApp

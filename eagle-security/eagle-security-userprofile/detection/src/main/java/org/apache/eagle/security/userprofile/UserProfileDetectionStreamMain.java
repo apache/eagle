@@ -19,9 +19,7 @@
 package org.apache.eagle.security.userprofile;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
 import org.apache.eagle.datastream.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,20 +32,14 @@ public class UserProfileDetectionStreamMain {
     private final static Logger LOG = LoggerFactory.getLogger(UserProfileDetectionStreamMain.class);
 
     public static void main(String[] args) throws Exception{
-        Config config = new ConfigOptionParser().load(args);
 
-        LOG.info("Config class: " + config.getClass().getCanonicalName());
-
-        if(LOG.isDebugEnabled()) LOG.debug("Config content:"+config.root().render(ConfigRenderOptions.concise()));
-
-        StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1).name("kafkaMsgConsumer")
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
+        env.from(new KafkaSourcedSpoutProvider()).renameOutputFields(1).name("kafkaMsgConsumer")
                 .flatMap(new AuditLogTransformer()).name("transformer")     // [user,map]
                 .groupBy(Arrays.asList(0))                                      // group by [user]
                 .flatMap(new UserProfileAggregatorExecutor()).name("aggregator")
                 .alertWithConsumer(Arrays.asList(UserProfileDetectionConstants.USER_ACTIVITY_AGGREGATION_STREAM),
                         UserProfileDetectionConstants.USER_PROFILE_ANOMALY_DETECTION_EXECUTOR); // alert
-                ;
         env.execute();
     }
 

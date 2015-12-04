@@ -26,7 +26,7 @@ import scala.collection.{JavaConversions, mutable}
 /**
  * wrapper of DAG, used for storm topology compiler
  */
-class StormStreamDAG(graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) extends AbstractStreamProducerGraph {
+class StreamDAG(val graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) extends AbstractStreamProducerGraph {
   var nodeMap: mutable.Map[String, StreamProducer[Any]] = null
 
   override def addEdge(from: StreamProducer[Any], to: StreamProducer[Any], streamConnector: StreamConnector[Any,Any]): Unit = {

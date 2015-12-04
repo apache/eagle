@@ -20,33 +20,21 @@ package org.apache.eagle.security.auditlog;
 
 import backtype.storm.spout.SchemeAsMultiScheme;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
-import org.apache.eagle.datastream.ExecutionEnvironmentFactory;
+import org.apache.eagle.datastream.ExecutionEnvironments;
 import org.apache.eagle.datastream.StormExecutionEnvironment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class HdfsAuditLogProcessorMain {
-	private static final Logger LOG = LoggerFactory.getLogger(HdfsAuditLogProcessorMain.class);
 
 	public static void main(String[] args) throws Exception{
-        Config config = new ConfigOptionParser().load(args);
-
-        LOG.info("Config class: " + config.getClass().getCanonicalName());
-
-        if(LOG.isDebugEnabled()) LOG.debug("Config content:"+config.root().render(ConfigRenderOptions.concise()));
-
-        StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-
-        String deserClsName = config.getString("dataSourceConfig.deserializerClass");
-        final KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, config) {
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
+        String deserClsName = env.getConfig().getString("dataSourceConfig.deserializerClass");
+        final KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, env.getConfig()) {
                 @Override
                 public List<Object> deserialize(byte[] ser) {
                         Object tmp = deserializer.deserialize(ser);
@@ -60,7 +48,7 @@ public class HdfsAuditLogProcessorMain {
                         return new SchemeAsMultiScheme(scheme);
                 }
         };
-        env.newSource(provider.getSpout(config)).renameOutputFields(2).name("kafkaMsgConsumer").groupBy(Arrays.asList(0))
+        env.from(provider.getSpout(env.getConfig())).renameOutputFields(2).name("kafkaMsgConsumer").groupBy(Arrays.asList(0))
                 .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new IPZoneDataJoinExecutor())
                 .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");

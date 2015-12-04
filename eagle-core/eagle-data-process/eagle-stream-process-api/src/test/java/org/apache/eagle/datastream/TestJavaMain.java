@@ -35,17 +35,17 @@ public class TestJavaMain {
     //@Test
     public void testGeneral(){
         Config config = ConfigFactory.load();
-        StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new TestKeyValueSpout()).renameOutputFields(2).groupBy(Arrays.asList(0)).flatMap(new GroupedEchoExecutor()).parallelism(2);
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
+        env.from(new TestKeyValueSpout()).renameOutputFields(2).groupBy(Arrays.asList(0)).flatMap(new GroupedEchoExecutor()).parallelism(2);
         env.execute();
     }
 
     //@Test
     public void testMap(){
         Config config = ConfigFactory.load();
-        StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
         SerializableFunction1 f1 = new SerializableFunction1<Object, Object>();
-        env.newSource(new TestKeyValueSpout()).renameOutputFields(2).
+        env.from(new TestKeyValueSpout()).renameOutputFields(2).
                 map1(f1);
         env.execute();
     }

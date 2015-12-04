@@ -19,10 +19,7 @@
 package org.apache.eagle.security.userprofile;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigRenderOptions;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
 import org.apache.eagle.datastream.*;
 import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.slf4j.Logger;
@@ -31,19 +28,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 public class UserProfileDetectionBatchMain {
-    private final static Logger LOG = LoggerFactory.getLogger(UserProfileDetectionBatchMain.class);
-
     public static void main(String[] args) throws Exception{
-        new ConfigOptionParser().load(args);
-        System.setProperty("config.trace", "loads");
-        Config config = ConfigFactory.load();
-
-        LOG.info("Config class: " + config.getClass().getCanonicalName());
-
-        if(LOG.isDebugEnabled()) LOG.debug("Config content:"+config.root().render(ConfigRenderOptions.concise()));
-
-        StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        env.newSource(new KafkaSourcedSpoutProvider().getSpout(config)).renameOutputFields(1)
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
+        env.from(new KafkaSourcedSpoutProvider()).renameOutputFields(1)
                 .flatMap(new UserActivityPartitionExecutor())
                 .alertWithConsumer(UserProfileDetectionConstants.USER_ACTIVITY_AGGREGATION_STREAM,
                         UserProfileDetectionConstants.USER_PROFILE_ANOMALY_DETECTION_EXECUTOR);
