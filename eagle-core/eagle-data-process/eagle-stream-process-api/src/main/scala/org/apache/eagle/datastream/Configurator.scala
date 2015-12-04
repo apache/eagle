@@ -24,7 +24,7 @@ import scala.reflect.runtime.universe._
 /**
  * @since  12/4/15
  */
-case class ConfigWrapper(private var config:Config) extends Serializable{
+case class Configurator(private var config:Config) extends Serializable{
   def get:Config = config
 
   def set[T<:AnyRef](key:String,value:T): Unit = {

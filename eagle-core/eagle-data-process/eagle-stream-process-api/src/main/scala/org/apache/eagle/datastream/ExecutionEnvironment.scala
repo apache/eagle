@@ -30,7 +30,7 @@ import scala.reflect.runtime.universe._
  */
 trait ExecutionEnvironment{
 
-  def config:ConfigWrapper
+  def config:Configurator
 
   /**
    * Business logic DAG
@@ -55,7 +55,7 @@ trait ExecutionEnvironment{
 abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment {
   private val LOG = LoggerFactory.getLogger(classOf[ExecutionEnvironmentBase])
   private val _dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
-  private val _config:ConfigWrapper = ConfigWrapper(conf)
+  private val _config:Configurator = Configurator(conf)
 
   override def dag = _dag
   override def config = _config
