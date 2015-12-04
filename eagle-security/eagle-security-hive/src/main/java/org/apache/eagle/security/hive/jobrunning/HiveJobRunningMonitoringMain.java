@@ -30,10 +30,10 @@ public class HiveJobRunningMonitoringMain {
 
 	public static void main(String[] args) throws Exception{
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
-
         String spoutName = "msgConsumer";
         int parallelism = env.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
-        env.from(new HiveJobRunningSourcedStormSpoutProvider().getSpout(env.getConfig(), parallelism)).renameOutputFields(4).name(spoutName).groupBy(Arrays.asList(0))
+        env.from(new HiveJobRunningSourcedStormSpoutProvider().getSpout(env.getConfig(), parallelism))
+                .renameOutputFields(4).name(spoutName).groupBy(Arrays.asList(0))
                 .flatMap(new JobConfigurationAdaptorExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveQueryParserExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new HiveResourceSensitivityDataJoinExecutor())

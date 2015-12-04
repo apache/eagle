@@ -102,7 +102,7 @@ public class AlertExecutorCreationUtils {
         String alertExecutorConfigsKey = "alertExecutorConfigs";
         if(config.hasPath(alertExecutorConfigsKey)) {
             Map<String, ConfigValue> alertExecutorConfigs = config.getObject(alertExecutorConfigsKey);
-            if(alertExecutorConfigs !=null && alertExecutorConfigs.containsKey(alertExecutorConfigs)) {
+            if(alertExecutorConfigs !=null && alertExecutorConfigs.containsKey(alertExecutorId)) {
                 Map<String, Object> alertExecutorConfig = (Map<String, Object>) alertExecutorConfigs.get(alertExecutorId).unwrapped();
                 int parts = 0;
                 if(alertExecutorConfig.containsKey("parallelism")) parts = (int) (alertExecutorConfig.get("parallelism"));

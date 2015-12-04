@@ -20,10 +20,18 @@ package org.apache.eagle.security.auditlog;
 
 import backtype.storm.spout.SchemeAsMultiScheme;
 import com.typesafe.config.Config;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
 import org.apache.eagle.datastream.ExecutionEnvironments;
 import org.apache.eagle.datastream.StormExecutionEnvironment;
+import org.apache.eagle.partition.DataDistributionDao;
+import org.apache.eagle.partition.PartitionAlgorithm;
+import org.apache.eagle.partition.PartitionStrategy;
+import org.apache.eagle.partition.PartitionStrategyImpl;
+import org.apache.eagle.security.partition.DataDistributionDaoImpl;
+import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,27 +39,69 @@ import java.util.Map;
 
 public class HdfsAuditLogProcessorMain {
 
-	public static void main(String[] args) throws Exception{
-        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
-        String deserClsName = env.getConfig().getString("dataSourceConfig.deserializerClass");
-        final KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, env.getConfig()) {
-                @Override
-                public List<Object> deserialize(byte[] ser) {
-                        Object tmp = deserializer.deserialize(ser);
-                        Map<String, Object> map = (Map<String, Object>)tmp;
-                        if(tmp == null) return null;
-                        return Arrays.asList(map.get("user"), tmp);
-                }
-        };
-        KafkaSourcedSpoutProvider provider = new KafkaSourcedSpoutProvider() {
-                public SchemeAsMultiScheme getStreamScheme(String deserClsName, Config context) {
-                        return new SchemeAsMultiScheme(scheme);
-                }
-        };
-        env.from(provider.getSpout(env.getConfig())).renameOutputFields(2).name("kafkaMsgConsumer").groupBy(Arrays.asList(0))
+    public static PartitionStrategy createStrategy(Config config) {
+        String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
+        Integer port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
+        String username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
+        String password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
+        String topic = config.getString("dataSourceConfig.topic");
+        DataDistributionDao dao = new DataDistributionDaoImpl(host, port, username, password, topic);
+        PartitionAlgorithm algorithm = new GreedyPartitionAlgorithm();
+        String key1 = EagleConfigConstants.EAGLE_PROPS + ".partitionRefreshIntervalInMin";
+        Integer partitionRefreshIntervalInMin = config.hasPath(key1) ? config.getInt(key1) : 60;
+        String key2 = EagleConfigConstants.EAGLE_PROPS + ".kafkaStatisticRangeInMin";
+        Integer kafkaStatisticRangeInMin =  config.hasPath(key2) ? config.getInt(key2) : 60;
+        PartitionStrategy strategy = new PartitionStrategyImpl(dao, algorithm, partitionRefreshIntervalInMin * DateUtils.MILLIS_PER_MINUTE, kafkaStatisticRangeInMin * DateUtils.MILLIS_PER_MINUTE);
+        return strategy;
+    }
+
+    public static KafkaSourcedSpoutProvider createProvider(Config config) {
+         String deserClsName = config.getString("dataSourceConfig.deserializerClass");
+         final KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, config) {
+                 @Override
+                 public List<Object> deserialize(byte[] ser) {
+                         Object tmp = deserializer.deserialize(ser);
+                         Map<String, Object> map = (Map<String, Object>)tmp;
+                         if(tmp == null) return null;
+                         return Arrays.asList(map.get("user"), tmp);
+                 }
+         };
+         KafkaSourcedSpoutProvider provider = new KafkaSourcedSpoutProvider() {
+                 @Override
+                 public SchemeAsMultiScheme getStreamScheme(String deserClsName, Config context) {
+                         return new SchemeAsMultiScheme(scheme);
+                  }
+         };
+         return provider;
+    }
+
+    public static void execWithDefaultPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
+        env.from(provider.getSpout(config)).renameOutputFields(2).name("kafkaMsgConsumer").groupBy(Arrays.asList(0))
                 .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new IPZoneDataJoinExecutor())
                 .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();
+    }
+
+    public static void execWithBalancedPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
+        PartitionStrategy strategy = createStrategy(config);
+        env.from(provider).renameOutputFields(2).name("kafkaMsgConsumer").customGroupBy(strategy)
+                .flatMap(new FileSensitivityDataJoinExecutor())
+                .customGroupBy(strategy)
+                .flatMap(new IPZoneDataJoinExecutor())
+                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor", strategy);
+        env.execute();
+    }
+
+	public static void main(String[] args) throws Exception{
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
+        Config config = env.getConfig();
+        KafkaSourcedSpoutProvider provider = createProvider(env.getConfig());
+        Boolean balancePartition = config.hasPath("eagleProps.balancePartitionEnabled") && config.getBoolean("eagleProps.balancePartitionEnabled");
+        if (balancePartition) {
+            execWithBalancedPartition(config, env, provider);
+        } else {
+            execWithDefaultPartition(config, env, provider);
+        }
 	}
 }

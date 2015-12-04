@@ -61,7 +61,7 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor2<String, Ma
         String user = (String)input.get(0);
         @SuppressWarnings("unchecked")
         Map<String, Object> hiveQueryLog = (Map<String, Object>)input.get(1);
-        LOG.info("Receive hive query log: " + hiveQueryLog);
+        //if(LOG.isDebugEnabled()) LOG.debug("Receive hive query log: " + hiveQueryLog);
 
         String query = null;
         String db = null;
@@ -95,15 +95,22 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor2<String, Ma
             }
         }
 
-        HiveQLParserContent parserContent;
+        HiveQLParserContent parserContent = null;
         Parser queryParser = new Parser();
         try {
             parserContent = queryParser.run(query);
         } catch (Exception ex) {
             LOG.error("Failed running hive query parser.", ex);
-            throw new IllegalStateException(ex);
+            //throw new IllegalStateException(ex);
         }
-
+        if(parserContent == null) {
+            LOG.warn("Event ignored as it can't be correctly parsed, the query log is " + query);
+            return;
+        }
+        if(parserContent.getTableColumnMap().size() == 0) {
+            LOG.warn("Unsupported command for parsing " + query);
+            return;
+        }
         /**
          * Generate "resource" field: /db/table/column
          * "resource" -> </db/table/column1,/db/table/column2,...>
@@ -111,8 +118,7 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor2<String, Ma
         StringBuilder resources = new StringBuilder();
         String prefix = ",";
         String connector = "/";
-        for (Entry<String, Set<String>> entry
-                : parserContent.getTableColumnMap().entrySet()) {
+        for (Entry<String, Set<String>> entry : parserContent.getTableColumnMap().entrySet()) {
             String table = entry.getKey();
             Set<String> colSet = entry.getValue();
             /**

@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
+import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
-import scala.collection.JavaConversions
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
@@ -50,7 +50,7 @@ trait StreamProtocol[+T]{
 
   def union[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3]
 
-  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean)
+  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
 
   /**
    * Set processing element parallelism setting
@@ -166,7 +166,17 @@ abstract class StreamProducer[+T](val id:Int = UniqueId.incrementAndGetId(),var 
   }
 
   override def union[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
-    val ret = StreamUnionProducer[T,T2,T3](others)
+    val ret = StreamUnionProducer[T, T2, T3](others)
+    hookupDAG(this, ret)
+    ret
+  }
+
+  def union[T2,T3](others : util.List[StreamProducer[T2]]) : StreamProducer[T3] = {
+    union(others);
+  }
+
+  def customGroupBy(strategy : PartitionStrategy) : StreamProducer[T] = {
+    val ret = GroupByProducer(strategy)
     hookupDAG(this, ret)
     ret
   }
@@ -174,26 +184,33 @@ abstract class StreamProducer[+T](val id:Int = UniqueId.incrementAndGetId(),var 
   /**
    * alert is always sink of data flow
    */
-  def alertWithConsumer(upStreamNames: util.List[String], alertExecutorId : String) = {
-    alert(upStreamNames.asScala, alertExecutorId, consume = true)
+  def alertconsume(upStreamNames: util.List[String], alertExecutorId : String) = {
+    alert(upStreamNames.asScala, alertExecutorId,consume = true)
   }
 
   def alertWithoutConsumer(upStreamNames: util.List[String], alertExecutorId : String) = {
     alert(upStreamNames.asScala, alertExecutorId, consume = false)
   }
 
-  override def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean = true) = {
-    val ret = AlertStreamSink(JavaConversions.asJavaList(upStreamNames), alertExecutorId, consume)
+  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean=true, strategy : PartitionStrategy=null) = {
+    val ret = AlertStreamSink(upStreamNames, alertExecutorId, consume, strategy)
     hookupDAG(this, ret)
-    ret
   }
 
-  def alertWithConsumer(upStreamName: String, alertExecutorId : String) ={
-    alert(Seq(upStreamName), alertExecutorId, consume = true)
+  def alertWithConsumer(upStreamName: String, alertExecutorId : String, strategy: PartitionStrategy): Unit ={
+    alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = true, strategy = strategy)
   }
 
-  def alertWithoutConsumer(upStreamName: String, alertExecutorId : String) ={
-    alert(Seq(upStreamName), alertExecutorId, consume = false)
+  def alertWithConsumer(upStreamName: String, alertExecutorId : String): Unit ={
+    alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = true)
+  }
+
+  def alertWithoutConsumer(upStreamName: String, alertExecutorId : String, strategy: PartitionStrategy): Unit ={
+    alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false, strategy)
+  }
+
+  def alertWithoutConsumer(upStreamName: String, alertExecutorId : String): Unit ={
+    alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
 
   protected def hookupDAG[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2]) = {
@@ -229,7 +246,12 @@ case class FlatMapProducer[T, R](var mapper: FlatMapper[R]) extends StreamProduc
 
 case class MapProducer[T,R](numOutputFields : Int, var fn : T => R) extends StreamProducer[R]
 
-case class GroupByProducer[T](fields : Seq[Int]) extends StreamProducer[T]
+case class GroupByProducer[T](fields : Seq[Int], partitionStrategy: PartitionStrategy) extends StreamProducer[T]
+
+object GroupByProducer {
+  def apply[T](fields: Seq[Int]) = new GroupByProducer[T](fields, null)
+  def apply[T](partitionStrategy : PartitionStrategy) = new GroupByProducer[T](Nil, partitionStrategy)
+}
 
 case class StreamUnionProducer[T1,T2,T3](others: Seq[StreamProducer[T2]]) extends StreamProducer[T3]
 
@@ -246,9 +268,9 @@ case class StormSourceProducer[+T](source : BaseRichSpout) extends StreamProduce
   }
 }
 
-case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var withConsumer: Boolean=true) extends StreamProducer[AlertAPIEntity]{
-  def consume(withConsumer:Boolean): AlertStreamSink ={
-    this.withConsumer = withConsumer
+case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
+  def consume(consume: Boolean): AlertStreamSink = {
+    this.consume = consume
     this
   }
 }

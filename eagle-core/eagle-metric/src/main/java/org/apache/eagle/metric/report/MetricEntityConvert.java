@@ -25,7 +25,7 @@ public class MetricEntityConvert {
         GenericMetricEntity entity = new GenericMetricEntity();
         entity.setPrefix(metric.getMetricName());
         entity.setValue(new double[]{metric.getValue().get()});
-        entity.setTags(metric.getDemensions());
+        entity.setTags(metric.getDimensions());
         entity.setTimestamp(metric.getTimestamp());
         return entity;
 	}

@@ -21,7 +21,7 @@ import org.apache.eagle.job.JobPartitioner;
 import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig;
 import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig.ControlConfig;
 import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig.RunningJobEndpointConfig;
-import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig.ZKStateConfig;
+import org.apache.eagle.dataproc.impl.storm.zookeeper.ZKStateConfig;
 import org.apache.eagle.jobrunning.storm.JobRunningSpout;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;

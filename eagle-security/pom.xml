@@ -41,5 +41,6 @@
     <module>eagle-security-hdfs-securitylog</module>
     <module>eagle-security-hbase-securitylog</module>
     <module>eagle-security-hbase-web</module>
+	<module>eagle-metric-collection</module>
   </modules>
 </project>

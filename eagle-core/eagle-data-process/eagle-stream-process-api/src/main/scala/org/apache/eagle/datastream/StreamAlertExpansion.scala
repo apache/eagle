@@ -68,7 +68,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
   def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
                dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], child: StreamProducer[Any]): Unit = {
     child match {
-      case AlertStreamSink(upStreamNames, alertExecutorId, withConsumer) => {
+      case AlertStreamSink(upStreamNames, alertExecutorId, withConsumer,strategy) => {
         /**
          * step 1: wrapper previous StreamProducer with one more field "streamName"
          * for AlertStreamSink, we check previous StreamProducer and replace that
@@ -107,6 +107,12 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
           t.setGraph(dag)
           alertProducers += t
           newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector[Any,Any](newsp, t).groupBy(Seq(0)))
+          if (strategy == null) {
+             newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp, t).groupBy(Seq(0)))
+          }
+          else {
+            newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp, t).customGroupBy(strategy))
+          }
         })
 
         // remove AlertStreamSink

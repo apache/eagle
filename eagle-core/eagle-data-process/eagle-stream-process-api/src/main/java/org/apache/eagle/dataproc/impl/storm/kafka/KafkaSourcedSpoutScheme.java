@@ -51,7 +51,6 @@ public class KafkaSourcedSpoutScheme implements Scheme {
 	@Override
 	public List<Object> deserialize(byte[] ser) {
 		Object tmp = deserializer.deserialize(ser);
-		Map<String, Object> map = (Map<String, Object>)tmp;
 		if(tmp == null)
 			return null;
 		// the following tasks are executed within the same process of kafka spout

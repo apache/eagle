@@ -21,6 +21,6 @@ import java.util.List;
 import org.apache.eagle.metric.Metric;
 
 public interface MetricReport {
-	 
-	public void emit(List<Metric> list);
+	// The method should be thread safe
+	void emit(List<Metric> list);
 }

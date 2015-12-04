@@ -21,24 +21,19 @@ package org.apache.eagle.security.userprofile;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.datastream.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class UserProfileDetectionStreamMain {
-    private final static Logger LOG = LoggerFactory.getLogger(UserProfileDetectionStreamMain.class);
-
     public static void main(String[] args) throws Exception{
-
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
         env.from(new KafkaSourcedSpoutProvider()).renameOutputFields(1).name("kafkaMsgConsumer")
                 .flatMap(new AuditLogTransformer()).name("transformer")     // [user,map]
                 .groupBy(Arrays.asList(0))                                      // group by [user]
                 .flatMap(new UserProfileAggregatorExecutor()).name("aggregator")
-                .alertWithConsumer(Arrays.asList(UserProfileDetectionConstants.USER_ACTIVITY_AGGREGATION_STREAM),
+                .alertWithConsumer(UserProfileDetectionConstants.USER_ACTIVITY_AGGREGATION_STREAM,
                         UserProfileDetectionConstants.USER_PROFILE_ANOMALY_DETECTION_EXECUTOR); // alert
         env.execute();
     }
