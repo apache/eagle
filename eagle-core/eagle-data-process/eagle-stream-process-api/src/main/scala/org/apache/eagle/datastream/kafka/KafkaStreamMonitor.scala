@@ -17,10 +17,10 @@
 package org.apache.eagle.datastream.kafka
 
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
-import org.apache.eagle.datastream.ExecutionEnvironments
+import org.apache.eagle.datastream.{StormExecutionEnvironment, ExecutionEnvironments}
 
 class KafkaStreamMonitorApp extends App {
-  val env = ExecutionEnvironments.getStorm(args)
+  val env = ExecutionEnvironments.get[StormExecutionEnvironment](args)
 
   val streamName = env.config.get[String]("eagle.stream.name","eventStream")
   val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")

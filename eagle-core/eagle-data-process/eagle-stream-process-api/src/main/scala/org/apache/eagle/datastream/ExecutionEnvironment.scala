@@ -17,13 +17,17 @@
 package org.apache.eagle.datastream
 
 import backtype.storm.topology.base.BaseRichSpout
-import com.typesafe.config.{ConfigFactory, Config}
+import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.eagle.dataproc.impl.storm.StormSpoutProvider
 import org.apache.eagle.dataproc.util.ConfigOptionParser
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 
+import scala.reflect.runtime.universe._
 
+/**
+ * @since 0.3.0
+ */
 trait ExecutionEnvironment{
 
   def config:ConfigWrapper
@@ -48,8 +52,8 @@ trait ExecutionEnvironment{
 }
 
 
-abstract class BaseExecutionEnvironment(private val conf:Config)  extends ExecutionEnvironment {
-  private val LOG = LoggerFactory.getLogger(classOf[BaseExecutionEnvironment])
+abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment {
+  private val LOG = LoggerFactory.getLogger(classOf[ExecutionEnvironmentBase])
   private val _dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
   private val _config:ConfigWrapper = ConfigWrapper(conf)
 
@@ -81,7 +85,7 @@ abstract class BaseExecutionEnvironment(private val conf:Config)  extends Execut
   def execute(dag: StreamDAG)
 }
 
-case class StormExecutionEnvironment(private val conf:Config) extends BaseExecutionEnvironment(conf){
+case class StormExecutionEnvironment(private val conf:Config) extends ExecutionEnvironmentBase(conf){
   override def execute(dag: StreamDAG) : Unit = {
     StormTopologyCompiler(config.get, dag).buildTopology.execute
   }
@@ -98,18 +102,111 @@ case class StormExecutionEnvironment(private val conf:Config) extends BaseExecut
 }
 
 /**
- * Execution Environment should not know any implementation layer type
+ * Execution environment factory
  *
+ * The factory is mainly used for create or manage execution environment,
+ * and also handles the shared works like configuration, arguments for execution environment
+ *
+ * Notice: this factory class should not know any implementation like storm or spark
+ *
+ * @since 0.3.0
  */
 object ExecutionEnvironments{
+  /**
+   * Use `'''get[StormExecutionEnvironment](config)'''` instead
+   *
+   * @param config
+   * @return
+   */
+  @deprecated("Execution environment should not know implementation of Storm")
   def getStorm(config : Config) = new StormExecutionEnvironment(config)
 
+  /**
+   * Use `'''get[StormExecutionEnvironment]'''` instead
+   *
+   * @return
+   */
+  @deprecated("Execution environment should not know implementation of Storm")
   def getStorm:StormExecutionEnvironment = {
     val config = ConfigFactory.load()
     getStorm(config)
   }
 
+  /**
+   * Use `'''get[StormExecutionEnvironment](args)'''` instead
+   *
+   * @see get[StormExecutionEnvironment](args)
+   *
+   * @param args
+   * @return
+   */
+  @deprecated("Execution environment should not know implementation of Storm")
   def getStorm(args:Array[String]):StormExecutionEnvironment = {
     getStorm(new ConfigOptionParser().load(args))
+  }
+
+  /**
+   * @param typeTag
+   * @tparam T
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](implicit typeTag: TypeTag[T]): T ={
+    get[T](ConfigFactory.load())
+  }
+
+  /**
+   *
+   * @param config
+   * @param typeTag
+   * @tparam T
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](config:Config)(implicit typeTag: TypeTag[T]): T ={
+    typeTag.mirror.runtimeClass(typeOf[T]).getConstructor(classOf[Config]).newInstance(config).asInstanceOf[T]
+  }
+
+  /**
+   *
+   * @param args
+   * @param typeTag
+   * @tparam T
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](args:Array[String])(implicit typeTag: TypeTag[T]): T ={
+    get[T](new ConfigOptionParser().load(args))
+  }
+
+  /**
+   * Support java style for default config
+   *
+   * @param clazz execution environment class
+   * @tparam T execution environment type
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](clazz:Class[T]):T ={
+    get[T](ConfigFactory.load(),clazz)
+  }
+
+  /**
+   * Support java style
+   * @param config command config
+   * @param clazz execution environment class
+   * @tparam T execution environment type
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](config:Config,clazz:Class[T]):T ={
+    clazz.getConstructor(classOf[Config]).newInstance(config)
+  }
+
+  /**
+   * Support java style
+   *
+   * @param args command arguments in string array
+   * @param clazz execution environment class
+   * @tparam T execution environment type
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](args:Array[String],clazz:Class[T]):T ={
+    clazz.getConstructor(classOf[Config]).newInstance(new ConfigOptionParser().load(args))
   }
 }
