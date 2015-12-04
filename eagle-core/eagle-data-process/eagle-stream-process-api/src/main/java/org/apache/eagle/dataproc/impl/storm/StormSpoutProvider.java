@@ -24,6 +24,6 @@ import com.typesafe.config.Config;
  * Normally storm spout is a special part of storm topology and it is implemented in underlying spout implementation
  * which can be retrieved from getSpout method.
  */
-public abstract class AbstractStormSpoutProvider{
-	public abstract BaseRichSpout getSpout(Config context);
+public interface StormSpoutProvider {
+	public BaseRichSpout getSpout(Config context);
 }

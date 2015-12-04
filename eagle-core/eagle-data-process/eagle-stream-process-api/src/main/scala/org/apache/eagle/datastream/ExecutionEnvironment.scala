@@ -18,7 +18,7 @@ package org.apache.eagle.datastream
 
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.{ConfigFactory, Config}
-import org.apache.eagle.dataproc.impl.storm.AbstractStormSpoutProvider
+import org.apache.eagle.dataproc.impl.storm.StormSpoutProvider
 import org.apache.eagle.dataproc.util.ConfigOptionParser
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
@@ -94,9 +94,13 @@ case class StormExecutionEnvironment(private val conf:Config) extends BaseExecut
     ret
   }
 
-  def from[T](sourceProvider: AbstractStormSpoutProvider):StormSourceProducer[T] = from(sourceProvider.getSpout(config.get))
+  def from[T](sourceProvider: StormSpoutProvider):StormSourceProducer[T] = from(sourceProvider.getSpout(config.get))
 }
 
+/**
+ * Execution Environment should not know any implementation layer type
+ *
+ */
 object ExecutionEnvironments{
   def getStorm(config : Config) = new StormExecutionEnvironment(config)
 

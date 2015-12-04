@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 public class HdfsAuditLogProcessorMain {
-
     public static PartitionStrategy createStrategy(Config config) {
+        // TODO: Refactor configuration structure to avoid repeated config processing configure
         String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
         Integer port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
         String username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);

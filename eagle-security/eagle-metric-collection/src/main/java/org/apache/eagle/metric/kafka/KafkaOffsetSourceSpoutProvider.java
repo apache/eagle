@@ -19,13 +19,11 @@ package org.apache.eagle.metric.kafka;
 import backtype.storm.topology.base.BaseRichSpout;
 import com.typesafe.config.Config;
 import org.apache.eagle.common.config.EagleConfigConstants;
-import org.apache.eagle.dataproc.impl.storm.AbstractStormSpoutProvider;
+import org.apache.eagle.dataproc.impl.storm.StormSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.zookeeper.ZKStateConfig;
 import org.apache.eagle.service.client.ServiceConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class KafkaOffsetSourceSpoutProvider extends AbstractStormSpoutProvider{
+public class KafkaOffsetSourceSpoutProvider implements StormSpoutProvider {
 	public BaseRichSpout getSpout(Config config){
 
 		ZKStateConfig zkStateConfig = new ZKStateConfig();
