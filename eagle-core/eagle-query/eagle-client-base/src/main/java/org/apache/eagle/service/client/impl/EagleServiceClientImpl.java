@@ -19,6 +19,7 @@ package org.apache.eagle.service.client.impl;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceClientException;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.EagleServiceSingleEntityQueryRequest;
 import com.sun.jersey.api.client.WebResource;
 import org.slf4j.Logger;
@@ -34,6 +35,10 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
 
     public EagleServiceClientImpl(String host, int port){
         super(host, port);
+    }
+
+    public EagleServiceClientImpl(EagleServiceConnector connector){
+        this(connector.getEagleServiceHost(), connector.getEagleServicePort(), connector.getUsername(), connector.getPassword());
     }
 
     public EagleServiceClientImpl(String host, int port, String username, String password){

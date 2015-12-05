@@ -27,5 +27,5 @@ import java.util.List;
  * interface for user command pattern READ
  */
 public interface HdfsUserCommandPatternDAO {
-    List<HdfsUserCommandPatternEntity> findAllPatterns();
+    List<HdfsUserCommandPatternEntity> findAllPatterns() throws Exception;
 }

@@ -24,6 +24,8 @@ import org.apache.eagle.alert.siddhi.SiddhiStreamMetadataUtils;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
 import org.apache.eagle.datastream.Tuple2;
+import org.apache.eagle.security.hdfs.entity.HdfsUserCommandPatternEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
@@ -61,9 +63,9 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
     }
 
     private static class GenericQueryCallback extends QueryCallback{
-        private SortedMap<String, String> outputSelector;
-        private SortedMap<String, String> outputModifier;
-        public GenericQueryCallback(SortedMap<String, String> outputSelector, SortedMap<String, String> outputModifier){
+        private Map<String, String> outputSelector;
+        private Map<String, String> outputModifier;
+        public GenericQueryCallback(Map<String, String> outputSelector, Map<String, String> outputModifier){
             this.outputSelector = outputSelector;
             this.outputModifier = outputModifier;
         }
@@ -93,11 +95,29 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
         SiddhiManager siddhiManager = new SiddhiManager();
         StringBuilder sb = new StringBuilder();
         sb.append(streamDef);
-        for(HdfsUserCommandPatternEnum rule : HdfsUserCommandPatternEnum.values()){
-            sb.append(String.format("@info(name = '%s') from ", rule.getUserCommand()));
+        String readFrom = null;
+        try {
+            readFrom = config.getString("eagleProps.readHdfsUserCommandPatternFrom");
+        }catch(Exception ex){
+            LOG.warn("no config for readHdfsUserCommandPatternFrom", ex);
+            readFrom = "file";
+        }
+        List<HdfsUserCommandPatternEntity> list = null;
+        try {
+            if (readFrom.equals("file")) {
+                list = new HdfsUserCommandPatternByFileImpl().findAllPatterns();
+            } else {
+                list = new HdfsUserCommandPatternByDBImpl(new EagleServiceConnector(config)).findAllPatterns();
+            }
+        }catch(Exception ex){
+            LOG.error("fail reading hfdsUserCommandPattern", ex);
+            throw new IllegalStateException(ex);
+        }
+        for(HdfsUserCommandPatternEntity rule : list){
+            sb.append(String.format("@info(name = '%s') from ", rule.getTags().get("userCommand")));
             sb.append(rule.getPattern());
             sb.append(" select a.context, ");
-            for(SortedMap.Entry<String, String> entry : rule.getOutputSelector().entrySet()){
+            for(Map.Entry<String, String> entry : rule.getFieldSelector().entrySet()){
                 sb.append(entry.getValue());
                 sb.append(" as ");
                 sb.append(entry.getKey());
@@ -105,13 +125,15 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
             }
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("insert into ");
-            sb.append(rule.getUserCommand());
+            sb.append(rule.getTags().get("userCommand"));
             sb.append("_outputStream;");
         }
+
+        LOG.info("patterns: " + sb.toString());
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(sb.toString());
 
-        for(HdfsUserCommandPatternEnum rule : HdfsUserCommandPatternEnum.values()){
-            executionPlanRuntime.addCallback(rule.getUserCommand(), new GenericQueryCallback(rule.getOutputSelector(), rule.getOutputModifier()));
+        for(HdfsUserCommandPatternEntity rule : list){
+            executionPlanRuntime.addCallback(rule.getTags().get("userCommand"), new GenericQueryCallback(rule.getFieldSelector(), rule.getFieldModifier()));
         }
 
         inputHandler = executionPlanRuntime.getInputHandler(streamName);

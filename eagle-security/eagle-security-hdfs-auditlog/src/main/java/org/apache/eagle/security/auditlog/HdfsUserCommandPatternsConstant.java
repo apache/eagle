@@ -32,9 +32,9 @@ public class HdfsUserCommandPatternsConstant {
      * 2015-11-19 23:57:03,046 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=append src=/tmp/private dst=null perm=null proto=rpc
      * 2015-11-19 23:57:03,118 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc
      */
-    public static String APPEND_PATTERN = "every a = eventStream[cmd=='getfileinfo'] " +
+    public static String APPEND_PATTERN = "every (a = eventStream[cmd=='getfileinfo'] " +
             "-> b = eventStream[cmd=='append' and user==a.user and src==a.src] " +
-            "-> c = eventStream[cmd=='getfileinfo'and user==a.user and src==a.src] ";
+            "-> c = eventStream[cmd=='getfileinfo'and user==a.user and src==a.src]) ";
 
     public static SortedMap<String, String> APPEND_SIDDHI_OUTPUT_SELECTOR = new TreeMap<String, String>() {{
         put("timestamp", "a.timestamp");
@@ -60,8 +60,8 @@ public class HdfsUserCommandPatternsConstant {
      * 2015-11-19 23:47:29,026 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=open src=/tmp/private dst=null perm=null proto=rpc
      */
 
-    public static String READ_PATTERN = "every a = eventStream[cmd=='getfileinfo'] " +
-            "-> b = eventStream[cmd=='open' and user==a.user and src==a.src] ";
+    public static String READ_PATTERN = "every (a = eventStream[cmd=='getfileinfo'] " +
+            "-> b = eventStream[cmd=='open' and user==a.user and src==a.src]) ";
 
     public static SortedMap<String, String> READ_SIDDHI_OUTPUT_SELECTOR = new TreeMap<String, String>() {{
         put("timestamp", "a.timestamp");
@@ -85,12 +85,12 @@ public class HdfsUserCommandPatternsConstant {
      * 2015-11-20 00:06:47,609 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=delete src=/tmp/private dst=null perm=null proto=rpc
      * 2015-11-20 00:06:47,624 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=rename src=/tmp/private._COPYING_ dst=/tmp/private perm=root:hdfs:rw-r--r-- proto=rpc
      */
-    public static String COPYFROMLOCAL_PATTERN = "every a = eventStream[cmd=='getfileinfo'] " +
+    public static String COPYFROMLOCAL_PATTERN = "every (a = eventStream[cmd=='getfileinfo'] " +
             "-> b = eventStream[cmd=='getfileinfo' and user==a.user and src==str:concat(a.src,'._COPYING_')] " +
             "-> c = eventStream[cmd=='create' and user==a.user and src==b.src] " +
             "-> d = eventStream[cmd=='getfileinfo' and user==a.user and src==b.src] " +
             "-> e = eventStream[cmd=='delete' and user==a.user and src==a.src] " +
-            "-> f = eventStream[cmd=='rename' and user==a.user and src==b.src and dst==a.src] ";
+            "-> f = eventStream[cmd=='rename' and user==a.user and src==b.src and dst==a.src]) ";
 
     public static SortedMap<String, String> COPYFROMLOCAL_SIDDHI_OUTPUT_SELECTOR = new TreeMap<String, String>() {{
         put("timestamp", "a.timestamp");
