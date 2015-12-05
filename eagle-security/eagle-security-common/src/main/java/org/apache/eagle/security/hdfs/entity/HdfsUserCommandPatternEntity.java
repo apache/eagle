@@ -30,11 +30,21 @@ import java.util.Map;
 @Table("hdfsusercommandpattern")
 @ColumnFamily("f")
 @Prefix("hdfsusercommandpattern")
-@Service("HdfsUserCommandPatternService")
+@Service(HdfsUserCommandPatternEntity.HDFS_USER_COMMAND_PATTERN_SERVICE)
 @TimeSeries(false)
 @Tags({"userCommand"})
 public class HdfsUserCommandPatternEntity extends TaggedLogAPIEntity {
+    public static final String HDFS_USER_COMMAND_PATTERN_SERVICE = "HdfsUserCommandPatternService";
     @Column("a")
+    private String description;
+    public String getDescription(){
+        return description;
+    }
+    public void setDescription(String description){
+        this.description = description;
+    }
+
+    @Column("b")
     private String pattern;
 
     public String getPattern() {
@@ -46,7 +56,7 @@ public class HdfsUserCommandPatternEntity extends TaggedLogAPIEntity {
         valueChanged("pattern");
     }
 
-    @Column("b")
+    @Column("c")
     private Map<String, String> fieldSelector;
 
     public Map<String, String> getFieldSelector(){
@@ -58,7 +68,7 @@ public class HdfsUserCommandPatternEntity extends TaggedLogAPIEntity {
         valueChanged("fieldSelector");
     }
 
-    @Column("c")
+    @Column("d")
     private Map<String, String> fieldModifier;
 
     public Map<String, String> getFieldModifier(){

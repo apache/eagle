@@ -75,6 +75,8 @@ public class TestUserCommandReassembler {
     public void testRead() throws Exception{
         String e1 = "2015-11-19 23:47:28,922 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
         String e2 = "2015-11-19 23:47:29,026 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=open src=/tmp/private dst=null perm=null proto=rpc";
+        String e3 = "2015-11-19 23:47:28,925 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
+        String e4 = "2015-11-19 23:47:29,028 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=open src=/tmp/private dst=null perm=null proto=rpc";
         HdfsUserCommandReassembler assembler = new HdfsUserCommandReassembler();
         Config config = ConfigFactory.load();
         assembler.prepareConfig(config);
@@ -89,7 +91,9 @@ public class TestUserCommandReassembler {
             }
         };
         assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
+        assembler.flatMap(Arrays.asList("user1", parseEvent(e4)), collector);
         // sleep for a while for Siddhi engine callback to be invoked
         Thread.sleep(100);
     }
@@ -104,12 +108,13 @@ public class TestUserCommandReassembler {
      */
     @Test
     public void testCopyFromLocal() throws Exception{
-        String e1 = "2015-11-20 00:06:47,090 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
-        String e2 = "2015-11-20 00:06:47,185 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private._COPYING_ dst=null perm=null proto=rpc";
-        String e3 = "2015-11-20 00:06:47,254 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=create src=/tmp/private._COPYING_ dst=null perm=root:hdfs:rw-r--r-- proto=rpc";
-        String e4 = "2015-11-20 00:06:47,289 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private._COPYING_ dst=null perm=null proto=rpc";
-        String e5 = "2015-11-20 00:06:47,609 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=delete src=/tmp/private dst=null perm=null proto=rpc";
-        String e6 = "2015-11-20 00:06:47,624 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=rename src=/tmp/private._COPYING_ dst=/tmp/private perm=root:hdfs:rw-r--r-- proto=rpc";
+        String e1 = "2015-12-04 22:03:11,609 INFO FSNamesystem.audit: allowed=true   ugi=hdfs (auth:SIMPLE)  ip=/10.0.2.15   cmd=getfileinfo src=/tmp/private      dst=null perm=null       proto=rpc";
+        String e2 = "2015-12-04 22:03:11,730 INFO FSNamesystem.audit: allowed=true   ugi=hdfs (auth:SIMPLE)  ip=/10.0.2.15   cmd=getfileinfo src=/tmp/private._COPYING_     dst=null        perm=null     proto=rpc";
+        String e3 = "2015-12-04 22:03:11,798 INFO FSNamesystem.audit: allowed=true   ugi=hdfs (auth:SIMPLE)  ip=/10.0.2.15   cmd=create      src=/tmp/private._COPYING_     dst=null        perm=hdfs:hdfs:rw-r--r--        proto=rpc";
+        String e4 = "2015-12-04 22:03:11,827 INFO FSNamesystem.audit: allowed=true   ugi=hdfs (auth:SIMPLE)  ip=/10.0.2.15   cmd=getfileinfo src=/tmp/private._COPYING_     dst=null        perm=null       proto=rpc";
+        String e5 = "2015-12-04 22:03:11,935 INFO FSNamesystem.audit: allowed=true   ugi=hdfs (auth:SIMPLE)  ip=/10.0.2.15   cmd=delete      src=/tmp/private      dst=null perm=null       proto=rpc";
+        String e6 = "2015-12-04 22:03:11,945 INFO FSNamesystem.audit: allowed=true   ugi=hdfs (auth:SIMPLE)  ip=/10.0.2.15   cmd=rename      src=/tmp/private._COPYING_     dst=/tmp/private        perm=hdfs:hdfs:rw-r--r--        proto=rpc";
+
         HdfsUserCommandReassembler assembler = new HdfsUserCommandReassembler();
         Config config = ConfigFactory.load();
         assembler.prepareConfig(config);
