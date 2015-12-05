@@ -18,11 +18,11 @@ package org.apache.eagle.datastream
 
 import java.io.{FileInputStream, File}
 
+import _root_.storm.trident.spout.RichSpoutBatchExecutor
 import backtype.storm.generated.StormTopology
 import backtype.storm.utils.Utils
 import backtype.storm.{Config, LocalCluster, StormSubmitter}
 import org.yaml.snakeyaml.Yaml
-import storm.trident.spout.RichSpoutBatchExecutor
 
 case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesafe.config.Config) extends AbstractTopologyExecutor {
   @throws(classOf[Exception])

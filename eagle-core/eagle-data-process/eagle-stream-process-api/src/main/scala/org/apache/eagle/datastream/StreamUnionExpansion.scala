@@ -22,6 +22,7 @@ package org.apache.eagle.datastream
 import com.typesafe.config.Config
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
+
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
@@ -39,13 +40,16 @@ class StreamUnionExpansion(config: Config) extends StreamDAGExpansion(config){
       val current = iter.next()
       dag.outgoingEdgesOf(current).foreach(edge => {
         val child = edge.to
-        val groupByFields = edge.groupByFields;
+        val groupByFields = edge match {
+          case GroupbyFieldsConnector(_,_,fields) => fields
+          case _ => null
+        }
         child match {
           case StreamUnionProducer(others) => {
             dag.outgoingEdgesOf(child).foreach(c2 => {
-              toBeAddedEdges += StreamConnector(current, c2.to).groupBy(groupByFields)
+              toBeAddedEdges += StreamConnector(current, c2.to,groupByFields)
               others.foreach(o => {
-                toBeAddedEdges += StreamConnector(o, c2.to).groupBy(groupByFields)
+                toBeAddedEdges += StreamConnector(o, c2.to,groupByFields)
               })
             })
             toBeRemovedVertex += child

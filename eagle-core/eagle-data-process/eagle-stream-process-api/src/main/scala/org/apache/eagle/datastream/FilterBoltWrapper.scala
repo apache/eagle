@@ -18,31 +18,24 @@ package org.apache.eagle.datastream
 
 import java.util
 
-import backtype.storm.task.{OutputCollector, TopologyContext}
-import backtype.storm.topology.OutputFieldsDeclarer
-import backtype.storm.topology.base.BaseRichBolt
-import backtype.storm.tuple.{Fields, Tuple}
-import org.slf4j.LoggerFactory
+import backtype.storm.tuple.Tuple
+import org.apache.eagle.datastream.storm.AbstractStreamBolt
 
-case class FilterBoltWrapper[T](fn : AnyRef => Boolean) extends BaseRichBolt{
-  val LOG = LoggerFactory.getLogger(FilterBoltWrapper.getClass)
-  var _collector : OutputCollector = null
-
-  override def prepare(stormConf: util.Map[_, _], context: TopologyContext, collector: OutputCollector): Unit = {
-    _collector = collector
+case class FilterBoltWrapper(fn:Any => Boolean)(implicit info:StreamInfo[Any]) extends AbstractStreamBolt[Any](fieldsNum = 1){
+  /**
+   * Handle keyed stream value
+   */
+  override def handleKeyValue(key: Any, value: Any)(implicit input:Tuple): Unit = {
+    if(fn(value)) emit(value)
   }
 
-  override def execute(input : Tuple): Unit = {
-    input.getValue(0) match {
-      case v@_ =>
-        if(fn(v)){
-          _collector.emit(input, input.getValues)
-          _collector.ack(input)
-        }
-    }
-  }
-
-  override def declareOutputFields(declarer : OutputFieldsDeclarer): Unit ={
-    declarer.declare(new Fields(OutputFieldNameConst.FIELD_PREFIX + "0"))
+  /**
+   * Handle general stream values list
+   *
+   * @param values
+   */
+  override def handleValues(values: util.List[AnyRef])(implicit input:Tuple): Unit = {
+    val value = values.get(0)
+    if(fn(value)) emit(value)
   }
 }

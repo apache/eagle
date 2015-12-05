@@ -18,51 +18,49 @@ package org.apache.eagle.datastream
 
 import java.util
 
-import backtype.storm.task.{OutputCollector, TopologyContext}
-import backtype.storm.topology.OutputFieldsDeclarer
-import backtype.storm.topology.base.BaseRichBolt
-import backtype.storm.tuple.{Fields, Tuple}
-import org.slf4j.LoggerFactory
+import backtype.storm.tuple.Tuple
+import org.apache.eagle.datastream.storm.AbstractStreamBolt
 
 /**
- * @since  9/29/15
+ * @param num if num is zero, then means that it's using type-safe way, because to map operation, it must require at least one output field
+ * @param fn
+ * @param streamInfo
  */
-case class MapBoltWrapper[T,R](num: Int, fn: T => R) extends BaseRichBolt {
-  val LOG = LoggerFactory.getLogger(FilterBoltWrapper.getClass)
-  var _collector : OutputCollector = null
-
-  override def declareOutputFields(declarer: OutputFieldsDeclarer): Unit = {
-    var fields = new util.ArrayList[String]()
-    var i : Int = 0;
-    while(i < num){
-      fields.add(OutputFieldNameConst.FIELD_PREFIX + i)
-      i += 1
-    }
-    declarer.declare(new Fields(fields))
+case class MapBoltWrapper(num: Int, fn: Any => Any)(implicit streamInfo: StreamInfo[Any]) extends AbstractStreamBolt[Any](fieldsNum = num){
+  /**
+   * Handle keyed stream value
+   */
+  override def handleKeyValue(key: Any, value: Any)(implicit input:Tuple): Unit = {
+    emit(fn(value))
   }
 
-  override def execute(input: Tuple): Unit = {
-    val size = input.size()
-    var values : AnyRef = null
-    size match {
-      case 1 => values = scala.Tuple1(input.getValue(0))
-      case 2 => values = scala.Tuple2(input.getValue(0), input.getValue(1))
-      case 3 => values = scala.Tuple3(input.getValue(0), input.getValue(1), input.getValue(2))
-      case 4 => values = scala.Tuple4(input.getValue(0), input.getValue(1), input.getValue(2), input.getValue(3))
-      case _ => throw new IllegalArgumentException
+  /**
+   * Handle general stream values list
+   *
+   * @param values
+   */
+  override def handleValues(values: util.List[AnyRef])(implicit input:Tuple): Unit = {
+    val size = values.size()
+    if(size == 0) return
+    if(num == 0) {
+      emit(fn(values.get(0)))
+    } else {
+      var tuple: AnyRef = null
+      size match {
+        case 1 => tuple = scala.Tuple1[AnyRef](values.get(0))
+        case 2 => tuple = scala.Tuple2(values.get(0), values.get(1))
+        case 3 => tuple = scala.Tuple3(values.get(0), values.get(1), values.get(2))
+        case 4 => tuple = scala.Tuple4(values.get(0), values.get(1), values.get(2), values.get(3))
+        case _ => throw new IllegalArgumentException(s"Exceed max supported tuple size $size > 4")
+      }
+      val output = fn(tuple)
+      output match {
+        case scala.Tuple1(a) => emit(util.Arrays.asList(a.asInstanceOf[AnyRef]))
+        case scala.Tuple2(a, b) => emit(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef]))
+        case scala.Tuple3(a, b, c) => emit(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef]))
+        case scala.Tuple4(a, b, c, d) => emit(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef], d.asInstanceOf[AnyRef]))
+        case a => emit(util.Arrays.asList(a.asInstanceOf[AnyRef]))
+      }
     }
-    val output = fn(values.asInstanceOf[T])
-    output match {
-      case scala.Tuple1(a) => _collector.emit(input, util.Arrays.asList(a.asInstanceOf[AnyRef]))
-      case scala.Tuple2(a, b) => _collector.emit(input, util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef]))
-      case scala.Tuple3(a, b, c) => _collector.emit(input, util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef]))
-      case scala.Tuple4(a, b, c, d) => _collector.emit(input, util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef], d.asInstanceOf[AnyRef]))
-      case a => _collector.emit(input, util.Arrays.asList(a.asInstanceOf[AnyRef]))
-    }
-    _collector.ack(input)
-  }
-
-  override def prepare(stormConf: util.Map[_, _], context: TopologyContext, collector: OutputCollector): Unit = {
-    _collector = collector
   }
 }

@@ -17,19 +17,33 @@
  *
  */
 package org.apache.eagle.datastream
+
 import org.apache.eagle.partition.PartitionStrategy
 
-case class StreamConnector[+T1 <: Any,+T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2]) {
-  var groupByFields : Seq[Int] = Nil
-  var customGroupBy : PartitionStrategy = null
+abstract class StreamConnector[+T1 <: Any,+T2 <: Any](val from: StreamProducer[T1], val to: StreamProducer[T2]) extends Serializable
 
-  def groupBy(fields : Seq[Int]) : StreamConnector[T1,T2] = {
-    groupByFields = fields
-    this
-  }
+case class ShuffleConnector[+T1 <: Any,+T2 <: Any](override val from: StreamProducer[T1], override val to: StreamProducer[T2])
+  extends StreamConnector[T1,T2](from,to){
+  override def toString: String = "shuffleGroup"
+}
 
-  def customGroupBy(custom : PartitionStrategy) : StreamConnector[T1,T2] = {
-    customGroupBy = custom
-    this
-  }
+case class GroupbyFieldsConnector[+T1 <: Any,+T2 <: Any](override val from: StreamProducer[T1], override val to: StreamProducer[T2],groupByFields : Seq[Int])
+  extends StreamConnector[T1,T2](from,to){
+  override def toString: String = s"groupByFields( $groupByFields )"
+}
+
+case class GroupbyKeyConnector[T1 <: Any,+T2 <: Any](override val from: StreamProducer[T1], override val to: StreamProducer[T2],keySelector: T1 => Any)
+  extends StreamConnector[T1,T2](from,to){
+  override def toString: String = s"groupByKey($keySelector)"
+}
+
+case class GroupbyStrategyConnector[+T1 <: Any,+T2 <: Any](override val from: StreamProducer[T1], override val to: StreamProducer[T2],customGroupBy:PartitionStrategy)
+  extends StreamConnector[T1,T2](from,to){
+  override def toString: String = s"groupByStrategy( $customGroupBy )"
+}
+
+object StreamConnector{
+  def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2]):ShuffleConnector[T1,T2] = ShuffleConnector(from,to)
+  def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2],groupByFields : Seq[Int]):GroupbyFieldsConnector[T1,T2] = GroupbyFieldsConnector(from,to,groupByFields)
+  def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2],customGroupBy: PartitionStrategy):GroupbyStrategyConnector[T1,T2] = GroupbyStrategyConnector(from,to,customGroupBy)
 }

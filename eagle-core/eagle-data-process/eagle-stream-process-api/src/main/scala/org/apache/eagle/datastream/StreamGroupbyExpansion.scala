@@ -21,17 +21,18 @@ package org.apache.eagle.datastream
 
 import com.typesafe.config.Config
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
-import org.slf4j.LoggerFactory
+
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
 /**
  * Replace GroupByProducer(Vertex) with StreamConnector (Edge)
+ *
+ * For example as to Storm, it's mainly for grouping method
+ *
  * @param config context configuration
  */
 class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(config){
-  val LOG = LoggerFactory.getLogger(classOf[StreamGroupbyExpansion])
-
   override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) = {
     val iter = dag.iterator()
     var toBeAddedEdges = new ListBuffer[StreamConnector[Any,Any]]
@@ -43,13 +44,18 @@ class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(config){
         child match {
           case p : GroupByProducer[Any] => {
             dag.outgoingEdgesOf(p).foreach(c2 => {
-              if (p.fields != Nil) {
-                toBeAddedEdges += StreamConnector(current, c2.to).groupBy(p.fields)
+              p match {
+                case GroupByFieldProducer(fields) =>
+                  toBeAddedEdges += GroupbyFieldsConnector(current, c2.to,fields)
+                case GroupByStrategyProducer(strategy) =>
+                  toBeAddedEdges += GroupbyStrategyConnector(current, c2.to,strategy)
+                case GroupByKeyProducer(keySelector) =>
+                  current.outKeyed = true
+                  current.keySelector = KeySelectorImpl(keySelector)
+                  c2.to.inKeyed = true
+                  toBeAddedEdges += GroupbyKeyConnector(current, c2.to,keySelector)
+                case _ => toBeAddedEdges += ShuffleConnector(current, c2.to)
               }
-              else if (p.partitionStrategy != null) {
-                toBeAddedEdges += StreamConnector(current, c2.to).customGroupBy(p.partitionStrategy)
-              }
-              else toBeAddedEdges += StreamConnector(current, c2.to);
             })
             toBeRemovedVertex += p
           }

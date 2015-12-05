@@ -106,12 +106,12 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
           t.setConfig(config)
           t.setGraph(dag)
           alertProducers += t
-          newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector[Any,Any](newsp, t).groupBy(Seq(0)))
+          newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector[Any,Any](newsp, t,Seq(0)))
           if (strategy == null) {
-             newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp, t).groupBy(Seq(0)))
+             newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp,t,Seq(0)))
           }
           else {
-            newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp, t).customGroupBy(strategy))
+            newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp,t,strategy))
           }
         })
 

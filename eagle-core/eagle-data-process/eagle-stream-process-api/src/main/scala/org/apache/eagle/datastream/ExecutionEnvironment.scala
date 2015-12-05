@@ -28,8 +28,7 @@ import scala.reflect.runtime.universe._
 /**
  * @since 0.3.0
  */
-trait ExecutionEnvironment{
-
+trait ExecutionEnvironment {
   def config:Configurator
 
   /**
@@ -49,8 +48,14 @@ trait ExecutionEnvironment{
    * @return
    */
   def getConfig:Config = config.get
-}
 
+
+  def fromCollection[T](seq: Seq[T]):CollectionStreamProducer[T] = {
+    val p = CollectionStreamProducer[T](seq)
+    p.setup(dag,config.get)
+    p
+  }
+}
 
 abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment {
   private val LOG = LoggerFactory.getLogger(classOf[ExecutionEnvironmentBase])
@@ -70,6 +75,7 @@ abstract class ExecutionEnvironmentBase(private val conf:Config)  extends Execut
     LOG.info("after StreamUnionExpansion graph:")
     GraphPrinter.print(dag)
     new StreamGroupbyExpansion(config.get).expand(dag)
+
     LOG.info("after StreamGroupbyExpansion graph:")
     GraphPrinter.print(dag)
     new StreamNameExpansion(config.get).expand(dag)
@@ -82,7 +88,7 @@ abstract class ExecutionEnvironmentBase(private val conf:Config)  extends Execut
     execute(streamDAG)
   }
   
-  def execute(dag: StreamDAG)
+  protected def execute(dag: StreamDAG)
 }
 
 case class StormExecutionEnvironment(private val conf:Config) extends ExecutionEnvironmentBase(conf){
@@ -97,6 +103,7 @@ case class StormExecutionEnvironment(private val conf:Config) extends ExecutionE
     dag.addVertex(ret)
     ret
   }
+
   def from[T<:Any](sourceProvider: StormSpoutProvider):StormSourceProducer[T] = from(sourceProvider.getSpout(config.get))
 }
 

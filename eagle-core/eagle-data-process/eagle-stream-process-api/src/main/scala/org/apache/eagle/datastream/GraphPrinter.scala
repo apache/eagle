@@ -30,7 +30,7 @@ object GraphPrinter {
     while(iter.hasNext) {
       val current = iter.next()
       dag.outgoingEdgesOf(current).foreach(edge => {
-        LOG.info(edge.from + "{" + edge.from.parallelism + "}" +" => " + edge.to + "{" + edge.to.parallelism + "}" + " with groupByFields " + edge.groupByFields)
+        LOG.info(edge.from + "{" + edge.from.parallelism + "}" +" => " + edge.to + "{" + edge.to.parallelism + "}" + " by " + edge.toString)
       })
     }
   }

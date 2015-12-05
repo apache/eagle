@@ -28,12 +28,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EagleCustomGrouping implements CustomStreamGrouping {
+public class CustomPartitionGrouping implements CustomStreamGrouping {
 
     public List<Integer> targetTasks;
     public PartitionStrategy strategy;
 
-    public EagleCustomGrouping(PartitionStrategy strategy) {
+    public CustomPartitionGrouping(PartitionStrategy strategy) {
         this.strategy = strategy;
     }
 

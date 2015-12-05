@@ -1,4 +1,4 @@
-package org.apache.eagle.datastream.typed
+package org.apache.eagle.datastream.storm
 
 import java.util
 
@@ -11,7 +11,7 @@ import org.apache.eagle.datastream.OutputFieldNameConst
 /**
  * @since  12/1/15
  */
-abstract class TypedBaseBolt[I,O](var keyer: Option[O => AnyRef] = None) extends BaseRichBolt{
+abstract class KeyedStreamBolt[I,O](var keyer: Option[O => AnyRef] = None) extends BaseRichBolt{
   implicit var collector: OutputCollector = null
 
   override def prepare(stormConf: util.Map[_, _], context: TopologyContext, collector: OutputCollector): Unit = {

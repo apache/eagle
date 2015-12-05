@@ -13,5 +13,4 @@ object TestExecutionEnvironment extends App{
   println(env1)
   val env2 = ExecutionEnvironments.get[StormExecutionEnvironment](Array[String]("-D","key=value"))
   println(env2)
-
 }

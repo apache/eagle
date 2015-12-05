@@ -22,7 +22,8 @@ import backtype.storm.topology.base.BaseRichBolt
 import com.typesafe.config.Config
 
 object StormBoltFactory {
-  def getBoltWrapper(graph: AbstractStreamProducerGraph, producer : StreamProducer[Any], config : Config) : BaseRichBolt = {
+  def getBoltWrapper(graph: StreamProducerGraph, producer : StreamProducer[Any], config : Config) : BaseRichBolt = {
+    implicit val streamInfo = producer.getInfo
     producer match{
       case FlatMapProducer(worker) => {
         if(worker.isInstanceOf[JavaStormStreamExecutor[EagleTuple]]){
@@ -41,7 +42,10 @@ object StormBoltFactory {
       case mapper:MapProducer[Any,Any] => {
         MapBoltWrapper(mapper.numOutputFields, mapper.fn)
       }
-      case _ => throw new UnsupportedOperationException
+      case foreach:ForeachProducer[Any] => {
+        ForeachBoltWrapper(foreach.fn)
+      }
+      case _ => throw new UnsupportedOperationException(s"Unsupported producer: ${producer.toString}")
     }
   }
 }

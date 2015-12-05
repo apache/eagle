@@ -18,7 +18,7 @@
  */
 package org.apache.eagle.datastream
 
-trait AbstractStreamProducerGraph {
+trait StreamProducerGraph {
   def addEdge(from: StreamProducer[Any], to: StreamProducer[Any], streamConnector: StreamConnector[Any,Any])
   def addVertex(producer: StreamProducer[Any])
   def iterator() : Iterator[StreamProducer[Any]]

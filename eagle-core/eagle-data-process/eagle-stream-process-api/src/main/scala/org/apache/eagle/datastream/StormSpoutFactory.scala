@@ -22,25 +22,40 @@ import java.util
 
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
+import org.apache.eagle.datastream.storm.CollectionStreamSpout
 
 object StormSpoutFactory {
+  def createSpout(config: Config, from: StreamProducer[Any], graph: StreamProducerGraph): BaseRichSpout = {
+    from match {
+      case p@StormSourceProducer(source, numFields) =>
+        if(p.outKeyed) throw new IllegalStateException(s"groupByKey for $p is not implemented yet")
+        createProxySpout(config, p)
+      case p@CollectionStreamProducer(seq) =>
+        createCollectionSpout(config,seq)(p.getInfo)
+      case _ =>
+        throw new IllegalArgumentException(s"Cannot convert $from to a Storm Spout")
+    }
+  }
+
   /**
    * @param config context configuration
    * @param sourceProducer source producer
    * @return
    */
-  def createSpout(config: Config, sourceProducer: StormSourceProducer[Any]) : BaseRichSpout = {
+  def createProxySpout(config: Config, sourceProducer: StormSourceProducer[Any]): BaseRichSpout = {
     val numFields = sourceProducer.numFields
-    if(numFields <= 0) {
+    if (numFields <= 0) {
       sourceProducer.source
-    }else{
+    } else {
       var i = 0
       val ret = new util.ArrayList[String]
-      while(i < numFields){
+      while (i < numFields) {
         ret.add(OutputFieldNameConst.FIELD_PREFIX + i)
         i += 1
       }
       SpoutProxy(sourceProducer.source, ret)
     }
   }
+
+  def createCollectionSpout(config: Config,seq:Seq[Any])(implicit info:StreamInfo[Any]): BaseRichSpout = CollectionStreamSpout(seq)
 }

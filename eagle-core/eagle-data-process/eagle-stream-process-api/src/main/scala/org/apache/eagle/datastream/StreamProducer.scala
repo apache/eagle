@@ -26,6 +26,7 @@ import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
+
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
@@ -35,18 +36,44 @@ import scala.collection.JavaConverters._
  * @tparam T processed elements type
  */
 trait StreamProtocol[+T <: Any]{
+
+  def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config):Unit
+
   def flatMap[R](flatMapper : FlatMapper [R]) : StreamProducer[R]
 
   def filter(fn : T => Boolean): StreamProducer[T]
 
+  def foreach(fn : T => Unit) : Unit
+
+  /**
+   * Type safe mapper
+   * @param fn
+   * @tparam R
+   * @return
+   */
+  def map[R](fn : T => R) : StreamProducer[R]
+
+  /**
+   * Field base mapper
+   * @param fn
+   * @tparam R
+   * @return
+   */
   def map1[R](fn : T => R) : StreamProducer[R]
   def map2[R](fn : T => R) : StreamProducer[R]
   def map3[R](fn : T => R) : StreamProducer[R]
   def map4[R](fn : T => R) : StreamProducer[R]
 
   def groupBy(fields : Int*) : StreamProducer[T]
-
   def groupBy(fields : java.util.List[Integer]) : StreamProducer[T]
+  def groupBy(strategy : PartitionStrategy) : StreamProducer[T]
+
+  /**
+   * @param keyer key selector function
+   * @tparam K
+   * @return
+   */
+  def groupByKey[K](keyer:T => K):StreamProducer[T]
 
   def union[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
 
@@ -58,6 +85,7 @@ trait StreamProtocol[+T <: Any]{
    * @return
    */
   def parallelism(parallelismNum : Int) : StreamProducer[T]
+  def parallelism : Int
 
   /**
    * Set component name
@@ -73,15 +101,39 @@ trait StreamProtocol[+T <: Any]{
    * @return
    */
   def stream(streamId: String): StreamProducer[T]
+  def stream: String
 
   def ? (fn:T => Boolean):StreamProducer[T] = this.filter(fn)
   def ~>[R](flatMapper : FlatMapper [R]):StreamProducer[R]= this.flatMap[R](flatMapper)
   def ! (upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean = true,strategy: PartitionStrategy = null) = alert(upStreamNames, alertExecutorId, consume,strategy)
+
+  def getInfo:StreamInfo[T]
+}
+
+trait KeySelector extends Serializable{
+  def key(t:Any):Any
+}
+
+case class KeySelectorImpl[T](fn:T => Any) extends KeySelector{
+  override def key(t: Any): Any = fn(t.asInstanceOf[T])
+}
+
+abstract class StreamInfo[+T]  extends Serializable{
+  val id:Int = UniqueId.incrementAndGetId()
+  var name: String = null
+  var streamId:String=null
+  var parallelismNum: Int = 1
+  /**
+   * Keyed Stream
+   */
+  var inKeyed:Boolean = false
+  var outKeyed:Boolean = false
+  var keySelector:KeySelector = null
 }
 
 /**
  *
- * Stream Producer = Process Element Metadata + Stream Protocol
+ * StreamProducer = StreamInfo + StreamProtocol
  *
  * StreamProducer is processing logic element, used the base class for all other concrete StreamProducer
  * Stream Producer can be treated as logical processing element but physical
@@ -89,26 +141,39 @@ trait StreamProtocol[+T <: Any]{
  *
  * StreamProducer is independent of execution environment
  *
- * @param id process element id
- * @param stream stream id
  * @tparam T processed elements type
  */
-abstract class StreamProducer[+T <: Any](val id:Int = UniqueId.incrementAndGetId(),var stream:String=null) extends StreamProtocol[T]{
+abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtocol[T]{
   /**
    * Component name
    */
-  var name: String = null
-  var parallelism: Int = 1
   var graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]] = null
   var config: Config = null
 
-  def setGraph(graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit = this.graph = graph
+  def setGraph(graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit = {
+    this.graph = graph
+    if(!this.graph.containsVertex(this)){
+      this.graph.addVertex(this)
+    }
+  }
+
   def getGraph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]] = graph
   def setConfig(config: Config) : Unit = this.config = config
   def getConfig: Config = config
 
+  override def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config):Unit ={
+    this.setConfig(config)
+    this.setGraph(graph)
+  }
+
+  /**
+   * Get stream pure metadata info
+   * @return
+   */
+  override def getInfo:StreamInfo[T] = this
+
   override def stream(streamId:String):StreamProducer[T] = {
-    this.stream = streamId;
+    this.streamId = streamId
     this
   }
 
@@ -121,6 +186,17 @@ abstract class StreamProducer[+T <: Any](val id:Int = UniqueId.incrementAndGetId
   @deprecated("Field-based flat mapper")
   override def flatMap[R](flatMapper : FlatMapper [R]) : StreamProducer[R] = {
     val ret = FlatMapProducer[T,R](flatMapper)
+    hookupDAG(this, ret)
+    ret
+  }
+
+  override def foreach(fn : T => Unit) : Unit = {
+    val ret = ForeachProducer[T](fn)
+    hookupDAG(this, ret)
+  }
+
+  override def map[R](fn : T => R) : StreamProducer[R] = {
+    val ret = MapProducer[T,R](0,fn)
     hookupDAG(this, ret)
     ret
   }
@@ -155,7 +231,7 @@ abstract class StreamProducer[+T <: Any](val id:Int = UniqueId.incrementAndGetId
   override def groupBy(fields : Int*) : StreamProducer[T] = {
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
-    val ret = GroupByProducer[T](fields)
+    val ret = GroupByFieldProducer[T](fields)
     hookupDAG(this, ret)
     ret
   }
@@ -164,8 +240,14 @@ abstract class StreamProducer[+T <: Any](val id:Int = UniqueId.incrementAndGetId
   override def groupBy(fields : java.util.List[Integer]) : StreamProducer[T] = {
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
-    val ret = GroupByProducer[T](fields.asScala.toSeq.asInstanceOf[Seq[Int]])
+    val ret = GroupByFieldProducer[T](fields.asScala.toSeq.asInstanceOf[Seq[Int]])
     hookupDAG(this, ret)
+    ret
+  }
+
+  override def groupByKey[K](keySelector: T=>K):StreamProducer[T] = {
+    val ret = GroupByKeyProducer(keySelector)
+    hookupDAG(this,ret)
     ret
   }
 
@@ -175,12 +257,10 @@ abstract class StreamProducer[+T <: Any](val id:Int = UniqueId.incrementAndGetId
     ret
   }
 
-  def union[T2,T3](others : util.List[StreamProducer[T2]]) : StreamProducer[T3] = {
-    union(others);
-  }
+  def union[T2,T3](others : util.List[StreamProducer[T2]]) : StreamProducer[T3] = union(others)
 
-  def customGroupBy(strategy : PartitionStrategy) : StreamProducer[T] = {
-    val ret = GroupByProducer(strategy)
+  override def groupBy(strategy : PartitionStrategy) : StreamProducer[T] = {
+    val ret = GroupByStrategyProducer(strategy)
     hookupDAG(this, ret)
     ret
   }
@@ -232,9 +312,12 @@ abstract class StreamProducer[+T <: Any](val id:Int = UniqueId.incrementAndGetId
    * can be set by programatically or by configuration
    */
   override def parallelism(parallelism : Int) : StreamProducer[T] = {
-    this.parallelism = parallelism
+    this.parallelismNum = parallelism
     this
   }
+
+  override def parallelism : Int = this.parallelismNum
+  override def stream:String = this.streamId
 
   /**
    * Component name
@@ -255,18 +338,22 @@ case class FlatMapProducer[T, R](var mapper: FlatMapper[R]) extends StreamProduc
 }
 
 case class MapProducer[T,R](numOutputFields : Int, var fn : T => R) extends StreamProducer[R]
+case class ForeachProducer[T](var fn : T => Unit) extends StreamProducer[T]
 
-case class GroupByProducer[T](fields : Seq[Int], partitionStrategy: PartitionStrategy) extends StreamProducer[T]
+abstract class GroupByProducer[T] extends StreamProducer[T]
+case class GroupByFieldProducer[T](fields : Seq[Int]) extends GroupByProducer[T]
+case class GroupByStrategyProducer[T](partitionStrategy: PartitionStrategy) extends GroupByProducer[T]
+case class GroupByKeyProducer[T](keyer:T => Any) extends GroupByProducer[T]
 
 object GroupByProducer {
-  def apply[T](fields: Seq[Int]) = new GroupByProducer[T](fields, null)
-  def apply[T](partitionStrategy : PartitionStrategy) = new GroupByProducer[T](Nil, partitionStrategy)
+  def apply[T](fields: Seq[Int]) = new GroupByFieldProducer[T](fields)
+  def apply[T](partitionStrategy : PartitionStrategy) = new GroupByStrategyProducer[T](partitionStrategy)
+  def apply[T](keySelector:T => Any) = new GroupByKeyProducer[T](keySelector)
 }
 
 case class StreamUnionProducer[T1,T2,T3](others: Seq[StreamProducer[T2]]) extends StreamProducer[T3]
 
-case class StormSourceProducer[+T](source : BaseRichSpout) extends StreamProducer[T]{
-  var numFields : Int = 0
+case class StormSourceProducer[T](source : BaseRichSpout,var numFields : Int = 0) extends StreamProducer[T]{
   /**
     * rename outputfields to f0, f1, f2, ...
    * if one spout declare some field names, those fields names will be modified
@@ -277,6 +364,8 @@ case class StormSourceProducer[+T](source : BaseRichSpout) extends StreamProduce
     this
   }
 }
+
+case class CollectionStreamProducer[T](seq:Seq[T]) extends StreamProducer[T]
 
 case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
   def consume(consume: Boolean): AlertStreamSink = {

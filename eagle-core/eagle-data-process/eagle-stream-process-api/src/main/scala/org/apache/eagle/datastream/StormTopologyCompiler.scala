@@ -24,10 +24,10 @@ import backtype.storm.topology.base.BaseRichBolt
 import backtype.storm.topology.{BoltDeclarer, TopologyBuilder}
 import backtype.storm.tuple.Fields
 import com.typesafe.config.Config
-import org.apache.eagle.dataproc.impl.storm.partition.EagleCustomGrouping
+import org.apache.eagle.dataproc.impl.storm.partition.CustomPartitionGrouping
 import org.slf4j.LoggerFactory
 
-case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGraph) extends AbstractTopologyCompiler{
+case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) extends AbstractTopologyCompiler{
   val LOG = LoggerFactory.getLogger(StormTopologyCompiler.getClass)
   val boltCache = scala.collection.mutable.Map[StreamProducer[Any], StormBoltWrapper]()
 
@@ -39,7 +39,7 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
       val from = iter.next()
       val fromName = from.name
       if(graph.isSource(from)){
-        val spout = StormSpoutFactory.createSpout(config, from.asInstanceOf[StormSourceProducer[Any]])
+        val spout = StormSpoutFactory.createSpout(config, from,graph)
         builder.setSpout(fromName, spout, from.parallelism)
         LOG.info("Spout name : " + fromName + " with parallelism " + from.parallelism)
       } else {
@@ -51,7 +51,7 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
         val toName = sc.to.name
         var boltDeclarer : BoltDeclarer = null
         val toBolt = createBoltIfAbsent(toName)
-        boltDeclarerCache.get(toName) match{
+        boltDeclarerCache.get(toName) match {
           case None => {
             var finalParallelism = 1
             graph.getNodeByName(toName) match {
@@ -64,22 +64,23 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
           }
           case Some(bt) => boltDeclarer = bt
         }
-        if (sc.groupByFields != Nil) {
-          boltDeclarer.fieldsGrouping(fromName, new Fields(fields(sc.groupByFields)))
+
+        sc match {
+          case GroupbyFieldsConnector(_,_,groupByFields) =>
+            boltDeclarer.fieldsGrouping(fromName, new Fields(fields(groupByFields)))
+          case GroupbyStrategyConnector(_,_,strategy) =>
+            boltDeclarer.customGrouping(fromName, new CustomPartitionGrouping(strategy));
+          case GroupbyKeyConnector(_,_,keySelector) =>
+            boltDeclarer.fieldsGrouping(fromName, new Fields(OutputFieldNameConst.FIELD_KEY));
+          case ShuffleConnector(_,_) => {
+            boltDeclarer.shuffleGrouping(fromName)
+          }
+          case _ => throw new UnsupportedOperationException(s"Supported stream connector $sc")
         }
-        else if (sc.customGroupBy != null) {
-          boltDeclarer.customGrouping(fromName, new EagleCustomGrouping(sc.customGroupBy));
-        }
-        else {
-          boltDeclarer.shuffleGrouping(fromName);
-        }
-/*        sc.groupByFields match{
-          case Nil => boltDeclarer.shuffleGrouping(fromName)
-          case p => boltDeclarer.fieldsGrouping(fromName, new Fields(fields(p)))
-        }*/
-        LOG.info("bolt connected " + fromName + "->" + toName + " with groupby fields " + sc.groupByFields)
+        LOG.info("Bolt[" + fromName + "] -> [" + toName + "] with "  + sc.toString)
       })
     }
+
     new StormTopologyExecutorImpl(builder.createTopology, config)
   }
 
@@ -97,7 +98,7 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
     }
   }
 
-  def createBoltIfAbsent(graph: AbstractStreamProducerGraph, producer : StreamProducer[Any]): BaseRichBolt ={
+  def createBoltIfAbsent(graph: StreamProducerGraph, producer : StreamProducer[Any]): BaseRichBolt ={
     boltCache.get(producer) match{
       case Some(bolt) => bolt
       case None => {

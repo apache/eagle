@@ -35,7 +35,7 @@ class StreamParallelismConfigExpansion(config: Config) extends StreamDAGExpansio
       if(streamProducer.name != null) {
         map.foreach(tuple => {
           tuple._1.matcher(streamProducer.name).find() match {
-            case true => streamProducer.parallelism = tuple._2
+            case true => streamProducer.parallelism(tuple._2)
             case false =>
           }
         })
