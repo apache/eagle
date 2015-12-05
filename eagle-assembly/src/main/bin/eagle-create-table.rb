@@ -50,5 +50,6 @@ createEagleTable(admin, 'hiveResourceSensitivity')
 createEagleTable(admin, 'hbaseResourceSensitivity')
 createEagleTable(admin, 'mlmodel')
 createEagleTable(admin, 'userprofile')
+createEagleTable(admin, 'hfdsusercommandpattern')
 
 exit
