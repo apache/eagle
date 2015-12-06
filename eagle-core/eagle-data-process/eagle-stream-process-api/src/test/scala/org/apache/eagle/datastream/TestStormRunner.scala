@@ -30,8 +30,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 object UnionForAlert extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  val tail1 = env.from(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
-  val tail2 = env.from(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key2",a))
+  val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
+  val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key2",a))
   tail1.union(List(tail2)).alert(Seq("s1","s2"), "alert1", consume = false)
   //env.execute
 }
@@ -42,7 +42,7 @@ object UnionForAlert extends App{
 object TestAlertAfterFlatMap extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  val tail1 = env.from(TestSpout())
+  val tail1 = env.fromSpout(TestSpout())
                   .flatMap(WordPrependForAlertExecutor("test"))
                   .alert(Seq("s1"), "alert1", consume = false)
   //env.execute
@@ -54,7 +54,7 @@ object TestAlertAfterFlatMap extends App{
 object TestAlertAfterMap extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  val tail1 = env.from(TestSpout())
+  val tail1 = env.fromSpout(TestSpout())
     .flatMap(WordPrependForAlertExecutor2("test"))
     .map2(a => ("key", a))
     .alert(Seq("s1"), "alert1", false)
@@ -64,7 +64,7 @@ object TestAlertAfterMap extends App{
 object StormRunnerWithoutSplitOrJoin extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  env.from(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test"))
+  env.fromSpout(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test"))
     .flatMap(PatternAlertExecutor("test.*"))
   //env.execute
 }
@@ -72,7 +72,7 @@ object StormRunnerWithoutSplitOrJoin extends Application{
 object StormRunnerWithSplit extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  val toBeSplit = env.from(TestSpout()).flatMap(EchoExecutor())
+  val toBeSplit = env.fromSpout(TestSpout()).flatMap(EchoExecutor())
   toBeSplit.flatMap(WordPrependExecutor("test")).flatMap(PatternAlertExecutor("test.*"))
   toBeSplit.flatMap(WordAppendExecutor("test"))
   //env.execute
@@ -81,8 +81,8 @@ object StormRunnerWithSplit extends Application{
 object StormRunnerWithUnion extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  val tail1 = env.from(TestSpout()).flatMap(WordPrependExecutor("test"))
-  val tail2 = env.from(TestSpout()).flatMap(WordAppendExecutor("test"))
+  val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependExecutor("test"))
+  val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendExecutor("test"))
   tail1.union(List(tail2)).flatMap(PatternAlertExecutor(".*test.*"))
   //env.execute
 }
@@ -90,7 +90,7 @@ object StormRunnerWithUnion extends Application{
 object StormRunnerWithFilter extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  env.from(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test")).
+  env.fromSpout(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test")).
     filter(_=>false).
     flatMap(PatternAlertExecutor("test.*"))
   //env.execute
@@ -99,7 +99,7 @@ object StormRunnerWithFilter extends Application{
 object StormRunnerWithJavaExecutor extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  env.from(TestSpout()).flatMap(new JavaEchoExecutor()).flatMap(WordPrependExecutor("test")).
+  env.fromSpout(TestSpout()).flatMap(new JavaEchoExecutor()).flatMap(WordPrependExecutor("test")).
     filter(_=>false).
     flatMap(PatternAlertExecutor("test.*"))
   //env.execute
@@ -108,13 +108,13 @@ object StormRunnerWithJavaExecutor extends Application{
 object StormRunnerWithKeyValueSpout extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  env.from(TestKeyValueSpout()).groupBy(1).flatMap(new GroupedEchoExecutor()).parallelism(2)
+  env.fromSpout(TestKeyValueSpout()).groupBy(1).flatMap(new GroupedEchoExecutor()).parallelism(2)
   //env.execute
 }
 
 object StormRunnerWithKeyValueSpoutRenameOutputFields extends Application{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
-  env.from(TestKeyValueSpout()).renameOutputFields(2).groupBy(0).flatMap(new GroupedEchoExecutor()).parallelism(2)
+  env.fromSpout(TestKeyValueSpout()).withOutputFields(2).groupBy(0).flatMap(new GroupedEchoExecutor()).parallelism(2)
   //env.execute
 }

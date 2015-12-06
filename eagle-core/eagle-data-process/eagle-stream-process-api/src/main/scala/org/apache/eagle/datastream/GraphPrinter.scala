@@ -22,16 +22,22 @@ package org.apache.eagle.datastream
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
 
+/**
+ * @see scala.tools.nsc.DotDiagramGenerator
+ */
 object GraphPrinter {
   private val LOG = LoggerFactory.getLogger(GraphPrinter.getClass)
-  def print(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit ={
+  def print(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]], message:String = "Stream DAG graph"): Unit = {
+    val graphStr = ListBuffer[String]()
     val iter = dag.iterator()
-    while(iter.hasNext) {
+    while (iter.hasNext) {
       val current = iter.next()
       dag.outgoingEdgesOf(current).foreach(edge => {
-        LOG.info(edge.from + "{" + edge.from.parallelism + "}" +" => " + edge.to + "{" + edge.to.parallelism + "}" + " by " + edge.toString)
+        graphStr += edge.from + "{" + edge.from.parallelism + "} -> " + edge.to + "{" + edge.to.parallelism + "}" + " in " + edge.toString + ""
       })
     }
+    LOG.info(message+"{ \n\t" + graphStr.mkString("\n\t") + "\n}")
   }
 }

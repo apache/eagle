@@ -21,7 +21,6 @@ import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.eagle.dataproc.impl.storm.StormSpoutProvider
 import org.apache.eagle.dataproc.util.ConfigOptionParser
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
-import org.slf4j.LoggerFactory
 
 import scala.reflect.runtime.universe._
 
@@ -29,7 +28,7 @@ import scala.reflect.runtime.universe._
  * @since 0.3.0
  */
 trait ExecutionEnvironment {
-  def config:Configurator
+  def config:Configuration
 
   /**
    * Business logic DAG
@@ -50,40 +49,33 @@ trait ExecutionEnvironment {
   def getConfig:Config = config.get
 
 
-  def fromCollection[T](seq: Seq[T]):CollectionStreamProducer[T] = {
-    val p = CollectionStreamProducer[T](seq)
+  def fromCollection[T](seq: Seq[T]):CollectionStream[T] = {
+    val p = CollectionStream[T](seq)
     p.setup(dag,config.get)
     p
   }
 }
 
+/**
+ * @todo Use Configuration instead of Config
+ *
+ * @param conf
+ */
 abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment {
-  private val LOG = LoggerFactory.getLogger(classOf[ExecutionEnvironmentBase])
   private val _dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
-  private val _config:Configurator = Configurator(conf)
+  private val _config:Configuration = Configuration(conf)
 
   override def dag = _dag
   override def config = _config
 
   override def execute(): Unit ={
-    LOG.info("initial graph:\n")
-    GraphPrinter.print(dag)
+    GraphPrinter.print(dag,"Before expanded DAG ")
     new StreamAlertExpansion(config.get).expand(dag)
-    LOG.info("after StreamAlertExpansion graph:")
-    GraphPrinter.print(dag)
     new StreamUnionExpansion(config.get).expand(dag)
-    LOG.info("after StreamUnionExpansion graph:")
-    GraphPrinter.print(dag)
     new StreamGroupbyExpansion(config.get).expand(dag)
-
-    LOG.info("after StreamGroupbyExpansion graph:")
-    GraphPrinter.print(dag)
     new StreamNameExpansion(config.get).expand(dag)
-    LOG.info("after StreamNameExpansion graph:")
-    GraphPrinter.print(dag)
     new StreamParallelismConfigExpansion(config.get).expand(dag)
-    LOG.info("after StreamParallelismConfigExpansion graph:")
-    GraphPrinter.print(dag)
+    GraphPrinter.print(dag,"After expanded DAG ")
     val streamDAG = StreamDAGTransformer.transform(dag)
     execute(streamDAG)
   }
@@ -96,7 +88,7 @@ case class StormExecutionEnvironment(private val conf:Config) extends ExecutionE
     StormTopologyCompiler(config.get, dag).buildTopology.execute
   }
 
-  def from[T<:Any](source: BaseRichSpout): StormSourceProducer[T] = {
+  def fromSpout[T<:Any](source: BaseRichSpout): StormSourceProducer[T] = {
     val ret = StormSourceProducer[T](source)
     ret.config = config.get
     ret.graph = dag
@@ -104,7 +96,7 @@ case class StormExecutionEnvironment(private val conf:Config) extends ExecutionE
     ret
   }
 
-  def from[T<:Any](sourceProvider: StormSpoutProvider):StormSourceProducer[T] = from(sourceProvider.getSpout(config.get))
+  def fromSpout[T<:Any](sourceProvider: StormSpoutProvider):StormSourceProducer[T] = fromSpout(sourceProvider.getSpout(config.get))
 }
 
 /**

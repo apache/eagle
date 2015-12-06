@@ -29,7 +29,7 @@ import java.util.Map;
 public class UserProfileDetectionStreamMain {
     public static void main(String[] args) throws Exception{
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
-        env.from(new KafkaSourcedSpoutProvider()).renameOutputFields(1).as("kafkaMsgConsumer")
+        env.fromSpout(new KafkaSourcedSpoutProvider()).withOutputFields(1).as("kafkaMsgConsumer")
                 .flatMap(new AuditLogTransformer()).as("transformer")     // [user,map]
                 .groupBy(Arrays.asList(0))                                      // group by [user]
                 .flatMap(new UserProfileAggregatorExecutor()).as("aggregator")

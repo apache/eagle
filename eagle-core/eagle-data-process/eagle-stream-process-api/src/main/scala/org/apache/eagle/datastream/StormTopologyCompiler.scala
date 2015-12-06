@@ -27,6 +27,8 @@ import com.typesafe.config.Config
 import org.apache.eagle.dataproc.impl.storm.partition.CustomPartitionGrouping
 import org.slf4j.LoggerFactory
 
+import scala.collection.mutable.ListBuffer
+
 case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) extends AbstractTopologyCompiler{
   val LOG = LoggerFactory.getLogger(StormTopologyCompiler.getClass)
   val boltCache = scala.collection.mutable.Map[StreamProducer[Any], StormBoltWrapper]()
@@ -35,21 +37,21 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
     val builder = new TopologyBuilder();
     val iter = graph.iterator()
     val boltDeclarerCache = scala.collection.mutable.Map[String, BoltDeclarer]()
+    val stormTopologyGraph = ListBuffer[String]()
     while(iter.hasNext){
       val from = iter.next()
       val fromName = from.name
       if(graph.isSource(from)){
         val spout = StormSpoutFactory.createSpout(config, from,graph)
         builder.setSpout(fromName, spout, from.parallelism)
-        LOG.info("Spout name : " + fromName + " with parallelism " + from.parallelism)
+        LOG.info("Spout: " + fromName + " with parallelism " + from.parallelism)
       } else {
-        LOG.info("Bolt name:" + fromName)
+        LOG.debug("Bolt" + fromName)
       }
-
       val edges = graph.outgoingEdgesOf(from)
       edges.foreach(sc => {
         val toName = sc.to.name
-        var boltDeclarer : BoltDeclarer = null
+        var boltDeclarer: BoltDeclarer = null
         val toBolt = createBoltIfAbsent(toName)
         boltDeclarerCache.get(toName) match {
           case None => {
@@ -59,28 +61,33 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
               case None => finalParallelism = 1
             }
             boltDeclarer = builder.setBolt(toName, toBolt, finalParallelism);
-            LOG.info("created bolt " + toName + " with parallelism " + finalParallelism)
+            LOG.info("Bolt: " + toName + " with parallelism " + finalParallelism)
             boltDeclarerCache.put(toName, boltDeclarer)
           }
           case Some(bt) => boltDeclarer = bt
         }
 
         sc match {
-          case GroupbyFieldsConnector(_,_,groupByFields) =>
+          case GroupbyFieldsConnector(_, _, groupByFields) =>
             boltDeclarer.fieldsGrouping(fromName, new Fields(fields(groupByFields)))
-          case GroupbyStrategyConnector(_,_,strategy) =>
+          case GroupbyStrategyConnector(_, _, strategy) =>
             boltDeclarer.customGrouping(fromName, new CustomPartitionGrouping(strategy));
-          case GroupbyKeyConnector(_,_,keySelector) =>
+          case GroupbyKeyConnector(_, _, keySelector) =>
             boltDeclarer.fieldsGrouping(fromName, new Fields(OutputFieldNameConst.FIELD_KEY));
-          case ShuffleConnector(_,_) => {
+          case ShuffleConnector(_, _) => {
             boltDeclarer.shuffleGrouping(fromName)
           }
           case _ => throw new UnsupportedOperationException(s"Supported stream connector $sc")
         }
-        LOG.info("Bolt[" + fromName + "] -> [" + toName + "] with "  + sc.toString)
+
+        if (graph.isSource(from)) {
+          stormTopologyGraph += s"Spout[$fromName]{${from.parallelism}} -> Bolt[$toName]{${from.parallelism}} in $sc"
+        } else {
+          stormTopologyGraph += s"Bolt[$fromName ]{${from.parallelism}} -> Bolt[$toName]{${from.parallelism}} in $sc"
+        }
       })
     }
-
+    LOG.info(s"Storm topology DAG {\n \t${stormTopologyGraph.mkString("\n\t")} \n}")
     new StormTopologyExecutorImpl(builder.createTopology, config)
   }
 

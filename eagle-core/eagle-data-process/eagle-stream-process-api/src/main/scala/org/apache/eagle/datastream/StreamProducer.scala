@@ -114,20 +114,33 @@ trait KeySelector extends Serializable{
   def key(t:Any):Any
 }
 
-case class KeySelectorImpl[T](fn:T => Any) extends KeySelector{
+case class KeySelectorWrapper[T](fn:T => Any) extends KeySelector{
   override def key(t: Any): Any = fn(t.asInstanceOf[T])
 }
 
 abstract class StreamInfo[+T]  extends Serializable{
+  /**
+   * Processing Element Id
+   */
   val id:Int = UniqueId.incrementAndGetId()
+  /**
+   * Processing Element Name
+   */
   var name: String = null
   var streamId:String=null
   var parallelismNum: Int = 1
+
   /**
-   * Keyed Stream
+   * Keyed input stream
    */
   var inKeyed:Boolean = false
+  /**
+   * Keyed output stream
+   */
   var outKeyed:Boolean = false
+  /**
+   * Output key selector
+   */
   var keySelector:KeySelector = null
 }
 
@@ -343,7 +356,7 @@ case class ForeachProducer[T](var fn : T => Unit) extends StreamProducer[T]
 abstract class GroupByProducer[T] extends StreamProducer[T]
 case class GroupByFieldProducer[T](fields : Seq[Int]) extends GroupByProducer[T]
 case class GroupByStrategyProducer[T](partitionStrategy: PartitionStrategy) extends GroupByProducer[T]
-case class GroupByKeyProducer[T](keyer:T => Any) extends GroupByProducer[T]
+case class GroupByKeyProducer[T](keySelectorFunc:T => Any) extends GroupByProducer[T]
 
 object GroupByProducer {
   def apply[T](fields: Seq[Int]) = new GroupByFieldProducer[T](fields)
@@ -359,13 +372,13 @@ case class StormSourceProducer[T](source : BaseRichSpout,var numFields : Int = 0
    * if one spout declare some field names, those fields names will be modified
    * @param n
    */
-  def renameOutputFields(n : Int): StormSourceProducer[T] ={
+  def withOutputFields(n : Int): StormSourceProducer[T] ={
     this.numFields = n
     this
   }
 }
 
-case class CollectionStreamProducer[T](seq:Seq[T]) extends StreamProducer[T]
+case class CollectionStream[T](seq:Seq[T]) extends StreamProducer[T]
 
 case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
   def consume(consume: Boolean): AlertStreamSink = {

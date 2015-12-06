@@ -43,7 +43,35 @@ case class GroupbyStrategyConnector[+T1 <: Any,+T2 <: Any](override val from: St
 }
 
 object StreamConnector{
+  /**
+   *
+   * @param from
+   * @param to
+   * @tparam T1
+   * @tparam T2
+   * @return
+   */
   def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2]):ShuffleConnector[T1,T2] = ShuffleConnector(from,to)
+
+  /**
+   *
+   * @param from
+   * @param to
+   * @param groupByFields
+   * @tparam T1
+   * @tparam T2
+   * @return
+   */
   def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2],groupByFields : Seq[Int]):GroupbyFieldsConnector[T1,T2] = GroupbyFieldsConnector(from,to,groupByFields)
+
+  /**
+   *
+   * @param from
+   * @param to
+   * @param customGroupBy
+   * @tparam T1
+   * @tparam T2
+   * @return
+   */
   def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2],customGroupBy: PartitionStrategy):GroupbyStrategyConnector[T1,T2] = GroupbyStrategyConnector(from,to,customGroupBy)
 }

@@ -51,7 +51,7 @@ class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(config){
                   toBeAddedEdges += GroupbyStrategyConnector(current, c2.to,strategy)
                 case GroupByKeyProducer(keySelector) =>
                   current.outKeyed = true
-                  current.keySelector = KeySelectorImpl(keySelector)
+                  current.keySelector = KeySelectorWrapper(keySelector)
                   c2.to.inKeyed = true
                   toBeAddedEdges += GroupbyKeyConnector(current, c2.to,keySelector)
                 case _ => toBeAddedEdges += ShuffleConnector(current, c2.to)

@@ -30,7 +30,7 @@ import java.util.Map;
 public class UserProfileDetectionBatchMain {
     public static void main(String[] args) throws Exception{
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
-        env.from(new KafkaSourcedSpoutProvider()).renameOutputFields(1)
+        env.fromSpout(new KafkaSourcedSpoutProvider()).withOutputFields(1)
                 .flatMap(new UserActivityPartitionExecutor())
                 .alertWithConsumer(UserProfileDetectionConstants.USER_ACTIVITY_AGGREGATION_STREAM,
                         UserProfileDetectionConstants.USER_PROFILE_ANOMALY_DETECTION_EXECUTOR);

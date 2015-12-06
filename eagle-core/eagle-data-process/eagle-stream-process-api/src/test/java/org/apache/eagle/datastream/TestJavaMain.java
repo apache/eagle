@@ -36,7 +36,7 @@ public class TestJavaMain {
     public void testGeneral(){
         Config config = ConfigFactory.load();
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
-        env.from(new TestKeyValueSpout()).renameOutputFields(2).groupBy(Arrays.asList(0)).flatMap(new GroupedEchoExecutor()).parallelism(2);
+        env.fromSpout(new TestKeyValueSpout()).withOutputFields(2).groupBy(Arrays.asList(0)).flatMap(new GroupedEchoExecutor()).parallelism(2);
         env.execute();
     }
 
@@ -45,7 +45,7 @@ public class TestJavaMain {
         Config config = ConfigFactory.load();
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
         SerializableFunction1 f1 = new SerializableFunction1<Object, Object>();
-        env.from(new TestKeyValueSpout()).renameOutputFields(2).
+        env.fromSpout(new TestKeyValueSpout()).withOutputFields(2).
                 map1(f1);
         env.execute();
     }

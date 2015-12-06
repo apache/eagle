@@ -30,7 +30,7 @@ object StormSpoutFactory {
       case p@StormSourceProducer(source, numFields) =>
         if(p.outKeyed) throw new IllegalStateException(s"groupByKey for $p is not implemented yet")
         createProxySpout(config, p)
-      case p@CollectionStreamProducer(seq) =>
+      case p@CollectionStream(seq) =>
         createCollectionSpout(config,seq)(p.getInfo)
       case _ =>
         throw new IllegalArgumentException(s"Cannot convert $from to a Storm Spout")

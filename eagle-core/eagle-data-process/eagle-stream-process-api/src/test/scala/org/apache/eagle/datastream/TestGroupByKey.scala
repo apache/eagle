@@ -19,8 +19,8 @@ object TestGroupByKey extends App{
 
   env.fromCollection(seq)
     .map(o => {o.inc+=2;o})
-    .filter(_.name == "b")
+    .filter(_.name != "b")
     .groupByKey(_.name)
-    .foreach(println(_))
+    .foreach(println)
   env.execute()
 }

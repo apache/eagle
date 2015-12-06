@@ -27,7 +27,7 @@ class KafkaStreamMonitorApp extends App {
 
   env.config.set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
 
-  env.from(new KafkaSourcedSpoutProvider()).parallelism(1).as(streamName) ! (Seq(streamName),streamExecutorId)
+  env.fromSpout(new KafkaSourcedSpoutProvider()).parallelism(1).as(streamName) ! (Seq(streamName),streamExecutorId)
   env.execute()
 }
 
