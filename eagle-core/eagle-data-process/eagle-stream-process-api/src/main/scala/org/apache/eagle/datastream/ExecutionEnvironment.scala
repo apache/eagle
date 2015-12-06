@@ -48,9 +48,15 @@ trait ExecutionEnvironment {
    */
   def getConfig:Config = config.get
 
-
-  def fromCollection[T](seq: Seq[T]):CollectionStream[T] = {
-    val p = CollectionStream[T](seq)
+  /**
+   *
+   * @param iterable top level Iterable interface
+   * @param recycle
+   * @tparam T
+   * @return
+   */
+  def from[T](iterable: Iterable[T],recycle:Boolean = false):IterableStreamProducer[T]={
+    val p = IterableStreamProducer[T](iterable,recycle)
     p.setup(dag,config.get)
     p
   }

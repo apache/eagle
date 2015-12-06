@@ -8,34 +8,33 @@ import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.topology.base.BaseRichSpout
 import backtype.storm.tuple.Fields
 import org.apache.eagle.datastream.{StreamInfo, OutputFieldNameConst}
-
+import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 
 /**
  * @since  12/6/15
  */
-case class CollectionStreamSpout(seq:Seq[Any])(implicit info:StreamInfo[Any]) extends BaseRichSpout{
-  val _seq = seq
-  var _currentIndex:Int=0
+case class IterableStreamSpout(iterable: Iterable[Any],recycle:Boolean = true)(implicit info:StreamInfo[Any]) extends BaseRichSpout {
+  val LOG = LoggerFactory.getLogger(classOf[IterableStreamSpout])
   var _collector:SpoutOutputCollector=null
-  var _seqLen = seq.length
+  var _iterator:Iterator[Any] = null
 
   override def open(conf: util.Map[_, _], context: TopologyContext, collector: SpoutOutputCollector): Unit = {
-    this._currentIndex = 0
     this._collector = collector
+    this._iterator = iterable.iterator
   }
 
   override def nextTuple(): Unit = {
-    val current = _seq(_currentIndex)
-    if(info.outKeyed) {
-      _collector.emit(List(info.keySelector.key(current),current).asJava.asInstanceOf[util.List[AnyRef]])
-    }else{
-      _collector.emit(List(current).asJava.asInstanceOf[util.List[AnyRef]])
-    }
-    if(_currentIndex >= _seqLen - 1) {
-      _currentIndex = 0
-    }else{
-      _currentIndex += 1
+    if(_iterator.hasNext){
+      val current = _iterator.next().asInstanceOf[AnyRef]
+      if(info.outKeyed) {
+        _collector.emit(List(info.keySelector.key(current),current).asJava.asInstanceOf[util.List[AnyRef]])
+      }else{
+        _collector.emit(List(current).asJava)
+      }
+    }else if(recycle){
+      LOG.info("Recycling the iterator")
+      _iterator = iterable.iterator
     }
   }
 

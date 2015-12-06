@@ -26,7 +26,6 @@ class KafkaStreamMonitorApp extends App {
   val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")
 
   env.config.set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
-
   env.fromSpout(new KafkaSourcedSpoutProvider()).parallelism(1).as(streamName) ! (Seq(streamName),streamExecutorId)
   env.execute()
 }

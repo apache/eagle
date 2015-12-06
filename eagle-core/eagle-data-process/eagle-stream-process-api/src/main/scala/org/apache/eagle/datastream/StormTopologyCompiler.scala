@@ -42,7 +42,7 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
       val from = iter.next()
       val fromName = from.name
       if(graph.isSource(from)){
-        val spout = StormSpoutFactory.createSpout(config, from,graph)
+        val spout = StormSpoutFactory.createSpout(config, from)
         builder.setSpout(fromName, spout, from.parallelism)
         LOG.info("Spout: " + fromName + " with parallelism " + from.parallelism)
       } else {
@@ -60,7 +60,7 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
               case Some(p) => finalParallelism = p.parallelism
               case None => finalParallelism = 1
             }
-            boltDeclarer = builder.setBolt(toName, toBolt, finalParallelism);
+            boltDeclarer = builder.setBolt(toName, toBolt, finalParallelism)
             LOG.info("Bolt: " + toName + " with parallelism " + finalParallelism)
             boltDeclarerCache.put(toName, boltDeclarer)
           }

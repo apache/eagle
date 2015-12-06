@@ -22,18 +22,19 @@ import java.util
 
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
-import org.apache.eagle.datastream.storm.CollectionStreamSpout
+import org.apache.eagle.datastream.storm.IterableStreamSpout
 
 object StormSpoutFactory {
-  def createSpout(config: Config, from: StreamProducer[Any], graph: StreamProducerGraph): BaseRichSpout = {
+  def createSpout(config: Config, from: StreamProducer[Any]): BaseRichSpout = {
+    implicit val streamInfo = from.getInfo
     from match {
       case p@StormSourceProducer(source, numFields) =>
-        if(p.outKeyed) throw new IllegalStateException(s"groupByKey for $p is not implemented yet")
+        if(p.outKeyed) throw new IllegalStateException(s"groupByKey after $p is not implemented yet")
         createProxySpout(config, p)
-      case p@CollectionStream(seq) =>
-        createCollectionSpout(config,seq)(p.getInfo)
+      case p@IterableStreamProducer(iterable,recycle) =>
+        IterableStreamSpout(iterable,recycle)
       case _ =>
-        throw new IllegalArgumentException(s"Cannot convert $from to a Storm Spout")
+        throw new IllegalArgumentException(s"Cannot compile unknown $from to a Storm Spout")
     }
   }
 
@@ -56,6 +57,4 @@ object StormSpoutFactory {
       SpoutProxy(sourceProducer.source, ret)
     }
   }
-
-  def createCollectionSpout(config: Config,seq:Seq[Any])(implicit info:StreamInfo[Any]): BaseRichSpout = CollectionStreamSpout(seq)
 }

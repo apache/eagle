@@ -70,10 +70,9 @@ trait StreamProtocol[+T <: Any]{
 
   /**
    * @param keyer key selector function
-   * @tparam K
    * @return
    */
-  def groupByKey[K](keyer:T => K):StreamProducer[T]
+  def groupByKey(keyer:T => Any):StreamProducer[T]
 
   def union[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
 
@@ -258,7 +257,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
     ret
   }
 
-  override def groupByKey[K](keySelector: T=>K):StreamProducer[T] = {
+  override def groupByKey(keySelector: T=> Any):StreamProducer[T] = {
     val ret = GroupByKeyProducer(keySelector)
     hookupDAG(this,ret)
     ret
@@ -378,7 +377,7 @@ case class StormSourceProducer[T](source : BaseRichSpout,var numFields : Int = 0
   }
 }
 
-case class CollectionStream[T](seq:Seq[T]) extends StreamProducer[T]
+case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]
 
 case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
   def consume(consume: Boolean): AlertStreamSink = {
