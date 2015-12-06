@@ -26,7 +26,7 @@ import org.apache.eagle.datastream.storm.AbstractStreamBolt
  * @param fn
  * @param streamInfo
  */
-case class MapBoltWrapper(num: Int, fn: Any => Any)(implicit streamInfo: StreamInfo[Any]) extends AbstractStreamBolt[Any](fieldsNum = num){
+case class MapBoltWrapper(num: Int, fn: Any => Any)(implicit streamInfo: StreamInfo) extends AbstractStreamBolt[Any](fieldsNum = num){
   /**
    * Handle keyed stream value
    */

@@ -8,7 +8,7 @@ import org.apache.eagle.datastream.storm.AbstractStreamBolt
 /**
  * @since  12/6/15
  */
-case class ForeachBoltWrapper(fn:Any=>Unit)(implicit info:StreamInfo[Any]) extends AbstractStreamBolt[Any]  {
+case class ForeachBoltWrapper(fn:Any=>Unit)(implicit info:StreamInfo) extends AbstractStreamBolt[Any]  {
   /**
    * Handle keyed stream value
    * @param value

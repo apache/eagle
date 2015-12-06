@@ -25,7 +25,7 @@ import org.apache.eagle.security.hbase.sensitivity.HbaseResourceSensitivityDataJ
 public class HbaseAuditLogProcessorMain {
     public static void main(String[] args) throws Exception{
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
-        env.fromSpout(new KafkaSourcedSpoutProvider()).withOutputFields(1).rename("kafkaMsgConsumer")
+        env.fromSpout(new KafkaSourcedSpoutProvider()).withOutputFields(1).nameAs("kafkaMsgConsumer")
                 .flatMap(new HbaseResourceSensitivityDataJoinExecutor())
                 .alertWithConsumer("hbaseSecurityLogEventStream", "hbaseSecurityLogAlertExecutor");
         env.execute();

@@ -16,8 +16,9 @@
  */
 package org.apache.eagle.datastream
 
-object OutputFieldNameConst {
+object NameConstant {
   val FIELD_PREFIX = "f"
   val FIELD_KEY = "key"
   val FIELD_VALUE = "value"
+  val FIELD_SEPARATOR = "_"
 }

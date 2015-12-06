@@ -51,7 +51,7 @@ object StormSpoutFactory {
       var i = 0
       val ret = new util.ArrayList[String]
       while (i < numFields) {
-        ret.add(OutputFieldNameConst.FIELD_PREFIX + i)
+        ret.add(NameConstant.FIELD_PREFIX + i)
         i += 1
       }
       SpoutProxy(sourceProducer.source, ret)

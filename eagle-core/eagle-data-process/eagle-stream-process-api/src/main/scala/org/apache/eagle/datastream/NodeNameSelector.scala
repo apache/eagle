@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.datastream
 
-case class NodeNameSelector(producer : StreamProducer[Any]) {
+case class NodeNameSelector(producer : StreamInfo) {
   def getName : String = {
     producer.name match {
-      case null => producer.toString
+      case null => producer.toString+NameConstant.FIELD_SEPARATOR+producer.id
       case _ => producer.name
     }
   }

@@ -29,7 +29,7 @@ import scala.collection.mutable.ListBuffer
 /**
  * union operator should be expanded
  */
-class StreamUnionExpansion(config: Config) extends StreamDAGExpansion(config){
+case class StreamUnionExpansion(config: Config) extends StreamDAGExpansion(config){
   val LOG = LoggerFactory.getLogger(classOf[StreamUnionExpansion])
 
   override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) = {

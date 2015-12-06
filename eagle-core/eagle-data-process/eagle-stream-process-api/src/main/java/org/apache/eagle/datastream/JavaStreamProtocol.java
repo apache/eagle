@@ -14,18 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.datastream
 
-trait FlatMapper[T] extends Serializable {
-  def flatMap(input : Seq[AnyRef], collector : Collector[T])
+package org.apache.eagle.datastream;
+
+/**
+ * Java API Specific Stream Protocol
+ *
+ * @since 12/7/15
+ */
+public interface JavaStreamProtocol {
+    public <R> StreamProducer<R> flatMap(JFlatMapper<R> flatMapper);
 }
-
-trait JFlatMapper[T] extends FlatMapper[T] {
-  def flatMap(input : Seq[AnyRef], collector : Collector[T])
-}
-
-//case class FlatMapperAdapter[T](jFlatMapper: JFlatMapper[T]) extends FlatMapper[T]{
-//  def flatMap(input : Seq[AnyRef], collector : Collector[T]) = {
-//    jFlatMapper.flatMap(input,collector)
-//  }
-//}

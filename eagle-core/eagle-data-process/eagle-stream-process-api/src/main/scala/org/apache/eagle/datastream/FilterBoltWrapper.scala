@@ -21,7 +21,7 @@ import java.util
 import backtype.storm.tuple.Tuple
 import org.apache.eagle.datastream.storm.AbstractStreamBolt
 
-case class FilterBoltWrapper(fn:Any => Boolean)(implicit info:StreamInfo[Any]) extends AbstractStreamBolt[Any](fieldsNum = 1){
+case class FilterBoltWrapper(fn:Any => Boolean)(implicit info:StreamInfo) extends AbstractStreamBolt[Any](fieldsNum = 1){
   /**
    * Handle keyed stream value
    */

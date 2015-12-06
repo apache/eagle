@@ -32,7 +32,7 @@ import scala.collection.mutable.ListBuffer
  *
  * @param config context configuration
  */
-class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(config){
+case class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(config){
   override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) = {
     val iter = dag.iterator()
     var toBeAddedEdges = new ListBuffer[StreamConnector[Any,Any]]

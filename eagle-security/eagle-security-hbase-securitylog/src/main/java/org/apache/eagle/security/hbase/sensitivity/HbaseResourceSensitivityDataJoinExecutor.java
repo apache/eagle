@@ -55,7 +55,6 @@ public class HbaseResourceSensitivityDataJoinExecutor extends JavaStormStreamExe
         }
     }
 
-
     @Override
     public void flatMap(List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
         @SuppressWarnings("unchecked")

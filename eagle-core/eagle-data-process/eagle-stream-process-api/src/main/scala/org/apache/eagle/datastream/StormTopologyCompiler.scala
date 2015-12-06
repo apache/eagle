@@ -73,7 +73,7 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
           case GroupbyStrategyConnector(_, _, strategy) =>
             boltDeclarer.customGrouping(fromName, new CustomPartitionGrouping(strategy));
           case GroupbyKeyConnector(_, _, keySelector) =>
-            boltDeclarer.fieldsGrouping(fromName, new Fields(OutputFieldNameConst.FIELD_KEY));
+            boltDeclarer.fieldsGrouping(fromName, new Fields(NameConstant.FIELD_KEY));
           case ShuffleConnector(_, _) => {
             boltDeclarer.shuffleGrouping(fromName)
           }
@@ -93,7 +93,7 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
 
   def fields(fields : Seq[Int]): java.util.List[String] ={
     val ret = new util.ArrayList[String]
-    fields.map(n => ret.add(OutputFieldNameConst.FIELD_PREFIX + n))
+    fields.map(n => ret.add(NameConstant.FIELD_PREFIX + n))
     ret
   }
 

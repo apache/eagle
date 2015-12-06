@@ -25,7 +25,7 @@ trait StormStreamExecutor[R <: EagleTuple] extends FlatMapper[R] {
   def fields : Array[String]
 }
 
-trait JavaStormStreamExecutor[R <: EagleTuple] extends FlatMapper[R] {
+trait JavaStormStreamExecutor[R <: EagleTuple] extends JFlatMapper[R] {
   def prepareConfig(config : Config)
   def init
   def fields : Array[String]

@@ -24,7 +24,7 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 
-class StreamParallelismConfigExpansion(config: Config) extends StreamDAGExpansion(config){
+case class StreamParallelismConfigExpansion(config: Config) extends StreamDAGExpansion(config){
   val LOG = LoggerFactory.getLogger(classOf[StreamParallelismConfigExpansion])
 
   override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) = {

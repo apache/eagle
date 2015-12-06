@@ -42,7 +42,7 @@ import scala.collection.mutable.ListBuffer
  * step 2: partition alert executor by policy partitioner class
  */
 
-class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
+case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
   val LOG = LoggerFactory.getLogger(classOf[StreamAlertExpansion])
 
   override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit ={
@@ -102,7 +102,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(config), upStreamNames, alertExecutorId)
         var alertProducers = new scala.collection.mutable.MutableList[StreamProducer[Any]]
         alertExecutors.foreach(exec => {
-          val t = FlatMapProducer(exec).rename(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
+          val t = FlatMapProducer(exec).nameAs(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
           t.setConfig(config)
           t.setGraph(dag)
           alertProducers += t

@@ -75,7 +75,7 @@ public class JavaMapperStormExecutor extends BaseRichBolt{
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         List<String> fields = new ArrayList<String>();
         for(int i=0; i<numOutputFields; i++){
-            fields.add(OutputFieldNameConst.FIELD_PREFIX() + i);
+            fields.add(NameConstant.FIELD_PREFIX() + i);
         }
         declarer.declare(new Fields(fields));
     }

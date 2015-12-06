@@ -47,7 +47,9 @@ trait ExecutionEnvironment {
    * @return
    */
   def getConfig:Config = config.get
+}
 
+trait StreamSourceProtocol extends ExecutionEnvironment{
   /**
    *
    * @param iterable top level Iterable interface
@@ -57,9 +59,7 @@ trait ExecutionEnvironment {
    */
   def from[T](iterable: Iterable[T],recycle:Boolean = false)(implicit typeTag:TypeTag[T]):IterableStreamProducer[T]={
     val p = IterableStreamProducer[T](iterable,recycle)
-    p.setup(dag,config.get)
-    p.entityFullClass = typeTag.mirror.runtimeClass(typeOf[T]).getCanonicalName
-    p.entitySimpleClass = typeTag.mirror.runtimeClass(typeOf[T]).getSimpleName
+    p.setup(dag,config.get)(typeTag)
     p
   }
 }
@@ -69,20 +69,21 @@ trait ExecutionEnvironment {
  *
  * @param conf
  */
-abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment {
+abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment with StreamSourceProtocol {
   private val _dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
-  private val _config:Configuration = Configuration(conf)
+  implicit private val _config:Configuration = Configuration(conf)
 
   override def dag = _dag
   override def config = _config
 
-  override def execute(): Unit ={
+  override def execute(): Unit = {
+    // Must set default name before graph printing
+    StreamNameExpansion(config.get).expand(dag)
     GraphPrinter.print(dag,"Before expanded DAG ")
-    new StreamAlertExpansion(config.get).expand(dag)
-    new StreamUnionExpansion(config.get).expand(dag)
-    new StreamGroupbyExpansion(config.get).expand(dag)
-    new StreamNameExpansion(config.get).expand(dag)
-    new StreamParallelismConfigExpansion(config.get).expand(dag)
+    StreamAlertExpansion(config.get).expand(dag)
+    StreamUnionExpansion(config.get).expand(dag)
+    StreamGroupbyExpansion(config.get).expand(dag)
+    StreamParallelismConfigExpansion(config.get).expand(dag)
     GraphPrinter.print(dag,"After expanded DAG ")
     val streamDAG = StreamDAGTransformer.transform(dag)
     execute(streamDAG)
@@ -92,6 +93,8 @@ abstract class ExecutionEnvironmentBase(private val conf:Config)  extends Execut
 }
 
 case class StormExecutionEnvironment(private val conf:Config) extends ExecutionEnvironmentBase(conf){
+  @transient  implicit var entityTypeTag:TypeTag[_] = typeTag[AnyRef]
+
   override def execute(dag: StreamDAG) : Unit = {
     StormTopologyCompiler(config.get, dag).buildTopology.execute
   }
@@ -103,7 +106,6 @@ case class StormExecutionEnvironment(private val conf:Config) extends ExecutionE
     dag.addVertex(ret)
     ret
   }
-
   def fromSpout[T<:Any](sourceProvider: StormSpoutProvider):StormSourceProducer[T] = fromSpout(sourceProvider.getSpout(config.get))
 }
 

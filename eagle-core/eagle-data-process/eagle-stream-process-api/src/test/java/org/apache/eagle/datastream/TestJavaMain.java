@@ -33,22 +33,22 @@ public class TestJavaMain {
     }
 
     //@Test
-    public void testGeneral(){
-        Config config = ConfigFactory.load();
-        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
-        env.fromSpout(new TestKeyValueSpout()).withOutputFields(2).groupBy(Arrays.asList(0)).flatMap(new GroupedEchoExecutor()).parallelism(2);
-        env.execute();
-    }
+//    public void testGeneral(){
+//        Config config = ConfigFactory.load();
+//        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
+//        env.fromSpout(new TestKeyValueSpout()).withOutputFields(2).groupBy(Arrays.asList(0)).flatMap(new GroupedEchoExecutor()).parallelism(2);
+//        env.execute();
+//    }
 
-    //@Test
-    public void testMap(){
-        Config config = ConfigFactory.load();
-        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
-        SerializableFunction1 f1 = new SerializableFunction1<Object, Object>();
-        env.fromSpout(new TestKeyValueSpout()).withOutputFields(2).
-                map1(f1);
-        env.execute();
-    }
+//    //@Test
+//    public void testMap(){
+//        Config config = ConfigFactory.load();
+//        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
+//        SerializableFunction1 f1 = new SerializableFunction1<Object, Object>();
+//        env.fromSpout(new TestKeyValueSpout()).withOutputFields(2).
+//                map1(f1);
+//        env.execute();
+//    }
 
     @Test
     public void test() {
