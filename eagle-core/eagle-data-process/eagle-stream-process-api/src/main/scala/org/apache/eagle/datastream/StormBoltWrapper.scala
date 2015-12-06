@@ -54,7 +54,7 @@ case class StormBoltWrapper(worker : StormStreamExecutor[EagleTuple]) extends Ba
 
   override def declareOutputFields(declarer : OutputFieldsDeclarer): Unit ={
     val fields = worker.fields
-    LOG.info("output fields for worker " + worker + " : " + fields.toList)
+    LOG.info("Output fields for worker " + worker + " : " + fields.toList)
     declarer.declare(new Fields(fields:_*))
   }
 }

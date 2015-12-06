@@ -1,11 +1,9 @@
 package org.apache.eagle.datastream
 
 /**
- * @author Chen, Hao (hchen9@ebay.com)
  * @since  12/4/15
  */
 case class Entity(name:String,value:Double,var inc:Int=0)
-
 
 object TestIterableWithGroupBy extends App {
   val env = ExecutionEnvironments.get[StormExecutionEnvironment](args)

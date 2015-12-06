@@ -38,6 +38,6 @@ object GraphPrinter {
         graphStr += edge.from + "{" + edge.from.parallelism + "} -> " + edge.to + "{" + edge.to.parallelism + "}" + " in " + edge.toString + ""
       })
     }
-    LOG.info(message+"{ \n\t" + graphStr.mkString("\n\t") + "\n}")
+    LOG.info(message+"\n{ \n\t" + graphStr.mkString("\n\t") + "\n}")
   }
 }

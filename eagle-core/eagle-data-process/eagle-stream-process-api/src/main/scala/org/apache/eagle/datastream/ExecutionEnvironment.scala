@@ -55,9 +55,11 @@ trait ExecutionEnvironment {
    * @tparam T
    * @return
    */
-  def from[T](iterable: Iterable[T],recycle:Boolean = false):IterableStreamProducer[T]={
+  def from[T](iterable: Iterable[T],recycle:Boolean = false)(implicit typeTag:TypeTag[T]):IterableStreamProducer[T]={
     val p = IterableStreamProducer[T](iterable,recycle)
     p.setup(dag,config.get)
+    p.entityFullClass = typeTag.mirror.runtimeClass(typeOf[T]).getCanonicalName
+    p.entitySimpleClass = typeTag.mirror.runtimeClass(typeOf[T]).getSimpleName
     p
   }
 }

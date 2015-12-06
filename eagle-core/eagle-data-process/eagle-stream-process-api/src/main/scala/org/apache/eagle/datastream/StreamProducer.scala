@@ -92,7 +92,7 @@ trait StreamProtocol[+T <: Any]{
    * @param componentName
    * @return
    */
-  def as(componentName : String) : StreamProducer[T]
+  def rename(componentName : String) : StreamProducer[T]
 
   /**
    * Set stream name
@@ -130,6 +130,12 @@ abstract class StreamInfo[+T]  extends Serializable{
   var parallelismNum: Int = 1
 
   /**
+   * Store entity class as name in String only to make sure serializable
+   */
+  var entityFullClass:String = null
+  var entitySimpleClass:String = null
+
+  /**
    * Keyed input stream
    */
   var inKeyed:Boolean = false
@@ -164,9 +170,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
 
   def setGraph(graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit = {
     this.graph = graph
-    if(!this.graph.containsVertex(this)){
-      this.graph.addVertex(this)
-    }
+
   }
 
   def getGraph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]] = graph
@@ -176,6 +180,9 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
   override def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config):Unit ={
     this.setConfig(config)
     this.setGraph(graph)
+    if(!this.graph.containsVertex(this)){
+      this.graph.addVertex(this)
+    }
   }
 
   /**
@@ -191,49 +198,49 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
 
   override def filter(fn : T => Boolean): StreamProducer[T] ={
     val ret = FilterProducer[T](fn)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
   @deprecated("Field-based flat mapper")
   override def flatMap[R](flatMapper : FlatMapper [R]) : StreamProducer[R] = {
     val ret = FlatMapProducer[T,R](flatMapper)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
   override def foreach(fn : T => Unit) : Unit = {
     val ret = ForeachProducer[T](fn)
-    hookupDAG(this, ret)
+    hookup(this, ret)
   }
 
   override def map[R](fn : T => R) : StreamProducer[R] = {
     val ret = MapProducer[T,R](0,fn)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
   override def map1[R](fn : T => R) : StreamProducer[R] = {
     val ret = MapProducer[T,R](1, fn)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
   override def map2[R](fn : T => R) : StreamProducer[R] = {
     val ret = MapProducer[T,R](2, fn)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
   override def map3[R](fn : T => R) : StreamProducer[R] = {
     val ret = MapProducer(3, fn)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
   override def map4[R](fn : T => R) : StreamProducer[R] = {
     val ret = MapProducer(4, fn)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
@@ -244,7 +251,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
     val ret = GroupByFieldProducer[T](fields)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
@@ -253,19 +260,19 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
     val ret = GroupByFieldProducer[T](fields.asScala.toSeq.asInstanceOf[Seq[Int]])
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
   override def groupByKey(keySelector: T=> Any):StreamProducer[T] = {
     val ret = GroupByKeyProducer(keySelector)
-    hookupDAG(this,ret)
+    hookup(this,ret)
     ret
   }
 
   override def union[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
     val ret = StreamUnionProducer[T, T2, T3](others)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
@@ -273,7 +280,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
 
   override def groupBy(strategy : PartitionStrategy) : StreamProducer[T] = {
     val ret = GroupByStrategyProducer(strategy)
-    hookupDAG(this, ret)
+    hookup(this, ret)
     ret
   }
 
@@ -290,7 +297,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
 
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean=true, strategy : PartitionStrategy=null) = {
     val ret = AlertStreamSink(upStreamNames, alertExecutorId, consume, strategy)
-    hookupDAG(this, ret)
+    hookup(this, ret)
   }
 
   def alertWithConsumer(upStreamName: String, alertExecutorId : String, strategy: PartitionStrategy): Unit ={
@@ -309,7 +316,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
     alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
 
-  protected def hookupDAG[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2]) = {
+  protected def hookup[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2]) = {
     current.getGraph.addVertex(next)
     current.getGraph.addEdge(current, next, StreamConnector(current, next))
     passOnContext(current, next)
@@ -337,7 +344,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo[T] with StreamProtoc
    * @param componentName component name
    * @return
    */
-  override def as(componentName : String) : StreamProducer[T] = {
+  override def rename(componentName : String) : StreamProducer[T] = {
     this.name = componentName
     this
   }
@@ -377,7 +384,11 @@ case class StormSourceProducer[T](source : BaseRichSpout,var numFields : Int = 0
   }
 }
 
-case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]
+case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]{
+  override def toString: String = {
+    if(entityFullClass==null) super.toString else s"${classOf[IterableStreamProducer[T]].getSimpleName}[$entitySimpleClass]"
+  }
+}
 
 case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
   def consume(consume: Boolean): AlertStreamSink = {

@@ -24,7 +24,7 @@ import org.apache.eagle.datastream.StormExecutionEnvironment;
 public class HDFSSecurityLogProcessorMain {
     public static void main(String[] args) throws Exception{
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
-        env.fromSpout(new KafkaSourcedSpoutProvider()).withOutputFields(1).as("kafkaMsgConsumer")
+        env.fromSpout(new KafkaSourcedSpoutProvider()).withOutputFields(1).rename("kafkaMsgConsumer")
                 .alertWithConsumer("hdfsSecurityLogEventStream", "hdfsSecurityLogAlertExecutor");
         env.execute();
     }

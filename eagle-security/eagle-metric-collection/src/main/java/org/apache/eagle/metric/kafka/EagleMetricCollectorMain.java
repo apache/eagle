@@ -114,8 +114,8 @@ public class EagleMetricCollectorMain {
             }
         };
 
-        env.fromSpout(new KafkaOffsetSourceSpoutProvider()).withOutputFields(0).as("kafkaLogLagChecker");
-        env.fromSpout(kafkaMessageSpoutProvider).withOutputFields(2).as("kafkaMessageFetcher").groupBy(Arrays.asList(0))
+        env.fromSpout(new KafkaOffsetSourceSpoutProvider()).withOutputFields(0).rename("kafkaLogLagChecker");
+        env.fromSpout(kafkaMessageSpoutProvider).withOutputFields(2).rename("kafkaMessageFetcher").groupBy(Arrays.asList(0))
                 .flatMap(new KafkaMessageDistributionExecutor());
         env.execute();
     }

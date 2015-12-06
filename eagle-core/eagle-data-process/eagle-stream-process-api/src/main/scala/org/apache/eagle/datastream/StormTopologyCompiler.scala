@@ -87,7 +87,7 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
         }
       })
     }
-    LOG.info(s"Storm topology DAG {\n \t${stormTopologyGraph.mkString("\n\t")} \n}")
+    LOG.info(s"Storm topology DAG\n{\n \t${stormTopologyGraph.mkString("\n\t")} \n}")
     new StormTopologyExecutorImpl(builder.createTopology, config)
   }
 

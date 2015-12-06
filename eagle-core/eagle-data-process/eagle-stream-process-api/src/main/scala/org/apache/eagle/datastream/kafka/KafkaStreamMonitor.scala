@@ -21,12 +21,10 @@ import org.apache.eagle.datastream.{StormExecutionEnvironment, ExecutionEnvironm
 
 class KafkaStreamMonitorApp extends App {
   val env = ExecutionEnvironments.get[StormExecutionEnvironment](args)
-
   val streamName = env.config.get[String]("eagle.stream.name","eventStream")
   val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")
-
   env.config.set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
-  env.fromSpout(new KafkaSourcedSpoutProvider()).parallelism(1).as(streamName) ! (Seq(streamName),streamExecutorId)
+  env.fromSpout(new KafkaSourcedSpoutProvider()).parallelism(1).rename(streamName) ! (Seq(streamName),streamExecutorId)
   env.execute()
 }
 

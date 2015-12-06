@@ -102,7 +102,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(config), upStreamNames, alertExecutorId)
         var alertProducers = new scala.collection.mutable.MutableList[StreamProducer[Any]]
         alertExecutors.foreach(exec => {
-          val t = FlatMapProducer(exec).as(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
+          val t = FlatMapProducer(exec).rename(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
           t.setConfig(config)
           t.setGraph(dag)
           alertProducers += t

@@ -89,7 +89,6 @@ public class KafkaSourcedSpoutProvider implements StormSpoutProvider {
 		}
 		
 		spoutConfig.scheme = getStreamScheme(deserClsName, context);
-		KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
-		return kafkaSpout;
+        return new KafkaSpout(spoutConfig);
 	}
 }
