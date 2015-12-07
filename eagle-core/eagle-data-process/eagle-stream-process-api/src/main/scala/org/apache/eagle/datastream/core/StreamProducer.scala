@@ -25,13 +25,13 @@ import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
 import org.apache.eagle.datastream._
+import org.apache.eagle.datastream.utils.Reflections
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.reflect.runtime.{universe => ru}
-
 /**
  * StreamProducer = StreamInfo + StreamProtocol
  *
@@ -43,7 +43,8 @@ import scala.reflect.runtime.{universe => ru}
  *
  * @tparam T processed elements type
  */
-abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[T]{
+abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[T] {
+
   /**
    * Component name
    */
@@ -95,15 +96,21 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   }
 
   @deprecated("Field-based flat mapper")
-  override def flatMap[R](flatMapper : FlatMapper [R])(implicit tag:ru.TypeTag[R]): StreamProducer[R] = {
+  override def flatMap[R:ru.TypeTag](flatMapper : FlatMapper [R]): StreamProducer[R] = {
     val ret = FlatMapProducer[T,R](flatMapper)
-    hookup(this, ret)(tag)
+    hookup(this, ret)(ru.typeTag[R])
     ret
   }
 
-  override def flatMap[R](flatMapper: JFlatMapper[R]): StreamProducer[R] = {
+  /**
+   * @param flatMapper
+   * @tparam R
+   * @return
+   */
+  override def flatMap[R](flatMapper: JavaFlatMapper[R]): StreamProducer[R] = {
+    implicit val tpeTag = Reflections.javaTypeTag[R](flatMapper)
     val ret = FlatMapProducer[T,R](flatMapper)
-    hookup(this, ret)(ru.typeTag[AnyRef])
+    hookup(this, ret)(tpeTag)
     ret
   }
 
@@ -168,7 +175,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     ret
   }
 
-  override def union[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
+  override def union[T2,T3:ru.TypeTag](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
     val ret = StreamUnionProducer[T, T2, T3](others)
     hookup(this, ret)(typeTag)
     ret

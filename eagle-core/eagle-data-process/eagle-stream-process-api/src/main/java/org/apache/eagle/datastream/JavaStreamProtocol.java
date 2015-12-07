@@ -25,5 +25,5 @@ import org.apache.eagle.datastream.core.StreamProducer;
  * @since 12/7/15
  */
 public interface JavaStreamProtocol {
-    public <R> StreamProducer<R> flatMap(JFlatMapper<R> flatMapper);
+    public <R> StreamProducer<R> flatMap(JavaFlatMapper<R> flatMapper);
 }

@@ -23,11 +23,17 @@ import scala.reflect.runtime.{universe => ru}
 /**
  * @since  12/7/15
  */
-object ReflectionUtils {
+object Reflections{
   private val UNIT_CLASS = classOf[Unit]
   private val UNIT_TYPE_TAG = ru.typeTag[Unit]
 
-  def classToTypeTag[T](clazz:Class[T]):ru.TypeTag[T]={
+  /**
+   * Class to TypeTag
+   * @param clazz class
+   * @tparam T Type T
+   * @return
+   */
+  def typeTag[T](clazz:Class[T]):ru.TypeTag[T]={
     if(clazz == null){
       null
     }else if(clazz == UNIT_CLASS) {
@@ -43,4 +49,7 @@ object ReflectionUtils {
       })
     }
   }
+
+  def javaTypeClass[T](obj: AnyRef, index: Int = 0):Class[T] = JavaReflections.getGenericTypeClass(obj,index).asInstanceOf[Class[T]]
+  def javaTypeTag[T](obj: AnyRef, index: Int = 0):ru.TypeTag[T] = typeTag(JavaReflections.getGenericTypeClass(obj,index)).asInstanceOf[ru.TypeTag[T]]
 }

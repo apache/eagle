@@ -20,12 +20,6 @@ trait FlatMapper[T] extends Serializable {
   def flatMap(input : Seq[AnyRef], collector : Collector[T])
 }
 
-trait JFlatMapper[T] extends FlatMapper[T] {
+trait JavaFlatMapper[T] extends FlatMapper[T] {
   def flatMap(input : Seq[AnyRef], collector : Collector[T])
 }
-
-//case class FlatMapperAdapter[T](jFlatMapper: JFlatMapper[T]) extends FlatMapper[T]{
-//  def flatMap(input : Seq[AnyRef], collector : Collector[T]) = {
-//    jFlatMapper.flatMap(input,collector)
-//  }
-//}

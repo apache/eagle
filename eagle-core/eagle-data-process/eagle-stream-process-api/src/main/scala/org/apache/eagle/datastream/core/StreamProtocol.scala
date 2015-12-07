@@ -18,7 +18,7 @@
 package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
-import org.apache.eagle.datastream.utils.ReflectionUtils
+import org.apache.eagle.datastream.utils.Reflections
 import org.apache.eagle.datastream.{FlatMapper, JavaStreamProtocol}
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
@@ -28,7 +28,7 @@ import scala.reflect.runtime.{universe => ru}
 /**
  * StreamInfo should be fully serializable and having not runtime type information
  */
-abstract class StreamInfo  extends Serializable{
+class StreamInfo  extends Serializable{
   /**
    * Processing Element Id
    */
@@ -69,13 +69,9 @@ abstract class StreamInfo  extends Serializable{
    * Handle unsupported issues like serializing un-serializable variable
    */
   def reinit():Unit = {
-    this.typeTag = ReflectionUtils.classToTypeTag(this.typeClass)
+    this.typeTag = Reflections.typeTag(this.typeClass)
   }
 
-  /**
-   * Initialize the stream metadata info
-   */
-  def init[E:ru.TypeTag](graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config):Unit
   def getInfo:StreamInfo = this
 }
 
@@ -85,6 +81,10 @@ abstract class StreamInfo  extends Serializable{
  * @tparam T processed elements type
  */
 trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
+  /**
+   * Initialize the stream metadata info
+   */
+  def init[E:ru.TypeTag](graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config):Unit
 
   /**
    * Support Java API
@@ -136,7 +136,7 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
    * @return
    */
   def groupByKey(keyer:T => Any):StreamProducer[T]
-  def union[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
+  def union[T2,T3:ru.TypeTag](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
   /**
    * Set processing element parallelism setting

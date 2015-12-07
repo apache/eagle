@@ -23,9 +23,9 @@ trait StreamSourceBuilder {
    * @tparam T
    * @return
    */
-  def from[T](iterable: Iterable[T],recycle:Boolean = false)(implicit typeTag:ru.TypeTag[T]):IterableStreamProducer[T]={
+  def from[T:ru.TypeTag](iterable: Iterable[T],recycle:Boolean = false):IterableStreamProducer[T]={
     val p = IterableStreamProducer[T](iterable,recycle)
-    p.init(dag,config.get)(typeTag)
+    p.init(dag,config.get)
     p
   }
 }
