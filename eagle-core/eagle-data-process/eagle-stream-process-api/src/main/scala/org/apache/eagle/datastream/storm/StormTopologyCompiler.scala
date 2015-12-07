@@ -83,9 +83,9 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
         }
 
         if (graph.isSource(from)) {
-          stormTopologyGraph += s"Spout[$fromName]{${from.parallelism}} -> Bolt[$toName]{${from.parallelism}} in $sc"
+          stormTopologyGraph += s"Spout($fromName ]{${from.parallelism}) -> Bolt( $toName ){${from.parallelism}} in $sc"
         } else {
-          stormTopologyGraph += s"Bolt[$fromName ]{${from.parallelism}} -> Bolt[$toName]{${from.parallelism}} in $sc"
+          stormTopologyGraph += s"Bolt($fromName ]{${from.parallelism}) -> Bolt( $toName ){${from.parallelism}} in $sc"
         }
       })
     }

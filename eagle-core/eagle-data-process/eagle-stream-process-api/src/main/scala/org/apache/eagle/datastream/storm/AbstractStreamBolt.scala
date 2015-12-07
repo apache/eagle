@@ -24,6 +24,7 @@ import backtype.storm.topology.base.BaseRichBolt
 import backtype.storm.tuple.{Fields, Tuple}
 import org.apache.eagle.datastream.core.StreamInfo
 import org.apache.eagle.datastream.utils.NameConstants
+import org.slf4j.LoggerFactory
 
 /**
  *
@@ -34,6 +35,7 @@ import org.apache.eagle.datastream.utils.NameConstants
  */
 abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true)(implicit streamInfo:StreamInfo) extends BaseRichBolt{
   private var _collector: OutputCollector = null
+  private val LOG = LoggerFactory.getLogger(classOf[AbstractStreamBolt[T]])
 
   /**
    * If outKeyed then
@@ -65,10 +67,10 @@ abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true
   }
 
   def emit(values:util.List[AnyRef])(implicit input:Tuple){
-    if(streamInfo.outKeyed) {
-      _collector.emit(input, util.Arrays.asList(streamInfo.keySelector.key(values).asInstanceOf[AnyRef],values))
-    }else {
-      _collector.emit(input,values)
+    if (streamInfo.outKeyed) {
+      _collector.emit(input, util.Arrays.asList(streamInfo.keySelector.key(values).asInstanceOf[AnyRef], values))
+    } else {
+      _collector.emit(input, values)
     }
   }
 
@@ -81,15 +83,22 @@ abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true
   }
 
   override def execute(input: Tuple): Unit = {
-    implicit val _input = input
-    if(streamInfo.inKeyed){
-      val key = input.getValueByField(NameConstants.FIELD_KEY)
-      val value = input.getValueByField(NameConstants.FIELD_VALUE).asInstanceOf[T]
-      onKeyValue(key,value)
-    }else{
-      onValues(input.getValues)
+    try {
+      implicit val _input = input
+      if (streamInfo.inKeyed) {
+        val key = input.getValueByField(NameConstants.FIELD_KEY)
+        val value = input.getValueByField(NameConstants.FIELD_VALUE).asInstanceOf[T]
+        onKeyValue(key, value)
+      } else {
+        onValues(input.getValues)
+      }
+      if(ack) _collector.ack(input)
+    }catch {
+      case t: Throwable => {
+        LOG.error(s"Got exception when processing $input",t)
+        _collector.fail(input)
+      }
     }
-    if(ack) _collector.ack(input)
   }
 
   /**
@@ -106,5 +115,6 @@ abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true
 
   override def prepare(stormConf: util.Map[_, _], context: TopologyContext, collector: OutputCollector): Unit = {
     _collector = collector
+    streamInfo.reinit()
   }
 }

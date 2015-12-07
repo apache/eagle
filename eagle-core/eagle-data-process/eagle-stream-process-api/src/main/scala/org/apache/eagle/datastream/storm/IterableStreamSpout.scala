@@ -27,6 +27,7 @@ import backtype.storm.utils.Utils
 import org.apache.eagle.datastream.core.StreamInfo
 import org.apache.eagle.datastream.utils.NameConstants
 import org.slf4j.LoggerFactory
+
 import scala.collection.JavaConverters._
 
 /**
@@ -54,7 +55,8 @@ case class IterableStreamSpout(iterable: Iterable[Any],recycle:Boolean = true)(i
       LOG.info("Recycling the iterator")
       _iterator = iterable.iterator
     }else{
-      LOG.info("No next tuple, sleep forever")
+      LOG.info("No tuple left, sleep forever")
+      this.deactivate()
       Utils.sleep(Long.MaxValue)
     }
   }

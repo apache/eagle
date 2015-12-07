@@ -41,7 +41,7 @@ object StormBoltFactory {
       case filter:FilterProducer[Any] => {
         FilterBoltWrapper(filter.fn)
       }
-      case mapper:MapProducer[Any,Any] => {
+      case mapper:MapperProducer[Any,Any] => {
         MapBoltWrapper(mapper.numOutputFields, mapper.fn)
       }
       case foreach:ForeachProducer[Any] => {

@@ -90,7 +90,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
           case _: FlatMapProducer[AnyRef, AnyRef] => {
             newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
           }
-          case _: MapProducer[AnyRef,AnyRef] => {
+          case _: MapperProducer[AnyRef,AnyRef] => {
             newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
           }
           case s: StreamProducer[AnyRef] if dag.inDegreeOf(s) == 0 => {
@@ -158,8 +158,8 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp, e.to))
         toBeRemovedVertex += current
       }
-      case _: MapProducer[Any,Any] => {
-        val mapper = current.asInstanceOf[MapProducer[Any,Any]].fn
+      case _: MapperProducer[Any,Any] => {
+        val mapper = current.asInstanceOf[MapperProducer[Any,Any]].fn
         val newfun: (Any => Any) = {
           a => mapper(a) match {
             case scala.Tuple2(x1, x2) => (x1, upStreamName, x2)
@@ -167,7 +167,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
           }
         }
         current match {
-          case MapProducer(2, fn) => newsp = MapProducer(3, newfun)
+          case MapperProducer(2, fn) => newsp = MapperProducer(3, newfun)
           case _ => throw new IllegalArgumentException
         }
         val incomingEdges = dag.incomingEdgesOf(current)
@@ -187,7 +187,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
             }
           }
         }
-        newsp = MapProducer(3,fn)
+        newsp = MapperProducer(3,fn)
         toBeAddedEdges += StreamConnector(current,newsp)
         val outgoingEdges = dag.outgoingEdgesOf(current)
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp,e.to))

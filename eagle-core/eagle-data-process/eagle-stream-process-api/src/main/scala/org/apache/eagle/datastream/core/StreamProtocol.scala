@@ -18,6 +18,7 @@
 package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
+import org.apache.eagle.datastream.utils.ReflectionUtils
 import org.apache.eagle.datastream.{FlatMapper, JavaStreamProtocol}
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
@@ -27,7 +28,7 @@ import scala.reflect.runtime.{universe => ru}
 /**
  * StreamInfo should be fully serializable and having not runtime type information
  */
-class StreamInfo  extends Serializable{
+abstract class StreamInfo  extends Serializable{
   /**
    * Processing Element Id
    */
@@ -57,12 +58,25 @@ class StreamInfo  extends Serializable{
   /**
    * Entity class type of T
    */
-  var typeClass:Class[_] = classOf[AnyRef]
+  var typeClass:Class[_] = null
 
   /**
    * Entity typeTag of T (un-serializable)
    */
-  @transient  implicit var typeTag:ru.TypeTag[_] = ru.typeTag[AnyRef]
+  @transient var typeTag:ru.TypeTag[_] = null
+
+  /**
+   * Handle unsupported issues like serializing un-serializable variable
+   */
+  def reinit():Unit = {
+    this.typeTag = ReflectionUtils.classToTypeTag(this.typeClass)
+  }
+
+  /**
+   * Initialize the stream metadata info
+   */
+  def init[E:ru.TypeTag](graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config):Unit
+  def getInfo:StreamInfo = this
 }
 
 /**
@@ -71,7 +85,6 @@ class StreamInfo  extends Serializable{
  * @tparam T processed elements type
  */
 trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
-  def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config)(implicit typeTag:ru.TypeTag[_]):Unit
 
   /**
    * Support Java API
@@ -80,7 +93,7 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
    * @tparam R
    * @return
    */
-  def flatMap[R](flatMapper : FlatMapper [R])(implicit tag:ru.TypeTag[R]) : StreamProducer[R]
+  def flatMap[R:ru.TypeTag](flatMapper : FlatMapper [R]): StreamProducer[R]
 
   /**
    *
@@ -101,7 +114,7 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
    * @tparam R
    * @return
    */
-  def map[R](fn : T => R)(implicit tag:ru.TypeTag[R]) : StreamProducer[R]
+  def map[R:ru.TypeTag](fn : T => R): StreamProducer[R]
 
   /**
    * Field base mapper
@@ -109,10 +122,10 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
    * @tparam R
    * @return
    */
-  def map1[R](fn : T => R)(implicit tag:ru.TypeTag[R]) : StreamProducer[R]
-  def map2[R](fn : T => R)(implicit tag:ru.TypeTag[R]) : StreamProducer[R]
-  def map3[R](fn : T => R)(implicit tag:ru.TypeTag[R]) : StreamProducer[R]
-  def map4[R](fn : T => R)(implicit tag:ru.TypeTag[R]) : StreamProducer[R]
+  def map1[R:ru.TypeTag](fn : T => R) : StreamProducer[R]
+  def map2[R:ru.TypeTag](fn : T => R) : StreamProducer[R]
+  def map3[R:ru.TypeTag](fn : T => R) : StreamProducer[R]
+  def map4[R:ru.TypeTag](fn : T => R) : StreamProducer[R]
 
   def groupBy(fields : Int*) : StreamProducer[T]
   def groupBy(fields : java.util.List[Integer]) : StreamProducer[T]
@@ -149,8 +162,6 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
   def stream: String
 
   def ? (fn:T => Boolean):StreamProducer[T] = this.filter(fn)
-  def ~>[R](flatMapper : FlatMapper [R])(implicit tag:ru.TypeTag[R]):StreamProducer[R]= this.flatMap[R](flatMapper)
+  def ~>[R:ru.TypeTag](flatMapper : FlatMapper [R]) = this.flatMap[R](flatMapper)
   def ! (upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean = true,strategy: PartitionStrategy = null) = alert(upStreamNames, alertExecutorId, consume,strategy)
-
-  def getInfo:StreamInfo
 }
