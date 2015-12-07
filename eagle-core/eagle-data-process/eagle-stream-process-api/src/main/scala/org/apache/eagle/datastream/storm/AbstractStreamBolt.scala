@@ -22,7 +22,8 @@ import backtype.storm.task.{OutputCollector, TopologyContext}
 import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.topology.base.BaseRichBolt
 import backtype.storm.tuple.{Fields, Tuple}
-import org.apache.eagle.datastream.{NameConstant, StreamInfo}
+import org.apache.eagle.datastream.core.StreamInfo
+import org.apache.eagle.datastream.utils.NameConstants
 
 /**
  *
@@ -47,18 +48,18 @@ abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true
    */
   override def declareOutputFields(declarer: OutputFieldsDeclarer): Unit = {
     if(streamInfo.outKeyed) {
-      declarer.declare(new Fields(NameConstant.FIELD_KEY,NameConstant.FIELD_VALUE))
+      declarer.declare(new Fields(NameConstants.FIELD_KEY,NameConstants.FIELD_VALUE))
     }else{
       if(fieldsNum > 0) {
         val fields = new util.ArrayList[String]()
         var i: Int = 0
         while (i < fieldsNum) {
-          fields.add(NameConstant.FIELD_PREFIX + i)
+          fields.add(NameConstants.FIELD_PREFIX + i)
           i += 1
         }
         declarer.declare(new Fields(fields))
       }else if(fieldsNum == 0){
-        declarer.declare(new Fields(NameConstant.FIELD_PREFIX + 0))
+        declarer.declare(new Fields(NameConstants.FIELD_PREFIX + 0))
       }
     }
   }
@@ -82,11 +83,11 @@ abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true
   override def execute(input: Tuple): Unit = {
     implicit val _input = input
     if(streamInfo.inKeyed){
-      val key = input.getValueByField(NameConstant.FIELD_KEY)
-      val value = input.getValueByField(NameConstant.FIELD_VALUE).asInstanceOf[T]
-      handleKeyValue(key,value)
+      val key = input.getValueByField(NameConstants.FIELD_KEY)
+      val value = input.getValueByField(NameConstants.FIELD_VALUE).asInstanceOf[T]
+      onKeyValue(key,value)
     }else{
-      handleValues(input.getValues)
+      onValues(input.getValues)
     }
     if(ack) _collector.ack(input)
   }
@@ -94,14 +95,14 @@ abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true
   /**
    * Handle keyed stream value
    */
-  def handleKeyValue(key:Any,value:T)(implicit input:Tuple)
+  def onKeyValue(key:Any,value:T)(implicit input:Tuple)
 
   /**
    * Handle general stream values list
    *
    * @param values
    */
-  def handleValues(values:util.List[AnyRef])(implicit input:Tuple)
+  def onValues(values:util.List[AnyRef])(implicit input:Tuple)
 
   override def prepare(stormConf: util.Map[_, _], context: TopologyContext, collector: OutputCollector): Unit = {
     _collector = collector

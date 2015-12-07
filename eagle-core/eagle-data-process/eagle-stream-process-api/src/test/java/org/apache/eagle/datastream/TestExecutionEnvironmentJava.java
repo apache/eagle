@@ -3,10 +3,10 @@ package org.apache.eagle.datastream;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.junit.Test;
 
 /**
- * @author Chen, Hao (hchen9@ebay.com)
  * @since 12/5/15
  */
 public class TestExecutionEnvironmentJava {

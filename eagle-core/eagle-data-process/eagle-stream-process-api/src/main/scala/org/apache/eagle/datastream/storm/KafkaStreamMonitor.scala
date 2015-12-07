@@ -14,15 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.datastream;
+package org.apache.eagle.datastream.storm
 
-import org.apache.eagle.datastream.storm.KafkaStreamMonitorApp;
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
+import org.apache.eagle.datastream.ExecutionEnvironments
 
-/**
- * @since 11/7/15
- */
-public class TestKafkaStreamMonitor {
-    public static void main(String[] args){
-        new KafkaStreamMonitorApp().main(args);
-    }
+class KafkaStreamMonitorApp extends App {
+  val env = ExecutionEnvironments.get[StormExecutionEnvironment](args)
+  val streamName = env.config.get[String]("eagle.stream.name","eventStream")
+  val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")
+  env.config.set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
+  env.fromSpout(new KafkaSourcedSpoutProvider()).parallelism(1).nameAs(streamName) ! (Seq(streamName),streamExecutorId)
+  env.execute()
 }
+
+object KafkaStreamMonitor extends KafkaStreamMonitorApp

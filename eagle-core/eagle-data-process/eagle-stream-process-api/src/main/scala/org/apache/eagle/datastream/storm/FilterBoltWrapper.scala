@@ -14,15 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.datastream;
+package org.apache.eagle.datastream.storm
 
-import org.apache.eagle.datastream.storm.KafkaStreamMonitorApp;
+import java.util
 
-/**
- * @since 11/7/15
- */
-public class TestKafkaStreamMonitor {
-    public static void main(String[] args){
-        new KafkaStreamMonitorApp().main(args);
-    }
+import backtype.storm.tuple.Tuple
+import org.apache.eagle.datastream.core.StreamInfo
+
+case class FilterBoltWrapper(fn:Any => Boolean)(implicit info:StreamInfo) extends AbstractStreamBolt[Any](fieldsNum = 1){
+  /**
+   * Handle keyed stream value
+   */
+  override def onKeyValue(key: Any, value: Any)(implicit input:Tuple): Unit = {
+    if(fn(value)) emit(value)
+  }
+
+  /**
+   * Handle general stream values list
+   *
+   * @param values
+   */
+  override def onValues(values: util.List[AnyRef])(implicit input:Tuple): Unit = {
+    val value = values.get(0)
+    if(fn(value)) emit(value)
+  }
 }

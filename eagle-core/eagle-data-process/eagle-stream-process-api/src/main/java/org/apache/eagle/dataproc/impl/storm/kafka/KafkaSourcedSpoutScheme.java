@@ -19,7 +19,7 @@ package org.apache.eagle.dataproc.impl.storm.kafka;
 import backtype.storm.spout.Scheme;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
-import org.apache.eagle.datastream.NameConstant;
+import org.apache.eagle.datastream.utils.NameConstants;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -66,6 +66,6 @@ public class KafkaSourcedSpoutScheme implements Scheme {
      */
 	@Override
 	public Fields getOutputFields() {
-        return new Fields(NameConstant.FIELD_PREFIX()+"0");
+        return new Fields(NameConstants.FIELD_PREFIX()+"0");
 	}
 }

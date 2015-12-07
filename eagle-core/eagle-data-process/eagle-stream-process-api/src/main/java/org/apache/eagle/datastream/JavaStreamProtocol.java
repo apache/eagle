@@ -17,6 +17,8 @@
 
 package org.apache.eagle.datastream;
 
+import org.apache.eagle.datastream.core.StreamProducer;
+
 /**
  * Java API Specific Stream Protocol
  *

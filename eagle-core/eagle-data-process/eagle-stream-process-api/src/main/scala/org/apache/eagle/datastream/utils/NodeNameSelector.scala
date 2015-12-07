@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.datastream;
+package org.apache.eagle.datastream.utils
 
-import org.apache.eagle.datastream.storm.KafkaStreamMonitorApp;
+import org.apache.eagle.datastream.core.StreamInfo
 
-/**
- * @since 11/7/15
- */
-public class TestKafkaStreamMonitor {
-    public static void main(String[] args){
-        new KafkaStreamMonitorApp().main(args);
+case class NodeNameSelector(producer : StreamInfo) {
+  def getName : String = {
+    producer.name match {
+      case null => producer.toString+NameConstants.FIELD_SEPARATOR+producer.id
+      case _ => producer.name
     }
+  }
 }

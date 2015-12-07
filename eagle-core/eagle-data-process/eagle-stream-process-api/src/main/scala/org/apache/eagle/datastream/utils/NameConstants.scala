@@ -14,15 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.datastream;
+package org.apache.eagle.datastream.utils
 
-import org.apache.eagle.datastream.storm.KafkaStreamMonitorApp;
-
-/**
- * @since 11/7/15
- */
-public class TestKafkaStreamMonitor {
-    public static void main(String[] args){
-        new KafkaStreamMonitorApp().main(args);
-    }
+object NameConstants {
+  val FIELD_PREFIX = "f"
+  val FIELD_KEY = "key"
+  val FIELD_VALUE = "value"
+  val FIELD_SEPARATOR = "_"
 }

@@ -14,15 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.datastream;
+package org.apache.eagle.datastream.core
 
-import org.apache.eagle.datastream.storm.KafkaStreamMonitorApp;
-
-/**
- * @since 11/7/15
- */
-public class TestKafkaStreamMonitor {
-    public static void main(String[] args){
-        new KafkaStreamMonitorApp().main(args);
-    }
+trait AbstractTopologyCompiler{
+  def buildTopology : AbstractTopologyExecutor
 }

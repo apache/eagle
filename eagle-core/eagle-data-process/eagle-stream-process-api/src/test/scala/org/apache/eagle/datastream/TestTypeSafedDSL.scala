@@ -1,5 +1,7 @@
 package org.apache.eagle.datastream
 
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment
+
 /**
  * @since  12/4/15
  */
@@ -16,10 +18,11 @@ object TestIterableWithGroupBy extends App {
     Entity("d", 3)
   )
   env.from(tuples)
+    .groupByKey(_.name)
     .map(o => {o.inc += 2;o})
     .filter(_.name != "b")
     .filter(_.name != "c")
-    .groupByKey(_.name)
+    .groupByKey(o=>(o.name,o.value))
     .map(o => (o.name,o))
     .map(o => (o._1,o._2.value,o._2.inc))
     .foreach(println)

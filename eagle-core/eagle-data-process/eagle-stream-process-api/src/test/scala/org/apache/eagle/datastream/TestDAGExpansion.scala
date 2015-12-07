@@ -20,9 +20,10 @@
 package org.apache.eagle.datastream
 
 import com.typesafe.config.{Config, ConfigFactory}
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment
 
 object testStreamUnionExpansion extends App{
-  val config : Config = ConfigFactory.load;
+  val config : Config = ConfigFactory.load
   val env = new StormExecutionEnvironment(config)
   val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
   val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key1",a))

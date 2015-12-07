@@ -23,7 +23,9 @@ import backtype.storm.task.TopologyContext
 import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.topology.base.BaseRichSpout
 import backtype.storm.tuple.Fields
-import org.apache.eagle.datastream.{StreamInfo, NameConstant}
+import backtype.storm.utils.Utils
+import org.apache.eagle.datastream.core.StreamInfo
+import org.apache.eagle.datastream.utils.NameConstants
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 
@@ -51,14 +53,17 @@ case class IterableStreamSpout(iterable: Iterable[Any],recycle:Boolean = true)(i
     }else if(recycle){
       LOG.info("Recycling the iterator")
       _iterator = iterable.iterator
+    }else{
+      LOG.info("No next tuple, sleep forever")
+      Utils.sleep(Long.MaxValue)
     }
   }
 
   override def declareOutputFields(declarer: OutputFieldsDeclarer): Unit = {
     if(info.outKeyed) {
-      declarer.declare(new Fields(NameConstant.FIELD_KEY,NameConstant.FIELD_VALUE))
+      declarer.declare(new Fields(NameConstants.FIELD_KEY,NameConstants.FIELD_VALUE))
     }else{
-      declarer.declare(new Fields(NameConstant.FIELD_PREFIX))
+      declarer.declare(new Fields(NameConstants.FIELD_PREFIX))
     }
   }
 }

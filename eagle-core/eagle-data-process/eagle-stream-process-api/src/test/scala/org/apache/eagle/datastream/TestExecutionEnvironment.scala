@@ -1,6 +1,7 @@
 package org.apache.eagle.datastream
 
 import com.typesafe.config.ConfigFactory
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment
 
 /**
  * @since  12/5/15
