@@ -142,6 +142,7 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
 
     @Override
     public void flatMap(List<Object> input, Collector<Tuple2<String, Map>> collector) {
+        LOG.debug("incoming event:" + input.get(1));
         SortedMap<String, Object> toBeCopied = (SortedMap<String, Object>)input.get(1);
         SortedMap<String, Object> event = new TreeMap<String, Object>(toBeCopied);
         Object[] siddhiEvent = convertToSiddhiEvent(collector, event);
