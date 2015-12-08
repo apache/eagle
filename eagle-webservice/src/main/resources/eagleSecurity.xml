@@ -53,13 +53,12 @@
 				</bean>
 			</constructor-arg>
 			<constructor-arg>
-				<bean class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
+				<bean class="org.apache.eagle.service.security.auth.AuthoritiesPopulator">
 					<constructor-arg index="0" ref="ldapSource" />
 					<constructor-arg index="1" value="${ldap.user.groupSearchBase}" />
-					<property name="groupSearchFilter" value="uniqueMember={0}"/>
-					<property name="convertToUpperCase" value="true" />
-					<property name="rolePrefix" value="ROLE_" /> 
-				</bean>
+                    <constructor-arg index="2" value="${acl.adminRole}" />
+                    <constructor-arg index="3" value="${acl.defaultRole}" />
+                </bean>
 			</constructor-arg>
 		</bean>
 
@@ -81,7 +80,7 @@
                 <scr:user-service>
                     <!-- user admin has role ADMIN, user eagle has role USER, both have password "secret" -->
                 	<scr:user name="eagle" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_USER" />
-                    <scr:user name="admin" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_ADMIN, ROLE_USER" />
+                    <scr:user name="admin" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_ADMIN" />
                 </scr:user-service>
                 <scr:password-encoder ref="passwordEncoder" />
             </scr:authentication-provider>

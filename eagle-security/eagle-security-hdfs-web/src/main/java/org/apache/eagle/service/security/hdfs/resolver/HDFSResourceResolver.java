@@ -25,8 +25,8 @@ import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
-import org.apache.eagle.service.security.hdfs.HDFSResourceAccessConfig;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +52,10 @@ public class HDFSResourceResolver  implements AttributeResolvable<GenericAttribu
 	public List<String> resolve(GenericAttributeResolveRequest request)
 			throws AttributeResolveException {
         List<String> result = new ArrayList<>();
+		HDFSResourceUtils resourceUtils = new HDFSResourceUtils();
 		try {
-			HDFSResourceAccessConfig config = HDFSResourceUtils.getConfig(request.getSite().trim());
-			HDFSFileSystem fileSystem = new HDFSFileSystem(config.getHdfsEndpoint());
+			Configuration config = resourceUtils.getConfig(request.getSite().trim());
+			HDFSFileSystem fileSystem = new HDFSFileSystem(config);
 			String query = request.getQuery().trim();
 			List<FileStatus> fileStatuses = null;
 			if(query.endsWith("/")) {

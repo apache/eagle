@@ -16,20 +16,35 @@
  */
 package org.apache.eagle.service.security.hdfs.test;
 
-import org.apache.eagle.service.security.hdfs.HDFSResourceAccessConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import junit.framework.Assert;
 import org.apache.eagle.service.security.hdfs.HDFSResourceUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HDFSResourceAccessConfigTest {
 
-	//@Test
-	public void testHDFSResourceAccessConfig() throws Exception {
-		HDFSResourceAccessConfig config = HDFSResourceUtils.getConfig("cluster1-dc1");
-		System.out.println(config);
-	}
-
 	@Test
-	public void test() {
+	public void testHDFSResourceAccessConfig() throws Exception {
+		String configStr = "{\"fs.defaultFS\":\"hdfs://sandbox-nn-ha\",\"dfs.nameservices\":\"sandbox-nn-ha\",\"dfs.ha.namenodes.sandbox-nn-ha\":\"nn1,nn2\",\"dfs.namenode.rpc-address.sandbox-nn-ha.nn1\":\"sandbox-nn.vip.ebay.com:8020\",\"dfs.namenode.rpc-address.sandbox-nn-ha.nn2\":\"sandbox-nn-2.vip.ebay.com:8020\",\"dfs.client.failover.proxy.provider.sandbox-nn-ha\":\"org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider\",\"hadoop.security.authentication\":\"kerberos\",\"dfs.namenode.kerberos.principal\":\"hadoop/_HOST@EXAMPLE.COM\"}";
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, String> configMap = mapper.readValue(configStr, Map.class);
+		Map<String, String> result = new HashMap<>();
+		result.put("fs.defaultFS" , "hdfs://sandbox-nn-ha");
+		result.put("dfs.nameservices", "sandbox-nn-ha");
+		result.put("dfs.ha.namenodes.sandbox-nn-ha", "nn1,nn2");
+		result.put("dfs.namenode.rpc-address.sandbox-nn-ha.nn1", "sandbox-nn.vip.ebay.com:8020");
+		result.put("dfs.namenode.rpc-address.sandbox-nn-ha.nn2", "sandbox-nn-2.vip.ebay.com:8020");
+		result.put("dfs.client.failover.proxy.provider.sandbox-nn-ha","org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
+		result.put("hadoop.security.authentication", "kerberos");
+		result.put("dfs.namenode.kerberos.principal", "hadoop/_HOST@EXAMPLE.COM");
 
+		Assert.assertEquals(configMap, result);
 	}
+
 }

@@ -20,10 +20,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.eagle.security.util.HadoopSecurityUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.security.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,23 +41,16 @@ import org.slf4j.LoggerFactory;
  */
 public class HDFSFileSystem {
 
-	private String hdfsEndPoint;
+	private Configuration config;
+
 	private static Logger LOG = LoggerFactory.getLogger(HDFSFileSystem.class);
 	
-	public HDFSFileSystem( String hdfsEndPoint )
-	{
-		this.hdfsEndPoint = hdfsEndPoint;
+	public HDFSFileSystem(Configuration hdfsConfig) {
+		config = hdfsConfig;
 	}
-	
-	/**
-	 * Creates FileSystem Object 	
-	 * @param config
-	 * @return
-	 * @throws IOException
-	 */
-	public FileSystem getFileSystem( Configuration config ) throws IOException
-	{
-		
+
+	public FileSystem getFileSystem() throws IOException {
+		HadoopSecurityUtil.login(config);
 		return FileSystem.get(config);
 	}
 	
@@ -66,14 +61,11 @@ public class HDFSFileSystem {
 	 * @return listOfFiles
 	 * @throws Exception 
 	 */
-	public List<FileStatus> browse(String filePath) throws Exception
-	{
-		LOG.info("HDFS File Path   :  "+filePath +"   and EndPoint  : "+hdfsEndPoint);
+	public List<FileStatus> browse(String filePath) throws Exception {
 		FileSystem hdfsFileSystem = null;
         FileStatus[]  listStatus;
         try {
-			Configuration config = createConfig();
-			hdfsFileSystem = getFileSystem(config);
+			hdfsFileSystem = getFileSystem();
 			Path path  = new Path(filePath);
 			listStatus = hdfsFileSystem.listStatus( path );
 		} catch ( Exception ex ) {
@@ -85,17 +77,5 @@ public class HDFSFileSystem {
 		}
 		return Arrays.asList(listStatus);
 	}
-
-
-	/**
-	 * Create Config Object
-	 * @return
-	 */
-	public Configuration createConfig() throws Exception {
-		Configuration config =  new Configuration();
-		config.set(HDFSResourceConstants.HDFS_FS_DEFAULT_NAME, this.hdfsEndPoint);		
-		return config;
-	}
-
 
 }

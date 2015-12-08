@@ -34,9 +34,4 @@ public class HDFSResourceSensitivityServiceTest {
 		service.getFileSensitivityMapBySite("cluster1-dc1");
 		
 	}
-
-	@Test
-	public void test() {
-
-	}
 }

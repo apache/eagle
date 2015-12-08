@@ -17,34 +17,42 @@
 package org.apache.eagle.service.security.hdfs;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.eagle.security.util.HadoopSecurityUtil;
 import org.apache.eagle.service.generic.ListQueryResource;
-
 import org.apache.eagle.alert.entity.AlertDataSourceEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hadoop.conf.Configuration;
 
 
 /**
  * Util API which has common methods and Service calls API
  */
 public class HDFSResourceUtils {
-		
-	@SuppressWarnings("unchecked")
-	public static HDFSResourceAccessConfig  getConfig(String siteId ) throws Exception
-	{
+
+	public  Configuration getConfig(String siteId) throws Exception {
 		ListQueryResource resource = new ListQueryResource();
 		String queryFormat = "AlertDataSourceService[@dataSource=\""+HDFSResourceConstants.HDFS_DATA_SOURCE+"\" AND @site=\"%s\"]{*}";
 		ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, siteId), null, null,Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null);
 		List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) ret.getObj();
 		if (list == null || list.size() == 0)
 			throw new Exception("Config is empty for site " + siteId +".");
-	    
+
 		ObjectMapper mapper = new ObjectMapper();
-		HDFSResourceAccessConfig config = mapper.readValue(list.get(0).getConfig(), HDFSResourceAccessConfig.class);				
+		Map<String, String> configMap = mapper.readValue(list.get(0).getConfig(), Map.class);
+		return convert(configMap);
+	}
+
+	private Configuration convert(Map<String, String> configMap) throws Exception {
+		Configuration config = new Configuration();
+		for(Map.Entry<String, String> entry : configMap.entrySet()) {
+			config.set(entry.getKey(), entry.getValue());
+		}
 		return config;
-	}	
-	
+	}
+
 	/**
 	 * Not Null String Check Method 
 	 * @param input

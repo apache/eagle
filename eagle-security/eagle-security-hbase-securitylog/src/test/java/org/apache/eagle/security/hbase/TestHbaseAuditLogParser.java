@@ -37,7 +37,7 @@ public class TestHbaseAuditLogParser {
 
     @Test
     public void test2() throws Exception {
-        String log = "2015-08-04 12:29:03,073 TRACE SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController: Access allowed for user eagle; reason: Global check allowed; remote address: ; request: preOpen; context: (user=eagle, scope=GLOBAL, family=, action=ADMIN)";
+        String log = "2015-12-02 06:48:48,160 TRACE SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController: Access allowed for user hbase; reason: All users allowed; remote address: /10.0.2.15; request: scan; context: (user=hbase/sandbox.hortonworks.com@HORTONWORKS.COM, scope=hbase:meta, family=info, action=READ)";
         HbaseAuditLogObject obj = parser.parse(log);
         Assert.assertEquals(obj.action, "ADMIN");
         Assert.assertEquals(obj.host, "");

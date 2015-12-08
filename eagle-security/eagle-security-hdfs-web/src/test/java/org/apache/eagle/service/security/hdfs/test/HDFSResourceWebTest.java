@@ -28,8 +28,4 @@ public class HDFSResourceWebTest {
 		
 	}
 
-	@Test
-	public void test() {
-
-	}
 }

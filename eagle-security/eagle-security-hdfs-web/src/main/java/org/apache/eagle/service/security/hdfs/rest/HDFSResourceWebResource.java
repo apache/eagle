@@ -27,9 +27,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.eagle.service.common.EagleExceptionWrapper;
-import org.apache.eagle.service.security.hdfs.HDFSResourceAccessConfig;
 import org.apache.eagle.service.security.hdfs.HDFSResourceConstants;
 import org.apache.eagle.service.security.hdfs.HDFSResourceSensitivityDataJoiner;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +54,14 @@ public class HDFSResourceWebResource
 	{
 		LOG.info("Starting HDFS Resource Browsing.  Query Parameters ==> Site :"+site+"  Path : "+filePath );
 		HDFSResourceWebResponse response = new HDFSResourceWebResponse();		
-		HDFSResourceWebRequestValidator validator = new HDFSResourceWebRequestValidator();		
+		HDFSResourceWebRequestValidator validator = new HDFSResourceWebRequestValidator();
+		HDFSResourceUtils resourceUtils = new HDFSResourceUtils();
 		List<FileStatusEntity> result = new ArrayList<>();		
 		List<FileStatus> fileStatuses = null;
 		try {
-			validator.validate(site, filePath); // First Step would be validating Request 
-			HDFSResourceAccessConfig config = HDFSResourceUtils.getConfig(site);
-			HDFSFileSystem fileSystem = new HDFSFileSystem(config.getHdfsEndpoint());
+			validator.validate(site, filePath); // First Step would be validating Request
+			Configuration config = resourceUtils.getConfig(site);
+			HDFSFileSystem fileSystem = new HDFSFileSystem(config);
 			fileStatuses = fileSystem.browse(filePath);
 			// Join with File Sensitivity Info
 			HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner();
