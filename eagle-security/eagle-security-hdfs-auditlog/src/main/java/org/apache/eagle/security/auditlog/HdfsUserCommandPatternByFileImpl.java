@@ -32,7 +32,7 @@ import java.util.List;
  * get HdfsUserCommandPattern from eagle database
  */
 public class HdfsUserCommandPatternByFileImpl implements HdfsUserCommandPatternDAO {
-    private final Logger LOG = LoggerFactory.getLogger(AlertDefinitionDAOImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(HdfsUserCommandPatternByFileImpl.class);
 
     @Override
     public List<HdfsUserCommandPatternEntity> findAllPatterns() throws Exception{
