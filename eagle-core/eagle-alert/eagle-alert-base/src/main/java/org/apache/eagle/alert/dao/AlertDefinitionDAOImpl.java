@@ -16,11 +16,10 @@
  */
 package org.apache.eagle.alert.dao;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
@@ -35,37 +34,17 @@ import java.util.Map;
  * Utility methods to load alert definitions for a program
  */
 public class AlertDefinitionDAOImpl implements AlertDefinitionDAO {
-	private final String eagleServiceHost;
-	private final Integer eagleServicePort;
-	private String username;
-	private String password;
 	private final Logger LOG = LoggerFactory.getLogger(AlertDefinitionDAOImpl.class);
+	private final EagleServiceConnector connector;
 
-	public AlertDefinitionDAOImpl(String eagleServiceHost, Integer eagleServicePort) {
-		this(eagleServiceHost, eagleServicePort, null, null);
-	}
-
-	public AlertDefinitionDAOImpl(String eagleServiceHost, Integer eagleServicePort, String username, String password) {
-		this.eagleServiceHost = eagleServiceHost;
-		this.eagleServicePort = eagleServicePort;
-		this.username = username;
-		this.password = password;
-	}
-
-	public AlertDefinitionDAOImpl(Config config){
-		this.eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-		this.eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-		if (config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) &&
-			config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD)) {
-			this.username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
-			this.password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
-		}
+	public AlertDefinitionDAOImpl(EagleServiceConnector connector){
+		this.connector = connector;
 	}
 
     @Override
 	public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) throws Exception {
 		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
+			IEagleServiceClient client = new EagleServiceClientImpl(connector);
 			String query = AlertConstants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
 			GenericServiceAPIResponseEntity<AlertDefinitionAPIEntity> response =  client.search()
 																		                .pageSize(Integer.MAX_VALUE)

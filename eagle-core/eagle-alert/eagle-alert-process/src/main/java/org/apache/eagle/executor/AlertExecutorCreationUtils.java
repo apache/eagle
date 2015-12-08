@@ -26,6 +26,7 @@ import org.apache.eagle.alert.policy.PolicyPartitioner;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValue;
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class AlertExecutorCreationUtils {
         // Get map from alertExecutorId to alert stream
         // (dataSource) => Map[alertExecutorId:String,streamName:List[String]]
         List<String> streamNames = new ArrayList<String>();
-        AlertExecutorDAOImpl alertExecutorDAO = new AlertExecutorDAOImpl(config);
+        AlertExecutorDAOImpl alertExecutorDAO = new AlertExecutorDAOImpl(new EagleServiceConnector(config));
         List<AlertExecutorEntity> alertExecutorEntities = alertExecutorDAO.findAlertExecutor(dataSource, alertExecutorId);
         for(AlertExecutorEntity entity : alertExecutorEntities){
             streamNames.add(entity.getTags().get(AlertConstants.STREAM_NAME));
@@ -70,7 +71,7 @@ public class AlertExecutorCreationUtils {
         if(streamNames.isEmpty()){
             throw new IllegalStateException("upstream names should not be empty for alert " + alertExecutorId);
         }
-        return createAlertExecutors(config, new AlertDefinitionDAOImpl(config),
+        return createAlertExecutors(config, new AlertDefinitionDAOImpl(new EagleServiceConnector(config)),
                 streamNames, alertExecutorId);
     }
 

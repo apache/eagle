@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.security.auditlog;
 
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.security.hdfs.entity.HdfsUserCommandPatternEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
@@ -34,7 +31,7 @@ import java.util.List;
  */
 public class HdfsUserCommandPatternByDBImpl implements HdfsUserCommandPatternDAO {
     private final EagleServiceConnector connector;
-    private final Logger LOG = LoggerFactory.getLogger(AlertDefinitionDAOImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(HdfsUserCommandPatternByDBImpl.class);
 
     @Override
     public List<HdfsUserCommandPatternEntity> findAllPatterns() throws Exception{
