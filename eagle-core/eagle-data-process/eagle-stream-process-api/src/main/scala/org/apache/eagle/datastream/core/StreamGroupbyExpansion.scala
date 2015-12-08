@@ -67,3 +67,11 @@ case class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(con
     toBeRemovedVertex.foreach(v => dag.removeVertex(v))
   }
 }
+
+object StreamGroupbyExpansion{
+  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamGroupbyExpansion ={
+    val e = StreamGroupbyExpansion(config)
+    e.expand(dag)
+    e
+  }
+}

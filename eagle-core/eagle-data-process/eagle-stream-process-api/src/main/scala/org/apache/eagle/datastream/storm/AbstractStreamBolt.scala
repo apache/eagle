@@ -115,6 +115,5 @@ abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true
 
   override def prepare(stormConf: util.Map[_, _], context: TopologyContext, collector: OutputCollector): Unit = {
     _collector = collector
-    streamInfo.restore()
   }
 }

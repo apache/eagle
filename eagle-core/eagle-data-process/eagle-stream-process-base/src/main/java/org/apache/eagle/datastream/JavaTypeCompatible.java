@@ -1,3 +1,4 @@
+package org.apache.eagle.datastream;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,12 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.datastream
 
-trait FlatMapper[T] extends Serializable {
-  def flatMap(input : Seq[AnyRef], collector : Collector[T])
-}
-
-trait JavaFlatMapper[T] extends FlatMapper[T] with JavaTypeCompatible{
-  def flatMap(input : Seq[AnyRef], collector : Collector[T])
+/**
+ * @since 12/8/15
+ */
+public interface JavaTypeCompatible {
+    Class<?> getType();
 }

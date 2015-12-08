@@ -38,3 +38,12 @@ case class StreamNameExpansion(config: Config) extends StreamDAGExpansion(config
     }
   }
 }
+
+
+object StreamNameExpansion{
+  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamNameExpansion ={
+    val e = StreamNameExpansion(config)
+    e.expand(dag)
+    e
+  }
+}

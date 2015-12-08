@@ -105,9 +105,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
         val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(config), upStreamNames, alertExecutorId)
         var alertProducers = new scala.collection.mutable.MutableList[StreamProducer[Any]]
         alertExecutors.foreach(exec => {
-          val t = FlatMapProducer(exec).nameAs(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
-          t.setConfig(config)
-          t.setGraph(dag)
+          val t = FlatMapProducer(exec).nameAs(exec.getAlertExecutorId + "_" + exec.getPartitionSeq).initWithClass(dag,config,exec.getType,hook = false)
           alertProducers += t
           newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector[Any,Any](newsp, t,Seq(0)))
           if (strategy == null) {
@@ -139,15 +137,11 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
         mapper match {
           case a: JavaStormStreamExecutor[EagleTuple] => {
             val newmapper = new JavaStormExecutorForAlertWrapper(a.asInstanceOf[JavaStormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
-            newsp = FlatMapProducer(newmapper)
-            newsp.setGraph(dag)
-            newsp.setConfig(config)
+            newsp = FlatMapProducer(newmapper).initWithClass(dag,config,classOf[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]],hook = false)
           }
           case b: StormStreamExecutor[EagleTuple] => {
             val newmapper = StormExecutorForAlertWrapper(b.asInstanceOf[StormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
-            newsp = FlatMapProducer(newmapper)
-            newsp.setGraph(dag)
-            newsp.setConfig(config)
+            newsp = FlatMapProducer(newmapper).initWithClass(dag,config,classOf[util.SortedMap[AnyRef, AnyRef]],hook = false)
           }
           case _ => throw new IllegalArgumentException
         }
@@ -188,6 +182,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
           }
         }
         newsp = MapperProducer(3,fn)
+        newsp.typeClass = classOf[AnyRef]
         toBeAddedEdges += StreamConnector(current,newsp)
         val outgoingEdges = dag.outgoingEdgesOf(current)
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp,e.to))
@@ -197,3 +192,12 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
     newsp
   }
 }
+
+object StreamAlertExpansion{
+  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamAlertExpansion ={
+    val e = StreamAlertExpansion(config)
+    e.expand(dag)
+    e
+  }
+}
+

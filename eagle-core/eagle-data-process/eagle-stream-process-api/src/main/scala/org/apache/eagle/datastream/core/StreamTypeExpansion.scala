@@ -14,32 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.eagle.datastream.core
 
+import com.typesafe.config.Config
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
-
-import scala.collection.mutable
+import org.slf4j.LoggerFactory
 
 /**
- * convert generic DAG data structure to Storm specific DAG data structure for easy topology compiler
+ * @since  12/8/15
  */
-object StreamDAGTransformer {
-  /**
-   * Transform DirectedAcyclicGraph[StreamProducer, StreamConnector] into StormStreamDAG
-   *
-   * @param dag DirectedAcyclicGraph[StreamProducer, StreamConnector]
-   * @return StormStreamDAG
-   */
-  def transform(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) : StreamDAG = {
-    val stormDAG = new StreamDAG(dag)
-    val nodeMap = mutable.HashMap[String, StreamProducer[Any]]()
+case class StreamTypeExpansion(config: Config) extends StreamDAGExpansion(config) {
+  val LOG = LoggerFactory.getLogger(classOf[StreamTypeExpansion])
+  override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]]): Unit = {
     val iter = dag.iterator()
     while(iter.hasNext){
-      val sp = iter.next()
-      nodeMap.put(sp.name, sp)
+      val next = iter.next()
+      if(next.typeClass == null){
+        LOG.warn(s"Stream type of $next is unknown, set as ${classOf[AnyRef]} by default")
+        next.typeClass = classOf[AnyRef]
+      }
     }
-    stormDAG.setNodeMap(nodeMap)
-    stormDAG
+  }
+}
+
+object StreamTypeExpansion{
+  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamTypeExpansion ={
+    val e = StreamTypeExpansion(config)
+    e.expand(dag)
+    e
   }
 }

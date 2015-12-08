@@ -64,3 +64,12 @@ case class StreamUnionExpansion(config: Config) extends StreamDAGExpansion(confi
     toBeRemovedVertex.foreach(v => dag.removeVertex(v))
   }
 }
+
+object StreamUnionExpansion{
+  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamUnionExpansion ={
+    val e = StreamUnionExpansion(config)
+    e.expand(dag)
+    e
+  }
+}
+

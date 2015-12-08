@@ -20,7 +20,6 @@
 package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
-import org.apache.eagle.datastream.core.StreamConnector
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
 abstract class StreamDAGExpansion(config: Config) {

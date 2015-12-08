@@ -44,31 +44,23 @@ import scala.reflect.runtime.{universe => ru}
  * @tparam T processed elements type
  */
 abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[T] {
-  /**
-   * Component name
-   */
-  var graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]] = null
   var config: Config = null
+  var graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]] = null
 
   /**
    * Should not modify graph when setting it
    *
    */
-  def setGraph(graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit = {
-    this.graph = graph
-  }
-
-  def getGraph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]] = graph
-  def setConfig(config: Config) : Unit = this.config = config
-  def getConfig: Config = config
-
-  override def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config,typeClass:Class[_]):Unit = {
+  override def initWithClass(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config, typeClass:Class[_],hook:Boolean = true):StreamProducer[T] = {
     this.typeClass=typeClass
-    this.setConfig(config)
-    this.setGraph(graph)
-    if(!this.graph.containsVertex(this)){
-      this.graph.addVertex(this)
+    this.config = config
+    this.graph = graph
+    if(hook) {
+      if (!this.graph.containsVertex(this)) {
+        this.graph.addVertex(this)
+      }
     }
+    this
   }
 
   /**
@@ -215,13 +207,14 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   }
 
   protected def hookup[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2])(implicit typeTag:ru.TypeTag[_]) = {
-    current.getGraph.addVertex(next)
-    current.getGraph.addEdge(current, next, StreamConnector(current, next))
+    current.graph.addVertex(next)
+    current.graph.addEdge(current, next, StreamConnector(current, next))
+
     passOnContext[T1,T2](current, next)(typeTag)
   }
 
   private def passOnContext[T1 ,T2](current: StreamProducer[T1], next: StreamProducer[T2])(implicit typeTag:ru.TypeTag[_]): Unit ={
-    next.setup(current.graph,current.config)(typeTag)
+    next.initWith(current.graph,current.config,hook = true)(typeTag)
   }
 
   /**
@@ -247,20 +240,30 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   }
 }
 
-case class FilterProducer[T](fn : T => Boolean) extends StreamProducer[T]
+case class FilterProducer[T](fn : T => Boolean) extends StreamProducer[T]{
+  override def toString: String = s"FilterProducer"
+}
 
 case class FlatMapProducer[T, R](var mapper: FlatMapper[R]) extends StreamProducer[R]{
+  mapper match {
+    case compatible: JavaTypeCompatible =>
+      this.typeClass = compatible.getType
+  }
   override def toString: String = mapper.toString
 }
 
-case class MapperProducer[T,R](numOutputFields : Int, var fn : T => R) extends StreamProducer[R]
+case class MapperProducer[T,R](numOutputFields : Int, var fn : T => R) extends StreamProducer[R]{
+  override def toString: String = s"MapperProducer"
+}
 
 case class ForeachProducer[T](var fn : T => Unit) extends StreamProducer[T]
 
 abstract class GroupByProducer[T] extends StreamProducer[T]
 case class GroupByFieldProducer[T](fields : Seq[Int]) extends GroupByProducer[T]
 case class GroupByStrategyProducer[T](partitionStrategy: PartitionStrategy) extends GroupByProducer[T]
-case class GroupByKeyProducer[T](keySelectorFunc:T => Any) extends GroupByProducer[T]
+case class GroupByKeyProducer[T](keySelectorFunc:T => Any) extends GroupByProducer[T]{
+  override def toString: String = s"GroupByKey"
+}
 
 object GroupByProducer {
   def apply[T](fields: Seq[Int]) = new GroupByFieldProducer[T](fields)

@@ -42,6 +42,7 @@ abstract class StormStreamExecutor1[T0] extends StormStreamExecutor[Tuple1[T0]] 
 
 abstract class JavaStormStreamExecutor1[T0] extends JavaStormStreamExecutor[Tuple1[T0]] {
   override def fields = Array("f0")
+  override def getType: Class[_] = classOf[Tuple1[T0]]
 }
 
 abstract class  StormStreamExecutor2[T0, T1] extends StormStreamExecutor[Tuple2[T0, T1]] {
@@ -50,6 +51,7 @@ abstract class  StormStreamExecutor2[T0, T1] extends StormStreamExecutor[Tuple2[
 
 abstract class  JavaStormStreamExecutor2[T0, T1] extends JavaStormStreamExecutor[Tuple2[T0, T1]] {
   override def fields = Array("f0", "f1")
+  override def getType: Class[_] = classOf[Tuple2[T0,T1]]
 }
 
 abstract class  StormStreamExecutor3[T0, T1, T2] extends StormStreamExecutor[Tuple3[T0, T1, T2]] {
@@ -58,6 +60,7 @@ abstract class  StormStreamExecutor3[T0, T1, T2] extends StormStreamExecutor[Tup
 
 abstract class  JavaStormStreamExecutor3[T0, T1, T2] extends JavaStormStreamExecutor[Tuple3[T0, T1, T2]] {
   override def fields = Array("f0", "f1", "f2")
+  override def getType: Class[_] = classOf[Tuple3[T0,T1,T2]]
 }
 
 abstract class  StormStreamExecutor4[T0, T1, T2, T3] extends StormStreamExecutor[Tuple4[T0, T1, T2, T3]] {
@@ -66,4 +69,5 @@ abstract class  StormStreamExecutor4[T0, T1, T2, T3] extends StormStreamExecutor
 
 abstract class  JavaStormStreamExecutor4[T0, T1, T2, T3] extends JavaStormStreamExecutor[Tuple4[T0, T1, T2, T3]] {
   override def fields = Array("f0", "f1", "f2", "f3")
+  override def getType: Class[_] = classOf[Tuple4[T0, T1, T2, T3]]
 }

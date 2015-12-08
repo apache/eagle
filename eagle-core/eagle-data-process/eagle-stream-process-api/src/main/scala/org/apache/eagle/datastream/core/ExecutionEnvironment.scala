@@ -35,21 +35,22 @@ trait ExecutionEnvironment {
  * @param conf
  */
 abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment with StreamSourceBuilder {
-  private val _dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
-  implicit private val _config:Configuration = Configuration(conf)
+  implicit private val _dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
+  private val _config:Configuration = Configuration(conf)
 
   override def dag = _dag
   override def config = _config
 
   override def execute(): Unit = {
-    // Must set default name before graph printing
-    StreamNameExpansion(config.get).expand(dag)
+    implicit val i_conf = _config.get
+    StreamNameExpansion()
     GraphPrinter.print(dag,"Before expanded DAG ")
-    StreamAlertExpansion(config.get).expand(dag)
-    StreamUnionExpansion(config.get).expand(dag)
-    StreamGroupbyExpansion(config.get).expand(dag)
-    StreamParallelismConfigExpansion(config.get).expand(dag)
-    StreamNameExpansion(config.get).expand(dag)
+    StreamAlertExpansion()
+    StreamUnionExpansion()
+    StreamGroupbyExpansion()
+    StreamParallelismConfigExpansion()
+    StreamNameExpansion()
+    StreamTypeExpansion()
     GraphPrinter.print(dag,"After expanded DAG ")
     val streamDAG = StreamDAGTransformer.transform(dag)
     execute(streamDAG)

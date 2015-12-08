@@ -66,19 +66,14 @@ class StreamInfo  extends Serializable{
    */
   def typeClassName = if(typeClass == null) null else typeClass.getSimpleName
 
-  /**
-   * Entity typeTag of T (un-serializable)
-   */
-  @transient var typeTag:ru.TypeTag[_] = null
+  @transient private var _typeTag:ru.TypeTag[_] = null
 
-  /**
-   * Handle unsupported issues like serializing un-serializable variable
-   */
-  def restore():Unit = {
-    this.typeTag = Reflections.typeTag(this.typeClass)
+  def typeTag:ru.TypeTag[_] = {
+    if(_typeTag == null) _typeTag = Reflections.typeTag(this.typeClass)
+    _typeTag
   }
 
-  def getInfo:StreamInfo = this
+  def getInfo = this
 }
 
 /**
@@ -90,11 +85,11 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
   /**
    * Initialize the stream metadata info
    */
-  def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config)(implicit typeTag: ru.TypeTag[_]):Unit = {
-    setup(graph,config,if(typeTag == null) null else typeTag.mirror.runtimeClass(typeTag.tpe))
+  def initWith(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config, hook:Boolean = true)(implicit typeTag: ru.TypeTag[_]):StreamProducer[T] = {
+    initWithClass(graph,config,if(typeTag == null) null else typeTag.mirror.runtimeClass(typeTag.tpe),hook)
   }
 
-  def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config,typeClass:Class[_]=null):Unit
+  def initWithClass(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config,typeClass:Class[_], hook:Boolean = true):StreamProducer[T]
 
   /**
    * Support Java API

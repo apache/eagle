@@ -19,7 +19,7 @@ case class StormExecutionEnvironment(private val conf:Config) extends ExecutionE
   def fromSpout[T](source: BaseRichSpout): StormSourceProducer[T] = {
     implicit val typeTag = ru.typeTag[java.util.List[_]]
     val ret = StormSourceProducer[T](source)
-    ret.setup(dag ,config.get)
+    ret.initWith(dag ,config.get)
     ret
   }
 
