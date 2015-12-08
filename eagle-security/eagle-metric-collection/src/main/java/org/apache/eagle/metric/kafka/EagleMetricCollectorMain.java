@@ -19,11 +19,9 @@ package org.apache.eagle.metric.kafka;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.base.BaseRichSpout;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
-import org.apache.eagle.datastream.ExecutionEnvironmentFactory;
+import org.apache.eagle.datastream.ExecutionEnvironments;
 import org.apache.eagle.datastream.StormExecutionEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +40,8 @@ public class EagleMetricCollectorMain {
     private static final Logger LOG = LoggerFactory.getLogger(EagleMetricCollectorMain.class);
 
     public static void main(String[] args) throws Exception {
-        new ConfigOptionParser().load(args);
-        //System.setProperty("config.resource", "/application.local.conf");
-
-        Config config = ConfigFactory.load();
-
-        StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
+        Config config = env.getConfig();
         String deserClsName = config.getString("dataSourceConfig.deserializerClass");
         final KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, config) {
             @Override
@@ -60,6 +53,8 @@ public class EagleMetricCollectorMain {
             }
         };
 
+
+        // TODO: Refactored the anonymous in to independen class file, avoiding too complex logic in main method
         KafkaSourcedSpoutProvider kafkaMessageSpoutProvider = new KafkaSourcedSpoutProvider() {
             @Override
             public BaseRichSpout getSpout(Config context) {
@@ -119,8 +114,8 @@ public class EagleMetricCollectorMain {
             }
         };
 
-        env.newSource(new KafkaOffsetSourceSpoutProvider().getSpout(config)).renameOutputFields(0).withName("kafkaLogLagChecker");
-        env.newSource(kafkaMessageSpoutProvider.getSpout(config)).renameOutputFields(2).withName("kafkaMessageFetcher").groupBy(Arrays.asList(0))
+        env.fromSpout(new KafkaOffsetSourceSpoutProvider()).withOutputFields(0).nameAs("kafkaLogLagChecker");
+        env.fromSpout(kafkaMessageSpoutProvider).withOutputFields(2).nameAs("kafkaMessageFetcher").groupBy(Arrays.asList(0))
                 .flatMap(new KafkaMessageDistributionExecutor());
         env.execute();
     }

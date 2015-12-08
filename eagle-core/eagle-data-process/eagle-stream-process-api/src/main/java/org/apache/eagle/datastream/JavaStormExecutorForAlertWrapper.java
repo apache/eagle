@@ -52,4 +52,5 @@ public class JavaStormExecutorForAlertWrapper extends JavaStormStreamExecutor3<S
         };
         delegate.flatMap(input, delegateCollector);
     }
+
 }

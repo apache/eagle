@@ -28,9 +28,9 @@ import storm.kafka.ZkHosts;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.base.BaseRichSpout;
 
-import org.apache.eagle.dataproc.impl.storm.AbstractStormSpoutProvider;
+import org.apache.eagle.dataproc.impl.storm.StormSpoutProvider;
 
-public class KafkaSourcedSpoutProvider extends AbstractStormSpoutProvider{
+public class KafkaSourcedSpoutProvider implements StormSpoutProvider {
     private final static Logger LOG = LoggerFactory.getLogger(KafkaSourcedSpoutProvider.class);
 
 	public SchemeAsMultiScheme getStreamScheme(String deserClsName, Config context) {
@@ -89,7 +89,6 @@ public class KafkaSourcedSpoutProvider extends AbstractStormSpoutProvider{
 		}
 		
 		spoutConfig.scheme = getStreamScheme(deserClsName, context);
-		KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
-		return kafkaSpout;
+        return new KafkaSpout(spoutConfig);
 	}
 }

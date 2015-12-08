@@ -16,9 +16,7 @@
  */
 package org.apache.eagle.datastream
 
-import java.util
-
-import com.typesafe.config.{ConfigFactory, Config}
+import com.typesafe.config.{Config, ConfigFactory}
 
 /**
  * explicit union
@@ -27,14 +25,14 @@ import com.typesafe.config.{ConfigFactory, Config}
  * 1. stream schema
  * curl -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamSchemaService" -d '[{"prefix":"alertStreamSchema","tags":{"dataSource":"ds1","streamName":"s1","attrName":"word"},"attrDescription":"word","attrType":"string","category":"","attrValueResolver":""}]'
  * 2. policy
- * curl -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDefinitionService" -d '[{"tags":{"site":"sandbox","dataSource":"ds1","alertExecutorId":"alert1","policyId":"testAlert","policyType":"siddhiCEPEngine"},"desc":"test alert","policyDef":"{\"type\":\"siddhiCEPEngine\",\"expression\":\"from s1 [(str:regexp(word,'\'.*test.*\'')==true)] select * insert into outputStream ;\"}","dedupeDef":"","notificationDef":"","remediationDef":"","enabled":"true"}]'
+ * curl -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDefinitionService" -d '[{"tags":{"site":"sandbox","dataSource":"ds1","alertExecutorId":"alert1","policyId":"testAlert","policyType":"siddhiCEPEngine"},"desc":"test alert","policyDef":"{\"type\":\"siddhiCEPEngine\",\"expression\":\"from s1 [(str:regexp(word,'\'.*test.*\)==true)] select * insert into outputStream ;\"}","dedupeDef":"","notificationDef":"","remediationDef":"","enabled":"true"}]'
  */
 object UnionForAlert extends App{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  val tail1 = env.newSource(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
-  val tail2 = env.newSource(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key2",a))
-  tail1.streamUnion(List(tail2)).alert(util.Arrays.asList("s1","s2"), "alert1", false)
+  val env = ExecutionEnvironments.getStorm(config)
+  val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
+  val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key2",a))
+  tail1.union(List(tail2)).alert(Seq("s1","s2"), "alert1", consume = false)
   //env.execute
 }
 
@@ -43,10 +41,10 @@ object UnionForAlert extends App{
  */
 object TestAlertAfterFlatMap extends App{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  val tail1 = env.newSource(TestSpout())
+  val env = ExecutionEnvironments.getStorm(config)
+  val tail1 = env.fromSpout(TestSpout())
                   .flatMap(WordPrependForAlertExecutor("test"))
-                  .alert(util.Arrays.asList("s1"), "alert1", false)
+                  .alert(Seq("s1"), "alert1", consume = false)
   //env.execute
 }
 
@@ -55,26 +53,26 @@ object TestAlertAfterFlatMap extends App{
  */
 object TestAlertAfterMap extends App{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  val tail1 = env.newSource(TestSpout())
+  val env = ExecutionEnvironments.getStorm(config)
+  val tail1 = env.fromSpout(TestSpout())
     .flatMap(WordPrependForAlertExecutor2("test"))
     .map2(a => ("key", a))
-    .alert(util.Arrays.asList("s1"), "alert1", false)
+    .alert(Seq("s1"), "alert1", false)
   //env.execute
 }
 
 object StormRunnerWithoutSplitOrJoin extends Application{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  env.newSource(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test"))
+  val env = ExecutionEnvironments.getStorm(config)
+  env.fromSpout(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test"))
     .flatMap(PatternAlertExecutor("test.*"))
   //env.execute
 }
 
 object StormRunnerWithSplit extends Application{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  val toBeSplit = env.newSource(TestSpout()).flatMap(EchoExecutor())
+  val env = ExecutionEnvironments.getStorm(config)
+  val toBeSplit = env.fromSpout(TestSpout()).flatMap(EchoExecutor())
   toBeSplit.flatMap(WordPrependExecutor("test")).flatMap(PatternAlertExecutor("test.*"))
   toBeSplit.flatMap(WordAppendExecutor("test"))
   //env.execute
@@ -82,17 +80,17 @@ object StormRunnerWithSplit extends Application{
 
 object StormRunnerWithUnion extends Application{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  val tail1 = env.newSource(TestSpout()).flatMap(WordPrependExecutor("test"))
-  val tail2 = env.newSource(TestSpout()).flatMap(WordAppendExecutor("test"))
-  tail1.streamUnion(List(tail2)).flatMap(PatternAlertExecutor(".*test.*"))
+  val env = ExecutionEnvironments.getStorm(config)
+  val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependExecutor("test"))
+  val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendExecutor("test"))
+  tail1.union(List(tail2)).flatMap(PatternAlertExecutor(".*test.*"))
   //env.execute
 }
 
 object StormRunnerWithFilter extends Application{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  env.newSource(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test")).
+  val env = ExecutionEnvironments.getStorm(config)
+  env.fromSpout(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test")).
     filter(_=>false).
     flatMap(PatternAlertExecutor("test.*"))
   //env.execute
@@ -100,8 +98,8 @@ object StormRunnerWithFilter extends Application{
 
 object StormRunnerWithJavaExecutor extends Application{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  env.newSource(TestSpout()).flatMap(new JavaEchoExecutor()).flatMap(WordPrependExecutor("test")).
+  val env = ExecutionEnvironments.getStorm(config)
+  env.fromSpout(TestSpout()).flatMap(new JavaEchoExecutor()).flatMap(WordPrependExecutor("test")).
     filter(_=>false).
     flatMap(PatternAlertExecutor("test.*"))
   //env.execute
@@ -109,14 +107,14 @@ object StormRunnerWithJavaExecutor extends Application{
 
 object StormRunnerWithKeyValueSpout extends Application{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  env.newSource(TestKeyValueSpout()).groupBy(1).flatMap(new GroupedEchoExecutor()).withParallelism(2)
+  val env = ExecutionEnvironments.getStorm(config)
+  env.fromSpout(TestKeyValueSpout()).groupBy(1).flatMap(new GroupedEchoExecutor()).parallelism(2)
   //env.execute
 }
 
 object StormRunnerWithKeyValueSpoutRenameOutputFields extends Application{
   val config : Config = ConfigFactory.load;
-  val env = ExecutionEnvironmentFactory.getStorm(config)
-  env.newSource(TestKeyValueSpout()).renameOutputFields(2).groupBy(0).flatMap(new GroupedEchoExecutor()).withParallelism(2)
+  val env = ExecutionEnvironments.getStorm(config)
+  env.fromSpout(TestKeyValueSpout()).withOutputFields(2).groupBy(0).flatMap(new GroupedEchoExecutor()).parallelism(2)
   //env.execute
 }
