@@ -17,24 +17,15 @@
  *
  */
 
-package org.apache.eagle.service.client;
+package org.apache.eagle.metric.reportor;
 
-import java.io.Serializable;
+import java.util.List;
 
-public class ServiceConfig implements Serializable{
-    public String serviceHost;
-    public Integer servicePort;
-    public String username;
-    public String password;
+public interface EagleMetricListener {
 
-    public ServiceConfig() {
-
-    }
-
-    public ServiceConfig(String serviceHost, Integer servicePort, String username, String password) {
-        this.serviceHost = serviceHost;
-        this.servicePort = servicePort;
-        this.username = username;
-        this.password = password;
-    }
+    /**
+     * The method should be called in thread-safe mode
+     * @param metrics
+     */
+    void onMetricFlushed(List<EagleMetric> metrics);
 }
