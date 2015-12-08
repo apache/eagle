@@ -61,6 +61,12 @@ class StreamInfo  extends Serializable{
   var typeClass:Class[_] = null
 
   /**
+   * Type Class Simple Name
+   * @return
+   */
+  def typeClassName = if(typeClass == null) null else typeClass.getSimpleName
+
+  /**
    * Entity typeTag of T (un-serializable)
    */
   @transient var typeTag:ru.TypeTag[_] = null
@@ -68,7 +74,7 @@ class StreamInfo  extends Serializable{
   /**
    * Handle unsupported issues like serializing un-serializable variable
    */
-  def reinit():Unit = {
+  def restore():Unit = {
     this.typeTag = Reflections.typeTag(this.typeClass)
   }
 
@@ -84,7 +90,11 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
   /**
    * Initialize the stream metadata info
    */
-  def init[E:ru.TypeTag](graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config):Unit
+  def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config)(implicit typeTag: ru.TypeTag[_]):Unit = {
+    setup(graph,config,if(typeTag == null) null else typeTag.mirror.runtimeClass(typeTag.tpe))
+  }
+
+  def setup(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config,typeClass:Class[_]=null):Unit
 
   /**
    * Support Java API

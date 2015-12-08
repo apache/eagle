@@ -4,7 +4,6 @@ import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.dataproc.impl.storm.StormSpoutProvider
 import org.apache.eagle.datastream.core.{ExecutionEnvironmentBase, StormSourceProducer, StreamDAG}
-
 import scala.reflect.runtime.{universe => ru}
 
 /**
@@ -18,8 +17,9 @@ case class StormExecutionEnvironment(private val conf:Config) extends ExecutionE
   }
 
   def fromSpout[T](source: BaseRichSpout): StormSourceProducer[T] = {
+    implicit val typeTag = ru.typeTag[java.util.List[_]]
     val ret = StormSourceProducer[T](source)
-    ret.init[java.util.List[_]](dag ,config.get)
+    ret.setup(dag ,config.get)
     ret
   }
 
