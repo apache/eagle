@@ -96,9 +96,9 @@ public class HdfsAuditLogProcessorMain {
         StreamProducer source = env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").customGroupBy(strategy);
         StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
         source.streamUnion(reassembler)
-                .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
-                .flatMap(new IPZoneDataJoinExecutor())
-                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
+              .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
+              .flatMap(new IPZoneDataJoinExecutor())
+              .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();
     }
 
