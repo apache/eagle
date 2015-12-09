@@ -17,7 +17,7 @@
  *
  */
 
-package org.apache.eagle.alert.siddhi;
+package org.apache.eagle.alert.state;
 
 import org.junit.Assert;
 import org.junit.Test;
