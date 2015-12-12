@@ -47,14 +47,17 @@ public class TestUserCommandReassembler {
         String e1 = "2015-11-19 23:57:02,934 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
         String e2 = "2015-11-19 23:57:03,046 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=append src=/tmp/private dst=null perm=null proto=rpc";
         String e3 = "2015-11-19 23:57:03,118 INFO FSNamesystem.audit: allowed=true ugi=root (auth:SIMPLE) ip=/10.0.2.15 cmd=getfileinfo src=/tmp/private dst=null perm=null proto=rpc";
-        HdfsUserCommandReassembler assembler = new HdfsUserCommandReassembler();Config config = ConfigFactory.load();
+
+        HdfsUserCommandReassembler assembler = new HdfsUserCommandReassembler();
+        Config config = ConfigFactory.load();
         assembler.prepareConfig(config);
         assembler.init();
 
         Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
             @Override
             public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2.f1().get("cmd");Assert.assertEquals("user:appendToFile", cmd);
+                String cmd = (String)stringMapTuple2.f1().get("cmd");
+                Assert.assertEquals("user:appendToFile", cmd);
                 System.out.println("assert passed!!!");
             }
         };
@@ -123,7 +126,6 @@ public class TestUserCommandReassembler {
             public void collect(Tuple2<String, Map> stringMapTuple2) {
                 String cmd = (String)stringMapTuple2.f1().get("cmd");
                 Assert.assertEquals("user:copyFromLocal", cmd);
-                Assert.assertEquals("user:appendToFile", cmd);
                 System.out.println("assert passed!!!");
             }
         };
