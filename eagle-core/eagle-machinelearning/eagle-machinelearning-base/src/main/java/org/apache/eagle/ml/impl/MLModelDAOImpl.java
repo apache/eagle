@@ -16,13 +16,11 @@
  */
 package org.apache.eagle.ml.impl;
 
-import com.typesafe.config.Config;
-import org.apache.eagle.alert.dao.AlertStreamSchemaDAOImpl;
-import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.ml.MLConstants;
 import org.apache.eagle.ml.MLModelDAO;
 import org.apache.eagle.ml.model.MLModelAPIEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.commons.lang.time.DateUtils;
@@ -32,36 +30,17 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class MLModelDAOImpl implements MLModelDAO {
-	private final Logger LOG = LoggerFactory.getLogger(AlertStreamSchemaDAOImpl.class);
+	private final Logger LOG = LoggerFactory.getLogger(MLModelDAOImpl.class);
+	private final EagleServiceConnector connector;
 
-	private String eagleServiceHost;
-	private int eagleServicePort;
-	private String eagleServiceUserName;
-	private String eagleServicePassword;
-	
-	public MLModelDAOImpl(String eagleServiceHost, int eagleServicePort){
-		this.eagleServiceHost = eagleServiceHost;
-		this.eagleServicePort = eagleServicePort;
+	public MLModelDAOImpl(EagleServiceConnector connector){
+		this.connector = connector;
 	}
 
-	public MLModelDAOImpl(String eagleServiceHost, int eagleServicePort, String eagleServiceUserName, String eagleServicePassword){
-		this.eagleServiceHost = eagleServiceHost;
-		this.eagleServicePort = eagleServicePort;
-		this.eagleServiceUserName = eagleServiceUserName;
-		this.eagleServicePassword = eagleServicePassword;
-	}
-	
-	public MLModelDAOImpl(Config config){
-		this.eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-		this.eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-		this.eagleServiceUserName =config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
-		this.eagleServicePassword = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
-	}
-	
 	@Override
 	public List<MLModelAPIEntity> findMLModelByContext(String user, String algorithm) {
 		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, eagleServiceUserName, eagleServicePassword);
+			IEagleServiceClient client = new EagleServiceClientImpl(connector);
 			String query = MLConstants.ML_MODEL_SERVICE_NAME + "[@user=\"" + user + "\" AND @algorithm=\""
 						+ algorithm + "\"]{*}";
 			GenericServiceAPIResponseEntity<MLModelAPIEntity> response =  client.search().startTime(0)

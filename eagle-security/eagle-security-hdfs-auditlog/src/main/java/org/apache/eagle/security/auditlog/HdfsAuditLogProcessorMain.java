@@ -34,6 +34,7 @@ import org.apache.eagle.partition.PartitionStrategy;
 import org.apache.eagle.partition.PartitionStrategyImpl;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
 import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
+import org.apache.eagle.datastream.StreamProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,19 +82,23 @@ public class HdfsAuditLogProcessorMain {
     }
 
     public static void execWithDefaultPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
-        env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").groupBy(Arrays.asList(0))
-                .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
-                .flatMap(new IPZoneDataJoinExecutor())
-                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
+        StreamProducer source = env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").groupBy(Arrays.asList(0));
+        StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
+        source.streamUnion(reassembler)
+              .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
+              .flatMap(new IPZoneDataJoinExecutor())
+              .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();
     }
 
     public static void execWithBalancedPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
         PartitionStrategy strategy = createStrategy(config);
-        env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").customGroupBy(strategy)
-                .flatMap(new FileSensitivityDataJoinExecutor()).customGroupBy(strategy)
+        StreamProducer source = env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").customGroupBy(strategy);
+        StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
+        source.streamUnion(reassembler)
+                .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new IPZoneDataJoinExecutor())
-                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor", strategy);
+                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();
     }
 

@@ -16,11 +16,10 @@
  */
 package org.apache.eagle.alert.dao;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.entity.AlertExecutorEntity;
-import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.commons.lang.time.DateUtils;
@@ -30,38 +29,17 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class AlertExecutorDAOImpl implements AlertExecutorDAO{
-    private final Logger LOG = LoggerFactory.getLogger(AlertDataSourceDAOImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(AlertExecutorDAOImpl.class);
+    private final EagleServiceConnector connector;
 
-    private final String eagleServiceHost;
-    private final Integer eagleServicePort;
-    private String username;
-    private String password;
-
-    public AlertExecutorDAOImpl(String eagleServiceHost, Integer eagleServicePort) {
-        this(eagleServiceHost, eagleServicePort, null, null);
-    }
-
-    public AlertExecutorDAOImpl(String eagleServiceHost, Integer eagleServicePort, String username, String password) {
-        this.eagleServiceHost = eagleServiceHost;
-        this.eagleServicePort = eagleServicePort;
-        this.username = username;
-        this.password = password;
-    }
-
-    public AlertExecutorDAOImpl(Config config) {
-        this.eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-        this.eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-        if (config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) &&
-                config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD)) {
-            this.username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
-            this.password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
-        }
+    public AlertExecutorDAOImpl(EagleServiceConnector connector){
+        this.connector = connector;
     }
 
     @Override
     public List<AlertExecutorEntity> findAlertExecutorByDataSource(String dataSource) throws Exception{
         try {
-            IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
             String query = AlertConstants.ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME + "[@dataSource=\"" + dataSource + "\"]{*}";
             GenericServiceAPIResponseEntity<AlertExecutorEntity> response =  client.search()
                     .startTime(0)
@@ -84,7 +62,7 @@ public class AlertExecutorDAOImpl implements AlertExecutorDAO{
     @Override
     public List<AlertExecutorEntity> findAlertExecutor(String dataSource, String alertExecutorId) throws Exception{
         try {
-            IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
             String query = AlertConstants.ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME + "[@dataSource=\"" + dataSource + "\""
                     + " AND @alertExecutorId=\"" + alertExecutorId + "\""
                     + "]{*}";

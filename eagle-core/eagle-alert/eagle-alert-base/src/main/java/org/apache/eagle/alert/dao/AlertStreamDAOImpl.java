@@ -21,6 +21,7 @@ import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.entity.AlertStreamEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.commons.lang.time.DateUtils;
@@ -31,36 +32,15 @@ import java.util.List;
 
 public class AlertStreamDAOImpl implements AlertStreamDAO{
     private final Logger LOG = LoggerFactory.getLogger(AlertStreamDAOImpl.class);
+    private final EagleServiceConnector connector;
 
-    private final String eagleServiceHost;
-    private final Integer eagleServicePort;
-    private String username;
-    private String password;
-
-    public AlertStreamDAOImpl(String eagleServiceHost, Integer eagleServicePort) {
-        this(eagleServiceHost, eagleServicePort, null, null);
-    }
-
-    public AlertStreamDAOImpl(String eagleServiceHost, Integer eagleServicePort, String username, String password) {
-        this.eagleServiceHost = eagleServiceHost;
-        this.eagleServicePort = eagleServicePort;
-        this.username = username;
-        this.password = password;
-    }
-
-    public AlertStreamDAOImpl(Config config) {
-        this.eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-        this.eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-        if (config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) &&
-            config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD)) {
-            this.username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
-            this.password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
-        }
+    public AlertStreamDAOImpl(EagleServiceConnector connector){
+        this.connector = connector;
     }
 
     public List<AlertStreamEntity> findAlertStreamByDataSource(String dataSource) throws Exception{
         try {
-            IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
             String query = AlertConstants.ALERT_STREAM_SERVICE_ENDPOINT_NAME + "[@dataSource=\"" + dataSource + "\"]{*}";
             GenericServiceAPIResponseEntity<AlertStreamEntity> response =  client.search()
                     .startTime(0)
