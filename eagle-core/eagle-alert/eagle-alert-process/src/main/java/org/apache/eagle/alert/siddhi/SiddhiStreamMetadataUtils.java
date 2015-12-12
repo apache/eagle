@@ -51,26 +51,7 @@ public class SiddhiStreamMetadataUtils {
 		StringBuilder sb = new StringBuilder();		
 		sb.append(EAGLE_ALERT_CONTEXT_FIELD + " object,");
 		for(Map.Entry<String, AlertStreamSchemaEntity> entry : map.entrySet()){
-			String attrName = entry.getKey();
-			sb.append(attrName);
-			sb.append(" ");
-			String attrType = entry.getValue().getAttrType();
-			if(attrType.equalsIgnoreCase(AttributeType.STRING.name())){
-				sb.append("string");
-			}else if(attrType.equalsIgnoreCase(AttributeType.INTEGER.name())){
-				sb.append("int");
-			}else if(attrType.equalsIgnoreCase(AttributeType.LONG.name())){
-				sb.append("long");
-			}else if(attrType.equalsIgnoreCase(AttributeType.BOOL.name())){
-				sb.append("bool");
-			}else if(attrType.equalsIgnoreCase(AttributeType.FLOAT.name())){
-                sb.append("float");
-            }else if(attrType.equalsIgnoreCase(AttributeType.DOUBLE.name())){
-                sb.append("double");
-            }else{
-				LOG.warn("AttrType is not recognized, ignore : " + attrType);
-			}
-			sb.append(",");
+            appendAttributeNameType(sb, entry.getKey(), entry.getValue().getAttrType());
 		}
 		if(sb.length() > 0){
 			sb.deleteCharAt(sb.length()-1);
@@ -79,6 +60,41 @@ public class SiddhiStreamMetadataUtils {
 		String siddhiStreamDefFormat = "define stream " + streamName + "(" + "%s" + ");";
 		return String.format(siddhiStreamDefFormat, sb.toString());
 	}
+
+    public static String convertToStreamDef(String streamName, Map<String, String> eventSchema){
+        StringBuilder sb = new StringBuilder();
+        sb.append("context" + " object,");
+        for(Map.Entry<String, String> entry : eventSchema.entrySet()){
+            appendAttributeNameType(sb, entry.getKey(), entry.getValue());
+        }
+        if(sb.length() > 0){
+            sb.deleteCharAt(sb.length()-1);
+        }
+
+        String siddhiStreamDefFormat = "define stream " + streamName + "(" + "%s" + ");";
+        return String.format(siddhiStreamDefFormat, sb.toString());
+    }
+
+    private static void appendAttributeNameType(StringBuilder sb, String attrName, String attrType){
+        sb.append(attrName);
+        sb.append(" ");
+        if(attrType.equalsIgnoreCase(AttributeType.STRING.name())){
+            sb.append("string");
+        }else if(attrType.equalsIgnoreCase(AttributeType.INTEGER.name())){
+            sb.append("int");
+        }else if(attrType.equalsIgnoreCase(AttributeType.LONG.name())){
+            sb.append("long");
+        }else if(attrType.equalsIgnoreCase(AttributeType.BOOL.name())){
+            sb.append("bool");
+        }else if(attrType.equalsIgnoreCase(AttributeType.FLOAT.name())){
+            sb.append("float");
+        }else if(attrType.equalsIgnoreCase(AttributeType.DOUBLE.name())){
+            sb.append("double");
+        }else{
+            LOG.warn("AttrType is not recognized, ignore : " + attrType);
+        }
+        sb.append(",");
+    }
 
 	public static Object getAttrDefaultValue(String streamName, String attrName){
 		SortedMap<String, AlertStreamSchemaEntity> map = getAttrMap(streamName);

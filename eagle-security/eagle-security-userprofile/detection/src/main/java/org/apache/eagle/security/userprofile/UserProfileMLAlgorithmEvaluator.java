@@ -29,6 +29,7 @@ import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.apache.eagle.security.userprofile.model.UserProfileModel;
 import com.typesafe.config.Config;
 import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public abstract class UserProfileMLAlgorithmEvaluator<M extends UserProfileModel
     protected MLModelDAO getModelDAO(){
         // TODO: 1. Adapt to different model protocol including service, hdfs, file or kafka
         // TODO: 2. Model cache configuration
-        return new MLModelDAOImpl(this.config);
+        return new MLModelDAOImpl(new EagleServiceConnector(this.config));
     }
 
     /**

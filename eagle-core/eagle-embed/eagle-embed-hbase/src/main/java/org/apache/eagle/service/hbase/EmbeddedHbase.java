@@ -123,7 +123,7 @@ public class EmbeddedHbase {
     }
 
     public static void main(String[] args){
-        EmbeddedHbase hbase = new EmbeddedHbase();
+        EmbeddedHbase hbase = new EmbeddedHbase(12181);
         hbase.start();
         for(String table : new Tables().getTables()){
             hbase.createTable(table, "f");
