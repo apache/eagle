@@ -134,6 +134,55 @@ public class TestSiddhiStateSnapshotAndRestore {
         restoredRuntime.shutdown();
     }
 
+    private ExecutionPlanRuntime setupRuntimeForLengthSlideWindowWithGroupby(){
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        String cseEventStream = "define stream testStream (user string, cmd string);";
+        String query = "@info(name = 'query1') from testStream#window.length(50) "
+                + " select user, cmd, count(user) as cnt"
+                + " insert all events into OutputStream";
+
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime("@Plan:name('testPlan') " + cseEventStream + query);
+
+        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+            }
+        });
+
+        executionPlanRuntime.start();
+        return executionPlanRuntime;
+    }
+
+    @Test
+    public void testLengthSlideWindowWithGroupby() throws Exception{
+        String tmpdir = System.getProperty("java.io.tmpdir");
+        System.out.println("temporary directory: " + tmpdir);
+
+        String stateFile = tmpdir + "/siddhi-state-lengthslidewindowwithgroupby";
+        ExecutionPlanRuntime executionPlanRuntime = setupRuntimeForLengthSlideWindowWithGroupby();
+        executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_1"});
+        executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_2"});
+        executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_3"});
+        executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_4"});
+        byte[] state = executionPlanRuntime.snapshot();
+        int length = state.length;
+        FileOutputStream output = new FileOutputStream(stateFile);
+        output.write(state);
+        output.close();
+        executionPlanRuntime.shutdown();
+
+        ExecutionPlanRuntime restoredRuntime = setupRuntimeForLengthSlideWindowWithGroupby();
+        FileInputStream input = new FileInputStream(stateFile);
+        byte[] restoredState = new byte[length];
+        input.read(restoredState);
+        restoredRuntime.restore(restoredState);
+        restoredRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_5"});
+        input.close();
+        restoredRuntime.shutdown();
+    }
+
     private ExecutionPlanRuntime setupRuntimeForTimeSlideWindow(){
         SiddhiManager siddhiManager = new SiddhiManager();
         String cseEventStream = "define stream testStream (timeStamp long, user string, cmd string);";
@@ -189,13 +238,13 @@ public class TestSiddhiStateSnapshotAndRestore {
         restoredRuntime.shutdown();
     }
 
-    private ExecutionPlanRuntime setupRuntimeForTimeSlideWindowWithGroupby(){
+    private ExecutionPlanRuntime setupRuntimeForExternalTimeSlideWindowWithGroupby(){
         SiddhiManager siddhiManager = new SiddhiManager();
         String cseEventStream = "define stream testStream (timeStamp long, user string, cmd string);";
         String query = "@info(name = 'query1') from testStream[cmd == 'open']#window.externalTime(timeStamp,3 sec)"
-                + " select user, timeStamp, count() as cnt"
-                + " group by user"
-                + " having cnt > 2"
+                + " select user, timeStamp, count(user) as cnt"
+//                + " group by user"
+//                + " having cnt > 2"
                + " insert all events into outputStream;";
 
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime("@Plan:name('testPlan') " + cseEventStream + query);
@@ -211,12 +260,12 @@ public class TestSiddhiStateSnapshotAndRestore {
     }
 
     @Test
-    public void testTimeSlideWindowWithGroupby() throws Exception{
+    public void testExternalTimeSlideWindowWithGroupby() throws Exception{
         String tmpdir = System.getProperty("java.io.tmpdir");
         System.out.println("temporary directory: " + tmpdir);
 
-        String stateFile = tmpdir + "/siddhi-state-timeslidewindow";
-        ExecutionPlanRuntime executionPlanRuntime = setupRuntimeForTimeSlideWindowWithGroupby();
+        String stateFile = tmpdir + "/siddhi-state-externaltimeslidewindow";
+        ExecutionPlanRuntime executionPlanRuntime = setupRuntimeForExternalTimeSlideWindowWithGroupby();
         InputHandler inputHandler = executionPlanRuntime.getInputHandler("testStream");
         long curTime = DateTimeUtil.humanDateToMilliseconds("2015-09-17 00:00:00,000");
         inputHandler.send(new Object[]{curTime, "user", "open"});
@@ -231,7 +280,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         output.close();
         executionPlanRuntime.shutdown();
 
-        ExecutionPlanRuntime restoredRuntime = setupRuntimeForTimeSlideWindowWithGroupby();
+        ExecutionPlanRuntime restoredRuntime = setupRuntimeForExternalTimeSlideWindowWithGroupby();
         FileInputStream input = new FileInputStream(stateFile);
         byte[] restoredState = new byte[length];
         input.read(restoredState);
@@ -241,6 +290,68 @@ public class TestSiddhiStateSnapshotAndRestore {
         inputHandler.send(new Object[]{curTime + 5000, "user", "open"});
         inputHandler.send(new Object[]{curTime + 6000, "user", "open"});
         inputHandler.send(new Object[]{curTime + 7000, "user", "open"});
+        Thread.sleep(1000);
+        input.close();
+        restoredRuntime.shutdown();
+    }
+
+    private ExecutionPlanRuntime setupRuntimeForInternalTimeSlideWindowWithGroupby(){
+        SiddhiManager siddhiManager = new SiddhiManager();
+        String cseEventStream = "define stream testStream (user string, cmd string);";
+        String query = "@info(name = 'query1') from testStream[cmd == 'open']#window.time(100 sec)"
+                + " select user, count(user) as cnt"
+                + " group by user"
+                + " having cnt > 2"
+                + " insert all events into outputStream;";
+
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime("@Plan:name('testPlan') " + cseEventStream + query);
+
+        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+            }
+        });
+        executionPlanRuntime.start();
+        return executionPlanRuntime;
+    }
+
+    @Test
+    public void testInternalTimeSlideWindowWithGroupby() throws Exception{
+        String tmpdir = System.getProperty("java.io.tmpdir");
+        System.out.println("temporary directory: " + tmpdir);
+
+        String stateFile = tmpdir + "/siddhi-state-internaltimeslidewindow";
+        ExecutionPlanRuntime executionPlanRuntime = setupRuntimeForInternalTimeSlideWindowWithGroupby();
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("testStream");
+        inputHandler.send(new Object[]{"user", "open"});
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{"user", "open"});
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{"user", "open"});
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{"user", "open"});
+
+        byte[] state = executionPlanRuntime.snapshot();
+        int length = state.length;
+        FileOutputStream output = new FileOutputStream(stateFile);
+        output.write(state);
+        output.close();
+        executionPlanRuntime.shutdown();
+
+        ExecutionPlanRuntime restoredRuntime = setupRuntimeForInternalTimeSlideWindowWithGroupby();
+        FileInputStream input = new FileInputStream(stateFile);
+        byte[] restoredState = new byte[length];
+        input.read(restoredState);
+        restoredRuntime.restore(restoredState);
+        inputHandler = restoredRuntime.getInputHandler("testStream");
+        inputHandler.send(new Object[]{"user", "open"});
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{"user", "open"});
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{"user", "open"});
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{"user", "open"});
         Thread.sleep(1000);
         input.close();
         restoredRuntime.shutdown();
