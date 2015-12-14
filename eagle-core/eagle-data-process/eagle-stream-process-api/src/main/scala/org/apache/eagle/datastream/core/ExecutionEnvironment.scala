@@ -50,7 +50,6 @@ abstract class ExecutionEnvironmentBase(private val conf:Config)  extends Execut
     StreamGroupbyExpansion()
     StreamParallelismConfigExpansion()
     StreamNameExpansion()
-    StreamTypeExpansion()
     GraphPrinter.print(dag,"After expanded DAG ")
     val streamDAG = StreamDAGTransformer.transform(dag)
     execute(streamDAG)

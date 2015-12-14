@@ -37,9 +37,6 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
     conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, Int.box(16384))
 
     if(config.hasPath("envContextConfig.stormConfigFile")) {
-      //val inputFileStream = {
-      //  StormTopologyExecutorImpl.getClass.getClassLoader.getResourceAsStream(config.getString("envContextConfig.stormConfigFile"))
-      //}
       val file = new File(config.getString("envContextConfig.stormConfigFile"))
       if(file.exists()) {
         val inputFileStream = new FileInputStream(file)
@@ -58,8 +55,7 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
     val topologyName = config.getString("envContextConfig.topologyName")
     if (!localMode) {
       StormSubmitter.submitTopologyWithProgressBar(topologyName, conf, topology)
-    }
-    else {
+    } else {
       val cluster: LocalCluster = new LocalCluster
       cluster.submitTopology(topologyName, conf, topology)
       while(true) {

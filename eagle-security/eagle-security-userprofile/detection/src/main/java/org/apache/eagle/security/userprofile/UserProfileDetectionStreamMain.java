@@ -21,6 +21,7 @@ package org.apache.eagle.security.userprofile;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.datastream.*;
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 
 import java.util.Arrays;
 import java.util.List;

@@ -18,8 +18,8 @@
 package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
-import org.apache.eagle.datastream.utils.Reflections
-import org.apache.eagle.datastream.{FlatMapper, JavaStreamProtocol}
+import org.apache.commons.lang3.builder.HashCodeBuilder
+import org.apache.eagle.datastream.FlatMapper
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
@@ -55,25 +55,32 @@ class StreamInfo  extends Serializable{
    */
   var keySelector:KeySelector = null
 
-  /**
-   * Entity class type of T
-   */
-  var typeClass:Class[_] = null
+// Type Information
+// ================
+//
+//  /**
+//   * Entity class type of T
+//   */
+//  var typeClass:Class[_] = null
+//
+//  /**
+//   * Type Class Simple Name
+//   * @return
+//   */
+//  def typeClassName = if(typeClass == null) null else typeClass.getSimpleName
+//
+//  @transient private var _typeTag[_] = null
+//
+//  def typeTag[_] = {
+//    if(_typeTag == null) _typeTag = Reflections.typeTag(this.typeClass)
+//    _typeTag
+//  }
 
-  /**
-   * Type Class Simple Name
-   * @return
-   */
-  def typeClassName = if(typeClass == null) null else typeClass.getSimpleName
-
-  @transient private var _typeTag:ru.TypeTag[_] = null
-
-  def typeTag:ru.TypeTag[_] = {
-    if(_typeTag == null) _typeTag = Reflections.typeTag(this.typeClass)
-    _typeTag
-  }
+  var config: Config = null
 
   def getInfo = this
+
+  override def hashCode(): Int = new HashCodeBuilder().append(this.id).append(this.getClass).toHashCode
 }
 
 /**
@@ -81,15 +88,11 @@ class StreamInfo  extends Serializable{
  *
  * @tparam T processed elements type
  */
-trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
+trait StreamProtocol[+T <: Any]{
   /**
    * Initialize the stream metadata info
    */
-  def initWith(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config, hook:Boolean = true)(implicit typeTag: ru.TypeTag[_]):StreamProducer[T] = {
-    initWithClass(graph,config,if(typeTag == null) null else typeTag.mirror.runtimeClass(typeTag.tpe),hook)
-  }
-
-  def initWithClass(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config,typeClass:Class[_], hook:Boolean = true):StreamProducer[T]
+  def initWith(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config, hook:Boolean = true):StreamProducer[T]
 
   /**
    * Support Java API
@@ -98,7 +101,7 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
    * @tparam R
    * @return
    */
-  def flatMap[R:ru.TypeTag](flatMapper : FlatMapper [R]): StreamProducer[R]
+  def flatMap[R](flatMapper:FlatMapper[R]): StreamProducer[R]
 
   /**
    *
@@ -119,7 +122,7 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
    * @tparam R
    * @return
    */
-  def map[R:ru.TypeTag](fn : T => R): StreamProducer[R]
+  def map[R](fn : T => R): StreamProducer[R]
 
   /**
    * Field base mapper
@@ -127,10 +130,10 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
    * @tparam R
    * @return
    */
-  def map1[R:ru.TypeTag](fn : T => R) : StreamProducer[R]
-  def map2[R:ru.TypeTag](fn : T => R) : StreamProducer[R]
-  def map3[R:ru.TypeTag](fn : T => R) : StreamProducer[R]
-  def map4[R:ru.TypeTag](fn : T => R) : StreamProducer[R]
+  def map1[R](fn : T => R) : StreamProducer[R]
+  def map2[R](fn : T => R) : StreamProducer[R]
+  def map3[R](fn : T => R) : StreamProducer[R]
+  def map4[R](fn : T => R) : StreamProducer[R]
 
   def groupBy(fields : Int*) : StreamProducer[T]
   def groupBy(fields : java.util.List[Integer]) : StreamProducer[T]
@@ -141,7 +144,7 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
    * @return
    */
   def groupByKey(keyer:T => Any):StreamProducer[T]
-  def union[T2,T3:ru.TypeTag](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
+  def union[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
   /**
    * Set processing element parallelism setting
@@ -167,6 +170,7 @@ trait StreamProtocol[+T <: Any] extends JavaStreamProtocol{
   def stream: String
 
   def ? (fn:T => Boolean):StreamProducer[T] = this.filter(fn)
-  def ~>[R:ru.TypeTag](flatMapper : FlatMapper [R]) = this.flatMap[R](flatMapper)
+  def ~>[R](flatMapper : FlatMapper[R]) = this.flatMap[R](flatMapper)
   def ! (upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean = true,strategy: PartitionStrategy = null) = alert(upStreamNames, alertExecutorId, consume,strategy)
+
 }

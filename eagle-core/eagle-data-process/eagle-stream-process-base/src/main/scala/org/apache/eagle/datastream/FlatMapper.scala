@@ -19,7 +19,3 @@ package org.apache.eagle.datastream
 trait FlatMapper[T] extends Serializable {
   def flatMap(input : Seq[AnyRef], collector : Collector[T])
 }
-
-trait JavaFlatMapper[T] extends FlatMapper[T] with JavaTypeCompatible{
-  def flatMap(input : Seq[AnyRef], collector : Collector[T])
-}

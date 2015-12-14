@@ -22,7 +22,7 @@ import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
 import org.apache.eagle.datastream.ExecutionEnvironments;
-import org.apache.eagle.datastream.StormExecutionEnvironment;
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import storm.kafka.BrokerHosts;

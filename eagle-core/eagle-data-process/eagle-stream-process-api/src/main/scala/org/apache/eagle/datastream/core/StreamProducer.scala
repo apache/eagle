@@ -25,13 +25,12 @@ import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
 import org.apache.eagle.datastream._
-import org.apache.eagle.datastream.utils.Reflections
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import scala.reflect.runtime.{universe => ru}
 /**
  * StreamProducer = StreamInfo + StreamProtocol
  *
@@ -44,25 +43,22 @@ import scala.reflect.runtime.{universe => ru}
  * @tparam T processed elements type
  */
 abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[T] {
-  var config: Config = null
-  var graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]] = null
+  private var graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]] = null
+  private val LOG = LoggerFactory.getLogger(classOf[StreamProducer[T]])
 
   /**
    * Should not modify graph when setting it
-   *
    */
-  override def initWithClass(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config, typeClass:Class[_],hook:Boolean = true):StreamProducer[T] = {
-    this.typeClass=typeClass
+  def initWith(graph:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]],config:Config, hook:Boolean = true):StreamProducer[T]={
     this.config = config
     this.graph = graph
-    if(hook) {
-      if (!this.graph.containsVertex(this)) {
-        this.graph.addVertex(this)
-      }
+    if(hook && ! this.graph.containsVertex(this)) {
+      this.graph.addVertex(this)
     }
+    LOG.debug(this.graph.toString)
     this
   }
-
+  
   /**
    * Get stream pure metadata info
    * @return
@@ -76,61 +72,48 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
 
   override def filter(fn : T => Boolean): StreamProducer[T] ={
     val ret = FilterProducer[T](fn)
-    hookup(this, ret)(typeTag)
+    hookup(this, ret)
     ret
   }
 
-  @deprecated("Field-based flat mapper")
-  override def flatMap[R:ru.TypeTag](flatMapper : FlatMapper [R]): StreamProducer[R] = {
+  override def flatMap[R](flatMapper:FlatMapper[R]): StreamProducer[R] = {
     val ret = FlatMapProducer[T,R](flatMapper)
-    hookup(this, ret)(ru.typeTag[R])
-    ret
-  }
-
-  /**
-   * @param flatMapper
-   * @tparam R
-   * @return
-   */
-  override def flatMap[R](flatMapper: JavaFlatMapper[R]): StreamProducer[R] = {
-    implicit val tpeTag = Reflections.javaTypeTag[R](flatMapper)
-    val ret = FlatMapProducer[T,R](flatMapper)
-    hookup(this, ret)(tpeTag)
+    hookup(this, ret)
     ret
   }
 
   override def foreach(fn : T => Unit) : Unit = {
     val ret = ForeachProducer[T](fn)
-    hookup(this, ret)(ru.typeTag[Unit])
+    hookup(this, ret)
   }
 
-  override def map[R:ru.TypeTag](fn : T => R) : StreamProducer[R] = {
+  override def map[R](fn : T => R) : StreamProducer[R] = {
     val ret = MapperProducer[T,R](0,fn)
-    hookup(this, ret)(ru.typeTag[R])
+    hookup(this, ret)
     ret
   }
 
-  override def map1[R:ru.TypeTag](fn : T => R): StreamProducer[R] = {
+  override def map1[R](fn : T => R): StreamProducer[R] = {
     val ret = MapperProducer[T,R](1, fn)
-    hookup(this, ret)(ru.typeTag[R])
+    hookup(this, ret)
     ret
   }
 
-  override def map2[R:ru.TypeTag](fn : T => R): StreamProducer[R] = {
+  override def map2[R](fn : T => R): StreamProducer[R] = {
     val ret = MapperProducer[T,R](2, fn)
-    hookup(this, ret)(ru.typeTag[R])
+    hookup(this, ret)
     ret
   }
 
-  override def map3[R:ru.TypeTag](fn : T => R): StreamProducer[R] = {
+  override def map3[R](fn : T => R): StreamProducer[R] = {
     val ret = MapperProducer(3, fn)
-    hookup(this, ret)(ru.typeTag[R])
+    hookup(this, ret)
     ret
   }
 
-  override def map4[R:ru.TypeTag](fn : T => R): StreamProducer[R] = {
+  override def map4[R](fn : T => R): StreamProducer[R] = {
     val ret = MapperProducer(4, fn)
-    hookup(this, ret)(ru.typeTag[R])
+    hookup(this, ret)
     ret
   }
 
@@ -141,7 +124,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
     val ret = GroupByFieldProducer[T](fields)
-    hookup(this, ret)(typeTag)
+    hookup(this, ret)
     ret
   }
 
@@ -150,27 +133,27 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
     val ret = GroupByFieldProducer[T](fields.asScala.toSeq.asInstanceOf[Seq[Int]])
-    hookup(this, ret)(typeTag)
+    hookup(this, ret)
     ret
   }
 
   override def groupByKey(keySelector: T=> Any):StreamProducer[T] = {
     val ret = GroupByKeyProducer(keySelector)
-    hookup(this,ret)(typeTag)
+    hookup(this,ret)
     ret
   }
 
-  override def union[T2,T3:ru.TypeTag](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
+  override def union[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
     val ret = StreamUnionProducer[T, T2, T3](others)
-    hookup(this, ret)(typeTag)
+    hookup(this, ret)
     ret
   }
 
-  def union[T2,T3](others : util.List[StreamProducer[T2]]) : StreamProducer[T3] = union(others)
+  def union[T2,T3](others : util.List[StreamProducer[T2]]) : StreamProducer[T3] = union(others.asScala)
 
   override def groupBy(strategy : PartitionStrategy) : StreamProducer[T] = {
     val ret = GroupByStrategyProducer(strategy)
-    hookup(this, ret)(typeTag)
+    hookup(this, ret)
     ret
   }
 
@@ -187,7 +170,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
 
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean=true, strategy : PartitionStrategy=null) = {
     val ret = AlertStreamSink(upStreamNames, alertExecutorId, consume, strategy)
-    hookup(this, ret)(ru.typeTag[AlertAPIEntity])
+    hookup(this, ret)
   }
 
   def alertWithConsumer(upStreamName: String, alertExecutorId : String, strategy: PartitionStrategy): Unit ={
@@ -206,15 +189,14 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
 
-  protected def hookup[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2])(implicit typeTag:ru.TypeTag[_]) = {
+  protected def hookup[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2]) = {
     current.graph.addVertex(next)
     current.graph.addEdge(current, next, StreamConnector(current, next))
-
-    passOnContext[T1,T2](current, next)(typeTag)
+    passOnContext[T1,T2](current, next)
   }
 
-  private def passOnContext[T1 ,T2](current: StreamProducer[T1], next: StreamProducer[T2])(implicit typeTag:ru.TypeTag[_]): Unit ={
-    next.initWith(current.graph,current.config,hook = true)(typeTag)
+  private def passOnContext[T1 ,T2](current: StreamProducer[T1], next: StreamProducer[T2]): Unit ={
+    next.initWith(current.graph,current.config)
   }
 
   /**
@@ -245,10 +227,6 @@ case class FilterProducer[T](fn : T => Boolean) extends StreamProducer[T]{
 }
 
 case class FlatMapProducer[T, R](var mapper: FlatMapper[R]) extends StreamProducer[R]{
-  mapper match {
-    case compatible: JavaTypeCompatible =>
-      this.typeClass = compatible.getType
-  }
   override def toString: String = mapper.toString
 }
 
@@ -273,7 +251,9 @@ object GroupByProducer {
 
 case class StreamUnionProducer[T1,T2,T3](others: Seq[StreamProducer[T2]]) extends StreamProducer[T3]
 
-case class StormSourceProducer[T](source : BaseRichSpout,var numFields : Int = 0) extends StreamProducer[T]{
+case class StormSourceProducer[T](source: BaseRichSpout) extends StreamProducer[T]{
+  var numFields : Int = 0
+
   /**
     * rename outputfields to f0, f1, f2, ...
    * if one spout declare some field names, those fields names will be modified
@@ -285,9 +265,7 @@ case class StormSourceProducer[T](source : BaseRichSpout,var numFields : Int = 0
   }
 }
 
-case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]{
-  override def toString: String = s"IterableStream[${typeClass.getSimpleName}]"
-}
+case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]
 
 case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
   def consume(consume: Boolean): AlertStreamSink = {

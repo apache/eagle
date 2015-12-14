@@ -19,7 +19,7 @@ package org.apache.eagle.security.hbase;
 
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.datastream.ExecutionEnvironments;
-import org.apache.eagle.datastream.StormExecutionEnvironment;
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.apache.eagle.security.hbase.sensitivity.HbaseResourceSensitivityDataJoinExecutor;
 
 public class HbaseAuditLogProcessorMain {
