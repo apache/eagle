@@ -19,16 +19,18 @@
 
 package org.apache.eagle.security.auditlog;
 
+import java.util.List;
+
 import org.apache.eagle.security.hdfs.entity.HdfsUserCommandPatternEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
+import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * test pattern download and parse
  */
 public class TestHdfsUserCommandPatternByDB {
+    @Ignore
     @Test
     // not qualified for unit test as it connects to local service
     public void testPatternDownload() throws Exception{

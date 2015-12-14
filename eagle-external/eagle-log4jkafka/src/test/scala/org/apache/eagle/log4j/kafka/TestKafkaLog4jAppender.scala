@@ -20,13 +20,14 @@ package org.apache.eagle.log4j.kafka
 
 import org.scalatest.{Matchers, FlatSpec}
 
-
-class TestKafkaLog4jAppender extends FlatSpec with Matchers {
-  val test = new KafkaLog4jAppender();
-  test.topic = "sandbox_hdfs_audit_log"
-  test.brokerList = "sandbox.hortonworks.com:6667"
-  test.keyClass = "eagle.log4j.kafka.hadoop.AuditLogKeyer"
-  test.keyPattern = "user=(\\w+),\\s+"
-  test.producerType = "async"
-  test.activateOptions()
+abstract class TestKafkaLog4jAppender extends FlatSpec with Matchers {
+  
+    val test = new KafkaLog4jAppender();
+    test.topic = "sandbox_hdfs_audit_log"
+    test.brokerList = "sandbox.hortonworks.com:6667"
+    test.keyClass = "eagle.log4j.kafka.hadoop.AuditLogKeyer"
+    test.keyPattern = "user=(\\w+),\\s+"
+    test.producerType = "async"
+    test.activateOptions()
+  
 }
