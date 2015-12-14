@@ -18,48 +18,24 @@
 
 package org.apache.eagle.security.util;
 
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class LogParseUtil {
-    /**
-     * .e.g. user@APD.xyz.com
-     */
-    private final static Pattern UGI_PATTERN_DEFAULT = Pattern.compile("^([\\w\\d\\-]+)@.*");
-    /**
-     * .e.g. hadoop/123.dc1.xyz.com@xyz.com (auth:KERBEROS)
-     */
-    private final static Pattern UGI_PATTERN_SYSTEM = Pattern.compile("^([\\w\\d\\-]+)/[\\w\\d\\-.]+@.*");
-
-    /**
-     * .e.g. hadoop (auth:KERBEROS)
-     */
-    private final static Pattern UGI_PATTERN_WITHBLANK = Pattern.compile("^([\\w\\d.\\-_]+)[\\s(]+.*");
 
     /**
      * @param ugi UGI field of audit log
-     * @return resultToMetrics user from UGI field of audit log
+     * @return resultToMetrics user from UGI field
+     * e.g.
+     * 1)user@APD.xyz.com
+     * 2)hadoop/123.dc1.xyz.com@xyz.com (auth:KERBEROS)
+     * 3)hadoop (auth:KERBEROS)
      */
-    public static  String parseUserFromUGI(String ugi) {
+    public static String parseUserFromUGI(String ugi) {
         if(ugi == null) return null;
-        String newugi = ugi.trim();
-
-        Matcher defaultMatcher = UGI_PATTERN_DEFAULT.matcher(newugi);
-        if(defaultMatcher.matches()){
-            return defaultMatcher.group(1);
-        }
-
-        Matcher sysMatcher = UGI_PATTERN_SYSTEM.matcher(newugi);
-        if(sysMatcher.matches()){
-            return sysMatcher.group(1);
-        }
-
-        Matcher viaMatcher = UGI_PATTERN_WITHBLANK.matcher(newugi);
-        if(viaMatcher.matches()){
-            return viaMatcher.group(1);
-        }
-
-        return newugi;
+        String newUgi = ugi.trim();
+        int index = newUgi.indexOf("/");
+        if (index != -1) return newUgi.substring(0, index).trim();
+        index = newUgi.indexOf("@");
+        if (index != -1) return newUgi.substring(0, index).trim();
+        index = newUgi.indexOf("(");
+        return newUgi.substring(0, index).trim();
     }
 }
