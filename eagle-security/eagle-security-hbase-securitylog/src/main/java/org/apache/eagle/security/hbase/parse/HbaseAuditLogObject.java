@@ -19,10 +19,10 @@ package org.apache.eagle.security.hbase.parse;
 
 public class HbaseAuditLogObject {
     public long timestamp;
-    public String user;
-    public String scope;
-    public String action;
-    public String host;
-    public String request;
-    public String status;
+    public String user = "";
+    public String scope = "";
+    public String action = "";
+    public String host = "";
+    public String request = "";
+    public String status = "";
 }

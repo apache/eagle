@@ -17,15 +17,16 @@
  */
 package org.apache.eagle.security.hbase.parse;
 
-import org.apache.eagle.common.DateTimeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.eagle.common.DateTimeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class HbaseAuditLogParser implements Serializable {
@@ -58,18 +59,18 @@ public class HbaseAuditLogParser implements Serializable {
         if(auditMap == null) return null;
 
         String status = auditMap.get(CONTROLLER);
-        if(status != "") {
+        if(StringUtils.isNotEmpty(status)) {
             ret.status = allowedPattern.matcher(status).find() ? ALLOWED : DENIED;
         }
 
         String scope = auditMap.get(SCOPE);
         String family = auditMap.get(FAMILY);
-        if(family != "") {
+        if(StringUtils.isNotEmpty(family)) {
             if(!scope.contains(":")) scope = "default:" + scope;
             scope = String.format("%s:%s", scope, family);
         }
         String ip = auditMap.get(ADDRESS);
-        if(ip != "") {
+        if(StringUtils.isNotEmpty(ip)) {
             ret.host = ip.substring(1);
         }
         ret.scope = scope;
