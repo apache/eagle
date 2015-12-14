@@ -1,8 +1,24 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.eagle.datastream
 
 import org.apache.eagle.datastream.storm.StormExecutionEnvironment
-
-
 
 /**
  * @since  12/4/15
@@ -48,6 +64,24 @@ object TestIterableWithGroupByCircularly extends App{
   env.from(tuples,recycle = true)
     .map(o => {o.inc += 2;o})
     .groupByKey(_.name)
+    .foreach(println)
+  env.execute()
+}
+
+object TestGroupByKeyOnSpoutproxy extends App{
+  val env = ExecutionEnvironments.get[StormExecutionEnvironment](args)
+
+  val tuples = Seq(
+    Entity("a", 1),
+    Entity("a", 2),
+    Entity("a", 3),
+    Entity("b", 2),
+    Entity("c", 3),
+    Entity("d", 3)
+  )
+
+  env.fromSpout[String](TestSpout())
+    .groupByKey(_.charAt(0))
     .foreach(println)
   env.execute()
 }

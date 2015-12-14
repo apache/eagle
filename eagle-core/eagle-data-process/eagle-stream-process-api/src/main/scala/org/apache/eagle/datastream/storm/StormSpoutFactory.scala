@@ -30,8 +30,11 @@ object StormSpoutFactory {
     implicit val streamInfo = from.getInfo
     from match {
       case p@StormSourceProducer(source) =>
-        if(p.outKeyed) throw new IllegalStateException(s"groupByKey after $p is not implemented yet")
-        createProxySpout(config, p)
+        if(p.outKeyed) {
+          createKeyedProxySpout(p)
+        }else {
+          createProxySpout(p)
+        }
       case p@IterableStreamProducer(iterable,recycle) =>
         IterableStreamSpout(iterable,recycle)
       case _ =>
@@ -40,11 +43,10 @@ object StormSpoutFactory {
   }
 
   /**
-   * @param config context configuration
    * @param sourceProducer source producer
    * @return
    */
-  def createProxySpout(config: Config, sourceProducer: StormSourceProducer[Any]): BaseRichSpout = {
+  def createProxySpout(sourceProducer: StormSourceProducer[Any]): BaseRichSpout = {
     val numFields = sourceProducer.numFields
     if (numFields <= 0) {
       sourceProducer.source
@@ -57,5 +59,9 @@ object StormSpoutFactory {
       }
       SpoutProxy(sourceProducer.source, ret)
     }
+  }
+
+  def createKeyedProxySpout(sourceProducer: StormSourceProducer[Any]):BaseRichSpout = {
+    KeyedSpoutProxy(sourceProducer.source)(sourceProducer.getInfo)
   }
 }

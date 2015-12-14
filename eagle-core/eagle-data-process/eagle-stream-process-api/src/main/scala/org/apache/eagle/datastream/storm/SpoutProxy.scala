@@ -16,11 +16,16 @@
  */
 package org.apache.eagle.datastream.storm
 
-import backtype.storm.spout.SpoutOutputCollector
+import java.util
+
+import backtype.storm.spout.{ISpoutOutputCollector, SpoutOutputCollector}
 import backtype.storm.task.TopologyContext
 import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.topology.base.BaseRichSpout
 import backtype.storm.tuple.Fields
+import org.apache.eagle.datastream.core.{KeySelector, StreamInfo}
+import org.apache.eagle.datastream.utils.NameConstants
+import java.util.{List => JList}
 
 /**
  * Declare delegated BaseRichSpout with given field names
@@ -51,6 +56,53 @@ case class SpoutProxy(delegate: BaseRichSpout, outputFields: java.util.List[Stri
 
   override def declareOutputFields(declarer: OutputFieldsDeclarer) {
     declarer.declare(new Fields(outputFields))
+  }
+
+  override def close {
+    this.delegate.close
+  }
+}
+
+case class KeyedSpoutOutputCollector(delegate: ISpoutOutputCollector,keyer:KeySelector) extends SpoutOutputCollector(delegate) {
+  override def emitDirect (taskId: Int, streamId: String, tuple: JList[AnyRef], messageId: AnyRef):Unit = {
+    val kv = toKeyValue(tuple)
+    delegate.emitDirect(taskId, streamId,kv, messageId)
+  }
+
+  override def emit(streamId: String, tuple: JList[AnyRef], messageId: AnyRef):JList[Integer] = {
+    val kv = toKeyValue(tuple)
+    delegate.emit(streamId,kv, messageId)
+  }
+
+  def toKeyValue(tuple: JList[AnyRef]) = util.Arrays.asList(keyer.key(tuple.get(0)),tuple.get(0)).asInstanceOf[JList[AnyRef]]
+}
+
+case class KeyedSpoutProxy(delegate: BaseRichSpout)(implicit streamInfo:StreamInfo) extends BaseRichSpout{
+  override def open(conf: java.util.Map[_, _], context: TopologyContext, collector: SpoutOutputCollector) {
+    if(!streamInfo.outKeyed) throw new IllegalArgumentException(s"$streamInfo is not key-based")
+    if(streamInfo.keySelector == null) throw new NullPointerException(s"KeySelector $streamInfo is null")
+
+    this.delegate.open(conf, context, KeyedSpoutOutputCollector(collector,streamInfo.keySelector))
+  }
+
+  override def nextTuple {
+    this.delegate.nextTuple
+  }
+
+  override def ack(msgId: AnyRef) {
+    this.delegate.ack(msgId)
+  }
+
+  override def fail(msgId: AnyRef) {
+    this.delegate.fail(msgId)
+  }
+
+  override def deactivate {
+    this.delegate.deactivate
+  }
+
+  override def declareOutputFields(declarer: OutputFieldsDeclarer) {
+    declarer.declare(new Fields(NameConstants.FIELD_KEY,NameConstants.FIELD_VALUE))
   }
 
   override def close {
