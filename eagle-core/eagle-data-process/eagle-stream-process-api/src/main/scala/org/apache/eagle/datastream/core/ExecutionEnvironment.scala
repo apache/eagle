@@ -44,13 +44,16 @@ abstract class ExecutionEnvironmentBase(private val conf:Config)  extends Execut
   override def execute(): Unit = {
     implicit val i_conf = _config.get
     StreamNameExpansion()
-    GraphPrinter.print(dag,"Before expanded DAG ")
+    GraphPrinter.print(dag,message="Before expanded DAG ")
     StreamAlertExpansion()
     StreamUnionExpansion()
     StreamGroupbyExpansion()
     StreamParallelismConfigExpansion()
     StreamNameExpansion()
-    GraphPrinter.print(dag,"After expanded DAG ")
+    GraphPrinter.print(dag,message="After expanded DAG ")
+
+    GraphPrinter.printDotDigraph(dag)
+
     val streamDAG = StreamDAGTransformer.transform(dag)
     execute(streamDAG)
   }

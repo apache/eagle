@@ -32,7 +32,7 @@ object UnionForAlert extends App{
   val env = ExecutionEnvironments.getStorm(config)
   val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
   val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key2",a))
-  tail1.union(List(tail2)).alert(Seq("s1","s2"), "alert1", consume = false)
+  tail1.streamUnion(List(tail2)).alert(Seq("s1","s2"), "alert1", consume = false)
   //env.execute
 }
 
@@ -83,7 +83,7 @@ object StormRunnerWithUnion extends Application{
   val env = ExecutionEnvironments.getStorm(config)
   val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependExecutor("test"))
   val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendExecutor("test"))
-  tail1.union(List(tail2)).flatMap(PatternAlertExecutor(".*test.*"))
+  tail1.streamUnion(List(tail2)).flatMap(PatternAlertExecutor(".*test.*"))
   //env.execute
 }
 

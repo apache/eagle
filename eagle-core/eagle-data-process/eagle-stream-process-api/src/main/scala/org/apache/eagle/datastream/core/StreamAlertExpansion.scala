@@ -25,6 +25,7 @@ import org.apache.eagle.datastream._
 import org.apache.eagle.datastream.storm.StormExecutorForAlertWrapper
 import org.apache.eagle.datastream.utils.AlertExecutorConsumerUtils
 import org.apache.eagle.executor.AlertExecutorCreationUtils
+import org.apache.eagle.service.client.EagleServiceConnector
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 
@@ -102,7 +103,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
         /**
          * step 2: partition alert executor by policy partitioner class
          */
-        val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(config), upStreamNames, alertExecutorId)
+        val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(new EagleServiceConnector(config)), upStreamNames, alertExecutorId)
         var alertProducers = new scala.collection.mutable.MutableList[StreamProducer[Any]]
         alertExecutors.foreach(exec => {
           val t = FlatMapProducer(exec).nameAs(exec.getAlertExecutorId + "_" + exec.getPartitionSeq).initWith(dag,config,hook = false)

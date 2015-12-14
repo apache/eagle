@@ -24,10 +24,12 @@ import org.apache.eagle.security.auditlog.timer.IPZonePollingJob;
 import org.apache.eagle.security.hdfs.entity.IPZoneEntity;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.security.util.ExternalDataJoiner;
+import org.apache.storm.guava.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 public class IPZoneDataJoinExecutor extends JavaStormStreamExecutor2<String, Map> {
 	private static final Logger LOG = LoggerFactory.getLogger(IPZoneDataJoinExecutor.class);
@@ -52,7 +54,8 @@ public class IPZoneDataJoinExecutor extends JavaStormStreamExecutor2<String, Map
 
     @Override
     public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
-        Map<String, Object> event = (Map<String, Object>)input.get(1);
+        Map<String, Object> toBeCopied = (Map<String, Object>)input.get(1);
+        Map<String, Object> event = new TreeMap<String, Object>(toBeCopied); // shallow copy
         Map<String, IPZoneEntity> map = (Map<String, IPZoneEntity>) ExternalDataCache.getInstance().getJobResult(IPZonePollingJob.class);
         IPZoneEntity e = null;
         if(map != null){

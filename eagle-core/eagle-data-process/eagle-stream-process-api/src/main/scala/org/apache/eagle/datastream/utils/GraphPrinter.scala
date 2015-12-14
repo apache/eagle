@@ -31,7 +31,7 @@ import scala.collection.mutable.ListBuffer
  */
 object GraphPrinter {
   private val LOG = LoggerFactory.getLogger(GraphPrinter.getClass)
-  def print(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]], message:String = "Stream DAG graph"): Unit = {
+  def print(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]], message:String = "Print stream DAG graph"): Unit = {
     val graphStr = ListBuffer[String]()
     val iter = dag.iterator()
     while (iter.hasNext) {
@@ -41,5 +41,19 @@ object GraphPrinter {
       })
     }
     LOG.info(message+"\n{ \n\t" + graphStr.mkString("\n\t") + "\n}")
+  }
+  
+  def printDotDigraph(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]], title:String = "dag", message:String = "Print DOT digraph (copy and visualize with http://www.webgraphviz.com/)"): String = {
+    val graphStr = ListBuffer[String]()
+    val iter = dag.iterator()
+    while (iter.hasNext) {
+      val current = iter.next()
+      dag.outgoingEdgesOf(current).foreach(edge => {
+        graphStr += s""""${edge.from.name} x ${edge.from.parallelismNum}" -> "${edge.to.name} x ${edge.from.parallelismNum}" [label = "$edge"];"""
+      })
+    }
+    val dotDigraph = s"""digraph $title { \n\t${graphStr.mkString("\n\t")} \n}"""
+    LOG.info(s"""$message\n\n$dotDigraph\n""")
+    dotDigraph
   }
 }

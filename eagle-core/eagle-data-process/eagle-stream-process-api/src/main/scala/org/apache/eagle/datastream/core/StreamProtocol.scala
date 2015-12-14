@@ -144,7 +144,7 @@ trait StreamProtocol[+T <: Any]{
    * @return
    */
   def groupByKey(keyer:T => Any):StreamProducer[T]
-  def union[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
+  def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
   /**
    * Set processing element parallelism setting

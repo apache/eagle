@@ -25,6 +25,8 @@ import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
 import org.apache.eagle.datastream.ExecutionEnvironments;
+import org.apache.eagle.datastream.Tuple2;
+import org.apache.eagle.datastream.core.StreamProducer;
 import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.apache.eagle.partition.DataDistributionDao;
 import org.apache.eagle.partition.PartitionAlgorithm;
@@ -75,23 +77,26 @@ public class HdfsAuditLogProcessorMain {
          return provider;
     }
 
-    public static void execWithDefaultPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
-        env.fromSpout(provider.getSpout(config)).withOutputFields(2).nameAs("kafkaMsgConsumer")
-                .groupBy(Arrays.asList(0))
-                .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
-                .flatMap(new IPZoneDataJoinExecutor())
-                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
+    @SuppressWarnings("unchecked")
+    public static void execWithDefaultPartition(StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
+        StreamProducer source = env.fromSpout(provider).withOutputFields(2).nameAs("kafkaMsgConsumer").groupBy(Arrays.asList(0));
+        StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
+        source.streamUnion(reassembler)
+              .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
+              .flatMap(new IPZoneDataJoinExecutor())
+              .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();
     }
 
-    public static void execWithBalancedPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
-        PartitionStrategy strategy = createStrategy(config);
-        env.fromSpout(provider).withOutputFields(2).nameAs("kafkaMsgConsumer")
-                .groupBy(strategy)
-                .flatMap(new FileSensitivityDataJoinExecutor())
-                .groupBy(strategy)
+    @SuppressWarnings("unchecked")
+    public static void execWithBalancedPartition(StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
+        PartitionStrategy strategy = createStrategy(env.getConfig());
+        StreamProducer source = env.fromSpout(provider).withOutputFields(2).nameAs("kafkaMsgConsumer").groupBy(strategy);
+        StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
+        source.streamUnion(reassembler)
+                .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new IPZoneDataJoinExecutor())
-                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor", strategy);
+                .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();
     }
 
@@ -101,9 +106,9 @@ public class HdfsAuditLogProcessorMain {
         KafkaSourcedSpoutProvider provider = createProvider(env.getConfig());
         Boolean balancePartition = config.hasPath("eagleProps.balancePartitionEnabled") && config.getBoolean("eagleProps.balancePartitionEnabled");
         if (balancePartition) {
-            execWithBalancedPartition(config, env, provider);
+            execWithBalancedPartition(env, provider);
         } else {
-            execWithDefaultPartition(config, env, provider);
+            execWithDefaultPartition(env, provider);
         }
 	}
 }

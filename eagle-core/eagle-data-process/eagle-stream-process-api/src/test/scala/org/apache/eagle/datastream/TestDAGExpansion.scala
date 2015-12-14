@@ -27,8 +27,7 @@ object testStreamUnionExpansion extends App{
   val env = new StormExecutionEnvironment(config)
   val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
   val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key1",a))
-  tail1.union(List(tail2)).map1(a => "xyz")
-  //env.execute
+  tail1.streamUnion(List(tail2)).map1(a => "xyz")
 }
 
 object testStreamGroupbyExpansion extends App{
@@ -43,8 +42,8 @@ object testStreamUnionAndGroupbyExpansion extends App{
   val env = new StormExecutionEnvironment(config)
   val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a)).groupBy(1)
   val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key1",a)).groupBy(0)
-  tail1.union(List(tail2)).map1(a => "xyz")
-  //env.execute
+  tail1.streamUnion(List(tail2)).map1(a => "xyz")
+//  env.execute()
 }
 
 /**
@@ -74,6 +73,32 @@ object testAlertExpansionWithUnion extends App{
   val env = new StormExecutionEnvironment(config)
   val tail1 = env.fromSpout(TestSpout()).nameAs("testSpout1").flatMap(WordPrependForAlertExecutor("test")).nameAs("prepend") //.map2(a => ("key1",a))
   val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendForAlertExecutor("test")) //.map2(a => ("key1",a))
-  tail1.union(List(tail2)).alert(Seq("s1","s2"), "alert1", consume = true)
+  tail1.streamUnion(List(tail2)).alert(Seq("s1","s2"), "alert1", consume = true)
   //env.execute
+}
+
+
+object testStreamUnionExpansionWithSharedSpout extends App{
+  val config : Config = ConfigFactory.load;
+  val env = new StormExecutionEnvironment(config)
+  val source = env.fromSpout(TestSpout())
+  val tail1 = source.flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
+  val tail2 = source.flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key1",a))
+  tail1.streamUnion(List(tail2)).map1(a  => {
+    println(a)
+    "xyz"
+  })
+//    env.execute
+}
+
+object testStreamUnionExpansionWithSharedSpout_2 extends App{
+  val config : Config = ConfigFactory.load;
+  val env = new StormExecutionEnvironment(config)
+  val source = env.fromSpout(TestSpout())
+  val tail1 = source.flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
+  source.streamUnion(List(tail1)).map1(a  => {
+    println(a)
+    "xyz"
+  })
+//  env.execute
 }

@@ -22,5 +22,6 @@ public class HDFSSecurityEntityRepository extends EntityRepository {
 	public HDFSSecurityEntityRepository(){
 		entitySet.add(FileSensitivityAPIEntity.class);
         entitySet.add(IPZoneEntity.class);
+        entitySet.add(HdfsUserCommandPatternEntity.class);
 	}
 }

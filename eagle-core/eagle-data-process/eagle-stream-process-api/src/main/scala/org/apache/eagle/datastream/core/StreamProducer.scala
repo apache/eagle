@@ -143,13 +143,17 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     ret
   }
 
-  override def union[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
+  override def streamUnion[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
     val ret = StreamUnionProducer[T, T2, T3](others)
     hookup(this, ret)
     ret
   }
 
-  def union[T2,T3](others : util.List[StreamProducer[T2]]) : StreamProducer[T3] = union(others.asScala)
+  def streamUnion[T2,T3](other : StreamProducer[T2]) : StreamProducer[T3] = {
+    streamUnion(Seq(other))
+  }
+
+  def streamUnion[T2,T3](others : util.List[StreamProducer[T2]]) : StreamProducer[T3] = streamUnion(others.asScala)
 
   override def groupBy(strategy : PartitionStrategy) : StreamProducer[T] = {
     val ret = GroupByStrategyProducer(strategy)
