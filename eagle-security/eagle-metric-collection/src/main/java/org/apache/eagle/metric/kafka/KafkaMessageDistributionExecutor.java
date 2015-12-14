@@ -74,7 +74,7 @@ public class KafkaMessageDistributionExecutor extends JavaStormStreamExecutor1<S
         Map<String, String> dimensions = new HashMap<>();
         dimensions.putAll(baseMetricDimension);
         dimensions.put("user", user);
-        String metricName = "kafka.message.user.count";
+        String metricName = "eagle.kafka.message.count";
         String encodedMetricName = MetricKeyCodeDecoder.codeMetricKey(metricName, dimensions);
         return encodedMetricName;
     }

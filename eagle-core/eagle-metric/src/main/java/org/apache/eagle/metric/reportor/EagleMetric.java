@@ -27,11 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * It's just a workaround to extends Gauge instead of Metric interface
- * For MetricRegistry's notifyListenerOfRemovedMetric method will throw exception on unknown metric type
- */
-
 public abstract class EagleMetric implements IEagleMetric {
 
     public long latestUserTimeClock;
