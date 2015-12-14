@@ -74,7 +74,7 @@ public class TestParser {
 
   @Test
   public void testSelectStatment() throws Exception {
-    String query = "select * from cts_common_prod_sd_2015060600_ed_2015071300 "
+    String query = "select * from t1 "
         + "where partner=965704 and brand_id=14623 "
         + "and date_key>=2015071400 and date_key<=2015071300";
     String expectedOperation = "SELECT";
@@ -82,7 +82,7 @@ public class TestParser {
     Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();;
     Set<String> set = new HashSet<String>();
     set.add("*");
-    expectedTableColumn.put("cts_common_prod_sd_2015060600_ed_2015071300", set);
+    expectedTableColumn.put("t1", set);
 
     _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
   }
@@ -90,10 +90,10 @@ public class TestParser {
   //@Test
   public void testSelectDistinctStatement() throws Exception {
     String query = "select distinct action_timestamp,exchange_id "
-        + "from chango_ica_new "
+        + "from t1 "
         + "where action='IM' and dt='20150615'";
     String expectedOperation = "SELECT DISTINCT";
-    String expectedInsertTable = "TOK_TMP_FILE";
+    String expectedInsertTable = "t1";
     Map<String, Set<String>> expectedTableColumn = null;
     Set<String> set = new HashSet<String>();
     set.add("action_timestamp");
@@ -123,16 +123,16 @@ public class TestParser {
 
   @Test
   public void testSelectExprStatement() throws Exception {
-    String query = "INSERT OVERWRITE TABLE top_level_viewer_dpms select scandate , pathtype , pathname , pathlevel , spacesize * 3 , diskspacequota , pathsize_increase , namespacequota , filecount , dircount , username , groupname, 'XYZ' system from hdfsdu where asofdate = '20150908' and pathlevel <= 3";
+    String query = "INSERT OVERWRITE TABLE t1 select scandate , pathtype , pathname , pathlevel , spacesize * 3 , diskspacequota , pathsize_increase , namespacequota , filecount , dircount , username , groupname, 'XYZ' system from hdfsdu where asofdate = '20150908' and pathlevel <= 3";
     String expectedOperation = "SELECT";
-    String expectedInsertTable = "top_level_viewer_dpms";
+    String expectedInsertTable = "t1";
     Map<String, Set<String>> expectedTableColumn = null;
     _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
   }
 
   @Test
   public void testAliaTableStatement() throws Exception {
-    String query = "select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number";
+    String query = "select a.phone_number from t1 a, t2 b where a.phone_number=b.phone_number";
     String expectedOperation = "SELECT";
     String expectedInsertTable = "TOK_TMP_FILE";
     Map<String, Set<String>> expectedTableColumn = null;
@@ -150,7 +150,7 @@ public class TestParser {
 
     @Test
     public void testFromStatement1() throws Exception {
-        String query = "INSERT OVERWRITE TABLE p13nquality.cust_dna_vq_cat_feed_target PARTITION ( dt='20151121')\n" +
+        String query = "INSERT OVERWRITE TABLE t1.tt1 PARTITION ( dt='20151121')\n" +
                 "select distinct user_id, concat(categ_id,get_json_object(dep3, '$.categ_id'), level_id, get_json_object(dep3, '$.level_id'), site_id, get_json_object(dep3, '$.site_id')) from (\n" +
                 "select user_id, if(instr(dep2, \"name\")>0, get_json_object(dep2, '$.vq_rank'), dep2) dep3 from (\n" +
                 "select user_id, if(instr(dep1, \"name\")>0, concat(dep1, \"}\"), dep1) dep2\n" +
@@ -163,14 +163,14 @@ public class TestParser {
                 "and schema_name = 'cust_dna_vq_cat_feed') a ) b\n" +
                 "lateral view outer explode(dep) c as dep1) d ) e";
         String expectedOperation = "SELECT";
-        String expectedInsertTable = "p13nquality";
+        String expectedInsertTable = "t1";
         Map<String, Set<String>> expectedTableColumn = null;
         _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
     }
 
     @Test
     public void testFromStatement2() throws Exception {
-        String query = "insert overwrite table bm2_item4_5\n" +
+        String query = "insert overwrite table t1\n" +
                 "SELECT dt,cobrand,device_type,geo_ind,byr_region,slr_id,slr_region,item_format,price_tranche,vertical,sap_category_id,site_id,user_seg,sort,page_id,page_number,item_rank,relist_flag,app_name,SUM(impr_cnt) impr_cnt\n" +
                 "FROM ( SELECT\n" +
                 "dt,\n" +
@@ -195,15 +195,15 @@ public class TestParser {
                 "relist_flag,\n" +
                 "app_name,\n" +
                 "impr_cnt\n" +
-                "FROM  (SELECT * FROM bm2_item3_5 WHERE user_id > 0) a\n" +
-                "LEFT JOIN bm2_user_SEG_lkup_5 b\n" +
+                "FROM  (SELECT * FROM t2 WHERE user_id > 0) a\n" +
+                "LEFT JOIN t3 b\n" +
                 "ON a.user_id=b.user_id\n" +
                 "UNION ALL\n" +
                 "SELECT dt,cobrand,device_type,geo_ind,byr_region,slr_id,slr_region,item_format,price_tranche,vertical,sap_category_id,site_id,'NA' AS user_seg,sort,page_id,page_number,item_rank,relist_flag,app_name,impr_cnt\n" +
-                "FROM bm2_item3_5 WHERE user_id < 0\n" +
+                "FROM t3 WHERE user_id < 0\n" +
                 ")a";
         String expectedOperation = "SELECT";
-        String expectedInsertTable = "bm2_item4_5";
+        String expectedInsertTable = "t1";
         Map<String, Set<String>> expectedTableColumn = null;
         _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
     }
@@ -222,12 +222,12 @@ public class TestParser {
 
     @Test
     public void testCreateTable2() throws Exception {
-        String query = "CREATE TABLE mf_cguid_to_uid_step2 as\n" +
+        String query = "CREATE TABLE t2 as\n" +
                 "        SELECT\n" +
                 "                user_id,\n" +
                 "                max(ts) as max_ts\n" +
                 "        FROM\n" +
-                "                mf_cguid_to_uid_step1\n" +
+                "                t1\n" +
                 "        GROUP BY user_id";
         String expectedOperation = "SELECT";
         _testParsingQuery(query, expectedOperation, null, null);
@@ -236,14 +236,14 @@ public class TestParser {
 
     @Test
     public void testAlertTable() throws Exception {
-        String query = "ALTER TABLE pv_users DROP PARTITION (ds='2008-08-08')";
+        String query = "ALTER TABLE t1 DROP PARTITION (ds='2008-08-08')";
         String expectedOperation = "ALTER";
         _testParsingQuery(query, expectedOperation, null, null);
     }
 
     @Test
     public void testDropTable() throws Exception {
-        String query = "DROP TABLE pv_users";
+        String query = "DROP TABLE t1";
         String expectedOperation = "DROP";
         _testParsingQuery(query, expectedOperation, null, null);
     }
@@ -259,7 +259,7 @@ public class TestParser {
 
     @Test
     public void testLateralView() throws Exception {
-        String query = "select game_id, user_id from test_lateral_view_shengli lateral view explode(split(userl_ids,'\\\\[\\\\[\\\\[')) snTable as user_id";
+        String query = "select game_id, user_id from t1 lateral view explode(split(userl_ids,'\\\\[\\\\[\\\\[')) snTable as user_id";
         String expectedOperation = "SELECT";
         String expectedInsertTable = "TOK_TMP_FILE";
         _testParsingQuery(query, expectedOperation, expectedInsertTable, null);
