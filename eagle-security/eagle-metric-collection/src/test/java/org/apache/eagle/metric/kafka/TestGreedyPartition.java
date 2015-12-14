@@ -1,3 +1,4 @@
+package org.apache.eagle.metric.kafka;
 /*
  *
  *    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -17,25 +18,32 @@
  *
  */
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.partition.DataDistributionDao;
+import org.apache.eagle.partition.PartitionAlgorithm;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
+import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class TestDataDistributionDaoImpl {
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
-    //@Test
+public class TestGreedyPartition {
+
+    @Ignore
+    @Test
     public void test() throws Exception{
         System.setProperty("config.resource", "/application.local.conf");
         Config config = ConfigFactory.load();
-        String eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-        Integer eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
+        String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
+        Integer port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
         String username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
         String password = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD);
         String topic = config.getString("dataSourceConfig.topic");
-        DataDistributionDao dao = new DataDistributionDaoImpl(eagleServiceHost, eagleServicePort, username, password, topic);
-        dao.fetchDataDistribution(System.currentTimeMillis() - 2 * DateUtils.MILLIS_PER_DAY, System.currentTimeMillis());
+        DataDistributionDao dao = new DataDistributionDaoImpl(host, port, username, password, topic);
+        PartitionAlgorithm algorithm = new GreedyPartitionAlgorithm();
+        algorithm.partition(dao.fetchDataDistribution(System.currentTimeMillis() - 2 * DateUtils.MILLIS_PER_DAY, System.currentTimeMillis()), 4);
     }
 }

@@ -1,3 +1,4 @@
+package org.apache.eagle.metric.kafka;
 /*
  *
  *    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -17,21 +18,21 @@
  *
  */
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.Map;
+
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.impl.storm.zookeeper.ZKStateConfig;
-import org.apache.eagle.metric.kafka.KafkaConsumerOffsetFetcher;
-import org.apache.eagle.metric.kafka.KafkaLatestOffsetFetcher;
-import org.apache.eagle.metric.kafka.KafkaOffsetCheckerConfig;
 import org.apache.eagle.service.client.ServiceConfig;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Map;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 public class TestKafkaOffset {
 
-    //@Test
+    @Ignore
+    @Test
     public void test() throws Exception {
         System.setProperty("config.resource", "/application.local.conf");
         Config config = ConfigFactory.load();
