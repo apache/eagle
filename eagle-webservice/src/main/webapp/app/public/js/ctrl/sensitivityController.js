@@ -18,13 +18,70 @@
 
 'use strict';
 
+damControllers.service('SensitivityConfig', function(Site) {
+	var config = {
+		list: [
+			{
+				name: "HDFS",
+				dataSrc: common.array.find("hdfsAuditLog", Site.current().dataSrcList, "tags.dataSource"),
+				service: "FileSensitivityService",
+				keys: ["filedir", "sensitivityType"],
+
+				type: "folder",
+				prefix: "fileSensitivity",
+				api: "hdfsResource",
+			},
+			{
+				name: "Hive",
+				dataSrc: common.array.find("hiveQueryLog", Site.current().dataSrcList, "tags.dataSource"),
+				service: "HiveResourceSensitivityService",
+				keys: ["hiveResource", "sensitivityType"],
+
+				type: "table",
+				prefix: "hiveResourceSensitivity",
+				api: {
+					database: "hiveResource/databases",
+					table: "hiveResource/tables",
+					column: "hiveResource/columns",
+				},
+				mapping: {
+					database: "database",
+					table: "table",
+					column: "column",
+				},
+			},
+			{
+				name: "HBase",
+				dataSrc: common.array.find("hbaseSecurityLog", Site.current().dataSrcList, "tags.dataSource"),
+				service: "HbaseResourceSensitivityService",
+				keys: ["hbaseResource", "sensitivityType"],
+				type: "table",
+				prefix: "hbaseResourceSensitivity",
+				api: {
+					database: "hbaseResource/namespaces",
+					table: "hbaseResource/tables",
+					column: "hbaseResource/columns",
+				},
+				mapping: {
+					database: "namespace",
+					table: "table",
+					column: "columnFamily",
+				},
+			},
+		],
+	};
+
+	return config;
+});
+
 // =============================================================
 // =                    Sensitivity Summary                    =
 // =============================================================
-damControllers.controller('sensitivitySummaryCtrl', function(globalContent, Site, damContent, $scope, Entities) {
+damControllers.controller('sensitivitySummaryCtrl', function(globalContent, Site, damContent, $scope, Entities, SensitivityConfig) {
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "Data Classification";
 	globalContent.pageSubTitle = Site.current().name;
+	$scope.config = SensitivityConfig;
 
 	$scope._sensitivitySource = null;
 	$scope._sensitivityLock = false;
@@ -32,31 +89,20 @@ damControllers.controller('sensitivitySummaryCtrl', function(globalContent, Site
 	$scope._sensitivityFile = "";
 	$scope._sensitivityData = "";
 	$scope._sensitivityError = "";
-	$scope.sensitivityList = [];
 
-	// TODO: Only support Hive & HDFS
-	if(common.array.find("hdfsAuditLog", Site.current().dataSrcList, "tags.dataSource")) {
-		$scope.sensitivityList.push(
-			{name: "HDFS", service: "FileSensitivityService", keys: ["filedir", "sensitivityType"]}
-		);
-	}
-	if(common.array.find("hiveQueryLog", Site.current().dataSrcList, "tags.dataSource")) {
-		$scope.sensitivityList.push(
-			{name: "Hive", service: "HiveResourceSensitivityService", keys: ["hiveResource", "sensitivityType"]}
-		);
-	}
-
-	function _refreshStatistic(entity) {
+	// ==================== Statistic ====================
+	var _refreshStatistic = function(entity) {
 		if(entity) {
 				entity.statisitc = Entities.queryGroup(entity.service, {site: Site.current().name}, "@site", "count");
 		} else {
-			$.each($scope.sensitivityList, function(i, entity) {
+			$.each($scope.config.list, function(i, entity) {
 				entity.statisitc = Entities.queryGroup(entity.service, {site: Site.current().name}, "@site", "count");
 			});
 		}
-	}
+	};
 	_refreshStatistic();
 
+	// ================== Configuration ==================
 	// Import sensitivity data
 	$scope.showImportEditor = function(entity) {
 		$scope._sensitivitySource = entity;
@@ -82,7 +128,7 @@ damControllers.controller('sensitivitySummaryCtrl', function(globalContent, Site
 				if(!Entities.dialog(data)) {
 					$("#sensitivityMDL").modal('hide');
 					$scope._sensitivityData = "";
-	
+
 					_refreshStatistic($scope._sensitivitySource);
 				}
 			}).finally(function() {
@@ -198,90 +244,38 @@ damControllers.controller('sensitivitySummaryCtrl', function(globalContent, Site
 // =============================================================
 // =                        Sensitivity                        =
 // =============================================================
-damControllers.controller('sensitivityCtrl', function(globalContent, Site, damContent, $scope, $q, $routeParams, $location, Entities) {
+damControllers.controller('sensitivityCtrl', function(globalContent, Site, damContent, $scope, $routeParams, SensitivityConfig) {
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "Data Classification";
 	globalContent.pageSubTitle = Site.current().name;
-
-	$scope.sensitivityList = [];
-	$scope.type = $routeParams.type;
+	$scope.config = SensitivityConfig;
 	$scope.ajaxId = Math.random();
 
-	// TODO: Only support Hive & HDFS
-	if(common.array.find("hdfsAuditLog", Site.current().dataSrcList, "tags.dataSource")) {
-		$scope.sensitivityList.push(
-			{name: "HDFS"}
-		);
+	// Check data source
+	$scope.dataSrc = common.array.find($routeParams.dataSrc, $scope.config.list, "name");
+	if(!$scope.dataSrc) {
+		$.dialog({
+			title: "OPS",
+			content: "Data Source '" + $routeParams.dataSrc + "' not found!"
+		}, function() {
+			Site.url('/dam/sensitivitySummary');
+		});
 	}
-	if(common.array.find("hiveQueryLog", Site.current().dataSrcList, "tags.dataSource")) {
-		$scope.sensitivityList.push(
-			{name: "Hive"}
-		);
-	}
-
-	// Update search
-	$scope.$watch("type", function(value) {
-		$location.search("type", value);
-	});
 });
 
-// =============================================================
-// =                     Sensitivity: HDFS                     =
-// =============================================================
-damControllers.controller('sensitivityHDFSCtrl', function(globalContent, Site, damContent, $scope, $location, $q, Entities) {
+// ==============================================================
+// =                    Sensitivity - Folder                    =
+// ==============================================================
+damControllers.controller('sensitivityViewFolderCtrl', function(globalContent, Site, damContent, $scope, $location, Entities, SensitivityConfig) {
 	$scope.path = $location.search().path || "/";
 	$scope.pathUnitList = [];
-
 	$scope.items = [];
-
-	/*$scope.$parent.$on("tab-change", function(event, pane) {
-		$location.search("path", pane.title === "HDFS" ? $scope.path : null);
-	});*/
 
 	// Mark sensitivity
 	$scope._oriItem = {};
 	$scope._markItem = {};
 
-	$scope.markSensitivity = function(item) {
-		$scope._oriItem = item;
-		$scope._markItem = {
-			prefix: "fileSensitivity",
-			tags: {
-				site: Site.current().name,
-				filedir: item.resource
-			},
-			sensitivityType: ""
-		};
-		$("#sensitivityHdfsMDL").modal();
-		setTimeout(function() {
-			$("#hdfsSensitiveType").focus();
-		}, 500);
-	};
-	$scope.confirmUpateSensitivity = function() {
-		$scope._oriItem.sensitiveType = $scope._markItem.sensitivityType;
-		var _promise = Entities.updateEntity("FileSensitivityService", $scope._markItem, {timestamp: false})._promise.success(function(data) {
-			Entities.dialog(data);
-		});
-		$("#sensitivityHdfsMDL").modal('hide');
-	};
-	$scope.unmarkSensitivity = function(item) {
-		$.dialog({
-			title: "Unmark Confirm",
-			content: "Do you want to remove the sensitivity mark on '" + item.resource + "'?",
-			confirm: true
-		}, function(ret) {
-			if(!ret) return;
-
-			Entities.deleteEntities("FileSensitivityService", {
-				site: Site.current().name,
-				filedir: item.resource
-			});
-
-			item.sensitiveType = null;
-			$scope.$apply();
-		});
-	};
-
+	// ======================= View =======================
 	// Path
 	function _refreshPathUnitList(_path) {
 		var _start,_current, _unitList = [];
@@ -302,15 +296,13 @@ damControllers.controller('sensitivityHDFSCtrl', function(globalContent, Site, d
 	$scope.updateItems = function(path) {
 		if(path) $scope.path = path;
 
-		$scope.items = Entities.query("hdfsResource", {site: Site.current().name, path: $scope.path});
+		$scope.items = Entities.query($scope.dataSrc.api, {site: Site.current().name, path: $scope.path});
 		$scope.items._promise.success(function(data) {
 			var $dlg = Entities.dialog(data, function() {
 				if($scope.path !== "/") $scope.updateItems("/");
 			});
 		});
 		_refreshPathUnitList($scope.path);
-
-		//$location.search("path", $scope.path);
 	};
 
 	$scope.getFileName = function(item) {
@@ -318,54 +310,118 @@ damControllers.controller('sensitivityHDFSCtrl', function(globalContent, Site, d
 	};
 
 	$scope.updateItems($scope.path);
+
+	// =================== Sensitivity ===================
+	$scope.markSensitivity = function(item) {
+		$scope._oriItem = item;
+		$scope._markItem = {
+			prefix: $scope.dataSrc.prefix,
+			tags: {
+				site: Site.current().name,
+			},
+			sensitivityType: ""
+		};
+		$scope._markItem.tags[$scope.dataSrc.keys[0]] = item.resource;
+		$("#sensitivityMDL").modal();
+		setTimeout(function() {
+			$("#sensitiveType").focus();
+		}, 500);
+	};
+	$scope.confirmUpateSensitivity = function() {
+		$scope._oriItem.sensitiveType = $scope._markItem.sensitivityType;
+		var _promise = Entities.updateEntity($scope.dataSrc.service, $scope._markItem, {timestamp: false})._promise.success(function(data) {
+			Entities.dialog(data);
+		});
+		$("#sensitivityMDL").modal('hide');
+	};
+	$scope.unmarkSensitivity = function(item) {
+		$.dialog({
+			title: "Unmark Confirm",
+			content: "Do you want to remove the sensitivity mark on '" + item.resource + "'?",
+			confirm: true
+		}, function(ret) {
+			if(!ret) return;
+
+			var _cond = {site: Site.current().name};
+			_cond[$scope.dataSrc.keys[0]] = item.resource;
+			Entities.deleteEntities($scope.dataSrc.service, _cond);
+
+			item.sensitiveType = null;
+			$scope.$apply();
+		});
+	};
 });
 
 // =============================================================
-// =                     Sensitivity: Hive                     =
+// =                    Sensitivity - Table                    =
 // =============================================================
-damControllers.controller('sensitivityHiveCtrl', function(globalContent, Site, damContent, $scope, $q, Entities) {
+damControllers.controller('sensitivityViewTableCtrl', function(globalContent, Site, damContent, $scope, $location, Entities, SensitivityConfig) {
 	$scope.table = null;
 
-	$scope.databases = Entities.query("hiveResource/databases", {site: Site.current().name});
+	// Mark sensitivity
+	$scope._oriItem = {};
+	$scope._markItem = {};
+
+	// ======================= View =======================
+	var _fillAttr = function(list, key, target) {
+		list._promise.then(function() {
+			$.each(list, function(i, unit) {
+				unit[key] = unit[target];
+			});
+		});
+	};
+
+	$scope.databases = Entities.query($scope.dataSrc.api.database, {site: Site.current().name});
+	_fillAttr($scope.databases, "database", $scope.dataSrc.mapping.database);
+
 	$scope.loadTables = function(database) {
 		if(database.tables) return;
-		database.tables = Entities.query("hiveResource/tables", {site: Site.current().name, database: database.database});
+		var _qry = {
+			site: Site.current().name
+		};
+		_qry[$scope.dataSrc.mapping.database] = database[$scope.dataSrc.mapping.database];
+		database.tables = Entities.query($scope.dataSrc.api.table, _qry);
+		_fillAttr(database.tables, "table", $scope.dataSrc.mapping.table);
+		_fillAttr(database.tables, "database", $scope.dataSrc.mapping.database);
 	};
 
 	$scope.loadColumns = function(database, table) {
 		$scope.table = table;
 
 		if(table.columns) return;
-		table.columns = Entities.query("hiveResource/columns", {site: Site.current().name, database: database.database, table: table.table});
+		var _qry = {
+			site: Site.current().name
+		};
+		_qry[$scope.dataSrc.mapping.database] = database[$scope.dataSrc.mapping.database];
+		_qry[$scope.dataSrc.mapping.table] = table[$scope.dataSrc.mapping.table];
+		table.columns = Entities.query($scope.dataSrc.api.column, _qry);
+		_fillAttr(table.columns, "column", $scope.dataSrc.mapping.column);
 	};
 
-	// Mark sensitivity
-	$scope._oriItem = {};
-	$scope._markItem = {};
-
+	// =================== Sensitivity ===================
 	$scope.markSensitivity = function(item, event) {
 		if(event) event.stopPropagation();
 
 		$scope._oriItem = item;
 		$scope._markItem = {
-			prefix: "hiveResourceSensitivity",
+			prefix: $scope.dataSrc.prefix,
 			tags: {
 				site: Site.current().name,
-				hiveResource: item.resource
 			},
 			sensitivityType: ""
 		};
-		$("#sensitivityHiveMDL").modal();
+		$scope._markItem.tags[$scope.dataSrc.keys[0]] = item.resource;
+		$("#sensitivityMDL").modal();
 		setTimeout(function() {
-			$("#hiveSensitiveType").focus();
+			$("#sensitiveType").focus();
 		}, 500);
 	};
 	$scope.confirmUpateSensitivity = function() {
 		$scope._oriItem.sensitiveType = $scope._markItem.sensitivityType;
-		var _promise = Entities.updateEntity("HiveResourceSensitivityService", $scope._markItem, {timestamp: false})._promise.success(function(data) {
+		var _promise = Entities.updateEntity($scope.dataSrc.service, $scope._markItem, {timestamp: false})._promise.success(function(data) {
 			Entities.dialog(data);
 		});
-		$("#sensitivityHiveMDL").modal('hide');
+		$("#sensitivityMDL").modal('hide');
 	};
 	$scope.unmarkSensitivity = function(item, event) {
 		if(event) event.stopPropagation();
@@ -377,10 +433,11 @@ damControllers.controller('sensitivityHiveCtrl', function(globalContent, Site, d
 		}, function(ret) {
 			if(!ret) return;
 
-			Entities.deleteEntities("HiveResourceSensitivityService", {
+			var _qry = {
 				site: Site.current().name,
-				hiveResource: item.resource
-			});
+			};
+			_qry[$scope.dataSrc.keys[0]] = item.resource;
+			Entities.deleteEntities($scope.dataSrc.service, _qry);
 
 			item.sensitiveType = null;
 			$scope.$apply();

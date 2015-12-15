@@ -61,7 +61,12 @@ public class JobConfigurationAdaptorExecutor extends JavaStormStreamExecutor2<St
         if (type.equals(ResourceType.JOB_CONFIGURATION)) {
             Map<String, String> configs = (Map<String, String>)input.get(3);
             if (filter.acceptJobConf(configs)) {
-                LOG.info("Got a hive job, jobID: " + jobId + ", query: " + configs.get(JobConstants.HIVE_QUERY_STRING));
+                if(LOG.isDebugEnabled()) {
+                    LOG.debug("Got a hive job, jobID: " + jobId + ", query: " + configs.get(JobConstants.HIVE_QUERY_STRING));
+                } else {
+                    LOG.info("Got a hive job, jobID: " + jobId);
+                }
+
                 Map<String, Object> map = convertMap(configs);
                 outputCollector.collect(new Tuple2(user, map));
             }

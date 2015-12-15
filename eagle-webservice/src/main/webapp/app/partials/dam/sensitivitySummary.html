@@ -16,40 +16,40 @@
   limitations under the License.
   -->
 <div class="row">
-	<div class="col-md-4" ng-repeat="entity in sensitivityList">
-			<div class="info-box bg-aqua box-clickable">
-				<span class="info-box-icon" ng-click="site.url('/dam/sensitivity?type=' + entity.name)"><i class="fa fa-suitcase"></i></span>
-				<div class="info-box-content">
-					<div class="pull-right btn-group" ng-show="auth.isRole('ROLE_ADMIN')">
-						<a class="fa fa-cog config" data-toggle="dropdown"></a>
-						<ul class="dropdown-menu" role="menu">
-							<li>
-								<a ng-click="showImportEditor(entity);"><span class="fa fa-cloud-upload"></span>Import</a>
-							</li>
-							<li class="divider"></li>
-							<li>
-								<a ng-click="showManagementEditor(entity);"><span class="fa fa-list"></span>Management</a>
-							</li>
-						</ul>
-					</div>
+	<div class="col-md-4" ng-repeat="entity in config.list">
+		<div class="info-box bg-aqua box-clickable">
+			<span class="info-box-icon" ng-click="site.url('/dam/sensitivity/' + entity.name)"><i class="fa fa-suitcase"></i></span>
+			<div class="info-box-content">
+				<div class="pull-right btn-group" ng-show="auth.isRole('ROLE_ADMIN')">
+					<a class="fa fa-cog config" data-toggle="dropdown"></a>
+					<ul class="dropdown-menu" role="menu">
+						<li>
+							<a ng-click="showImportEditor(entity);"><span class="fa fa-cloud-upload"></span>Import</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a ng-click="showManagementEditor(entity);"><span class="fa fa-list"></span>Management</a>
+						</li>
+					</ul>
+				</div>
 
-					<div ng-click="site.url('/dam/sensitivity?type=' + entity.name)">
-						<span class="info-box-text text-large">{{entity.name}}</span>
-						<!--span class="info-box-number">
-							<small>Connected</small>
-						</span-->
-						<div class="progress">
-							<div class="progress-bar"></div>
-						</div>
-						<span class="progress-description">
-							<span class="fa fa-refresh fa-spin" ng-hide="entity.statisitc._promise.$$state.status === 1"></span>
-							<span ng-show="entity.statisitc._promise.$$state.status === 1">{{entity.statisitc[0].value[0] || 0}}</span>
-							sensitivity items
-						</span>
+				<div ng-click="site.url('/dam/sensitivity/' + entity.name)">
+					<span class="info-box-text text-large">{{entity.name}}</span>
+					<!--span class="info-box-number">
+						<small>Connected</small>
+					</span-->
+					<div class="progress">
+						<div class="progress-bar"></div>
 					</div>
-				</div><!-- /.info-box-content -->
-			</div>
+					<span class="progress-description">
+						<span class="fa fa-refresh fa-spin" ng-hide="entity.statisitc._promise.$$state.status === 1"></span>
+						<span ng-show="entity.statisitc._promise.$$state.status === 1">{{entity.statisitc[0].value[0] || 0}}</span>
+						sensitivity items
+					</span>
+				</div>
+			</div><!-- /.info-box-content -->
 		</div>
+	</div>
 </div>
 
 <!-- Modal: Create sensitivity -->

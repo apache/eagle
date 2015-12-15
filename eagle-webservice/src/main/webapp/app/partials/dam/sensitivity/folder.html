@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<div ng-controller="sensitivityHDFSCtrl">
+<div ng-controller="sensitivityViewFolderCtrl">
 	<ul class="list-inline path">
 		<li>Path:</li>
 		<li ng-repeat="unit in pathUnitList">
@@ -76,7 +76,7 @@
 
 
 	<!-- Modal: Create / Edit site -->
-	<div class="modal fade" id="sensitivityHdfsMDL" tabindex="-1" role="dialog">
+	<div class="modal fade" id="sensitivityMDL" tabindex="-1" role="dialog">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -92,7 +92,7 @@
 					</div>
 					<div class="form-group">
 						<label>* Sensitivity Type</label>
-						<input type="text" class="form-control" ng-model="_markItem.sensitivityType" id="hdfsSensitiveType" />
+						<input type="text" class="form-control" ng-model="_markItem.sensitivityType" id="sensitiveType" />
 					</div>
 				</div>
 				<div class="modal-footer">

@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
+import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
@@ -103,10 +104,24 @@ trait StreamProducer{
     ret
   }
 
+  def customGroupBy(strategy : PartitionStrategy) : StreamProducer = {
+    val ret = GroupByProducer(incrementAndGetId(), strategy)
+    hookupDAG(graph, this, ret)
+    ret
+  }
+
+  def streamUnion(others : util.List[StreamProducer]) : StreamProducer = {
+    streamUnion(others);
+  }
+
   def streamUnion(others : Seq[StreamProducer]) : StreamProducer = {
     val ret = StreamUnionProducer(incrementAndGetId(), others)
     hookupDAG(graph, this, ret)
     ret
+  }
+
+  def streamUnion(other : StreamProducer) : StreamProducer = {
+    streamUnion(Seq(other))
   }
 
   /**
@@ -120,13 +135,21 @@ trait StreamProducer{
     alert(upStreamNames, alertExecutorId, false)
   }
 
-  def alert(upStreamNames: util.List[String], alertExecutorId : String, withConsumer: Boolean=true) = {
-    val ret = AlertStreamSink(incrementAndGetId(), upStreamNames, alertExecutorId, withConsumer)
+  def alert(upStreamNames: util.List[String], alertExecutorId : String, withConsumer: Boolean=true, strategy : PartitionStrategy=null ) = {
+    val ret = AlertStreamSink(incrementAndGetId(), upStreamNames, alertExecutorId, withConsumer, strategy)
     hookupDAG(graph, this, ret)
+  }
+
+  def alertWithConsumer(upStreamName: String, alertExecutorId : String, strategy: PartitionStrategy): Unit ={
+    alert(util.Arrays.asList(upStreamName), alertExecutorId, true, strategy)
   }
 
   def alertWithConsumer(upStreamName: String, alertExecutorId : String): Unit ={
     alert(util.Arrays.asList(upStreamName), alertExecutorId, true)
+  }
+
+  def alertWithoutConsumer(upStreamName: String, alertExecutorId : String, strategy: PartitionStrategy): Unit ={
+    alert(util.Arrays.asList(upStreamName), alertExecutorId, false, strategy)
   }
 
   def alertWithoutConsumer(upStreamName: String, alertExecutorId : String): Unit ={
@@ -166,7 +189,12 @@ case class FlatMapProducer[T, R](id: Int, var mapper: FlatMapper[T, R]) extends 
 
 case class MapProducer(id: Int, numOutputFields : Int, var fn : AnyRef => AnyRef) extends StreamProducer
 
-case class GroupByProducer(id: Int, fields : Seq[Int]) extends StreamProducer
+case class GroupByProducer(id: Int, fields : Seq[Int], partitionStrategy: PartitionStrategy) extends StreamProducer
+
+object GroupByProducer {
+  def apply(id: Int, fields: Seq[Int]) = new GroupByProducer(id, fields, null)
+  def apply(id: Int, partitionStrategy : PartitionStrategy) = new GroupByProducer(id, Nil, partitionStrategy)
+}
 
 case class StreamUnionProducer(id: Int, others: Seq[StreamProducer]) extends StreamProducer
 
@@ -183,7 +211,7 @@ case class StormSourceProducer(id: Int, source : BaseRichSpout) extends StreamPr
   }
 }
 
-case class AlertStreamSink(id: Int, upStreamNames: util.List[String], alertExecutorId : String, withConsumer: Boolean=true) extends StreamProducer
+case class AlertStreamSink(id: Int, upStreamNames: util.List[String], alertExecutorId : String, withConsumer: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer
 
 object UniqueId{
   val id : AtomicInteger = new AtomicInteger(0);

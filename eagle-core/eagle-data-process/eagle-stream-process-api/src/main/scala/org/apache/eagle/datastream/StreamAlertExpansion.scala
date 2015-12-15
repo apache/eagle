@@ -24,6 +24,7 @@ import java.util
 import com.typesafe.config.Config
 import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl
 import org.apache.eagle.executor.AlertExecutorCreationUtils
+import org.apache.eagle.service.client.EagleServiceConnector
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 
@@ -70,7 +71,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
   def onIteration(toBeAddedEdges: ListBuffer[StreamConnector], toBeRemovedVertex: ListBuffer[StreamProducer],
                dag: DirectedAcyclicGraph[StreamProducer, StreamConnector], current: StreamProducer, child: StreamProducer): Unit = {
     child match {
-      case AlertStreamSink(id, upStreamNames, alertExecutorId, withConsumer) => {
+      case AlertStreamSink(id, upStreamNames, alertExecutorId, withConsumer, strategy) => {
         /**
          * step 1: wrapper previous StreamProducer with one more field "streamName"
          * for AlertStreamSink, we check previous StreamProducer and replace that
@@ -101,14 +102,19 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         /**
          * step 2: partition alert executor by policy partitioner class
          */
-        val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(config), upStreamNames, alertExecutorId)
+        val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(new EagleServiceConnector(config)), upStreamNames, alertExecutorId)
         var alertProducers = new scala.collection.mutable.MutableList[StreamProducer]
         alertExecutors.foreach(exec => {
           val t = FlatMapProducer(UniqueId.incrementAndGetId(), exec).withName(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
           t.setConfig(config)
           t.setGraph(dag)
           alertProducers += t
-          newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp, t).groupBy(Seq(0)))
+          if (strategy == null) {
+             newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp, t).groupBy(Seq(0)))
+          }
+          else {
+            newStreamProducers.foreach(newsp => toBeAddedEdges += StreamConnector(newsp, t).customGroupBy(strategy))
+          }
         })
 
         // remove AlertStreamSink

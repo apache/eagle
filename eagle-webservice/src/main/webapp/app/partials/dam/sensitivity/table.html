@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<div ng-controller="sensitivityHiveCtrl">
+<div ng-controller="sensitivityViewTableCtrl">
 	<p ng-show="databases._promise.$$state.status !== 1">
 		<span class="fa fa-refresh fa-spin"> </span>
 		Loading...
@@ -43,7 +43,7 @@
 							</span>
 
 							<span class="pull-right" ng-show="db.childSensitiveTypes.length">
-								<span class="fa fa-dot-circle-o" tooltip="Contain child sensitivity defination"> </span>
+								<span class="fa fa-dot-circle-o" uib-tooltip="Contain child sensitivity defination" tooltip-placement="right" tooltip-append-to-body="true"> </span>
 							</span>
 							<span ng-show="db.sensitiveType" class="pull-right">[{{db.sensitiveType}}]</span>
 						</span>
@@ -69,7 +69,7 @@
 									</span>
 
 									<span class="pull-right" ng-show="tb.childSensitiveTypes.length">
-										<span class="fa fa-dot-circle-o" uib-tooltip="Contain child sensitivity defination"> </span>
+										<span class="fa fa-dot-circle-o" uib-tooltip="Contain child sensitivity defination" tooltip-placement="right" tooltip-append-to-body="true"> </span>
 									</span>
 									<span ng-show="tb.sensitiveType" class="pull-right">[{{tb.sensitiveType}}]</span>
 								</span>
@@ -117,7 +117,7 @@
 
 
 	<!-- Modal: Create / Edit site -->
-	<div class="modal fade" id="sensitivityHiveMDL" tabindex="-1" role="dialog">
+	<div class="modal fade" id="sensitivityMDL" tabindex="-1" role="dialog">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -129,11 +129,11 @@
 				<div class="modal-body">
 					<div class="form-group">
 						<label>Resource</label>
-						<input type="text" readonly="readonly" class="form-control" ng-model="_markItem.tags.hiveResource" />
+						<input type="text" readonly="readonly" class="form-control" ng-model="_markItem.tags[dataSrc.keys[0]]" />
 					</div>
 					<div class="form-group">
 						<label>* Sensitivity Type</label>
-						<input type="text" class="form-control" ng-model="_markItem.sensitivityType" id="hiveSensitiveType" />
+						<input type="text" class="form-control" ng-model="_markItem.sensitivityType" id="sensitiveType" />
 					</div>
 				</div>
 				<div class="modal-footer">

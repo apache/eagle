@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 public class HiveCommandResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
     private final static Logger LOG = LoggerFactory.getLogger(HiveCommandResolver.class);
 
-    private final static String [] cmdStrs = {"SELECT", "UPDATE", "DELETE FROM"};
+    private final static String [] cmdStrs = {"SELECT", "UPDATE", "DELETE", "ALTER", "CREATE", "DROP"};
 
     private final static String HIVE_ATTRIBUTE_RESOLVE_FORMAT_HINT = String.format("hive command must be in {%s}", StringUtils.join(cmdStrs, ","));
 

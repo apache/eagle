@@ -16,9 +16,10 @@
  */
 package org.apache.eagle.jobrunning.config;
 
-import java.io.Serializable;
-
+import org.apache.eagle.dataproc.impl.storm.zookeeper.ZKStateConfig;
 import org.apache.eagle.job.JobPartitioner;
+
+import java.io.Serializable;
 
 public class RunningJobCrawlConfig implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -48,14 +49,5 @@ public class RunningJobCrawlConfig implements Serializable{
     	public int sizeOfJobCompletedInfoQueue;
         public Class<? extends JobPartitioner> partitionerCls;
         public int numTotalPartitions = 1;
-    }
-    
-	public static class ZKStateConfig implements Serializable{
-		private static final long serialVersionUID = 1L;
-		public String zkQuorum;
-        public String zkRoot;
-        public int zkSessionTimeoutMs;
-        public int zkRetryTimes;
-        public int zkRetryInterval;
     }
 }

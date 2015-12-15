@@ -24,6 +24,7 @@ import backtype.storm.topology.base.BaseRichBolt
 import backtype.storm.topology.{BoltDeclarer, TopologyBuilder}
 import backtype.storm.tuple.Fields
 import com.typesafe.config.Config
+import org.apache.eagle.dataproc.impl.storm.partition.EagleCustomGrouping
 import org.slf4j.LoggerFactory
 
 case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGraph) extends AbstractTopologyCompiler{
@@ -63,10 +64,19 @@ case class StormTopologyCompiler(config: Config, graph: AbstractStreamProducerGr
           }
           case Some(bt) => boltDeclarer = bt
         }
-        sc.groupByFields match{
+        if (sc.groupByFields != Nil) {
+          boltDeclarer.fieldsGrouping(fromName, new Fields(fields(sc.groupByFields)))
+        }
+        else if (sc.customGroupBy != null) {
+          boltDeclarer.customGrouping(fromName, new EagleCustomGrouping(sc.customGroupBy));
+        }
+        else {
+          boltDeclarer.shuffleGrouping(fromName);
+        }
+/*        sc.groupByFields match{
           case Nil => boltDeclarer.shuffleGrouping(fromName)
           case p => boltDeclarer.fieldsGrouping(fromName, new Fields(fields(p)))
-        }
+        }*/
         LOG.info("bolt connected " + fromName + "->" + toName + " with groupby fields " + sc.groupByFields)
       })
     }

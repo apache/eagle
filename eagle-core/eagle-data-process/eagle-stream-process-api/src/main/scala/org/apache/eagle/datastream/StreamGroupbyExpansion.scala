@@ -43,7 +43,13 @@ class StreamGroupbyExpansion(config: Config) extends StreamDAGExpansion(config){
         child match {
           case p : GroupByProducer => {
             dag.outgoingEdgesOf(p).foreach(c2 => {
-              toBeAddedEdges += StreamConnector(current, c2.to).groupBy(p.fields)
+              if (p.fields != Nil) {
+                toBeAddedEdges += StreamConnector(current, c2.to).groupBy(p.fields)
+              }
+              else if (p.partitionStrategy != null) {
+                toBeAddedEdges += StreamConnector(current, c2.to).customGroupBy(p.partitionStrategy)
+              }
+              else toBeAddedEdges += StreamConnector(current, c2.to);
             })
             toBeRemovedVertex += p
           }

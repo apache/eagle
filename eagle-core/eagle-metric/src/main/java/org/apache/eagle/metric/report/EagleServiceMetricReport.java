@@ -16,30 +16,29 @@
  */
 package org.apache.eagle.metric.report;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.eagle.log.entity.GenericMetricEntity;
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metric.Metric;
+import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.eagle.log.entity.GenericMetricEntity;
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
+import java.util.ArrayList;
+import java.util.List;
 
-public class EagleSerivceMetricReport implements MetricReport{
+public class EagleServiceMetricReport implements MetricReport{
 		
     private EagleServiceClientImpl client;
-	private static final Logger LOG = LoggerFactory.getLogger(EagleSerivceMetricReport.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EagleServiceMetricReport.class);
 
-	public EagleSerivceMetricReport(String host, int port, String username, String password) {
+	public EagleServiceMetricReport(String host, int port, String username, String password) {
 		client = new EagleServiceClientImpl(host, port, username, password);
 	}
 
-    public EagleSerivceMetricReport(String host, int port) {
-    	 client = new EagleServiceClientImpl(host, port, null, null);
+    public EagleServiceMetricReport(String host, int port) {
+    	client = new EagleServiceClientImpl(host, port, null, null);
     }
-    	 
+
 	public void emit(List<Metric> list) {
 		List<GenericMetricEntity> entities = new ArrayList<GenericMetricEntity>();
 		for (Metric metric : list) {

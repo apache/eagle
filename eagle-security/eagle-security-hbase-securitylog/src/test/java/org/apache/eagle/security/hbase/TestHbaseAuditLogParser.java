@@ -31,8 +31,8 @@ public class TestHbaseAuditLogParser {
         String log = "2015-08-11 13:31:03,729 TRACE SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController: Access allowed for user eagle; reason: Table permission granted; remote address: /127.0.0.1; request: get; context: (user=eagle,scope=hbase:namespace,family=info, action=READ)";
         HbaseAuditLogObject obj = parser.parse(log);
         Assert.assertEquals(obj.action, "READ");
-        Assert.assertEquals(obj.host, "/127.0.0.1");
-        Assert.assertEquals(obj.scope, "hbase:namespace");
+        Assert.assertEquals(obj.host, "127.0.0.1");
+        Assert.assertEquals(obj.scope, "hbase:namespace:info");
     }
 
     @Test

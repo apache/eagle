@@ -15,8 +15,18 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<div tabs icon="folder-open" data-title="Sensitivity Broswer" selected="type">
-	<div pane ng-repeat="entity in sensitivityList" data-title="{{entity.name}}">
-		<ng-include src="'partials/dam/sensitivity/' + entity.name + '.html?_=' + ajaxId"></ng-include>
+<div class="nav-tabs-custom">
+	<!-- Tabs within a box -->
+	<ul class="nav nav-tabs pull-right ui-sortable-handle">
+		<li ng-repeat="entity in config.list" ng-class="{active: dataSrc.name === entity.name}">
+			<a ng-click="site.url('/dam/sensitivity/' + entity.name)">{{entity.name}}</a>
+		</li>
+		<li class="pull-left header"><i class="fa fa-folder-open"></i> Sensitivity Broswer</li>
+	</ul>
+	<div class="tab-content">
+		<!-- Morris chart - Sales -->
+		<div class="tab-pane active">
+			<ng-include src="'partials/dam/sensitivity/' + dataSrc.type + '.html?_=' + ajaxId"></ng-include>
+		</div>
 	</div>
 </div>
