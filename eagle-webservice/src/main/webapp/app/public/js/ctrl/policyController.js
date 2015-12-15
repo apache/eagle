@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-'use strict';
-
-
 // =============================================================
 // =                        Policy List                        =
 // =============================================================
 damControllers.controller('policyListCtrl', function(globalContent, Site, damContent, $scope, $routeParams, Entities) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "Policy List";
 	globalContent.pageSubTitle = Site.current().name;
@@ -75,6 +74,8 @@ damControllers.controller('policyListCtrl', function(globalContent, Site, damCon
 // =                       Policy Detail                       =
 // =============================================================
 damControllers.controller('policyDetailCtrl', function(globalContent, Site, damContent, charts, $scope, $routeParams, Entities) {
+	'use strict';
+
 	var MAX_PAGESIZE = 10000;
 
 	globalContent.setConfig(damContent.config);
@@ -97,6 +98,8 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 		});
 	}
 	$scope.policyList._promise.then(function() {
+		var policy = null;
+
 		if($scope.policyList.length === 0) {
 			$.dialog({
 				title: "OPS!",
@@ -106,7 +109,7 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 			});
 			return;
 		} else {
-			var policy = $scope.policyList[0];
+			policy = $scope.policyList[0];
 
 			policy.__mailStr = common.getValueByPath(common.parseJSON(policy.notificationDef, {}), "0.recipients", "");
 			policy.__mailList = policy.__mailStr.trim() === "" ? [] : policy.__mailStr.split(/[\,\;]/);
@@ -160,6 +163,8 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 // =                        Policy Edit                        =
 // =============================================================
 (function() {
+	'use strict';
+
 	function policyCtrl(create, globalContent, Site, damContent, $scope, $routeParams, $location, $q, Entities) {
 		globalContent.setConfig(damContent.config);
 		globalContent.pageTitle = "Policy Edit";
@@ -265,7 +270,7 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 					}
 				}
 				return null;
-			};
+			}
 
 			// ==========================================
 			// =              Step control              =

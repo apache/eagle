@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-'use strict';
-
 // =============================================================
 // =                     User Profile List                     =
 // =============================================================
 damControllers.controller('authLoginCtrl', function(globalContent, Site, Authorization, $scope) {
+	'use strict';
+
 	globalContent.hideSidebar = true;
 	globalContent.hideSite = true;
 	globalContent.hideUser = true;

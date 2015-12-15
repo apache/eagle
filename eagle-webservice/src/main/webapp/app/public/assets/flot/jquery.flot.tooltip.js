@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-"use strict";
-
 (function($) {
+	"use strict";
+
 	// Common
 	function getValueByPath(unit, path, defaultValue) {
 		if(unit === null || unit === undefined) throw "Unit or path can't be empty!";
@@ -27,7 +27,7 @@
 		path = path.split(/\./);
 		$.each(path, function(i, path) {
 			unit = unit[path];
-			if(unit == null) {
+			if(unit === null || unit === undefined) {
 				unit = null;
 				return false;
 			}
@@ -36,7 +36,7 @@
 			unit = defaultValue;
 		}
 		return unit;
-	};
+	}
 
 	var OFFSET_X = 15;
 	var OFFSET_Y = 20;

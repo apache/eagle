@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-'use strict';
-
 // =============================================================
 // =                        Alert List                         =
 // =============================================================
 damControllers.controller('alertListCtrl', function(globalContent, Site, damContent, $scope, $routeParams, $interval, $timeout, Entities) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageSubTitle = Site.current().name;
 
@@ -91,6 +91,8 @@ damControllers.controller('alertListCtrl', function(globalContent, Site, damCont
 // =                       Alert Detail                        =
 // =============================================================
 damControllers.controller('alertDetailCtrl', function(globalContent, Site, damContent, $scope, $routeParams, Entities) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "Alert Detail";
 	globalContent.navPath = ["Alert List", "Alert Detail"];
