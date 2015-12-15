@@ -25,8 +25,7 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * @author liasu
- *
+ * @since 15/12/15
  */
 @Path("/status")
 public class MonitorResource {
