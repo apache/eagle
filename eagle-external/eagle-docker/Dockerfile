@@ -34,11 +34,10 @@ ENV EAGLE_HOME=/usr/hdp/current/eagle
 ADD target/eagle-current /usr/hdp/current/eagle
 
 # Load External Packages
-RUN yum install -y httpd ganglia ganglia-gmetad ganglia-gmond ganglia-web nagios kafka zookeeper storm hbase tez hadoop snappy snappy-devel hadoop-libhdfs ambari-log4j hive hive-hcatalog hive-webhcat webhcat-tar-hive webhcat-tar-pig mysql-connector-java mysql-server
+RUN yum install -y kafka zookeeper storm hbase tez hadoop snappy snappy-devel hadoop-libhdfs ambari-log4j hive hive-hcatalog hive-webhcat webhcat-tar-hive webhcat-tar-pig mysql-connector-java mysql-server
 
 # Load Static Resources
 ADD resource/serf /usr/local/serf
-ADD resource/httpd /var/log/httpd
 ADD resource/install-cluster.sh /tmp/
 ADD resource/eagle-singlenode.json /tmp/
 ADD resource/eagle-multinode.json /tmp/
