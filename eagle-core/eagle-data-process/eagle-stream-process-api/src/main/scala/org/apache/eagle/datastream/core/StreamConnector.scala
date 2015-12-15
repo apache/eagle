@@ -54,6 +54,24 @@ object StreamConnector{
   def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2]):ShuffleConnector[T1,T2] = ShuffleConnector(from,to)
 
   /**
+   * Clone connector from old connector to apply to new processing element, return ShuffleConnector by default
+   *
+   * @param from
+   * @param to
+   * @param connector
+   * @tparam T1
+   * @tparam T2
+   * @return
+   */
+  def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2],connector: StreamConnector[Any,Any]):StreamConnector[T1,T2] = connector match {
+      case GroupbyFieldsConnector(_,_,fields) => GroupbyFieldsConnector[T1,T2](from,to,fields)
+      case GroupbyKeyConnector(_,_,keySelector) => GroupbyKeyConnector[T1,T2](from,to,keySelector)
+      case GroupbyStrategyConnector(_,_,strategy) => GroupbyStrategyConnector[T1,T2](from,to,strategy)
+      case null | ShuffleConnector(_,_) => ShuffleConnector[T1,T2](from,to)
+      case c@_ => throw new IllegalArgumentException(s"Unknown type of stream connector $c")
+  }
+
+  /**
    *
    * @param from
    * @param to
@@ -74,4 +92,6 @@ object StreamConnector{
    * @return
    */
   def apply[T1 <: Any,T2 <: Any](from: StreamProducer[T1], to: StreamProducer[T2],customGroupBy: PartitionStrategy):GroupbyStrategyConnector[T1,T2] = GroupbyStrategyConnector(from,to,customGroupBy)
+
+
 }

@@ -40,16 +40,12 @@ case class StreamUnionExpansion(config: Config) extends StreamDAGExpansion(confi
       val current = iter.next()
       dag.outgoingEdgesOf(current).foreach(edge => {
         val child = edge.to
-        val groupByFields = edge match {
-          case GroupbyFieldsConnector(_,_,fields) => fields
-          case _ => null
-        }
         child match {
           case StreamUnionProducer(others) => {
             dag.outgoingEdgesOf(child).foreach(c2 => {
-              toBeAddedEdges += StreamConnector(current, c2.to,groupByFields)
+              toBeAddedEdges += StreamConnector(current, c2.to, edge)
               others.foreach(o => {
-                toBeAddedEdges += StreamConnector(o, c2.to,groupByFields)
+                toBeAddedEdges += StreamConnector(o, c2.to, edge)
               })
             })
             toBeRemovedVertex += child

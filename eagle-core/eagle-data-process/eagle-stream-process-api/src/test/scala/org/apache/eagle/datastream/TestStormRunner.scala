@@ -66,7 +66,7 @@ object StormRunnerWithoutSplitOrJoin extends Application{
   val env = ExecutionEnvironments.getStorm(config)
   env.fromSpout(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test"))
     .flatMap(PatternAlertExecutor("test.*"))
-  //env.execute
+//  env.execute()
 }
 
 object StormRunnerWithSplit extends Application{
@@ -75,7 +75,7 @@ object StormRunnerWithSplit extends Application{
   val toBeSplit = env.fromSpout(TestSpout()).flatMap(EchoExecutor())
   toBeSplit.flatMap(WordPrependExecutor("test")).flatMap(PatternAlertExecutor("test.*"))
   toBeSplit.flatMap(WordAppendExecutor("test"))
-  //env.execute
+//  env.execute()
 }
 
 object StormRunnerWithUnion extends Application{
@@ -84,7 +84,7 @@ object StormRunnerWithUnion extends Application{
   val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependExecutor("test"))
   val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendExecutor("test"))
   tail1.streamUnion(List(tail2)).flatMap(PatternAlertExecutor(".*test.*"))
-  //env.execute
+  env.execute()
 }
 
 object StormRunnerWithFilter extends Application{
