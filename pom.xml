@@ -224,6 +224,9 @@
         <jaxb-impl.version>2.2.6</jaxb-impl.version>
         <stax-api.version>1.0.1</stax-api.version>
         <org.mortbay.jetty.version>6.1.26</org.mortbay.jetty.version>
+                
+        <!-- servlet  -->
+        <servlet-api.version>2.5</servlet-api.version>
 
         <!-- Alert Framework -->
         <velocity.version>1.7</velocity.version>
@@ -246,6 +249,7 @@
 
         <!-- sprint security -->
         <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
+
     </properties>
 
     <dependencyManagement>
