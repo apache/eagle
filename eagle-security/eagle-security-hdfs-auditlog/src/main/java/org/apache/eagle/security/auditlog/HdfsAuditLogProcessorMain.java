@@ -20,32 +20,27 @@ package org.apache.eagle.security.auditlog;
 
 import backtype.storm.spout.SchemeAsMultiScheme;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigRenderOptions;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
-import org.apache.eagle.datastream.ExecutionEnvironmentFactory;
-import org.apache.eagle.datastream.StormExecutionEnvironment;
+import org.apache.eagle.datastream.ExecutionEnvironments;
+import org.apache.eagle.datastream.core.StreamProducer;
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.apache.eagle.partition.DataDistributionDao;
 import org.apache.eagle.partition.PartitionAlgorithm;
 import org.apache.eagle.partition.PartitionStrategy;
 import org.apache.eagle.partition.PartitionStrategyImpl;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
 import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
-import org.apache.eagle.datastream.StreamProducer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class HdfsAuditLogProcessorMain {
-	private static final Logger LOG = LoggerFactory.getLogger(HdfsAuditLogProcessorMain.class);
-
     public static PartitionStrategy createStrategy(Config config) {
+        // TODO: Refactor configuration structure to avoid repeated config processing configure ~ hao
         String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
         Integer port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
         String username = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME);
@@ -72,6 +67,7 @@ public class HdfsAuditLogProcessorMain {
                          return Arrays.asList(map.get("user"), tmp);
                  }
          };
+
          KafkaSourcedSpoutProvider provider = new KafkaSourcedSpoutProvider() {
                  @Override
                  public SchemeAsMultiScheme getStreamScheme(String deserClsName, Config context) {
@@ -81,8 +77,9 @@ public class HdfsAuditLogProcessorMain {
          return provider;
     }
 
-    public static void execWithDefaultPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
-        StreamProducer source = env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").groupBy(Arrays.asList(0));
+    @SuppressWarnings("unchecked")
+    public static void execWithDefaultPartition(StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
+        StreamProducer source = env.fromSpout(provider).withOutputFields(2).nameAs("kafkaMsgConsumer").groupBy(Arrays.asList(0));
         StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
         source.streamUnion(reassembler)
               .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
@@ -91,9 +88,10 @@ public class HdfsAuditLogProcessorMain {
         env.execute();
     }
 
-    public static void execWithBalancedPartition(Config config, StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
-        PartitionStrategy strategy = createStrategy(config);
-        StreamProducer source = env.newSource(provider.getSpout(config)).renameOutputFields(2).withName("kafkaMsgConsumer").customGroupBy(strategy);
+    @SuppressWarnings("unchecked")
+    public static void execWithBalancedPartition(StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
+        PartitionStrategy strategy = createStrategy(env.getConfig());
+        StreamProducer source = env.fromSpout(provider).withOutputFields(2).nameAs("kafkaMsgConsumer").groupBy(strategy);
         StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
         source.streamUnion(reassembler)
                 .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
@@ -103,18 +101,14 @@ public class HdfsAuditLogProcessorMain {
     }
 
 	public static void main(String[] args) throws Exception{
-        Config config = new ConfigOptionParser().load(args);
-        LOG.info("Config class: " + config.getClass().getCanonicalName());
-        if(LOG.isDebugEnabled()) LOG.debug("Config content:"+config.root().render(ConfigRenderOptions.concise()));
-
-        StormExecutionEnvironment env = ExecutionEnvironmentFactory.getStorm(config);
-        KafkaSourcedSpoutProvider provider = createProvider(config);
-        Boolean balancePartition = config.hasPath("eagleProps.balancePartitionEnabled") ? config.getBoolean("eagleProps.balancePartitionEnabled") : false;
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
+        Config config = env.getConfig();
+        KafkaSourcedSpoutProvider provider = createProvider(env.getConfig());
+        Boolean balancePartition = config.hasPath("eagleProps.balancePartitionEnabled") && config.getBoolean("eagleProps.balancePartitionEnabled");
         if (balancePartition) {
-            execWithBalancedPartition(config, env, provider);
-        }
-        else {
-            execWithDefaultPartition(config, env, provider);
+            execWithBalancedPartition(env, provider);
+        } else {
+            execWithDefaultPartition(env, provider);
         }
 	}
 }

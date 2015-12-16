@@ -20,7 +20,6 @@
 package org.apache.eagle.security.partition;
 
 import com.sun.jersey.api.client.WebResource;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metric.MetricConstants;
 import org.apache.eagle.partition.DataDistributionDao;

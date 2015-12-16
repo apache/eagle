@@ -36,9 +36,6 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 
 import java.util.*;
 
-/**
- * Created by yonzhang on 11/20/15.
- */
 public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String, Map> {
     private static final Logger LOG = LoggerFactory.getLogger(HdfsUserCommandReassembler.class);
     private Config config;
@@ -142,14 +139,14 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
 
     @Override
     public void flatMap(List<Object> input, Collector<Tuple2<String, Map>> collector) {
-        LOG.debug("incoming event:" + input.get(1));
-        SortedMap<String, Object> toBeCopied = (SortedMap<String, Object>)input.get(1);
-        SortedMap<String, Object> event = new TreeMap<String, Object>(toBeCopied);
+        if(LOG.isDebugEnabled()) LOG.debug("incoming event:" + input.get(1));
+        SortedMap<String, Object> toBeCopied = (SortedMap<String, Object>) input.get(1);
+        SortedMap<String, Object> event = new TreeMap<>(toBeCopied);
         Object[] siddhiEvent = convertToSiddhiEvent(collector, event);
         try {
             inputHandler.send(siddhiEvent);
-        }catch(Exception ex){
-            LOG.error("fail sending event to Siddhi pattern engine", ex);
+        } catch (Exception ex){
+            LOG.error("Fail sending event to Siddhi pattern engine", ex);
             throw new IllegalStateException(ex);
         }
     }

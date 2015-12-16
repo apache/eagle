@@ -16,6 +16,6 @@
  */
 package org.apache.eagle.datastream
 
-trait FlatMapper[T, R] extends Serializable{
-  def flatMap(input : T, collector : Collector[R])
+trait FlatMapper[T] extends Serializable {
+  def flatMap(input : Seq[AnyRef], collector : Collector[T])
 }

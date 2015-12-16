@@ -16,8 +16,7 @@
  */
 package org.apache.eagle.datastream;
 
-import org.apache.eagle.datastream.kafka.KafkaStreamMonitorApp;
-import org.apache.eagle.datastream.kafka.KafkaStreamMonitorApp;
+import org.apache.eagle.datastream.storm.KafkaStreamMonitorApp;
 
 /**
  * @since 11/7/15

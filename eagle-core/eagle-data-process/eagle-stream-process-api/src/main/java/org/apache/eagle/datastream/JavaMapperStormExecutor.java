@@ -29,6 +29,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import org.apache.eagle.datastream.utils.NameConstants;
 
 public class JavaMapperStormExecutor extends BaseRichBolt{
     public static class e1 extends JavaMapperStormExecutor {
@@ -75,7 +76,7 @@ public class JavaMapperStormExecutor extends BaseRichBolt{
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         List<String> fields = new ArrayList<String>();
         for(int i=0; i<numOutputFields; i++){
-            fields.add(OutputFieldNameConst.FIELD_PREFIX() + i);
+            fields.add(NameConstants.FIELD_PREFIX() + i);
         }
         declarer.declare(new Fields(fields));
     }

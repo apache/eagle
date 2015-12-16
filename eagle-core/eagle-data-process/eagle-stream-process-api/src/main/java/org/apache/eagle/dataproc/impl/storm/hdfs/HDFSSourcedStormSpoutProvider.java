@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.eagle.dataproc.impl.storm.hdfs;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.dataproc.impl.storm.AbstractStormSpoutProvider;
+import org.apache.eagle.dataproc.impl.storm.StormSpoutProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import backtype.storm.topology.base.BaseRichSpout;
 
-public class HDFSSourcedStormSpoutProvider extends AbstractStormSpoutProvider {
+public class HDFSSourcedStormSpoutProvider implements StormSpoutProvider {
 	private static final Logger LOG = LoggerFactory.getLogger(HDFSSourcedStormSpoutProvider.class);
 	
 	public abstract static class HDFSSpout extends BaseRichSpout{

@@ -19,12 +19,12 @@ package org.apache.eagle.dataproc.impl.storm.kafka;
 import backtype.storm.spout.Scheme;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
+import org.apache.eagle.datastream.utils.NameConstants;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.Map;
 
 /**
  * This scheme defines how a kafka message is deserialized and the output field name for storm stream
@@ -56,10 +56,16 @@ public class KafkaSourcedSpoutScheme implements Scheme {
 		// the following tasks are executed within the same process of kafka spout
 		return Arrays.asList(tmp);
 	}
-	
+
+    /**
+     * Default only f0, but it requires to be overrode if different
+     *
+     * TODO: Handle the schema with KeyValue based structure
+     *
+     * @return Fields
+     */
 	@Override
 	public Fields getOutputFields() {
-//		return new Fields(deserializer.getOutputFields());
-		throw new UnsupportedOperationException("output fields should be declared in sub class of KafkaSourcedSpoutProvider");
+        return new Fields(NameConstants.FIELD_PREFIX()+"0");
 	}
 }
