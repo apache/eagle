@@ -17,7 +17,7 @@
 package org.apache.eagle.executor;
 
 import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
+import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl;
 import org.apache.eagle.alert.dao.AlertExecutorDAOImpl;
 import org.apache.eagle.alert.entity.AlertExecutorEntity;
@@ -95,7 +95,7 @@ public class AlertExecutorCreationUtils {
      * <li>(config["alertExecutorConfigs"]) => AlertExecutor(alertExecutorID, partitioner, numPartitions, partitionSeq, alertDefs, alertDefDAO, sourceStreams)[]</li>
      * </ol>
      */
-	public static AlertExecutor[] createAlertExecutors(Config config, AlertDefinitionDAO alertDefDAO,
+	public static AlertExecutor[] createAlertExecutors(Config config, PolicyDefinitionDAO alertDefDAO,
 			List<String> streamNames, String alertExecutorId) throws Exception{
 		// Read `alertExecutorConfigs` from configuration and get config for this alertExecutorId
         int numPartitions =1;
@@ -118,7 +118,7 @@ public class AlertExecutorCreationUtils {
     /**
      * Build alert executors and assign alert definitions between these executors by partitioner (alertExecutorConfigs["${alertExecutorId}"]["partitioner"])
      */
-	public static AlertExecutor[] createAlertExecutors(AlertDefinitionDAO alertDefDAO, List<String> sourceStreams,
+	public static AlertExecutor[] createAlertExecutors(PolicyDefinitionDAO alertDefDAO, List<String> sourceStreams,
                                                           String alertExecutorID, int numPartitions, String partitionerCls) throws Exception{
 		LOG.info("Creating alert executors with alertExecutorID: " + alertExecutorID + ", numPartitions: " + numPartitions + ", Partition class is: "+ partitionerCls);
 

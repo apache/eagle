@@ -20,16 +20,17 @@
 package org.apache.eagle.datastream
 
 import java.util
-
 import com.typesafe.config.Config
 import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl
 import org.apache.eagle.executor.AlertExecutorCreationUtils
 import org.apache.eagle.service.client.EagleServiceConnector
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
-
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
+import org.apache.eagle.executor.AlertExecutorCreationUtils
+import org.apache.eagle.datastream.JavaStormStreamExecutor
+import org.apache.eagle.datastream.StormStreamExecutor
 
 /**
  * The constraints for alert is:
@@ -105,7 +106,7 @@ class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
         val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(new EagleServiceConnector(config)), upStreamNames, alertExecutorId)
         var alertProducers = new scala.collection.mutable.MutableList[StreamProducer]
         alertExecutors.foreach(exec => {
-          val t = FlatMapProducer(UniqueId.incrementAndGetId(), exec).withName(exec.getAlertExecutorId() + "_" + exec.getPartitionSeq())
+          val t = FlatMapProducer(UniqueId.incrementAndGetId(), exec).withName(exec.getExecutorId() + "_" + exec.getPartitionSeq())
           t.setConfig(config)
           t.setGraph(dag)
           alertProducers += t

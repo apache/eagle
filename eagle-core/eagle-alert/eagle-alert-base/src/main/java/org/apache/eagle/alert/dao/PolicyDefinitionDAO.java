@@ -20,14 +20,17 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
 
-public interface AlertDefinitionDAO extends Serializable{
+/**
+ * @param <T> - Policy definition type
+ */
+public interface PolicyDefinitionDAO<T extends AbstractPolicyEntity> extends Serializable{
 	/**
 	 * find list of active alert definitions for one specific site and dataSource
 	 * @return
 	 */
-	List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) throws Exception;
+	List<T> findActiveAlertDefs(String site, String dataSource) throws Exception;
 	
 	/**
 	 * find map from alertExecutorId to map from policy Id to alert definition for one specific site and dataSource
@@ -35,5 +38,5 @@ public interface AlertDefinitionDAO extends Serializable{
        (site,dataSource) => Map[alertExecutorId,Map[policyId,alertDefinition]]
 	 * @return
 	 */
-	Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception;
+	Map<String, Map<String, T>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception;
 }

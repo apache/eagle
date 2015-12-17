@@ -20,20 +20,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.policy.PolicyEvaluator;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
 import org.apache.eagle.alert.policy.PolicyEvaluatorServiceProvider;
+
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-public class SiddhiPolicyEvaluatorServiceProviderImpl implements PolicyEvaluatorServiceProvider {
+public class SiddhiPolicyEvaluatorServiceProviderImpl<T extends AbstractPolicyEntity> implements PolicyEvaluatorServiceProvider<T> {
 	@Override
 	public String getPolicyType() {
 		return AlertConstants.policyType.siddhiCEPEngine.name();
 	}
 
 	@Override
-	public Class<? extends PolicyEvaluator> getPolicyEvaluator() {
+	public Class getPolicyEvaluator() {
 		return SiddhiPolicyEvaluator.class;
 	}
 

@@ -71,3 +71,6 @@ logs/
 *.log*
 # Mac files
 .DS_Store
+
+*.cache-tests
+

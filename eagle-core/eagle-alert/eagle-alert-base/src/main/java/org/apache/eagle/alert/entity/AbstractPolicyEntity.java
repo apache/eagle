@@ -14,14 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.policy;
+package org.apache.eagle.alert.entity;
 
-import java.util.Map;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
-
-public interface PolicyLifecycleMethods<T extends AbstractPolicyEntity> {
-	void onPolicyCreated(Map<String, T> added);
-	void onPolicyChanged(Map<String, T> changed);
-	void onPolicyDeleted(Map<String, T> deleted);
+@SuppressWarnings("serial")
+public abstract class AbstractPolicyEntity extends TaggedLogAPIEntity {
+	public abstract String getPolicyDef();
 }

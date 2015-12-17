@@ -14,14 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.policy;
+package org.apache.eagle.dataproc.impl.analyze;
 
-import java.util.Map;
+/**
+ * @since Dec 16, 2015
+ *
+ */
+public class AnalyzeExecutorFactory {
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
-
-public interface PolicyLifecycleMethods<T extends AbstractPolicyEntity> {
-	void onPolicyCreated(Map<String, T> added);
-	void onPolicyChanged(Map<String, T> changed);
-	void onPolicyDeleted(Map<String, T> deleted);
+	/**
+	 * 
+	 * @return
+	 */
+	public static AnalyzeExecutor[] createExecutors() {
+		// TODO
+		return new AnalyzeExecutor[] {};
+	}
 }

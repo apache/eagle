@@ -1,0 +1,433 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.eagle.executor;
+
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.eagle.alert.common.AlertConstants;
+import org.apache.eagle.alert.config.AbstractPolicyDefinition;
+import org.apache.eagle.alert.dao.AlertStreamSchemaDAOImpl;
+import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.policy.DynamicPolicyLoader;
+import org.apache.eagle.alert.policy.PolicyEvaluator;
+import org.apache.eagle.alert.policy.PolicyLifecycleMethods;
+import org.apache.eagle.alert.policy.PolicyManager;
+import org.apache.eagle.alert.policy.PolicyPartitioner;
+import org.apache.eagle.alert.siddhi.PolicyEvaluationContext;
+import org.apache.eagle.alert.siddhi.SiddhiEvaluationHandler;
+import org.apache.eagle.alert.siddhi.StreamMetadataManager;
+import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
+import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import org.apache.eagle.datastream.Tuple2;
+import org.apache.eagle.metric.CountingMetric;
+import org.apache.eagle.metric.Metric;
+import org.apache.eagle.metric.report.EagleServiceMetricReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
+import com.typesafe.config.Config;
+
+/**
+ * The stream process executor based on two types
+ * @since Dec 17, 2015
+ *
+ * @param <T> - The policy definition entity type
+ * @param <K> - The stream entity type
+ */
+public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K> 
+		extends JavaStormStreamExecutor2<String, K> 
+		implements PolicyLifecycleMethods<T>, SiddhiEvaluationHandler<T, K> {
+	
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOG = LoggerFactory.getLogger(PolicyProcessExecutor.class);
+	
+	private static final String EAGLE_EVENT_COUNT = "eagle.event.count";
+	private static final String EAGLE_POLICY_EVAL_COUNT = "eagle.policy.eval.count";
+	private static final String EAGLE_POLICY_EVAL_FAIL_COUNT = "eagle.policy.eval.fail.count";
+	private static final String EAGLE_ALERT_COUNT = "eagle.alert.count";
+	private static final String EAGLE_ALERT_FAIL_COUNT = "eagle.alert.fail.count";
+	
+	private	 static long MERITE_GRANULARITY = DateUtils.MILLIS_PER_MINUTE;
+
+	private String executorId;
+	private volatile CopyOnWriteHashMap<String, PolicyEvaluator<T>> policyEvaluators;
+	private PolicyPartitioner partitioner;
+	private int numPartitions;
+	private int partitionSeq;
+	private Config config;
+	private Map<String, Map<String, T>> initialAlertDefs;
+	private String[] sourceStreams;
+	
+	/**
+	 * metricMap's key = metricName[#policyId]
+	 */
+	private Map<String, Metric> metricMap;
+	private Map<String, Map<String, String>> dimensionsMap; // cache it for performance
+	private Map<String, String> baseDimensions;
+	private Thread metricReportThread;
+	private EagleServiceMetricReport metricReport;
+
+	private PolicyDefinitionDAO<T> policyDefinitionDao;
+
+	public PolicyProcessExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
+                         PolicyDefinitionDAO<T> alertDefinitionDao, String[] sourceStreams){
+		this.executorId = alertExecutorId;
+		this.partitioner = partitioner;
+		this.numPartitions = numPartitions;
+		this.partitionSeq = partitionSeq;
+		this.policyDefinitionDao = alertDefinitionDao;
+		this.sourceStreams = sourceStreams;
+	}
+	
+	public String getExecutorId(){
+		return this.executorId;
+	}
+	
+	public int getNumPartitions() {
+		return this.numPartitions;
+	}
+	
+	public int getPartitionSeq(){
+		return this.partitionSeq;
+	}
+	
+	public PolicyPartitioner getPolicyPartitioner() {
+		return this.partitioner;
+	}
+	
+	public Map<String, Map<String, T>> getInitialAlertDefs() {
+		return this.initialAlertDefs;
+	}
+		
+	public PolicyDefinitionDAO<T> getPolicyDefinitionDao() {
+		return policyDefinitionDao;
+	}
+	
+	@Override
+	public void prepareConfig(Config config) {
+		this.config = config;
+	}
+	
+	public void initMetricReportor() {
+		String eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
+		int eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
+
+		String username = config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) ?
+				          config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) : null;
+		String password = config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) ?
+				          config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) : null;
+		this.metricReport = new EagleServiceMetricReport(eagleServiceHost, eagleServicePort, username, password);
+
+		metricMap = new ConcurrentHashMap<String, Metric>();
+		baseDimensions = new HashMap<String, String>();
+		baseDimensions.put(AlertConstants.ALERT_EXECUTOR_ID, executorId);
+		baseDimensions.put(AlertConstants.PARTITIONSEQ, String.valueOf(partitionSeq));
+		baseDimensions.put(AlertConstants.SOURCE, ManagementFactory.getRuntimeMXBean().getName());
+		baseDimensions.put(EagleConfigConstants.DATA_SOURCE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE));
+		baseDimensions.put(EagleConfigConstants.SITE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE));
+
+		dimensionsMap = new HashMap<String, Map<String, String>>();
+		this.metricReportThread = new Thread() {
+			@Override
+			public void run() {
+				runMetricReporter();
+			}
+		};
+		this.metricReportThread.setDaemon(true);
+		metricReportThread.start();
+	}
+
+	@Override
+	public void init() {
+		// initialize StreamMetadataManager before it is used
+		StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAOImpl(config));
+		// for each AlertDefinition, to create a PolicyEvaluator
+		Map<String, PolicyEvaluator<T>> tmpPolicyEvaluators = new HashMap<String, PolicyEvaluator<T>>();
+		
+        String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
+		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
+		try {
+			initialAlertDefs = policyDefinitionDao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
+		}
+		catch (Exception ex) {
+			LOG.error("fail to initialize initialAlertDefs: ", ex);
+            throw new IllegalStateException("fail to initialize initialAlertDefs: ", ex);
+		}
+        if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
+            LOG.warn("No alert definitions was found for site: " + site + ", dataSource: " + dataSource);
+        }
+        else if (initialAlertDefs.get(executorId) != null) { 
+			for(T alertDef : initialAlertDefs.get(executorId).values()){
+				int part = partitioner.partition(numPartitions, alertDef.getTags().get(AlertConstants.POLICY_TYPE), alertDef.getTags().get(AlertConstants.POLICY_ID));
+				if (part == partitionSeq) {
+					tmpPolicyEvaluators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), createPolicyEvaluator(alertDef));
+				}
+			}
+		}
+		
+		policyEvaluators = new CopyOnWriteHashMap<>();
+		// for efficiency, we don't put single policy evaluator
+		policyEvaluators.putAll(tmpPolicyEvaluators);
+		DynamicPolicyLoader policyLoader = DynamicPolicyLoader.getInstance();
+		
+		policyLoader.init(initialAlertDefs, policyDefinitionDao, config);
+		policyLoader.addPolicyChangeListener(executorId + "_" + partitionSeq, this);
+		LOG.info("Alert Executor created, partitionSeq: " + partitionSeq + " , numPartitions: " + numPartitions);
+        LOG.info("All policy evaluators: " + policyEvaluators);
+		
+		initMetricReportor();
+	}
+
+    /**
+     * Create PolicyEvaluator instance according to policyType-mapped policy evaluator class
+     *
+     * @param alertDef alert definition
+     * @return PolicyEvaluator instance
+     */
+	private PolicyEvaluator<T> createPolicyEvaluator(T alertDef){
+		String policyType = alertDef.getTags().get(AlertConstants.POLICY_TYPE);
+		Class<? extends PolicyEvaluator> evalCls = PolicyManager.getInstance().getPolicyEvaluator(policyType);
+		if(evalCls == null){
+			String msg = "No policy evaluator defined for policy type : " + policyType;
+			LOG.error(msg);
+			throw new IllegalStateException(msg);
+		}
+		
+		// check out whether strong incoming data validation is necessary
+        String needValidationConfigKey= AlertConstants.ALERT_EXECUTOR_CONFIGS + "." + executorId + ".needValidation";
+
+        // Default: true
+        boolean needValidation = !config.hasPath(needValidationConfigKey) || config.getBoolean(needValidationConfigKey);
+
+		AbstractPolicyDefinition policyDef = null;
+		try {
+			policyDef = JsonSerDeserUtils.deserialize(alertDef.getPolicyDef(), AbstractPolicyDefinition.class, PolicyManager.getInstance().getPolicyModules(policyType));
+		} catch (Exception ex) {
+			LOG.error("Fail initial alert policy def: "+alertDef.getPolicyDef(), ex);
+		}
+		PolicyEvaluator<T> pe;
+		try{
+            // Create evaluator instances
+			pe = evalCls.getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class).newInstance(config, alertDef.getTags().get("policyId"), policyDef, sourceStreams, needValidation);
+		}catch(Exception ex){
+			LOG.error("Fail creating new policyEvaluator", ex);
+			LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
+			throw new IllegalStateException(ex);
+		}
+		return pe;
+	}
+
+    /**
+     * verify both alertExecutor logic name and partition id
+     * @param alertDef alert definition
+     *
+     * @return whether accept the alert definition
+     */
+	private boolean accept(T alertDef){
+        if(!alertDef.getTags().get("alertExecutorId").equals(executorId)) {
+            if(LOG.isDebugEnabled()){
+                LOG.debug("alertDef does not belong to this alertExecutorId : " + executorId + ", alertDef : " + alertDef);
+            }
+            return false;
+        }
+		int targetPartitionSeq = partitioner.partition(numPartitions, alertDef.getTags().get(AlertConstants.POLICY_TYPE), alertDef.getTags().get(AlertConstants.POLICY_ID));
+		if(targetPartitionSeq == partitionSeq)
+			return true;
+		return false;
+	}
+	
+	public long trim(long value, long granularity) {
+		return value / granularity * granularity;
+	}
+
+	public void runMetricReporter() {
+		while(true) {
+			try {
+				long current = System.currentTimeMillis();
+				List<Metric> metricList = new ArrayList<Metric>();
+				synchronized (this.metricMap) {
+					for (Entry<String, Metric> entry : metricMap.entrySet()) {
+						String name = entry.getKey();
+						Metric metric = entry.getValue();
+						long previous = metric.getTimestamp();
+						if (current > previous + MERITE_GRANULARITY) {
+							metricList.add(metric);
+							metricMap.put(name, new CountingMetric(trim(current, MERITE_GRANULARITY), metric.getDimensions(), metric.getMetricName()));
+						}
+					}
+				}
+				if (metricList.size() > 0) {
+					LOG.info("Going to persist alert metrics, size: " + metricList.size());
+					metricReport.emit(metricList);
+				}
+				try {
+					Thread.sleep(MERITE_GRANULARITY / 2);
+					} catch (InterruptedException ex) { /* Do nothing */ }
+				}
+			catch (Throwable t) {
+				LOG.error("Got a throwable in metricReporter " , t);
+			}
+		}
+	}
+
+	public void updateCounter(String name, Map<String, String> dimensions, double value) {
+		long current = System.currentTimeMillis();
+		synchronized (metricMap) {
+			if (metricMap.get(name) == null) {
+				String metricName = name.split("#")[0];
+				metricMap.put(name, new CountingMetric(trim(current, MERITE_GRANULARITY), dimensions, metricName));
+			}
+			metricMap.get(name).update(value);
+		}
+	}
+	
+	public void updateCounter(String name, Map<String, String> dimensions) {
+		updateCounter(name, dimensions, 1.0);
+	}
+	
+	public Map<String, String> getDimensions(String policyId) {
+		if (dimensionsMap.get(policyId) == null) {
+			Map<String, String> newDimensions = new HashMap<String, String>(baseDimensions);
+			newDimensions.put(AlertConstants.POLICY_ID, policyId);
+			dimensionsMap.put(policyId, newDimensions);
+		}
+		return dimensionsMap.get(policyId);
+	}
+	
+	public String getMetricKey(String metricName, String policy) {
+		return metricName + "#" + policy;
+	}
+
+    /**
+     * within this single executor, execute all PolicyEvaluator sequentially
+     * the contract for input:
+     * 1. total # of fields for input is 3, which is fixed
+     * 2. the first field is key
+     * 3. the second field is stream name
+     * 4. the third field is value which is java SortedMap
+     */
+    @Override
+    public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, K>> outputCollector){
+        if(input.size() != 3)
+            throw new IllegalStateException("AlertExecutor always consumes exactly 3 fields: key, stream name and value(SortedMap)");
+        if(LOG.isDebugEnabled()) LOG.debug("Msg is coming " + input.get(2));
+        if(LOG.isDebugEnabled()) LOG.debug("Current policyEvaluators: " + policyEvaluators.keySet().toString());
+
+        updateCounter(EAGLE_EVENT_COUNT, baseDimensions);
+        try{
+            synchronized(this.policyEvaluators) {
+                for(Entry<String, PolicyEvaluator<T>> entry : policyEvaluators.entrySet()){
+                    String policyId = entry.getKey();
+                    PolicyEvaluator<T> evaluator = entry.getValue();
+                    updateCounter(getMetricKey(EAGLE_POLICY_EVAL_COUNT, policyId), getDimensions(policyId));
+                    try {
+                        PolicyEvaluationContext<T, K> evaluationContext = new PolicyEvaluationContext<T, K>();
+                        evaluationContext.alertExecutor = this;
+                        evaluationContext.policyId = policyId;
+                        evaluationContext.evaluator = evaluator;
+                        evaluationContext.outputCollector = outputCollector;
+                        evaluator.evaluate(new ValuesArray(evaluationContext, input.get(1), input.get(2)));
+                    }
+                    catch (Exception ex) {
+                        LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
+                        updateCounter(getMetricKey(EAGLE_POLICY_EVAL_FAIL_COUNT, policyId), getDimensions(policyId));
+                    }
+                }
+            }
+        } catch(Exception ex){
+            LOG.error(executorId + ", partition " + partitionSeq + ", error fetching alerts, but continue to run", ex);
+            updateCounter(EAGLE_ALERT_FAIL_COUNT, baseDimensions);
+        }
+    }
+
+	@Override
+	public void onPolicyCreated(Map<String, T> added) {
+		if(LOG.isDebugEnabled()) LOG.debug(executorId + ", partition " + partitionSeq + " policy added : " + added + " policyEvaluators " + policyEvaluators);
+		for(T alertDef : added.values()){
+			if(!accept(alertDef))
+				continue;
+			LOG.info(executorId + ", partition " + partitionSeq + " policy really added " + alertDef);
+			PolicyEvaluator newEvaluator = createPolicyEvaluator(alertDef);
+			if(newEvaluator != null){
+				synchronized(this.policyEvaluators) {
+					policyEvaluators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), newEvaluator);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onPolicyChanged(Map<String, T> changed) {
+		if(LOG.isDebugEnabled()) LOG.debug(executorId + ", partition " + partitionSeq + " policy changed : " + changed);
+		for(T alertDef : changed.values()){
+			if(!accept(alertDef))
+				continue;
+			LOG.info(executorId + ", partition " + partitionSeq + " policy really changed " + alertDef);
+			synchronized(this.policyEvaluators) {
+				PolicyEvaluator<T> pe = policyEvaluators.get(alertDef.getTags().get(AlertConstants.POLICY_ID));
+				pe.onPolicyUpdate(alertDef);
+			}
+		}
+	}
+
+	@Override
+	public void onPolicyDeleted(Map<String, T> deleted) {
+		if(LOG.isDebugEnabled()) LOG.debug(executorId + ", partition " + partitionSeq + " policy deleted : " + deleted);
+		for(T alertDef : deleted.values()){
+			if(!accept(alertDef))
+				continue;
+			LOG.info(executorId + ", partition " + partitionSeq + " policy really deleted " + alertDef);
+			String policyId = alertDef.getTags().get(AlertConstants.POLICY_ID);
+			synchronized(this.policyEvaluators) {			
+				if (policyEvaluators.containsKey(policyId)) {
+					PolicyEvaluator<T> pe = policyEvaluators.remove(alertDef.getTags().get(AlertConstants.POLICY_ID));
+					pe.onPolicyDelete();
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onAlerts(PolicyEvaluationContext<T, K> context, List<K> alerts) {
+		if(alerts != null && !alerts.isEmpty()){
+			String policyId = context.policyId;
+            LOG.info(String.format("Detected %s alerts for policy %s",alerts.size(),policyId));
+			Collector outputCollector = context.outputCollector;
+			PolicyEvaluator<T> evaluator = context.evaluator;
+			updateCounter(getMetricKey(EAGLE_ALERT_COUNT, policyId), getDimensions(policyId), alerts.size());
+			for (K entity : alerts) {
+				synchronized(this) {
+					outputCollector.collect(new Tuple2(policyId, entity));
+				}
+				if(LOG.isDebugEnabled()) LOG.debug("A new alert is triggered: " + executorId + ", partition " + partitionSeq + ", Got an alert with output context: " + entity + ", for policy " + evaluator);
+			}
+		}
+	}
+
+}

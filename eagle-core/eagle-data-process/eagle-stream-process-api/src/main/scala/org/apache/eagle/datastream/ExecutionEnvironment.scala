@@ -42,6 +42,9 @@ class StormExecutionEnvironment(config: Config) extends ExecutionEnvironment(con
   override def execute() : Unit = {
     LOG.info("initial graph:\n")
     GraphPrinter.print(dag)
+    new StreamAnalyzeExpansion(config).expand(dag)
+    LOG.info("after StreamAnalyzeExpansion graph:")
+    GraphPrinter.print(dag)
     new StreamAlertExpansion(config).expand(dag)
     LOG.info("after StreamAlertExpansion graph:")
     GraphPrinter.print(dag)

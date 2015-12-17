@@ -18,6 +18,8 @@ package org.apache.eagle.alert.policy;
 
 import java.util.List;
 
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+
 import com.fasterxml.jackson.databind.Module;
 
 /**
@@ -40,8 +42,8 @@ import com.fasterxml.jackson.databind.Module;
  * - create evaluator engine runtime when configuration is changed
  *
  */
-public interface PolicyEvaluatorServiceProvider {
+public interface PolicyEvaluatorServiceProvider<T extends AbstractPolicyEntity> {
 	String getPolicyType();
-	Class<? extends PolicyEvaluator> getPolicyEvaluator();
+	Class<? extends PolicyEvaluator<T>> getPolicyEvaluator();
 	List<Module> getBindingModules();
 }

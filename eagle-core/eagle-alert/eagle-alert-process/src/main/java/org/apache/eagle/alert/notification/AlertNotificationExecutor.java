@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.config.EmailNotificationConfig;
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
+import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.policy.DynamicPolicyLoader;
@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * notify alert by email, sms or other means
  * currently we only implements email notification
  */
-public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> implements PolicyLifecycleMethods {
+public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> implements PolicyLifecycleMethods<AlertDefinitionAPIEntity> {
 
 	private static final long serialVersionUID = 1690354365435407034L;
 	private static final Logger LOG = LoggerFactory.getLogger(AlertNotificationExecutor.class);
@@ -51,7 +51,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 
 	private List<String> alertExecutorIdList;
 	private volatile CopyOnWriteHashMap<String, List<AlertEmailGenerator>> alertEmailGeneratorsMap;
-	private AlertDefinitionDAO dao;
+	private PolicyDefinitionDAO dao;
 
     private final static int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
     private final static int DEFAULT_THREAD_POOL_MAX_SIZE = 8;
@@ -59,7 +59,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 
     private transient ThreadPoolExecutor executorPool;
 
-    public AlertNotificationExecutor(List<String> alertExecutorIdList, AlertDefinitionDAO dao){
+    public AlertNotificationExecutor(List<String> alertExecutorIdList, PolicyDefinitionDAO dao){
 		this.alertExecutorIdList = alertExecutorIdList;
 		this.dao = dao;
 	}

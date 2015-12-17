@@ -25,6 +25,8 @@ public class AlertConstants {
 	public final static String ALERT_STREAM_SERVICE_ENDPOINT_NAME = "AlertStreamService";
 	public static final String ALERT_EMAIL_ORIGIN_PROPERTY = "alertEmailOrigin";
 	public static final String ALERT_TIMESTAMP_PROPERTY = "alertTimestamp";
+	
+	public final static String ANALYZE_DEFINITION_SERVICE_ENDPOINT_NAME = "AnalyzeDefinitionService";
 
 	public static final String ALERT_EMAIL_TIME_PROPERTY = "timestamp";
 	public static final String ALERT_EMAIL_COUNT_PROPERTY = "count";

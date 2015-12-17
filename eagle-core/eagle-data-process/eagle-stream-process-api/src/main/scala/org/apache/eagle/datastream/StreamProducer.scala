@@ -20,13 +20,16 @@ package org.apache.eagle.datastream
 
 import java.util
 import java.util.concurrent.atomic.AtomicInteger
-
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
+import org.apache.eagle.partition.PartitionStrategy
+import org.apache.eagle.datastream.FlatMapper
+import org.apache.eagle.partition.PartitionStrategy
+import org.apache.eagle.datastream.FlatMapper
 
 /**
  * StreamProducer is the base class for all other concrete StreamProducer
@@ -155,6 +158,18 @@ trait StreamProducer{
   def alertWithoutConsumer(upStreamName: String, alertExecutorId : String): Unit ={
     alert(util.Arrays.asList(upStreamName), alertExecutorId, false)
   }
+  
+  def analyze(upStreamName :String, queryExecutorId : String, strategy: PartitionStrategy = null, cepQl: String = null): AnalyzeProducer = {
+    val ret= AnalyzeProducer(util.Arrays.asList(upStreamName), queryExecutorId, cepQl, strategy)
+    hookupDAG(graph, this, ret)
+    ret
+  }
+  
+  def analyze(upStreamName :String, queryExecutorId : String, strategy: PartitionStrategy): AnalyzeProducer = {
+    val ret= AnalyzeProducer(util.Arrays.asList(upStreamName), queryExecutorId, null, strategy)
+    hookupDAG(graph, this, ret)
+    ret
+  }
 
   def hookupDAG(graph: DirectedAcyclicGraph[StreamProducer, StreamConnector], current: StreamProducer, next: StreamProducer) = {
     current.getGraph.addVertex(next)
@@ -212,6 +227,8 @@ case class StormSourceProducer(id: Int, source : BaseRichSpout) extends StreamPr
 }
 
 case class AlertStreamSink(id: Int, upStreamNames: util.List[String], alertExecutorId : String, withConsumer: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer
+
+case class AnalyzeProducer(upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer
 
 object UniqueId{
   val id : AtomicInteger = new AtomicInteger(0);

@@ -52,7 +52,7 @@ public class TestAlertDefinitionDAOImpl {
 
 		String site = "sandbox";
 		String dataSource = "UnitTest";
-		AlertDefinitionDAO dao = new AlertDefinitionDAOImpl(new EagleServiceConnector(eagleServiceHost, eagleServicePort)) {
+		PolicyDefinitionDAO dao = new AlertDefinitionDAOImpl(new EagleServiceConnector(eagleServiceHost, eagleServicePort)) {
 			@Override
 			public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) throws Exception {
 				List<AlertDefinitionAPIEntity> list = new ArrayList<AlertDefinitionAPIEntity>();

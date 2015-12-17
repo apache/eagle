@@ -14,38 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.policy;
-
-import java.util.Map;
+package org.apache.eagle.alert.siddhi;
 
 import org.apache.eagle.alert.entity.AbstractPolicyEntity;
-import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.alert.policy.PolicyEvaluator;
+import org.apache.eagle.alert.policy.ResultRender;
+import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.executor.PolicyProcessExecutor;
 
-/***
- * 
- * @param <T> - The policy definition entity
- */
-public interface PolicyEvaluator<T extends AbstractPolicyEntity> {
-	/**
-	 * take input and evaluate expression
-	 * input has 3 fields, first is siddhiAlertContext, second one is streamName, the third is map of attribute name/value
-	 * @param input
-	 * @throws Exception
-	 */
-	public void evaluate(ValuesArray input) throws Exception;
+public class PolicyEvaluationContext<T extends AbstractPolicyEntity, K> {
 	
-	/**
-	 * notify policy evaluator that policy is updated
-	 */
-	public void onPolicyUpdate(T newAlertDef);
+	public PolicyProcessExecutor<T, K> alertExecutor;
 	
-	/**
-	 * notify policy evaluator that policy is deleted, here is cleanup work for this policy evaluator
-	 */
-	public void onPolicyDelete();
+	public String policyId;
 	
-	/**
-	 * get additional context
-	 */	
-	public Map<String, String> getAdditionalContext();
+	public PolicyEvaluator<T> evaluator;
+	
+	public Collector outputCollector;
+	
+	public ResultRender<T, K> resultRender;
 }

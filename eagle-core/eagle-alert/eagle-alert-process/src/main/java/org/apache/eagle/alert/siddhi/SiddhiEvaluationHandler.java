@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.alert.siddhi;
 
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-
 import java.util.List;
 
-public interface SiddhiAlertHandler {
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
 
-	void onAlerts(EagleAlertContext context, List<AlertAPIEntity> alerts);
+public interface SiddhiEvaluationHandler<T extends AbstractPolicyEntity, K> {
+
+	void onAlerts(PolicyEvaluationContext<T, K> context, List<K> alerts);
 }

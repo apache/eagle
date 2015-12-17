@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.entity;
+package org.apache.eagle.dataproc.impl.analyze.entity;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.eagle.alert.common.AlertConstants;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
 import org.apache.eagle.log.entity.meta.Column;
 import org.apache.eagle.log.entity.meta.ColumnFamily;
 import org.apache.eagle.log.entity.meta.Index;
@@ -31,32 +31,29 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * site: site name
- * dataSource: data source name
+ * Metaclass entity of stream analyze definition
  *
- * alertExecutorId: Group Policy by alertExecutorId, the policy definition with the sample ["site", "dataSource", "alertExecutorId"] should run on the sample alert executor
- *
- * policyId: policy name, should be unique
- * policyType: policy engine implementation type
  */
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@Table("alertdef")
+@Table("analyzedef")
 @ColumnFamily("f")
-@Prefix("alertdef")
+@Prefix("analyzedef")
 @Service(AlertConstants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "dataSource", "alertExecutorId", "policyId", "policyType"})
+@Tags({"site", "dataSource", "analyzeExecutorId", "policyId", "policyType"})
 @Indexes({
-	@Index(name="Index_1_alertExecutorId", columns = { "alertExecutorID" }, unique = true),
+	@Index(name="Index_1_analyzeExecutorId", columns = { "analyzeExecutorID" }, unique = true),
 })
-public class AlertDefinitionAPIEntity extends AbstractPolicyEntity {
+@SuppressWarnings("serial")
+public class AnalyzeDefinitionAPIEntity extends AbstractPolicyEntity {
+
 	@Column("a")
-	private String desc;
+	private String name;
 	@Column("b")
 	private String policyDef;
 	@Column("c")
-	private String dedupeDef;
+	private String description;
 	@Column("d")
 	private String notificationDef;
 	@Column("e")
@@ -64,116 +61,82 @@ public class AlertDefinitionAPIEntity extends AbstractPolicyEntity {
 	@Column("f")
 	private boolean enabled;
 	@Column("g")
-	private String owner;	
+	private String owner;
 	@Column("h")
 	private long lastModifiedDate;
-	@Column("i")
-	private long severity;
 	@Column("j")
 	private long createdTime;
 
-	public String getDesc() {
-		return desc;
+	public String getName() {
+		return name;
 	}
-	public void setDesc(String desc) {
-		this.desc = desc;
-		valueChanged("desc");
+
+	public void setName(String name) {
+		this.name = name;
 	}
+
 	public String getPolicyDef() {
 		return policyDef;
 	}
-	public void setPolicyDef(String policyDef) {
-		this.policyDef = policyDef;
-		valueChanged("policyDef");
+
+	public void setPolicyDef(String analyzeDef) {
+		this.policyDef = analyzeDef;
 	}
-	public String getDedupeDef() {
-		return dedupeDef;
+
+	public String getDescription() {
+		return description;
 	}
-	public void setDedupeDef(String dedupeDef) {
-		this.dedupeDef = dedupeDef;
-		valueChanged("dedupeDef");
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
+
 	public String getNotificationDef() {
 		return notificationDef;
 	}
+
 	public void setNotificationDef(String notificationDef) {
 		this.notificationDef = notificationDef;
-		valueChanged("notificationDef");
 	}
+
 	public String getRemediationDef() {
 		return remediationDef;
 	}
+
 	public void setRemediationDef(String remediationDef) {
 		this.remediationDef = remediationDef;
-		valueChanged("remediationDef");
 	}
+
 	public boolean isEnabled() {
 		return enabled;
 	}
+
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
-		valueChanged("enabled");
 	}
+
 	public String getOwner() {
 		return owner;
 	}
+
 	public void setOwner(String owner) {
 		this.owner = owner;
-		valueChanged("owner");
-	}	
+	}
+
 	public long getLastModifiedDate() {
 		return lastModifiedDate;
 	}
+
 	public void setLastModifiedDate(long lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
-		valueChanged("lastModifiedDate");
-	}	
-	public long getSeverity() {
-		return severity;
 	}
-	public void setSeverity(long severity) {
-		this.severity = severity;
-		valueChanged("severity");
-	}	
+
 	public long getCreatedTime() {
 		return createdTime;
 	}
+
 	public void setCreatedTime(long createdTime) {
 		this.createdTime = createdTime;
-		valueChanged("createdTime");
 	}
-	public boolean equals(Object o){
-		if(o == this)
-			return true;
-		if(!(o instanceof AlertDefinitionAPIEntity))
-			return false;
-		AlertDefinitionAPIEntity that = (AlertDefinitionAPIEntity)o;
-		if(that.enabled == this.enabled &&
-				compare(that.policyDef, this.policyDef) &&
-				compare(that.dedupeDef, this.dedupeDef) &&
-				compare(that.notificationDef, this.notificationDef) &&
-				compare(that.remediationDef, this.remediationDef))
-			return true;
-		return false;
-	}
-	
-	private boolean compare(String a, String b){
-		if(a == b)
-			return true;
-		if(a == null || b == null)
-			return false;
-		if(a.equals(b))
-			return true;
-		return false;
-	}
-	
-	public int hashCode(){
-		HashCodeBuilder builder = new HashCodeBuilder();
-		builder.append(enabled);
-		builder.append(policyDef);
-		builder.append(dedupeDef);
-		builder.append(notificationDef);
-		builder.append(remediationDef);
-		return builder.toHashCode();
-	}
+
 }

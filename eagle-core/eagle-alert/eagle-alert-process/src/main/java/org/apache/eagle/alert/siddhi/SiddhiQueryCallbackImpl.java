@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.executor.AlertExecutor;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.event.Event;
@@ -30,14 +29,20 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 
-public class SiddhiQueryCallbackImpl extends QueryCallback{
+/**
+ * Siddhi call back implementation
+ *
+ * @param <T> - The policy definition type
+ * @param <K> - K the alert entity type
+ */
+public class SiddhiQueryCallbackImpl<T extends AbstractPolicyEntity, K> extends QueryCallback{
 
-	private SiddhiPolicyEvaluator evaluator;
+	private SiddhiPolicyEvaluator<T, K> evaluator;
 	public static final Logger LOG = LoggerFactory.getLogger(SiddhiQueryCallbackImpl.class);
 	public static final ObjectMapper mapper = new ObjectMapper();	
 	public Config config;
 	
-	public SiddhiQueryCallbackImpl(Config config, SiddhiPolicyEvaluator evaluator) {
+	public SiddhiQueryCallbackImpl(Config config, SiddhiPolicyEvaluator<T, K> evaluator) {
 		this.config = config;		
 		this.evaluator = evaluator;
 	}
@@ -73,13 +78,14 @@ public class SiddhiQueryCallbackImpl extends QueryCallback{
 		return rets;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
 		Object[] data = inEvents[0].getData();
-		EagleAlertContext siddhiAlertContext = (EagleAlertContext)data[0];
+		PolicyEvaluationContext<T, K> siddhiAlertContext = (PolicyEvaluationContext<T, K>)data[0];
 		List<String> rets = getOutputMessage(inEvents[0]);
-		AlertAPIEntity alert = SiddhiAlertAPIEntityRendner.render(config, rets, siddhiAlertContext, timeStamp);
-		AlertExecutor alertExecutor = siddhiAlertContext.alertExecutor;
-		alertExecutor.onAlerts(siddhiAlertContext, Arrays.asList(alert));
+		K alert = siddhiAlertContext.resultRender.render(config, rets, siddhiAlertContext, timeStamp);
+		SiddhiEvaluationHandler<T, K> handler = siddhiAlertContext.alertExecutor;
+		handler.onAlerts(siddhiAlertContext, Arrays.asList(alert));
 	}
 }

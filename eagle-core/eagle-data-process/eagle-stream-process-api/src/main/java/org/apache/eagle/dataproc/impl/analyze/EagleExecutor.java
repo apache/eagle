@@ -14,14 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.policy;
+package org.apache.eagle.dataproc.impl.analyze;
 
-import java.util.Map;
-
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
-
-public interface PolicyLifecycleMethods<T extends AbstractPolicyEntity> {
-	void onPolicyCreated(Map<String, T> added);
-	void onPolicyChanged(Map<String, T> changed);
-	void onPolicyDeleted(Map<String, T> deleted);
+public interface EagleExecutor<DEF> {
+	
+	public String getExecutorId();
+	
+	public int getPartitionSeq();
 }

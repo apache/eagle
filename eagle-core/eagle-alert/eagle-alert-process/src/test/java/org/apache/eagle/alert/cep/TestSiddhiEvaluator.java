@@ -16,16 +16,21 @@
  */
 package org.apache.eagle.alert.cep;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl;
 import org.apache.eagle.alert.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.alert.dao.AlertStreamSchemaDAOImpl;
+import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
-import org.apache.eagle.alert.siddhi.EagleAlertContext;
+import org.apache.eagle.alert.siddhi.PolicyEvaluationContext;
+import org.apache.eagle.alert.siddhi.SiddhiAlertAPIEntityRender;
 import org.apache.eagle.alert.siddhi.SiddhiPolicyDefinition;
 import org.apache.eagle.alert.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.alert.siddhi.StreamMetadataManager;
@@ -33,11 +38,13 @@ import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.executor.AlertExecutor;
-import junit.framework.Assert;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Test;
 
-import java.util.*;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
+import junit.framework.Assert;
 
 public class TestSiddhiEvaluator {
 
@@ -92,10 +99,10 @@ public class TestSiddhiEvaluator {
 							"select * " +
 							"insert into outputStream ;";
         policyDef.setExpression(expression);
-        SiddhiPolicyEvaluator evaluator = new SiddhiPolicyEvaluator(config, "testPolicy", policyDef, new String[]{"hdfsAuditLogEventStream"});
-		EagleAlertContext context = new EagleAlertContext();
+        SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity> evaluator = new SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity>(config, "testPolicy", policyDef, new String[]{"hdfsAuditLogEventStream"});
+		PolicyEvaluationContext context = new PolicyEvaluationContext();
 
-		AlertDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, null)) {
+		PolicyDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, null)) {
 			@Override
 			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception {
 				return null;
@@ -115,6 +122,7 @@ public class TestSiddhiEvaluator {
 		context.alertExecutor.init();
 		context.evaluator = evaluator;
 		context.policyId = "testPolicy";
+		context.resultRender = new SiddhiAlertAPIEntityRender();
 		context.outputCollector = new Collector<Tuple2<String, AlertAPIEntity>> () {
 			@Override
 			public void collect(Tuple2<String, AlertAPIEntity> stringAlertAPIEntityTuple2) {

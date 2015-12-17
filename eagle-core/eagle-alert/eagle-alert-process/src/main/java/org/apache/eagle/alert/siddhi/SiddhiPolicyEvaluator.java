@@ -17,14 +17,22 @@
 package org.apache.eagle.alert.siddhi;
 
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeSet;
 
-import org.apache.eagle.alert.config.AbstractPolicyDefinition;
-import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.alert.common.AlertConstants;
+import org.apache.eagle.alert.config.AbstractPolicyDefinition;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.policy.PolicyEvaluator;
 import org.apache.eagle.alert.policy.PolicyManager;
+import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
+import org.apache.eagle.dataproc.core.ValuesArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
@@ -34,21 +42,19 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.policy.PolicyEvaluator;
-import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
-import org.apache.eagle.dataproc.core.ValuesArray;
 import com.typesafe.config.Config;
 
 /**
  * when policy is updated or deleted, SiddhiManager.shutdown should be invoked to release resources.
  * during this time, synchronization is important
  */
-public class SiddhiPolicyEvaluator implements PolicyEvaluator{
-	private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyEvaluator.class);	
+public class SiddhiPolicyEvaluator<T extends AbstractPolicyEntity, K> implements PolicyEvaluator<T>{
+	
 	public static final int DEFAULT_QUEUE_SIZE = 1000;
-	private final BlockingQueue<AlertAPIEntity> queue = new ArrayBlockingQueue<AlertAPIEntity>(DEFAULT_QUEUE_SIZE);
+
+	private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyEvaluator.class);	
+	
+//	private final BlockingQueue<K> queue = new ArrayBlockingQueue<K>(DEFAULT_QUEUE_SIZE);
 	private volatile SiddhiRuntime siddhiRuntime;
 	private String[] sourceStreams;
 	private boolean needValidation;
@@ -125,7 +131,7 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 		}
 		executionPlanRuntime.start();
 
-		QueryCallback callback = new SiddhiQueryCallbackImpl(config, this);		
+		QueryCallback callback = new SiddhiQueryCallbackImpl<T, K>(config, this);		
 
 		LOG.info("Siddhi query: " + expression);
 		executionPlanRuntime.addCallback(EXECUTION_PLAN_NAME, callback);
@@ -160,7 +166,7 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 	 *     the attribute names should be equal to attribute names which stream metadata defines
 	 *     the input field cannot be null
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void evaluate(ValuesArray data) throws Exception {
 		if(LOG.isDebugEnabled()) LOG.debug("Siddhi policy evaluator consumers data :" + data);
@@ -214,7 +220,7 @@ public class SiddhiPolicyEvaluator implements PolicyEvaluator{
 	}
 
 	@Override
-	public void onPolicyUpdate(AlertDefinitionAPIEntity newAlertDef) {
+	public void onPolicyUpdate(T newAlertDef) {
 		AbstractPolicyDefinition policyDef = null;
 		try {
 			policyDef = JsonSerDeserUtils.deserialize(newAlertDef.getPolicyDef(), 

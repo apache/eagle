@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.common.config.EagleConfigConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import com.netflix.config.AbstractPollingScheduler;
 import com.netflix.config.ConcurrentCompositeConfiguration;
 import com.netflix.config.DynamicConfiguration;
@@ -42,7 +42,13 @@ import com.netflix.config.PolledConfigurationSource;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 
-public class DynamicPolicyLoader {
+/**
+ * TODO : make this not singleton
+ * @since Dec 17, 2015
+ *
+ * @param <T>
+ */
+public class DynamicPolicyLoader<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(DynamicPolicyLoader.class);
 	
 	private final int defaultInitialDelayMillis = 30*1000;
@@ -72,7 +78,7 @@ public class DynamicPolicyLoader {
 	 * @param dao
 	 */
 	public void init(Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs, 
-			AlertDefinitionDAO dao, Config config){
+			PolicyDefinitionDAO dao, Config config){
 		if(!initialized){
 			synchronized(this){
 				if(!initialized){
@@ -90,7 +96,7 @@ public class DynamicPolicyLoader {
 	 * @param config
 	 */
 	private void internalInit(Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs,
-			AlertDefinitionDAO dao, Config config){
+			PolicyDefinitionDAO dao, Config config){
 		if(!config.getBoolean("dynamicConfigSource.enabled")) {
             return;
         }
@@ -153,13 +159,13 @@ public class DynamicPolicyLoader {
 	public static class DynamicPolicySource implements PolledConfigurationSource{
 		private static Logger LOG = LoggerFactory.getLogger(DynamicPolicySource.class);
 		private Config config;
-		private AlertDefinitionDAO dao;
+		private PolicyDefinitionDAO dao;
 		/**
 		 * mapping from alertExecutorId to list of policies 
 		 */
 		private Map<String, Map<String, AlertDefinitionAPIEntity>> cachedAlertDefs;
 		
-		public DynamicPolicySource(Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs, AlertDefinitionDAO dao, Config config){
+		public DynamicPolicySource(Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs, PolicyDefinitionDAO dao, Config config){
 			this.cachedAlertDefs = initialAlertDefs;
 			this.dao = dao;
 			this.config = config;

@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.ml;
 
-import org.apache.eagle.alert.siddhi.EagleAlertContext;
+import org.apache.eagle.alert.siddhi.PolicyEvaluationContext;
 import org.apache.eagle.ml.model.MLCallbackResult;
 
 public interface MLAnomalyCallback {
@@ -24,5 +24,5 @@ public interface MLAnomalyCallback {
      * @param callbackResult call-backed result
      * @param alertContext context
      */
-	void receive(MLCallbackResult callbackResult,EagleAlertContext alertContext);
+	void receive(MLCallbackResult callbackResult,PolicyEvaluationContext alertContext);
 }

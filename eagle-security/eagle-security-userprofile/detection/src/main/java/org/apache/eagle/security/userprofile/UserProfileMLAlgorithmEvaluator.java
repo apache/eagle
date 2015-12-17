@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.security.userprofile;
 
-import org.apache.eagle.alert.siddhi.EagleAlertContext;
+import org.apache.eagle.alert.siddhi.PolicyEvaluationContext;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.ml.MLAlgorithmEvaluator;
 import org.apache.eagle.ml.MLAnomalyCallback;
@@ -68,7 +68,7 @@ public abstract class UserProfileMLAlgorithmEvaluator<M extends UserProfileModel
      */
     @Override
     public void evaluate(ValuesArray data) throws Exception {
-        EagleAlertContext alertContext = (EagleAlertContext)data.get(0);
+        PolicyEvaluationContext alertContext = (PolicyEvaluationContext)data.get(0);
         String streamName = (String)data.get(1);
 
         UserActivityAggModelEntity userActivityAggModelEntity = (UserActivityAggModelEntity) data.get(2);
@@ -99,7 +99,7 @@ public abstract class UserProfileMLAlgorithmEvaluator<M extends UserProfileModel
         }
     }
 
-    protected void notifyCallbacks(List<MLCallbackResult> callbackResults, EagleAlertContext alertContext){
+    protected void notifyCallbacks(List<MLCallbackResult> callbackResults, PolicyEvaluationContext alertContext){
         for(MLCallbackResult callbackResult: callbackResults){
             if(callbackResult.isAnomaly()) {
                 for (MLAnomalyCallback callback : this.callbacks) {

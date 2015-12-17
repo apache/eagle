@@ -24,24 +24,28 @@ import java.util.Map.Entry;
 
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.alert.notification.UrlBuilder;
+import org.apache.eagle.alert.policy.ResultRender;
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.common.metric.AlertContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.eagle.common.DateTimeUtil;
-import org.apache.eagle.common.metric.AlertContext;
 import com.typesafe.config.Config;
 
-public class SiddhiAlertAPIEntityRendner {
+public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionAPIEntity, AlertAPIEntity> {
 
-	public static final Logger LOG = LoggerFactory.getLogger(SiddhiAlertAPIEntityRendner.class);
+	public static final Logger LOG = LoggerFactory.getLogger(SiddhiAlertAPIEntityRender.class);
 	public static final String source = ManagementFactory.getRuntimeMXBean().getName();
-	
-	public static AlertAPIEntity render(Config config, List<String> rets, EagleAlertContext siddhiAlertContext, long timestamp) {
-		SiddhiPolicyEvaluator evaluator = (SiddhiPolicyEvaluator)siddhiAlertContext.evaluator;
-		String alertExecutorId = siddhiAlertContext.alertExecutor.getAlertExecutorId();
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public AlertAPIEntity render(Config config, List<String> rets, PolicyEvaluationContext<AlertDefinitionAPIEntity, AlertAPIEntity> siddhiAlertContext, long timestamp) {
+		SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity> evaluator = (SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity>) siddhiAlertContext.evaluator;
+		String alertExecutorId = siddhiAlertContext.alertExecutor.getExecutorId();
 		AlertAPIEntity entity = new AlertAPIEntity();
 		AlertContext context = new AlertContext();
 		String sourceStreams = evaluator.getAdditionalContext().get(AlertConstants.SOURCE_STREAMS);

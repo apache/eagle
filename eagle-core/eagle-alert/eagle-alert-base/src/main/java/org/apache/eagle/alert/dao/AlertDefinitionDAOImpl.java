@@ -16,6 +16,11 @@
  */
 package org.apache.eagle.alert.dao;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
@@ -25,16 +30,13 @@ import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Utility methods to load alert definitions for a program
  */
-public class AlertDefinitionDAOImpl implements AlertDefinitionDAO {
-	private final Logger LOG = LoggerFactory.getLogger(AlertDefinitionDAOImpl.class);
+public class AlertDefinitionDAOImpl implements PolicyDefinitionDAO<AlertDefinitionAPIEntity> {
+
+	private static final long serialVersionUID = 7717408104714443056L;
+	private static final Logger LOG = LoggerFactory.getLogger(AlertDefinitionDAOImpl.class);
 	private final EagleServiceConnector connector;
 
 	public AlertDefinitionDAOImpl(EagleServiceConnector connector){

@@ -14,19 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.siddhi;
+package org.apache.eagle.alert.policy;
 
-import org.apache.eagle.executor.AlertExecutor;
-import org.apache.eagle.alert.policy.PolicyEvaluator;
-import org.apache.eagle.datastream.Collector;
+import java.util.List;
 
-public class EagleAlertContext {
-	
-	public AlertExecutor alertExecutor;
-	
-	public String policyId;
-	
-	public PolicyEvaluator evaluator;
-	
-	public Collector outputCollector;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.siddhi.PolicyEvaluationContext;
+
+import com.typesafe.config.Config;
+
+/**
+ * @since Dec 17, 2015
+ *
+ */
+public interface ResultRender<T extends AbstractPolicyEntity, K> {
+
+	K render(Config config, List<String> rets, PolicyEvaluationContext<T, K> siddhiAlertContext, long timestamp);
+
 }
