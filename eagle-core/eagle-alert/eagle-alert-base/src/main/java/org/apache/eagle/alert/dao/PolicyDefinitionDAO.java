@@ -30,7 +30,7 @@ public interface PolicyDefinitionDAO<T extends AbstractPolicyEntity> extends Ser
 	 * find list of active alert definitions for one specific site and dataSource
 	 * @return
 	 */
-	List<T> findActiveAlertDefs(String site, String dataSource) throws Exception;
+	List<T> findActivePolicies(String site, String dataSource) throws Exception;
 	
 	/**
 	 * find map from alertExecutorId to map from policy Id to alert definition for one specific site and dataSource
@@ -38,5 +38,5 @@ public interface PolicyDefinitionDAO<T extends AbstractPolicyEntity> extends Ser
        (site,dataSource) => Map[alertExecutorId,Map[policyId,alertDefinition]]
 	 * @return
 	 */
-	Map<String, Map<String, T>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception;
+	Map<String, Map<String, T>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception;
 }

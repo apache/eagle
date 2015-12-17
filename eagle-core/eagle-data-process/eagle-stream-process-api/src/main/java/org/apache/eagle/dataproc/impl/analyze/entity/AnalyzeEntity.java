@@ -26,4 +26,7 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
  */
 public class AnalyzeEntity extends TaggedLogAPIEntity {
 
+	private static final long serialVersionUID = 5911351515190098292L;
+
+	
 }

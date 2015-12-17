@@ -66,7 +66,7 @@ public class TestDynamicPolicyLoader {
 		
 		PolicyDefinitionDAO<AlertDefinitionAPIEntity> dao = new PolicyDefinitionDAO<AlertDefinitionAPIEntity>() {
 			@Override
-			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(
+			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(
 					String site, String dataSource) {
 				Map<String, Map<String, AlertDefinitionAPIEntity>> currentAlertDefs = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
 				currentAlertDefs.put("testAlertExecutorId", new HashMap<String, AlertDefinitionAPIEntity>());
@@ -77,7 +77,7 @@ public class TestDynamicPolicyLoader {
 			}
 			
 			@Override
-			public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) {
+			public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) {
 				return null;
 			}
 		};

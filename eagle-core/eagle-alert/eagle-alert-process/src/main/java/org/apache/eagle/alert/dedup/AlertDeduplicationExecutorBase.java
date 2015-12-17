@@ -91,7 +91,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
         String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 	    Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;	    	    
 	    try {
-	 		initialAlertDefs = dao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
+	 		initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);
 	    }
 	    catch (Exception ex) {
  			LOG.error("fail to initialize initialAlertDefs: ", ex);

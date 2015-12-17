@@ -173,7 +173,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
         String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
 		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 		try {
-			initialAlertDefs = policyDefinitionDao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
+			initialAlertDefs = policyDefinitionDao.findActivePoliciesGroupbyExecutorId(site, dataSource);
 		}
 		catch (Exception ex) {
 			LOG.error("fail to initialize initialAlertDefs: ", ex);

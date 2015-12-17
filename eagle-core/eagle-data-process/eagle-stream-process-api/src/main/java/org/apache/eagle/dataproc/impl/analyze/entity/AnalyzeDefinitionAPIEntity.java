@@ -31,7 +31,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * Metaclass entity of stream analyze definition
+ * entity of stream analyze definition
  *
  */
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)

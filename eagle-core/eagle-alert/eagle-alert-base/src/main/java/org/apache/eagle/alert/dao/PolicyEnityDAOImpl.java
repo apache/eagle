@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
@@ -31,34 +31,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility methods to load alert definitions for a program
+ * @since Dec 17, 2015
+ *
  */
-public class AlertDefinitionDAOImpl implements PolicyDefinitionDAO<AlertDefinitionAPIEntity> {
+public class PolicyEnityDAOImpl<T extends AbstractPolicyEntity> implements PolicyDefinitionDAO<T> {
 
-	private static final long serialVersionUID = 7717408104714443056L;
-	private static final Logger LOG = LoggerFactory.getLogger(AlertDefinitionDAOImpl.class);
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOG = LoggerFactory.getLogger(PolicyEnityDAOImpl.class);
 	private final EagleServiceConnector connector;
+	private final String servicePointName;
 
-	public AlertDefinitionDAOImpl(EagleServiceConnector connector){
+	public PolicyEnityDAOImpl(EagleServiceConnector connector, String serviceName){
 		this.connector = connector;
+		this.servicePointName = serviceName;
 	}
 
     @Override
-	public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) throws Exception {
+	public List<T> findActivePolicies(String site, String dataSource) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AlertConstants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
-			GenericServiceAPIResponseEntity<AlertDefinitionAPIEntity> response =  client.search()
-																		                .pageSize(Integer.MAX_VALUE)
-																		                .query(query)
-																	                    .send();
+			String query = servicePointName + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
+			GenericServiceAPIResponseEntity<T> response = client.search()
+												                .pageSize(Integer.MAX_VALUE)
+												                .query(query)
+											                    .send();
 			client.close();
 			if (response.getException() != null) {
 				throw new Exception("Got an exception when query eagle service: " + response.getException()); 
 			}
-			List<AlertDefinitionAPIEntity> list = response.getObj();
-			List<AlertDefinitionAPIEntity> enabledList = new ArrayList<AlertDefinitionAPIEntity>();
-			for (AlertDefinitionAPIEntity entity : list) {
+			List<T> list = response.getObj();
+			List<T> enabledList = new ArrayList<T>();
+			for (T entity : list) {
 				if (entity.isEnabled()) enabledList.add(entity);
 			}
 			return enabledList;
@@ -68,18 +72,25 @@ public class AlertDefinitionDAOImpl implements PolicyDefinitionDAO<AlertDefiniti
 			throw new IllegalStateException(ex);
 		}					   
 	}
+    
+    
 
     @Override
-	public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
-		List<AlertDefinitionAPIEntity> list = findActivePolicies(site, dataSource);
-		Map<String, Map<String, AlertDefinitionAPIEntity>> map = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
-			for (AlertDefinitionAPIEntity entity : list) {
-				String executorID = entity.getTags().get(AlertConstants.ALERT_EXECUTOR_ID);
-				if (map.get(executorID) == null) {
-					map.put(executorID, new HashMap<String, AlertDefinitionAPIEntity>());
-				}
-				map.get(executorID).put(entity.getTags().get("policyId"), entity);
+	public Map<String, Map<String, T>> findActivePoliciesGroupbyExecutorId(String site, String dataSource)
+			throws Exception {
+		List<T> list = findActivePolicies(site, dataSource);
+		Map<String, Map<String, T>> map = new HashMap<String, Map<String, T>>();
+		for (T entity : list) {
+			// support both executorId and legacy alertExecutorId
+			String executorID = entity.getTags().containsKey("executorId") ? entity.getTags().get("executorId")
+					: entity.getTags().get(AlertConstants.ALERT_EXECUTOR_ID);
+
+			if (map.get(executorID) == null) {
+				map.put(executorID, new HashMap<String, T>());
 			}
+			map.get(executorID).put(entity.getTags().get("policyId"), entity);
+		}
 		return map;
 	}
+
 }

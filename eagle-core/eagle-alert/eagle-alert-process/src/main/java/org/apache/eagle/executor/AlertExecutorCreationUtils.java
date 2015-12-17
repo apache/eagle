@@ -16,23 +16,25 @@
  */
 package org.apache.eagle.executor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl;
 import org.apache.eagle.alert.dao.AlertExecutorDAOImpl;
+import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
+import org.apache.eagle.alert.dao.PolicyEnityDAOImpl;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertExecutorEntity;
 import org.apache.eagle.alert.policy.DefaultPolicyPartitioner;
 import org.apache.eagle.alert.policy.PolicyPartitioner;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigValue;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigValue;
 
 /**
  * Create alert executors and provide callback for programmer to link alert executor to immediate parent executors
@@ -71,7 +73,8 @@ public class AlertExecutorCreationUtils {
         if(streamNames.isEmpty()){
             throw new IllegalStateException("upstream names should not be empty for alert " + alertExecutorId);
         }
-        return createAlertExecutors(config, new AlertDefinitionDAOImpl(new EagleServiceConnector(config)),
+        return createAlertExecutors(config, 
+        		new PolicyEnityDAOImpl<AlertDefinitionAPIEntity>(new EagleServiceConnector(config), AlertConstants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME),
                 streamNames, alertExecutorId);
     }
 
@@ -95,7 +98,7 @@ public class AlertExecutorCreationUtils {
      * <li>(config["alertExecutorConfigs"]) => AlertExecutor(alertExecutorID, partitioner, numPartitions, partitionSeq, alertDefs, alertDefDAO, sourceStreams)[]</li>
      * </ol>
      */
-	public static AlertExecutor[] createAlertExecutors(Config config, PolicyDefinitionDAO alertDefDAO,
+	public static AlertExecutor[] createAlertExecutors(Config config, PolicyDefinitionDAO<AlertDefinitionAPIEntity> alertDefDAO,
 			List<String> streamNames, String alertExecutorId) throws Exception{
 		// Read `alertExecutorConfigs` from configuration and get config for this alertExecutorId
         int numPartitions =1;

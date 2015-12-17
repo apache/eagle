@@ -175,7 +175,7 @@ public class DynamicPolicyLoader<T> {
 			LOG.info("Poll policy from eagle service " +  config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST) +
 					":" + config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT) );
 			Map<String, Map<String, AlertDefinitionAPIEntity>> newAlertDefs = 
-					dao.findActiveAlertDefsGroupbyAlertExecutorId(config.getString("eagleProps.site"),
+					dao.findActivePoliciesGroupbyExecutorId(config.getString("eagleProps.site"),
                             config.getString("eagleProps.dataSource"));
 			
 			// compare runtime alertDefs with cachedAlertDefs and figure out what are added/deleted/updated

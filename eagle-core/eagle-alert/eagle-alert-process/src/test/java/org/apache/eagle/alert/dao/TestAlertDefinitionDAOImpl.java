@@ -54,7 +54,7 @@ public class TestAlertDefinitionDAOImpl {
 		String dataSource = "UnitTest";
 		PolicyDefinitionDAO dao = new AlertDefinitionDAOImpl(new EagleServiceConnector(eagleServiceHost, eagleServicePort)) {
 			@Override
-			public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) throws Exception {
+			public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) throws Exception {
 				List<AlertDefinitionAPIEntity> list = new ArrayList<AlertDefinitionAPIEntity>();
 				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor1", "TestPolicyIDA", "TestPolicyTypeA"));
 				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor1", "TestPolicyIDB", "TestPolicyTypeB"));
@@ -64,7 +64,7 @@ public class TestAlertDefinitionDAOImpl {
 			}
 		};
 
-		Map<String, Map<String, AlertDefinitionAPIEntity>> retMap = dao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
+		Map<String, Map<String, AlertDefinitionAPIEntity>> retMap = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);
 		
 		Assert.assertEquals(2, retMap.size());
 		Assert.assertEquals(2, retMap.get("TestExecutor1").size());
