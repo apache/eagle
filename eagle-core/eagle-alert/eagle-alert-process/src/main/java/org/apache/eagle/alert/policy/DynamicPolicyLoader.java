@@ -24,10 +24,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,32 +44,40 @@ import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 
 /**
- * TODO : make this not singleton
- * @since Dec 17, 2015
  *
  * @param <T>
  */
-public class DynamicPolicyLoader<T> {
+public class DynamicPolicyLoader<T extends AbstractPolicyEntity> {
 	private static final Logger LOG = LoggerFactory.getLogger(DynamicPolicyLoader.class);
 	
-	private final int defaultInitialDelayMillis = 30*1000;
-	private final int defaultDelayMillis = 60*1000;
-	private final boolean defaultIgnoreDeleteFromSource = true;
-	private volatile CopyOnWriteHashMap<String, List<PolicyLifecycleMethods>> policyChangeListeners = new CopyOnWriteHashMap<String, List<PolicyLifecycleMethods>>();
-	private static DynamicPolicyLoader instance = new DynamicPolicyLoader();
+	private volatile CopyOnWriteHashMap<String, List<PolicyLifecycleMethods<T>>> policyChangeListeners = new CopyOnWriteHashMap<String, List<PolicyLifecycleMethods<T>>>();
+	// private static DynamicPolicyLoader instance = new DynamicPolicyLoader();
 	private volatile boolean initialized = false;
 	
-	public void addPolicyChangeListener(String alertExecutorId, PolicyLifecycleMethods alertExecutor){
+	public void addPolicyChangeListener(String alertExecutorId, PolicyLifecycleMethods<T> alertExecutor){
 		synchronized(policyChangeListeners) {
 			if (policyChangeListeners.get(alertExecutorId) == null) {
-				policyChangeListeners.put(alertExecutorId, new ArrayList<PolicyLifecycleMethods>());
+				policyChangeListeners.put(alertExecutorId, new ArrayList<PolicyLifecycleMethods<T>>());
 			}
 			policyChangeListeners.get(alertExecutorId).add(alertExecutor);
 		}
 	}
 	
-	public static DynamicPolicyLoader getInstance(){
-		return instance;
+//	public static DynamicPolicyLoader getInstance(){
+//		return instance;
+//	}
+	
+	private static ConcurrentHashMap<Class, DynamicPolicyLoader> maps = new ConcurrentHashMap<Class, DynamicPolicyLoader>();
+	
+	@SuppressWarnings("unchecked")
+	public static <K extends AbstractPolicyEntity> DynamicPolicyLoader<K> getInstanceOf(Class<K> clz) {
+		if (maps.containsKey(clz)) {
+			return maps.get(clz);
+		} else {
+			DynamicPolicyLoader<K> loader = new DynamicPolicyLoader<K>();
+			maps.putIfAbsent(clz, loader);
+			return maps.get(clz);
+		}
 	}
 	
 	/**
@@ -77,8 +86,8 @@ public class DynamicPolicyLoader<T> {
 	 * @param config
 	 * @param dao
 	 */
-	public void init(Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs, 
-			PolicyDefinitionDAO dao, Config config){
+	public void init(Map<String, Map<String, T>> initialAlertDefs, 
+			PolicyDefinitionDAO<T> dao, Config config){
 		if(!initialized){
 			synchronized(this){
 				if(!initialized){
@@ -95,8 +104,8 @@ public class DynamicPolicyLoader<T> {
 	 * @param dao
 	 * @param config
 	 */
-	private void internalInit(Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs,
-			PolicyDefinitionDAO dao, Config config){
+	private void internalInit(Map<String, Map<String, T>> initialAlertDefs,
+			PolicyDefinitionDAO<T> dao, Config config){
 		if(!config.getBoolean("dynamicConfigSource.enabled")) {
             return;
         }
@@ -107,6 +116,7 @@ public class DynamicPolicyLoader<T> {
         );
 
 		scheduler.addPollListener(new PollListener(){
+			@SuppressWarnings("unchecked")
 			@Override
 			public void handleEvent(EventType eventType, PollResult lastResult,
 					Throwable exception) {
@@ -117,18 +127,18 @@ public class DynamicPolicyLoader<T> {
 				Map<String, Object> added = lastResult.getAdded();
 				Map<String, Object> changed = lastResult.getChanged();
 				Map<String, Object> deleted = lastResult.getDeleted();
-				for(Map.Entry<String, List<PolicyLifecycleMethods>> entry : policyChangeListeners.entrySet()){
+				for(Map.Entry<String, List<PolicyLifecycleMethods<T>>> entry : policyChangeListeners.entrySet()){
 					String alertExecutorId = entry.getKey();
-					for (PolicyLifecycleMethods policyLifecycleMethod : entry.getValue()) {
-						Map<String, AlertDefinitionAPIEntity> addedPolicies = (Map<String, AlertDefinitionAPIEntity>)added.get(trimPartitionNum(alertExecutorId));
+					for (PolicyLifecycleMethods<T> policyLifecycleMethod : entry.getValue()) {
+						Map<String, T> addedPolicies = (Map<String, T>)added.get(trimPartitionNum(alertExecutorId));
 						if(addedPolicies != null && addedPolicies.size() > 0){
 							policyLifecycleMethod.onPolicyCreated(addedPolicies);
 						}
-						Map<String, AlertDefinitionAPIEntity> changedPolicies = (Map<String, AlertDefinitionAPIEntity>)changed.get(trimPartitionNum(alertExecutorId));
+						Map<String, T> changedPolicies = (Map<String, T>)changed.get(trimPartitionNum(alertExecutorId));
 						if(changedPolicies != null && changedPolicies.size() > 0){
 							policyLifecycleMethod.onPolicyChanged(changedPolicies);
 						}
-						Map<String, AlertDefinitionAPIEntity> deletedPolicies = (Map<String, AlertDefinitionAPIEntity>)deleted.get(trimPartitionNum(alertExecutorId));
+						Map<String, T> deletedPolicies = (Map<String, T>)deleted.get(trimPartitionNum(alertExecutorId));
 						if(deletedPolicies != null && deletedPolicies.size() > 0){
 							policyLifecycleMethod.onPolicyDeleted(deletedPolicies);
 						}
@@ -146,7 +156,7 @@ public class DynamicPolicyLoader<T> {
 		
 		ConcurrentCompositeConfiguration finalConfig = new ConcurrentCompositeConfiguration();
 		      
-		PolledConfigurationSource source = new DynamicPolicySource(initialAlertDefs, dao, config);
+		PolledConfigurationSource source = new DynamicPolicySource<T>(initialAlertDefs, dao, config);
 
 		try{
 			DynamicConfiguration dbSourcedConfiguration = new DynamicConfiguration(source, scheduler);
@@ -156,16 +166,16 @@ public class DynamicPolicyLoader<T> {
 		}
 	}
 	
-	public static class DynamicPolicySource implements PolledConfigurationSource{
+	public static class DynamicPolicySource<M extends AbstractPolicyEntity> implements PolledConfigurationSource {
 		private static Logger LOG = LoggerFactory.getLogger(DynamicPolicySource.class);
 		private Config config;
-		private PolicyDefinitionDAO dao;
+		private PolicyDefinitionDAO<M> dao;
 		/**
 		 * mapping from alertExecutorId to list of policies 
 		 */
-		private Map<String, Map<String, AlertDefinitionAPIEntity>> cachedAlertDefs;
+		private Map<String, Map<String, M>> cachedAlertDefs;
 		
-		public DynamicPolicySource(Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs, PolicyDefinitionDAO dao, Config config){
+		public DynamicPolicySource(Map<String, Map<String, M>> initialAlertDefs, PolicyDefinitionDAO<M> dao, Config config){
 			this.cachedAlertDefs = initialAlertDefs;
 			this.dao = dao;
 			this.config = config;
@@ -174,7 +184,7 @@ public class DynamicPolicyLoader<T> {
 		public PollResult poll(boolean initial, Object checkPoint) throws Exception {
 			LOG.info("Poll policy from eagle service " +  config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST) +
 					":" + config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT) );
-			Map<String, Map<String, AlertDefinitionAPIEntity>> newAlertDefs = 
+			Map<String, Map<String, M>> newAlertDefs = 
 					dao.findActivePoliciesGroupbyExecutorId(config.getString("eagleProps.site"),
                             config.getString("eagleProps.dataSource"));
 			
@@ -205,8 +215,8 @@ public class DynamicPolicyLoader<T> {
 //			Collection<String> updatedAlertExecutorIds = CollectionUtils.intersection(newAlertExecutorIds, cachedAlertExecutorIds);
             Collection<String> updatedAlertExecutorIds = newAlertExecutorIds;
 			for(String updatedAlertExecutorId : updatedAlertExecutorIds){
-				Map<String, AlertDefinitionAPIEntity> newPolicies = newAlertDefs.get(updatedAlertExecutorId);
-				Map<String, AlertDefinitionAPIEntity> cachedPolicies = cachedAlertDefs.get(updatedAlertExecutorId);
+				Map<String, M> newPolicies = newAlertDefs.get(updatedAlertExecutorId);
+				Map<String, M> cachedPolicies = cachedAlertDefs.get(updatedAlertExecutorId);
 				PolicyComparator.compare(updatedAlertExecutorId, newPolicies, cachedPolicies, added, changed, deleted);
 			}
 			
@@ -215,8 +225,9 @@ public class DynamicPolicyLoader<T> {
 		}
 	}
 	
-	public static class PolicyComparator{
-		public static void compare(String alertExecutorId, Map<String, AlertDefinitionAPIEntity> newPolicies, Map<String, AlertDefinitionAPIEntity> cachedPolicies, 
+	public static class PolicyComparator {
+		
+		public static <M extends AbstractPolicyEntity> void compare(String alertExecutorId, Map<String, M> newPolicies, Map<String, M> cachedPolicies, 
 				Map<String, Object> added, Map<String, Object> changed, Map<String, Object> deleted){
 			Set<String> newPolicyIds = newPolicies.keySet();
             Set<String> cachedPolicyIds = cachedPolicies != null ? cachedPolicies.keySet() : new HashSet<String>();
@@ -224,21 +235,21 @@ public class DynamicPolicyLoader<T> {
 			Collection<String> deletedPolicyIds = CollectionUtils.subtract(cachedPolicyIds, newPolicyIds);
 			Collection<String> changedPolicyIds = CollectionUtils.intersection(cachedPolicyIds, newPolicyIds);
 			if(addedPolicyIds != null && addedPolicyIds.size() > 0){
-				Map<String, AlertDefinitionAPIEntity> tmp = new HashMap<String, AlertDefinitionAPIEntity>();
+				Map<String, M> tmp = new HashMap<String, M>();
 				for(String addedPolicyId : addedPolicyIds){
 					tmp.put(addedPolicyId, newPolicies.get(addedPolicyId));
 				}
 				added.put(alertExecutorId, tmp);
 			}
 			if(deletedPolicyIds != null && deletedPolicyIds.size() > 0){
-				Map<String, AlertDefinitionAPIEntity> tmp = new HashMap<String, AlertDefinitionAPIEntity>();
+				Map<String, M> tmp = new HashMap<String, M>();
 				for(String deletedPolicyId : deletedPolicyIds){
 					tmp.put(deletedPolicyId, cachedPolicies.get(deletedPolicyId));
 				}
 				deleted.put(alertExecutorId, tmp);
 			}
 			if(changedPolicyIds != null && changedPolicyIds.size() > 0){
-				Map<String, AlertDefinitionAPIEntity> tmp = new HashMap<String, AlertDefinitionAPIEntity>();
+				Map<String, M> tmp = new HashMap<String, M>();
 				for(String changedPolicyId : changedPolicyIds){
 					// check if policy is really changed
 					if(!newPolicies.get(changedPolicyId).equals(cachedPolicies.get(changedPolicyId))){

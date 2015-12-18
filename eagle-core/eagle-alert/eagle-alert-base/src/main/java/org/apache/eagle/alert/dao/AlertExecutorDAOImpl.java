@@ -16,20 +16,22 @@
  */
 package org.apache.eagle.alert.dao;
 
+import java.util.List;
+
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.entity.AlertExecutorEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 public class AlertExecutorDAOImpl implements AlertExecutorDAO{
-    private final Logger LOG = LoggerFactory.getLogger(AlertExecutorDAOImpl.class);
+	
+    private static final Logger LOG = LoggerFactory.getLogger(AlertExecutorDAOImpl.class);
+    
     private final EagleServiceConnector connector;
 
     public AlertExecutorDAOImpl(EagleServiceConnector connector){

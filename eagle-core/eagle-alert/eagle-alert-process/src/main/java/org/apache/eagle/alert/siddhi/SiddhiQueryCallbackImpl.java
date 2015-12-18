@@ -86,6 +86,6 @@ public class SiddhiQueryCallbackImpl<T extends AbstractPolicyEntity, K> extends 
 		List<String> rets = getOutputMessage(inEvents[0]);
 		K alert = siddhiAlertContext.resultRender.render(config, rets, siddhiAlertContext, timeStamp);
 		SiddhiEvaluationHandler<T, K> handler = siddhiAlertContext.alertExecutor;
-		handler.onAlerts(siddhiAlertContext, Arrays.asList(alert));
+		handler.onEvalEvents(siddhiAlertContext, Arrays.asList(alert));
 	}
 }

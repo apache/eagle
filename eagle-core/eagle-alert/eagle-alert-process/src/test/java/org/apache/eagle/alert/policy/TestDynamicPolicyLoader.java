@@ -82,7 +82,7 @@ public class TestDynamicPolicyLoader {
 			}
 		};
 		
-		DynamicPolicyLoader<AlertDefinitionAPIEntity> loader = DynamicPolicyLoader.getInstance();
+		DynamicPolicyLoader<AlertDefinitionAPIEntity> loader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
 		loader.init(initialAlertDefs, dao, config);
 		
 		try{
@@ -104,4 +104,5 @@ public class TestDynamicPolicyLoader {
 		entity.setPolicyDef(policyDef);
 		return entity;
 	}
+	
 }

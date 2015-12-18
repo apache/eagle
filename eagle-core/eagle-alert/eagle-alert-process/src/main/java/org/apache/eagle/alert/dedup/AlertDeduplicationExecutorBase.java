@@ -47,14 +47,14 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 
 	private List<String> alertExecutorIdList;
 	private volatile CopyOnWriteHashMap<String, DefaultDeduplicator<AlertAPIEntity>> alertDedups;
-	private PolicyDefinitionDAO dao;
+	private PolicyDefinitionDAO<AlertDefinitionAPIEntity> dao;
 
 	public enum DEDUP_TYPE {
 		ENTITY,
 		EMAIL
 	}
 
-	public AlertDeduplicationExecutorBase(List<String> alertExecutorIdList, DEDUP_TYPE dedupType, PolicyDefinitionDAO dao){
+	public AlertDeduplicationExecutorBase(List<String> alertExecutorIdList, DEDUP_TYPE dedupType, PolicyDefinitionDAO<AlertDefinitionAPIEntity> dao){
 		this.alertExecutorIdList = alertExecutorIdList;
 		this.dedupType = dedupType;
 		this.dao = dao;
@@ -122,7 +122,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 
 		alertDedups = new CopyOnWriteHashMap<>();
 		alertDedups.putAll(tmpDeduplicators);
-		DynamicPolicyLoader policyLoader = DynamicPolicyLoader.getInstance();
+		DynamicPolicyLoader<AlertDefinitionAPIEntity> policyLoader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
 		policyLoader.init(initialAlertDefs, dao, config);
 		for (String alertExecutorId : alertExecutorIdList) {
 		 	policyLoader.addPolicyChangeListener(alertExecutorId, this);

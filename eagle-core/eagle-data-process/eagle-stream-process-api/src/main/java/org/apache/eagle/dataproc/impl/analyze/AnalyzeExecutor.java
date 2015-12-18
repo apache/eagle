@@ -26,80 +26,14 @@ import org.apache.eagle.executor.PolicyProcessExecutor;
  * @since Dec 16, 2015
  *
  */
-public class AnalyzeExecutor extends PolicyProcessExecutor<AnalyzeDefinitionAPIEntity, AnalyzeEntity> 
+public class AnalyzeExecutor extends PolicyProcessExecutor<AnalyzeDefinitionAPIEntity, AnalyzeEntity> {
 
-//extends JavaStormStreamExecutor2<String, AnalyzeDefinitionAPIEntity> 
-//		implements PolicyLifecycleMethods, SiddhiAlertHandler, EagleExecutor<AnalyzeDefinitionAPIEntity> 
-{
+	private static final long serialVersionUID = 1L;
 
 	public AnalyzeExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
 			PolicyDefinitionDAO<AnalyzeDefinitionAPIEntity> alertDefinitionDao, String[] sourceStreams) {
-		super(alertExecutorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams);
+		super(alertExecutorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams,
+				AnalyzeDefinitionAPIEntity.class);
 	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	
-//	private static final long serialVersionUID = 1L;
-//
-//	private final int partitionSeq;
-//	private final String givenCepQl;
-//
-//	public AnalyzeExecutor(int partitionSeq, String givenCepQl) {
-//		this.partitionSeq = partitionSeq;
-//		this.givenCepQl = givenCepQl;
-//	}
-//
-//	public String getExecutorId() {
-//		return "";
-//	}
-//	
-//	public int getPartitionSeq() {
-//		return partitionSeq;
-//	}
-//
-//	@Override
-//    public void flatMap(List<Object> input, Collector<Tuple2<String, AnalyzeDefinitionAPIEntity>> outputCollector) {
-//		
-//	}
-//
-//	@Override
-//	public void onAlerts(EagleAlertContext context, List<AlertAPIEntity> alerts) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	@Override
-//	public void onPolicyCreated(Map<String, AlertDefinitionAPIEntity> added) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	@Override
-//	public void onPolicyChanged(Map<String, AlertDefinitionAPIEntity> changed) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	@Override
-//	public void onPolicyDeleted(Map<String, AlertDefinitionAPIEntity> deleted) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	@Override
-//	public void prepareConfig(Config config) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	@Override
-//	public void init() {
-//		// TODO Auto-generated method stub
-//		
-//	}
 
 }

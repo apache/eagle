@@ -16,18 +16,108 @@
  */
 package org.apache.eagle.dataproc.impl.analyze;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.eagle.alert.common.AlertConstants;
+import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
+import org.apache.eagle.alert.dao.PolicyEnityDAOImpl;
+import org.apache.eagle.alert.policy.DefaultPolicyPartitioner;
+import org.apache.eagle.alert.policy.PolicyPartitioner;
+import org.apache.eagle.dataproc.impl.analyze.entity.AnalyzeDefinitionAPIEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigValue;
+
 /**
  * @since Dec 16, 2015
  *
  */
 public class AnalyzeExecutorFactory {
 
-	/**
-	 * 
-	 * @return
-	 */
-	public static AnalyzeExecutor[] createExecutors() {
-		// TODO
-		return new AnalyzeExecutor[] {};
+	private static final Logger LOG = LoggerFactory.getLogger(AnalyzeExecutorFactory.class);
+	
+	private AnalyzeExecutorFactory() {}
+	public static final AnalyzeExecutorFactory Instance = new AnalyzeExecutorFactory();
+
+
+	public AnalyzeExecutor[] createExecutors(Config config, List<String> streamNames, String executorId) throws Exception {
+//		// Read site and dataSource from configuration.
+//		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
+//		LOG.info("Loading alerting definitions for dataSource: " + dataSource);
+//		List<String> streamNames = findStreamNames(config, executorId, dataSource);
+//		if (streamNames.isEmpty()) {
+//			throw new IllegalStateException("upstream names should not be empty for analyze executor " + executorId);
+//		}
+
+		StringBuilder partitionerCls = new StringBuilder(DefaultPolicyPartitioner.class.getCanonicalName());
+        int numPartitions = loadExecutorConfig(config, executorId, partitionerCls);
+        
+		PolicyDefinitionDAO<AnalyzeDefinitionAPIEntity> policyDefDao = new PolicyEnityDAOImpl<AnalyzeDefinitionAPIEntity>(
+				new EagleServiceConnector(config), AlertConstants.ANALYZE_DEFINITION_SERVICE_ENDPOINT_NAME);
+		
+		
+		return newAnalyzeExecutors(policyDefDao, streamNames, executorId, numPartitions, partitionerCls.toString());
 	}
+	
+	@SuppressWarnings("unchecked")
+	private int loadExecutorConfig(Config config, String executorId, StringBuilder partitionerCls) {
+		int numPartitions = 0;
+		String analyzeExecutorConfigsKey = "analyzeExecutorConfigs";
+        if(config.hasPath(analyzeExecutorConfigsKey)) {
+            Map<String, ConfigValue> analyzeExecutorConfigs = config.getObject(analyzeExecutorConfigsKey);
+            if(analyzeExecutorConfigs !=null && analyzeExecutorConfigs.containsKey(executorId)) {
+                Map<String, Object> alertExecutorConfig = (Map<String, Object>) analyzeExecutorConfigs.get(executorId).unwrapped();
+                int parts = 0;
+                if(alertExecutorConfig.containsKey("parallelism")) parts = (int) (alertExecutorConfig.get("parallelism"));
+                numPartitions = parts == 0 ? 1 : parts;
+                if(alertExecutorConfig.containsKey("partitioner")) {
+                	partitionerCls.setLength(0);
+                	partitionerCls.append((String) alertExecutorConfig.get("partitioner"));
+                }
+            }
+        }
+        return numPartitions;
+	}
+
+
+//	private List<String> findStreamNames(Config config, String executorId, String dataSource) throws Exception {
+//		// Get map from alertExecutorId to alert stream
+//		// (dataSource) => Map[alertExecutorId:String,streamName:List[String]]
+//		List<String> streamNames = new ArrayList<String>();
+//		// FIXME : here we reuse the executor definition. But the name alert is not ambiguous now.
+//		AlertExecutorDAOImpl alertExecutorDAO = new AlertExecutorDAOImpl(new EagleServiceConnector(config));
+//		List<AlertExecutorEntity> alertExecutorEntities = alertExecutorDAO.findAlertExecutor(dataSource,
+//				executorId);
+//		for (AlertExecutorEntity entity : alertExecutorEntities) {
+//			streamNames.add(entity.getTags().get(AlertConstants.STREAM_NAME));
+//		}
+//		return streamNames;
+//	}
+	
+	/**
+	 * Build alert executors and assign alert definitions between these
+	 * executors by partitioner
+	 * (alertExecutorConfigs["${alertExecutorId}"]["partitioner"])
+	 */
+	private AnalyzeExecutor[] newAnalyzeExecutors(PolicyDefinitionDAO<AnalyzeDefinitionAPIEntity> alertDefDAO,
+			List<String> sourceStreams, String executorID, int numPartitions, String partitionerCls)
+					throws Exception {
+		LOG.info("Creating alert executors with executorID: " + executorID + ", numPartitions: "
+				+ numPartitions + ", Partition class is: " + partitionerCls);
+
+		PolicyPartitioner partitioner = (PolicyPartitioner) Class.forName(partitionerCls).newInstance();
+		AnalyzeExecutor[] alertExecutors = new AnalyzeExecutor[numPartitions];
+		String[] _sourceStreams = sourceStreams.toArray(new String[0]);
+
+		for (int i = 0; i < numPartitions; i++) {
+			alertExecutors[i] = new AnalyzeExecutor(executorID, partitioner, numPartitions, i, alertDefDAO,
+					_sourceStreams);
+		}
+		return alertExecutors;
+	}
+
 }

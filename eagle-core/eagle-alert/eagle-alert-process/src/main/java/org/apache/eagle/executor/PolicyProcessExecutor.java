@@ -75,6 +75,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 	
 	private	 static long MERITE_GRANULARITY = DateUtils.MILLIS_PER_MINUTE;
 
+	private final Class<T> policyDefinitionClz;
 	private String executorId;
 	private volatile CopyOnWriteHashMap<String, PolicyEvaluator<T>> policyEvaluators;
 	private PolicyPartitioner partitioner;
@@ -96,13 +97,14 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 	private PolicyDefinitionDAO<T> policyDefinitionDao;
 
 	public PolicyProcessExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
-                         PolicyDefinitionDAO<T> alertDefinitionDao, String[] sourceStreams){
+                         PolicyDefinitionDAO<T> alertDefinitionDao, String[] sourceStreams, Class<T> clz){
 		this.executorId = alertExecutorId;
 		this.partitioner = partitioner;
 		this.numPartitions = numPartitions;
 		this.partitionSeq = partitionSeq;
 		this.policyDefinitionDao = alertDefinitionDao;
 		this.sourceStreams = sourceStreams;
+		this.policyDefinitionClz = clz;
 	}
 	
 	public String getExecutorId(){
@@ -166,6 +168,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 	@Override
 	public void init() {
 		// initialize StreamMetadataManager before it is used
+		// TODO : use the same stream schema definition
 		StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAOImpl(config));
 		// for each AlertDefinition, to create a PolicyEvaluator
 		Map<String, PolicyEvaluator<T>> tmpPolicyEvaluators = new HashMap<String, PolicyEvaluator<T>>();
@@ -194,8 +197,8 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 		policyEvaluators = new CopyOnWriteHashMap<>();
 		// for efficiency, we don't put single policy evaluator
 		policyEvaluators.putAll(tmpPolicyEvaluators);
-		DynamicPolicyLoader policyLoader = DynamicPolicyLoader.getInstance();
-		
+
+		DynamicPolicyLoader<T> policyLoader = DynamicPolicyLoader.getInstanceOf(policyDefinitionClz);
 		policyLoader.init(initialAlertDefs, policyDefinitionDao, config);
 		policyLoader.addPolicyChangeListener(executorId + "_" + partitionSeq, this);
 		LOG.info("Alert Executor created, partitionSeq: " + partitionSeq + " , numPartitions: " + numPartitions);
@@ -210,6 +213,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
      * @param alertDef alert definition
      * @return PolicyEvaluator instance
      */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private PolicyEvaluator<T> createPolicyEvaluator(T alertDef){
 		String policyType = alertDef.getTags().get(AlertConstants.POLICY_TYPE);
 		Class<? extends PolicyEvaluator> evalCls = PolicyManager.getInstance().getPolicyEvaluator(policyType);
@@ -227,14 +231,17 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 
 		AbstractPolicyDefinition policyDef = null;
 		try {
-			policyDef = JsonSerDeserUtils.deserialize(alertDef.getPolicyDef(), AbstractPolicyDefinition.class, PolicyManager.getInstance().getPolicyModules(policyType));
+			policyDef = JsonSerDeserUtils.deserialize(alertDef.getPolicyDef(), AbstractPolicyDefinition.class, 
+					PolicyManager.getInstance().getPolicyModules(policyType));
 		} catch (Exception ex) {
 			LOG.error("Fail initial alert policy def: "+alertDef.getPolicyDef(), ex);
 		}
 		PolicyEvaluator<T> pe;
-		try{
-            // Create evaluator instances
-			pe = evalCls.getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class).newInstance(config, alertDef.getTags().get("policyId"), policyDef, sourceStreams, needValidation);
+		try {
+			// Create evaluator instances
+			pe = (PolicyEvaluator<T>) evalCls
+					.getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
+					.newInstance(config, alertDef.getTags().get("policyId"), policyDef, sourceStreams, needValidation);
 		}catch(Exception ex){
 			LOG.error("Fail creating new policyEvaluator", ex);
 			LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
@@ -373,7 +380,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 			if(!accept(alertDef))
 				continue;
 			LOG.info(executorId + ", partition " + partitionSeq + " policy really added " + alertDef);
-			PolicyEvaluator newEvaluator = createPolicyEvaluator(alertDef);
+			PolicyEvaluator<T> newEvaluator = createPolicyEvaluator(alertDef);
 			if(newEvaluator != null){
 				synchronized(this.policyEvaluators) {
 					policyEvaluators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), newEvaluator);
@@ -413,8 +420,9 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 		}
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void onAlerts(PolicyEvaluationContext<T, K> context, List<K> alerts) {
+	public void onEvalEvents(PolicyEvaluationContext<T, K> context, List<K> alerts) {
 		if(alerts != null && !alerts.isEmpty()){
 			String policyId = context.policyId;
             LOG.info(String.format("Detected %s alerts for policy %s",alerts.size(),policyId));

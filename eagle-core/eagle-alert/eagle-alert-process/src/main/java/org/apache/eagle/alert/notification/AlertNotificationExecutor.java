@@ -16,11 +16,15 @@
  */
 package org.apache.eagle.alert.notification;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.sun.jersey.client.impl.CopyOnWriteHashMap;
-import com.typesafe.config.Config;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.eagle.alert.config.EmailNotificationConfig;
 import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
@@ -34,10 +38,11 @@ import org.apache.eagle.datastream.Tuple1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
+import com.typesafe.config.Config;
 
 /**
  * notify alert by email, sms or other means
@@ -134,7 +139,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		
 		alertEmailGeneratorsMap = new CopyOnWriteHashMap<String, List<AlertEmailGenerator>>();
 		alertEmailGeneratorsMap.putAll(tmpEmailGenerators);				
-		DynamicPolicyLoader policyLoader = DynamicPolicyLoader.getInstance();
+		DynamicPolicyLoader<AlertDefinitionAPIEntity> policyLoader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
 		policyLoader.init(initialAlertDefs, dao, config);
 		for (String alertExecutorId : alertExecutorIdList) {
 			policyLoader.addPolicyChangeListener(alertExecutorId, this);

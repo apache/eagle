@@ -48,7 +48,7 @@ public class AlertExecutor extends PolicyProcessExecutor<AlertDefinitionAPIEntit
 
 	public AlertExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
                          PolicyDefinitionDAO<AlertDefinitionAPIEntity> alertDefinitionDao, String[] sourceStreams){
-		super(alertExecutorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams);
+		super(alertExecutorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams, AlertDefinitionAPIEntity.class);
 //		this.alertExecutorId = alertExecutorId;
 //		this.partitioner = partitioner;
 //		this.numPartitions = numPartitions;

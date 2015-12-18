@@ -58,7 +58,7 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
 	public void receive(MLCallbackResult aResult,PolicyEvaluationContext alertContext) {
 		LOG.info("Receive called with : " + aResult.toString());
         AlertAPIEntity alert = renderAlert(aResult,alertContext);
-        alertContext.alertExecutor.onAlerts(alertContext, Arrays.asList(alert));
+        alertContext.alertExecutor.onEvalEvents(alertContext, Arrays.asList(alert));
 	}
 
     private AlertAPIEntity renderAlert(MLCallbackResult aResult,PolicyEvaluationContext alertContext){

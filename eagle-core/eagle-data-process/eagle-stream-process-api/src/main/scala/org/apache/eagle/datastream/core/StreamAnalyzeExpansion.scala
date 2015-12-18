@@ -24,7 +24,6 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
 import com.typesafe.config.Config
 
-
 /**
  * The expansion job for stream analyze
  * 
@@ -52,7 +51,7 @@ class StreamAnalyzeExpansion(config: Config) extends StreamDAGExpansion(config) 
     dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]], current: StreamProducer[Any]): Unit = {
     current match {
       case AnalyzeProducer(upStreamNames, analyzerId, cepQl, strategy) => {
-        val analyzeExecutors = AnalyzeExecutorFactory.createExecutors();
+        val analyzeExecutors = AnalyzeExecutorFactory.Instance.createExecutors(config, upStreamNames, analyzerId);
         analyzeExecutors.foreach(exec => {
           val t = FlatMapProducer(exec).nameAs(exec.getExecutorId() + "_" + exec.getPartitionSeq()).initWith(dag,config, hook = false)
 

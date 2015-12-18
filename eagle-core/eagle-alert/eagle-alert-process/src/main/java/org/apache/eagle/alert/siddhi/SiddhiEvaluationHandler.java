@@ -22,5 +22,5 @@ import org.apache.eagle.alert.entity.AbstractPolicyEntity;
 
 public interface SiddhiEvaluationHandler<T extends AbstractPolicyEntity, K> {
 
-	void onAlerts(PolicyEvaluationContext<T, K> context, List<K> alerts);
+	void onEvalEvents(PolicyEvaluationContext<T, K> context, List<K> alerts);
 }
