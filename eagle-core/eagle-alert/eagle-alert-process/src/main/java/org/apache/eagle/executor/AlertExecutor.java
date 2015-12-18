@@ -22,7 +22,6 @@ import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.policy.PolicyPartitioner;
 
 public class AlertExecutor extends PolicyProcessExecutor<AlertDefinitionAPIEntity, AlertAPIEntity> {
-	private static final long serialVersionUID = 1L;
 
 //	private static final Logger LOG = LoggerFactory.getLogger(AlertExecutor.class);
 //
@@ -48,7 +47,7 @@ public class AlertExecutor extends PolicyProcessExecutor<AlertDefinitionAPIEntit
 //	private EagleServiceMetricReport metricReport;
 
 	public AlertExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
-                         PolicyDefinitionDAO alertDefinitionDao, String[] sourceStreams){
+                         PolicyDefinitionDAO<AlertDefinitionAPIEntity> alertDefinitionDao, String[] sourceStreams){
 		super(alertExecutorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams);
 //		this.alertExecutorId = alertExecutorId;
 //		this.partitioner = partitioner;

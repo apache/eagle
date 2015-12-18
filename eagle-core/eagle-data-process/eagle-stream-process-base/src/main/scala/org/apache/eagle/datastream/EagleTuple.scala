@@ -21,26 +21,18 @@ trait EagleTuple extends Serializable{
 }
 
 case class Tuple1[T0](f0 : T0) extends EagleTuple{
-  override def getList : List[AnyRef] = {
-    return List(f0.asInstanceOf[AnyRef])
-  }
+  override def getList : List[AnyRef] = List(f0.asInstanceOf[AnyRef])
+
 }
 
 case class Tuple2[T0, T1](f0 : T0, f1: T1) extends EagleTuple{
-  override def getList : List[AnyRef] = {
-    return List(f0.asInstanceOf[AnyRef], f1.asInstanceOf[AnyRef])
-  }
+  override def getList : List[AnyRef] = List(f0.asInstanceOf[AnyRef], f1.asInstanceOf[AnyRef])
 }
 
 case class Tuple3[T0, T1, T2](f0 : T0, f1: T1, f2: T2) extends EagleTuple{
-  override def getList : List[AnyRef] = {
-    return List(f0.asInstanceOf[AnyRef], f1.asInstanceOf[AnyRef], f2.asInstanceOf[AnyRef])
-  }
+  override def getList : List[AnyRef] = List(f0.asInstanceOf[AnyRef], f1.asInstanceOf[AnyRef], f2.asInstanceOf[AnyRef])
 }
 
 case class Tuple4[T0, T1, T2, T3](f0 : T0, f1: T1, f2: T2, f3 : T3) extends EagleTuple{
-  override def getList : List[AnyRef] = {
-    return List(f0.asInstanceOf[AnyRef], f1.asInstanceOf[AnyRef], f2.asInstanceOf[AnyRef], f3.asInstanceOf[AnyRef])
-  }
+  override def getList : List[AnyRef] = List(f0.asInstanceOf[AnyRef], f1.asInstanceOf[AnyRef], f2.asInstanceOf[AnyRef], f3.asInstanceOf[AnyRef])
 }
-

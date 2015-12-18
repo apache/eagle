@@ -16,61 +16,119 @@
  */
 package org.apache.eagle.datastream
 
-import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.{Config, ConfigFactory}
-import org.apache.eagle.dataproc.impl.storm.AbstractStormSpoutProvider
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph
-import org.slf4j.LoggerFactory
+import org.apache.eagle.dataproc.util.ConfigOptionParser
+import org.apache.eagle.datastream.core._
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment
 
-object ExecutionEnvironmentFactory{
+import scala.reflect.runtime.universe._
 
+/**
+ * Execution environment factory
+ *
+ * The factory is mainly used for create or manage execution environment,
+ * and also handles the shared works like configuration, arguments for execution environment
+ *
+ * Notice: this factory class should not know any implementation like storm or spark
+ *
+ * @since 0.3.0
+ */
+object ExecutionEnvironments{
+  /**
+   * Use `'''get[StormExecutionEnvironment](config)'''` instead
+   *
+   * @param config
+   * @return
+   */
+  @deprecated("Execution environment should not know implementation of Storm")
   def getStorm(config : Config) = new StormExecutionEnvironment(config)
+
+  /**
+   * Use `'''get[StormExecutionEnvironment]'''` instead
+   *
+   * @return
+   */
+  @deprecated("Execution environment should not know implementation of Storm")
   def getStorm:StormExecutionEnvironment = {
     val config = ConfigFactory.load()
     getStorm(config)
   }
-}
 
-abstract class ExecutionEnvironment(config : Config){
-  def execute()
-}
-
-class StormExecutionEnvironment(config: Config) extends ExecutionEnvironment(config){
-  val LOG = LoggerFactory.getLogger(classOf[StormExecutionEnvironment])
-  val dag = new DirectedAcyclicGraph[StreamProducer, StreamConnector](classOf[StreamConnector])
-
-  override def execute() : Unit = {
-    LOG.info("initial graph:\n")
-    GraphPrinter.print(dag)
-    new StreamAnalyzeExpansion(config).expand(dag)
-    LOG.info("after StreamAnalyzeExpansion graph:")
-    GraphPrinter.print(dag)
-    new StreamAlertExpansion(config).expand(dag)
-    LOG.info("after StreamAlertExpansion graph:")
-    GraphPrinter.print(dag)
-    new StreamUnionExpansion(config).expand(dag)
-    LOG.info("after StreamUnionExpansion graph:")
-    GraphPrinter.print(dag)
-    new StreamGroupbyExpansion(config).expand(dag)
-    LOG.info("after StreamGroupbyExpansion graph:")
-    GraphPrinter.print(dag)
-    new StreamNameExpansion(config).expand(dag)
-    LOG.info("after StreamNameExpansion graph:")
-    GraphPrinter.print(dag)
-    new StreamParallelismConfigExpansion(config).expand(dag)
-    LOG.info("after StreamParallelismConfigExpansion graph:")
-    GraphPrinter.print(dag)
-    val stormDag = StormStreamDAGTransformer.transform(dag)
-    StormTopologyCompiler(config, stormDag).buildTopology.execute
+  /**
+   * Use `'''get[StormExecutionEnvironment](args)'''` instead
+   *
+   * @see get[StormExecutionEnvironment](args)
+   *
+   * @param args
+   * @return
+   */
+  @deprecated("Execution environment should not know implementation of Storm")
+  def getStorm(args:Array[String]):StormExecutionEnvironment = {
+    getStorm(new ConfigOptionParser().load(args))
   }
 
-  def newSource(source: BaseRichSpout): StormSourceProducer ={
-    val ret = StormSourceProducer(UniqueId.incrementAndGetId(), source)
-    ret.config = config
-    ret.graph = dag
-    dag.addVertex(ret)
-    ret
+  /**
+   * @param typeTag
+   * @tparam T
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](implicit typeTag: TypeTag[T]): T ={
+    get[T](ConfigFactory.load())
   }
 
-  def newSource(sourceProvider: AbstractStormSpoutProvider):StormSourceProducer = newSource(sourceProvider.getSpout(config))
+  /**
+   *
+   * @param config
+   * @param typeTag
+   * @tparam T
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](config:Config)(implicit typeTag: TypeTag[T]): T ={
+    typeTag.mirror.runtimeClass(typeOf[T]).getConstructor(classOf[Config]).newInstance(config).asInstanceOf[T]
+  }
+
+  /**
+   *
+   * @param args
+   * @param typeTag
+   * @tparam T
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](args:Array[String])(implicit typeTag: TypeTag[T]): T ={
+    get[T](new ConfigOptionParser().load(args))
+  }
+
+  /**
+   * Support java style for default config
+   *
+   * @param clazz execution environment class
+   * @tparam T execution environment type
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](clazz:Class[T]):T ={
+    get[T](ConfigFactory.load(),clazz)
+  }
+
+  /**
+   * Support java style
+   * @param config command config
+   * @param clazz execution environment class
+   * @tparam T execution environment type
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](config:Config,clazz:Class[T]):T ={
+    clazz.getConstructor(classOf[Config]).newInstance(config)
+  }
+
+  /**
+   * Support java style
+   *
+   * @param args command arguments in string array
+   * @param clazz execution environment class
+   * @tparam T execution environment type
+   * @return
+   */
+  def get[T<:ExecutionEnvironment](args:Array[String],clazz:Class[T]):T ={
+    clazz.getConstructor(classOf[Config]).newInstance(new ConfigOptionParser().load(args))
+  }
 }

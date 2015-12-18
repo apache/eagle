@@ -45,7 +45,7 @@ common.getValueByPath = function (unit, path, defaultValue) {
 };
 
 common.setValueByPath = function(unit, path, value) {
-	if(!unit || path == null || path === "") throw "Unit or path can't be empty!";
+	if(!unit || typeof path !== "string" || path === "") throw "Unit or path can't be empty!";
 
 	var _inArray = false;
 	var _end = 0;

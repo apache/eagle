@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
 eagleComponents.directive('barChart', function($compile) {
+	'use strict';
+
 	return {
 		restrict : 'AE',
 		scope : {
@@ -44,6 +45,8 @@ eagleComponents.directive('barChart', function($compile) {
 });
 
 eagleComponents.service('barCharts', function() {
+	'use strict';
+
 	/*$(window).resize(function() {
 	 });
 	 $("body").on("collapsed.pushMenu", function() {
@@ -80,7 +83,7 @@ eagleComponents.service('barCharts', function() {
 					left : 40
 				}, width = ele.innerWidth() - margin.left - margin.right, height = config.height - margin.top - margin.bottom;
 
-				var x0 = d3.scale.ordinal().rangeRoundBands([0, width], .1);
+				var x0 = d3.scale.ordinal().rangeRoundBands([0, width], 0.1);
 				var x1 = d3.scale.ordinal();
 				var y = d3.scale.linear().range([height, 0]);
 
@@ -116,6 +119,11 @@ eagleComponents.service('barCharts', function() {
 					$.each(_series, function(i, unit) {
 						_maxLen = Math.max(_maxLen, unit.data.length);
 					});
+					function _fillValue(id) {
+						$.each(_keys, function(j, key) {
+							_data[id][key] = _series[j].data[id] || 0;
+						});
+					}
 					for(var i = 0 ; i < _maxLen ; i += 1) {
 						_data[i] = {};
 
@@ -127,9 +135,7 @@ eagleComponents.service('barCharts', function() {
 						}
 
 						// Value
-						$.each(_keys, function(j, key) {
-							_data[i][key] = _series[j].data[i] || 0;
-						});
+						_fillValue(i);
 					}
 
 					// ====== Convert Format ======

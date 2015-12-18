@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
 eagleComponents.directive('chart', function($compile) {
+	'use strict';
+
 	return {
 		restrict : 'E',
 		scope: {
@@ -47,6 +48,8 @@ eagleComponents.directive('chart', function($compile) {
  * 		type:	"line"(default), "area". Chart type is the default type of all series. Will be replaced by each series configure.
  */
 eagleComponents.service('charts', function() {
+	'use strict';
+
 	/*
 	 * Destroy chart
 	 */
@@ -56,7 +59,7 @@ eagleComponents.service('charts', function() {
 			_plot.shutdown();
 			_plot.destroy();
 		});
-	};
+	}
 
 	var charts = function($scope) {
 		var _id = 0;
@@ -119,6 +122,7 @@ eagleComponents.service('charts', function() {
 					case "area":
 						common.setValueByPath(_series, "lines.show", true);
 						common.setValueByPath(_series, "lines.fill", true);
+						/* falls through */
 					default:
 						common.setValueByPath(_series, "lines.show", true);
 					}
@@ -154,7 +158,7 @@ eagleComponents.service('charts', function() {
 						var _my = $(this);
 						var _plot = _my.data("plot");
 						if(!_plot) {
-							var _plot = $.plot(this, series, _config);
+							_plot = $.plot(this, series, _config);
 							_plot._id = ++_id;
 							_my.data("plot", _plot);
 						} else {
