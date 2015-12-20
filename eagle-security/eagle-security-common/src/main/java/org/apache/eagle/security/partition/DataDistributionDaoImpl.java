@@ -79,7 +79,7 @@ public class DataDistributionDaoImpl implements DataDistributionDao {
                     .endTime(endTime)
                     .pageSize(Integer.MAX_VALUE)
                     .query(query)
-                    .metricName("kafka.message.user.count")
+                    .metricName("eagle.kafka.message.count")
                     .send();
             if (!response.isSuccess()) {
                 LOG.error(response.getException());

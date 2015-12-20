@@ -41,18 +41,16 @@ public class KafkaLatestOffsetFetcher {
         Map<Integer, Long> ret = new HashMap<>();
         for (int partition = 0; partition < partitionCount; partition++) {
             PartitionMetadata metadata = metadatas.get(partition);
-            if (metadata == null) {
-                throw new RuntimeException("Can't find metadata for Topic and Partition. Exiting");
-            }
-            if (metadata.leader() == null) {
-                throw new RuntimeException("Can't find Leader for Topic and Partition. Exiting");
+            if (metadata == null || metadata.leader() == null) {
+                ret.put(partition, -1L);
+                //throw new RuntimeException("Can't find Leader for Topic and Partition. Exiting");
             }
             String leadBroker = metadata.leader().host();
             String clientName = "Client_" + topic + "_" + partition;
             SimpleConsumer consumer = new SimpleConsumer(leadBroker, port, 100000, 64 * 1024, clientName);
-            long lastestOffset = getLatestOffset(consumer, topic, partition, clientName);
+            long latestOffset = getLatestOffset(consumer, topic, partition, clientName);
             if (consumer != null) consumer.close();
-            ret.put(partition, lastestOffset);
+            ret.put(partition, latestOffset);
         }
         return ret;
     }
@@ -88,7 +86,7 @@ public class KafkaLatestOffsetFetcher {
                 }
                 if (partitionMetadata.size() == partitionCount) break;
             } catch (Exception e) {
-                throw new RuntimeException("Error communicating with Broker [" + broker + "] " + "to find Leader for [" + topic + "] Reason: " + e);
+                throw new RuntimeException("Error communicating with Broker [" + broker + "] " + "to find Leader for [" + topic + "] Reason: ", e);
             } finally {
                 if (consumer != null) consumer.close();
             }

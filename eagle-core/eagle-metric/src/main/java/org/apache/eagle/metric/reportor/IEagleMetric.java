@@ -17,24 +17,24 @@
  *
  */
 
-package org.apache.eagle.service.client;
+package org.apache.eagle.metric.reportor;
 
-import java.io.Serializable;
+import com.codahale.metrics.Gauge;
 
-public class ServiceConfig implements Serializable{
-    public String serviceHost;
-    public Integer servicePort;
-    public String username;
-    public String password;
+/**
+ * It's just a workaround to extends Gauge instead of Metric interface
+ * For MetricRegistry's notifyListenerOfRemovedMetric method will throw exception on unknown metric type
+ */
 
-    public ServiceConfig() {
+public interface IEagleMetric extends Gauge<Double> {
 
-    }
+    void registerListener(EagleMetricListener listener);
 
-    public ServiceConfig(String serviceHost, Integer servicePort, String username, String password) {
-        this.serviceHost = serviceHost;
-        this.servicePort = servicePort;
-        this.username = username;
-        this.password = password;
-    }
+    /**
+     * return true if the metric need to be flushed, otherwise return false
+     * @param value
+     * @param userTimeClock
+     * @return
+     */
+    boolean update(double value, long userTimeClock);
 }

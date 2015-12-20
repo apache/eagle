@@ -107,9 +107,6 @@ public class TestSiddhiEvaluator {
 			public Map<String, String> getDimensions(String policyId) {
 				return new HashMap<String, String>();
 			}
-
-			@Override
-			public void runMetricReporter() {}
 		};
 		context.alertExecutor.prepareConfig(config);
 		context.alertExecutor.init();
