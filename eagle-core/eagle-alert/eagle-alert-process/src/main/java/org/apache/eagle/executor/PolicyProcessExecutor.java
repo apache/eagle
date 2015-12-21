@@ -41,6 +41,7 @@ import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.metric.reportor.EagleCounterMetric;
 import org.apache.eagle.metric.reportor.EagleMetricListener;
 import org.apache.eagle.metric.reportor.EagleServiceReporterMetricListener;
@@ -51,8 +52,6 @@ import org.slf4j.LoggerFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
-
-import org.apache.eagle.datastream.Tuple2;
 
 /**
  * The stream process executor based on two types
@@ -208,7 +207,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K>
      * @return PolicyEvaluator instance
      */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private PolicyEvaluator<T> createPolicyEvaluator(T alertDef){
+	protected PolicyEvaluator<T> createPolicyEvaluator(T alertDef){
 		String policyType = alertDef.getTags().get(AlertConstants.POLICY_TYPE);
 		Class<? extends PolicyEvaluator> evalCls = PolicyManager.getInstance().getPolicyEvaluator(policyType);
 		if(evalCls == null){

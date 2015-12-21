@@ -55,17 +55,23 @@ public class AnalyzeDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 	@Column("c")
 	private String description;
 	@Column("d")
-	private String notificationDef;
-	@Column("e")
-	private String remediationDef;
-	@Column("f")
 	private boolean enabled;
-	@Column("g")
+	@Column("e")
 	private String owner;
-	@Column("h")
+	@Column("f")
 	private long lastModifiedDate;
-	@Column("j")
+	@Column("g")
 	private long createdTime;
+	/**
+	 * TODO: By setting this to true, eagle would generate a simple sampling for each field given.
+	 * for each field, an
+	 * 	avg(Field)
+	 * 	min(Field)
+	 * 	max(Field)
+	 * 	count(Field) would be collected
+	 */
+	@Column("h")
+	private boolean downSampling;
 
 	public String getName() {
 		return name;
@@ -89,22 +95,6 @@ public class AnalyzeDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getNotificationDef() {
-		return notificationDef;
-	}
-
-	public void setNotificationDef(String notificationDef) {
-		this.notificationDef = notificationDef;
-	}
-
-	public String getRemediationDef() {
-		return remediationDef;
-	}
-
-	public void setRemediationDef(String remediationDef) {
-		this.remediationDef = remediationDef;
 	}
 
 	public boolean isEnabled() {
@@ -137,6 +127,14 @@ public class AnalyzeDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 
 	public void setCreatedTime(long createdTime) {
 		this.createdTime = createdTime;
+	}
+
+	public boolean isDownSampling() {
+		return downSampling;
+	}
+
+	public void setDownSampling(boolean downSampling) {
+		this.downSampling = downSampling;
 	}
 
 }
