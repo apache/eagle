@@ -20,17 +20,17 @@ package org.apache.eagle.datastream.core
 
 import java.util
 import java.util.concurrent.atomic.AtomicInteger
-
-import backtype.storm.topology.base.BaseRichSpout
-import com.typesafe.config.Config
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.seqAsJavaList
+import scala.collection.JavaConverters.asScalaBufferConverter
 import org.apache.eagle.alert.entity.AlertAPIEntity
-import org.apache.eagle.datastream._
+import org.apache.eagle.datastream.FlatMapper
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
-
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
+import com.typesafe.config.Config
+import backtype.storm.topology.base.BaseRichSpout
+import org.apache.eagle.dataproc.impl.analyze.entity.AnalyzeEntity
 /**
  * StreamProducer = StreamInfo + StreamProtocol
  *
@@ -192,16 +192,15 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   def alertWithoutConsumer(upStreamName: String, alertExecutorId : String): Unit ={
     alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
-  
-  def analyze(upStreamName :String, queryExecutorId : String, strategy: PartitionStrategy = null, cepQl: String = null): AnalyzeProducer = {
-    val ret= AnalyzeProducer(util.Arrays.asList(upStreamName), queryExecutorId, cepQl, strategy)
+
+  def analyze(upStreamNames: java.util.List[String], queryExecutorId : String, strategy: PartitionStrategy = null): StreamProducer[AnalyzeEntity] = {
+    val ret= AnalyzeProducer(upStreamNames, queryExecutorId, null, strategy)
     hookup(this, ret)
     ret
   }
-
-  def analyze(upStreamName :String, queryExecutorId : String, strategy: PartitionStrategy): AnalyzeProducer = {
-    val ret= AnalyzeProducer(util.Arrays.asList(upStreamName), queryExecutorId, null, strategy)
-    hookup(this, ret)
+  
+  def persist() : StreamProducer[T] = {
+    val ret = PersisProducer()
     ret
   }
 
@@ -290,8 +289,9 @@ case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : S
   }
 }
 
-case class AnalyzeProducer(upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer
+case class AnalyzeProducer(upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[AnalyzeEntity]
 
+case class PersisProducer[T]() extends StreamProducer[T]
 
 object UniqueId{
   val id : AtomicInteger = new AtomicInteger(0);

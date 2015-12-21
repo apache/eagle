@@ -18,20 +18,24 @@
 package org.apache.eagle.datastream.core
 
 import java.util
-import com.typesafe.config.Config
+
+import scala.collection.JavaConversions.asScalaSet
+import scala.collection.mutable.ListBuffer
+
 import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl
-import org.apache.eagle.datastream._
+import org.apache.eagle.datastream.EagleTuple
+import org.apache.eagle.datastream.JavaStormExecutorForAlertWrapper
+import org.apache.eagle.datastream.JavaStormStreamExecutor
+import org.apache.eagle.datastream.StormStreamExecutor
+import org.apache.eagle.datastream.Tuple2
 import org.apache.eagle.datastream.storm.StormExecutorForAlertWrapper
 import org.apache.eagle.datastream.utils.AlertExecutorConsumerUtils
 import org.apache.eagle.executor.AlertExecutorCreationUtils
 import org.apache.eagle.service.client.EagleServiceConnector
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
-import scala.collection.JavaConversions._
-import scala.collection.mutable.ListBuffer
-import org.apache.eagle.executor.AlertExecutorCreationUtils
-import org.apache.eagle.datastream.JavaStormStreamExecutor
-import org.apache.eagle.datastream.StormStreamExecutor
+
+import com.typesafe.config.Config
 
 /**
  * The constraints for alert is:
@@ -70,7 +74,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
     toBeRemovedVertex.foreach(v => dag.removeVertex(v))
   }
 
-  def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
+  def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]], 
                dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], child: StreamProducer[Any]): Unit = {
     child match {
       case AlertStreamSink(upStreamNames, alertExecutorId, withConsumer,strategy) => {
@@ -78,28 +82,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
          * step 1: wrapper previous StreamProducer with one more field "streamName"
          * for AlertStreamSink, we check previous StreamProducer and replace that
          */
-        val newStreamProducers = new ListBuffer[StreamProducer[Any]]
-        current match {
-          case StreamUnionProducer(others) => {
-            val incomingEdges = dag.incomingEdgesOf(current)
-            incomingEdges.foreach(e => newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, e.from, upStreamNames.get(0)))
-            var i: Int = 1
-            others.foreach(o => {
-              newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, o, upStreamNames.get(i))
-              i += 1
-            })
-          }
-          case _: FlatMapProducer[AnyRef, AnyRef] => {
-            newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
-          }
-          case _: MapperProducer[AnyRef,AnyRef] => {
-            newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
-          }
-          case s: StreamProducer[AnyRef] if dag.inDegreeOf(s) == 0 => {
-            newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
-          }
-          case p@_ => throw new IllegalStateException(s"$p can not be put before AlertStreamSink, only StreamUnionProducer,FlatMapProducer and MapProducer are supported")
-        }
+        val newStreamProducers = rewriteWithStreamOutputWrapper(current, dag, toBeAddedEdges, toBeRemovedVertex, upStreamNames)
 
         /**
          * step 2: partition alert executor by policy partitioner class
@@ -130,7 +113,36 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
     }
   }
 
-  private def replace(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
+  protected def rewriteWithStreamOutputWrapper(current: org.apache.eagle.datastream.core.StreamProducer[Any], dag: org.jgrapht.experimental.dag.DirectedAcyclicGraph[org.apache.eagle.datastream.core.StreamProducer[Any],org.apache.eagle.datastream.core.StreamConnector[Any,Any]], toBeAddedEdges: scala.collection.mutable.ListBuffer[org.apache.eagle.datastream.core.StreamConnector[Any,Any]], toBeRemovedVertex: scala.collection.mutable.ListBuffer[org.apache.eagle.datastream.core.StreamProducer[Any]], upStreamNames: java.util.List[String]) = {/**
+     * step 1: wrapper previous StreamProducer with one more field "streamName"
+     * for AlertStreamSink, we check previous StreamProducer and replace that
+     */
+    val newStreamProducers = new ListBuffer[StreamProducer[Any]]
+    current match {
+      case StreamUnionProducer(others) => {
+        val incomingEdges = dag.incomingEdgesOf(current)
+        incomingEdges.foreach(e => newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, e.from, upStreamNames.get(0)))
+        var i: Int = 1
+        others.foreach(o => {
+          newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, o, upStreamNames.get(i))
+          i += 1
+        })
+      }
+      case _: FlatMapProducer[AnyRef, AnyRef] => {
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+      }
+      case _: MapperProducer[AnyRef,AnyRef] => {
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+      }
+      case s: StreamProducer[AnyRef] if dag.inDegreeOf(s) == 0 => {
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+      }
+      case p@_ => throw new IllegalStateException(s"$p can not be put before AlertStreamSink, only StreamUnionProducer,FlatMapProducer and MapProducer are supported")
+    }
+    newStreamProducers
+  }
+
+  protected def replace(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
                       dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], upStreamName: String) : StreamProducer[Any]= {
     var newsp: StreamProducer[Any] = null
     current match {

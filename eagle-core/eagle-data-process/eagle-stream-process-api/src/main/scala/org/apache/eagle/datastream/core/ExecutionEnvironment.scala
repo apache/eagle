@@ -70,6 +70,7 @@ abstract class ExecutionEnvironmentBase(private val conf:Config)  extends Execut
     StreamGroupbyExpansion()
     StreamParallelismConfigExpansion()
     StreamNameExpansion()
+    StreamPersistExpansion()
     GraphPrinter.print(dag,message="After expanded DAG ")
 
     GraphPrinter.printDotDigraph(dag)

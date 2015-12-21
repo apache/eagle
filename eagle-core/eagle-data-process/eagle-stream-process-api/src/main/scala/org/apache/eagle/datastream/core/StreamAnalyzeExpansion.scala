@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -27,44 +28,38 @@ import com.typesafe.config.Config
 /**
  * The expansion job for stream analyze
  * 
- * TODO : should re-use flow with stream alert expansion
+ * TODO : should re-use flow with stream alert expansion, make code cleaner
  */
-class StreamAnalyzeExpansion(config: Config) extends StreamDAGExpansion(config) {
+class StreamAnalyzeExpansion(config: Config) extends StreamAlertExpansion(config) {
 
-  def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) {
-    val iter = dag.iterator()
-    val toBeAddedEdges = new ListBuffer[StreamConnector[Any, Any]]
-    val toBeRemovedVertex = new ListBuffer[StreamProducer[Any]]
-    while (iter.hasNext) {
-      onIteration(toBeAddedEdges, toBeRemovedVertex, dag, iter.next())
-    }
-    // add back edges
-    toBeAddedEdges.foreach(e => {
-      dag.addVertex(e.from)
-      dag.addVertex(e.to)
-      dag.addEdge(e.from, e.to, e)
-    })
-    toBeRemovedVertex.foreach(v => dag.removeVertex(v))
-  }
-
-  def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any, Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
-    dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]], current: StreamProducer[Any]): Unit = {
-    current match {
+  override def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any, Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
+    dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]], current: StreamProducer[Any],
+    child: StreamProducer[Any]): Unit = {
+    child match {
       case AnalyzeProducer(upStreamNames, analyzerId, cepQl, strategy) => {
+        /**
+         * Rewrite the tree to add output field wrapper since policy executors accept only fixed tuple format 
+         */
+        val newStreamProducers = rewriteWithStreamOutputWrapper(current, dag, toBeAddedEdges, toBeRemovedVertex, upStreamNames)
+        
         val analyzeExecutors = AnalyzeExecutorFactory.Instance.createExecutors(config, upStreamNames, analyzerId);
         analyzeExecutors.foreach(exec => {
           val t = FlatMapProducer(exec).nameAs(exec.getExecutorId() + "_" + exec.getPartitionSeq()).initWith(dag,config, hook = false)
 
           // connect with previous
-          val incomingEdges = dag.incomingEdgesOf(current)
-          incomingEdges.foreach(e => toBeAddedEdges += StreamConnector(e.from, t, e))
+          if (strategy == null) {
+            newStreamProducers.foreach(s => toBeAddedEdges += StreamConnector(s, t))
+          } else {
+            newStreamProducers.foreach(s => toBeAddedEdges += StreamConnector(s, t, strategy))
+          }
 
           // connect with next
-          val outgoingEdges = dag.outgoingEdgesOf(current)
+          val outgoingEdges = dag.outgoingEdgesOf(child)
           outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(t, e.to, e))
         })
-
-        toBeRemovedVertex += current
+        
+        // remote current child
+        toBeRemovedVertex += child
       }
       case _ => 
     }
@@ -73,8 +68,8 @@ class StreamAnalyzeExpansion(config: Config) extends StreamDAGExpansion(config) 
 }
 
 object StreamAnalyzeExpansion{
-  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamAlertExpansion ={
-    val e = StreamAlertExpansion(config)
+  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamAnalyzeExpansion ={
+    val e = new StreamAnalyzeExpansion(config)
     e.expand(dag)
     e
   }

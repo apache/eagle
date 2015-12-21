@@ -22,8 +22,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.eagle.datastream.FlatMapper
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
-
 import scala.reflect.runtime.{universe => ru}
+import org.apache.eagle.dataproc.impl.analyze.entity.AnalyzeEntity
 
 /**
  * StreamInfo should be fully serializable and having not runtime type information
@@ -144,8 +144,13 @@ trait StreamProtocol[+T <: Any]{
    * @return
    */
   def groupByKey(keyer:T => Any):StreamProducer[T]
+
   def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
+  def analyze(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy) : StreamProducer[AnalyzeEntity]
+  
+  def persist(): StreamProducer[T]
+  
   /**
    * Set processing element parallelism setting
    * @param parallelismNum parallelism value
