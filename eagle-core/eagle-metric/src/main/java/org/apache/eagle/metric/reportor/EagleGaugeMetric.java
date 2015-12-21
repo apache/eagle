@@ -17,24 +17,29 @@
  *
  */
 
-package org.apache.eagle.service.client;
+package org.apache.eagle.metric.reportor;
 
-import java.io.Serializable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ServiceConfig implements Serializable{
-    public String serviceHost;
-    public Integer servicePort;
-    public String username;
-    public String password;
+import java.util.Arrays;
+import java.util.Map;
 
-    public ServiceConfig() {
+public class EagleGaugeMetric extends EagleMetric {
 
+    private static final Logger LOG = LoggerFactory.getLogger(EagleGaugeMetric.class);
+
+    public EagleGaugeMetric(long latestUserTimeClock, String name, double value) {
+        super(latestUserTimeClock, name, value, 0);
     }
 
-    public ServiceConfig(String serviceHost, Integer servicePort, String username, String password) {
-        this.serviceHost = serviceHost;
-        this.servicePort = servicePort;
-        this.username = username;
-        this.password = password;
+    public EagleGaugeMetric(EagleGaugeMetric metric) {
+        super(metric);
+    }
+
+    public boolean update(double d, long currentUserTimeClock) {
+        value.getAndSet(d);
+        this.latestUserTimeClock = currentUserTimeClock;
+        return true;
     }
 }

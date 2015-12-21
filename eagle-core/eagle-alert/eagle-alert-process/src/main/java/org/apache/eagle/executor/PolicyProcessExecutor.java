@@ -17,12 +17,10 @@
 package org.apache.eagle.executor;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.alert.common.AlertConstants;
@@ -43,15 +41,18 @@ import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
-import org.apache.eagle.metric.CountingMetric;
-import org.apache.eagle.metric.Metric;
-import org.apache.eagle.metric.report.EagleServiceMetricReport;
+import org.apache.eagle.metric.reportor.EagleCounterMetric;
+import org.apache.eagle.metric.reportor.EagleMetricListener;
+import org.apache.eagle.metric.reportor.EagleServiceReporterMetricListener;
+import org.apache.eagle.metric.reportor.MetricKeyCodeDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.MetricRegistry;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
+
+import org.apache.eagle.datastream.Tuple2;
 
 /**
  * The stream process executor based on two types
@@ -88,11 +89,11 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 	/**
 	 * metricMap's key = metricName[#policyId]
 	 */
-	private Map<String, Metric> metricMap;
 	private Map<String, Map<String, String>> dimensionsMap; // cache it for performance
 	private Map<String, String> baseDimensions;
-	private Thread metricReportThread;
-	private EagleServiceMetricReport metricReport;
+
+	private MetricRegistry registry;
+	private EagleMetricListener listener;
 
 	private PolicyDefinitionDAO<T> policyDefinitionDao;
 
@@ -137,16 +138,18 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 	}
 	
 	public void initMetricReportor() {
-		String eagleServiceHost = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-		int eagleServicePort = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
+		String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
+		int port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
 
 		String username = config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) ?
 				          config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) : null;
 		String password = config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) ?
 				          config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) : null;
-		this.metricReport = new EagleServiceMetricReport(eagleServiceHost, eagleServicePort, username, password);
-
-		metricMap = new ConcurrentHashMap<String, Metric>();
+		
+		registry = new MetricRegistry();
+		listener = new EagleServiceReporterMetricListener(host, port, username, password);
+		
+		baseDimensions = new HashMap<>();
 		baseDimensions = new HashMap<String, String>();
 		baseDimensions.put(AlertConstants.ALERT_EXECUTOR_ID, executorId);
 		baseDimensions.put(AlertConstants.PARTITIONSEQ, String.valueOf(partitionSeq));
@@ -155,20 +158,11 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 		baseDimensions.put(EagleConfigConstants.SITE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE));
 
 		dimensionsMap = new HashMap<String, Map<String, String>>();
-		this.metricReportThread = new Thread() {
-			@Override
-			public void run() {
-				runMetricReporter();
-			}
-		};
-		this.metricReportThread.setDaemon(true);
-		metricReportThread.start();
 	}
 
 	@Override
 	public void init() {
 		// initialize StreamMetadataManager before it is used
-		// TODO : use the same stream schema definition
 		StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAOImpl(config));
 		// for each AlertDefinition, to create a PolicyEvaluator
 		Map<String, PolicyEvaluator<T>> tmpPolicyEvaluators = new HashMap<String, PolicyEvaluator<T>>();
@@ -273,44 +267,17 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 		return value / granularity * granularity;
 	}
 
-	public void runMetricReporter() {
-		while(true) {
-			try {
-				long current = System.currentTimeMillis();
-				List<Metric> metricList = new ArrayList<Metric>();
-				synchronized (this.metricMap) {
-					for (Entry<String, Metric> entry : metricMap.entrySet()) {
-						String name = entry.getKey();
-						Metric metric = entry.getValue();
-						long previous = metric.getTimestamp();
-						if (current > previous + MERITE_GRANULARITY) {
-							metricList.add(metric);
-							metricMap.put(name, new CountingMetric(trim(current, MERITE_GRANULARITY), metric.getDimensions(), metric.getMetricName()));
-						}
-					}
-				}
-				if (metricList.size() > 0) {
-					LOG.info("Going to persist alert metrics, size: " + metricList.size());
-					metricReport.emit(metricList);
-				}
-				try {
-					Thread.sleep(MERITE_GRANULARITY / 2);
-					} catch (InterruptedException ex) { /* Do nothing */ }
-				}
-			catch (Throwable t) {
-				LOG.error("Got a throwable in metricReporter " , t);
-			}
-		}
-	}
-
 	public void updateCounter(String name, Map<String, String> dimensions, double value) {
 		long current = System.currentTimeMillis();
-		synchronized (metricMap) {
-			if (metricMap.get(name) == null) {
-				String metricName = name.split("#")[0];
-				metricMap.put(name, new CountingMetric(trim(current, MERITE_GRANULARITY), dimensions, metricName));
-			}
-			metricMap.get(name).update(value);
+		String metricName = MetricKeyCodeDecoder.codeMetricKey(name, dimensions);
+		if (registry.getMetrics().get(metricName) == null) {
+			EagleCounterMetric metric = new EagleCounterMetric(current, metricName, value, MERITE_GRANULARITY);
+			metric.registerListener(listener);
+			registry.register(metricName, metric);
+		} else {
+			EagleCounterMetric metric = (EagleCounterMetric) registry.getMetrics().get(metricName);
+			metric.update(value, current);
+			// TODO: need remove unused metric from registry
 		}
 	}
 	
@@ -327,10 +294,6 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
 		return dimensionsMap.get(policyId);
 	}
 	
-	public String getMetricKey(String metricName, String policy) {
-		return metricName + "#" + policy;
-	}
-
     /**
      * within this single executor, execute all PolicyEvaluator sequentially
      * the contract for input:
@@ -352,7 +315,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
                 for(Entry<String, PolicyEvaluator<T>> entry : policyEvaluators.entrySet()){
                     String policyId = entry.getKey();
                     PolicyEvaluator<T> evaluator = entry.getValue();
-                    updateCounter(getMetricKey(EAGLE_POLICY_EVAL_COUNT, policyId), getDimensions(policyId));
+                    updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
                     try {
                         PolicyEvaluationContext<T, K> evaluationContext = new PolicyEvaluationContext<T, K>();
                         evaluationContext.alertExecutor = this;
@@ -363,7 +326,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
                     }
                     catch (Exception ex) {
                         LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
-                        updateCounter(getMetricKey(EAGLE_POLICY_EVAL_FAIL_COUNT, policyId), getDimensions(policyId));
+                        updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
                     }
                 }
             }
@@ -428,7 +391,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K>
             LOG.info(String.format("Detected %s alerts for policy %s",alerts.size(),policyId));
 			Collector outputCollector = context.outputCollector;
 			PolicyEvaluator<T> evaluator = context.evaluator;
-			updateCounter(getMetricKey(EAGLE_ALERT_COUNT, policyId), getDimensions(policyId), alerts.size());
+			updateCounter(EAGLE_ALERT_COUNT, getDimensions(policyId), alerts.size());
 			for (K entity : alerts) {
 				synchronized(this) {
 					outputCollector.collect(new Tuple2(policyId, entity));

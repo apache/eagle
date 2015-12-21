@@ -17,24 +17,12 @@
  *
  */
 
-package org.apache.eagle.service.client;
+package org.apache.eagle.metric.reportor;
 
-import java.io.Serializable;
+import java.util.Map;
 
-public class ServiceConfig implements Serializable{
-    public String serviceHost;
-    public Integer servicePort;
-    public String username;
-    public String password;
-
-    public ServiceConfig() {
-
-    }
-
-    public ServiceConfig(String serviceHost, Integer servicePort, String username, String password) {
-        this.serviceHost = serviceHost;
-        this.servicePort = servicePort;
-        this.username = username;
-        this.password = password;
-    }
+public class EagleMetricKey {
+    public String metricName;
+    public Map<String, String> tags;
+    public long timestamp;
 }
