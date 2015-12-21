@@ -42,19 +42,24 @@ public class TestAggregation {
 	note4: what is output for aggregation? If it is druid, then we need a following DruidPersistenceTask
 	 * </pre>
 	 */
-	@Test
-	public void test01DownSampling() throws Exception {
-		String stream = "define stream jmxMetric (cpu int, memory int, bytesIn long, bytesOut long, timestamp long);";
-		String query = "@info(name = 'downSample') " + 
-					"from jmxMetric#window.timeBatch(3 sec) "
-					+ "select avg(cpu) as avgCpu, max(cpu) as maxCpu, avg(memory) as avgMem, max(memory) as maxMem,"
-					+ "avg(bytesIn) as avgBytesIn, max(bytesIn) as maxBytesIn, "
-					+ "avg(bytesOut) as avgBytesOut, max(bytesOut) as maxBytesOut,"
-					+ "timestamp as timeWindowEnds, "
-					+ " count(1) as count "
-//					+ " output snapshot every 3 sec "
-					// expired-events
-					+ "INSERT  INTO tmp;";
+    @Test
+    public void test01DownSampling() throws Exception {
+        String stream = "define stream jmxMetric(cpu int, memory int, bytesIn int, bytesOut long, timestamp long);";
+        String query = "@info(name = 'downSample') " 
+                + "from jmxMetric#window.timeBatch(3 sec) "
+                + "select "
+                + "avg(cpu) as avgCpu, max(cpu) as maxCpu, "
+                + " avg(memory) as avgMem, max(memory) as maxMem, "
+                + " avg(bytesIn) as avgBytesIn, max(bytesIn) as maxBytesIn, "
+//                + " avg(bytesOut) as avgBytesOut, max(bytesOut) as maxBytesOut " 
+//                + " , "
+//                + " min(cpu) as minCpu, max(cpu) as maxCpu, avg(cpu) as avgCpu, "
+                + " timestamp as timeWindowEnds "
+                + " , "
+                + " count(1) as errorCount "
+//                + " output snapshot every 3 sec "
+                // expired-events
+                + " INSERT  INTO tmp;";
 
 		SiddhiManager sm = new SiddhiManager();
 		ExecutionPlanRuntime plan = sm.createExecutionPlanRuntime(stream + query);
