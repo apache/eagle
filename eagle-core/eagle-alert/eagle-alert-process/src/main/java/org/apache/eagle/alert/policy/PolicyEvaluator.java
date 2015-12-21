@@ -18,14 +18,14 @@ package org.apache.eagle.alert.policy;
 
 import java.util.Map;
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.dataproc.core.ValuesArray;
 
 /***
  * 
  * @param <T> - The policy definition entity
  */
-public interface PolicyEvaluator<T extends AbstractPolicyEntity> {
+public interface PolicyEvaluator<T extends AbstractPolicyDefinitionEntity> {
 	/**
 	 * take input and evaluate expression
 	 * input has 3 fields, first is siddhiAlertContext, second one is streamName, the third is map of attribute name/value

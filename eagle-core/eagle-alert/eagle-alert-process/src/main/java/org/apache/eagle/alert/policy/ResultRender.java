@@ -18,7 +18,7 @@ package org.apache.eagle.alert.policy;
 
 import java.util.List;
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.siddhi.PolicyEvaluationContext;
 
 import com.typesafe.config.Config;
@@ -27,7 +27,7 @@ import com.typesafe.config.Config;
  * @since Dec 17, 2015
  *
  */
-public interface ResultRender<T extends AbstractPolicyEntity, K> {
+public interface ResultRender<T extends AbstractPolicyDefinitionEntity, K> {
 
 	K render(Config config, List<String> rets, PolicyEvaluationContext<T, K> siddhiAlertContext, long timestamp);
 

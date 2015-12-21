@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.event.Event;
@@ -35,7 +35,7 @@ import com.typesafe.config.Config;
  * @param <T> - The policy definition type
  * @param <K> - K the alert entity type
  */
-public class SiddhiQueryCallbackImpl<T extends AbstractPolicyEntity, K> extends QueryCallback{
+public class SiddhiQueryCallbackImpl<T extends AbstractPolicyDefinitionEntity, K> extends QueryCallback{
 
 	private SiddhiPolicyEvaluator<T, K> evaluator;
 	public static final Logger LOG = LoggerFactory.getLogger(SiddhiQueryCallbackImpl.class);

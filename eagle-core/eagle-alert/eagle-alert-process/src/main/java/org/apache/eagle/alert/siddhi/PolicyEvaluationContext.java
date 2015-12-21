@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.alert.siddhi;
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.policy.PolicyEvaluator;
 import org.apache.eagle.alert.policy.ResultRender;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.executor.PolicyProcessExecutor;
 
-public class PolicyEvaluationContext<T extends AbstractPolicyEntity, K> {
+public class PolicyEvaluationContext<T extends AbstractPolicyDefinitionEntity, K> {
 	
 	public PolicyProcessExecutor<T, K> alertExecutor;
 	

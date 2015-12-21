@@ -19,7 +19,7 @@ package org.apache.eagle.executor;
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.config.AbstractPolicyDefinition;
 import org.apache.eagle.alert.dao.AlertStreamSchemaDAOImpl;
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.policy.PolicyEvaluator;
 import org.apache.eagle.alert.policy.PolicyManager;
@@ -40,20 +40,15 @@ import junit.framework.Assert;
  */
 public class TestPolicyExecutor {
 
-	public static class T2 extends AbstractPolicyEntity {
-
+	public static class T2 extends AbstractPolicyDefinitionEntity {
 		@Override
 		public String getPolicyDef() {
-			// TODO Auto-generated method stub
 			return null;
 		}
-
 		@Override
 		public boolean isEnabled() {
-			// TODO Auto-generated method stub
 			return false;
 		}
-
 	}
 
 	// not feasible to Unit test, it requires the local service.

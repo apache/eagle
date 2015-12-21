@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ import com.typesafe.config.Config;
  *
  * @param <T>
  */
-public class DynamicPolicyLoader<T extends AbstractPolicyEntity> {
+public class DynamicPolicyLoader<T extends AbstractPolicyDefinitionEntity> {
 	private static final Logger LOG = LoggerFactory.getLogger(DynamicPolicyLoader.class);
 	
 	private volatile CopyOnWriteHashMap<String, List<PolicyLifecycleMethods<T>>> policyChangeListeners = new CopyOnWriteHashMap<String, List<PolicyLifecycleMethods<T>>>();
@@ -70,7 +70,7 @@ public class DynamicPolicyLoader<T extends AbstractPolicyEntity> {
 	private static ConcurrentHashMap<Class, DynamicPolicyLoader> maps = new ConcurrentHashMap<Class, DynamicPolicyLoader>();
 	
 	@SuppressWarnings("unchecked")
-	public static <K extends AbstractPolicyEntity> DynamicPolicyLoader<K> getInstanceOf(Class<K> clz) {
+	public static <K extends AbstractPolicyDefinitionEntity> DynamicPolicyLoader<K> getInstanceOf(Class<K> clz) {
 		if (maps.containsKey(clz)) {
 			return maps.get(clz);
 		} else {
@@ -166,7 +166,7 @@ public class DynamicPolicyLoader<T extends AbstractPolicyEntity> {
 		}
 	}
 	
-	public static class DynamicPolicySource<M extends AbstractPolicyEntity> implements PolledConfigurationSource {
+	public static class DynamicPolicySource<M extends AbstractPolicyDefinitionEntity> implements PolledConfigurationSource {
 		private static Logger LOG = LoggerFactory.getLogger(DynamicPolicySource.class);
 		private Config config;
 		private PolicyDefinitionDAO<M> dao;
@@ -227,7 +227,7 @@ public class DynamicPolicyLoader<T extends AbstractPolicyEntity> {
 	
 	public static class PolicyComparator {
 		
-		public static <M extends AbstractPolicyEntity> void compare(String alertExecutorId, Map<String, M> newPolicies, Map<String, M> cachedPolicies, 
+		public static <M extends AbstractPolicyDefinitionEntity> void compare(String alertExecutorId, Map<String, M> newPolicies, Map<String, M> cachedPolicies, 
 				Map<String, Object> added, Map<String, Object> changed, Map<String, Object> deleted){
 			Set<String> newPolicyIds = newPolicies.keySet();
             Set<String> cachedPolicyIds = cachedPolicies != null ? cachedPolicies.keySet() : new HashSet<String>();

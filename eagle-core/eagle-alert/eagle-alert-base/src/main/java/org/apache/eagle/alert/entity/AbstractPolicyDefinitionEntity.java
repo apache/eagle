@@ -19,7 +19,7 @@ package org.apache.eagle.alert.entity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 @SuppressWarnings("serial")
-public abstract class AbstractPolicyEntity extends TaggedLogAPIEntity {
+public abstract class AbstractPolicyDefinitionEntity extends TaggedLogAPIEntity {
 	
 	public abstract String getPolicyDef();
 	

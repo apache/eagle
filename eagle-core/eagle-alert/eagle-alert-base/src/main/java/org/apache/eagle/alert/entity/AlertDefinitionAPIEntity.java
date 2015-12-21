@@ -50,7 +50,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Indexes({
 	@Index(name="Index_1_alertExecutorId", columns = { "alertExecutorID" }, unique = true),
 })
-public class AlertDefinitionAPIEntity extends AbstractPolicyEntity {
+public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 	@Column("a")
 	private String desc;
 	@Column("b")

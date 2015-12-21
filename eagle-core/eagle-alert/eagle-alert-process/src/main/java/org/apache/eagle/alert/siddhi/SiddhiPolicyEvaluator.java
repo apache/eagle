@@ -27,7 +27,7 @@ import java.util.TreeSet;
 
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.config.AbstractPolicyDefinition;
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.alert.policy.PolicyEvaluator;
 import org.apache.eagle.alert.policy.PolicyManager;
@@ -48,7 +48,7 @@ import com.typesafe.config.Config;
  * when policy is updated or deleted, SiddhiManager.shutdown should be invoked to release resources.
  * during this time, synchronization is important
  */
-public class SiddhiPolicyEvaluator<T extends AbstractPolicyEntity, K> implements PolicyEvaluator<T>{
+public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> implements PolicyEvaluator<T>{
 	
 	public static final int DEFAULT_QUEUE_SIZE = 1000;
 

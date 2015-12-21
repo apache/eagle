@@ -20,14 +20,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.policy.PolicyEvaluatorServiceProvider;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-public class SiddhiPolicyEvaluatorServiceProviderImpl<T extends AbstractPolicyEntity> implements PolicyEvaluatorServiceProvider<T> {
+public class SiddhiPolicyEvaluatorServiceProviderImpl<T extends AbstractPolicyDefinitionEntity> implements PolicyEvaluatorServiceProvider<T> {
 	@Override
 	public String getPolicyType() {
 		return AlertConstants.policyType.siddhiCEPEngine.name();

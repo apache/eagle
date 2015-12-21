@@ -18,9 +18,9 @@ package org.apache.eagle.alert.policy;
 
 import java.util.Map;
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 
-public interface PolicyLifecycleMethods<T extends AbstractPolicyEntity> {
+public interface PolicyLifecycleMethods<T extends AbstractPolicyDefinitionEntity> {
 	void onPolicyCreated(Map<String, T> added);
 	void onPolicyChanged(Map<String, T> changed);
 	void onPolicyDeleted(Map<String, T> deleted);

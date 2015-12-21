@@ -20,12 +20,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 
 /**
  * @param <T> - Policy definition type
  */
-public interface PolicyDefinitionDAO<T extends AbstractPolicyEntity> extends Serializable{
+public interface PolicyDefinitionDAO<T extends AbstractPolicyDefinitionEntity> extends Serializable{
 	/**
 	 * find list of active alert definitions for one specific site and dataSource
 	 * @return

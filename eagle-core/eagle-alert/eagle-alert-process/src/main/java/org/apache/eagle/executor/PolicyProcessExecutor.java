@@ -27,7 +27,7 @@ import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.config.AbstractPolicyDefinition;
 import org.apache.eagle.alert.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.policy.DynamicPolicyLoader;
 import org.apache.eagle.alert.policy.PolicyEvaluator;
 import org.apache.eagle.alert.policy.PolicyLifecycleMethods;
@@ -61,7 +61,7 @@ import org.apache.eagle.datastream.Tuple2;
  * @param <T> - The policy definition entity type
  * @param <K> - The stream entity type
  */
-public class PolicyProcessExecutor<T extends AbstractPolicyEntity, K> 
+public class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K> 
 		extends JavaStormStreamExecutor2<String, K> 
 		implements PolicyLifecycleMethods<T>, SiddhiEvaluationHandler<T, K> {
 	

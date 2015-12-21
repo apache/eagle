@@ -17,7 +17,7 @@
 package org.apache.eagle.dataproc.impl.analyze.entity;
 
 import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.log.entity.meta.Column;
 import org.apache.eagle.log.entity.meta.ColumnFamily;
 import org.apache.eagle.log.entity.meta.Index;
@@ -46,7 +46,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 	@Index(name="Index_1_analyzeExecutorId", columns = { "analyzeExecutorID" }, unique = true),
 })
 @SuppressWarnings("serial")
-public class AnalyzeDefinitionAPIEntity extends AbstractPolicyEntity {
+public class AnalyzeDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 
 	@Column("a")
 	private String name;

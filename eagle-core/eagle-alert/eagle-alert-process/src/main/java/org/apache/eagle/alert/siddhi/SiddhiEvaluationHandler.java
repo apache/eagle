@@ -18,9 +18,9 @@ package org.apache.eagle.alert.siddhi;
 
 import java.util.List;
 
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 
-public interface SiddhiEvaluationHandler<T extends AbstractPolicyEntity, K> {
+public interface SiddhiEvaluationHandler<T extends AbstractPolicyDefinitionEntity, K> {
 
 	void onEvalEvents(PolicyEvaluationContext<T, K> context, List<K> alerts);
 }

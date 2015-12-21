@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.entity.AbstractPolicyEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @since Dec 17, 2015
  *
  */
-public class PolicyEnityDAOImpl<T extends AbstractPolicyEntity> implements PolicyDefinitionDAO<T> {
+public class PolicyEnityDAOImpl<T extends AbstractPolicyDefinitionEntity> implements PolicyDefinitionDAO<T> {
 
 	private static final long serialVersionUID = 1L;
 
