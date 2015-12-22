@@ -1,0 +1,5 @@
+import org.apache.eagle.stream.dsl.experimental.StreamInterface._
+import org.apache.eagle.stream.dsl.experimental.StringPrefix._
+import org.apache.eagle.stream.dsl.experimental.AlertInterface._
+import org.apache.eagle.stream.dsl.experimental.AggregateInterface._
+import org.apache.eagle.stream.dsl.experimental.DefineInterface._
