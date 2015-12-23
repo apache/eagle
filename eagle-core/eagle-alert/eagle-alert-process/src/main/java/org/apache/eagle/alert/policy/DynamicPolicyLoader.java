@@ -42,13 +42,20 @@ import com.netflix.config.PolledConfigurationSource;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 
+/**
+ * JVM level singleton, so multiple alert executor may share the same policy loader
+ */
 public class DynamicPolicyLoader {
 	private static final Logger LOG = LoggerFactory.getLogger(DynamicPolicyLoader.class);
 	
 	private final int defaultInitialDelayMillis = 30*1000;
 	private final int defaultDelayMillis = 60*1000;
 	private final boolean defaultIgnoreDeleteFromSource = true;
+    /**
+     * one alertExecutorId may be paralleled by data, that is why there is a list of PolicyLifecycleMethods
+     */
 	private volatile CopyOnWriteHashMap<String, List<PolicyLifecycleMethods>> policyChangeListeners = new CopyOnWriteHashMap<String, List<PolicyLifecycleMethods>>();
+    private volatile CopyOnWriteHashMap<String, List<PolicyDistributionReportMethods>> policyDistributionUpdaters = new CopyOnWriteHashMap<String, List<PolicyDistributionReportMethods>>();
 	private static DynamicPolicyLoader instance = new DynamicPolicyLoader();
 	private volatile boolean initialized = false;
 	
@@ -60,6 +67,15 @@ public class DynamicPolicyLoader {
 			policyChangeListeners.get(alertExecutorId).add(alertExecutor);
 		}
 	}
+
+    public void addPolicyDistributionUpdateListener(String alertExecutorId, PolicyDistributionReportMethods policyDistUpdater){
+        synchronized(policyDistributionUpdaters) {
+            if(policyDistributionUpdaters.get(alertExecutorId) == null) {
+                policyDistributionUpdaters.put(alertExecutorId, new ArrayList<PolicyDistributionReportMethods>());
+            }
+            policyDistributionUpdaters.get(alertExecutorId).add(policyDistUpdater);
+        }
+    }
 	
 	public static DynamicPolicyLoader getInstance(){
 		return instance;
@@ -128,6 +144,14 @@ public class DynamicPolicyLoader {
 						}
 					}
 				}
+
+                // notify policyDistributionUpdaters
+                for(Map.Entry<String, List<PolicyDistributionReportMethods>> entry : policyDistributionUpdaters.entrySet()){
+                    String alertExecutorId = entry.getKey();
+                    for(PolicyDistributionReportMethods policyDistributionUpdateMethod : entry.getValue()){
+                        policyDistributionUpdateMethod.report();
+                    }
+                }
 			}
 			private String trimPartitionNum(String alertExecutorId){
 				int i = alertExecutorId.lastIndexOf('_');
@@ -205,6 +229,7 @@ public class DynamicPolicyLoader {
 			}
 			
 			cachedAlertDefs = newAlertDefs;
+
 			return PollResult.createIncremental(added, changed, deleted, new Date().getTime());
 		}
 	}

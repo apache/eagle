@@ -23,6 +23,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.config.AbstractPolicyDefinition;
 import org.apache.eagle.alert.dao.AlertDefinitionDAO;
+import org.apache.eagle.alert.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.alert.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEntity> implements PolicyLifecycleMethods, SiddhiAlertHandler {
+public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEntity> implements PolicyLifecycleMethods, SiddhiAlertHandler, PolicyDistributionReportMethods {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOG = LoggerFactory.getLogger(AlertExecutor.class);
@@ -107,6 +108,10 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 	public AlertDefinitionDAO getAlertDefinitionDao() {
 		return alertDefinitionDao;
 	}
+
+    public Map<String, PolicyEvaluator> getPolicyEvaluators(){
+        return policyEvaluators;
+    }
 	
 	@Override
 	public void prepareConfig(Config config) {
@@ -135,10 +140,19 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		dimensionsMap = new HashMap<>();
 	}
 
+    /**
+     * for unit test purpose only
+     * @param config
+     * @return
+     */
+    public AlertStreamSchemaDAO getAlertStreamSchemaDAO(Config config){
+        return new AlertStreamSchemaDAOImpl(config);
+    }
+
 	@Override
 	public void init() {
 		// initialize StreamMetadataManager before it is used
-		StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAOImpl(config));
+		StreamMetadataManager.getInstance().init(config, getAlertStreamSchemaDAO(config));
 		// for each AlertDefinition, to create a PolicyEvaluator
 		Map<String, PolicyEvaluator> tmpPolicyEvaluators = new HashMap<String, PolicyEvaluator>();
 		
@@ -169,7 +183,9 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		DynamicPolicyLoader policyLoader = DynamicPolicyLoader.getInstance();
 		
 		policyLoader.init(initialAlertDefs, alertDefinitionDao, config);
-		policyLoader.addPolicyChangeListener(alertExecutorId + "_" + partitionSeq, this);
+        String fullQualifiedAlertExecutorId = alertExecutorId + "_" + partitionSeq;
+		policyLoader.addPolicyChangeListener(fullQualifiedAlertExecutorId, this);
+        policyLoader.addPolicyDistributionUpdateListener(fullQualifiedAlertExecutorId, this);
 		LOG.info("Alert Executor created, partitionSeq: " + partitionSeq + " , numPartitions: " + numPartitions);
         LOG.info("All policy evaluators: " + policyEvaluators);
 		
@@ -370,4 +386,10 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 			}
 		}
 	}
+
+    @Override
+    public void report() {
+        PolicyDistStatsDAOLogReporter appender = new PolicyDistStatsDAOLogReporter();
+        appender.reportPolicyMembership(alertExecutorId, policyEvaluators.keySet());
+    }
 }
