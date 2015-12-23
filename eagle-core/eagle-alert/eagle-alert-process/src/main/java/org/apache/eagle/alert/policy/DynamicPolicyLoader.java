@@ -52,7 +52,7 @@ public class DynamicPolicyLoader {
 	private final int defaultDelayMillis = 60*1000;
 	private final boolean defaultIgnoreDeleteFromSource = true;
     /**
-     * one alertExecutorId may be paralleled by data, that is why there is a list of PolicyLifecycleMethods
+     * one alertExecutor may have multiple instances, that is why there is a list of PolicyLifecycleMethods
      */
 	private volatile CopyOnWriteHashMap<String, List<PolicyLifecycleMethods>> policyChangeListeners = new CopyOnWriteHashMap<String, List<PolicyLifecycleMethods>>();
     private volatile CopyOnWriteHashMap<String, List<PolicyDistributionReportMethods>> policyDistributionUpdaters = new CopyOnWriteHashMap<String, List<PolicyDistributionReportMethods>>();
@@ -68,7 +68,7 @@ public class DynamicPolicyLoader {
 		}
 	}
 
-    public void addPolicyDistributionUpdateListener(String alertExecutorId, PolicyDistributionReportMethods policyDistUpdater){
+    public void addPolicyDistributionReporter(String alertExecutorId, PolicyDistributionReportMethods policyDistUpdater){
         synchronized(policyDistributionUpdaters) {
             if(policyDistributionUpdaters.get(alertExecutorId) == null) {
                 policyDistributionUpdaters.put(alertExecutorId, new ArrayList<PolicyDistributionReportMethods>());
@@ -147,7 +147,6 @@ public class DynamicPolicyLoader {
 
                 // notify policyDistributionUpdaters
                 for(Map.Entry<String, List<PolicyDistributionReportMethods>> entry : policyDistributionUpdaters.entrySet()){
-                    String alertExecutorId = entry.getKey();
                     for(PolicyDistributionReportMethods policyDistributionUpdateMethod : entry.getValue()){
                         policyDistributionUpdateMethod.report();
                     }

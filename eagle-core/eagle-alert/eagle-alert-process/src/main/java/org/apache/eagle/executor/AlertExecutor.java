@@ -185,7 +185,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		policyLoader.init(initialAlertDefs, alertDefinitionDao, config);
         String fullQualifiedAlertExecutorId = alertExecutorId + "_" + partitionSeq;
 		policyLoader.addPolicyChangeListener(fullQualifiedAlertExecutorId, this);
-        policyLoader.addPolicyDistributionUpdateListener(fullQualifiedAlertExecutorId, this);
+        policyLoader.addPolicyDistributionReporter(fullQualifiedAlertExecutorId, this);
 		LOG.info("Alert Executor created, partitionSeq: " + partitionSeq + " , numPartitions: " + numPartitions);
         LOG.info("All policy evaluators: " + policyEvaluators);
 		
@@ -389,7 +389,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 
     @Override
     public void report() {
-        PolicyDistStatsDAOLogReporter appender = new PolicyDistStatsDAOLogReporter();
-        appender.reportPolicyMembership(alertExecutorId, policyEvaluators.keySet());
+        PolicyDistroStatsLogReporter appender = new PolicyDistroStatsLogReporter();
+        appender.reportPolicyMembership(alertExecutorId + "_" + partitionSeq, policyEvaluators.keySet());
     }
 }

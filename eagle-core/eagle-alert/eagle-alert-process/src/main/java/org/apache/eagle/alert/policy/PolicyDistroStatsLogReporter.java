@@ -27,16 +27,19 @@ import java.util.Set;
 /**
  * just append log
  */
-public class PolicyDistStatsDAOLogReporter implements PolicyDistributionStatsDAO{
-    private static Logger LOG = LoggerFactory.getLogger(PolicyDistStatsDAOLogReporter.class);
+public class PolicyDistroStatsLogReporter implements PolicyDistributionStatsDAO{
+    private static Logger LOG = LoggerFactory.getLogger(PolicyDistroStatsLogReporter.class);
 
     @Override
     public void reportPolicyMembership(String policyGroupId, Set<String> policyIds) {
         if(policyIds != null){
             StringBuilder sb = new StringBuilder();
-            sb.append("policyDistirbutionStats for " + policyGroupId + "[" + "total: " + policyIds.size() + ", ");
+            sb.append("policyDistributionStats for " + policyGroupId +", total: " + policyIds.size() + ", [");
             for(String policyId : policyIds){
                 sb.append(policyId + ",");
+            }
+            if(policyIds.size() > 0){
+                sb.deleteCharAt(sb.length()-1);
             }
             sb.append("]");
             LOG.info(sb.toString());
