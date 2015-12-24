@@ -65,7 +65,7 @@ case class IterableStreamSpout(iterable: Iterable[Any],recycle:Boolean = true)(i
     if(info.outKeyed) {
       declarer.declare(new Fields(NameConstants.FIELD_KEY,NameConstants.FIELD_VALUE))
     }else{
-      declarer.declare(new Fields(NameConstants.FIELD_PREFIX))
+      declarer.declare(new Fields(s"${NameConstants.FIELD_PREFIX}0"))
     }
   }
 }

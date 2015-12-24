@@ -1,5 +1,3 @@
-package org.apache.eagle.stream.dsl
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,6 +13,12 @@ package org.apache.eagle.stream.dsl
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * *.egl|*.eagle -> "Eagle General Language" or "EaGLe"
  */
+package org.apache.eagle.stream.dsl.interface
+
+trait ConfigAPIBuilder extends BaseAPIBuilder{
+//  implicit class ConfigKeyPrefix(val sc:StringContext) extends AnyVal {
+//    def c[T](arg:Any)(implicit tag: TypeTag[T]):T = conf[T](arg)
+//    def conf[T](arg:Any)(implicit tag: TypeTag[T]):T = getContext.getConfig.get[T](arg.asInstanceOf[String])
+//  }
+}

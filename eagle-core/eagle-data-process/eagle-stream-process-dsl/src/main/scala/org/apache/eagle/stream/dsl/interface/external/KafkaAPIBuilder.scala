@@ -1,5 +1,3 @@
-package org.apache.eagle.stream.dsl
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,6 +13,22 @@ package org.apache.eagle.stream.dsl
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * *.egl|*.eagle -> "Eagle General Language" or "EaGLe"
  */
+package org.apache.eagle.stream.dsl.interface.external
+
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
+import org.apache.eagle.datastream.core.StreamProducer
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment
+import org.apache.eagle.stream.dsl.interface.BaseAPIBuilder
+
+trait KafkaAPIBuilder extends BaseAPIBuilder{
+  /**
+   * kafka interface without parameters
+   * @return
+   */
+  def kafka:StreamProducer[AnyRef] = this.context.getEnvironment match {
+    case e:StormExecutionEnvironment =>
+      e.fromSpout(new KafkaSourcedSpoutProvider())
+    case e@_ => throw new IllegalStateException(s"kafka only supports as source (i.e. spout) for storm now, but not support environment $e")
+  }
+}

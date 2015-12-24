@@ -72,48 +72,48 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
 
   override def filter(fn : T => Boolean): StreamProducer[T] ={
     val ret = FilterProducer[T](fn)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
   override def flatMap[R](flatMapper:FlatMapper[R]): StreamProducer[R] = {
     val ret = FlatMapProducer[T,R](flatMapper)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
   override def foreach(fn : T => Unit) : Unit = {
     val ret = ForeachProducer[T](fn)
-    hookup(this, ret)
+    connect(this, ret)
   }
 
   override def map[R](fn : T => R) : StreamProducer[R] = {
     val ret = MapperProducer[T,R](0,fn)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
   override def map1[R](fn : T => R): StreamProducer[R] = {
     val ret = MapperProducer[T,R](1, fn)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
   override def map2[R](fn : T => R): StreamProducer[R] = {
     val ret = MapperProducer[T,R](2, fn)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
   override def map3[R](fn : T => R): StreamProducer[R] = {
     val ret = MapperProducer(3, fn)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
   override def map4[R](fn : T => R): StreamProducer[R] = {
     val ret = MapperProducer(4, fn)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
@@ -124,7 +124,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
     val ret = GroupByFieldProducer[T](fields)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
@@ -133,19 +133,19 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
     val ret = GroupByFieldProducer[T](fields.asScala.toSeq.asInstanceOf[Seq[Int]])
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
   override def groupByKey(keySelector: T=> Any):StreamProducer[T] = {
     val ret = GroupByKeyProducer(keySelector)
-    hookup(this,ret)
+    connect(this,ret)
     ret
   }
 
   override def streamUnion[T2,T3](others : Seq[StreamProducer[T2]]) : StreamProducer[T3] = {
     val ret = StreamUnionProducer[T, T2, T3](others)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
@@ -157,7 +157,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
 
   override def groupBy(strategy : PartitionStrategy) : StreamProducer[T] = {
     val ret = GroupByStrategyProducer(strategy)
-    hookup(this, ret)
+    connect(this, ret)
     ret
   }
 
@@ -174,7 +174,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
 
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean=true, strategy : PartitionStrategy=null) = {
     val ret = AlertStreamSink(upStreamNames, alertExecutorId, consume, strategy)
-    hookup(this, ret)
+    connect(this, ret)
   }
 
   def alertWithConsumer(upStreamName: String, alertExecutorId : String, strategy: PartitionStrategy): Unit ={
@@ -193,10 +193,17 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
 
-  protected def hookup[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2]) = {
+  def connect[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2]) = {
+    if(current.graph == null) throw new NullPointerException(s"$current has not been registered to any graph before being connected")
     current.graph.addVertex(next)
     current.graph.addEdge(current, next, StreamConnector(current, next))
     passOnContext[T1,T2](current, next)
+  }
+
+  def connect[T2]( next: StreamProducer[T2]) = {
+    this.graph.addVertex(next)
+    this.graph.addEdge(this, next, StreamConnector(this, next))
+    passOnContext[T,T2](this, next)
   }
 
   private def passOnContext[T1 ,T2](current: StreamProducer[T1], next: StreamProducer[T2]): Unit ={
@@ -268,6 +275,8 @@ case class StormSourceProducer[T](source: BaseRichSpout) extends StreamProducer[
     this
   }
 }
+
+case class StreamTransform
 
 case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]
 

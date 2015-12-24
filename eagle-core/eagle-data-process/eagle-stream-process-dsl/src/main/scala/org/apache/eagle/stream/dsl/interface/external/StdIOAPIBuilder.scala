@@ -1,4 +1,6 @@
-package org.apache.eagle.stream.dsl
+package org.apache.eagle.stream.dsl.interface.external
+
+import org.apache.eagle.datastream.core.{ForeachProducer, StreamProducer}
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -15,6 +17,7 @@ package org.apache.eagle.stream.dsl
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * *.egl|*.eagle -> "Eagle General Language" or "EaGLe"
  */
+trait StdIOAPIBuilder {
+  def stdout:StreamProducer[AnyRef] = ForeachProducer[AnyRef](t=>println(t))
+}

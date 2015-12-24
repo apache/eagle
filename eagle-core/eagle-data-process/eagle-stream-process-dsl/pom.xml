@@ -25,6 +25,11 @@
             <artifactId>scalatest_${scala.version}</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>eagle</groupId>
+            <artifactId>eagle-stream-process-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 <build>
 <plugins>
