@@ -30,6 +30,23 @@
     <artifactId>eagle-storage-hbase</artifactId>
 
     <dependencies>
+        <!-- added for jira EAGLE-47 -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>${spring.framework.version}</version>
+		</dependency> 
+        <dependency>
+            <groupId>eagle</groupId>
+            <artifactId>eagle-audit-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eagle</groupId>
+            <artifactId>eagle-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>eagle</groupId>
             <artifactId>eagle-storage-base</artifactId>

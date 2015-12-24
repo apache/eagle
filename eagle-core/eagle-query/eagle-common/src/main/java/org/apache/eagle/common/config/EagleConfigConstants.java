@@ -31,6 +31,7 @@ public final class EagleConfigConstants {
     public final static String SERVICE_THREADPOOL_CORE_SIZE = "eagle.service.threadpool-core-size";
     public final static String SERVICE_THREADPOOL_MAX_SIZE = "eagle.service.threadpool-max-size";
     public final static String SERVICE_THREADPOOL_SHRINK_SIZE = "eagle.service.threadpool-shrink-size";
+    public final static String SERVICE_AUDITING_ENABLED = "eagle.service.audit-enabled";
 
     public final static String EAGLE_TIME_ZONE = "eagle.timezone";
     public final static String DEFAULT_EAGLE_TIME_ZONE = "UTC";

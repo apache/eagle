@@ -38,13 +38,18 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.apache.eagle.audit.common.AuditConstants.AUDIT_EVENT_CREATE;
+import static org.apache.eagle.audit.common.AuditConstants.AUDIT_EVENT_UPDATE;
+import static org.apache.eagle.audit.common.AuditConstants.AUDIT_EVENT_DELETE;
+
 /**
  * @since 3/18/15
  */
 public class HBaseStorage extends DataStorageBase {
 
     private final static Logger LOG = LoggerFactory.getLogger(HBaseStorage.class);
-
+    private HBaseStorageAudit audit = new HBaseStorageAudit();
+    
     @Override
     public void init() throws IOException {
         LOG.info("Initializing");
@@ -52,7 +57,9 @@ public class HBaseStorage extends DataStorageBase {
 
     @Override
     public <E extends TaggedLogAPIEntity> ModifyResult<String> update(List<E> entities, EntityDefinition entityDefinition) throws IOException {
-        return create(entities, entityDefinition);
+    	ModifyResult<String> result = create(entities, entityDefinition);
+    	audit.auditOperation(AUDIT_EVENT_UPDATE, entities, null, entityDefinition); // added for jira: EAGLE-47
+    	return result;
     }
 
     @Override
@@ -66,9 +73,11 @@ public class HBaseStorage extends DataStorageBase {
             LOG.error(e.getMessage(),e);
             throw new IOException(e);
         }
+
+        audit.auditOperation(AUDIT_EVENT_CREATE, entities, null, entityDefinition); // added for jira: EAGLE-47
         return result;
     }
-
+    
     /**
      * @param entities
      * @param entityDefinition
@@ -89,6 +98,8 @@ public class HBaseStorage extends DataStorageBase {
             result.setSuccess(false);
             throw new IOException(ex);
         }
+        
+        audit.auditOperation(AUDIT_EVENT_DELETE, entities, null, entityDefinition); // added for jira: EAGLE-47
         result.setSuccess(true);
         return result;
     }
@@ -113,6 +124,8 @@ public class HBaseStorage extends DataStorageBase {
             result.setSuccess(false);
             throw new IOException(ex);
         }
+        
+        audit.auditOperation(AUDIT_EVENT_DELETE, null, ids, entityDefinition); // added for jira: EAGLE-47
         result.setSuccess(true);
         return result;
     }
