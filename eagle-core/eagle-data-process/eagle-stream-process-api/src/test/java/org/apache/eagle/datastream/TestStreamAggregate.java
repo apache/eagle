@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.datastream.TestStreamAnalyze.DummyExecutor;
-import org.apache.eagle.datastream.TestStreamAnalyze.DummyStrategy;
-import org.apache.eagle.datastream.TestStreamAnalyze.TestEnvironment;
+import org.apache.eagle.datastream.TestStreamAggregate.DummyExecutor;
+import org.apache.eagle.datastream.TestStreamAggregate.DummyStrategy;
+import org.apache.eagle.datastream.TestStreamAggregate.TestEnvironment;
 import org.apache.eagle.datastream.core.FlatMapProducer;
 import org.apache.eagle.datastream.core.StormSourceProducer;
 import org.apache.eagle.datastream.core.StreamConnector;
@@ -50,7 +50,7 @@ import scala.collection.Seq;
  * @since Dec 18, 2015
  *
  */
-public class TestStreamAnalyze {
+public class TestStreamAggregate {
 
 	private Config config;
 
@@ -108,7 +108,7 @@ public class TestStreamAnalyze {
 
 	@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 	@Test
-	public void testAnalyze1() {
+	public void testAggregate1() {
 		StormExecutionEnvironment exe = new TestEnvironment(config);
 		
 		BaseRichSpout spout = new SimpleSpout();
@@ -119,7 +119,7 @@ public class TestStreamAnalyze {
 			public void flatMap(Seq<Object> input, Collector<String> collector) {
 				// do nothing
 			}
-		}).analyze(Arrays.asList("c3EsLogEventStream"), "qid", new DummyStrategy());
+		}).aggregate(Arrays.asList("c3EsLogEventStream"), "qid", new DummyStrategy());
 		
 		try {
 			exe.execute();
@@ -130,11 +130,11 @@ public class TestStreamAnalyze {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 	@Test
-	public void testAnalyze2() {
+	public void testAggregate() {
 		StormExecutionEnvironment exe = new TestEnvironment(config);
 		StormSourceProducer ssp = exe.fromSpout(new SimpleSpout());
 		DummyExecutor dummy = new DummyExecutor();
-		ssp.flatMap(dummy).analyze(Arrays.asList("c3EsLogEventStream"), "analyzeStreamExecutor", new DummyStrategy());
+		ssp.flatMap(dummy).aggregate(Arrays.asList("c3EsLogEventStream"), "analyzeStreamExecutor", new DummyStrategy());
 
 		try {
 			exe.execute();

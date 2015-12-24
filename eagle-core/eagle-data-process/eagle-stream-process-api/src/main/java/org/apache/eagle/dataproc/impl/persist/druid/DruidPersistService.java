@@ -14,13 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.persist;
+package org.apache.eagle.dataproc.impl.persist.druid;
+
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.dataproc.impl.persist.IPersistService;
 
 /**
- * @since Dec 19, 2015
+ * @since Dec 21, 2015
  *
  */
-public interface IPersistService<T> {
+public class DruidPersistService implements IPersistService<AlertAPIEntity> {
 
-	void save(T apiEntity);
+
+	@Override
+	public void save(AlertAPIEntity apiEntity) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

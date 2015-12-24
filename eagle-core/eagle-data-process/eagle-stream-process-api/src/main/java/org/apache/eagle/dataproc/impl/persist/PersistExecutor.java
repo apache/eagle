@@ -37,7 +37,7 @@ public class PersistExecutor extends JavaStormStreamExecutor2<String, AlertAPIEn
 	private static final Logger LOG = LoggerFactory.getLogger(PersistExecutor.class);
 
 	private Config config;
-	private IPersistService persistService;
+	private IPersistService<AlertAPIEntity> persistService;
 	private String executorId;
 
 	public PersistExecutor() {

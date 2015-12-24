@@ -193,7 +193,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
 
-  def analyze(upStreamNames: java.util.List[String], queryExecutorId : String, strategy: PartitionStrategy = null): StreamProducer[AnalyzeEntity] = {
+  def aggregate(upStreamNames: java.util.List[String], queryExecutorId : String, strategy: PartitionStrategy = null): StreamProducer[AnalyzeEntity] = {
     val ret= AnalyzeProducer(upStreamNames, queryExecutorId, null, strategy)
     hookup(this, ret)
     ret

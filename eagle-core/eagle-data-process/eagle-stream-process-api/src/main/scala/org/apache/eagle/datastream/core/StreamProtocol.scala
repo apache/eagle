@@ -147,7 +147,7 @@ trait StreamProtocol[+T <: Any]{
 
   def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
-  def analyze(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy) : StreamProducer[AnalyzeEntity]
+  def aggregate(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy): StreamProducer[AnalyzeEntity]
   
   def persist(): StreamProducer[T]
   

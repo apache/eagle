@@ -22,8 +22,8 @@ import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
 
 import junit.framework.Assert;
 
@@ -44,15 +44,15 @@ public class TestAggregation {
 	 */
     @Test
     public void test01DownSampling() throws Exception {
-        String stream = "define stream jmxMetric(cpu int, memory int, bytesIn int, bytesOut long, timestamp long);";
+        String stream = "define stream jmxMetric(cpu int, memory int, bytesIn long, bytesOut long, timestamp long);";
         String query = "@info(name = 'downSample') " 
                 + "from jmxMetric#window.timeBatch(3 sec) "
                 + "select "
                 + "avg(cpu) as avgCpu, max(cpu) as maxCpu, "
                 + " avg(memory) as avgMem, max(memory) as maxMem, "
                 + " avg(bytesIn) as avgBytesIn, max(bytesIn) as maxBytesIn, "
-//                + " avg(bytesOut) as avgBytesOut, max(bytesOut) as maxBytesOut " 
-//                + " , "
+                + " avg(bytesOut) as avgBytesOut, max(bytesOut) as maxBytesOut " 
+                + " , "
 //                + " min(cpu) as minCpu, max(cpu) as maxCpu, avg(cpu) as avgCpu, "
                 + " timestamp as timeWindowEnds "
                 + " , "
@@ -67,11 +67,17 @@ public class TestAggregation {
 		InputHandler input = plan.getInputHandler("jmxMetric");
 		
 		final AtomicInteger counter = new AtomicInteger();
-		plan.addCallback("jmxMetric", new StreamCallback() {
-			@Override
+		plan.addCallback("downSample", new QueryCallback() {
+//			@Override
 			public void receive(Event[] arg0) {
 				int current = counter.addAndGet(arg0.length);
 //				System.out.println(String.format("number %d event, with values : %s ", current, );
+			}
+
+			@Override
+			public void receive(long arg0, Event[] arg1, Event[] arg2) {
+				// TODO Auto-generated method stub
+				int current = counter.addAndGet(arg1.length);
 			}
 		});
 		
@@ -99,8 +105,8 @@ public class TestAggregation {
 			events[i] = new Event(externalTs + i, new Object[] {
 					15,
 					15,
-					1000,
-					2000,
+					1000L,
+					2000L,
 					externalTs + i
 			});
 		}
