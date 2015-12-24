@@ -49,8 +49,14 @@ trait DefinitionAPIBuilder extends BaseAPIBuilder{
     ProducerSettingAPIBuilder(source)
   }
 
-  def from(iterable:Iterable[AnyRef],recycle:Boolean=true):ProducerSettingAPIBuilder = {
-    val producer = context.getEnvironment.from(iterable,recycle)
+  def from(iterable:Iterable[Any]):ProducerSettingAPIBuilder = {
+    val producer = context.getEnvironment.from(iterable,recycle = false)
+    _instance.setProducer(producer)
+    ProducerSettingAPIBuilder(producer)
+  }
+
+  def from(product:Product):ProducerSettingAPIBuilder = {
+    val producer = context.getEnvironment.from(product)
     _instance.setProducer(producer)
     ProducerSettingAPIBuilder(producer)
   }

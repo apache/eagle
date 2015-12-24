@@ -22,7 +22,7 @@ object StreamAPPExample extends App {
   init[storm](args)
 
   // define("metric") as("name" -> 'string, "value" -> 'double, "timestamp" -> 'long) from kafka parallism 10
-  define("metric") as("name" -> 'string, "value" -> 'double, "timestamp" -> 'long) from Seq("1","2") parallism 1
+  define("metric") as("name" -> 'string, "value" -> 'double, "timestamp" -> 'long) from Range(1,10000) parallism 1
 
   // filter ("metric") groupBy 0 by {line:Map[String,AnyRef] => line}
   "metric" groupBy 0 to stdout parallism 1

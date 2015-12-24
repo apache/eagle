@@ -21,7 +21,7 @@ import org.apache.eagle.datastream.core.StreamProducer
 
 import scala.collection.JavaConversions._
 
-private[dsl] case class ProducerSettingAPIBuilder(producer:StreamProducer[AnyRef]) {
+private[dsl] case class ProducerSettingAPIBuilder(producer:StreamProducer[Any]) {
   def parallism(num:Int):ProducerSettingAPIBuilder = {
     producer.parallelism(num)
     this
@@ -29,9 +29,9 @@ private[dsl] case class ProducerSettingAPIBuilder(producer:StreamProducer[AnyRef
 }
 
 trait ConnectAPIBuilder extends BaseAPIBuilder {
-  private var _current:StreamProducer[AnyRef]  = null
+  private var _current:StreamProducer[Any]  = null
 
-  def to(next: StreamProducer[AnyRef]): ProducerSettingAPIBuilder = {
+  def to(next: StreamProducer[Any]): ProducerSettingAPIBuilder = {
     _current.connect(next)
     _current = next
     ProducerSettingAPIBuilder(next)
@@ -50,7 +50,7 @@ trait ConnectAPIBuilder extends BaseAPIBuilder {
       outer
     }
 
-    def groupBy(func:AnyRef => Any):ConnectAPIBuilder = {
+    def groupBy(func:Any => Any):ConnectAPIBuilder = {
       outer._current = outer._current.groupByKey(func)
       outer
     }

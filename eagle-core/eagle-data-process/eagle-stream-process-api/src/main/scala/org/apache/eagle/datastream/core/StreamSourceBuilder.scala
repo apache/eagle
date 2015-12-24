@@ -44,4 +44,16 @@ trait StreamSourceBuilder {
     p.initWith(dag,config.get)
     p
   }
+
+  def from[T:ru.TypeTag](iterator: Iterator[T],recycle:Boolean):IteratorStreamProducer[T]={
+    val p = IteratorStreamProducer[T](iterator)
+    p.initWith(dag,config.get)
+    p
+  }
+
+  def from(product: Product):IteratorStreamProducer[Any]={
+    val p = IteratorStreamProducer[Any](product.productIterator)
+    p.initWith(dag,config.get)
+    p
+  }
 }

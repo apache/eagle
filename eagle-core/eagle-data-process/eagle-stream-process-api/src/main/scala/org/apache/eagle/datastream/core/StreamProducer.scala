@@ -276,9 +276,12 @@ case class StormSourceProducer[T](source: BaseRichSpout) extends StreamProducer[
   }
 }
 
-case class StreamTransform
-
-case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]
+case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]{
+  override def toString: String = s"IterableStreamProducer(${iterable.getClass.getSimpleName}))"
+}
+case class IteratorStreamProducer[T](iterator: Iterator[T]) extends StreamProducer[T]{
+  override def toString: String = s"IteratorStreamProducer(${iterator.getClass.getSimpleName})"
+}
 
 case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
   def consume(consume: Boolean): AlertStreamSink = {
