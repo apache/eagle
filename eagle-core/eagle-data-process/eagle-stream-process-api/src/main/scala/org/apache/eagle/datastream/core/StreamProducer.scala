@@ -81,6 +81,12 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     connect(this, ret)
     ret
   }
+  override def flatMap[R](func:(Any,Collector[R])=>Unit): StreamProducer[R] = {
+    val ret = FlatMapProducer[T,R](FlatMapperWrapper[R](func))
+    connect(this, ret)
+    ret
+  }
+
 
   override def foreach(fn : T => Unit) : Unit = {
     val ret = ForeachProducer[T](fn)
@@ -121,6 +127,14 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
    * starting from 0, groupby operator would be upon edge of the graph
    */
   override def groupBy(fields : Int*) : StreamProducer[T] = {
+    // validate each field index is greater or equal to 0
+    fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
+    val ret = GroupByFieldProducer[T](fields)
+    connect(this, ret)
+    ret
+  }
+
+  def groupByFieldIndex(fields : Seq[Int]) : StreamProducer[T] = {
     // validate each field index is greater or equal to 0
     fields.foreach(n => if(n<0) throw new IllegalArgumentException("field index should be always >= 0"))
     val ret = GroupByFieldProducer[T](fields)

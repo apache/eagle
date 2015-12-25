@@ -1,6 +1,7 @@
 package org.apache.eagle.stream.dsl.interface
 
 import org.apache.eagle.datastream.core.StreamProducer
+import org.apache.eagle.stream.dsl.definition.StreamDefinition
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,40 +20,37 @@ import org.apache.eagle.datastream.core.StreamProducer
  * limitations under the License.
  */
 
-import scala.collection.JavaConversions._
+trait ConnectAPIBuilder extends AbstractAPIBuilder {
+  private implicit var current:StreamDefinition  = null
 
-private[dsl] case class ProducerSettingAPIBuilder(producer:StreamProducer[Any]) {
-  def parallism(num:Int):ProducerSettingAPIBuilder = {
-    producer.parallelism(num)
-    this
-  }
-}
-
-trait ConnectAPIBuilder extends BaseAPIBuilder {
-  private var _current:StreamProducer[Any]  = null
-
-  def to(next: StreamProducer[Any]): ProducerSettingAPIBuilder = {
-    _current.connect(next)
-    _current = next
-    ProducerSettingAPIBuilder(next)
+  def to(next: StreamProducer[Any]): StreamSettingAPIBuilder = {
+    current.getProducer.connect(next)
+    current.setProducer(next)
+    StreamSettingAPIBuilder(current)
   }
 
   implicit class StreamConnectImplicits(name:String) {
-    private val outer:ConnectAPIBuilder = ConnectAPIBuilder.this
-    outer._current = outer.context.getStreamManager.getStreamDefinition(name).getProducer
-
-    def to(producer: StreamProducer[AnyRef]): ProducerSettingAPIBuilder = {
-      outer.to(producer)
+    private val self:ConnectAPIBuilder = ConnectAPIBuilder.this
+    self.current = self.context.getStreamManager.getStreamDefinition(name)
+    def to(producer: StreamProducer[Any]): StreamSettingAPIBuilder = {
+      self.to(producer)
     }
-
-    def groupBy(fields:Int*):ConnectAPIBuilder = {
-      outer._current = outer._current.groupBy(fields.map(_.asInstanceOf[Integer]))
-      outer
+    def ~>(producer: StreamProducer[Any]): StreamSettingAPIBuilder = to(producer)
+    def groupBy(fields:Any*):ConnectAPIBuilder = {
+      self.current.setProducer(self.current.getProducer.groupByFieldIndex(fields.map {
+        case name: String => {
+          val index = self.current.getSchema.indexOfAttribute(name)
+          if (index < 0) throw new IllegalArgumentException(s"Attribute $name is not found in stream ${self.current}")
+          index
+        }
+        case index: Int => index
+        case f@_ => throw new IllegalArgumentException(s"Illegal field type $f, support: String, Int ")
+      }))
+      self
     }
-
     def groupBy(func:Any => Any):ConnectAPIBuilder = {
-      outer._current = outer._current.groupByKey(func)
-      outer
+      self.current.setProducer(self.current.getProducer.groupByKey(func))
+      self
     }
   }
 }

@@ -52,10 +52,10 @@ case class IterableStreamSpout(iterable: Iterable[Any],recycle:Boolean = true)(i
         _collector.emit(List(current).asJava)
       }
     }else if(recycle){
-      LOG.info("Recycling the iterator")
+      if(LOG.isDebugEnabled) LOG.debug("Recycling the iterator")
       _iterator = iterable.iterator
     }else{
-      LOG.info("No tuple left, sleep forever")
+      if(LOG.isDebugEnabled) LOG.debug("No tuple left, sleep forever")
       this.deactivate()
       Utils.sleep(Long.MaxValue)
     }

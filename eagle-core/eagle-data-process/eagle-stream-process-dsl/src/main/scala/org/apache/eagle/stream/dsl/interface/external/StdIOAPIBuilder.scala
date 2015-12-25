@@ -19,5 +19,5 @@ import org.apache.eagle.datastream.core.{ForeachProducer, StreamProducer}
  * limitations under the License.
  */
 trait StdIOAPIBuilder {
-  def stdout:StreamProducer[AnyRef] = ForeachProducer[AnyRef](t=>println(t))
+  def stdout:StreamProducer[Any] = ForeachProducer[Any](t=>println(t))
 }

@@ -1,3 +1,8 @@
+package org.apache.eagle.stream.dsl.interface
+
+import org.apache.eagle.datastream.Collector
+import org.apache.eagle.stream.dsl.definition.StreamDefinition
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,11 +19,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.interface
 
-trait ConfigAPIBuilder extends AbstractAPIBuilder{
-//  implicit class ConfigKeyPrefix(val sc:StringContext) extends AnyVal {
-//    def c[T](arg:Any)(implicit tag: TypeTag[T]):T = conf[T](arg)
-//    def conf[T](arg:Any)(implicit tag: TypeTag[T]):T = getContext.getConfig.get[T](arg.asInstanceOf[String])
-//  }
+trait FilterAPIBuilder extends AbstractAPIBuilder{
+  private[dsl] var _current:StreamDefinition = null
+
+  def filter(streamName:String):FilterAPIBuilder = {
+    _current = context.getStreamManager.getStreamDefinition(streamName)
+    this
+  }
+
+  def where(func:Any=>Boolean):FilterAPIBuilder = {
+    val producer = _current.getProducer.filter(func)
+    _current.setProducer(producer)
+    this
+  }
+
+  def by(func:(Any,Collector[Any])=>Unit):StreamSettingAPIBuilder = {
+    val producer = _current.getProducer.flatMap(func)
+    _current.setProducer(producer)
+    StreamSettingAPIBuilder(_current)
+  }
 }

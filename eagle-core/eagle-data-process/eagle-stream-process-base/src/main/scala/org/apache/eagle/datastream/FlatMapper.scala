@@ -19,3 +19,7 @@ package org.apache.eagle.datastream
 trait FlatMapper[T] extends Serializable {
   def flatMap(input : Seq[AnyRef], collector : Collector[T])
 }
+
+case class FlatMapperWrapper[T](func:(Any,Collector[T]) => Unit) extends FlatMapper[T]{
+  override def flatMap(input: Seq[AnyRef], collector: Collector[T]): Unit = func(input,collector)
+}

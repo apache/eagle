@@ -19,7 +19,7 @@ package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
 import org.apache.commons.lang3.builder.HashCodeBuilder
-import org.apache.eagle.datastream.FlatMapper
+import org.apache.eagle.datastream.{Collector, FlatMapper}
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
@@ -102,6 +102,7 @@ trait StreamProtocol[+T <: Any]{
    * @return
    */
   def flatMap[R](flatMapper:FlatMapper[R]): StreamProducer[R]
+  def flatMap[R](func:(Any,Collector[R])=>Unit): StreamProducer[R]
 
   /**
    *

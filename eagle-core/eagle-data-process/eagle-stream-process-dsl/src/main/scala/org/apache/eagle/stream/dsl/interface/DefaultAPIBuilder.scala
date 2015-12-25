@@ -24,3 +24,5 @@ trait DefaultAPIBuilder
   with ConfigAPIBuilder
   with KafkaAPIBuilder
   with StdIOAPIBuilder
+  with FilterAPIBuilder
+  with NativeTypeAdapter

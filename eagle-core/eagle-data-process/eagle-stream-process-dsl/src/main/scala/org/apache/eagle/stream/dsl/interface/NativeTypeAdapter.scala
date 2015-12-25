@@ -16,9 +16,8 @@
  */
 package org.apache.eagle.stream.dsl.interface
 
-trait ConfigAPIBuilder extends AbstractAPIBuilder{
-//  implicit class ConfigKeyPrefix(val sc:StringContext) extends AnyVal {
-//    def c[T](arg:Any)(implicit tag: TypeTag[T]):T = conf[T](arg)
-//    def conf[T](arg:Any)(implicit tag: TypeTag[T]):T = getContext.getConfig.get[T](arg.asInstanceOf[String])
-//  }
+trait NativeTypeAdapter {
+  implicit class TypeImplicits(value:Any){
+    def as[T]:T = value.asInstanceOf[T]
+  }
 }

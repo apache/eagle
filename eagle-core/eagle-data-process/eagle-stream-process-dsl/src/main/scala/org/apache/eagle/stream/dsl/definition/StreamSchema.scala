@@ -16,7 +16,10 @@
  */
 package org.apache.eagle.stream.dsl.definition
 
-class Attribute(name:String) extends Serializable
+class Attribute(name:String) extends Serializable{
+  def getName:String = name
+}
+
 case class StringAttribute(name:String) extends Attribute(name)
 case class LongAttribute(name:String) extends Attribute(name)
 case class IntegerAttribute(name:String) extends Attribute(name)
@@ -45,7 +48,19 @@ object Attribute{
   }
 }
 
-case class StreamSchema(name:String,attributes:Seq[Attribute]) extends Serializable
+case class StreamSchema(name:String,attributes:Seq[Attribute]) extends Serializable{
+  def getAttribute(attributeName:String):Option[Attribute]={
+    if(attributes != null){
+      attributes.find(_.getName.eq(attributeName))
+    }else None
+  }
+
+  def indexOfAttribute(attributeName:String):Int = {
+    if(attributes != null){
+      attributes.indexWhere(_.getName.eq(attributeName))
+    } else -1
+  }
+}
 
 object StreamSchema{
   /**

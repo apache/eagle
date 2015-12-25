@@ -14,21 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.interface.external
+package org.apache.eagle.datastream.storm
 
-import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
-import org.apache.eagle.datastream.core.StreamProducer
-import org.apache.eagle.datastream.storm.StormExecutionEnvironment
-import org.apache.eagle.stream.dsl.interface.AbstractAPIBuilder
+import java.util
 
-trait KafkaAPIBuilder extends AbstractAPIBuilder{
+import backtype.storm.tuple.Tuple
+import org.apache.eagle.datastream.Collector
+import org.apache.eagle.datastream.core.StreamInfo
+
+case class StormFlatMapperWrapper(flatMapper:(Any,Collector[Any])=>Unit)(implicit info:StreamInfo) extends AbstractStreamBolt[Any]{
   /**
-   * kafka interface without parameters
-   * @return
+   * Handle keyed stream value
    */
-  def kafka:StreamProducer[AnyRef] = this.context.getEnvironment match {
-    case e:StormExecutionEnvironment =>
-      e.fromSpout(new KafkaSourcedSpoutProvider())
-    case e@_ => throw new IllegalStateException(s"kafka only supports as source (i.e. spout) for storm now, but not support environment $e")
+  override def onKeyValue(key: Any, value: Any)(implicit input: Tuple): Unit = {
+    flatMapper(value,new Collector[Any] {
+      override def collect(r: Any): Unit = emit(r)(input)
+    })
+  }
+
+  /**
+   * Handle general stream values list
+   *
+   * @param values
+   */
+  override def onValues(values: util.List[AnyRef])(implicit input: Tuple): Unit = {
+    flatMapper(values,new Collector[Any] {
+      override def collect(r: Any): Unit = emit(r)(input)
+    })
   }
 }

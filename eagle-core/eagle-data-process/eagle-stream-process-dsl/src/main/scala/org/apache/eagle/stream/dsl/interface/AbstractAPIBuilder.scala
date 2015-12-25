@@ -21,7 +21,7 @@ import org.apache.eagle.datastream.core.ExecutionEnvironment
 import org.apache.eagle.stream.dsl.StreamContext
 
 import scala.reflect.runtime.universe._
-trait BaseAPIBuilder extends APIBuilderHelper{
+trait AbstractAPIBuilder extends APIBuilderHelper{
   private var _context:StreamContext = null
 
   def context(context:StreamContext):Unit = {

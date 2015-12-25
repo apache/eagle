@@ -19,7 +19,7 @@ package org.apache.eagle.stream.dsl.interface
 import org.apache.eagle.datastream.core.StreamProducer
 import org.apache.eagle.stream.dsl.definition.{StreamDefinition, StreamSchema}
 
-trait DefinitionAPIBuilder extends BaseAPIBuilder{
+trait DefinitionAPIBuilder extends AbstractAPIBuilder{
   private var _instance:StreamDefinition = null
   def define(name:String):DefinitionAPIBuilder = {
     _instance = StreamDefinition(name)
@@ -43,27 +43,38 @@ trait DefinitionAPIBuilder extends BaseAPIBuilder{
     this
   }
 
-  def from(source:StreamProducer[AnyRef]):ProducerSettingAPIBuilder = {
+  def from(source:StreamProducer[AnyRef]):StreamSettingAPIBuilder = {
     shouldNotBeNull(_instance)
     _instance.setProducer(source)
-    ProducerSettingAPIBuilder(source)
+    StreamSettingAPIBuilder(_instance)
   }
 
-  def from(iterable:Iterable[Any]):ProducerSettingAPIBuilder = {
+  def from(iterable:Iterable[Any]):StreamSettingAPIBuilder = {
     val producer = context.getEnvironment.from(iterable,recycle = false)
     _instance.setProducer(producer)
-    ProducerSettingAPIBuilder(producer)
+    StreamSettingAPIBuilder(_instance)
   }
 
-  def from(product:Product):ProducerSettingAPIBuilder = {
+  def from(product:Product):StreamSettingAPIBuilder = {
     val producer = context.getEnvironment.from(product)
     _instance.setProducer(producer)
-    ProducerSettingAPIBuilder(producer)
+    StreamSettingAPIBuilder(_instance)
   }
 
   def parallism(num:Int):DefinitionAPIBuilder = {
     shouldNotBeNull(_instance)
     _instance.getProducer.parallelism(num)
+    this
+  }
+}
+
+case class StreamSettingAPIBuilder(stream:StreamDefinition){
+  def parallism(num:Int):StreamSettingAPIBuilder = {
+    stream.getProducer.parallelism(num)
+    this
+  }
+  def as(attributes:(String,AnyRef)*):StreamSettingAPIBuilder = {
+    stream.setSchema(StreamSchema.build(stream.name,attributes))
     this
   }
 }

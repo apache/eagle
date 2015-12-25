@@ -18,14 +18,41 @@ package org.apache.eagle.stream.dsl.example
 
 import org.apache.eagle.stream.dsl.StreamApp._
 
-object StreamAPPExample extends App {
+/**
+ * Simplest example
+ */
+object StreamAPPExample_1 extends App {
   init[storm](args)
 
-  // define("metric") as("name" -> 'string, "value" -> 'double, "timestamp" -> 'long) from kafka parallism 10
-  define("metric") as("name" -> 'string, "value" -> 'double, "timestamp" -> 'long) from Range(1,10000) parallism 1
+  define("number") from Range(1,10000)
 
-  // filter ("metric") groupBy 0 by {line:Map[String,AnyRef] => line}
-  "metric" groupBy 0 to stdout parallism 1
+  "number" ~> stdout parallism 1
+
+  submit()
+}
+
+object StreamAPPExample_2 extends App {
+  init[storm](args)
+
+  define("number") as ("value" -> 'integer) from Range(1,10000) parallism 1
+
+  filter("number") where {_.as[Int] % 2 == 0}
+
+  "number" groupBy "value" to stdout parallism 1
+
+  submit()
+}
+
+object StreamAPPExample_3 extends App {
+  init[storm](args)
+
+  define("number") from Range(1,10000) parallism 1 as ("value" -> 'integer)
+
+  filter("number") where {_.as[Int] % 2 == 0} by {(a,c)=>
+    c.collect(("key",a))
+  } as ("key" ->'string,"value"->'integer)
+
+  "number" groupBy "key" to stdout parallism 1
 
   submit()
 }
