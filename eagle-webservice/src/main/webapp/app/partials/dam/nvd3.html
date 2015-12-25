@@ -12,7 +12,8 @@
 <button class="btn btn-primary" ng-click="chart = 'column'">To Column</button>
 <button class="btn btn-primary" ng-click="chart = 'line'">To Line</button>
 <button class="btn btn-primary" ng-click="chart = 'area'">To Area</button>
-<button class="btn btn-warning" ng-click="chartConfig.xType = 'date'">Date</button>
+<button class="btn btn-primary" ng-click="chart = 'pie'">To Pie</button>
+<button class="btn btn-warning" ng-click="chartConfig.xType = 'number'">Number</button>
 <button class="btn btn-warning" ng-click="chartConfig.xType = 'time'">Time</button>
 
 <div nvd3="data" data-title="" data-chart="{{chart}}" data-watching="true" data-config="chartConfig" class="nvd3-chart-cntr"></div>

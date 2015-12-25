@@ -117,6 +117,7 @@ damControllers.controller('nvd3Ctrl', function(globalContent, Site, damContent, 
 	globalContent.setConfig(damContent.config);
 	globalContent.pageTitle = "NVD3 Test";
 
+	var _len = 75;
 	function sinAndCos() {
 		var sin = [],sin2 = [],
 			cos = [];
@@ -126,10 +127,9 @@ damControllers.controller('nvd3Ctrl', function(globalContent, Site, damContent, 
 
 		//Data is represented as an array of {x,y} pairs.
 		var _now = new moment().hour(0).minute(0).second(0).millisecond(0).valueOf();
-		//_now -= 1000 * 60 * 60 * 4;
-		//console.log(_now);
 		var _x;
-		for (var i = 0; i < 100; i++) {
+		_len += 1;
+		for (var i = 0; i < _len; i++) {
 			_x = _now + i * 1000 * 60 * 60 * 24;
 			sin.push({x: _x, y: Math.abs(Math.sin((i+_offset1)/10))});
 			sin2.push({x: _x, y: Math.abs(Math.sin((i+_offset2)/10) *0.25 + 0.5)});
@@ -163,10 +163,10 @@ damControllers.controller('nvd3Ctrl', function(globalContent, Site, damContent, 
 
 		xTitle: "Test X Axis",
 		yTitle: "Test Y Axis",
-		xType: "date"
+		xType: "time"
 	};
 
-	$scope.chart = "line";
+	$scope.chart = "area";
 
 	$scope.randomChartData = function() {
 		$scope.data = sinAndCos();
