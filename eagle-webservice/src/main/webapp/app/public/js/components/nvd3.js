@@ -125,10 +125,9 @@ eagleComponents.directive('nvd3', function(nvd3) {
 							});
 						break;
 					case "pie":
-						_chart = nv.models.pieChart()
+						_chart = nv.models.dimensionalPieChart()
 							.x(function(d) { return d.key })
 							.y(function(d) { return d.values[0].y })
-							.showLabels(true);
 						break;
 				}
 
