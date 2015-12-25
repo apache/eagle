@@ -56,3 +56,26 @@ object StreamAPPExample_3 extends App {
 
   submit()
 }
+
+object StreamAPPExample_4 extends App {
+  init[storm](args)
+
+  define("metricStream") from kafka parallism 1
+
+  'metricStream to alert("metricExecutor")
+
+  submit()
+}
+
+object StreamAPPExample_5 extends App{
+  init[storm](args)
+
+  define("metricStream") from kafka parallism 1
+
+  alert ("metricStream" -> "alertStream") by sql"""
+     from metricStream[metric=="RpcActivityForPort50020.RpcQueueTimeNumOps" and value>100]
+         select * insert into alertStream;
+  """
+
+  submit()
+}

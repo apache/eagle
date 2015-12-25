@@ -2,6 +2,7 @@ package org.apache.eagle.stream.dsl.interface
 
 import org.apache.eagle.datastream.core.StreamProducer
 import org.apache.eagle.stream.dsl.definition.StreamDefinition
+import org.slf4j.LoggerFactory
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,26 +22,31 @@ import org.apache.eagle.stream.dsl.definition.StreamDefinition
  */
 
 trait ConnectAPIBuilder extends AbstractAPIBuilder {
-  private implicit var current:StreamDefinition  = null
+  private val LOG = LoggerFactory.getLogger(classOf[ConnectAPIBuilder])
+  protected var primaryStream:StreamDefinition  = null
 
   def to(next: StreamProducer[Any]): StreamSettingAPIBuilder = {
-    current.getProducer.connect(next)
-    current.setProducer(next)
-    StreamSettingAPIBuilder(current)
+    LOG.info(s"${primaryStream.getProducer} -> $next")
+    primaryStream.getProducer.connect(next)
+    primaryStream.setProducer(next)
+    StreamSettingAPIBuilder(primaryStream)
   }
 
   implicit class StreamConnectImplicits(name:String) {
     private val self:ConnectAPIBuilder = ConnectAPIBuilder.this
-    self.current = self.context.getStreamManager.getStreamDefinition(name)
+
+    self.primaryStream = self.context.getStreamManager.getStreamDefinition(name)
+
     def to(producer: StreamProducer[Any]): StreamSettingAPIBuilder = {
       self.to(producer)
     }
+
     def ~>(producer: StreamProducer[Any]): StreamSettingAPIBuilder = to(producer)
     def groupBy(fields:Any*):ConnectAPIBuilder = {
-      self.current.setProducer(self.current.getProducer.groupByFieldIndex(fields.map {
+      self.primaryStream.setProducer(self.primaryStream.getProducer.groupByFieldIndex(fields.map {
         case name: String => {
-          val index = self.current.getSchema.indexOfAttribute(name)
-          if (index < 0) throw new IllegalArgumentException(s"Attribute $name is not found in stream ${self.current}")
+          val index = self.primaryStream.getSchema.indexOfAttribute(name)
+          if (index < 0) throw new IllegalArgumentException(s"Attribute $name is not found in stream ${self.primaryStream}")
           index
         }
         case index: Int => index
@@ -49,8 +55,10 @@ trait ConnectAPIBuilder extends AbstractAPIBuilder {
       self
     }
     def groupBy(func:Any => Any):ConnectAPIBuilder = {
-      self.current.setProducer(self.current.getProducer.groupByKey(func))
+      self.primaryStream.setProducer(self.primaryStream.getProducer.groupByKey(func))
       self
     }
   }
+
+  implicit class StreamSymbolConnectImplicits(name:Symbol) extends StreamConnectImplicits(name.name)
 }

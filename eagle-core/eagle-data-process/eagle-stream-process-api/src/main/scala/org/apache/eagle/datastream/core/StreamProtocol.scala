@@ -146,7 +146,7 @@ trait StreamProtocol[+T <: Any]{
    */
   def groupByKey(keyer:T => Any):StreamProducer[T]
   def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
-  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
+  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy):AlertStreamProducer
   /**
    * Set processing element parallelism setting
    * @param parallelismNum parallelism value

@@ -73,6 +73,7 @@ case class StreamSettingAPIBuilder(stream:StreamDefinition){
     stream.getProducer.parallelism(num)
     this
   }
+
   def as(attributes:(String,AnyRef)*):StreamSettingAPIBuilder = {
     stream.setSchema(StreamSchema.build(stream.name,attributes))
     this

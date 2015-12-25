@@ -1,3 +1,5 @@
+package org.apache.eagle.stream.dsl.interface
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,17 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.interface
-
-import org.apache.eagle.stream.dsl.interface.external.{StdIOAPIBuilder, KafkaAPIBuilder}
-
-trait DefaultAPIBuilder
-  extends DefinitionAPIBuilder
-  with ConnectAPIBuilder
-  with ConfigAPIBuilder
-  with KafkaAPIBuilder
-  with StdIOAPIBuilder
-  with FilterAPIBuilder
-  with NativeTypeAdapter
-  with AlertAPIBuilder
-  with ScriptAPIBuilder
+class ScriptString(content:String,scriptType:String) extends Serializable
+case class SqlScript(content:String) extends ScriptString(content,"sql")
+trait ScriptAPIBuilder extends AbstractAPIBuilder{
+  implicit class ScriptStringImplicits(val sc:StringContext) extends AnyVal{
+    def sql(arg:Any):SqlScript = SqlScript(arg.asInstanceOf[String])
+  }
+}

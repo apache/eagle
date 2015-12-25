@@ -186,9 +186,10 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     alert(upStreamNames.asScala, alertExecutorId, consume = false)
   }
 
-  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean=true, strategy : PartitionStrategy=null) = {
-    val ret = AlertStreamSink(upStreamNames, alertExecutorId, consume, strategy)
+  override def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean=true, strategy : PartitionStrategy=null):AlertStreamProducer = {
+    val ret = AlertStreamProducer(upStreamNames, alertExecutorId, consume, strategy)
     connect(this, ret)
+    ret
   }
 
   def alertWithConsumer(upStreamName: String, alertExecutorId : String, strategy: PartitionStrategy): Unit ={
@@ -297,8 +298,8 @@ case class IteratorStreamProducer[T](iterator: Iterator[T]) extends StreamProduc
   override def toString: String = s"IteratorStreamProducer(${iterator.getClass.getSimpleName})"
 }
 
-case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
-  def consume(consume: Boolean): AlertStreamSink = {
+case class AlertStreamProducer(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
+  def consume(consume: Boolean): AlertStreamProducer = {
     this.consume = consume
     this
   }
