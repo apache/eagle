@@ -25,6 +25,7 @@
 				"app/public/assets/flot/jquery.flot.tooltip.js",
 				"app/public/assets/flot/jquery.flot.legend.js",
 				"node_modules/d3/d3.min.js",
+				"node_modules/nvd3/build/nv.d3.min.js",
 
 				"tmp/public/js/scripts.min.js"
 			],
@@ -35,6 +36,7 @@
 				"node_modules/bootstrap/dist/css/bootstrap.min.css",
 				"node_modules/zombiej-bootstrap-components/bootstrap-components/css/bootstrap-components.min.css",
 				"node_modules/font-awesome/css/font-awesome.min.css",
+				"node_modules/nvd3/build/nv.d3.min.css",
 				"node_modules/admin-lte/dist/css/AdminLTE.min.css",
 				"node_modules/admin-lte/dist/css/skins/skin-blue.min.css",
 
