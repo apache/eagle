@@ -229,7 +229,6 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					} else {
 						_chart.forceY([]);
 					}
-					console.log(_min, _max);
 				}
 
 				// Update data

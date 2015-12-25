@@ -17,13 +17,6 @@
 				"node_modules/angular-route/angular-route.min.js",
 				"node_modules/angular-cookies/angular-cookies.min.js",
 				"node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.min.js",
-				"node_modules/Flot/jquery.flot.js",
-				"node_modules/Flot/jquery.flot.stack.js",
-				"node_modules/Flot/jquery.flot.pie.js",
-				"node_modules/Flot/jquery.flot.time.js",
-				"node_modules/Flot/jquery.flot.crosshair.js",
-				"app/public/assets/flot/jquery.flot.tooltip.js",
-				"app/public/assets/flot/jquery.flot.legend.js",
 				"node_modules/d3/d3.min.js",
 				"node_modules/zombiej-nvd3/build/nv.d3.min.js",
 

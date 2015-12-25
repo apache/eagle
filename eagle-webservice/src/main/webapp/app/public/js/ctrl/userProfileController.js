@@ -186,6 +186,8 @@ damControllers.controller('userProfileDetailCtrl', function(globalContent, Site,
 
 		// DE
 		if($scope.profiles.DE) {
+			console.log($scope.profiles.DE);
+
 			$scope.profiles.DE._chart = {};
 
 			$scope.profiles.DE.estimates = {};

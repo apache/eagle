@@ -54,7 +54,8 @@
 			<div class="row">
 				<div class="col-md-9">
 					<button class="btn btn-primary fixed-right" ng-click="showRawData(profiles.DE.content)">Raw Data</button>
-					<div bar-chart height="400" data="profiles.DE._chart.series"> </div>
+					<div nvd3="profiles.DE._chart.series" data-config="{chart: 'line', xType: 'time'}" class="nvd3-chart-cntr"></div>
+					<!--div bar-chart height="400" data="profiles.DE._chart.series"> </div-->
 					<div class="inline-group text-center">
 						<dl ng-repeat="(key, value) in profiles.DE.estimates"><dt>{{key}}</dt><dd>{{value}}</dd></dl>
 					</div>

@@ -73,7 +73,7 @@ damControllers.controller('policyListCtrl', function(globalContent, Site, damCon
 // =============================================================
 // =                       Policy Detail                       =
 // =============================================================
-damControllers.controller('policyDetailCtrl', function(globalContent, Site, damContent, charts, $scope, $routeParams, Entities, nvd3) {
+damControllers.controller('policyDetailCtrl', function(globalContent, Site, damContent, $scope, $routeParams, Entities, nvd3) {
 	'use strict';
 
 	var MAX_PAGESIZE = 10000;
@@ -82,8 +82,6 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 	globalContent.pageTitle = "Policy Detail";
 	globalContent.navPath = ["Policy View", "Polict List", "Polict Detail"];
 	globalContent.lockSite = true;
-
-	charts = charts($scope);
 
 	$scope.common = common;
 	$scope.chartConfig = {
