@@ -24,10 +24,30 @@ eagleComponents.service('nvd3', function() {
 		]
 	};
 
-	$(window).on("resize.components.nvd3", function() {
-		$.each(nvd3.charts, function(i, chart) {
-			chart.update();
+	// ============================================
+	// =              Format Convert              =
+	// ============================================
+	nvd3.convert = {};
+	nvd3.convert.eagle = function(seriesList) {
+		return $.map(seriesList, function(series) {
+			var seriesObj = $.isArray(series) ? {values: series} : series;
+			if(!seriesObj.key) seriesObj.key = "value";
+			return seriesObj;
 		});
+	};
+
+	// ============================================
+	// =                    UI                    =
+	// ============================================
+	// Resize with refresh
+	function chartResize() {
+		$.each(nvd3.charts, function(i, chart) {
+			if(chart) chart.update();
+		});
+	}
+	$(window).on("resize.components.nvd3", chartResize);
+	$("body").on("collapsed.pushMenu expanded.pushMenu", function() {
+		setTimeout(chartResize, 300);
 	});
 
 	return nvd3;
@@ -56,7 +76,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 		controller: function($scope, $element, $attrs, $timeout) {
 			var _config, _chartType;
 			var _chart;
-			var _chartCntr;// = $element.find("> svg")[0];
+			var _chartCntr;
 
 			// Destroy
 			function destroy() {
@@ -129,6 +149,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 							.x(function(d) { return d.key })
 							.y(function(d) { return d.values[0].y })
 						break;
+					default :
+						throw "Type not defined: " + _chartType;
 				}
 
 				// Define title
@@ -147,6 +169,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 				]);
 
 				function _defineLabelType(axis, type) {
+					if(!_chart) return;
+
 					var _axis = _chart[axis + "Axis"];
 					switch(type) {
 						case "decimal":
@@ -158,7 +182,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 								_chart[axis + "Scale"](d3.time.scale());
 							}
 							_axis.tickFormat(function(d) {
-								return _tickMultiFormat(new Date(d));
+								return _tickMultiFormat(app.time.offset(d).toDate(true));
 							});
 							break;
 						default:
@@ -171,6 +195,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					_defineLabelType("y", _config.yType || "decimal");
 				}
 
+				// Global chart list update
 				if(_preIndex === -1) {
 					nvd3.charts.push(_chart);
 				} else {
@@ -182,12 +207,30 @@ eagleComponents.directive('nvd3', function(nvd3) {
 
 			// Update chart data
 			function updateData() {
+				var _min, _max;
+
 				// Copy series to prevent Angular loop watching
 				var _data = $.map($scope.nvd3 || [], function(series, i) {
 					var _series = $.extend(true, {}, series);
 					_series.color = _series.color || nvd3.colors[i % nvd3.colors.length];
 					return _series;
 				});
+
+				// Chart Y value
+				if(($scope.chart || _config.chart) !== "pie") {
+					$.each(_data, function(i, series) {
+						$.each(series.values, function(j, unit) {
+							if(_min === undefined || unit.y < _min) _min = unit.y;
+							if(_max === undefined || unit.y > _max) _max = unit.y;
+						});
+					});
+					if(_min === 0 && _max === 0) {
+						_chart.forceY([0, 10]);
+					} else {
+						_chart.forceY([]);
+					}
+					console.log(_min, _max);
+				}
 
 				// Update data
 				d3.select(_chartCntr)						//Select the <svg> element you want to render the chart in.

@@ -407,7 +407,17 @@ ul.tree.tree-bordered > li > ul > li > a {
 }
 
 /* Chart */
-.chart .chart-header h3 {
+.nvd3-chart-cntr > h3 {
+	text-align: center;
+	font-size: 16px;
+	font-weight: bolder;
+}
+
+.nvd3-chart-cntr > svg.nvd3-svg {
+	height: 200px;
+}
+
+/*.chart .chart-header h3 {
 	text-align: center;
 	margin: 10px 0 5px 0;
 }
@@ -423,7 +433,7 @@ ul.tree.tree-bordered > li > ul > li > a {
 
 .chart .chart-body .bar {
 	fill: steelblue;
-}
+}*/
 
 /* Tab */
 body .tab-content>.tab-pane {
