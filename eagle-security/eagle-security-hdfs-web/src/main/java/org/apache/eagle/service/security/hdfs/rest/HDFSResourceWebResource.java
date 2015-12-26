@@ -26,6 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.eagle.security.resolver.MetadateAccessConfigRepo;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
 import org.apache.eagle.service.security.hdfs.HDFSResourceConstants;
 import org.apache.eagle.service.security.hdfs.HDFSResourceSensitivityDataJoiner;
@@ -35,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.eagle.service.security.hdfs.HDFSFileSystem;
-import org.apache.eagle.service.security.hdfs.HDFSResourceUtils;
 import org.apache.eagle.security.hdfs.entity.FileStatusEntity;
 
 
@@ -43,10 +43,12 @@ import org.apache.eagle.security.hdfs.entity.FileStatusEntity;
  * REST Web Service to browse files and Paths in HDFS
  */
 @Path(HDFSResourceConstants.HDFS_RESOURCE)
-public class HDFSResourceWebResource 
-{
+public class HDFSResourceWebResource {
 	private static Logger LOG = LoggerFactory.getLogger(HDFSResourceWebResource.class);
-	
+
+	private MetadateAccessConfigRepo repo = new MetadateAccessConfigRepo();
+	public static final String HDFS_DATA_SOURCE="hdfsAuditLog";
+
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)	
@@ -55,12 +57,11 @@ public class HDFSResourceWebResource
 		LOG.info("Starting HDFS Resource Browsing.  Query Parameters ==> Site :"+site+"  Path : "+filePath );
 		HDFSResourceWebResponse response = new HDFSResourceWebResponse();		
 		HDFSResourceWebRequestValidator validator = new HDFSResourceWebRequestValidator();
-		HDFSResourceUtils resourceUtils = new HDFSResourceUtils();
 		List<FileStatusEntity> result = new ArrayList<>();		
 		List<FileStatus> fileStatuses = null;
 		try {
 			validator.validate(site, filePath); // First Step would be validating Request
-			Configuration config = resourceUtils.getConfig(site);
+			Configuration config = repo.getConfig(HDFS_DATA_SOURCE, site);
 			HDFSFileSystem fileSystem = new HDFSFileSystem(config);
 			fileStatuses = fileSystem.browse(filePath);
 			// Join with File Sensitivity Info

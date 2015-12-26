@@ -17,10 +17,10 @@
 package org.apache.eagle.service.security.hbase;
 
 import org.apache.eagle.security.hbase.HbaseResourceEntity;
+import org.apache.eagle.security.resolver.MetadateAccessConfigRepo;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
-import org.apache.eagle.service.security.hbase.dao.HbaseMetadataAccessConfig;
-import org.apache.eagle.service.security.hbase.dao.HbaseMetadataAccessConfigDAOImpl;
 import org.apache.eagle.service.security.hbase.dao.HbaseMetadataDAOImpl;
+import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +32,12 @@ import java.util.regex.Pattern;
 @Path("/hbaseResource")
 public class HbaseMetadataBrowseWebResource {
     private static Logger LOG = LoggerFactory.getLogger(HbaseMetadataBrowseWebResource.class);
+
     private HbaseSensitivityResourceService dao = new HbaseSensitivityResourceService();
     private Map<String, Map<String, String>> maps = dao.getAllHbaseSensitivityMap();
+    private MetadateAccessConfigRepo repo = new MetadateAccessConfigRepo();
+    final public static String HBASE_DATA_SOURCE = "hbaseSecurityLog";
+
 
     @Path("/namespaces")
     @GET
@@ -44,7 +48,7 @@ public class HbaseMetadataBrowseWebResource {
         List<HbaseResourceEntity> values = new ArrayList<>();
         HbaseMetadataBrowseWebResponse response = new HbaseMetadataBrowseWebResponse();
         try {
-            HbaseMetadataAccessConfig config = new HbaseMetadataAccessConfigDAOImpl().getConfig(site);
+            Configuration config = repo.getConfig(HBASE_DATA_SOURCE, site);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(config);
             namespaces = dao.getNamespaces();
 
@@ -72,7 +76,7 @@ public class HbaseMetadataBrowseWebResource {
         List<String> tables = null;
         List<HbaseResourceEntity> values = new ArrayList<>();
         try {
-            HbaseMetadataAccessConfig config = new HbaseMetadataAccessConfigDAOImpl().getConfig(site);
+            Configuration config = repo.getConfig(HBASE_DATA_SOURCE, site);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(config);
             tables = dao.getTables(namespace);
         }catch(Exception ex){
@@ -102,7 +106,7 @@ public class HbaseMetadataBrowseWebResource {
         List<String> columns = null;
         List<HbaseResourceEntity> values = new ArrayList<>();
         try {
-            HbaseMetadataAccessConfig config = new HbaseMetadataAccessConfigDAOImpl().getConfig(site);
+            Configuration config = repo.getConfig(HBASE_DATA_SOURCE, site);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(config);
             String tableName = String.format("%s:%s", namespace, table);
             columns = dao.getColumnFamilies(tableName);

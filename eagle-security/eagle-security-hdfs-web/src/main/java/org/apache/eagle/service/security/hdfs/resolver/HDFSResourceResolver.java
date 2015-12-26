@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.eagle.security.resolver.MetadateAccessConfigRepo;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
 
+import org.apache.eagle.service.security.hdfs.rest.HDFSResourceWebResource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
@@ -33,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.eagle.service.security.hdfs.HDFSFileSystem;
 import org.apache.eagle.service.security.hdfs.HDFSResourceConstants;
-import org.apache.eagle.service.security.hdfs.HDFSResourceUtils;
 
 /**
  * HDFS Resource Resolver 
@@ -52,9 +53,9 @@ public class HDFSResourceResolver  implements AttributeResolvable<GenericAttribu
 	public List<String> resolve(GenericAttributeResolveRequest request)
 			throws AttributeResolveException {
         List<String> result = new ArrayList<>();
-		HDFSResourceUtils resourceUtils = new HDFSResourceUtils();
+		MetadateAccessConfigRepo repo = new MetadateAccessConfigRepo();
 		try {
-			Configuration config = resourceUtils.getConfig(request.getSite().trim());
+			Configuration config = repo.getConfig(HDFSResourceWebResource.HDFS_DATA_SOURCE, request.getSite().trim());
 			HDFSFileSystem fileSystem = new HDFSFileSystem(config);
 			String query = request.getQuery().trim();
 			List<FileStatus> fileStatuses = null;

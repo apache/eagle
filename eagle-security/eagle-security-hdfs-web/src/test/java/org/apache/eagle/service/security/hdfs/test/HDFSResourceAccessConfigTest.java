@@ -18,11 +18,7 @@ package org.apache.eagle.service.security.hdfs.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
-import org.apache.eagle.service.security.hdfs.HDFSResourceUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;

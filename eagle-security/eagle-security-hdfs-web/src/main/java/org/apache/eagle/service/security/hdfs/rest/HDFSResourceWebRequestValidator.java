@@ -16,12 +16,18 @@
  */
 package org.apache.eagle.service.security.hdfs.rest;
 
-import org.apache.eagle.service.security.hdfs.HDFSResourceUtils;
 
 /**
  * Validate the REST API request
  */
 public class HDFSResourceWebRequestValidator {
+
+	public boolean isNullOrEmpty( String input ) {
+		if( null == input ||  input.length() <= 0 )
+			return true;
+
+		return false;
+	}
 
 	/**
 	 * validate HDFSResource Site and File Path
@@ -29,10 +35,11 @@ public class HDFSResourceWebRequestValidator {
 	 * @param filePath
 	 * @throws Exception
 	 */
+
 	public void validate( String site, String filePath ) throws Exception {
-		if (HDFSResourceUtils.isNullOrEmpty(site))
+		if (isNullOrEmpty(site))
 			throw new Exception("Invalid Request Received ... Site is Empty Or Null..");
-		if (HDFSResourceUtils.isNullOrEmpty(filePath))
+		if (isNullOrEmpty(filePath))
 			throw new Exception("Invalid Request Received ... file/Directory Path is Empty Or Null..");
 	}
 }
