@@ -38,4 +38,4 @@ echo ""
 ## AlertDataSource: data sources bound to sites
 echo "Importing AlertDataSourceService for hbase... "
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDataSourceService" -d '[{"prefix":"alertDataSource","tags":{"site":"sandbox","dataSource":"hbaseSecurityLog"},"enabled":"true","config":"{\"zkClientPort\":\"2181\", \"zkQuorum\":\"localhost\"}","desc":"HBASE"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDataSourceService" -d '[{"prefix":"alertDataSource","tags":{"site":"sandbox","dataSource":"hbaseSecurityLog"},"enabled":"true","config":"{\"hbase.zookeeper.property.clientPort\":\"2181\", \"hbase.zookeeper.quorum\":\"localhost\"}","desc":"HBASE"}]'
