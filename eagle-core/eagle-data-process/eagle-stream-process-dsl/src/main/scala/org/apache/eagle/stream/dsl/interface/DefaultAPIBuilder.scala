@@ -28,3 +28,4 @@ trait DefaultAPIBuilder
   with NativeTypeAdapter
   with AlertAPIBuilder
   with ScriptAPIBuilder
+  with AggregateAPIBuilder

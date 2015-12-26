@@ -72,10 +72,14 @@ object StreamAPPExample_5 extends App{
 
   define("metricStream") from kafka parallism 1
 
-  alert ("metricStream" -> "alertStream") by sql"""
-     from metricStream[metric=="RpcActivityForPort50020.RpcQueueTimeNumOps" and value>100]
-         select * insert into alertStream;
+  alert("metricStream" -> "alertStream") by sql"""
+    from metricStream[metric=="RpcActivityForPort50020.RpcQueueTimeNumOps" and value>100] select * insert into alertStream;
   """
+
+  aggregate("metricStream" -> "aggregatedStream") by {sql"""
+    from metricStream[component=='dn' and metricType=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
+    select sum(value) group by host output every 1 hour insert into aggregatedStream;
+  """} as("host" -> 'string,"metric"->'string,"sum"->'double,"timestamp"->'long)
 
   submit()
 }
