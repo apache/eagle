@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl
+package org.apache.eagle.stream.dsl.definition
 
 import org.apache.eagle.datastream.core.{Configuration, ExecutionEnvironment}
-import org.apache.eagle.stream.dsl.definition.StreamDefinitionManager
 
 trait StreamContext{
   def getEnvironment: ExecutionEnvironment

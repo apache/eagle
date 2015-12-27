@@ -18,8 +18,7 @@ package org.apache.eagle.stream.dsl.interface
 
 import org.apache.eagle.datastream.ExecutionEnvironments
 import org.apache.eagle.datastream.core.ExecutionEnvironment
-import org.apache.eagle.stream.dsl.StreamContext
-import org.apache.eagle.stream.dsl.definition.StreamDefinition
+import org.apache.eagle.stream.dsl.definition.{StreamContext, StreamDefinition}
 
 import scala.reflect.runtime.universe._
 trait AbstractAPIBuilder extends APIBuilderHelper{
