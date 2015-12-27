@@ -51,11 +51,21 @@ class StreamEvaluatorSpec extends FlatSpec with Matchers{
 object StreamEvaluatorSpec extends App{
   val code =
     """
-      | define("number") from Range(1,10000)
+      | define("logStream") from Seq(
+      |    "55.3.244.1 GET /index.html 15824 0.043",
+      |    "55.3.244.1 GET /index.html 15824 0.043",
+      |    "55.3.244.1 GET /index.html 15824 0.043",
+      |    "55.3.244.1 GET /index.html 15824 0.043",
+      |    "55.3.244.1 GET /index.html 15824 0.043",
+      |    "55.3.244.1 GET /index.html 15824 0.043"
+      |  ) as ("line"->'string) parallism 1
       |
-      | "number" ~> stdout parallism 1
+      |  filter("logStream") by grok {
+      |     pattern("line"->"(?<ip>[\\d+\\.]+)\\s+(?<method>\\w+)\\s+(?<path>[\\w/\\.]+)\\s+(?<bytes>\\d+)\\s+(?<time>[\\d+\\.]+)".r)
+      |  } parallism 1
+      |
+      |  'logStream to stdout
     """.stripMargin
-
   val ret = StreamEvaluator(code).evaluate
   println(ret)
 }
