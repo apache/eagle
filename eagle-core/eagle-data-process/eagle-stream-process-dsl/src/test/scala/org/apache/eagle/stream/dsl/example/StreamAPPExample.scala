@@ -28,7 +28,7 @@ object StreamAPPExample_1 extends App {
 
   "number" ~> stdout parallism 1
 
-  submit()
+  submit
 }
 
 object StreamAPPExample_2 extends App {
@@ -38,9 +38,9 @@ object StreamAPPExample_2 extends App {
 
   filter("number") where {_.as[Int] % 2 == 0}
 
-  "number" groupBy "value" to stdout parallism 1
+  "number" groupBy "value" to console() parallism 1
 
-  submit()
+  submit
 }
 
 object StreamAPPExample_3 extends App {
@@ -54,7 +54,7 @@ object StreamAPPExample_3 extends App {
 
   "number" groupBy "key" to stdout parallism 1
 
-  submit()
+  submit
 }
 
 object StreamAPPExample_4 extends App {
@@ -64,22 +64,56 @@ object StreamAPPExample_4 extends App {
 
   'metricStream to alert("metricExecutor")
 
-  submit()
+  submit
 }
 
-object StreamAPPExample_5 extends App{
+object StreamAPPExample_5 extends App {
   init[storm](args)
 
-  define("metricStream") from kafka parallism 1
+  define("logStream") from Seq(
+    "55.3.244.1 GET /index.html 15824 0.043",
+    "55.3.244.1 GET /index.html 15824 0.043",
+    "55.3.244.1 GET /index.html 15824 0.043",
+    "55.3.244.1 GET /index.html 15824 0.043",
+    "55.3.244.1 GET /index.html 15824 0.043",
+    "55.3.244.1 GET /index.html 15824 0.043"
+  ) as ("line"->'string) parallism 1
 
-  alert("metricStream" -> "alertStream") by sql"""
-    from metricStream[metric=="RpcActivityForPort50020.RpcQueueTimeNumOps" and value>100] select * insert into alertStream;
-  """
+  filter("logStream") by grok {
+    pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""".r)
+  }
 
-  aggregate("metricStream" -> "aggregatedStream") by {sql"""
-    from metricStream[component=='dn' and metricType=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
-    select sum(value) group by host output every 1 hour insert into aggregatedStream;
-  """} as("host" -> 'string,"metric"->'string,"sum"->'double,"timestamp"->'long)
+  'logStream to stdout
 
-  submit()
+  submit
 }
+
+//object StreamAPPExample_5 extends App{
+//  init[storm](args)
+//
+//  define("metricStream") from kafka parallism 1
+//
+//  alert("metricStream" -> "alertStream") by sql"""
+//    from metricStream[metric=="RpcActivityForPort50020.RpcQueueTimeNumOps" and value>100] select * insert into alertStream;
+//  """
+//
+//  aggregate("metricStream" -> "aggregatedStream") by sql"""
+//   from metricStream[component=='dn' and metric=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
+//    select sum(value) group by host output every 1 hour insert into aggregatedStream;
+//  """ as("host" -> 'string,"metric"->'string,"sum"->'double,"timestamp"->'long)
+//
+//  submit
+//}
+//
+//object StreamAPPExample_6 extends App {
+//  init[storm](args)
+//
+//  define("logStream") from Seq("2015-12-25 18:36:06,047 INFO [http-bio-38080-exec-7] generic.ListQueryResource[264]: Output: ALL")
+//  filter("logStream") by grok {
+//    pattern("field"-> """""".r)
+//    add_field("new_field"->"value")
+//  }
+//  "logStream" to stdout
+//
+//  submit
+//}

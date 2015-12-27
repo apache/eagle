@@ -1,7 +1,3 @@
-package org.apache.eagle.stream.dsl.interface.external
-
-import org.apache.eagle.datastream.core.{ForeachProducer, StreamProducer}
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,6 +14,18 @@ import org.apache.eagle.datastream.core.{ForeachProducer, StreamProducer}
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-trait StdIOAPIBuilder {
-  def stdout:StreamProducer[Any] = ForeachProducer[Any](t=>println(t))
+package org.apache.eagle.stream.dsl.example
+
+import org.apache.eagle.stream.dsl.utils.UtilImplicits._
+import org.scalatest.{FlatSpec, Matchers}
+
+class StreamAppSpec extends FlatSpec with Matchers{
+  "Named group pattern" should "match" in {
+    val log = "55.3.244.1 GET /index.html 15824 0.043"
+    val pattern = """(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""".r
+    pattern.findAllMatchIn(log).foreach(m=>{
+      pattern.namedGroups shouldNot be(null)
+      m.namedGroupsValue(pattern) shouldNot be(null)
+    })
+  }
 }

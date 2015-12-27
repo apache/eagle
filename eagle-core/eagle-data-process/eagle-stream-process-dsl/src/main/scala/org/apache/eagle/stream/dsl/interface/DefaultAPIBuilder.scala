@@ -16,16 +16,17 @@
  */
 package org.apache.eagle.stream.dsl.interface
 
-import org.apache.eagle.stream.dsl.interface.external.{StdIOAPIBuilder, KafkaAPIBuilder}
+import org.apache.eagle.stream.dsl.interface.external.{ConsoleAPIBuilder, KafkaAPIBuilder}
 
 trait DefaultAPIBuilder
   extends DefinitionAPIBuilder
   with ConnectAPIBuilder
   with ConfigAPIBuilder
   with KafkaAPIBuilder
-  with StdIOAPIBuilder
+  with ConsoleAPIBuilder
   with FilterAPIBuilder
+  with GrokAPIBuilder
   with NativeTypeAdapter
   with AlertAPIBuilder
-  with ScriptAPIBuilder
   with AggregateAPIBuilder
+  with ScriptAPIBuilder

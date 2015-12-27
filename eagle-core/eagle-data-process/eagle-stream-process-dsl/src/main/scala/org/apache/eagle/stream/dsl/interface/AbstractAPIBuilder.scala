@@ -19,10 +19,13 @@ package org.apache.eagle.stream.dsl.interface
 import org.apache.eagle.datastream.ExecutionEnvironments
 import org.apache.eagle.datastream.core.ExecutionEnvironment
 import org.apache.eagle.stream.dsl.StreamContext
+import org.apache.eagle.stream.dsl.definition.StreamDefinition
 
 import scala.reflect.runtime.universe._
 trait AbstractAPIBuilder extends APIBuilderHelper{
   private var _context:StreamContext = null
+
+  implicit protected var primaryStream:StreamDefinition  = null
 
   def context(context:StreamContext):Unit = {
     if(_context!=null) throw new IllegalStateException("Context has already been initialized")
@@ -43,8 +46,9 @@ trait AbstractAPIBuilder extends APIBuilderHelper{
     context(StreamContext(ExecutionEnvironments.get[T](args)))
   }
 
-  def submit():Unit = {
+  def submit:ExecutionEnvironment = {
     context.getEnvironment.execute()
+    context.getEnvironment
   }
 }
 

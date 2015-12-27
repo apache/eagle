@@ -12,6 +12,6 @@ define("number") from Range(1,10000) parallism 1
 
 // filter ("metric") groupBy 0 by {line:Map[String,AnyRef] => line}
 
-"number" groupBy 0 to stdout parallism 1
+"number" groupBy 0 to console parallism 1
 
 submit()

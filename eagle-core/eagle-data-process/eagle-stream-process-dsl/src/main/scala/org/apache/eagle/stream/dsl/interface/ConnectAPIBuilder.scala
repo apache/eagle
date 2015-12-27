@@ -1,7 +1,6 @@
 package org.apache.eagle.stream.dsl.interface
 
 import org.apache.eagle.datastream.core.StreamProducer
-import org.apache.eagle.stream.dsl.definition.StreamDefinition
 import org.slf4j.LoggerFactory
 
 /**
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory
 
 trait ConnectAPIBuilder extends AbstractAPIBuilder {
   private val LOG = LoggerFactory.getLogger(classOf[ConnectAPIBuilder])
-  protected var primaryStream:StreamDefinition  = null
 
   def to(next: StreamProducer[Any]): StreamSettingAPIBuilder = {
     LOG.info(s"${primaryStream.getProducer} -> $next")

@@ -22,18 +22,21 @@ private case class AggregateContext(from:StreamDefinition,var to:StreamDefinitio
 
 trait AggregateAPIBuilder extends AbstractAPIBuilder{
   private var _context:AggregateContext = null
-  def aggregate(streamFlow:(String,String)):AggregateAPIBuilder={
+
+  def aggregate(stream:(String,String)):AggregateAPIBuilder= {
     shouldNotBeNull(_context)
-    _context = AggregateContext(context.getStreamManager.getStreamDefinition(streamFlow._1),StreamDefinition(streamFlow._1,null))
+    if(stream._1.equals(stream._2)) throw new IllegalArgumentException(s"input and output stream should not be same but it's ${stream._1} -> ${stream._2}")
+    _context = AggregateContext(context.getStreamManager.getStreamDefinition(stream._1),StreamDefinition(stream._1,null))
     this
   }
 
-  def by(rule:ScriptString):StreamSettingAPIBuilder = rule match {
-    case sql:SqlScript => {
-      val producer = null // TODO: _context.from.getProducer.aggregateBy(sql.getContent)
-      _context.to.setProducer(producer)
-      StreamSettingAPIBuilder(_context.to)
-    }
-    case _ => throw new UnsupportedOperationException(s"aggregate rule $rule is not supported")
-  }
+  def using(rule:ScriptString):StreamSettingAPIBuilder = ???
+//  rule match {
+//    case sql:SqlScript => {
+//      val producer = null // TODO: _context.from.getProducer.aggregateBy(sql.getContent)
+//      _context.to.setProducer(producer)
+//      StreamSettingAPIBuilder(_context.to)
+//    }
+//    case _ => throw new UnsupportedOperationException(s"aggregate rule $rule is not supported")
+//  }
 }

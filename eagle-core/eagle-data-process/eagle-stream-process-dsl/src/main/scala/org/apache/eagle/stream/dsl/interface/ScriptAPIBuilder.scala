@@ -22,8 +22,6 @@ class ScriptString(content:String,scriptType:String) extends Serializable{
 }
 
 case class SqlScript(content:String) extends ScriptString(content,"sql")
-trait ScriptAPIBuilder extends AbstractAPIBuilder{
-  implicit class ScriptStringImplicits(val sc:StringContext) extends AnyVal{
-    def sql(arg:Any):SqlScript = SqlScript(arg.asInstanceOf[String])
-  }
+
+trait ScriptAPIBuilder{
 }

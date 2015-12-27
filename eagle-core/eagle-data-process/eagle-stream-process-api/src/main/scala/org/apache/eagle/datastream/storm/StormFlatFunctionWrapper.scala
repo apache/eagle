@@ -16,17 +16,18 @@
  */
 package org.apache.eagle.datastream.storm
 
-import backtype.storm.tuple.Tuple
-import org.apache.eagle.datastream.{Collector, FlatMapper}
-import org.apache.eagle.datastream.core.StreamInfo
-import scala.collection.JavaConverters._
+import java.util
 
-case class StormFlatMapperWrapper(flatMapper:FlatMapper[Any])(implicit info:StreamInfo) extends AbstractStreamBolt[Any]{
+import backtype.storm.tuple.Tuple
+import org.apache.eagle.datastream.Collector
+import org.apache.eagle.datastream.core.StreamInfo
+
+case class StormFlatFunctionWrapper(flatMapper:(Any,Collector[Any])=>Unit)(implicit info:StreamInfo) extends AbstractStreamBolt[Any]{
   /**
    * Handle keyed stream value
    */
   override def onKeyValue(key: Any, value: Any)(implicit input: Tuple): Unit = {
-    flatMapper.flatMap(value.asInstanceOf[Seq[AnyRef]],new Collector[Any] {
+    flatMapper(value,new Collector[Any] {
       override def collect(r: Any): Unit = emit(r)(input)
     })
   }
@@ -36,8 +37,8 @@ case class StormFlatMapperWrapper(flatMapper:FlatMapper[Any])(implicit info:Stre
    *
    * @param values
    */
-  override def onValues(values: java.util.List[AnyRef])(implicit input: Tuple): Unit = {
-    flatMapper.flatMap(values.asScala,new Collector[Any] {
+  override def onValues(values: util.List[AnyRef])(implicit input: Tuple): Unit = {
+    flatMapper(values,new Collector[Any] {
       override def collect(r: Any): Unit = emit(r)(input)
     })
   }

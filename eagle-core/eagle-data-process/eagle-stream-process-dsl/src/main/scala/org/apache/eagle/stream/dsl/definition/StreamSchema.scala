@@ -60,6 +60,13 @@ case class StreamSchema(name:String,attributes:Seq[Attribute]) extends Serializa
       attributes.indexWhere(_.getName.eq(attributeName))
     } else -1
   }
+
+  @throws[IllegalArgumentException]
+  def indexOfAttributeOrException(attributeName:String):Int = {
+    if(attributes != null){
+      attributes.indexWhere(_.getName.eq(attributeName))
+    } else throw new IllegalArgumentException(s"Attribute [$attributeName] is not found in stream $this")
+  }
 }
 
 object StreamSchema{

@@ -1,7 +1,6 @@
 package org.apache.eagle.stream.dsl.interface
 
 import org.apache.eagle.datastream.Collector
-import org.apache.eagle.stream.dsl.definition.StreamDefinition
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,22 +20,22 @@ import org.apache.eagle.stream.dsl.definition.StreamDefinition
  */
 
 trait FilterAPIBuilder extends AbstractAPIBuilder{
-  private[dsl] var _current:StreamDefinition = null
-
   def filter(streamName:String):FilterAPIBuilder = {
-    _current = context.getStreamManager.getStreamDefinition(streamName)
+    primaryStream = context.getStreamManager.getStreamDefinition(streamName)
     this
   }
 
   def where(func:Any=>Boolean):FilterAPIBuilder = {
-    val producer = _current.getProducer.filter(func)
-    _current.setProducer(producer)
+    val producer = primaryStream.getProducer.filter(func)
+    primaryStream.setProducer(producer)
     this
   }
 
   def by(func:(Any,Collector[Any])=>Unit):StreamSettingAPIBuilder = {
-    val producer = _current.getProducer.flatMap(func)
-    _current.setProducer(producer)
-    StreamSettingAPIBuilder(_current)
+    val producer = primaryStream.getProducer.flatMap(func)
+    primaryStream.setProducer(producer)
+    StreamSettingAPIBuilder(primaryStream)
   }
+
+  def by(grok:GrokContext):StreamSettingAPIBuilder
 }

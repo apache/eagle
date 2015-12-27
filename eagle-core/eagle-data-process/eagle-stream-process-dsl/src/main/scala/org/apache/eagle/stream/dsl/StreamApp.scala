@@ -16,9 +16,14 @@
  */
 package org.apache.eagle.stream.dsl
 
-import org.apache.eagle.stream.dsl.interface.DefaultAPIBuilder
+import org.apache.eagle.stream.dsl.interface.{SqlScript, DefaultAPIBuilder}
 
 class StreamApp extends DefaultAPIBuilder
+
 object StreamApp extends StreamApp{
   type storm = org.apache.eagle.datastream.storm.StormExecutionEnvironment
+
+  implicit class ScriptStringImplicits(val sc:StringContext) extends AnyVal{
+    def sql(arg:Any):SqlScript = SqlScript(arg.asInstanceOf[String])
+  }
 }

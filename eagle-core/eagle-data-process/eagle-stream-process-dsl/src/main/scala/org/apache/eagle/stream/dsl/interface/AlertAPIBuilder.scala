@@ -29,21 +29,21 @@ trait AlertAPIBuilder extends AbstractAPIBuilder with ConnectAPIBuilder{
     primaryStream.getProducer.alert(Seq(primaryStream.name),alertExecutor)
   }
 
-//  def alert(policy:ScriptString):ScriptAlertAPIBuilder = ???
   def alert(flowTo:(String,String)):AlertAPIBuilder = {
     _context = AlertContext(context.getStreamManager.getStreamDefinition(flowTo._1),context.getStreamManager.getStreamDefinition(flowTo._2))
     this.primaryStream = _context.from
     this
   }
 
-  def by(policy:Any):StreamSettingAPIBuilder = {
-    policy match {
-      case sql:SqlScript => {
-        primaryStream.getProducer.alertByPolicy(sql.content)
-      }
-      case _ => throw new IllegalArgumentException(s"Policy $policy is not supported yet")
-    }
-    StreamSettingAPIBuilder(this.primaryStream)
-  }
+  def by(policy:Any):StreamSettingAPIBuilder = ???
+//  {
+//    policy match {
+//      case sql:SqlScript => {
+//        // TODO: primaryStream.getProducer.alertByPolicy(sql.content)
+//      }
+//      case _ => throw new IllegalArgumentException(s"Policy $policy is not supported yet")
+//    }
+//    StreamSettingAPIBuilder(this.primaryStream)
+//  }
 }
 

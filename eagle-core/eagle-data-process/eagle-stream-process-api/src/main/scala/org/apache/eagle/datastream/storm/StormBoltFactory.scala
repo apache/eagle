@@ -35,10 +35,13 @@ object StormBoltFactory {
           worker.asInstanceOf[StormStreamExecutor[EagleTuple]].prepareConfig(config)
           StormBoltWrapper(worker.asInstanceOf[StormStreamExecutor[EagleTuple]])
         }else if(worker.isInstanceOf[FlatMapperWrapper[Any]]){
-          StormFlatMapperWrapper(worker.asInstanceOf[FlatMapperWrapper[Any]].func)
-        }else {
-          throw new UnsupportedOperationException(s"Unsupported FlatMapperProducer type: $producer")
+          StormFlatFunctionWrapper(worker.asInstanceOf[FlatMapperWrapper[Any]].func)
+        } else {
+          StormFlatMapperWrapper(worker)
         }
+//        else {
+//          throw new UnsupportedOperationException(s"Unsupported FlatMapperProducer type: $producer")
+//        }
       }
       case filter:FilterProducer[Any] => {
         FilterBoltWrapper(filter.fn)
