@@ -21,6 +21,10 @@ import org.slf4j.LoggerFactory
 import scala.reflect.runtime.{currentMirror => cm}
 import scala.tools.reflect.ToolBox
 
+case class ParseException(message:String,throwable:Throwable) extends Exception(message,throwable)
+case class CompileException(message:String,throwable:Throwable) extends Exception(message,throwable)
+case class EvaluateException(message:String,throwable:Throwable) extends Exception(message,throwable)
+
 case class StreamEvaluator(code:String) {
   private val logger = LoggerFactory.getLogger(classOf[StreamEvaluator])
   val tb = cm.mkToolBox()
@@ -36,27 +40,48 @@ case class StreamEvaluator(code:String) {
       | submit
     """.stripMargin
 
-  @throws[Exception]
+  @throws[ParseException]
   def parse = {
     val formatted = format
     if(logger.isDebugEnabled) logger.debug(s"Parsing \n $formatted")
-    val ret = tb.parse(format)
-    if(logger.isDebugEnabled) logger.debug(s"Parsed as\n $ret")
-    ret
+    try {
+      val ret = tb.parse(format)
+      if (logger.isDebugEnabled) logger.debug(s"Parsed as\n $ret")
+      ret
+    } catch {
+      case e:Throwable => {
+        sys.error(s"Failed to parse $formatted\nException: $e")
+        throw ParseException(s"Failed to parse $formatted",e)
+      }
+    }
   }
 
-  @throws[Exception]
+  @throws[CompileException]
   def compile:()=>Any = {
     val tree = parse
     if(logger.isDebugEnabled) logger.debug(s"Compiling $tree")
-    tb.compile(tree)
+    try {
+      tb.compile(tree)
+    }catch{
+      case e:Throwable =>{
+        sys.error(s"Failed to compile $tree\nException: $e")
+        throw CompileException(s"Failed to compile $tree",e)
+      }
+    }
   }
 
-  @throws[Exception]
+  @throws[EvaluateException]
   def evaluate:Any = {
     val tree = parse
     if(logger.isDebugEnabled) logger.debug(s"Evaluating $tree")
-    tb.eval(tree)
+    try {
+      tb.eval(tree)
+    } catch {
+      case e:Throwable =>{
+        sys.error(s"Failed to evaluate $tree\nException: $e")
+        throw EvaluateException(s"Failed to evaluate $tree",e)
+      }
+    }
   }
 }
 

@@ -81,7 +81,7 @@ object StreamAPPExample_5 extends App {
 
   filter("logStream") by grok {
     pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""".r)
-  }
+  } parallism 1
 
   'logStream to stdout
 

@@ -37,5 +37,5 @@ trait FilterAPIBuilder extends AbstractAPIBuilder{
     StreamSettingAPIBuilder(primaryStream)
   }
 
-  def by(grok:GrokContext):StreamSettingAPIBuilder
+  def by(grok:GrokAPIBuilder):StreamSettingAPIBuilder
 }

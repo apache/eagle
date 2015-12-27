@@ -65,12 +65,12 @@ case class FieldPatternGrok(fieldPattern:Seq[(String,Regex)])(implicit stream:St
 //}
 
 trait GrokAPIBuilder extends FilterAPIBuilder{
-  protected var _grokContext:GrokContext = null
+  private var grokContext:GrokContext = null
 
   def pattern(fieldPattern:(String,Regex)*):GrokContext = {
     ensureGrok()
-    _grokContext.appendGrok(FieldPatternGrok(fieldPattern))
-    _grokContext
+    grokContext.appendGrok(FieldPatternGrok(fieldPattern))
+    grokContext
   }
 
 //  def add_field(fieldValue:(String,Any)*):GrokDefinition = {
@@ -78,22 +78,23 @@ trait GrokAPIBuilder extends FilterAPIBuilder{
 //    _grokDefinition
 //  }
 
-  def grok(grokDef:GrokContext):GrokContext = {
-    val tmp = _grokContext
-    resetGrok()
-    tmp
+  def grok(func: => GrokContext):GrokAPIBuilder = {
+    func
+    this
   }
 
-  override def by(grok:GrokContext):StreamSettingAPIBuilder = {
-    val producer = primaryStream.getProducer.flatMap(grok)
+  override def by(grok:GrokAPIBuilder):StreamSettingAPIBuilder = {
+    val producer = primaryStream.getProducer.flatMap(grok.grokContext)
     primaryStream.setProducer(producer)
+    cleanGrok()
     StreamSettingAPIBuilder(primaryStream)
   }
 
-  protected def ensureGrok():Unit = {
-    if(_grokContext == null) _grokContext = GrokContext()
+  private def ensureGrok():Unit = {
+    if(grokContext == null) grokContext = GrokContext()
   }
-  protected def resetGrok():Unit = {
-    _grokContext = null
+
+  private def cleanGrok():Unit = {
+    grokContext = null
   }
 }
