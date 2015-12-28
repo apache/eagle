@@ -20,10 +20,10 @@ package org.apache.eagle.datastream.core
 
 import java.util
 
+import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl
+
 import scala.collection.JavaConversions.asScalaSet
 import scala.collection.mutable.ListBuffer
-
-import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl
 import org.apache.eagle.datastream.EagleTuple
 import org.apache.eagle.datastream.JavaStormExecutorForAlertWrapper
 import org.apache.eagle.datastream.JavaStormStreamExecutor

@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.ml;
 
-import org.apache.eagle.alert.siddhi.PolicyEvaluationContext;
+import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.ml.model.MLCallbackResult;
 
 public interface MLAnomalyCallback {

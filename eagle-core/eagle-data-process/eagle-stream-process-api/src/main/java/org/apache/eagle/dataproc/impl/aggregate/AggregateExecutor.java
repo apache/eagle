@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate;
 
-import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.policy.PolicyPartitioner;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.PolicyPartitioner;
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEntity;
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
-import org.apache.eagle.executor.PolicyProcessExecutor;
+import org.apache.eagle.policy.executor.PolicyProcessExecutor;
 
 /**
  * @since Dec 16, 2015

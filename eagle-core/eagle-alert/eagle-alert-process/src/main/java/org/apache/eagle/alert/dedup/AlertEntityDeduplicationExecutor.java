@@ -18,8 +18,8 @@ package org.apache.eagle.alert.dedup;
 
 import java.util.List;
 
-import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
 
 public class AlertEntityDeduplicationExecutor extends AlertDeduplicationExecutorBase {
 

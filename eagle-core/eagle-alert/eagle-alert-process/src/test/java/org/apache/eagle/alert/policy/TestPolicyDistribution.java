@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.policy;
 
+import org.apache.eagle.policy.DefaultPolicyPartitioner;
 import org.junit.Test;
 
 public class TestPolicyDistribution {

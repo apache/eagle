@@ -16,15 +16,15 @@
  */
 package org.apache.eagle.executor;
 
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.config.AbstractPolicyDefinition;
-import org.apache.eagle.alert.dao.AlertStreamSchemaDAOImpl;
-import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.policy.PolicyEvaluator;
-import org.apache.eagle.alert.policy.PolicyManager;
-import org.apache.eagle.alert.siddhi.SiddhiPolicyDefinition;
-import org.apache.eagle.alert.siddhi.StreamMetadataManager;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.config.AbstractPolicyDefinition;
+import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
+import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.policy.PolicyEvaluator;
+import org.apache.eagle.policy.PolicyManager;
+import org.apache.eagle.policy.siddhi.SiddhiPolicyDefinition;
+import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class TestPolicyExecutor {
 	@Test
 	public void testReflectCreatePolicyEvaluator() throws Exception {
 		System.setProperty("config.resource", "/unittest.conf");
-		String policyType = AlertConstants.policyType.siddhiCEPEngine.name();
+		String policyType = Constants.policyType.siddhiCEPEngine.name();
 		Class<? extends PolicyEvaluator> evalCls = PolicyManager.getInstance().getPolicyEvaluator(policyType);
 		Config config = ConfigFactory.load();
 

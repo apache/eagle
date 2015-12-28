@@ -23,10 +23,10 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
-import org.apache.eagle.alert.entity.AlertAPIEntity
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity
 import org.apache.eagle.datastream.FlatMapper
 import org.apache.eagle.partition.PartitionStrategy
+import org.apache.eagle.policy.entity.AlertAPIEntity
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 

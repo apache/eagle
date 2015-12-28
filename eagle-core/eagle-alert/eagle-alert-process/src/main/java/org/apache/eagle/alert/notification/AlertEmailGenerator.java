@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-import org.apache.eagle.alert.common.AlertConstants;
+import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.alert.common.AlertEmailSender;
 import org.apache.eagle.alert.email.AlertEmailComponent;
 import org.apache.eagle.alert.email.AlertEmailContext;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.policy.entity.AlertAPIEntity;
 import com.typesafe.config.ConfigObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +61,8 @@ public class AlertEmailGenerator{
 		List<AlertEmailComponent> components = new ArrayList<AlertEmailComponent>();
 		components.add(component);		
 		email.setComponents(components);
-		if (entity.getAlertContext().getProperty(AlertConstants.SUBJECT) != null) {
-			email.setSubject(entity.getAlertContext().getProperty(AlertConstants.SUBJECT));
+		if (entity.getAlertContext().getProperty(Constants.SUBJECT) != null) {
+			email.setSubject(entity.getAlertContext().getProperty(Constants.SUBJECT));
 		}
 		else email.setSubject(subject);
 		email.setVelocityTplFile(tplFile);

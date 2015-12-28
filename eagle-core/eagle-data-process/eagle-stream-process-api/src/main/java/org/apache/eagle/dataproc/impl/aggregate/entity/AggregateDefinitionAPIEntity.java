@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate.entity;
 
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.log.entity.meta.Column;
 import org.apache.eagle.log.entity.meta.ColumnFamily;
 import org.apache.eagle.log.entity.meta.Index;
@@ -38,7 +38,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Table("analyzedef")
 @ColumnFamily("f")
 @Prefix("analyzedef")
-@Service(AlertConstants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME)
+@Service(Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
 @Tags({"site", "dataSource", "analyzeExecutorId", "policyId", "policyType"})

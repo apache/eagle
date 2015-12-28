@@ -23,11 +23,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.config.AbstractPolicyDefinition;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.policy.PolicyEvaluator;
-import org.apache.eagle.alert.policy.PolicyManager;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.config.AbstractPolicyDefinition;
+import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.policy.PolicyEvaluator;
+import org.apache.eagle.policy.PolicyManager;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.ml.impl.MLAnomalyCallbackImpl;
@@ -67,7 +67,7 @@ public class MLPolicyEvaluator implements PolicyEvaluator<AlertDefinitionAPIEnti
         this.policyName = policyName;
         LOG.info("Initializing policy named: "+policyName);
         this.context = new HashMap<>();
-        this.context.put(AlertConstants.SOURCE_STREAMS, StringUtils.join(sourceStreams,","));
+        this.context.put(Constants.SOURCE_STREAMS, StringUtils.join(sourceStreams,","));
 		this.init(policyDef);
 	}
 

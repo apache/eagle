@@ -21,13 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.alert.common.AlertConstants;
+import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.alert.config.DeduplicatorConfig;
-import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.policy.DynamicPolicyLoader;
-import org.apache.eagle.alert.policy.PolicyLifecycleMethods;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.entity.AlertAPIEntity;
+import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.policy.DynamicPolicyLoader;
+import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.datastream.Collector;
@@ -107,7 +107,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
                        try {
                           DefaultDeduplicator<AlertAPIEntity> deduplicator = createAlertDedup(alertDef);
                           if (deduplicator != null)
-                              tmpDeduplicators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), deduplicator);
+                              tmpDeduplicators.put(alertDef.getTags().get(Constants.POLICY_ID), deduplicator);
                           else LOG.warn("The dedup interval is not set, alertDef: " + alertDef);
                         }
                         catch (Throwable t) {
@@ -160,7 +160,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 			DefaultDeduplicator<AlertAPIEntity> dedup = createAlertDedup(alertDef);
 			if (dedup != null) {
 				synchronized(alertDedups) {		
-					alertDedups.put(alertDef.getTags().get(AlertConstants.POLICY_ID), dedup);
+					alertDedups.put(alertDef.getTags().get(Constants.POLICY_ID), dedup);
 				}
 			}
 		}
@@ -173,7 +173,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 			DefaultDeduplicator<AlertAPIEntity> dedup = createAlertDedup(alertDef);
 			if (dedup != null) {
 				synchronized(alertDedups) {
-					alertDedups.put(alertDef.getTags().get(AlertConstants.POLICY_ID), dedup);
+					alertDedups.put(alertDef.getTags().get(Constants.POLICY_ID), dedup);
 				}
 			}
 		}
@@ -185,7 +185,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 			LOG.info("alert dedup config deleted " + alertDef);
 			// no cleanup to do, just remove it
 			synchronized(alertDedups) {		
-				alertDedups.remove(alertDef.getTags().get(AlertConstants.POLICY_ID));
+				alertDedups.remove(alertDef.getTags().get(Constants.POLICY_ID));
 			}
 		}
 	}

@@ -19,11 +19,11 @@ package org.apache.eagle.dataproc.impl.aggregate;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.dao.PolicyEnityDAOImpl;
-import org.apache.eagle.alert.policy.DefaultPolicyPartitioner;
-import org.apache.eagle.alert.policy.PolicyPartitioner;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
+import org.apache.eagle.policy.DefaultPolicyPartitioner;
+import org.apache.eagle.policy.PolicyPartitioner;
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
@@ -56,8 +56,8 @@ public class AggregateExecutorFactory {
 		StringBuilder partitionerCls = new StringBuilder(DefaultPolicyPartitioner.class.getCanonicalName());
         int numPartitions = loadExecutorConfig(config, executorId, partitionerCls);
         
-		PolicyDefinitionDAO<AggregateDefinitionAPIEntity> policyDefDao = new PolicyEnityDAOImpl<AggregateDefinitionAPIEntity>(
-				new EagleServiceConnector(config), AlertConstants.ANALYZE_DEFINITION_SERVICE_ENDPOINT_NAME);
+		PolicyDefinitionDAO<AggregateDefinitionAPIEntity> policyDefDao = new PolicyDefinitionEntityDAOImpl<AggregateDefinitionAPIEntity>(
+				new EagleServiceConnector(config), Constants.ANALYZE_DEFINITION_SERVICE_ENDPOINT_NAME);
 		
 		
 		return newAggregateExecutors(policyDefDao, streamNames, executorId, numPartitions, partitionerCls.toString());
@@ -93,7 +93,7 @@ public class AggregateExecutorFactory {
 //		List<AlertExecutorEntity> alertExecutorEntities = alertExecutorDAO.findAlertExecutor(dataSource,
 //				executorId);
 //		for (AlertExecutorEntity entity : alertExecutorEntities) {
-//			streamNames.add(entity.getTags().get(AlertConstants.STREAM_NAME));
+//			streamNames.add(entity.getTags().get(Constants.STREAM_NAME));
 //		}
 //		return streamNames;
 //	}

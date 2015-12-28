@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.apache.eagle.service.generic.ListQueryResource;
 
-import org.apache.eagle.alert.entity.AlertDataSourceEntity;
+import org.apache.eagle.policy.entity.AlertDataSourceEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

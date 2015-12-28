@@ -18,7 +18,7 @@ package org.apache.eagle.dataproc.impl.persist.druid;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValue;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.policy.entity.AlertAPIEntity;
 import org.apache.eagle.dataproc.impl.persist.IPersistService;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;

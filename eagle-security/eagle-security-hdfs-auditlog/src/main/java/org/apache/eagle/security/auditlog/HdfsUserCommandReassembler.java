@@ -19,8 +19,8 @@
 package org.apache.eagle.security.auditlog;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.siddhi.AttributeType;
-import org.apache.eagle.alert.siddhi.SiddhiStreamMetadataUtils;
+import org.apache.eagle.policy.siddhi.AttributeType;
+import org.apache.eagle.policy.siddhi.SiddhiStreamMetadataUtils;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
 import org.apache.eagle.datastream.Tuple2;

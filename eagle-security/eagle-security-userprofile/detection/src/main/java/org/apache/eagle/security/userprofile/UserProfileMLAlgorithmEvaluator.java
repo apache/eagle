@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.security.userprofile;
 
-import org.apache.eagle.alert.siddhi.PolicyEvaluationContext;
+import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.ml.MLAlgorithmEvaluator;
 import org.apache.eagle.ml.MLAnomalyCallback;
@@ -28,7 +28,6 @@ import org.apache.eagle.ml.model.MLModelAPIEntity;
 import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.apache.eagle.security.userprofile.model.UserProfileModel;
 import com.typesafe.config.Config;
-import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

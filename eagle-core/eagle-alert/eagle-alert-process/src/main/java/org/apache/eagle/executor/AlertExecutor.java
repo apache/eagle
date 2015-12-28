@@ -16,10 +16,11 @@
  */
 package org.apache.eagle.executor;
 
-import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.policy.PolicyPartitioner;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.entity.AlertAPIEntity;
+import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.policy.PolicyPartitioner;
+import org.apache.eagle.policy.executor.PolicyProcessExecutor;
 
 public class AlertExecutor extends PolicyProcessExecutor<AlertDefinitionAPIEntity, AlertAPIEntity> {
 

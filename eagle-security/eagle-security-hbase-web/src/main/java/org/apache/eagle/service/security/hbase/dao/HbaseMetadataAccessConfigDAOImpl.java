@@ -20,7 +20,7 @@ package org.apache.eagle.service.security.hbase.dao;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.eagle.alert.entity.AlertDataSourceEntity;
+import org.apache.eagle.policy.entity.AlertDataSourceEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import org.apache.eagle.security.util.BadMetadataAccessConfigException;
 import org.apache.eagle.service.generic.ListQueryResource;

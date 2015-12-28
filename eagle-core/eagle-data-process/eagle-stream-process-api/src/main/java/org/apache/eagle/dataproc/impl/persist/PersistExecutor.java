@@ -17,7 +17,7 @@
 package org.apache.eagle.dataproc.impl.persist;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.policy.entity.AlertAPIEntity;
 import org.apache.eagle.dataproc.impl.persist.druid.DruidPersistService;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;

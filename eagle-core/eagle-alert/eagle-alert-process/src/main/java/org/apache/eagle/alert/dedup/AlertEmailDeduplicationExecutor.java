@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.alert.dedup;
 
-import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 
 import java.util.List;
 

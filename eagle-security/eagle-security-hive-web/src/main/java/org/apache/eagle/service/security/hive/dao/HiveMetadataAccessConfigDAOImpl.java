@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.service.security.hive.dao;
 
-import org.apache.eagle.alert.entity.AlertDataSourceEntity;
+import org.apache.eagle.policy.entity.AlertDataSourceEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import org.apache.eagle.service.generic.ListQueryResource;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
-import org.apache.eagle.alert.siddhi.AttributeType;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.policy.siddhi.AttributeType;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.common.DateTimeUtil;
 import com.fasterxml.jackson.databind.Module;
@@ -50,7 +50,7 @@ public class SiddhiAlertPolicyValidateProvider extends AlertPolicyValidateProvid
 		String startTime = "1969-01-01 00:00:00";
 		String endTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(Long.MAX_VALUE);
 		int pageSize = 1000;
-		String query = AlertConstants.ALERT_STREAM_SCHEMA_SERVICE_ENDPOINT_NAME + "[@streamName=\"" + streamName + "\"]{*}";
+		String query = Constants.ALERT_STREAM_SCHEMA_SERVICE_ENDPOINT_NAME + "[@streamName=\"" + streamName + "\"]{*}";
 		GenericServiceAPIResponseEntity<AlertStreamSchemaEntity> streamResponse = resource.search(query, startTime, endTime, pageSize, null, false, false, 0L, 0, true, 0, null, false);
 		List<AlertStreamSchemaEntity> list = streamResponse.getObj();
 		

@@ -18,7 +18,6 @@
  */
 package org.apache.eagle.security.auditlog;
 
-import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl;
 import org.apache.eagle.security.hdfs.entity.HdfsUserCommandPatternEntity;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;

@@ -20,10 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.datastream.TestStreamAggregate.DummyExecutor;
-import org.apache.eagle.datastream.TestStreamAggregate.DummyStrategy;
-import org.apache.eagle.datastream.TestStreamAggregate.TestEnvironment;
+import org.apache.eagle.policy.entity.AlertAPIEntity;
 import org.apache.eagle.datastream.core.FlatMapProducer;
 import org.apache.eagle.datastream.core.StormSourceProducer;
 import org.apache.eagle.datastream.core.StreamConnector;
