@@ -95,6 +95,14 @@
             <lineEnding>unix</lineEnding>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/src/main/tools</directory>
+            <outputDirectory>tools/</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/src/main/lib/tomcat/bin</directory>
             <outputDirectory>lib/tomcat/bin</outputDirectory>
             <includes>
