@@ -38,9 +38,9 @@ public class PersistExecutor extends JavaStormStreamExecutor2<String, AlertAPIEn
 
 	private Config config;
 	private IPersistService<AlertAPIEntity> persistService;
-	private scala.Enumeration.Value persistType;
+	private String persistType;
 
-	public PersistExecutor(scala.Enumeration.Value persistType) {
+	public PersistExecutor(String persistType) {
 		this.persistType = persistType;
 	}
 
@@ -51,7 +51,7 @@ public class PersistExecutor extends JavaStormStreamExecutor2<String, AlertAPIEn
 
     @Override
 	public void init() {
-		if (persistType == StorageType.DRUID()) {
+		if (persistType.equalsIgnoreCase(StorageType.DRUID().toString())) {
 			persistService = new DruidPersistService(this.config);
 		} else {
 			throw new RuntimeException(String.format("Persist type '%s' not supported yet!", persistService));

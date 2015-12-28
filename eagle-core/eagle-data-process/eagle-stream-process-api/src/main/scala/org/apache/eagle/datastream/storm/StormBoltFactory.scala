@@ -51,7 +51,7 @@ object StormBoltFactory {
         ForeachBoltWrapper(foreach.fn)
       }
       case persist : PersistProducer[storage] => {
-        val persisExecutor = new PersistExecutor(persist.storageType);
+        val persisExecutor = new PersistExecutor(persist.storageType.toString());
         persisExecutor.prepareConfig(config);
         JavaStormBoltWrapper(persist.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
       }
