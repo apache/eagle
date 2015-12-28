@@ -19,11 +19,12 @@ package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
 import org.apache.commons.lang3.builder.HashCodeBuilder
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity
 import org.apache.eagle.datastream.FlatMapper
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
+
 import scala.reflect.runtime.{universe => ru}
-import org.apache.eagle.dataproc.impl.analyze.entity.AnalyzeEntity
 
 /**
  * StreamInfo should be fully serializable and having not runtime type information
@@ -81,6 +82,12 @@ class StreamInfo  extends Serializable{
   def getInfo = this
 
   override def hashCode(): Int = new HashCodeBuilder().append(this.id).append(this.getClass).toHashCode
+}
+
+
+object StorageType extends Enumeration {
+  type StorageType = Value
+  val DRUID, HBASE = Value
 }
 
 /**
@@ -147,9 +154,12 @@ trait StreamProtocol[+T <: Any]{
 
   def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
-  def aggregate(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy): StreamProducer[AnalyzeEntity]
-  
-  def persist(): StreamProducer[T]
+
+  def aggregate(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy): StreamProducer[AggregateEntity]
+
+  // def aggregate(cql : String): StreamProducer[AggregateEntity]
+
+  def persist(storageType: StorageType.StorageType): StreamProducer[T]
   
   /**
    * Set processing element parallelism setting

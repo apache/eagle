@@ -18,9 +18,6 @@ package org.apache.eagle.alert.entity;
 
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.common.metric.AlertContext;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.Column;
 import org.apache.eagle.log.entity.meta.ColumnFamily;
@@ -28,6 +25,8 @@ import org.apache.eagle.log.entity.meta.Prefix;
 import org.apache.eagle.log.entity.meta.Service;
 import org.apache.eagle.log.entity.meta.Table;
 import org.apache.eagle.log.entity.meta.TimeSeries;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("alertdetail")
@@ -45,6 +44,8 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 	private String remediationCallback;
 	@Column("alertContext")
 	private AlertContext alertContext;
+	@Column("streamId")
+	private String streamId;
 
 	public String getDescription() {
 		return description;
@@ -80,5 +81,13 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 	public void setAlertContext(AlertContext alertContext) {
 		this.alertContext = alertContext;
 		_pcs.firePropertyChange("alertContext", null, null);
+	}
+
+	public String getStreamId() {
+		return streamId;
+	}
+
+	public void setStreamId(String streamId) {
+		this.streamId = streamId;
 	}
 }

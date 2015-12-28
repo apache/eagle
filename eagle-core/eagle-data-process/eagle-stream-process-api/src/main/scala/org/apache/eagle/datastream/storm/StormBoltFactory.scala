@@ -50,11 +50,11 @@ object StormBoltFactory {
       case foreach:ForeachProducer[Any] => {
         ForeachBoltWrapper(foreach.fn)
       }
-//      case persist : PersisProducer[Any] => {
-//        val persisExecutor = new PersistExecutor();
-//        persisExecutor.prepareConfig(config);
-//        JavaStormBoltWrapper(persisExecutor)
-//      }
+      case persist : PersistProducer[storage] => {
+        val persisExecutor = new PersistExecutor(persist.storageType);
+        persisExecutor.prepareConfig(config);
+        JavaStormBoltWrapper(persist.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
+      }
       case _ => throw new UnsupportedOperationException(s"Unsupported producer: ${producer.toString}")
     }
   }

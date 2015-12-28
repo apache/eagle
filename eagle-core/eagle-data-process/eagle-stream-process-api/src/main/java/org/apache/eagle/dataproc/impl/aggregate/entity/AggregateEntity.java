@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.analyze.entity;
+package org.apache.eagle.dataproc.impl.aggregate.entity;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
@@ -24,7 +24,7 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
  * @since Dec 17, 2015
  *
  */
-public class AnalyzeEntity extends TaggedLogAPIEntity {
+public class AggregateEntity extends TaggedLogAPIEntity {
 
 	private static final long serialVersionUID = 5911351515190098292L;
 

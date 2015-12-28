@@ -14,26 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.analyze;
+package org.apache.eagle.dataproc.impl.aggregate;
 
 import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.policy.PolicyPartitioner;
-import org.apache.eagle.dataproc.impl.analyze.entity.AnalyzeDefinitionAPIEntity;
-import org.apache.eagle.dataproc.impl.analyze.entity.AnalyzeEntity;
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEntity;
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.executor.PolicyProcessExecutor;
 
 /**
  * @since Dec 16, 2015
  *
  */
-public class AnalyzeExecutor extends PolicyProcessExecutor<AnalyzeDefinitionAPIEntity, AnalyzeEntity> {
+public class AggregateExecutor extends PolicyProcessExecutor<AggregateDefinitionAPIEntity, AggregateEntity> {
 
 	private static final long serialVersionUID = 1L;
 
-	public AnalyzeExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
-			PolicyDefinitionDAO<AnalyzeDefinitionAPIEntity> alertDefinitionDao, String[] sourceStreams) {
-		super(alertExecutorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams,
-				AnalyzeDefinitionAPIEntity.class);
+	public AggregateExecutor(String executorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
+			PolicyDefinitionDAO<AggregateDefinitionAPIEntity> alertDefinitionDao, String[] sourceStreams) {
+		super(executorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams,
+				AggregateDefinitionAPIEntity.class);
 	}
 
 }

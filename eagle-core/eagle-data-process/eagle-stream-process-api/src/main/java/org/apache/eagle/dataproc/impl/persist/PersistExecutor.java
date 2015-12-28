@@ -16,15 +16,17 @@
  */
 package org.apache.eagle.dataproc.impl.persist;
 
-import java.util.List;
-
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.dataproc.impl.persist.druid.DruidPersistService;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import org.apache.eagle.datastream.core.StorageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * @since Dec 19, 2015
@@ -32,42 +34,45 @@ import com.typesafe.config.Config;
  */
 public class PersistExecutor extends JavaStormStreamExecutor2<String, AlertAPIEntity> {
 	
-	private static final long serialVersionUID = 1L;
-
 	private static final Logger LOG = LoggerFactory.getLogger(PersistExecutor.class);
 
 	private Config config;
 	private IPersistService<AlertAPIEntity> persistService;
-	private String executorId;
+	private scala.Enumeration.Value persistType;
 
-	public PersistExecutor() {
-		// TODO Auto-generated constructor stub
+	public PersistExecutor(scala.Enumeration.Value persistType) {
+		this.persistType = persistType;
 	}
 
-	@Override
+    @Override
 	public void prepareConfig(Config config) {
 		this.config = config;
-		
-		String persistType = this.config.getString("persistConfigs" + "." + "type");
-		
 	}
 
-	@Override
+    @Override
 	public void init() {
+		if (persistType == StorageType.DRUID()) {
+			persistService = new DruidPersistService(this.config);
+		} else {
+			throw new RuntimeException(String.format("Persist type '%s' not supported yet!", persistService));
+		}
 	}
 
-	@Override
+    @Override
 	public void flatMap(List input, Collector collector) {
-		// TODO Auto-generated method stub
 		if (input.size() != 2) {
-			LOG.error(String.format("Persist executor expect two elements per tuple. But actually got size %d lists",
+			LOG.error(String.format("Persist executor expect two elements per tuple. But actually got size %d lists!",
 					input.size()));
 			return;
 		}
-		
-		String streamId = (String)input.get(0);
-		AlertAPIEntity entity = (AlertAPIEntity)input.get(1);
+
+		String policyId = (String) input.get(0);
+		AlertAPIEntity entity = (AlertAPIEntity) input.get(1);
+		try {
+			persistService.save(entity.getStreamId(), entity);
+		} catch (Exception e) {
+			LOG.error(MessageFormat.format("persist entity failed: {0}", entity), e);
+		}
 	}
 
-	
 }

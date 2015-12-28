@@ -20,17 +20,18 @@ package org.apache.eagle.datastream.core
 
 import java.util
 import java.util.concurrent.atomic.AtomicInteger
-import scala.collection.JavaConversions.asScalaBuffer
-import scala.collection.JavaConversions.seqAsJavaList
-import scala.collection.JavaConverters.asScalaBufferConverter
+
+import backtype.storm.topology.base.BaseRichSpout
+import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity
 import org.apache.eagle.datastream.FlatMapper
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
-import com.typesafe.config.Config
-import backtype.storm.topology.base.BaseRichSpout
-import org.apache.eagle.dataproc.impl.analyze.entity.AnalyzeEntity
+
+import scala.collection.JavaConversions.{asScalaBuffer, seqAsJavaList}
+import scala.collection.JavaConverters.asScalaBufferConverter
 /**
  * StreamProducer = StreamInfo + StreamProtocol
  *
@@ -193,14 +194,14 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
 
-  def aggregate(upStreamNames: java.util.List[String], queryExecutorId : String, strategy: PartitionStrategy = null): StreamProducer[AnalyzeEntity] = {
-    val ret= AnalyzeProducer(upStreamNames, queryExecutorId, null, strategy)
+  def aggregate(upStreamNames: java.util.List[String], queryExecutorId : String, strategy: PartitionStrategy = null): StreamProducer[AggregateEntity] = {
+    val ret= AggregateProducer(upStreamNames, queryExecutorId, null, strategy)
     hookup(this, ret)
     ret
   }
   
-  def persist() : StreamProducer[T] = {
-    val ret = PersisProducer()
+  def persist(storageType: StorageType.StorageType) : StreamProducer[T] = {
+    val ret = PersistProducer(storageType)
     ret
   }
 
@@ -227,7 +228,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
 
   /**
    * Component name
-   * 
+   *
    * @param componentName component name
    * @return
    */
@@ -289,9 +290,9 @@ case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : S
   }
 }
 
-case class AnalyzeProducer(upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[AnalyzeEntity]
+case class AggregateProducer(upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[AggregateEntity]
 
-case class PersisProducer[T]() extends StreamProducer[T]
+case class PersistProducer[T](storageType: StorageType.StorageType) extends StreamProducer[T]
 
 object UniqueId{
   val id : AtomicInteger = new AtomicInteger(0);

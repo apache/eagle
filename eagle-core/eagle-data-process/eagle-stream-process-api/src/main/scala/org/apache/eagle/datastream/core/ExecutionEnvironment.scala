@@ -63,7 +63,7 @@ abstract class ExecutionEnvironmentBase(private val conf:Config)  extends Execut
     implicit val i_conf = _config.get
     StreamNameExpansion()
     GraphPrinter.print(dag,message="Before expanded DAG ")
-    StreamAnalyzeExpansion()
+    StreamAggregateExpansion()
     GraphPrinter.print(dag,message="after analyze expanded DAG ")
     StreamAlertExpansion()
     StreamUnionExpansion()

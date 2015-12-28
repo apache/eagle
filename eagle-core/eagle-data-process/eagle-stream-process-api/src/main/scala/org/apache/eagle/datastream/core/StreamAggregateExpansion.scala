@@ -20,7 +20,7 @@ package org.apache.eagle.datastream.core
 import scala.collection.JavaConversions.asScalaSet
 import scala.collection.mutable.ListBuffer
 
-import org.apache.eagle.dataproc.impl.analyze.AnalyzeExecutorFactory
+import org.apache.eagle.dataproc.impl.aggregate.AggregateExecutorFactory
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
 import com.typesafe.config.Config
@@ -30,19 +30,19 @@ import com.typesafe.config.Config
  * 
  * TODO : should re-use flow with stream alert expansion, make code cleaner
  */
-class StreamAnalyzeExpansion(config: Config) extends StreamAlertExpansion(config) {
+class StreamAggregateExpansion(config: Config) extends StreamAlertExpansion(config) {
 
   override def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any, Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
     dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any, Any]], current: StreamProducer[Any],
     child: StreamProducer[Any]): Unit = {
     child match {
-      case AnalyzeProducer(upStreamNames, analyzerId, cepQl, strategy) => {
+      case AggregateProducer(upStreamNames, analyzerId, cepQl, strategy) => {
         /**
          * Rewrite the tree to add output field wrapper since policy executors accept only fixed tuple format 
          */
         val newStreamProducers = rewriteWithStreamOutputWrapper(current, dag, toBeAddedEdges, toBeRemovedVertex, upStreamNames)
         
-        val analyzeExecutors = AnalyzeExecutorFactory.Instance.createExecutors(config, upStreamNames, analyzerId);
+        val analyzeExecutors = AggregateExecutorFactory.Instance.createExecutors(config, upStreamNames, analyzerId);
         analyzeExecutors.foreach(exec => {
           val t = FlatMapProducer(exec).nameAs(exec.getExecutorId() + "_" + exec.getPartitionSeq()).initWith(dag,config, hook = false)
 
@@ -67,9 +67,9 @@ class StreamAnalyzeExpansion(config: Config) extends StreamAlertExpansion(config
   
 }
 
-object StreamAnalyzeExpansion{
-  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamAnalyzeExpansion ={
-    val e = new StreamAnalyzeExpansion(config)
+object StreamAggregateExpansion{
+  def apply()(implicit config:Config, dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): StreamAggregateExpansion ={
+    val e = new StreamAggregateExpansion(config)
     e.expand(dag)
     e
   }

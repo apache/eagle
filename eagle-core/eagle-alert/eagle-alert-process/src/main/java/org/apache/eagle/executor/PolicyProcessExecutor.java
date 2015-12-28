@@ -387,7 +387,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K>
 	public void onEvalEvents(PolicyEvaluationContext<T, K> context, List<K> alerts) {
 		if(alerts != null && !alerts.isEmpty()){
 			String policyId = context.policyId;
-            LOG.info(String.format("Detected %s alerts for policy %s",alerts.size(),policyId));
+            LOG.info(String.format("Detected %d alerts for policy %s", alerts.size(), policyId));
 			Collector outputCollector = context.outputCollector;
 			PolicyEvaluator<T> evaluator = context.evaluator;
 			updateCounter(EAGLE_ALERT_COUNT, getDimensions(policyId), alerts.size());

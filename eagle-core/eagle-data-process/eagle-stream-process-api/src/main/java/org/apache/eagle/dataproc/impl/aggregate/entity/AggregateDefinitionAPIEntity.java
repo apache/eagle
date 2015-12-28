@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.analyze.entity;
+package org.apache.eagle.dataproc.impl.aggregate.entity;
 
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
@@ -46,7 +46,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 	@Index(name="Index_1_analyzeExecutorId", columns = { "analyzeExecutorID" }, unique = true),
 })
 @SuppressWarnings("serial")
-public class AnalyzeDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
+public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 
 	@Column("a")
 	private String name;

@@ -17,10 +17,12 @@
 package org.apache.eagle.dataproc.impl.persist;
 
 /**
+ * Interface by the stream framework to storage
+ * 
  * @since Dec 19, 2015
  *
  */
 public interface IPersistService<T> {
 
-	void save(T apiEntity);
+	void save(String stream, T apiEntity) throws Exception;
 }

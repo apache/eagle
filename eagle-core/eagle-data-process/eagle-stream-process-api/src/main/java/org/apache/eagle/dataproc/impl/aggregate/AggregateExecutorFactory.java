@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.analyze;
+package org.apache.eagle.dataproc.impl.aggregate;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.apache.eagle.alert.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.dao.PolicyEnityDAOImpl;
 import org.apache.eagle.alert.policy.DefaultPolicyPartitioner;
 import org.apache.eagle.alert.policy.PolicyPartitioner;
-import org.apache.eagle.dataproc.impl.analyze.entity.AnalyzeDefinitionAPIEntity;
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +36,15 @@ import com.typesafe.config.ConfigValue;
  * @since Dec 16, 2015
  *
  */
-public class AnalyzeExecutorFactory {
+public class AggregateExecutorFactory {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AnalyzeExecutorFactory.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AggregateExecutorFactory.class);
 	
-	private AnalyzeExecutorFactory() {}
-	public static final AnalyzeExecutorFactory Instance = new AnalyzeExecutorFactory();
+	private AggregateExecutorFactory() {}
+	public static final AggregateExecutorFactory Instance = new AggregateExecutorFactory();
 
 
-	public AnalyzeExecutor[] createExecutors(Config config, List<String> streamNames, String executorId) throws Exception {
+	public AggregateExecutor[] createExecutors(Config config, List<String> streamNames, String executorId) throws Exception {
 //		// Read site and dataSource from configuration.
 //		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 //		LOG.info("Loading alerting definitions for dataSource: " + dataSource);
@@ -56,11 +56,11 @@ public class AnalyzeExecutorFactory {
 		StringBuilder partitionerCls = new StringBuilder(DefaultPolicyPartitioner.class.getCanonicalName());
         int numPartitions = loadExecutorConfig(config, executorId, partitionerCls);
         
-		PolicyDefinitionDAO<AnalyzeDefinitionAPIEntity> policyDefDao = new PolicyEnityDAOImpl<AnalyzeDefinitionAPIEntity>(
+		PolicyDefinitionDAO<AggregateDefinitionAPIEntity> policyDefDao = new PolicyEnityDAOImpl<AggregateDefinitionAPIEntity>(
 				new EagleServiceConnector(config), AlertConstants.ANALYZE_DEFINITION_SERVICE_ENDPOINT_NAME);
 		
 		
-		return newAnalyzeExecutors(policyDefDao, streamNames, executorId, numPartitions, partitionerCls.toString());
+		return newAggregateExecutors(policyDefDao, streamNames, executorId, numPartitions, partitionerCls.toString());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -98,23 +98,18 @@ public class AnalyzeExecutorFactory {
 //		return streamNames;
 //	}
 	
-	/**
-	 * Build alert executors and assign alert definitions between these
-	 * executors by partitioner
-	 * (alertExecutorConfigs["${alertExecutorId}"]["partitioner"])
-	 */
-	private AnalyzeExecutor[] newAnalyzeExecutors(PolicyDefinitionDAO<AnalyzeDefinitionAPIEntity> alertDefDAO,
+	private AggregateExecutor[] newAggregateExecutors(PolicyDefinitionDAO<AggregateDefinitionAPIEntity> alertDefDAO,
 			List<String> sourceStreams, String executorID, int numPartitions, String partitionerCls)
 					throws Exception {
 		LOG.info("Creating alert executors with executorID: " + executorID + ", numPartitions: "
 				+ numPartitions + ", Partition class is: " + partitionerCls);
 
 		PolicyPartitioner partitioner = (PolicyPartitioner) Class.forName(partitionerCls).newInstance();
-		AnalyzeExecutor[] alertExecutors = new AnalyzeExecutor[numPartitions];
+		AggregateExecutor[] alertExecutors = new AggregateExecutor[numPartitions];
 		String[] _sourceStreams = sourceStreams.toArray(new String[0]);
 
 		for (int i = 0; i < numPartitions; i++) {
-			alertExecutors[i] = new AnalyzeExecutor(executorID, partitioner, numPartitions, i, alertDefDAO,
+			alertExecutors[i] = new AggregateExecutor(executorID, partitioner, numPartitions, i, alertDefDAO,
 					_sourceStreams);
 		}
 		return alertExecutors;
