@@ -22,7 +22,7 @@ limitations under the License.
 > Docker image for Apache Eagle https://hub.docker.com/r/apacheeagle/sandbox
 
 This is docker container for eagle to help users to have a quick preview about eagle features. 
-And this project is to build apache/eagle images and provide eagle-functions to start the containers of eagle.
+And this project is to build apache/eagle images and provide eagle-functions to start the containers of eagle. The Recommended Minimum Configuration for running machine is 6G RAM and 4 processors.
 
 ## Prerequisite
 * [Apache Maven](https://maven.apache.org)
