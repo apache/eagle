@@ -25,19 +25,20 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
 ### How to use it
   
   1. Edit the configuration file (eagle-collector.conf). For example:
-        {
-          "env": {
-          "site": "sandbox"
-        },
-        "input": {
-          "port": "50070",
-          "https": false
-        },
-        "filter": {
-          "monitoring.group.selected": ["hadoop"]
-        },
-        "output": {}
-        }
+  
+          {
+            "env": {
+            "site": "sandbox"
+          },
+          "input": {
+            "port": "50070",
+            "https": false
+          },
+          "filter": {
+            "monitoring.group.selected": ["hadoop"]
+          },
+          "output": {}
+          }
      
   2. Run the scripts
   
