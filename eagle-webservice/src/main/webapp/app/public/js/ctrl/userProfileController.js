@@ -190,42 +190,6 @@ damControllers.controller('userProfileDetailCtrl', function(globalContent, Site,
 
 			$scope.profiles.DE._chart = {};
 
-			/*$scope.profiles.DE.estimates = {};
-			$.each($scope.profiles.DE._content, function(key, value) {
-				if(key !== "statistics") {
-					$scope.profiles.DE.estimates[key] = value;
-				}
-			});*/
-
-			var _meanList = [];
-			var _stddevList = [];
-			var _categoryList = [];
-
-			$.each($scope.profiles.DE._content.statistics, function(i, unit) {
-				_meanList[i] = unit.mean;
-				_stddevList[i] = unit.stddev;
-
-				_categoryList[i] = unit.commandName;
-			});
-			$scope.profiles.DE._chart.series = [
-				{
-					name: "mean",
-					data: _meanList
-				},
-				{
-					name: "stddev",
-					data: _stddevList
-				},
-				{
-					type: "category",
-					data: _categoryList
-				}
-			];
-			console.log($scope.profiles.DE._chart.series);
-
-			/*
-			$scope.profiles.DE._chart = {};
-
 			$scope.profiles.DE.estimates = {};
 			$.each($scope.profiles.DE._content, function(key, value) {
 				if(key !== "statistics") {
@@ -235,27 +199,26 @@ damControllers.controller('userProfileDetailCtrl', function(globalContent, Site,
 
 			var _meanList = [];
 			var _stddevList = [];
-			var _categoryList = [];
 
 			$.each($scope.profiles.DE._content.statistics, function(i, unit) {
-				_meanList[i] = unit.mean;
-				_stddevList[i] = unit.stddev;
-
-				_categoryList[i] = unit.commandName;
+				_meanList[i] = {
+					x: unit.commandName,
+					y: unit.mean
+				};
+				_stddevList[i] = {
+					x: unit.commandName,
+					y: unit.stddev
+				};
 			});
 			$scope.profiles.DE._chart.series = [
 				{
-					name: "mean",
-					data: _meanList
+					key: "mean",
+					values: _meanList
 				},
 				{
-					name: "stddev",
-					data: _stddevList
-				},
-				{
-					type: "category",
-					data: _categoryList
-				},
+					key: "stddev",
+					values: _stddevList
+				}
 			];
 
 			// Percentage table list
@@ -267,7 +230,6 @@ damControllers.controller('userProfileDetailCtrl', function(globalContent, Site,
 					percentage: unit.mean / _total
 				});
 			});
-			*/
 		}
 
 		// EigenDecomposition

@@ -223,6 +223,10 @@ td.text-ellipsis {
 }
 
 /* Navigation Tab */
+ul.nav.nav-tabs li .btn {
+	margin-top: 1px;
+}
+
 .modal-body ul.nav.nav-tabs {
 	border-bottom-color: #F4F4F4;
 	margin-bottom: 15px;

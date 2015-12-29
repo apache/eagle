@@ -116,6 +116,11 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					.attr("_rnd", Math.random())
 					.appendTo($element)[0];
 
+				// Size
+				if(_config.height) {
+					$(_chartCntr).css("height", _config.height);
+				}
+
 				switch(_chartType) {
 					case "line":
 						_chart = nv.models.lineChart()
@@ -177,6 +182,15 @@ eagleComponents.directive('nvd3', function(nvd3) {
 						case "decimals":
 							_axis.tickFormat(d3.format('.02f'));
 							break;
+						case "text":
+							if(axis === "x") {
+								_chart.rotateLabels(10);
+								_chart.reduceXTicks(false).staggerLabels(true);
+							}
+							_axis.tickFormat(function(d) {
+								return d;
+							});
+							break;
 						case "time":
 							if(_chartType !== 'column') {
 								_chart[axis + "Scale"](d3.time.scale());
@@ -185,6 +199,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 								return _tickMultiFormat(app.time.offset(d).toDate(true));
 							});
 							break;
+						case "number":
+						/* falls through */
 						default:
 							_axis.tickFormat(d3.format(',r'));
 					}
