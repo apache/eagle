@@ -24,9 +24,23 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
 
 ### How to use it
   
-  1. edit the configuration file (json file)
+  1. Edit the configuration file (json file). For example:
+         {
+           "env": {
+            "site": "sandbox"
+           },
+           "input": {
+            "port": "50070",
+            "https": false
+           },
+           "filter": {
+            "monitoring.group.selected": ["hadoop"]
+           },
+           "output": {
+           }
+        }
      
-  2. run the scripts
+  2. Run the scripts
   
         # for general use
         python hadoop_jmx_kafka.py > 1.txt
@@ -57,18 +71,5 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
         }
       
 ### Example
-        {
-           "env": {
-            "site": "sandbox"
-           },
-           "input": {
-            "port": "50070",
-            "https": false
-           },
-           "filter": {
-            "monitoring.group.selected": ["hadoop"]
-           },
-           "output": {
-           }
-        }
+       
 
