@@ -20,6 +20,7 @@ package org.apache.eagle.datastream.core
 
 import java.util
 
+import org.apache.eagle.alert.executor.AlertExecutorCreationUtils
 import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl
 
 import scala.collection.JavaConversions.asScalaSet
@@ -31,7 +32,6 @@ import org.apache.eagle.datastream.StormStreamExecutor
 import org.apache.eagle.datastream.Tuple2
 import org.apache.eagle.datastream.storm.StormExecutorForAlertWrapper
 import org.apache.eagle.datastream.utils.AlertExecutorConsumerUtils
-import org.apache.eagle.executor.AlertExecutorCreationUtils
 import org.apache.eagle.service.client.EagleServiceConnector
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory

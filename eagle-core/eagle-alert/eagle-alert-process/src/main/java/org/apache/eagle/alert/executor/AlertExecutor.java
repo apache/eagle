@@ -14,19 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.executor;
+package org.apache.eagle.alert.executor;
 
+import org.apache.eagle.policy.ResultRender;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.entity.AlertAPIEntity;
 import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.policy.PolicyPartitioner;
 import org.apache.eagle.policy.executor.PolicyProcessExecutor;
+import org.apache.eagle.alert.siddhi.SiddhiAlertAPIEntityRender;
 
 public class AlertExecutor extends PolicyProcessExecutor<AlertDefinitionAPIEntity, AlertAPIEntity> {
+
+	private final SiddhiAlertAPIEntityRender resultRender = new SiddhiAlertAPIEntityRender();
 
 	public AlertExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
 			PolicyDefinitionDAO<AlertDefinitionAPIEntity> alertDefinitionDao, String[] sourceStreams) {
 		super(alertExecutorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams,
 				AlertDefinitionAPIEntity.class);
+	}
+
+	@Override
+	public ResultRender<AlertDefinitionAPIEntity, AlertAPIEntity> getResultRender() {
+		return resultRender;
 	}
 }

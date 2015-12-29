@@ -17,7 +17,7 @@
 package org.apache.eagle.dataproc.impl.persist;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.policy.entity.AlertAPIEntity;
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.dataproc.impl.persist.druid.DruidPersistService;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
@@ -32,15 +32,17 @@ import java.util.List;
  * @since Dec 19, 2015
  *
  */
-public class PersistExecutor extends JavaStormStreamExecutor2<String, AlertAPIEntity> {
+public class PersistExecutor extends JavaStormStreamExecutor2<String, AggregateEntity> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(PersistExecutor.class);
 
 	private Config config;
-	private IPersistService<AlertAPIEntity> persistService;
+	private IPersistService<AggregateEntity> persistService;
+	private String persistExecutorId;
 	private String persistType;
 
-	public PersistExecutor(String persistType) {
+	public PersistExecutor(String persistExecutorId, String persistType) {
+		this.persistExecutorId = persistExecutorId;
 		this.persistType = persistType;
 	}
 
@@ -52,7 +54,8 @@ public class PersistExecutor extends JavaStormStreamExecutor2<String, AlertAPIEn
     @Override
 	public void init() {
 		if (persistType.equalsIgnoreCase(StorageType.DRUID().toString())) {
-			persistService = new DruidPersistService(this.config);
+			Config subConfig = this.config.atKey("persistExecutorConfigs." + persistExecutorId);
+			persistService = new DruidPersistService(subConfig);
 		} else {
 			throw new RuntimeException(String.format("Persist type '%s' not supported yet!", persistService));
 		}
@@ -67,9 +70,9 @@ public class PersistExecutor extends JavaStormStreamExecutor2<String, AlertAPIEn
 		}
 
 		String policyId = (String) input.get(0);
-		AlertAPIEntity entity = (AlertAPIEntity) input.get(1);
+		AggregateEntity entity = (AggregateEntity) input.get(1);
 		try {
-			persistService.save(entity.getStreamId(), entity);
+			persistService.save("defaultOutput", entity);
 		} catch (Exception e) {
 			LOG.error(MessageFormat.format("persist entity failed: {0}", entity), e);
 		}

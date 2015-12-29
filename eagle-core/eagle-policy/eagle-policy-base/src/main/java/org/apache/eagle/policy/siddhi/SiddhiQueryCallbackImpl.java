@@ -16,10 +16,8 @@
  */
 package org.apache.eagle.policy.siddhi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
 import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
 import org.slf4j.Logger;
@@ -27,8 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.typesafe.config.Config;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Siddhi call back implementation
@@ -48,16 +47,9 @@ public class SiddhiQueryCallbackImpl<T extends AbstractPolicyDefinitionEntity, K
 		this.evaluator = evaluator;
 	}
 	
-	public List<String> getOutputMessage(Event event) {
-		Object[] data = event.getData();
+	public static List<String> convertToString(List<Object> data) {
 		List<String> rets = new ArrayList<String>();
-		boolean isFirst = true;
 		for (Object object : data) {
-			// The first field is siddhiAlertContext, skip it
-			if (isFirst) {
-				isFirst = false;
-				continue;
-			}
 			String value = null;
 			if (object instanceof Double) {
 				value = String.valueOf((Double)object);
@@ -78,13 +70,27 @@ public class SiddhiQueryCallbackImpl<T extends AbstractPolicyDefinitionEntity, K
 		}
 		return rets;
 	}
+
+	public static List<Object> getOutputObject(Object[] data) {
+		List<Object> rets = new ArrayList<Object>();
+		boolean isFirst = true;
+		for (Object object : data) {
+			// The first field is siddhiAlertContext, skip it
+			if (isFirst) {
+				isFirst = false;
+				continue;
+			}
+			rets.add(object);
+		}
+		return rets;
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
 		Object[] data = inEvents[0].getData();
 		PolicyEvaluationContext<T, K> siddhiAlertContext = (PolicyEvaluationContext<T, K>)data[0];
-		List<String> rets = getOutputMessage(inEvents[0]);
+		List<Object> rets = getOutputObject(inEvents[0].getData());
 		K alert = siddhiAlertContext.resultRender.render(config, rets, siddhiAlertContext, timeStamp);
 		SiddhiEvaluationHandler<T, K> handler = siddhiAlertContext.alertExecutor;
 		handler.onEvalEvents(siddhiAlertContext, Arrays.asList(alert));

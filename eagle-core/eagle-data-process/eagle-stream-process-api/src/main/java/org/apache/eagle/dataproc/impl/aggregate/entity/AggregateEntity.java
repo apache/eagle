@@ -16,7 +16,11 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate.entity;
 
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Event entity during stream processing
@@ -24,9 +28,20 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
  * @since Dec 17, 2015
  *
  */
-public class AggregateEntity extends TaggedLogAPIEntity {
+public class AggregateEntity implements Serializable {
 
 	private static final long serialVersionUID = 5911351515190098292L;
 
+    private Map<String, Object> results = new HashMap<>();
+
+    private List<Object> result = new LinkedList<>();
+
+    public void add(String col, Object res) {
+        results.put(col, res);
+    }
+
+    public void add(Object res) {
+        result.add(res);
+    }
 	
 }

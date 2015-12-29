@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate;
 
+import org.apache.eagle.policy.ResultRender;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.PolicyPartitioner;
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEntity;
@@ -30,10 +31,16 @@ public class AggregateExecutor extends PolicyProcessExecutor<AggregateDefinition
 
 	private static final long serialVersionUID = 1L;
 
+	private ResultRender<AggregateDefinitionAPIEntity, AggregateEntity> render = new AggregateResultRender();
+
 	public AggregateExecutor(String executorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
 			PolicyDefinitionDAO<AggregateDefinitionAPIEntity> alertDefinitionDao, String[] sourceStreams) {
 		super(executorId, partitioner, numPartitions, partitionSeq, alertDefinitionDao, sourceStreams,
 				AggregateDefinitionAPIEntity.class);
 	}
 
+	@Override
+	public ResultRender<AggregateDefinitionAPIEntity, AggregateEntity> getResultRender() {
+		return render;
+	}
 }

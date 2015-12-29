@@ -54,7 +54,7 @@ import java.util.Map.Entry;
  * @param <T> - The policy definition entity type
  * @param <K> - The stream entity type
  */
-public class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K> 
+public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K>
 		extends JavaStormStreamExecutor2<String, K> 
 		implements PolicyLifecycleMethods<T>, SiddhiEvaluationHandler<T, K> {
 	
@@ -78,7 +78,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K>
 	private Config config;
 	private Map<String, Map<String, T>> initialAlertDefs;
 	private String[] sourceStreams;
-	
+
 	/**
 	 * metricMap's key = metricName[#policyId]
 	 */
@@ -315,6 +315,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K>
                         evaluationContext.policyId = policyId;
                         evaluationContext.evaluator = evaluator;
                         evaluationContext.outputCollector = outputCollector;
+						evaluationContext.resultRender = getResultRender();
                         evaluator.evaluate(new ValuesArray(evaluationContext, input.get(1), input.get(2)));
                     }
                     catch (Exception ex) {
@@ -393,5 +394,7 @@ public class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K>
 			}
 		}
 	}
+
+	public abstract ResultRender<T, K> getResultRender();
 
 }

@@ -14,14 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.policy.siddhi;
+package org.apache.eagle.dataproc.impl.aggregate;
 
+import com.typesafe.config.Config;
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEntity;
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.policy.PolicyEvaluationContext;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.policy.ResultRender;
 
 import java.util.List;
 
-public interface SiddhiEvaluationHandler<T extends AbstractPolicyDefinitionEntity, K> {
+/**
+ * Created on 12/29/15.
+ */
+public class AggregateResultRender implements ResultRender<AggregateDefinitionAPIEntity, AggregateEntity> {
 
-	void onEvalEvents(PolicyEvaluationContext<T, K> context, List<K> alerts);
+
+    @Override
+    public AggregateEntity render(Config config,
+                                  List<Object> rets,
+                                  PolicyEvaluationContext<AggregateDefinitionAPIEntity, AggregateEntity> siddhiAlertContext,
+                                  long timestamp) {
+        AggregateEntity result = new AggregateEntity();
+        for (Object o : rets) {
+            result.add(o);
+        }
+        return result;
+    }
 }

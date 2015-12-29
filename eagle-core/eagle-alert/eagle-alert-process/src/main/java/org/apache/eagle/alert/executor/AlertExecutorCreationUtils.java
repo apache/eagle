@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.executor;
+package org.apache.eagle.alert.executor;
 
 import java.util.List;
 import java.util.Map;

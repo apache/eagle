@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.policy.siddhi;
+package org.apache.eagle.alert.siddhi;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.common.DateTimeUtil;
@@ -27,6 +27,9 @@ import org.apache.eagle.policy.common.UrlBuilder;
 import org.apache.eagle.policy.entity.AlertAPIEntity;
 import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
+import org.apache.eagle.policy.siddhi.SiddhiQueryCallbackImpl;
+import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +46,8 @@ public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionA
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public AlertAPIEntity render(Config config, List<String> rets, PolicyEvaluationContext<AlertDefinitionAPIEntity, AlertAPIEntity> siddhiAlertContext, long timestamp) {
+	public AlertAPIEntity render(Config config, List<Object> results, PolicyEvaluationContext<AlertDefinitionAPIEntity, AlertAPIEntity> siddhiAlertContext, long timestamp) {
+		List<String> rets = SiddhiQueryCallbackImpl.convertToString(results);
 		SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity> evaluator = (SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity>) siddhiAlertContext.evaluator;
 		String alertExecutorId = siddhiAlertContext.alertExecutor.getExecutorId();
 		AlertAPIEntity entity = new AlertAPIEntity();

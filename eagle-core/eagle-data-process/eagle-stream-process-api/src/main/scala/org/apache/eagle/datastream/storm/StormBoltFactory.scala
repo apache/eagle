@@ -18,13 +18,11 @@
  */
 package org.apache.eagle.datastream.storm
 
+import backtype.storm.topology.base.BaseRichBolt
+import com.typesafe.config.Config
 import org.apache.eagle.dataproc.impl.persist.PersistExecutor
 import org.apache.eagle.datastream._
 import org.apache.eagle.datastream.core._
-
-import com.typesafe.config.Config
-
-import backtype.storm.topology.base.BaseRichBolt
 
 object StormBoltFactory {
   def getBoltWrapper(graph: StreamProducerGraph, producer : StreamProducer[Any], config : Config) : BaseRichBolt = {
@@ -50,8 +48,8 @@ object StormBoltFactory {
       case foreach:ForeachProducer[Any] => {
         ForeachBoltWrapper(foreach.fn)
       }
-      case persist : PersistProducer[storage] => {
-        val persisExecutor = new PersistExecutor(persist.storageType.toString());
+      case persist : PersistProducer[Any] => {
+        val persisExecutor = new PersistExecutor(persist.executorId, persist.storageType.toString());
         persisExecutor.prepareConfig(config);
         JavaStormBoltWrapper(persist.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
       }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.executor;
+package org.apache.eagle.alert.executor;
 
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.config.AbstractPolicyDefinition;

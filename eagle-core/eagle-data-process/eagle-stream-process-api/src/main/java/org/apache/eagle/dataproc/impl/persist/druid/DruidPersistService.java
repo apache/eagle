@@ -18,7 +18,7 @@ package org.apache.eagle.dataproc.impl.persist.druid;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValue;
-import org.apache.eagle.policy.entity.AlertAPIEntity;
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.dataproc.impl.persist.IPersistService;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -31,7 +31,7 @@ import java.util.concurrent.Future;
  * @since Dec 21, 2015
  *
  */
-public class DruidPersistService implements IPersistService<AlertAPIEntity> {
+public class DruidPersistService implements IPersistService<AggregateEntity> {
 
 	private static final String ACKS = "acks";
 	private static final String RETRIES = "retries";
@@ -42,7 +42,7 @@ public class DruidPersistService implements IPersistService<AlertAPIEntity> {
 	private static final String VALUE_SERIALIZER = "valueSerializer";
 	private static final String BOOTSTRAP_SERVERS = "bootstrap.servers";
 	
-	private KafkaProducer<String, AlertAPIEntity> producer;
+	private KafkaProducer<String, AggregateEntity> producer;
 //	private final Config config;
 	private final SortedMap<String, String> streamTopicMap;
 	private final Properties props;
@@ -61,7 +61,7 @@ public class DruidPersistService implements IPersistService<AlertAPIEntity> {
 	 */
 	public DruidPersistService(Config config) {
 //		this.config = config;
-		Config kafkaConfig = config.getConfig("persistConfig.kafka");
+		Config kafkaConfig = config.getConfig("kafka");
 		if (kafkaConfig == null) {
 			throw new IllegalStateException("Druid persiste service failed to find kafka configurations!");
 		}
@@ -104,9 +104,9 @@ public class DruidPersistService implements IPersistService<AlertAPIEntity> {
 	}
 
 	@Override
-	public void save(String stream, AlertAPIEntity apiEntity) throws Exception {
+	public void save(String stream, AggregateEntity apiEntity) throws Exception {
 		if (streamTopicMap.get(stream) != null) {
-			ProducerRecord<String, AlertAPIEntity> record = new ProducerRecord<>(streamTopicMap.get(stream), apiEntity);
+			ProducerRecord<String, AggregateEntity> record = new ProducerRecord<>(streamTopicMap.get(stream), apiEntity);
 			Future<RecordMetadata> future = producer.send(record);
 			// TODO : more for check the sending status
 		}

@@ -22,10 +22,10 @@ package org.apache.eagle.datastream.utils
 import java.util
 
 import org.apache.eagle.alert.dedup.{AlertEmailDeduplicationExecutor, AlertEntityDeduplicationExecutor}
+import org.apache.eagle.alert.executor.AlertExecutor
 import org.apache.eagle.alert.notification.AlertNotificationExecutor
 import org.apache.eagle.alert.persist.AlertPersistExecutor
 import org.apache.eagle.datastream.core.{StreamConnector, FlatMapProducer, StreamProducer}
-import org.apache.eagle.executor.AlertExecutor
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable.ListBuffer

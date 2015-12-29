@@ -66,9 +66,9 @@ public class AggregateExecutorFactory {
 	@SuppressWarnings("unchecked")
 	private int loadExecutorConfig(Config config, String executorId, StringBuilder partitionerCls) {
 		int numPartitions = 0;
-		String analyzeExecutorConfigsKey = "analyzeExecutorConfigs";
-        if(config.hasPath(analyzeExecutorConfigsKey)) {
-            Map<String, ConfigValue> analyzeExecutorConfigs = config.getObject(analyzeExecutorConfigsKey);
+		String aggregateExecutorConfigsKey = "aggregateExecutorConfigs";
+        if(config.hasPath(aggregateExecutorConfigsKey)) {
+            Map<String, ConfigValue> analyzeExecutorConfigs = config.getObject(aggregateExecutorConfigsKey);
             if(analyzeExecutorConfigs !=null && analyzeExecutorConfigs.containsKey(executorId)) {
                 Map<String, Object> alertExecutorConfig = (Map<String, Object>) analyzeExecutorConfigs.get(executorId).unwrapped();
                 int parts = 0;

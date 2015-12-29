@@ -159,7 +159,7 @@ trait StreamProtocol[+T <: Any]{
 
   // def aggregate(cql : String): StreamProducer[AggregateEntity]
 
-  def persist(storageType: StorageType.StorageType): StreamProducer[T]
+  def persist(executorId : String, storageType: StorageType.StorageType): StreamProducer[T]
   
   /**
    * Set processing element parallelism setting

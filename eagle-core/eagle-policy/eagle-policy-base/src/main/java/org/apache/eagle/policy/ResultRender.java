@@ -27,6 +27,6 @@ import java.util.List;
  */
 public interface ResultRender<T extends AbstractPolicyDefinitionEntity, K> {
 
-	K render(Config config, List<String> rets, PolicyEvaluationContext<T, K> siddhiAlertContext, long timestamp);
+	K render(Config config, List<Object> rets, PolicyEvaluationContext<T, K> siddhiAlertContext, long timestamp);
 
 }

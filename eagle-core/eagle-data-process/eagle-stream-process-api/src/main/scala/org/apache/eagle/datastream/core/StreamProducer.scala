@@ -200,8 +200,8 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     ret
   }
   
-  def persist(storageType: StorageType.StorageType) : StreamProducer[T] = {
-    val ret = PersistProducer(storageType)
+  def persist(executorId : String, storageType: StorageType.StorageType) : StreamProducer[T] = {
+    val ret = PersistProducer(executorId, storageType)
     ret
   }
 
@@ -292,7 +292,7 @@ case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : S
 
 case class AggregateProducer(upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[AggregateEntity]
 
-case class PersistProducer[T](storageType: StorageType.StorageType) extends StreamProducer[T]
+case class PersistProducer[T](executorId :String, storageType: StorageType.StorageType) extends StreamProducer[T]
 
 object UniqueId{
   val id : AtomicInteger = new AtomicInteger(0);

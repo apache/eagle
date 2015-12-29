@@ -30,14 +30,14 @@ import org.apache.eagle.policy.entity.AlertAPIEntity;
 import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.policy.PolicyEvaluationContext;
-import org.apache.eagle.policy.siddhi.SiddhiAlertAPIEntityRender;
+import org.apache.eagle.alert.siddhi.SiddhiAlertAPIEntityRender;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyDefinition;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.Tuple2;
-import org.apache.eagle.executor.AlertExecutor;
+import org.apache.eagle.alert.executor.AlertExecutor;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Test;
 

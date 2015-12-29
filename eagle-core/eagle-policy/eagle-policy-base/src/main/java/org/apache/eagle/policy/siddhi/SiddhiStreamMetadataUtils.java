@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.policy.siddhi;
 
-import java.util.Map;
-import java.util.SortedMap;
-
 import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * convert metadata entities for a stream to stream definition for siddhi cep engine
@@ -48,8 +48,8 @@ public class SiddhiStreamMetadataUtils {
 	 */
 	public static String convertToStreamDef(String streamName){
 		SortedMap<String, AlertStreamSchemaEntity> map = getAttrMap(streamName);
-		StringBuilder sb = new StringBuilder();		
-		sb.append(EAGLE_ALERT_CONTEXT_FIELD + " object,");
+		StringBuilder sb = new StringBuilder();
+		sb.append(EAGLE_ALERT_CONTEXT_FIELD + " object, ");
 		for(Map.Entry<String, AlertStreamSchemaEntity> entry : map.entrySet()){
             appendAttributeNameType(sb, entry.getKey(), entry.getValue().getAttrType());
 		}
