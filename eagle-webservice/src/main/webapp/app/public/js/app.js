@@ -157,11 +157,6 @@ eagleApp.config(function($routeProvider) {
 			auth: function(Authorization) {return Authorization._promise();},
 		},
 
-	// TODO: NVD3 Test
-	}).when('/nvd3', {
-		templateUrl : 'partials/dam/nvd3.html',
-		controller : 'nvd3Ctrl',
-
 	}).otherwise({
 		redirectTo : '/dam/summary'
 	});
