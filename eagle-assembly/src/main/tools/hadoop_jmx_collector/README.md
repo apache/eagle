@@ -30,8 +30,6 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
   
         # for general use
         python hadoop_jmx_kafka.py > 1.txt
-        # for eBay cronus agent
-        python cronus_hadoop_jmx.py
       
 ## Edit cronus.ini
 
@@ -47,19 +45,15 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
 
         "output": {
           "kafka": {
-            "topic": "apollo-phx_cronus_nn_jmx",
-            "brokerList": [ "druid-test-host1-556191.slc01.dev.ebayc3.com:9092",
-                            "druid-test-host2-550753.slc01.dev.ebayc3.com:9092",
-                            "druid-test-host3-550755.slc01.dev.ebayc3.com:9092"]
+            "topic": "test_topic",
+            "brokerList": [ "sandbox.hortonworks.com:6667"]
           }
         }
       
 ## Example
         {
            "env": {
-            "site": "apollo-phx",
-            "cluster": "apollo",
-            "datacenter": "phx"
+            "site": "sandbox"
            },
            "input": {
             "port": "50070",
