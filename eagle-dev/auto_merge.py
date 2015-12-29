@@ -1,7 +1,6 @@
-#! /usr/local/bin/python3.3
+#! /usr/bin/python2.7
 import os
-import urllib.error
-import urllib.request
+import urllib2 as url_lib
 import getopt
 import json
 import sys
@@ -22,6 +21,7 @@ OPERATING_BRANCH_PREFIX = "operating_branch_"
 TEMP_FILE_DIR = "auto_merge_temp"
 APPROVED_SIGNS = [":+1:", "LGTM"]
 REJECTED_SIGNS = [":-1:"]
+ENCODING = "utf-8"
 
 # string templates:
 GITHUB_PATH_TUPLE = (GITHUB_ORGANIZATION, REPO_NAME)
@@ -40,36 +40,37 @@ committers = dict()
 # TODO - Px - need to filter low level log type and define invoking argument for specifying it
 
 def to_console(msg):
-	print(msg)
+	print msg
 
-def __log_msg__(key, *msg):
-	if msg:
-		for m in msg:
-			if isinstance(m, list):
-				l = list(m)
-				for sm in l:
-					to_console("%s: %s" % (key, sm))
-			elif isinstance(m, tuple):
-				for sm in m:
-					to_console("%s: %s" % (key, sm))
-			else:
-				to_console("%s: %s" % (key, m))
+def __log_msg_list__(key, msg):
+	if isinstance(msg, list):
+		for sm in msg:
+			to_console("%s: %s" % (key, sm))
+	elif isinstance(msg, str):
+		to_console("%s: %s" % (key, msg))
+	elif isinstance(msg, unicode):
+		to_console("%s: %s" % (key, msg.encode(ENCODING)))
+	else:
+		raise AttributeError("argument 'msg' must be a string, unicode or list, but %s is given" % type(msg))
 
-def error(*msg):
-	__log_msg__("ERR", msg)
+def error(msg):
+	__log_msg_list__("ERR", msg)
 
-def warn(*msg):
-	__log_msg__("WRN", msg)
+def warn(msg):
+	__log_msg_list__("WRN", msg)
 
-def info(*msg):
-	__log_msg__("INF", msg)
+def info(msg):
+	__log_msg_list__("INF", msg)
 
-def debug(*msg):
-	__log_msg__("DBG", msg)
+def debug(msg):
+	__log_msg_list__("DBG", msg)
 
 def display_help(*err_msg):
 	if err_msg:
-		error(err_msg)
+		if len(err_msg) == 1 and isinstance(err_msg[0], list):
+			error(err_msg[0])
+		else:
+			error(list(err_msg))
 	to_console("Usage: %s" % HELP_MESSAGE)
 
 def exit_with_errmsg(err, err_code):
@@ -92,13 +93,13 @@ def run_command(command):
 
 def get_info_from_github(url):
 	try:
-		gh_req = urllib.request.Request(url)
-		with urllib.request.urlopen(gh_req) as response:
-			pr_info = response.read().decode()
-			return json.loads(pr_info)
-	except urllib.error.HTTPError as e:
+		gh_req = url_lib.Request(url)
+		response = url_lib.urlopen(gh_req)
+		pr_info = response.read().decode()
+		return json.loads(pr_info)
+	except url_lib.HTTPError as e:
 		exit_with_errmsg("failed to get data from URL: %s" % url, -1)
-	except urllib.error.URLError as e:
+	except url_lib.URLError as e:
 		exit_with_errmsg("server not reachable: %s" % url, -1)
 
 def get_repo_root_dir():
@@ -194,8 +195,8 @@ def ensure_quality_metrics(pr_number, author, last_push_timestamp):
 	never_found_review_comment = True   # True to mean haven't found any review comment
 	for i in range(count-1, -1, -1):   # loop from count-1 to 0, step is -1
 		comment_json = pr_comments[i]
-		reviewer = comment_json['user']['login']
-		comment_timestamp = comment_json['created_at']
+		reviewer = comment_json['user']['login'].encode(ENCODING)
+		comment_timestamp = comment_json['created_at'].encode(ENCODING)
 		is_current_comment_valid = comment_timestamp > last_push_timestamp
 		# currently, allow self-reviewing, but may disallow in the future, to disallow, modify in function is_self_reviewed()
 		if is_self_reviewed(author, reviewer):   # the author of the pr shall not be considered as a reviewer
@@ -204,7 +205,7 @@ def ensure_quality_metrics(pr_number, author, last_push_timestamp):
 			not (reviewer in approvers or 
 				reviewer in rejecters or 
 				reviewer in reviewers)):   # valid review comments of this reviewer have been proceeded, continue to next comment
-			comment = comment_json['body']
+			comment = comment_json['body'].encode(ENCODING)
 			parts = re.split("\n", comment)
 			for part in parts:
 				part = part.strip()
@@ -238,7 +239,7 @@ def get_reviewer_email_mapping(reviewers_accounts):
 	reviewer_email_mapping = dict()
 	for account in reviewers_accounts:
 		reviewer_info = get_info_from_github(GITHUB_USER_INFO_TEMPLATE % account)
-		email = reviewer_info['email']
+		email = reviewer_info['email'].encode(ENCODING)
 		if email:
 			reviewer_email_mapping[account] = email
 		else:
@@ -248,7 +249,7 @@ def get_reviewer_email_mapping(reviewers_accounts):
 	return reviewer_email_mapping
 
 def ask_for_input(prompt_msg):
-	return input("%s%s" % ("IPT: ", prompt_msg))
+	return raw_input("%s%s" % ("IPT: ", prompt_msg))
 
 def ask_for_multiline_input(prompt_msg):
 	to_console("IPT: %s" % prompt_msg)
@@ -308,6 +309,11 @@ def compose_commit_template(commit_msg_template_file_path, pr_number, jira_id, p
 		f.write("\r\n")
 		f.write("Closes #%s.\r\n" % pr_number)
 
+def download_file(download_url, file_path):
+	source = url_lib.urlopen(download_url)
+	with open(file_path, "wb") as f:
+		f.write(source.read())
+
 def merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id, pr_title_content, jira_url, author, reviewer_email_mapping):
 	original_branch = None
 	operating_branch = "%s%s" % (OPERATING_BRANCH_PREFIX, str(time.time()).replace(".", ""))
@@ -325,7 +331,7 @@ def merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id,
 
 		# download patch
 		info("downloading %s.patch from github..." % pr_number)
-		urllib.request.urlretrieve(download_url, patch_file_path)
+		download_file(download_url, patch_file_path)
 
 		# choose the right branch and check the sha
 		original_branch = run_command("git rev-parse --abbrev-ref HEAD").strip()
@@ -338,13 +344,12 @@ def merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id,
 
 		# query email address of the author
 		author_email = ""
-		queried_author_email = ""
 		if author in reviewer_email_mapping.keys():   # the email of the author in reviewer list has been queried, no need to query again
 			author_email = reviewer_email_mapping[author]
 		else:
 			info("querying email address of author <%s> from github" % author)
 			author_info = get_info_from_github(GITHUB_USER_INFO_TEMPLATE % author)
-			author_email = author_info['email']
+			author_email = author_info['email'].encode(ENCODING)
 		if not author_email or author_email.strip() == "":   # means couldn't find public email of author
 			log_error = False
 			skip_author_email_regexp = re.compile("^no$", re.I)
@@ -420,7 +425,7 @@ def main(argv):
 		exit(-1)
 	pr_number = ""
 	try:
-		opts, args = getopt.getopt(argv, "hn:", ["pull_request_number="])
+		opts, args = getopt.getopt(argv, "hn:")
 	except getopt.GetoptError as e:
 		display_help(e.msg)
 		sys.exit(-1)
@@ -438,7 +443,7 @@ def main(argv):
 	pr_info = get_info_from_github(pr_info_url)
 
 	# validate pr state
-	pr_state = pr_info['state']
+	pr_state = pr_info['state'].encode(ENCODING)
 	if pr_state != GITHUB_PR_STATE_OPEN:
 		exit_with_errmsg("the state of pr %s is not %s, please try another pull request number" % (pr_number, GITHUB_PR_STATE_OPEN), -1)
 
@@ -452,17 +457,17 @@ def main(argv):
 
 	# validate and extract info from pr title, then generate jira url
 	# currently will not check if the jira ticket is valid for reason of authentication complication
-	(jira_id, pr_title_content) = parse_pr_title(pr_info['title'])
+	(jira_id, pr_title_content) = parse_pr_title(pr_info['title'].encode(ENCODING))
 	jira_url = JIRA_TICKET_LINK_TEMPLATE % jira_id
 
 	# check if the pr is well approved and get reviewers' account together with their email
-	last_push_timestamp = pr_info['head']['repo']['pushed_at']
-	pr_author = pr_info['user']['login']
+	last_push_timestamp = pr_info['head']['repo']['pushed_at'].encode(ENCODING)
+	pr_author = pr_info['user']['login'].encode(ENCODING)
 	reviewer_accounts = ensure_quality_metrics(pr_number, pr_author, last_push_timestamp)
 	reviewer_email_mapping = get_reviewer_email_mapping(reviewer_accounts)
 
 	# merge and push to github, to finish the whole process
-	base_sha = pr_info['base']['sha']
+	base_sha = pr_info['base']['sha'].encode(ENCODING)
 	success = merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id, pr_title_content, jira_url, pr_author, reviewer_email_mapping)
 
 	# notify user to update the forked repo for original has been updated
