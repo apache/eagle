@@ -22,16 +22,16 @@ limitations under the License.
 
 These scripts help to collect Hadoop jmx and evently sent the metrics to stdout or Kafka. Tested with Python 2.7.
 
-## How to use it
+### How to use it
   
-  1. edit the configuration file `cronus.ini` (json file)
+  1. edit the configuration file (json file)
      
   2. run the scripts
   
         # for general use
         python hadoop_jmx_kafka.py > 1.txt
       
-## Edit configuraiton file `eagle-collector.conf`
+### Edit `eagle-collector.conf`
 
 * input
 
@@ -56,7 +56,7 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
           }
         }
       
-## Example
+### Example
         {
            "env": {
             "site": "sandbox"
