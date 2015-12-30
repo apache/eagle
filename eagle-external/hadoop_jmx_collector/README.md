@@ -24,7 +24,6 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
 
 ### How to use it
 
-
   1. Edit the configuration file (json file). For example:
          {
            "env": {
@@ -55,7 +54,7 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
   "port" defines the hadoop service port, such as 50070 => "namenode", 60010 => "hbase master".
 
 * filter
-  
+
   "monitoring.group.selected" can filter out beans which we care about.
 
 * output 
