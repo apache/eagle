@@ -24,6 +24,9 @@ private case class AlertContext(from:StreamDefinition,to:StreamDefinition)
 
 trait AlertAPIBuilder extends AbstractAPIBuilder with ConnectAPIBuilder{
   private var _context: AlertContext = null
+
+  onInit {_context = null}
+
   def alert(alertExecutor:String):StreamProducer[AlertAPIEntity]={
     shouldNotBeNull(primaryStream)
     primaryStream.getProducer.alert(Seq(primaryStream.name),alertExecutor)

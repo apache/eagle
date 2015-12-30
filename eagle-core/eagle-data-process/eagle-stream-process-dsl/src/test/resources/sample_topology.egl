@@ -1,35 +1,82 @@
-define ("metricStream_1") as ("name" -> 'string, "value"->'double, "timestamp"->'long) from
-  kafka(topic="metricStream_1",zk=conf"kafka.zk.hosts")
+"logStream"         := stream from kafka as ("line"->'string) parallism 1
+"filteredStream"    := filter from "logStream" by grok {
+							pattern(
+								"line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)"""
+							)
+						} parallism 1
+"filteredStream"    := $"logStream" |
+						grok { pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""")} |
+						sql""" select from logStream insert into filteredStream """ parallism 1
+"aggregatedStream"  := $"logStream" |
+						sql"""select xxx"""
+"alertStream"       := $"aggregatedStream" !
+						sql""" select from * insert into alertStream"""
+"filteredStream"    :=> stdout
+"alertStream"       :=> (notification,kafka)
 
-define ("metricStream_2") as ("name" -> 'string, "value"->'double, "timestamp"->'long) from
-  kafka(topic="metricStream_2")
+// another stream
+metricStream                        := stream from kafka as ("line"->'string) parallism 1 |
+										grok { pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""")} |
+										sql""" select from logStream insert into filteredStream """ parallism 1
+alertStream                         := metricStream ! "metricStreamExecutor"
+notificationStream                  := notificaton()
+kafkaStream                         := kafka("alertTopic")
+alertStream groupBy("alertType")    :=> (notificationStream,kafkaStream)
+metricStream groupBy("metricType")  :=> druid("metricStream")
 
-alert partitionBy "metricStream_1.metricType" parallism 1 by sql"""
-    from metricStream_1[component=='dn' and metricType=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
-    select sum(value) group by host output every 1 hour insert into alertStream;"""
+// Stream-Oriented not API oriented
+// Stream Definition
 
-aggregate by sql"""from metricStream_1[component=='dn' and metricType=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
-    select sum(value) group by host output every 1 hour insert into aggregatedMetricStream_1;""" partitionBy "metricStream_1.metricType" parallism 2
+DataStream extends StreamAPI with StreamDefinition
 
-"alertStream" ~> kafka("alert_topic",zk=conf"kafka.zk.hosts")
+trait StreamAPI{
+	def self:DataStream
 
-"alertStream" to mail(
-  from = "sender@eagle.incubator.apache.org",
-  to = "receiver@eagle.incubator.apache.org",
-  smtp = "localhost:25",
-  template =
-    <html>
-      <head>
-        <title>Alert Notification</title>
-      </head>
-      <body>
-        <h1>Message</h1>
-        <p>$message</p>
-      </body>
-    </html>
-)
+	def stream:DataStream
+	def from(producer:StreamProducer):DataStream
+	def as(schema:Schema):DataStream
+	def parallism(num:Int):DataStream
 
-// split stream by logic
-"aggregatedMetricStream_1" to kafka("aggregated_stream_dn") where "component == 'dn'" partitionBy "aggregatedMetricStream_1.metricType"
-"aggregatedMetricStream_1" ~> druid("aggregated_stream_nn")  where "component == 'nn'" partitionBy "aggregatedMetricStream_1.metricType"
-// # end
+	def groupBy(fields:Int*):DataStream = {
+		self.setProducer(self.getProducer.groupBy(fields))
+	}
+
+	def filter(func: Any=>Boolean): DataStream = {
+		DataStream(self).getProducer.filter(func)
+	}
+
+	def transform(transformer: (Any,Collector)=>Unit): DataStream = {
+		DataStream(self).getProducer.flatMap(transformer)
+	}
+
+	def alert(executor:String): DataStream = {
+		DataStream(self).getProducer.alert(executor)
+	}
+
+	def sink(stream:DataStream):DataStream = {
+		self.getProducer.connect(stream.getStartProducer())
+		stream
+	}
+
+	def ?(func: Any=>Boolean):DataStream = filter(func)
+	def |(processor:PipeProducer) = transform(producer)
+	def !(executor:String) = alert(executor)
+}
+
+implicit class streamNameImplicitis(name:String){
+	def := (func: => DataStream): DataStream(name) = {
+		StreamNamager.put(name,func)
+	}
+
+	def :=> (func: =>DataStream): DataStreamSink = {
+		StreamNamager.get(name).sink(func)
+	}
+}
+
+// Stream Operator
+
+1. ":="     : stream definition operator
+2. ":=>"    : stream sink operator
+3. "?"      : stream filter operator
+4. "|"      : stream pipe operator
+5. "!"      : stream alert operator

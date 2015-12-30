@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.stream.dsl.execution
 
+import org.apache.eagle.stream.dsl.StreamApp.storm
 import org.scalatest.{FlatSpec, Matchers}
 
 class StreamEvaluatorSpec extends FlatSpec with Matchers{
@@ -30,25 +31,29 @@ class StreamEvaluatorSpec extends FlatSpec with Matchers{
     val ret = StreamEvaluator(code).parse
     println(ret)
   }
+
   "stream code" should "compile successfully" in {
     val ret = StreamEvaluator(code).compile
     println(ret)
   }
 
   "stream code" should "evaluate successfully" in {
+    // TODO: Fix the bug
+    //
     // Failed because scalatest plugin bug for storm topology local runner due to following exception
+    //
     // Exception:
     //  2015-12-27 14:51:50,788 ERROR [Thread-5] storm.event[0]: Error when processing event
     //    java.io.FileNotFoundException: /Users/${user}/Library/Application Support/IntelliJIdea14/Scala/lib/Runners.jar (No such file or directory)
-    intercept[Throwable]
-    {
-      val ret = StreamEvaluator(code).evaluate
+    //
+    intercept[Throwable] {
+      val ret = StreamEvaluator(code).evaluate[storm]
       println(ret)
     }
   }
 }
 
-object StreamEvaluatorSpec extends App{
+object StreamEvaluatorSpec extends App {
   val code =
     """
       | define("logStream") from Seq(
@@ -66,6 +71,6 @@ object StreamEvaluatorSpec extends App{
       |
       |  'logStream to stdout
     """.stripMargin
-  val ret = StreamEvaluator(code).evaluate
+  val ret = StreamEvaluator(code).evaluate[storm]
   println(ret)
 }

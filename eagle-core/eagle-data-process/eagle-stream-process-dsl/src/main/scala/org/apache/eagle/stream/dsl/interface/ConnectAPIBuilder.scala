@@ -1,8 +1,3 @@
-package org.apache.eagle.stream.dsl.interface
-
-import org.apache.eagle.datastream.core.StreamProducer
-import org.slf4j.LoggerFactory
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,8 +14,12 @@ import org.slf4j.LoggerFactory
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.stream.dsl.interface
 
-trait ConnectAPIBuilder extends AbstractAPIBuilder {
+import org.apache.eagle.datastream.core.StreamProducer
+import org.slf4j.LoggerFactory
+
+trait ConnectAPIBuilder extends AbstractAPIBuilder{
   private val LOG = LoggerFactory.getLogger(classOf[ConnectAPIBuilder])
 
   def to(next: StreamProducer[Any]): StreamSettingAPIBuilder = {
@@ -30,32 +29,36 @@ trait ConnectAPIBuilder extends AbstractAPIBuilder {
     StreamSettingAPIBuilder(primaryStream)
   }
 
+  def sink(name:String):ConnectAPIBuilder = {
+    this.primaryStream = this.context.getStreamManager.getStreamDefinition(name)
+    this
+  }
+
+  def ~>(producer: StreamProducer[Any]): StreamSettingAPIBuilder = to(producer)
+  def groupBy(fields:Any*):ConnectAPIBuilder = {
+    this.primaryStream.setProducer(this.primaryStream.getProducer.groupByFieldIndex(fields.map {
+      case name: String => {
+        val index = this.primaryStream.getSchema.indexOfAttribute(name)
+        if (index < 0) throw new IllegalArgumentException(s"Attribute $name is not found in stream ${this.primaryStream}")
+        index
+      }
+      case index: Int => index
+      case f@_ => throw new IllegalArgumentException(s"Illegal field type $f, support: String, Int ")
+    }))
+    this
+  }
+  def groupBy(func:Any => Any):ConnectAPIBuilder = {
+    this.primaryStream.setProducer(this.primaryStream.getProducer.groupByKey(func))
+    this
+  }
+
   implicit class StreamConnectImplicits(name:String) {
     private val self:ConnectAPIBuilder = ConnectAPIBuilder.this
-
     self.primaryStream = self.context.getStreamManager.getStreamDefinition(name)
-
-    def to(producer: StreamProducer[Any]): StreamSettingAPIBuilder = {
-      self.to(producer)
-    }
-
+    def to(producer: StreamProducer[Any]): StreamSettingAPIBuilder = self.to(producer)
     def ~>(producer: StreamProducer[Any]): StreamSettingAPIBuilder = to(producer)
-    def groupBy(fields:Any*):ConnectAPIBuilder = {
-      self.primaryStream.setProducer(self.primaryStream.getProducer.groupByFieldIndex(fields.map {
-        case name: String => {
-          val index = self.primaryStream.getSchema.indexOfAttribute(name)
-          if (index < 0) throw new IllegalArgumentException(s"Attribute $name is not found in stream ${self.primaryStream}")
-          index
-        }
-        case index: Int => index
-        case f@_ => throw new IllegalArgumentException(s"Illegal field type $f, support: String, Int ")
-      }))
-      self
-    }
-    def groupBy(func:Any => Any):ConnectAPIBuilder = {
-      self.primaryStream.setProducer(self.primaryStream.getProducer.groupByKey(func))
-      self
-    }
+    def groupBy(fields:Any*):ConnectAPIBuilder = self.groupBy(fields)
+    def groupBy(func:Any => Any):ConnectAPIBuilder = self.groupBy(func)
   }
 
   implicit class StreamSymbolConnectImplicits(name:Symbol) extends StreamConnectImplicits(name.name)

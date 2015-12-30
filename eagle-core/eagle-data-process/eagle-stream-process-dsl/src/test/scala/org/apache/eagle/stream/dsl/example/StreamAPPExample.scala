@@ -83,10 +83,31 @@ object StreamAPPExample_5 extends App {
     pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""".r)
   } parallism 1
 
-  'logStream to stdout
+  sink("logStream") to stdout
 
   submit
 }
+
+//object StreamAPPExample_6 extends App {
+//  init[storm](args)
+//
+//  "logStream" := stream from Seq(
+//    "55.3.244.1 GET /index.html 15824 0.043",
+//    "55.3.244.1 GET /index.html 15824 0.043",
+//    "55.3.244.1 GET /index.html 15824 0.043",
+//    "55.3.244.1 GET /index.html 15824 0.043",
+//    "55.3.244.1 GET /index.html 15824 0.043",
+//    "55.3.244.1 GET /index.html 15824 0.043"
+//  ) as ("line"->'string) parallism 1
+//
+//  "filteredStream" := filter ("logStream") by grok {
+//    pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""".r)
+//  } parallism 1
+//
+//  "filteredStream" :=> stdout
+//
+//  submit
+//}
 
 //object StreamAPPExample_5 extends App{
 //  init[storm](args)

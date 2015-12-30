@@ -23,6 +23,10 @@ private case class AggregateContext(from:StreamDefinition,var to:StreamDefinitio
 trait AggregateAPIBuilder extends AbstractAPIBuilder{
   private var _context:AggregateContext = null
 
+  onInit {
+      _context = null
+  }
+
   def aggregate(stream:(String,String)):AggregateAPIBuilder= {
     shouldNotBeNull(_context)
     if(stream._1.equals(stream._2)) throw new IllegalArgumentException(s"input and output stream should not be same but it's ${stream._1} -> ${stream._2}")

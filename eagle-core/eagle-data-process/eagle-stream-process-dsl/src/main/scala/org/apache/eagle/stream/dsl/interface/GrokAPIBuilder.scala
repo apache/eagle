@@ -24,20 +24,27 @@ import scala.collection.mutable
 import scala.util.matching.Regex
 
 case class GrokContext() extends FlatMapper[Any]{
-  private var grokFuncs = mutable.ArrayBuffer[GrokFunction]()
-  def appendGrok(grok: GrokFunction):Unit = {
-    grokFuncs += grok
+  private var processors = mutable.ArrayBuffer[GrokProcessor]()
+  def append(grok: GrokProcessor):Unit = {
+    processors += grok
   }
-
   override def flatMap(input: Seq[AnyRef], collector: Collector[Any]): Unit = {
-    grokFuncs.foreach(f=> f.flatMap(input,collector))
+    processors.foreach(f=> f.process(input,collector))
   }
 }
 
-trait GrokFunction extends FlatMapper[Any]
+private[dsl] trait GrokProcessor{
+  def process(input: Seq[AnyRef], collector: Collector[Any]):Unit
+}
 
-case class FieldPatternGrok(fieldPattern:Seq[(String,Regex)])(implicit stream:StreamDefinition) extends GrokFunction {
-  override def flatMap(input: Seq[AnyRef], collector: Collector[Any]): Unit = {
+case class FieldPatternGrok(fieldPattern:Seq[(String,Regex)])(implicit stream:StreamDefinition) extends GrokProcessor {
+  /**
+   * TODO: Make sure fields in fixed order, otherwise it may cause logic bug
+   *
+   * @param input
+   * @param collector
+   */
+  override def process(input: Seq[AnyRef], collector: Collector[Any]): Unit = {
     fieldPattern.foreach(pair =>{
       val field = pair._1
       val regex = pair._2
@@ -58,25 +65,28 @@ case class FieldPatternGrok(fieldPattern:Seq[(String,Regex)])(implicit stream:St
   }
 }
 
-//case class AddFieldGrok(fieldPattern:Seq[(String,Any)])(implicit stream:StreamDefinition) extends GrokFunc {
-//  override def flatMap(input: Seq[AnyRef], collector: Collector[Any]): Unit = {
-//    //
-//  }
-//}
+case class AddFieldGrok(fieldPattern:Seq[(String,Any)])(implicit stream:StreamDefinition) extends GrokProcessor {
+  // TODO: Implement AddFieldGrok
+  override def process(input: Seq[AnyRef], collector: Collector[Any]): Unit = ???
+}
 
 trait GrokAPIBuilder extends FilterAPIBuilder{
   private var grokContext:GrokContext = null
 
+  onInit {
+    grokContext = null
+  }
+
   def pattern(fieldPattern:(String,Regex)*):GrokContext = {
-    ensureGrok()
-    grokContext.appendGrok(FieldPatternGrok(fieldPattern))
+    ensure()
+    grokContext.append(FieldPatternGrok(fieldPattern))
     grokContext
   }
 
-//  def add_field(fieldValue:(String,Any)*):GrokDefinition = {
-//    _grokDefinition.addGrok(AddFieldGrok(fieldValue))
-//    _grokDefinition
-//  }
+  def add_field(fieldValue:(String,Any)*):GrokContext = {
+    grokContext.append(AddFieldGrok(fieldValue))
+    grokContext
+  }
 
   def grok(func: => GrokContext):GrokAPIBuilder = {
     func
@@ -86,15 +96,15 @@ trait GrokAPIBuilder extends FilterAPIBuilder{
   override def by(grok:GrokAPIBuilder):StreamSettingAPIBuilder = {
     val producer = primaryStream.getProducer.flatMap(grok.grokContext)
     primaryStream.setProducer(producer)
-    cleanGrok()
+    clean()
     StreamSettingAPIBuilder(primaryStream)
   }
 
-  private def ensureGrok():Unit = {
+  private def ensure():Unit = {
     if(grokContext == null) grokContext = GrokContext()
   }
 
-  private def cleanGrok():Unit = {
+  private def clean():Unit = {
     grokContext = null
   }
 }

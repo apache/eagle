@@ -18,6 +18,7 @@
 package org.apache.eagle.stream.dsl.interface.external
 
 import org.apache.eagle.datastream.core.{ForeachProducer, StreamProducer}
+import org.apache.eagle.stream.dsl.interface.AbstractAPIBuilder
 import org.slf4j.LoggerFactory
 
 
@@ -26,7 +27,7 @@ case class ConsoleDefinition() extends Serializable{
   var stdout:Boolean = false
 }
 
-trait ConsoleAPIBuilder {
+trait ConsoleAPIBuilder extends AbstractAPIBuilder{
   private var _def:ConsoleDefinition = null
 
   def stdout:StreamProducer[Any] = ForeachProducer[Any](t=>println(t))
@@ -38,7 +39,7 @@ trait ConsoleAPIBuilder {
   }
 
   def level(flag:String = "INFO"):Unit = {
-    init()
+    ensure()
     _def.level = flag
   }
 
@@ -60,8 +61,9 @@ trait ConsoleAPIBuilder {
     }
   }
 
-  private def init():Unit = {
+  private def ensure():Unit = {
     if(_def == null) _def = ConsoleDefinition()
   }
+
 }
 

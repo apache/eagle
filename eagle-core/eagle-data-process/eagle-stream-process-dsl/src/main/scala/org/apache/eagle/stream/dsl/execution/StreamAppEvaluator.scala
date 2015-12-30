@@ -16,34 +16,41 @@
  */
 package org.apache.eagle.stream.dsl.execution
 
+import com.typesafe.config.{ConfigFactory, Config}
+import org.apache.eagle.datastream.core.ExecutionEnvironment
+import org.apache.eagle.stream.dsl.StreamApp._
 import org.slf4j.LoggerFactory
 
 import scala.reflect.runtime.{currentMirror => cm}
 import scala.tools.reflect.ToolBox
+import scala.reflect.runtime.universe._
 
 case class ParseException(message:String,throwable:Throwable) extends Exception(message,throwable)
 case class CompileException(message:String,throwable:Throwable) extends Exception(message,throwable)
 case class EvaluateException(message:String,throwable:Throwable) extends Exception(message,throwable)
 
-case class StreamEvaluator(code:String) {
+case class StreamEvaluator(code:String,config:Config = ConfigFactory.load()) {
   private val logger = LoggerFactory.getLogger(classOf[StreamEvaluator])
   val tb = cm.mkToolBox()
 
+  val importLibrary =
+    """
+      | import org.apache.eagle.stream.dsl.StreamApp._
+    """.stripMargin
+
   def format:String =
     s"""
-      | import org.apache.eagle.stream.dsl.StreamApp._
-      |
-      | init[storm](Array[String]())
+      | $importLibrary
       |
       | $code
-      |
-      | submit
     """.stripMargin
 
   @throws[ParseException]
   def parse = {
     val formatted = format
-    if(logger.isDebugEnabled) logger.debug(s"Parsing \n $formatted")
+    if(logger.isDebugEnabled)
+      logger.debug(s"Parsing \n $formatted")
+    else logger.info("Parsing")
     try {
       val ret = tb.parse(format)
       if (logger.isDebugEnabled) logger.debug(s"Parsed as\n $ret")
@@ -59,7 +66,9 @@ case class StreamEvaluator(code:String) {
   @throws[CompileException]
   def compile:()=>Any = {
     val tree = parse
-    if(logger.isDebugEnabled) logger.debug(s"Compiling $tree")
+    if(logger.isDebugEnabled)
+      logger.debug(s"Compiling $tree")
+    else logger.info("Compiling")
     try {
       tb.compile(tree)
     }catch{
@@ -71,13 +80,36 @@ case class StreamEvaluator(code:String) {
   }
 
   @throws[EvaluateException]
-  def evaluate:Any = {
+  def evaluate(environmentClass:Class[_ <:ExecutionEnvironment]=classOf[storm]):Any = {
+    val tree = parse
+    if(logger.isDebugEnabled)
+      logger.debug(s"Evaluating $tree")
+    else
+      logger.info("Evaluating")
+    try {
+      init(config,environmentClass)
+      tb.eval(tree)
+      submit
+      reset()
+    } catch {
+      case e:Throwable =>{
+        sys.error(s"Failed to evaluate $tree\nException: $e")
+        throw EvaluateException(s"Failed to evaluate $tree",e)
+      }
+    }
+  }
+
+  @throws[EvaluateException]
+  def evaluate[T<:ExecutionEnvironment](implicit typeTag:TypeTag[T]):Any = {
     val tree = parse
     if(logger.isDebugEnabled) logger.debug(s"Evaluating $tree")
     try {
+      init[T](config)
       tb.eval(tree)
+      submit
+      reset()
     } catch {
-      case e:Throwable =>{
+      case e:Throwable => {
         sys.error(s"Failed to evaluate $tree\nException: $e")
         throw EvaluateException(s"Failed to evaluate $tree",e)
       }
@@ -88,6 +120,5 @@ case class StreamEvaluator(code:String) {
 object StreamEvaluator {
   def main(args:Array[String]): Unit ={
     // stream.app.conf
-
   }
 }

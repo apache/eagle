@@ -35,6 +35,8 @@ object DefineInterface{
   def define(name:String):DefineDef = ???
   def define(name:Symbol):DefineDef = define(name.toString())
 
+  def stream:DefineDef = ???
+
   def datetime(format:String = "YYYY-MM-DD hh:mm"):DefineDef = ???
 }
 
@@ -98,10 +100,13 @@ object StreamInterface{
     def ~>(toName:String): StreamNameImplicits = to(toName)
     def to(streamMeta: StreamMeta): StreamNameImplicits = ???
     def ~>(streamMeta: StreamMeta): StreamNameImplicits = to(streamMeta)
+    def :=>(streamMeta: StreamMeta): StreamNameImplicits = to(streamMeta)
     def where(filter:String): StreamNameImplicits = ???
     def partitionBy(fields:String*): StreamNameImplicits = ???
     def as(attributes:(String,Symbol)*) = ???
+    def :=(func: => Any) :DefineDef = ???
   }
+
   implicit class SymbolStreamNameImplicits(name:Symbol) extends StreamNameImplicits(name.toString())
 }
 
@@ -157,15 +162,20 @@ object SampleApp {
   // filter by pattern and rename stream
   filter("logStream_3"->"logStream_3_parsed") by """(?<timestamp>\d{4}-\d{2}-\d{2})""".r as ("name" -> 'string, "value"->'double, "timestamp"-> datetime("YYYY-MM-DD"))
 
-  alert partitionBy "metricStream_1.metricType" parallism 1 by {sql"""
+  alert partitionBy "metricStream_1.metricType" parallism 1 by { sql"""
     from metricStream_1[component=='dn' and metricType=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
     select sum(value) group by host output every 1 hour insert into alertStream;
-  """}
+  """ }
 
-  aggregate partitionBy "metricStream_1.metricType" parallism 2 by {sql"""
+  aggregate partitionBy "metricStream_1.metricType" parallism 2 by { sql"""
     from metricStream_1[component=='dn' and metricType=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
     select sum(value) group by host output every 1 hour insert into aggregatedMetricStream_1;
-  """}
+  """ }
+
+  aggregate partitionBy "metricStream_1.metricType" parallism 2 by { sql"""
+    from metricStream_1[component=='dn' and metricType=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
+    select sum(value) group by host output every 1 hour insert into aggregatedMetricStream_2;
+  """ }
 
   'alertStream ~> kafka("alert_topic",zk=conf"kafka.zk.hosts")
   "alertStream" to mail(
@@ -188,4 +198,44 @@ object SampleApp {
   'aggregatedMetricStream_1 to kafka("aggregated_stream_dn") where "component == 'dn'" partitionBy "aggregatedMetricStream_1.metricType"
   'aggregatedMetricStream_1 ~> druid("aggregated_stream_nn")  where "component == 'nn'" partitionBy "aggregatedMetricStream_1.metricType"
   // # end
+
+//  LogStash Pipeline Support
+//  =========================
+//
+//  define("logstream") from logstash"""
+//      input{
+//
+//      }
+//  """
+//  filter("logstream") by logstash"""
+//    filter{
+//
+//    }
+//  """
+//  "logstream" -> logstash"""
+//    filter{
+//
+//    }
+//  """
+//  logstash("""
+//    input{
+//
+//    }
+//    filter{
+//
+//    }
+//    output{
+//
+//    }
+//  """)
+
+  "streamA" :=
+    aggregate partitionBy "metricType" parallism 2 by { sql"""
+    from metricStream_1[component=='dn' and metricType=="RpcActivityForPort50020.RpcQueueTimeNumOps"].time[3600]
+    select sum(value) group by host output every 1 hour insert into aggregatedMetricStream_1;
+    """ }
+  "streamB" :=
+    stream from kafka(topic="metricStream_1",zk=conf"kafka.zk.hosts",deserializer="") as ("name" -> 'string, "value"->'double, "timestamp"->'long)
+  "streamC" :=>
+    kafka("alert_topic",zk=conf"kafka.zk.hosts") partitionBy "someField"
 }

@@ -36,7 +36,7 @@ case class StormTopologyCompiler(config: Config, graph: StreamProducerGraph) ext
   val boltCache = scala.collection.mutable.Map[StreamProducer[Any], StormBoltWrapper]()
 
   override def buildTopology: AbstractTopologyExecutor ={
-    val builder = new TopologyBuilder();
+    val builder = new TopologyBuilder()
     val iter = graph.iterator()
     val boltDeclarerCache = scala.collection.mutable.Map[String, BoltDeclarer]()
     val stormTopologyGraph = ListBuffer[String]()

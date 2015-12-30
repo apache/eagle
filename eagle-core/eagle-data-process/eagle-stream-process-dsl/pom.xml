@@ -30,6 +30,12 @@
             <artifactId>eagle-stream-process-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_${scala.version}</artifactId>
+            <version>${akka.actor.version}</version>
+        </dependency>
     </dependencies>
 <build>
 <plugins>

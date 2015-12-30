@@ -20,16 +20,15 @@ import org.apache.eagle.datastream.core.StreamProducer
 import org.apache.eagle.stream.dsl.definition.{StreamDefinition, StreamSchema}
 
 trait DefinitionAPIBuilder extends AbstractAPIBuilder{
-  private var _instance:StreamDefinition = null
   def define(name:String):DefinitionAPIBuilder = {
-    _instance = StreamDefinition(name)
-    context.getStreamManager.setStreamDefinition(name,_instance)
+    primaryStream = StreamDefinition(name)
+    context.getStreamManager.setStreamDefinition(name,primaryStream)
     this
   }
 
   def define(name:String,attributes:Seq[(String,AnyRef)]):DefinitionAPIBuilder = {
-    _instance = StreamDefinition(name,StreamSchema.build(name,attributes))
-    context.getStreamManager.setStreamDefinition(name,_instance)
+    primaryStream = StreamDefinition(name,StreamSchema.build(name,attributes))
+    context.getStreamManager.setStreamDefinition(name,primaryStream)
     this
   }
 
@@ -38,34 +37,40 @@ trait DefinitionAPIBuilder extends AbstractAPIBuilder{
   }
 
   def as(attributes:(String,AnyRef)*):DefinitionAPIBuilder = {
-    shouldNotBeNull(_instance)
-    _instance.setSchema(StreamSchema.build(_instance.name,attributes))
+    shouldNotBeNull(primaryStream)
+    primaryStream.setSchema(StreamSchema.build(primaryStream.name,attributes))
     this
   }
 
   def from(source:StreamProducer[AnyRef]):StreamSettingAPIBuilder = {
-    shouldNotBeNull(_instance)
-    _instance.setProducer(source)
-    StreamSettingAPIBuilder(_instance)
+    shouldNotBeNull(primaryStream)
+    primaryStream.setProducer(source)
+    StreamSettingAPIBuilder(primaryStream)
   }
 
   def from(iterable:Iterable[Any]):StreamSettingAPIBuilder = {
     val producer = context.getEnvironment.from(iterable,recycle = false)
-    _instance.setProducer(producer)
-    StreamSettingAPIBuilder(_instance)
+    primaryStream.setProducer(producer)
+    StreamSettingAPIBuilder(primaryStream)
   }
 
   def from(product:Product):StreamSettingAPIBuilder = {
     val producer = context.getEnvironment.from(product)
-    _instance.setProducer(producer)
-    StreamSettingAPIBuilder(_instance)
+    primaryStream.setProducer(producer)
+    StreamSettingAPIBuilder(primaryStream)
   }
 
   def parallism(num:Int):DefinitionAPIBuilder = {
-    shouldNotBeNull(_instance)
-    _instance.getProducer.parallelism(num)
+    shouldNotBeNull(primaryStream)
+    primaryStream.getProducer.parallelism(num)
     this
   }
+
+//  implicit class StreamDefinitionImplicits(name:String) {
+//    def :=(source:StreamProducer[AnyRef]) :StreamSettingAPIBuilder = define(name).from(source)
+//    def :=(iterable:Iterable[Any]) :StreamSettingAPIBuilder = define(name).from(iterable)
+//    def :=(product:Product) :StreamSettingAPIBuilder = define(name).from(product)
+//  }
 }
 
 case class StreamSettingAPIBuilder(stream:StreamDefinition){
