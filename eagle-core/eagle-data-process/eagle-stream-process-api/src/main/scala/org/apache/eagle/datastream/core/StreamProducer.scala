@@ -216,6 +216,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   }
 
   def connect[T2]( next: StreamProducer[T2]) = {
+    if(this.graph == null) throw new NullPointerException("graph is null")
     this.graph.addVertex(next)
     this.graph.addEdge(this, next, StreamConnector(this, next))
     passOnContext[T,T2](this, next)

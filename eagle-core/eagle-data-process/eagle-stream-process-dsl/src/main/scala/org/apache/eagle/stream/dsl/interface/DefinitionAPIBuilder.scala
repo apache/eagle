@@ -21,24 +21,20 @@ import org.apache.eagle.stream.dsl.definition.{StreamDefinition, StreamSchema}
 
 trait DefinitionAPIBuilder extends AbstractAPIBuilder{
   def define(name:String):DefinitionAPIBuilder = {
-    primaryStream = StreamDefinition(name)
+    primaryStream = new StreamDefinition(name)
     context.getStreamManager.setStreamDefinition(name,primaryStream)
     this
   }
 
   def define(name:String,attributes:Seq[(String,AnyRef)]):DefinitionAPIBuilder = {
-    primaryStream = StreamDefinition(name,StreamSchema.build(name,attributes))
+    primaryStream = new StreamDefinition(name,StreamSchema.build(name,attributes))
     context.getStreamManager.setStreamDefinition(name,primaryStream)
     this
   }
 
-  def show(name:String): Unit = {
-    println(context.getStreamManager.getStreamDefinition(name))
-  }
-
   def as(attributes:(String,AnyRef)*):DefinitionAPIBuilder = {
     shouldNotBeNull(primaryStream)
-    primaryStream.setSchema(StreamSchema.build(primaryStream.name,attributes))
+    primaryStream.setSchema(StreamSchema.build(primaryStream.getName,attributes))
     this
   }
 
@@ -80,7 +76,7 @@ case class StreamSettingAPIBuilder(stream:StreamDefinition){
   }
 
   def as(attributes:(String,AnyRef)*):StreamSettingAPIBuilder = {
-    stream.setSchema(StreamSchema.build(stream.name,attributes))
+    stream.setSchema(StreamSchema.build(stream.getName,attributes))
     this
   }
 }

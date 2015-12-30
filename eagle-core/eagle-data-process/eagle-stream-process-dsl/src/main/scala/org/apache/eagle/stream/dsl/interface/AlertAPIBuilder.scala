@@ -29,7 +29,7 @@ trait AlertAPIBuilder extends AbstractAPIBuilder with ConnectAPIBuilder{
 
   def alert(alertExecutor:String):StreamProducer[AlertAPIEntity]={
     shouldNotBeNull(primaryStream)
-    primaryStream.getProducer.alert(Seq(primaryStream.name),alertExecutor)
+    primaryStream.getProducer.alert(Seq(primaryStream.getName),alertExecutor)
   }
 
   def alert(flowTo:(String,String)):AlertAPIBuilder = {

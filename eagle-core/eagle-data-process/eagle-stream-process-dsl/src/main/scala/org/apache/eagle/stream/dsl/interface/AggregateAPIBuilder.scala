@@ -30,7 +30,7 @@ trait AggregateAPIBuilder extends AbstractAPIBuilder{
   def aggregate(stream:(String,String)):AggregateAPIBuilder= {
     shouldNotBeNull(_context)
     if(stream._1.equals(stream._2)) throw new IllegalArgumentException(s"input and output stream should not be same but it's ${stream._1} -> ${stream._2}")
-    _context = AggregateContext(context.getStreamManager.getStreamDefinition(stream._1),StreamDefinition(stream._1,null))
+    _context = AggregateContext(context.getStreamManager.getStreamDefinition(stream._1),new StreamDefinition(stream._1,null))
     this
   }
 
