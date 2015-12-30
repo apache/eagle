@@ -40,6 +40,7 @@ public class Tables {
         // for security
         tables.add("hiveResourceSensitivity");
         tables.add("fileSensitivity");
+        tables.add("ipzone");
         tables.add("mlmodel");
         tables.add("userprofile");
     }
