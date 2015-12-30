@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.interface.external
+package org.apache.eagle.stream.dsl.builder
 
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
-import org.apache.eagle.datastream.core.StreamProducer
+import org.apache.eagle.datastream.core.{ForeachProducer, StreamProducer}
 import org.apache.eagle.datastream.storm.StormExecutionEnvironment
-import org.apache.eagle.stream.dsl.interface.AbstractAPIBuilder
 
-trait KafkaAPIBuilder extends AbstractAPIBuilder{
+trait StreamSinkBuilder extends StreamContextBuilder{
   /**
    * kafka interface without parameters
    * @return
@@ -31,4 +30,6 @@ trait KafkaAPIBuilder extends AbstractAPIBuilder{
       e.fromSpout(new KafkaSourcedSpoutProvider())
     case e@_ => throw new IllegalStateException(s"kafka only supports as source (i.e. spout) for storm now, but not support environment $e")
   }
+
+  def stdout:StreamProducer[Any] = ForeachProducer[Any](t=>println(t))
 }

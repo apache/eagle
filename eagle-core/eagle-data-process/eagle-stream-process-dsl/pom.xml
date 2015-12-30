@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-compiler</artifactId>
-            <version>2.10.0</version>
+            <version>${scala.version}.0</version>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
@@ -30,11 +30,15 @@
             <artifactId>eagle-stream-process-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_${scala.version}</artifactId>
             <version>${akka.actor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 <build>

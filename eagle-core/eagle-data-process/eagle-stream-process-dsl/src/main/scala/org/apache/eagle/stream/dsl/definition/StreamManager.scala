@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.api
+package org.apache.eagle.stream.dsl.definition
 
 import org.slf4j.LoggerFactory
 
@@ -22,7 +22,7 @@ import scala.collection.mutable
 
 class UnknownStreamException(message:String = null,throwable:Throwable = null) extends RuntimeException(message,throwable)
 
-protected[api] class DataStreamManager {
+class DataStreamManager {
   private val streamMap = mutable.Map[String,DataStream]()
   private val logger = LoggerFactory.getLogger(classOf[DataStreamManager])
 
@@ -48,4 +48,4 @@ protected[api] class DataStreamManager {
   }
 }
 
-protected[api] object DataStreamManager extends DataStreamManager
+object DataStreamManager extends DataStreamManager

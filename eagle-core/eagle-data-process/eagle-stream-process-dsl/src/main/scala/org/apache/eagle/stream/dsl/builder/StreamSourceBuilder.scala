@@ -1,5 +1,3 @@
-package org.apache.eagle.stream.dsl.interface
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,12 +14,14 @@ package org.apache.eagle.stream.dsl.interface
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class ScriptString(content:String,scriptType:String) extends Serializable{
-  def getContent:String = content
-  def getScriptType:String = scriptType
-}
+package org.apache.eagle.stream.dsl.builder
 
-case class SqlScript(content:String) extends ScriptString(content,"sql")
+import org.apache.eagle.stream.dsl.definition.DataStream
 
-trait ScriptAPIBuilder{
+trait StreamSourceBuilder extends StreamContextBuilder{
+  def stream:DataStream = {
+    val stream = new DataStream()
+    stream.context(context)
+    stream
+  }
 }

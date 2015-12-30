@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.interface
+package org.apache.eagle.stream.dsl.builder
 
-trait NativeTypeAdapter {
-  implicit class TypeImplicits(value:Any){
-    def as[T]:T = value.asInstanceOf[T]
-  }
-}
+trait StreamBuilder
+  extends StreamContextBuilder
+  with StreamSourceBuilder
+  with StreamSinkBuilder
+  with StreamImplicits

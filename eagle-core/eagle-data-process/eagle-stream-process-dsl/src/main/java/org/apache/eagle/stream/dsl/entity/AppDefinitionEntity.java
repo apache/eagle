@@ -19,7 +19,6 @@ package org.apache.eagle.stream.dsl.entity;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.Tags;
-import org.apache.eagle.stream.dsl.execution.StreamEvaluator;
 
 import java.util.Map;
 
@@ -38,6 +37,6 @@ public class AppDefinitionEntity extends TaggedLogAPIEntity {
 
     public void validate() throws Exception {
         if(definition == null) throw new IllegalArgumentException("definition should not empty");
-        new StreamEvaluator(definition, ConfigFactory.parseMap(environment)).compile();
+        // new StreamAppEvaluator(definition, ConfigFactory.parseMap(environment)).compile();
     }
 }

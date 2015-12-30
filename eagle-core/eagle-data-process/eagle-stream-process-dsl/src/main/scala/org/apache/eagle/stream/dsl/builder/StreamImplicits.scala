@@ -1,3 +1,8 @@
+package org.apache.eagle.stream.dsl.builder
+
+import org.apache.eagle.datastream.core.StreamProducer
+import org.apache.eagle.stream.dsl.definition.DataStream
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,19 +19,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.interface
+trait StreamImplicits extends StreamContextBuilder{
+  implicit class DataStreamNameImplicits(name:String) {
+    def := ( builder: => DataStream) :Unit = {
+      val stream = builder
+      stream.setName(name)
+      setStream(stream)
+    }
 
-import org.apache.eagle.stream.dsl.interface.external.{ConsoleAPIBuilder, KafkaAPIBuilder}
+    def :=> ( builder: => DataStream) :Unit = {
+      getStream(name).sink(builder)
+    }
 
-trait DefaultAPIBuilder
-  extends DefinitionAPIBuilder
-  with ConnectAPIBuilder
-  with ConfigAPIBuilder
-  with KafkaAPIBuilder
-  with ConsoleAPIBuilder
-  with FilterAPIBuilder
-  with GrokAPIBuilder
-  with NativeTypeAdapter
-  with AlertAPIBuilder
-  with AggregateAPIBuilder
-  with ScriptAPIBuilder
+    def :=> ( producer: StreamProducer[Any]) :Unit = {
+      getStream(name).sink(producer)
+    }
+  }
+}

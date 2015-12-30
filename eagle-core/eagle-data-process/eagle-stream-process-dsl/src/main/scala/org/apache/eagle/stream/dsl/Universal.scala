@@ -16,14 +16,27 @@
  */
 package org.apache.eagle.stream.dsl
 
-import org.apache.eagle.stream.dsl.interface.{SqlScript, DefaultAPIBuilder}
+import com.typesafe.config.ConfigFactory
+import org.apache.eagle.stream.dsl.builder.StreamBuilder
+import org.apache.eagle.stream.dsl.definition.{SqlCode, DataStream}
 
-class StreamApp extends DefaultAPIBuilder
+import scala.reflect.runtime.universe._
 
-object StreamApp extends StreamApp{
+object universal extends StreamBuilder{
   type storm = org.apache.eagle.datastream.storm.StormExecutionEnvironment
 
-  implicit class ScriptStringImplicits(val sc:StringContext) extends AnyVal{
-    def sql(arg:Any):SqlScript = SqlScript(arg.asInstanceOf[String])
+  // Initialize as storm environment by default
+  // TODO: May need define environment from configuration or system properties
+  init[storm](ConfigFactory.load())
+
+  implicit class StringPrefix(val sc:StringContext) extends AnyVal{
+    def sql(arg:Any):SqlCode = SqlCode(arg.asInstanceOf[String])
+
+    def cf[T](arg:Any)(implicit tag: TypeTag[T]):T = conf[T](arg)
+    def conf[T](arg:Any)(implicit tag: TypeTag[T]):T = context.getConfig.get[T](arg.asInstanceOf[String])
+
+    def $(arg:Any):DataStream = {
+      getStream(sc.parts(0))
+    }
   }
 }

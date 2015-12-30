@@ -20,7 +20,7 @@ import org.apache.eagle.datastream.core.{Configuration, ExecutionEnvironment}
 
 trait StreamContext{
   def getEnvironment: ExecutionEnvironment
-  def getStreamManager: StreamDefinitionManager
+  def getStreamManager: DataStreamManager
   def getConfig:Configuration
 }
 
@@ -29,9 +29,9 @@ object StreamContext{
 }
 
 private case class StreamContextImpl(executionEnvironment: ExecutionEnvironment) extends StreamContext{
-  private val streamManager = new StreamDefinitionManager()
+  private val streamManager = new DataStreamManager()
   private val configuration = Configuration(executionEnvironment.getConfig)
-  def getEnvironment: ExecutionEnvironment = executionEnvironment
-  def getStreamManager: StreamDefinitionManager = streamManager
-  def getConfig:Configuration = configuration
+  override def getEnvironment: ExecutionEnvironment = executionEnvironment
+  override def getStreamManager: DataStreamManager = streamManager
+  override def getConfig:Configuration = configuration
 }

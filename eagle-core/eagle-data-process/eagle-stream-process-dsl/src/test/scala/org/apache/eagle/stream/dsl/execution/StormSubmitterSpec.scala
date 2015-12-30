@@ -21,14 +21,13 @@ import backtype.storm.topology.TopologyBuilder
 import backtype.storm.utils.NimbusClient
 import backtype.storm.{Config, StormSubmitter}
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.eagle.stream.dsl.StreamApp
 import org.slf4j.LoggerFactory
 
 /**
  * Should build as jar firstly then run with `java -cp package.jar org.apache.eagle.stream.dsl.execution.StormSubmitterSpec`
  */
 object StormSubmitterSpec extends App{
-  val runningJar = classOf[StreamApp].getProtectionDomain.getCodeSource.getLocation.getPath // should build as jar firstly
+  val runningJar = getClass.getProtectionDomain.getCodeSource.getLocation.getPath // should build as jar firstly
   val logger = LoggerFactory.getLogger(classOf[App])
   val conf: Config = new Config()
   conf.put(Config.NIMBUS_HOST, "localhost")

@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.interface
+package org.apache.eagle.stream.dsl.definition
 
-trait ConfigAPIBuilder extends AbstractAPIBuilder{
-//  implicit class ConfigKeyPrefix(val sc:StringContext) extends AnyVal {
-//    def c[T](arg:Any)(implicit tag: TypeTag[T]):T = conf[T](arg)
-//    def conf[T](arg:Any)(implicit tag: TypeTag[T]):T = getContext.getConfig.get[T](arg.asInstanceOf[String])
-//  }
-}
+/**
+ * External code string
+ * @param code content
+ * @param codeType type
+ */
+class CodeString(code:String,codeType:String)
+case class SqlCode(code:String) extends CodeString(code,"sql")
