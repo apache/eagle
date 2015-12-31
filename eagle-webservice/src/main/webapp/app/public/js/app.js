@@ -571,7 +571,10 @@ eagleApp.service('Entities', function($http, $q, $rootScope, $location, Authoriz
 				if(_list._convert) {
 					var _current = _cond.additionalCondition._startTime.clone();
 					$.each(_list, function(i, value) {
-						_list[i] = [_current.valueOf(), value];
+						_list[i] = {
+							x: _current.valueOf(),
+							y: value
+						};
 						_current.add(intervalmin, "m");
 					});
 				}
@@ -628,13 +631,14 @@ eagleApp.filter('reverse', function() {
 	};
 });
 
-eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent, Site, Authorization, Entities) {
+eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent, Site, Authorization, Entities, nvd3) {
 	'use strict';
 
 	window.globalContent = $scope.globalContent = globalContent;
 	window.site = $scope.site = Site;
 	window.auth = $scope.auth = Authorization;
 	window.entities = $scope.entities = Entities;
+	window.nvd3 = nvd3;
 	$scope.app = app;
 
 	// Clean up

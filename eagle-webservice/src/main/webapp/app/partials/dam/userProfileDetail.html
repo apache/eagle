@@ -43,18 +43,20 @@
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs">
 		<li class="active">
-			<a href="[data-id='DE']" data-toggle="tab">DE</a>
+			<a href="[data-id='DE']" data-toggle="tab" ng-click=" currentTab='DE'">DE</a>
 		</li>
 		<li>
-			<a href="[data-id='EigenDecomposition']" data-toggle="tab">EigenDecomposition</a>
+			<a href="[data-id='EigenDecomposition']" data-toggle="tab" ng-click=" currentTab='EigenDecomposition'">EigenDecomposition</a>
+		</li>
+		<li class="pull-right">
+			<button class="btn btn-primary" ng-click="showRawData(currentTab === 'EigenDecomposition' ? profiles.EigenDecomposition.content : profiles.DE.content)">Raw Data</button>
 		</li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active" data-id="DE">
 			<div class="row">
 				<div class="col-md-9">
-					<button class="btn btn-primary fixed-right" ng-click="showRawData(profiles.DE.content)">Raw Data</button>
-					<div bar-chart height="400" data="profiles.DE._chart.series"> </div>
+					<div nvd3="profiles.DE._chart.series" data-config="{chart: 'column', xType: 'text', height: 400}" class="nvd3-chart-cntr" height="400"></div>
 					<div class="inline-group text-center">
 						<dl ng-repeat="(key, value) in profiles.DE.estimates"><dt>{{key}}</dt><dd>{{value}}</dd></dl>
 					</div>
@@ -79,7 +81,6 @@
 			</div>
 		</div><!-- /.tab-pane -->
 		<div class="tab-pane" data-id="EigenDecomposition">
-			<button class="btn btn-primary fixed-right" ng-click="showRawData(profiles.EigenDecomposition.content)">Raw Data</button>
 			<div line3d-chart height="400" data="profiles.EigenDecomposition._chart.series"> </div>
 		</div><!-- /.tab-pane -->
 	</div><!-- /.tab-content -->
