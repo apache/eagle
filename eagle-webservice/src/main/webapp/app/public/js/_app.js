@@ -19,9 +19,9 @@
 var app = {};
 
 /* App Module */
-var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'eagleControllers', 'damControllers', 'eagle.service']);
+var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'damControllers']);
 
-eagleApp.config(function($routeProvider, ModuleProvider) {
+eagleApp.config(function($routeProvider) {
 	'use strict';
 
 	$routeProvider.when('/dam/summary', {
@@ -32,13 +32,13 @@ eagleApp.config(function($routeProvider, ModuleProvider) {
 			auth: function(Authorization) {return Authorization._promise();},
 		},
 
-		// Authorization
+	// Authorization
 	}).when('/dam/login', {
 		templateUrl : 'partials/dam/login.html',
 		controller : 'authLoginCtrl',
 		access: {skipCheck: true},
 
-		// Policy
+	// Policy
 	}).when('/dam/policyList', {
 		templateUrl : 'partials/dam/policyList.html',
 		controller : 'policyListCtrl',
@@ -82,7 +82,7 @@ eagleApp.config(function($routeProvider, ModuleProvider) {
 			auth: function(Authorization) {return Authorization._promise();},
 		},
 
-		// Alert
+	// Alert
 	}).when('/dam/alertList', {
 		templateUrl : 'partials/dam/alertList.html',
 		controller : 'alertListCtrl',
@@ -105,7 +105,7 @@ eagleApp.config(function($routeProvider, ModuleProvider) {
 			auth: function(Authorization) {return Authorization._promise();},
 		},
 
-		// Stream
+	// Stream
 	}).when('/dam/streamList', {
 		templateUrl : 'partials/dam/streamList.html',
 		controller : 'streamListCtrl',
@@ -114,7 +114,7 @@ eagleApp.config(function($routeProvider, ModuleProvider) {
 			auth: function(Authorization) {return Authorization._promise();},
 		},
 
-		// Site
+	// Site
 	}).when('/dam/siteList', {
 		templateUrl : 'partials/dam/siteList.html',
 		controller : 'siteListCtrl',
@@ -124,7 +124,7 @@ eagleApp.config(function($routeProvider, ModuleProvider) {
 		},
 		access: {roles: ["ROLE_ADMIN"]},
 
-		// Sensitivity
+	// Sensitivity
 	}).when('/dam/sensitivitySummary', {
 		templateUrl : 'partials/dam/sensitivitySummary.html',
 		controller : 'sensitivitySummaryCtrl',
@@ -141,7 +141,7 @@ eagleApp.config(function($routeProvider, ModuleProvider) {
 			auth: function(Authorization) {return Authorization._promise();},
 		},
 
-		// User Profile
+	// User Profile
 	}).when('/dam/userProfileList', {
 		templateUrl : 'partials/dam/userProfileList.html',
 		controller : 'userProfileListCtrl',
@@ -157,21 +157,12 @@ eagleApp.config(function($routeProvider, ModuleProvider) {
 			auth: function(Authorization) {return Authorization._promise();},
 		},
 
-		// Configuration
-	}).when('/configuration', {
-		templateUrl : 'partials/configuration.html',
-		controller : 'configurationCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-
 	}).otherwise({
 		redirectTo : '/dam/summary'
 	});
 });
 
-eagleApp.service('globalContent', function(Entities, $rootScope, $route, $location, Module) {
+eagleApp.service('globalContent', function(Entities, $rootScope, $route, $location) {
 	'use strict';
 
 	var content = {
@@ -183,7 +174,6 @@ eagleApp.service('globalContent', function(Entities, $rootScope, $route, $locati
 
 		hideSite: false,
 		lockSite: false,
-		hideModule: false,
 
 		dataSrcList: [],
 
@@ -581,10 +571,7 @@ eagleApp.service('Entities', function($http, $q, $rootScope, $location, Authoriz
 				if(_list._convert) {
 					var _current = _cond.additionalCondition._startTime.clone();
 					$.each(_list, function(i, value) {
-						_list[i] = {
-							x: _current.valueOf(),
-							y: value
-						};
+						_list[i] = [_current.valueOf(), value];
 						_current.add(intervalmin, "m");
 					});
 				}
@@ -641,14 +628,13 @@ eagleApp.filter('reverse', function() {
 	};
 });
 
-eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent, Site, Authorization, Entities, nvd3) {
+eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent, Site, Authorization, Entities) {
 	'use strict';
 
 	window.globalContent = $scope.globalContent = globalContent;
-	window.site = $scope.Site = $scope.site = Site;
-	window.auth = $scope.Auth = $scope.auth = Authorization;
-	window.entities = $scope.Entities = $scope.entities = Entities;
-	window.nvd3 = nvd3;
+	window.site = $scope.site = Site;
+	window.auth = $scope.auth = Authorization;
+	window.entities = $scope.entities = Entities;
 	$scope.app = app;
 
 	// Clean up
@@ -658,7 +644,6 @@ eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent
 		globalContent.pageSubTitle = "";
 		globalContent.hideSite = false;
 		globalContent.lockSite = false;
-		globalContent.hideModule = false;
 		globalContent.hideSidebar = false;
 		globalContent.hideUser = false;
 

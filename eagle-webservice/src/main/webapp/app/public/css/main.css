@@ -451,6 +451,16 @@ body .tab-content>.tab-pane.active {
 	overflow-y: auto;
 }
 
+body .box-body .nav-pills > li > a {
+	padding: 5px 15px;
+	border: none;
+}
+
+/* Box */
+.box .guideline {
+	margin-top: 0;
+}
+
 /* Customize */
 #content {
 	position: relative;
@@ -474,8 +484,37 @@ body .tab-content>.tab-pane.active {
 	z-index: 3;
 }
 
-.main-header .logo .logo-lg small {
-	font-size: 12px;
+.main-header .logo img {
+	height: 34px;
+}
+
+.main-header .navbar-toggle {
+	float: none;
+	border-radius: 0;
+}
+.main-header .navbar-toggle:hover {
+	background: rgba(0, 0, 0, 0.1);
+}
+
+#moduleMenu ul li.active a {
+	//background: transparent;
+	border-top: 3px solid rgba(255,255,255,0.8);
+	padding-top: 12px;
+}
+
+@media (max-width: 767px) {
+	#moduleMenu ul li.active a {
+		padding: 10px 15px;
+		border-top: none;
+		border-left: 3px solid rgba(255,255,255,0.8);
+	}
+
+	.main-header .navbar .navbar-custom-menu .nav .dropdown-menu li a {
+		color: #333;
+	}
+	.main-header .navbar .navbar-custom-menu .nav .dropdown-menu li a:hover {
+		color: #FFF;
+	}
 }
 
 #timeRangePickerCntr .navbar-form {

@@ -45,6 +45,9 @@ module.exports = function (grunt) {
 		concat: {
 			app: {
 				src: [
+					'app/public/js/srv/main.js',
+					'app/public/js/srv/**.js',
+
 					'app/public/js/app.js',
 					'app/public/js/app.*.js',
 
@@ -54,6 +57,7 @@ module.exports = function (grunt) {
 					'app/public/js/components/**.js',
 					'app/public/js/components/**/**.js',
 
+					'app/public/js/ctrl/main.js',
 					'app/public/js/ctrl/damController.js',
 					'app/public/js/ctrl/*.js',
 				],

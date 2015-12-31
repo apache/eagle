@@ -1,0 +1,59 @@
+<div class="box box-info">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			<span class="fa fa-cogs"></span>
+			Configuration
+		</h3>
+	</div><!-- /.box-header -->
+
+	<div class="box-body">
+		<div class="row">
+			<div class="col-md-3">
+				<ul class="nav nav-pills nav-stacked">
+					<li class="disabled"><a>Site</a></li>
+					<li role="presentation" ng-repeat="_site in Site.list" ng-class="{active: site === _site}">
+						<a ng-click="setSite(_site)">
+							<span class="fa fa-server"></span>
+							{{_site.name}}
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="col-md-9">
+				<h3 class="guideline">
+					Application
+					<small>{{site.name}}</small>
+				</h3>
+
+				<div ng-repeat="_app in appList track by $index">
+					<div class="panel box box-primary">
+						<div class="box-header with-border">
+							<label class="box-title">
+								<input type="checkbox" />
+								{{_app.name}}
+							</label>
+							<div class="box-tools pull-right">
+								<button class="btn btn-box-tool"><i class="fa fa-wrench"></i></button>
+							</div>
+						</div>
+						<div class="panel-collapse">
+							<div class="box-body">
+								{{_app.description}}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<button class="btn btn-primary">Confirm</button>
+			</div>
+		</div>
+	</div><!-- /.box-body -->
+
+	<!--div class="overlay">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div-->
+
+	<!--div class="box-footer clearfix">
+	</div-->
+</div>
