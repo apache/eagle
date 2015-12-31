@@ -121,7 +121,8 @@ public class EagleConfigFactory implements EagleConfig {
 		int threadPoolCoreSize = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_CORE_SIZE)? config.getInt(EagleConfigConstants.SERVICE_THREADPOOL_CORE_SIZE): EagleConfigConstants.DEFAULT_THREAD_POOL_CORE_SIZE;
 		int threadPoolMaxSize = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_MAX_SIZE) ? config.getInt(EagleConfigConstants.SERVICE_THREADPOOL_MAX_SIZE) : EagleConfigConstants.DEFAULT_THREAD_POOL_MAX_SIZE;
 		long threadPoolShrinkTime = config.hasPath(EagleConfigConstants.SERVICE_THREADPOOL_SHRINK_SIZE) ? config.getLong(EagleConfigConstants.SERVICE_THREADPOOL_SHRINK_SIZE) : EagleConfigConstants.DEFAULT_THREAD_POOL_SHRINK_TIME;
-
+		this.isServiceAuditingEnabled = config.hasPath(EagleConfigConstants.SERVICE_AUDITING_ENABLED) && config.getBoolean(EagleConfigConstants.SERVICE_AUDITING_ENABLED);
+		
 		this.executor = new ThreadPoolExecutor(threadPoolCoreSize, threadPoolMaxSize, threadPoolShrinkTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
 		LOG.info("Successfully initialized config");
@@ -179,4 +180,12 @@ public class EagleConfigFactory implements EagleConfig {
     public Config getConfig() {
         return this.config;
     }
+    
+    // added for jira EAGLE-47
+    boolean isServiceAuditingEnabled;
+    
+    @Override
+	public boolean isServiceAuditingEnabled() {
+		return isServiceAuditingEnabled;
+	}
 }

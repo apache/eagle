@@ -14,44 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.common.config;
 
-import com.typesafe.config.Config;
-import org.apache.hadoop.hbase.client.HTableInterface;
+package org.apache.eagle.audit.common;
 
-import java.util.TimeZone;
-import java.util.concurrent.ThreadPoolExecutor;
+public class AuditConstants {
 
-public interface EagleConfig {
-
-    boolean isCoprocessorEnabled();
-
-	HTableInterface getHTable(String tableName);
-
-    String getStorageType();
-
-    ThreadPoolExecutor getExecutor();
-
-	String getZKQuorum();
-
-	String getZKPort();
-
-	String getServiceHost();
-
-	int getServicePort();
-
-    String getEnv();
-
-    boolean isTableNamePrefixedWithEnvironment();
+	public static final String AUDIT_SERVICE_ENDPOINT = "AuditService";
 	
-    int getHBaseClientScanCacheSize();
-
-    TimeZone getTimeZone();
-    
-    boolean isServiceAuditingEnabled();
-
-    /**
-     * @return root config
-     */
-    Config getConfig();
+	// HBase Operations
+	public static final String AUDIT_EVENT_CREATE = "CREATE";
+	public static final String AUDIT_EVENT_UPDATE = "UPDATE";
+	public static final String AUDIT_EVENT_DELETE = "DELETE";
+	
+	// Audit table details
+	public static final String AUDIT_TABLE = "serviceAudit";
+	public static final String AUDIT_COLUMN_SERVICE_NAME = "serviceName"; 
+	public static final String AUDIT_COLUMN_USER_ID = "userID";
+	public static final String AUDIT_COLUMN_OPERATION = "operation";
+	public static final String AUDIT_COLUMN_TIMESTAMP = "auditTimestamp";
 }

@@ -14,44 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.common.config;
 
-import com.typesafe.config.Config;
-import org.apache.hadoop.hbase.client.HTableInterface;
+package org.apache.eagle.audit.listener;
 
-import java.util.TimeZone;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.EventListenerProxy;
 
-public interface EagleConfig {
+import org.apache.eagle.audit.common.AuditEvent;
 
-    boolean isCoprocessorEnabled();
+public class AuditListenerProxy extends EventListenerProxy<AuditListener> implements AuditListener {
 
-	HTableInterface getHTable(String tableName);
-
-    String getStorageType();
-
-    ThreadPoolExecutor getExecutor();
-
-	String getZKQuorum();
-
-	String getZKPort();
-
-	String getServiceHost();
-
-	int getServicePort();
-
-    String getEnv();
-
-    boolean isTableNamePrefixedWithEnvironment();
+	private final String propertyName;
 	
-    int getHBaseClientScanCacheSize();
+	public String getPropertyName() {
+		return propertyName;
+	}
 
-    TimeZone getTimeZone();
-    
-    boolean isServiceAuditingEnabled();
+	public AuditListenerProxy(String propertyName, AuditListener listener) {
+		super(listener);
+		this.propertyName = propertyName;
+	}
 
-    /**
-     * @return root config
-     */
-    Config getConfig();
+	@Override
+	public void auditEvent(AuditEvent event) {
+		getListener().auditEvent(event);
+	}
 }

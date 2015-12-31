@@ -34,6 +34,7 @@
 		<module>eagle-common</module>
 		<module>eagle-antlr</module>
 		<module>eagle-entity-base</module>
+		<module>eagle-audit-base</module>
 		<module>eagle-client-base</module>
 		<module>eagle-service-base</module>
         <module>eagle-query-base</module>

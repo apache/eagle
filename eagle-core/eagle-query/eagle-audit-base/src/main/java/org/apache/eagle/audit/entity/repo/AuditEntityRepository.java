@@ -14,44 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.common.config;
 
-import com.typesafe.config.Config;
-import org.apache.hadoop.hbase.client.HTableInterface;
+package org.apache.eagle.audit.entity.repo;
 
-import java.util.TimeZone;
-import java.util.concurrent.ThreadPoolExecutor;
+import org.apache.eagle.audit.entity.GenericAuditEntity;
+import org.apache.eagle.log.entity.repo.EntityRepository;
 
-public interface EagleConfig {
+public class AuditEntityRepository extends EntityRepository {
 
-    boolean isCoprocessorEnabled();
-
-	HTableInterface getHTable(String tableName);
-
-    String getStorageType();
-
-    ThreadPoolExecutor getExecutor();
-
-	String getZKQuorum();
-
-	String getZKPort();
-
-	String getServiceHost();
-
-	int getServicePort();
-
-    String getEnv();
-
-    boolean isTableNamePrefixedWithEnvironment();
-	
-    int getHBaseClientScanCacheSize();
-
-    TimeZone getTimeZone();
-    
-    boolean isServiceAuditingEnabled();
-
-    /**
-     * @return root config
-     */
-    Config getConfig();
+	public AuditEntityRepository() {
+		entitySet.add(GenericAuditEntity.class);
+	}
 }
