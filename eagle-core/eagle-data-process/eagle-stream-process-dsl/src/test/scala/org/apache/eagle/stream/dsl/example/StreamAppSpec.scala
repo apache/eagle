@@ -23,6 +23,7 @@ class StreamAppSpec extends FlatSpec with Matchers{
   "Named group pattern" should "match" in {
     val log = "55.3.244.1 GET /index.html 15824 0.043"
     val pattern = """(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""".r
+
     pattern.findAllMatchIn(log).foreach(m=>{
       pattern.namedGroups shouldNot be(null)
       m.namedGroupsValue(pattern) shouldNot be(null)

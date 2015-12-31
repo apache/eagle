@@ -23,12 +23,12 @@ class StreamEvaluatorSpec extends FlatSpec with Matchers{
   import StreamEvaluatorSpec._
 
   "stream code" should "parse successfully" in {
-    val ret = StreamRuntime(code).parse
+    val ret = StreamEvaluator(code).parse
     println(ret)
   }
 
   "stream code" should "compile successfully" in {
-    val ret = StreamRuntime(code).compile
+    val ret = StreamEvaluator(code).compile
     println(ret)
   }
 
@@ -42,7 +42,7 @@ class StreamEvaluatorSpec extends FlatSpec with Matchers{
     //    java.io.FileNotFoundException: /Users/${user}/Library/Application Support/IntelliJIdea14/Scala/lib/Runners.jar (No such file or directory)
     //
     intercept[Throwable] {
-      val ret = StreamRuntime(code).evaluate[storm]
+      val ret = StreamEvaluator(code).evaluate[storm]
       println(ret)
     }
   }
@@ -51,8 +51,7 @@ class StreamEvaluatorSpec extends FlatSpec with Matchers{
 object StreamEvaluatorSpec{
   val code =
     """
-      | "logStream" := stream from
-      |    Seq(
+      | "logStream" := stream from Seq(
       |      "55.3.244.1 GET /index.html 15824 0.043",
       |      "55.3.244.1 GET /index.html 15824 0.043",
       |      "55.3.244.1 GET /index.html 15824 0.043",
@@ -71,6 +70,6 @@ object StreamEvaluatorSpec{
 }
 
 object StreamEvaluatorSpec_1 extends App {
-  val ret = StreamRuntime(StreamEvaluatorSpec.code).evaluate[storm]
+  val ret = StreamEvaluator(StreamEvaluatorSpec.code).evaluate[storm]
   println(ret)
 }

@@ -100,12 +100,9 @@ object StreamAPIExample_7 extends App{
   submit
 }
 
-
 object StreamAPIExample_8 extends App{
-
   // =====================================
-  "logStream" := stream from
-    Seq(
+  "logStream" := stream from Seq(
       "55.3.244.1 GET /index.html 15824 0.043",
       "55.3.244.1 GET /index.html 15824 0.043",
       "55.3.244.1 GET /index.html 15824 0.043",

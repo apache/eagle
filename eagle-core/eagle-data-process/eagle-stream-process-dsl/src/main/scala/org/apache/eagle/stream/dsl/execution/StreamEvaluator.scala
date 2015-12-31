@@ -29,8 +29,8 @@ case class ParseException(message:String,throwable:Throwable) extends Exception(
 case class CompileException(message:String,throwable:Throwable) extends Exception(message,throwable)
 case class EvaluateException(message:String,throwable:Throwable) extends Exception(message,throwable)
 
-case class StreamRuntime(code:String,config:Config = ConfigFactory.load()) {
-  private val logger = LoggerFactory.getLogger(classOf[StreamRuntime])
+case class StreamEvaluator(code:String,config:Config = ConfigFactory.load()) {
+  private val logger = LoggerFactory.getLogger(classOf[StreamEvaluator])
   val tb = cm.mkToolBox()
 
   def format:String = StreamFormatter(config).format(code)
@@ -110,7 +110,7 @@ case class StreamRuntime(code:String,config:Config = ConfigFactory.load()) {
   }
 }
 
-object StreamRuntime {
+object StreamEvaluator {
   def main(args:Array[String]): Unit ={
     // stream.app.conf
   }
