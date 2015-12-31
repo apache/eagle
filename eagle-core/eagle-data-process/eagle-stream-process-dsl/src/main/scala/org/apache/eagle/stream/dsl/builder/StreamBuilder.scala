@@ -20,4 +20,5 @@ trait StreamBuilder
   extends StreamContextBuilder
   with StreamSourceBuilder
   with StreamSinkBuilder
+  with StreamProcessorBuilder
   with StreamImplicits

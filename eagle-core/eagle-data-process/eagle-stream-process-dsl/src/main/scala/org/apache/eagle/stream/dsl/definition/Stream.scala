@@ -18,7 +18,7 @@ package org.apache.eagle.stream.dsl.definition
 
 import org.apache.eagle.datastream.Collector
 import org.apache.eagle.datastream.core.StreamProducer
-import org.apache.eagle.stream.dsl.builder.StreamContextBuilder
+import org.apache.eagle.stream.dsl.builder.{Processor, ProcessorContext, StreamContextBuilder}
 
 import scala.collection.JavaConverters._
 
@@ -29,7 +29,9 @@ trait StreamDefinition {
   private var startStreamProducer:StreamProducer[Any] = null
 
   def setSchema(schema: StreamSchema): Unit = this.schema = schema
-  def getSchema: StreamSchema = this.schema
+  def getSchema: Option[StreamSchema] = if(this.schema == null) None else Some(schema)
+  def getSchemaOrException: StreamSchema = if(this.schema == null) throw new StreamUndefinedException(s"Schema of stream $this is not defined") else schema
+
   def setProducer(producer:StreamProducer[Any]) = this.streamProducer = producer
   def getProducer = this.streamProducer
 
@@ -42,7 +44,7 @@ trait StreamDefinition {
   def getName:String = this.name
 }
 
-class DataStream extends StreamDefinition with StreamContextBuilder{
+class DataStream extends StreamDefinition with StreamContextBuilder with Serializable{
   def as(attributes:(String,Symbol)*):DataStream = {
     this.setSchema(StreamSchema.build(this.getName,attributes))
     this
@@ -87,6 +89,23 @@ class DataStream extends StreamDefinition with StreamContextBuilder{
       stream.setProducer(stream.getProducer.flatMap(func))
     }
   }
+
+  def grok(builder: ProcessorContext):DataStream =  process(builder)
+
+  def process(context: ProcessorContext):DataStream =  {
+    newStream {stream =>
+      context.setStream(stream)
+      stream.setProducer(stream.getProducer.flatMap(context))
+      context.close()
+    }
+  }
+
+  def process(processor: Processor):DataStream =  {
+    newStream {stream =>
+      stream.setProducer(stream.getProducer.flatMap(processor))
+    }
+  }
+
   def map(func: (Any,Collector[Any])=>Unit): DataStream = transform(func)
   def alert(executor:String): DataStream = {
     newStream { stream =>
@@ -117,26 +136,30 @@ class DataStream extends StreamDefinition with StreamContextBuilder{
   }
 
   def ?(func: Any=>Boolean):DataStream = filter(func)
+
   def |(func:(Any,Collector[Any])=>Unit) = transform(func)
   def |(producer:StreamProducer[Any]) = flow(producer)
+  def |(processor: Processor) = process(processor)
+  def |(processor: ProcessorContext) = process(processor)
   def | = this
   def !(executor:String) = alert(executor)
 
-  protected def newStream(func: (DataStream)=> Unit):DataStream = {
+  protected def newStream(func: (DataStream)=> Unit = null):DataStream = {
     val newStream = DataStream(this)
-    func(newStream)
+    if(func != null) func(newStream)
     newStream
   }
 
   override def toString: String = s"${getClass.getSimpleName}[name = $getName, schema = $getSchema]"
 }
 
+
 object DataStream {
   def apply(dataStream: DataStream): DataStream = {
     val newStream = new DataStream()
     newStream.setName(dataStream.getName)
     newStream.setProducer(dataStream.getProducer)
-    newStream.setSchema(dataStream.getSchema)
+    newStream.setSchema(dataStream.getSchema.get)
     newStream.setStartProducer(dataStream.getStartProducer)
     newStream
   }

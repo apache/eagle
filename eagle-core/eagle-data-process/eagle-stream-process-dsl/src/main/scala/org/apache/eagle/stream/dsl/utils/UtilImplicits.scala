@@ -48,7 +48,7 @@ object UtilImplicits {
     def asMap(stream:StreamDefinition):mutable.Map[String,AnyRef]={
       val result = mutable.ListMap[String,AnyRef]()
       var index = 0
-      stream.getSchema.attributes.foreach(a =>{
+      stream.getSchemaOrException.attributes.foreach(a =>{
         result(a.getName) = input(index)
         index += 1
       })

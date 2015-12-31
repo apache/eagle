@@ -23,7 +23,7 @@ object StreamAPIExample_1 extends App {
 
   // =====================================
   "stream" := stream from Range(1,10000) parallism 1 as ("value"->'integer)
-  "stream" :=> stdout
+  "stream" > stdout
   // =====================================
 
   submit
@@ -35,7 +35,7 @@ object StreamAPIExample extends App {
   // =====================================
   "stream"            := stream from Range(1,10000) parallism 1 as ("value"->'integer)
   "filteredStream"    := $"stream" filter {_.asInstanceOf[Int] % 2 == 0}
-  "filteredStream"    :=> stdout
+  "filteredStream"    > stdout
   // =====================================
 
   submit
@@ -48,7 +48,7 @@ object StreamAPIExample_3 extends App {
   "sequenceStream"    := stream from Range(1,10000) parallism 1 as ("value"->'integer)
   "filteredStream"    := $"sequenceStream" ? {_.asInstanceOf[Int] % 2 == 0}
   "transformedStream" := $"filteredStream" | {(value,collector)=> collector.collect(("key",value))}
-  "transformedStream" :=> stdout
+  "transformedStream" > stdout
   // =====================================
 
   submit
@@ -61,7 +61,7 @@ object StreamAPIExample_4 extends App {
   "sequenceStream"    := stream from Range(1,10000) parallism 1 as ("value"->'integer)
   "filteredStream"    := $"sequenceStream" ? {_.asInstanceOf[Int] % 2 == 0}
   "transformedStream" := $"filteredStream" | {(value,collector)=> collector.collect(("key",value))}
-  "transformedStream" :=> stdout
+  "transformedStream" > stdout
   // =====================================
 
   submit
@@ -84,7 +84,7 @@ object StreamAPIExample_6 extends App{
   "stream_1" := { stream from Range(1,10000) parallism 1 as ("value"->'integer) } ? {_.asInstanceOf[Int] % 1 == 0}
   "stream_2" := { stream from Range(1,20000) parallism 1 as ("value"->'integer) } ? {_.asInstanceOf[Int] % 2 == 0}
   "stream_3" := $"stream_1" union $"stream_2"
-  "stream_3" :=> stdout
+  "stream_3" > stdout
   // =====================================
 
   submit
@@ -103,6 +103,7 @@ object StreamAPIExample_7 extends App{
 
 object StreamAPIExample_8 extends App{
 
+  // =====================================
   "logStream" := stream from Seq(
     "55.3.244.1 GET /index.html 15824 0.043",
     "55.3.244.1 GET /index.html 15824 0.043",
@@ -110,13 +111,14 @@ object StreamAPIExample_8 extends App{
     "55.3.244.1 GET /index.html 15824 0.043",
     "55.3.244.1 GET /index.html 15824 0.043",
     "55.3.244.1 GET /index.html 15824 0.043"
-  ) as ("line"->'string) parallism 1
+  ) as ("line"->'string) parallism 10
 
-//  "parserStream" := $"logStream" transform by grok {
-//    pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""".r)
-//  } parallism 1
+  "parserStream" := $"logStream" grok {
+    pattern("line"->"(?<ip>\\d+\\.\\d+\\.\\d+\\.\\d+)\\s+(?<method>\\w+)\\s+(?<path>[\\w/\\.]+)\\s+(?<bytes>\\d+)\\s+(?<time>[\\d\\.]+)")
+  }
 
-  "parserStream" :=> stdout
+  "parserStream" > stdout parallism 1
+  // =====================================
 
   submit
 }

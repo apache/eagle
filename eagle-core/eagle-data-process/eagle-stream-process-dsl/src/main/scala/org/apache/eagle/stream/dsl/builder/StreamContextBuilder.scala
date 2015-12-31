@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory
 
 import scala.reflect.runtime.{universe => ru}
 
-trait StreamContextBuilder{
+trait StreamContextBuilder extends Serializable{
   private val logger = LoggerFactory.getLogger(classOf[StreamContextBuilder])
   private var _context:StreamContext = null
   def context(context:StreamContext):Unit = {

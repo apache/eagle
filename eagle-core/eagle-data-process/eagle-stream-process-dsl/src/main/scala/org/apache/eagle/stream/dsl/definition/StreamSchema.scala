@@ -92,3 +92,5 @@ object StreamSchema{
     })
   }
 }
+
+class StreamUndefinedException(message:String = "stream is not defined",throwable: Throwable = null) extends Exception(message,throwable)

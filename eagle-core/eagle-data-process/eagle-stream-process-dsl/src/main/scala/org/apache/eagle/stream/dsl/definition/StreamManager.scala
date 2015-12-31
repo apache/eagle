@@ -36,10 +36,10 @@ class DataStreamManager {
     val name = stream.getName
     if(name == null){
       throw new NullPointerException(s"Name of $stream is null")
-    }else if(streamMap.contains(stream.getName)) {
-      logger.info(s"Redefine stream $name (${streamMap(name)}) as $stream")
+    }else if(logger.isDebugEnabled && streamMap.contains(stream.getName)) {
+      logger.debug(s"Redefine stream $name (${streamMap(name)}) as $stream")
     }else{
-      logger.info(s"Define new stream '$name' as $stream")
+      if(logger.isDebugEnabled) logger.debug(s"Define new stream '$name' as $stream")
     }
     streamMap(name) = stream
   }

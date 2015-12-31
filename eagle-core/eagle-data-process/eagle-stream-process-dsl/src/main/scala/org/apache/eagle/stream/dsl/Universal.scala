@@ -20,7 +20,7 @@ import com.typesafe.config.ConfigFactory
 import org.apache.eagle.stream.dsl.builder.StreamBuilder
 import org.apache.eagle.stream.dsl.definition.{SqlCode, DataStream}
 
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.{universe => ru}
 
 object universal extends StreamBuilder{
   type storm = org.apache.eagle.datastream.storm.StormExecutionEnvironment
@@ -32,8 +32,8 @@ object universal extends StreamBuilder{
   implicit class StringPrefix(val sc:StringContext) extends AnyVal{
     def sql(arg:Any):SqlCode = SqlCode(arg.asInstanceOf[String])
 
-    def cf[T](arg:Any)(implicit tag: TypeTag[T]):T = conf[T](arg)
-    def conf[T](arg:Any)(implicit tag: TypeTag[T]):T = context.getConfig.get[T](arg.asInstanceOf[String])
+    def cf[T](arg:Any)(implicit tag: ru.TypeTag[T]):T = conf[T](arg)
+    def conf[T](arg:Any)(implicit tag: ru.TypeTag[T]):T = context.getConfig.get[T](arg.asInstanceOf[String])
 
     def $(arg:Any):DataStream = {
       getStream(sc.parts(0))

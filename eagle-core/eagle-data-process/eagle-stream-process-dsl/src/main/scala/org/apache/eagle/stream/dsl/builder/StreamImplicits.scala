@@ -27,11 +27,11 @@ trait StreamImplicits extends StreamContextBuilder{
       setStream(stream)
     }
 
-    def :=> ( builder: => DataStream) :Unit = {
+    def > ( builder: => DataStream) :DataStream = {
       getStream(name).sink(builder)
     }
 
-    def :=> ( producer: StreamProducer[Any]) :Unit = {
+    def > ( producer: StreamProducer[Any]) :DataStream = {
       getStream(name).sink(producer)
     }
   }
