@@ -144,6 +144,14 @@ class DataStream extends StreamDefinition with StreamContextBuilder with Seriali
   def | = this
   def !(executor:String) = alert(executor)
 
+  def > ( builder: => DataStream) :DataStream = {
+    this.sink(builder)
+  }
+
+  def > ( producer: StreamProducer[Any]) :DataStream = {
+    this.sink(producer)
+  }
+
   protected def newStream(func: (DataStream)=> Unit = null):DataStream = {
     val newStream = DataStream(this)
     if(func != null) func(newStream)

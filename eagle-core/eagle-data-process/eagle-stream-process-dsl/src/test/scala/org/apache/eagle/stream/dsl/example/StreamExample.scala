@@ -104,20 +104,21 @@ object StreamAPIExample_7 extends App{
 object StreamAPIExample_8 extends App{
 
   // =====================================
-  "logStream" := stream from Seq(
-    "55.3.244.1 GET /index.html 15824 0.043",
-    "55.3.244.1 GET /index.html 15824 0.043",
-    "55.3.244.1 GET /index.html 15824 0.043",
-    "55.3.244.1 GET /index.html 15824 0.043",
-    "55.3.244.1 GET /index.html 15824 0.043",
-    "55.3.244.1 GET /index.html 15824 0.043"
-  ) as ("line"->'string) parallism 10
+  "logStream" := stream from
+    Seq(
+      "55.3.244.1 GET /index.html 15824 0.043",
+      "55.3.244.1 GET /index.html 15824 0.043",
+      "55.3.244.1 GET /index.html 15824 0.043",
+      "55.3.244.1 GET /index.html 15824 0.043",
+      "55.3.244.1 GET /index.html 15824 0.043",
+      "55.3.244.1 GET /index.html 15824 0.043"
+    ) as ("line"->'string) parallism 10
 
   "parserStream" := $"logStream" grok {
     pattern("line"->"(?<ip>\\d+\\.\\d+\\.\\d+\\.\\d+)\\s+(?<method>\\w+)\\s+(?<path>[\\w/\\.]+)\\s+(?<bytes>\\d+)\\s+(?<time>[\\d\\.]+)")
   }
 
-  "parserStream" > stdout parallism 1
+  $"parserStream" > stdout parallism 1
   // =====================================
 
   submit

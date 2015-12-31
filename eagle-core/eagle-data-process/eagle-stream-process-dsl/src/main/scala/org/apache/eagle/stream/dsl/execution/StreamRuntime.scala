@@ -29,36 +29,30 @@ case class ParseException(message:String,throwable:Throwable) extends Exception(
 case class CompileException(message:String,throwable:Throwable) extends Exception(message,throwable)
 case class EvaluateException(message:String,throwable:Throwable) extends Exception(message,throwable)
 
-case class StreamAppEvaluator(code:String,config:Config = ConfigFactory.load()) {
-  private val logger = LoggerFactory.getLogger(classOf[StreamAppEvaluator])
+case class StreamRuntime(code:String,config:Config = ConfigFactory.load()) {
+  private val logger = LoggerFactory.getLogger(classOf[StreamRuntime])
   val tb = cm.mkToolBox()
 
-  val importLibrary =
-    """
-      | import org.apache.eagle.stream.dsl.universal._
-      |
-    """.stripMargin
-
-  def format:String =
-    s"""
-      | $importLibrary
-      |
-      | $code
-    """.stripMargin
+  def format:String = StreamFormatter(config).format(code)
 
   @throws[ParseException]
   def parse = {
     val formatted = format
     if(logger.isDebugEnabled)
       logger.debug(s"Parsing \n $formatted")
-    else logger.info("Parsing")
+    else
+      logger.info("Parsing ...")
     try {
       val ret = tb.parse(format)
-      if (logger.isDebugEnabled) logger.debug(s"Parsed as\n $ret")
+      if (logger.isDebugEnabled) {
+        logger.debug(s"Successfully parsed as\n $ret")
+      }else{
+        logger.info("Successfully parsed")
+      }
       ret
     } catch {
       case e:Throwable => {
-        sys.error(s"Failed to parse $formatted\nException: $e")
+        logger.error(s"Failed to parse $formatted",e)
         throw ParseException(s"Failed to parse $formatted",e)
       }
     }
@@ -116,7 +110,7 @@ case class StreamAppEvaluator(code:String,config:Config = ConfigFactory.load()) 
   }
 }
 
-object StreamAppEvaluator {
+object StreamRuntime {
   def main(args:Array[String]): Unit ={
     // stream.app.conf
   }
