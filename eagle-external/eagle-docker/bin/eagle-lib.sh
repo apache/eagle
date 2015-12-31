@@ -122,7 +122,7 @@ eagle-deploy-cluster() {
 }
 
 amb-start-first() {
-  run-command docker run -p 9099:9099 -p 8080:8080 -p 8744:8744 -p 2181:2181 -p 2888:2888 -p 6667:6667 -p 60020:60020 -p 60030:60030 -p 60010:60010 -d $DOCKER_OPTS --name $AMBARI_SERVER_NAME -h $AMBARI_SERVER_NAME.$MYDOMAIN --privileged=true $IMAGE --tag ambari-server=true
+  run-command docker run -p 9099:9099 -p 8080:8080 -p 8744:8744 -p 2181:2181 -p 2888:2888 -p 6667:6667 -p 60020:60020 -p 60030:60030 -p 60010:60010 -p 50070:50070 -p 50075:50075 -d $DOCKER_OPTS --name $AMBARI_SERVER_NAME -h $AMBARI_SERVER_NAME.$MYDOMAIN --privileged=true $IMAGE --tag ambari-server=true
 }
 
 amb-copy-to-hdfs() {
