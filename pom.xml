@@ -131,6 +131,7 @@
         <module>eagle-external</module>
         <module>eagle-assembly</module>
         <module>eagle-topology-assembly</module>
+        <module>eagle-gc</module>
     </modules>
     <properties>
         <!-- General Properties -->

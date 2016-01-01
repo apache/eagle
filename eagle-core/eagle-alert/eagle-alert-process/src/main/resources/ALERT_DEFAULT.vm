@@ -124,9 +124,6 @@
 							<td style="padding: 0 0 0 0;" align="left" >
 								<p style="color:#FFFFFF;font-weight: bold; font-size: 24px">Eagle</p>
 							</td>
-							<td style="padding: 0 0 0 0;" align="right">
-								<p style="color:#FFFFFF;font-weight: bold;">DAM Alert</p>
-							</td>
 						</tr>
 					</table>
 				</td>
@@ -139,7 +136,7 @@
 						<tr>
 							<!-- Title -->
 							<td align="center">
-								<h1>Malicious Data Operation Detected</h1>
+								<h1>$elem["dataSource"] Alert Detected</h1>
 							</td>
 						</tr>
 						<tr>
@@ -214,9 +211,6 @@
 									</tr>
 									<tr>
 										<th>
-											<p>Alert Type</p>
-										</th>
-										<th>
 											<p>Policy Name</p>
 										</th>
 										<th>
@@ -224,9 +218,6 @@
 										</th>
 									</tr>
 									<tr>
-										<td>
-											<p>DAM Alert</p>
-										</td>									
 										<td>
 											<p>$elem["policyId"]</p>
 										</td>
@@ -258,7 +249,7 @@
 						<tr>
 							<!-- Possible Root Causes Content -->
 							<td class="panel" valign="top" style="background: #F4F4F4; border: 1px solid #AAAAAA; padding: 10px 10px 12px 10px;">
-								<p> Malicious data operation found, please check.</p>
+								<p> $elem["dataSource"] alert found, please check.</p>
 							</td>
 						</tr>
 						<tr>

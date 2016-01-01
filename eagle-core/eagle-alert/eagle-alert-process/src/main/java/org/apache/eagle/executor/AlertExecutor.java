@@ -118,7 +118,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		this.config = config;
 	}
 	
-	public void initMetricReportor() {
+	private void initMetricReportor() {
 		String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
 		int port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
 
@@ -250,11 +250,11 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		return false;
 	}
 	
-	public long trim(long value, long granularity) {
+	private long trim(long value, long granularity) {
 		return value / granularity * granularity;
 	}
 
-	public void updateCounter(String name, Map<String, String> dimensions, double value) {
+	private void updateCounter(String name, Map<String, String> dimensions, double value) {
 		long current = System.currentTimeMillis();
 		String metricName = MetricKeyCodeDecoder.codeMetricKey(name, dimensions);
 		if (registry.getMetrics().get(metricName) == null) {
@@ -268,11 +268,11 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		}
 	}
 	
-	public void updateCounter(String name, Map<String, String> dimensions) {
+	private void updateCounter(String name, Map<String, String> dimensions) {
 		updateCounter(name, dimensions, 1.0);
 	}
 	
-	public Map<String, String> getDimensions(String policyId) {
+	protected Map<String, String> getDimensions(String policyId) {
 		if (dimensionsMap.get(policyId) == null) {
 			Map<String, String> newDimensions = new HashMap<String, String>(baseDimensions);
 			newDimensions.put(AlertConstants.POLICY_ID, policyId);
