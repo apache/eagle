@@ -10,7 +10,7 @@ import time
 
 ##### Constants Definitions - start #####
 # textuals:
-HELP_MESSAGE = "auto_merge.py -n <pr_number>"
+HELP_MESSAGE = "auto_merge.py -n <pr_number> [--log-level debug|info|warn|error|fatal]"
 GITHUB_ORGANIZATION = "apache"
 REPO_NAME = "incubator-eagle"
 APACHE_GIT_REPO_URL = "https://git-wip-us.apache.org/repos/asf/incubator-eagle.git"
@@ -23,6 +23,25 @@ APPROVED_SIGNS = [":+1:", "LGTM"]
 REJECTED_SIGNS = [":-1:"]
 ENCODING = "utf-8"
 
+# for log level:
+LOG_LEVEL_NAME_DEBUG = "debug"
+LOG_LEVEL_VALUE_DEBUG = 1
+LOG_LEVEL_NAME_INFO = "info"
+LOG_LEVEL_VALUE_INFO = 2
+LOG_LEVEL_NAME_WARN = "warn"
+LOG_LEVEL_VALUE_WARN = 3
+LOG_LEVEL_NAME_ERROR = "error"
+LOG_LEVEL_VALUE_ERROR = 4
+LOG_LEVEL_NAME_FATAL = "fatal"
+LOG_LEVEL_VALUE_FATAL = 5
+LOG_LEVEL_REGEXP = re.compile("^(%s|%s|%s|%s|%s)$" % (LOG_LEVEL_NAME_DEBUG, LOG_LEVEL_NAME_INFO, LOG_LEVEL_NAME_WARN, LOG_LEVEL_NAME_ERROR, LOG_LEVEL_NAME_FATAL), re.I)
+LOG_LEVEL_MAPPING = dict()
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_DEBUG] = LOG_LEVEL_VALUE_DEBUG
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_INFO] = LOG_LEVEL_VALUE_INFO
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_WARN] = LOG_LEVEL_VALUE_WARN
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_ERROR] = LOG_LEVEL_VALUE_ERROR
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_FATAL] = LOG_LEVEL_VALUE_FATAL
+
 # string templates:
 GITHUB_PATH_TUPLE = (GITHUB_ORGANIZATION, REPO_NAME)
 GITHUB_PATCH_URL_TEMPLATE = "/".join(["https://patch-diff.githubusercontent.com/raw", GITHUB_ORGANIZATION, REPO_NAME, "pull", "%s.patch"])
@@ -32,12 +51,14 @@ PR_COMMENTS_API_TEMPLATE = "/".join(["https://api.github.com/repos", GITHUB_ORGA
 JIRA_TICKET_LINK_TEMPLATE = "".join(["https://issues.apache.org/jira/browse/", PROJECT_PREFIX, "%s"])
 ##### Constants Definitions - end #####
 
+##### Global Variable Definitions - start #####
+log_level = LOG_LEVEL_VALUE_INFO
+##### Global Variable Definitions - end #####
+
 ##### Define Valid Committers - start #####
 committers = dict()
 # here is where to add committer, with syntax: committers[author_github_id] = author_email_address
 ##### Define Valid Committers - end #####
-
-# TODO - Px - need to filter low level log type and define invoking argument for specifying it
 
 def to_console(msg):
 	print msg
@@ -53,17 +74,28 @@ def __log_msg_list__(key, msg):
 	else:
 		raise AttributeError("argument 'msg' must be a string, unicode or list, but %s is given" % type(msg))
 
+def __shall_log__(level_number):
+	return level_number >= log_level
+
+def fatal(msg):
+	if __shall_log__(LOG_LEVEL_VALUE_FATAL):
+		__log_msg_list__("FTL", msg)
+
 def error(msg):
-	__log_msg_list__("ERR", msg)
+	if __shall_log__(LOG_LEVEL_VALUE_ERROR):
+		__log_msg_list__("ERR", msg)
 
 def warn(msg):
-	__log_msg_list__("WRN", msg)
+	if __shall_log__(LOG_LEVEL_VALUE_WARN):
+		__log_msg_list__("WRN", msg)
 
 def info(msg):
-	__log_msg_list__("INF", msg)
+	if __shall_log__(LOG_LEVEL_VALUE_INFO):
+		__log_msg_list__("INF", msg)
 
 def debug(msg):
-	__log_msg_list__("DBG", msg)
+	if __shall_log__(LOG_LEVEL_VALUE_DEBUG):
+		__log_msg_list__("DBG", msg)
 
 def display_help(*err_msg):
 	if err_msg:
@@ -425,7 +457,7 @@ def main(argv):
 		exit(-1)
 	pr_number = ""
 	try:
-		opts, args = getopt.getopt(argv, "hn:")
+		opts, args = getopt.getopt(argv, "hn:", ["log-level="])
 	except getopt.GetoptError as e:
 		display_help(e.msg)
 		sys.exit(-1)
@@ -435,6 +467,15 @@ def main(argv):
 			exit(1)
 		elif opt == "-n":
 			pr_number = arg
+		elif opt == "--log-level":
+			log_level_name = arg
+			match = LOG_LEVEL_REGEXP.search(log_level_name)
+			if match:
+				global log_level
+				log_level = LOG_LEVEL_MAPPING[match.group(1).lower()]
+			else:
+				display_help("un-recognized log level: %s" % log_level_name)
+				exit(-1)
 
 	# validate pr info
 	to_console("-------------------- START PROCESSING --------------------")
