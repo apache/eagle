@@ -24,22 +24,23 @@ import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.policy.ResultRender;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.common.UrlBuilder;
-import org.apache.eagle.policy.entity.AlertAPIEntity;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.SiddhiQueryCallbackImpl;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionAPIEntity, AlertAPIEntity> {
+public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionAPIEntity, AlertAPIEntity>, Serializable {
 
 	public static final Logger LOG = LoggerFactory.getLogger(SiddhiAlertAPIEntityRender.class);
 	public static final String source = ManagementFactory.getRuntimeMXBean().getName();

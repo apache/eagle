@@ -25,7 +25,7 @@ import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
 
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
-import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.policy.siddhi.SiddhiStreamMetadataUtils;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.junit.Test;

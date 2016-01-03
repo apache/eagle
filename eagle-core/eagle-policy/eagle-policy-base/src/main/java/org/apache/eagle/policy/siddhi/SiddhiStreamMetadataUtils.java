@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.policy.siddhi;
 
-import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

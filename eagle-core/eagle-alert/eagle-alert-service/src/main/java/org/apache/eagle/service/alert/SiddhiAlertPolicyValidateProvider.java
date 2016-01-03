@@ -28,7 +28,7 @@ import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.policy.siddhi.AttributeType;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.common.DateTimeUtil;

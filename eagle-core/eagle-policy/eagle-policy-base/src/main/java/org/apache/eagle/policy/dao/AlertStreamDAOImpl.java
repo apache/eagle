@@ -17,7 +17,7 @@
 package org.apache.eagle.policy.dao;
 
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AlertStreamEntity;
+import org.apache.eagle.alert.entity.AlertStreamEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;

@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -27,7 +27,7 @@ import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.alert.common.AlertEmailSender;
 import org.apache.eagle.alert.email.AlertEmailComponent;
 import org.apache.eagle.alert.email.AlertEmailContext;
-import org.apache.eagle.policy.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
 import com.typesafe.config.ConfigObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

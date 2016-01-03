@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.policy.entity;
+package org.apache.eagle.alert.entity;
 
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -23,38 +23,16 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@Table("alertDataSource")
+@Table("alertExecutor")
 @ColumnFamily("f")
-@Prefix("alertDataSource")
-@Service(Constants.ALERT_DATA_SOURCE_SERVICE_ENDPOINT_NAME)
+@Prefix("alertExecutor")
+@Service(Constants.ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "dataSource"})
-public class AlertDataSourceEntity extends TaggedLogAPIEntity{
+@Tags({"dataSource", "alertExecutorId", "streamName"})
+public class AlertExecutorEntity extends TaggedLogAPIEntity{
     @Column("a")
-    private boolean enabled;
-    @Column("b")
-    private String config;
-    @Column("c")
     private String desc;
-
-    public String getConfig() {
-        return config;
-    }
-
-    public void setConfig(String config) {
-        this.config = config;
-        valueChanged("config");
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        valueChanged("enabled");
-    }
 
     public String getDesc() {
         return desc;

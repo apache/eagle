@@ -27,8 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.eagle.alert.config.EmailNotificationConfig;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.entity.AlertAPIEntity;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.policy.DynamicPolicyLoader;
 import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;

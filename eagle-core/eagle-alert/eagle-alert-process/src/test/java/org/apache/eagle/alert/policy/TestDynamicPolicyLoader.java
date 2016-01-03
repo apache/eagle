@@ -23,7 +23,7 @@ import java.util.Map;
 import org.apache.eagle.policy.DynamicPolicyLoader;
 import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

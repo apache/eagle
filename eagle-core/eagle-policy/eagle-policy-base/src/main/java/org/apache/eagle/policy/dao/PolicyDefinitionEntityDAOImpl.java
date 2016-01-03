@@ -17,7 +17,7 @@
 package org.apache.eagle.policy.dao;
 
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;

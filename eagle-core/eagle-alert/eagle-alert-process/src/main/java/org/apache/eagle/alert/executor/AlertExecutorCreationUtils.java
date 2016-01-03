@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.policy.DefaultPolicyPartitioner;
 import org.apache.eagle.policy.PolicyPartitioner;
 import org.slf4j.Logger;

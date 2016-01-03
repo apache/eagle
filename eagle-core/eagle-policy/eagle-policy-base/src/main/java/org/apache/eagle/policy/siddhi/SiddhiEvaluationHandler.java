@@ -17,7 +17,7 @@
 package org.apache.eagle.policy.siddhi;
 
 import org.apache.eagle.policy.PolicyEvaluationContext;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 
 import java.util.List;
 

@@ -17,7 +17,7 @@
 
 package org.apache.eagle.policy.common;
 
-import org.apache.eagle.policy.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.common.EagleBase64Wrapper;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.log.entity.HBaseInternalLogHelper;

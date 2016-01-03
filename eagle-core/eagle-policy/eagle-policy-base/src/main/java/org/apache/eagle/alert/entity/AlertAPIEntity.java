@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.policy.entity;
+package org.apache.eagle.alert.entity;
 
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.common.metric.AlertContext;

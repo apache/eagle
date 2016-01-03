@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;

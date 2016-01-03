@@ -18,7 +18,7 @@ package org.apache.eagle.policy;
 
 import java.util.List;
 
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 
 import com.fasterxml.jackson.databind.Module;
 

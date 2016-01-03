@@ -27,8 +27,8 @@ import java.util.TreeSet;
 
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.config.AbstractPolicyDefinition;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
-import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.policy.PolicyEvaluator;
 import org.apache.eagle.policy.PolicyManager;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;

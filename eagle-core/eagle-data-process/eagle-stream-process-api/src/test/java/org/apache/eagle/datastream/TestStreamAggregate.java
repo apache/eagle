@@ -16,31 +16,25 @@
  */
 package org.apache.eagle.datastream;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.eagle.policy.entity.AlertAPIEntity;
-import org.apache.eagle.datastream.core.FlatMapProducer;
-import org.apache.eagle.datastream.core.StormSourceProducer;
-import org.apache.eagle.datastream.core.StreamConnector;
-import org.apache.eagle.datastream.core.StreamDAG;
-import org.apache.eagle.datastream.core.StreamProducer;
-import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
-import org.apache.eagle.partition.PartitionStrategy;
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
+import org.apache.eagle.datastream.core.*;
+import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
+import org.apache.eagle.partition.PartitionStrategy;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
+import org.junit.Before;
+import org.junit.Test;
 import scala.collection.Seq;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -136,7 +130,7 @@ public class TestStreamAggregate {
 		try {
 			exe.execute();
 		} catch (Exception e) {
-			Assert.fail("customzied flat mapper before");
+			Assert.fail("customized flat mapper before");
 		}
 		// Assertion
 		DirectedAcyclicGraph<StreamProducer<Object>, StreamConnector<Object, Object>> dag = exe.dag();

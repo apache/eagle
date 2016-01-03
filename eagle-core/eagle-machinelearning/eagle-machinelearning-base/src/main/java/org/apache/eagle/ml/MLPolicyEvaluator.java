@@ -25,7 +25,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.config.AbstractPolicyDefinition;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.policy.PolicyEvaluator;
 import org.apache.eagle.policy.PolicyManager;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;

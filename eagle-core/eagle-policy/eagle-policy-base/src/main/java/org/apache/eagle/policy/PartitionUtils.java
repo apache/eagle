@@ -18,7 +18,7 @@ package org.apache.eagle.policy;
 
 
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 
 public class PartitionUtils {
 	

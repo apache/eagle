@@ -19,7 +19,7 @@ package org.apache.eagle.alert.dao;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.service.client.EagleServiceConnector;

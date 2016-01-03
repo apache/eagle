@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 
 /**
  * @param <T> - Policy definition type

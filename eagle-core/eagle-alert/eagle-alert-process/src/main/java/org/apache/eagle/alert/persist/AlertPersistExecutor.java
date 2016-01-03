@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.alert.persist;
 
-import org.apache.eagle.policy.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
 import com.typesafe.config.Config;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.datastream.Collector;

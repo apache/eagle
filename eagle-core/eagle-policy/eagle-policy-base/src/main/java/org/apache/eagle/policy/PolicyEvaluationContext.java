@@ -18,7 +18,7 @@ package org.apache.eagle.policy;
 
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.policy.executor.PolicyProcessExecutor;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 
 public class PolicyEvaluationContext<T extends AbstractPolicyDefinitionEntity, K> {
 	

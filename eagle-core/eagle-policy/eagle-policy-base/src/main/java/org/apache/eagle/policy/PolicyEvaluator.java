@@ -18,7 +18,7 @@ package org.apache.eagle.policy;
 
 import java.util.Map;
 
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.dataproc.core.ValuesArray;
 
 /***

@@ -17,7 +17,7 @@
 package org.apache.eagle.dataproc.impl.aggregate.entity;
 
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.log.entity.meta.Column;
 import org.apache.eagle.log.entity.meta.ColumnFamily;
 import org.apache.eagle.log.entity.meta.Index;

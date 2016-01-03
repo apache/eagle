@@ -35,7 +35,7 @@ import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.policy.siddhi.SiddhiEvaluationHandler;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;

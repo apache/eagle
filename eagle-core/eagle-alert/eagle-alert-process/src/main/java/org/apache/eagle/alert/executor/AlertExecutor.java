@@ -18,8 +18,8 @@ package org.apache.eagle.alert.executor;
 
 import org.apache.eagle.policy.ResultRender;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.entity.AlertAPIEntity;
-import org.apache.eagle.policy.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.policy.PolicyPartitioner;
 import org.apache.eagle.policy.executor.PolicyProcessExecutor;
 import org.apache.eagle.alert.siddhi.SiddhiAlertAPIEntityRender;

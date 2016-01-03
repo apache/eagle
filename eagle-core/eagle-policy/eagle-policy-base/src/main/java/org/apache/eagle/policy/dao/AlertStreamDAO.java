@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.policy.dao;
 
-import org.apache.eagle.policy.entity.AlertStreamEntity;
+import org.apache.eagle.alert.entity.AlertStreamEntity;
 
 import java.util.List;
 

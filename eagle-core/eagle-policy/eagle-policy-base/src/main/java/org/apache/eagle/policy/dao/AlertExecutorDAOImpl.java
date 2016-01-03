@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AlertExecutorEntity;
+import org.apache.eagle.alert.entity.AlertExecutorEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;

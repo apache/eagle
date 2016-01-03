@@ -24,7 +24,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import com.typesafe.config.Config;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.common.config.EagleConfigConstants;

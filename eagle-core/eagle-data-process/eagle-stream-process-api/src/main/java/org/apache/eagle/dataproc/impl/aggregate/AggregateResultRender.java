@@ -22,12 +22,13 @@ import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.policy.ResultRender;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created on 12/29/15.
  */
-public class AggregateResultRender implements ResultRender<AggregateDefinitionAPIEntity, AggregateEntity> {
+public class AggregateResultRender implements ResultRender<AggregateDefinitionAPIEntity, AggregateEntity>, Serializable {
 
 
     @Override

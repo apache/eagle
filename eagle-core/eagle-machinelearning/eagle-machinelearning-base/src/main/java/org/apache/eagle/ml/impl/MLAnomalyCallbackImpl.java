@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.common.config.EagleConfigConstants;

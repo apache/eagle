@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.policy.PolicyEvaluatorServiceProvider;
 
 import com.fasterxml.jackson.databind.Module;

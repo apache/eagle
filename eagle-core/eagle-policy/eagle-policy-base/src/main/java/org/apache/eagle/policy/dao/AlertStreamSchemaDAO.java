@@ -18,7 +18,7 @@ package org.apache.eagle.policy.dao;
 
 import java.util.List;
 
-import org.apache.eagle.policy.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 
 public interface AlertStreamSchemaDAO {
 	List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception;
