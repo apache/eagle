@@ -14,15 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.persist;
+package org.apache.eagle.persist.test;
+
+import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
 
 /**
- * Interface by the stream framework to storage
- * 
- * @since Dec 19, 2015
- *
+ * Created on 1/4/16.
  */
-public interface IPersistService<T> {
+public class MetricSerializer implements SpoutKafkaMessageDeserializer {
+    @Override
+    public Object deserialize(byte[] arg0) {
+        String logLine = new String(arg0);
 
-	boolean save(String stream, T apiEntity) throws Exception;
+        return null;
+    }
 }

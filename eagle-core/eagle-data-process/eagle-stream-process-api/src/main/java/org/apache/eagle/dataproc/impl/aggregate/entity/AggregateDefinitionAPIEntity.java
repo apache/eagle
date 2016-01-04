@@ -16,17 +16,9 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate.entity;
 
-import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
-import org.apache.eagle.log.entity.meta.Column;
-import org.apache.eagle.log.entity.meta.ColumnFamily;
-import org.apache.eagle.log.entity.meta.Index;
-import org.apache.eagle.log.entity.meta.Indexes;
-import org.apache.eagle.log.entity.meta.Prefix;
-import org.apache.eagle.log.entity.meta.Service;
-import org.apache.eagle.log.entity.meta.Table;
-import org.apache.eagle.log.entity.meta.Tags;
-import org.apache.eagle.log.entity.meta.TimeSeries;
+import org.apache.eagle.log.entity.meta.*;
+import org.apache.eagle.policy.common.Constants;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -35,15 +27,15 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
  *
  */
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@Table("analyzedef")
+@Table("aggregatedef")
 @ColumnFamily("f")
-@Prefix("analyzedef")
+@Prefix("aggregatedef")
 @Service(Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "dataSource", "analyzeExecutorId", "policyId", "policyType"})
+@Tags({"site", "dataSource", "aggregateExecutorId", "policyId", "policyType"})
 @Indexes({
-	@Index(name="Index_1_analyzeExecutorId", columns = { "analyzeExecutorID" }, unique = true),
+	@Index(name="Index_1_aggregateExecutorId", columns = { "aggregateExecutorID" }, unique = true),
 })
 @SuppressWarnings("serial")
 public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
@@ -62,16 +54,6 @@ public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity
 	private long lastModifiedDate;
 	@Column("g")
 	private long createdTime;
-	/**
-	 * TODO: By setting this to true, eagle would generate a simple sampling for each field given.
-	 * for each field, an
-	 * 	avg(Field)
-	 * 	min(Field)
-	 * 	max(Field)
-	 * 	count(Field) would be collected
-	 */
-	@Column("h")
-	private boolean downSampling;
 
 	public String getName() {
 		return name;
@@ -129,12 +111,5 @@ public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity
 		this.createdTime = createdTime;
 	}
 
-	public boolean isDownSampling() {
-		return downSampling;
-	}
-
-	public void setDownSampling(boolean downSampling) {
-		this.downSampling = downSampling;
-	}
 
 }

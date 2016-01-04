@@ -17,10 +17,8 @@
 package org.apache.eagle.dataproc.impl.aggregate.entity;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Event entity during stream processing
@@ -32,16 +30,14 @@ public class AggregateEntity implements Serializable {
 
 	private static final long serialVersionUID = 5911351515190098292L;
 
-    private Map<String, Object> results = new HashMap<>();
-
-    private List<Object> result = new LinkedList<>();
-
-    public void add(String col, Object res) {
-        results.put(col, res);
-    }
+    private List<Object> data = new LinkedList<>();
 
     public void add(Object res) {
-        result.add(res);
+        data.add(res);
+    }
+
+    public List<Object> getData() {
+        return data;
     }
 	
 }

@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.concurrent.Future;
 
 /**
+ * TODO : support more general entity input
  * @since Dec 21, 2015
  *
  */
@@ -40,10 +41,10 @@ public class DruidPersistService implements IPersistService<AggregateEntity> {
 	private static final String BUFFER_MEMORY = "bufferMemory";
 	private static final String KEY_SERIALIZER = "keySerializer";
 	private static final String VALUE_SERIALIZER = "valueSerializer";
-	private static final String BOOTSTRAP_SERVERS = "bootstrap.servers";
+	private static final String BOOTSTRAP_SERVERS = "bootstrap_servers";
 	
 	private KafkaProducer<String, AggregateEntity> producer;
-//	private final Config config;
+	private final Config config;
 	private final SortedMap<String, String> streamTopicMap;
 	private final Properties props;
 	
@@ -60,7 +61,7 @@ public class DruidPersistService implements IPersistService<AggregateEntity> {
 	 * </pre>
 	 */
 	public DruidPersistService(Config config) {
-//		this.config = config;
+		this.config = config;
 		Config kafkaConfig = config.getConfig("kafka");
 		if (kafkaConfig == null) {
 			throw new IllegalStateException("Druid persiste service failed to find kafka configurations!");
@@ -87,9 +88,10 @@ public class DruidPersistService implements IPersistService<AggregateEntity> {
 		if (kafkaConfig.hasPath(KEY_SERIALIZER)) {
 			props.put("key.serializer", kafkaConfig.getLong(KEY_SERIALIZER));
 		}
-		if (kafkaConfig.hasPath(VALUE_SERIALIZER)) {
-			props.put("value.serializer", kafkaConfig.getLong(VALUE_SERIALIZER));
-		}
+//		if (kafkaConfig.hasPath(VALUE_SERIALIZER)) {
+//			props.put("value.serializer", kafkaConfig.getLong(VALUE_SERIALIZER));
+//		}
+		props.put("value.serializer", AggregateEntitySerializer.class.getCanonicalName());
 
 		streamTopicMap = new TreeMap<>();
 		if (kafkaConfig.hasPath("topics")) {
@@ -104,12 +106,14 @@ public class DruidPersistService implements IPersistService<AggregateEntity> {
 	}
 
 	@Override
-	public void save(String stream, AggregateEntity apiEntity) throws Exception {
+	public boolean save(String stream, AggregateEntity apiEntity) throws Exception {
 		if (streamTopicMap.get(stream) != null) {
 			ProducerRecord<String, AggregateEntity> record = new ProducerRecord<>(streamTopicMap.get(stream), apiEntity);
 			Future<RecordMetadata> future = producer.send(record);
 			// TODO : more for check the sending status
+			return true;
 		}
+		return false;
 	}
 
 }
