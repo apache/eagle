@@ -19,23 +19,36 @@
 // =============================================================
 // =                       Configuration                       =
 // =============================================================
-eagleControllers.controller('configurationCtrl', function($scope, configPageConfig, globalContent, Site) {
+eagleControllers.controller('configSiteCtrl', function($scope, configPageConfig, globalContent, Site, Application) {
 	'use strict';
 
-	globalContent.hideModule = true;
+	globalContent.hideApplication = true;
 	globalContent.setConfig(configPageConfig);
 
-	// Site
+	// =================== Site ===================
 	$scope.site = Site.list[0];
 	$scope.setSite = function(site) {
 		$scope.site = site;
 	};
+	// TODO: Mock
+	$.each(Site.list, function(i, site) {
+		site.app = {};
+	});
+});
 
-	// Application
-	$scope.appList = [
-		{name: "DAM", description: "Security check application"},
-		{name: "JPA", description: "JPA Test Application"}
-	];
+eagleControllers.controller('configApplicationCtrl', function($scope, configPageConfig, globalContent, Application) {
+	'use strict';
 
-	console.log('1234');
+	globalContent.hideApplication = true;
+	globalContent.setConfig(configPageConfig);
+
+	// ================ Application ================
+	$scope.application = Application.list[0];
+	$scope.setApplication = function(application) {
+		$scope.application = application;
+	};
+	// TODO: Mock
+	$.each(Application.list, function(i, app) {
+		app.feature = {};
+	});
 });

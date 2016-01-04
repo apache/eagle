@@ -25,7 +25,8 @@
 	eagleControllers.service('configPageConfig', function() {
 		var config = {
 			pageList: [
-				{icon: "server", title: "Sites", url: "#/configuration"},
+				{icon: "server", title: "Sites", url: "#/config/site"},
+				{icon: "cubes", title: "Applications", url: "#/config/application"}
 			],
 			navMapping: {
 			}

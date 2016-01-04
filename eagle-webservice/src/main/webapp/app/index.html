@@ -106,7 +106,7 @@
 									<!-- Menu Footer-->
 									<li class="user-footer">
 										<div class="pull-left" ng-if="auth.isRole('ROLE_ADMIN')">
-											<a href="#/configuration" class="btn btn-default btn-flat">Configuration</a>
+											<a href="#/config/site" class="btn btn-default btn-flat">Configuration</a>
 										</div>
 										<div class="pull-right">
 											<a ng-click="logout();" class="btn btn-default btn-flat">Sign out</a>
@@ -117,8 +117,8 @@
 						</ul>
 					</div>
 
-					<!-- Modules -->
-					<div ng-hide="globalContent.hideModule">
+					<!-- Applications -->
+					<div ng-hide="globalContent.hideApplication">
 						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#moduleMenu">
 							<span class="sr-only">Toggle navigation</span>
 							<span class="fa fa-map"></span>
@@ -194,7 +194,10 @@
 
 		<!-- Service -->
 		<script src="public/js/srv/main.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/srv/moduleSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/applicationSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/authorizationSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/entitiesSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/siteSrv.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Application -->
 		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>

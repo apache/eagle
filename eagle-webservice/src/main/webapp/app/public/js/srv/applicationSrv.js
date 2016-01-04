@@ -17,9 +17,25 @@
  */
 
 (function() {
-	var serviceModule = angular.module('eagle.service');
+	'use strict';
 
-	serviceModule.provider('Module', function(){
+	var serviceModule = angular.module('eagle.service');
+	serviceModule.provider('Application', function() {
+		// TODO: Mock
+		this.list = [
+			{name: "DAM", description: "Security check application"},
+			{name: "JPA", description: "JPA Test Application"}
+		];
+
+		// TODO: Mock
+		this.featureList = [
+			{name: "Common", description: "Provide the Policy & Alert feature."},
+			{name: "Classification", description: "Sensitivity browser of the data classification."},
+			{name: "User Profile", description: "Machine learning of the user profile"},
+			{name: "Metadata", description: "Stream metadata viewer"},
+			{name: "Setup", description: "Stream configuration"},
+		];
+
 		this.$get = function() {
 			return this;
 		};
