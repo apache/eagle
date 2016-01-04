@@ -45,8 +45,9 @@ public class TestPolicyDistributionUpdater {
 
     @Test
     public void testPolicyDistributionReporter() throws Exception{
-        PolicyDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, null)) {
-            public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception {
+        PolicyDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, 1)) {
+            @Override
+            public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
                 final AlertDefinitionAPIEntity entity = new AlertDefinitionAPIEntity();
                 entity.setTags(new HashMap<String, String>() {{
                     put(Constants.POLICY_TYPE, "siddhiCEPEngine");
