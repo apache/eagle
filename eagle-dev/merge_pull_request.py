@@ -8,9 +8,48 @@ import subprocess
 import re
 import time
 
+# TODO - P2 - need to fix some unicode bytes in debug of run_command()
+
 ##### Constants Definitions - start #####
+SCRIPT_ABS_DIR, SCRIPT_NAME = os.path.split(os.path.abspath(sys.argv[0]))
+EXPECTED_DIR_IN_REPO = "eagle-dev"
+
+# for log level:
+LOG_LEVEL_NAME_DEBUG = "debug"
+LOG_LEVEL_VALUE_DEBUG = 0
+LOG_LEVEL_NAME_INFO = "info"
+LOG_LEVEL_VALUE_INFO = 1
+LOG_LEVEL_NAME_WARN = "warn"
+LOG_LEVEL_VALUE_WARN = 2
+LOG_LEVEL_NAME_ERROR = "error"
+LOG_LEVEL_VALUE_ERROR = 3
+LOG_LEVEL_NAME_FATAL = "fatal"
+LOG_LEVEL_VALUE_FATAL = 4
+DEFAULT_LOG_LEVEL_NAME = LOG_LEVEL_NAME_INFO
+LOG_LEVEL_REGEXP = re.compile("^(%s|%s|%s|%s|%s)$" % (LOG_LEVEL_NAME_DEBUG, LOG_LEVEL_NAME_INFO, LOG_LEVEL_NAME_WARN, LOG_LEVEL_NAME_ERROR, LOG_LEVEL_NAME_FATAL), re.I)
+LOG_LEVEL_MAPPING = dict()
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_DEBUG] = LOG_LEVEL_VALUE_DEBUG
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_INFO] = LOG_LEVEL_VALUE_INFO
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_WARN] = LOG_LEVEL_VALUE_WARN
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_ERROR] = LOG_LEVEL_VALUE_ERROR
+LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_FATAL] = LOG_LEVEL_VALUE_FATAL
+
 # textuals:
-HELP_MESSAGE = "auto_merge.py -n <pr_number> [--log-level debug|info|warn|error|fatal]"
+HELP_MESSAGE = "".join([
+	"%s -n <pr_number> [--log-level <log_level_string>] [-p|--patch]\n" % SCRIPT_NAME,
+	"\n"
+	"args: (arg-type: R --> Required, O --> Optional)\n",
+	"    -n",          "\t\t\t", "R", "\tpull request number", "\n",
+	"    --log_level", "\t\t",   "O", "\tlowest log level considered, valid value:\n",
+	"               ", "\t\t",   " ", ("\t  |--> '%s', '%s', '%s', '%s', and '%s'\n" % (LOG_LEVEL_NAME_DEBUG, LOG_LEVEL_NAME_INFO, LOG_LEVEL_NAME_WARN, LOG_LEVEL_NAME_ERROR, LOG_LEVEL_NAME_FATAL)),
+	"               ", "\t\t",   " ", ("\t  \\--> '%s' by default\n" % DEFAULT_LOG_LEVEL_NAME),
+	"    -p, --patch", "\t\t",   "O", "\toperate with patch mode\n",
+	"\n"
+	"samples (replace '0' with real pull request number):\n",
+	"    %s -n 0\n" % SCRIPT_NAME,
+	"    %s -n 0 --log_level debug -p\n" % SCRIPT_NAME,
+	"    %s -n 0 --log_level info --patch\n" % SCRIPT_NAME
+])
 GITHUB_ORGANIZATION = "apache"
 REPO_NAME = "incubator-eagle"
 APACHE_GIT_REPO_URL = "https://git-wip-us.apache.org/repos/asf/incubator-eagle.git"
@@ -23,25 +62,6 @@ APPROVED_SIGNS = [":+1:", "LGTM"]
 REJECTED_SIGNS = [":-1:"]
 ENCODING = "utf-8"
 
-# for log level:
-LOG_LEVEL_NAME_DEBUG = "debug"
-LOG_LEVEL_VALUE_DEBUG = 1
-LOG_LEVEL_NAME_INFO = "info"
-LOG_LEVEL_VALUE_INFO = 2
-LOG_LEVEL_NAME_WARN = "warn"
-LOG_LEVEL_VALUE_WARN = 3
-LOG_LEVEL_NAME_ERROR = "error"
-LOG_LEVEL_VALUE_ERROR = 4
-LOG_LEVEL_NAME_FATAL = "fatal"
-LOG_LEVEL_VALUE_FATAL = 5
-LOG_LEVEL_REGEXP = re.compile("^(%s|%s|%s|%s|%s)$" % (LOG_LEVEL_NAME_DEBUG, LOG_LEVEL_NAME_INFO, LOG_LEVEL_NAME_WARN, LOG_LEVEL_NAME_ERROR, LOG_LEVEL_NAME_FATAL), re.I)
-LOG_LEVEL_MAPPING = dict()
-LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_DEBUG] = LOG_LEVEL_VALUE_DEBUG
-LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_INFO] = LOG_LEVEL_VALUE_INFO
-LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_WARN] = LOG_LEVEL_VALUE_WARN
-LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_ERROR] = LOG_LEVEL_VALUE_ERROR
-LOG_LEVEL_MAPPING[LOG_LEVEL_NAME_FATAL] = LOG_LEVEL_VALUE_FATAL
-
 # string templates:
 GITHUB_PATH_TUPLE = (GITHUB_ORGANIZATION, REPO_NAME)
 GITHUB_PATCH_URL_TEMPLATE = "/".join(["https://patch-diff.githubusercontent.com/raw", GITHUB_ORGANIZATION, REPO_NAME, "pull", "%s.patch"])
@@ -51,7 +71,12 @@ JIRA_TICKET_LINK_TEMPLATE = "".join(["https://issues.apache.org/jira/browse/", P
 ##### Constants Definitions - end #####
 
 ##### Global Variable Definitions - start #####
-log_level = LOG_LEVEL_VALUE_INFO
+log_level_name = DEFAULT_LOG_LEVEL_NAME
+log_level = LOG_LEVEL_MAPPING[log_level_name]
+patch_mode = False
+pr_number = 0
+repo_root_dir = None
+script_in_repo_root_dir = False
 ##### Global Variable Definitions - end #####
 
 ##### Define Valid Committers - start #####
@@ -75,6 +100,9 @@ def __log_msg_list__(key, msg):
 
 def __shall_log__(level_number):
 	return level_number >= log_level
+
+def __go_with_patch__():
+	return patch_mode
 
 def fatal(msg):
 	if __shall_log__(LOG_LEVEL_VALUE_FATAL):
@@ -102,7 +130,8 @@ def display_help(*err_msg):
 			error(err_msg[0])
 		else:
 			error(list(err_msg))
-	to_console("Usage: %s" % HELP_MESSAGE)
+	help_msg_sign = "-------------------- HELPING MESSAGE --------------------\n"
+	to_console("\n%sUsage: %s%s" % (help_msg_sign, HELP_MESSAGE, help_msg_sign))
 
 def exit_with_errmsg(err, err_code):
 	if isinstance(err, subprocess.CalledProcessError):
@@ -114,6 +143,9 @@ def exit_with_errmsg(err, err_code):
 def extract_run_command_err_msg(e):
 	return e.output.decode().strip()
 
+def __debug_command__(command_in_list, result):
+	debug("running command: %s, result:\n%s" % (command_in_list, result))
+
 def run_command(command):
 	c = None
 	if isinstance(command, list):
@@ -121,19 +153,8 @@ def run_command(command):
 	else:
 		c = command.split(" ")
 	result = subprocess.check_output(c, stderr=subprocess.STDOUT).decode()
-	debug("running command: %s, result:\n%s" % (c, result))
+	__debug_command__(c, result)
 	return result
-
-def get_info_from_github(url):
-	try:
-		gh_req = url_lib.Request(url)
-		response = url_lib.urlopen(gh_req)
-		pr_info = response.read().decode()
-		return json.loads(pr_info)
-	except url_lib.HTTPError as e:
-		exit_with_errmsg("failed to get data from URL: %s" % url, -1)
-	except url_lib.URLError as e:
-		exit_with_errmsg("server not reachable: %s" % url, -1)
 
 def get_repo_root_dir():
 	try:
@@ -142,25 +163,122 @@ def get_repo_root_dir():
 		exit_with_errmsg(e, -1)
 
 def get_temp_file_dir():
-	repo_root_dir = get_repo_root_dir()
 	return os.sep.join([repo_root_dir, "..", TEMP_FILE_DIR])
 
-def compose_patch_file_path(temp_dir, pr_number):
+def compose_patch_file_path(temp_dir):
 	return os.sep.join([temp_dir, "%s.patch" % pr_number])
 
-def compose_commit_msg_template(temp_dir, pr_number):
-	return os.sep.join([temp_dir, "pr_%s_commit_msg.template" % pr_number])
+def compose_commit_msg_file_path(temp_dir):
+	return os.sep.join([temp_dir, "pr_%s_commit_msg" % pr_number])
 
 def is_working_directory_clean():
-	return_code = subprocess.call(["git", "diff-index", "--quiet", "HEAD"])
+	# TODO - P0 - should also check if there is any untracked file
+	commands = ["git", "diff-index", "--quiet", "HEAD"]
+	return_code = subprocess.call(commands)
+	__debug_command__(commands, "return_code: %s (0 for True, 1 for False)\n" % return_code)
 	if return_code == 0:
 		return True
 	else:
 		return False
 
-def ensure_env(pr_number):
+def has_untracked_files_excluding(exclusion):
+	return len(find_untracked_files_excluding(exclusion)) != 0
+
+def find_untracked_files_excluding(exclusion):
+	fs = run_command("git ls-files --exclude-standard --others").strip().split("\n")
+	count = len(fs)
+	for i in range(count):
+		if fs[i] == "" or fs[i] == exclusion:
+			fs.pop(i)
+	return fs
+
+def is_self_reviewed(author, reviewer):
+	# currently, allow self-reviewing, but may disallow in the future
+	#return author == reviewer
+	return False
+
+def is_valid_reviewer(reviewer):
+	# currently, don't validate the authorization of the reviewer, may validate it in the future
+	#return reviewer in committers.keys()
+	return True
+
+def ask_for_input(prompt_msg):
+	return raw_input("%s%s" % ("IPT: ", prompt_msg))
+
+def ask_for_multiline_input(prompt_msg):
+	to_console("IPT: %s" % prompt_msg)
+	lines = sys.stdin.readlines()
+	return lines
+
+def is_valid_email(email):
+	if not email:
+		return False
+	return re.search("^[\w\-\.]+@(\w[\w\-]+\.)+[a-zA-Z0-9]+$", email)
+
+def has_branch(branch):
 	try:
-		temp_dir = get_temp_file_dir()
+		result = run_command("git branch --list %s" % branch).strip()
+		return result != ""
+	except subprocess.CalledProcessError as e:
+		exit_with_errmsg(e, -1)
+
+def get_commit_history(branch, required_count):
+	try:
+		result = run_command("git log --decorate --graph -n %s" % required_count).strip()
+		rows = re.split("\n", result)
+		git_logs = []
+		i = 0
+		for row in rows:
+			if row.startswith("*"):
+				if i == 0:
+					git_logs.append("new -> \t%s\n" % row)
+					i += 1
+				elif i == 1:
+					git_logs.append("old -> \t%s\n" % row)
+					i += 1
+				else:
+					git_logs.append("\t%s\n" % row)
+			else:
+				git_logs.append("\t%s\n" % row)
+		git_logs.append("\t* commit ......")
+		return "".join(git_logs)
+	except subprocess.CalledProcessError as e:
+		exit_with_errmsg(e, -1)
+
+def compose_commit_msg(commit_msg_file_path, jira_id, pr_title_content, commit_description_lines, jira_url, author, author_email, reviewer_email_mapping):
+	if os.path.exists(commit_msg_file_path):
+		os.remove(commit_msg_file_path)
+	comp = ["@%s <%s>" % (key, reviewer_email_mapping.get(key)) for key in reviewer_email_mapping.keys()]
+	reviewer_row = "Reviewer(s): %s\r\n" % ", ".join(comp)
+	with open(commit_msg_file_path, "w") as f:
+		f.write("%s%s %s\r\n" % (PROJECT_PREFIX, jira_id, pr_title_content))
+		for line in commit_description_lines:
+			if line.strip() != "":
+				f.write("%s" % line)
+		f.write("\r\n")
+		f.write("%s\r\n" % jira_url)
+		f.write("\r\n")
+		f.write("Author: @%s <%s>\r\n" % (author, author_email))
+		f.write(reviewer_row)
+		f.write("\r\n")
+		f.write("Closes #%s.\r\n" % pr_number)
+
+def download_file(download_url, file_path):
+	source = url_lib.urlopen(download_url)
+	with open(file_path, "wb") as f:
+		f.write(source.read())
+
+def ensure_env():
+	try:
+		# check if the git working directory is clean
+		if not is_working_directory_clean():
+			exit_with_errmsg("working directory is not clean, please commit un-staged changes or stash them and try again", -1)
+
+		# check if any untrack file(s)
+		untracked_files = find_untracked_files_excluding(SCRIPT_NAME if script_in_repo_root_dir else "")
+		if len(untracked_files) > 0:
+			warn("untracked files found:\n    %s" % "\n    ".join(untracked_files))
+			exit_with_errmsg("to avoid loss, please commit untracked files before executing this script", -1)
 
 		# choose a remote name to operate
 		rows = run_command("git remote -v").strip().split("\n")
@@ -179,14 +297,11 @@ def ensure_env(pr_number):
 			info("remote name \"%s\" added" % DEFAULT_REMOTE_NAME)
 			pushable_remote_name = DEFAULT_REMOTE_NAME
 
-		# check if the git working directory is clean
-		if not is_working_directory_clean():
-			exit_with_errmsg("working directory is not clean, please commit un-staged changes or stash them and try again", -1)
-
 		# create temporary folder
-		patch_file_path = compose_patch_file_path(temp_dir, pr_number)
+		temp_dir = get_temp_file_dir()
+		patch_file_path = compose_patch_file_path(temp_dir)
 		if os.path.exists(temp_dir):
-			if os.path.exists(patch_file_path):
+			if patch_mode and os.path.exists(patch_file_path):
 				os.remove(patch_file_path)
 				info("old %s deleted successfully" % patch_file_path)
 		else:
@@ -197,6 +312,17 @@ def ensure_env(pr_number):
 	except subprocess.CalledProcessError as e:
 		exit_with_errmsg(e, -1)
 
+def get_info_from_github(url):
+	try:
+		gh_req = url_lib.Request(url)
+		response = url_lib.urlopen(gh_req)
+		pr_info = response.read().decode()
+		return json.loads(pr_info)
+	except url_lib.HTTPError as e:
+		exit_with_errmsg("failed to get data from URL: %s" % url, -1)
+	except url_lib.URLError as e:
+		exit_with_errmsg("server not reachable: %s" % url, -1)
+
 def parse_pr_title(pr_title):
 	regex = re.compile("^%s(\d+)\s+(.+)$" % PROJECT_PREFIX)
 	match = re.search(regex, pr_title)
@@ -206,17 +332,7 @@ def parse_pr_title(pr_title):
 		err_msg = "the title of the pull request should start with \"%s${jira_id}\", followed by a white-space and textual content, please revise accordingly" % PROJECT_PREFIX
 		exit_with_errmsg(err_msg, -1)
 
-def is_self_reviewed(author, reviewer):
-	# currently, allow self-reviewing, but may disallow in the future
-	#return author == reviewer
-	return False
-
-def is_valid_reviewer(reviewer):
-	# currently, don't validate the authorization of the reviewer, may validate it in the future
-	#return reviewer in committers.keys()
-	return True
-
-def ensure_quality_metrics(pr_number, author, pr_comments_url, latest_commit_timestamp):
+def ensure_quality_metrics(pr_comments_url, author, latest_commit_timestamp):
 	# TODO - Px - need to add checking steps for CI auto testing
 	info("looking up comments from github...")
 	pr_comments = get_info_from_github(pr_comments_url)
@@ -280,90 +396,22 @@ def get_reviewer_email_mapping(reviewers_accounts):
 			#reviewer_email_mapping[account] = committers[account]
 	return reviewer_email_mapping
 
-def ask_for_input(prompt_msg):
-	return raw_input("%s%s" % ("IPT: ", prompt_msg))
-
-def ask_for_multiline_input(prompt_msg):
-	to_console("IPT: %s" % prompt_msg)
-	lines = sys.stdin.readlines()
-	return lines
-
-def is_valid_email(email):
-	if not email:
-		return False
-	return re.search("^[\w\-\.]+@(\w[\w\-]+\.)+[a-zA-Z0-9]+$", email)
-
-def has_branch(branch):
-	try:
-		result = run_command("git branch --list %s" % branch).strip()
-		return result != ""
-	except subprocess.CalledProcessError as e:
-		exit_with_errmsg(e, -1)
-
-def get_commit_history(branch, required_count):
-	try:
-		result = run_command("git log --decorate --graph -n %s" % required_count).strip()
-		rows = re.split("\n", result)
-		git_logs = []
-		i = 0
-		for row in rows:
-			if row.startswith("*"):
-				if i == 0:
-					git_logs.append("new -> \t%s\n" % row)
-					i += 1
-				elif i == 1:
-					git_logs.append("old -> \t%s\n" % row)
-					i += 1
-				else:
-					git_logs.append("\t%s\n" % row)
-			else:
-				git_logs.append("\t%s\n" % row)
-		git_logs.append("\t* commit ......")
-		return "".join(git_logs)
-	except subprocess.CalledProcessError as e:
-		exit_with_errmsg(e, -1)
-
-def compose_commit_template(commit_msg_template_file_path, pr_number, jira_id, pr_title_content, commit_description_lines, jira_url, author, author_email, reviewer_email_mapping):
-	if os.path.exists(commit_msg_template_file_path):
-		os.remove(commit_msg_template_file_path)
-	comp = ["@%s <%s>" % (key, reviewer_email_mapping.get(key)) for key in reviewer_email_mapping.keys()]
-	reviewer_row = "Reviewer(s): %s\r\n" % ", ".join(comp)
-	with open(commit_msg_template_file_path, "w") as f:
-		f.write("%s%s %s\r\n" % (PROJECT_PREFIX, jira_id, pr_title_content))
-		for line in commit_description_lines:
-			if line.strip() != "":
-				f.write("%s" % line)
-		f.write("\r\n")
-		f.write("%s\r\n" % jira_url)
-		f.write("\r\n")
-		f.write("Author: @%s <%s>\r\n" % (author, author_email))
-		f.write(reviewer_row)
-		f.write("\r\n")
-		f.write("Closes #%s.\r\n" % pr_number)
-
-def download_file(download_url, file_path):
-	source = url_lib.urlopen(download_url)
-	with open(file_path, "wb") as f:
-		f.write(source.read())
-
-def merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id, pr_title_content, jira_url, author, reviewer_email_mapping):
+def merge_and_push(pushable_remote_name, base_sha, temp_dir, jira_id, pr_title_content, jira_url, author, reviewer_email_mapping):
 	original_branch = None
 	operating_branch = "%s%s" % (OPERATING_BRANCH_PREFIX, str(time.time()).replace(".", ""))
-	commit_msg_template_file_path = compose_commit_msg_template(temp_dir, pr_number)
+	commit_msg_file_path = compose_commit_msg_file_path(temp_dir)
 	download_url = GITHUB_PATCH_URL_TEMPLATE % pr_number
-	patch_file_path = compose_patch_file_path(temp_dir, pr_number)
+	patch_file_path = compose_patch_file_path(temp_dir)
 
-	current_dir = run_command("pwd").strip()
+	current_dir = os.getcwd()
+	debug("originally executing from directory: %s" % current_dir)
 
 	success = False
 
 	try:
-		repo_root_dir = get_repo_root_dir()
-		os.chdir(repo_root_dir)   # this step is very important to 'git applly', without it, the command executed from some location may do nothing without notifications
-
-		# download patch
-		info("downloading %s.patch from github..." % pr_number)
-		download_file(download_url, patch_file_path)
+		# TODO - P1 - need to remove the below 2 lines
+		# os.chdir(repo_root_dir)   # this step is very important to 'git applly', without it, the command executed from some location may do nothing without notifications
+		#debug("switch to directory: %s" % repo_root_dir)
 
 		# choose the right branch and check the sha
 		original_branch = run_command("git rev-parse --abbrev-ref HEAD").strip()
@@ -372,7 +420,14 @@ def merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id,
 		if base_sha != remote_master_sha:
 			warn("the master branch of remote <%s> has commit(s) ahead of the ones in this %s.patch" % (pushable_remote_name, pr_number))
 		run_command("git checkout -b %s %s/master" % (operating_branch, pushable_remote_name))
-		run_command("git apply %s" % patch_file_path)
+		# TODO - P0 - here to add switch based on global patch_mode setting
+		if patch_mode:
+			# download patch
+			info("downloading %s.patch from github..." % pr_number)
+			download_file(download_url, patch_file_path)
+			run_command("git apply %s" % patch_file_path)
+		else:
+			info("shall be doing with non-patch mode")
 
 		# query email address of the author
 		author_email = ""
@@ -403,10 +458,11 @@ def merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id,
 			commit_description_lines.pop()
 
 		# compose the template file
-		compose_commit_template(commit_msg_template_file_path, pr_number, jira_id, pr_title_content, commit_description_lines, jira_url, author, author_email, reviewer_email_mapping)
+		compose_commit_msg(commit_msg_file_path, jira_id, pr_title_content, commit_description_lines, jira_url, author, author_email, reviewer_email_mapping)
 
 		# commit
-		run_command("git commit -aF %s" % commit_msg_template_file_path)
+		# TODO - P0 - should add * except for this file itself
+		run_command("git commit -aF %s" % commit_msg_file_path)
 		info("committed to local repository on branch %s, the commit history now looks like: " % operating_branch)
 		history = get_commit_history(operating_branch, 2)
 		to_console("%s" % history)
@@ -431,7 +487,7 @@ def merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id,
 			except subprocess.CalledProcessError as e:
 				exit_with_errmsg(e, -1)
 			finally:
-				os.remove(commit_msg_template_file_path)
+				os.remove(commit_msg_file_path)
 				os.remove(patch_file_path)
 		else:
 			try:
@@ -444,88 +500,138 @@ def merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id,
 			except subprocess.CalledProcessError as e:
 				exit_with_errmsg(e, -1)
 			finally:
-				if os.path.exists(commit_msg_template_file_path):
-					os.remove(commit_msg_template_file_path)
+				if os.path.exists(commit_msg_file_path):
+					os.remove(commit_msg_file_path)
 				if os.path.exists(patch_file_path):
 					os.remove(patch_file_path)
 		os.chdir(current_dir)
+		debug("switch back to directory: %s" % current_dir)
 
 def main(argv):
 	# cope with invoking arguments
-	if len(argv) == 0:
-		display_help("pull request number must be provided")
-		exit(-1)
-	pr_number = ""
 	try:
-		opts, args = getopt.getopt(argv, "hn:", ["log-level="])
+		opts, args = getopt.getopt(argv, "hn:l:p", ["log-level=", "patch"])
 	except getopt.GetoptError as e:
 		display_help(e.msg)
 		sys.exit(-1)
+	has_pr = False
 	for opt, arg in opts:
 		if opt == "-h":
 			display_help()
 			exit(1)
 		elif opt == "-n":
-			pr_number = arg
-		elif opt == "--log-level":
-			log_level_name = arg
-			match = LOG_LEVEL_REGEXP.search(log_level_name)
-			if match:
-				global log_level
-				log_level = LOG_LEVEL_MAPPING[match.group(1).lower()]
-			else:
-				display_help("un-recognized log level: %s" % log_level_name)
+			regexp = re.compile("^[1-9][0-9]*$")
+			if not regexp.search(arg):
+				display_help("pull request number should be a positive integer")
 				exit(-1)
+			global pr_number
+			pr_number = arg
+		elif (opt == "-l" or opt == "--log-level"):
+			match = LOG_LEVEL_REGEXP.search(arg)
+			if match:
+				matched_value = match.group(1).lower()
+				global log_level_name
+				global log_level
+				log_level_name = matched_value
+				log_level = LOG_LEVEL_MAPPING[log_level_name]
+			else:
+				display_help("un-recognized log level: %s" % arg)
+				exit(-1)
+		elif (opt == "-p" or opt == "--patch"):
+			global patch_mode
+			patch_mode = True
+		else:
+			display_help("un-recognized argument: %s" % opt)
 
-	# validate pr info
-	to_console("-------------------- START PROCESSING --------------------")
-	info("query pr information from github...")
-	pr_info_url = PR_INFO_API_TEMPLATE % pr_number
-	pr_info = get_info_from_github(pr_info_url)
+	# pr_number is a required argument
+	if pr_number == 0:
+		display_help("pull request number must be provided")
+		exit(-1)
 
-	# validate pr state
-	pr_state = pr_info['state'].encode(ENCODING)
-	if pr_state != GITHUB_PR_STATE_OPEN:
-		exit_with_errmsg("the state of pr %s is not %s, please try another pull request number" % (pr_number, GITHUB_PR_STATE_OPEN), -1)
+	# log executing basic info
+	debug("log level is: %s" % log_level_name)
+	debug("attempt to work on pull request: #%s" % pr_number)
+	debug("attempt to use %s mode to operate" % ("patch" if patch_mode else "non-patch"))
 
-	# validate if pr has conflict(s)
-	pr_mergeable = pr_info['mergeable']
-	if not pr_mergeable:
-		exit_with_errmsg("this pull request contains conflict(s) that must be revolved", -1)
+	# start processing
+	success = False
+	executing_dir = os.getcwd()
+	try:
+		to_console("-------------------- START PROCESSING --------------------")
+		# set global repo root dir, guarantee all git related operations are executed in local git repo
+		global repo_root_dir
+		repo_root_dir = get_repo_root_dir()
 
-	# guarantee the environment for operations
-	(pushable_remote_name, temp_dir) = ensure_env(pr_number)
+		# validate the location of the script file, it's important for future "git add" and recovery
+		global script_in_repo_root_dir
+		if SCRIPT_ABS_DIR.endswith(EXPECTED_DIR_IN_REPO):
+			debug("the script is in dir %s" % SCRIPT_ABS_DIR)
+			script_in_repo_root_dir = False
+		else:
+			if repo_root_dir != SCRIPT_ABS_DIR:
+				exit_with_errmsg("you're executing copied script, please place it under dir %s, and try again" % repo_root_dir, -1)
+			else:
+				debug("the script is in dir %s" % repo_root_dir)
+				script_in_repo_root_dir = True
 
-	# validate and extract info from pr title, then generate jira url
-	# currently will not check if the jira ticket is valid for reason of authentication complication
-	(jira_id, pr_title_content) = parse_pr_title(pr_info['title'].encode(ENCODING))
-	jira_url = JIRA_TICKET_LINK_TEMPLATE % jira_id
+		# guarantee operating in repo_root_dir
+		if os.getcwd() != repo_root_dir:
+			os.chdir(repo_root_dir)
+			debug("change dir to %s" % repo_root_dir)
 
-	# get latest commit timestamp
-	pr_commits_count = pr_info['commits']
-	pr_commits_url = pr_info['_links']['commits']['href'].encode(ENCODING)
-	pr_commits_json = get_info_from_github(pr_commits_url)
-	latest_commit_json = pr_commits_json[pr_commits_count-1]
-	latest_commit_timestamp = latest_commit_json['commit']['committer']['date'].encode(ENCODING)
+		# guarantee the environment for operations
+		(pushable_remote_name, temp_dir) = ensure_env()
 
-	# check if the pr is well approved and get reviewers' account together with their email
-	pr_author = pr_info['user']['login'].encode(ENCODING)
-	pr_comments_url = pr_info['_links']['comments']['href'].encode(ENCODING)
-	reviewer_accounts = ensure_quality_metrics(pr_number, pr_author, pr_comments_url, latest_commit_timestamp)
-	reviewer_email_mapping = get_reviewer_email_mapping(reviewer_accounts)
+		# validate pr info
+		info("query pr information from github...")
+		pr_info_url = PR_INFO_API_TEMPLATE % pr_number
+		pr_info = get_info_from_github(pr_info_url)
 
-	# merge and push to github, to finish the whole process
-	base_sha = pr_info['base']['sha'].encode(ENCODING)
-	success = merge_and_push(pushable_remote_name, base_sha, pr_number, temp_dir, jira_id, pr_title_content, jira_url, pr_author, reviewer_email_mapping)
+		# validate pr state
+		pr_state = pr_info['state'].encode(ENCODING)
+		if pr_state != GITHUB_PR_STATE_OPEN:
+			exit_with_errmsg("the state of pr %s is not %s, please try another pull request number" % (pr_number, GITHUB_PR_STATE_OPEN), -1)
 
-	# notify user to update the forked repo for original has been updated
-	if success:
-		info("pull request <%s> has been applied and pushed to remote <%s/master> of repository <%s>" % (pr_number, pushable_remote_name, APACHE_GIT_REPO_URL))
-		info("if you're going to continue with any forked repository, please update it accordingly")
-	else:
-		info("the process is cancelled, and the environment has been recovered")
-	info("Bye.")
-	to_console("-------------------- ENDED PROCESSING --------------------")
+		# validate if pr has conflict(s)
+		pr_mergeable = pr_info['mergeable']
+		if not pr_mergeable:
+			exit_with_errmsg("this pull request contains conflict(s) that must be revolved", -1)
+
+		# validate and extract info from pr title, then generate jira url
+		# currently will not check if the jira ticket is valid for reason of authentication complication
+		(jira_id, pr_title_content) = parse_pr_title(pr_info['title'].encode(ENCODING))
+		jira_url = JIRA_TICKET_LINK_TEMPLATE % jira_id
+
+		# get latest commit timestamp
+		pr_commits_count = pr_info['commits']
+		pr_commits_url = pr_info['_links']['commits']['href'].encode(ENCODING)
+		pr_commits_json = get_info_from_github(pr_commits_url)
+		latest_commit_json = pr_commits_json[pr_commits_count-1]
+		latest_commit_timestamp = latest_commit_json['commit']['committer']['date'].encode(ENCODING)
+
+		# check if the pr is well approved and get reviewers' account together with their email
+		pr_author = pr_info['user']['login'].encode(ENCODING)
+		pr_comments_url = pr_info['_links']['comments']['href'].encode(ENCODING)
+		reviewer_accounts = ensure_quality_metrics(pr_comments_url, pr_author, latest_commit_timestamp)
+		reviewer_email_mapping = get_reviewer_email_mapping(reviewer_accounts)
+
+		# merge and push to github, to finish the whole process
+		base_sha = pr_info['base']['sha'].encode(ENCODING)
+		success = merge_and_push(pushable_remote_name, base_sha, temp_dir, jira_id, pr_title_content, jira_url, pr_author, reviewer_email_mapping)
+
+	finally:
+		# guarantee return to original executing dir
+		if os.getcwd() != executing_dir:
+			os.chdir(executing_dir)
+			debug("change back to original executing dir: %s" % executing_dir)
+		# notify user
+		if success:
+			info("pull request <%s> has been applied and pushed to remote <%s/master> of repository <%s>" % (pr_number, pushable_remote_name, APACHE_GIT_REPO_URL))
+			info("if you're going to continue with any forked repository, please update it accordingly")
+		else:
+			info("failure occurs, the process is cancelled, and the environment has been recovered")
+		info("Bye.")
+		to_console("-------------------- ENDED PROCESSING --------------------")
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
