@@ -21,8 +21,6 @@
 
 	var serviceModule = angular.module('eagle.service');
 	serviceModule.service('Site', function(Authorization, Entities, $rootScope, $route, $location) {
-		'use strict';
-
 		var _currentSite;
 		var content = {};
 
