@@ -23,8 +23,22 @@
 	serviceModule.provider('Application', function() {
 		// TODO: Mock
 		this.list = [
-			{name: "DAM", description: "Security check application"},
-			{name: "JPA", description: "JPA Test Application"}
+			{
+				name: "DAM",
+				description: "Security check application",
+				feature: {
+					Common: true,
+					Classification: true,
+					"User Profile": true,
+					Metadata: true,
+					Setup: true
+				}
+			},
+			{
+				name: "JPA",
+				description: "JPA Test Application",
+				feature: {}
+			}
 		];
 
 		// TODO: Mock

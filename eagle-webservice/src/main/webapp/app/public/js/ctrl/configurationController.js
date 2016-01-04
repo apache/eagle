@@ -30,10 +30,6 @@ eagleControllers.controller('configSiteCtrl', function($scope, configPageConfig,
 	$scope.setSite = function(site) {
 		$scope.site = site;
 	};
-	// TODO: Mock
-	$.each(Site.list, function(i, site) {
-		site.app = {};
-	});
 });
 
 eagleControllers.controller('configApplicationCtrl', function($scope, configPageConfig, globalContent, Application) {
@@ -47,8 +43,4 @@ eagleControllers.controller('configApplicationCtrl', function($scope, configPage
 	$scope.setApplication = function(application) {
 		$scope.application = application;
 	};
-	// TODO: Mock
-	$.each(Application.list, function(i, app) {
-		app.feature = {};
-	});
 });

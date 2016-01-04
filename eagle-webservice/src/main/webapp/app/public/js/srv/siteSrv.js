@@ -92,6 +92,13 @@
 				} else {
 					content.current(content.list[0]);
 				}
+
+				// TODO: Mock site application
+				$.each(content.list, function(i, _site) {
+					_site.app = {
+						DAM: true
+					};
+				});
 			});
 
 			_promise = content.dataSrcList._promise;
