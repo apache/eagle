@@ -121,8 +121,9 @@ def run_command(command):
 		c = command
 	else:
 		c = command.split(" ")
-	debug("running command: %s" % c)
-	return subprocess.check_output(c, stderr=subprocess.STDOUT).decode()
+	result = subprocess.check_output(c, stderr=subprocess.STDOUT).decode()
+	debug("running command: %s, result:\n%s" % (c, result))
+	return result
 
 def get_info_from_github(url):
 	try:
