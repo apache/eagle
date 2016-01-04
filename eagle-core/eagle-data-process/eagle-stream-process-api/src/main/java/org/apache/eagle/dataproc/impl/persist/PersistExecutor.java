@@ -21,6 +21,7 @@ import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.dataproc.impl.persist.druid.DruidPersistService;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.datastream.core.StorageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +64,8 @@ public class PersistExecutor extends JavaStormStreamExecutor2<String, AggregateE
 		}
 	}
 
-    @Override
-	public void flatMap(List input, Collector collector) {
+	@Override
+	public void flatMap(List<Object> input, Collector<Tuple2<String, AggregateEntity>> collector) {
 		if (input.size() != 2) {
 			LOG.error(String.format("Persist executor expect two elements per tuple. But actually got size %d lists!",
 					input.size()));
