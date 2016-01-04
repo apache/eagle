@@ -21,11 +21,9 @@
 
 	var serviceModule = angular.module('eagle.service');
 	serviceModule.service('Entities', function($http, $q, $rootScope, $location, Authorization) {
-		'use strict';
-
 		var pkg;
 
-			// Query
+		// Query
 		function _query(name, kvs) {
 			kvs = kvs || {};
 			var _list = [];
@@ -232,7 +230,10 @@
 					if(_list._convert) {
 						var _current = _cond.additionalCondition._startTime.clone();
 						$.each(_list, function(i, value) {
-							_list[i] = [_current.valueOf(), value];
+							_list[i] = {
+								x: _current.valueOf(),
+								y: value
+							};
 							_current.add(intervalmin, "m");
 						});
 					}
