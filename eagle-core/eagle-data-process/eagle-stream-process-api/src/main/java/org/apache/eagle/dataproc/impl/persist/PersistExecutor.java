@@ -29,6 +29,8 @@ import java.text.MessageFormat;
 import java.util.List;
 
 /**
+ *
+ * TODO: currently only accept to be used after aggregation node (See the AggregateEntity reference here).
  * @since Dec 19, 2015
  *
  */
