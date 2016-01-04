@@ -47,7 +47,6 @@ GITHUB_PATH_TUPLE = (GITHUB_ORGANIZATION, REPO_NAME)
 GITHUB_PATCH_URL_TEMPLATE = "/".join(["https://patch-diff.githubusercontent.com/raw", GITHUB_ORGANIZATION, REPO_NAME, "pull", "%s.patch"])
 GITHUB_USER_INFO_TEMPLATE = "https://api.github.com/users/%s"
 PR_INFO_API_TEMPLATE = "/".join(["https://api.github.com/repos", GITHUB_ORGANIZATION, REPO_NAME, "pulls", "%s"])
-PR_COMMENTS_API_TEMPLATE = "/".join(["https://api.github.com/repos", GITHUB_ORGANIZATION, REPO_NAME, "issues", "%s/comments"])
 JIRA_TICKET_LINK_TEMPLATE = "".join(["https://issues.apache.org/jira/browse/", PROJECT_PREFIX, "%s"])
 ##### Constants Definitions - end #####
 
@@ -217,9 +216,8 @@ def is_valid_reviewer(reviewer):
 	#return reviewer in committers.keys()
 	return True
 
-def ensure_quality_metrics(pr_number, author, last_push_timestamp):
+def ensure_quality_metrics(pr_number, author, pr_comments_url, latest_commit_timestamp):
 	# TODO - Px - need to add checking steps for CI auto testing
-	pr_comments_url = PR_COMMENTS_API_TEMPLATE % pr_number
 	info("looking up comments from github...")
 	pr_comments = get_info_from_github(pr_comments_url)
 	count = len(pr_comments)
@@ -231,7 +229,7 @@ def ensure_quality_metrics(pr_number, author, last_push_timestamp):
 		comment_json = pr_comments[i]
 		reviewer = comment_json['user']['login'].encode(ENCODING)
 		comment_timestamp = comment_json['created_at'].encode(ENCODING)
-		is_current_comment_valid = comment_timestamp > last_push_timestamp
+		is_current_comment_valid = comment_timestamp > latest_commit_timestamp
 		# currently, allow self-reviewing, but may disallow in the future, to disallow, modify in function is_self_reviewed()
 		if is_self_reviewed(author, reviewer):   # the author of the pr shall not be considered as a reviewer
 			continue
@@ -503,10 +501,17 @@ def main(argv):
 	(jira_id, pr_title_content) = parse_pr_title(pr_info['title'].encode(ENCODING))
 	jira_url = JIRA_TICKET_LINK_TEMPLATE % jira_id
 
+	# get latest commit timestamp
+	pr_commits_count = pr_info['commits']
+	pr_commits_url = pr_info['_links']['commits']['href'].encode(ENCODING)
+	pr_commits_json = get_info_from_github(pr_commits_url)
+	latest_commit_json = pr_commits_json[pr_commits_count-1]
+	latest_commit_timestamp = latest_commit_json['commit']['committer']['date'].encode(ENCODING)
+
 	# check if the pr is well approved and get reviewers' account together with their email
-	last_push_timestamp = pr_info['head']['repo']['pushed_at'].encode(ENCODING)
 	pr_author = pr_info['user']['login'].encode(ENCODING)
-	reviewer_accounts = ensure_quality_metrics(pr_number, pr_author, last_push_timestamp)
+	pr_comments_url = pr_info['_links']['comments']['href'].encode(ENCODING)
+	reviewer_accounts = ensure_quality_metrics(pr_number, pr_author, pr_comments_url, latest_commit_timestamp)
 	reviewer_email_mapping = get_reviewer_email_mapping(reviewer_accounts)
 
 	# merge and push to github, to finish the whole process
