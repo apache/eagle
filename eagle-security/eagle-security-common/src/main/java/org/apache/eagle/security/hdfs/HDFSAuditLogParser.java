@@ -16,121 +16,71 @@
  */
 package org.apache.eagle.security.hdfs;
 
-
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.security.util.LogParseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+/**
+ * e.g. 2015-09-21 21:36:52,172 INFO FSNamesystem.audit: allowed=true   ugi=hadoop (auth:KERBEROS)     ip=/x.x.x.x   cmd=getfileinfo src=/tmp   dst=null        perm=null       proto=rpc
+ */
 
 public final class HDFSAuditLogParser implements Serializable{
 	private final static Logger LOG = LoggerFactory.getLogger(HDFSAuditLogParser.class);
 
-	private final static int LOGDATE_INDEX = 1;
-	private final static int LOGLEVEL_INDEX = 2;
-	private final static int LOGGER_INDEX = 3;
-	private final static int LOGATTRS_INDEX = 4;
-	private final static String LOGDATE="logdate";
-	private final static String LOGLEVEL="loglevel";
-	private final static String LOGHEADER="logheader";
-	private final static String ALLOWED="allowed";
-	private final static String UGI="ugi";
-	private final static String IP="ip";
-	private final static String CMD="cmd";
-	private final static String SRC="src";
-	private final static String DST="dst";
-	private final static String PERM="perm";
-	private final static Pattern loggerPattern = Pattern.compile("^([\\d\\s\\-:,]+)\\s+(\\w+)\\s+(.*):\\s+(.*)");
-	private final static Pattern loggerAttributesPattern = Pattern.compile("(\\w+=[/.@\\-\\w\\\\$\\s\\\\(\\\\):]+)\\s+");
-
 	public HDFSAuditLogParser(){
 	}
 
-	public HDFSAuditLogObject parse(String logLine) throws Exception{
-		Map<String,String> auditMaps = parseAudit(logLine);
-		if(auditMaps == null) return null;
-        HDFSAuditLogObject entity = new HDFSAuditLogObject();
+	public static String parseUser(String ugi) {
+		/** e.g.
+		 * .1)user@APD.xyz.com
+		 * .2)hadoop/123.dc1.xyz.com@xyz.com (auth:KERBEROS)
+		 * .3)hadoop (auth:KERBEROS)
+		 */
+		int index = ugi.indexOf("/");
+		if (index != -1) return ugi.substring(0, index).trim();
+		index = ugi.indexOf("@");
+		if (index != -1) return ugi.substring(0, index).trim();
+		index = ugi.indexOf("(");
+		return ugi.substring(0, index).trim();
+	}
 
-		String ugi = auditMaps.get(UGI);
-		if(ugi == null){
-			LOG.warn("Ugi is null from audit log: " + logLine);
-		}
+	public HDFSAuditLogObject parse(String log) throws Exception{
+		int index0 = log.indexOf(" ");
+		index0 = log.indexOf(" ",index0+1);
+		String data = log.substring(0, index0).trim();
+		int index1 = log.indexOf("allowed="); int len1 = 8;
+		int index2 = log.indexOf("ugi="); int len2 = 4;
+		int index3 = log.indexOf("ip=/"); int len3 = 4;
+		int index4 = log.indexOf("cmd="); int len4 = 4;
+		int index5 = log.indexOf("src="); int len5= 4;
+		int index6 = log.indexOf("dst="); int len6 = 4;
+		int index7 = log.indexOf("perm=");
 
+		String allowed = log.substring(index1 + len1, index2).trim();
+		String ugi = log.substring(index2 + len2, index3).trim();
+		String ip = log.substring(index3 + len3, index4).trim();
+		String cmd = log.substring(index4 + len4, index5).trim();
+		String src = log.substring(index5 + len5, index6).trim();
+		String dst = log.substring(index6 + len6, index7).trim();
+
+		HDFSAuditLogObject entity = new HDFSAuditLogObject();
 		String user = LogParseUtil.parseUserFromUGI(ugi);
-
-		if(user == null){
-			LOG.warn("User is null from ugi" + ugi + ", audit log: " + logLine);
-		}
-
-		String src = auditMaps.get(SRC);
-		if(src != null && src.equals("null")){
+		if (src != null && src.equals("null")) {
 			src = null;
 		}
 
-		String dst = auditMaps.get(DST);
-		if(dst != null && dst.equals("null")){
+		if (dst != null && dst.equals("null")) {
 			dst = null;
 		}
-
-
-		String cmd = auditMaps.get(CMD);
-		if(cmd == null){
-			LOG.warn("Cmd is null from audit log: " + logLine);
-		}
-
-        entity.user = user;
-        entity.cmd = cmd;
-        entity.src = src;
-        entity.dst = dst;
-        entity.host = auditMaps.get(IP);
-        entity.allowed = Boolean.valueOf(auditMaps.get(ALLOWED));
-        entity.timestamp = DateTimeUtil.humanDateToMilliseconds(auditMaps.get(LOGDATE));
-
+		entity.user = user;
+		entity.cmd = cmd;
+		entity.src = src;
+		entity.dst = dst;
+		entity.host = ip;
+		entity.allowed = Boolean.valueOf(allowed);
+		entity.timestamp = DateTimeUtil.humanDateToMilliseconds(data);
 		return entity;
-	}
-
-	private static Map<String,String> parseAttribute(String attrs){
-		Matcher matcher = loggerAttributesPattern.matcher(attrs+" ");
-		Map<String,String> attrMap=new HashMap<String, String>();
-		while(matcher.find()){
-			String kv = matcher.group();
-			String[] kvs = kv.split("=");
-			if(kvs.length>=2){
-				attrMap.put(kvs[0].toLowerCase(),kvs[1].trim());
-			}else{
-				attrMap.put(kvs[0].toLowerCase(),null);
-			}
-		}
-		return attrMap;
-	}
-
-	private Map<String,String> parseAudit(String log){
-		Matcher loggerMatcher = loggerPattern.matcher(log);
-		Map<String,String> map = null;
-		if(loggerMatcher.find()){
-			try{
-				map = new HashMap<String, String>();
-				map.put(LOGDATE, loggerMatcher.group(LOGDATE_INDEX)); // logdate
-				map.put(LOGLEVEL, loggerMatcher.group(LOGLEVEL_INDEX)); // level
-				map.put(LOGHEADER, loggerMatcher.group(LOGGER_INDEX)); // logg
-				Map<String,String> loggerAttributes = parseAttribute(loggerMatcher.group(LOGATTRS_INDEX));
-				map.put(ALLOWED, loggerAttributes.get(ALLOWED));
-				map.put(UGI, loggerAttributes.get(UGI));
-				map.put(IP, loggerAttributes.get(IP));
-				map.put(CMD, loggerAttributes.get(CMD));
-				map.put(SRC, loggerAttributes.get(SRC));
-				map.put(DST, loggerAttributes.get(DST));
-				map.put(PERM, loggerAttributes.get(PERM));
-			}catch (IndexOutOfBoundsException e){
-				LOG.error("Got exception when parsing audit log:" + log + ", exception:" + e.getMessage(), e);
-				map = null;
-			}
-		}
-		return map;
 	}
 }

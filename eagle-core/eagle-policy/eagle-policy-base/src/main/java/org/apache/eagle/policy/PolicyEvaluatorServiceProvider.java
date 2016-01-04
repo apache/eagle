@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.Module;
  *   - if policy is created, then invoke onPolicyCreated
  *   - if policy is deleted, then invoke onPolicyDeleted
  *   - if policy is updated, then invoke onPolicyUpdated
- * - for policy update, replace old evaluator engine with new evaluator engine which is created by policy evaluator provider
+ * - for policy report, replace old evaluator engine with new evaluator engine which is created by policy evaluator provider
  * - specify # of executors for this alert executor id
  * - dynamically balance # of policies evaluated by each alert executor
  *   - use zookeeper to balance. eaglePolicies/${alertExecutorId}/${alertExecutorInstanceId} => list of policies

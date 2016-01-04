@@ -17,7 +17,7 @@ limitations under the License.
 {% endcomment %}
 -->
 
-# Apache Eagle
+# Apache Eagle [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-pr-reviewer)](https://builds.apache.org/job/incubator-eagle-pr-reviewer/)
 
 >  Secure Hadoop Data in Real Time
 
@@ -26,7 +26,7 @@ Apache Eagle is an open source monitoring solution to instantly identify access 
 For more details, please visit [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org)
 
 ## Documentation
-You can find the latest Eagle documentation on the [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README.md) file only contains basic setup instructions.
+You can find the latest Eagle documentation on [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README.md) file only contains basic setup instructions.
 
 ## Getting Started
 The fastest way to get started with Eagle is to run with [docker](https://github.com/docker/docker) by one of following options:

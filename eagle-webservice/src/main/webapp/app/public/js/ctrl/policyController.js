@@ -73,7 +73,7 @@ damControllers.controller('policyListCtrl', function(globalContent, Site, damCon
 // =============================================================
 // =                       Policy Detail                       =
 // =============================================================
-damControllers.controller('policyDetailCtrl', function(globalContent, Site, damContent, charts, $scope, $routeParams, Entities) {
+damControllers.controller('policyDetailCtrl', function(globalContent, Site, damContent, $scope, $routeParams, Entities, nvd3) {
 	'use strict';
 
 	var MAX_PAGESIZE = 10000;
@@ -83,9 +83,11 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 	globalContent.navPath = ["Policy View", "Polict List", "Polict Detail"];
 	globalContent.lockSite = true;
 
-	charts = charts($scope);
-
 	$scope.common = common;
+	$scope.chartConfig = {
+		chart: "line",
+		xType: "time"
+	};
 
 	// Query policy
 	if($routeParams.encodedRowkey) {
@@ -121,23 +123,26 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 		}
 
 		// Visualization
+		var _endTime = app.time.now().hour(23).minute(59).second(59).millisecond(0);
+		var _startTime = _endTime.clone().subtract(1, "month").hour(0).minute(0).second(0).millisecond(0);
 		var _cond = {
 			dataSource: policy.tags.dataSource,
 			policyId: policy.tags.policyId,
-			_duration: 1000 * 60 * 60 * 24 * 30,
+			_startTime: _startTime,
+			_endTime: _endTime
 		};
 
 		// > eagle.policy.eval.count
-		$scope.policyEvalSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+		$scope.policyEvalSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
 
 		// > eagle.policy.eval.fail.count
-		$scope.policyEvalFailSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+		$scope.policyEvalFailSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
 
 		// > eagle.alert.count
-		$scope.alertSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+		$scope.alertSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
 
 		// > eagle.alert.fail.count
-		$scope.alertFailSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+		$scope.alertFailSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
 
 		// Alert list
 		$scope.alertList = Entities.queryEntities("AlertService", {

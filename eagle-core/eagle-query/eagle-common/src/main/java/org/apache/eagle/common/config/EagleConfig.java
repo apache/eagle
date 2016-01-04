@@ -47,6 +47,8 @@ public interface EagleConfig {
     int getHBaseClientScanCacheSize();
 
     TimeZone getTimeZone();
+    
+    boolean isServiceAuditingEnabled();
 
     /**
      * @return root config

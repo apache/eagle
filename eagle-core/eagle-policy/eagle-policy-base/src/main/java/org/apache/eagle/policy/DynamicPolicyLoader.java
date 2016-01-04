@@ -16,32 +16,18 @@
  */
 package org.apache.eagle.policy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.netflix.config.*;
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
+import com.typesafe.config.Config;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.netflix.config.AbstractPollingScheduler;
-import com.netflix.config.ConcurrentCompositeConfiguration;
-import com.netflix.config.DynamicConfiguration;
-import com.netflix.config.FixedDelayPollingScheduler;
-import com.netflix.config.PollListener;
-import com.netflix.config.PollResult;
-import com.netflix.config.PolledConfigurationSource;
-import com.sun.jersey.client.impl.CopyOnWriteHashMap;
-import com.typesafe.config.Config;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -50,8 +36,15 @@ import com.typesafe.config.Config;
 public class DynamicPolicyLoader<T extends AbstractPolicyDefinitionEntity> {
 	private static final Logger LOG = LoggerFactory.getLogger(DynamicPolicyLoader.class);
 	
-	private volatile CopyOnWriteHashMap<String, List<PolicyLifecycleMethods<T>>> policyChangeListeners = new CopyOnWriteHashMap<String, List<PolicyLifecycleMethods<T>>>();
-	// private static DynamicPolicyLoader instance = new DynamicPolicyLoader();
+	private final int defaultInitialDelayMillis = 30*1000;
+	private final int defaultDelayMillis = 60*1000;
+	private final boolean defaultIgnoreDeleteFromSource = true;
+    /**
+     * one alertExecutor may have multiple instances, that is why there is a list of PolicyLifecycleMethods
+     */
+	private volatile CopyOnWriteHashMap<String, List<PolicyLifecycleMethods<T>>> policyChangeListeners = new CopyOnWriteHashMap<>();
+    private volatile CopyOnWriteHashMap<String, List<PolicyDistributionReportMethods>> policyDistributionUpdaters = new CopyOnWriteHashMap<>();
+	private static DynamicPolicyLoader instance = new DynamicPolicyLoader();
 	private volatile boolean initialized = false;
 	
 	public void addPolicyChangeListener(String alertExecutorId, PolicyLifecycleMethods<T> alertExecutor){
@@ -64,6 +57,14 @@ public class DynamicPolicyLoader<T extends AbstractPolicyDefinitionEntity> {
 	}
 
 	private static ConcurrentHashMap<Class, DynamicPolicyLoader> maps = new ConcurrentHashMap<Class, DynamicPolicyLoader>();
+    public void addPolicyDistributionReporter(String alertExecutorId, PolicyDistributionReportMethods policyDistUpdater){
+        synchronized(policyDistributionUpdaters) {
+            if(policyDistributionUpdaters.get(alertExecutorId) == null) {
+                policyDistributionUpdaters.put(alertExecutorId, new ArrayList<PolicyDistributionReportMethods>());
+            }
+            policyDistributionUpdaters.get(alertExecutorId).add(policyDistUpdater);
+        }
+    }
 	
 	@SuppressWarnings("unchecked")
 	public static <K extends AbstractPolicyDefinitionEntity> DynamicPolicyLoader<K> getInstanceOf(Class<K> clz) {
@@ -140,6 +141,13 @@ public class DynamicPolicyLoader<T extends AbstractPolicyDefinitionEntity> {
 						}
 					}
 				}
+
+                // notify policyDistributionUpdaters
+                for(Map.Entry<String, List<PolicyDistributionReportMethods>> entry : policyDistributionUpdaters.entrySet()){
+                    for(PolicyDistributionReportMethods policyDistributionUpdateMethod : entry.getValue()){
+                        policyDistributionUpdateMethod.report();
+                    }
+                }
 			}
 			private String trimPartitionNum(String alertExecutorId){
 				int i = alertExecutorId.lastIndexOf('_');
@@ -217,6 +225,7 @@ public class DynamicPolicyLoader<T extends AbstractPolicyDefinitionEntity> {
 			}
 			
 			cachedAlertDefs = newAlertDefs;
+
 			return PollResult.createIncremental(added, changed, deleted, new Date().getTime());
 		}
 	}

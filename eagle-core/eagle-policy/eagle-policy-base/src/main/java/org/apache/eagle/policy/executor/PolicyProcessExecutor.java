@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
@@ -33,9 +34,9 @@ import org.apache.eagle.metric.reportor.MetricKeyCodeDecoder;
 import org.apache.eagle.policy.*;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.config.AbstractPolicyDefinition;
+import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.policy.siddhi.SiddhiEvaluationHandler;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ import java.util.Map.Entry;
  */
 public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K>
 		extends JavaStormStreamExecutor2<String, K> 
-		implements PolicyLifecycleMethods<T>, SiddhiEvaluationHandler<T, K> {
+		implements PolicyLifecycleMethods<T>, SiddhiEvaluationHandler<T, K>, PolicyDistributionReportMethods {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOG = LoggerFactory.getLogger(PolicyProcessExecutor.class);
@@ -124,6 +125,10 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 	public PolicyDefinitionDAO<T> getPolicyDefinitionDao() {
 		return policyDefinitionDao;
 	}
+
+    public Map<String, PolicyEvaluator<T>> getPolicyEvaluators(){
+        return policyEvaluators;
+    }
 	
 	@Override
 	public void prepareConfig(Config config) {
@@ -153,10 +158,14 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		dimensionsMap = new HashMap<String, Map<String, String>>();
 	}
 
+    public AlertStreamSchemaDAO getAlertStreamSchemaDAO(Config config){
+        return new AlertStreamSchemaDAOImpl(config);
+    }
+
 	@Override
 	public void init() {
 		// initialize StreamMetadataManager before it is used
-		StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAOImpl(config));
+		StreamMetadataManager.getInstance().init(config, getAlertStreamSchemaDAO(config));
 		// for each AlertDefinition, to create a PolicyEvaluator
 		Map<String, PolicyEvaluator<T>> tmpPolicyEvaluators = new HashMap<String, PolicyEvaluator<T>>();
 		
@@ -184,10 +193,11 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		policyEvaluators = new CopyOnWriteHashMap<>();
 		// for efficiency, we don't put single policy evaluator
 		policyEvaluators.putAll(tmpPolicyEvaluators);
-
 		DynamicPolicyLoader<T> policyLoader = DynamicPolicyLoader.getInstanceOf(policyDefinitionClz);
 		policyLoader.init(initialAlertDefs, policyDefinitionDao, config);
-		policyLoader.addPolicyChangeListener(executorId + "_" + partitionSeq, this);
+        String fullQualifiedAlertExecutorId = executorId + "_" + partitionSeq;
+		policyLoader.addPolicyChangeListener(fullQualifiedAlertExecutorId, this);
+        policyLoader.addPolicyDistributionReporter(fullQualifiedAlertExecutorId, this);
 		LOG.info("Alert Executor created, partitionSeq: " + partitionSeq + " , numPartitions: " + numPartitions);
         LOG.info("All policy evaluators: " + policyEvaluators);
 		
@@ -397,4 +407,9 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 
 	public abstract ResultRender<T, K> getResultRender();
 
+    @Override
+    public void report() {
+        PolicyDistroStatsLogReporter appender = new PolicyDistroStatsLogReporter();
+        appender.reportPolicyMembership(executorId + "_" + partitionSeq, policyEvaluators.keySet());
+    }
 }
