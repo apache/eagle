@@ -87,7 +87,7 @@ class StreamInfo  extends Serializable{
 
 object StorageType extends Enumeration {
   type StorageType = Value
-  val DRUID, HBASE = Value
+  val KAFKA, DRUID, HBASE = Value
 }
 
 /**

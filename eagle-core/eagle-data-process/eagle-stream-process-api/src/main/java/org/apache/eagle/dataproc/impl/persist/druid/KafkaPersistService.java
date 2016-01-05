@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
  * @since Dec 21, 2015
  *
  */
-public class DruidPersistService implements IPersistService<AggregateEntity> {
+public class KafkaPersistService implements IPersistService<AggregateEntity> {
 
 	private static final String ACKS = "acks";
 	private static final String RETRIES = "retries";
@@ -60,7 +60,7 @@ public class DruidPersistService implements IPersistService<AggregateEntity> {
 	 * props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 	 * </pre>
 	 */
-	public DruidPersistService(Config config) {
+	public KafkaPersistService(Config config) {
 		this.config = config;
 		Config kafkaConfig = config.getConfig("kafka");
 		if (kafkaConfig == null) {

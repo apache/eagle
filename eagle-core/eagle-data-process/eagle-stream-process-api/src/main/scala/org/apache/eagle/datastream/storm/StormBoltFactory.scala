@@ -51,7 +51,7 @@ object StormBoltFactory {
       case persist : PersistProducer[Any] => {
         val persisExecutor = new PersistExecutor(persist.executorId, persist.storageType.toString());
         persisExecutor.prepareConfig(config);
-        JavaStormBoltWrapper(persist.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
+        JavaStormBoltWrapper(persisExecutor.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
       }
       case _ => throw new UnsupportedOperationException(s"Unsupported producer: ${producer.toString}")
     }

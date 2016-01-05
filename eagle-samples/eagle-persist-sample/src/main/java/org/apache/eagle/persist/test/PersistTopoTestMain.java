@@ -30,7 +30,6 @@ import org.apache.eagle.datastream.core.StorageType;
 import org.apache.eagle.datastream.core.StreamProducer;
 import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.apache.eagle.partition.PartitionStrategy;
-import scala.Function1;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -38,6 +37,9 @@ import java.util.Random;
 
 /**
  * Created on 1/4/16.
+ *
+ * This test demonstrates how user could use the new aggregate and persist feature for case like metrics processing&storage.
+ *
  */
 public class PersistTopoTestMain {
 
@@ -70,14 +72,14 @@ public class PersistTopoTestMain {
 
         // required : aggregateTestStream schema be created in metadata manager
         // required : policy for aggregateExecutor1 be created in metadata manager
-        StreamProducer aggregate = filter.aggregate(Arrays.asList("aggregateTestStream"), "aggregateExecutor1", new PartitionStrategy() {
+        StreamProducer aggregate = filter.aggregate(Arrays.asList("persistTestEventStream"), "aggregateExecutor1", new PartitionStrategy() {
             @Override
             public int balance(String key, int buckNum) {
                 return 0;
             }
         });
 
-        StreamProducer persist = aggregate.persist("persistExecutor1", StorageType.DRUID());
+        StreamProducer persist = aggregate.persist("persistExecutor1", StorageType.KAFKA());
 
         env.execute();
     }

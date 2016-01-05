@@ -202,6 +202,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   
   def persist(executorId : String, storageType: StorageType.StorageType) : StreamProducer[T] = {
     val ret = PersistProducer(executorId, storageType)
+    hookup(this, ret)
     ret
   }
 

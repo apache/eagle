@@ -18,7 +18,7 @@ package org.apache.eagle.dataproc.impl.persist;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
-import org.apache.eagle.dataproc.impl.persist.druid.DruidPersistService;
+import org.apache.eagle.dataproc.impl.persist.druid.KafkaPersistService;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
 import org.apache.eagle.datastream.Tuple2;
@@ -56,9 +56,9 @@ public class PersistExecutor extends JavaStormStreamExecutor2<String, AggregateE
 
     @Override
 	public void init() {
-		if (persistType.equalsIgnoreCase(StorageType.DRUID().toString())) {
-			Config subConfig = this.config.atKey("persistExecutorConfigs." + persistExecutorId);
-			persistService = new DruidPersistService(subConfig);
+		if (persistType.equalsIgnoreCase(StorageType.KAFKA().toString())) {
+			Config subConfig = this.config.getConfig("persistExecutorConfigs" + "." + persistExecutorId);
+			persistService = new KafkaPersistService(subConfig);
 		} else {
 			throw new RuntimeException(String.format("Persist type '%s' not supported yet!", persistService));
 		}
