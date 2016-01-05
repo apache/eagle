@@ -30,7 +30,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Table("aggregatedef")
 @ColumnFamily("f")
 @Prefix("aggregatedef")
-@Service(Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME)
+@Service(Constants.AGGREGATE_DEFINITION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
 @Tags({"site", "dataSource", "aggregateExecutorId", "policyId", "policyType"})
