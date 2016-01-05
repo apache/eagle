@@ -20,7 +20,7 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.service('Application', function($q) {
+	serviceModule.service('Application', function($q, $location, $state, FeaturePageConfig) {
 		var Application = {};
 		var _deferred;
 		var _current;
@@ -62,11 +62,40 @@
 		// Set current application
 		Application.current = function(app) {
 			if(app && _current !== app) {
+				var _prev = _current;
 				_current = app;
+				Application.refresh();
+
+				if(sessionStorage) {
+					sessionStorage.setItem("application", _current.name);
+				}
+
+				if(_prev) {
+					if ($state.current.name === "landing") {
+						$state.reload();
+					} else {
+						$state.go('landing');
+					}
+				}
 			}
 			return _current;
 		};
-		Application.current(Application.list[0]);
+		Application.find = function(appName) {
+			return common.array.find(appName, Application.list, "name");
+		};
+
+		// Refresh to update the related UI
+		Application.refresh = function() {
+			var _current = Application.current();
+			FeaturePageConfig.pageList = [];
+			if(_current && _current.feature) {
+				$.each(Application.featureList, function (i, feature) {
+					if(!_current.feature[feature.name]) return;
+
+					FeaturePageConfig.pageList.push.apply(FeaturePageConfig.pageList, FeaturePageConfig._navItemMapping[feature.name] || []);
+				});
+			}
+		};
 
 		// TODO: Mock promise
 		Application._promise = function() {
@@ -94,7 +123,12 @@
 					});
 					$q.all(_ajaxList).then(function() {
 						console.log("[Application]", "Load module...finished!");
-						_deferred.resolve(this);
+						if(sessionStorage && Application.find(sessionStorage.getItem("application"))) {
+							Application.current(Application.find(sessionStorage.getItem("application")));
+						} else {
+							Application.current(Application.list[0]);
+						}
+						_deferred.resolve(Application);
 					});
 				}, 1000);
 			}

@@ -28,7 +28,7 @@
 
 	// ========================== Summary ==========================
 	feature.navItem("summary", "Policies", "list");
-	feature.controller('summaryCtrl', function(PageConfig, Site, damContent, $scope, $q, Entities, $route) {
+	feature.controller('summaryCtrl', function(PageConfig, Site, damContent, $scope, $q, Entities) {
 		PageConfig.pageSubTitle = Site.current().name;
 
 		$scope.dataSources = {};

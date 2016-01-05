@@ -40,7 +40,7 @@ var app = {};
 			title = title || path;
 			icon = icon || "question";
 
-			featureControllers.FeaturePageConfig.pageList.push({
+			featureControllers.FeaturePageConfig.addNavItem(this.name, {
 				icon: icon,
 				title: title,
 				url: "#/" + this.name + "/" + path
@@ -53,6 +53,7 @@ var app = {};
 		};
 	});
 
+	/* Router config */
 	eagleApp.config(function ($stateProvider, $urlRouterProvider) {
 		function _resolve() {
 			return {
@@ -132,8 +133,6 @@ var app = {};
 
 		// Clean up
 		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
-			console.log("[State Change]", arguments);
-
 			// Page initialization
 			pageConfig.reset();
 

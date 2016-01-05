@@ -20,7 +20,7 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.service('Site', function(Authorization, Entities, $rootScope, $route, $location) {
+	serviceModule.service('Site', function(Authorization, Entities, $rootScope, $state, $location) {
 		var _currentSite;
 		var content = {};
 
@@ -39,7 +39,9 @@
 						sessionStorage.setItem("site", _currentSite.name);
 					}
 
-					if(!content.hideSite) $route.reload();
+					if(!$state.current.abstract) {
+						$state.reload();
+					}
 				}
 			}
 			return _currentSite;

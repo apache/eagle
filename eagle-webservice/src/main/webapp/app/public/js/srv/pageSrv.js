@@ -25,7 +25,7 @@
 	// =                         Service                         =
 	// ===========================================================
 	// Feature page
-	serviceModule.service('PageConfig', function() {
+	serviceModule.service('PageConfig', function($state) {
 		var _tmplConfig = {
 			pageTitle: "",
 			pageSubTitle: "",
@@ -40,6 +40,8 @@
 		};
 
 		var pageConfig = {};
+
+		// Reset
 		pageConfig.reset = function() {
 			$.extend(pageConfig, _tmplConfig);
 		};
@@ -51,8 +53,15 @@
 	// Feature page
 	serviceModule.service('FeaturePageConfig', function() {
 		var config = {
+			_navItemMapping: {},
+
 			pageList: [],
 			navMapping: {}
+		};
+
+		config.addNavItem = function(feature, item) {
+			var _navItemList = config._navItemMapping[feature] = config._navItemMapping[feature] || [];
+			_navItemList.push(item);
 		};
 
 		return config;
@@ -60,14 +69,12 @@
 
 	// Configuration page
 	serviceModule.service('ConfigPageConfig', function() {
-		var config = {
+		return config = {
 			pageList: [
 				{icon: "server", title: "Sites", url: "#/config/site"},
 				{icon: "cubes", title: "Applications", url: "#/config/application"}
 			],
 			navMapping: {}
 		};
-
-		return config;
 	});
 })();

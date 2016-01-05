@@ -19,7 +19,7 @@
 // =============================================================
 // =                        Stream List                        =
 // =============================================================
-damControllers.controller('streamListCtrl', function(globalContent, damContent, $scope, $route, $routeParams, $q, Entities) {
+damControllers.controller('streamListCtrl', function(globalContent, damContent, $scope, $state, $routeParams, $q, Entities) {
 	'use strict';
 
 	globalContent.setConfig(damContent.config);
@@ -145,7 +145,7 @@ damControllers.controller('streamListCtrl', function(globalContent, damContent, 
 				$("#streamMDL").modal("hide");
 
 				setTimeout(function() {
-					$route.reload();
+					$state.reload();
 				}, 500);
 			});
 		});
@@ -197,7 +197,7 @@ damControllers.controller('streamListCtrl', function(globalContent, damContent, 
 				$scope._streamEntityLock = false;
 
 				setTimeout(function() {
-					$route.reload();
+					$state.reload();
 				}, 500);
 			});
 		}, function() {

@@ -19,11 +19,25 @@
 (function() {
 	'use strict';
 
-	var eagleControllers = angular.module('eagleControllers', ['ui.bootstrap', 'eagle.components']);
+	var eagleControllers = angular.module('eagleControllers', ['ui.bootstrap', 'eagle.components', 'eagle.service']);
 
 	// ===========================================================
 	// =                        Controller                       =
 	// ===========================================================
-	eagleControllers.controller('landingCtrl', function($scope, $location) {
+	eagleControllers.controller('landingCtrl', function($scope, $location, Site, Application, PageConfig, FeaturePageConfig) {
+		var _app = Application.current();
+
+		PageConfig.pageTitle = _app.name;
+		PageConfig.pageSubTitle = Site.current().name;
+
+		$.each(Application.featureList, function(i, feature) {
+			if(!_app.feature[feature.name]) return;
+
+			var _navItemList = FeaturePageConfig._navItemMapping[feature.name];
+			if(_navItemList.length !== 0) {
+				$location.path(_navItemList[0].url.replace(/^#/, ''));
+				return false;
+			}
+		});
 	});
 })();
