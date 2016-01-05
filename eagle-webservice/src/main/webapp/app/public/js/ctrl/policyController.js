@@ -635,7 +635,7 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 			// Aggregation
 			$scope.groupAggPathList = function() {
 				return $.grep(common.getValueByPath($scope, "_stream.metas", []), function(meta) {
-					return $.inArray(meta.attrType, ['long','integer','number']) !== -1;
+					return $.inArray(meta.attrType, ['long','integer','number', 'double', 'float']) !== -1;
 				});
 			};
 
