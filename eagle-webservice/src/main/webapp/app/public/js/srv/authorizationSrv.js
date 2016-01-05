@@ -83,6 +83,8 @@
 				$.each(content.userProfile.authorities, function (i, role) {
 					content.userProfile.roles[role.authority] = true;
 				});
+
+				return content;
 			});
 			return _promise;
 		};
@@ -103,6 +105,8 @@
 				} else {
 					$location.path(rejectPath || "");
 				}
+
+				return content;
 			});
 
 			return _deferred.promise;

@@ -20,6 +20,7 @@
 		"angular-cookies"		: "1.4.7",
 		"angular-animate"		: "1.4.7",
 		"angular-ui-bootstrap"	: "0.14.3",
+		"angular-ui-router"		: "~0.2.15",
 		"d3"					: "~3.5.10",
 		"zombiej-nvd3"			: "~1.8.1-1",
 		"jquery-slimscroll": "1.3.6",

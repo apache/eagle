@@ -23,6 +23,7 @@ damControllers.controller('authLoginCtrl', function(globalContent, Site, Authori
 	'use strict';
 
 	globalContent.hideSidebar = true;
+	globalContent.hideApplication = true;
 	globalContent.hideSite = true;
 	globalContent.hideUser = true;
 

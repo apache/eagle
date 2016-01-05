@@ -21,7 +21,23 @@
 
 	var eagleControllers = window.eagleControllers = angular.module('eagleControllers', ['ui.bootstrap', 'eagle.components']);
 
-	// Page configuration
+	// ===========================================================
+	// =                         Service                         =
+	// ===========================================================
+	// Feature page
+	eagleControllers.service('featurePageConfig', function(Application) {
+		var config = {
+			pageList: [
+				{icon: "thumbs-up", title: "TEST", url: "#/config/site"},
+			],
+			navMapping: {
+			}
+		};
+
+		return config;
+	});
+
+	// Configuration page
 	eagleControllers.service('configPageConfig', function() {
 		var config = {
 			pageList: [
@@ -33,5 +49,11 @@
 		};
 
 		return config;
+	});
+
+	// ===========================================================
+	// =                        Controller                       =
+	// ===========================================================
+	eagleControllers.controller('landingCtrl', function($scope, $location) {
 	});
 })();

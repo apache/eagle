@@ -20,18 +20,21 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.provider('Application', function() {
+	serviceModule.service('Application', function($q) {
+		var Application = {};
+		var _deferred;
+
 		// TODO: Mock
-		this.list = [
+		Application.list = [
 			{
 				name: "DAM",
 				description: "Security check application",
 				feature: {
-					Common: true,
-					Classification: true,
-					"User Profile": true,
-					Metadata: true,
-					Setup: true
+					common: true,
+					classification: true,
+					userProfile: true,
+					metadata: true,
+					setup: true
 				}
 			},
 			{
@@ -42,16 +45,47 @@
 		];
 
 		// TODO: Mock
-		this.featureList = [
-			{name: "Common", description: "Provide the Policy & Alert feature."},
-			{name: "Classification", description: "Sensitivity browser of the data classification."},
-			{name: "User Profile", description: "Machine learning of the user profile"},
-			{name: "Metadata", description: "Stream metadata viewer"},
-			{name: "Setup", description: "Stream configuration"},
+		Application.featureList = [
+			{name: "common", displayName: "Common", description: "Provide the Policy & Alert feature."},
+			{name: "classification", displayName: "Classification", description: "Sensitivity browser of the data classification."},
+			{name: "userProfile", displayName: "User Profile", description: "Machine learning of the user profile"},
+			{name: "metadata", displayName: "Metadata", description: "Stream metadata viewer"},
+			{name: "setup", displayName: "Setup", description: "Stream configuration"},
 		];
 
-		this.$get = function() {
-			return this;
+		// TODO: Mock promise
+		Application._promise = function() {
+			if(!_deferred) {
+				_deferred = $q.defer();
+
+				console.log("[Application]", "Do ajax mock delay.");
+				setTimeout(function () {
+					console.log("[Application]", "Do ajax mock delay...mock list ready!");
+
+					// Dynamic load feature js list
+					var _ajaxList = $.map(Application.featureList, function (feature) {
+						var _ajax_deferred = $q.defer();
+						var _script = document.createElement('script');
+						_script.type = 'text/javascript';
+						_script.src = "public/feature/" + feature.name + "/controller.js?_=" + Math.random();
+						document.head.appendChild(_script);
+						_script.onload = function() {
+							_ajax_deferred.resolve();
+						};
+						_script.onerror = function() {
+							_ajax_deferred.reject();
+						};
+						return _ajax_deferred.promise;
+					});
+					$q.all(_ajaxList).then(function() {
+						console.log("[Application]", "Load module...finished!");
+						_deferred.resolve(this);
+					});
+				}, 1500);
+			}
+			return _deferred.promise;
 		};
+
+		return Application;
 	});
 })();

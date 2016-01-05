@@ -101,7 +101,9 @@
 				});
 			});
 
-			_promise = content.dataSrcList._promise;
+			_promise = content.dataSrcList._promise.then(function() {
+				return content;
+			});
 			return _promise;
 		};
 
