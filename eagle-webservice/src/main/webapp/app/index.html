@@ -139,7 +139,7 @@
 				<!-- side bar: style can be found in sidebar.less -->
 				<section class="sidebar">
 					<ul class="sidebar-menu">
-						<li ng-repeat="page in pageConfig.pageList" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
+						<li ng-repeat="page in PageConfig.navConfig.pageList" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
 							<a href="{{page.url}}">
 								<i class="fa fa-{{page.icon}}"></i> <span>{{page.title}}</span> 
 							</a>
@@ -153,15 +153,15 @@
 			<!-- Right side column. Contains the navbar and content of the page -->
 			<div class="content-wrapper">
 				<!-- Content Header (Page header) -->
-				<section class="content-header" ng-hide="globalContent.hideSidebar">
+				<section class="content-header" ng-hide="PageConfig.hideSidebar">
 					<h1>
-						<span class="pageTitle">{{globalContent.pageTitle}}</span>
-						<small class="pageSubTitle">{{globalContent.pageSubTitle}}</small>
+						<span class="pageTitle">{{PageConfig.pageTitle}}</span>
+						<small class="pageSubTitle">{{PageConfig.pageSubTitle}}</small>
 					</h1>
 
 					<ol class="breadcrumb">
-						<li ng-repeat="nav in globalContent.navPath">
-							<a ng-href="{{$last ? '' : globalContent.navMapping[nav]}}">
+						<li ng-repeat="nav in PageConfig.navPath">
+							<a ng-href="{{$last ? '' : PageConfig.navMapping[nav]}}">
 								<span class="fa fa-home" ng-show="$first"></span>
 								{{nav}}
 							</a>
@@ -199,7 +199,7 @@
 		<script src="public/js/srv/authorizationSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/entitiesSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/siteSrv.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/srv/pageConfig.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/PageConfig.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Application -->
 		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>

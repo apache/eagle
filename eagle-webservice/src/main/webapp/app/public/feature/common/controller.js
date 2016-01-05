@@ -22,14 +22,14 @@
 	var featureControllers = angular.module("featureControllers");
 	var feature = featureControllers.register("common");
 
-	// =============================================================
-	// =                          Summary                          =
-	// =============================================================
-	feature.navItem("summary", "Policies", "list");
+	// ==============================================================
+	// =                          Policies                          =
+	// ==============================================================
 
-	feature.controller('summaryCtrl', function(globalContent, Site, damContent, $scope, $q, Entities, $route) {
-		//globalContent.setConfig(damContent.config);
-		globalContent.pageSubTitle = Site.current().name;
+	// ========================== Summary ==========================
+	feature.navItem("summary", "Policies", "list");
+	feature.controller('summaryCtrl', function(PageConfig, Site, damContent, $scope, $q, Entities, $route) {
+		PageConfig.pageSubTitle = Site.current().name;
 
 		$scope.dataSources = {};
 		$scope.dataReady = false;
