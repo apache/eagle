@@ -139,7 +139,7 @@
 				<!-- side bar: style can be found in sidebar.less -->
 				<section class="sidebar">
 					<ul class="sidebar-menu">
-						<li ng-repeat="page in globalContent.pageList" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
+						<li ng-repeat="page in pageConfig.pageList" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
 							<a href="{{page.url}}">
 								<i class="fa fa-{{page.icon}}"></i> <span>{{page.title}}</span> 
 							</a>

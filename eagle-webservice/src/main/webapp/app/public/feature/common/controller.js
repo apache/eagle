@@ -25,10 +25,10 @@
 	// =============================================================
 	// =                          Summary                          =
 	// =============================================================
-	feature.navItem("list", "Policies", "summary");
+	feature.navItem("summary", "Policies", "list");
 
 	feature.controller('summaryCtrl', function(globalContent, Site, damContent, $scope, $q, Entities, $route) {
-		globalContent.setConfig(damContent.config);
+		//globalContent.setConfig(damContent.config);
 		globalContent.pageSubTitle = Site.current().name;
 
 		$scope.dataSources = {};

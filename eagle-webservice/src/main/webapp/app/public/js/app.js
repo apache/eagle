@@ -18,40 +18,33 @@
 
 var app = {};
 
-/* App Module */
-var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 'eagleControllers', 'featureControllers', 'damControllers', 'eagle.service']);
-
-/* Feature Module */
 (function() {
 	'use strict';
 
+	/* App Module */
+	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 'eagleControllers', 'featureControllers', 'damControllers', 'eagle.service']);
+
+	/* Feature Module */
 	var featureControllers = angular.module('featureControllers', ['ui.bootstrap', 'eagle.components']);
-	featureControllers.config(function ($routeProvider, $controllerProvider, $compileProvider, $filterProvider, $provide) {
-		/*featureControllers.controllerProvider = $controllerProvider;
-		featureControllers.compileProvider = $compileProvider;
-		featureControllers.routeProvider = $routeProvider;
-		featureControllers.filterProvider = $filterProvider;
-		featureControllers.provide = $provide;*/
-
-		/*featureControllers.register = function (name, constructor) {
-			console.log("[Feature] Register:", name);
-			$controllerProvider.register(name, constructor);
-		};
-		featureControllers.registerNavItem = function() {
-			//featureControllers.featurePageConfig =
-		};*/
-
+	featureControllers.config(function ($routeProvider, $controllerProvider, $injector) {
 		var _features = {};
 		var Feature = function(name) {
 			this.name = name;
 		};
 
 		Feature.prototype.controller = function(name, constructor) {
-			console.log("[Feature] Register Controller:", this.name, "->", name);
 			$controllerProvider.register(this.name + "_" + name, constructor);
 		};
 
-		Feature.prototype.navItem = function(icon, title, url) {
+		Feature.prototype.navItem = function(path, title, icon) {
+			title = title || path;
+			icon = icon || "question";
+
+			featureControllers.featurePageConfig.pageList.push({
+				icon: icon,
+				title: title,
+				url: "#/" + this.name + "/" + path
+			});
 
 		};
 
@@ -90,7 +83,7 @@ var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 
 				url: "/login",
 				templateUrl: "partials/login.html",
 				controller: "authLoginCtrl",
-				access: {skipCheck: true},
+				access: {skipCheck: true}
 			})
 
 			// Dynamic feature page
@@ -100,10 +93,10 @@ var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 
 					return "public/feature/" + $stateParams.feature + "/page/" + $stateParams.page;
 				},
 				controllerProvider: function ($stateParams) {
-					console.log("[State] Param:", $stateParams);
-					return "common_summaryCtrl";
+					return $stateParams.feature + "_" + $stateParams.page + "Ctrl";
 				},
-				resolve: _resolve()
+				resolve: _resolve(),
+				pageConfig: "featurePageConfig"
 			})
 		;
 
@@ -308,7 +301,7 @@ var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 
 		};
 	});
 
-	eagleApp.controller('MainCtrl', function ($scope, $location, $http, globalContent, Site, Authorization, Entities, nvd3, Application, featurePageConfig) {
+	eagleApp.controller('MainCtrl', function ($scope, $location, $http, $injector, globalContent, Site, Authorization, Entities, nvd3, Application, featurePageConfig) {
 		featureControllers.featurePageConfig = featurePageConfig;
 
 		window.globalContent = $scope.globalContent = globalContent;
@@ -322,6 +315,13 @@ var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 
 		// Clean up
 		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
 			console.log("[State Change]", arguments);
+
+			// Dynamic loading navigation item list
+			if(next.pageConfig) {
+				$scope.pageConfig = $injector.get(next.pageConfig);
+			} else {
+				$scope.pageConfig = {};
+			}
 
 			// Page initialization
 			globalContent.pageTitle = "";

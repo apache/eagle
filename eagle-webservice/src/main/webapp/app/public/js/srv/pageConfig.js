@@ -25,13 +25,10 @@
 	// =                         Service                         =
 	// ===========================================================
 	// Feature page
-	serviceModule.service('featurePageConfig', function(Application) {
+	serviceModule.service('featurePageConfig', function() {
 		var config = {
-			pageList: [
-				{icon: "thumbs-up", title: "TEST", url: "#/config/site"},
-			],
-			navMapping: {
-			}
+			pageList: [],
+			navMapping: {}
 		};
 
 		return config;
@@ -44,8 +41,7 @@
 				{icon: "server", title: "Sites", url: "#/config/site"},
 				{icon: "cubes", title: "Applications", url: "#/config/application"}
 			],
-			navMapping: {
-			}
+			navMapping: {}
 		};
 
 		return config;
