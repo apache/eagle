@@ -19,17 +19,15 @@
 (function() {
 	'use strict';
 
-	var featureControllers = angular.module('featureControllers');
+	var featureControllers = angular.module("featureControllers");
+	var feature = featureControllers.register("common");
 
 	// =============================================================
 	// =                          Summary                          =
 	// =============================================================
-	featureControllers.registerNavItem({
-		icon: "list",
-		title: "Policies",
-		url: "summary"
-	});
-	featureControllers.register('common_summaryCtrl', function(globalContent, Site, damContent, $scope, $q, Entities, $route) {
+	feature.navItem("list", "Policies", "summary");
+
+	feature.controller('summaryCtrl', function(globalContent, Site, damContent, $scope, $q, Entities, $route) {
 		globalContent.setConfig(damContent.config);
 		globalContent.pageSubTitle = Site.current().name;
 

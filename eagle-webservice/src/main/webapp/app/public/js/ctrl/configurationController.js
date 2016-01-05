@@ -16,31 +16,36 @@
  * limitations under the License.
  */
 
-// =============================================================
-// =                       Configuration                       =
-// =============================================================
-eagleControllers.controller('configSiteCtrl', function($scope, configPageConfig, globalContent, Site, Application) {
+(function() {
 	'use strict';
 
-	globalContent.hideApplication = true;
-	globalContent.setConfig(configPageConfig);
+	var eagleControllers = angular.module('eagleControllers');
+	// =============================================================
+	// =                       Configuration                       =
+	// =============================================================
+	eagleControllers.controller('configSiteCtrl', function ($scope, configPageConfig, globalContent, Site, Application) {
+		'use strict';
 
-	// =================== Site ===================
-	$scope.site = Site.list[0];
-	$scope.setSite = function(site) {
-		$scope.site = site;
-	};
-});
+		globalContent.hideApplication = true;
+		globalContent.setConfig(configPageConfig);
 
-eagleControllers.controller('configApplicationCtrl', function($scope, configPageConfig, globalContent, Application) {
-	'use strict';
+		// =================== Site ===================
+		$scope.site = Site.list[0];
+		$scope.setSite = function (site) {
+			$scope.site = site;
+		};
+	});
 
-	globalContent.hideApplication = true;
-	globalContent.setConfig(configPageConfig);
+	eagleControllers.controller('configApplicationCtrl', function ($scope, configPageConfig, globalContent, Application) {
+		'use strict';
 
-	// ================ Application ================
-	$scope.application = Application.list[0];
-	$scope.setApplication = function(application) {
-		$scope.application = application;
-	};
+		globalContent.hideApplication = true;
+		globalContent.setConfig(configPageConfig);
+
+		// ================ Application ================
+		$scope.application = Application.list[0];
+		$scope.setApplication = function (application) {
+			$scope.application = application;
+		};
+	});
 });

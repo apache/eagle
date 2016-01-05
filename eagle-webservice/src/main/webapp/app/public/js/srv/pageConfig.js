@@ -19,11 +19,35 @@
 (function() {
 	'use strict';
 
-	var eagleControllers = angular.module('eagleControllers', ['ui.bootstrap', 'eagle.components']);
+	var serviceModule = angular.module('eagle.service');
 
 	// ===========================================================
-	// =                        Controller                       =
+	// =                         Service                         =
 	// ===========================================================
-	eagleControllers.controller('landingCtrl', function($scope, $location) {
+	// Feature page
+	serviceModule.service('featurePageConfig', function(Application) {
+		var config = {
+			pageList: [
+				{icon: "thumbs-up", title: "TEST", url: "#/config/site"},
+			],
+			navMapping: {
+			}
+		};
+
+		return config;
+	});
+
+	// Configuration page
+	serviceModule.service('configPageConfig', function() {
+		var config = {
+			pageList: [
+				{icon: "server", title: "Sites", url: "#/config/site"},
+				{icon: "cubes", title: "Applications", url: "#/config/application"}
+			],
+			navMapping: {
+			}
+		};
+
+		return config;
 	});
 })();

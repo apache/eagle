@@ -42,13 +42,21 @@ var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 
 		};*/
 
 		var _features = {};
-		var Feature = function() {
+		var Feature = function(name) {
+			this.name = name;
 		};
 
-		Feature.prototype.
+		Feature.prototype.controller = function(name, constructor) {
+			console.log("[Feature] Register Controller:", this.name, "->", name);
+			$controllerProvider.register(this.name + "_" + name, constructor);
+		};
+
+		Feature.prototype.navItem = function(icon, title, url) {
+
+		};
 
 		featureControllers.register = function(featureName) {
-			return _features[featureName] = _features[featureName] || new Feature();
+			return _features[featureName] = _features[featureName] || new Feature(featureName);
 		};
 	});
 
@@ -87,7 +95,7 @@ var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 
 
 			// Dynamic feature page
 			.state('page', {
-				url: "/p/:feature/:page",
+				url: "/:feature/:page",
 				templateUrl: function ($stateParams) {
 					return "public/feature/" + $stateParams.feature + "/page/" + $stateParams.page;
 				},
@@ -329,7 +337,7 @@ var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 
 			if (!common.getValueByPath(next, "access.skipCheck", false)) {
 				if (!Authorization.isLogin) {
 					console.log("[Authorization] Need access. Redirect...");
-					$location.path("/dam/login");
+					$location.path("/login");
 				}
 			}
 
@@ -379,7 +387,7 @@ var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 
 		// Authorization
 		$scope.logout = function () {
 			Authorization.logout();
-			$location.path("/dam/login");
+			$location.path("/login");
 		};
 	});
 })();
