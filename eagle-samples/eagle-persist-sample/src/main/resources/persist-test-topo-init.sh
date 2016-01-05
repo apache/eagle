@@ -167,7 +167,9 @@ echo ""
 echo "Importing AlertStreamSchemaService for HDFS... "
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
  "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamSchemaService" \
- -d ''
+ -d '{
+
+ }'
 
 
 

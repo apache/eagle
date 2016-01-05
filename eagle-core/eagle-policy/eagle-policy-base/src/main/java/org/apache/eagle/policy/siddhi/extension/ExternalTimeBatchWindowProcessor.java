@@ -16,10 +16,8 @@
  */
 package org.apache.eagle.policy.siddhi.extension;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.event.ComplexEvent;
 import org.wso2.siddhi.core.event.ComplexEventChunk;
@@ -39,6 +37,9 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 import org.wso2.siddhi.query.api.expression.Expression;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @since Dec 23, 2015
  *
@@ -51,7 +52,7 @@ public class ExternalTimeBatchWindowProcessor extends WindowProcessor implements
     private ComplexEventChunk<StreamEvent> currentEventChunk = new ComplexEventChunk<StreamEvent>();
     private ComplexEventChunk<StreamEvent> expiredEventChunk = new ComplexEventChunk<StreamEvent>();
     
-    static final Logger log = Logger.getLogger(ExternalTimeBatchWindowProcessor.class);
+    static final Logger log = LoggerFactory.getLogger(ExternalTimeBatchWindowProcessor.class);
     private VariableExpressionExecutor timeStampVariableExpressionExecutor;
 
     private long lastSendTime = -1;

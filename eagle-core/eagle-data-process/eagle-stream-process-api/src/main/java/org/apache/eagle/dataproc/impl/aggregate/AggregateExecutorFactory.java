@@ -16,21 +16,20 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate;
 
-import java.util.List;
-import java.util.Map;
-
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigValue;
+import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEntity;
+import org.apache.eagle.policy.DefaultPolicyPartitioner;
+import org.apache.eagle.policy.PolicyPartitioner;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
-import org.apache.eagle.policy.DefaultPolicyPartitioner;
-import org.apache.eagle.policy.PolicyPartitioner;
-import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigValue;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @since Dec 16, 2015
@@ -57,7 +56,7 @@ public class AggregateExecutorFactory {
         int numPartitions = loadExecutorConfig(config, executorId, partitionerCls);
         
 		PolicyDefinitionDAO<AggregateDefinitionAPIEntity> policyDefDao = new PolicyDefinitionEntityDAOImpl<AggregateDefinitionAPIEntity>(
-				new EagleServiceConnector(config), Constants.ANALYZE_DEFINITION_SERVICE_ENDPOINT_NAME);
+				new EagleServiceConnector(config), Constants.AGGREGATE_DEFINITION_SERVICE_ENDPOINT_NAME);
 		
 		
 		return newAggregateExecutors(policyDefDao, streamNames, executorId, numPartitions, partitionerCls.toString());
