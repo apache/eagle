@@ -19,13 +19,13 @@
 // =============================================================
 // =                     User Profile List                     =
 // =============================================================
-damControllers.controller('authLoginCtrl', function(globalContent, Site, Authorization, $scope) {
+damControllers.controller('authLoginCtrl', function(PageConfig, Site, Authorization, $scope) {
 	'use strict';
 
-	globalContent.hideSidebar = true;
-	globalContent.hideApplication = true;
-	globalContent.hideSite = true;
-	globalContent.hideUser = true;
+	PageConfig.hideSidebar = true;
+	PageConfig.hideApplication = true;
+	PageConfig.hideSite = true;
+	PageConfig.hideUser = true;
 
 	$scope.username = "";
 	$scope.password = "";

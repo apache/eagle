@@ -23,6 +23,7 @@
 	serviceModule.service('Application', function($q) {
 		var Application = {};
 		var _deferred;
+		var _current;
 
 		// TODO: Mock
 		Application.list = [
@@ -41,6 +42,11 @@
 				name: "JPA",
 				description: "JPA Test Application",
 				feature: {}
+			},
+			{
+				name: "TEST",
+				description: "Test for something",
+				feature: {}
 			}
 		];
 
@@ -52,6 +58,15 @@
 			{name: "metadata", displayName: "Metadata", description: "Stream metadata viewer"},
 			{name: "setup", displayName: "Setup", description: "Stream configuration"},
 		];
+
+		// Set current application
+		Application.current = function(app) {
+			if(app && _current !== app) {
+				_current = app;
+			}
+			return _current;
+		};
+		Application.current(Application.list[0]);
 
 		// TODO: Mock promise
 		Application._promise = function() {
@@ -81,7 +96,7 @@
 						console.log("[Application]", "Load module...finished!");
 						_deferred.resolve(this);
 					});
-				}, 1500);
+				}, 1000);
 			}
 			return _deferred.promise;
 		};

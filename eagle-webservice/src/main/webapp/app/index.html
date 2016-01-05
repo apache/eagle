@@ -38,7 +38,7 @@
 		<link href="../node_modules/admin-lte/dist/css/skins/skin-blue.css" rel="stylesheet" type="text/css" />
 		<!-- endref -->
 	</head>
-	<body class="skin-blue sidebar-mini" ng-class="{'no-sidebar' : globalContent.hideSidebar}">
+	<body class="skin-blue sidebar-mini" ng-class="{'no-sidebar' : PageConfig.hideSidebar}">
 		<!-- Site wrapper -->
 		<div class="wrapper">
 			<header class="main-header">
@@ -49,7 +49,7 @@
 				<!-- Header Navbar: style can be found in header.less -->
 				<nav class="navbar navbar-static-top" role="navigation">
 					<!-- Sidebar toggle button-->
-					<a ng-hide="globalContent.hideSidebar" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+					<a ng-hide="PageConfig.hideSidebar" class="sidebar-toggle" data-toggle="offcanvas" role="button">
 						<span class="sr-only">Toggle navigation</span>
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
@@ -59,7 +59,7 @@
 					<div class="navbar-custom-menu">
 						<ul class="nav navbar-nav">
 							<!-- Site -->
-							<li class="dropdown" ng-show="!globalContent.hideSite && !globalContent.lockSite">
+							<li class="dropdown" ng-show="!PageConfig.hideSite && !PageConfig.lockSite">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-server"></i>
 									{{site.current().name}}
@@ -77,7 +77,7 @@
 									</li-->
 								</ul>
 							</li>
-							<li class="dropdown" ng-show="globalContent.lockSite">
+							<li class="dropdown" ng-show="PageConfig.lockSite">
 								<a>
 									<i class="fa fa-server"></i>
 									{{site.current().name}}
@@ -85,7 +85,7 @@
 							</li>
 
 							<!-- User -->
-							<li class="dropdown user user-menu" ng-hide="globalContent.hideUser">
+							<li class="dropdown user user-menu" ng-hide="PageConfig.hideUser">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-user"></i>
 									{{auth.userProfile.username}}
@@ -118,15 +118,16 @@
 					</div>
 
 					<!-- Applications -->
-					<div ng-hide="globalContent.hideApplication">
+					<div ng-hide="PageConfig.hideApplication">
 						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#moduleMenu">
 							<span class="sr-only">Toggle navigation</span>
 							<span class="fa fa-map"></span>
 						</button>
 						<div class="collapse navbar-collapse" id="moduleMenu">
 							<ul class="nav navbar-nav">
-								<li class="active"><a>DAM</a></li>
-								<li><a>JPA</a></li>
+								<li ng-repeat="_app in Application.list" ng-class="{active: Application.current() === _app}">
+									<a ng-click="Application.current(_app)">{{_app.name}}</a>
+								</li>
 							</ul>
 						</div>
 					</div>
@@ -135,7 +136,7 @@
 
 			<!-- =============================================== -->
 			<!-- Left side column. contains the side bar -->
-			<aside class="main-sidebar" ng-hide="globalContent.hideSidebar">
+			<aside class="main-sidebar" ng-hide="PageConfig.hideSidebar">
 				<!-- side bar: style can be found in sidebar.less -->
 				<section class="sidebar">
 					<ul class="sidebar-menu">
