@@ -32,6 +32,11 @@
     <dependencies>
         <dependency>
             <groupId>eagle</groupId>
+            <artifactId>eagle-executor-state</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eagle</groupId>
     		<artifactId>eagle-embed-server</artifactId>
     		<version>${project.version}</version>
             <scope>test</scope>

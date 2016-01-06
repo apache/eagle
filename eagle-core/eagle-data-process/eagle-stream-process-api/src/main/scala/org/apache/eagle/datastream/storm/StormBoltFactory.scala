@@ -30,10 +30,10 @@ object StormBoltFactory {
       case FlatMapProducer(worker) => {
         if(worker.isInstanceOf[JavaStormStreamExecutor[EagleTuple]]){
           worker.asInstanceOf[JavaStormStreamExecutor[EagleTuple]].prepareConfig(config)
-          JavaStormBoltWrapper(worker.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
+          JavaStormBoltWrapper(config, worker.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
         }else if(worker.isInstanceOf[StormStreamExecutor[EagleTuple]]){
           worker.asInstanceOf[StormStreamExecutor[EagleTuple]].prepareConfig(config)
-          StormBoltWrapper(worker.asInstanceOf[StormStreamExecutor[EagleTuple]])
+          StormBoltWrapper(config, worker.asInstanceOf[StormStreamExecutor[EagleTuple]])
         }else {
           throw new UnsupportedOperationException
         }

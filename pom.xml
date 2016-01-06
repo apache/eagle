@@ -250,10 +250,17 @@
         <!-- sprint security -->
         <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
 
+        <!-- zkclient -->
+        <com.101tec.zkclient.version>0.3</com.101tec.zkclient.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.101tec</groupId>
+                <artifactId>zkclient</artifactId>
+                <version>${com.101tec.zkclient.version}</version>
+            </dependency>
             <!-- Commons Dependencies-->
             <dependency>
                 <groupId>commons-cli</groupId>

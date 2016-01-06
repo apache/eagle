@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.security.auditlog;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -31,6 +32,7 @@ import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
 public class HdfsAuditLogKafkaDeserializer implements SpoutKafkaMessageDeserializer{
 	private static Logger LOG = LoggerFactory.getLogger(HdfsAuditLogKafkaDeserializer.class);
 	private Properties props;
+    private final static String CHARSET = "UTF-8";
 
 	public  HdfsAuditLogKafkaDeserializer(Properties props){
 		this.props = props;
@@ -43,7 +45,12 @@ public class HdfsAuditLogKafkaDeserializer implements SpoutKafkaMessageDeseriali
 	 */
 	@Override
 	public Object deserialize(byte[] arg0) {
-		String logLine = new String(arg0);
+		String logLine = null;
+        try{
+            logLine = new String(arg0, CHARSET);
+        }catch(UnsupportedEncodingException ex){
+            throw new RuntimeException(ex);
+        }
 
 		HDFSAuditLogParser parser = new HDFSAuditLogParser();
 		HDFSAuditLogObject entity = null;

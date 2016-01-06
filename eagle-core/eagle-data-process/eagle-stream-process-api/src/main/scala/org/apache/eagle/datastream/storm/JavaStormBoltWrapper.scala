@@ -22,27 +22,73 @@ import backtype.storm.task.{OutputCollector, TopologyContext}
 import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.topology.base.BaseRichBolt
 import backtype.storm.tuple.{Fields, Tuple}
+import com.typesafe.config.Config
+import org.apache.eagle.state.base.DeltaEventReplayable
 import org.apache.eagle.datastream.{Collector, EagleTuple, JavaStormStreamExecutor}
+import org.apache.eagle.state.StateMgmtService
+import org.apache.eagle.state.base.{DeltaEventReplayable, Snapshotable}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
-case class JavaStormBoltWrapper(worker : JavaStormStreamExecutor[EagleTuple]) extends BaseRichBolt{
-  val LOG = LoggerFactory.getLogger(StormBoltWrapper.getClass)
+case class JavaStormBoltWrapper(config : Config, worker : JavaStormStreamExecutor[EagleTuple]) extends BaseRichBolt with DeltaEventReplayable{
+  val LOG = LoggerFactory.getLogger(JavaStormBoltWrapper.getClass)
   var _collector : OutputCollector = null
+  @volatile var _snapshotLock : AnyRef = null
+  var _stateMgmtService : StateMgmtService = null
 
   override def prepare(stormConf: util.Map[_, _], context: TopologyContext, collector: OutputCollector): Unit = {
     _collector = collector
     worker.init
+    if(isStateMgmtEnabled() && worker.isInstanceOf[Snapshotable]) {
+      _snapshotLock = new Object
+      _stateMgmtService = new StateMgmtService(config, this, _snapshotLock, worker.asInstanceOf[Snapshotable])
+    }
+  }
+
+  private def isStateMgmtEnabled() : Boolean = {
+    try {
+      return config.getBoolean("eagleProps.executorState.enabled");
+    } catch{
+      case ex => return false
+    }
   }
 
   override def execute(input : Tuple): Unit ={
-    worker.flatMap(input.getValues, new Collector[EagleTuple](){
-      def collect(t: EagleTuple): Unit ={
+      _snapshotLock match{
+        case null => {
+          dispatchDeltaEventToWorker(input)
+          _collector.ack(input)
+        }
+        case _ => {
+          _snapshotLock.synchronized {
+            // the sequence of dispatch is significant, don't exchange them
+            dispatchDeltaEventToWorker(input)
+            dispatchDeltaEventToStateMgmtService(input)
+            _collector.ack(input)
+          }
+        }
+      }
+  }
+
+  private def dispatchDeltaEventToWorker(input : Tuple) : Unit = {
+    worker.flatMap(input.getValues, new Collector[EagleTuple]() {
+      def collect(t: EagleTuple): Unit = {
         _collector.emit(input, t.getList.asJava)
       }
     })
-    _collector.ack(input)
+  }
+
+  private def dispatchDeltaEventToStateMgmtService(input : Tuple) : Unit = {
+    _stateMgmtService.persist(input.getValues)
+  }
+
+  override def replay(event: scala.Any): Unit = {
+    worker.flatMap(event.asInstanceOf[java.util.List[AnyRef]], new Collector[EagleTuple]() {
+      def collect(t: EagleTuple): Unit = {
+        _collector.emit(t.getList.asJava)
+      }
+    })
   }
 
   override def declareOutputFields(declarer : OutputFieldsDeclarer): Unit ={

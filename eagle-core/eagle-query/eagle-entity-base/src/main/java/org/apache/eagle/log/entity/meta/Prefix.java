@@ -21,6 +21,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * prefix sits in the leading place of an Eagle entity row key, there are 2 potential benefits by using prefix
+ * 1. with prefix we can distribute different table into different region potentially. In this case, we can assign static prefix string while defining entity
+ * 2. with prefix we can put different metrics into one table but may be distributed into different regions. In this case, user can assign different prefix programatically
+ */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Prefix {
