@@ -50,6 +50,7 @@ fi
 
 
 EAGLE_SERVICE_CONF="eagle-service.conf"
+EAGLE_LDAP_CONF="ldap.properties"
 
 # Always copy conf/eagle-service.properties to lib/tomcat/webapps/eagle-service/WEB-INF/classes/application.conf before starting
 if [ ! -e ${EAGLE_HOME}/conf/${EAGLE_SERVICE_CONF} ]
@@ -58,6 +59,12 @@ then
 	exit 1
 fi
 cp -f $EAGLE_HOME/conf/$EAGLE_SERVICE_CONF ${EAGLE_HOME}/lib/tomcat/webapps/eagle-service/WEB-INF/classes/application.conf
+
+if [ -e ${EAGLE_HOME}/conf/${EAGLE_LDAP_CONF} ]
+then
+	cp -f $EAGLE_HOME/conf/$EAGLE_LDAP_CONF ${EAGLE_HOME}/lib/tomcat/webapps/eagle-service/WEB-INF/classes/
+fi
+
 
 case $1 in
 "start")

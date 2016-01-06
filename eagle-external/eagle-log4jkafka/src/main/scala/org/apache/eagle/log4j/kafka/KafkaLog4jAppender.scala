@@ -101,8 +101,6 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
     props.put("serializer.class", serializerClass)
     props.put("batch.num.messages",batchSize.toString)
 
-    if(keyPattern != null) props.put("keyPattern", keyPattern)
-
     //These have default values in ProducerConfig and AsyncProducerConfig. We don't care if they're not specified
     if(producerType != null) props.put("producer.type", producerType)
     if(compressionCodec != null) props.put("compression.codec", compressionCodec)
@@ -114,8 +112,11 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
 
     producer = new Producer[String, String](config)
 
+    val extraProps = new Properties()
+    if(keyPattern != null) extraProps.put("keyPattern", keyPattern)
+
     if(keyClass != null){
-      keyer = Utils.createObject[Keyer](keyClass,props)
+      keyer = Utils.createObject[Keyer](keyClass,extraProps)
       LogLog.debug("Instantiated Key class " +  keyClass)
     }
 
