@@ -27,7 +27,7 @@ echo "Importing AlertDataSourceService for persist... "
 
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
  "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDataSourceService" \
-  -d '[{"prefix":"persistTestDataSource","tags":{"site" : "sandbox", "dataSource":"persistTest"}, "enabled": "true", "config" : " just some description", "desc":"persistTest"}]'
+  -d '[{"prefix":"alertDataSource","tags":{"site" : "sandbox", "dataSource":"persistTest"}, "enabled": "true", "config" : " just some description", "desc":"persistTest"}]'
 
 
 ## AlertStreamService: alert streams generated from data source
@@ -35,14 +35,14 @@ echo ""
 echo "Importing AlertStreamService for HDFS... "
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
  "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamService" \
- -d '[{"prefix":"persistTestStream","tags":{"dataSource":"persistTest","streamName":"persistTestEventStream"},"desc":"persistTest metrics"}]'
+ -d '[{"prefix":"alertStream","tags":{"dataSource":"persistTest","streamName":"persistTestEventStream"},"desc":"persistTest metrics"}]'
 
 ## AlertExecutorService: what alert streams are consumed by alert executor
 echo ""
 echo "Importing AlertExecutorService for HDFS... "
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
  "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertExecutorService" \
- -d '[{"prefix":"persistTestExecutor","tags":{"dataSource":"persistTest","alertExecutorId":"aggregateExecutor1","streamName":"persistTestEventStream"},"desc":"aggregate executor for persist test log event stream"}]'
+ -d '[{"prefix":"alertExecutor","tags":{"dataSource":"persistTest","alertExecutorId":"aggregateExecutor1","streamName":"persistTestEventStream"},"desc":"aggregate executor for persist test log event stream"}]'
 
 ## AlertStreamSchemaService: schema for event from alert stream
 echo ""
