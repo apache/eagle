@@ -23,6 +23,7 @@ import org.apache.eagle.dataproc.impl.persist.IPersistService;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.*;
 import java.util.concurrent.Future;
@@ -68,7 +69,7 @@ public class KafkaPersistService implements IPersistService<AggregateEntity> {
 		}
 		props = new Properties();
 		if (kafkaConfig.hasPath(BOOTSTRAP_SERVERS)) {
-			props.put(BOOTSTRAP_SERVERS, kafkaConfig.getString(BOOTSTRAP_SERVERS));
+			props.put("bootstrap.servers", kafkaConfig.getString(BOOTSTRAP_SERVERS));
 		}
 		if (kafkaConfig.hasPath(ACKS)) {
 			props.put(ACKS, kafkaConfig.getString(ACKS));
@@ -86,10 +87,12 @@ public class KafkaPersistService implements IPersistService<AggregateEntity> {
 			props.put("buffer.memory", kafkaConfig.getLong(BUFFER_MEMORY));
 		}
 		if (kafkaConfig.hasPath(KEY_SERIALIZER)) {
-			props.put("key.serializer", kafkaConfig.getLong(KEY_SERIALIZER));
+			props.put("key.serializer", kafkaConfig.getString(KEY_SERIALIZER));
+		} else {
+			props.put("key.serializer", StringSerializer.class.getCanonicalName());
 		}
 //		if (kafkaConfig.hasPath(VALUE_SERIALIZER)) {
-//			props.put("value.serializer", kafkaConfig.getLong(VALUE_SERIALIZER));
+//			props.put("value.serializer", kafkaConfig.getString(VALUE_SERIALIZER));
 //		}
 		props.put("value.serializer", AggregateEntitySerializer.class.getCanonicalName());
 

@@ -53,24 +53,8 @@ public class PersistTopoTestMain {
     public static void execWithDefaultPartition(StormExecutionEnvironment env, StormSpoutProvider provider) {
         StreamProducer source = env.fromSpout(provider).withOutputFields(2).nameAs("kafkaMsgConsumer");
         StreamProducer filter = source;
-//                .flatMap(new Function1() {
-//            @Override
-//            public Object apply(Object v1) {
-//                return true;
-//            }
-//
-//            @Override
-//            public Function1 andThen(Function1 g) {
-//                return g;
-//            }
-//
-//            @Override
-//            public Function1 compose(Function1 g) {
-//                return g;
-//            }
-//        });
 
-        // required : aggregateTestStream schema be created in metadata manager
+        // required : persistTestEventStream schema be created in metadata manager
         // required : policy for aggregateExecutor1 be created in metadata manager
         StreamProducer aggregate = filter.aggregate(Arrays.asList("persistTestEventStream"), "aggregateExecutor1", new PartitionStrategy() {
             @Override
@@ -110,7 +94,7 @@ public class PersistTopoTestMain {
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
-            declarer.declare(new Fields("timestamp", "cpu", "mem"));
+            declarer.declareStream("test-stream", new Fields("timestamp", "host", "cpu", "mem"));
         }
 
         @Override
@@ -123,7 +107,7 @@ public class PersistTopoTestMain {
             Utils.sleep(100);
             base = base + 100;// with fix steps..
             long mem = Double.valueOf(memRandom.nextGaussian() * FULL_MEM_SIZE_BYTES).longValue();
-            collector.emit(new Values(base, cpuRandom.nextInt(100), mem));
+            collector.emit("test-stream", new Values(base, "host", cpuRandom.nextInt(100), mem));
         }
     }
 
