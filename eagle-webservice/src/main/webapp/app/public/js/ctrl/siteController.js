@@ -133,7 +133,7 @@ damControllers.controller('siteListCtrl', function(globalContent, Site, damConte
 			$("#siteMDL").modal("hide")
 			.on("hidden.bs.modal", function() {
 				$("#siteMDL").off("hidden.bs.modal");
-				Site.refresh();
+				Site.reload();
 			});
 		}).finally(function() {
 			$scope._siteEntityLock = false;
@@ -156,7 +156,7 @@ damControllers.controller('siteListCtrl', function(globalContent, Site, damConte
 			Entities.deleteEntities("AlertDataSourceService", {
 				site: site.name
 			})._promise.then(function() {
-				Site.refresh();
+				Site.reload();
 			});
 		});
 	};
@@ -201,7 +201,7 @@ damControllers.controller('siteListCtrl', function(globalContent, Site, damConte
 				if(!ret) return;
 
 				Entities.deleteEntity("AlertDataSourceService", $scope._dataSrcEntity)._promise.then(function() {
-					Site.refresh();
+					Site.reload();
 				});
 			});
 		});

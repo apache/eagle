@@ -20,7 +20,7 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.service('Application', function($q, $location, $state, FeaturePageConfig) {
+	serviceModule.service('Application', function($q, $location, $wrapState) {
 		var Application = {};
 		var _deferred;
 		var _current;
@@ -61,40 +61,23 @@
 
 		// Set current application
 		Application.current = function(app) {
-			if(app && _current !== app) {
+			if(arguments.length && _current !== app) {
 				var _prev = _current;
 				_current = app;
-				Application.refresh();
 
-				if(sessionStorage) {
+				if(sessionStorage && _current) {
 					sessionStorage.setItem("application", _current.name);
 				}
 
 				if(_prev) {
-					if ($state.current.name === "landing") {
-						$state.reload();
-					} else {
-						$state.go('landing');
-					}
+					console.log("[Application] Switch. Redirect to landing page.");
+					$wrapState.go('landing', true);
 				}
 			}
 			return _current;
 		};
 		Application.find = function(appName) {
 			return common.array.find(appName, Application.list, "name");
-		};
-
-		// Refresh to update the related UI
-		Application.refresh = function() {
-			var _current = Application.current();
-			FeaturePageConfig.pageList = [];
-			if(_current && _current.feature) {
-				$.each(Application.featureList, function (i, feature) {
-					if(!_current.feature[feature.name]) return;
-
-					FeaturePageConfig.pageList.push.apply(FeaturePageConfig.pageList, FeaturePageConfig._navItemMapping[feature.name] || []);
-				});
-			}
 		};
 
 		// TODO: Mock promise

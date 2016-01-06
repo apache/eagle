@@ -20,7 +20,7 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.service('Authorization', function ($rootScope, $http, $location, $q) {
+	serviceModule.service('Authorization', function ($rootScope, $http, $location, $wrapState, $q) {
 		$http.defaults.withCredentials = true;
 
 		var _promise;
@@ -29,12 +29,11 @@
 		var content = {
 			isLogin: true,	// Status mark. Work for UI status check, changed when eagle api return 403 authorization failure.
 			needLogin: function () {
-				console.log("Need Login!");
-				window.aaa = $rootScope;
-				window.bbb = $location;
+				console.log("[Authorization] Need Login!");
 				_path = _path || $location.path();
 				content.isLogin = false;
-				$location.path("/login");
+				console.log("[Authorization] Call need login. Redirect...");
+				$wrapState.go("login");
 			},
 			login: function (username, password) {
 				var _hash = btoa(username + ':' + password);
@@ -74,7 +73,7 @@
 			return content.userProfile.roles[role] === true;
 		};
 
-		content.refresh = function () {
+		content.reload = function () {
 			_promise = $http({
 				url: app.getURL('userProfile'),
 				method: "GET"
@@ -98,7 +97,7 @@
 
 		content._promise = function () {
 			if (!_promise) {
-				content.refresh();
+				content.reload();
 			}
 			return _promise;
 		};

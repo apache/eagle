@@ -45,8 +45,8 @@ damControllers.controller('authLoginCtrl', function(PageConfig, Site, Authorizat
 
 			Authorization.login($scope.username, $scope.password).then(function(success) {
 				if(success) {
-					Site.refresh();
-					Authorization.refresh();
+					Site.reload();
+					Authorization.reload();
 					Authorization.path(true);
 				} else {
 					$.dialog({

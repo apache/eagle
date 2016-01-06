@@ -25,7 +25,7 @@
 	// =                         Service                         =
 	// ===========================================================
 	// Feature page
-	serviceModule.service('PageConfig', function($state) {
+	serviceModule.service('PageConfig', function() {
 		var _tmplConfig = {
 			pageTitle: "",
 			pageSubTitle: "",
@@ -69,7 +69,7 @@
 
 	// Configuration page
 	serviceModule.service('ConfigPageConfig', function() {
-		return config = {
+		return {
 			pageList: [
 				{icon: "server", title: "Sites", url: "#/config/site"},
 				{icon: "cubes", title: "Applications", url: "#/config/application"}

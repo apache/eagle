@@ -27,17 +27,16 @@
 	eagleControllers.controller('landingCtrl', function($scope, $location, Site, Application, PageConfig, FeaturePageConfig) {
 		var _app = Application.current();
 
-		PageConfig.pageTitle = _app.name;
+		PageConfig.pageTitle = _app ? _app.name : 'OPS';
 		PageConfig.pageSubTitle = Site.current().name;
 
-		$.each(Application.featureList, function(i, feature) {
-			if(!_app.feature[feature.name]) return;
+		$scope.Application = Application;
+		$scope.aaa = 123123123132123132123123132123;
 
-			var _navItemList = FeaturePageConfig._navItemMapping[feature.name];
-			if(_navItemList.length !== 0) {
-				$location.path(_navItemList[0].url.replace(/^#/, ''));
-				return false;
-			}
-		});
+		var _navItemList = FeaturePageConfig.pageList;
+		if(_navItemList.length) {
+			console.log("[Landing] Auto redirect.", FeaturePageConfig);
+			$location.path(_navItemList[0].url.replace(/^#/, ''));
+		}
 	});
 })();

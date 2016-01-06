@@ -20,40 +20,42 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.service('Site', function(Authorization, Entities, $rootScope, $state, $location) {
+	serviceModule.service('Site', function($rootScope, $wrapState, $location, $q, Entities, Application) {
 		var _currentSite;
-		var content = {};
+		var Site = {};
+		var _promise;
 
-		content.list = [];
-		content.list.set = {};
-		content.dataSrcList = [];
+		Site.list = [];
+		Site.list.set = {};
+		Site.dataSrcList = [];
 
-		content.current = function(site) {
+		Site.current = function(site) {
 			if(site) {
 				var _prev = _currentSite;
 				_currentSite = site;
 
-				// Broadcast if site update
+				// Keep current site and reload page
 				if(!_prev || _prev.name !== _currentSite.name) {
 					if(sessionStorage) {
 						sessionStorage.setItem("site", _currentSite.name);
 					}
 
-					if(!$state.current.abstract) {
-						$state.reload();
+					if(!$wrapState.current.abstract && $wrapState.current.name !== "login") {
+						console.log("[Site]", "Switch. Reload.");
+						$wrapState.reload();
 					}
 				}
 			}
 			return _currentSite;
 		};
-		content.find = function(siteName) {
-			return common.array.find(siteName, content.list, "name");
+		Site.find = function(siteName) {
+			return common.array.find(siteName, Site.list, "name");
 		};
-		content.url = function(site, url) {
+		Site.url = function(site, url) {
 			if(arguments.length == 1) {
 				url = site;
 			} else {
-				content.current(site);
+				Site.current(site);
 			}
 			$location.url(url);
 
@@ -62,24 +64,23 @@
 			}
 		};
 
-		var _promise;
-		content.refresh = function() {
-			content.list = [];
-			content.list.set = {};
+		Site.reload = function() {
+			Site.list = [];
+			Site.list.set = {};
 
-			content.dataSrcList = Entities.queryEntities("AlertDataSourceService", '');
-			content.dataSrcList._promise.success(function() {
-				$.each(content.dataSrcList, function(i, dataSrc) {
-					var _site = content.list.set[dataSrc.tags.site];
+			Site.dataSrcList = Entities.queryEntities("AlertDataSourceService", '');
+			Site.dataSrcList._promise.success(function() {
+				$.each(Site.dataSrcList, function(i, dataSrc) {
+					var _site = Site.list.set[dataSrc.tags.site];
 					if(!_site) {
-						_site = content.list.set[dataSrc.tags.site] = {
+						_site = Site.list.set[dataSrc.tags.site] = {
 							name: dataSrc.tags.site,
 							dataSrcList: []
 						};
 						_site.dataSrcList.find = function(dataSrcName) {
 							return common.array.find(dataSrcName, _site.dataSrcList, "tags.dataSource");
 						};
-						content.list.push(_site);
+						Site.list.push(_site);
 					}
 					_site.dataSrcList.push(dataSrc);
 
@@ -89,33 +90,38 @@
 					}
 				});
 
-				if(sessionStorage && content.find(sessionStorage.getItem("site"))) {
-					content.current(content.find(sessionStorage.getItem("site")));
+				if(sessionStorage && Site.find(sessionStorage.getItem("site"))) {
+					Site.current(Site.find(sessionStorage.getItem("site")));
 				} else {
-					content.current(content.list[0]);
+					Site.current(Site.list[0]);
 				}
 
 				// TODO: Mock site application
-				$.each(content.list, function(i, _site) {
+				$.each(Site.list, function(i, _site) {
 					_site.app = {
-						DAM: true
+						//DAM: true
 					};
+					if(_site.name === "sandbox") {
+						_site.app.DAM = true;
+						_site.app.JPA = true;
+						_site.app.TEST = true;
+					}
 				});
 			});
 
-			_promise = content.dataSrcList._promise.then(function() {
-				return content;
+			_promise = Site.dataSrcList._promise.then(function() {
+				return Site;
 			});
 			return _promise;
 		};
 
-		content._promise = function() {
+		Site._promise = function() {
 			if(!_promise) {
-				content.refresh();
+				Site.reload();
 			}
 			return _promise;
 		};
 
-		return content;
+		return Site;
 	});
 })();

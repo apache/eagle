@@ -125,7 +125,7 @@
 						</button>
 						<div class="collapse navbar-collapse" id="moduleMenu">
 							<ul class="nav navbar-nav">
-								<li ng-repeat="_app in Application.list" ng-class="{active: Application.current() === _app}">
+								<li ng-repeat="_app in Application.list" ng-class="{active: Application.current() === _app}" ng-if="Site.current().app[_app.name]">
 									<a ng-click="Application.current(_app)">{{_app.name}}</a>
 								</li>
 							</ul>
@@ -201,6 +201,7 @@
 		<script src="public/js/srv/entitiesSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/siteSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/pageSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/wrapStateSrv.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Application -->
 		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>

@@ -24,9 +24,11 @@ var app = {};
 	/* App Module */
 	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 'eagleControllers', 'featureControllers', 'damControllers', 'eagle.service']);
 
-	/* Feature Module */
+	// ======================================================================================
+	// =                                   Feature Module                                   =
+	// ======================================================================================
 	var featureControllers = angular.module('featureControllers', ['ui.bootstrap', 'eagle.components']);
-	featureControllers.config(function ($routeProvider, $controllerProvider, $injector) {
+	featureControllers.config(function ($routeProvider, $controllerProvider) {
 		var _features = {};
 		var Feature = function(name) {
 			this.name = name;
@@ -53,30 +55,86 @@ var app = {};
 		};
 	});
 
-	/* Router config */
+	// ======================================================================================
+	// =                                   Router config                                    =
+	// ======================================================================================
 	eagleApp.config(function ($stateProvider, $urlRouterProvider) {
-		function _resolve() {
-			return {
+		// Resolve
+		function _resolve(config) {
+			config = config || {};
+			var resolve = {
 				Site: function (Site) {
 					return Site._promise();
 				},
 				Authorization: function (Authorization) {
-					return Authorization._promise();
+					if(!config.roleType) {
+						return Authorization._promise();
+					} else {
+						return Authorization.rolePromise(config.roleType);
+					}
 				},
 				Application: function (Application) {
 					return Application._promise();
 				}
 			};
+
+			if(config.featureCheck) {
+				resolve._navigationCheck = function($q, $wrapState, Site, Application, FeaturePageConfig) {
+					var _deferred = $q.defer();
+
+					$q.all(Site._promise(), Application._promise()).then(function() {
+						var _match;
+						var _site = Site.current();
+						var _app = Application.current();
+
+						FeaturePageConfig.pageList = [];
+
+						// Check application
+						if(_site && (!_app || (_app && !_site.app[_app.name]))) {
+							_match = false;
+
+							$.each(Application.list, function(i, app) {
+								if(_site.app[app.name]) {
+									_app = Application.current(app);
+									_match = true;
+									return false;
+								}
+							});
+
+							if(!_match) {
+								_app = null;
+								Application.current(null);
+							}
+						}
+
+						// Update feature navigation list
+						if(_app && _app.feature) {
+							$.each(Application.featureList, function (i, feature) {
+								if(!_app.feature[feature.name]) return;
+
+								FeaturePageConfig.pageList.push.apply(FeaturePageConfig.pageList, FeaturePageConfig._navItemMapping[feature.name] || []);
+							});
+						}
+
+						_deferred.resolve();
+					});
+
+					return _deferred.promise;
+				};
+			}
+
+			return resolve;
 		}
 
+		// Router
 		$urlRouterProvider.otherwise("/landing");
 		$stateProvider
-			// Landing page
+			// Landing
 			.state('landing', {
 				url: "/landing",
 				templateUrl: "partials/landing.html",
 				controller: "landingCtrl",
-				resolve: _resolve()
+				resolve: _resolve({featureCheck: true})
 			})
 
 			// Authorization
@@ -85,6 +143,15 @@ var app = {};
 				templateUrl: "partials/login.html",
 				controller: "authLoginCtrl",
 				access: {skipCheck: true}
+			})
+
+			// Configuration
+			.state('config', {
+				url: "/config/site",
+				templateUrl: "partials/config/site.html",
+				controller: "configSiteCtrl",
+				pageConfig: "ConfigPageConfig",
+				resolve: _resolve({roleType: 'ROLE_ADMIN'})
 			})
 
 			// Dynamic feature page
@@ -96,7 +163,7 @@ var app = {};
 				controllerProvider: function ($stateParams) {
 					return $stateParams.feature + "_" + $stateParams.page + "Ctrl";
 				},
-				resolve: _resolve(),
+				resolve: _resolve({featureCheck: true}),
 				pageConfig: "FeaturePageConfig"
 			})
 		;
@@ -120,7 +187,10 @@ var app = {};
 		};
 	});
 
-	eagleApp.controller('MainCtrl', function ($scope, $location, $http, $injector, PageConfig, Site, Authorization, Entities, nvd3, Application, FeaturePageConfig) {
+	// ======================================================================================
+	// =                                   Main Controller                                  =
+	// ======================================================================================
+	eagleApp.controller('MainCtrl', function ($scope, $location, $wrapState, $http, $injector, PageConfig, Site, Authorization, Entities, nvd3, Application, FeaturePageConfig) {
 		featureControllers.FeaturePageConfig = FeaturePageConfig;
 
 		window.site = $scope.Site = $scope.site = Site;
@@ -133,6 +203,8 @@ var app = {};
 
 		// Clean up
 		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
+			console.log("[Switch] current ->", current, currentParam);
+			console.log("[Switch] next ->", next, nextParam);
 			// Page initialization
 			pageConfig.reset();
 
@@ -148,12 +220,12 @@ var app = {};
 			if (!common.getValueByPath(next, "access.skipCheck", false)) {
 				if (!Authorization.isLogin) {
 					console.log("[Authorization] Need access. Redirect...");
-					$location.path("/login");
+					$wrapState.go("login");
 				}
 			}
 
 			// > Role control
-			var _roles = common.getValueByPath(next, "access.roles", []);
+			/*var _roles = common.getValueByPath(next, "access.roles", []);
 			if (_roles.length && Authorization.userProfile.roles) {
 				var _roleMatch = false;
 				$.each(_roles, function (i, roleName) {
@@ -166,14 +238,14 @@ var app = {};
 				if (!_roleMatch) {
 					$location.path("/dam");
 				}
-			}
+			}*/
 		});
 
 		// Get side bar navigation item class
 		$scope.getNavClass = function (page) {
 			var path = page.url.replace(/^#/, '');
 
-			if ($location.path() == path) {
+			if ($location.path() === path) {
 				pageConfig.pageTitle = pageConfig.pageTitle || page.title;
 				return "active";
 			} else {
@@ -197,8 +269,9 @@ var app = {};
 
 		// Authorization
 		$scope.logout = function () {
+			console.log("[Authorization] Logout. Redirect...");
 			Authorization.logout();
-			$location.path("/login");
+			$wrapState.go("login");
 		};
 	});
 })();

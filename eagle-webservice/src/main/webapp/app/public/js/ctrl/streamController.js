@@ -190,7 +190,7 @@ damControllers.controller('streamListCtrl', function(globalContent, damContent, 
 				streamName: _entity.tags.streamName,
 			})._promise.then(function() {
 				Entities.updateEntity("AlertStreamSchemaService", _metaList)._promise.finally(function() {
-					Site.refresh();
+					Site.reload();
 				});
 			}).finally(function() {
 				$("#streamMDL").modal("hide");

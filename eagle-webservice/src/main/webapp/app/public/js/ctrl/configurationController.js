@@ -23,20 +23,35 @@
 	// =============================================================
 	// =                       Configuration                       =
 	// =============================================================
-	eagleControllers.controller('configSiteCtrl', function ($scope, configPageConfig, globalContent, Site, Application) {
+	eagleControllers.controller('configSiteCtrl', function ($scope, PageConfig, Site) {
 		'use strict';
 
-		globalContent.hideApplication = true;
-		globalContent.setConfig(configPageConfig);
+		PageConfig.hideApplication = true;
+		PageConfig.hideSite = true;
 
 		// =================== Site ===================
-		$scope.site = Site.list[0];
+		$scope.site = Site.current() || Site.list[0];
 		$scope.setSite = function (site) {
 			$scope.site = site;
 		};
+
+		$scope.sites = {};
+		$.each(Site.list, function(i, site) {
+			$scope.sites[site.name] = {
+				app: $.extend({}, site.app),
+			};
+		});
+
+		$scope.saveAll = function() {
+			$.each(Site.list, function(i, site) {
+				site.app = $scope.sites[site.name].app;
+
+				// TODO: Ajax update entities
+			});
+		};
 	});
 
-	eagleControllers.controller('configApplicationCtrl', function ($scope, configPageConfig, globalContent, Application) {
+	eagleControllers.controller('configApplicationCtrl', function ($scope, globalContent, Application) {
 		'use strict';
 
 		globalContent.hideApplication = true;
@@ -48,4 +63,4 @@
 			$scope.application = application;
 		};
 	});
-});
+})();
