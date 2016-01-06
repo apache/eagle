@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-'use strict';
-
 /* Controllers */
 var damControllers = angular.module('damControllers', ['ui.bootstrap', 'eagle.components']);
 
 damControllers.service('damContent', function(Entities) {
+	'use strict';
+
 	var content = {
 		config: {
 			pageList: [
@@ -75,6 +75,8 @@ damControllers.service('damContent', function(Entities) {
 // =                          Summary                          =
 // =============================================================
 damControllers.controller('summaryCtrl', function(globalContent, Site, damContent, $scope, $q, Entities, $route) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.pageSubTitle = Site.current().name;
 

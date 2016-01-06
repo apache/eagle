@@ -23,6 +23,20 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 		config: grunt.file.readJSON('grunt.json'),
 
+		jshint: {
+			options: {
+				browser: true,
+				globals: {
+					$: true,
+					jQuery: true,
+					moment: true,
+				},
+			},
+			all: [
+				'app/**/*.js'
+			],
+		},
+
 		clean: {
 			build: ['ui/', 'tmp/'],
 			tmp: ['tmp/'],
@@ -38,6 +52,7 @@ module.exports = function (grunt) {
 
 					'app/public/js/components/main.js',
 					'app/public/js/components/**.js',
+					'app/public/js/components/**/**.js',
 
 					'app/public/js/ctrl/damController.js',
 					'app/public/js/ctrl/*.js',
@@ -103,6 +118,7 @@ module.exports = function (grunt) {
 		}
 	});
 
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -112,6 +128,8 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 
 	grunt.registerTask('default', [
+		// jshint
+		'jshint:all',
 		// Clean Env
 		'clean:build',
 		// Compress JS

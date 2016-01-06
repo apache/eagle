@@ -17,6 +17,7 @@
   -->
 <div class="page-fixed">
 	<button class="btn btn-primary"
+		ng-if="auth.isRole('ROLE_ADMIN')"
 		ng-click="showStreamEditor()"
 	>+ New Stream</button>
 </div>
@@ -33,7 +34,7 @@
 			<button class="btn btn-box-tool" data-widget="collapse">
 				<i class="fa fa-minus"></i>
 			</button>
-			<button class="btn btn-box-tool" ng-click="showStreamEditor(stream)">
+			<button class="btn btn-box-tool" ng-click="showStreamEditor(stream)" ng-if="auth.isRole('ROLE_ADMIN')">
 				<i class="fa fa-wrench"></i>
 			</button>
 		</div>

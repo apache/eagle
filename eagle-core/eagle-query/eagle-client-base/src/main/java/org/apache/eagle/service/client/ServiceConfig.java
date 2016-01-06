@@ -26,4 +26,15 @@ public class ServiceConfig implements Serializable{
     public Integer servicePort;
     public String username;
     public String password;
+
+    public ServiceConfig() {
+
+    }
+
+    public ServiceConfig(String serviceHost, Integer servicePort, String username, String password) {
+        this.serviceHost = serviceHost;
+        this.servicePort = servicePort;
+        this.username = username;
+        this.password = password;
+    }
 }

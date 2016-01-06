@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 
-'use strict';
-
 // =============================================================
 // =                        Stream List                        =
 // =============================================================
 damControllers.controller('streamListCtrl', function(globalContent, damContent, $scope, $route, $routeParams, $q, Entities) {
+	'use strict';
+
 	globalContent.setConfig(damContent.config);
 	globalContent.hideSite = true;
 
 	$scope.streams = {};
-	$scope._streamEntity;
+	$scope._streamEntity = null;
 	$scope._streamEntityLock = false;
 
 	// =========================================== List ===========================================

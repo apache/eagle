@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-'use strict';
-
 var app = {};
 
 /* App Module */
 var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'damControllers']);
 
 eagleApp.config(function($routeProvider) {
+	'use strict';
+
 	$routeProvider.when('/dam/summary', {
 		templateUrl : 'partials/dam/summary.html',
 		controller : 'summaryCtrl',
@@ -163,6 +163,8 @@ eagleApp.config(function($routeProvider) {
 });
 
 eagleApp.service('globalContent', function(Entities, $rootScope, $route, $location) {
+	'use strict';
+
 	var content = {
 		pageTitle: "",
 		pageSubTitle: "",
@@ -189,6 +191,8 @@ eagleApp.service('globalContent', function(Entities, $rootScope, $route, $locati
 
 // Site
 eagleApp.service('Site', function(Authorization, Entities, $rootScope, $route, $location, $q) {
+	'use strict';
+
 	var _currentSite;
 	var content = {};
 
@@ -278,6 +282,8 @@ eagleApp.service('Site', function(Authorization, Entities, $rootScope, $route, $
 
 // Authorization
 eagleApp.service('Authorization', function($http, $location, $cookies) {
+	'use strict';
+
 	$http.defaults.withCredentials = true;
 
 	var _path = "";
@@ -355,13 +361,17 @@ eagleApp.service('Authorization', function($http, $location, $cookies) {
 	return content;
 });
 
-eagleApp.service('Entities', function($http, $q, $rootScope, Authorization) {
+eagleApp.service('Entities', function($http, $q, $rootScope, $location, Authorization) {
+	'use strict';
+
 	// Query
 	function _query(name, kvs) {
 		kvs = kvs || {};
 		var _list = [];
 		var _condition = kvs._condition || {};
 		var _addtionalCondition = _condition.additionalCondition || {};
+		var _startTime, _endTime;
+		var _startTimeStr, _endTimeStr;
 
 		// Initial
 		// > Condition
@@ -384,8 +394,8 @@ eagleApp.service('Entities', function($http, $q, $rootScope, Authorization) {
 		// Fill special parameters
 		// > Query by time duration
 		if(_addtionalCondition._duration) {
-			var _endTime = app.time.now();
-			var _startTime = _endTime.clone().subtract(_addtionalCondition._duration, "ms");
+			_endTime = app.time.now();
+			_startTime = _endTime.clone().subtract(_addtionalCondition._duration, "ms");
 
 			// Debug usage. Extend more time duration for end time
 			if(_addtionalCondition.__ETD) {
@@ -395,13 +405,13 @@ eagleApp.service('Entities', function($http, $q, $rootScope, Authorization) {
 			_addtionalCondition._startTime = _startTime;
 			_addtionalCondition._endTime = _endTime;
 
-			var _startTimeStr = _startTime.format("YYYY-MM-DD HH:mm:ss");
-			var _endTimeStr = _endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
+			_startTimeStr = _startTime.format("YYYY-MM-DD HH:mm:ss");
+			_endTimeStr = _endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
 
 			_url += "&startTime=" + _startTimeStr + "&endTime=" + _endTimeStr;
 		} else if(_addtionalCondition._startTime && _addtionalCondition._endTime) {
-			var _startTimeStr = _addtionalCondition._startTime.format("YYYY-MM-DD HH:mm:ss");
-			var _endTimeStr = _addtionalCondition._endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
+			_startTimeStr = _addtionalCondition._startTime.format("YYYY-MM-DD HH:mm:ss");
+			_endTimeStr = _addtionalCondition._endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
 
 			_url += "&startTime=" + _startTimeStr + "&endTime=" + _endTimeStr;
 		}
@@ -460,7 +470,7 @@ eagleApp.service('Entities', function($http, $q, $rootScope, Authorization) {
 		});
 		return _list;
 	}
-	function _parseCondition(condition) {
+	function ParseCondition(condition) {
 		var _this = this;
 		_this.condition = "";
 		_this.additionalCondition = {};
@@ -529,20 +539,20 @@ eagleApp.service('Entities', function($http, $q, $rootScope, Authorization) {
 			return _post(app.getURL("deleteEntity", {serviceName: serviceName}), _entities);
 		},
 		deleteEntities: function(serviceName, condition) {
-			return _delete(app.getURL("deleteEntities", {serviceName: serviceName, condition: new _parseCondition(condition).condition}));
+			return _delete(app.getURL("deleteEntities", {serviceName: serviceName, condition: new ParseCondition(condition).condition}));
 		},
 
 		queryEntity: function(serviceName, encodedRowkey) {
 			return _query("queryEntity", {serviceName: serviceName, encodedRowkey: encodedRowkey});
 		},
 		queryEntities: function(serviceName, condition, fields) {
-			return _query("queryEntities", {serviceName: serviceName, _condition: new _parseCondition(condition), values: fields});
+			return _query("queryEntities", {serviceName: serviceName, _condition: new ParseCondition(condition), values: fields});
 		},
 		queryGroup: function(serviceName, condition, groupBy, fields) {
-			return _query("queryGroup", {serviceName: serviceName, _condition: new _parseCondition(condition), groupBy: groupBy, values: fields});
+			return _query("queryGroup", {serviceName: serviceName, _condition: new ParseCondition(condition), groupBy: groupBy, values: fields});
 		},
 		querySeries: function(serviceName, condition, groupBy, fields, intervalmin) {
-			var _cond = new _parseCondition(condition);
+			var _cond = new ParseCondition(condition);
 			var _list = _query("querySeries", {serviceName: serviceName, _condition: _cond, groupBy: groupBy, values: fields, intervalmin: intervalmin});
 			_list._promise.success(function() {
 				if(_list.length === 0) {
@@ -561,7 +571,10 @@ eagleApp.service('Entities', function($http, $q, $rootScope, Authorization) {
 				if(_list._convert) {
 					var _current = _cond.additionalCondition._startTime.clone();
 					$.each(_list, function(i, value) {
-						_list[i] = [_current.valueOf(), value];
+						_list[i] = {
+							x: _current.valueOf(),
+							y: value
+						};
 						_current.add(intervalmin, "m");
 					});
 				}
@@ -595,28 +608,37 @@ eagleApp.service('Entities', function($http, $q, $rootScope, Authorization) {
 });
 
 eagleApp.filter('parseJSON', function() {
+	'use strict';
+
 	return function(input, defaultVal) {
 		return common.parseJSON(input, defaultVal);
 	};
 });
 
 eagleApp.filter('split', function() {
+	'use strict';
+
 	return function(input, regex) {
 		return input.split(regex);
 	};
 });
 
 eagleApp.filter('reverse', function() {
+	'use strict';
+
 	return function(items) {
 		return items.slice().reverse();
 	};
 });
 
-eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent, Site, Authorization, Entities) {
+eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent, Site, Authorization, Entities, nvd3) {
+	'use strict';
+
 	window.globalContent = $scope.globalContent = globalContent;
 	window.site = $scope.site = Site;
 	window.auth = $scope.auth = Authorization;
 	window.entities = $scope.entities = Entities;
+	window.nvd3 = nvd3;
 	$scope.app = app;
 
 	// Clean up

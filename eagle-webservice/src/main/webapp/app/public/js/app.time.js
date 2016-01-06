@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-"use strict";
-
 // Time Zone
 (function() {
+	"use strict";
+
 	app.time = {
 		UTC_OFFSET: 0,
 		now: function() {
@@ -51,5 +51,20 @@
 	// Moment update
 	moment.fn.toISO = function() {
 		return this.format("YYYY-MM-DDTHH:mm:ss.000Z");
+	};
+
+	// Force convert date
+	var _toDate = moment.fn.toDate;
+	moment.fn.toDate = function(ignoreTimeZone) {
+		if(!ignoreTimeZone) return _toDate.bind(this)();
+		return new Date(
+			this.year(),
+			this.month(),
+			this.date(),
+			this.hour(),
+			this.minute(),
+			this.second(),
+			this.millisecond()
+		);
 	};
 })();

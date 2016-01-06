@@ -20,7 +20,6 @@
 package org.apache.eagle.security.partition;
 
 import com.sun.jersey.api.client.WebResource;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metric.MetricConstants;
 import org.apache.eagle.partition.DataDistributionDao;
@@ -80,7 +79,7 @@ public class DataDistributionDaoImpl implements DataDistributionDao {
                     .endTime(endTime)
                     .pageSize(Integer.MAX_VALUE)
                     .query(query)
-                    .metricName("kafka.message.user.count")
+                    .metricName("eagle.kafka.message.count")
                     .send();
             if (!response.isSuccess()) {
                 LOG.error(response.getException());

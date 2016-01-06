@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-'use strict';
-
 eagleComponents.directive('line3dChart', function($compile) {
+	'use strict';
+
 	return {
 		restrict : 'AE',
 		scope : {
@@ -45,6 +45,8 @@ eagleComponents.directive('line3dChart', function($compile) {
 });
 
 eagleComponents.service('line3dCharts', function() {
+	'use strict';
+
 	var charts = function($scope) {
 		return {
 			gen : function(ele, series, config) {
@@ -210,13 +212,14 @@ eagleComponents.service('line3dCharts', function() {
 						}
 					}
 					function _axisPoints(dimension, bound) {
-						for(var i = _step ; i < bound.max + _step ; i += _step) {
-							var _unit = [0,0,0];
+						var i, _unit;
+						for(i = _step ; i < bound.max + _step ; i += _step) {
+							_unit = [0,0,0];
 							_unit[dimension] = i;
 							_axisPoint(_unit, dimension, i);
 						}
-						for(var i = -_step ; i > bound.min - _step ; i -= _step) {
-							var _unit = [0,0,0];
+						for(i = -_step ; i > bound.min - _step ; i -= _step) {
+							_unit = [0,0,0];
 							_unit[dimension] = i;
 							_axisPoint(_unit, dimension, i);
 						}

@@ -20,10 +20,12 @@ package org.apache.eagle.service.client;
 import com.typesafe.config.Config;
 import org.apache.eagle.common.config.EagleConfigConstants;
 
+import java.io.Serializable;
+
 /**
  * Some common codes to enable DAO through eagle service including service host/post, credential population etc.
  */
-public class EagleServiceConnector {
+public class EagleServiceConnector implements Serializable{
     private final String eagleServiceHost;
     private final Integer eagleServicePort;
     private String username;
