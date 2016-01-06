@@ -21,6 +21,10 @@ import org.apache.eagle.alert.entity.AlertAPIEntity;
 import java.util.List;
 
 public interface SiddhiAlertHandler {
-
+    /**
+     * Siddhi evaluate events in another thread other than the thread where event is sent.
+     * @param context
+     * @param alerts
+     */
 	void onAlerts(EagleAlertContext context, List<AlertAPIEntity> alerts);
 }

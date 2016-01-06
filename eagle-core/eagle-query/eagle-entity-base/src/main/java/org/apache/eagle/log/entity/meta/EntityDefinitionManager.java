@@ -85,6 +85,10 @@ public class EntityDefinitionManager {
 		_serDeserMap.put(int[].class, new IntArraySerDeser());
 		_serIDDeserClassMap.put(id, int[].class);
 		_serDeserClassIDMap.put(int[].class, id++);
+
+        _serDeserMap.put(byte[].class, new ByteArraySerDeser());
+        _serIDDeserClassMap.put(id, byte[].class);
+        _serDeserClassIDMap.put(byte[].class, id++);
 		
 		_serDeserMap.put(double[].class, new DoubleArraySerDeser());
 		_serIDDeserClassMap.put(id, double[].class);

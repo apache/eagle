@@ -33,5 +33,6 @@
 		<module>eagle-alert-base</module>
 		<module>eagle-alert-process</module>
 		<module>eagle-alert-service</module>
+        <module>eagle-executor-state</module>
     </modules>
 </project>

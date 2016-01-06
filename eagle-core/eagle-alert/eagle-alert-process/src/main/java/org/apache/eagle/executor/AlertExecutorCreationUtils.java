@@ -76,7 +76,7 @@ public class AlertExecutorCreationUtils {
     }
 
     /**
-     * Build DAG Tasks based on persisted alert definition and schemas from eagle store.
+     * Build DAG Tasks based on persisted alert definition and schemas from eagle writeState.
      *
      * <h3>Require configuration:</h3>
      *

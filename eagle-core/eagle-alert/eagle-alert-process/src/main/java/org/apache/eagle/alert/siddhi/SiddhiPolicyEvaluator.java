@@ -18,8 +18,6 @@ package org.apache.eagle.alert.siddhi;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import org.apache.eagle.alert.config.AbstractPolicyDefinition;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
@@ -33,8 +31,7 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
-
-import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.state.base.Snapshotable;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.policy.PolicyEvaluator;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
@@ -42,15 +39,38 @@ import org.apache.eagle.dataproc.core.ValuesArray;
 import com.typesafe.config.Config;
 
 /**
- * when policy is updated or deleted, SiddhiManager.shutdown should be invoked to release resources.
- * during this time, synchronization is important
+ * There are several critical sections for policy evaluation to be protected:
+ * 1. creation of policy evaluator
+ * 2. update of policy, this will trigger previous siddhi manager shutdown and creation of a new siddhi manager
+ * 3. delete of policy, this will trigger previous siddhi manager shutdown
+ * 4. event evaluation
+ * 5. snapshot of current state
+ * 6. state restore
  */
-public class SiddhiPolicyEvaluator implements PolicyEvaluator{
+public class SiddhiPolicyEvaluator implements PolicyEvaluator, Snapshotable{
 	private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyEvaluator.class);	
-	public static final int DEFAULT_QUEUE_SIZE = 1000;
-	private final BlockingQueue<AlertAPIEntity> queue = new ArrayBlockingQueue<AlertAPIEntity>(DEFAULT_QUEUE_SIZE);
 	private volatile SiddhiRuntime siddhiRuntime;
-	private String[] sourceStreams;
+
+    @Override
+    public String getElementId() {
+        return policyId;
+    }
+
+    @Override
+    public byte[] currentState() {
+        synchronized(siddhiRuntime){
+            return siddhiRuntime.siddhiManager.getExecutionPlanRuntime(siddhiRuntime.executionPlanName).snapshot();
+        }
+    }
+
+    @Override
+    public void restoreState(byte[] state) {
+        synchronized (siddhiRuntime){
+            siddhiRuntime.siddhiManager.getExecutionPlanRuntime(siddhiRuntime.executionPlanName).restore(state);
+        }
+    }
+
+    private String[] sourceStreams;
 	private boolean needValidation;
 	private String policyId;
 	private Config config;

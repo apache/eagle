@@ -42,6 +42,10 @@ public class Tables {
         tables.add("fileSensitivity");
         tables.add("mlmodel");
         tables.add("userprofile");
+
+        // for executor state management
+        tables.add("policyStateSnapshot");
+        tables.add("deltaEventIdRange");
     }
 
     public List<String> getTables(){
