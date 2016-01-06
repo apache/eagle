@@ -1,4 +1,5 @@
 <p class="lead">
 	Current application do not install any feature.
 	<span ng-if="Auth.isRole('ROLE_ADMIN')">Click <a href="#/config/site">here</a> to configure.</span>
+	<span ng-if="!Auth.isRole('ROLE_ADMIN')">Please contact your admin.</span>
 </p>
