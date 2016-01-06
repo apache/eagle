@@ -16,10 +16,8 @@
  */
 package org.apache.eagle.executor;
 
-import com.codahale.metrics.MetricRegistry;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.alert.common.AlertConstants;
 import org.apache.eagle.alert.config.AbstractPolicyDefinition;
 import org.apache.eagle.alert.dao.AlertDefinitionDAO;
@@ -28,6 +26,8 @@ import org.apache.eagle.alert.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.policy.*;
+import org.apache.eagle.state.base.Snapshotable;
+import org.apache.eagle.state.snapshot.ByteSerializer;
 import org.apache.eagle.alert.siddhi.EagleAlertContext;
 import org.apache.eagle.alert.siddhi.SiddhiAlertHandler;
 import org.apache.eagle.alert.siddhi.StreamMetadataManager;
@@ -37,23 +37,16 @@ import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
 import org.apache.eagle.datastream.Tuple2;
-import org.apache.eagle.metric.reportor.EagleCounterMetric;
-import org.apache.eagle.metric.reportor.EagleMetricListener;
-import org.apache.eagle.metric.reportor.EagleServiceReporterMetricListener;
-import org.apache.eagle.metric.reportor.MetricKeyCodeDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEntity> implements PolicyLifecycleMethods, SiddhiAlertHandler, PolicyDistributionReportMethods {
-	private static final long serialVersionUID = 1L;
-
-	private static final Logger LOG = LoggerFactory.getLogger(AlertExecutor.class);
+public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEntity> implements PolicyLifecycleMethods, SiddhiAlertHandler,PolicyDistributionReportMethods, Snapshotable {
+    private static final Logger LOG = LoggerFactory.getLogger(AlertExecutor.class);
 
 	private String alertExecutorId;
 	private volatile CopyOnWriteHashMap<String, PolicyEvaluator> policyEvaluators;
@@ -64,16 +57,8 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 	private Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;
 	private AlertDefinitionDAO alertDefinitionDao;
 	private String[] sourceStreams;
-	private static String EAGLE_EVENT_COUNT = "eagle.event.count";
-	private static String EAGLE_POLICY_EVAL_COUNT = "eagle.policy.eval.count";
-	private static String EAGLE_POLICY_EVAL_FAIL_COUNT = "eagle.policy.eval.fail.count";
-	private static String EAGLE_ALERT_COUNT = "eagle.alert.count";
-	private static String EAGLE_ALERT_FAIL_COUNT = "eagle.alert.fail.count";
-	private	static long MERITE_GRANULARITY = DateUtils.MILLIS_PER_MINUTE;
-	private Map<String, Map<String, String>> dimensionsMap; // cache it for performance
-	private Map<String, String> baseDimensions;
-	private MetricRegistry registry;
-	private EagleMetricListener listener;
+
+    private PolicyStatsReporter reporter;
 
 	public AlertExecutor(String alertExecutorId, PolicyPartitioner partitioner, int numPartitions, int partitionSeq,
                          AlertDefinitionDAO alertDefinitionDao, String[] sourceStreams){
@@ -118,28 +103,6 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		this.config = config;
 	}
 	
-	public void initMetricReportor() {
-		String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
-		int port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
-
-		String username = config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) ?
-				          config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) : null;
-		String password = config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) ?
-				          config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) : null;
-
-		//TODO: need to it replace it with batch flush listener
-		registry = new MetricRegistry();
-		listener = new EagleServiceReporterMetricListener(host, port, username, password);
-
-		baseDimensions = new HashMap<>();
-		baseDimensions.put(AlertConstants.ALERT_EXECUTOR_ID, alertExecutorId);
-		baseDimensions.put(AlertConstants.PARTITIONSEQ, String.valueOf(partitionSeq));
-		baseDimensions.put(AlertConstants.SOURCE, ManagementFactory.getRuntimeMXBean().getName());
-		baseDimensions.put(EagleConfigConstants.DATA_SOURCE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE));
-		baseDimensions.put(EagleConfigConstants.SITE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE));
-		dimensionsMap = new HashMap<>();
-	}
-
     /**
      * for unit test purpose only
      * @param config
@@ -189,7 +152,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		LOG.info("Alert Executor created, partitionSeq: " + partitionSeq + " , numPartitions: " + numPartitions);
         LOG.info("All policy evaluators: " + policyEvaluators);
 		
-		initMetricReportor();
+        reporter = PolicyStatsReporters.newReporter(config, alertExecutorId, partitionSeq);
 	}
 
     /**
@@ -254,33 +217,6 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		return value / granularity * granularity;
 	}
 
-	public void updateCounter(String name, Map<String, String> dimensions, double value) {
-		long current = System.currentTimeMillis();
-		String metricName = MetricKeyCodeDecoder.codeMetricKey(name, dimensions);
-		if (registry.getMetrics().get(metricName) == null) {
-			EagleCounterMetric metric = new EagleCounterMetric(current, metricName, value, MERITE_GRANULARITY);
-			metric.registerListener(listener);
-			registry.register(metricName, metric);
-		} else {
-			EagleCounterMetric metric = (EagleCounterMetric) registry.getMetrics().get(metricName);
-			metric.update(value, current);
-			//TODO: need remove unused metric from registry
-		}
-	}
-	
-	public void updateCounter(String name, Map<String, String> dimensions) {
-		updateCounter(name, dimensions, 1.0);
-	}
-	
-	public Map<String, String> getDimensions(String policyId) {
-		if (dimensionsMap.get(policyId) == null) {
-			Map<String, String> newDimensions = new HashMap<String, String>(baseDimensions);
-			newDimensions.put(AlertConstants.POLICY_ID, policyId);
-			dimensionsMap.put(policyId, newDimensions);
-		}
-		return dimensionsMap.get(policyId);
-	}
-
     /**
      * within this single executor, execute all PolicyEvaluator sequentially
      * the contract for input:
@@ -296,30 +232,25 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
         if(LOG.isDebugEnabled()) LOG.debug("Msg is coming " + input.get(2));
         if(LOG.isDebugEnabled()) LOG.debug("Current policyEvaluators: " + policyEvaluators.keySet().toString());
 
-        updateCounter(EAGLE_EVENT_COUNT, baseDimensions);
-        try{
-            synchronized(this.policyEvaluators) {
-                for(Entry<String, PolicyEvaluator> entry : policyEvaluators.entrySet()){
-                    String policyId = entry.getKey();
-                    PolicyEvaluator evaluator = entry.getValue();
-                    updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
-                    try {
-                        EagleAlertContext siddhiAlertContext = new EagleAlertContext();
-                        siddhiAlertContext.alertExecutor = this;
-                        siddhiAlertContext.policyId = policyId;
-                        siddhiAlertContext.evaluator = evaluator;
-                        siddhiAlertContext.outputCollector = outputCollector;
-                        evaluator.evaluate(new ValuesArray(siddhiAlertContext, input.get(1), input.get(2)));
-                    }
-                    catch (Exception ex) {
-                        LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
-                        updateCounter(EAGLE_POLICY_EVAL_FAIL_COUNT, getDimensions(policyId));
-                    }
+        reporter.incrIncomingEvent();
+        synchronized(this.policyEvaluators) {
+            for(Entry<String, PolicyEvaluator> entry : policyEvaluators.entrySet()){
+                String policyId = entry.getKey();
+                PolicyEvaluator evaluator = entry.getValue();
+                reporter.incrPolicyEvaluation(policyId);
+                try {
+                    EagleAlertContext siddhiAlertContext = new EagleAlertContext();
+                    siddhiAlertContext.alertExecutor = this;
+                    siddhiAlertContext.policyId = policyId;
+                    siddhiAlertContext.evaluator = evaluator;
+                    siddhiAlertContext.outputCollector = outputCollector;
+                    evaluator.evaluate(new ValuesArray(siddhiAlertContext, input.get(1), input.get(2)));
+                }
+                catch (Exception ex) {
+                    LOG.error("Error evaluating policy, but continue to run for " + alertExecutorId + ", partition " + partitionSeq + ", with event " + input.get(2).toString(), ex);
+                    reporter.incrPolicyEvaluationFailure(policyId);
                 }
             }
-        } catch(Exception ex){
-            LOG.error(alertExecutorId + ", partition " + partitionSeq + ", error fetching alerts, but continue to run", ex);
-            updateCounter(EAGLE_ALERT_FAIL_COUNT, baseDimensions);
         }
     }
 
@@ -370,6 +301,12 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
 		}
 	}
 
+    /**
+     * This is probably called in another thread other than the thread where event is sent.
+     * collect method is synchronized to make sure asynchronized callback consistent
+     * @param context
+     * @param alerts
+     */
 	@Override
 	public void onAlerts(EagleAlertContext context, List<AlertAPIEntity> alerts) {
 		if(alerts != null && !alerts.isEmpty()){
@@ -377,7 +314,7 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
             LOG.info(String.format("Detected %s alerts for policy %s",alerts.size(),policyId));
 			Collector outputCollector = context.outputCollector;
 			PolicyEvaluator evaluator = context.evaluator;
-			updateCounter(EAGLE_ALERT_COUNT, getDimensions(policyId), alerts.size());
+            reporter.incrAlert(policyId, alerts.size());
 			for (AlertAPIEntity entity : alerts) {
 				synchronized(this) {
 					outputCollector.collect(new Tuple2(policyId, entity));
@@ -391,5 +328,45 @@ public class AlertExecutor extends JavaStormStreamExecutor2<String, AlertAPIEnti
     public void report() {
         PolicyDistroStatsLogReporter appender = new PolicyDistroStatsLogReporter();
         appender.reportPolicyMembership(alertExecutorId + "_" + partitionSeq, policyEvaluators.keySet());
+    }
+
+    /**
+     * this is stop-the-world operation
+     * @return
+     */
+    @Override
+    public byte[] currentState() {
+        Map<String, byte[]> map = new HashMap<String, byte[]>();
+        synchronized (this.policyEvaluators) {
+            for(PolicyEvaluator evaluator : this.policyEvaluators.values()){
+                if(evaluator instanceof Snapshotable){
+                    Snapshotable snapshotable = (Snapshotable)evaluator;
+                    map.put(snapshotable.getElementId(), snapshotable.currentState());
+                }
+            }
+        }
+        // serialization need not be synchronized
+        return ByteSerializer.OToB(map);
+    }
+
+    @Override
+    public void restoreState(byte[] state) {
+        Map<String, byte[]> map = (Map<String, byte[]>)ByteSerializer.BToO(state);
+        if(map == null)
+            return;
+        for(String policyId : map.keySet()){
+            PolicyEvaluator evaluator = policyEvaluators.get(policyId);
+            if(evaluator != null && evaluator instanceof Snapshotable){
+                Snapshotable snapshotable = (Snapshotable)evaluator;
+                snapshotable.restoreState(map.get(policyId));
+            }else{
+                LOG.info("restoring non existing policy " + policyId);
+            }
+        }
+    }
+
+    @Override
+    public String getElementId() {
+        return alertExecutorId + "_" + partitionSeq;
     }
 }

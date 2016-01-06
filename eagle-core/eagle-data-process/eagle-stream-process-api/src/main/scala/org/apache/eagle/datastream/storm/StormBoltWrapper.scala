@@ -22,12 +22,13 @@ import backtype.storm.task.{OutputCollector, TopologyContext}
 import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.topology.base.BaseRichBolt
 import backtype.storm.tuple.{Fields, Tuple}
+import com.typesafe.config.Config
 import org.apache.eagle.datastream.{Collector, EagleTuple, StormStreamExecutor}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
-case class StormBoltWrapper(worker : StormStreamExecutor[EagleTuple]) extends BaseRichBolt{
+case class StormBoltWrapper(config : Config, worker : StormStreamExecutor[EagleTuple]) extends BaseRichBolt{
   val LOG = LoggerFactory.getLogger(StormBoltWrapper.getClass)
   var _collector : OutputCollector = null
 
