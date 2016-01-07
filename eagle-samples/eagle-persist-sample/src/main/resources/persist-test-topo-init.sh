@@ -175,10 +175,10 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
          "site": "sandbox",
          "dataSource": "persistTest",
          "policyId": "persitTestPolicy1",
-         "aggregateExecutorId": "aggregateExecutor1",
+         "executorId": "aggregateExecutor1",
          "policyType": "siddhiCEPEngine"
        },
-       "desc": "persistetest",
+       "description": "persistetest",
        "policyDef": "{\"expression\":\"from persistTestEventStream[(logLevel == 'ERROR')] select * insert into outputStream;\",\"type\":\"siddhiCEPEngine\"}",
        "enabled": true
      }

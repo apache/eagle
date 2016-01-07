@@ -44,7 +44,8 @@ import java.util.Random;
 public class PersistTopoTestMain {
 
     public static void main(String[] args) {
-        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
+//        System.setProperty("config.resource", "application.conf");
+        StormExecutionEnvironment env = ExecutionEnvironments.getStorm();
         StormSpoutProvider provider = createProvider(env.getConfig());
         execWithDefaultPartition(env, provider);
     }

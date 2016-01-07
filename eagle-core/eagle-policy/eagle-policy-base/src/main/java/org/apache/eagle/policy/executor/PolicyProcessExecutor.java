@@ -254,7 +254,10 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
      * @return whether accept the alert definition
      */
 	private boolean accept(T alertDef){
-        if(!alertDef.getTags().get("alertExecutorId").equals(executorId)) {
+		String executorID = alertDef.getTags().containsKey("executorId") ? alertDef.getTags().get("executorId")
+				: alertDef.getTags().get("alertExecutorId");
+
+		if(!executorID.equals(executorId)) {
             if(LOG.isDebugEnabled()){
                 LOG.debug("alertDef does not belong to this alertExecutorId : " + executorId + ", alertDef : " + alertDef);
             }
