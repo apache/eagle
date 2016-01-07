@@ -41,7 +41,9 @@
 			{
 				name: "JPA",
 				description: "JPA Test Application",
-				feature: {}
+				feature: {
+					common: true
+				}
 			},
 			{
 				name: "TEST",

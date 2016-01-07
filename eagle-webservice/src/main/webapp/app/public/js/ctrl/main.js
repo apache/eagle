@@ -35,7 +35,11 @@
 		var _navItemList = FeaturePageConfig.pageList;
 		if(_navItemList.length) {
 			console.log("[Landing] Auto redirect.", FeaturePageConfig);
-			$wrapState.path(_navItemList[0].url.replace(/^#/, ''));
+			var _match = _navItemList[0].url.match(/#\/([^\/]+)\/([^\/]+)/);
+			$wrapState.go("page", {
+				feature: _match[1],
+				page: _match[2]
+			}, 2);
 		}
 	});
 })();
