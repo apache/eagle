@@ -17,7 +17,7 @@ limitations under the License.
 {% endcomment %}
 -->
 
-# Apache Eagle [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-pr-reviewer)](https://builds.apache.org/job/incubator-eagle-pr-reviewer/)
+# Apache Eagle [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-main)](https://builds.apache.org/job/incubator-eagle-main/)
 
 >  Secure Hadoop Data in Real Time
 

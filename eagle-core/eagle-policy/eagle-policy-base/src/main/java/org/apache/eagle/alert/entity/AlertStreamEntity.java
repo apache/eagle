@@ -39,7 +39,7 @@ import org.apache.eagle.log.entity.meta.TimeSeries;
 @Tags({"dataSource", "streamName"})
 public class AlertStreamEntity extends TaggedLogAPIEntity{
 	@Column("a")
-	private String desc;	
+	private String desc;
 
 	public String getDesc() {
 		return desc;

@@ -62,7 +62,7 @@ public class KafkaOffsetSpout extends BaseRichSpout {
 		listener = new EagleServiceReporterMetricListener(host, port, username, password);
 	}
 
-	public EagleMetric constructMetric(long timestamp, String partition, double value) {
+	private EagleMetric constructMetric(long timestamp, String partition, double value) {
 		Map<String, String> dimensions = new HashMap<>();
 		dimensions.putAll(baseMetricDimension);
 		dimensions.put("partition", partition);
@@ -72,7 +72,7 @@ public class KafkaOffsetSpout extends BaseRichSpout {
 		return metric;
 	}
 
-	public long trimTimestamp(long currentTime, long granularity) {
+	private long trimTimestamp(long currentTime, long granularity) {
 		return currentTime / granularity * granularity;
 	}
 
