@@ -35,7 +35,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(false)
 @Tags({"site", "dataSource", "aggregateExecutorId", "policyId", "policyType"})
 @Indexes({
-	@Index(name="Index_1_aggregateExecutorId", columns = { "aggregateExecutorID" }, unique = true),
+	@Index(name="Index_1_aggregateExecutorId", columns = { "aggregateExecutorId" }, unique = true),
 })
 @SuppressWarnings("serial")
 public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
@@ -67,8 +67,9 @@ public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity
 		return policyDef;
 	}
 
-	public void setPolicyDef(String analyzeDef) {
-		this.policyDef = analyzeDef;
+	public void setPolicyDef(String policyDef) {
+		this.policyDef = policyDef;
+		valueChanged("policyDef");
 	}
 
 	public String getDescription() {
@@ -77,6 +78,7 @@ public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity
 
 	public void setDescription(String description) {
 		this.description = description;
+		valueChanged("description");
 	}
 
 	public boolean isEnabled() {
@@ -85,6 +87,7 @@ public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+		valueChanged("enabled");
 	}
 
 	public String getOwner() {
@@ -93,6 +96,7 @@ public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+		valueChanged("owner");
 	}
 
 	public long getLastModifiedDate() {
@@ -101,6 +105,7 @@ public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity
 
 	public void setLastModifiedDate(long lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+		valueChanged("lastModifiedDate");
 	}
 
 	public long getCreatedTime() {
@@ -109,6 +114,7 @@ public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity
 
 	public void setCreatedTime(long createdTime) {
 		this.createdTime = createdTime;
+		valueChanged("createdTime");
 	}
 
 

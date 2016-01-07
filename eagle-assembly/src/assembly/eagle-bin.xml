@@ -210,13 +210,13 @@
             </excludes>
         </fileSet>
 
-        <fileSet>
-            <directory>${project.basedir}/../eagle-samples/eagle-persist-sample/target/</directory>
-            <outputDirectory>lib/topology</outputDirectory>
-            <includes>
-                <include>eagle-persist-sample-*-assembly.jar</include>
-            </includes>
-        </fileSet>
+        <!--<fileSet>-->
+            <!--<directory>${project.basedir}/../eagle-samples/eagle-persist-sample/target/</directory>-->
+            <!--<outputDirectory>lib/topology</outputDirectory>-->
+            <!--<includes>-->
+                <!--<include>eagle-persist-sample-*-assembly.jar</include>-->
+            <!--</includes>-->
+        <!--</fileSet>-->
 
         <fileSet>
             <directory>${project.basedir}/../eagle-external/eagle-ambari</directory>
