@@ -38,7 +38,7 @@
 		$scope.sites = {};
 		$.each(Site.list, function(i, site) {
 			$scope.sites[site.name] = {
-				app: $.extend({}, site.app),
+				app: $.extend({}, site.app)
 			};
 		});
 
@@ -51,16 +51,40 @@
 		};
 	});
 
-	eagleControllers.controller('configApplicationCtrl', function ($scope, globalContent, Application) {
+	eagleControllers.controller('configApplicationCtrl', function ($scope, PageConfig, Application) {
 		'use strict';
 
-		globalContent.hideApplication = true;
-		globalContent.setConfig(configPageConfig);
+		PageConfig.hideApplication = true;
+		PageConfig.hideSite = true;
+
+		// ================ Application ================
+		$scope.application = Application.current() || Application.list[0];
+		$scope.setApplication = function (application) {
+			$scope.application = application;
+		};
+
+		$scope.applications = {};
+		$.each(Application.list, function(i, app) {
+			$scope.applications[app.name] = {
+				feature: $.extend({}, app.feature)
+			};
+		});
+
+		$scope.saveAll = function() {
+			$.each(Application.list, function(i, app) {
+				app.feature = $scope.applications[app.name].feature;
+
+				// TODO: Ajax update entities
+			});
+		};
+
+
+		/*globalContent.setConfig(configPageConfig);
 
 		// ================ Application ================
 		$scope.application = Application.list[0];
 		$scope.setApplication = function (application) {
 			$scope.application = application;
-		};
+		};*/
 	});
 })();

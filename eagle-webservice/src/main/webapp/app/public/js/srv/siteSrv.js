@@ -57,7 +57,7 @@
 			} else {
 				Site.current(site);
 			}
-			$location.url(url);
+			$wrapState.url(url);
 
 			if ($rootScope.$$phase != '$apply' && $rootScope.$$phase != '$digest') {
 				$rootScope.$apply();

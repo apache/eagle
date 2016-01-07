@@ -20,32 +20,58 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.service('$wrapState', function($state) {
+	serviceModule.service('$wrapState', function($state, $location) {
 		var $wrapState = {};
-		var _targetState;
+		var _targetState = null;
+		var _targetPriority = 0;
 
 		// Go
-		$wrapState.go = function(state, force) {
+		$wrapState.go = function(state, priority) {
 			setTimeout(function() {
 				_targetState = null;
+				_targetPriority = 0;
 			});
 
-			if(_targetState !== state || force) {
+			priority = priority === true ? 1 : (priority || 0);
+			if(_targetPriority > priority) {
+				console.log("[Wrap State] Go - low priority:", state, "(Skip)");
+				return false;
+			}
+
+			if(_targetState !== state || priority) {
 				if($state.current && $state.current.name === state) {
+					console.log("[Wrap State] Go reload.");
 					$state.reload();
 				} else {
+					console.log("[Wrap State] Go:", state);
 					$state.go(state);
 				}
 				_targetState = state;
+				_targetPriority = priority;
 				return true;
+			} else {
+				console.log("[Wrap State] Go:", state, "(Ignored)");
 			}
 			return false;
 		};
 
 		// Reload
 		$wrapState.reload = function() {
+			console.log("[Wrap State] Do reload.");
 			$state.reload();
 		};
+
+		// Path
+		$wrapState.path = function(path) {
+			if(path !== undefined) console.log("[Wrap State] Switch path:", path);
+			return $location.path(path);
+		};
+
+		// URL
+		$wrapState.url = function(url) {
+			if(url !== undefined) console.log("[Wrap State] Switch url:", url);
+			return $location.url(url);
+		}
 
 		Object.defineProperties($wrapState, {
 			// Origin $state

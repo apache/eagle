@@ -129,27 +129,37 @@ var app = {};
 		// Router
 		$urlRouterProvider.otherwise("/landing");
 		$stateProvider
-			// Landing
+			// =================== Landing ===================
 			.state('landing', {
 				url: "/landing",
-				templateUrl: "partials/landing.html",
+				templateUrl: "partials/landing.html?_=" + Math.random(),
 				controller: "landingCtrl",
 				resolve: _resolve({featureCheck: true})
 			})
 
-			// Authorization
+			// ================ Authorization ================
 			.state('login', {
 				url: "/login",
-				templateUrl: "partials/login.html",
+				templateUrl: "partials/login.html?_=" + Math.random(),
 				controller: "authLoginCtrl",
 				access: {skipCheck: true}
 			})
 
-			// Configuration
-			.state('config', {
+			// ================ Configuration ================
+			// Site
+			.state('configSite', {
 				url: "/config/site",
-				templateUrl: "partials/config/site.html",
+				templateUrl: "partials/config/site.html?_=" + Math.random(),
 				controller: "configSiteCtrl",
+				pageConfig: "ConfigPageConfig",
+				resolve: _resolve({roleType: 'ROLE_ADMIN'})
+			})
+
+			// Application
+			.state('configApplication', {
+				url: "/config/application",
+				templateUrl: "partials/config/application.html?_=" + Math.random(),
+				controller: "configApplicationCtrl",
 				pageConfig: "ConfigPageConfig",
 				resolve: _resolve({roleType: 'ROLE_ADMIN'})
 			})
@@ -158,7 +168,7 @@ var app = {};
 			.state('page', {
 				url: "/:feature/:page",
 				templateUrl: function ($stateParams) {
-					return "public/feature/" + $stateParams.feature + "/page/" + $stateParams.page;
+					return "public/feature/" + $stateParams.feature + "/page/" + $stateParams.page + ".html?_=" + Math.random();
 				},
 				controllerProvider: function ($stateParams) {
 					return $stateParams.feature + "_" + $stateParams.page + "Ctrl";
@@ -190,7 +200,7 @@ var app = {};
 	// ======================================================================================
 	// =                                   Main Controller                                  =
 	// ======================================================================================
-	eagleApp.controller('MainCtrl', function ($scope, $location, $wrapState, $http, $injector, PageConfig, Site, Authorization, Entities, nvd3, Application, FeaturePageConfig) {
+	eagleApp.controller('MainCtrl', function ($scope, $wrapState, $http, $injector, PageConfig, Site, Authorization, Entities, nvd3, Application, FeaturePageConfig) {
 		featureControllers.FeaturePageConfig = FeaturePageConfig;
 
 		window.site = $scope.Site = $scope.site = Site;
@@ -236,7 +246,7 @@ var app = {};
 				});
 
 				if (!_roleMatch) {
-					$location.path("/dam");
+					$wrapState.path("/dam");
 				}
 			}*/
 		});
@@ -245,7 +255,7 @@ var app = {};
 		$scope.getNavClass = function (page) {
 			var path = page.url.replace(/^#/, '');
 
-			if ($location.path() === path) {
+			if ($wrapState.path() === path) {
 				pageConfig.pageTitle = pageConfig.pageTitle || page.title;
 				return "active";
 			} else {

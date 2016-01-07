@@ -30,7 +30,7 @@
 					<div class="panel box box-primary">
 						<div class="box-header with-border">
 							<label class="box-title">
-								<input type="checkbox" ng-checked="application.feature[_feature.name]" ng-click="application.feature[_feature.name] = !application.feature[_feature.name];" />
+								<input type="checkbox" ng-checked="applications[application.name].feature[_feature.name]" ng-click="applications[application.name].feature[_feature.name] = !applications[application.name].feature[_feature.name];" />
 								{{_feature.displayName}}
 							</label>
 							<div class="box-tools pull-right">
@@ -49,6 +49,6 @@
 	</div><!-- /.box-body -->
 
 	<div class="box-footer clearfix">
-		<button class="btn btn-primary">Save All</button>
+		<button class="btn btn-primary" ng-click="saveAll()">Save All</button>
 	</div>
 </div>
