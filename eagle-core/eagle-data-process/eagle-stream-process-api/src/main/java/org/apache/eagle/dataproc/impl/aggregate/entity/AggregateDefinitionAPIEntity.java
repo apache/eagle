@@ -33,9 +33,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.AGGREGATE_DEFINITION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "dataSource", "aggregateExecutorId", "policyId", "policyType"})
+@Tags({"site", "dataSource", "executorId", "policyId", "policyType"})
 @Indexes({
-	@Index(name="Index_1_aggregateExecutorId", columns = { "aggregateExecutorId" }, unique = true),
+	@Index(name="Index_1_aggregateExecutorId", columns = { "executorId" }, unique = true),
 })
 @SuppressWarnings("serial")
 public class AggregateDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
