@@ -158,7 +158,7 @@ def run_command(command):
 
 def get_repo_root_dir():
 	debug("to get repo root directory")
-	return run_command("git rev-parse --show-toplevel").strip()
+	return run_command("git rev-parse --show-toplevel").strip().replace("/", os.sep)
 
 def get_temp_file_dir():
 	return os.sep.join([repo_root_dir, "..", TEMP_FILE_DIR])
@@ -554,8 +554,10 @@ def main(argv):
 		# set global repo root dir, guarantee all git related operations are executed in local git repo
 		global repo_root_dir
 		repo_root_dir = get_repo_root_dir()
+		debug("repo's root dir is: %s" % repo_root_dir)
 
 		# validate the location of the script file, it's important for future "git add" and recovery
+		debug("the executed script is locating at: %s" % SCRIPT_ABS_DIR)
 		global script_in_repo_root_dir
 		if SCRIPT_ABS_DIR.endswith(EXPECTED_DIR_IN_REPO):
 			debug("the script is in dir %s" % SCRIPT_ABS_DIR)
