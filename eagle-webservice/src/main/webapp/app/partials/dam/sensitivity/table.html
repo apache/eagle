@@ -35,7 +35,7 @@
 							{{db.database}}
 							<span ng-show="db.tables._promise.$$state.status === 1">({{db.tables.length}})</span>
 
-							<span ng-show="auth.isRole('ROLE_ADMIN')">
+							<span ng-show="Auth.isRole('ROLE_ADMIN')">
 								<a class="fa fa-eye text-muted hover" ng-click="markSensitivity(db, $event)" ng-show="!db.sensitiveType"
 								uib-tooltip="Mark as sensitivity data" tooltip-animation="false" tooltip-placement="right"></a>
 								<a class="fa fa-eye-slash text-muted hover" ng-click="unmarkSensitivity(db, $event)" ng-show="db.sensitiveType"
@@ -61,7 +61,7 @@
 									<span class="fa fa-table"> </span>
 									{{tb.table}}
 
-									<span ng-show="auth.isRole('ROLE_ADMIN')">
+									<span ng-show="Auth.isRole('ROLE_ADMIN')">
 										<a class="fa fa-eye text-muted hover" ng-click="markSensitivity(tb, $event)" ng-show="!tb.sensitiveType"
 										uib-tooltip="Mark as sensitivity data" tooltip-animation="false" tooltip-placement="right"></a>
 										<a class="fa fa-eye-slash text-muted hover" ng-click="unmarkSensitivity(tb, $event)" ng-show="tb.sensitiveType"
@@ -91,14 +91,14 @@
 						<tr>
 							<th width="40%">Column Name</th>
 							<th>Sensitivity Type</th>
-							<th width="10" ng-show="auth.isRole('ROLE_ADMIN')"> </th>
+							<th width="10" ng-show="Auth.isRole('ROLE_ADMIN')"> </th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr ng-repeat="col in table.columns" ng-class="{warning : col.sensitiveType}">
 							<td>{{col.column}}</td>
 							<td>{{col.sensitiveType}}</td>
-							<td ng-show="auth.isRole('ROLE_ADMIN')">
+							<td ng-show="Auth.isRole('ROLE_ADMIN')">
 								<button class="fa fa-eye btn btn-primary btn-xs" ng-click="markSensitivity(col)" ng-show="!col.sensitiveType"
 								uib-tooltip="Mark as sensitivity data" tooltip-animation="false" tooltip-placement="left"> </button>
 								<button class="fa fa-eye-slash btn btn-warning btn-xs" ng-click="unmarkSensitivity(col)" ng-show="col.sensitiveType"

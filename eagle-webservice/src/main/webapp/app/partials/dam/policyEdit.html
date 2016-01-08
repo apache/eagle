@@ -46,7 +46,7 @@
 				<div class="form-group">
 					<label>Select Data Source</label>
 					<select class="form-control" ng-model="policy.tags.dataSource">
-						<option ng-repeat="dataSource in site.current().dataSrcList" ng-hide="dataSource.hide" value="{{dataSource.tags.dataSource}}">{{dataSource.desc || dataSource.tags.dataSource}}</option>
+						<option ng-repeat="dataSource in Site.current().dataSrcList" ng-hide="dataSource.hide" value="{{dataSource.tags.dataSource}}">{{dataSource.desc || dataSource.tags.dataSource}}</option>
 					</select>
 				</div>
 			</div>

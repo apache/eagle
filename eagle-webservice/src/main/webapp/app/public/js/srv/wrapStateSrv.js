@@ -33,6 +33,7 @@
 			});
 
 			if(typeof param !== "object") {
+				param = {};
 				priority = param;
 			}
 
@@ -43,7 +44,8 @@
 			}
 
 			if(_targetState !== state || priority) {
-				if($state.current && $state.current.name === state) {
+				if($state.current && $state.current.name === state && angular.equals($state.params, param)) {
+					console.log($state);
 					console.log("[Wrap State] Go reload.");
 					$state.reload();
 				} else {

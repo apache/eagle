@@ -42,7 +42,7 @@
 					</dd></dl>
 				</div>
 			</div>
-			<div class="col-xs-4 text-right" ng-show="auth.isRole('ROLE_ADMIN')">
+			<div class="col-xs-4 text-right" ng-show="Auth.isRole('ROLE_ADMIN')">
 				<a class="btn btn-primary" href="#/dam/policyEdit/{{policy.encodedRowkey}}">Edit</a>
 				<button class="btn btn-warning" ng-show="!policy.enabled" ng-click="updatePolicyStatus(policy, true)">Enable</button>
 				<button class="btn btn-warning" ng-show="policy.enabled" ng-click="updatePolicyStatus(policy, false)">Disable</button>

@@ -62,25 +62,21 @@
 							<li class="dropdown" ng-show="!PageConfig.hideSite && !PageConfig.lockSite">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-server"></i>
-									{{site.current().name}}
+									{{Site.current().name}}
 									<i class="fa fa-caret-down"></i>
 								</a>
 								<ul class="dropdown-menu">
-									<li ng-repeat="sites in site.list">
-										<a ng-click="site.current(sites);">
+									<li ng-repeat="sites in Site.list">
+										<a ng-click="Site.current(sites);">
 											<span class="fa fa-database"></span> {{sites.name}}
 										</a>
 									</li>
-									<!--li role="separator" class="divider"></li>
-									<li>
-										<a href="#/dam/siteList"><span class="fa fa-cog"></span>Config Sites</a>
-									</li-->
 								</ul>
 							</li>
 							<li class="dropdown" ng-show="PageConfig.lockSite">
 								<a>
 									<i class="fa fa-server"></i>
-									{{site.current().name}}
+									{{Site.current().name}}
 								</a>
 							</li>
 
@@ -88,7 +84,7 @@
 							<li class="dropdown user user-menu" ng-hide="PageConfig.hideUser">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-user"></i>
-									{{auth.userProfile.username}}
+									{{Auth.userProfile.username}}
 								</a>
 								<ul class="dropdown-menu">
 									<!-- User image -->
@@ -97,9 +93,9 @@
 											<span class="fa fa-user" alt="User Image"></span>
 										</span>
 										<p>
-											{{auth.userProfile.username}}
+											{{Auth.userProfile.username}}
 											<small>
-												<span ng-repeat="role in auth.userProfile.authorities">{{role.authority}} </span>
+												<span ng-repeat="role in Auth.userProfile.authorities">{{role.authority}} </span>
 											</small>
 										</p>
 									</li>
@@ -160,11 +156,12 @@
 						<small class="pageSubTitle">{{PageConfig.pageSubTitle}}</small>
 					</h1>
 
+
 					<ol class="breadcrumb">
-						<li ng-repeat="nav in PageConfig.navPath">
-							<a ng-href="{{$last ? '' : PageConfig.navMapping[nav]}}">
-								<span class="fa fa-home" ng-show="$first"></span>
-								{{nav}}
+						<li ng-repeat="navPath in PageConfig.navPath">
+							<a ng-href="#{{navPath.path}}">
+								<span class="fa fa-home" ng-if="$first"></span>
+								{{navPath.title || navPath.path}}
 							</a>
 						</li>
 					</ol>

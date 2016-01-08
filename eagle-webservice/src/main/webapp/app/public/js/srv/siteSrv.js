@@ -52,6 +52,7 @@
 			return common.array.find(siteName, Site.list, "name");
 		};
 		Site.url = function(site, url) {
+			console.warn("[Site] Site.url is a deprecated function.");
 			if(arguments.length == 1) {
 				url = site;
 			} else {

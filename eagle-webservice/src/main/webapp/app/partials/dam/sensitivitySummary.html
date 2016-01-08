@@ -18,9 +18,9 @@
 <div class="row">
 	<div class="col-md-4" ng-repeat="entity in config.list">
 		<div class="info-box bg-aqua box-clickable">
-			<span class="info-box-icon" ng-click="site.url('/dam/sensitivity/' + entity.name)"><i class="fa fa-suitcase"></i></span>
+			<span class="info-box-icon" ng-click="Site.url('/dam/sensitivity/' + entity.name)"><i class="fa fa-suitcase"></i></span>
 			<div class="info-box-content">
-				<div class="pull-right btn-group" ng-show="auth.isRole('ROLE_ADMIN')">
+				<div class="pull-right btn-group" ng-show="Auth.isRole('ROLE_ADMIN')">
 					<a class="fa fa-cog config" data-toggle="dropdown"></a>
 					<ul class="dropdown-menu" role="menu">
 						<li>
@@ -33,7 +33,7 @@
 					</ul>
 				</div>
 
-				<div ng-click="site.url('/dam/sensitivity/' + entity.name)">
+				<div ng-click="Site.url('/dam/sensitivity/' + entity.name)">
 					<span class="info-box-text text-large">{{entity.name}}</span>
 					<!--span class="info-box-number">
 						<small>Connected</small>

@@ -22,7 +22,7 @@
 	>+ New Site</button>
 </div>
 
-<div class="box box-primary" ng-repeat="_site in site.list">
+<div class="box box-primary" ng-repeat="_site in Site.list">
 	<div class="box-header">
 		<h3 class="box-title">{{_site.name}}</h3>
 		<div class="box-tools pull-right">
@@ -55,7 +55,7 @@
 						<span class="info-box-text">{{dataSrc.desc || dataSrc.tags.dataSource}}</span>
 
 						<span class="info-box-number" ng-show="dataSrc.hide"><small>-</small></span>
-						<a class="info-box-number" ng-show="!dataSrc.hide" ng-click="site.url(_site, '/dam/policyList/' + dataSrc.tags.dataSource);">
+						<a class="info-box-number" ng-show="!dataSrc.hide" ng-click="Site.url(_site, '/dam/policyList/' + dataSrc.tags.dataSource);">
 							<span class="fa fa-refresh fa-spin" ng-hide="policyStatistic._promise.$$state.status === 1"></span>
 							<span ng-show="policyStatistic._promise.$$state.status === 1">{{getPolicyCount(_site.name, dataSrc.tags.dataSource)}}</span>
 							<small>Policies</small>
@@ -64,7 +64,7 @@
 							<div class="progress-bar"></div>
 						</div>
 						<span class="progress-description" ng-show="dataSrc.hide"><small>-</small></span>
-						<a class="progress-description" ng-show="!dataSrc.hide" ng-click="site.url(_site, '/dam/alertList/' + dataSrc.tags.dataSource);">
+						<a class="progress-description" ng-show="!dataSrc.hide" ng-click="Site.url(_site, '/dam/alertList/' + dataSrc.tags.dataSource);">
 							<span class="fa fa-refresh fa-spin" ng-hide="alertStatistic._promise.$$state.status === 1"></span>
 							<span ng-show="alertStatistic._promise.$$state.status === 1">{{getAlertCount(_site.name, dataSrc.tags.dataSource)}}</span>
 							alerts in 30 Days

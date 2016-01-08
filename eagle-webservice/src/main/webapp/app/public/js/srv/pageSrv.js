@@ -36,27 +36,40 @@
 			hideSidebar: false,
 			hideUser: false,
 
+			// Current page navigation path
+			navPath: [],
+
 			navConfig: {}
 		};
 
-		var pageConfig = {};
+		var PageConfig = {};
 
 		// Reset
-		pageConfig.reset = function() {
-			$.extend(pageConfig, _tmplConfig);
+		PageConfig.reset = function() {
+			$.extend(PageConfig, _tmplConfig);
+			PageConfig.navPath = [];
 		};
-		pageConfig.reset();
+		PageConfig.reset();
 
-		return pageConfig;
+		// Create navigation path
+		PageConfig.addNavPath = function(title, path) {
+			PageConfig.navPath.push({
+				title: title,
+				path: path
+			});
+			return PageConfig;
+		};
+
+		return PageConfig;
 	});
 
 	// Feature page
 	serviceModule.service('FeaturePageConfig', function() {
 		var config = {
+			// Feature mapping pages
 			_navItemMapping: {},
 
-			pageList: [],
-			navMapping: {}
+			pageList: []
 		};
 
 		config.addNavItem = function(feature, item) {
@@ -73,8 +86,7 @@
 			pageList: [
 				{icon: "server", title: "Sites", url: "#/config/site"},
 				{icon: "cubes", title: "Applications", url: "#/config/application"}
-			],
-			navMapping: {}
+			]
 		};
 	});
 })();

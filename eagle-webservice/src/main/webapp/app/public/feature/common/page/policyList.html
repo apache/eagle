@@ -26,11 +26,11 @@
 				</button>
 				<ul id="programList" class="dropdown-menu" role="menu">
 					<li ng-repeat="dataSrc in Site.current().dataSrcList" ng-hide="dataSrc.hide">
-						<a href="#/dam/policyList/{{dataSrc.tags.dataSource}}">{{dataSrc.desc || dataSrc.tags.dataSource}}</a>
+						<a href="#/common/policyList/{{dataSrc.tags.dataSource}}">{{dataSrc.desc || dataSrc.tags.dataSource}}</a>
 					</li>
 					<li class="divider"></li>
 					<li>
-						<a href="#/dam/policyList">All Policy List</a>
+						<a href="#/common/policyList">All Policy List</a>
 					</li>
 				</ul>
 			</div>
@@ -51,7 +51,7 @@
 				</div>
 			</div>
 			<div class="col-xs-3 text-right">
-				<a class="btn btn-primary" href="#/dam/policyCreate/{{!dataSource ? '' : '?dataSrc=' + dataSource.tags.dataSource}}" ng-show="Auth.isRole('ROLE_ADMIN')">
+				<a class="btn btn-primary" href="#/common/policyCreate/{{!dataSource ? '' : '?dataSrc=' + dataSource.tags.dataSource}}" ng-show="Auth.isRole('ROLE_ADMIN')">
 					New Policy
 					<i class="fa fa-plus-circle"> </i>
 				</a>

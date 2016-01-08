@@ -28,31 +28,68 @@ var app = {};
 	// =                                   Feature Module                                   =
 	// ======================================================================================
 	var featureControllers = angular.module('featureControllers', ['ui.bootstrap', 'eagle.components']);
-	featureControllers.config(function ($routeProvider, $controllerProvider) {
+	var featureControllerProvider;
+	var featureProvider;
+
+	featureControllers.config(function ($controllerProvider, $provide) {
+		featureControllerProvider = $controllerProvider;
+		featureProvider = $provide;
+	});
+
+	featureControllers.service("Feature", function($wrapState, PageConfig, FeaturePageConfig) {
 		var _features = {};
+		var _services = {};
+
 		var Feature = function(name) {
 			this.name = name;
 		};
 
+		Feature.prototype.service = function(name, constructor) {
+			if(!_services[name]) {
+				featureProvider.service(name, constructor);
+				_services[name] = this.name;
+			} else {
+				throw "Service '" + name + "' has already be registered by feature '" + _services[name] + "'";
+			}
+		};
+
 		Feature.prototype.controller = function(name, constructor) {
-			$controllerProvider.register(this.name + "_" + name, constructor);
+			featureControllerProvider.register(this.name + "_" + name, constructor);
 		};
 
 		Feature.prototype.navItem = function(path, title, icon) {
 			title = title || path;
 			icon = icon || "question";
 
-			featureControllers.FeaturePageConfig.addNavItem(this.name, {
+			FeaturePageConfig.addNavItem(this.name, {
 				icon: icon,
 				title: title,
 				url: "#/" + this.name + "/" + path
 			});
-
 		};
 
-		featureControllers.register = function(featureName) {
+		// Register
+		featureControllers.register = Feature.register = function(featureName) {
 			return _features[featureName] = _features[featureName] || new Feature(featureName);
 		};
+
+		// Page go
+		Feature.go = function(feature, page, filter) {
+			if(!filter) {
+				$wrapState.go("page", {
+					feature: feature,
+					page: page,
+				}, 2);
+			} else {
+				$wrapState.go("pageFilter", {
+					feature: feature,
+					page: page,
+					filter: filter
+				}, 2);
+			}
+		};
+
+		return Feature;
 	});
 
 	// ======================================================================================
@@ -127,6 +164,17 @@ var app = {};
 		}
 
 		// Router
+		var _featureBase = {
+			templateUrl: function ($stateParams) {
+				return "public/feature/" + $stateParams.feature + "/page/" + $stateParams.page + ".html?_=" + Math.random();
+			},
+			controllerProvider: function ($stateParams) {
+				return $stateParams.feature + "_" + $stateParams.page;
+			},
+			resolve: _resolve({featureCheck: true}),
+			pageConfig: "FeaturePageConfig"
+		};
+
 		$urlRouterProvider.otherwise("/landing");
 		$stateProvider
 			// =================== Landing ===================
@@ -165,17 +213,8 @@ var app = {};
 			})
 
 			// Dynamic feature page
-			.state('page', {
-				url: "/:feature/:page",
-				templateUrl: function ($stateParams) {
-					return "public/feature/" + $stateParams.feature + "/page/" + $stateParams.page + ".html?_=" + Math.random();
-				},
-				controllerProvider: function ($stateParams) {
-					return $stateParams.feature + "_" + $stateParams.page + "Ctrl";
-				},
-				resolve: _resolve({featureCheck: true}),
-				pageConfig: "FeaturePageConfig"
-			})
+			.state('page', $.extend({url: "/:feature/:page"}, _featureBase))
+			.state('pageFilter', $.extend({url: "/:feature/:page/:filter"}, _featureBase))
 		;
 	});
 
@@ -200,23 +239,28 @@ var app = {};
 	// ======================================================================================
 	// =                                   Main Controller                                  =
 	// ======================================================================================
-	eagleApp.controller('MainCtrl', function ($scope, $wrapState, $http, $injector, PageConfig, Site, Authorization, Entities, nvd3, Application, FeaturePageConfig) {
-		featureControllers.FeaturePageConfig = FeaturePageConfig;
-
-		window.site = $scope.Site = $scope.site = Site;
-		window.auth = $scope.Auth = $scope.auth = Authorization;
-		window.entities = $scope.Entities = $scope.entities = Entities;
+	eagleApp.controller('MainCtrl', function ($scope, $wrapState, $http, $injector, PageConfig, Site, Authorization, Entities, nvd3, Application, Feature) {
+		window.site = $scope.Site = Site;
+		window.auth = $scope.Auth = Authorization;
+		window.entities = $scope.Entities = Entities;
 		window.application = $scope.Application = Application;
 		window.pageConfig = $scope.PageConfig = PageConfig;
+		window.feature = $scope.Feature = Feature;
 		window.nvd3 = nvd3;
 		$scope.app = app;
+
+		Object.defineProperty(window, "scope",{
+			get: function() {
+				return angular.element("[ui-view]").scope();
+			}
+		});
 
 		// Clean up
 		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
 			console.log("[Switch] current ->", current, currentParam);
 			console.log("[Switch] next ->", next, nextParam);
 			// Page initialization
-			pageConfig.reset();
+			PageConfig.reset();
 
 			// Dynamic navigation list
 			if(next.pageConfig) {
@@ -256,7 +300,7 @@ var app = {};
 			var path = page.url.replace(/^#/, '');
 
 			if ($wrapState.path() === path) {
-				pageConfig.pageTitle = pageConfig.pageTitle || page.title;
+				PageConfig.pageTitle = PageConfig.pageTitle || page.title;
 				return "active";
 			} else {
 				return "";

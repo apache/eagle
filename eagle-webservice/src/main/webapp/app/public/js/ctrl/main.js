@@ -24,7 +24,7 @@
 	// ===========================================================
 	// =                        Controller                       =
 	// ===========================================================
-	eagleControllers.controller('landingCtrl', function($scope, $wrapState, Site, Application, PageConfig, FeaturePageConfig) {
+	eagleControllers.controller('landingCtrl', function($scope, $wrapState, Site, Application, PageConfig, FeaturePageConfig, Feature) {
 		var _app = Application.current();
 
 		PageConfig.pageTitle = _app ? _app.name : 'OPS';
@@ -36,10 +36,7 @@
 		if(_navItemList.length) {
 			console.log("[Landing] Auto redirect.", FeaturePageConfig);
 			var _match = _navItemList[0].url.match(/#\/([^\/]+)\/([^\/]+)/);
-			$wrapState.go("page", {
-				feature: _match[1],
-				page: _match[2]
-			}, 2);
+			Feature.go(_match[1], _match[2]);
 		}
 	});
 })();

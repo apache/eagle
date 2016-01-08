@@ -19,7 +19,7 @@
 	<!-- Tabs within a box -->
 	<ul class="nav nav-tabs pull-right ui-sortable-handle">
 		<li ng-repeat="entity in config.list" ng-class="{active: dataSrc.name === entity.name}">
-			<a ng-click="site.url('/dam/sensitivity/' + entity.name)">{{entity.name}}</a>
+			<a ng-click="Site.url('/dam/sensitivity/' + entity.name)">{{entity.name}}</a>
 		</li>
 		<li class="pull-left header"><i class="fa fa-folder-open"></i> Sensitivity Broswer</li>
 	</ul>
