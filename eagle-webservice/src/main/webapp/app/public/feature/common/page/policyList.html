@@ -78,12 +78,12 @@
 				<tbody>
 					<tr>
 						<td><span class='fa fa-square' ng-class="item.enabled ? 'text-green' : 'text-muted'"> </span></td>
-						<td><a href="#/dam/policyDetail/{{item.encodedRowkey}}">{{item.tags.policyId}}</a></td>
+						<td><a href="#/common/policyDetail/{{item.encodedRowkey}}">{{item.tags.policyId}}</a></td>
 						<td>{{item.desc}}</td>
 						<td>{{item.owner}}</td>
 						<td>{{common.format.date(item.lastModifiedDate) || "-"}}</td>
 						<td ng-show="_parent.Auth.isRole('ROLE_ADMIN')">
-							<a class="fa fa-pencil btn btn-default btn-xs" uib-tooltip="Edit" tooltip-animation="false" href="#/dam/policyEdit/{{item.encodedRowkey}}"> </a>
+							<a class="fa fa-pencil btn btn-default btn-xs" uib-tooltip="Edit" tooltip-animation="false" href="#/common/policyEdit/{{item.encodedRowkey}}"> </a>
 							<button class="fa fa-play sm btn btn-default btn-xs" uib-tooltip="Enable" tooltip-animation="false" ng-show="!item.enabled" ng-click="_parent.updatePolicyStatus(item, true)"> </button>
 							<button class="fa fa-pause sm btn btn-default btn-xs" uib-tooltip="Disable" tooltip-animation="false" ng-show="item.enabled" ng-click="_parent.updatePolicyStatus(item, false)"> </button>
 							<button class="rm fa fa-trash-o btn btn-danger btn-xs" uib-tooltip="Delete" tooltip-animation="false" ng-click="_parent.deletePolicy(item)"> </button>

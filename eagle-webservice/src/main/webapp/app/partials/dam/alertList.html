@@ -26,11 +26,11 @@
 				</button>
 				<ul id="programList" class="dropdown-menu" role="menu">
 					<li ng-repeat="dataSrc in Site.current().dataSrcList">
-						<a href="#/dam/alertList/{{dataSrc.tags.dataSource}}">{{dataSrc.tags.dataSource}}</a>
+						<a href="#/common/alertList/{{dataSrc.tags.dataSource}}">{{dataSrc.tags.dataSource}}</a>
 					</li>
 					<li class="divider"></li>
 					<li>
-						<a href="#/dam/alertList">All Policy List</a>
+						<a href="#/common/alertList">All Policy List</a>
 					</li>
 				</ul>
 			</div>
@@ -65,13 +65,13 @@
 						<!--td>{{item.severity}}</td-->
 						<td class="text-nowrap">
 							<a class="fa fa-share-square-o" ng-show="item.tags.policyId"
-							href="#/dam/policyDetail/?policy={{item.tags.policyId}}&site={{item.tags.site}}&executor={{item.tags.alertExecutorId}}"> </a>
+							href="#/common/policyDetail/?policy={{item.tags.policyId}}&site={{item.tags.site}}&executor={{item.tags.alertExecutorId}}"> </a>
 							{{item.tags.policyId}}
 						</td>
 						<td>{{item.alertContext.properties.user}}</td>
 						<td>{{item.alertContext.properties.host}}</td>
 						<td>{{item.alertContext.properties.alertMessage}}</td>
-						<td><a href="#/dam/alertDetail/{{item.encodedRowkey}}">Detail</a></td>
+						<td><a href="#/common/alertDetail/{{item.encodedRowkey}}">Detail</a></td>
 					</tr>
 				</tbody>
 			</table>

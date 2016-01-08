@@ -25,8 +25,39 @@
 	// ==============================================================
 	// =                          Function                          =
 	// ==============================================================
-	feature.service("PolicyOperation", function() {});
-	feature.service("PolicyOperation", function() {});
+	feature.service("Policy", function(Entities) {
+		var Policy = function () {};
+
+		Policy.updatePolicyStatus = function(policy, status) {
+			$.dialog({
+				title: "Confirm",
+				content: "Do you want to " + (status ? "enable" : "disable") + " policy[" + policy.tags.policyId + "]?",
+				confirm: true
+			}, function(ret) {
+				if(ret) {
+					policy.enabled = status;
+					Entities.updateEntity("AlertDefinitionService", policy);
+				}
+			});
+		};
+		Policy.deletePolicy = function(policy, callback) {
+			$.dialog({
+				title: "Confirm",
+				content: "Do you want to delete policy[" + policy.tags.policyId + "]?",
+				confirm: true
+			}, function(ret) {
+				if(ret) {
+					policy.enabled = status;
+					Entities.deleteEntity("AlertDefinitionService", policy)._promise.finally(function() {
+						if(callback) {
+							callback(policy);
+						}
+					});
+				}
+			});
+		};
+		return Policy;
+	});
 
 	// ==============================================================
 	// =                          Policies                          =
@@ -49,7 +80,7 @@
 				if(_dataSrc) {
 					_dataSrc.count = unit.value[0];
 				} else {
-					var _siteHref = $("<a>").attr('href', '#/dam/siteList').text("Setup");
+					var _siteHref = $("<a>").attr('href', '#/common/siteList').text("Setup");
 					var _dlg = $.dialog({
 						title: "Data Source Not Found",
 						content: $("<div>")
@@ -68,7 +99,7 @@
 	});
 
 	// ========================= Policy List ========================
-	feature.controller('policyList', function(PageConfig, Site, $scope, $stateParams, Entities) {
+	feature.controller('policyList', function(PageConfig, Site, $scope, $stateParams, Entities, Policy) {
 		'use strict';
 
 		PageConfig.pageTitle = "Policy List";
@@ -111,9 +142,9 @@
 			return _hasKey(item, "tags.policyId") || _hasKey(item, "__expression") || _hasKey(item, "desc") || _hasKey(item, "owner") || _hasKey(item, "__mailStr");
 		};
 
-		$scope.updatePolicyStatus = damContent.updatePolicyStatus;
+		$scope.updatePolicyStatus = Policy.updatePolicyStatus;
 		$scope.deletePolicy = function(policy) {
-			damContent.deletePolicy(policy, function(policy) {
+			Policy.deletePolicy(policy, function(policy) {
 				var _index = $scope.policyList.indexOf(policy);
 				$scope.policyList.splice(_index, 1);
 			});
@@ -121,7 +152,7 @@
 	});
 
 	// ======================= Policy Detail ========================
-	feature.controller('policyDetail', function(PageConfig, Site, $scope, $stateParams, Entities, nvd3) {
+	feature.controller('policyDetail', function(PageConfig, Site, $scope, $stateParams, Entities, Policy, nvd3) {
 		'use strict';
 
 		var MAX_PAGESIZE = 10000;
@@ -140,13 +171,14 @@
 		};
 
 		// Query policy
-		if($routeParams.encodedRowkey) {
-			$scope.policyList = Entities.queryEntity("AlertDefinitionService", $routeParams.encodedRowkey);
+		if($stateParams.filter) {
+			$scope.policyList = Entities.queryEntity("AlertDefinitionService", $stateParams.filter);
 		} else {
+			// TODO: Must: Check this when alert finished!
 			$scope.policyList = Entities.queryEntities("AlertDefinitionService", {
-				policyId: $routeParams.policy,
-				site: $routeParams.site,
-				alertExecutorId: $routeParams.executor
+				policyId: $stateParams.policy,
+				site: $stateParams.site,
+				alertExecutorId: $stateParams.executor
 			});
 		}
 		$scope.policyList._promise.then(function() {
@@ -155,16 +187,16 @@
 			if($scope.policyList.length === 0) {
 				$.dialog({
 					title: "OPS!",
-					content: "Policy not found!",
+					content: "Policy not found!"
 				}, function() {
-					location.href = "#/dam/policyList";
+					location.href = "#/common/policyList";
 				});
 				return;
 			} else {
 				policy = $scope.policyList[0];
 
 				policy.__mailStr = common.getValueByPath(common.parseJSON(policy.notificationDef, {}), "0.recipients", "");
-				policy.__mailList = policy.__mailStr.trim() === "" ? [] : policy.__mailStr.split(/[\,\;]/);
+				policy.__mailList = policy.__mailStr.trim() === "" ? [] : policy.__mailStr.split(/[,;]/);
 				policy.__expression = common.parseJSON(policy.policyDef, {}).expression;
 
 				$scope.policy = policy;
@@ -206,10 +238,10 @@
 		});
 
 		// Function
-		$scope.updatePolicyStatus = damContent.updatePolicyStatus;
+		$scope.updatePolicyStatus = Policy.updatePolicyStatus;
 		$scope.deletePolicy = function(policy) {
-			damContent.deletePolicy(policy, function(policy) {
-				location.href = "#/dam/policyList";
+			Policy.deletePolicy(policy, function() {
+				location.href = "#/common/policyList";
 			});
 		};
 	});

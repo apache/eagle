@@ -136,7 +136,6 @@ damControllers.controller('userProfileListCtrl', function(globalContent, Site, d
 			content: _content
 		});
 
-		// TODO: Remove task
 		_content.click(function(e) {
 			if(!e.ctrlKey) return;
 

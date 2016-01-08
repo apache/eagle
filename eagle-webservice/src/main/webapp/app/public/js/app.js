@@ -27,6 +27,11 @@ var app = {};
 	// ======================================================================================
 	// =                                   Feature Module                                   =
 	// ======================================================================================
+	var FN_ARGS = /^[^\(]*\(\s*([^\)]*)\)/m;
+	var FN_ARG_SPLIT = /,/;
+	var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
+	var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+
 	var featureControllers = angular.module('featureControllers', ['ui.bootstrap', 'eagle.components']);
 	var featureControllerProvider;
 	var featureProvider;
@@ -42,9 +47,52 @@ var app = {};
 
 		var Feature = function(name) {
 			this.name = name;
+			this.features = {};
 		};
 
-		Feature.prototype.service = function(name, constructor) {
+		/***
+		 * Inner function. Replace the dependency of constructor.
+		 * @param constructor
+		 * @private
+		 */
+		Feature.prototype._replaceDependencies = function(constructor) {
+			var i, srvName;
+			var _constructor, _$inject;
+			var fnText, argDecl;
+
+			if($.isArray(constructor)) {
+				_constructor = constructor[constructor.length - 1];
+				_$inject = constructor.slice(0, -1);
+			} else if(constructor.$inject) {
+				_constructor = constructor;
+				_$inject = constructor.$inject;
+			} else {
+				_$inject = [];
+				_constructor = constructor;
+				fnText = constructor.toString().replace(STRIP_COMMENTS, '');
+				argDecl = fnText.match(FN_ARGS);
+				$.each(argDecl[1].split(FN_ARG_SPLIT), function(i, arg) {
+					arg.replace(FN_ARG, function(all, underscore, name) {
+						_$inject.push(name);
+					});
+				});
+			}
+			_constructor.$inject = _$inject;
+
+			for(i = 0 ; i < _$inject.length ; i += 1) {
+				srvName = _$inject[i];
+				_$inject[i] = this.features[srvName] || _$inject[i];
+			}
+
+			return _constructor;
+		};
+
+		/***
+		 * Register a common service for feature usage. Common service will share between the feature. If you are coding customize feature, use 'Feature.service' is the better way.
+		 * @param name
+		 * @param constructor
+		 */
+		Feature.prototype.commonService = function(name, constructor) {
 			if(!_services[name]) {
 				featureProvider.service(name, constructor);
 				_services[name] = this.name;
@@ -53,7 +101,32 @@ var app = {};
 			}
 		};
 
+		/***
+		 * Register a service for feature usage.
+		 * @param name
+		 * @param constructor
+		 */
+		Feature.prototype.service = function(name, constructor) {
+			var _serviceName;
+			if(!this.features[name]) {
+				_serviceName = "__FEATURE_" + this.name + "_" + name;
+				featureProvider.service(_serviceName, this._replaceDependencies(constructor));
+				this.features[name] = _serviceName;
+			} else {
+				console.warn("Service '" + name + "' has already be registered.");
+			}
+		};
+
+		/***
+		 * Register a controller.
+		 * @param name
+		 * @param constructor
+		 */
 		Feature.prototype.controller = function(name, constructor) {
+			// Replace feature registered service
+			constructor = this._replaceDependencies(constructor);
+
+			// Register controller
 			featureControllerProvider.register(this.name + "_" + name, constructor);
 		};
 
@@ -78,7 +151,7 @@ var app = {};
 			if(!filter) {
 				$wrapState.go("page", {
 					feature: feature,
-					page: page,
+					page: page
 				}, 2);
 			} else {
 				$wrapState.go("pageFilter", {

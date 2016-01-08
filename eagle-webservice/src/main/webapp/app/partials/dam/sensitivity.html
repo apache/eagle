@@ -19,14 +19,14 @@
 	<!-- Tabs within a box -->
 	<ul class="nav nav-tabs pull-right ui-sortable-handle">
 		<li ng-repeat="entity in config.list" ng-class="{active: dataSrc.name === entity.name}">
-			<a ng-click="Site.url('/dam/sensitivity/' + entity.name)">{{entity.name}}</a>
+			<a ng-click="Site.url('/common/sensitivity/' + entity.name)">{{entity.name}}</a>
 		</li>
 		<li class="pull-left header"><i class="fa fa-folder-open"></i> Sensitivity Broswer</li>
 	</ul>
 	<div class="tab-content">
 		<!-- Morris chart - Sales -->
 		<div class="tab-pane active">
-			<ng-include src="'partials/dam/sensitivity/' + dataSrc.type + '.html?_=' + ajaxId"></ng-include>
+			<ng-include src="'partials/common/sensitivity/' + dataSrc.type + '.html?_=' + ajaxId"></ng-include>
 		</div>
 	</div>
 </div>

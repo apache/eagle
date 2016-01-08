@@ -22,7 +22,7 @@
 
 <div class="row">
 	<div class="col-md-4" ng-repeat="dataSrc in Site.current().dataSrcList" ng-hide="dataSrc.hide">
-		<div class="small-box bg-aqua box-clickable" ng-click="Site.url('/dam/policyList/' + dataSrc.tags.dataSource)">
+		<div class="small-box bg-aqua box-clickable" ng-click="Site.url('/common/policyList/' + dataSrc.tags.dataSource)">
 			<div class="inner">
 				<h3>
 					{{dataSrc.desc || dataSrc.tags.dataSource}}
@@ -42,4 +42,4 @@
 	</div>
 </div>
 
-<a class="btn btn-primary" href="#/dam/policyCreate" ng-show="Auth.isRole('ROLE_ADMIN')">+ New Policy</a>
+<a class="btn btn-primary" href="#/common/policyCreate" ng-show="Auth.isRole('ROLE_ADMIN')">+ New Policy</a>
