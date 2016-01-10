@@ -7,6 +7,7 @@ import sys
 import subprocess
 import re
 import time
+import platform
 
 ##### Constants Definitions - start #####
 SCRIPT_ABS_DIR, SCRIPT_NAME = os.path.split(os.path.abspath(sys.argv[0]))
@@ -140,6 +141,10 @@ def exit_with_errmsg(err, err_code):
 
 def extract_run_command_err_msg(e):
 	return e.output.decode().strip()
+
+def is_windows():
+	s = platform.system().lower()
+	return s.startswith("win")
 
 def __debug_command__(command_in_list, result):
 	debug("running command: %s, result:\n%s" % (command_in_list, result))
@@ -420,9 +425,12 @@ def determine_author_email(author, reviewer_email_mapping):
 	return author_email
 
 def generate_commit_msg_file(temp_dir, jira_id, pr_title_content, author, author_email, reviewer_email_mapping):
+	finish_hint = "<press Ctrl+D>"
+	if is_windows():
+		finish_hint = "<press Ctrl+Z then press Enter key>"
 	commit_msg_file_path = compose_commit_msg_file_path(temp_dir)
 	# prompt user to input description of this merge, better to open a vi
-	commit_description_lines = ask_for_multiline_input("please input the description of the merge, which will be regarded as a part of the final commit message\n(<press Enter key> to start new lines, <press Ctrl+D> to finish inputting):")
+	commit_description_lines = ask_for_multiline_input("please input the description of the merge, which will be regarded as a part of the final commit message\n(<press Enter key> to start new lines, %s to finish inputting):" % finish_hint)
 	# in the input multi-line message, discard redundant blank lines after the meanful lines
 	while len(commit_description_lines) != 0 and commit_description_lines[-1].strip() == "":
 		commit_description_lines.pop()
@@ -431,12 +439,10 @@ def generate_commit_msg_file(temp_dir, jira_id, pr_title_content, author, author
 	debug("save commit message file: %s" % commit_msg_file_path)
 	return commit_msg_file_path
 
-def merge_pr_and_checkin(pushable_remote_name, base_sha, forked_repo_url, forked_repo_pr_branch, temp_dir, commit_msg_file_path):
+def merge_pr_and_checkin(operating_branch, pushable_remote_name, base_sha, forked_repo_url, forked_repo_pr_branch, temp_dir, commit_msg_file_path):
 	success = False
 	user_skip = False
 	patch_file_path = None
-	timestamp = str(time.time()).replace(".", "")
-	operating_branch = "%s%s" % (OPERATING_BRANCH_PREFIX, timestamp)
 	try:
 		# get latest update from base repo
 		debug("to get latest updates from base remote")
@@ -490,7 +496,7 @@ def merge_pr_and_checkin(pushable_remote_name, base_sha, forked_repo_url, forked
 			info("recovering working directory to original state...")
 			user_skip = True
 
-		return (success, user_skip, operating_branch)
+		return (success, user_skip)
 	finally:
 		if patch_file_path and os.path.exists(patch_file_path):
 			os.remove(patch_file_path)
@@ -624,7 +630,9 @@ def main(argv):
 		forked_repo_pr_branch = pr_info['head']['ref'].encode(ENCODING)
 
 		# merge pr and checkin
-		(success, user_skip, operating_branch) = merge_pr_and_checkin(pushable_remote_name, base_sha, forked_repo_url, forked_repo_pr_branch, temp_dir, commit_msg_file_path)
+		timestamp = str(time.time()).replace(".", "")
+		operating_branch = "%s%s" % (OPERATING_BRANCH_PREFIX, timestamp)
+		(success, user_skip) = merge_pr_and_checkin(operating_branch, pushable_remote_name, base_sha, forked_repo_url, forked_repo_pr_branch, temp_dir, commit_msg_file_path)
 	except subprocess.CalledProcessError as e:
 		exit_with_errmsg(e, -1)
 	finally:
