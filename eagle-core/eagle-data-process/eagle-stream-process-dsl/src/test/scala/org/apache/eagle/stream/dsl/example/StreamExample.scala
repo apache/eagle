@@ -78,7 +78,7 @@ object StreamAPIExample_5 extends App{
   submit
 }
 
-object StreamAPIExample_6 extends App{
+object StreamAPIExample_6 extends App {
 
   // =====================================
   "stream_1" := { stream from Range(1,10000) parallism 1 as ("value"->'integer) } ? {_.asInstanceOf[Int] % 1 == 0}
@@ -91,7 +91,6 @@ object StreamAPIExample_6 extends App{
 }
 
 object StreamAPIExample_7 extends App{
-
   // =====================================
   "stream" := stream from Range(1,1000)
   $"stream" alert "alertExecutor"
@@ -101,6 +100,8 @@ object StreamAPIExample_7 extends App{
 }
 
 object StreamAPIExample_8 extends App{
+  init[storm](args)
+
   // =====================================
   "logStream" := stream from Seq(
       "55.3.244.1 GET /index.html 15824 0.043",
