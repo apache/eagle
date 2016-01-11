@@ -853,6 +853,71 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>header-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <!-- Git specific files -->
+                                <exclude>.git/</exclude>
+                                <exclude>.java-version</exclude>
+                                <exclude>.gitignore</exclude>
+                                <!-- IDE specific files-->
+                                <exclude>**/.idea/</exclude>
+                                <exclude>**/.scalastyle/</exclude>
+                                <exclude>**/*.iml</exclude>
+                                <exclude>**/nb-configuration.xml</exclude>
+                                <exclude>**/.classpath</exclude>
+                                <exclude>**/.settings/**</exclude>
+                                <exclude>**/.project</exclude>
+                                <exclude>**/.metadata/</exclude>
+                                <!-- Maven working directory -->
+                                <exclude>**/target/**</exclude>
+                                <!-- Patch files which can be lying around -->
+                                <exclude>**/*.patch</exclude>
+                                <exclude>**/*.rej</exclude>
+                                <!-- Exclude generated files -->
+                                <exclude>**/gen/**</exclude>
+                                <!-- README and test data with exact format -->
+                                <exclude>README*</exclude>
+                                <exclude>**/*.log</exclude>
+                                <exclude>**/eagle.log*</exclude>
+                                <exclude>**/resources/**/*.json</exclude>
+                                <exclude>**/test/resources/securityAuditLog</exclude>
+                                <exclude>**/resources/**/ml-policyDef-UserProfile.txt</exclude>
+                                <exclude>**/test/resources/onelinehiveauditlog.txt</exclude>
+                                <exclude>**/test/resources/ranger-policy-update-request.txt</exclude>
+                                <exclude>**/dev-supports/**/*.json</exclude>
+                                <exclude>**/dev-supports/**/useractivity-agg-json.txt</exclude>
+                                <exclude>**/conf/sandbox-userprofile-topology.conf</exclude>
+                                <!-- Fonts and Images -->
+                                <exclude>**/fonts/**</exclude>
+                                <exclude>**/images/**</exclude>
+                                <exclude>**/lib/js/**</exclude>
+                                <exclude>**/lib/css/**</exclude>
+                                <exclude>**/*.min.js</exclude>
+                                <exclude>**/jquery-*.js</exclude>
+                                <exclude>**/MANIFEST.MF</exclude>
+                                <!-- External dependency script -->
+                                <exclude>**/resource/serf/etc/ambari.json</exclude>
+
+                                <!-- TODO: fix it -->
+                                <exclude>**/webapp/**</exclude>
+
+                            </excludes>
+                         </configuration>
+                     </execution>
+                 </executions>
+             </plugin>
+         </plugins>
     </build>
     <repositories>
         <repository>
