@@ -1,0 +1,143 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<div class="row">
+	<div class="col-md-4" ng-repeat="entity in config.list">
+		<div class="info-box bg-aqua box-clickable">
+			<span class="info-box-icon" ng-click="Feature.go('classification', 'sensitivity', entity.name)"><i class="fa fa-suitcase"></i></span>
+			<div class="info-box-content">
+				<div class="pull-right btn-group" ng-show="Auth.isRole('ROLE_ADMIN')">
+					<a class="fa fa-cog config" data-toggle="dropdown"></a>
+					<ul class="dropdown-menu" role="menu">
+						<li>
+							<a ng-click="showImportEditor(entity);"><span class="fa fa-cloud-upload"></span>Import</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a ng-click="showManagementEditor(entity);"><span class="fa fa-list"></span>Management</a>
+						</li>
+					</ul>
+				</div>
+
+				<div ng-click="Feature.go('classification', 'sensitivity', entity.name)">
+					<span class="info-box-text text-large">{{entity.name}}</span>
+					<!--span class="info-box-number">
+						<small>Connected</small>
+					</span-->
+					<div class="progress">
+						<div class="progress-bar"></div>
+					</div>
+					<span class="progress-description">
+						<span class="fa fa-refresh fa-spin" ng-hide="entity.statisitc._promise.$$state.status === 1"></span>
+						<span ng-show="entity.statisitc._promise.$$state.status === 1">{{entity.statisitc[0].value[0] || 0}}</span>
+						sensitivity items
+					</span>
+				</div>
+			</div><!-- /.info-box-content -->
+		</div>
+	</div>
+</div>
+
+<!-- Modal: Create sensitivity -->
+<div class="modal fade" id="sensitivityMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-disabled="_sensitivityLock">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Import Sensitivity Data</h4>
+			</div>
+			<div class="modal-body">
+				<div tabs data-inner="true" selected="_sensitivityImportType">
+					<div pane data-title="By Text">
+						<div class="form-group">
+							<label>* Sensitivity Data</label>
+							<textarea class="form-control" placeholder="Json format here..." rows="10" id="sensitivityData" ng-model="_parent._sensitivityData" ng-disabled="_parent._sensitivityLock"></textarea>
+						</div>
+					</div>
+					<div pane data-title="By File">
+						<input type="file" file filepath="_parent._sensitivityFile" id="sensitivityFile" ng-disabled="_parent._sensitivityLock" />
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<p class="text-danger pull-left">{{_sensitivityError}}</p>
+
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="_sensitivityLock">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmImport()"
+				ng-disabled="!importCheck()">
+					Import
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: Manage sensitivity -->
+<div class="modal fade" id="sensitivityListMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-disabled="_sensitivityLock">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Sensitivity List</h4>
+			</div>
+			<div class="modal-body">
+				<p ng-show="_sensitivitySource.list._promise.$$state.status !== 1">
+					<span class="fa fa-refresh fa-spin"> </span>
+					Loading...
+				</p>
+
+				<div sorttable source="_sensitivitySource.list" ng-show="_sensitivitySource.list._promise.$$state.status === 1">
+					<table class="table table-bordered" ng-non-bindable>
+						<thead>
+							<tr>
+								<!--th width="10"></th-->
+								<th ng-repeat="key in _parent._sensitivitySource.keys">{{key}}</th>
+								<th width="10"> </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<!--td>
+									<input type="checkbox" ng-checked="item.selected" ng-click="item.selected = !item.selected">
+								</td-->
+								<td ng-repeat="key in _parent._sensitivitySource.keys">{{item.tags[key] || item[key]}}</td>
+								<td>
+									<a ng-click="_parent.deleteItem(item)">Delete</a>
+								</td>
+							</tr>
+						</tbody>
+				</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger pull-left" ng-click="deleteAll(_sensitivitySource)">
+					Delete All
+				</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

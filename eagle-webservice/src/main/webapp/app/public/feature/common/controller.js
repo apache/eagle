@@ -244,7 +244,7 @@
 
 	// ======================== Policy Edit =========================
 	function policyCtrl(create, PageConfig, Site, Policy, $scope, $wrapState, $q, Entities) {
-		PageConfig.pageTitle = "Policy Edit";
+		PageConfig.pageTitle = create ? "Policy Create" : "Policy Edit";
 		PageConfig.pageSubTitle = Site.current().name;
 		PageConfig
 			.addNavPath("Policy View", "/common/summary")
@@ -541,7 +541,7 @@
 
 						// >> Parse expression
 						$scope.policy.__.conditions = {};
-						var _condition = _policyUnit.expression.match(/from\s+(\w+)(\[(.*)\])?(#window[^\)]*\))?\s+(select (\w+\, )?(\w+)\((\w+)\) as [\w\d_]+ (group by (\w+) )?having ([\w\d_]+) ([<>=]+) ([^\s]+))?/);
+						var _condition = _policyUnit.expression.match(/from\s+(\w+)(\[(.*)])?(#window[^\)]*\))?\s+(select (\w+, )?(\w+)\((\w+)\) as [\w\d_]+ (group by (\w+) )?having ([\w\d_]+) ([<>=]+) ([^\s]+))?/);
 						var _cond_stream = _condition[1];
 						var _cond_query = _condition[3] || "";
 						var _cond_window = _condition[4];
@@ -572,7 +572,7 @@
 											var _val = _opMatch[3];
 											var _conds = $scope.policy.__.conditions[_key] = $scope.policy.__.conditions[_key] || [];
 											var _type = "";
-											if(_val.match(/\'.*\'/)) {
+											if(_val.match(/'.*'/)) {
 												_val = _val.slice(1, -1);
 												_type = "string";
 											} else if(_val === "true" || _val === "false") {
@@ -964,5 +964,110 @@
 	feature.controller('policyEdit', function(PageConfig, Site, Policy, $scope, $wrapState, $q, Entities) {
 		PageConfig.lockSite = true;
 		policyCtrl(false, PageConfig, Site, Policy, $scope, $wrapState, $q, Entities);
+	});
+
+	// ==============================================================
+	// =                           Alerts                           =
+	// ==============================================================
+
+	// ========================= Alert List =========================
+	feature.navItem("alertList", "Alerts", "exclamation-triangle");
+	feature.controller('alertList', function(PageConfig, Site, $scope, $wrapState, $interval, $timeout, Entities) {
+		PageConfig.pageSubTitle = Site.current().name;
+
+		var MAX_PAGESIZE = 10000;
+
+		// Initial load
+		$scope.dataSource = $wrapState.param.dataSource;
+
+		$scope.alertList = [];
+		$scope.alertList.ready = false;
+
+		// Load data
+		function _loadAlerts() {
+			if($scope.alertList._promise) {
+				$scope.alertList._promise.abort();
+			}
+
+			var _list = Entities.queryEntities("AlertService", {
+				site: Site.current().name,
+				dataSource: $scope.dataSource,
+				hostname: null,
+				_pageSize: MAX_PAGESIZE,
+				_duration: 1000 * 60 * 60 * 24 * 30,
+				__ETD: 1000 * 60 * 60 * 24
+			});
+			$scope.alertList._promise = _list._promise;
+			_list._promise.then(function() {
+				var index;
+
+				if($scope.alertList[0]) {
+					// List new alerts
+					for(index = 0 ; index < _list.length ; index += 1) {
+						var _alert = _list[index];
+						_alert.__new = true;
+						if(_alert.encodedRowkey === $scope.alertList[0].encodedRowkey) {
+							break;
+						}
+					}
+
+					if(index > 0) {
+						$scope.alertList.unshift.apply($scope.alertList, _list.slice(0, index));
+
+						// Clean up UI highlight
+						$timeout(function() {
+							$.each(_list, function(i, alert) {
+								delete alert.__new;
+							});
+						}, 100);
+					}
+				} else {
+					// List all alerts
+					$scope.alertList.push.apply($scope.alertList, _list);
+				}
+
+				$scope.alertList.ready = true;
+			});
+		}
+
+		_loadAlerts();
+		var _loadInterval = $interval(_loadAlerts, app.time.refreshInterval);
+		$scope.$on('$destroy',function(){
+			$interval.cancel(_loadInterval);
+		});
+	});
+
+	// ========================= Alert List =========================
+	feature.controller('alertDetail', function(PageConfig, Site, $scope, $wrapState, Entities) {
+		PageConfig.pageTitle = "Alert Detail";
+		PageConfig.lockSite = true;
+		PageConfig
+			.addNavPath("Alert List", "/common/alertList")
+			.addNavPath("Alert Detail");
+
+		$scope.common = common;
+
+		// Query policy
+		$scope.alertList = Entities.queryEntity("AlertService", $wrapState.param.filter);
+		$scope.alertList._promise.then(function() {
+			if($scope.alertList.length === 0) {
+				$.dialog({
+					title: "OPS!",
+					content: "Alert not found!"
+				}, function() {
+					location.href = "#/common/alertList";
+				});
+			} else {
+				$scope.alert = $scope.alertList[0];
+				Site.current(Site.find($scope.alert.tags.site));
+				console.log($scope.alert);
+			}
+		});
+
+		// UI
+		$scope.getMessageTime = function(alert) {
+			var _time = common.getValueByPath(alert, "alertContext.properties.timestamp");
+			return Number(_time);
+		};
 	});
 })();

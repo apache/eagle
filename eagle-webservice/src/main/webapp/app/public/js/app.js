@@ -151,6 +151,8 @@ var app = {};
 			if(htmlTemplatePath) {
 				featureControllerCustomizeHtmlTemplate[_name] = htmlTemplatePath;
 			}
+
+			featureControllerProvider.name = _name;
 		};
 
 		// Register
