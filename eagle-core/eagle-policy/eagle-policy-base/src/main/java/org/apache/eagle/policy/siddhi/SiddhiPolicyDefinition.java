@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.policy.siddhi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 
 /**
@@ -25,8 +27,20 @@ import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 		"expression" : "from every b1=HeapUsage[metric == 'eagle.metric.gc'] -> a1=FullGCEvent[eventName == 'full gc'] -> b2=HeapUsage[metric == b1.metric and host == b1.host and value >= b1.value * 0.8] within 100 sec select a1.eventName, b1.metric, b2.timestamp, 60 as timerange insert into GCMonitor; "
 	}
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible=true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SiddhiPolicyDefinition extends AbstractPolicyDefinition {
 	private String expression;
+
+	private boolean containsDefintion;
+
+	public boolean isContainsDefintion() {
+		return containsDefintion;
+	}
+
+	public void setContainsDefintion(boolean containsDefintion) {
+		this.containsDefintion = containsDefintion;
+	}
 
 	public String getExpression() {
 		return expression;

@@ -16,23 +16,15 @@
  */
 package org.apache.eagle.policy.siddhi;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeSet;
-
-import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.config.AbstractPolicyDefinition;
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
-import org.apache.eagle.policy.PolicyEvaluator;
-import org.apache.eagle.policy.PolicyManager;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.policy.PolicyEvaluator;
+import org.apache.eagle.policy.PolicyManager;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
@@ -42,7 +34,8 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 
-import com.typesafe.config.Config;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * when policy is updated or deleted, SiddhiManager.shutdown should be invoked to release resources.
@@ -50,11 +43,8 @@ import com.typesafe.config.Config;
  */
 public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> implements PolicyEvaluator<T>{
 	
-	public static final int DEFAULT_QUEUE_SIZE = 1000;
-
-	private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyEvaluator.class);	
+	private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyEvaluator.class);
 	
-//	private final BlockingQueue<K> queue = new ArrayBlockingQueue<K>(DEFAULT_QUEUE_SIZE);
 	private volatile SiddhiRuntime siddhiRuntime;
 	private String[] sourceStreams;
 	private boolean needValidation;
@@ -115,15 +105,20 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 		SiddhiManager siddhiManager = new SiddhiManager();
 		Map<String, InputHandler> siddhiInputHandlers = new HashMap<String, InputHandler>();
 
-		StringBuilder sb = new StringBuilder();		
-		for(String sourceStream : sourceStreams){
-			String streamDef = SiddhiStreamMetadataUtils.convertToStreamDef(sourceStream);
-			LOG.info("Siddhi stream definition : " + streamDef);
-			sb.append(streamDef);
+		// compose execution plan sql
+		String executionPlan = policyDef.getExpression();
+		if (!policyDef.isContainsDefintion()) {
+			StringBuilder sb = new StringBuilder();
+			for (String sourceStream : sourceStreams) {
+				String streamDef = SiddhiStreamMetadataUtils.convertToStreamDef(sourceStream);
+				LOG.info("Siddhi stream definition : " + streamDef);
+				sb.append(streamDef);
+			}
+
+			String expression = addContextFieldIfNotExist(policyDef.getExpression());
+			executionPlan = sb.toString() + " @info(name = '" + EXECUTION_PLAN_NAME + "') " + expression;
 		}
-		
-		String expression = addContextFieldIfNotExist(policyDef.getExpression());
-		String executionPlan = sb.toString() + " @info(name = '" + EXECUTION_PLAN_NAME + "') " +  expression;
+
 		ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
 		
 		for(String sourceStream : sourceStreams){			
@@ -133,7 +128,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 
 		QueryCallback callback = new SiddhiQueryCallbackImpl<T, K>(config, this);		
 
-		LOG.info("Siddhi query: " + expression);
+		LOG.info("Siddhi query: " + executionPlan);
 		executionPlanRuntime.addCallback(EXECUTION_PLAN_NAME, callback);
 
 		List<String> outputFields = new ArrayList<String>();

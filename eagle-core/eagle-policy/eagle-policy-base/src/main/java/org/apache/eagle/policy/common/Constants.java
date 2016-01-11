@@ -56,6 +56,8 @@ public class Constants {
 	public static final String PARTITIONER = "partitioner";
 	public static final String SOURCE = "source";
 	public static final String PARTITIONSEQ = "partitionSeq";
+	// policy definition status
+	public static final String EAGLE_DEFAULT_POLICY_NAME = "eagleQuery";
 
 	public enum policyType {
 		siddhiCEPEngine,

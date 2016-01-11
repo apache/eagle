@@ -37,7 +37,6 @@ import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.siddhi.SiddhiEvaluationHandler;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,17 +56,18 @@ import java.util.Map.Entry;
  */
 public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEntity, K>
 		extends JavaStormStreamExecutor2<String, K> 
-		implements PolicyLifecycleMethods<T>, SiddhiEvaluationHandler<T, K>, PolicyDistributionReportMethods {
+		implements PolicyLifecycleMethods<T>, PolicyDistributionReportMethods, IPolicyExecutor<T, K>
+{
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOG = LoggerFactory.getLogger(PolicyProcessExecutor.class);
 	
-	private static final String EAGLE_EVENT_COUNT = "eagle.event.count";
-	private static final String EAGLE_POLICY_EVAL_COUNT = "eagle.policy.eval.count";
-	private static final String EAGLE_POLICY_EVAL_FAIL_COUNT = "eagle.policy.eval.fail.count";
-	private static final String EAGLE_ALERT_COUNT = "eagle.alert.count";
-	private static final String EAGLE_ALERT_FAIL_COUNT = "eagle.alert.fail.count";
-	
+	public static final String EAGLE_EVENT_COUNT = "eagle.event.count";
+	public static final String EAGLE_POLICY_EVAL_COUNT = "eagle.policy.eval.count";
+	public static final String EAGLE_POLICY_EVAL_FAIL_COUNT = "eagle.policy.eval.fail.count";
+	public static final String EAGLE_ALERT_COUNT = "eagle.alert.count";
+	public static final String EAGLE_ALERT_FAIL_COUNT = "eagle.alert.fail.count";
+
 	private	 static long MERITE_GRANULARITY = DateUtils.MILLIS_PER_MINUTE;
 
 	private final Class<T> policyDefinitionClz;

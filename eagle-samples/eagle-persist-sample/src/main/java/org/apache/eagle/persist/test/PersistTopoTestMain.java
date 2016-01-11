@@ -95,7 +95,7 @@ public class PersistTopoTestMain {
 
         @Override
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
-            declarer.declareStream("test-stream", new Fields("timestamp", "host", "cpu", "mem"));
+            declarer.declare(new Fields("timestamp", "host", "cpu", "mem"));
         }
 
         @Override
@@ -108,7 +108,7 @@ public class PersistTopoTestMain {
             Utils.sleep(100);
             base = base + 100;// with fix steps..
             long mem = Double.valueOf(memRandom.nextGaussian() * FULL_MEM_SIZE_BYTES).longValue();
-            collector.emit("test-stream", new Values(base, "host", cpuRandom.nextInt(100), mem));
+            collector.emit(new Values(base, "host", cpuRandom.nextInt(100), mem));
         }
     }
 

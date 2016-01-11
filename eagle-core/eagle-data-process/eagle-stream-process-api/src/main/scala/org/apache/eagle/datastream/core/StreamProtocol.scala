@@ -19,7 +19,6 @@ package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
 import org.apache.commons.lang3.builder.HashCodeBuilder
-import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity
 import org.apache.eagle.datastream.FlatMapper
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
@@ -155,9 +154,9 @@ trait StreamProtocol[+T <: Any]{
   def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
 
-  def aggregate(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy): StreamProducer[AggregateEntity]
+  def aggregate(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy): StreamProducer[T]
 
-  // def aggregate(cql : String): StreamProducer[AggregateEntity]
+  def aggregate(cql : String, strategy:PartitionStrategy): StreamProducer[T]
 
   def persist(executorId : String, storageType: StorageType.StorageType): StreamProducer[T]
   

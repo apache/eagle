@@ -17,13 +17,13 @@
  */
 package org.apache.eagle.datastream.core
 
-import scala.collection.JavaConversions.asScalaSet
-import scala.collection.mutable.ListBuffer
-
+import com.typesafe.config.Config
 import org.apache.eagle.dataproc.impl.aggregate.AggregateExecutorFactory
+import org.apache.eagle.datastream.FlatMapper
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
-import com.typesafe.config.Config
+import scala.collection.JavaConversions.asScalaSet
+import scala.collection.mutable.ListBuffer
 
 /**
  * The expansion job for stream analyze
@@ -41,10 +41,16 @@ class StreamAggregateExpansion(config: Config) extends StreamAlertExpansion(conf
          * Rewrite the tree to add output field wrapper since policy executors accept only fixed tuple format 
          */
         val newStreamProducers = rewriteWithStreamOutputWrapper(current, dag, toBeAddedEdges, toBeRemovedVertex, upStreamNames)
-        
-        val analyzeExecutors = AggregateExecutorFactory.Instance.createExecutors(config, upStreamNames, analyzerId);
+
+
+        val analyzeExecutors = if (cepQl != null) {
+          AggregateExecutorFactory.Instance.createExecutors(cepQl)
+        } else {
+          AggregateExecutorFactory.Instance.createExecutors(config, upStreamNames, analyzerId)
+        }
+
         analyzeExecutors.foreach(exec => {
-          val t = FlatMapProducer(exec).nameAs(exec.getExecutorId() + "_" + exec.getPartitionSeq()).initWith(dag,config, hook = false)
+          val t = FlatMapProducer(exec.asInstanceOf[FlatMapper[Any]]).nameAs(exec.getExecutorId() + "_" + exec.getPartitionSeq()).initWith(dag,config, hook = false)
 
           // connect with previous
           if (strategy == null) {

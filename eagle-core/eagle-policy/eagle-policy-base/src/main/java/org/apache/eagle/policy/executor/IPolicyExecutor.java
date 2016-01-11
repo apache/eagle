@@ -14,21 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.policy;
+package org.apache.eagle.policy.executor;
 
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
-import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.policy.executor.IPolicyExecutor;
+import org.apache.eagle.policy.siddhi.SiddhiEvaluationHandler;
 
-public class PolicyEvaluationContext<T extends AbstractPolicyDefinitionEntity, K> {
-	
-	public IPolicyExecutor<T, K> alertExecutor;
-	
-	public String policyId;
-	
-	public PolicyEvaluator<T> evaluator;
-	
-	public Collector outputCollector;
-	
-	public ResultRender<T, K> resultRender;
+/**
+ * Created on 1/10/16.
+ */
+public interface IPolicyExecutor<T extends AbstractPolicyDefinitionEntity, K> extends SiddhiEvaluationHandler<T, K> {
+    String getExecutorId();
+
+    int getPartitionSeq();
 }

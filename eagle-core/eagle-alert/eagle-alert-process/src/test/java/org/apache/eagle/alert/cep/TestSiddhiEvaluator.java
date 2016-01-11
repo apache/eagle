@@ -16,35 +16,29 @@
  */
 package org.apache.eagle.alert.cep;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import junit.framework.Assert;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.alert.executor.AlertExecutor;
+import org.apache.eagle.alert.siddhi.SiddhiAlertAPIEntityRender;
+import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.datastream.Tuple2;
+import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
-import org.apache.eagle.policy.PolicyEvaluationContext;
-import org.apache.eagle.alert.siddhi.SiddhiAlertAPIEntityRender;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyDefinition;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
-import org.apache.eagle.dataproc.core.ValuesArray;
-import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.Tuple2;
-import org.apache.eagle.alert.executor.AlertExecutor;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Test;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
-import junit.framework.Assert;
+import java.util.*;
 
 public class TestSiddhiEvaluator {
 
@@ -109,14 +103,15 @@ public class TestSiddhiEvaluator {
 			}
 		};
 
-		context.alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {
+		AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {
 			@Override
 			protected Map<String, String> getDimensions(String policyId) {
 				return new HashMap<String, String>();
 			}
 		};
-		context.alertExecutor.prepareConfig(config);
-		context.alertExecutor.init();
+		alertExecutor.prepareConfig(config);
+		alertExecutor.init();
+		context.alertExecutor = alertExecutor;
 		context.evaluator = evaluator;
 		context.policyId = "testPolicy";
 		context.resultRender = new SiddhiAlertAPIEntityRender();

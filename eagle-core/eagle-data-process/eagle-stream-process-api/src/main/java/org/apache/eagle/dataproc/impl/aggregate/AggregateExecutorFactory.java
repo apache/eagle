@@ -24,6 +24,7 @@ import org.apache.eagle.policy.PolicyPartitioner;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
+import org.apache.eagle.policy.executor.IPolicyExecutor;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,15 +44,18 @@ public class AggregateExecutorFactory {
 	public static final AggregateExecutorFactory Instance = new AggregateExecutorFactory();
 
 
-	public AggregateExecutor[] createExecutors(Config config, List<String> streamNames, String executorId) throws Exception {
-//		// Read site and dataSource from configuration.
-//		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
-//		LOG.info("Loading alerting definitions for dataSource: " + dataSource);
-//		List<String> streamNames = findStreamNames(config, executorId, dataSource);
-//		if (streamNames.isEmpty()) {
-//			throw new IllegalStateException("upstream names should not be empty for analyze executor " + executorId);
-//		}
+	public IPolicyExecutor[] createExecutors(String cql) throws Exception {
+		int numPartitions = 1; //loadExecutorConfig(config, executorId, partitionerCls);
 
+		IPolicyExecutor[] executors = new IPolicyExecutor[numPartitions];
+		for (int i = 0; i < numPartitions ; i++ ) {
+			executors[i] = new SimpleAggregateExecutor(cql, "siddhiCEPEngine", i, numPartitions);
+		}
+
+		return executors;
+	}
+
+	public IPolicyExecutor[] createExecutors(Config config, List<String> streamNames, String executorId) throws Exception {
 		StringBuilder partitionerCls = new StringBuilder(DefaultPolicyPartitioner.class.getCanonicalName());
         int numPartitions = loadExecutorConfig(config, executorId, partitionerCls);
         

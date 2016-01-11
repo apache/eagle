@@ -24,9 +24,9 @@ import java.util.concurrent.atomic.AtomicInteger
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
-import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity
 import org.apache.eagle.datastream.FlatMapper
 import org.apache.eagle.partition.PartitionStrategy
+import org.apache.eagle.policy.common.Constants
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 
@@ -194,8 +194,14 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
 
-  def aggregate(upStreamNames: java.util.List[String], queryExecutorId : String, strategy: PartitionStrategy = null): StreamProducer[AggregateEntity] = {
+  def aggregate(upStreamNames: java.util.List[String], queryExecutorId : String, strategy: PartitionStrategy = null): StreamProducer[T] = {
     val ret= AggregateProducer(upStreamNames, queryExecutorId, null, strategy)
+    hookup(this, ret)
+    ret
+  }
+
+  def aggregate(cql : String, strategy: PartitionStrategy): StreamProducer[T] = {
+    val ret= AggregateProducer(util.Arrays.asList(Constants.EAGLE_DEFAULT_POLICY_NAME), null, cql, strategy)
     hookup(this, ret)
     ret
   }
@@ -291,7 +297,7 @@ case class AlertStreamSink(upStreamNames: util.List[String], alertExecutorId : S
   }
 }
 
-case class AggregateProducer(upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[AggregateEntity]
+case class AggregateProducer[T](upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[T]
 
 case class PersistProducer[T](executorId :String, storageType: StorageType.StorageType) extends StreamProducer[T]
 
