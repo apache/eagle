@@ -1,0 +1,82 @@
+"logStream"         := stream from kafka as ("line"->'string) parallism 1
+"filteredStream"    := filter from "logStream" by grok {
+							pattern(
+								"line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)"""
+							)
+						} parallism 1
+"filteredStream"    := $"logStream" |
+						grok { pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""")} |
+						sql""" select from logStream insert into filteredStream """ parallism 1
+"aggregatedStream"  := $"logStream" |
+						sql"""select xxx"""
+"alertStream"       := $"aggregatedStream" !
+						sql""" select from * insert into alertStream"""
+"filteredStream"    :=> stdout
+"alertStream"       :=> (notification,kafka)
+
+// another stream
+metricStream                        := stream from kafka as ("line"->'string) parallism 1 |
+										grok { pattern("line"->"""(?<ip>\d+\.\d+\.\d+\.\d+)\s+(?<method>\w+)\s+(?<path>[\w/\.]+)\s+(?<bytes>\d+)\s+(?<time>[\d\.]+)""")} |
+										sql""" select from logStream insert into filteredStream """ parallism 1
+alertStream                         := metricStream ! "metricStreamExecutor"
+notificationStream                  := notificaton()
+kafkaStream                         := kafka("alertTopic")
+alertStream groupBy("alertType")    :=> (notificationStream,kafkaStream)
+metricStream groupBy("metricType")  :=> druid("metricStream")
+
+// Stream-Oriented not API oriented
+// Stream Definition
+
+DataStream extends StreamAPI with StreamDefinition
+
+trait StreamAPI{
+	def self:DataStream
+
+	def stream:DataStream
+	def from(producer:StreamProducer):DataStream
+	def as(schema:Schema):DataStream
+	def parallism(num:Int):DataStream
+
+	def groupBy(fields:Int*):DataStream = {
+		self.setProducer(self.getProducer.groupBy(fields))
+	}
+
+	def filter(func: Any=>Boolean): DataStream = {
+		DataStream(self).getProducer.filter(func)
+	}
+
+	def transform(transformer: (Any,Collector)=>Unit): DataStream = {
+		DataStream(self).getProducer.flatMap(transformer)
+	}
+
+	def alert(executor:String): DataStream = {
+		DataStream(self).getProducer.alert(executor)
+	}
+
+	def sink(stream:DataStream):DataStream = {
+		self.getProducer.connect(stream.getStartProducer())
+		stream
+	}
+
+	def ?(func: Any=>Boolean):DataStream = filter(func)
+	def |(processor:PipeProducer) = transform(producer)
+	def !(executor:String) = alert(executor)
+}
+
+implicit class streamNameImplicitis(name:String){
+	def := (func: => DataStream): DataStream(name) = {
+		StreamNamager.put(name,func)
+	}
+
+	def :=> (func: =>DataStream): DataStreamSink = {
+		StreamNamager.get(name).sink(func)
+	}
+}
+
+// Stream Operator
+
+1. ":="     : stream definition operator
+2. ":=>"    : stream sink operator
+3. "?"      : stream filter operator
+4. "|"      : stream pipe operator
+5. "!"      : stream alert operator
