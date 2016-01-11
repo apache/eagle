@@ -196,7 +196,7 @@
 								<div class="input-group">
 									<div class="input-group-btn">
 										<select class="form-control" ng-model="policy.__.groupAgg" ng-change="updateGroupAgg()">
-											<option ng-repeat="op in ['max','min','avg','count']">{{op}}</option>
+											<option ng-repeat="op in ['max','min','avg','count', 'sum']">{{op}}</option>
 										</select>
 									</div>
 									<select class="form-control" ng-model="policy.__.groupAggPath" ng-class="{'has-warning' : !policy.__.groupAggPath}" id="groupAggPath"
@@ -218,6 +218,13 @@
 									</div>
 									<input type="text" class="form-control" ng-model="policy.__.groupCondVal" ng-class="{'has-warning' : !policy.__.groupCondVal}" />
 								</div>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="form-group">
+								<label for="window">Alias (Optional)</label>
+								<input type="text" class="form-control" ng-model="policy.__.groupAggAlias" placeholder="Default: aggValue" />
 							</div>
 						</div>
 					</div>
