@@ -22,7 +22,7 @@ var app = {};
 	'use strict';
 
 	/* App Module */
-	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 'eagleControllers', 'featureControllers', 'damControllers', 'eagle.service']);
+	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 'eagleControllers', 'featureControllers', 'eagle.service']);
 
 	// ======================================================================================
 	// =                                   Feature Module                                   =
@@ -33,6 +33,7 @@ var app = {};
 	var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 
 	var featureControllers = angular.module('featureControllers', ['ui.bootstrap', 'eagle.components']);
+	var featureControllerCustomizeHtmlTemplate = {};
 	var featureControllerProvider;
 	var featureProvider;
 
@@ -118,18 +119,11 @@ var app = {};
 		};
 
 		/***
-		 * Register a controller.
-		 * @param name
-		 * @param constructor
+		 * Create an navigation item in left navigation bar
+		 * @param path
+		 * @param title
+		 * @param icon use Font Awesome. Needn't with 'fa fa-'.
 		 */
-		Feature.prototype.controller = function(name, constructor) {
-			// Replace feature registered service
-			constructor = this._replaceDependencies(constructor);
-
-			// Register controller
-			featureControllerProvider.register(this.name + "_" + name, constructor);
-		};
-
 		Feature.prototype.navItem = function(path, title, icon) {
 			title = title || path;
 			icon = icon || "question";
@@ -139,6 +133,24 @@ var app = {};
 				title: title,
 				url: "#/" + this.name + "/" + path
 			});
+		};
+
+		/***
+		 * Register a controller.
+		 * @param name
+		 * @param constructor
+		 */
+		Feature.prototype.controller = function(name, constructor, htmlTemplatePath) {
+			var _name = this.name + "_" + name;
+
+			// Replace feature registered service
+			constructor = this._replaceDependencies(constructor);
+
+			// Register controller
+			featureControllerProvider.register(_name, constructor);
+			if(htmlTemplatePath) {
+				featureControllerCustomizeHtmlTemplate[_name] = htmlTemplatePath;
+			}
 		};
 
 		// Register
@@ -239,7 +251,8 @@ var app = {};
 		// Router
 		var _featureBase = {
 			templateUrl: function ($stateParams) {
-				return "public/feature/" + $stateParams.feature + "/page/" + $stateParams.page + ".html?_=" + Math.random();
+				var _htmlTemplate = featureControllerCustomizeHtmlTemplate[$stateParams.feature + "_" + $stateParams.page];
+				return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + Math.random();
 			},
 			controllerProvider: function ($stateParams) {
 				return $stateParams.feature + "_" + $stateParams.page;

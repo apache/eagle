@@ -20,7 +20,7 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.service('$wrapState', function($state, $location) {
+	serviceModule.service('$wrapState', function($state, $location, $stateParams) {
 		var $wrapState = {};
 		var _targetState = null;
 		var _targetPriority = 0;
@@ -77,7 +77,7 @@
 		$wrapState.url = function(url) {
 			if(url !== undefined) console.log("[Wrap State] Switch url:", url);
 			return $location.url(url);
-		}
+		};
 
 		Object.defineProperties($wrapState, {
 			// Origin $state
@@ -86,10 +86,18 @@
 					return $state;
 				}
 			},
+
 			// Current
 			current: {
 				get: function() {
 					return $state.current;
+				}
+			},
+
+			// Parameter
+			param: {
+				get: function() {
+					return $.extend({}, $location.search(), $stateParams);
 				}
 			}
 		});
