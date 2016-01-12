@@ -104,12 +104,9 @@ public class TestSiddhiEvaluator {
 
 		context.alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {
 			@Override
-			public Map<String, String> getDimensions(String policyId) {
+			protected Map<String, String> getDimensions(String policyId) {
 				return new HashMap<String, String>();
 			}
-
-			@Override
-			public void runMetricReporter() {}
 		};
 		context.alertExecutor.prepareConfig(config);
 		context.alertExecutor.init();

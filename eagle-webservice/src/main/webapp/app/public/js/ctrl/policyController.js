@@ -73,7 +73,7 @@ damControllers.controller('policyListCtrl', function(globalContent, Site, damCon
 // =============================================================
 // =                       Policy Detail                       =
 // =============================================================
-damControllers.controller('policyDetailCtrl', function(globalContent, Site, damContent, charts, $scope, $routeParams, Entities) {
+damControllers.controller('policyDetailCtrl', function(globalContent, Site, damContent, $scope, $routeParams, Entities, nvd3) {
 	'use strict';
 
 	var MAX_PAGESIZE = 10000;
@@ -83,9 +83,11 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 	globalContent.navPath = ["Policy View", "Polict List", "Polict Detail"];
 	globalContent.lockSite = true;
 
-	charts = charts($scope);
-
 	$scope.common = common;
+	$scope.chartConfig = {
+		chart: "line",
+		xType: "time"
+	};
 
 	// Query policy
 	if($routeParams.encodedRowkey) {
@@ -121,23 +123,26 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 		}
 
 		// Visualization
+		var _endTime = app.time.now().hour(23).minute(59).second(59).millisecond(0);
+		var _startTime = _endTime.clone().subtract(1, "month").hour(0).minute(0).second(0).millisecond(0);
 		var _cond = {
 			dataSource: policy.tags.dataSource,
 			policyId: policy.tags.policyId,
-			_duration: 1000 * 60 * 60 * 24 * 30,
+			_startTime: _startTime,
+			_endTime: _endTime
 		};
 
 		// > eagle.policy.eval.count
-		$scope.policyEvalSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+		$scope.policyEvalSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
 
 		// > eagle.policy.eval.fail.count
-		$scope.policyEvalFailSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+		$scope.policyEvalFailSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
 
 		// > eagle.alert.count
-		$scope.alertSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+		$scope.alertSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
 
 		// > eagle.alert.fail.count
-		$scope.alertFailSeries = Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24);
+		$scope.alertFailSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
 
 		// Alert list
 		$scope.alertList = Entities.queryEntities("AlertService", {
@@ -461,12 +466,12 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 
 						// >> Parse expression
 						$scope.policy.__.conditions = {};
-						var _condition = _policyUnit.expression.match(/from\s+(\w+)(\[(.*)\])?(#window[^\)]*\))?\s+(select (\w+\, )?(\w+)\((\w+)\) as aggValue (group by (\w+) )?having aggValue ([<>=]+) ([^\s]+))?/);
+						var _condition = _policyUnit.expression.match(/from\s+(\w+)(\[(.*)\])?(#window[^\)]*\))?\s+(select (\w+\, )?(\w+)\((\w+)\) as [\w\d_]+ (group by (\w+) )?having ([\w\d_]+) ([<>=]+) ([^\s]+))?/);
 						var _cond_stream = _condition[1];
 						var _cond_query = _condition[3] || "";
 						var _cond_window = _condition[4];
 						var _cond_group = _condition[5];
-						var _cond_groupUnit = _condition.slice(7,13);
+						var _cond_groupUnit = _condition.slice(7,14);
 
 						if(!_condition) {
 							$scope.policy.__.advanced = true;
@@ -547,8 +552,9 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 										$scope.policy.__.group = _cond_groupUnit[3];
 										$scope.policy.__.groupAgg = _cond_groupUnit[0];
 										$scope.policy.__.groupAggPath = _cond_groupUnit[1];
-										$scope.policy.__.groupCondOp = _cond_groupUnit[4];
-										$scope.policy.__.groupCondVal = _cond_groupUnit[5];
+										$scope.policy.__.groupAggAlias = _cond_groupUnit[4] === "aggValue" ? "" : _cond_groupUnit[4];
+										$scope.policy.__.groupCondOp = _cond_groupUnit[5];
+										$scope.policy.__.groupCondVal = _cond_groupUnit[6];
 									} else {
 										$scope.policy.__.group = "";
 										$scope.policy.__.groupAgg = "count";
@@ -630,7 +636,7 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 			// Aggregation
 			$scope.groupAggPathList = function() {
 				return $.grep(common.getValueByPath($scope, "_stream.metas", []), function(meta) {
-					return $.inArray(meta.attrType, ['long','integer','number']) !== -1;
+					return $.inArray(meta.attrType, ['long','integer','number', 'double', 'float']) !== -1;
 				});
 			};
 
@@ -749,19 +755,21 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 
 					// > Group
 					if($scope.policy.__.group) {
-						_windowStr += common.template(" select ${group}, ${groupAgg}(${groupAggPath}) as aggValue group by ${group} having aggValue ${groupCondOp} ${groupCondVal}", {
+						_windowStr += common.template(" select ${group}, ${groupAgg}(${groupAggPath}) as ${groupAggAlias} group by ${group} having ${groupAggAlias} ${groupCondOp} ${groupCondVal}", {
 							group: $scope.policy.__.group,
 							groupAgg: $scope.policy.__.groupAgg,
 							groupAggPath: $scope.policy.__.groupAggPath,
 							groupCondOp: $scope.policy.__.groupCondOp,
 							groupCondVal: $scope.policy.__.groupCondVal,
+							groupAggAlias: $scope.policy.__.groupAggAlias || "aggValue"
 						});
 					} else {
-						_windowStr += common.template(" select ${groupAgg}(${groupAggPath}) as aggValue having aggValue ${groupCondOp} ${groupCondVal}", {
+						_windowStr += common.template(" select ${groupAgg}(${groupAggPath}) as ${groupAggAlias} having ${groupAggAlias} ${groupCondOp} ${groupCondVal}", {
 							groupAgg: $scope.policy.__.groupAgg,
 							groupAggPath: $scope.policy.__.groupAggPath,
 							groupCondOp: $scope.policy.__.groupCondOp,
 							groupCondVal: $scope.policy.__.groupCondVal,
+							groupAggAlias: $scope.policy.__.groupAggAlias || "aggValue"
 						});
 					}
 				} else {

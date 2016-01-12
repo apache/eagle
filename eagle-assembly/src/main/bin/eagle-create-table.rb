@@ -53,5 +53,6 @@ createEagleTable(admin, 'userprofile')
 createEagleTable(admin, 'hfdsusercommandpattern')
 createEagleTable(admin, 'appCommand')
 createEagleTable(admin, 'appDefinition')
+createEagleTable(admin, 'serviceAudit')
 
 exit

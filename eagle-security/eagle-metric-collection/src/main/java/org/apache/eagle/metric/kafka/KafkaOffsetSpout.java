@@ -20,10 +20,7 @@ import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
-import org.apache.eagle.metric.CountingMetric;
-import org.apache.eagle.metric.Metric;
-import org.apache.eagle.metric.manager.EagleMetricReportManager;
-import org.apache.eagle.metric.report.EagleServiceMetricReport;
+import org.apache.eagle.metric.reportor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +31,13 @@ import java.util.Map;
 
 public class KafkaOffsetSpout extends BaseRichSpout {
 	private static final long serialVersionUID = 1L;
-	private static final long DEFAULT_ROUND_INTERVALS = 5 * 60 * 1000;
+	private static final long DEFAULT_ROUND_INTERVALS = 60 * 1000;
 	private KafkaOffsetCheckerConfig config;
 	private KafkaConsumerOffsetFetcher consumerOffsetFetcher;
 	private KafkaLatestOffsetFetcher latestOffsetFetcher;
 	private Map<String, String> baseMetricDimension;
 	private long lastRoundTime = 0;
+	private EagleMetricListener listener;
 
 	private static final Logger LOG = LoggerFactory.getLogger(KafkaOffsetSpout.class);
 
@@ -57,24 +55,24 @@ public class KafkaOffsetSpout extends BaseRichSpout {
 		this.baseMetricDimension.put("site", config.kafkaConfig.site);
 		this.baseMetricDimension.put("topic", config.kafkaConfig.topic);
 		this.baseMetricDimension.put("group", config.kafkaConfig.group);
-		String eagleServiceHost = config.serviceConfig.serviceHost;
-		Integer eagleServicePort = config.serviceConfig.servicePort;
+		String host = config.serviceConfig.serviceHost;
+		Integer port = config.serviceConfig.servicePort;
 		String username = config.serviceConfig.username;
 		String password = config.serviceConfig.password;
-		EagleServiceMetricReport report = new EagleServiceMetricReport(eagleServiceHost, eagleServicePort, username, password);
-		EagleMetricReportManager.getInstance().register("metricCollectServiceReport", report);
+		listener = new EagleServiceReporterMetricListener(host, port, username, password);
 	}
 
-	public Metric constructMetric(long timestamp, String partition, double value) {
+	private EagleMetric constructMetric(long timestamp, String partition, double value) {
 		Map<String, String> dimensions = new HashMap<>();
 		dimensions.putAll(baseMetricDimension);
 		dimensions.put("partition", partition);
 		String metricName = "eagle.kafka.message.consumer.lag";
-		Metric metric = new CountingMetric(timestamp, dimensions, metricName, value);
+		String metricKey = MetricKeyCodeDecoder.codeTSMetricKey(timestamp, metricName, dimensions);
+		EagleGaugeMetric metric = new EagleGaugeMetric(timestamp, metricKey, value);
 		return metric;
 	}
 
-	public long trimTimestamp(long currentTime, long granularity) {
+	private long trimTimestamp(long currentTime, long granularity) {
 		return currentTime / granularity * granularity;
 	}
 
@@ -83,18 +81,21 @@ public class KafkaOffsetSpout extends BaseRichSpout {
 		Long currentTime = System.currentTimeMillis();
 		if (currentTime - lastRoundTime > DEFAULT_ROUND_INTERVALS) {
 			try {
-				long trimedCurrentTime = trimTimestamp(currentTime, DEFAULT_ROUND_INTERVALS);
+				long trimCurrentTime = trimTimestamp(currentTime, DEFAULT_ROUND_INTERVALS);
 				Map<String, Long> consumedOffset = consumerOffsetFetcher.fetch();
 				Map<Integer, Long> latestOffset = latestOffsetFetcher.fetch(config.kafkaConfig.topic, consumedOffset.size());
-				List<Metric> list = new ArrayList<>();
+				List<EagleMetric> metrics = new ArrayList<>();
 				for (Map.Entry<String, Long> entry : consumedOffset.entrySet()) {
 					String partition = entry.getKey();
 					Integer partitionNumber = Integer.valueOf(partition.split("_")[1]);
 					Long lag = latestOffset.get(partitionNumber) - entry.getValue();
-					list.add(constructMetric(trimedCurrentTime, partition, lag));
+					// If the partition is not available
+					if (latestOffset.get(partitionNumber) == -1) lag = -1L;
+					EagleMetric metric = constructMetric(trimCurrentTime, partition, lag);
+					metrics.add(metric);
 				}
-				lastRoundTime = trimedCurrentTime;
-				EagleMetricReportManager.getInstance().emit(list);
+				lastRoundTime = trimCurrentTime;
+				listener.onMetricFlushed(metrics);
 			} catch (Exception ex) {
 				LOG.error("Got an exception, ex: ", ex);
 			}

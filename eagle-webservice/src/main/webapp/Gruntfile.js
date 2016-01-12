@@ -52,6 +52,7 @@ module.exports = function (grunt) {
 
 					'app/public/js/components/main.js',
 					'app/public/js/components/**.js',
+					'app/public/js/components/**/**.js',
 
 					'app/public/js/ctrl/damController.js',
 					'app/public/js/ctrl/*.js',
