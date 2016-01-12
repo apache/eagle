@@ -141,8 +141,8 @@
 						enabled: dataSrc.enabled,
 						tags: {
 							site: $scope._siteEntity.name,
-							dataSource: name,
-						},
+							dataSource: name
+						}
 					};
 
 					if(dataSrc.enabled) {
@@ -163,8 +163,8 @@
 						enabled: true,
 						tags: {
 							site: $scope._siteEntity.name,
-							dataSource: name,
-						},
+							dataSource: name
+						}
 					};
 					promiseList.push(Entities.updateEntity("AlertDataSourceService", _entity)._promise);
 				});
@@ -203,7 +203,7 @@
 		$scope.confirmDeleteDataSource = function() {
 			console.log($scope._dataSrcEntity);
 			$("#dataSrcMDL").modal("hide")
-				.on('hidden.bs.modal', function (e) {
+				.on('hidden.bs.modal', function () {
 					$("#dataSrcMDL").off('hidden.bs.modal');
 
 					var _additionalContent = Site.find($scope._dataSrcEntity.tags.site).dataSrcList.length > 1 ? "" : "<p class='text-muted' style='margin-left: 60px;'>(This site has only one source. Delete will remove site either.)</p>";
@@ -215,7 +215,7 @@
 						"<p>Proceed to delete?</p>" + _additionalContent,
 						buttons: [
 							{name: "Delete", class: "btn btn-danger", value: true},
-							{name: "Cancel", class: "btn btn-default", value: false},
+							{name: "Cancel", class: "btn btn-default", value: false}
 						]
 					}, function(ret) {
 						if(!ret) return;
@@ -339,7 +339,6 @@
 		if($wrapState.param.filter) {
 			$scope.policyList = Entities.queryEntity("AlertDefinitionService", $wrapState.param.filter);
 		} else {
-			// TODO: Must: Check this when alert finished!
 			$scope.policyList = Entities.queryEntities("AlertDefinitionService", {
 				policyId: $wrapState.param.policy,
 				site: $wrapState.param.site,
