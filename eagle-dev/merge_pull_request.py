@@ -449,7 +449,7 @@ def merge_pr_and_checkin(operating_branch, pushable_remote_name, base_sha, forke
 		run_command("git fetch %s master" % pushable_remote_name)
 		remote_master_sha = run_command("git rev-parse %s/master" % pushable_remote_name).strip()
 		if base_sha != remote_master_sha:
-			warn("the master branch of remote <%s> has commit(s) ahead of the ones in this %s.patch" % (pushable_remote_name, pr_number))
+			warn("the master branch of remote <%s> has commit(s) ahead of the base-commit of the ones in this PR" % pushable_remote_name)
 		# checkout operating branch
 		debug("to checkout base remote master as base")
 		run_command("git checkout -b %s %s/master" % (operating_branch, pushable_remote_name))
@@ -619,7 +619,14 @@ def main(argv):
 		reviewer_email_mapping = get_reviewer_email_mapping(reviewer_accounts)
 
 		# determine author's email
-		author_email = determine_author_email(pr_author, reviewer_email_mapping)
+		author_email = None
+		author_email_in_last_commit = latest_commit_json['commit']['author']['email'].encode(ENCODING)
+		if author_email_in_last_commit:
+			author_email = author_email_in_last_commit
+			if pr_author in reviewer_email_mapping:
+				reviewer_email_mapping[pr_author] = author_email_in_last_commit
+		else:
+			author_email = determine_author_email(pr_author, reviewer_email_mapping)
 
 		# generate commit message file
 		commit_msg_file_path = generate_commit_msg_file(temp_dir, jira_id, pr_title_content, pr_author, author_email, reviewer_email_mapping)
