@@ -24,9 +24,10 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
 
+import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
-import org.apache.eagle.alert.siddhi.SiddhiStreamMetadataUtils;
-import org.apache.eagle.alert.siddhi.StreamMetadataManager;
+import org.apache.eagle.policy.siddhi.SiddhiStreamMetadataUtils;
+import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.junit.Test;
 
 public class TestSiddhiStreamMetadataUtils {
@@ -43,7 +44,7 @@ public class TestSiddhiStreamMetadataUtils {
 			}
 		});
 		String siddhiStreamDef = SiddhiStreamMetadataUtils.convertToStreamDef("testStreamName");
-		Assert.assertEquals("define stream " + "testStreamName" + "(eagleAlertContext object,attrName1 string,attrName2 long);", siddhiStreamDef);
+		Assert.assertEquals("define stream " + "testStreamName" + "(eagleAlertContext object, attrName1 string,attrName2 long);", siddhiStreamDef);
 		StreamMetadataManager.getInstance().reset();
 	}
 	

@@ -16,17 +16,21 @@
  */
 package org.apache.eagle.alert.notification;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.sun.jersey.client.impl.CopyOnWriteHashMap;
-import com.typesafe.config.Config;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.eagle.alert.config.EmailNotificationConfig;
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.policy.DynamicPolicyLoader;
-import org.apache.eagle.alert.policy.PolicyLifecycleMethods;
+import org.apache.eagle.policy.DynamicPolicyLoader;
+import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor1;
@@ -34,16 +38,17 @@ import org.apache.eagle.datastream.Tuple1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
+import com.typesafe.config.Config;
 
 /**
  * notify alert by email, sms or other means
  * currently we only implements email notification
  */
-public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> implements PolicyLifecycleMethods {
+public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> implements PolicyLifecycleMethods<AlertDefinitionAPIEntity> {
 
 	private static final long serialVersionUID = 1690354365435407034L;
 	private static final Logger LOG = LoggerFactory.getLogger(AlertNotificationExecutor.class);
@@ -51,7 +56,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 
 	private List<String> alertExecutorIdList;
 	private volatile CopyOnWriteHashMap<String, List<AlertEmailGenerator>> alertEmailGeneratorsMap;
-	private AlertDefinitionDAO dao;
+	private PolicyDefinitionDAO dao;
 
     private final static int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
     private final static int DEFAULT_THREAD_POOL_MAX_SIZE = 8;
@@ -59,7 +64,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 
     private transient ThreadPoolExecutor executorPool;
 
-    public AlertNotificationExecutor(List<String> alertExecutorIdList, AlertDefinitionDAO dao){
+    public AlertNotificationExecutor(List<String> alertExecutorIdList, PolicyDefinitionDAO dao){
 		this.alertExecutorIdList = alertExecutorIdList;
 		this.dao = dao;
 	}
@@ -109,7 +114,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
         String dataSource = config.getString("eagleProps.dataSource");
 	    Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;
 	    try {
-	 		initialAlertDefs = dao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
+	 		initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);
 	    }
 	    catch (Exception ex) {
  			LOG.error("fail to initialize initialAlertDefs: ", ex);
@@ -134,7 +139,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		
 		alertEmailGeneratorsMap = new CopyOnWriteHashMap<String, List<AlertEmailGenerator>>();
 		alertEmailGeneratorsMap.putAll(tmpEmailGenerators);				
-		DynamicPolicyLoader policyLoader = DynamicPolicyLoader.getInstance();
+		DynamicPolicyLoader<AlertDefinitionAPIEntity> policyLoader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
 		policyLoader.init(initialAlertDefs, dao, config);
 		for (String alertExecutorId : alertExecutorIdList) {
 			policyLoader.addPolicyChangeListener(alertExecutorId, this);

@@ -21,6 +21,7 @@ import org.apache.hadoop.hbase.client.HBaseAdmin
 
 def createEagleTable(admin, tableName)
     if !admin.tableExists(tableName)
+        # create tableName, {NAME => 'f', VERSIONS => '1', BLOOMFILTER => 'ROW', COMPRESSION => 'GZ'}
         create tableName, {NAME => 'f', VERSIONS => '1', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
 	puts "Create Table #{tableName} successfully"
     elsif admin.isTableDisabled(tableName)
@@ -52,5 +53,6 @@ createEagleTable(admin, 'mlmodel')
 createEagleTable(admin, 'userprofile')
 createEagleTable(admin, 'hfdsusercommandpattern')
 createEagleTable(admin, 'serviceAudit')
+createEagleTable(admin, 'aggregatedef')
 
 exit

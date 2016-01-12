@@ -18,8 +18,13 @@ package org.apache.eagle.datastream.storm
 
 import java.util
 
+import org.apache.eagle.datastream.Collector
+import org.apache.eagle.datastream.StormStreamExecutor
+import org.apache.eagle.datastream.StormStreamExecutor3
+import org.apache.eagle.datastream.Tuple2
+import org.apache.eagle.datastream.Tuple3
+
 import com.typesafe.config.Config
-import org.apache.eagle.datastream._
 
 case class StormExecutorForAlertWrapper(delegate: StormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]], streamName: String)
   extends StormStreamExecutor3[String, String, util.SortedMap[Object, Object]]{

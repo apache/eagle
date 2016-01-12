@@ -16,15 +16,16 @@
  */
 package org.apache.eagle.alert.dedup;
 
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
-
 import java.util.List;
+
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 
 public class AlertEntityDeduplicationExecutor extends AlertDeduplicationExecutorBase {
 
 	private static final long serialVersionUID = 1L;
 
-	public AlertEntityDeduplicationExecutor(List<String> alertExecutorIdList, AlertDefinitionDAO dao){
+	public AlertEntityDeduplicationExecutor(List<String> alertExecutorIdList, PolicyDefinitionDAO<AlertDefinitionAPIEntity> dao){
 		super(alertExecutorIdList, DEDUP_TYPE.ENTITY, dao);
 	}
 }

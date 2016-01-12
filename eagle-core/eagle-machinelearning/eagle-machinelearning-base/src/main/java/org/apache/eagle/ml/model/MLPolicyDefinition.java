@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.ml.model;
 
-import org.apache.eagle.alert.config.AbstractPolicyDefinition;
+import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

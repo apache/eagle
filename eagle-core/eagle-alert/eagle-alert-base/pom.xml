@@ -42,6 +42,11 @@
 			<artifactId>eagle-client-base</artifactId>
             <version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>eagle</groupId>
+			<artifactId>eagle-policy-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
 

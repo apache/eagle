@@ -36,7 +36,7 @@ public final class EntityRepositoryScanner {
 	public static void scan() throws InstantiationException, IllegalAccessException {
 		// TODO currently extcos 0.3b doesn't support to search packages like "com.*.eagle.*", "org.*.eagle.*". However 0.4b depends on asm-all version 4.0, which is 
 		// conflicted with jersey server 1.8. We should fix it later
-		LOG.info("Scanning all entity repositories with pattern \"eagle.*\"");
+		LOG.info("Scanning all entity repositories with pattern \"org.apache.eagle.*\"");
 		final ComponentScanner scanner = new ComponentScanner();
 		final Set<Class<?>> classes = scanner.getClasses(new EntityRepoScanQuery() );
 		for (Class<?> entityClass : classes) {

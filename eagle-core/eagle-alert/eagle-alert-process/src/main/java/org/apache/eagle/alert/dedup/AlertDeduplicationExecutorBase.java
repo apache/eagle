@@ -16,29 +16,30 @@
  */
 package org.apache.eagle.alert.dedup;
 
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.config.DeduplicatorConfig;
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.policy.DynamicPolicyLoader;
-import org.apache.eagle.alert.policy.PolicyLifecycleMethods;
-import org.apache.eagle.common.config.EagleConfigConstants;
-import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
-import com.sun.jersey.client.impl.CopyOnWriteHashMap;
-import com.typesafe.config.Config;
-import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExecutor2<String, AlertAPIEntity> implements PolicyLifecycleMethods {
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.alert.config.DeduplicatorConfig;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.policy.DynamicPolicyLoader;
+import org.apache.eagle.policy.PolicyLifecycleMethods;
+import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
+import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import org.apache.eagle.datastream.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
+import com.typesafe.config.Config;
+
+public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExecutor2<String, AlertAPIEntity> implements PolicyLifecycleMethods<AlertDefinitionAPIEntity> {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOG = LoggerFactory.getLogger(AlertDeduplicationExecutorBase.class);
 	protected Config config;
@@ -46,14 +47,14 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 
 	private List<String> alertExecutorIdList;
 	private volatile CopyOnWriteHashMap<String, DefaultDeduplicator<AlertAPIEntity>> alertDedups;
-	private AlertDefinitionDAO dao;
+	private PolicyDefinitionDAO<AlertDefinitionAPIEntity> dao;
 
 	public enum DEDUP_TYPE {
 		ENTITY,
 		EMAIL
 	}
 
-	public AlertDeduplicationExecutorBase(List<String> alertExecutorIdList, DEDUP_TYPE dedupType, AlertDefinitionDAO dao){
+	public AlertDeduplicationExecutorBase(List<String> alertExecutorIdList, DEDUP_TYPE dedupType, PolicyDefinitionDAO<AlertDefinitionAPIEntity> dao){
 		this.alertExecutorIdList = alertExecutorIdList;
 		this.dedupType = dedupType;
 		this.dao = dao;
@@ -90,7 +91,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
         String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 	    Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;	    	    
 	    try {
-	 		initialAlertDefs = dao.findActiveAlertDefsGroupbyAlertExecutorId(site, dataSource);
+	 		initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);
 	    }
 	    catch (Exception ex) {
  			LOG.error("fail to initialize initialAlertDefs: ", ex);
@@ -106,7 +107,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
                        try {
                           DefaultDeduplicator<AlertAPIEntity> deduplicator = createAlertDedup(alertDef);
                           if (deduplicator != null)
-                              tmpDeduplicators.put(alertDef.getTags().get(AlertConstants.POLICY_ID), deduplicator);
+                              tmpDeduplicators.put(alertDef.getTags().get(Constants.POLICY_ID), deduplicator);
                           else LOG.warn("The dedup interval is not set, alertDef: " + alertDef);
                         }
                         catch (Throwable t) {
@@ -121,7 +122,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 
 		alertDedups = new CopyOnWriteHashMap<>();
 		alertDedups.putAll(tmpDeduplicators);
-		DynamicPolicyLoader policyLoader = DynamicPolicyLoader.getInstance();
+		DynamicPolicyLoader<AlertDefinitionAPIEntity> policyLoader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
 		policyLoader.init(initialAlertDefs, dao, config);
 		for (String alertExecutorId : alertExecutorIdList) {
 		 	policyLoader.addPolicyChangeListener(alertExecutorId, this);
@@ -159,7 +160,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 			DefaultDeduplicator<AlertAPIEntity> dedup = createAlertDedup(alertDef);
 			if (dedup != null) {
 				synchronized(alertDedups) {		
-					alertDedups.put(alertDef.getTags().get(AlertConstants.POLICY_ID), dedup);
+					alertDedups.put(alertDef.getTags().get(Constants.POLICY_ID), dedup);
 				}
 			}
 		}
@@ -172,7 +173,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 			DefaultDeduplicator<AlertAPIEntity> dedup = createAlertDedup(alertDef);
 			if (dedup != null) {
 				synchronized(alertDedups) {
-					alertDedups.put(alertDef.getTags().get(AlertConstants.POLICY_ID), dedup);
+					alertDedups.put(alertDef.getTags().get(Constants.POLICY_ID), dedup);
 				}
 			}
 		}
@@ -184,7 +185,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 			LOG.info("alert dedup config deleted " + alertDef);
 			// no cleanup to do, just remove it
 			synchronized(alertDedups) {		
-				alertDedups.remove(alertDef.getTags().get(AlertConstants.POLICY_ID));
+				alertDedups.remove(alertDef.getTags().get(Constants.POLICY_ID));
 			}
 		}
 	}

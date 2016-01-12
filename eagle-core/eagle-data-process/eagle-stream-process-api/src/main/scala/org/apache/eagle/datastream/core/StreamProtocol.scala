@@ -23,8 +23,6 @@ import org.apache.eagle.datastream.{Collector, FlatMapper}
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
-import scala.reflect.runtime.{universe => ru}
-
 /**
  * StreamInfo should be fully serializable and having not runtime type information
  */
@@ -81,6 +79,12 @@ class StreamInfo  extends Serializable{
   def getInfo = this
 
   override def hashCode(): Int = new HashCodeBuilder().append(this.id).append(this.getClass).toHashCode
+}
+
+
+object StorageType extends Enumeration {
+  type StorageType = Value
+  val KAFKA, DRUID, HBASE = Value
 }
 
 /**
@@ -145,8 +149,16 @@ trait StreamProtocol[+T <: Any]{
    * @return
    */
   def groupByKey(keyer:T => Any):StreamProducer[T]
+
   def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy):AlertStreamProducer
+
+  def aggregate(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy): StreamProducer[T]
+
+  def aggregate(cql : String, strategy:PartitionStrategy): StreamProducer[T]
+
+  def persist(executorId : String, storageType: StorageType.StorageType): StreamProducer[T]
+  
   /**
    * Set processing element parallelism setting
    * @param parallelismNum parallelism value

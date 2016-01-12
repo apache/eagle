@@ -1,20 +1,18 @@
 /*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *  * Licensed to the Apache Software Foundation (ASF) under one or more
- *  * contributor license agreements.  See the NOTICE file distributed with
- *  * this work for additional information regarding copyright ownership.
- *  * The ASF licenses this file to You under the Apache License, Version 2.0
- *  * (the "License"); you may not use this file except in compliance with
- *  * the License.  You may obtain a copy of the License at
- *  *
- *  *    http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.eagle.datastream.core
 
@@ -24,13 +22,14 @@ import java.util.concurrent.atomic.AtomicInteger
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
-import org.apache.eagle.datastream._
+import org.apache.eagle.datastream.{FlatMapperWrapper, Collector, FlatMapper}
 import org.apache.eagle.partition.PartitionStrategy
+import org.apache.eagle.policy.common.Constants
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
+import scala.collection.JavaConversions.{asScalaBuffer, seqAsJavaList}
+import scala.collection.JavaConverters.asScalaBufferConverter
 /**
  * StreamProducer = StreamInfo + StreamProtocol
  *
@@ -208,6 +207,24 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     alert(util.Arrays.asList(upStreamName), alertExecutorId, consume = false)
   }
 
+  def aggregate(upStreamNames: java.util.List[String], queryExecutorId : String, strategy: PartitionStrategy = null): StreamProducer[T] = {
+    val ret= AggregateProducer(upStreamNames, queryExecutorId, null, strategy)
+    connect(this, ret)
+    ret
+  }
+
+  def aggregate(cql : String, strategy: PartitionStrategy): StreamProducer[T] = {
+    val ret= AggregateProducer(util.Arrays.asList(Constants.EAGLE_DEFAULT_POLICY_NAME), null, cql, strategy)
+    connect(this, ret)
+    ret
+  }
+  
+  def persist(executorId : String, storageType: StorageType.StorageType) : StreamProducer[T] = {
+    val ret = PersistProducer(executorId, storageType)
+    connect(this, ret)
+    ret
+  }
+
   def connect[T1,T2](current: StreamProducer[T1], next: StreamProducer[T2]) = {
     if(current.graph == null) throw new NullPointerException(s"$current has not been registered to any graph before being connected")
     current.graph.addVertex(next)
@@ -239,7 +256,7 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
 
   /**
    * Component name
-   * 
+   *
    * @param componentName component name
    * @return
    */
@@ -305,6 +322,10 @@ case class AlertStreamProducer(upStreamNames: util.List[String], alertExecutorId
     this
   }
 }
+
+case class AggregateProducer[T](upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[T]
+
+case class PersistProducer[T](executorId :String, storageType: StorageType.StorageType) extends StreamProducer[T]
 
 object UniqueId{
   val id : AtomicInteger = new AtomicInteger(0);

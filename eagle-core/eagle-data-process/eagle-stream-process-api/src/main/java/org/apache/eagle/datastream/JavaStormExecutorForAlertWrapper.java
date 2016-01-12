@@ -19,10 +19,10 @@
 
 package org.apache.eagle.datastream;
 
-import com.typesafe.config.Config;
-
 import java.util.List;
 import java.util.SortedMap;
+
+import com.typesafe.config.Config;
 
 public class JavaStormExecutorForAlertWrapper extends JavaStormStreamExecutor3<String, String, SortedMap<Object, Object>>{
     private JavaStormStreamExecutor<Tuple2<String, SortedMap<Object, Object>>> delegate;
@@ -51,6 +51,10 @@ public class JavaStormExecutorForAlertWrapper extends JavaStormStreamExecutor3<S
             }
         };
         delegate.flatMap(input, delegateCollector);
+    }
+    
+    public JavaStormStreamExecutor<Tuple2<String, SortedMap<Object, Object>>> getDelegate() {
+    	return delegate;
     }
 
 }

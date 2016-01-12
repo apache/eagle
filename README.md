@@ -26,7 +26,7 @@ Apache Eagle is an open source monitoring solution to instantly identify access 
 For more details, please visit [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org)
 
 ## Documentation
-You can find the latest Eagle documentation on [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README) file only contains basic setup instructions.
+You can find the latest Eagle documentation on [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org/docs). This [README](README.md) file only contains basic setup instructions.
 
 ## Getting Started
 The fastest way to get started with Eagle is to run with [docker](https://github.com/docker/docker) by one of following options:
