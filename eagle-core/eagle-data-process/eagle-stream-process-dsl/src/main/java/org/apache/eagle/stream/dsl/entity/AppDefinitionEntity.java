@@ -16,24 +16,120 @@
  */
 package org.apache.eagle.stream.dsl.entity;
 
-import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.meta.Tags;
+import org.apache.eagle.log.entity.meta.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import java.util.Map;
 
-@Tags({"name"})
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@Table("appDefinition")
+@ColumnFamily("f")
+@Prefix("appDefinition")
+@Service("AppDefinitionService")
+@TimeSeries(false)
+@Tags({"site", "name"})
 public class AppDefinitionEntity extends TaggedLogAPIEntity {
-    private long updateTimestamp;
-    private long createTimestamp;
+
     /**
      * Definition code
      */
+    @Column("a")
     private String definition;
-    private Map<String,Object> environment;
-
-    private String creator;
+    @Column("b")
+    private String configuration;
+    @Column("c")
     private String description;
+    @Column("d")
+    private String creator;
+    @Column("e")
+    private String executionStatus;
+    @Column("f")
+    private String executionEnvironment;
+    @Column("g")
+    private long updateTimestamp;
+    @Column("h")
+    private long createTimestamp;
+
+    public long getUpdateTimestamp() {
+        return updateTimestamp;
+    }
+
+    public void setUpdateTimestamp(long updateTimestamp) {
+        this.updateTimestamp = updateTimestamp;
+        valueChanged("updateTimestamp");
+    }
+
+    public long getCreateTimestamp() {
+        return createTimestamp;
+    }
+
+    public void setCreateTimestamp(long createTimestamp) {
+        this.createTimestamp = createTimestamp;
+        valueChanged("createTimestamp");
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+        valueChanged("definition");
+    }
+
+    public String getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
+        valueChanged("configuration");
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+        valueChanged("description");
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+        valueChanged("creator");
+    }
+
+    public String getExecutionStatus() {
+        return executionStatus;
+    }
+
+    public void setExecutionStatus(String executionStatus) {
+        this.executionStatus = executionStatus;
+        valueChanged("executionStatus");
+    }
+
+    public String getExecutionEnvironment() {
+        return executionEnvironment;
+    }
+
+    public void setExecutionEnvironment(String executionEnvironment) {
+        this.executionEnvironment = executionEnvironment;
+        valueChanged("executionEnvironment");
+    }
+
+    public final static class STATUS {
+        public final static String UNKNOWN = "UNKNOWN";
+        public final static String INITIALIZED = "INITIALIZED";
+        public final static String RUNNING = "RUNNING";
+        public final static String STARTING = "STARTING";
+        public final static String STOPPING = "STOPPING";
+        public final static String STOPPED = "STOPPED";
+    }
 
     public void validate() throws Exception {
         if(definition == null) throw new IllegalArgumentException("definition should not empty");

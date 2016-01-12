@@ -18,7 +18,7 @@
 package org.apache.eagle.service.security.hbase;
 
 
-import org.apache.eagle.security.hbase.HbaseResourceEntity;
+import org.apache.eagle.security.entity.HbaseResourceEntity;
 
 import java.util.List;
 

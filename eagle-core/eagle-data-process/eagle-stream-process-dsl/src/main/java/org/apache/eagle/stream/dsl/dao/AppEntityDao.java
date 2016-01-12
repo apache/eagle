@@ -16,22 +16,27 @@
  */
 package org.apache.eagle.stream.dsl.dao;
 
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.storage.DataStorage;
+import org.apache.eagle.storage.DataStorageManager;
+import org.apache.eagle.storage.exception.IllegalDataStorageException;
+import org.apache.eagle.storage.operation.Statement;
+import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.stream.dsl.entity.AppCommandEntity;
 import org.apache.eagle.stream.dsl.entity.AppDefinitionEntity;
-import org.apache.eagle.stream.dsl.entity.AppExecutionEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.QueryParam;
 import java.util.List;
 
+
 public interface AppEntityDao{
-    public List<AppDefinitionEntity> getAllAppDefinitions();
-    public AppDefinitionEntity getAppDefinitionByName(String name);
-
-    public boolean updateAppDefinition(AppDefinitionEntity entity);
-    public boolean deleteAppDefinition(AppDefinitionEntity entity);
-
-    public List<AppExecutionEntity> getAppExecutionInstanceByName(String name);
-    public List<AppExecutionEntity> getAllAppExecutionInstances();
-
-    public List<AppCommandEntity> getAllAppCommands();
-    public List<AppCommandEntity> getAppCommandsByStatus(String... status);
+    GenericServiceAPIResponseEntity update(List<? extends TaggedLogAPIEntity> entities, String serviceName) throws Exception;
+    GenericServiceAPIResponseEntity create(List<? extends TaggedLogAPIEntity> entities, String serviceName) throws Exception;
+    GenericServiceAPIResponseEntity deleteByEntities(List<? extends TaggedLogAPIEntity> entities, String serviceName) throws Exception;
+    GenericServiceAPIResponseEntity deleteByIds(List<String> ids, String serviceName) throws Exception;
+    GenericServiceAPIResponseEntity<AppCommandEntity> search(String query, int pageSize);
 }
+

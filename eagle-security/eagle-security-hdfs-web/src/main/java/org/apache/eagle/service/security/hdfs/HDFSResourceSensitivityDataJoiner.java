@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.apache.hadoop.fs.FileStatus;
 
-import org.apache.eagle.security.hdfs.entity.FileStatusEntity;
+import org.apache.eagle.security.entity.FileStatusEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

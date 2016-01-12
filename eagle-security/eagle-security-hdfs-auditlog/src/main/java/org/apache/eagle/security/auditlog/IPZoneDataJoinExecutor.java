@@ -21,10 +21,9 @@ import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
 import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.security.auditlog.timer.IPZonePollingJob;
-import org.apache.eagle.security.hdfs.entity.IPZoneEntity;
+import org.apache.eagle.security.entity.IPZoneEntity;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.security.util.ExternalDataJoiner;
-import org.apache.storm.guava.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
