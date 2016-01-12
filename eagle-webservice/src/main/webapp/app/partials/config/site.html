@@ -10,17 +10,30 @@
 		<div class="row">
 			<div class="col-md-3">
 				<ul class="nav nav-pills nav-stacked">
-					<li class="disabled"><a>Site</a></li>
+					<li class="disabled">
+						<a>Site</a>
+					</li>
 					<li role="presentation" ng-repeat="_site in Site.list" ng-class="{active: site === _site}">
 						<a ng-click="setSite(_site)">
 							<span class="fa fa-server"></span>
 							{{_site.name}}
 						</a>
 					</li>
+					<li>
+						<a class="text-light-blue" ng-click="newSite()">
+							<span class="fa fa-plus-square"></span>
+							New Site
+						</a>
+					</li>
 				</ul>
 			</div>
 
 			<div class="col-md-9">
+				<a class="pull-right btn btn-danger btn-xs">
+					<span class="fa fa-trash-o"></span>
+					Delete Site
+				</a>
+
 				<h3 class="guideline">
 					Application
 					<small>{{site.name}}</small>
@@ -54,5 +67,34 @@
 
 	<div class="box-footer clearfix">
 		<button class="btn btn-primary" ng-click="saveAll()">Save All</button>
+	</div>
+</div>
+
+
+
+<!-- Modal: Create / Edit site -->
+<div class="modal fade" id="siteMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">New Site</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<label>* Site Name</label>
+					<input type="text" class="form-control" placeholder="Site name..." ng-model="_newSiteName" id="siteName">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<p class="pull-left text-danger">{{newSiteCheck()}}</p>
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="newSiteConfirm()" ng-disabled="newSiteCheck() || !_newSiteName || _newSiteLock">Create</button>
+			</div>
+		</div>
 	</div>
 </div>

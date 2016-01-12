@@ -29,19 +29,60 @@
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
 
-		// =================== Site ===================
 		$scope.site = Site.current() || Site.list[0];
+		$scope.sites = {};
+		$scope._newSiteName = null;
+		$scope._newSiteLock = false;
+		
+		// =================== Site ===================
 		$scope.setSite = function (site) {
 			$scope.site = site;
 		};
 
-		$scope.sites = {};
 		$.each(Site.list, function(i, site) {
 			$scope.sites[site.name] = {
 				app: $.extend({}, site.app)
 			};
 		});
 
+		// ================= New Site =================
+		$scope.newSite = function() {
+			$("#siteMDL").modal();
+			setTimeout(function() {
+				$("#siteName").focus();
+			}, 500);
+		};
+		$scope.newSiteCheck = function() {
+			if($scope._newSiteName === null) return "";
+
+			// Empty name
+			if($scope._newSiteName === "") {
+				return "Site can't be empty!";
+			}
+
+			// Conflict name
+			if($scope._newSiteName && $.map($scope.sites, function(site, name) {
+					return name.toUpperCase() === $scope._newSiteName.toUpperCase() ? true : null;
+				}).length) {
+				return "Site name conflict!";
+			}
+			return "";
+		};
+
+		$scope.newSiteConfirm = function() {
+			$scope._newSiteLock = true;
+
+			// TODO: Ajax create
+			$("#siteMDL").modal("hide")
+				.on("hidden.bs.modal", function() {
+					$("#siteMDL").off("hidden.bs.modal");
+					Site.reload();
+				});
+
+			$scope._newSiteName = null;
+		};
+
+		// ================= Save Site ================
 		$scope.saveAll = function() {
 			$.each(Site.list, function(i, site) {
 				site.app = $scope.sites[site.name].app;
