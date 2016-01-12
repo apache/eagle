@@ -64,29 +64,68 @@
 	});
 
 	// Feature page
-	serviceModule.service('FeaturePageConfig', function() {
+	serviceModule.service('FeaturePageConfig', function(Application) {
 		var config = {
 			// Feature mapping pages
-			_navItemMapping: {},
-
-			pageList: []
+			_navItemMapping: {}
 		};
 
+		// Register feature controller
 		config.addNavItem = function(feature, item) {
 			var _navItemList = config._navItemMapping[feature] = config._navItemMapping[feature] || [];
 			_navItemList.push(item);
 		};
 
+		// Page list
+		Object.defineProperty(config, "pageList", {
+			get: function() {
+				var _app = Application.current();
+				var _list = [];
+
+				if(_app && _app.feature) {
+					$.each(Application.featureList, function (i, feature) {
+						if(!_app.feature[feature.name]) return;
+						_list = _list.concat(config._navItemMapping[feature.name] || []);
+					});
+				}
+
+				return _list;
+			}
+		});
+
 		return config;
 	});
 
 	// Configuration page
-	serviceModule.service('ConfigPageConfig', function() {
-		return {
-			pageList: [
-				{icon: "server", title: "Sites", url: "#/config/site"},
-				{icon: "cubes", title: "Applications", url: "#/config/application"}
-			]
+	serviceModule.service('ConfigPageConfig', function(Application) {
+		var _originPageList = [
+			{icon: "server", title: "Sites", url: "#/config/site"},
+			{icon: "cubes", title: "Applications", url: "#/config/application"}
+		];
+
+		var config = {
+			_navItemMapping: {}
 		};
+
+		// Register feature controller
+		config.addNavItem = function(feature, item) {
+			var _navItemList = config._navItemMapping[feature] = config._navItemMapping[feature] || [];
+			_navItemList.push(item);
+		};
+
+		// Page list
+		Object.defineProperty(config, "pageList", {
+			get: function() {
+				var _list = _originPageList;
+
+				$.each(Application.featureList, function(i, feature) {
+					_list = _list.concat(config._navItemMapping[feature.name] || []);
+				});
+
+				return _list;
+			}
+		});
+
+		return config;
 	});
 })();

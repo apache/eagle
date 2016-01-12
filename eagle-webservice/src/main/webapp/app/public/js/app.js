@@ -42,7 +42,7 @@ var app = {};
 		featureProvider = $provide;
 	});
 
-	featureControllers.service("Feature", function($wrapState, PageConfig, FeaturePageConfig) {
+	featureControllers.service("Feature", function($wrapState, PageConfig, ConfigPageConfig, FeaturePageConfig) {
 		var _features = {};
 		var _services = {};
 
@@ -152,7 +152,44 @@ var app = {};
 				featureControllerCustomizeHtmlTemplate[_name] = htmlTemplatePath;
 			}
 
-			featureControllerProvider.name = _name;
+			return _name;
+		};
+
+		/***
+		 * Register a configuration controller for admin usage.
+		 * @param name
+		 * @param constructor
+		 */
+		Feature.prototype.configController = function(name, constructor, htmlTemplatePath) {
+			var _name = "config_" + this.name + "_" + name;
+
+			// Replace feature registered service
+			constructor = this._replaceDependencies(constructor);
+
+			// Register controller
+			featureControllerProvider.register(_name, constructor);
+			if(htmlTemplatePath) {
+				featureControllerCustomizeHtmlTemplate[_name] = htmlTemplatePath;
+			}
+
+			return _name;
+		};
+
+		/***
+		 * Create an navigation item in left navigation bar for admin configuraion page
+		 * @param path
+		 * @param title
+		 * @param icon use Font Awesome. Needn't with 'fa fa-'.
+		 */
+		Feature.prototype.configNavItem = function(path, title, icon) {
+			title = title || path;
+			icon = icon || "question";
+
+			ConfigPageConfig.addNavItem(this.name, {
+				icon: icon,
+				title: title,
+				url: "#/config/" + this.name + "/" + path
+			});
 		};
 
 		// Register
@@ -203,15 +240,13 @@ var app = {};
 			};
 
 			if(config.featureCheck) {
-				resolve._navigationCheck = function($q, $wrapState, Site, Application, FeaturePageConfig) {
+				resolve._navigationCheck = function($q, $wrapState, Site, Application) {
 					var _deferred = $q.defer();
 
 					$q.all(Site._promise(), Application._promise()).then(function() {
 						var _match;
 						var _site = Site.current();
 						var _app = Application.current();
-
-						FeaturePageConfig.pageList = [];
 
 						// Check application
 						if(_site && (!_app || (_app && !_site.app[_app.name]))) {
@@ -229,15 +264,6 @@ var app = {};
 								_app = null;
 								Application.current(null);
 							}
-						}
-
-						// Update feature navigation list
-						if(_app && _app.feature) {
-							$.each(Application.featureList, function (i, feature) {
-								if(!_app.feature[feature.name]) return;
-
-								FeaturePageConfig.pageList.push.apply(FeaturePageConfig.pageList, FeaturePageConfig._navItemMapping[feature.name] || []);
-							});
 						}
 
 						_deferred.resolve();
@@ -300,6 +326,20 @@ var app = {};
 				resolve: _resolve({roleType: 'ROLE_ADMIN'})
 			})
 
+			// Feature configuration page
+			.state('configFeature', $.extend({url: "/config/:feature/:page"}, {
+				templateUrl: function ($stateParams) {
+					var _htmlTemplate = featureControllerCustomizeHtmlTemplate[$stateParams.feature + "_" + $stateParams.page];
+					return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + Math.random();
+				},
+				controllerProvider: function ($stateParams) {
+					return "config_" + $stateParams.feature + "_" + $stateParams.page;
+				},
+				pageConfig: "ConfigPageConfig",
+				resolve: _resolve({roleType: 'ROLE_ADMIN'})
+			}))
+
+			// =================== Feature ===================
 			// Dynamic feature page
 			.state('page', $.extend({url: "/:feature/:page"}, _featureBase))
 			.state('pageFilter', $.extend({url: "/:feature/:page/:filter"}, _featureBase))

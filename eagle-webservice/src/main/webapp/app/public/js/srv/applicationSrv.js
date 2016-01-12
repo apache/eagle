@@ -34,8 +34,7 @@
 					common: true,
 					classification: true,
 					userProfile: true,
-					metadata: true,
-					setup: true
+					metadata: true
 				}
 			},
 			{
@@ -58,7 +57,6 @@
 			{name: "classification", displayName: "Classification", description: "Sensitivity browser of the data classification."},
 			{name: "userProfile", displayName: "User Profile", description: "Machine learning of the user profile"},
 			{name: "metadata", displayName: "Metadata", description: "Stream metadata viewer"},
-			{name: "setup", displayName: "Setup", description: "Stream configuration"},
 		];
 
 		// Set current application

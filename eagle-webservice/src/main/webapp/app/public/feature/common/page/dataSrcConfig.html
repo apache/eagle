@@ -1,0 +1,125 @@
+<div class="box box-primary" ng-repeat="_site in Site.list">
+	<div class="box-header">
+		<h3 class="box-title">{{_site.name}}</h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" ng-click="showSiteEditor(_site)">
+				<i class="fa fa-wrench"></i>
+			</button>
+		</div>
+	</div><!-- /.box-header -->
+	<div class="box-body">
+		<div class="row">
+			<div class="col-md-4" ng-repeat="dataSrc in _site.dataSrcList">
+				<div class="info-box" ng-class="dataSrc.enabled !== false ? 'bg-aqua' : 'bg-gray'">
+					<span class="info-box-icon"><i class="fa fa-suitcase"></i></span>
+					<div class="info-box-content">
+						<a class="fa fa-cog config pull-right" ng-click="showDataSourceEditor(dataSrc)"></a>
+						<span class="info-box-text">{{dataSrc.desc || dataSrc.tags.dataSource}}</span>
+
+						<span class="info-box-number" ng-show="dataSrc.hide"><small>-</small></span>
+						<span class="info-box-number" ng-show="!dataSrc.hide">
+							<span class="fa fa-refresh fa-spin" ng-hide="policyStatistic._promise.$$state.status === 1"></span>
+							<span ng-show="policyStatistic._promise.$$state.status === 1">{{getPolicyCount(_site.name, dataSrc.tags.dataSource)}}</span>
+							<small>Policies</small>
+						</span>
+						<div class="progress">
+							<div class="progress-bar"></div>
+						</div>
+						<span class="progress-description" ng-show="dataSrc.hide"><small>-</small></span>
+						<span class="progress-description" ng-show="!dataSrc.hide">
+							<span class="fa fa-refresh fa-spin" ng-hide="alertStatistic._promise.$$state.status === 1"></span>
+							<span ng-show="alertStatistic._promise.$$state.status === 1">{{getAlertCount(_site.name, dataSrc.tags.dataSource)}}</span>
+							alerts in 30 Days
+						</span>
+					</div><!-- /.info-box-content -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: Create / Edit site -->
+<div class="modal fade" id="siteMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">{{!_siteEntity.srcSite ? 'Create' : 'Config'}} Site</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<label>* Site Name</label>
+					<input type="text" class="form-control" placeholder="Site name..." ng-model="_siteEntity.name" ng-disabled="!!_siteEntity.srcSite" id="siteName">
+				</div>
+
+				<label>
+					* Data Source
+					<small class="text-muted">at least select 1 source</small>
+				</label>
+				<div class="checkbox" ng-repeat="item in _siteEntity.dataSrcList">
+					<label>
+						<input type="checkbox" value="{{item.name}}"
+							   ng-checked="item.enabled"
+							   ng-click="item.enabled = !item.enabled">
+						{{item.name}}
+					</label>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmUpateSite()"
+						ng-disabled="!checkUpdateSite()">
+					{{!_siteEntity.srcSite ? 'Create' : 'Update'}}
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: Edit data source -->
+<div class="modal fade" id="dataSrcMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">{{_dataSrcEntity.tags.dataSource}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox"
+							   ng-checked="_dataSrcEntity.enabled"
+							   ng-click="_dataSrcEntity.enabled = !_dataSrcEntity.enabled">
+						Enabled
+					</label>
+				</div>
+
+				<div class="form-group">
+					<label>Configuration</label>
+					<textarea type="text" class="form-control" placeholder="Data source configuration..." ng-model="_dataSrcEntity.config" id="dataSrcConfig" rows="10"></textarea>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger pull-left" ng-click="confirmDeleteDataSource()">
+					Delete Source
+				</button>
+
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmUpateDataSource()" ng-disabled="_dataSrcEntityLock">
+					Update
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
