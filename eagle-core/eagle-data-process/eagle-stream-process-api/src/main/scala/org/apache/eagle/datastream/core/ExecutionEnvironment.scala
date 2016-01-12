@@ -25,7 +25,7 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 /**
  * @since 0.3.0
  */
-trait ExecutionEnvironment {
+trait ExecutionEnvironment extends StreamSourceBuilder  {
   def config:Configuration
 
   /**
@@ -52,7 +52,7 @@ trait ExecutionEnvironment {
  *
  * @param conf
  */
-abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment with StreamSourceBuilder {
+abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment{
   implicit private val _dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
   private val _config:Configuration = Configuration(conf)
 
@@ -69,9 +69,7 @@ abstract class ExecutionEnvironmentBase(private val conf:Config)  extends Execut
     StreamParallelismConfigExpansion()
     StreamNameExpansion()
     GraphPrinter.print(dag,message="After expanded DAG ")
-
     GraphPrinter.printDotDigraph(dag)
-
     val streamDAG = StreamDAGTransformer.transform(dag)
     execute(streamDAG)
   }

@@ -72,7 +72,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
   def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
                dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], child: StreamProducer[Any]): Unit = {
     child match {
-      case AlertStreamSink(upStreamNames, alertExecutorId, withConsumer,strategy) => {
+      case AlertStreamProducer(upStreamNames, alertExecutorId, withConsumer,strategy) => {
         /**
          * step 1: wrapper previous StreamProducer with one more field "streamName"
          * for AlertStreamSink, we check previous StreamProducer and replace that

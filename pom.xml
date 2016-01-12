@@ -196,6 +196,7 @@
         <log4j-over-slf4j.version>1.7.2</log4j-over-slf4j.version>
         <quartz.version>2.2.1</quartz.version>
         <scopt.version>3.3.0</scopt.version>
+        <akka.actor.version>2.3.14</akka.actor.version>
 
         <!-- Streaming -->
         <kafka.version>0.8.1.2.2.0.0-2041</kafka.version>

@@ -53,6 +53,7 @@ object TestIterableWithGroupBy extends App {
 
 object TestIterableWithGroupByCircularly extends App{
   val env = ExecutionEnvironments.get[StormExecutionEnvironment](args)
+
   val tuples = Seq(
     Entity("a", 1),
     Entity("a", 2),
@@ -61,6 +62,7 @@ object TestIterableWithGroupByCircularly extends App{
     Entity("c", 3),
     Entity("d", 3)
   )
+
   env.from(tuples,recycle = true)
     .map(o => {o.inc += 2;o})
     .groupByKey(_.name)
