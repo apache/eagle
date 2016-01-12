@@ -416,7 +416,10 @@ public class TestSiddhiStateSnapshotAndRestore {
         eventArrived = false;
     }
 
-    @Test
+    /**
+     * Siddhi does not support external time based policy snaphost/recover yet
+     * @throws InterruptedException
+     */
     public void persistenceTest7() throws InterruptedException {
         PersistenceStore persistenceStore = new InMemoryPersistenceStore();
 
