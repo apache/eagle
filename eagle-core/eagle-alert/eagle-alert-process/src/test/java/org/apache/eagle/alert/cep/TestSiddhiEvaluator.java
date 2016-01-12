@@ -73,7 +73,8 @@ public class TestSiddhiEvaluator {
 				return list;
 			}
 		};
-		StreamMetadataManager.getInstance().init(config, streamDao);
+        StreamMetadataManager.getInstance().reset();
+        StreamMetadataManager.getInstance().init(config, streamDao);
 
 		Map<String, Object> data1 =  new TreeMap<String, Object>(){{
 			put("cmd", "open");
@@ -121,6 +122,5 @@ public class TestSiddhiEvaluator {
 		evaluator.evaluate(new ValuesArray(context, "hdfsAuditLogEventStream", data1));
 		Thread.sleep(2 * 1000);
 		Assert.assertEquals(alertCount, 1);
-		StreamMetadataManager.getInstance().reset();
 	}
 }
