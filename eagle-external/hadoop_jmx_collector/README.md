@@ -25,7 +25,7 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
 ### How to use it
 
   1. Edit the configuration file (json file). For example:
-         {
+          {
            "env": {
             "site": "sandbox"
            },
@@ -39,7 +39,7 @@ These scripts help to collect Hadoop jmx and evently sent the metrics to stdout 
            },
            "output": {
            }
-         }
+          }
 
   2. Run the scripts
   
