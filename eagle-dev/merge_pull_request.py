@@ -328,12 +328,12 @@ def get_info_from_github(url):
 		exit_with_errmsg("server not reachable: %s" % url, -1)
 
 def parse_pr_title(pr_title):
-	regex = re.compile("^%s(\d+)\s+(.+)$" % PROJECT_PREFIX)
+	regex = re.compile("^[[]?%s(\d+)[]]?\W?\s*(.+)$" % PROJECT_PREFIX, re.I)
 	match = re.search(regex, pr_title)
 	if match:
 		return (match.group(1), match.group(2))
 	else:
-		err_msg = "the title of the pull request should start with \"%s${jira_id}\", followed by a white-space and textual content, please revise accordingly" % PROJECT_PREFIX
+		err_msg = "the title of the pull request should start with \"%s${jira_id}\" (case-insensitive), followed by a white-space and textual content, please revise accordingly" % PROJECT_PREFIX
 		exit_with_errmsg(err_msg, -1)
 
 def ensure_quality_metrics(pr_comments_url, author, latest_commit_timestamp):
