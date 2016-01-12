@@ -22,13 +22,14 @@ package org.apache.eagle.alert.policy;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
-import org.apache.eagle.alert.dao.AlertDefinitionDAOImpl;
-import org.apache.eagle.alert.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
-import org.apache.eagle.executor.AlertExecutor;
+import org.apache.eagle.alert.executor.AlertExecutor;
+import org.apache.eagle.policy.DefaultPolicyPartitioner;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl;
+import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -44,13 +45,13 @@ public class TestPolicyDistributionUpdater {
 
     @Test
     public void testPolicyDistributionReporter() throws Exception{
-        AlertDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, null)) {
+        PolicyDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, 1)) {
             @Override
-            public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception {
+            public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
                 final AlertDefinitionAPIEntity entity = new AlertDefinitionAPIEntity();
                 entity.setTags(new HashMap<String, String>() {{
-                    put(AlertConstants.POLICY_TYPE, "siddhiCEPEngine");
-                    put(AlertConstants.POLICY_ID, "policyId_1");
+                    put(Constants.POLICY_TYPE, "siddhiCEPEngine");
+                    put(Constants.POLICY_ID, "policyId_1");
                 }});
                 Map<String, Map<String, AlertDefinitionAPIEntity>> map = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
                 map.put("alertExecutorId_1", new HashMap<String, AlertDefinitionAPIEntity>() {{

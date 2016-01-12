@@ -83,6 +83,12 @@ class StreamInfo  extends Serializable{
   override def hashCode(): Int = new HashCodeBuilder().append(this.id).append(this.getClass).toHashCode
 }
 
+
+object StorageType extends Enumeration {
+  type StorageType = Value
+  val KAFKA, DRUID, HBASE = Value
+}
+
 /**
  * Stream interaction protocol interface
  *
@@ -144,8 +150,16 @@ trait StreamProtocol[+T <: Any]{
    * @return
    */
   def groupByKey(keyer:T => Any):StreamProducer[T]
+
   def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
   def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
+
+  def aggregate(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy): StreamProducer[T]
+
+  def aggregate(cql : String, strategy:PartitionStrategy): StreamProducer[T]
+
+  def persist(executorId : String, storageType: StorageType.StorageType): StreamProducer[T]
+  
   /**
    * Set processing element parallelism setting
    * @param parallelismNum parallelism value

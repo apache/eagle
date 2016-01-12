@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.alert.email.AlertEmailContext;
+import org.apache.eagle.policy.common.Constants;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,10 +147,10 @@ public class AlertEmailSender implements Runnable {
 	}
 	
 	private void generateCommonContext(VelocityContext context) {
-		context.put(AlertConstants.ALERT_EMAIL_TIME_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds( System.currentTimeMillis() ));
-		context.put(AlertConstants.ALERT_EMAIL_COUNT_PROPERTY, alertContexts.size());
-		context.put(AlertConstants.ALERT_EMAIL_ALERTLIST_PROPERTY, alertContexts);
-		context.put(AlertConstants.ALERT_EMAIL_ORIGIN_PROPERTY, origin);
+		context.put(Constants.ALERT_EMAIL_TIME_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds( System.currentTimeMillis() ));
+		context.put(Constants.ALERT_EMAIL_COUNT_PROPERTY, alertContexts.size());
+		context.put(Constants.ALERT_EMAIL_ALERTLIST_PROPERTY, alertContexts);
+		context.put(Constants.ALERT_EMAIL_ORIGIN_PROPERTY, origin);
 	}
 
 	public boolean sentSuccessfully(){

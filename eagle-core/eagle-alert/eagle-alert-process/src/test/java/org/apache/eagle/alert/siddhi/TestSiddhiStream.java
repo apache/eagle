@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.siddhi;
 
+import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,6 +29,6 @@ public class TestSiddhiStream {
 		Assert.assertFalse(SiddhiPolicyEvaluator.addContextFieldIfNotExist(rule).equals(rule));
 		
 		rule = "from hiveAccessLogStream[sensitivityType=='PHONE_NUMBER'] select    * insert into outputStream;";
-		Assert.assertTrue(SiddhiPolicyEvaluator.addContextFieldIfNotExist(rule).equals(rule));		
+		Assert.assertTrue(SiddhiPolicyEvaluator.addContextFieldIfNotExist(rule).equals(rule));
 	}
 }

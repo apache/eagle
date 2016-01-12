@@ -16,23 +16,24 @@
  */
 package org.apache.eagle.ml.impl;
 
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.alert.siddhi.EagleAlertContext;
-import org.apache.eagle.common.DateTimeUtil;
-import org.apache.eagle.common.config.EagleConfigConstants;
-import org.apache.eagle.ml.MLAnomalyCallback;
-import org.apache.eagle.ml.MLPolicyEvaluator;
-import org.apache.eagle.ml.model.MLCallbackResult;
-import org.apache.eagle.common.metric.AlertContext;
-import com.typesafe.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.policy.PolicyEvaluationContext;
+import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.common.metric.AlertContext;
+import org.apache.eagle.ml.MLAnomalyCallback;
+import org.apache.eagle.ml.MLPolicyEvaluator;
+import org.apache.eagle.ml.model.MLCallbackResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.Config;
 
 public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
 	private static Logger LOG = LoggerFactory.getLogger(MLAnomalyCallbackImpl.class);
@@ -54,13 +55,13 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
      * @param alertContext context
      */
 	@Override
-	public void receive(MLCallbackResult aResult,EagleAlertContext alertContext) {
+	public void receive(MLCallbackResult aResult,PolicyEvaluationContext alertContext) {
 		LOG.info("Receive called with : " + aResult.toString());
         AlertAPIEntity alert = renderAlert(aResult,alertContext);
-        alertContext.alertExecutor.onAlerts(alertContext, Arrays.asList(alert));
+        alertContext.alertExecutor.onEvalEvents(alertContext, Arrays.asList(alert));
 	}
 
-    private AlertAPIEntity renderAlert(MLCallbackResult aResult,EagleAlertContext alertContext){
+    private AlertAPIEntity renderAlert(MLCallbackResult aResult,PolicyEvaluationContext alertContext){
         String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
         String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 
@@ -70,10 +71,10 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
         Map<String, String> tags = new HashMap<>();
         tags.put(EagleConfigConstants.SITE, site);
         tags.put(EagleConfigConstants.DATA_SOURCE, dataSource);
-        tags.put(AlertConstants.SOURCE_STREAMS, alertContext.evaluator.getAdditionalContext().get(AlertConstants.SOURCE_STREAMS));
-        tags.put(AlertConstants.POLICY_ID, alertContext.policyId);
-        tags.put(AlertConstants.ALERT_SOURCE, source);
-        tags.put(AlertConstants.ALERT_EXECUTOR_ID, alertContext.alertExecutor.getAlertExecutorId());
+        tags.put(Constants.SOURCE_STREAMS, (String)alertContext.evaluator.getAdditionalContext().get(Constants.SOURCE_STREAMS));
+        tags.put(Constants.POLICY_ID, alertContext.policyId);
+        tags.put(Constants.ALERT_SOURCE, source);
+        tags.put(Constants.ALERT_EXECUTOR_ID, alertContext.alertExecutor.getExecutorId());
         entity.setTags(tags);
 
         entity.setTimestamp(aResult.getTimestamp());
@@ -83,9 +84,9 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
         if(aResult.getContext() != null) context.addAll(aResult.getContext());
 
         String alertMessage = "Anomaly activities detected by algorithm ["+aResult.getAlgorithmName()+"] with information: " + aResult.toString() ;
-        context.addProperty(AlertConstants.ALERT_EVENT, aResult.toString());
-        context.addProperty(AlertConstants.ALERT_MESSAGE, alertMessage);
-        context.addProperty(AlertConstants.ALERT_TIMESTAMP_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds(System.currentTimeMillis()));
+        context.addProperty(Constants.ALERT_EVENT, aResult.toString());
+        context.addProperty(Constants.ALERT_MESSAGE, alertMessage);
+        context.addProperty(Constants.ALERT_TIMESTAMP_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds(System.currentTimeMillis()));
 
         try {
             site = config.getString("eagleProps.site");
@@ -98,7 +99,7 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
 
         context.addProperty(EagleConfigConstants.DATA_SOURCE, dataSource);
         context.addProperty(EagleConfigConstants.SITE, site);
-        context.addProperty(AlertConstants.POLICY_NAME, alertContext.policyId);
+        context.addProperty(Constants.POLICY_NAME, alertContext.policyId);
 
         entity.setAlertContext(context);
         return entity;

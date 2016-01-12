@@ -20,14 +20,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
+import org.apache.eagle.policy.DynamicPolicyLoader;
+import org.apache.eagle.policy.PolicyLifecycleMethods;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import junit.framework.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
+import junit.framework.Assert;
 
 public class TestDynamicPolicyLoader {
 	private final static Logger LOG = LoggerFactory.getLogger(TestDynamicPolicyLoader.class);
@@ -36,8 +40,8 @@ public class TestDynamicPolicyLoader {
 	public void test() throws Exception{
 		System.setProperty("config.resource", "/unittest.conf");
 		Config config = ConfigFactory.load();
-		Map<String, PolicyLifecycleMethods> policyChangeListeners = new HashMap<String, PolicyLifecycleMethods>();
-		policyChangeListeners.put("testAlertExecutorId", new PolicyLifecycleMethods() {
+		Map<String, PolicyLifecycleMethods<AlertDefinitionAPIEntity>> policyChangeListeners = new HashMap<String, PolicyLifecycleMethods<AlertDefinitionAPIEntity>>();
+		policyChangeListeners.put("testAlertExecutorId", new PolicyLifecycleMethods<AlertDefinitionAPIEntity>() {
 			@Override
 			public void onPolicyDeleted(Map<String, AlertDefinitionAPIEntity> deleted) {
 				LOG.info("deleted : " + deleted);
@@ -62,9 +66,9 @@ public class TestDynamicPolicyLoader {
 		map.put("policyId_1", buildTestAlertDefEntity("testProgramId", "testAlertExecutorId", "policyId_1", "siddhi", "policyDef_1"));
 		map.put("policyId_3", buildTestAlertDefEntity("testProgramId", "testAlertExecutorId", "policyId_3", "siddhi", "policyDef_3"));
 		
-		AlertDefinitionDAO dao = new AlertDefinitionDAO() {
+		PolicyDefinitionDAO<AlertDefinitionAPIEntity> dao = new PolicyDefinitionDAO<AlertDefinitionAPIEntity>() {
 			@Override
-			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(
+			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(
 					String site, String dataSource) {
 				Map<String, Map<String, AlertDefinitionAPIEntity>> currentAlertDefs = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
 				currentAlertDefs.put("testAlertExecutorId", new HashMap<String, AlertDefinitionAPIEntity>());
@@ -75,12 +79,12 @@ public class TestDynamicPolicyLoader {
 			}
 			
 			@Override
-			public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) {
+			public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) {
 				return null;
 			}
 		};
 		
-		DynamicPolicyLoader loader = DynamicPolicyLoader.getInstance();
+		DynamicPolicyLoader<AlertDefinitionAPIEntity> loader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
 		loader.init(initialAlertDefs, dao, config);
 		
 		try{
@@ -102,4 +106,5 @@ public class TestDynamicPolicyLoader {
 		entity.setPolicyDef(policyDef);
 		return entity;
 	}
+	
 }

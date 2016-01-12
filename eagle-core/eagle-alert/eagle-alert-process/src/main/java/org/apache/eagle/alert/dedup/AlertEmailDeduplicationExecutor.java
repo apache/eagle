@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.alert.dedup;
 
-import org.apache.eagle.alert.dao.AlertDefinitionDAO;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class AlertEmailDeduplicationExecutor extends AlertDeduplicationExecutorB
 
 	private static final long serialVersionUID = 1L;
 
-	public AlertEmailDeduplicationExecutor(List<String> alertExecutorIdList, AlertDefinitionDAO dao){
+	public AlertEmailDeduplicationExecutor(List<String> alertExecutorIdList, PolicyDefinitionDAO dao){
 		super(alertExecutorIdList, DEDUP_TYPE.EMAIL, dao);
 	}
 }

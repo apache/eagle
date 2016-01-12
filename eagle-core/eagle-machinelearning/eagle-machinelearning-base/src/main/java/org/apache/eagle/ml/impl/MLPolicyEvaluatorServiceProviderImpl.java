@@ -16,9 +16,9 @@
  */
 package org.apache.eagle.ml.impl;
 
-import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.policy.PolicyEvaluator;
-import org.apache.eagle.alert.policy.PolicyEvaluatorServiceProvider;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.PolicyEvaluator;
+import org.apache.eagle.policy.PolicyEvaluatorServiceProvider;
 import org.apache.eagle.ml.MLPolicyEvaluator;
 import org.apache.eagle.ml.model.MLPolicyDefinition;
 import com.fasterxml.jackson.databind.Module;
@@ -35,7 +35,7 @@ public class MLPolicyEvaluatorServiceProviderImpl implements PolicyEvaluatorServ
 
 	@Override
 	public String getPolicyType() {
-		return AlertConstants.policyType.MachineLearning.name();
+		return Constants.policyType.MachineLearning.name();
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class MLPolicyEvaluatorServiceProviderImpl implements PolicyEvaluatorServ
 
 	@Override
 	public List<Module> getBindingModules() {
-		Module module1 = new SimpleModule(AlertConstants.POLICY_DEFINITION).registerSubtypes(new NamedType(MLPolicyDefinition.class, getPolicyType()));
+		Module module1 = new SimpleModule(Constants.POLICY_DEFINITION).registerSubtypes(new NamedType(MLPolicyDefinition.class, getPolicyType()));
 		Module module2 = new SimpleModule(ALERT_CONTEXT).registerSubtypes(new NamedType(Properties.class, getPolicyType()));
 		return Arrays.asList(module1, module2);
 	}
