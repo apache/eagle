@@ -16,12 +16,12 @@
 */
 package org.apache.eagle.stream.dsl.execution.impl
 
-import org.apache.eagle.stream.dsl.entity.{AppDefinitionEntity, AppExecutionEntity}
+import org.apache.eagle.stream.dsl.entity.{AppDefinitionEntity}
 import org.apache.eagle.stream.dsl.execution.StreamAppManager
 import org.apache.eagle.stream.dsl.execution.model.StreamAppExecution
 
 class StreamAppManagerImpl extends StreamAppManager{
-  override def submit(app: AppDefinitionEntity): AppExecutionEntity = ???
+  override def submit(app: AppDefinitionEntity): Boolean = ???
 
   override def stop(app: StreamAppExecution): Boolean = ???
 

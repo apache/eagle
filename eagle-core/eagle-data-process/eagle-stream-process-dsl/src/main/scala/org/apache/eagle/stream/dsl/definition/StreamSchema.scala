@@ -79,7 +79,7 @@ object StreamSchema{
   def build(name:String,attributes:Seq[AnyRef]):StreamSchema = {
     StreamSchema(name,attributes.map{ a:AnyRef =>
       a match {
-        case t:(String,AnyRef) => {
+        case t:(String, AnyRef) => {
           t._2 match {
             case v:String => Attribute(t._1,v)
             case v:Symbol => Attribute(t._1,v.name)

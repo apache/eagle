@@ -17,7 +17,6 @@
 package org.apache.eagle.stream.dsl.execution
 
 import org.apache.eagle.stream.dsl.entity.AppDefinitionEntity
-import org.apache.eagle.stream.dsl.entity.AppExecutionEntity
 import org.apache.eagle.stream.dsl.execution.impl.StreamAppManagerImpl
 import org.apache.eagle.stream.dsl.execution.model.StreamAppExecution
 
@@ -25,7 +24,7 @@ import org.apache.eagle.stream.dsl.execution.model.StreamAppExecution
 * The actual function for stream app management
 */
 trait StreamAppManager {
-  def submit(app:AppDefinitionEntity):AppExecutionEntity
+  def submit(app:AppDefinitionEntity):Boolean
   def start(app:StreamAppExecution):Boolean
   def stop(app:StreamAppExecution):Boolean
 }
