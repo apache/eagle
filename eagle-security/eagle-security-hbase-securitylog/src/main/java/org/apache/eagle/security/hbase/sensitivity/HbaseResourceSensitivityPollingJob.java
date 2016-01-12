@@ -19,10 +19,7 @@ package org.apache.eagle.security.hbase.sensitivity;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
-import org.apache.eagle.security.hbase.HbaseResourceSensitivityAPIEntity;
-import org.apache.eagle.security.util.AbstractResourceSensitivityPollingJob;
-import org.apache.eagle.security.util.ExternalDataCache;
-import org.apache.eagle.security.hbase.HbaseResourceSensitivityAPIEntity;
+import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
 import org.apache.eagle.security.util.AbstractResourceSensitivityPollingJob;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.quartz.Job;
