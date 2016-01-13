@@ -33,7 +33,7 @@ import java.util.List;
 
 
 public interface AppEntityDao{
-    GenericServiceAPIResponseEntity update(List<? extends TaggedLogAPIEntity> entities, String serviceName) throws Exception;
+    GenericServiceAPIResponseEntity update(TaggedLogAPIEntity entity, String serviceName) throws Exception;
     GenericServiceAPIResponseEntity create(List<? extends TaggedLogAPIEntity> entities, String serviceName) throws Exception;
     GenericServiceAPIResponseEntity deleteByEntities(List<? extends TaggedLogAPIEntity> entities, String serviceName) throws Exception;
     GenericServiceAPIResponseEntity deleteByIds(List<String> ids, String serviceName) throws Exception;
