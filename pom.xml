@@ -133,6 +133,7 @@
         <module>eagle-topology-assembly</module>
         <module>eagle-samples</module>
         <module>eagle-gc</module>
+        <module>eagle-hadoop-metric</module>
     </modules>
     <properties>
         <!-- General Properties -->
