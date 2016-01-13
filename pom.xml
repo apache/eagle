@@ -900,6 +900,8 @@
                                 <exclude>**/dev-supports/**/*.json</exclude>
                                 <exclude>**/dev-supports/**/useractivity-agg-json.txt</exclude>
                                 <exclude>**/conf/sandbox-userprofile-topology.conf</exclude>
+                                <exclude>**/kafka-python/**</exclude>
+                                <exclude>**/six/**</exclude>
                                 <!-- Fonts and Images -->
                                 <exclude>**/fonts/**</exclude>
                                 <exclude>**/images/**</exclude>
