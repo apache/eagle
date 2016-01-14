@@ -35,15 +35,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+/**
+ * create table unittest_testtsentity (uuid varchar(100), cluster varchar(10), datacenter varchar(10), field1 int, field2 int, field3 bigint, field4 bigint, field5 double, field6 double, field7 varchar(100), timestamp bigint)
+ */
 public class TestJdbcStorage {
 
     JdbcStorage storage;
     EntityDefinition entityDefinition;
+    long baseTimestamp;
     final static Logger LOG = LoggerFactory.getLogger(TestJdbcStorage.class);
 
     @Before
@@ -51,32 +52,39 @@ public class TestJdbcStorage {
         storage = (JdbcStorage) DataStorageManager.getDataStorageByEagleConfig();
         storage.init();
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.clear();
+        gc.set(2014, 1, 6, 1, 40, 12);
+        gc.setTimeZone(TimeZone.getTimeZone("UTC"));
+        baseTimestamp = gc.getTime().getTime();
+        System.out.println("timestamp:" + baseTimestamp);
     }
 
-    //@Test
+    @Test
     public void testReadBySimpleQuery() throws QueryCompileException, IOException {
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[]{*}");
-        rawQuery.setStartTime("2014-01-06 01:40:02");
-        rawQuery.setEndTime("2016-01-06 01:40:02");
+        System.out.println(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithMilliseconds(baseTimestamp+2000));
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult<TestTimeSeriesAPIEntity> result = storage.query(query, entityDefinition);
         Assert.assertNotNull(result);
     }
 
-    //@Test
+    @Test
     public void testReadByComplexQuery() throws QueryCompileException, IOException {
         RawQuery rawQuery = new RawQuery();
-        rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"cluster\" AND @field4 > 1000 AND @field7 CONTAINS \"subtext\" OR @jobID =\"jobID\" ]{@field1,@field2}");
-        rawQuery.setStartTime("2015-01-06 01:40:02");
-        rawQuery.setEndTime("2016-01-06 01:40:02");
+        rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"c4ut\" AND @field4 > 1000 AND @field7 CONTAINS \"99404f47e309\" OR @datacenter =\"d4ut\" ]{@field1,@field2}");
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp + 2000));
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         storage.query(query,entityDefinition);
     }
 
-    //@Test
+    @Test
     public void testWrite() throws IOException {
         List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
 
@@ -88,7 +96,7 @@ public class TestJdbcStorage {
         Assert.assertTrue(result.getSize() > 0);
     }
 
-    //@Test
+    @Test
     public void testWriteAndRead() throws IOException, QueryCompileException {
         // record insert init time
         long startTime = System.currentTimeMillis();
@@ -114,7 +122,7 @@ public class TestJdbcStorage {
         Assert.assertTrue(queryResult.getSize() >= 1000);
     }
 
-    //@Test
+    @Test
     public void testWriteAndAggregation() throws IOException, QueryCompileException {
         // record insert init time
         long startTime = System.currentTimeMillis();
@@ -140,7 +148,7 @@ public class TestJdbcStorage {
         Assert.assertTrue(queryResult.getSize() >= 1);
     }
 
-    //@Test
+    @Test
     public void testWriteAndDelete() throws IOException, QueryCompileException {
         // record insert init time
         long startTime = System.currentTimeMillis();
@@ -166,7 +174,7 @@ public class TestJdbcStorage {
         Assert.assertTrue(queryResult.getSize() >= 1000);
     }
 
-    //@Test
+    @Test
     public void testWriteAndUpdate() throws IOException, QueryCompileException {
         // Write 1000 entities
         List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
@@ -222,7 +230,7 @@ public class TestJdbcStorage {
             put("cluster", "c4ut");
             put("datacenter", "d4ut");
         }});
-        instance.setTimestamp(System.currentTimeMillis());
+        instance.setTimestamp(baseTimestamp + 1000);
         return instance;
     }
 

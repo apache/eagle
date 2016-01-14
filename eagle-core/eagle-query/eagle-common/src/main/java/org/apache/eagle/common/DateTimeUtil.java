@@ -58,7 +58,7 @@ public class DateTimeUtil {
 	
 	public static String millisecondsToHumanDateWithSeconds(long milliseconds){
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        sdf.setTimeZone(CURRENT_TIME_ZONE);
+        sdf.setTimeZone(CURRENT_TIME_ZONE);
 		Date t = new Date();
 		t.setTime(milliseconds);
 		return sdf.format(t);
