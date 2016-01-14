@@ -17,7 +17,6 @@
 package org.apache.eagle.storage.jdbc.conn;
 
 import junit.framework.Assert;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +31,10 @@ import java.sql.Statement;
 public class TestConnectionFactory {
     final static Logger LOG = LoggerFactory.getLogger(TestConnectionFactory.class);
 
-//    @Test
-    public void testConnection(){
+    /**
+     * this is hard to be a unit test, make it an integration test
+     */
+    public static void testConnection(){
         try {
             Connection connection = ConnectionManagerFactory.getInstance().getConnection();
             Statement statement = connection.createStatement();
@@ -48,8 +49,13 @@ public class TestConnectionFactory {
         }
     }
 
-    @Test
-    public void test() {
-
+    public static void main(String[] args) throws Exception {
+        /**
+         * before run this integration test, you can do the following stesp in mysql setup
+         * create user eagle identified by 'eagle';
+         * create database eagle;
+         * grant all on eagle.* to 'eagle';
+         */
+        testConnection();
     }
 }
