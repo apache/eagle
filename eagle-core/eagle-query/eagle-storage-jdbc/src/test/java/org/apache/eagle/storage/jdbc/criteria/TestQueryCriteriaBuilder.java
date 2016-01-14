@@ -38,7 +38,7 @@ public class TestQueryCriteriaBuilder {
         ConnectionManagerFactory.getInstance();
     }
 
-    //@Test
+    @Test
     public void testSimpleQueryBuilder() throws QueryCompileException {
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"thecluster\" AND @field4 > 1000 ]{@field1,@field2, EXP{@field3/2}}");
