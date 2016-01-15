@@ -32,6 +32,8 @@ import org.apache.eagle.stream.dsl.entity.AppCommandEntity;
 import org.apache.eagle.stream.dsl.rest.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,8 +77,8 @@ public class AppEntityDaoImpl2 implements AppEntityDao {
     }
 
 
-    public GenericServiceAPIResponseEntity update(List<? extends TaggedLogAPIEntity> entities, String serviceName) throws Exception {
-        UpdateStatement statement = new UpdateStatement(entities, serviceName);
+    public GenericServiceAPIResponseEntity update(TaggedLogAPIEntity entity, String serviceName) throws Exception {
+        UpdateStatement statement = new UpdateStatement(Arrays.asList(entity), serviceName);
         GenericServiceAPIResponseEntity<String> response = updateEntities(statement);
         return response;
     }

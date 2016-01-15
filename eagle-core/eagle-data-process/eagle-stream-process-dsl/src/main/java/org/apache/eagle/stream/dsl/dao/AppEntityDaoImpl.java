@@ -24,6 +24,7 @@ import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -71,16 +72,15 @@ public class AppEntityDaoImpl implements AppEntityDao {
     }
 
     @Override
-    public GenericServiceAPIResponseEntity update(List<? extends TaggedLogAPIEntity> entities, String serviceName) throws Exception {
+    public GenericServiceAPIResponseEntity update(TaggedLogAPIEntity entity, String serviceName) throws Exception {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
         try {
-            int total = entities.size();
             EagleServiceClientImpl client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
-            response = client.update(entities, serviceName);
+            response = client.update(Arrays.asList(entity), serviceName);
             if(response.isSuccess()) {
-                LOG.info("Updated " + total + " entities to service " + serviceName);
+                LOG.info("Updated a entity to service " + serviceName);
             }else{
-                LOG.error("Failed to update " + total + " entities to service, due to server exception: "+ response.getException());
+                LOG.error("Failed to update a entity to service, due to server exception: "+ response.getException());
             }
             client.close();
         }

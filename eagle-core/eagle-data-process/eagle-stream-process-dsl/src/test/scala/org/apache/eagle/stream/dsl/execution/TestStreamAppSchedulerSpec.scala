@@ -48,5 +48,12 @@ class TestStreamAppSchedulerSpec extends TestKit(ActorSystem(StreamAppConstants.
 }
 
 object TestStreamAppScheduler extends App {
-  new StreamAppScheduler().start()
+  val conf: String = """
+                          akka.loglevel = "DEBUG"
+                          akka.actor.debug {
+                            receive = on
+                            lifecycle = on
+                          }
+                     """
+  new StreamAppScheduler(conf).start()
 }
