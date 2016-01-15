@@ -316,14 +316,14 @@ case class IteratorStreamProducer[T](iterator: Iterator[T]) extends StreamProduc
   override def toString: String = s"IteratorStreamProducer(${iterator.getClass.getSimpleName})"
 }
 
-case class AlertStreamProducer(upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
+case class AlertStreamProducer(var upStreamNames: util.List[String], alertExecutorId : String, var consume: Boolean=true, strategy: PartitionStrategy=null) extends StreamProducer[AlertAPIEntity] {
   def consume(consume: Boolean): AlertStreamProducer = {
     this.consume = consume
     this
   }
 }
 
-case class AggregateProducer[T](upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[T]
+case class AggregateProducer[T](var upStreamNames: util.List[String], analyzerId : String, cepQl: String = null, strategy:PartitionStrategy = null) extends StreamProducer[T]
 
 case class PersistProducer[T](executorId :String, storageType: StorageType.StorageType) extends StreamProducer[T]
 

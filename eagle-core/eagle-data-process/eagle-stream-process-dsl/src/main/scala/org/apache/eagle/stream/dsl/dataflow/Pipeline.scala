@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.pipeline
+package org.apache.eagle.stream.dsl.dataflow
 
-trait Template {
-  def evaluate()
-}
+import com.typesafe.config.Config
 
-object Template{
-  def newInstance(className:String):Template = ???
+class Pipeline {
+  def config:Config = ???
+  def schema = ???
+  def dataflow:DataFlow = ???
 }
