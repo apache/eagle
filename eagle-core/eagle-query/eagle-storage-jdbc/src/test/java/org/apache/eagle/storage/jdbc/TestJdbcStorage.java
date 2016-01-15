@@ -65,7 +65,7 @@ public class TestJdbcStorage {
         Assert.assertNotNull(result);
     }
 
-    //@Test
+    @Test
     public void testReadByComplexQuery() throws QueryCompileException, IOException {
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"cluster\" AND @field4 > 1000 AND @field7 CONTAINS \"subtext\" OR @jobID =\"jobID\" ]{@field1,@field2}");

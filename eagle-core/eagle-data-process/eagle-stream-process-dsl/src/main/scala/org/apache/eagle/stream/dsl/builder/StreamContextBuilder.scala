@@ -37,8 +37,14 @@ trait StreamContextBuilder extends Serializable{
     _context
   }
 
-  protected def getStream(name:String) = context.getStreamManager.getStream(name)
-  protected def setStream(stream:DataStream) = context.getStreamManager.setStream(stream)
+  def getStream(name:String):Option[DataStream] = context.getStreamManager.getStream(name)
+
+  @throws[IllegalStateException]
+  def getStreamOrException(name:String):DataStream = {
+    context.getStreamManager.getStreamOrException(name)
+  }
+
+  def setStream(stream:DataStream) = context.getStreamManager.setStream(stream)
 
   /**
    * Override App#args:Array[String] method

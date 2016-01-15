@@ -1,8 +1,3 @@
-package org.apache.eagle.stream.dsl.builder
-
-import org.apache.eagle.datastream.core.StreamProducer
-import org.apache.eagle.stream.dsl.definition.DataStream
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,20 +14,13 @@ import org.apache.eagle.stream.dsl.definition.DataStream
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-trait StreamImplicits extends StreamContextBuilder{
-  implicit class DataStreamNameImplicits(name:String) {
-    def := ( builder: => DataStream) :Unit = {
-      val stream = builder
-      stream.setName(name)
-      setStream(stream)
-    }
+package org.apache.eagle.stream.dsl.pipeline.template
 
-    def > ( builder: => DataStream) :DataStream = {
-      getStreamOrException(name).sink(builder)
-    }
+import org.apache.eagle.stream.dsl.StreamBuilder._
+import org.apache.eagle.stream.dsl.pipeline.Template
 
-    def > ( producer: StreamProducer[Any]) :DataStream = {
-      getStreamOrException(name).sink(producer)
-    }
+class SingleStreamMonitor extends Template{
+  override def evaluate(): Unit = {
+    $"defaultStream" alert "defaultStreamExecutor"
   }
 }

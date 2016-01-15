@@ -21,10 +21,10 @@ import scala.collection.mutable
  * limitations under the License.
  */
 case class StreamFormatter(config:Config) {
-  import StreamFormatter._
+  import org.apache.eagle.stream.dsl.execution.StreamFormatter._
 
   val library = mutable.ArrayBuffer(
-    "org.apache.eagle.stream.dsl.universal"
+    "org.apache.eagle.stream.dsl.StreamBuilder"
   )
 
   def format(code:String):String = {

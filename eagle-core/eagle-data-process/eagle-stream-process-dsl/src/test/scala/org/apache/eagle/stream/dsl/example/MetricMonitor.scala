@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.stream.dsl.example
 
-import org.apache.eagle.stream.dsl.universal._
+import org.apache.eagle.stream.dsl.StreamBuilder._
 
 object MetricMonitor extends App {
   init[storm](args)

@@ -26,10 +26,15 @@ class DataStreamManager {
   private val streamMap = mutable.Map[String,DataStream]()
   private val logger = LoggerFactory.getLogger(classOf[DataStreamManager])
 
-  def getStream(name:String):DataStream = {
-    if(streamMap.contains(name)) {
-      streamMap(name)
-    } else throw new UnknownStreamException(s"Stream '$name' is not defined")
+  def getStream(name:String):Option[DataStream] = {
+    if(streamMap.contains(name)) Some(streamMap(name)) else None
+  }
+
+  @throws[IllegalStateException]
+  def getStreamOrException(name:String):DataStream = {
+    getStream(name).getOrElse {
+      throw new IllegalStateException(s"Stream [$name] is not defined")
+    }
   }
 
   def setStream(stream:DataStream) = {

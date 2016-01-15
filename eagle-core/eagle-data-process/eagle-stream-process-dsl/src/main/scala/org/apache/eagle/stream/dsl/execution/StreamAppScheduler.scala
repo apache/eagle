@@ -23,7 +23,7 @@ import akka.routing.RoundRobinRouter
 import org.apache.eagle.stream.dsl.dao.{AppEntityDaoImpl}
 
 import org.apache.eagle.stream.dsl.entity.{AppDefinitionEntity, AppCommandEntity}
-import org.apache.eagle.stream.dsl.universal._
+import org.apache.eagle.stream.dsl.StreamBuilder._
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 

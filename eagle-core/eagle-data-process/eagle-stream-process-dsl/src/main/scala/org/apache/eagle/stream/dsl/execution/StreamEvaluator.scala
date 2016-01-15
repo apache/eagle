@@ -18,7 +18,7 @@ package org.apache.eagle.stream.dsl.execution
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.eagle.datastream.core.ExecutionEnvironment
-import org.apache.eagle.stream.dsl.universal._
+import org.apache.eagle.stream.dsl.StreamBuilder._
 import org.slf4j.LoggerFactory
 
 import scala.reflect.runtime.universe._
@@ -75,16 +75,20 @@ case class StreamEvaluator(code:String,config:Config = ConfigFactory.load()) {
   }
 
   @throws[EvaluateException]
-  def evaluate(environmentClass:Class[_ <:ExecutionEnvironment]=classOf[storm]):Any = {
+  def evaluate(env:Class[_ <:ExecutionEnvironment]=classOf[storm],submit:Boolean = true):Any = {
     val tree = parse
     if(logger.isDebugEnabled)
       logger.debug(s"Evaluating $tree")
     else
       logger.info("Evaluating")
     try {
-      init(config,environmentClass)
-      tb.eval(tree)
-      submit
+      if(submit) {
+        init(config, env)
+        tb.eval(tree)
+        submit
+      }else{
+        tb.eval(tree)
+      }
     } catch {
       case e:Throwable =>{
         sys.error(s"Failed to evaluate $tree\nException: $e")

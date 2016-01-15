@@ -56,4 +56,8 @@ trait StreamSourceBuilder {
     p.initWith(dag,config.get)
     p
   }
+
+  def register[T](producer:StreamProducer[T]):Unit = {
+    producer.initWith(dag,config.get)
+  }
 }

@@ -22,7 +22,7 @@ import org.apache.eagle.stream.dsl.definition.{SqlCode, DataStream}
 
 import scala.reflect.runtime.{universe => ru}
 
-object universal extends StreamBuilder{
+object StreamBuilder extends StreamBuilder{
   type storm = org.apache.eagle.datastream.storm.StormExecutionEnvironment
 
   // Initialize as storm environment by default
@@ -36,7 +36,13 @@ object universal extends StreamBuilder{
     def conf[T](arg:Any)(implicit tag: ru.TypeTag[T]):T = context.getConfig.get[T](arg.asInstanceOf[String])
 
     def $(arg:Any):DataStream = {
-      getStream(sc.parts(0))
+      val name = sc.parts(0)
+      getStream(name).getOrElse[DataStream]{
+        val stream = new DataStream
+        stream.setName(name)
+        setStream(stream)
+        stream
+      }
     }
   }
 }
