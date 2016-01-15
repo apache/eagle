@@ -173,7 +173,6 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 			//insert siddhiAlertContext into the first field
 			List<Object> input = new ArrayList<>();
 			input.add(siddhiAlertContext);
-			input.add(streamName);
 			putAttrsIntoInputStream(input, streamName, map);
 			siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
 		}
