@@ -89,7 +89,7 @@ object KafkaSinkStreamProducer extends StreamFactory{
 
 object ConsoleStreamProducer extends StreamFactory{
   override def getType: String = "Stdout"
-  override def createInstance(config: Map[String, AnyRef]): StreamProducer[Any] = ForeachProducer(print)
+  override def createInstance(config: Map[String, AnyRef]): StreamProducer[Any] = ForeachProducer[Any](m=>print(s"$m\n"))
 }
 
 object AlertStreamProducer extends StreamFactory{

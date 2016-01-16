@@ -76,7 +76,7 @@ case class Connector (from:String,to:String, config:Map[String,AnyRef]) extends 
 }
 
 object Connector{
-  val GROUP_FIELD = "group"
+  val GROUP_FIELD = "grouping"
   val GROUP_BY_FIELD_FIELD = "groupByField"
   val GROUP_BY_INDEX_FIELD = "groupByIndex"
 }

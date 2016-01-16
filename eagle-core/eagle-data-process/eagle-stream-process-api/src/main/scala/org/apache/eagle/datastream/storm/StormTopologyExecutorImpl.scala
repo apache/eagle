@@ -23,9 +23,11 @@ import backtype.storm.generated.StormTopology
 import backtype.storm.utils.Utils
 import backtype.storm.{Config, LocalCluster, StormSubmitter}
 import org.apache.eagle.datastream.core.AbstractTopologyExecutor
+import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 
 case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesafe.config.Config) extends AbstractTopologyExecutor {
+  val LOG = LoggerFactory.getLogger(classOf[StormTopologyExecutorImpl])
   @throws(classOf[Exception])
   def execute {
     val localMode: Boolean = config.getString("envContextConfig.mode").equalsIgnoreCase("local")
@@ -45,7 +47,10 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
           val stormConf = yaml.load(inputFileStream).asInstanceOf[java.util.LinkedHashMap[String, Object]]
           if(stormConf != null) conf.putAll(stormConf)
         } catch {
-          case _: Throwable => ()
+          case t: Throwable => {
+            LOG.error(s"Got example $t",t)
+            throw t
+          }
         } finally {
           if(inputFileStream != null) inputFileStream.close()
         }
@@ -54,8 +59,10 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
 
     val topologyName = config.getString("envContextConfig.topologyName")
     if (!localMode) {
+      LOG.info("Submitting as cluster mode")
       StormSubmitter.submitTopologyWithProgressBar(topologyName, conf, topology)
     } else {
+      LOG.info("Submitting as local mode")
       val cluster: LocalCluster = new LocalCluster
       cluster.submitTopology(topologyName, conf, topology)
       while(true) {
