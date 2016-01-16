@@ -19,20 +19,20 @@ package org.apache.eagle.stream.dsl.builder
 import com.typesafe.config.Config
 import org.apache.eagle.datastream.ExecutionEnvironments
 import org.apache.eagle.datastream.core.ExecutionEnvironment
-import org.apache.eagle.stream.dsl.definition.{DataStream, StreamContext}
+import org.apache.eagle.stream.dsl.definition.{StreamBuilderContext, DataStream}
 import org.slf4j.LoggerFactory
 
 import scala.reflect.runtime.{universe => ru}
 
 trait StreamContextBuilder extends Serializable{
   private val logger = LoggerFactory.getLogger(classOf[StreamContextBuilder])
-  private var _context:ExecutionEnvironment = null
-  def context(context:ExecutionEnvironment):Unit = {
+  private var _context:StreamBuilderContext = null
+  def context(context:StreamBuilderContext):Unit = {
     if(_context!=null && logger.isDebugEnabled) logger.debug(s"Initializing with $context")
     _context = context
   }
 
-  def context:ExecutionEnvironment = {
+  def context:StreamBuilderContext = {
     if(_context ==null) throw new IllegalStateException("Context is not initialized")
     _context
   }
@@ -52,15 +52,15 @@ trait StreamContextBuilder extends Serializable{
    * @return
    */
   def init[T<:ExecutionEnvironment](args:Array[String] = Array[String]())(implicit typeTag: ru.TypeTag[T]) = {
-    context(StreamContext(ExecutionEnvironments.get[T](args)))
+    context(StreamBuilderContext(ExecutionEnvironments.get[T](args)))
   }
 
   def init[T<:ExecutionEnvironment](config:Config)(implicit typeTag: ru.TypeTag[T]) = {
-    context(StreamContext(ExecutionEnvironments.get[T](config)))
+    context(StreamBuilderContext(ExecutionEnvironments.get[T](config)))
   }
 
   def init[T<:ExecutionEnvironment](config:Config,executionEnvironment:Class[T]) = {
-    context(StreamContext(ExecutionEnvironments.get[T](config,executionEnvironment)))
+    context(StreamBuilderContext(ExecutionEnvironments.get[T](config,executionEnvironment)))
   }
 
   def submit:ExecutionEnvironment = {

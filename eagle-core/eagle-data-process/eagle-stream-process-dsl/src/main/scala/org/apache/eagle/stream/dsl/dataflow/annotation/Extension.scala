@@ -14,11 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow
+package org.apache.eagle.stream.dsl.dataflow.annotation
 
-import org.apache.eagle.stream.dsl.dataflow.compiler.PipelineCompiler
-import org.apache.eagle.stream.dsl.dataflow.parser.PipelineParser
+import scala.annotation.StaticAnnotation
 
-object Pipeline extends PipelineParser with PipelineCompiler{
-
-}
+case class Extension(extType:String) extends StaticAnnotation

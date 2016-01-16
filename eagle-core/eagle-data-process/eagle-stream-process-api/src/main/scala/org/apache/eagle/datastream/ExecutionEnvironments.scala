@@ -34,6 +34,8 @@ import scala.reflect.runtime.universe._
  * @since 0.3.0
  */
 object ExecutionEnvironments{
+  type storm = StormExecutionEnvironment
+
   /**
    * Use `'''get[StormExecutionEnvironment](config)'''` instead
    *

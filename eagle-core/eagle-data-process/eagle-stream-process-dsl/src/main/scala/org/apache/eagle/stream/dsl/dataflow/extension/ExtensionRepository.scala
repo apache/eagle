@@ -1,3 +1,5 @@
+package org.apache.eagle.stream.dsl.dataflow.extension
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,11 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow
-
-import org.apache.eagle.stream.dsl.dataflow.compiler.PipelineCompiler
-import org.apache.eagle.stream.dsl.dataflow.parser.PipelineParser
-
-object Pipeline extends PipelineParser with PipelineCompiler{
+class ExtensionRepository {
 
 }

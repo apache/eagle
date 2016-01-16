@@ -18,8 +18,11 @@ package org.apache.eagle.stream.dsl.dataflow.parser
 
 import com.typesafe.config.Config
 
-import scala.collection.JavaConversions.mapAsScalaMap
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+
 import scala.collection.mutable
+
 
 class DataFlow {
   private var processors = mutable.Map[String,Processor]()
@@ -58,8 +61,25 @@ case class Processor(var processorId:String = null,var processorType:String = nu
   def getSchema:Option[Schema] = if(schema == null) None else Some(schema)
 }
 
-case class Connector (from:String,to:String, config:Map[String,AnyRef]) extends Serializable
+case class Connector (from:String,to:String, config:Map[String,AnyRef]) extends Serializable{
+  import Connector._
 
+  def group:Option[String] = config.get(GROUP_FIELD).asInstanceOf[Option[String]]
+  def groupByFields:Option[Seq[String]] = config.get(GROUP_BY_FIELD_FIELD) match {
+    case Some(obj) => Some(obj.asInstanceOf[java.util.List[String]].asScala.toSeq)
+    case None => None
+  }
+  def groupByIndexes:Option[Seq[Int]] = config.get(GROUP_BY_INDEX_FIELD) match {
+    case Some(obj) => Some(obj.asInstanceOf[java.util.List[java.lang.Integer]].asScala.toSeq.map(Int.unbox(_)))
+    case None => None
+  }
+}
+
+object Connector{
+  val GROUP_FIELD = "group"
+  val GROUP_BY_FIELD_FIELD = "groupByField"
+  val GROUP_BY_INDEX_FIELD = "groupByIndex"
+}
 
 private [dataflow]
 object Processor {

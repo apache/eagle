@@ -16,11 +16,20 @@
  */
 package org.apache.eagle.stream.dsl.dataflow
 
+import org.apache.eagle.datastream.ExecutionEnvironments.storm
 import org.scalatest.{FlatSpec, Matchers}
 
 class PipelineSpec extends FlatSpec with Matchers{
-  "Pipeline" should "parse successfully from pipeline.conf" in {
-    val pipeline = Pipeline.parseResource("pipeline.conf")
+  "Pipeline" should "parse successfully from pipeline_1.conf" in {
+    val pipeline = Pipeline.parseResource("pipeline_1.conf")
     pipeline should not be null
+  }
+
+  "Pipeline" should "compile successfully from pipeline_2.conf" in {
+    val pipeline = Pipeline.parseResource("pipeline_2.conf")
+    pipeline should not be null
+    val stream = Pipeline.compile(pipeline)
+    stream should not be null
+    stream.submit[storm]
   }
 }
