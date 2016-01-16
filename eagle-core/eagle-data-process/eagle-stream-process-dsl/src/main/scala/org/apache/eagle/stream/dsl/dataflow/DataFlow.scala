@@ -23,56 +23,144 @@ import scala.collection.mutable
 
 private [dataflow]
 class DataFlow {
-  private var modules = mutable.Map[String,Module]()
+  private var processors = mutable.Map[String,Processor]()
   private var connectors = mutable.Seq[Connector]()
-  def setModules(modules:Seq[Module]):Unit = {
-    modules.foreach{module =>
-      this.modules.put(module.getModuleId,module)
+  def setProcessors(processors:Seq[Processor]):Unit = {
+    processors.foreach{module =>
+      this.processors.put(module.getId,module)
     }
   }
-  def setModules(modules:mutable.Map[String,Module]):Unit = {
-    this.modules = modules
+  def setProcessors(processors:mutable.Map[String,Processor]):Unit = {
+    this.processors = processors
   }
   def setConnectors(connectors:Seq[Connector]):Unit = {
     connectors.foreach(connector =>{
       this.connectors :+= connector
     })
   }
-
-  def addModule(module:Module):Unit = {
-    if(contains(module)) throw new IllegalArgumentException(s"Duplicated module id error, ${module.getModuleId} has already been taken by ${getModuleById(module.getModuleId)}")
-    modules.put(module.getModuleId,module)
+  def addProcessor(module:Processor):Unit = {
+    if(contains(module)) throw new IllegalArgumentException(s"Duplicated processor id error, ${module.getId} has already been defined as ${getProcessor(module.getId)}")
+    processors.put(module.getId,module)
   }
 
-  def contains(module:Module):Boolean = modules.contains(module.getModuleId)
-
+  def contains(module:Processor):Boolean = processors.contains(module.getId)
   def addConnector(connector:Connector):Unit = {
     connectors :+= connector
   }
-
-  def getModules:Seq[Module] = modules.values.toSeq
-  def getModuleById(moduleId:String):Option[Module] = modules.get(moduleId)
+  def getProcessors:Seq[Processor] = processors.values.toSeq
+  def getProcessor(processorId:String):Option[Processor] = processors.get(processorId)
   def getConnectors:Seq[Connector] = connectors
 }
 
-object DataFlow {
-  def parse(config:Config):DataFlow = DataFlowParser.parse(config)
+private [dataflow]
+case class Processor(var processorId:String = null,var processorType:String = null,var schema:Schema = null, var processorConfig:Map[String,AnyRef] = null) extends Serializable {
+  def getId:String = processorId
+  def getType:String = processorType
+  def getConfig:Map[String,AnyRef] = processorConfig
+  def getSchema:Option[Schema] = if(schema == null) None else Some(schema)
 }
 
 private [dataflow]
-case class Module(var moduleId:String,var moduleType:String,var context:Map[String,AnyRef]) extends Serializable {
-  def getModuleId:String = moduleId
-  def getModuleType:String = moduleType
-  def getContext:Map[String,AnyRef] = context
-}
-
-private [dataflow]
-object Module {
-  def apply(moduleType:String,context:Map[String,AnyRef]) = {
-    val data = context.head._2.asInstanceOf[java.util.HashMap[String,AnyRef]].toMap
-    new Module(data.head._1, moduleType,data)
+object Processor {
+  val SCHEMA_FIELD:String = "schema"
+  def parse(processorId:String,processorType:String,context:Map[String,AnyRef], schemaSet:SchemaSet):Processor = {
+    val schema = context.get(SCHEMA_FIELD) match {
+      case Some(schemaDef) => schemaDef match {
+        case schemaId:String => schemaSet.get(schemaId).getOrElse {
+          throw new ParseException(s"Schema [$schemaId] is not found but referred by [$processorType:$processorId] in $context")
+        }
+        case schemaMap:java.util.HashMap[String,AnyRef] => Schema.parse(schemaMap.toMap)
+        case _ => throw new ParseException(s"Illegal value for schema: $schemaDef")
+      }
+      case None => null
+    }
+    new Processor(processorId,processorType,schema,context-SCHEMA_FIELD)
   }
 }
 
 private [dataflow]
 case class Connector (from:String,to:String, config:Map[String,AnyRef]) extends Serializable
+
+
+trait DataFlowParser {
+  def parse(config:Config,schemaSet:SchemaSet = SchemaSet.empty()):DataFlow = {
+    val dataw = new DataFlow()
+    val map = config.root().unwrapped().toMap
+
+    // Parse processors and connectors
+    map.foreach(entry => {
+      parseSingleProcessor(entry._1,entry._2.asInstanceOf[java.util.HashMap[String,AnyRef]].toMap,dataw,schemaSet)
+    })
+
+    validate(dataw)
+    dataw
+  }
+
+  private def
+  validate(pipeline:DataFlow): Unit ={
+    def checkModuleExists(id:String): Unit ={
+      pipeline.getProcessor(id).orElse {
+        throw new ParseException(s"Stream [$id] is not defined before being referred")
+      }
+    }
+
+    pipeline.getConnectors.foreach {connector =>
+      checkModuleExists(connector.from)
+      checkModuleExists(connector.to)
+    }
+  }
+
+  private def
+  parseSingleProcessor(identifier:String,config:Map[String,AnyRef],dataflow:DataFlow, schemaSet: SchemaSet):Unit = {
+    Identifier.parse(identifier) match {
+      case DefinitionIdentifier(processorType) => {
+        config foreach {entry =>
+          dataflow.addProcessor(Processor.parse(entry._1, processorType,entry._2.asInstanceOf[java.util.HashMap[String, AnyRef]].toMap,schemaSet))
+        }
+      }
+      case ConnectionIdentifier(fromIds,toId) => fromIds.foreach { fromId =>
+        if(fromId.eq(toId)) throw new ParseException(s"Can't connect $fromId to $toId")
+        dataflow.addConnector(Connector(fromId,toId,config))
+      }
+      case _ => ???
+    }
+  }
+}
+
+
+private trait Identifier
+
+private[dataflow] case class DefinitionIdentifier(moduleType: String) extends Identifier
+private[dataflow] case class ConnectionIdentifier(fromIds: Seq[String], toId: String) extends Identifier
+
+private[dataflow] object Identifier {
+  val ConnectorFlag = "->"
+  val UnitFlagSplitPattern = "\\|"
+  val UnitFlagChar = "|"
+  val ConnectorPattern = s"([\\w-|\\s]+)\\s+$ConnectorFlag\\s+([\\w-_]+)".r
+  def parse(identifier: String): Identifier = {
+    // ${id} -> ${id}
+    ConnectorPattern.findFirstMatchIn(identifier) match {
+      case Some(matcher) => {
+        if(matcher.groupCount != 2){
+          throw new ParseException(s"Illegal connector definition: $identifier")
+        }else{
+          val source = matcher.group(1)
+          val destination = matcher.group(2)
+          if(source.contains(UnitFlagChar)) {
+            val sources = source.split(UnitFlagSplitPattern).toSeq
+            ConnectionIdentifier(sources.map{_.trim()},destination)
+          }else{
+            ConnectionIdentifier(Seq(source),destination)
+          }
+        }
+      }
+      case None => {
+        if(identifier.contains(ConnectorFlag)) throw new ParseException(s"Failed to parse $identifier")
+        DefinitionIdentifier(identifier)
+      }
+    }
+  }
+}
+
+object DataFlow extends DataFlowParser

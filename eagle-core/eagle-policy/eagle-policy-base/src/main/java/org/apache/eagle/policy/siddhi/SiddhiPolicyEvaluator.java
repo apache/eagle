@@ -124,6 +124,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 		for(String sourceStream : sourceStreams){			
 			siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
 		}
+
 		executionPlanRuntime.start();
 
 		QueryCallback callback = new SiddhiQueryCallbackImpl<T, K>(config, this);		
