@@ -16,15 +16,20 @@
  */
 package org.apache.eagle.stream.dsl.dataflow.compiler
 
+import com.typesafe.config.ConfigFactory
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
 import org.apache.eagle.datastream.core._
 import org.apache.eagle.stream.dsl.dataflow.parser._
+
+import scala.collection.JavaConverters._
 
 trait PipelineCompiler {
   val classOfProcessorType = Map[String,StreamFactory](
     "KafkaSource" -> KafkaSourceStreamProducer,
     "KafkaSink" -> KafkaSinkStreamProducer,
     "Alert" -> AlertStreamProducer,
-    "Persistence" -> PersistProducer
+    "Persistence" -> PersistProducer,
+    "Console" -> ConsoleStreamProducer
   )
 
   def compile(pipeline:Pipeline):StreamContext = {
@@ -59,9 +64,9 @@ trait PipelineCompiler {
       groupByIndexes = connector.groupByFields.get.map(dataflow.getProcessor(from.name).get.getSchema.get.indexOfAttribute)
     }
     if(groupByIndexes == null){
-      GroupbyFieldsConnector(from,to,groupByIndexes)
-    } else {
       ShuffleConnector(from,to)
+    } else {
+      GroupbyFieldsConnector(from,to,groupByIndexes)
     }
   }
 }
@@ -73,12 +78,18 @@ trait StreamFactory{
 
 object KafkaSourceStreamProducer extends StreamFactory{
   def getType = "KafkaSource"
-  override def createInstance(config:Map[String,AnyRef]): StreamProducer[Any] = new KafkaSourceStreamProducer(config)
+  override def createInstance(config:Map[String,AnyRef]): StreamProducer[Any] =
+    new StormSourceProducer[Any](new KafkaSourcedSpoutProvider(null).getSpout(ConfigFactory.parseMap(config.asJava)))
 }
 
 object KafkaSinkStreamProducer extends StreamFactory{
   def getType = "KafkaSink"
   override def createInstance(config:Map[String,AnyRef]): StreamProducer[Any] = new KafkaSinkStreamProducer(config)
+}
+
+object ConsoleStreamProducer extends StreamFactory{
+  override def getType: String = "Stdout"
+  override def createInstance(config: Map[String, AnyRef]): StreamProducer[Any] = ForeachProducer(print)
 }
 
 object AlertStreamProducer extends StreamFactory{
@@ -96,5 +107,5 @@ object PersistProducer extends StreamFactory{
   }
 }
 
-case class KafkaSourceStreamProducer[T](context:Map[String,AnyRef]) extends StreamProducer[T]
+
 case class KafkaSinkStreamProducer[T](context:Map[String,AnyRef]) extends StreamProducer[T]

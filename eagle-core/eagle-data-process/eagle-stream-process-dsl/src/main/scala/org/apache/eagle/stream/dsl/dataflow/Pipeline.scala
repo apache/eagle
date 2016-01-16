@@ -19,6 +19,4 @@ package org.apache.eagle.stream.dsl.dataflow
 import org.apache.eagle.stream.dsl.dataflow.compiler.PipelineCompiler
 import org.apache.eagle.stream.dsl.dataflow.parser.PipelineParser
 
-object Pipeline extends PipelineParser with PipelineCompiler{
-
-}
+object Pipeline extends PipelineParser with PipelineCompiler
