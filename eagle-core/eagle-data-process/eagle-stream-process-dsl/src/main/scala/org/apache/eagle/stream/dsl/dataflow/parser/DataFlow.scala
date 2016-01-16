@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow
+package org.apache.eagle.stream.dsl.dataflow.parser
 
 import com.typesafe.config.Config
 
 import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.mutable
 
-private [dataflow]
 class DataFlow {
   private var processors = mutable.Map[String,Processor]()
   private var connectors = mutable.Seq[Connector]()
@@ -52,13 +51,15 @@ class DataFlow {
   def getConnectors:Seq[Connector] = connectors
 }
 
-private [dataflow]
 case class Processor(var processorId:String = null,var processorType:String = null,var schema:Schema = null, var processorConfig:Map[String,AnyRef] = null) extends Serializable {
   def getId:String = processorId
   def getType:String = processorType
   def getConfig:Map[String,AnyRef] = processorConfig
   def getSchema:Option[Schema] = if(schema == null) None else Some(schema)
 }
+
+case class Connector (from:String,to:String, config:Map[String,AnyRef]) extends Serializable
+
 
 private [dataflow]
 object Processor {
@@ -77,9 +78,6 @@ object Processor {
     new Processor(processorId,processorType,schema,context-SCHEMA_FIELD)
   }
 }
-
-private [dataflow]
-case class Connector (from:String,to:String, config:Map[String,AnyRef]) extends Serializable
 
 
 trait DataFlowParser {
@@ -128,7 +126,7 @@ trait DataFlowParser {
 }
 
 
-private trait Identifier
+private[dataflow] trait Identifier
 
 private[dataflow] case class DefinitionIdentifier(moduleType: String) extends Identifier
 private[dataflow] case class ConnectionIdentifier(fromIds: Seq[String], toId: String) extends Identifier

@@ -19,19 +19,19 @@ package org.apache.eagle.stream.dsl.definition
 import org.apache.eagle.datastream.core.{Configuration, ExecutionEnvironment}
 
 trait StreamContext{
-  def getEnvironment: ExecutionEnvironment
+  def getEnvironment: StreamContext
   def getStreamManager: DataStreamManager
   def getConfig:Configuration
 }
 
 object StreamContext{
-  def apply(implicit executionEnvironment: ExecutionEnvironment):StreamContext = StreamContextImpl(executionEnvironment)
+  def apply(implicit executionEnvironment: StreamContext):StreamContext = StreamContextImpl(executionEnvironment)
 }
 
-private case class StreamContextImpl(executionEnvironment: ExecutionEnvironment) extends StreamContext{
+private case class StreamContextImpl(executionEnvironment: StreamContext) extends StreamContext{
   private val streamManager = new DataStreamManager()
   private val configuration = Configuration(executionEnvironment.getConfig)
-  override def getEnvironment: ExecutionEnvironment = executionEnvironment
+  override def getEnvironment: StreamContext = executionEnvironment
   override def getStreamManager: DataStreamManager = streamManager
   override def getConfig:Configuration = configuration
 }

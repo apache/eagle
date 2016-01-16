@@ -17,6 +17,7 @@
 package org.apache.eagle.stream.dsl.dataflow
 
 import com.typesafe.config.ConfigFactory
+import org.apache.eagle.stream.dsl.dataflow.parser.{DataFlow, Identifier, ConnectionIdentifier, DefinitionIdentifier}
 import org.scalatest.{FlatSpec, Matchers}
 
 class DataFlowSpec extends FlatSpec with Matchers {

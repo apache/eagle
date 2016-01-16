@@ -1,3 +1,7 @@
+package org.apache.eagle.stream.dsl.dataflow.compiler
+
+import org.apache.eagle.stream.dsl.dataflow.parser.Pipeline
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,7 +18,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow
-
-class ParseException(message:String) extends Exception(message)
-class CompileException(message:String) extends Exception(message)
+trait PipelineCompiler {
+  def compiler(pipeline:Pipeline):Unit = {
+    
+  }
+}

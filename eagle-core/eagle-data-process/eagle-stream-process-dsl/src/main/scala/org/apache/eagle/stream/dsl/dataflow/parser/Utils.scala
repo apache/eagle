@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow
+package org.apache.eagle.stream.dsl.dataflow.parser
 
-import org.apache.eagle.stream.dsl.dataflow.parser.PipelineParser
-
-object Pipeline extends PipelineParser
+class ParseException(message:String) extends Exception(message)
+class CompileException(message:String) extends Exception(message)

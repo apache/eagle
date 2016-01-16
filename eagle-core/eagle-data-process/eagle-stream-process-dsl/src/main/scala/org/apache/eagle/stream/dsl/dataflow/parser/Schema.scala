@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow
+package org.apache.eagle.stream.dsl.dataflow.parser
 
 import com.typesafe.config.Config
 
-import scala.collection.mutable
 import scala.collection.JavaConversions.mapAsScalaMap
+import scala.collection.mutable
 
 class Field(name:String) extends Serializable{
   def getName:String = name

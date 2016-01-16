@@ -26,13 +26,13 @@ import scala.reflect.runtime.{universe => ru}
 
 trait StreamContextBuilder extends Serializable{
   private val logger = LoggerFactory.getLogger(classOf[StreamContextBuilder])
-  private var _context:StreamContext = null
-  def context(context:StreamContext):Unit = {
+  private var _context:ExecutionEnvironment = null
+  def context(context:ExecutionEnvironment):Unit = {
     if(_context!=null && logger.isDebugEnabled) logger.debug(s"Initializing with $context")
     _context = context
   }
 
-  def context:StreamContext = {
+  def context:ExecutionEnvironment = {
     if(_context ==null) throw new IllegalStateException("Context is not initialized")
     _context
   }
