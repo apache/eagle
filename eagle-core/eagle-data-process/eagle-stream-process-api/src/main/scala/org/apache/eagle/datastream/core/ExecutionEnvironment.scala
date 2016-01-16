@@ -19,62 +19,27 @@
 package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
-import org.apache.eagle.datastream.utils.GraphPrinter
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
-/**
- * @since 0.3.0
- */
-trait ExecutionEnvironment extends StreamSourceBuilder  {
-  def config:Configuration
-
-  /**
-   * Business logic DAG
-   * @return
-   */
-  def dag:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]
-
-  /**
-   * Start to execute
-   */
-  def execute():Unit
-
-  /**
-   * Support Java Style Config
-   *
-   * @return
-   */
-  def getConfig:Config = config.get
+trait StreamContextAdapter{
+  def submit(context:StreamContext):Unit = {
+    execute(context.build)
+  }
+  def execute(dag: StreamDAG)
 }
 
 /**
- * @todo Use Configuration instead of Config
+ * TODO: Decouple execution environment with stream context
  *
- * @param conf
+ * @since 0.3.0
  */
-abstract class ExecutionEnvironmentBase(private val conf:Config)  extends ExecutionEnvironment{
-  implicit private val _dag = new DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]](classOf[StreamConnector[Any,Any]])
-  private val _config:Configuration = Configuration(conf)
-
-  override def dag = _dag
-  override def config = _config
-
-  override def execute(): Unit = {
-    implicit val i_conf = _config.get
-    StreamNameExpansion()
-    GraphPrinter.print(dag,message="Before expanded DAG ")
-    StreamAggregateExpansion()
-    GraphPrinter.print(dag,message="after analyze expanded DAG ")
-    StreamAlertExpansion()
-    StreamUnionExpansion()
-    StreamGroupbyExpansion()
-    StreamParallelismConfigExpansion()
-    StreamNameExpansion()
-    GraphPrinter.print(dag,message="After expanded DAG ")
-    GraphPrinter.printDotDigraph(dag)
-    val streamDAG = StreamDAGTransformer.transform(dag)
-    execute(streamDAG)
+abstract class ExecutionEnvironment(private val conf:Config)
+  extends StreamContext(conf) with StreamContextAdapter     // Continue to support old API
+  with StreamSourceBuilder
+{
+  /**
+   * Start to execute
+   */
+  def execute():Unit = {
+    submit(this)
   }
-
-  protected def execute(dag: StreamDAG)
 }
