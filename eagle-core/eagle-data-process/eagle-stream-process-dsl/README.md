@@ -42,7 +42,7 @@ Features
 --------
 * [x] Compile DSL Configure to Pipeline model
 * [x] Compile Pipeline model to Stream Execution Graph
-* [x] Submit Stream Execution Graph to actual running environment say storm
+* [ ] Submit Stream Execution Graph to actual running environment say storm
 * [ ] Support Alert and Persistence for metric monitoring
 * [ ] Extensible stream module management
 	* [ ] Automatically scan and register module
@@ -51,3 +51,9 @@ Features
 * [ ] Stream Pipeline Scheduler
 * [ ] Graph editor to define streaming graph in UI
 * [?] JSON/Config & Scala Case Class Mapping (https://github.com/scala/pickling)
+* [?] Raw message structure oriented programing is a little ugly, we should define a generic message/event consist of [payload:stream/timestamp/serializer/deserializer,data:message]
+* [ ] Provide stream schema inline and send to metadata when submitting
+* [ ] UI should support specify executorId when defining new stream
+* [ ] Lack of a entity named StreamEntity for the workflow of defining topology&policy end-to-end
+
+
