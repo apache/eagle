@@ -28,14 +28,42 @@ import java.text.ParseException;
 
 public class TestHDFSSecuritylogParser {
 
+  /**
+   * Test success log message with simple auth
+   * @throws ParseException
+   */
     @Test
-    public void test() throws ParseException {
-        String msg = "2015-11-18 08:41:10,200 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hbase (auth:SIMPLE) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol";
+    public void testSimpleAuth() throws ParseException {
+      String msg = "2015-11-18 08:41:10,200 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hbase (auth:SIMPLE) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol";
+      verifyParserAttributes(msg);
+    }
 
-        HDFSSecurityLogParser parser = new HDFSSecurityLogParser();
-        HDFSSecurityLogObject obj = parser.parse(msg);
+    /**
+     * Test success log message with kerberos auth for service principal
+     * @throws ParseException
+     */
+    @Test
+    public void testServicePrincipalAuth() throws ParseException {
+      String msg = "2015-12-22 17:07:03,359 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hbase/node1.foo.com@EXAMPLE.COM (auth:KERBEROS) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol";
+      verifyParserAttributes(msg);
+    }
 
-        Assert.assertEquals("hbase", obj.user);
-        Assert.assertEquals(true, obj.allowed);
+    /**
+     * Test success log message with kerberos auth for user principal
+     * @throws ParseException
+     */
+    @Test
+    public void testUserPrincipalAuth() throws ParseException {
+      String msg = "2015-12-22 17:07:03,359 INFO SecurityLogger.org.apache.hadoop.security.authorize.ServiceAuthorizationManager: Authorization successful for hbase@EXAMPLE.COM (auth:KERBEROS) for protocol=interface org.apache.hadoop.hdfs.protocol.ClientProtocol";
+      verifyParserAttributes(msg);
+    }
+
+    private void verifyParserAttributes(String logMessage) throws ParseException {
+      HDFSSecurityLogParser parser = new HDFSSecurityLogParser();
+      HDFSSecurityLogObject obj = parser.parse(logMessage);
+
+      Assert.assertEquals("hbase", obj.user);
+      Assert.assertEquals(true, obj.allowed);
+
     }
 }
