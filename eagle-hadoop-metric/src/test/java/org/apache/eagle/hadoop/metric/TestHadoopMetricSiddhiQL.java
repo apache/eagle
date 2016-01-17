@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +38,7 @@ public class TestHadoopMetricSiddhiQL {
     @Test
     public void testNameNodeLag() throws Exception {
         String ql = "define stream s (host string, timestamp long, metric string, component string, site string, value long);" +
+                " @info(name='query') " +
                 " from s[metric=='hadoop.namenode.dfs.lastwrittentransactionid' and host=='a' ]#window.externalTime(timestamp, 5 min) select * insert into tmp1;" +
                 " from s[metric=='hadoop.namenode.dfs.lastwrittentransactionid' and host=='b' ]#window.externalTime(timestamp, 5 min) select * insert into tmp2;" +
                 " from tmp1 , tmp2 select tmp1.timestamp as t1time, max(tmp1.value) - max(tmp2.value) as gap insert into tmp3;" +
@@ -51,9 +52,16 @@ public class TestHadoopMetricSiddhiQL {
 
         final AtomicInteger count = new AtomicInteger(0);
         final CountDownLatch latch = new CountDownLatch(1);
-        runtime.addCallback("tmp", new StreamCallback() {
+//        runtime.addCallback("tmp", new StreamCallback() {
+//            @Override
+//            public void receive(Event[] events) {
+//                count.incrementAndGet();
+//                latch.countDown();
+//            }
+//        });
+        runtime.addCallback("query", new QueryCallback() {
             @Override
-            public void receive(Event[] events) {
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 count.incrementAndGet();
                 latch.countDown();
             }
