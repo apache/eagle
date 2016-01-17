@@ -26,6 +26,23 @@ import scala.collection.mutable
 
 
 class DataFlow {
+  def getInputs(id: String):Seq[Processor] = {
+    this.getConnectors.filter(_.to.equals(id)).map(c => getProcessor(c.from).get)
+  }
+
+  /**
+    * Connect if not, do nothing if already connected
+    *
+    * @param from
+    * @param to
+    */
+  def connect(from: String, to: String): Unit = {
+    val connector = Connector(from,to,null)
+    var exists = false
+    connectors.foreach(c => exists = (c.from.equals(from) && c.to.equals(to)) || exists)
+    if(!exists) addConnector(connector)
+  }
+
   private var processors = mutable.Map[String,Processor]()
   private var connectors = mutable.Seq[Connector]()
   def setProcessors(processors:Seq[Processor]):Unit = {
@@ -56,6 +73,9 @@ class DataFlow {
 }
 
 case class Processor(var processorId:String = null,var processorType:String = null,var schema:Schema = null, var processorConfig:Map[String,AnyRef] = null) extends Serializable {
+  private[dataflow] var inputs:Seq[Processor] = null
+  private[dataflow] var inputpIds:Seq[String] = null
+
   def getId:String = processorId
   def getType:String = processorType
   def getConfig:Map[String,AnyRef] = processorConfig
@@ -85,6 +105,7 @@ object Connector{
 private [dataflow]
 object Processor {
   val SCHEMA_FIELD:String = "schema"
+  val INPUTS_FIELD = "inputs"
   def parse(processorId:String,processorType:String,context:Map[String,AnyRef], schemaSet:SchemaSet):Processor = {
     val schema = context.get(SCHEMA_FIELD) match {
       case Some(schemaDef) => schemaDef match {
@@ -96,7 +117,9 @@ object Processor {
       }
       case None => null
     }
-    new Processor(processorId,processorType,schema,context-SCHEMA_FIELD)
+    val instance = new Processor(processorId,processorType,schema,context-SCHEMA_FIELD)
+    if(context.contains(INPUTS_FIELD)) instance.inputpIds = context.get(INPUTS_FIELD).get.asInstanceOf[java.util.List[String]].asScala.toSeq
+    instance
   }
 }
 
@@ -108,11 +131,23 @@ trait DataFlowParser {
 
     // Parse processors and connectors
     map.foreach(entry => {
-      parseSingleProcessor(entry._1,entry._2.asInstanceOf[java.util.HashMap[String,AnyRef]].toMap,dataw,schemaSet)
+      parseSingle(entry._1,entry._2.asInstanceOf[java.util.HashMap[String,AnyRef]].toMap,dataw,schemaSet)
     })
-
+    expand(dataw)
     validate(dataw)
     dataw
+  }
+
+  private def expand(datafw: DataFlow):Unit = {
+    datafw.getProcessors.foreach(proc =>{
+      if(proc.inputpIds!=null) {
+        proc.inputpIds.foreach(id => {
+          // connect if not
+          datafw.connect(id,proc.getId)
+        })
+      }
+      proc.inputs = datafw.getInputs(proc.getId)
+    })
   }
 
   private def
@@ -130,7 +165,7 @@ trait DataFlowParser {
   }
 
   private def
-  parseSingleProcessor(identifier:String,config:Map[String,AnyRef],dataflow:DataFlow, schemaSet: SchemaSet):Unit = {
+  parseSingle(identifier:String,config:Map[String,AnyRef],dataflow:DataFlow, schemaSet: SchemaSet):Unit = {
     Identifier.parse(identifier) match {
       case DefinitionIdentifier(processorType) => {
         config foreach {entry =>

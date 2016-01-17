@@ -23,7 +23,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * Each stream can only run on one alertExecutorId, all this stream related policy should on this stream as well.
+ * Stream and Alert executor Id mapping should be automatically created by topology definition
  */
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("alertExecutor")

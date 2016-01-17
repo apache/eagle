@@ -57,3 +57,5 @@ Features
 * [!] Fix configuration conflict, should pass through Config instead of ConfigFactory.load() manually
 * [ ] Override application configuration with pipeline configuration
 * [ ] Refactor schema registration structure and automatically submit stream schema when submitting pipeline
+* [ ] Submit alertStream, alertExecutorId mapping to AlertExecutorService when submitting pipeline
+* [x] Supports `inputs` field to define connector
