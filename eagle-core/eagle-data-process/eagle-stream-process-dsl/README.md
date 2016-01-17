@@ -42,8 +42,8 @@ Features
 --------
 * [x] Compile DSL Configure to Pipeline model
 * [x] Compile Pipeline model to Stream Execution Graph
-* [ ] Submit Stream Execution Graph to actual running environment say storm
-* [ ] Support Alert and Persistence for metric monitoring
+* [x] Submit Stream Execution Graph to actual running environment say storm
+* [x] Support Alert and Persistence for metric monitoring
 * [ ] Extensible stream module management
 	* [ ] Automatically scan and register module
 * [ ] Pipeline runner CLI tool and shell script
@@ -55,5 +55,6 @@ Features
 * [ ] Provide stream schema inline and send to metadata when submitting
 * [ ] UI should support specify executorId when defining new stream
 * [ ] Lack of a entity named StreamEntity for the workflow of defining topology&policy end-to-end
-
+* [ ] Fix multi-configure bug
+* [ ] Fix configuration conflict
 
