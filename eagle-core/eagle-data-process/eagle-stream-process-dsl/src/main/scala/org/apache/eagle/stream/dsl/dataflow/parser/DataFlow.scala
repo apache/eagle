@@ -17,6 +17,7 @@
 package org.apache.eagle.stream.dsl.dataflow.parser
 
 import com.typesafe.config.Config
+import org.apache.eagle.stream.dsl.dataflow.utils.ParseException
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._

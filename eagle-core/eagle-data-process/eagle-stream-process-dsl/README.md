@@ -32,7 +32,7 @@ DSL Format
 	}
 
 Usage
-------
+-----
 
 	val pipeline = Pipeline.parseResource("pipeline.conf")
 	val stream = Pipeline.compile(pipeline)
@@ -40,12 +40,9 @@ Usage
 
 Features
 --------
-* Compile DSL Configure to Pipeline model
-* Compile Pipeline model to Stream Execution Graph
-* Submit Stream Execution Graph to actual running environment say storm
-
-TODO
-----
+* [x] Compile DSL Configure to Pipeline model
+* [x] Compile Pipeline model to Stream Execution Graph
+* [x] Submit Stream Execution Graph to actual running environment say storm
 * [ ] Support Alert and Persistence for metric monitoring
 * [ ] Extensible stream module management
 	* [ ] Automatically scan and register module
@@ -53,3 +50,4 @@ TODO
 * [ ] Decouple pipeline compiler and scheduler into individual modules
 * [ ] Stream Pipeline Scheduler
 * [ ] Graph editor to define streaming graph in UI
+* [?] JSON/Config & Scala Case Class Mapping (https://github.com/scala/pickling)
