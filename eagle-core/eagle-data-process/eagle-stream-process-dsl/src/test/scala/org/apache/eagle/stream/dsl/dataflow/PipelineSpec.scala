@@ -39,13 +39,11 @@ class PipelineSpec extends FlatSpec with Matchers{
  * Storm LocalCluster throws ClassNotFoundException when submit in unit test, so here submit in App
  */
 object PipelineSpec_2 extends App{
-  val pipeline = Pipeline.parseResource("pipeline_2.conf")
+  val pipeline = Pipeline(args).parseResource("pipeline_2.conf")
   val stream = Pipeline.compile(pipeline)
   stream.submit[storm]
 }
 
-object PipelineSpec_3 extends App{
-  val pipeline = Pipeline.parseResource("pipeline_3.conf")
-  val stream = Pipeline.compile(pipeline)
-  stream.submit[storm]
+object PipelineSpec_3 extends App {
+  Pipeline(args).submit[storm]("pipeline_3.conf")
 }

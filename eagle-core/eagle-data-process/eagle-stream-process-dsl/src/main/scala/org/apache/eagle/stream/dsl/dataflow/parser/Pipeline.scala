@@ -68,8 +68,14 @@ trait PipelineParser{
     if(config.hasPath(CONFIG_FIELD)) pConfig = config.getConfig(CONFIG_FIELD)
     if(config.hasPath(SCHEMA_FIELD)) pSchemaSet = SchemaSet.parse(config.getConfig(SCHEMA_FIELD))
     if(config.hasPath(DATAFLOW_FIELD)) pDataflow = DataFlow.parse(config.getConfig(DATAFLOW_FIELD),pSchemaSet)
+
+    // Merge pipeline config over base config
+    val baseConfig =ConfigFactory.load()
+    pConfig = if(pConfig!=null) baseConfig.withFallback(pConfig) else baseConfig
+
     new Pipeline(pConfig,pDataflow)
   }
+
   def parseString(config:String):Pipeline = parse(ConfigFactory.parseString(config))
   def parseResource(resource:String):Pipeline = {
     parse(ConfigFactory.parseResourcesAnySyntax(getClass.getClassLoader,resource))

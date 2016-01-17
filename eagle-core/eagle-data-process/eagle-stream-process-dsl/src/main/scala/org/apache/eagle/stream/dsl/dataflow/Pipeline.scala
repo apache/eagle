@@ -16,7 +16,23 @@
  */
 package org.apache.eagle.stream.dsl.dataflow
 
+import com.typesafe.config.Config
+import org.apache.eagle.dataproc.util.ConfigOptionParser
+import org.apache.eagle.datastream.core.ExecutionEnvironment
 import org.apache.eagle.stream.dsl.dataflow.compiler.PipelineCompiler
 import org.apache.eagle.stream.dsl.dataflow.parser.PipelineParser
+import scala.reflect.runtime.{universe => ru}
 
-object Pipeline extends PipelineParser with PipelineCompiler
+class PipelineSubmitter extends PipelineParser with PipelineCompiler{
+  def submit[T <: ExecutionEnvironment](resource:String)(implicit typeTag:ru.TypeTag[T]) = compile(parseResource(resource)).submit[T]
+  def submit(resource:String,clazz:Class[ExecutionEnvironment]) = compile(parseResource(resource)).submit(clazz)
+  def submit(pipelineConfig:Config,clazz:Class[ExecutionEnvironment]) = compile(parse(pipelineConfig)).submit(clazz)
+  def apply(args:Array[String]):PipelineSubmitter = {
+    new ConfigOptionParser().load(args)
+    this
+  }
+}
+
+object Pipeline extends PipelineSubmitter
+  with PipelineParser
+  with PipelineCompiler

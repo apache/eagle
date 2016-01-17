@@ -6,7 +6,7 @@ DSL Format
 
 	{
 		config {
-		  execution.environment.config = someValue
+		  config.key = configValue
 		}
 
 		schema {
@@ -40,12 +40,11 @@ Usage
 
 Features
 --------
-* [x] Compile DSL Configure to Pipeline model
-* [x] Compile Pipeline model to Stream Execution Graph
-* [x] Submit Stream Execution Graph to actual running environment say storm
-* [x] Support Alert and Persistence for metric monitoring
-* [ ] Extensible stream module management
-	* [ ] Automatically scan and register module
+* [done] Compile DSL Configure to Pipeline model
+* [done] Compile Pipeline model to Stream Execution Graph
+* [done] Submit Stream Execution Graph to actual running environment say storm
+* [done] Support Alert and Persistence for metric monitoring
+* [ ] Extensible stream module management and automatically scan and register module
 * [ ] Pipeline runner CLI tool and shell script
 * [ ] Decouple pipeline compiler and scheduler into individual modules
 * [ ] Stream Pipeline Scheduler
@@ -55,6 +54,6 @@ Features
 * [ ] Provide stream schema inline and send to metadata when submitting
 * [ ] UI should support specify executorId when defining new stream
 * [ ] Lack of a entity named StreamEntity for the workflow of defining topology&policy end-to-end
-* [ ] Fix multi-configure bug
-* [ ] Fix configuration conflict
-
+* [!] Fix configuration conflict, should pass through Config instead of ConfigFactory.load() manually
+* [ ] Override application configuration with pipeline configuration
+* [ ] Refactor schema registration structure and automatically submit stream schema when submitting pipeline

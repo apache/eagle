@@ -79,7 +79,7 @@ object Schema{
     new Schema(map.keys.map {attributeName =>
       map(attributeName) match{
         case simpleType:String => Field(attributeName,simpleType)
-        case complexType:java.util.Map[String,AnyRef] => throw new IllegalStateException(s"ComplexType attribute definition is supported yet [$attributeName : $complexType] ")
+        case complexType:java.util.Map[String,AnyRef] => throw new IllegalStateException(s"ComplexType attribute definition is not supported yet [$attributeName : $complexType] ")
         case otherType@_ => throw new IllegalStateException(s"Illegal attribute definition $attributeName : $otherType")
       }
     }.toSeq)
