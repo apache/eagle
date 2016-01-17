@@ -874,6 +874,7 @@
                                 <exclude>.gitignore</exclude>
                                 <!-- IDE specific files-->
                                 <exclude>**/.idea/</exclude>
+                                <exclude>**/.cache-main</exclude>
                                 <exclude>**/.scalastyle/</exclude>
                                 <exclude>**/*.iml</exclude>
                                 <exclude>**/nb-configuration.xml</exclude>

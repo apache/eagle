@@ -23,6 +23,8 @@ import org.apache.eagle.datastream.core.StreamProducer;
 import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.apache.eagle.partition.PartitionStrategy;
 
+import java.util.Arrays;
+
 /**
  * Created on 1/10/16.
  */
@@ -44,7 +46,7 @@ public class PersistTopoTestMain2 {
                 + " @info(name='query')"
                 + " from eagleQuery#window.externalTime(timestamp, 10 min) "
                 + " select eagleAlertContext, min(timestamp) as starttime, avg(cpu) as avgCpu, avg(mem) as avgMem insert into tmp;";
-        StreamProducer aggregate = filter.aggregate(cql, new PartitionStrategy() {
+        StreamProducer aggregate = filter.aggregate(Arrays.asList("ealgeQuery"), cql, new PartitionStrategy() {
             @Override
             public int balance(String key, int buckNum) {
                 return 0;
