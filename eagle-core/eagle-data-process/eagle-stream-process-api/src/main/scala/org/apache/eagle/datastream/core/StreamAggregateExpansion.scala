@@ -44,7 +44,7 @@ class StreamAggregateExpansion(config: Config) extends StreamAlertExpansion(conf
 
 
         val analyzeExecutors = if (cepQl != null) {
-          AggregateExecutorFactory.Instance.createExecutors(cepQl)
+          AggregateExecutorFactory.Instance.createExecutors(upStreamNames, cepQl)
         } else {
           AggregateExecutorFactory.Instance.createExecutors(config, upStreamNames, analyzerId)
         }

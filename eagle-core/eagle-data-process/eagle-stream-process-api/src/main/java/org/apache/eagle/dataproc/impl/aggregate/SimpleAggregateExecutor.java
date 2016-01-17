@@ -52,15 +52,17 @@ public class SimpleAggregateExecutor
     private final int partitionSeq;
     private final int totalPartitionNum;
 
+    private final String[] upStreamNames;
     private String policyId;
     private String executorId;
     private Config config;
     private AggregateDefinitionAPIEntity aggDef;
     private PolicyEvaluator<AggregateDefinitionAPIEntity> evaluator;
 
-    public SimpleAggregateExecutor(String cql, String policyType, int partitionSeq, int totalPartitionNum) {
+    public SimpleAggregateExecutor(String[] upStreams, String cql, String policyType, int partitionSeq, int totalPartitionNum) {
         this.cql = cql;
         this.partitionSeq = partitionSeq;
+        this.upStreamNames = upStreams;
         this.totalPartitionNum = totalPartitionNum;
         // create an fixed definition policy api entity, and indicate it has full definition
         aggDef = new AggregateDefinitionAPIEntity();
@@ -123,7 +125,7 @@ public class SimpleAggregateExecutor
             // Create evaluator instances
             pe = (PolicyEvaluator<AggregateDefinitionAPIEntity>) evalCls
                     .getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
-                    .newInstance(config, alertDef.getTags().get(Constants.POLICY_ID), policyDef, new String[]{Constants.EAGLE_DEFAULT_POLICY_NAME}, false);
+                    .newInstance(config, alertDef.getTags().get(Constants.POLICY_ID), policyDef, upStreamNames, false);
         } catch (Exception ex) {
             LOG.error("Fail creating new policyEvaluator", ex);
             LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
