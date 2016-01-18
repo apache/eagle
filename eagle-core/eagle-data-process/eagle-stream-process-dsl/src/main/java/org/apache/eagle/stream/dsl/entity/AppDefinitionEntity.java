@@ -16,9 +16,16 @@
  */
 package org.apache.eagle.stream.dsl.entity;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
+import org.apache.eagle.stream.dsl.AppConstants;
+import org.apache.eagle.stream.dsl.execution.model.StreamAppDefinition;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import scala.collection.JavaConversions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -44,7 +51,7 @@ public class AppDefinitionEntity extends TaggedLogAPIEntity {
     @Column("e")
     private String executionStatus;
     @Column("f")
-    private String executionEnvironment;
+    private String executionCluster;
     @Column("g")
     private long updateTimestamp;
     @Column("h")
@@ -113,13 +120,13 @@ public class AppDefinitionEntity extends TaggedLogAPIEntity {
         valueChanged("executionStatus");
     }
 
-    public String getExecutionEnvironment() {
-        return executionEnvironment;
+    public String getExecutionCluster() {
+        return executionCluster;
     }
 
-    public void setExecutionEnvironment(String executionEnvironment) {
-        this.executionEnvironment = executionEnvironment;
-        valueChanged("executionEnvironment");
+    public void setExecutionCluster(String executionCluster) {
+        this.executionCluster = executionCluster;
+        valueChanged("executionCluster");
     }
 
     public final static class STATUS {
@@ -134,5 +141,38 @@ public class AppDefinitionEntity extends TaggedLogAPIEntity {
     public void validate() throws Exception {
         if(definition == null) throw new IllegalArgumentException("definition should not empty");
         // new StreamAppEvaluator(definition, ConfigFactory.parseMap(environment)).compile();
+    }
+
+    public static StreamAppDefinition toModel(final AppDefinitionEntity entity){
+        StreamAppDefinition model = new StreamAppDefinition(
+                entity.getTags().get(AppConstants.SITE_TAG),
+                entity.getTags().get(AppConstants.APP_NAME_TAG),
+                entity.getDefinition(),
+                entity.getConfiguration(),
+                entity.getDescription(),
+                entity.getCreator(),
+                entity.getExecutionStatus(),
+                entity.getExecutionCluster(),
+                entity.getUpdateTimestamp(),
+                entity.getCreateTimestamp());
+        return model;
+    }
+
+    public static AppDefinitionEntity fromModel(final StreamAppDefinition model){
+        AppDefinitionEntity entity = new AppDefinitionEntity();
+        entity.setDefinition(model.definition());
+        entity.setConfiguration(model.configuration());
+        entity.setDescription(model.description());
+        entity.setCreator(model.creator());
+        entity.setExecutionCluster(model.executionCluster());
+        entity.setExecutionStatus(model.executionStatus());
+        Map<String,String> tags = new HashMap<String,String>(){{
+            put(AppConstants.SITE_TAG, model.site());
+            put(AppConstants.APP_NAME_TAG, model.name());
+        }};
+        entity.setUpdateTimestamp(model.updateTimestamp());
+        entity.setCreateTimestamp(model.createTimestamp());
+        entity.setTags(tags);
+        return entity;
     }
 }

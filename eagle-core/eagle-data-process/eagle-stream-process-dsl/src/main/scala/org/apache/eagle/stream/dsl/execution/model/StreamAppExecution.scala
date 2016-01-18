@@ -1,5 +1,7 @@
 package org.apache.eagle.stream.dsl.execution.model
 
+import org.apache.eagle.stream.dsl.entity.AppCommandEntity
+
 /**
 * Licensed to the Apache Software Foundation (ASF) under one or more
 * contributor license agreements.  See the NOTICE file distributed with
@@ -16,6 +18,12 @@ package org.apache.eagle.stream.dsl.execution.model
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-class StreamAppExecution {
 
+
+case class StreamAppExecution(site: String, uuid: String, CommandType: String, appName: String, commandStatus: String,
+                         updateTimestamp: Long, createTimestamp: Long)
+  extends EntityConversion[AppCommandEntity]{
+  override def toEntity: AppCommandEntity = App
+
+  override def fromEntity(entity: AppCommandEntity): Unit =
 }

@@ -16,4 +16,12 @@
 */
 package org.apache.eagle.stream.dsl.execution.model
 
-class StreamAppDefinition {}
+import org.apache.eagle.stream.dsl.entity.AppDefinitionEntity
+
+case class StreamAppDefinition(site: String, name: String, definition: String, configuration: String, description: String,
+  creator: String, executionStatus: String, executionCluster: String, updateTimestamp: Long, createTimestamp: Long)
+  extends EntityConversion[AppDefinitionEntity]{
+  override def toEntity: AppDefinitionEntity = ???
+
+  override def fromEntity(m: AppDefinitionEntity): Unit = ???
+}

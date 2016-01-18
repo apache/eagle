@@ -16,15 +16,17 @@
  *
  */
 
-package org.apache.eagle.stream.dsl.rest;
+package org.apache.eagle.stream.dsl;
 
 
 public class AppConstants {
-    public final static String DELETE_ENTITIES_PATH = "delete";
-    public final static String APP_COMMAND_PATH = "/appCommand";
-    public final static String APP_DEFINITION_PATH = "/appDefinition";
     public final static String APP_COMMAND_SERVICE = "AppCommandService";
     public final static String APP_DEFINITION_SERVICE = "AppDefinitionService";
     public final static String ELAPSEDMS = "elapsedms";
     public final static String TOTAL_RESULTS = "totalResults";
+    public final static String SITE_TAG = "site";
+    public final static String APP_NAME_TAG = "name";
+    public final static String COMMAND_TYPE_TAG = "commandType";
+    public final static String COMMAND_ID_TAG = "UUID";
+
 }

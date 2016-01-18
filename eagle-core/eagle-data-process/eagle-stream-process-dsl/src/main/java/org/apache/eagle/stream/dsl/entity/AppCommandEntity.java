@@ -18,7 +18,12 @@ package org.apache.eagle.stream.dsl.entity;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
+import org.apache.eagle.stream.dsl.AppConstants;
+import org.apache.eagle.stream.dsl.execution.model.StreamAppExecution;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -27,13 +32,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Prefix("appCommand")
 @Service("AppCommandService")
 @TimeSeries(false)
-@Tags({"site", "uuid", "type"})
+@Tags({"site", "uuid", "commandType"})
 public class AppCommandEntity extends TaggedLogAPIEntity {
 
     @Column("a")
     private String appName;
     @Column("b")
-    private String status;
+    private String commandStatus;
     @Column("c")
     private long updateTimestamp;
     @Column("d")
@@ -48,13 +53,13 @@ public class AppCommandEntity extends TaggedLogAPIEntity {
         valueChanged("appName");
     }
 
-    public String getStatus() {
-        return status;
+    public String getCommandStatus() {
+        return commandStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-        valueChanged("status");
+    public void setCommandStatus(String status) {
+        this.commandStatus = status;
+        valueChanged("commandStatus");
     }
 
     public long getUpdateTimestamp() {
@@ -86,5 +91,32 @@ public class AppCommandEntity extends TaggedLogAPIEntity {
         public final static String RUNNING = "RUNNING";
         public final static String PENDING = "PENDING";
         public final static String DOWN = "DOWN";
+    }
+
+    public static StreamAppExecution toModel(final AppCommandEntity entity){
+        //return null;
+        StreamAppExecution model = new StreamAppExecution(
+                entity.getTags().get(AppConstants.SITE_TAG),
+                entity.getTags().get(AppConstants.COMMAND_ID_TAG),
+                entity.getTags().get(AppConstants.COMMAND_TYPE_TAG),
+                entity.getAppName(),
+                entity.getCommandStatus(),
+                entity.getUpdateTimestamp(),
+                entity.getCreateTimestamp());
+        return model;
+    }
+
+    public static AppCommandEntity fromModel(final StreamAppExecution model){
+        AppCommandEntity entity = new AppCommandEntity();
+        entity.setCmdTypes(JavaConversions.asJavaList(model.cmdTypes()));
+        entity.setCmdMatrix(model.matrix().getData());
+        Map<String,String> tags = new HashMap<String,String>(){{
+            put(UserProfileConstants.SITE_TAG,model.site());
+            put(UserProfileConstants.USER_TAG,model.uuid());
+
+        }};
+        entity.setTimestamp(model.timestamp());
+        entity.setTags(tags);
+        return entity;
     }
 }

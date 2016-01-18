@@ -29,7 +29,7 @@ import org.apache.eagle.storage.operation.Statement;
 import org.apache.eagle.storage.operation.UpdateStatement;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.stream.dsl.entity.AppCommandEntity;
-import org.apache.eagle.stream.dsl.rest.AppConstants;
+import org.apache.eagle.stream.dsl.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
