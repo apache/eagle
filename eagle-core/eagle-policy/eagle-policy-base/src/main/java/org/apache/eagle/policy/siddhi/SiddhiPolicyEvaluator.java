@@ -124,6 +124,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 		for(String sourceStream : sourceStreams){			
 			siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
 		}
+
 		executionPlanRuntime.start();
 
 		QueryCallback callback = new SiddhiQueryCallbackImpl<T, K>(config, this);		
@@ -173,9 +174,13 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 			//insert siddhiAlertContext into the first field
 			List<Object> input = new ArrayList<>();
 			input.add(siddhiAlertContext);
-			input.add(streamName);
+			// input.add(streamName);
 			putAttrsIntoInputStream(input, streamName, map);
-			siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
+            try {
+                siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
+            }catch (InterruptedException ex){
+                LOG.error("Got exception "+ex.getMessage(),ex);
+            }
 		}
 	}
 

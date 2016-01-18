@@ -1,0 +1,166 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.eagle.stream.dsl.definition
+
+import org.apache.eagle.datastream.Collector
+import org.apache.eagle.datastream.core.StreamProducer
+import org.apache.eagle.stream.dsl.builder.{ProcessorContext, Processor, StreamContextBuilder}
+
+import scala.collection.JavaConverters._
+
+class DataStream extends StreamDefinition with StreamContextBuilder with Serializable{
+  def as(attributes:(String,Symbol)*):DataStream = {
+    this.setSchema(StreamSchema.build(this.getName,attributes))
+    this
+  }
+
+  def parallism(num:Int):DataStream = {
+    this.getProducer.parallelism(num)
+    this
+  }
+
+  def from(producer:StreamProducer[Any]):DataStream = {
+    this.setProducer(producer)
+    this
+  }
+
+  def from(iterable:Iterable[Any]):DataStream = {
+    val producer = context.getEnvironment.from(iterable)
+    this.setProducer(producer)
+    this
+  }
+
+  def from(product:Product):DataStream = {
+    val producer = context.getEnvironment.from(product)
+    this.setProducer(producer)
+    this
+  }
+
+  def groupBy(fields:Int*):DataStream = {
+    newStream { stream =>
+      stream.setProducer(this.getProducer.groupBy(fields.map(Int.box).asJava))
+    }
+  }
+
+  def filter(func: Any=>Boolean): DataStream = {
+    newStream { stream =>
+      stream.setProducer(stream.getProducer.filter(func))
+    }
+  }
+
+  def transform(func: (Any,Collector[Any])=>Unit): DataStream = {
+    newStream {stream =>
+      stream.setProducer(stream.getProducer.flatMap(func))
+    }
+  }
+
+  def grok(builder: ProcessorContext):DataStream =  process(builder)
+
+  def process(context: ProcessorContext):DataStream =  {
+    newStream {stream =>
+      context.setStream(stream)
+      stream.setProducer(stream.getProducer.flatMap(context))
+      context.close()
+    }
+  }
+
+  def process(processor: Processor):DataStream =  {
+    newStream {stream =>
+      stream.setProducer(stream.getProducer.flatMap(processor))
+    }
+  }
+
+  def map(func: (Any,Collector[Any])=>Unit): DataStream = transform(func)
+  def alert(executor:String): DataStream = {
+    newStream { stream =>
+      stream.setProducer(stream.getProducer.alert(Seq(this.getName),executor))
+    }
+  }
+
+  def sink(stream:DataStream):DataStream = {
+    this.getProducer.connect(stream.getStartProducer)
+    stream
+  }
+
+  def sink(producer:StreamProducer[Any]):DataStream = {
+    this.getProducer.connect(producer)
+    this
+  }
+
+  def flow(producer:StreamProducer[Any]):DataStream = {
+    this.getProducer.connect(producer)
+    this.setProducer(producer)
+    this
+  }
+
+  def connect(dataStream:DataStream):DataStream = {
+    if(dataStream == null) throw new IllegalArgumentException(s"Failed to connect for $this to $dataStream, because the destination stream is null ")
+    if(this.getProducer == null){
+      this.setProducer(dataStream.getProducer)
+    } else if(dataStream.getProducer == null){
+      dataStream.setProducer(this.getProducer)
+    } else {
+      this.getProducer.connect(dataStream.getStartProducer)
+    }
+    dataStream
+  }
+
+  def ~>(dataStream:DataStream):DataStream = connect(dataStream)
+
+  def union(dataStreams:DataStream*):DataStream = {
+    newStream {stream =>
+      stream.setProducer(stream.getProducer.streamUnion(dataStreams.map(_.getProducer)))
+    }
+  }
+
+  def ?(func: Any=>Boolean):DataStream = filter(func)
+  def |(func:(Any,Collector[Any])=>Unit) = transform(func)
+  def |(producer:StreamProducer[Any]) = flow(producer)
+  def |(processor: Processor) = process(processor)
+  def |(processor: ProcessorContext) = process(processor)
+  def | = this
+
+  def !(executor:String) = alert(executor)
+
+  def > ( builder: => DataStream) :DataStream = {
+    this.sink(builder)
+  }
+
+  def > ( producer: StreamProducer[Any]) :DataStream = {
+    this.sink(producer)
+  }
+
+  protected def newStream(func: (DataStream)=> Unit = null):DataStream = {
+    val newStream = DataStream(this)
+    if(func != null) func(newStream)
+    newStream
+  }
+
+  override def toString: String = s"${getClass.getSimpleName}[name = $getName, schema = $getSchema]"
+}
+
+
+object DataStream {
+  def apply(dataStream: DataStream): DataStream = {
+    val newStream = new DataStream()
+    newStream.setName(dataStream.getName)
+    newStream.setProducer(dataStream.getProducer)
+    newStream.setSchema(dataStream.getSchema.orNull)
+    newStream.setStartProducer(dataStream.getStartProducer)
+    newStream
+  }
+}

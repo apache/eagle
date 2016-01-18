@@ -27,7 +27,8 @@ import scala.collection.{JavaConversions, mutable}
  * wrapper of DAG, used for storm topology compiler
  */
 class StreamDAG(val graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) extends StreamProducerGraph {
-  var nodeMap: mutable.Map[String, StreamProducer[Any]] = null
+  var nodeMap: mutable.Map[String, StreamProducer[Any]] = mutable.Map[String,StreamProducer[Any]]()
+  graph.iterator().asScala.foreach(p=> nodeMap.put(p.name,p))
 
   override def addEdge(from: StreamProducer[Any], to: StreamProducer[Any], streamConnector: StreamConnector[Any,Any]): Unit = {
     graph.addEdge(from, to, streamConnector)
@@ -35,6 +36,7 @@ class StreamDAG(val graph: DirectedAcyclicGraph[StreamProducer[Any], StreamConne
 
   override def addVertex(producer: StreamProducer[Any]): Unit = {
     graph.addVertex(producer)
+    nodeMap.put(producer.name,producer)
   }
 
   override def iterator(): Iterator[StreamProducer[Any]] = {
