@@ -16,14 +16,42 @@
 */
 package org.apache.eagle.stream.dsl.execution.impl
 
-import org.apache.eagle.stream.dsl.entity.{AppDefinitionEntity}
-import org.apache.eagle.stream.dsl.execution.StreamAppManager
+import org.apache.eagle.stream.dsl.entity.{AppCommandEntity, AppDefinitionEntity}
+import org.apache.eagle.stream.dsl.execution.{StreamEvaluator, StreamAppManager}
 import org.apache.eagle.stream.dsl.execution.model.StreamAppExecution
+import org.apache.eagle.stream.dsl.universal._
 
 class StreamAppManagerImpl extends StreamAppManager{
-  override def submit(app: AppDefinitionEntity): Boolean = ???
+  override def submit(app: AppDefinitionEntity, cmd: AppCommandEntity): Boolean = {
+    val code = appDefinition.getDefinition.stripMargin
+    var newAppStatus: String = AppDefinitionEntity.STATUS.UNKNOWN
+    var newCmdStatus: String = AppCommandEntity.Status.PENDING
+    try {
+      changeAppStatus(appDefinition, AppDefinitionEntity.STATUS.STARTING)
+      val ret = StreamEvaluator(code).evaluate[storm]
 
-  override def stop(app: StreamAppExecution): Boolean = ???
+      ret match {
+        case true => {
+          newAppStatus = AppDefinitionEntity.STATUS.RUNNING
+          newCmdStatus = AppCommandEntity.Status.RUNNING
+        }
+        case m@_ => {
+          newAppStatus = AppDefinitionEntity.STATUS.STOPPED
+          newCmdStatus = AppCommandEntity.Status.DOWN
+        }
+      }
+    } catch {
+      case e: Throwable => {
+        newAppStatus = AppDefinitionEntity.STATUS.STOPPED
+        newCmdStatus = AppCommandEntity.Status.DOWN
+      }
+    }
+    changeAppStatus(appDefinition, newAppStatus)
+    changeCommandStatus(appCommand, newCmdStatus)
 
-  override def start(app: StreamAppExecution): Boolean = ???
+  }
+
+  override def stop(app: AppDefinitionEntity, cmd: AppCommandEntity): Boolean = ???
+
+  override def start(app: AppDefinitionEntity, cmd: AppCommandEntity): Boolean = ???
 }
