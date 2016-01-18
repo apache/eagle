@@ -18,37 +18,9 @@ package org.apache.eagle.stream.dsl.definition
 
 import org.apache.eagle.datastream.Collector
 import org.apache.eagle.datastream.core.StreamProducer
-import org.apache.eagle.stream.dsl.builder.{Processor, ProcessorContext, StreamContextBuilder}
+import org.apache.eagle.stream.dsl.builder.{ProcessorContext, Processor, StreamContextBuilder}
 
 import scala.collection.JavaConverters._
-
-trait StreamDefinition {
-  private var name:String = null
-  private var schema:StreamSchema = null
-  private var streamProducer:StreamProducer[Any] = null
-  private var startStreamProducer:StreamProducer[Any] = null
-
-  def setSchema(schema: StreamSchema): Unit = this.schema = schema
-  def getSchema: Option[StreamSchema] = if(this.schema == null) None else Some(schema)
-  def getSchemaOrException: StreamSchema = if(this.schema == null) throw new StreamUndefinedException(s"Schema of stream $this is not defined") else schema
-
-  def setProducer(producer:StreamProducer[Any]) = {
-    this.streamProducer = producer
-    if(this.getStartProducer == null){
-      this.setStartProducer(producer)
-    }
-  }
-
-  def getProducer = this.streamProducer
-
-  def getStartProducer = startStreamProducer
-  def setStartProducer(producer:StreamProducer[Any]) = startStreamProducer = producer
-
-  def setName(name:String):Unit = {
-    this.name = name
-  }
-  def getName:String = this.name
-}
 
 class DataStream extends StreamDefinition with StreamContextBuilder with Serializable{
   def as(attributes:(String,Symbol)*):DataStream = {

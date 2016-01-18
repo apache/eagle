@@ -1,3 +1,5 @@
+package org.apache.eagle.stream.pipeline.extension
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,35 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.pipeline
+class ExtensionRepository {
 
-import org.apache.eagle.stream.dsl.StreamBuilder._
-
-case class PipelineExecutor(pipeline:Pipeline) {
-  def execute():Unit = {
-    init[storm](pipeline.config)
-
-    pipeline.publishers.foreach(module =>{
-      PipelineFactory.registerStreamPublisher(module,context)
-    })
-
-
-    if(pipeline.extend !=null){
-      pipeline.extend.evaluate()
-    }
-
-//    $"metricStream" alert "streamExecutor"
-
-    $"metricStream" ~> $"outputStream"
-
-//    if(pipeline.dataflow!=null){
-//      StreamEvaluator(pipeline.dataflow.stripMargin, config = pipeline.config).evaluate(submit = false)
-//    }
-
-    pipeline.subscribers.foreach(module => {
-      PipelineFactory.registerStreamSubscriber(module,context)
-    })
-
-    submit
-  }
 }

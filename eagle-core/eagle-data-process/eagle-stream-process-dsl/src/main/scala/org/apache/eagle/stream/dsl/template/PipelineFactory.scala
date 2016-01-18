@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.pipeline
+package org.apache.eagle.stream.dsl.template
 
 import org.apache.eagle.datastream.core.StreamProducer
-import org.apache.eagle.stream.dsl.definition.{StreamContext, DataStream}
+import org.apache.eagle.stream.dsl.definition.{StreamBuilderContext, DataStream}
 
 class PipelineFactory {
-  def registerStreamPublisher(module:Module,context:StreamContext):Unit = {
+  def registerStreamPublisher(module:Module,context:StreamBuilderContext):Unit = {
     val stream = new DataStream()
     stream.setName(module.getStream)
 
@@ -34,7 +34,7 @@ class PipelineFactory {
     context.getStreamManager.setStream(stream)
   }
 
-  def registerStreamSubscriber(module:Module,context:StreamContext):Unit = {
+  def registerStreamSubscriber(module:Module,context:StreamBuilderContext):Unit = {
     val stream = context.getStreamManager.getStreamOrException(module.getStream)
     // TODO: Module -> StreamProducer extension management
     val producer = module.getType match {

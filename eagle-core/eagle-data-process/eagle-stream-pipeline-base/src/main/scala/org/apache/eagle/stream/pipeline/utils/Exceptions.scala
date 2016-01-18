@@ -14,12 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.pipeline
+package org.apache.eagle.stream.pipeline.utils
 
-trait Template {
-  def evaluate()
-}
-
-object Template{
-  def newInstance(className:String):Template = ???
-}
+class ParseException(message:String) extends Exception(message)
+class CompileException(message:String) extends Exception(message)

@@ -38,7 +38,7 @@ public class KafkaSourcedSpoutScheme implements Scheme {
 	public KafkaSourcedSpoutScheme(String deserClsName, Config context){
 		try{
 			Properties prop = new Properties();
-            if(context.getObject("eagleProps") != null) {
+            if(context.hasPath("eagleProps")) {
                 prop.putAll(context.getObject("eagleProps"));
             }
 			Constructor<?> constructor =  Class.forName(deserClsName).getConstructor(Properties.class);

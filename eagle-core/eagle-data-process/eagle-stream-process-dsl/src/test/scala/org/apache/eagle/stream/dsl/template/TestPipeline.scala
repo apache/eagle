@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.pipeline
+package org.apache.eagle.stream.dsl.template
 
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{Matchers, FlatSpec}

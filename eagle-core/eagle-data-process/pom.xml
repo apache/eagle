@@ -31,5 +31,8 @@
     	<module>eagle-job-common</module>
         <module>eagle-stream-process-api</module>
         <module>eagle-stream-process-dsl</module>
+        <module>eagle-stream-pipeline-base</module>
+        <module>eagle-stream-pipeline-runner</module>
+        <module>eagle-stream-pipeline-scheduler</module>
     </modules>
 </project>

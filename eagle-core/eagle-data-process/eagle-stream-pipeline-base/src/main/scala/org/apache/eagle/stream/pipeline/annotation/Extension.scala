@@ -14,13 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.pipeline.template
+package org.apache.eagle.stream.pipeline.annotation
 
-import org.apache.eagle.stream.dsl.StreamBuilder._
-import org.apache.eagle.stream.dsl.pipeline.Template
+import scala.annotation.StaticAnnotation
 
-class SingleStreamMonitor extends Template{
-  override def evaluate(): Unit = {
-    $"defaultStream" alert "defaultStreamExecutor"
-  }
-}
+case class Extension(extType:String) extends StaticAnnotation
