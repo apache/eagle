@@ -71,8 +71,7 @@ trait PipelineParser{
 
     // Merge pipeline config over base config
     val baseConfig =ConfigFactory.load()
-    pConfig = if(pConfig!=null) baseConfig.withFallback(pConfig) else baseConfig
-
+    pConfig = if(pConfig!=null) pConfig.withFallback(baseConfig) else baseConfig
     new Pipeline(pConfig,pDataflow)
   }
 

@@ -29,9 +29,12 @@ import org.apache.eagle.stream.pipeline.parser.PipelineParser
 import scala.reflect.runtime.{universe => ru}
 
 trait PipelineRunner extends PipelineParser with PipelineCompiler{
-  def submit[T <: ExecutionEnvironment](resource:String)(implicit typeTag:ru.TypeTag[T]) = compile(parseResource(resource)).submit[T]
-  def submit(resource:String,clazz:Class[ExecutionEnvironment]) = compile(parseResource(resource)).submit(clazz)
-  def submit(pipelineConfig:Config,clazz:Class[ExecutionEnvironment]) = compile(parse(pipelineConfig)).submit(clazz)
+  def submit[T <: ExecutionEnvironment](resource:String)(implicit typeTag:ru.TypeTag[T]) =
+    compile(parseResource(resource)).submit[T]
+  def submit(resource:String,clazz:Class[ExecutionEnvironment]) =
+    compile(parseResource(resource)).submit(clazz)
+  def submit(pipelineConfig:Config,clazz:Class[ExecutionEnvironment]) =
+    compile(parse(pipelineConfig)).submit(clazz)
   def apply(args:Array[String]):PipelineRunner = {
     new ConfigOptionParser().load(args)
     this
