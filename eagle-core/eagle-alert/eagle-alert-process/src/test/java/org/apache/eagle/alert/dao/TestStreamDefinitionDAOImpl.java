@@ -59,10 +59,9 @@ public class TestStreamDefinitionDAOImpl {
 				return list;
 			}
 		};
-
+        StreamMetadataManager.getInstance().reset();
 		StreamMetadataManager.getInstance().init(config, dao);
 		Map<String, List<AlertStreamSchemaEntity>> retMap = StreamMetadataManager.getInstance().getMetadataEntitiesForAllStreams();
 		Assert.assertTrue(retMap.get("TestStream").size() == 4);
-		StreamMetadataManager.getInstance().reset();
 	}
 }

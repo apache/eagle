@@ -34,18 +34,18 @@ public class TestSiddhiStreamMetadataUtils {
 	@Test
 	public void test() throws Exception{
         Config config = ConfigFactory.load();
-		StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAO(){
-			@Override
-			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(
+        StreamMetadataManager.getInstance().reset();
+        StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAO() {
+            @Override
+            public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(
                     String dataSource) {
-				return Arrays.asList(generateStreamMetadataAPIEntity("attrName1", "STRING"),
-						generateStreamMetadataAPIEntity("attrName2", "LONG")
-						);
-			}
-		});
+                return Arrays.asList(generateStreamMetadataAPIEntity("attrName1", "STRING"),
+                        generateStreamMetadataAPIEntity("attrName2", "LONG")
+                );
+            }
+        });
 		String siddhiStreamDef = SiddhiStreamMetadataUtils.convertToStreamDef("testStreamName");
 		Assert.assertEquals("define stream " + "testStreamName" + "(eagleAlertContext object, attrName1 string,attrName2 long);", siddhiStreamDef);
-		StreamMetadataManager.getInstance().reset();
 	}
 	
 	private AlertStreamSchemaEntity generateStreamMetadataAPIEntity(final String attrName, String attrType){
