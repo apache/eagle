@@ -60,8 +60,7 @@ object ExecutionEnvironments{
    * Use `'''get[StormExecutionEnvironment](args)'''` instead
    *
    * @see get[StormExecutionEnvironment](args)
-   *
-   * @param args
+    * @param args
    * @return
    */
   @deprecated("Execution environment should not know implementation of Storm")
@@ -75,7 +74,7 @@ object ExecutionEnvironments{
    * @return
    */
   def get[T<:ExecutionEnvironment](implicit typeTag: TypeTag[T]): T ={
-    get[T](ConfigFactory.load())
+    getWithConfig[T](ConfigFactory.load())
   }
 
   /**
@@ -85,7 +84,7 @@ object ExecutionEnvironments{
    * @tparam T
    * @return
    */
-  def get[T<:ExecutionEnvironment](config:Config)(implicit typeTag: TypeTag[T]): T ={
+  def getWithConfig[T <: ExecutionEnvironment](config:Config)(implicit typeTag: TypeTag[T]): T ={
     typeTag.mirror.runtimeClass(typeOf[T]).getConstructor(classOf[Config]).newInstance(config).asInstanceOf[T]
   }
 
@@ -97,7 +96,7 @@ object ExecutionEnvironments{
    * @return
    */
   def get[T<:ExecutionEnvironment](args:Array[String])(implicit typeTag: TypeTag[T]): T ={
-    get[T](new ConfigOptionParser().load(args))
+    getWithConfig[T](new ConfigOptionParser().load(args))
   }
 
   /**
@@ -111,9 +110,14 @@ object ExecutionEnvironments{
     get[T](ConfigFactory.load(),clazz)
   }
 
+  def get[T<:ExecutionEnvironment](clazz:Class[T], config:Config):T ={
+    get[T](config,clazz)
+  }
+
   /**
    * Support java style
-   * @param config command config
+    *
+    * @param config command config
    * @param clazz execution environment class
    * @tparam T execution environment type
    * @return

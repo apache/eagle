@@ -69,11 +69,11 @@ class StreamContext(private val conf:Config) extends StreamContextBuilder{
   }
 
   override def submit(clazz: Class[ExecutionEnvironment]): Unit = {
-    ExecutionEnvironments.get(clazz).submit(this)
+    ExecutionEnvironments.get(clazz,conf).submit(this)
   }
 
   override def submit[E <: ExecutionEnvironment](implicit typeTag: TypeTag[E]): Unit = {
-    ExecutionEnvironments.get[E].submit(this)
+    ExecutionEnvironments.getWithConfig[E](conf).submit(this)
   }
 }
 
