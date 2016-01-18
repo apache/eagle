@@ -28,12 +28,12 @@
 
 			updateEntity: 'rest/entities?serviceName=${serviceName}',
 			queryEntity: 'rest/entities/rowkey?serviceName=${serviceName}&value=${encodedRowkey}',
-			queryEntities: 'rest/list?query=${serviceName}[${condition}]{${values}}&pageSize=100000',
+			queryEntities: 'rest/entities?query=${serviceName}[${condition}]{${values}}&pageSize=100000',
 			deleteEntity: 'rest/entities/delete?serviceName=${serviceName}&byId=true',
 			deleteEntities: 'rest/entities?query=${serviceName}[${condition}]{*}&pageSize=100000',
 
-			queryGroup: 'rest/list?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000',
-			querySeries: 'rest/list?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000&timeSeries=true&intervalmin=${intervalmin}',
+			queryGroup: 'rest/entities?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000',
+			querySeries: 'rest/entities?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000&timeSeries=true&intervalmin=${intervalmin}',
 
 			query: 'rest/',
 
