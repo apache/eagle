@@ -1,8 +1,3 @@
-package org.apache.eagle.stream.dsl.builder
-
-import org.apache.eagle.datastream.core.StreamProducer
-import org.apache.eagle.stream.dsl.definition.DataStream
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,20 +14,35 @@ import org.apache.eagle.stream.dsl.definition.DataStream
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-trait StreamImplicits extends StreamContextBuilder{
-  implicit class DataStreamNameImplicits(name:String) {
-    def := ( builder: => DataStream) :Unit = {
-      val stream = builder
-      stream.setName(name)
-      setStream(stream)
+package org.apache.eagle.stream.dsl.pipeline
+
+import org.apache.eagle.stream.dsl.StreamBuilder._
+
+case class PipelineExecutor(pipeline:Pipeline) {
+  def execute():Unit = {
+    init[storm](pipeline.config)
+
+    pipeline.publishers.foreach(module =>{
+      PipelineFactory.registerStreamPublisher(module,context)
+    })
+
+
+    if(pipeline.extend !=null){
+      pipeline.extend.evaluate()
     }
 
-    def > ( builder: => DataStream) :DataStream = {
-      getStreamOrException(name).sink(builder)
-    }
+//    $"metricStream" alert "streamExecutor"
 
-    def > ( producer: StreamProducer[Any]) :DataStream = {
-      getStreamOrException(name).sink(producer)
-    }
+    $"metricStream" ~> $"outputStream"
+
+//    if(pipeline.dataflow!=null){
+//      StreamEvaluator(pipeline.dataflow.stripMargin, config = pipeline.config).evaluate(submit = false)
+//    }
+
+    pipeline.subscribers.foreach(module => {
+      PipelineFactory.registerStreamSubscriber(module,context)
+    })
+
+    submit
   }
 }

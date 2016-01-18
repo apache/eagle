@@ -24,12 +24,9 @@ import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity
 import org.apache.eagle.stream.dsl.dao.AppEntityDaoImpl
 
 import org.apache.eagle.stream.dsl.entity.{AppDefinitionEntity, AppCommandEntity}
+import org.apache.eagle.stream.dsl.StreamBuilder._
 import org.apache.eagle.stream.dsl.rest.AppConstants
-import org.apache.eagle.stream.dsl.universal._
-
 import scala.collection.JavaConverters._
-
-
 
 object StreamAppConstants {
   val SCHEDULE_SYSTEM = "stream-app-scheduler"

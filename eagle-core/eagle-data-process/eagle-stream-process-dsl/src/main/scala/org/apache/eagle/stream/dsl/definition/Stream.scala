@@ -32,7 +32,13 @@ trait StreamDefinition {
   def getSchema: Option[StreamSchema] = if(this.schema == null) None else Some(schema)
   def getSchemaOrException: StreamSchema = if(this.schema == null) throw new StreamUndefinedException(s"Schema of stream $this is not defined") else schema
 
-  def setProducer(producer:StreamProducer[Any]) = this.streamProducer = producer
+  def setProducer(producer:StreamProducer[Any]) = {
+    this.streamProducer = producer
+    if(this.getStartProducer == null){
+      this.setStartProducer(producer)
+    }
+  }
+
   def getProducer = this.streamProducer
 
   def getStartProducer = startStreamProducer
@@ -129,6 +135,20 @@ class DataStream extends StreamDefinition with StreamContextBuilder with Seriali
     this
   }
 
+  def connect(dataStream:DataStream):DataStream = {
+    if(dataStream == null) throw new IllegalArgumentException(s"Failed to connect for $this to $dataStream, because the destination stream is null ")
+    if(this.getProducer == null){
+      this.setProducer(dataStream.getProducer)
+    } else if(dataStream.getProducer == null){
+      dataStream.setProducer(this.getProducer)
+    } else {
+      this.getProducer.connect(dataStream.getStartProducer)
+    }
+    dataStream
+  }
+
+  def ~>(dataStream:DataStream):DataStream = connect(dataStream)
+
   def union(dataStreams:DataStream*):DataStream = {
     newStream {stream =>
       stream.setProducer(stream.getProducer.streamUnion(dataStreams.map(_.getProducer)))
@@ -136,12 +156,12 @@ class DataStream extends StreamDefinition with StreamContextBuilder with Seriali
   }
 
   def ?(func: Any=>Boolean):DataStream = filter(func)
-
   def |(func:(Any,Collector[Any])=>Unit) = transform(func)
   def |(producer:StreamProducer[Any]) = flow(producer)
   def |(processor: Processor) = process(processor)
   def |(processor: ProcessorContext) = process(processor)
   def | = this
+
   def !(executor:String) = alert(executor)
 
   def > ( builder: => DataStream) :DataStream = {
@@ -167,7 +187,7 @@ object DataStream {
     val newStream = new DataStream()
     newStream.setName(dataStream.getName)
     newStream.setProducer(dataStream.getProducer)
-    newStream.setSchema(dataStream.getSchema.get)
+    newStream.setSchema(dataStream.getSchema.orNull)
     newStream.setStartProducer(dataStream.getStartProducer)
     newStream
   }
