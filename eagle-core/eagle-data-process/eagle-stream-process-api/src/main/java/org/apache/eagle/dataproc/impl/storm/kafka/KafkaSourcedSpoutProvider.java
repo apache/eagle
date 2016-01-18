@@ -36,9 +36,11 @@ public class KafkaSourcedSpoutProvider implements StormSpoutProvider {
 	public SchemeAsMultiScheme getStreamScheme(String deserClsName, Config context) {
 		return new SchemeAsMultiScheme(new KafkaSourcedSpoutScheme(deserClsName, context));
 	}
+
     private String configPrefix = "dataSourceConfig";
 
     public KafkaSourcedSpoutProvider(){}
+
     public KafkaSourcedSpoutProvider(String prefix){
         this.configPrefix = prefix;
     }

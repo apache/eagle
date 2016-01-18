@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow.utils
+package org.apache.eagle.stream.pipeline.annotation
 
-class ParseException(message:String) extends Exception(message)
-class CompileException(message:String) extends Exception(message)
+import scala.annotation.StaticAnnotation
+
+case class Extension(extType:String) extends StaticAnnotation

@@ -1,4 +1,4 @@
-package org.apache.eagle.stream.dsl.dataflow.parser
+package org.apache.eagle.stream.pipeline.parser
 
 import com.typesafe.config.{Config, ConfigFactory}
 

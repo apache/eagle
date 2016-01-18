@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow
+package org.apache.eagle.stream.pipeline
+
 
 import com.typesafe.config.Config
 import org.apache.eagle.dataproc.util.ConfigOptionParser
 import org.apache.eagle.datastream.core.ExecutionEnvironment
-import org.apache.eagle.stream.dsl.dataflow.compiler.PipelineCompiler
-import org.apache.eagle.stream.dsl.dataflow.parser.PipelineParser
+import org.apache.eagle.stream.pipeline.compiler.PipelineCompiler
+import org.apache.eagle.stream.pipeline.parser.PipelineParser
+
 import scala.reflect.runtime.{universe => ru}
 
 class PipelineSubmitter extends PipelineParser with PipelineCompiler{

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow.parser
+package org.apache.eagle.stream.pipeline.parser
 
 import com.typesafe.config.Config
 
@@ -106,9 +106,9 @@ object Schema{
   }
 }
 
-private[dataflow] class StreamUndefinedException(message:String = "stream is not defined",throwable: Throwable = null) extends Exception(message,throwable)
+private[pipeline] class StreamUndefinedException(message:String = "stream is not defined",throwable: Throwable = null) extends Exception(message,throwable)
 
-private[dataflow] class SchemaSet {
+private[pipeline] class SchemaSet {
   private val processorSchemaCache = mutable.Map[String,Schema]()
   def set(schemaId:String,schema:Schema):Unit = {
     if(processorSchemaCache.contains(schemaId)) throw new IllegalArgumentException(
@@ -122,7 +122,7 @@ private[dataflow] class SchemaSet {
   def get(schemaId:String):Option[Schema] = processorSchemaCache.get(schemaId)
 }
 
-private[dataflow] object SchemaSet{
+private[pipeline] object SchemaSet{
   def empty() = new SchemaSet()
   /**
    * For example:

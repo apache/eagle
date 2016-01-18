@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow.compiler
+package org.apache.eagle.stream.pipeline.compiler
 
 import java.util.Properties
 import java.util.concurrent.atomic.AtomicBoolean
@@ -23,8 +23,8 @@ import com.typesafe.config.ConfigFactory
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider
 import org.apache.eagle.datastream.core._
 import org.apache.eagle.partition.PartitionStrategy
-import org.apache.eagle.stream.dsl.dataflow.parser._
-import org.apache.eagle.stream.dsl.dataflow.utils.CompileException
+import org.apache.eagle.stream.pipeline.parser._
+import org.apache.eagle.stream.pipeline.utils.CompileException
 import org.apache.kafka.clients.producer.{RecordMetadata, Callback, ProducerRecord, KafkaProducer}
 import org.slf4j.LoggerFactory
 

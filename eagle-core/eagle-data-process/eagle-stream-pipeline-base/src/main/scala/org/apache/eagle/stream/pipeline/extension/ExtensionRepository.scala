@@ -1,4 +1,4 @@
-package org.apache.eagle.stream.dsl.dataflow.extension
+package org.apache.eagle.stream.pipeline.extension
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more

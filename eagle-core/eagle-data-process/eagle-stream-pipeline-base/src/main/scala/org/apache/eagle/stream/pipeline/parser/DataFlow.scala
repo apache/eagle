@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow.parser
+package org.apache.eagle.stream.pipeline.parser
 
 import com.typesafe.config.Config
-import org.apache.eagle.stream.dsl.dataflow.utils.ParseException
+import org.apache.eagle.stream.pipeline.utils.ParseException
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
@@ -73,8 +73,8 @@ class DataFlow {
 }
 
 case class Processor(var processorId:String = null,var processorType:String = null,var schema:Schema = null, var processorConfig:Map[String,AnyRef] = null) extends Serializable {
-  private[dataflow] var inputs:Seq[Processor] = null
-  private[dataflow] var inputpIds:Seq[String] = null
+  private[pipeline] var inputs:Seq[Processor] = null
+  private[pipeline] var inputpIds:Seq[String] = null
 
   def getId:String = processorId
   def getType:String = processorType
@@ -102,7 +102,7 @@ object Connector{
   val GROUP_BY_INDEX_FIELD = "groupByIndex"
 }
 
-private [dataflow]
+private [pipeline]
 object Processor {
   val SCHEMA_FIELD:String = "schema"
   val INPUTS_FIELD = "inputs"
@@ -182,12 +182,12 @@ trait DataFlowParser {
 }
 
 
-private[dataflow] trait Identifier
+private[pipeline] trait Identifier
 
-private[dataflow] case class DefinitionIdentifier(moduleType: String) extends Identifier
-private[dataflow] case class ConnectionIdentifier(fromIds: Seq[String], toId: String) extends Identifier
+private[pipeline] case class DefinitionIdentifier(moduleType: String) extends Identifier
+private[pipeline] case class ConnectionIdentifier(fromIds: Seq[String], toId: String) extends Identifier
 
-private[dataflow] object Identifier {
+private[pipeline] object Identifier {
   val ConnectorFlag = "->"
   val UnitFlagSplitPattern = "\\|"
   val UnitFlagChar = "|"

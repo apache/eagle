@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.stream.dsl.dataflow
+package org.apache.eagle.stream.pipeline
 
 import com.typesafe.config.ConfigFactory
-import org.apache.eagle.stream.dsl.dataflow.parser.{DataFlow, Identifier, ConnectionIdentifier, DefinitionIdentifier}
+import org.apache.eagle.stream.pipeline.parser.{ConnectionIdentifier, DataFlow, DefinitionIdentifier, Identifier}
 import org.scalatest.{FlatSpec, Matchers}
 
 class DataFlowSpec extends FlatSpec with Matchers {
