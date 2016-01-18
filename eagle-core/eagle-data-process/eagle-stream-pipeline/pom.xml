@@ -15,7 +15,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -25,8 +24,7 @@
         <version>0.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>eagle-stream-process-dsl</artifactId>
+    <artifactId>eagle-stream-pipeline</artifactId>
     <dependencies>
         <dependency>
             <groupId>eagle</groupId>
@@ -100,53 +98,53 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-<build>
-<plugins>
-    <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <executions>
-            <execution>
-                <id>scala-compile-first</id>
-                <phase>process-resources</phase>
-                <goals>
-                    <goal>add-source</goal>
-                    <goal>compile</goal>
-                </goals>
-            </execution>
-            <execution>
-                <id>scala-test-compile</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                    <goal>testCompile</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-            <skipTests>true</skipTests>
-        </configuration>
-    </plugin>
-    <plugin>
-        <groupId>org.scalatest</groupId>
-        <artifactId>scalatest-maven-plugin</artifactId>
-        <configuration>
-            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-            <junitxml>.</junitxml>
-            <filereports>TestSuite.txt</filereports>
-        </configuration>
-        <executions>
-            <execution>
-                <id>test</id>
-                <goals>
-                    <goal>test</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>
-</plugins>
-</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <configuration>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <junitxml>.</junitxml>
+                    <filereports>TestSuite.txt</filereports>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -18,12 +18,11 @@ package org.apache.eagle.stream.dsl.execution.impl
 
 import org.apache.eagle.stream.dsl.entity.{AppCommandEntity, AppDefinitionEntity}
 import org.apache.eagle.stream.dsl.execution.{StreamEvaluator, StreamAppManager}
-import org.apache.eagle.stream.dsl.execution.model.StreamAppExecution
-import org.apache.eagle.stream.dsl.universal._
+import org.apache.eagle.stream.dsl.StreamBuilder._
 
 class StreamAppManagerImpl extends StreamAppManager{
   override def submit(app: AppDefinitionEntity, cmd: AppCommandEntity): Boolean = {
-    val code = appDefinition.getDefinition.stripMargin
+    val code = app.getDefinition.stripMargin
     var newAppStatus: String = AppDefinitionEntity.STATUS.UNKNOWN
     var newCmdStatus: String = AppCommandEntity.Status.PENDING
     try {
