@@ -216,6 +216,11 @@ public class CompiledQuery {
             this.searchCondition.setEndTime(this.rawQuery.getEndTime());
             this.setStartTime(DateTimeUtil.humanDateToSeconds(this.getRawQuery().getStartTime()) * 1000);
             this.setEndTime(DateTimeUtil.humanDateToSeconds(this.getRawQuery().getEndTime()) * 1000);
+        }else{
+            this.searchCondition.setStartTime("0");
+            this.searchCondition.setEndTime("1");
+            this.setStartTime(0);
+            this.setEndTime(1);
         }
 
         // 4. Set HBase start scanning rowkey if given
