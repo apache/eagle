@@ -1,4 +1,4 @@
-package org.apache.eagle.stream.dsl.execution
+package org.apache.eagle.stream.dsl.scheduler
 
 import com.typesafe.config.Config
 
@@ -21,7 +21,7 @@ import scala.collection.mutable
  * limitations under the License.
  */
 case class StreamFormatter(config:Config) {
-  import org.apache.eagle.stream.dsl.execution.StreamFormatter._
+  import StreamFormatter._
 
   val library = mutable.ArrayBuffer(
     "org.apache.eagle.stream.dsl.StreamBuilder"

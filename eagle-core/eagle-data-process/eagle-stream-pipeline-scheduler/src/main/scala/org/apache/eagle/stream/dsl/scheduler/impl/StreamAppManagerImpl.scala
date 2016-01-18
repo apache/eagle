@@ -14,11 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.eagle.stream.dsl.execution.impl
+package org.apache.eagle.stream.dsl.scheduler.impl
 
 import org.apache.eagle.stream.dsl.entity.{AppCommandEntity, AppDefinitionEntity}
-import org.apache.eagle.stream.dsl.execution.{StreamEvaluator, StreamAppManager}
+import org.apache.eagle.stream.dsl.execution.StreamAppManager
 import org.apache.eagle.stream.dsl.StreamBuilder._
+import org.apache.eagle.stream.dsl.scheduler.{StreamEvaluator, StreamAppManager}
 
 class StreamAppManagerImpl extends StreamAppManager{
   override def submit(app: AppDefinitionEntity, cmd: AppCommandEntity): Boolean = {

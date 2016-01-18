@@ -20,7 +20,7 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.stream.dsl.AppConstants;
-import org.apache.eagle.stream.dsl.execution.model.StreamAppDefinition;
+import org.apache.eagle.stream.dsl.scheduler.model.StreamAppDefinition;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import scala.collection.JavaConversions;
 

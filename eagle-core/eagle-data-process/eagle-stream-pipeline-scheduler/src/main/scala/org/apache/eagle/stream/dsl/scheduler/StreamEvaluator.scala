@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.eagle.stream.dsl.execution
+package org.apache.eagle.stream.dsl.scheduler
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.eagle.datastream.core.ExecutionEnvironment

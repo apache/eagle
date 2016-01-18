@@ -14,11 +14,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.eagle.stream.dsl.execution
+package org.apache.eagle.stream.dsl.scheduler
 
 import org.apache.eagle.stream.dsl.entity.AppDefinitionEntity
-import org.apache.eagle.stream.dsl.execution.impl.StreamAppManagerImpl
-import org.apache.eagle.stream.dsl.execution.model.StreamAppExecution
+import org.apache.eagle.stream.dsl.scheduler.impl.StreamAppManagerImpl
+import org.apache.eagle.stream.dsl.scheduler.model.StreamAppExecution
 
 /**
 * The actual function for stream app management

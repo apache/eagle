@@ -17,6 +17,7 @@
 package org.apache.eagle.stream.dsl.execution
 
 import org.apache.eagle.stream.dsl.StreamBuilder._
+import org.apache.eagle.stream.dsl.scheduler.StreamEvaluator
 import org.scalatest.{FlatSpec, Matchers}
 
 class StreamEvaluatorSpec extends FlatSpec with Matchers{

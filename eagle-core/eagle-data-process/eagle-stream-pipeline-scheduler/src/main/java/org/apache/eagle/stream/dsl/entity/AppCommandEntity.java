@@ -19,7 +19,7 @@ package org.apache.eagle.stream.dsl.entity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.stream.dsl.AppConstants;
-import org.apache.eagle.stream.dsl.execution.model.StreamAppExecution;
+import org.apache.eagle.stream.dsl.scheduler.model.StreamAppExecution;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.HashMap;

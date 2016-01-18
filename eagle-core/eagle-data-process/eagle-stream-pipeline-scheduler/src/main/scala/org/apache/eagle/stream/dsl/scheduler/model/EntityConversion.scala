@@ -1,4 +1,4 @@
-package org.apache.eagle.stream.dsl.execution.model
+package org.apache.eagle.stream.dsl.scheduler.model
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity
 

@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.stream.dsl.execution
 
+import org.apache.eagle.stream.dsl.scheduler.{StreamAppCoordinator, StreamAppScheduler, CommandLoaderEvent, StreamAppConstants}
 import org.scalatest.{MustMatchers, BeforeAndAfterAll, WordSpecLike}
 
 import akka.actor.{Props, ActorSystem}
