@@ -54,6 +54,7 @@ import com.typesafe.config.Config
 
 case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
   val LOG = LoggerFactory.getLogger(classOf[StreamAlertExpansion])
+  import StreamAlertExpansion._
 
   override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit ={
     val iter = dag.iterator()
@@ -132,19 +133,21 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
           i += 1
         })
       }
-      case _: FlatMapProducer[AnyRef, AnyRef] => {
-        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+      case p: FlatMapProducer[AnyRef, AnyRef] =>
+        if(upStreamNames.size()>1) throw new IllegalStateException("More than 1 upStreamNames "+upStreamNames+" found for "+p){
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, recognizeSingleStreamName(p,upStreamNames))
       }
-      case _: MapperProducer[AnyRef,AnyRef] => {
-        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+      case p: MapperProducer[AnyRef,AnyRef] => {
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, recognizeSingleStreamName(p,upStreamNames))
       }
       case s: StreamProducer[AnyRef] if dag.inDegreeOf(s) == 0 => {
-        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, recognizeSingleStreamName(s,upStreamNames))
       }
       case p@_ => throw new IllegalStateException(s"$p can not be put before AlertStreamSink, only StreamUnionProducer,FlatMapProducer and MapProducer are supported")
     }
     newStreamProducers
   }
+
 
   protected def replace(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
                       dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], upStreamName: String) : StreamProducer[Any]= {
@@ -215,6 +218,35 @@ object StreamAlertExpansion{
     val e = StreamAlertExpansion(config)
     e.expand(dag)
     e
+  }
+
+  /**
+    * Try upStreamNames firstly, otherwise try producer.streamId
+    *
+    * @param producer
+    * @param upStreamNames
+    * @return
+    */
+  private def recognizeSingleStreamName(producer: StreamProducer[AnyRef],upStreamNames:util.List[String]):String = {
+    if(upStreamNames == null){
+      producer.streamId
+    }else if(upStreamNames.size()>1){
+      if(producer.streamId == null) {
+        if (upStreamNames.size() > 1)
+          throw new IllegalStateException("Too many (more than 1) upStreamNames " + upStreamNames + " given for " + producer)
+        else
+          upStreamNames.get(0)
+      } else {
+        producer.streamId
+      }
+    } else if(upStreamNames.size() == 1){
+      upStreamNames.get(0)
+    }else {
+      if(producer.streamId == null){
+        throw new IllegalArgumentException("No stream name found for "+producer)
+      } else
+        producer.streamId
+    }
   }
 }
 

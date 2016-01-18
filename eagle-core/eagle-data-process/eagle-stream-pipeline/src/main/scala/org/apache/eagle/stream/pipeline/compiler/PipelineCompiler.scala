@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 
 trait PipelineCompiler {
-  val classOfProcessorType = Map[String,ModuleGenerator](
+  val classOfProcessorType = Map[String,ModuleMapper](
     "KafkaSource" -> KafkaSourceStreamProducer,
     "KafkaSink" -> KafkaSinkStreamProducer,
     "Alert" -> AlertStreamProducer,
@@ -57,7 +57,7 @@ trait PipelineCompiler {
 
   private def  buildStreamProducer(dag:StreamDAG,processor:Processor):StreamProducer[Any] = {
     if(classOfProcessorType.contains(processor.getType)){
-      classOfProcessorType(processor.getType).generate(processor.getId,processor.getConfig).nameAs(processor.getId)
+      classOfProcessorType(processor.getType).map(processor).nameAs(processor.getId).stream(processor.streamId)
     } else {
       throw new CompileException(s"Unknown processor type [${processor.getType}]")
     }
@@ -78,33 +78,40 @@ trait PipelineCompiler {
   }
 }
 
-trait ModuleGenerator{
+trait ModuleMapper{
   def getType:String
-  def generate(moduleId:String,config:Map[String,AnyRef]):StreamProducer[Any]
+  def map(module:Processor):StreamProducer[Any]
 }
 
-object KafkaSourceStreamProducer extends ModuleGenerator{
+object KafkaSourceStreamProducer extends ModuleMapper{
   def getType = "KafkaSource"
-  override def generate(moduleId:String,config:Map[String,AnyRef]): StreamProducer[Any] =
+  override def map(module:Processor): StreamProducer[Any] = {
+    val config = module.getConfig
     new StormSourceProducer[Any](new KafkaSourcedSpoutProvider(null).getSpout(ConfigFactory.parseMap(config.asJava)))
+  }
 }
 
-object KafkaSinkStreamProducer extends ModuleGenerator{
+object KafkaSinkStreamProducer extends ModuleMapper{
   def getType = "KafkaSink"
-  override def generate(moduleId:String,config:Map[String,AnyRef]): StreamProducer[Any] = ForeachProducer[AnyRef](KafkaSinkExecutor(config))
+  override def map(module:Processor): StreamProducer[Any] = {
+    val config = module.getConfig
+    ForeachProducer[AnyRef](KafkaSinkExecutor(config))
+  }
 }
 
-object ConsoleStreamProducer extends ModuleGenerator{
+object ConsoleStreamProducer extends ModuleMapper{
   override def getType: String = "Stdout"
-  override def generate(moduleId:String,config: Map[String, AnyRef]): StreamProducer[Any] = ForeachProducer[Any](m=>print(s"$m\n"))
+  override def map(module:Processor): StreamProducer[Any] = ForeachProducer[Any](m=>print(s"$m\n"))
 }
 
-object AlertStreamProducer extends ModuleGenerator{
+object AlertStreamProducer extends ModuleMapper{
   def getType:String = "Alert"
-  override def generate(moduleId:String,config:Map[String,AnyRef]): StreamProducer[Any] = {
+  override def map(module:Processor): StreamProducer[Any] = {
+    val config = module.getConfig
+    val moduleId = module.getId
     // Support create functional AlertStreamProducer constructor
     new AlertStreamProducer (
-      upStreamNames = config.getOrElse("upStreamNames",null).asInstanceOf[java.util.List[String]],
+      upStreamNames = config.getOrElse("upStreamNames",if(module.inputIds!=null) module.inputIds.asJava else null).asInstanceOf[java.util.List[String]],
       alertExecutorId = config.getOrElse("alertExecutorId",moduleId).asInstanceOf[String],
       consume = config.getOrElse("consume",true).asInstanceOf[Boolean],
       strategy = config.get("strategy") match {case Some(strategy)=> Class.forName(strategy.asInstanceOf[String]).newInstance().asInstanceOf[PartitionStrategy] case None => null}
@@ -112,16 +119,18 @@ object AlertStreamProducer extends ModuleGenerator{
   }
 }
 
-object PersistProducer extends ModuleGenerator{
+object PersistProducer extends ModuleMapper{
   override def getType = "Persistence"
-  override def generate(moduleId:String,config: Map[String, AnyRef]): StreamProducer[Any] = {
+  override def map(module:Processor): StreamProducer[Any] = {
+    val config = module.getConfig
     new PersistProducer(config.getOrElse("executorId","defaultExecutorId").asInstanceOf[String],StorageType.withName(config.getOrElse("storageType",null).asInstanceOf[String]))
   }
 }
 
-object AggregatorProducer extends ModuleGenerator{
+object AggregatorProducer extends ModuleMapper{
   override def getType: String = "Aggregator"
-  override def generate(moduleId:String,config: Map[String, AnyRef]): StreamProducer[Any] = {
+  override def map(module:Processor): StreamProducer[Any] = {
+    val config = module.getConfig
     new AggregateProducer(
       config.get("upStreamNames") match {case Some(streams) => streams.asInstanceOf[java.util.List[String]] case None => null},
       config.get("analyzerId") match {case Some(id)=>id.asInstanceOf[String] case None => null},

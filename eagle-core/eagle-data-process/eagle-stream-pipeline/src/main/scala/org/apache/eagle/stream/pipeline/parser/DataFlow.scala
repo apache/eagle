@@ -72,14 +72,28 @@ class DataFlow {
   def getConnectors:Seq[Connector] = connectors
 }
 
+/**
+  * Stream Processor
+  *
+  * @param processorId
+  * @param processorType
+  * @param schema
+  * @param processorConfig
+  */
 case class Processor(var processorId:String = null,var processorType:String = null,var schema:Schema = null, var processorConfig:Map[String,AnyRef] = null) extends Serializable {
   private[pipeline] var inputs:Seq[Processor] = null
-  private[pipeline] var inputpIds:Seq[String] = null
+  private[pipeline] var inputIds:Seq[String] = null
 
   def getId:String = processorId
   def getType:String = processorType
   def getConfig:Map[String,AnyRef] = processorConfig
   def getSchema:Option[Schema] = if(schema == null) None else Some(schema)
+
+  /**
+    * @todo assume processorId as streamId
+    * @return
+    */
+  def streamId = processorId
 }
 
 case class Connector (from:String,to:String, config:Map[String,AnyRef]) extends Serializable{
@@ -118,7 +132,7 @@ object Processor {
       case None => null
     }
     val instance = new Processor(processorId,processorType,schema,context-SCHEMA_FIELD)
-    if(context.contains(INPUTS_FIELD)) instance.inputpIds = context.get(INPUTS_FIELD).get.asInstanceOf[java.util.List[String]].asScala.toSeq
+    if(context.contains(INPUTS_FIELD)) instance.inputIds = context.get(INPUTS_FIELD).get.asInstanceOf[java.util.List[String]].asScala.toSeq
     instance
   }
 }
@@ -140,13 +154,14 @@ trait DataFlowParser {
 
   private def expand(datafw: DataFlow):Unit = {
     datafw.getProcessors.foreach(proc =>{
-      if(proc.inputpIds!=null) {
-        proc.inputpIds.foreach(id => {
+      if(proc.inputIds!=null) {
+        proc.inputIds.foreach(id => {
           // connect if not
           datafw.connect(id,proc.getId)
         })
       }
       proc.inputs = datafw.getInputs(proc.getId)
+      proc.inputIds = proc.inputs.map(_.getId)
     })
   }
 

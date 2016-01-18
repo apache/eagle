@@ -44,7 +44,7 @@ trait PipelineRunner extends PipelineParser with PipelineCompiler{
   }
 }
 
-object PipelineCLIOptionParser extends ConfigOptionParser{
+private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
   val PIPELINE_OPT_KEY="pipeline"
   val PIPELINE_RESOURCE_KEY="pipeline.resource"
   val CONFIG_OPT_KEY="config"

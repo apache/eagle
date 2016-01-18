@@ -21,8 +21,7 @@ import org.apache.eagle.stream.pipeline.compiler.PipelineCompiler
 import org.apache.eagle.stream.pipeline.parser.PipelineParser
 import org.apache.eagle.stream.pipeline.runner.PipelineRunner
 
-object Pipeline extends PipelineRunner
+object Pipeline
+  extends PipelineRunner
   with PipelineParser
-  with PipelineCompiler{
-
-}
+  with PipelineCompiler

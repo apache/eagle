@@ -37,7 +37,11 @@ class StreamInfo  extends Serializable{
    */
   var name: String = null
 
+  /**
+    * Output stream id, equals to name by default
+    */
   var streamId:String=null
+
   var parallelismNum: Int = 1
 
   /**
