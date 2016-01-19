@@ -27,6 +27,10 @@
     <artifactId>eagle-stream-pipeline</artifactId>
     <dependencies>
         <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+        <dependency>
             <groupId>eagle</groupId>
             <artifactId>eagle-service-base</artifactId>
             <version>${project.version}</version>

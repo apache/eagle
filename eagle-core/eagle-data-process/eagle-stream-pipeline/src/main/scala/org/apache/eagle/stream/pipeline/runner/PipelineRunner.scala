@@ -52,7 +52,17 @@ private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
   val PIPELINE_RESOURCE_KEY="pipeline.resource"
   val CONFIG_OPT_KEY="config"
   val CONFIG_RESOURCE_KEY="config.resource"
-
+  val USAGE =
+    """
+      |Usage: java org.apache.eagle.stream.pipeline.Pipeline [options]
+      |
+      |Options:
+      |   --pipeline   pipeline configuration
+      |   --config     common configuration
+      |   --env        storm (support spark, etc later)
+      |   --mode       local/remote/cluster
+    """.stripMargin
+  
   override protected def options(): Options = {
     val options = super.options()
     options.addOption(PIPELINE_OPT_KEY, true, "Pipeline configuration file")
@@ -64,9 +74,14 @@ private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
     val map = super.parseCommand(cmd)
     if (cmd.hasOption(PIPELINE_OPT_KEY)) {
       map.put(PIPELINE_RESOURCE_KEY,cmd.getOptionValue(PIPELINE_OPT_KEY))
-    }else{
-      throw new IllegalArgumentException("--"+PIPELINE_OPT_KEY +" is required")
+    }else {
+      sys.error(
+        s"""
+           |Error: --$PIPELINE_OPT_KEY is required
+           |$USAGE
+         """.stripMargin)
     }
+
     if(cmd.hasOption(CONFIG_OPT_KEY)){
       map.put(CONFIG_RESOURCE_KEY,cmd.getOptionValue(CONFIG_OPT_KEY))
     }
