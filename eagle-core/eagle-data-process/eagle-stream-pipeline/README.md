@@ -40,12 +40,12 @@ Usage
 
 Features
 --------
-* [done] Compile DSL Configure to Pipeline model
-* [done] Compile Pipeline model to Stream Execution Graph
-* [done] Submit Stream Execution Graph to actual running environment say storm
-* [done] Support Alert and Persistence for metric monitoring
+* [x] Compile DSL Configure to Pipeline model
+* [x] Compile Pipeline model to Stream Execution Graph
+* [x] Submit Stream Execution Graph to actual running environment say storm
+* [x] Support Alert and Persistence for metric monitoring
 * [ ] Extensible stream module management and automatically scan and register module
-* [ ] Pipeline runner CLI tool and shell script
+* [x] Pipeline runner CLI tool and shell script
 * [ ] Decouple pipeline compiler and scheduler into individual modules
 * [ ] Stream Pipeline Scheduler
 * [ ] Graph editor to define streaming graph in UI
