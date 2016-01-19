@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>eagle</groupId>
-            <artifactId>eagle-stream-process-dsl</artifactId>
+            <artifactId>eagle-stream-pipeline</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

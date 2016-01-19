@@ -25,16 +25,22 @@ import org.apache.eagle.datastream.ExecutionEnvironments.storm
 import org.apache.eagle.datastream.core.ExecutionEnvironment
 import org.apache.eagle.stream.pipeline.compiler.PipelineCompiler
 import org.apache.eagle.stream.pipeline.parser.PipelineParser
+import org.slf4j.LoggerFactory
 
 import scala.reflect.runtime.{universe => ru}
 
 trait PipelineRunner extends PipelineParser with PipelineCompiler{
+  import PipelineCLIOptionParser._
+  private val LOG = LoggerFactory.getLogger("PipelineCLIOptionParser")
   def submit[T <: ExecutionEnvironment](resource:String)(implicit typeTag:ru.TypeTag[T]) =
     compile(parseResource(resource)).submit[T]
   def submit(resource:String,clazz:Class[ExecutionEnvironment]) =
     compile(parseResource(resource)).submit(clazz)
   def submit(pipelineConfig:Config,clazz:Class[ExecutionEnvironment]) =
     compile(parse(pipelineConfig)).submit(clazz)
+  def submit[T <: ExecutionEnvironment](pipelineConfig:Config)(implicit typeTag: ru.TypeTag[T]) =
+    compile(parse(pipelineConfig)).submit[T]
+
   def apply(args:Array[String]):PipelineRunner = {
     new ConfigOptionParser().load(args)
     this
@@ -42,16 +48,19 @@ trait PipelineRunner extends PipelineParser with PipelineCompiler{
 
   def main(args: Array[String]): Unit = {
     val config = PipelineCLIOptionParser.load(args)
-    // TODO: Load environment, currently hard-code with storm
-    submit[storm](config.getString(PipelineCLIOptionParser.PIPELINE_RESOURCE_KEY))
+    submit[storm](config.getString(PIPELINE_CONFIG_KEY))
   }
 }
 
 private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
+  val LOG = LoggerFactory.getLogger("PipelineCLIOptionParser")
   val PIPELINE_OPT_KEY="pipeline"
-  val PIPELINE_RESOURCE_KEY="pipeline.resource"
+
+  val PIPELINE_CONFIG_KEY="pipeline.config"
+
   val CONFIG_OPT_KEY="config"
   val CONFIG_RESOURCE_KEY="config.resource"
+  val CONFIG_FILE_KEY="config.file"
   val USAGE =
     """
       |Usage: java org.apache.eagle.stream.pipeline.Pipeline [options]
@@ -73,7 +82,13 @@ private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
   override protected def parseCommand(cmd: CommandLine): util.Map[String, String] = {
     val map = super.parseCommand(cmd)
     if (cmd.hasOption(PIPELINE_OPT_KEY)) {
-      map.put(PIPELINE_RESOURCE_KEY,cmd.getOptionValue(PIPELINE_OPT_KEY))
+      val pipelineConf = cmd.getOptionValue(PIPELINE_OPT_KEY)
+      if(pipelineConf == null){
+        throw new IllegalArgumentException(s"$PIPELINE_OPT_KEY should not be null")
+      } else {
+        LOG.info(s"Set $PIPELINE_CONFIG_KEY as $pipelineConf")
+        map.put(PIPELINE_CONFIG_KEY, pipelineConf)
+      }
     }else {
       sys.error(
         s"""
@@ -83,7 +98,14 @@ private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
     }
 
     if(cmd.hasOption(CONFIG_OPT_KEY)){
-      map.put(CONFIG_RESOURCE_KEY,cmd.getOptionValue(CONFIG_OPT_KEY))
+      val commonConf = cmd.getOptionValue(CONFIG_OPT_KEY)
+      if(commonConf.contains("/")){
+        LOG.info(s"Set $CONFIG_FILE_KEY as $commonConf")
+        map.put(CONFIG_FILE_KEY, commonConf)
+      }else {
+        LOG.info(s"Set $CONFIG_RESOURCE_KEY $commonConf")
+        map.put(CONFIG_RESOURCE_KEY, commonConf)
+      }
     }
     map
   }
