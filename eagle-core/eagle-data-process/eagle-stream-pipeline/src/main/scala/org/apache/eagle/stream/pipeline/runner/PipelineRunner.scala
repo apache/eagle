@@ -48,7 +48,15 @@ trait PipelineRunner extends PipelineParser with PipelineCompiler{
 
   def main(args: Array[String]): Unit = {
     val config = PipelineCLIOptionParser.load(args)
-    submit[storm](config.getString(PIPELINE_CONFIG_KEY))
+    if(config.hasPath(PIPELINE_CONFIG_KEY)) {
+      submit[storm](config.getString(PIPELINE_CONFIG_KEY))
+    } else {
+      sys.error(
+        s"""
+           |Error: --$PIPELINE_OPT_KEY is required
+           |$USAGE
+         """.stripMargin)
+    }
   }
 }
 
@@ -58,7 +66,7 @@ private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
 
   val PIPELINE_CONFIG_KEY="pipeline.config"
 
-  val CONFIG_OPT_KEY="config"
+  val CONFIG_OPT_KEY="conf"
   val CONFIG_RESOURCE_KEY="config.resource"
   val CONFIG_FILE_KEY="config.file"
   val USAGE =
@@ -67,7 +75,7 @@ private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
       |
       |Options:
       |   --pipeline   pipeline configuration
-      |   --config     common configuration
+      |   --conf       common configuration
       |   --env        storm (support spark, etc later)
       |   --mode       local/remote/cluster
     """.stripMargin
@@ -81,20 +89,15 @@ private[runner] object PipelineCLIOptionParser extends ConfigOptionParser{
 
   override protected def parseCommand(cmd: CommandLine): util.Map[String, String] = {
     val map = super.parseCommand(cmd)
+
     if (cmd.hasOption(PIPELINE_OPT_KEY)) {
       val pipelineConf = cmd.getOptionValue(PIPELINE_OPT_KEY)
       if(pipelineConf == null){
-        throw new IllegalArgumentException(s"$PIPELINE_OPT_KEY should not be null")
+        throw new IllegalArgumentException(s"--$PIPELINE_OPT_KEY should not be null")
       } else {
         LOG.info(s"Set $PIPELINE_CONFIG_KEY as $pipelineConf")
         map.put(PIPELINE_CONFIG_KEY, pipelineConf)
       }
-    }else {
-      sys.error(
-        s"""
-           |Error: --$PIPELINE_OPT_KEY is required
-           |$USAGE
-         """.stripMargin)
     }
 
     if(cmd.hasOption(CONFIG_OPT_KEY)){
