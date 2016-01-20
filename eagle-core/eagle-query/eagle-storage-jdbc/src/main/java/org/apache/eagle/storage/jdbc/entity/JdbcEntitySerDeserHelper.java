@@ -97,7 +97,17 @@ public class JdbcEntitySerDeserHelper {
                 if(obj.getTags() == null){
                     obj.setTags(new HashMap<String, String>());
                 }
-                obj.getTags().put(entry.getKey(), (String) entry.getValue());
+                // get normalized tag name, not efficient, but we need make it work first
+                String key = null;
+                if(ed.getTags() != null) {
+                    for (String tag : ed.getTags()) {
+                        if (tag.toLowerCase().equals(entry.getKey().toLowerCase())) {
+                            key = tag;
+                            break;
+                        }
+                    }
+                }
+                obj.getTags().put(key == null ? entry.getKey() : key, (String) entry.getValue());
                 continue;
             }
 

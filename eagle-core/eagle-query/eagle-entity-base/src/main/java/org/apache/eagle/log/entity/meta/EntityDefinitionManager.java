@@ -424,7 +424,13 @@ public class EntityDefinitionManager {
 				ed.setServiceCreationPath(path.path());
 			}
 		}
-		
+
+		final Tags tags = cls.getAnnotation(Tags.class);
+		if(tags != null) {
+			String[] tagNames = tags.value();
+			ed.setTags(tagNames);
+		}
+
 		return ed;
 	}
 	
