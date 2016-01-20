@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.storage.jdbc.entity;
 
+import org.apache.commons.collections.map.UnmodifiableMap;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
@@ -64,7 +65,12 @@ public class JdbcEntitySerDeserHelper {
         }
 
         TaggedLogAPIEntity obj = clazz.newInstance();
-        Map<String, Qualifier> map = ed.getDisplayNameMap();
+        Map<String, Qualifier> rawmap = ed.getDisplayNameMap();
+        // rdbms may contains field which is not case insensitive, we need convert all into lower case
+        Map<String, Qualifier> map = new HashMap<String, Qualifier>();
+        for(Map.Entry<String, Qualifier> e : rawmap.entrySet()){
+            map.put(e.getKey().toLowerCase(), e.getValue());
+        }
         for(Map.Entry<String, Object> entry : row.entrySet()){
             // timestamp;
             if(JdbcConstants.TIMESTAMP_COLUMN_NAME.equals(entry.getKey())){

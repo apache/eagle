@@ -50,6 +50,7 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
     public <E extends Object> List<E> query(CompiledQuery query) throws Exception {
         QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition.getJdbcTableName());
         Criteria criteria = criteriaBuilder.build();
+        criteria.toString();
         String displaySql = SqlBuilder.buildQuery(criteria).getDisplayString();
 
         if(LOG.isDebugEnabled()) LOG.debug("Querying: " + displaySql);
