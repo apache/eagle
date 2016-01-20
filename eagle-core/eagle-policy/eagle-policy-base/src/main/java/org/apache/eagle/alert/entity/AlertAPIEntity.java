@@ -43,7 +43,7 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 	@Column("remediationCallback")
 	private String remediationCallback;
 	@Column("alertContext")
-	private AlertContext alertContext;
+	private String alertContext;
 	@Column("streamId")
 	private String streamId;
 
@@ -74,11 +74,11 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 		_pcs.firePropertyChange("remediationCallback", null, null);
 	}
 
-	public AlertContext getAlertContext() {
+	public String getAlertContext() {
 		return alertContext;
 	}
 	
-	public void setAlertContext(AlertContext alertContext) {
+	public void setAlertContext(String alertContext) {
 		this.alertContext = alertContext;
 		_pcs.firePropertyChange("alertContext", null, null);
 	}

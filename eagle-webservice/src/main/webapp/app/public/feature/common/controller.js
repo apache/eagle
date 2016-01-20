@@ -451,7 +451,7 @@
 							groupCondOp: ">=",
 							groupCondVal: "2"
 						},
-						desc: "",
+						description: "",
 						enabled: true,
 						prefix: "alertdef",
 						remediationDef: "",
