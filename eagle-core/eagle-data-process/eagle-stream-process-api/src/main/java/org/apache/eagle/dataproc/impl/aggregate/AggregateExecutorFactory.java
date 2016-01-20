@@ -44,12 +44,12 @@ public class AggregateExecutorFactory {
 	public static final AggregateExecutorFactory Instance = new AggregateExecutorFactory();
 
 
-	public IPolicyExecutor[] createExecutors(String cql) throws Exception {
+	public IPolicyExecutor[] createExecutors(String cql,List<String> upStreamNames) throws Exception {
 		int numPartitions = 1; //loadExecutorConfig(config, executorId, partitionerCls);
 
 		IPolicyExecutor[] executors = new IPolicyExecutor[numPartitions];
 		for (int i = 0; i < numPartitions ; i++ ) {
-			executors[i] = new SimpleAggregateExecutor(cql, "siddhiCEPEngine", i, numPartitions);
+			executors[i] = new SimpleAggregateExecutor(cql, "siddhiCEPEngine", i, numPartitions,upStreamNames);
 		}
 
 		return executors;

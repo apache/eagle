@@ -43,7 +43,7 @@ class StreamAggregateExpansion(config: Config) extends StreamAlertExpansion(conf
         val newStreamProducers = rewriteWithStreamOutputWrapper(current, dag, toBeAddedEdges, toBeRemovedVertex, upStreamNames)
 
         val analyzeExecutors = if (cepQl != null) {
-          AggregateExecutorFactory.Instance.createExecutors(cepQl)
+          AggregateExecutorFactory.Instance.createExecutors(cepQl,upStreamNames)
         } else {
           AggregateExecutorFactory.Instance.createExecutors(config, upStreamNames, analyzerId)
         }
