@@ -23,12 +23,21 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created on 1/19/16.
  */
 public class HadoopJmxMetricDeserializer implements SpoutKafkaMessageDeserializer {
+    
     private static final Logger LOG = LoggerFactory.getLogger(HadoopJmxMetricDeserializer.class);
+
+    private Properties props;
+
+    public  HadoopJmxMetricDeserializer(Properties props){
+        this.props = props;
+    }
+
 
     // convert to a map of <key, map<>>
     @Override

@@ -28,7 +28,7 @@ public class HadoopJmxMetricDeserializerTest {
 
     @Test
     public void test() {
-        HadoopJmxMetricDeserializer des = new HadoopJmxMetricDeserializer();
+        HadoopJmxMetricDeserializer des = new HadoopJmxMetricDeserializer(null);
 
         String m = "{\"host\": \"hostname-1\", \"timestamp\": 1453208956395, \"metric\": \"hadoop.namenode.dfs.lastwrittentransactionid\", \"component\": \"namenode\", \"site\": \"sandbox\", \"value\": \"49716\"}";
         Object obj = des.deserialize(m.getBytes());
