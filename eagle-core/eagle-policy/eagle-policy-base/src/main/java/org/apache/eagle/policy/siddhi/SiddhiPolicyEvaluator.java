@@ -33,6 +33,7 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
+import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -107,7 +108,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 
 		// compose execution plan sql
 		String executionPlan = policyDef.getExpression();
-		if (!policyDef.isContainsDefintion()) {
+		if (!policyDef.isContainsDefinition()) {
 			StringBuilder sb = new StringBuilder();
 			for (String sourceStream : sourceStreams) {
 				String streamDef = SiddhiStreamMetadataUtils.convertToStreamDef(sourceStream);
@@ -119,7 +120,13 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 			executionPlan = sb.toString() + " @info(name = '" + EXECUTION_PLAN_NAME + "') " + expression;
 		}
 
-		ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+		ExecutionPlanRuntime executionPlanRuntime = null;
+		try {
+				executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+		}catch (SiddhiParserException ex){
+			LOG.error("Failed to parse: "+executionPlan,ex);
+			throw ex;
+		}
 
 		for(String sourceStream : sourceStreams){
 			siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
@@ -177,7 +184,9 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 			// input.add(streamName);
 			putAttrsIntoInputStream(input, streamName, map);
             try {
-                siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
+                InputHandler inputHandler = siddhiRuntime.siddhiInputHandlers.get(streamName);
+				if(inputHandler == null) throw new NullPointerException("InputHandler for stream ["+streamName+"] is not found");
+				inputHandler.send(input.toArray(new Object[input.size()]));
             }catch (InterruptedException ex){
                 LOG.error("Got exception "+ex.getMessage(),ex);
             }

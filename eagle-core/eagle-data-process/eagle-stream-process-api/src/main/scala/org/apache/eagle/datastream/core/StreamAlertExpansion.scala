@@ -175,10 +175,13 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
       }
       case _: MapperProducer[Any,Any] => {
         val mapper = current.asInstanceOf[MapperProducer[Any,Any]].fn
-        val newfun: (Any => Any) = {
-          a => mapper(a) match {
+        val newfun: (Any => Any) = { a =>
+          val result = mapper(a)
+          result match {
+            case scala.Tuple1(x1) => (null, upStreamName, x1)
             case scala.Tuple2(x1, x2) => (x1, upStreamName, x2)
-            case _ => throw new IllegalArgumentException
+            case scala.Tuple3(_, _, _) => result
+            case _ => throw new IllegalArgumentException(s"Illegal message :$result, Tuple1/Tuple2/Tuple3 are supported")
           }
         }
         current match {
