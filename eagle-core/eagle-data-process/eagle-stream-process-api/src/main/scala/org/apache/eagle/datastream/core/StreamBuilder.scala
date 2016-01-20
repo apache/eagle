@@ -53,7 +53,6 @@ class StreamContext(private val conf:Config) extends StreamContextBuilder{
     StreamNameExpansion()
     GraphPrinter.print(dag,message="Before expanded DAG ")
     StreamAggregateExpansion()
-    GraphPrinter.print(dag,message="after analyze expanded DAG ")
     StreamAlertExpansion()
     StreamUnionExpansion()
     StreamGroupbyExpansion()

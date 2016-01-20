@@ -35,7 +35,7 @@ public class SiddhiStreamMetadataUtils {
 	public static SortedMap<String, AlertStreamSchemaEntity> getAttrMap(String streamName) {
 		SortedMap<String, AlertStreamSchemaEntity> map = StreamMetadataManager.getInstance().getMetadataEntityMapForStream(streamName);
 		if(map == null || map.size() == 0){
-			throw new IllegalStateException("alert stream schema should never be empty");
+			throw new IllegalStateException("Alert stream schema should never be empty");
 		}
 		return map;
 	}

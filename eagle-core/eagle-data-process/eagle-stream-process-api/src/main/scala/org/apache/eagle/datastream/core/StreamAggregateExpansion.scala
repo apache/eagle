@@ -42,7 +42,6 @@ class StreamAggregateExpansion(config: Config) extends StreamAlertExpansion(conf
          */
         val newStreamProducers = rewriteWithStreamOutputWrapper(current, dag, toBeAddedEdges, toBeRemovedVertex, upStreamNames)
 
-
         val analyzeExecutors = if (cepQl != null) {
           AggregateExecutorFactory.Instance.createExecutors(cepQl)
         } else {
@@ -50,7 +49,7 @@ class StreamAggregateExpansion(config: Config) extends StreamAlertExpansion(conf
         }
 
         analyzeExecutors.foreach(exec => {
-          val t = FlatMapProducer(exec.asInstanceOf[FlatMapper[Any]]).nameAs(exec.getExecutorId() + "_" + exec.getPartitionSeq()).initWith(dag,config, hook = false)
+          val t = FlatMapProducer(exec.asInstanceOf[FlatMapper[Any]]).initWith(dag,config, hook = false).nameAs(exec.getExecutorId + "_" + exec.getPartitionSeq).stream(child.stream)
 
           // connect with previous
           if (strategy == null) {
@@ -70,7 +69,6 @@ class StreamAggregateExpansion(config: Config) extends StreamAlertExpansion(conf
       case _ => 
     }
   }
-  
 }
 
 object StreamAggregateExpansion{

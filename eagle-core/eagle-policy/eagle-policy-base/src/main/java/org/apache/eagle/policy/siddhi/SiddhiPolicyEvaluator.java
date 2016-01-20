@@ -103,7 +103,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 
 	private SiddhiRuntime createSiddhiRuntime(SiddhiPolicyDefinition policyDef){
 		SiddhiManager siddhiManager = new SiddhiManager();
-		Map<String, InputHandler> siddhiInputHandlers = new HashMap<String, InputHandler>();
+		Map<String, InputHandler> siddhiInputHandlers = new HashMap<>();
 
 		// compose execution plan sql
 		String executionPlan = policyDef.getExpression();

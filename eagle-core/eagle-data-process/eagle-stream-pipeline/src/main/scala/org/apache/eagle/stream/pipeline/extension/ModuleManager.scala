@@ -43,6 +43,7 @@ object ModuleManager{
     "KafkaSink" -> KafkaSinkStreamProducer,
     "Alert" -> AlertStreamProducer,
     "Persistence" -> PersistProducer,
+    "Aggregator" -> AggregatorProducer,
     "Console" -> ConsoleStreamProducer
   )
 }
@@ -88,7 +89,7 @@ object PersistProducer extends ModuleMapper{
   override def getType = "Persistence"
   override def map(module:Processor): StreamProducer[Any] = {
     val config = module.getConfig
-    new PersistProducer(config.getOrElse("executorId","defaultExecutorId").asInstanceOf[String],StorageType.withName(config.getOrElse("storageType",null).asInstanceOf[String]))
+    new PersistProducer(config.getOrElse("executorId",module.getId).asInstanceOf[String],StorageType.withName(config.getOrElse("storageType",null).asInstanceOf[String]))
   }
 }
 
@@ -97,9 +98,9 @@ object AggregatorProducer extends ModuleMapper{
   override def map(module:Processor): StreamProducer[Any] = {
     val config = module.getConfig
     new AggregateProducer(
-      config.get("upStreamNames") match {case Some(streams) => streams.asInstanceOf[java.util.List[String]] case None => null},
-      config.get("analyzerId") match {case Some(id)=>id.asInstanceOf[String] case None => null},
-      config.get("cepQl") match {case Some(sql)=> sql.asInstanceOf[String] case None => null},
+      upStreamNames = config.getOrElse("upStreamNames",if(module.inputIds!=null) module.inputIds.asJava else null).asInstanceOf[java.util.List[String]],
+      config.getOrElse("analyzer",module.getId).asInstanceOf[String],
+      config.get("sql") match {case Some(sql) => sql.asInstanceOf[String] case None => null },
       config.get("strategy") match {case Some(strategy)=> Class.forName(strategy.asInstanceOf[String]).newInstance().asInstanceOf[PartitionStrategy] case None => null}
     )
   }

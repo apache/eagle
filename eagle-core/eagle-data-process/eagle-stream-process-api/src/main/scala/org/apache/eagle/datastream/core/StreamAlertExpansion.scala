@@ -158,11 +158,11 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
         mapper match {
           case a: JavaStormStreamExecutor[EagleTuple] => {
             val newmapper = new JavaStormExecutorForAlertWrapper(a.asInstanceOf[JavaStormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
-            newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false)
+            newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false).stream(current.streamId)
           }
           case b: StormStreamExecutor[EagleTuple] => {
             val newmapper = StormExecutorForAlertWrapper(b.asInstanceOf[StormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
-            newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false)
+            newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false).stream(current.streamId)
           }
           case _ => throw new IllegalArgumentException
         }
@@ -182,8 +182,8 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
           }
         }
         current match {
-          case MapperProducer(2, fn) => newsp = MapperProducer(3, newfun)
-          case _ => throw new IllegalArgumentException
+          case MapperProducer(_, fn) => newsp = MapperProducer(3, newfun).initWith(dag,config,hook = false).stream(current.stream)
+          case _ => throw new IllegalArgumentException(s"Illegal producer $current")
         }
         val incomingEdges = dag.incomingEdgesOf(current)
         incomingEdges.foreach(e => toBeAddedEdges += StreamConnector(e.from, newsp))
@@ -202,7 +202,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
             }
           }
         }
-        newsp = MapperProducer(3,fn)
+        newsp = MapperProducer(3,fn).initWith(dag,config,hook = false).stream(s.stream)
         toBeAddedEdges += StreamConnector(current,newsp)
         val outgoingEdges = dag.outgoingEdgesOf(current)
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp,e.to))
