@@ -52,7 +52,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 })
 public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 	@Column("a")
-	private String desc;
+	private String description;
 	@Column("b")
 	private String policyDef;
 	@Column("c")
@@ -76,11 +76,11 @@ public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
     @Column("l")
     private String markdownReason;
 
-	public String getDesc() {
-		return desc;
+	public String getDescription() {
+		return description;
 	}
-	public void setDesc(String desc) {
-		this.desc = desc;
+	public void setDescription(String desc) {
+		this.description = desc;
 		valueChanged("desc");
 	}
 	public String getPolicyDef() {
