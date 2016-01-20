@@ -414,7 +414,7 @@ damControllers.controller('policyDetailCtrl', function(globalContent, Site, damC
 							groupCondOp: ">=",
 							groupCondVal: "2",
 						},
-						desc: "",
+						description: "",
 						enabled: true,
 						prefix: "alertdef",
 						remediationDef: "",

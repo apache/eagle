@@ -26,6 +26,23 @@ import java.sql.ResultSet;
  * @since 3/26/15
  */
 public interface JdbcSerDeser<T> {
+    /**
+     * for entity read
+     * convert value from jdbc storage into user-typed object
+     * @param result
+     * @param fieldName
+     * @param JdbcEntityDefinition
+     * @return
+     * @throws IOException
+     */
     T readValue(ResultSet result, String fieldName, JdbcEntityDefinition JdbcEntityDefinition) throws IOException;
+
+    /**
+     * for write entity
+     * convert user-typed fieldValue into fieldType-compatible value and persist that value into jdbc storage
+     * @param fieldValue
+     * @param fieldType
+     * @return
+     */
     JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType);
 }

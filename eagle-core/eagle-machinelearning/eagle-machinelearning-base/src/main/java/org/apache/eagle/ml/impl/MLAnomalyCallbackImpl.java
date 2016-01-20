@@ -101,7 +101,7 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
         context.addProperty(EagleConfigConstants.SITE, site);
         context.addProperty(Constants.POLICY_NAME, alertContext.policyId);
 
-        entity.setAlertContext(context);
+        entity.setAlertContext(context.toJsonString());
         return entity;
     }
 }

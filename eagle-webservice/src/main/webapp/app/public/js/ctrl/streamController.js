@@ -70,7 +70,7 @@ damControllers.controller('streamListCtrl', function(globalContent, damContent, 
 			$scope._streamEntity.srcStream = stream;
 			$scope._streamEntity.dataSource = stream.tags.dataSource;
 			$scope._streamEntity.streamName = stream.tags.streamName;
-			$scope._streamEntity.desc = stream.desc;
+			$scope._streamEntity.description = stream.description;
 
 			$scope._streamEntity.metaList = $.map(stream.metaList, function(meta) {
 				return {
@@ -161,7 +161,7 @@ damControllers.controller('streamListCtrl', function(globalContent, damContent, 
 				dataSource: $scope._streamEntity.dataSource,
 				streamName: $scope._streamEntity.streamName,
 			},
-			desc: $scope._streamEntity.desc
+			description: $scope._streamEntity.description
 		};
 
 		// Merge original stream

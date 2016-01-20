@@ -103,7 +103,7 @@ public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionA
 
 		context.addProperty(Constants.POLICY_DETAIL_URL, UrlBuilder.buiildPolicyDetailUrl(host, port, tags));
 		context.addProperty(Constants.ALERT_DETAIL_URL, UrlBuilder.buildAlertDetailUrl(host, port, entity));
-		entity.setAlertContext(context);
+		entity.setAlertContext(context.toJsonString());
 		return entity;
 	}	
 }

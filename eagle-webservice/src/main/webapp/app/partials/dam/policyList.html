@@ -19,14 +19,14 @@
 	<div class="box-header with-border">
 		<i class="fa fa-list-alt"> </i>
 		<h3 class="box-title">
-			{{dataSource.desc || dataSource.tags.dataSource || "All Policies"}}
+			{{dataSource.description || dataSource.tags.dataSource || "All Policies"}}
 			<div class="btn-group">
 				<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 					<i class="fa fa-caret-down"></i>
 				</button>
 				<ul id="programList" class="dropdown-menu" role="menu">
 					<li ng-repeat="dataSrc in site.current().dataSrcList" ng-hide="dataSrc.hide">
-						<a href="#/dam/policyList/{{dataSrc.tags.dataSource}}">{{dataSrc.desc || dataSrc.tags.dataSource}}</a>
+						<a href="#/dam/policyList/{{dataSrc.tags.dataSource}}">{{dataSrc.description || dataSrc.tags.dataSource}}</a>
 					</li>
 					<li class="divider"></li>
 					<li>

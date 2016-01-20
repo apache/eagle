@@ -52,7 +52,7 @@
 					<span class="info-box-icon"><i class="fa fa-suitcase"></i></span>
 					<div class="info-box-content">
 						<a class="fa fa-cog config pull-right" ng-click="showDataSourceEditor(dataSrc)"></a>
-						<span class="info-box-text">{{dataSrc.desc || dataSrc.tags.dataSource}}</span>
+						<span class="info-box-text">{{dataSrc.description || dataSrc.tags.dataSource}}</span>
 
 						<span class="info-box-number" ng-show="dataSrc.hide"><small>-</small></span>
 						<a class="info-box-number" ng-show="!dataSrc.hide" ng-click="site.url(_site, '/dam/policyList/' + dataSrc.tags.dataSource);">
