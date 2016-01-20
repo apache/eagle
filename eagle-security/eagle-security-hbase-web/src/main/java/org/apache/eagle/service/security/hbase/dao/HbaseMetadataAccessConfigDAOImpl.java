@@ -50,8 +50,7 @@ public class HbaseMetadataAccessConfigDAOImpl {
         /* parameters are: query, startTime, endTime, pageSzie, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing,
         * parallel, metricName*/
         String queryFormat = "AlertDataSourceService[@dataSource=\"hbaseSecurityLog\" AND @site=\"%s\"]{*}";
-        ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
-                0, null);
+        ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null);
         List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) ret.getObj();
         if(list == null || list.size() ==0)
             throw new BadMetadataAccessConfigException("config is empty for site " + site);

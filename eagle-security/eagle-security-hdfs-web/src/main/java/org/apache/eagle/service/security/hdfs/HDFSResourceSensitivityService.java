@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import org.apache.eagle.service.generic.ListQueryResource;
-import org.apache.eagle.security.hdfs.entity.FileSensitivityAPIEntity;
+import org.apache.eagle.security.entity.FileSensitivityAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

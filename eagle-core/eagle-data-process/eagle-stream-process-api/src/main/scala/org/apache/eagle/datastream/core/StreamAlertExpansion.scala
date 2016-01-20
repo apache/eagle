@@ -54,6 +54,7 @@ import com.typesafe.config.Config
 
 case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(config) {
   val LOG = LoggerFactory.getLogger(classOf[StreamAlertExpansion])
+  import StreamAlertExpansion._
 
   override def expand(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]): Unit ={
     val iter = dag.iterator()
@@ -78,7 +79,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
   def onIteration(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]], 
                dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], child: StreamProducer[Any]): Unit = {
     child match {
-      case AlertStreamSink(upStreamNames, alertExecutorId, withConsumer,strategy) => {
+      case AlertStreamProducer(upStreamNames, alertExecutorId, withConsumer,strategy) => {
         /**
          * step 1: wrapper previous StreamProducer with one more field "streamName"
          * for AlertStreamSink, we check previous StreamProducer and replace that
@@ -114,7 +115,10 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
     }
   }
 
-  protected def rewriteWithStreamOutputWrapper(current: org.apache.eagle.datastream.core.StreamProducer[Any], dag: org.jgrapht.experimental.dag.DirectedAcyclicGraph[org.apache.eagle.datastream.core.StreamProducer[Any],org.apache.eagle.datastream.core.StreamConnector[Any,Any]], toBeAddedEdges: scala.collection.mutable.ListBuffer[org.apache.eagle.datastream.core.StreamConnector[Any,Any]], toBeRemovedVertex: scala.collection.mutable.ListBuffer[org.apache.eagle.datastream.core.StreamProducer[Any]], upStreamNames: java.util.List[String]) = {/**
+  protected def rewriteWithStreamOutputWrapper(current: org.apache.eagle.datastream.core.StreamProducer[Any], dag: org.jgrapht.experimental.dag.DirectedAcyclicGraph[org.apache.eagle.datastream.core.StreamProducer[Any],org.apache.eagle.datastream.core.StreamConnector[Any,Any]], toBeAddedEdges: scala.collection.mutable.ListBuffer[org.apache.eagle.datastream.core.StreamConnector[Any,Any]], toBeRemovedVertex: scala.collection.mutable.ListBuffer[org.apache.eagle.datastream.core.StreamProducer[Any]], upStreamNames: java.util.List[String]) = {
+    if(upStreamNames == null) throw new NullPointerException("upStreamNames is null")
+
+    /**
      * step 1: wrapper previous StreamProducer with one more field "streamName"
      * for AlertStreamSink, we check previous StreamProducer and replace that
      */
@@ -129,19 +133,21 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
           i += 1
         })
       }
-      case _: FlatMapProducer[AnyRef, AnyRef] => {
-        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+      case p: FlatMapProducer[AnyRef, AnyRef] =>
+        if(upStreamNames.size()>1) throw new IllegalStateException("More than 1 upStreamNames "+upStreamNames+" found for "+p){
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, recognizeSingleStreamName(p,upStreamNames))
       }
-      case _: MapperProducer[AnyRef,AnyRef] => {
-        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+      case p: MapperProducer[AnyRef,AnyRef] => {
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, recognizeSingleStreamName(p,upStreamNames))
       }
       case s: StreamProducer[AnyRef] if dag.inDegreeOf(s) == 0 => {
-        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, upStreamNames.get(0))
+        newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, recognizeSingleStreamName(s,upStreamNames))
       }
       case p@_ => throw new IllegalStateException(s"$p can not be put before AlertStreamSink, only StreamUnionProducer,FlatMapProducer and MapProducer are supported")
     }
     newStreamProducers
   }
+
 
   protected def replace(toBeAddedEdges: ListBuffer[StreamConnector[Any,Any]], toBeRemovedVertex: ListBuffer[StreamProducer[Any]],
                       dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]], current: StreamProducer[Any], upStreamName: String) : StreamProducer[Any]= {
@@ -152,11 +158,11 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
         mapper match {
           case a: JavaStormStreamExecutor[EagleTuple] => {
             val newmapper = new JavaStormExecutorForAlertWrapper(a.asInstanceOf[JavaStormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
-            newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false)
+            newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false).stream(current.streamId)
           }
           case b: StormStreamExecutor[EagleTuple] => {
             val newmapper = StormExecutorForAlertWrapper(b.asInstanceOf[StormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
-            newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false)
+            newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false).stream(current.streamId)
           }
           case _ => throw new IllegalArgumentException
         }
@@ -176,8 +182,8 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
           }
         }
         current match {
-          case MapperProducer(2, fn) => newsp = MapperProducer(3, newfun)
-          case _ => throw new IllegalArgumentException
+          case MapperProducer(_, fn) => newsp = MapperProducer(3, newfun).initWith(dag,config,hook = false).stream(current.stream)
+          case _ => throw new IllegalArgumentException(s"Illegal producer $current")
         }
         val incomingEdges = dag.incomingEdgesOf(current)
         incomingEdges.foreach(e => toBeAddedEdges += StreamConnector(e.from, newsp))
@@ -196,7 +202,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
             }
           }
         }
-        newsp = MapperProducer(3,fn)
+        newsp = MapperProducer(3,fn).initWith(dag,config,hook = false).stream(s.stream)
         toBeAddedEdges += StreamConnector(current,newsp)
         val outgoingEdges = dag.outgoingEdgesOf(current)
         outgoingEdges.foreach(e => toBeAddedEdges += StreamConnector(newsp,e.to))
@@ -212,6 +218,35 @@ object StreamAlertExpansion{
     val e = StreamAlertExpansion(config)
     e.expand(dag)
     e
+  }
+
+  /**
+    * Try upStreamNames firstly, otherwise try producer.streamId
+    *
+    * @param producer
+    * @param upStreamNames
+    * @return
+    */
+  private def recognizeSingleStreamName(producer: StreamProducer[AnyRef],upStreamNames:util.List[String]):String = {
+    if(upStreamNames == null){
+      producer.streamId
+    }else if(upStreamNames.size()>1){
+      if(producer.streamId == null) {
+        if (upStreamNames.size() > 1)
+          throw new IllegalStateException("Too many (more than 1) upStreamNames " + upStreamNames + " given for " + producer)
+        else
+          upStreamNames.get(0)
+      } else {
+        producer.streamId
+      }
+    } else if(upStreamNames.size() == 1){
+      upStreamNames.get(0)
+    }else {
+      if(producer.streamId == null){
+        throw new IllegalArgumentException("No stream name found for "+producer)
+      } else
+        producer.streamId
+    }
   }
 }
 

@@ -17,7 +17,7 @@
  *
  */
 
-package org.apache.eagle.security.hdfs.entity;
+package org.apache.eagle.security.entity;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;

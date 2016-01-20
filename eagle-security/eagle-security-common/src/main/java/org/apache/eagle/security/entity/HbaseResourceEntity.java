@@ -14,27 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.security.hive.entity;
+
+package org.apache.eagle.security.entity;
 
 import com.google.common.base.Objects;
 
 import java.io.Serializable;
 import java.util.Set;
 
-public class HiveResourceEntity implements Serializable {
+public class HbaseResourceEntity implements Serializable {
     private String resource;
-    private String database;
+    private String namespace;
     private String table;
-    private String column;
+    private String columnFamily;
     private String sensitiveType;
     private Set<String> childSensitiveTypes;
 
 
-    public Set<String> getChildSensitiveTypes() {
-        return childSensitiveTypes;
-    }
 
-    public void setChildSensitiveTypes(Set<String> childSensitiveTypes) {
+    public HbaseResourceEntity(String resource, String ns, String table, String cf, String sensitiveType, Set<String> childSensitiveTypes) {
+        this.resource = resource;
+        this.namespace = ns;
+        this.table = table;
+        this.columnFamily = cf;
+        this.sensitiveType = sensitiveType;
         this.childSensitiveTypes = childSensitiveTypes;
     }
 
@@ -46,12 +49,12 @@ public class HiveResourceEntity implements Serializable {
         this.resource = resource;
     }
 
-    public String getDatabase() {
-        return database;
+    public String getNamespace() {
+        return namespace;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     public String getTable() {
@@ -62,12 +65,12 @@ public class HiveResourceEntity implements Serializable {
         this.table = table;
     }
 
-    public String getColumn() {
-        return column;
+    public String getColumnFamily() {
+        return columnFamily;
     }
 
-    public void setColumn(String column) {
-        this.column = column;
+    public void setColumnFamily(String columnFamily) {
+        this.columnFamily = columnFamily;
     }
 
     public String getSensitiveType() {
@@ -78,13 +81,11 @@ public class HiveResourceEntity implements Serializable {
         this.sensitiveType = sensitiveType;
     }
 
+    public Set<String> getChildSensitiveTypes() {
+        return childSensitiveTypes;
+    }
 
-    public HiveResourceEntity(String resource, String database, String table, String column, String sensitiveType, Set<String> childSensitiveTypes) {
-        this.resource = resource;
-        this.database = database;
-        this.table = table;
-        this.column = column;
-        this.sensitiveType = sensitiveType;
+    public void setChildSensitiveTypes(Set<String> childSensitiveTypes) {
         this.childSensitiveTypes = childSensitiveTypes;
     }
 
@@ -93,11 +94,11 @@ public class HiveResourceEntity implements Serializable {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final HiveResourceEntity other = (HiveResourceEntity) obj;
+        final HbaseResourceEntity other = (HbaseResourceEntity) obj;
         return Objects.equal(this.resource, other.resource)
-                && this.database.equals(other.database)
+                && this.namespace.equals(other.namespace)
                 && this.table.equals(other.table)
-                && this.column.equals(other.column)
+                && this.columnFamily.equals(other.columnFamily)
                 && this.sensitiveType.equals(other.sensitiveType)
                 && this.childSensitiveTypes.containsAll(other.childSensitiveTypes);
     }

@@ -175,6 +175,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>eagle</groupId>
+			<artifactId>eagle-stream-process-dsl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-core</artifactId>
 			<exclusions>
