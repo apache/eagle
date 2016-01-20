@@ -32,14 +32,14 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Tags({"dataSource", "alertExecutorId", "streamName"})
 public class AlertExecutorEntity extends TaggedLogAPIEntity{
     @Column("a")
-    private String desc;
+    private String description;
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDescription(String desc) {
+        this.description = desc;
         valueChanged("desc");
     }
 }
