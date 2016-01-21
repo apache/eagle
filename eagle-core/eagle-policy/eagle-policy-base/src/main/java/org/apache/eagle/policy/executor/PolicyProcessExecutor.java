@@ -234,12 +234,16 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			LOG.error("Fail initial alert policy def: "+alertDef.getPolicyDef(), ex);
 		}
 		PolicyEvaluator<T> pe;
+		PolicyEvaluationContext<T, K> context = new PolicyEvaluationContext<>();
+		context.policyId = alertDef.getTags().get("policyId");
+		context.alertExecutor = this;
+		context.resultRender = this.getResultRender();
 		try {
-			// Create evaluator instances
+			// create evaluator instance
 			pe = (PolicyEvaluator<T>) evalCls
-					.getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
-					.newInstance(config, alertDef.getTags().get("policyId"), policyDef, sourceStreams, needValidation);
-		}catch(Exception ex){
+					.getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
+					.newInstance(config, context, policyDef, sourceStreams, needValidation);
+		} catch(Exception ex) {
 			LOG.error("Fail creating new policyEvaluator", ex);
 			LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
 			throw new IllegalStateException(ex);
@@ -267,10 +271,6 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		if(targetPartitionSeq == partitionSeq)
 			return true;
 		return false;
-	}
-	
-	private long trim(long value, long granularity) {
-		return value / granularity * granularity;
 	}
 
 	private void updateCounter(String name, Map<String, String> dimensions, double value) {
@@ -323,13 +323,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
                     PolicyEvaluator<T> evaluator = entry.getValue();
                     updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
                     try {
-                        PolicyEvaluationContext<T, K> evaluationContext = new PolicyEvaluationContext<T, K>();
-                        evaluationContext.alertExecutor = this;
-                        evaluationContext.policyId = policyId;
-                        evaluationContext.evaluator = evaluator;
-                        evaluationContext.outputCollector = outputCollector;
-						evaluationContext.resultRender = getResultRender();
-                        evaluator.evaluate(new ValuesArray(evaluationContext, input.get(1), input.get(2)));
+                        evaluator.evaluate(new ValuesArray(outputCollector, input.get(1), input.get(2)));
                     }
                     catch (Exception ex) {
                         LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);

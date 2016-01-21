@@ -133,6 +133,7 @@
         <module>eagle-topology-assembly</module>
         <module>eagle-samples</module>
         <module>eagle-gc</module>
+        <module>eagle-hadoop-metric</module>
     </modules>
     <properties>
         <!-- General Properties -->
@@ -881,6 +882,7 @@
                                 <exclude>.gitignore</exclude>
                                 <!-- IDE specific files-->
                                 <exclude>**/.idea/</exclude>
+                                <exclude>**/.cache-main</exclude>
                                 <exclude>**/.scalastyle/</exclude>
                                 <exclude>**/*.iml</exclude>
                                 <exclude>**/nb-configuration.xml</exclude>

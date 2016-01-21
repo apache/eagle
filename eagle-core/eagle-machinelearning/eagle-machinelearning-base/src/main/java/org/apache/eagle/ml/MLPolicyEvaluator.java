@@ -16,35 +16,32 @@
  */
 package org.apache.eagle.ml;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.config.AbstractPolicyDefinition;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.policy.PolicyEvaluator;
-import org.apache.eagle.policy.PolicyManager;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.ml.impl.MLAnomalyCallbackImpl;
 import org.apache.eagle.ml.model.MLAlgorithm;
 import org.apache.eagle.ml.model.MLPolicyDefinition;
 import org.apache.eagle.ml.utils.MLReflectionUtils;
+import org.apache.eagle.policy.PolicyEvaluationContext;
+import org.apache.eagle.policy.PolicyEvaluator;
+import org.apache.eagle.policy.PolicyManager;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.*;
 
 public class MLPolicyEvaluator implements PolicyEvaluator<AlertDefinitionAPIEntity> {
 	private static Logger LOG = LoggerFactory.getLogger(MLPolicyEvaluator.class);
     private volatile MLRuntime mlRuntime;
-	private String policyName;
 	private Config config;
 	private Map<String,String> context;
+	private final PolicyEvaluationContext<AlertDefinitionAPIEntity, AlertAPIEntity> evalContext;
 
 	private class MLRuntime{
 		MLPolicyDefinition mlPolicyDef;
@@ -52,8 +49,8 @@ public class MLPolicyEvaluator implements PolicyEvaluator<AlertDefinitionAPIEnti
 		List<MLAnomalyCallback> mlAnomalyCallbacks = new ArrayList<>();
 	}
 
-	public MLPolicyEvaluator(Config config, String policyName, AbstractPolicyDefinition policyDef, String[] sourceStreams){
-		this(config, policyName, policyDef, sourceStreams, false);
+	public MLPolicyEvaluator(Config config, PolicyEvaluationContext<AlertDefinitionAPIEntity, AlertAPIEntity> evalContext, AbstractPolicyDefinition policyDef, String[] sourceStreams){
+		this(config, evalContext, policyDef, sourceStreams, false);
 	}
 
 	/**
@@ -62,10 +59,10 @@ public class MLPolicyEvaluator implements PolicyEvaluator<AlertDefinitionAPIEnti
 	 * @param sourceStreams
 	 * @param needValidation
 	 */
-	public MLPolicyEvaluator(Config config, String policyName, AbstractPolicyDefinition policyDef, String[] sourceStreams, boolean needValidation){
+	public MLPolicyEvaluator(Config config, PolicyEvaluationContext<AlertDefinitionAPIEntity, AlertAPIEntity> evalContext, AbstractPolicyDefinition policyDef, String[] sourceStreams, boolean needValidation){
 		this.config = config;
-        this.policyName = policyName;
-        LOG.info("Initializing policy named: "+policyName);
+		this.evalContext = evalContext;
+        LOG.info("Initializing policy named: " + evalContext.policyId);
         this.context = new HashMap<>();
         this.context.put(Constants.SOURCE_STREAMS, StringUtils.join(sourceStreams,","));
 		this.init(policyDef);
@@ -98,7 +95,7 @@ public class MLPolicyEvaluator implements PolicyEvaluator<AlertDefinitionAPIEnti
 			int i = 0; 
 			for(MLAlgorithm algorithm:mlAlgorithms){
                 MLAlgorithmEvaluator mlAlgorithmEvaluator = MLReflectionUtils.newMLAlgorithmEvaluator(algorithm);
-                mlAlgorithmEvaluator.init(algorithm,config);
+                mlAlgorithmEvaluator.init(algorithm, config, evalContext);
 				runtime.mlAlgorithmEvaluators[i] =  mlAlgorithmEvaluator;
 				LOG.info("mlAlgorithmEvaluator: " + mlAlgorithmEvaluator.toString());
 						mlAlgorithmEvaluator.register(callbackImpl);
@@ -153,7 +150,7 @@ public class MLPolicyEvaluator implements PolicyEvaluator<AlertDefinitionAPIEnti
 	}
 
     public String getPolicyName() {
-		return policyName;
+		return evalContext.policyId;
 	}
 	
 	public Map<String, String> getAdditionalContext() {

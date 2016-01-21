@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Only one policy for one simple aggregate executor
+ *
  * Created on 1/10/16.
  */
 public class SimpleAggregateExecutor
@@ -53,25 +55,19 @@ public class SimpleAggregateExecutor
     private final String cql;
     private final int partitionSeq;
     private final int totalPartitionNum;
-    private final String[] sourceStreams;
 
+    private final String[] upStreamNames;
     private String policyId;
     private String executorId;
     private Config config;
     private AggregateDefinitionAPIEntity aggDef;
     private PolicyEvaluator<AggregateDefinitionAPIEntity> evaluator;
 
-    public SimpleAggregateExecutor(String cql, String policyType, int partitionSeq, int totalPartitionNum,List<String> sourceStreams) {
+    public SimpleAggregateExecutor(String[] upStreams, String cql, String policyType, int partitionSeq, int totalPartitionNum) {
         this.cql = cql;
         this.partitionSeq = partitionSeq;
+        this.upStreamNames = upStreams;
         this.totalPartitionNum = totalPartitionNum;
-
-        if(sourceStreams == null){
-            this.sourceStreams = new String[]{Constants.EAGLE_DEFAULT_POLICY_NAME};
-        }else{
-            this.sourceStreams = sourceStreams.toArray(new String[sourceStreams.size()]);
-        }
-
         // create an fixed definition policy api entity, and indicate it has full definition
         aggDef = new AggregateDefinitionAPIEntity();
         aggDef.setTags(new HashMap<String, String>());
@@ -132,11 +128,15 @@ public class SimpleAggregateExecutor
         }
 
         PolicyEvaluator<AggregateDefinitionAPIEntity> pe;
+        PolicyEvaluationContext<AggregateDefinitionAPIEntity, AggregateEntity> context = new PolicyEvaluationContext<>();
+        context.policyId = alertDef.getTags().get("policyId");
+        context.alertExecutor = this;
+        context.resultRender = new AggregateResultRender();
         try {
-            // Create evaluator instances
+            // create evaluator instances
             pe = (PolicyEvaluator<AggregateDefinitionAPIEntity>) evalCls
-                    .getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
-                    .newInstance(config, alertDef.getTags().get(Constants.POLICY_ID), policyDef, sourceStreams, false);
+                    .getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
+                    .newInstance(config, context, policyDef, upStreamNames, false);
         } catch (Exception ex) {
             LOG.error("Fail creating new policyEvaluator", ex);
             LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
@@ -153,13 +153,7 @@ public class SimpleAggregateExecutor
         if (LOG.isDebugEnabled()) LOG.debug("Current policyEvaluators: " + evaluator);
 
         try {
-            PolicyEvaluationContext<AggregateDefinitionAPIEntity, AggregateEntity> evaluationContext = new PolicyEvaluationContext<>();
-            evaluationContext.alertExecutor = this;
-            evaluationContext.policyId = policyId;
-            evaluationContext.evaluator = evaluator;
-            evaluationContext.outputCollector = collector;
-            evaluationContext.resultRender = new AggregateResultRender();
-            evaluator.evaluate(new ValuesArray(evaluationContext, input.get(1), input.get(2)));
+            evaluator.evaluate(new ValuesArray(collector, input.get(1), input.get(2)));
         } catch (Exception ex) {
             LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
         }

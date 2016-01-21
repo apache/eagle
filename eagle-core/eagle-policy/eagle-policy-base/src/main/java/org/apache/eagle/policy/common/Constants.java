@@ -38,7 +38,7 @@ public class Constants {
 	public static final String ALERT_SOURCE = "alertSource";
 	public static final String ALERT_MESSAGE = "alertMessage";
 	public static final String SUBJECT = "subject";
-	public static final String ALERT_EXECUTOR_ID = PolicyDefinitionEntityDAOImpl.ALERT_EXECUTOR_ID;// "alertExecutorId";
+	public static final String ALERT_EXECUTOR_ID = "alertExecutorId";
 	public static final String POLICY_NAME = "policyName";
 	public static final String POLICY_ID = "policyId";
     public static final String SOURCE_STREAMS = "sourceStreams";
@@ -56,8 +56,7 @@ public class Constants {
 	public static final String PARTITIONER = "partitioner";
 	public static final String SOURCE = "source";
 	public static final String PARTITIONSEQ = "partitionSeq";
-	// policy definition status
-	public static final String EAGLE_DEFAULT_POLICY_NAME = "eagleQuery";
+	public static final String EXECUTOR_ID = "executorId";
 
 	public enum policyType {
 		siddhiCEPEngine,

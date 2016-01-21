@@ -89,13 +89,11 @@ public class TestSiddhiEvaluator {
 			put("allowed", "true");
 		}};
         final SiddhiPolicyDefinition policyDef = new SiddhiPolicyDefinition();
-        policyDef.setType("SiddhiCEPEngine");
+        policyDef.setType("siddhiCEPEngine");
         String expression = "from hdfsAuditLogEventStream[cmd=='open'] " +
 							"select * " +
 							"insert into outputStream ;";
         policyDef.setExpression(expression);
-        SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity> evaluator = new SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity>(config, "testPolicy", policyDef, new String[]{"hdfsAuditLogEventStream"});
-		PolicyEvaluationContext context = new PolicyEvaluationContext();
 
 		PolicyDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, null)) {
 			@Override
@@ -112,8 +110,9 @@ public class TestSiddhiEvaluator {
 		};
 		alertExecutor.prepareConfig(config);
 		alertExecutor.init();
+
+		PolicyEvaluationContext<AlertDefinitionAPIEntity, AlertAPIEntity> context = new PolicyEvaluationContext<>();
 		context.alertExecutor = alertExecutor;
-		context.evaluator = evaluator;
 		context.policyId = "testPolicy";
 		context.resultRender = new SiddhiAlertAPIEntityRender();
 		context.outputCollector = new Collector<Tuple2<String, AlertAPIEntity>> () {
@@ -122,7 +121,11 @@ public class TestSiddhiEvaluator {
 				alertCount++;
 			}
 		};
-		evaluator.evaluate(new ValuesArray(context, "hdfsAuditLogEventStream", data1));
+
+		SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity> evaluator =
+				new SiddhiPolicyEvaluator<>(config, context, policyDef, new String[]{"hdfsAuditLogEventStream"}, false);
+
+		evaluator.evaluate(new ValuesArray(context.outputCollector, "hdfsAuditLogEventStream", data1));
 		Thread.sleep(2 * 1000);
 		Assert.assertEquals(alertCount, 1);
 	}

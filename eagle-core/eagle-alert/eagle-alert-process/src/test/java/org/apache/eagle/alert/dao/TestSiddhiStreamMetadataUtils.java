@@ -16,23 +16,22 @@
  */
 package org.apache.eagle.alert.dao;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
-
-import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
+import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.policy.siddhi.SiddhiStreamMetadataUtils;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 public class TestSiddhiStreamMetadataUtils {
 	@Test
-	public void test() throws Exception{
+	public void test() throws Exception {
         Config config = ConfigFactory.load();
         StreamMetadataManager.getInstance().reset();
         StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAO() {
@@ -45,7 +44,7 @@ public class TestSiddhiStreamMetadataUtils {
             }
         });
 		String siddhiStreamDef = SiddhiStreamMetadataUtils.convertToStreamDef("testStreamName");
-		Assert.assertEquals("define stream " + "testStreamName" + "(eagleAlertContext object, attrName1 string,attrName2 long);", siddhiStreamDef);
+		Assert.assertEquals("define stream " + "testStreamName" + "(attrName1 string,attrName2 long);", siddhiStreamDef);
 	}
 	
 	private AlertStreamSchemaEntity generateStreamMetadataAPIEntity(final String attrName, String attrType){

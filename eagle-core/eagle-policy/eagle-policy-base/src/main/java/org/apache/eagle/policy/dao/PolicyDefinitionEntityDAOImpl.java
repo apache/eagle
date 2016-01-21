@@ -16,8 +16,9 @@
  */
 package org.apache.eagle.policy.dao;
 
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -38,7 +39,6 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOG = LoggerFactory.getLogger(PolicyDefinitionEntityDAOImpl.class);
-	public static final String ALERT_EXECUTOR_ID = "alertExecutorId";
 	private final EagleServiceConnector connector;
 	private final String servicePointName;
 
@@ -82,8 +82,8 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 		Map<String, Map<String, T>> map = new HashMap<String, Map<String, T>>();
 		for (T entity : list) {
 			// support both executorId and legacy alertExecutorId
-			String executorID = entity.getTags().containsKey("executorId") ? entity.getTags().get("executorId")
-					: entity.getTags().get(ALERT_EXECUTOR_ID);
+			String executorID = entity.getTags().containsKey(Constants.EXECUTOR_ID) ? entity.getTags().get(Constants.EXECUTOR_ID)
+					: entity.getTags().get(Constants.ALERT_EXECUTOR_ID);
 
 			if (map.get(executorID) == null) {
 				map.put(executorID, new HashMap<String, T>());
