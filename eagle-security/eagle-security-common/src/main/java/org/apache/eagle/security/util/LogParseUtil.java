@@ -28,14 +28,14 @@ public class LogParseUtil {
      * 2)hadoop/123.dc1.xyz.com@xyz.com (auth:KERBEROS)
      * 3)hadoop (auth:KERBEROS)
      */
-    public static String parseUserFromUGI(String newUgi) {
-        if(newUgi == null) return null;
+    public static String parseUserFromUGI(String ugi) {
+        if(ugi == null) return null;
+        String newUgi = ugi.trim();
         int index = newUgi.indexOf("/");
-        if (index != -1) return newUgi.substring(0, index);
-        index = newUgi.indexOf("@");
-        if (index != -1) return newUgi.substring(0, index);
-        index = newUgi.indexOf("(");
         if (index != -1) return newUgi.substring(0, index).trim();
-        return newUgi.trim();
+        index = newUgi.indexOf("@");
+        if (index != -1) return newUgi.substring(0, index).trim();
+        index = newUgi.indexOf("(");
+        return newUgi.substring(0, index).trim();
     }
 }

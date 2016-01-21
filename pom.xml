@@ -892,7 +892,6 @@
                                 <exclude>**/*.log</exclude>
                                 <exclude>**/eagle.log*</exclude>
                                 <exclude>**/resources/**/*.json</exclude>
-                                <exclude>**/resources/eagle.siddhiext</exclude>
                                 <exclude>**/test/resources/securityAuditLog</exclude>
                                 <exclude>**/resources/**/ml-policyDef-UserProfile.txt</exclude>
                                 <exclude>**/test/resources/onelinehiveauditlog.txt</exclude>
