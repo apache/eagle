@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedMap;
 
 /**
  * Created on 1/19/16.
@@ -44,7 +45,7 @@ public class HadoopJmxMetricDeserializer implements SpoutKafkaMessageDeserialize
     public Object deserialize(byte[] arg0) {
         try {
             String content = new String(arg0, Charset.defaultCharset().name());
-            Map<String, Object> metricItem = JsonSerDeserUtils.deserialize(content, Map.class);
+            Map<String, Object> metricItem = JsonSerDeserUtils.deserialize(content, SortedMap.class);
             return metricItem;
         } catch (Exception e) {
             e.printStackTrace();

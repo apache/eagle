@@ -16,19 +16,19 @@
  */
 package org.apache.eagle.policy.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utility methods to load alert definitions for a program
@@ -74,7 +74,8 @@ public class AlertDefinitionDAOImpl implements PolicyDefinitionDAO<AlertDefiniti
 		List<AlertDefinitionAPIEntity> list = findActivePolicies(site, dataSource);
 		Map<String, Map<String, AlertDefinitionAPIEntity>> map = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
 			for (AlertDefinitionAPIEntity entity : list) {
-				String executorID = entity.getTags().get(Constants.ALERT_EXECUTOR_ID);
+				String executorID = entity.getTags().containsKey(Constants.EXECUTOR_ID) ? entity.getTags().get(Constants.EXECUTOR_ID)
+						: entity.getTags().get(Constants.ALERT_EXECUTOR_ID);
 				if (map.get(executorID) == null) {
 					map.put(executorID, new HashMap<String, AlertDefinitionAPIEntity>());
 				}

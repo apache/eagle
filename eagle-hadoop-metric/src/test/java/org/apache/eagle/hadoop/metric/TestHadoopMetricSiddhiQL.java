@@ -169,10 +169,10 @@ public class TestHadoopMetricSiddhiQL {
             events.add(e);
 
             // trigger event
-            base1 = base1 + 6 * 60 * 1000;
-            e = new Event();
-            e.setData(new Object[]{"b", base1, "hadoop.namenode.dfs.lastwrittentransactionid", "namenode", "sandbox", String.valueOf(tbase2)});
-            events.add(e);
+//            base1 = base1 + 6 * 60 * 1000;
+//            e = new Event();
+//            e.setData(new Object[]{"b", base1, "hadoop.namenode.dfs.lastwrittentransactionid", "namenode", "sandbox", String.valueOf(tbase2)});
+//            events.add(e);
         }
 
         return events;

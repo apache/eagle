@@ -49,7 +49,7 @@ public class SiddhiStreamMetadataUtils {
 	public static String convertToStreamDef(String streamName){
 		SortedMap<String, AlertStreamSchemaEntity> map = getAttrMap(streamName);
 		StringBuilder sb = new StringBuilder();
-		sb.append(EAGLE_ALERT_CONTEXT_FIELD + " object, ");
+//		sb.append(EAGLE_ALERT_CONTEXT_FIELD + " object, ");
 		for(Map.Entry<String, AlertStreamSchemaEntity> entry : map.entrySet()){
             appendAttributeNameType(sb, entry.getKey(), entry.getValue().getAttrType());
 		}

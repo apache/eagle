@@ -35,7 +35,7 @@ public class NameNodeLagMonitor {
 
     public static void main(String[] args) {
         StormExecutionEnvironment env = ExecutionEnvironments.get(args, StormExecutionEnvironment.class);
-        String streamName = "s";
+        String streamName = "hadoopJmxMetricEventStream";
         StreamProducer sp = env.fromSpout(createProvider(env.getConfig())).withOutputFields(2).parallelism(1).nameAs(streamName);
         sp.alertWithConsumer(streamName, "hadoopJmxMetricAlertExecutor");
 

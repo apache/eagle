@@ -17,6 +17,9 @@
 package org.apache.eagle.alert.siddhi;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.common.metric.AlertContext;
@@ -24,9 +27,6 @@ import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.policy.ResultRender;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.common.UrlBuilder;
-import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.SiddhiQueryCallbackImpl;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
@@ -69,7 +69,7 @@ public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionA
 
 		for (int index = 0; index < rets.size(); index++) {
 			//attrRenameList.get(0) -> "eagleAlertContext". We need to skip "eagleAlertContext", index is from 1 for attRenameList.
-			context.addProperty(attrRenameList.get(index + 1), rets.get(index));
+			context.addProperty(attrRenameList.get(index), rets.get(index));
 		}
 
 		StringBuilder sb = new StringBuilder();

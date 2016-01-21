@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Only one policy for one simple aggregate executor
+ *
  * Created on 1/10/16.
  */
 public class SimpleAggregateExecutor
@@ -121,11 +123,15 @@ public class SimpleAggregateExecutor
         }
 
         PolicyEvaluator<AggregateDefinitionAPIEntity> pe;
+        PolicyEvaluationContext<AggregateDefinitionAPIEntity, AggregateEntity> context = new PolicyEvaluationContext<>();
+        context.policyId = alertDef.getTags().get("policyId");
+        context.alertExecutor = this;
+        context.resultRender = new AggregateResultRender();
         try {
-            // Create evaluator instances
+            // create evaluator instances
             pe = (PolicyEvaluator<AggregateDefinitionAPIEntity>) evalCls
-                    .getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
-                    .newInstance(config, alertDef.getTags().get(Constants.POLICY_ID), policyDef, upStreamNames, false);
+                    .getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
+                    .newInstance(config, context, policyDef, upStreamNames, false);
         } catch (Exception ex) {
             LOG.error("Fail creating new policyEvaluator", ex);
             LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
@@ -142,13 +148,7 @@ public class SimpleAggregateExecutor
         if (LOG.isDebugEnabled()) LOG.debug("Current policyEvaluators: " + evaluator);
 
         try {
-            PolicyEvaluationContext<AggregateDefinitionAPIEntity, AggregateEntity> evaluationContext = new PolicyEvaluationContext<>();
-            evaluationContext.alertExecutor = this;
-            evaluationContext.policyId = policyId;
-            evaluationContext.evaluator = evaluator;
-            evaluationContext.outputCollector = collector;
-            evaluationContext.resultRender = new AggregateResultRender();
-            evaluator.evaluate(new ValuesArray(evaluationContext, input.get(1), input.get(2)));
+            evaluator.evaluate(new ValuesArray(collector, input.get(1), input.get(2)));
         } catch (Exception ex) {
             LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
         }
