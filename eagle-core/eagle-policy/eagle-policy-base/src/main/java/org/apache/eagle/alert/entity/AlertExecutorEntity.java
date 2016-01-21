@@ -22,6 +22,9 @@ import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+/**
+ * Stream and Alert executor Id mapping should be automatically created by topology definition
+ */
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("alertExecutor")
 @ColumnFamily("f")

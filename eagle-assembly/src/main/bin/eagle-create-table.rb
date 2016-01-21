@@ -52,6 +52,8 @@ createEagleTable(admin, 'hbaseResourceSensitivity')
 createEagleTable(admin, 'mlmodel')
 createEagleTable(admin, 'userprofile')
 createEagleTable(admin, 'hfdsusercommandpattern')
+createEagleTable(admin, 'appCommand')
+createEagleTable(admin, 'appDefinition')
 createEagleTable(admin, 'serviceAudit')
 createEagleTable(admin, 'aggregatedef')
 

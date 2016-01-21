@@ -31,6 +31,7 @@ object StreamDAGTransformer {
    * @param dag DirectedAcyclicGraph[StreamProducer, StreamConnector]
    * @return StormStreamDAG
    */
+  @deprecated("Use StreamDAG(dag) will transform directly")
   def transform(dag: DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]) : StreamDAG = {
     val stormDAG = new StreamDAG(dag)
     val nodeMap = mutable.HashMap[String, StreamProducer[Any]]()

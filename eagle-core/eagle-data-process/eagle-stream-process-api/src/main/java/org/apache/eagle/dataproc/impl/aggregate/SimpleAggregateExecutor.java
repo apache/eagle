@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 1/10/16.
@@ -51,6 +53,7 @@ public class SimpleAggregateExecutor
     private final String cql;
     private final int partitionSeq;
     private final int totalPartitionNum;
+    private final String[] sourceStreams;
 
     private String policyId;
     private String executorId;
@@ -58,20 +61,30 @@ public class SimpleAggregateExecutor
     private AggregateDefinitionAPIEntity aggDef;
     private PolicyEvaluator<AggregateDefinitionAPIEntity> evaluator;
 
-    public SimpleAggregateExecutor(String cql, String policyType, int partitionSeq, int totalPartitionNum) {
+    public SimpleAggregateExecutor(String cql, String policyType, int partitionSeq, int totalPartitionNum,List<String> sourceStreams) {
         this.cql = cql;
         this.partitionSeq = partitionSeq;
         this.totalPartitionNum = totalPartitionNum;
+
+        if(sourceStreams == null){
+            this.sourceStreams = new String[]{Constants.EAGLE_DEFAULT_POLICY_NAME};
+        }else{
+            this.sourceStreams = sourceStreams.toArray(new String[sourceStreams.size()]);
+        }
+
         // create an fixed definition policy api entity, and indicate it has full definition
         aggDef = new AggregateDefinitionAPIEntity();
         aggDef.setTags(new HashMap<String, String>());
         aggDef.getTags().put(Constants.POLICY_TYPE, policyType);
         // TODO make it more general, not only hard code siddhi cep support here.
         try {
-            String template = "{\"type\":\"siddhiCEPEngine\", \"expression\":\"%s\", \"containsDefintion\": true }";
-            aggDef.setPolicyDef(String.format(template, this.cql));
+            Map<String,Object> template = new HashMap<>();
+            template.put("type","siddhiCEPEngine");
+            template.put("expression",this.cql);
+            template.put("containsDefinition",true);
+            aggDef.setPolicyDef(new ObjectMapper().writer().writeValueAsString(template));
         } catch (Exception e) {
-            LOG.error("simple aggregate generate policy definition failed!", e);
+            LOG.error("Simple aggregate generate policy definition failed!", e);
         }
         aggDef.setCreatedTime(new Date().getTime());
         aggDef.setLastModifiedDate(new Date().getTime());
@@ -123,7 +136,7 @@ public class SimpleAggregateExecutor
             // Create evaluator instances
             pe = (PolicyEvaluator<AggregateDefinitionAPIEntity>) evalCls
                     .getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
-                    .newInstance(config, alertDef.getTags().get(Constants.POLICY_ID), policyDef, new String[]{Constants.EAGLE_DEFAULT_POLICY_NAME}, false);
+                    .newInstance(config, alertDef.getTags().get(Constants.POLICY_ID), policyDef, sourceStreams, false);
         } catch (Exception ex) {
             LOG.error("Fail creating new policyEvaluator", ex);
             LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());

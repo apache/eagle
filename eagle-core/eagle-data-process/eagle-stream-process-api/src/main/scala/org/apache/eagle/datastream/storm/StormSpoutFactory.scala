@@ -22,7 +22,7 @@ import java.util
 
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
-import org.apache.eagle.datastream.core.{IterableStreamProducer, StormSourceProducer, StreamProducer}
+import org.apache.eagle.datastream.core.{IteratorStreamProducer, IterableStreamProducer, StormSourceProducer, StreamProducer}
 import org.apache.eagle.datastream.utils.NameConstants
 
 object StormSpoutFactory {
@@ -37,6 +37,8 @@ object StormSpoutFactory {
         }
       case p@IterableStreamProducer(iterable,recycle) =>
         IterableStreamSpout(iterable,recycle)
+      case p@IteratorStreamProducer(iterator) =>
+        IteratorStreamSpout(iterator)
       case _ =>
         throw new IllegalArgumentException(s"Cannot compile unknown $from to a Storm Spout")
     }

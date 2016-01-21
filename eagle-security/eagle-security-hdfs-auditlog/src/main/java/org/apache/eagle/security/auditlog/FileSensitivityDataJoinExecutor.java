@@ -22,10 +22,9 @@ import org.apache.eagle.datastream.JavaStormStreamExecutor2;
 import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.security.auditlog.timer.FileSensitivityPollingJob;
 import org.apache.eagle.security.auditlog.util.SimplifyPath;
-import org.apache.eagle.security.hdfs.entity.FileSensitivityAPIEntity;
+import org.apache.eagle.security.entity.FileSensitivityAPIEntity;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.security.util.ExternalDataJoiner;
-import org.apache.storm.guava.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -33,6 +33,7 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
+import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -42,16 +43,16 @@ import java.util.*;
  * during this time, synchronization is important
  */
 public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> implements PolicyEvaluator<T>{
-	
+
 	private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyEvaluator.class);
-	
+
 	private volatile SiddhiRuntime siddhiRuntime;
 	private String[] sourceStreams;
 	private boolean needValidation;
 	private String policyId;
 	private Config config;
 	private final static String EXECUTION_PLAN_NAME = "query";
-	
+
 	/**
 	 * everything dependent on policyDef should be together and switched in runtime
 	 */
@@ -63,24 +64,24 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 		List<String> outputFields;
 		String executionPlanName;
 	}
-	
+
 	public SiddhiPolicyEvaluator(Config config, String policyName, AbstractPolicyDefinition policyDef, String[] sourceStreams){
 		this(config, policyName, policyDef, sourceStreams, false);
 	}
-	
+
 	public SiddhiPolicyEvaluator(Config config, String policyId, AbstractPolicyDefinition policyDef, String[] sourceStreams, boolean needValidation){
 		this.config = config;
 		this.policyId = policyId;
 		this.needValidation = needValidation;
-		this.sourceStreams = sourceStreams; 
+		this.sourceStreams = sourceStreams;
 		init(policyDef);
 	}
-	
-	public void init(AbstractPolicyDefinition policyDef){			
+
+	public void init(AbstractPolicyDefinition policyDef){
 		siddhiRuntime = createSiddhiRuntime((SiddhiPolicyDefinition)policyDef);
 	}
 
-	public static String addContextFieldIfNotExist(String expression) {		
+	public static String addContextFieldIfNotExist(String expression) {
 		// select fieldA, fieldB --> select eagleAlertContext, fieldA, fieldB
 		int pos = expression.indexOf("select ") + 7;
 		int index = pos;
@@ -103,11 +104,11 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 
 	private SiddhiRuntime createSiddhiRuntime(SiddhiPolicyDefinition policyDef){
 		SiddhiManager siddhiManager = new SiddhiManager();
-		Map<String, InputHandler> siddhiInputHandlers = new HashMap<String, InputHandler>();
+		Map<String, InputHandler> siddhiInputHandlers = new HashMap<>();
 
 		// compose execution plan sql
 		String executionPlan = policyDef.getExpression();
-		if (!policyDef.isContainsDefintion()) {
+		if (!policyDef.isContainsDefinition()) {
 			StringBuilder sb = new StringBuilder();
 			for (String sourceStream : sourceStreams) {
 				String streamDef = SiddhiStreamMetadataUtils.convertToStreamDef(sourceStream);
@@ -119,14 +120,21 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 			executionPlan = sb.toString() + " @info(name = '" + EXECUTION_PLAN_NAME + "') " + expression;
 		}
 
-		ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
-		
-		for(String sourceStream : sourceStreams){			
+		ExecutionPlanRuntime executionPlanRuntime = null;
+		try {
+				executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+		}catch (SiddhiParserException ex){
+			LOG.error("Failed to parse: "+executionPlan,ex);
+			throw ex;
+		}
+
+		for(String sourceStream : sourceStreams){
 			siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
 		}
+
 		executionPlanRuntime.start();
 
-		QueryCallback callback = new SiddhiQueryCallbackImpl<T, K>(config, this);		
+		QueryCallback callback = new SiddhiQueryCallbackImpl<T, K>(config, this);
 
 		LOG.info("Siddhi query: " + executionPlan);
 		executionPlanRuntime.addCallback(EXECUTION_PLAN_NAME, callback);
@@ -137,7 +145,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 	        field.setAccessible(true);
 	        Query query = (Query)field.get(callback);
 	        List<OutputAttribute> list = query.getSelector().getSelectionList();
-	        for (OutputAttribute output : list) {	        	
+	        for (OutputAttribute output : list) {
 	        	outputFields.add(output.getRename());
 	        }
 		}
@@ -153,7 +161,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 		runtime.executionPlanName = executionPlanRuntime.getName();
 		return runtime;
 	}
-	
+
 	/**
 	 * 1. input has 3 fields, first is siddhi context, second is streamName, the last one is map of attribute name/value
 	 * 2. runtime check for input data (This is very expensive, so we ignore for now)
@@ -173,9 +181,15 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 			//insert siddhiAlertContext into the first field
 			List<Object> input = new ArrayList<>();
 			input.add(siddhiAlertContext);
-			input.add(streamName);
+			// input.add(streamName);
 			putAttrsIntoInputStream(input, streamName, map);
-			siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
+            try {
+                InputHandler inputHandler = siddhiRuntime.siddhiInputHandlers.get(streamName);
+				if(inputHandler == null) throw new NullPointerException("InputHandler for stream ["+streamName+"] is not found");
+				inputHandler.send(input.toArray(new Object[input.size()]));
+            }catch (InterruptedException ex){
+                LOG.error("Got exception "+ex.getMessage(),ex);
+            }
 		}
 	}
 
@@ -219,7 +233,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 	public void onPolicyUpdate(T newAlertDef) {
 		AbstractPolicyDefinition policyDef = null;
 		try {
-			policyDef = JsonSerDeserUtils.deserialize(newAlertDef.getPolicyDef(), 
+			policyDef = JsonSerDeserUtils.deserialize(newAlertDef.getPolicyDef(),
 					AbstractPolicyDefinition.class, PolicyManager.getInstance().getPolicyModules(newAlertDef.getTags().get(Constants.POLICY_TYPE)));
 		}
 		catch (Exception ex) {
@@ -231,7 +245,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 			previous.siddhiManager.getExecutionPlanRuntime(previous.executionPlanName).shutdown();
 		}
 	}
-	
+
 	@Override
 	public void onPolicyDelete(){
 		synchronized(siddhiRuntime){
@@ -240,12 +254,12 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 			LOG.info("Siddhi execution plan " + siddhiRuntime.executionPlanName + " is successfully shutdown ");
 		}
 	}
-	
+
 	@Override
 	public String toString(){
 		return siddhiRuntime.policyDef.toString();
 	}
-	
+
 	public String[] getStreamNames() {
 		return sourceStreams;
 	}
