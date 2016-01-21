@@ -136,7 +136,6 @@ public class TestHadoopMetricSiddhiQL {
         long base1 = System.currentTimeMillis();
         long tbase1 = 1000;
         long tbase2 = 1000;
-        // {"host": "eagle-c3-lvs01-1-9953.lvs01.dev.ebayc3.com", "timestamp": 1453039016336, "metric": "hadoop.namenode.dfs.lastwrittentransactionid", "component": "namenode", "site": "sandbox", "value": "47946"}
 
         int SIZE = 10;
         // master / slave in sync, no events for these
@@ -206,7 +205,6 @@ public class TestHadoopMetricSiddhiQL {
         long base1 = System.currentTimeMillis();
         long tbase1 = 1000;
         long tbase2 = 5000;
-        // {"host": "eagle-c3-lvs01-1-9953.lvs01.dev.ebayc3.com", "timestamp": 1453039016336, "metric": "hadoop.namenode.dfs.lastwrittentransactionid", "component": "namenode", "site": "sandbox", "value": "47946"}
 
         int SIZE = 10;
         // master / slave in sync

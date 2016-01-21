@@ -182,7 +182,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
        "policyDef": "{\"expression\":\"from every a = s[metric=='hadoop.namenode.dfs.lastwrittentransactionid'] -> b = s[metric=='hadoop.namenode.dfs.lastwrittentransactionid' and b.host != a.host and (convert(a.value, 'long') + 100) < convert(value, 'long') ] within 5 min select a.host as hostA, b.host as hostB insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
        "enabled": true,
        "dedupeDef": "{\"alertDedupIntervalMin\":1,\"emailDedupIntervalMin\":1}",
-       "notificationDef": "[{\"sender\":\"liasu@ebay.com\",\"recipients\":\"liasu@ebay.com\",\"subject\":\"private file touched.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
+       "notificationDef": "[{\"sender\":\"dev@apache.org\",\"recipients\":\"liasu@apache.org\",\"subject\":\"private file touched.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
      }
  ]
  '
