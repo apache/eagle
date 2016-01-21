@@ -16,15 +16,10 @@
  */
 package org.apache.eagle.alert.entity;
 
+import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.meta.Column;
-import org.apache.eagle.log.entity.meta.ColumnFamily;
-import org.apache.eagle.log.entity.meta.Prefix;
-import org.apache.eagle.log.entity.meta.Service;
-import org.apache.eagle.log.entity.meta.Table;
-import org.apache.eagle.log.entity.meta.TimeSeries;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -35,6 +30,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.ALERT_SERVICE_ENDPOINT_NAME)
 @TimeSeries(true)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Tags({"site", "hostname", "dataSource", "policyId", "sourceStreams", "alertSource", "alertExecutorId"})
 public class AlertAPIEntity extends TaggedLogAPIEntity{
 	@Column("description")
 	private String description;
