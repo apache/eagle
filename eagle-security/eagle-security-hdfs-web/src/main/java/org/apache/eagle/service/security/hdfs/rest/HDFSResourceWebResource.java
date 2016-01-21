@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.eagle.service.security.hdfs.HDFSFileSystem;
 import org.apache.eagle.service.security.hdfs.HDFSResourceUtils;
-import org.apache.eagle.security.hdfs.entity.FileStatusEntity;
+import org.apache.eagle.security.entity.FileStatusEntity;
 
 
 /**

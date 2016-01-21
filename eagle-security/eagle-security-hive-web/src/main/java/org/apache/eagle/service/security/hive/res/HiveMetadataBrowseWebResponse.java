@@ -17,7 +17,7 @@
 package org.apache.eagle.service.security.hive.res;
 
 
-import org.apache.eagle.security.hive.entity.HiveResourceEntity;
+import org.apache.eagle.security.entity.HiveResourceEntity;
 
 import java.util.List;
 

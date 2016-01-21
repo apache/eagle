@@ -33,11 +33,15 @@ case class JsonMessageDeserializer(props:Properties) extends SpoutKafkaMessageDe
 
   override def deserialize(bytes: Array[Byte]): AnyRef = {
     var map: util.Map[String, _] = null
-    try {
-      map = objectMapper.readValue(bytes, classOf[util.TreeMap[String, _]])
-    } catch {
-      case e: IOException => {
-        LOG.error("Failed to deserialize json from: " + new String(bytes), e)
+    if(bytes.length == 0 || bytes == null){
+     if(LOG.isDebugEnabled) LOG.warn("Skip empty message")
+    }else {
+      try {
+        map = objectMapper.readValue(bytes, classOf[util.TreeMap[String, _]])
+      } catch {
+        case e: IOException => {
+          LOG.error("Failed to deserialize json from: " + new String(bytes), e)
+        }
       }
     }
     map

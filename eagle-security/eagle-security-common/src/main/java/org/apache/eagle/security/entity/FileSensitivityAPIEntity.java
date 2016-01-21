@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.security.hdfs.entity;
+package org.apache.eagle.security.entity;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 

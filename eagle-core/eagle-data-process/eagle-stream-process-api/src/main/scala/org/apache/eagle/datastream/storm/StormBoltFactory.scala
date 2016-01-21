@@ -35,9 +35,14 @@ object StormBoltFactory {
         }else if(worker.isInstanceOf[StormStreamExecutor[EagleTuple]]){
           worker.asInstanceOf[StormStreamExecutor[EagleTuple]].prepareConfig(config)
           StormBoltWrapper(worker.asInstanceOf[StormStreamExecutor[EagleTuple]])
-        }else {
-          throw new UnsupportedOperationException
+        }else if(worker.isInstanceOf[FlatMapperWrapper[Any]]){
+          StormFlatFunctionWrapper(worker.asInstanceOf[FlatMapperWrapper[Any]].func)
+        } else {
+          StormFlatMapperWrapper(worker)
         }
+//        else {
+//          throw new UnsupportedOperationException(s"Unsupported FlatMapperProducer type: $producer")
+//        }
       }
       case filter:FilterProducer[Any] => {
         FilterBoltWrapper(filter.fn)
@@ -49,8 +54,8 @@ object StormBoltFactory {
         ForeachBoltWrapper(foreach.fn)
       }
       case persist : PersistProducer[Any] => {
-        val persisExecutor = new PersistExecutor(persist.executorId, persist.storageType.toString());
-        persisExecutor.prepareConfig(config);
+        val persisExecutor = new PersistExecutor(persist.executorId, persist.storageType.toString)
+        persisExecutor.prepareConfig(config)
         JavaStormBoltWrapper(persisExecutor.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
       }
       case _ => throw new UnsupportedOperationException(s"Unsupported producer: ${producer.toString}")

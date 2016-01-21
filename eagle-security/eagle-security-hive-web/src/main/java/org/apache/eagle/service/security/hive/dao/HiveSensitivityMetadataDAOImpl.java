@@ -18,7 +18,7 @@ package org.apache.eagle.service.security.hive.dao;
 
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import org.apache.eagle.service.generic.ListQueryResource;
-import org.apache.eagle.security.hive.entity.HiveResourceSensitivityAPIEntity;
+import org.apache.eagle.security.entity.HiveResourceSensitivityAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

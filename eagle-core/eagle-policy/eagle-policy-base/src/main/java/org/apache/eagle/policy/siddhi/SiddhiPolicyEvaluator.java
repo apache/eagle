@@ -111,7 +111,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 
         // compose execution plan sql
         String executionPlan = policyDef.getExpression();
-        if (!policyDef.isContainsDefintion()) {
+        if (!policyDef.isContainsDefinition()) {
             StringBuilder sb = new StringBuilder();
             for (String sourceStream : sourceStreams) {
                 String streamDef = SiddhiStreamMetadataUtils.convertToStreamDef(sourceStream);

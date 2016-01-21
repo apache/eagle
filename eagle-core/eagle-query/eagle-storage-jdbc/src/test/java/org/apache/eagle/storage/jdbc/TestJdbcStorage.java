@@ -16,6 +16,9 @@
  */
 package org.apache.eagle.storage.jdbc;
 
+import junit.framework.Assert;
+import org.apache.commons.lang.time.StopWatch;
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
@@ -26,9 +29,6 @@ import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
-import org.apache.eagle.common.DateTimeUtil;
-import junit.framework.Assert;
-import org.apache.commons.lang.time.StopWatch;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ public class TestJdbcStorage {
         Assert.assertNotNull(result);
     }
 
-    //@Test
+//    @Test
     public void testReadByComplexQuery() throws QueryCompileException, IOException {
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"cluster\" AND @field4 > 1000 AND @field7 CONTAINS \"subtext\" OR @jobID =\"jobID\" ]{@field1,@field2}");

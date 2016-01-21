@@ -45,9 +45,13 @@ case class StreamParallelismConfigExpansion(config: Config) extends StreamDAGExp
   }
 
   private def getParallelismMap(config: Config) : Map[Pattern, Int]= {
-    val parallelismConfig: ConfigObject = config.getObject("envContextConfig.parallelismConfig")
-    parallelismConfig.asScala.toMap map {
-      case (name, value) => (Pattern.compile(name), value.asInstanceOf[ConfigValue].unwrapped().asInstanceOf[Int])
+    if(config.hasPath("envContextConfig.parallelismConfig")) {
+      val parallelismConfig: ConfigObject = config.getObject("envContextConfig.parallelismConfig")
+      parallelismConfig.asScala.toMap map {
+        case (name, value) => (Pattern.compile(name), value.asInstanceOf[ConfigValue].unwrapped().asInstanceOf[Int])
+      }
+    }else{
+      Map[Pattern,Int]()
     }
   }
 }

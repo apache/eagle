@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Only one policy for one simple aggregate executor
@@ -72,10 +74,13 @@ public class SimpleAggregateExecutor
         aggDef.getTags().put(Constants.POLICY_TYPE, policyType);
         // TODO make it more general, not only hard code siddhi cep support here.
         try {
-            String template = "{\"type\":\"siddhiCEPEngine\", \"expression\":\"%s\", \"containsDefintion\": true }";
-            aggDef.setPolicyDef(String.format(template, this.cql));
+            Map<String,Object> template = new HashMap<>();
+            template.put("type","siddhiCEPEngine");
+            template.put("expression",this.cql);
+            template.put("containsDefinition",true);
+            aggDef.setPolicyDef(new ObjectMapper().writer().writeValueAsString(template));
         } catch (Exception e) {
-            LOG.error("simple aggregate generate policy definition failed!", e);
+            LOG.error("Simple aggregate generate policy definition failed!", e);
         }
         aggDef.setCreatedTime(new Date().getTime());
         aggDef.setLastModifiedDate(new Date().getTime());

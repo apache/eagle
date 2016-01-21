@@ -19,11 +19,9 @@ package org.apache.eagle.datastream.core
 
 import com.typesafe.config.Config
 import org.apache.commons.lang3.builder.HashCodeBuilder
-import org.apache.eagle.datastream.FlatMapper
+import org.apache.eagle.datastream.{Collector, FlatMapper}
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
-
-import scala.reflect.runtime.{universe => ru}
 
 /**
  * StreamInfo should be fully serializable and having not runtime type information
@@ -39,7 +37,11 @@ class StreamInfo  extends Serializable{
    */
   var name: String = null
 
+  /**
+    * Output stream id, equals to name by default
+    */
   var streamId:String=null
+
   var parallelismNum: Int = 1
 
   /**
@@ -108,6 +110,7 @@ trait StreamProtocol[+T <: Any]{
    * @return
    */
   def flatMap[R](flatMapper:FlatMapper[R]): StreamProducer[R]
+  def flatMap[R](func:(Any,Collector[R])=>Unit): StreamProducer[R]
 
   /**
    *
@@ -152,7 +155,7 @@ trait StreamProtocol[+T <: Any]{
   def groupByKey(keyer:T => Any):StreamProducer[T]
 
   def streamUnion[T2,T3](otherStreams : Seq[StreamProducer[T2]]) : StreamProducer[T3]
-  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy)
+  def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean,strategy : PartitionStrategy):AlertStreamProducer
 
   def aggregate(upStreamNames: java.util.List[String], executorId :String, strategy:PartitionStrategy): StreamProducer[T]
 

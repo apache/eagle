@@ -16,6 +16,6 @@
  */
 package org.apache.eagle.datastream
 
-trait Collector[R] {
+trait Collector[-R] {
   def collect(r : R);
 }
