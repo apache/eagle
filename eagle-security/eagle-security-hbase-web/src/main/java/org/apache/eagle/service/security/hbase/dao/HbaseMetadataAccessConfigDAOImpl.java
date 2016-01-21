@@ -20,10 +20,12 @@ package org.apache.eagle.service.security.hbase.dao;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
+import org.apache.eagle.alert.entity.AlertDataSourceEntity;
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.security.util.BadMetadataAccessConfigException;
+import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.apache.eagle.service.generic.ListQueryResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +48,27 @@ public class HbaseMetadataAccessConfigDAOImpl {
     }
 
 
+//    public HbaseMetadataAccessConfig getConfig(String site) throws Exception{
+//        ListQueryResource resource = new ListQueryResource();
+//        /* parameters are: query, startTime, endTime, pageSzie, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing,
+//        * parallel, metricName*/
+//        String queryFormat = "AlertDataSourceService[@dataSource=\"hbaseSecurityLog\" AND @site=\"%s\"]{*}";
+//        ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
+//                0, null);
+//        List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) ret.getObj();
+//        if(list == null || list.size() ==0)
+//            throw new BadMetadataAccessConfigException("config is empty for site " + site);
+//        return convert(list.get(0).getConfig());
+//    }
+
     public HbaseMetadataAccessConfig getConfig(String site) throws Exception{
-        ListQueryResource resource = new ListQueryResource();
+        GenericEntityServiceResource resource = new GenericEntityServiceResource();
         /* parameters are: query, startTime, endTime, pageSzie, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing,
         * parallel, metricName*/
-        String queryFormat = Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME + "[@application=\"hbaseSecurityLog\" AND @site=\"%s\"]{*}";
-        ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null);
-        List<SiteApplicationServiceEntity> list = (List<SiteApplicationServiceEntity>) ret.getObj();
+        String queryFormat = "AlertDataSourceService[@dataSource=\"hbaseSecurityLog\" AND @site=\"%s\"]{*}";
+        GenericServiceAPIResponseEntity ret = resource.search(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
+                0, null, false);
+        List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) ret.getObj();
         if(list == null || list.size() ==0)
             throw new BadMetadataAccessConfigException("config is empty for site " + site);
         return convert(list.get(0).getConfig());

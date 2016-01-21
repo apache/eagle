@@ -18,8 +18,8 @@ package org.apache.eagle.service.security.hdfs;
 
 import java.util.List;
 
-import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
-import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.apache.eagle.service.generic.ListQueryResource;
 
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
@@ -30,21 +30,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Util API which has common methods and Service calls API
  */
 public class HDFSResourceUtils {
-		
 	@SuppressWarnings("unchecked")
 	public static HDFSResourceAccessConfig  getConfig(String siteId ) throws Exception
 	{
-		ListQueryResource resource = new ListQueryResource();
-		String queryFormat = Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME+"[@application=\""+HDFSResourceConstants.HDFS_DATA_SOURCE+"\" AND @site=\"%s\"]{*}";
-		ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, siteId), null, null,Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null);
-		List<SiteApplicationServiceEntity> list = (List<SiteApplicationServiceEntity>) ret.getObj();
+		GenericEntityServiceResource resource = new GenericEntityServiceResource();
+		String queryFormat = "AlertDataSourceService[@dataSource=\""+HDFSResourceConstants.HDFS_DATA_SOURCE+"\" AND @site=\"%s\"]{*}";
+		GenericServiceAPIResponseEntity entity = resource.search(String.format(queryFormat, siteId), null, null,Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
+
+		List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) entity.getObj();
 		if (list == null || list.size() == 0)
 			throw new Exception("Config is empty for site " + siteId +".");
-	    
+
 		ObjectMapper mapper = new ObjectMapper();
-		HDFSResourceAccessConfig config = mapper.readValue(list.get(0).getConfig(), HDFSResourceAccessConfig.class);				
+		HDFSResourceAccessConfig config = mapper.readValue(list.get(0).getConfig(), HDFSResourceAccessConfig.class);
 		return config;
-	}	
+	}
 	
 	/**
 	 * Not Null String Check Method 

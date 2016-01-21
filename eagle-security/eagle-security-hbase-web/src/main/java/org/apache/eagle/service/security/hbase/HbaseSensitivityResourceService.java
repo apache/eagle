@@ -18,8 +18,10 @@
 package org.apache.eagle.service.security.hbase;
 
 
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
-import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
+import org.apache.eagle.security.hbase.HbaseResourceSensitivityAPIEntity;
+import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.apache.eagle.service.generic.ListQueryResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +35,11 @@ public class HbaseSensitivityResourceService {
     private static Logger LOG = LoggerFactory.getLogger(HbaseSensitivityResourceService.class);
 
     public Map<String, Map<String, String>> getAllHbaseSensitivityMap(){
-        ListQueryResource resource = new ListQueryResource();
+        GenericEntityServiceResource resource = new GenericEntityServiceResource();
         /* parameters are: query, startTime, endTime, pageSzie, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing,
         * parallel, metricName*/
-        ListQueryAPIResponseEntity ret = resource.listQuery("HbaseResourceSensitivityService[]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
-                0, null);
+        GenericServiceAPIResponseEntity ret = resource.search("HbaseResourceSensitivityService[]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
+                0, null, false);
         List<HbaseResourceSensitivityAPIEntity> list = (List<HbaseResourceSensitivityAPIEntity>) ret.getObj();
         if( list == null )
             return Collections.emptyMap();
@@ -62,10 +64,10 @@ public class HbaseSensitivityResourceService {
     }
 
     public Map<String, String> getHbaseSensitivityMap(String site){
-        ListQueryResource resource = new ListQueryResource();
+        GenericEntityServiceResource resource = new GenericEntityServiceResource();
         String queryFormat = "HbaseResourceSensitivityService[@site=\"%s\"]{*}";
-        ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
-                0, null);
+        GenericServiceAPIResponseEntity ret = resource.search(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
+                0, null, false);
         List<HbaseResourceSensitivityAPIEntity> list = (List<HbaseResourceSensitivityAPIEntity>) ret.getObj();
         if( list == null )
             return Collections.emptyMap();
