@@ -55,7 +55,7 @@ def load_config(filename):
     script_dir = os.path.dirname(__file__)
     rel_path = "./" + filename
     abs_file_path = os.path.join(script_dir, rel_path)
-    f = open(filename, 'r')
+    f = open(abs_file_path, 'r')
     json_file = f.read()
     f.close()
     #print json_file
