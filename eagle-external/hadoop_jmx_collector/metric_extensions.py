@@ -17,7 +17,7 @@
 #!/usr/bin/python
 
 from util_func import *
-
+import json
 
 def cal_mem_usage(producer, topic, bean, metricMap, metric_prefix_name):
     kafka_dict = metricMap.copy()
@@ -34,6 +34,19 @@ def cal_mem_usage(producer, topic, bean, metricMap, metric_prefix_name):
     PercentVal = round(float(bean['MemHeapCommittedM']) / float(bean['MemHeapMaxM']) * 100, 2)
     send_output_message(producer, topic, kafka_dict, metric_prefix_name + ".MemHeapCommittedUsage", PercentVal)
 
+def journal_transaction_info(producer, topic, bean, metric, metric_prefix_name):
+    new_metric = metric.copy()
+    if bean.has_key("JournalTransactionInfo"):
+        JournalTransactionInfo = json.loads(bean.get("JournalTransactionInfo"))
 
-def add_extended_metrics(producer, topic, metricMap, fat_bean):
-    cal_mem_usage(producer, topic, fat_bean, metricMap, "hadoop.namenode.jvm")
+        LastAppliedOrWrittenTxId = int(JournalTransactionInfo.get("LastAppliedOrWrittenTxId"))
+        MostRecentCheckpointTxId = int(JournalTransactionInfo.get("MostRecentCheckpointTxId"))
+
+        send_output_message(producer, topic, new_metric, metric_prefix_name + ".LastAppliedOrWrittenTxId", LastAppliedOrWrittenTxId)
+        send_output_message(producer, topic, new_metric, metric_prefix_name + ".MostRecentCheckpointTxId", MostRecentCheckpointTxId)
+    else:
+        raise Exception("JournalTransactionInfo not found")
+
+def extend_jmx_metrics(producer, topic, metric, bean):
+    cal_mem_usage(producer, topic, bean, metric, "hadoop.namenode.jvm")
+    journal_transaction_info(producer,topic,bean,metric,"hadoop.namenode.JournalTransaction")

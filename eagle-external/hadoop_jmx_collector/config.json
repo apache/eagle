@@ -1,0 +1,19 @@
+{
+   "env": {
+    "site": "sandbox"
+   },
+   "input": {
+    "component": "namenode",
+    "port": "50070",
+    "https": false
+   },
+   "filter": {
+    "monitoring.group.selected": ["hadoop", "java.lang"]
+   },
+   "output": {
+     "kafka": {
+       "topic": "nn_jmx_metric_sandbox",
+       "brokerList": ["localhost:9092"]
+     }
+   }
+}

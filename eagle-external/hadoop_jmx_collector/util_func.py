@@ -21,6 +21,7 @@ import re
 import time
 import json
 
+from kafka import KafkaClient, SimpleProducer, SimpleConsumer
 
 def kafka_connect(host):
     # To send messages synchronously
@@ -48,21 +49,15 @@ def send_output_message(producer, topic, kafka_dict, metric, value):
     else:
         print(kafka_json)
 
-
-def readFile(filename):
-    f = open(filename, 'r')
-    s = f.read()
-    f.close()
-    return s
-
-
-def loadConfigFile(filename):
+def load_config(filename):
     # read the self-defined filters
 
     script_dir = os.path.dirname(__file__)
     rel_path = "./" + filename
     abs_file_path = os.path.join(script_dir, rel_path)
-    json_file = readFile(abs_file_path)
+    f = open(filename, 'r')
+    json_file = f.read()
+    f.close()
     #print json_file
 
     try:
