@@ -147,7 +147,7 @@ def main():
         component = config[u'input'].get('component').encode('utf-8')
 
         if config[u'input'].has_key("host"):
-            host = config[u'input'].get("host")
+            host = config[u'input'].get("host").encode('utf-8')
         else:
             host = socket.getfqdn()
 
@@ -155,7 +155,7 @@ def main():
         https = config[u'input'].get('https')
         kafkaConfig = config[u'output'].get(u'kafka')
         brokerList = kafkaConfig.get('brokerList')
-        topic = kafkaConfig.get('topic')
+        topic = kafkaConfig.get('topic').encode('utf-8')
 
         beans = get_jmx_beans(host, port, https)
         #print brokerList
