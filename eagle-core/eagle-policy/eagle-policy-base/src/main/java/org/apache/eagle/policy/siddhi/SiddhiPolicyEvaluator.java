@@ -35,6 +35,7 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
+import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -53,6 +54,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     private final boolean needValidation;
     private final Config config;
     private final PolicyEvaluationContext<T, K> context;
+    private SiddhiPolicyEvaluatorUtility policyEvaluatorUtility = new SiddhiPolicyEvaluatorUtility();	
 
     /**
      * everything dependent on policyDef should be together and switched in runtime
@@ -64,6 +66,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
         SiddhiPolicyDefinition policyDef;
         List<String> outputFields;
         String executionPlanName;
+        boolean markdownEnabled;
     }
 
     public SiddhiPolicyEvaluator(Config config, PolicyEvaluationContext<T, K> context, AbstractPolicyDefinition policyDef, String[] sourceStreams) {
@@ -107,7 +110,17 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     private SiddhiRuntime createSiddhiRuntime(SiddhiPolicyDefinition policyDef) {
         SiddhiManager siddhiManager = new SiddhiManager();
         Map<String, InputHandler> siddhiInputHandlers = new HashMap<String, InputHandler>();
+        
+	boolean markdownEnabled = false;
+       	try {
+		policyEvaluatorUtility.checkQueryValidity(policyDef.getExpression().toString());
+        } catch (SiddhiParserException exception) {
+          	markdownEnabled = true;
+        }
+
+
         SiddhiRuntime runtime = new SiddhiRuntime();
+	runtime.markdownEnabled = markdownEnabled;
 
         // compose execution plan sql
         String executionPlan = policyDef.getExpression();
@@ -123,21 +136,27 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
             executionPlan = sb.toString() + " @info(name = '" + EXECUTION_PLAN_NAME + "') " + expression;
         }
 
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+	ExecutionPlanRuntime executionPlanRuntime = null;
+	if (!markdownEnabled) {
+		executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
 
-        for (String sourceStream : sourceStreams) {
-            siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
-        }
-        executionPlanRuntime.start();
+		for (String sourceStream : sourceStreams) {
+		    siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
+		}
+		executionPlanRuntime.start();
 
-        LOG.info("Siddhi query: " + executionPlan);
+		LOG.info("Siddhi query: " + executionPlan);
 
-        attachCallback(runtime, executionPlanRuntime, context);
+		attachCallback(runtime, executionPlanRuntime, context);
+	} else {
+            runtime.queryCallback = null;
+	    runtime.outputFields = null;			
+	}
 
         runtime.siddhiInputHandlers = siddhiInputHandlers;
         runtime.siddhiManager = siddhiManager;
         runtime.policyDef = policyDef;
-        runtime.executionPlanName = executionPlanRuntime.getName();
+        runtime.executionPlanName = (null != executionPlanRuntime) ? executionPlanRuntime.getName() : null;
         return runtime;
     }
 
@@ -187,19 +206,21 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     @SuppressWarnings({"rawtypes"})
     @Override
     public void evaluate(ValuesArray data) throws Exception {
-        if (LOG.isDebugEnabled()) LOG.debug("Siddhi policy evaluator consumers data :" + data);
-        Collector outputCollector = (Collector) data.get(0);
-        String streamName = (String) data.get(1);
-        SortedMap map = (SortedMap) data.get(2);
-        validateEventInRuntime(streamName, map);
-        synchronized (siddhiRuntime) {
-            // retain the collector in the context. This assignment is idempotent
-            context.outputCollector = outputCollector;
+	if (!siddhiRuntime.markdownEnabled) {
+	    if (LOG.isDebugEnabled()) LOG.debug("Siddhi policy evaluator consumers data :" + data);
+	    Collector outputCollector = (Collector) data.get(0);
+	    String streamName = (String) data.get(1);
+	    SortedMap map = (SortedMap) data.get(2);
+	    validateEventInRuntime(streamName, map);
+	    synchronized (siddhiRuntime) {
+		// retain the collector in the context. This assignment is idempotent
+		context.outputCollector = outputCollector;
 
-            List<Object> input = new ArrayList<>();
-            putAttrsIntoInputStream(input, streamName, map);
-            siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
-        }
+		List<Object> input = new ArrayList<>();
+		putAttrsIntoInputStream(input, streamName, map);
+		siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
+	    }
+	}
     }
 
     /**

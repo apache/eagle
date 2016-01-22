@@ -47,7 +47,7 @@ public class AlertDefinitionDAOImpl implements PolicyDefinitionDAO<AlertDefiniti
 	public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
+			String query = Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\" AND @enabled=\"true\"]{*}";
 			GenericServiceAPIResponseEntity<AlertDefinitionAPIEntity> response =  client.search()
 																		                .pageSize(Integer.MAX_VALUE)
 																		                .query(query)

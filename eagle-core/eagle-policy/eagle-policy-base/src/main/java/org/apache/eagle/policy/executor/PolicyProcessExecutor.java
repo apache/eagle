@@ -21,6 +21,7 @@ import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
@@ -37,6 +38,7 @@ import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluatorUtility;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 	private Config config;
 	private Map<String, Map<String, T>> initialAlertDefs;
 	private String[] sourceStreams;
+	private SiddhiPolicyEvaluatorUtility policyEvaluatorUtility = new SiddhiPolicyEvaluatorUtility();
 
 	/**
 	 * metricMap's key = metricName[#policyId]
@@ -220,6 +223,8 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			throw new IllegalStateException(msg);
 		}
 		
+		policyEvaluatorUtility.updateMarkdownDetails((AlertDefinitionAPIEntity) alertDef); // jira: EAGLE-95
+
 		// check out whether strong incoming data validation is necessary
         String needValidationConfigKey= Constants.ALERT_EXECUTOR_CONFIGS + "." + executorId + ".needValidation";
 
@@ -359,6 +364,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		for(T alertDef : changed.values()){
 			if(!accept(alertDef))
 				continue;
+			policyEvaluatorUtility.updateMarkdownDetails((AlertDefinitionAPIEntity) alertDef); // jira: EAGLE-95
 			LOG.info(executorId + ", partition " + partitionSeq + " policy really changed " + alertDef);
 			synchronized(this.policyEvaluators) {
 				PolicyEvaluator<T> pe = policyEvaluators.get(alertDef.getTags().get(Constants.POLICY_ID));
