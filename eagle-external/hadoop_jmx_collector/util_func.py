@@ -21,6 +21,7 @@ import re
 import time
 import json
 
+from kafka import KafkaClient, SimpleProducer, SimpleConsumer
 
 def kafka_connect(host):
     # To send messages synchronously

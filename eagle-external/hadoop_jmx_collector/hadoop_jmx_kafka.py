@@ -73,7 +73,7 @@ def get_metric_prefix_name(mbean_attribute, context):
     return DATA_TYPE + "." + metric_prefix_name
 
 
-def getHadoopData(producer, topic, config, beans, dataMap, fat_bean):
+def parse_hadoop_jmx(producer, topic, config, beans, dataMap, fat_bean):
     selected_group = [s.encode('utf-8') for s in config[u'filter'].get('monitoring.group.selected')]
     #print selected_group
 
@@ -116,10 +116,9 @@ def getHadoopData(producer, topic, config, beans, dataMap, fat_bean):
             send_output_message(producer, topic, kafka_dict, metric, value)
 
 
-def loadJmxData(host, inputConfig):
-    port = inputConfig.get('port')
-    https = inputConfig.get('https')
-
+def get_jmx_beans(host, port, https):
+    # port = inputConfig.get('port')
+    # https = inputConfig.get('https')
     url = host + ':' + port
     #print url
 
@@ -134,7 +133,6 @@ def loadJmxData(host, inputConfig):
 
     return beans
 
-
 def main():
     kafka = None
     producer = None
@@ -144,34 +142,27 @@ def main():
         #start = time.clock()
 
         # read the kafka.ini
-        config = loadConfigFile('eagle-collector.conf')
+        config = loadConfigFile('config.json')
         #print config
 
         site = config[u'env'].get('site').encode('utf-8')
         component = config[u'input'].get('component').encode('utf-8')
         host = socket.getfqdn()
-        #host="10.249.66.185"
+        port = config[u'input'].get('port')
+        https = config[u'input'].get('https')
+        kafkaConfig = config[u'output'].get(u'kafka')
+        brokerList = kafkaConfig.get('brokerList')
+        topic = kafkaConfig.get('topic')
 
-        beans = loadJmxData(host, config[u'input'])
-
-        outputs = [s.encode('utf-8') for s in config[u'output']]
-        #print outputs
-
-        if('kafka' in outputs):
-            kafkaConfig = config[u'output'].get(u'kafka')
-            brokerList = kafkaConfig.get('brokerList')
-            topic = kafkaConfig.get('topic')
-            #print brokerList
-            kafka, producer = kafka_connect(brokerList)
-
+        beans = get_jmx_beans(host, port, https)
+        #print brokerList
+        kafka, producer = kafka_connect(brokerList)
         dataMap = {"site": site, "host": host, "timestamp": '', "component": component, "metric": '', "value": ''}
         fat_bean = dict()
-        getHadoopData(producer, topic, config, beans, dataMap, fat_bean)
+        parse_hadoop_jmx(producer, topic, config, beans, dataMap, fat_bean)
         add_extended_metrics(producer, topic, dataMap, fat_bean)
-
     except Exception, e:
         print 'main except: ', e
-
     finally:
         if kafka != None and producer != None:
             kafka_close(kafka, producer)
@@ -179,8 +170,5 @@ def main():
         #elapsed = (time.clock() - start)
         #print("Time used:",elapsed)
 
-
 if __name__ == "__main__":
     main()
-
-
