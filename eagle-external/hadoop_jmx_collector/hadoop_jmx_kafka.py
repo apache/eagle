@@ -34,7 +34,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '', 'li
 from kafka import KafkaClient, SimpleProducer, SimpleConsumer
 
 from util_func import *
-from add_extended_metrics import *
+from metric_extensions import *
 
 
 DATA_TYPE = "hadoop"
@@ -89,9 +89,7 @@ def parse_hadoop_jmx(producer, topic, config, beans, dataMap, fat_bean):
         if mbean_domain not in selected_group:
             # print "Unexpected mbean domain = %s on %s" % (mbean_domain, mbean)
             continue
-
         fat_bean.update(bean)
-
         context = bean.get("tag.Context", "")
         metric_prefix_name = get_metric_prefix_name(mbean_attribute, context)
 
@@ -142,12 +140,17 @@ def main():
         #start = time.clock()
 
         # read the kafka.ini
-        config = loadConfigFile('config.json')
+        config = load_config('config.json')
         #print config
 
         site = config[u'env'].get('site').encode('utf-8')
         component = config[u'input'].get('component').encode('utf-8')
-        host = socket.getfqdn()
+
+        if config[u'input'].has_key("host"):
+            host = config[u'input'].get("host")
+        else:
+            host = socket.getfqdn()
+
         port = config[u'input'].get('port')
         https = config[u'input'].get('https')
         kafkaConfig = config[u'output'].get(u'kafka')
@@ -157,10 +160,10 @@ def main():
         beans = get_jmx_beans(host, port, https)
         #print brokerList
         kafka, producer = kafka_connect(brokerList)
-        dataMap = {"site": site, "host": host, "timestamp": '', "component": component, "metric": '', "value": ''}
+        default_metric = {"site": site, "host": host, "timestamp": '', "component": component, "metric": '', "value": ''}
         fat_bean = dict()
-        parse_hadoop_jmx(producer, topic, config, beans, dataMap, fat_bean)
-        add_extended_metrics(producer, topic, dataMap, fat_bean)
+        parse_hadoop_jmx(producer, topic, config, beans, default_metric, fat_bean)
+        extend_jmx_metrics(producer, topic, default_metric, fat_bean)
     except Exception, e:
         print 'main except: ', e
     finally:
