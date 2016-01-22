@@ -75,3 +75,4 @@ logs/
 *.cache-tests
 
 *.orig
+**/*.pyc
