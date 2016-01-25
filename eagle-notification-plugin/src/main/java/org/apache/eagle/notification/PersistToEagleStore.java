@@ -42,7 +42,7 @@ public class PersistToEagleStore implements  NotificationPlugin {
     @Override
     public void _init() throws Exception {
         config = EagleConfigFactory.load().getConfig();
-        this.persist = new EagleAlertPersist(config.getString("eagleProps.eagleService.host"), /*config.getInt("eagleProps.eagleService.port")*/ 8080,
+        this.persist = new EagleAlertPersist(config.getString("eagleProps.eagleService.host"),  config.getInt("eagleProps.eagleService.port"),
                                              config.getString("eagleProps.eagleService.username"), config.getString("eagleProps.eagleService.password"));
     }
 

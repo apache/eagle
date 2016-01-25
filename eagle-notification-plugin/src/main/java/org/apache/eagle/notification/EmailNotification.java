@@ -63,7 +63,7 @@ public class EmailNotification  implements NotificationPlugin {
 		activeAlerts.clear();
 		emailGenerators.clear();
 		// find out all policies and its notification Config
-		alertDefinitionDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(config.getString("eagleProps.eagleService.host"), /*config.getInt("eagleProps.eagleService.port")*/ 8080));
+		alertDefinitionDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(config.getString("eagleProps.eagleService.host"), config.getInt("eagleProps.eagleService.port")));
 		try{
 			activeAlerts = alertDefinitionDao.findActiveAlertDefsByNotification( site , dataSource ,"Email Notification");
 		}catch (Exception ex ){

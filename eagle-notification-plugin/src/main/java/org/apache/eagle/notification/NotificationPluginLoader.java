@@ -51,7 +51,7 @@ public class NotificationPluginLoader {
         try {
             notificationMapping.clear();
             Config config = EagleConfigFactory.load().getConfig();
-            AlertNotificationDAO dao = new AlertNotificationDAOImpl(new EagleServiceConnector(config.getString("eagleProps.eagleService.host"), 8080));
+            AlertNotificationDAO dao = new AlertNotificationDAOImpl(new EagleServiceConnector(config.getString("eagleProps.eagleService.host"), config.getInt("eagleProps.eagleService.port")));
             dao.deleteAllAlertNotifications();
             dao.persistAlertNotificationTypes( buildAlertNotificationEntities() );
             isPluginLoaded = true;

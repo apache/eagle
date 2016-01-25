@@ -76,7 +76,7 @@
     </filter-mapping>
 
     <!-- spring security -->
-    <context-param>
+  <!--  <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
             classpath:/applicationContext.xml
@@ -101,5 +101,5 @@
     </filter-mapping>
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
+    </listener>-->
 </web-app>

@@ -59,13 +59,13 @@ object AlertExecutorConsumerUtils {
     val entityDedupExecutor: AlertEntityDeduplicationExecutor = new AlertEntityDeduplicationExecutor(alertExecutorIdList, alertDefDao)
     val emailDedupExecutor: AlertEmailDeduplicationExecutor = new AlertEmailDeduplicationExecutor(alertExecutorIdList, alertDefDao)
     val notificationExecutor: AlertNotificationExecutor = new AlertNotificationExecutor(alertExecutorIdList, alertDefDao)
-    val persistExecutor: AlertPersistExecutor = new AlertPersistExecutor
+    //val persistExecutor: AlertPersistExecutor = new AlertPersistExecutor
 
     val entityDedupStreamProducer = FlatMapProducer(entityDedupExecutor)
-    val persistStreamProducer = FlatMapProducer(persistExecutor)
+    //val persistStreamProducer = FlatMapProducer(persistExecutor)
     val emailDedupStreamProducer = FlatMapProducer(emailDedupExecutor)
     val notificationStreamProducer = FlatMapProducer(notificationExecutor)
-    toBeAddedEdges += StreamConnector(entityDedupStreamProducer, persistStreamProducer)
+   // toBeAddedEdges += StreamConnector(entityDedupStreamProducer, persistStreamProducer)
     toBeAddedEdges += StreamConnector(emailDedupStreamProducer, notificationStreamProducer)
 
     alertStreamProducers.foreach(sp => {
