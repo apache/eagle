@@ -48,7 +48,7 @@ import org.apache.eagle.log.entity.meta.TimeSeries;
 @Service(AlertConstants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "dataSource", "alertExecutorId", "policyId", "policyType"})
+@Tags({"site", "dataSource", "alertExecutorId", "policyId", "policyType", "notificationType"})
 @Indexes({
 	@Index(name="Index_1_alertExecutorId", columns = { "alertExecutorID" }, unique = true),
 })

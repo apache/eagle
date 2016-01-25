@@ -70,14 +70,69 @@ public class AlertDefinitionDAOImpl implements AlertDefinitionDAO {
     @Override
 	public Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception {
 		List<AlertDefinitionAPIEntity> list = findActiveAlertDefs(site, dataSource);
-		Map<String, Map<String, AlertDefinitionAPIEntity>> map = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
+		return groupByAlertExecutorId(list);
+	}
+
+	@Override
+	public  Map<String, AlertDefinitionAPIEntity> findActiveAlertDefsByNotification( String site, String dataSource , String notificationType ) throws Exception {
+		List<AlertDefinitionAPIEntity> enabledList = new ArrayList<AlertDefinitionAPIEntity>();
+		try {
+			IEagleServiceClient client = new EagleServiceClientImpl(connector);
+			String query = AlertConstants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\" AND @notificationType=\"" + notificationType + "\"]{*}";
+			GenericServiceAPIResponseEntity<AlertDefinitionAPIEntity> response =  client.search()
+					.pageSize(Integer.MAX_VALUE)
+					.query(query)
+					.send();
+			client.close();
+			if (response.getException() != null) {
+				throw new Exception("Got an exception when query eagle service: " + response.getException());
+			}
+			List<AlertDefinitionAPIEntity> list = response.getObj();
+			for (AlertDefinitionAPIEntity entity : list) {
+				if (entity.isEnabled()) enabledList.add(entity);
+			}
+		}
+		catch (Exception ex) {
+			LOG.error("Got an exception when query alert Def service", ex);
+			throw new IllegalStateException(ex);
+		}
+		return groupByPolicyId(enabledList);
+		}
+
+	/**
+	 * Group Active Alert List by Alert Executor ID
+	 * @param list
+	 * @return activeAlertsByExecutorId
+     */
+		public Map<String, Map<String, AlertDefinitionAPIEntity>>  groupByAlertExecutorId(List<AlertDefinitionAPIEntity> list)
+		{
+			Map<String, Map<String, AlertDefinitionAPIEntity>> activeAlertsMap  = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
 			for (AlertDefinitionAPIEntity entity : list) {
 				String executorID = entity.getTags().get(AlertConstants.ALERT_EXECUTOR_ID);
-				if (map.get(executorID) == null) {
-					map.put(executorID, new HashMap<String, AlertDefinitionAPIEntity>());
+				if (activeAlertsMap.get(executorID) == null) {
+					activeAlertsMap.put(executorID, new HashMap<String, AlertDefinitionAPIEntity>());
 				}
-				map.get(executorID).put(entity.getTags().get("policyId"), entity);
+				activeAlertsMap.get(executorID).put(entity.getTags().get("policyId"), entity);
 			}
-		return map;
+			return activeAlertsMap;
+		}
+
+
+	/**
+	 * Group Active Alert List by Alert Executor ID
+	 * @param list
+	 * @return activeAlertsByExecutorId
+	 */
+	public Map<String, AlertDefinitionAPIEntity>   groupByPolicyId ( List<AlertDefinitionAPIEntity> list )
+	{
+		Map<String, AlertDefinitionAPIEntity> activeAlertsMap  = new HashMap<String , AlertDefinitionAPIEntity>();
+		for (AlertDefinitionAPIEntity entity : list) {
+			String policyId = entity.getTags().get(AlertConstants.POLICY_ID);
+			if (activeAlertsMap.get(policyId) == null) {
+				activeAlertsMap.put(policyId, entity);
+			}
+		}
+		return activeAlertsMap;
 	}
+
 }

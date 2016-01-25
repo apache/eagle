@@ -17,48 +17,50 @@
 /**
  * 
  */
-package org.apache.eagle.alert.notification;
+package org.apache.eagle.notification.email;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
 import org.apache.eagle.alert.common.AlertConstants;
-import org.apache.eagle.alert.common.AlertEmailSender;
-import org.apache.eagle.alert.email.AlertEmailComponent;
-import org.apache.eagle.alert.email.AlertEmailContext;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
-import com.typesafe.config.ConfigObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AlertEmailGenerator{
+import com.typesafe.config.ConfigObject;
+
+/**
+ * Email Generator API which creates
+ */
+public class EmailGenerator {
+
 	private String tplFile;
 	private String sender;
 	private String recipients;
 	private String subject;
 	private ConfigObject eagleProps;
 
-    private ThreadPoolExecutor executorPool;
-
-    private final static Logger LOG = LoggerFactory.getLogger(AlertEmailGenerator.class);
+	private ExecutorService  _service = Executors.newFixedThreadPool(4); // Revisit this
+	private final static Logger LOG = LoggerFactory.getLogger(EmailGenerator.class);
 
     private final static long MAX_TIMEOUT_MS =60000;
 
-    public void sendAlertEmail(AlertAPIEntity entity) {
-		sendAlertEmail(entity, recipients, null);
+    public boolean sendAlertEmail(AlertAPIEntity entity) {
+		return sendAlertEmail(entity, recipients, null);
 	}
 	
-	public void sendAlertEmail(AlertAPIEntity entity, String recipients) {
-		sendAlertEmail(entity, recipients, null);	
+	public boolean sendAlertEmail(AlertAPIEntity entity, String recipients) {
+		return sendAlertEmail(entity, recipients, null);
 	}
 	
-	public void sendAlertEmail(AlertAPIEntity entity, String recipients, String cc) {
-		AlertEmailContext email = new AlertEmailContext();
+	public boolean sendAlertEmail(AlertAPIEntity entity, String recipients, String cc) {
+		EmailContext email = new EmailContext();
+		boolean sentSuccessfully = false;
 		
-		AlertEmailComponent component = new AlertEmailComponent();
+		EmailComponent component = new EmailComponent();
 		component.setAlertContext(entity.getAlertContext());
-		List<AlertEmailComponent> components = new ArrayList<AlertEmailComponent>();
+		List<EmailComponent> components = new ArrayList<EmailComponent>();
 		components.add(component);		
 		email.setComponents(components);
 		if (entity.getAlertContext().getProperty(AlertConstants.SUBJECT) != null) {
@@ -70,22 +72,20 @@ public class AlertEmailGenerator{
 		email.setCc(cc);
 		email.setSender(sender);
 		
-		/** asynchronized email sending */
-		@SuppressWarnings("rawtypes")
-        AlertEmailSender thread = new AlertEmailSender(email, eagleProps);
+		EmailSender emailTask = new EmailSender(email, eagleProps);
 
-        if(this.executorPool == null) throw new IllegalStateException("Invoking thread executor pool but it's is not set yet");
-
-        LOG.info("Sending email  in asynchronous to: "+recipients+", cc: "+cc);
-        Future future = this.executorPool.submit(thread);
-        try {
-            future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-            LOG.info(String.format("Successfully send email to %s", recipients));
-        } catch (InterruptedException | ExecutionException  e) {
-            LOG.error(String.format("Failed to send email to %s, due to:%s",recipients,e),e);
-        } catch (TimeoutException e) {
-            LOG.error(String.format("Failed to send email to %s due to timeout exception, max timeout: %s ms ",recipients, MAX_TIMEOUT_MS),e);
-        }
+		LOG.info("Sending email  in asynchronous to: "+recipients+", cc: "+cc);
+		Future fut =  _service.submit(emailTask);
+		try {
+			fut.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+			sentSuccessfully = true;
+			LOG.info(String.format("Successfully send email to %s", recipients));
+		} catch (InterruptedException | ExecutionException  e) {
+			LOG.error(String.format("Failed to send email to %s, due to:%s",recipients,e),e);
+		} catch (TimeoutException e) {
+			LOG.error(String.format("Failed to send email to %s due to timeout exception, max timeout: %s ms ",recipients, MAX_TIMEOUT_MS),e);
+		}
+		return sentSuccessfully;
     }
 	
 	public String getTplFile() {
@@ -128,7 +128,4 @@ public class AlertEmailGenerator{
 		this.eagleProps = eagleProps;
 	}
 
-    public void setExecutorPool(ThreadPoolExecutor executorPool) {
-        this.executorPool = executorPool;
-    }
 }

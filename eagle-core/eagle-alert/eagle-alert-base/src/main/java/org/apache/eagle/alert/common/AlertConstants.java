@@ -23,6 +23,7 @@ public class AlertConstants {
 	public final static String ALERT_DATA_SOURCE_SERVICE_ENDPOINT_NAME = "AlertDataSourceService";
 	public final static String ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME = "AlertExecutorService";
 	public final static String ALERT_STREAM_SERVICE_ENDPOINT_NAME = "AlertStreamService";
+	public final static String ALERT_NOTIFICATION_SERVICE_ENDPOINT_NAME = "AlertNotificationService";
 	public static final String ALERT_EMAIL_ORIGIN_PROPERTY = "alertEmailOrigin";
 	public static final String ALERT_TIMESTAMP_PROPERTY = "alertTimestamp";
 
@@ -37,6 +38,7 @@ public class AlertConstants {
 	public static final String ALERT_EXECUTOR_ID = "alertExecutorId";
 	public static final String POLICY_NAME = "policyName";
 	public static final String POLICY_ID = "policyId";
+	public static final String NOTIFICATION_TYPE = "notificationType";
     public static final String SOURCE_STREAMS = "sourceStreams";
     public static final String ALERT_EVENT = "alertEvent";
 	public static final String POLICY_DETAIL_URL = "policyDetailUrl";

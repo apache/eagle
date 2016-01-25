@@ -14,20 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.entity;
 
-import org.apache.eagle.common.metric.AlertContext;
-import org.apache.eagle.log.entity.repo.EntityRepository;
+package org.apache.eagle.notification;
 
-public class AlertEntityRepository extends EntityRepository {
-	public AlertEntityRepository() {
-		serDeserMap.put(AlertContext.class, new AlertContextSerDeser());
-		entitySet.add(AlertAPIEntity.class);
-		entitySet.add(AlertDefinitionAPIEntity.class);
-		entitySet.add(AlertStreamSchemaEntity.class);
-		entitySet.add(AlertStreamEntity.class);
-		entitySet.add(AlertDataSourceEntity.class);
-        entitySet.add(AlertExecutorEntity.class);
-		entitySet.add(AlertNotificationEntity.class);
+/**
+ * Object that holds the status of Notification Posted to Notification Plugin  
+ */
+public class NotificationStatus {
+
+	private boolean isNotificationSuccess;
+	private String message;
+	
+	public NotificationStatus() {
+	 setNotificationSuccess(false);
+	}
+	public boolean isNotificationSuccess() {
+		return isNotificationSuccess;
+	}
+	public void setNotificationSuccess(boolean isNotificationSuccess) {
+		this.isNotificationSuccess = isNotificationSuccess;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }

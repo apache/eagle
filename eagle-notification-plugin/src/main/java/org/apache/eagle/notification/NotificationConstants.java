@@ -14,20 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.entity;
 
-import org.apache.eagle.common.metric.AlertContext;
-import org.apache.eagle.log.entity.repo.EntityRepository;
+package org.apache.eagle.notification;
 
-public class AlertEntityRepository extends EntityRepository {
-	public AlertEntityRepository() {
-		serDeserMap.put(AlertContext.class, new AlertContextSerDeser());
-		entitySet.add(AlertAPIEntity.class);
-		entitySet.add(AlertDefinitionAPIEntity.class);
-		entitySet.add(AlertStreamSchemaEntity.class);
-		entitySet.add(AlertStreamEntity.class);
-		entitySet.add(AlertDataSourceEntity.class);
-        entitySet.add(AlertExecutorEntity.class);
-		entitySet.add(AlertNotificationEntity.class);
-	}
+public class NotificationConstants {
+
+	public static final String ALERT_EMAIL_TIME_PROPERTY = "timestamp";
+	public static final String ALERT_EMAIL_COUNT_PROPERTY = "count";
+	public static final String ALERT_EMAIL_ALERTLIST_PROPERTY = "alertList";
+	public static final String ALERT_EMAIL_ORIGIN_PROPERTY = "alertEmailOrigin";
+	public static final String NOTIFICATION_ALERT_KAFKA_TOPIC = "notification_kafka_topic";
 }

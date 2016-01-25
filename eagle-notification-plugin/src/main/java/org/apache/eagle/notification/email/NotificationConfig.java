@@ -14,19 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.email;
+package org.apache.eagle.notification.email;
 
-import org.apache.eagle.common.metric.AlertContext;
+
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
+import java.io.Serializable;
 
 /**
- * Alert email component is one part of an email, which could be an individual alert
+ *
  */
-public class AlertEmailComponent {
-	private AlertContext alertContext;
-	public AlertContext getAlertContext() {
-		return alertContext;
-	}
-	public void setAlertContext(AlertContext alertContext) {
-		this.alertContext = alertContext;
-	}
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "flavor")
+public class NotificationConfig implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String id;
+    private String flavor;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getFlavor() {
+        return flavor;
+    }
+
+    public void setFlavor(String flavor) {
+        this.flavor = flavor;
+    }
 }

@@ -78,6 +78,11 @@ public class TestDynamicPolicyLoader {
 			public List<AlertDefinitionAPIEntity> findActiveAlertDefs(String site, String dataSource) {
 				return null;
 			}
+
+			@Override
+			public Map<String, AlertDefinitionAPIEntity> findActiveAlertDefsByNotification(String site, String dataSource, String notificationType) throws Exception {
+				return null;
+			}
 		};
 		
 		DynamicPolicyLoader loader = DynamicPolicyLoader.getInstance();

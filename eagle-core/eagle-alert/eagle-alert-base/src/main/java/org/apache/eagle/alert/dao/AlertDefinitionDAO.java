@@ -36,4 +36,13 @@ public interface AlertDefinitionDAO extends Serializable{
 	 * @return
 	 */
 	Map<String, Map<String, AlertDefinitionAPIEntity>> findActiveAlertDefsGroupbyAlertExecutorId(String site, String dataSource) throws Exception;
+
+	/**
+	 * Find the active alerts based on Notification Type
+	 * @param site
+	 * @param dataSource
+	 * @return
+	 * @throws Exception
+     */
+	Map<String, AlertDefinitionAPIEntity> findActiveAlertDefsByNotification(String site, String dataSource, String notificationType) throws Exception;
 }
