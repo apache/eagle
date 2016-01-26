@@ -66,6 +66,11 @@
           </exclusions>
       </dependency>
       <dependency>
+          <groupId>org.apache.spark</groupId>
+          <artifactId>spark-streaming_2.10</artifactId>
+          <version>1.6.0</version>
+      </dependency>
+      <dependency>
           <groupId>eagle</groupId>
           <artifactId>eagle-alert-process</artifactId>
           <version>${project.version}</version>
