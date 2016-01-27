@@ -64,7 +64,7 @@ public class PersistAlertToKafkaTopic  implements NotificationPlugin {
 		String dataSource = config.getString("eagleProps.dataSource");
 		activeAlerts.clear();
 		kafaConfigs.clear();
-		alertDefinitionDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(config.getString("eagleProps.eagleService.host"),  config.getInt("eagleProps.eagleService.port")));
+		alertDefinitionDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(config));
 		try{
 			activeAlerts = alertDefinitionDao.findActiveAlertDefsByNotification( site , dataSource ,"Kafka Store");
 		}catch (Exception ex ){
