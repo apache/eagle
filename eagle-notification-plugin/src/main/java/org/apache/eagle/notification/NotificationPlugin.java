@@ -24,6 +24,10 @@ import org.apache.eagle.alert.entity.AlertAPIEntity;
  */
 public interface NotificationPlugin {
 
+	/**
+	 * for initialization
+	 * @throws Exception
+     */
 	public void _init() throws  Exception;
 	/**
 	 * Post a notification for the given alertEntity 
