@@ -62,7 +62,7 @@
       <dependency>
           <groupId>eagle</groupId>
           <artifactId>eagle-stream-process-base</artifactId>
-          <version>0.3.0</version>
+          <version>${project.version}</version>
       </dependency>
       <dependency>
           <groupId>org.reflections</groupId>
