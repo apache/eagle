@@ -57,4 +57,9 @@ createEagleTable(admin, 'appDefinition')
 createEagleTable(admin, 'serviceAudit')
 createEagleTable(admin, 'aggregatedef')
 
+createEagleTable(admin, 'eagleSiteDesc')
+createEagleTable(admin, 'eagleSiteApplication')
+createEagleTable(admin, 'eagleApplicationDesc')
+createEagleTable(admin, 'eagleFeatureDesc')
+
 exit
