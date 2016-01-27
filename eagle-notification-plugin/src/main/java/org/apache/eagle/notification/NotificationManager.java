@@ -39,6 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p> Scanning Plugins </p>
  * <p> Loading Plugins and Policy Mapping </p>
  * <p> Initializing Plugins </p>
+ * <p> Forwarding eagle alert to configured Notification Plugin </p>
+ * <p> BroadCast Changes in Policy to all Notification Plugins  </p>
  */
 public class NotificationManager  {
 
@@ -63,7 +65,7 @@ public class NotificationManager  {
         for( String plugin : plugins ){
             try {
                 Object obj =  NotificationPluginLoader.notificationMapping.get(plugin);
-                obj.getClass().getMethod("_init").invoke(obj);
+                obj.getClass().getMethod("_init").invoke(obj); // invoke _init method of all notification plugins
             } catch (Exception e) {
                 LOG.error(" Error in loading Plugins . Reason : "+e.getMessage());
             }
@@ -74,12 +76,12 @@ public class NotificationManager  {
         // find notification Types
         AlertDefinitionDAO alertDefinitionDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(config.getString("eagleProps.eagleService.host"), config.getInt("eagleProps.eagleService.port")));
         try{
-            List<AlertDefinitionAPIEntity> activeAlerts = alertDefinitionDao.findActiveAlertDefs( site , dataSource);
+            List<AlertDefinitionAPIEntity> activeAlerts = alertDefinitionDao.findActiveAlertDefs( site , dataSource );
             for( AlertDefinitionAPIEntity entity : activeAlerts ){
                 policyNotificationMapping.put(entity.getTags().get(AlertConstants.POLICY_ID) , entity.getTags().get(AlertConstants.NOTIFICATION_TYPE));
             }
         }catch (Exception ex ){
-            LOG.error(ex.getMessage());
+            LOG.error(" Error in determining policy and its notification type. Reason : "+ex.getMessage());
         }
     }
 
@@ -91,8 +93,8 @@ public class NotificationManager  {
         try {
             Object obj  = getNotificationPluginAPI( this.policyNotificationMapping.get(entity.getTags().get(AlertConstants.POLICY_ID)) );
             obj.getClass().getMethod("onAlert" , new Class[]{AlertAPIEntity.class}).invoke( obj , entity);
-        } catch ( Exception e) {
-            LOG.error(" Error in NotificationManager when invoking NotifyAlert method  . Reason : "+e.getMessage());
+        } catch ( Exception ex) {
+            LOG.error(" Error in NotificationManager when invoking NotifyAlert method  . Reason : "+ex.getMessage());
         }
     }
 
@@ -105,6 +107,10 @@ public class NotificationManager  {
         return NotificationPluginLoader.notificationMapping.get(type);
     }
 
+    /**
+     * Update all Notification Plugin if changes in Policy
+     * @param entity
+     */
     public void updateNotificationPlugins( AlertDefinitionAPIEntity entity ){
         try {
             // Re Load the plugins
