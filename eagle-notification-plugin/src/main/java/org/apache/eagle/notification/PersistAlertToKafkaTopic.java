@@ -74,7 +74,7 @@ public class PersistAlertToKafkaTopic  implements NotificationPlugin {
 		Set<String> policies = activeAlerts.keySet();
 		for( String policyId : policies )
 		{
-			Module module = new SimpleModule("notification").registerSubtypes(new NamedType(EmailNotificationConfig.class, "email"));
+			Module module = new SimpleModule("notification").registerSubtypes(new NamedType(KafkaTopicConfig.class, "kafka topic"));
 			KafkaTopicConfig kafkaConfig = new KafkaTopicConfig();
 			try {
 				kafkaConfig = JsonSerDeserUtils.deserialize(activeAlerts.get(policyId).getNotificationDef(), KafkaTopicConfig.class, Arrays.asList(module));
@@ -92,7 +92,7 @@ public class PersistAlertToKafkaTopic  implements NotificationPlugin {
 			processAlertEntity(alertEntity);
 			status.setNotificationSuccess(true);
 		}catch(Exception ex ){
-			LOG.error(" Exception when Posting Alert Entity to Kafaka Topic. Reason : "+ex.getMessage());
+			LOG.error(" Exception when Posting Alert Entity to Kafka Topic. Reason : "+ex.getMessage());
 			status.setMessage(ex.getMessage());
 		}		
 	}
