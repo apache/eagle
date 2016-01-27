@@ -74,7 +74,7 @@ public class NotificationManager  {
         String site = config.getString("eagleProps.site");
         String dataSource = config.getString("eagleProps.dataSource");
         // find notification Types
-        AlertDefinitionDAO alertDefinitionDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(config.getString("eagleProps.eagleService.host"), config.getInt("eagleProps.eagleService.port")));
+        AlertDefinitionDAO alertDefinitionDao = new AlertDefinitionDAOImpl(new EagleServiceConnector( config ));
         try{
             List<AlertDefinitionAPIEntity> activeAlerts = alertDefinitionDao.findActiveAlertDefs( site , dataSource );
             for( AlertDefinitionAPIEntity entity : activeAlerts ){
