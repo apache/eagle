@@ -17,14 +17,37 @@
 							{{_application.name}}
 						</a>
 					</li>
+
+					<li>
+						<a class="text-light-blue" ng-click="newApplication()">
+							<span class="fa fa-plus-square"></span>
+							New Application
+						</a>
+					</li>
 				</ul>
 			</div>
 
 			<div class="col-md-9">
+				<!-- Title -->
 				<h3 class="guideline">
-					Feature
+					Application
 					<small>{{application.name}}</small>
 				</h3>
+				<hr/>
+
+				<!-- Config -->
+				<div class="form-group">
+					<label for="displayName">Display Name</label>
+					<input type="text" class="form-control" id="displayName" placeholder="(Optional) Display name.">
+				</div>
+				<div class="form-group">
+					<label for="applicationGroup">Group</label>
+					<input type="text" class="form-control" id="applicationGroup" placeholder="(Optional) Group name.">
+				</div>
+				<hr/>
+
+				<!-- Feature -->
+				<label>* Feature</label>
 
 				<div ng-repeat="_feature in Application.featureList track by $index">
 					<div class="panel box box-primary">
