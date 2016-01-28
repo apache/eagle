@@ -39,6 +39,10 @@ public class ApplicationDescServiceEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String desc;
     @Column("b")
+    private String alias;
+    @Column("c")
+    private String group;
+    @Column("d")
     private List<String> features;
 
     public String getDesc() {
@@ -48,6 +52,24 @@ public class ApplicationDescServiceEntity extends TaggedLogAPIEntity {
     public void setDesc(String desc) {
         this.desc = desc;
         valueChanged("desc");
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+        valueChanged("group");
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+        valueChanged("alias");
     }
 
     public List<String> getFeatures() {

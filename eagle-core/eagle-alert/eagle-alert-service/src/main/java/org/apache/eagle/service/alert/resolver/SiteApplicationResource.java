@@ -27,11 +27,12 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-@Path("/site/delete")
+@Path("/site")
 public class SiteApplicationResource {
     private final static Logger LOG = LoggerFactory.getLogger(SiteApplicationResource.class);
     private final static GenericEntityServiceResource resource = new GenericEntityServiceResource();
 
+    @Path("/delete")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -43,6 +44,9 @@ public class SiteApplicationResource {
         GenericServiceAPIResponseEntity response = resource.deleteByQuery(siteQuery, null, null, pageSize, null, false, false, 0L, 0, true, 0, null, false);
         if(response.isSuccess()) {
             response = resource.deleteByQuery(siteApplicationQuery, null, null, pageSize, null, false, false, 0L, 0, true, 0, null, false);
+            if(!response.isSuccess()) {
+                LOG.error(response.getException());
+            }
         } else {
             LOG.error(response.getException());
         }
