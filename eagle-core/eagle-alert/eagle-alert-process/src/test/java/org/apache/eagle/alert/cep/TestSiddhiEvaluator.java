@@ -100,6 +100,9 @@ public class TestSiddhiEvaluator {
 			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
 				return null;
 			}
+
+            @Override
+            public void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) { /* do nothing */ }
 		};
 
 		AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {

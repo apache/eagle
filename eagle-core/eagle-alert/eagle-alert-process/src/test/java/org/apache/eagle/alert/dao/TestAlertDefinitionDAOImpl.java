@@ -64,6 +64,9 @@ public class TestAlertDefinitionDAOImpl {
 				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor2", "TestPolicyIDD", "TestPolicyTypeD"));
 				return list;
 			}
+
+			@Override
+			public void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) { /* do nothing */ }
 		};
 
 		Map<String, Map<String, AlertDefinitionAPIEntity>> retMap = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);

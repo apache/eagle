@@ -250,7 +250,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			pe = (PolicyEvaluator<T>) evalCls
 					.getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
 					.newInstance(config, context, policyDef, sourceStreams, needValidation);
-            updatePolicyDetails((AlertDefinitionAPIEntity) alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
+            policyDefinitionDao.updatePolicyDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
 		} catch(Exception ex) {
 			LOG.error("Fail creating new policyEvaluator", ex);
 			LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
@@ -372,7 +372,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			synchronized(this.policyEvaluators) {
 				PolicyEvaluator<T> pe = policyEvaluators.get(alertDef.getTags().get(Constants.POLICY_ID));
 				pe.onPolicyUpdate(alertDef);
-                updatePolicyDetails((AlertDefinitionAPIEntity) alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
+                policyDefinitionDao.updatePolicyDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
 			}
 		}
 	}
@@ -419,33 +419,4 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
         PolicyDistroStatsLogReporter appender = new PolicyDistroStatsLogReporter();
         appender.reportPolicyMembership(executorId + "_" + partitionSeq, policyEvaluators.keySet());
     }
-
-	/**
-	 * Persists alert definition entity updated with markdown columns into HBase.
-	 * @param entity
-	 * @param markdownEnabled
-	 * @param markdownReason
-	 */
-	private void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) {
-		List<AlertDefinitionAPIEntity> entityList = new ArrayList<>();
-		entity.setMarkdownReason(null != markdownReason ? markdownReason : "");
-		entity.setMarkdownEnabled(markdownEnabled);
-		entityList.add(entity);
-
-		EagleServiceConnector connector = new EagleServiceConnector(config);
-		IEagleServiceClient client = new EagleServiceClientImpl(connector);
-
-		try {
-			client.create(entityList, "AlertDefinitionService");
-		} catch (IOException | EagleServiceClientException exception) {
-			LOG.error("Exception in updating markdown for policy in HBase", exception.getMessage());
-		} finally {
-			try {
-				if (null != client)
-					client.close();
-			} catch (IOException exception) {
-				LOG.debug("Unable to close Eagle service client, " + exception.getMessage());
-			}
-		}
-	}
 }

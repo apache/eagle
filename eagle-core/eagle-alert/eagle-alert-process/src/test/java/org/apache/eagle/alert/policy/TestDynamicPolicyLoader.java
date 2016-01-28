@@ -82,6 +82,9 @@ public class TestDynamicPolicyLoader {
 			public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) {
 				return null;
 			}
+
+			@Override
+			public void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) { /* do nothing */ }
 		};
 		
 		DynamicPolicyLoader<AlertDefinitionAPIEntity> loader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
