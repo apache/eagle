@@ -74,9 +74,11 @@
 					_script.src = "public/feature/" + feature.tags.feature + "/controller.js?_=" + Math.random();
 					document.head.appendChild(_script);
 					_script.onload = function() {
+						feature._loaded = true;
 						_ajax_deferred.resolve();
 					};
 					_script.onerror = function() {
+						feature._loaded = false;
 						_featureCache[feature.tags.feature] = false;
 						_ajax_deferred.reject();
 					};

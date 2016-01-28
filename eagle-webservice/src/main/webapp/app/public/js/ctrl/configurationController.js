@@ -91,6 +91,23 @@
 				$scope._newSiteName = null;
 			});
 		};
+
+		// Delete feature
+		$scope.deleteFeature = function(feature) {
+			$.dialog({
+				title: "Delete Confirm",
+				content: "Do you want to delete '" + feature.tags.feature + "'?",
+				buttons: [
+					{name: "Delete", class: "btn btn-danger", value: true},
+					{name: "Cancel", class: "btn btn-default", value: false}
+				]
+			}, function(ret) {
+				if(!ret) return;
+				Entities.deleteEntity("FeatureDescService", feature)._promise.then(function() {
+					location.reload();
+				});
+			});
+		};
 	});
 
 	// ======================== Application ========================

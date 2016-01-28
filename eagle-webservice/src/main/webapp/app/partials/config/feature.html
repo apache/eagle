@@ -15,7 +15,7 @@
 					</li>
 					<li role="presentation" ng-repeat="_feature in Application.featureList" ng-class="{active: feature === _feature}">
 						<a ng-click="setFeature(_feature)">
-							<span class="fa fa-leaf"></span>
+							<span class="fa fa-leaf" ng-class="{'text-danger': _feature._loaded === false}" uib-tooltip="Module load failed!" tooltip-enable="_feature._loaded === false"></span>
 							{{_feature.tags.feature}}
 						</a>
 					</li>
@@ -29,14 +29,14 @@
 			</div>
 
 			<div class="col-md-9">
-				<a class="pull-right btn btn-danger btn-xs">
+				<a class="pull-right btn btn-danger btn-xs" ng-click="deleteFeature(feature)">
 					<span class="fa fa-trash-o"></span>
 					Delete Feature
 				</a>
 
 				<h3 class="guideline">
-					Feature
-					<small>{{feature.tags.feature}}</small>
+					<span class="fa fa-exclamation-triangle text-danger" uib-tooltip="Module load failed!" ng-show="feature._loaded === false"></span>
+					{{feature.tags.feature}}
 				</h3>
 				<hr/>
 
