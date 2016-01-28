@@ -32,10 +32,21 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.FEATURE_DESCRIPTION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"feature", "version"})
+@Tags({"feature"})
 public class FeatureDescServiceEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String desc;
+    @Column("b")
+    private String version;
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+        valueChanged("version");
+    }
 
     public String getDesc() {
         return desc;

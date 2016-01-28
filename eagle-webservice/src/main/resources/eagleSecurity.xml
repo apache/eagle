@@ -28,6 +28,7 @@
         <scr:http-basic entry-point-ref="unauthorisedEntryPoint"/>
         <scr:intercept-url pattern="/rest/entities" method="POST" access="hasRole('ROLE_ADMIN')" />
         <scr:intercept-url pattern="/rest/entities/delete" method="POST" access="hasRole('ROLE_ADMIN')" />
+        <scr:intercept-url pattern="/rest/module/*" method="DELETE" access="hasRole('ROLE_ADMIN')" />
         <scr:intercept-url pattern="/rest/list" method="POST" access="hasRole('ROLE_ADMIN')" />
         <scr:intercept-url pattern="/rest/status" method="GET" access="permitAll" />
         <scr:intercept-url pattern="/rest/*" access="isAuthenticated()" />
