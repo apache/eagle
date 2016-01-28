@@ -17,19 +17,10 @@
 
 source $(dirname $0)/eagle-env.sh
 
-###################################################
-###        create hbase tables for eagle
-###################################################
+commands=''
+for i in $EAGLE_TABLE_LIST; do
+    commands="disable '$i'\ndrop '$i'\n"$commands
+done
 
-echo "Creating hbase tables for eagle ... "
-
-hbase shell ${EAGLE_HOME}/bin/eagle-create-table.rb $EAGLE_TABLE_LIST
-
-if [ $? = 0 ];then
-	echo "==> Successfully created hbase tables"
-else
-	echo "==> Failed creating hbase tables"
-	exit 1
-fi
-
-exit 0
+echo -e $commands | hbase shell
+#echo commands | hbase shell -n > /dev/null 2>&1

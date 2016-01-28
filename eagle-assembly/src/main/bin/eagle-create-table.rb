@@ -20,45 +20,28 @@ import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.HBaseAdmin
 
 def createEagleTable(admin, tableName)
-    if !admin.tableExists(tableName)
-        # create tableName, {NAME => 'f', VERSIONS => '1', BLOOMFILTER => 'ROW', COMPRESSION => 'GZ'}
-        create tableName, {NAME => 'f', VERSIONS => '1', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
-	puts "Create Table #{tableName} successfully"
-    elsif admin.isTableDisabled(tableName)
-        admin.enableTable(tableName)
-	  puts "Table #{tableName} already exists"
-    else
-	  puts "Table #{tableName} already exists"
-    end
+  if !admin.tableExists(tableName)
+    # create tableName, {NAME => 'f', VERSIONS => '1', BLOOMFILTER => 'ROW', COMPRESSION => 'GZ'}
+    create tableName, {NAME => 'f', VERSIONS => '1', BLOOMFILTER => 'ROW', COMPRESSION => 'SNAPPY'}
+    puts "Create Table #{tableName} successfully"
+  elsif admin.isTableDisabled(tableName)
+    admin.enableTable(tableName)
+    puts "Table #{tableName} already exists"
+  else
+    puts "Table #{tableName} already exists"
+  end
 end
 
 conf = HBaseConfiguration.new
 admin = HBaseAdmin.new(conf)
 
-createEagleTable(admin, 'alertdef')
-createEagleTable(admin, 'ipzone')
-createEagleTable(admin, 'streamMetadata')
-createEagleTable(admin, 'alertdetail')
-createEagleTable(admin, 'fileSensitivity')
-createEagleTable(admin, 'eaglehdfs_alert')
-createEagleTable(admin, 'streamdef')
-createEagleTable(admin, 'eagle_metric')
-createEagleTable(admin, 'alertExecutor')
-createEagleTable(admin, 'alertStream')
-createEagleTable(admin, 'alertStreamSchema')
-createEagleTable(admin, 'hiveResourceSensitivity')
-createEagleTable(admin, 'hbaseResourceSensitivity')
-createEagleTable(admin, 'mlmodel')
-createEagleTable(admin, 'userprofile')
-createEagleTable(admin, 'hfdsusercommandpattern')
-createEagleTable(admin, 'appCommand')
-createEagleTable(admin, 'appDefinition')
-createEagleTable(admin, 'serviceAudit')
-createEagleTable(admin, 'aggregatedef')
+if ARGV.empty?
+  puts "Table list is empty, please go back to bin/eagle-env.sh and export EAGLE_TABLE_LIST"
+  exit 1
+end
 
-createEagleTable(admin, 'eagleSiteDesc')
-createEagleTable(admin, 'eagleSiteApplication')
-createEagleTable(admin, 'eagleApplicationDesc')
-createEagleTable(admin, 'eagleFeatureDesc')
+tableListVal=ARGV.first
 
-exit
+tableListVal.split(' ').map { |i| createEagleTable(admin, i) }
+
+exit 0
