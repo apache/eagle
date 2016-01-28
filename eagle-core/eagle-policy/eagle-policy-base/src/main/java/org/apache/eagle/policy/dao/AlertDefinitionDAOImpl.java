@@ -35,52 +35,89 @@ import java.util.Map;
  */
 public class AlertDefinitionDAOImpl implements PolicyDefinitionDAO<AlertDefinitionAPIEntity> {
 
-	private static final long serialVersionUID = 7717408104714443056L;
-	private static final Logger LOG = LoggerFactory.getLogger(AlertDefinitionDAOImpl.class);
-	private final EagleServiceConnector connector;
+    private static final long serialVersionUID = 7717408104714443056L;
+    private static final Logger LOG = LoggerFactory.getLogger(AlertDefinitionDAOImpl.class);
+    private final EagleServiceConnector connector;
 
-	public AlertDefinitionDAOImpl(EagleServiceConnector connector){
-		this.connector = connector;
-	}
-
-    @Override
-	public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) throws Exception {
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
-			GenericServiceAPIResponseEntity<AlertDefinitionAPIEntity> response =  client.search()
-																		                .pageSize(Integer.MAX_VALUE)
-																		                .query(query)
-																	                    .send();
-			client.close();
-			if (response.getException() != null) {
-				throw new Exception("Got an exception when query eagle service: " + response.getException()); 
-			}
-			List<AlertDefinitionAPIEntity> list = response.getObj();
-			List<AlertDefinitionAPIEntity> enabledList = new ArrayList<AlertDefinitionAPIEntity>();
-			for (AlertDefinitionAPIEntity entity : list) {
-				if (entity.isEnabled()) enabledList.add(entity);
-			}
-			return enabledList;
-		}
-		catch (Exception ex) {
-			LOG.error("Got an exception when query alert Def service", ex);
-			throw new IllegalStateException(ex);
-		}					   
-	}
+    public AlertDefinitionDAOImpl(EagleServiceConnector connector){
+        this.connector = connector;
+    }
 
     @Override
-	public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
-		List<AlertDefinitionAPIEntity> list = findActivePolicies(site, dataSource);
-		Map<String, Map<String, AlertDefinitionAPIEntity>> map = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
-			for (AlertDefinitionAPIEntity entity : list) {
-				String executorID = entity.getTags().containsKey(Constants.EXECUTOR_ID) ? entity.getTags().get(Constants.EXECUTOR_ID)
-						: entity.getTags().get(Constants.ALERT_EXECUTOR_ID);
-				if (map.get(executorID) == null) {
-					map.put(executorID, new HashMap<String, AlertDefinitionAPIEntity>());
-				}
-				map.get(executorID).put(entity.getTags().get("policyId"), entity);
-			}
-		return map;
-	}
+    public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) throws Exception {
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
+            GenericServiceAPIResponseEntity<AlertDefinitionAPIEntity> response =  client.search()
+                    .pageSize(Integer.MAX_VALUE)
+                    .query(query)
+                    .send();
+            client.close();
+            if (response.getException() != null) {
+                throw new Exception("Got an exception when query eagle service: " + response.getException());
+            }
+            List<AlertDefinitionAPIEntity> list = response.getObj();
+            List<AlertDefinitionAPIEntity> enabledList = new ArrayList<AlertDefinitionAPIEntity>();
+            for (AlertDefinitionAPIEntity entity : list) {
+                if (entity.isEnabled()) enabledList.add(entity);
+            }
+            return enabledList;
+        }
+        catch (Exception ex) {
+            LOG.error("Got an exception when query alert Def service", ex);
+            throw new IllegalStateException(ex);
+        }
+    }
+
+    @Override
+    public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
+        List<AlertDefinitionAPIEntity> list = findActivePolicies(site, dataSource);
+        Map<String, Map<String, AlertDefinitionAPIEntity>> map = new HashMap<String, Map<String, AlertDefinitionAPIEntity>>();
+        for (AlertDefinitionAPIEntity entity : list) {
+            String executorID = entity.getTags().containsKey(Constants.EXECUTOR_ID) ? entity.getTags().get(Constants.EXECUTOR_ID)
+                    : entity.getTags().get(Constants.ALERT_EXECUTOR_ID);
+            if (map.get(executorID) == null) {
+                map.put(executorID, new HashMap<String, AlertDefinitionAPIEntity>());
+            }
+            map.get(executorID).put(entity.getTags().get("policyId"), entity);
+        }
+        return map;
+    }
+
+    /**
+     * Find the active alerts by Notification Type
+     * @param site
+     * @param dataSource
+     * @param notificationType
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public  Map<String, AlertDefinitionAPIEntity> findActiveAlertDefsByNotification( String site, String dataSource , String notificationType ) throws Exception {
+        Map<String, AlertDefinitionAPIEntity> map = new HashMap<String, AlertDefinitionAPIEntity>();
+        try {
+            IEagleServiceClient client = new EagleServiceClientImpl(connector);
+            String query = Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\" AND @notificationType=\"" + notificationType + "\"]{*}";
+            GenericServiceAPIResponseEntity<AlertDefinitionAPIEntity> response =  client.search()
+                    .pageSize(Integer.MAX_VALUE)
+                    .query(query)
+                    .send();
+            client.close();
+            if (response.getException() != null) {
+                throw new Exception("Got an exception when query eagle service: " + response.getException());
+            }
+            List<AlertDefinitionAPIEntity> list = response.getObj();
+            for (AlertDefinitionAPIEntity entity : list) {
+                String policyId = entity.getTags().get(Constants.POLICY_ID);
+                if (map.get(policyId) == null) {
+                    map.put(policyId, entity);
+                }
+            }
+        }
+        catch (Exception ex) {
+            LOG.error("Got an exception when query alert Def service", ex);
+            throw new IllegalStateException(ex);
+        }
+        return map;
+    }
 }

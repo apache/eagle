@@ -39,4 +39,14 @@ public interface PolicyDefinitionDAO<T extends AbstractPolicyDefinitionEntity> e
 	 * @return
 	 */
 	Map<String, Map<String, T>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception;
+
+	/**
+	 * find Active Policies by Notification Type
+	 * @param site
+	 * @param dataSource
+	 * @param notificationType
+	 * @return
+     * @throws Exception
+     */
+	Map<String, T> findActiveAlertDefsByNotification(String site, String dataSource, String notificationType) throws Exception;
 }

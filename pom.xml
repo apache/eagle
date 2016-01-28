@@ -134,6 +134,7 @@
         <module>eagle-samples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
+        <module>eagle-notification-plugin</module>
     </modules>
     <properties>
         <!-- General Properties -->
@@ -164,6 +165,12 @@
         <hbase.version>0.98.4.2.2.5.1-3-hadoop2</hbase.version>
         <hive.version>1.2.1</hive.version>
         <spark.core.version>1.4.0</spark.core.version>
+
+        <!--  Client -->
+        <kafka-client.version>0.9.0.0</kafka-client.version>
+
+        <!-- Reflection -->
+        <reflections.version>0.9.8</reflections.version>
 
         <!-- Common Versions -->
         <commons-cli.version>1.2</commons-cli.version>
