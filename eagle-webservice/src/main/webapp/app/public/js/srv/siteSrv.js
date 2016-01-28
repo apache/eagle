@@ -27,7 +27,6 @@
 
 		Site.list = [];
 		Site.list.set = {};
-		Site.dataSrcList = [];
 
 		Site.current = function(site) {
 			if(site) {
@@ -66,6 +65,42 @@
 		};
 
 		Site.reload = function() {
+			var _applicationList;
+
+			Site.list = Entities.queryEntities("SiteDescService", '');
+			Site.list.set = {};
+			_applicationList = Entities.queryEntities("SiteApplicationService", '');
+
+			_promise = $q.all([Site.list._promise, _applicationList._promise]).then(function() {
+				// Fill site set
+				$.each(Site.list, function(i, site) {
+					Site.list.set[site.tags.site] = site;
+					site.applicationList = [];
+					site.applicationList.set = {};
+
+					// Find application
+					site.applicationList.find = function(applicationName) {
+						return common.array.find(applicationName, site.applicationList, "tags.application");
+					};
+				});
+
+				// Fill site application mapping
+				$.each(_applicationList, function(i, application) {
+					var _site = Site.list.set[application.tags.site];
+					if(!_site) {
+						console.warn("[Site] Application not match site:", application.tags.application, "-", application.tags.site);
+					} else {
+						_site.applicationList.push(application);
+						_site.applicationList.set[application.tags.application] = application;
+					}
+				});
+
+				return Site;
+			});
+
+			return _promise;
+
+			/*
 			Site.list = [];
 			Site.list.set = {};
 
@@ -113,7 +148,8 @@
 			_promise = Site.dataSrcList._promise.then(function() {
 				return Site;
 			});
-			return _promise;
+
+			 return _promise;*/
 		};
 
 		Site._promise = function() {

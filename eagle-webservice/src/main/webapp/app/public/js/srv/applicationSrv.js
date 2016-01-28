@@ -20,44 +20,16 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
-	serviceModule.service('Application', function($q, $location, $wrapState) {
+	serviceModule.service('Application', function($q, $location, $wrapState, Entities) {
 		var Application = {};
-		var _deferred;
 		var _current;
+		var _featureCache = {};// After loading feature will be in cache. Which will not load twice.
+		var _deferred;
 
-		// TODO: Mock
-		Application.list = [
-			{
-				name: "DAM",
-				description: "Security check application",
-				feature: {
-					common: true,
-					classification: true,
-					userProfile: true,
-					metadata: true
-				}
-			},
-			{
-				name: "JPA",
-				description: "JPA Test Application",
-				feature: {
-					common: true
-				}
-			},
-			{
-				name: "TEST",
-				description: "Test for something",
-				feature: {}
-			}
-		];
-
-		// TODO: Mock
-		Application.featureList = [
-			{name: "common", displayName: "Common", description: "Provide the Policy & Alert feature."},
-			{name: "classification", displayName: "Classification", description: "Sensitivity browser of the data classification."},
-			{name: "userProfile", displayName: "User Profile", description: "Machine learning of the user profile"},
-			{name: "metadata", displayName: "Metadata", description: "Stream metadata viewer"},
-		];
+		Application.list = [];
+		Application.list.set = {};
+		Application.featureList = [];
+		Application.featureList.set = {};
 
 		// Set current application
 		Application.current = function(app) {
@@ -80,40 +52,75 @@
 			return common.array.find(appName, Application.list, "name");
 		};
 
-		// TODO: Mock promise
+		Application.reload = function() {
+			_deferred = $q.defer();
+
+			Application.list = Entities.queryEntities("ApplicationDescService", '');
+			Application.list.set = {};
+			Application.featureList = Entities.queryEntities("FeatureDescService", '');
+			Application.featureList.set = {};
+
+			Application.featureList._promise.then(function() {
+				var _promiseList;
+				// Load feature script
+				_promiseList = $.map(Application.featureList, function(feature) {
+					var _ajax_deferred, _script;
+					if(_featureCache[feature.tags.feature]) return;
+
+					_featureCache[feature.tags.feature] = true;
+					_ajax_deferred = $q.defer();
+					_script = document.createElement('script');
+					_script.type = 'text/javascript';
+					_script.src = "public/feature/" + feature.tags.feature + "/controller.js?_=" + Math.random();
+					document.head.appendChild(_script);
+					_script.onload = function() {
+						_ajax_deferred.resolve();
+					};
+					_script.onerror = function() {
+						_featureCache[feature.tags.feature] = false;
+						_ajax_deferred.reject();
+					};
+					return _ajax_deferred.promise;
+				});
+
+				// Merge application & feature
+				Application.list._promise.then(function() {
+					// Fill feature set
+					$.each(Application.featureList, function(i, feature) {
+						Application.featureList.set[feature.tags.feature] = feature;
+					});
+
+					// Fill application set
+					$.each(Application.list, function(i, application) {
+						Application.list.set[application.tags.application] = application;
+						application.featureList = $.map(application.features, function(featureName) {
+							var _feature = Application.featureList.set[featureName];
+							if(!_feature) {
+								console.warn("[Application] Feature not mapping:", application.tags.application, "-", featureName);
+							} else {
+								return _feature;
+							}
+						});
+
+						// Find feature
+						application.featureList.find = function(featureName) {
+							return common.array.find(featureName, application.featureList, "tags.feature");
+						};
+					});
+				});
+
+				// Process all promise
+				$q.all(_promiseList.concat(Application.list._promise)).then(function() {
+					_deferred.resolve(Application);
+				});
+			});
+
+			return _deferred.promise;
+		};
+
 		Application._promise = function() {
 			if(!_deferred) {
-				_deferred = $q.defer();
-
-				console.log("[Application]", "Do ajax mock delay.");
-				setTimeout(function () {
-					console.log("[Application]", "Do ajax mock delay...mock list ready!");
-
-					// Dynamic load feature js list
-					var _ajaxList = $.map(Application.featureList, function (feature) {
-						var _ajax_deferred = $q.defer();
-						var _script = document.createElement('script');
-						_script.type = 'text/javascript';
-						_script.src = "public/feature/" + feature.name + "/controller.js?_=" + Math.random();
-						document.head.appendChild(_script);
-						_script.onload = function() {
-							_ajax_deferred.resolve();
-						};
-						_script.onerror = function() {
-							_ajax_deferred.reject();
-						};
-						return _ajax_deferred.promise;
-					});
-					$q.all(_ajaxList).then(function() {
-						console.log("[Application]", "Load module...finished!");
-						if(sessionStorage && Application.find(sessionStorage.getItem("application"))) {
-							Application.current(Application.find(sessionStorage.getItem("application")));
-						} else {
-							Application.current(Application.list[0]);
-						}
-						_deferred.resolve(Application);
-					});
-				}, 1000);
+				Application.reload();
 			}
 			return _deferred.promise;
 		};

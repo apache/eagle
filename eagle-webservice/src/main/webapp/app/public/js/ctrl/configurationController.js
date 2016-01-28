@@ -40,8 +40,8 @@
 		};
 
 		$.each(Site.list, function(i, site) {
-			$scope.sites[site.name] = {
-				app: $.extend({}, site.app)
+			$scope.sites[site.tags.site] = {
+				app: $.extend({}, site.applicationList.set)
 			};
 		});
 
@@ -85,7 +85,7 @@
 		// ================= Save Site ================
 		$scope.saveAll = function() {
 			$.each(Site.list, function(i, site) {
-				site.app = $scope.sites[site.name].app;
+				site.app = $scope.sites[site.tags.site].app;
 
 				// TODO: Ajax update entities
 			});
@@ -106,14 +106,14 @@
 
 		$scope.applications = {};
 		$.each(Application.list, function(i, app) {
-			$scope.applications[app.name] = {
+			$scope.applications[app.tags.application] = {
 				feature: $.extend({}, app.feature)
 			};
 		});
 
 		$scope.saveAll = function() {
 			$.each(Application.list, function(i, app) {
-				app.feature = $scope.applications[app.name].feature;
+				app.feature = $scope.applications[app.tags.application].feature;
 
 				// TODO: Ajax update entities
 			});
