@@ -54,7 +54,6 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     private final boolean needValidation;
     private final Config config;
     private final PolicyEvaluationContext<T, K> context;
-    private SiddhiPolicyEvaluatorUtility policyEvaluatorUtility = new SiddhiPolicyEvaluatorUtility();	
 
     /**
      * everything dependent on policyDef should be together and switched in runtime
@@ -67,6 +66,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
         List<String> outputFields;
         String executionPlanName;
         boolean markdownEnabled;
+        String markdownReason;
     }
 
     public SiddhiPolicyEvaluator(Config config, PolicyEvaluationContext<T, K> context, AbstractPolicyDefinition policyDef, String[] sourceStreams) {
@@ -110,17 +110,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     private SiddhiRuntime createSiddhiRuntime(SiddhiPolicyDefinition policyDef) {
         SiddhiManager siddhiManager = new SiddhiManager();
         Map<String, InputHandler> siddhiInputHandlers = new HashMap<String, InputHandler>();
-        
-	boolean markdownEnabled = false;
-       	try {
-		policyEvaluatorUtility.checkQueryValidity(policyDef.getExpression().toString());
-        } catch (SiddhiParserException exception) {
-          	markdownEnabled = true;
-        }
-
-
         SiddhiRuntime runtime = new SiddhiRuntime();
-	runtime.markdownEnabled = markdownEnabled;
 
         // compose execution plan sql
         String executionPlan = policyDef.getExpression();
@@ -136,27 +126,33 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
             executionPlan = sb.toString() + " @info(name = '" + EXECUTION_PLAN_NAME + "') " + expression;
         }
 
-	ExecutionPlanRuntime executionPlanRuntime = null;
-	if (!markdownEnabled) {
-		executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+        ExecutionPlanRuntime executionPlanRuntime = null;
 
-		for (String sourceStream : sourceStreams) {
-		    siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
-		}
-		executionPlanRuntime.start();
+        try {
+            executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
 
-		LOG.info("Siddhi query: " + executionPlan);
+            for (String sourceStream : sourceStreams) {
+                siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
+            }
 
-		attachCallback(runtime, executionPlanRuntime, context);
-	} else {
+            executionPlanRuntime.start();
+            LOG.info("Siddhi query: " + executionPlan);
+            attachCallback(runtime, executionPlanRuntime, context);
+
+            runtime.markdownEnabled = false;
+            runtime.markdownReason = null;
+        } catch (SiddhiParserException exception) { // process is not interrupted in case of an invalid policy defined by marking down
+            LOG.error("Exception in parsing Siddhi query: " + executionPlan + ", reason being: " + exception.getMessage());
             runtime.queryCallback = null;
-	    runtime.outputFields = null;			
-	}
+            runtime.outputFields = null;
+            runtime.markdownEnabled = true;
+            runtime.markdownReason = exception.getMessage();
+        }
 
         runtime.siddhiInputHandlers = siddhiInputHandlers;
         runtime.siddhiManager = siddhiManager;
         runtime.policyDef = policyDef;
-        runtime.executionPlanName = (null != executionPlanRuntime) ? executionPlanRuntime.getName() : null;
+        runtime.executionPlanName = (null != executionPlanRuntime) ? executionPlanRuntime.getName() : null; // executionPlanRuntime will be set to null in case of an invalid policy
         return runtime;
     }
 
@@ -177,21 +173,21 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 //                LOG.error("Got an Exception when initial outputFields ", ex);
 //            }
 //        } else {
-            QueryCallback callback = new SiddhiQueryCallbackImpl<T, K>(config, context);
-            executionPlanRuntime.addCallback(EXECUTION_PLAN_NAME, callback);
-            runtime.queryCallback = callback;
-            // find output attribute from query call back
-            try {
-                Field field = QueryCallback.class.getDeclaredField(EXECUTION_PLAN_NAME);
-                field.setAccessible(true);
-                Query query = (Query) field.get(callback);
-                List<OutputAttribute> list = query.getSelector().getSelectionList();
-                for (OutputAttribute output : list) {
-                    outputFields.add(output.getRename());
-                }
-            } catch (Exception ex) {
-                LOG.error("Got an Exception when initial outputFields ", ex);
+        QueryCallback callback = new SiddhiQueryCallbackImpl<T, K>(config, context);
+        executionPlanRuntime.addCallback(EXECUTION_PLAN_NAME, callback);
+        runtime.queryCallback = callback;
+        // find output attribute from query call back
+        try {
+            Field field = QueryCallback.class.getDeclaredField(EXECUTION_PLAN_NAME);
+            field.setAccessible(true);
+            Query query = (Query) field.get(callback);
+            List<OutputAttribute> list = query.getSelector().getSelectionList();
+            for (OutputAttribute output : list) {
+                outputFields.add(output.getRename());
             }
+        } catch (Exception ex) {
+            LOG.error("Got an Exception when initial outputFields ", ex);
+        }
 //        }
         runtime.outputFields = outputFields;
     }
@@ -206,21 +202,21 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     @SuppressWarnings({"rawtypes"})
     @Override
     public void evaluate(ValuesArray data) throws Exception {
-	if (!siddhiRuntime.markdownEnabled) {
-	    if (LOG.isDebugEnabled()) LOG.debug("Siddhi policy evaluator consumers data :" + data);
-	    Collector outputCollector = (Collector) data.get(0);
-	    String streamName = (String) data.get(1);
-	    SortedMap map = (SortedMap) data.get(2);
-	    validateEventInRuntime(streamName, map);
-	    synchronized (siddhiRuntime) {
-		// retain the collector in the context. This assignment is idempotent
-		context.outputCollector = outputCollector;
+        if (!siddhiRuntime.markdownEnabled) {
+            if (LOG.isDebugEnabled()) LOG.debug("Siddhi policy evaluator consumers data :" + data);
+            Collector outputCollector = (Collector) data.get(0);
+            String streamName = (String) data.get(1);
+            SortedMap map = (SortedMap) data.get(2);
+            validateEventInRuntime(streamName, map);
+            synchronized (siddhiRuntime) {
+                // retain the collector in the context. This assignment is idempotent
+                context.outputCollector = outputCollector;
 
-		List<Object> input = new ArrayList<>();
-		putAttrsIntoInputStream(input, streamName, map);
-		siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
-	    }
-	}
+                List<Object> input = new ArrayList<>();
+                putAttrsIntoInputStream(input, streamName, map);
+                siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
+            }
+        }
     }
 
     /**
@@ -269,7 +265,8 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
         SiddhiRuntime previous = siddhiRuntime;
         siddhiRuntime = createSiddhiRuntime((SiddhiPolicyDefinition) policyDef);
         synchronized (previous) {
-            previous.siddhiManager.getExecutionPlanRuntime(previous.executionPlanName).shutdown();
+            if (!previous.markdownEnabled) // condition to check if previous SiddhiRuntime was started after policy validation
+                previous.siddhiManager.getExecutionPlanRuntime(previous.executionPlanName).shutdown();
         }
     }
 
@@ -277,7 +274,8 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     public void onPolicyDelete() {
         synchronized (siddhiRuntime) {
             LOG.info("Going to shutdown siddhi execution plan, planName: " + siddhiRuntime.executionPlanName);
-            siddhiRuntime.siddhiManager.getExecutionPlanRuntime(siddhiRuntime.executionPlanName).shutdown();
+            if (!siddhiRuntime.markdownEnabled) // condition to check if previous SiddhiRuntime was started after policy validation
+                siddhiRuntime.siddhiManager.getExecutionPlanRuntime(siddhiRuntime.executionPlanName).shutdown();
             LOG.info("Siddhi execution plan " + siddhiRuntime.executionPlanName + " is successfully shutdown ");
         }
     }
@@ -307,5 +305,15 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 
     public List<String> getOutputStreamAttrNameList() {
         return siddhiRuntime.outputFields;
+    }
+
+    @Override
+    public boolean isMarkdownEnabled() {
+        return siddhiRuntime.markdownEnabled;
+    }
+
+    @Override
+    public String getMarkdownReason() {
+        return siddhiRuntime.markdownReason;
     }
 }

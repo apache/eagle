@@ -38,12 +38,17 @@ import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluatorUtility;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
+import org.apache.eagle.service.client.EagleServiceClientException;
+import org.apache.eagle.service.client.EagleServiceConnector;
+import org.apache.eagle.service.client.IEagleServiceClient;
+import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +86,6 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 	private Config config;
 	private Map<String, Map<String, T>> initialAlertDefs;
 	private String[] sourceStreams;
-	private SiddhiPolicyEvaluatorUtility policyEvaluatorUtility = new SiddhiPolicyEvaluatorUtility();
 
 	/**
 	 * metricMap's key = metricName[#policyId]
@@ -222,8 +226,6 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			LOG.error(msg);
 			throw new IllegalStateException(msg);
 		}
-		
-		policyEvaluatorUtility.updateMarkdownDetails((AlertDefinitionAPIEntity) alertDef); // jira: EAGLE-95
 
 		// check out whether strong incoming data validation is necessary
         String needValidationConfigKey= Constants.ALERT_EXECUTOR_CONFIGS + "." + executorId + ".needValidation";
@@ -248,6 +250,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			pe = (PolicyEvaluator<T>) evalCls
 					.getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
 					.newInstance(config, context, policyDef, sourceStreams, needValidation);
+            updatePolicyDetails((AlertDefinitionAPIEntity) alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
 		} catch(Exception ex) {
 			LOG.error("Fail creating new policyEvaluator", ex);
 			LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
@@ -326,13 +329,14 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
                 for(Entry<String, PolicyEvaluator<T>> entry : policyEvaluators.entrySet()){
                     String policyId = entry.getKey();
                     PolicyEvaluator<T> evaluator = entry.getValue();
-                    updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
-                    try {
-                        evaluator.evaluate(new ValuesArray(outputCollector, input.get(1), input.get(2)));
-                    }
-                    catch (Exception ex) {
-                        LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
+                    if (!evaluator.isMarkdownEnabled()) { // not evaluated for a marked down policy
                         updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
+                        try {
+                            evaluator.evaluate(new ValuesArray(outputCollector, input.get(1), input.get(2)));
+                        } catch (Exception ex) {
+                            LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
+                            updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
+                        }
                     }
                 }
             }
@@ -364,11 +368,11 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		for(T alertDef : changed.values()){
 			if(!accept(alertDef))
 				continue;
-			policyEvaluatorUtility.updateMarkdownDetails((AlertDefinitionAPIEntity) alertDef); // jira: EAGLE-95
 			LOG.info(executorId + ", partition " + partitionSeq + " policy really changed " + alertDef);
 			synchronized(this.policyEvaluators) {
 				PolicyEvaluator<T> pe = policyEvaluators.get(alertDef.getTags().get(Constants.POLICY_ID));
 				pe.onPolicyUpdate(alertDef);
+                updatePolicyDetails((AlertDefinitionAPIEntity) alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
 			}
 		}
 	}
@@ -415,4 +419,33 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
         PolicyDistroStatsLogReporter appender = new PolicyDistroStatsLogReporter();
         appender.reportPolicyMembership(executorId + "_" + partitionSeq, policyEvaluators.keySet());
     }
+
+	/**
+	 * Persists alert definition entity updated with markdown columns into HBase.
+	 * @param entity
+	 * @param markdownEnabled
+	 * @param markdownReason
+	 */
+	private void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) {
+		List<AlertDefinitionAPIEntity> entityList = new ArrayList<>();
+		entity.setMarkdownReason(null != markdownReason ? markdownReason : "");
+		entity.setMarkdownEnabled(markdownEnabled);
+		entityList.add(entity);
+
+		EagleServiceConnector connector = new EagleServiceConnector(config);
+		IEagleServiceClient client = new EagleServiceClientImpl(connector);
+
+		try {
+			client.create(entityList, "AlertDefinitionService");
+		} catch (IOException | EagleServiceClientException exception) {
+			LOG.error("Exception in updating markdown for policy in HBase", exception.getMessage());
+		} finally {
+			try {
+				if (null != client)
+					client.close();
+			} catch (IOException exception) {
+				LOG.debug("Unable to close Eagle service client, " + exception.getMessage());
+			}
+		}
+	}
 }

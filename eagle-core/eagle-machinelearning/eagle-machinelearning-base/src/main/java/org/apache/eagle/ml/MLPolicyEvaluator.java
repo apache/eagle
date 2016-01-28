@@ -160,4 +160,10 @@ public class MLPolicyEvaluator implements PolicyEvaluator<AlertDefinitionAPIEnti
 	public List<String> getOutputStreamAttrNameList() {
 		return new ArrayList<String>();
 	}
+
+    @Override
+    public boolean isMarkdownEnabled() { return false; }
+
+    @Override
+    public String getMarkdownReason() { return null; }
 }
