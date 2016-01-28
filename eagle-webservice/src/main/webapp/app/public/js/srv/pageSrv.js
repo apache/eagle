@@ -100,7 +100,8 @@
 	serviceModule.service('ConfigPageConfig', function(Application) {
 		var _originPageList = [
 			{icon: "server", title: "Sites", url: "#/config/site"},
-			{icon: "cubes", title: "Applications", url: "#/config/application"}
+			{icon: "cubes", title: "Applications", url: "#/config/application"},
+			{icon: "leaf", title: "Features", url: "#/config/feature"}
 		];
 
 		var config = {

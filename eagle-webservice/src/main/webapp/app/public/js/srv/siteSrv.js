@@ -91,7 +91,7 @@
 						console.warn("[Site] Application not match site:", application.tags.application, "-", application.tags.site);
 					} else {
 						_site.applicationList.push(application);
-						_site.applicationList.set[application.tags.application] = application;
+						_site.applicationList.set[application.tags.application] = application.enabled;
 					}
 				});
 

@@ -23,9 +23,114 @@
 	// =============================================================
 	// =                       Configuration                       =
 	// =============================================================
-	eagleControllers.controller('configSiteCtrl', function ($scope, PageConfig, Site) {
-		'use strict';
+	// ========================== Feature ==========================
+	eagleControllers.controller('configFeatureCtrl', function ($scope, PageConfig, Application, Entities) {
+		PageConfig.hideApplication = true;
+		PageConfig.hideSite = true;
 
+		$scope._newFeatureName = null;
+		$scope._newFeatureLock = false;
+
+		// ================== Feature ==================
+		// Current feature
+		$scope.feature = Application.featureList[0];
+		$scope.setFeature = function (feature) {
+			$scope.feature = feature;
+		};
+
+		// Feature list
+		$scope.features = {};
+		$.each(Application.featureList, function(i, feature) {
+			$scope.features[feature.tags.feature] = $.extend({}, feature, true);
+		});
+
+		// Create feature
+		$scope.newFeature = function() {
+			$("#featureMDL").modal();
+		};
+
+		$scope.newFeatureCheck = function() {
+			if($scope._newFeatureName === null) return "";
+
+			// Empty name
+			if($scope._newFeatureName === "") {
+				return "Feature can't be empty!";
+			}
+
+			// Conflict name
+			if($scope._newFeatureName && $.map($scope.features, function(feature, name) {
+					return name.toUpperCase() === $scope._newFeatureName.toUpperCase() ? true : null;
+				}).length) {
+				return "Feature name conflict!";
+			}
+			return "";
+		};
+
+		$scope.newFeatureConfirm = function() {
+			var _feature;
+			$scope._newFeatureLock = true;
+
+			_feature = {
+				tags: {
+					feature: $scope._newFeatureName
+				}
+			};
+
+			Entities.updateEntity(
+				"FeatureDescService",
+				_feature,
+				{timestamp: false}
+			)._promise.success(function() {
+				// Reload Page
+				$("#featureMDL").modal("hide")
+					.on("hidden.bs.modal", function() {
+						$(this).off("hidden.bs.modal");
+						location.reload();
+					});
+
+				$scope._newSiteName = null;
+			});
+		};
+	});
+
+	// ======================== Application ========================
+	eagleControllers.controller('configApplicationCtrl', function ($scope, PageConfig, Application) {
+		PageConfig.hideApplication = true;
+		PageConfig.hideSite = true;
+
+		// ================ Application ================
+		$scope.application = Application.current() || Application.list[0];
+		$scope.setApplication = function (application) {
+			$scope.application = application;
+		};
+
+		$scope.applications = {};
+		$.each(Application.list, function(i, app) {
+			$scope.applications[app.tags.application] = {
+				feature: $.extend({}, app.feature)
+			};
+		});
+
+		$scope.saveAll = function() {
+			$.each(Application.list, function(i, app) {
+				app.feature = $scope.applications[app.tags.application].feature;
+
+				// TODO: Ajax update entities
+			});
+		};
+
+
+		/*globalContent.setConfig(configPageConfig);
+
+		 // ================ Application ================
+		 $scope.application = Application.list[0];
+		 $scope.setApplication = function (application) {
+		 $scope.application = application;
+		 };*/
+	});
+
+	// ============================ Site ===========================
+	eagleControllers.controller('configSiteCtrl', function ($scope, PageConfig, Site) {
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
 
@@ -90,42 +195,5 @@
 				// TODO: Ajax update entities
 			});
 		};
-	});
-
-	eagleControllers.controller('configApplicationCtrl', function ($scope, PageConfig, Application) {
-		'use strict';
-
-		PageConfig.hideApplication = true;
-		PageConfig.hideSite = true;
-
-		// ================ Application ================
-		$scope.application = Application.current() || Application.list[0];
-		$scope.setApplication = function (application) {
-			$scope.application = application;
-		};
-
-		$scope.applications = {};
-		$.each(Application.list, function(i, app) {
-			$scope.applications[app.tags.application] = {
-				feature: $.extend({}, app.feature)
-			};
-		});
-
-		$scope.saveAll = function() {
-			$.each(Application.list, function(i, app) {
-				app.feature = $scope.applications[app.tags.application].feature;
-
-				// TODO: Ajax update entities
-			});
-		};
-
-
-		/*globalContent.setConfig(configPageConfig);
-
-		// ================ Application ================
-		$scope.application = Application.list[0];
-		$scope.setApplication = function (application) {
-			$scope.application = application;
-		};*/
 	});
 })();

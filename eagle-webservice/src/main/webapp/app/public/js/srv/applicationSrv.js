@@ -110,7 +110,7 @@
 				});
 
 				// Process all promise
-				$q.all(_promiseList.concat(Application.list._promise)).then(function() {
+				$q.all(_promiseList.concat(Application.list._promise)).finally(function() {
 					_deferred.resolve(Application);
 				});
 			});

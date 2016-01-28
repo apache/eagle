@@ -24,8 +24,6 @@
 	// =                     User Profile List                     =
 	// =============================================================
 	eagleControllers.controller('authLoginCtrl', function (PageConfig, Site, Authorization, $scope) {
-		'use strict';
-
 		PageConfig.hideSidebar = true;
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;

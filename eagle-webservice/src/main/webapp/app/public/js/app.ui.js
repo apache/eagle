@@ -63,4 +63,14 @@
 			_fadeToggle.apply(this, arguments);
 		}
 	};
+
+	// Modal
+	var _modal = $.fn.modal;
+	$.fn.modal = function() {
+		setTimeout(function() {
+			$(this).find("input, textarea").focus();
+		}.bind(this), 500);
+		_modal.apply(this, arguments);
+		return this;
+	};
 })();

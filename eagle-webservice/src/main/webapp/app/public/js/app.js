@@ -46,8 +46,9 @@ var app = {};
 		var _features = {};
 		var _services = {};
 
-		var Feature = function(name) {
+		var Feature = function(name, version) {
 			this.name = name;
+			this.version = version;
 			this.features = {};
 		};
 
@@ -194,7 +195,8 @@ var app = {};
 
 		// Register
 		featureControllers.register = Feature.register = function(featureName) {
-			return _features[featureName] = _features[featureName] || new Feature(featureName);
+			_features[featureName] = _features[featureName] || new Feature(featureName);
+			return _features[featureName];
 		};
 
 		// Page go
@@ -326,8 +328,17 @@ var app = {};
 				resolve: _resolve({roleType: 'ROLE_ADMIN'})
 			})
 
+			// Feature
+			.state('configFeature', {
+				url: "/config/feature",
+				templateUrl: "partials/config/feature.html?_=" + Math.random(),
+				controller: "configFeatureCtrl",
+				pageConfig: "ConfigPageConfig",
+				resolve: _resolve({roleType: 'ROLE_ADMIN'})
+			})
+
 			// Feature configuration page
-			.state('configFeature', $.extend({url: "/config/:feature/:page"}, {
+			.state('configFeatureDetail', $.extend({url: "/config/:feature/:page"}, {
 				templateUrl: function ($stateParams) {
 					var _htmlTemplate = featureControllerCustomizeHtmlTemplate[$stateParams.feature + "_" + $stateParams.page];
 					return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + Math.random();
