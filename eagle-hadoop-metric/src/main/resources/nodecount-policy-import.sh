@@ -36,10 +36,10 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
          "policyType": "siddhiCEPEngine"
        },
        "description": "jmx metric ",
-       "policyDef": "{\"expression\":\"from every (e1 = hadoopJmxMetricEventStream[metric == \\\"hadoop.namenode.fsnamesystemstate.numlivedatanodes\\\" ]) -> e2 = hadoopJmxMetricEventStream[metric == e1.metric and host == e1.host and (convert(e1.value, \\\"long\\\") + 5) <= convert(value, \\\"long\\\") ] within 5 min select e1.metric, e1.host, e1.value as lowNum, e1.timestamp as start, e2.value as highNum, e2.timestamp as end insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
+       "policyDef": "{\"expression\":\"from every (e1 = hadoopJmxMetricEventStream[metric == \\\"hadoop.namenode.fsnamesystemstate.numlivedatanodes\\\" ]) -> e2 = hadoopJmxMetricEventStream[metric == e1.metric and host == e1.host and (convert(e1.value, \\\"long\\\") + 0) <= convert(value, \\\"long\\\") ] within 5 min select e1.metric, e1.host, e1.value as lowNum, e1.timestamp as start, e2.value as highNum, e2.timestamp as end insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
        "enabled": true,
        "dedupeDef": "{\"alertDedupIntervalMin\":1,\"emailDedupIntervalMin\":1}",
-       "notificationDef": "[{\"sender\":\"mock-user@apache.org\",\"recipients\":\"mock-user@apache.org\",\"subject\":\"private file touched.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
+       "notificationDef": "[{\"sender\":\"mock-user@apache.org\",\"recipients\":\"mock-user@apache.org\",\"subject\":\"node count joggling found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
      }
  ]
  '

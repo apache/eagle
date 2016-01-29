@@ -898,6 +898,8 @@
                                 <exclude>**/.metadata/</exclude>
                                 <!-- Maven working directory -->
                                 <exclude>**/target/**</exclude>
+                                <exclude>**/*.json</exclude>
+                                <exclude>**/*.json.*</exclude>
                                 <!-- Patch files which can be lying around -->
                                 <exclude>**/*.patch</exclude>
                                 <exclude>**/*.rej</exclude>
