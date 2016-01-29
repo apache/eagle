@@ -24,7 +24,7 @@
 	// =                       Configuration                       =
 	// =============================================================
 	// ========================== Feature ==========================
-	eagleControllers.controller('configFeatureCtrl', function ($scope, PageConfig, Application, Entities) {
+	eagleControllers.controller('configFeatureCtrl', function ($scope, PageConfig, Application, Entities, UI) {
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
 
@@ -94,19 +94,17 @@
 
 		// Delete feature
 		$scope.deleteFeature = function(feature) {
-			$.dialog({
-				title: "Delete Confirm",
-				content: "Do you want to delete '" + feature.tags.feature + "'?",
-				buttons: [
-					{name: "Delete", class: "btn btn-danger", value: true},
-					{name: "Cancel", class: "btn btn-default", value: false}
-				]
-			}, function(ret) {
-				if(!ret) return;
+			UI.deleteConfirm(feature.tags.feature).then(function(colseFunc) {
 				Entities.deleteEntity("FeatureDescService", feature)._promise.then(function() {
+					colseFunc();
 					location.reload();
 				});
 			});
+		};
+
+		// Save feature
+		$scope.saveAll = function() {
+			
 		};
 	});
 

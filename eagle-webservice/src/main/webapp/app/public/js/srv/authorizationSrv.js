@@ -30,10 +30,14 @@
 			isLogin: true,	// Status mark. Work for UI status check, changed when eagle api return 403 authorization failure.
 			needLogin: function () {
 				console.log("[Authorization] Need Login!");
-				_path = _path || $wrapState.path();
-				content.isLogin = false;
-				console.log("[Authorization] Call need login. Redirect...");
-				$wrapState.go("login", 99);
+				if(content.isLogin) {
+					_path = _path || $wrapState.path();
+					content.isLogin = false;
+					console.log("[Authorization] Call need login. Redirect...");
+					$wrapState.go("login", 99);
+				} else {
+					console.log("[Authorization] Already login state...");
+				}
 			},
 			login: function (username, password) {
 				var _hash = btoa(username + ':' + password);
@@ -108,8 +112,12 @@
 			_oriPromise.then(function() {
 				if(content.isRole(role)) {
 					_deferred.resolve(content);
-				} else {
+				} else if(content.isLogin) {
+					_deferred.resolve(content);
+					console.log("[Authorization] go landing...");
 					$wrapState.go(rejectState || "landing");
+				} else {
+					_deferred.reject(content);
 				}
 
 				return content;

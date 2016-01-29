@@ -69,7 +69,9 @@
 
 		// Path
 		$wrapState.path = function(path) {
-			if(path !== undefined) console.log("[Wrap State] Switch path:", path);
+			if(path !== undefined) {
+				console.log("[Wrap State][Deprecated] Switch path:", path);
+			}
 			return $location.path(path);
 		};
 

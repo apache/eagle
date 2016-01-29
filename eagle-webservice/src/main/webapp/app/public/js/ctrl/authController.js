@@ -23,7 +23,7 @@
 	// =============================================================
 	// =                     User Profile List                     =
 	// =============================================================
-	eagleControllers.controller('authLoginCtrl', function (PageConfig, Site, Authorization, $scope) {
+	eagleControllers.controller('authLoginCtrl', function (PageConfig, Site, Authorization, Application, $scope) {
 		PageConfig.hideSidebar = true;
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
@@ -47,7 +47,9 @@
 
 				Authorization.login($scope.username, $scope.password).then(function (success) {
 					if (success) {
+						console.log("[Login] Login success! Reload data...");
 						Site.reload();
+						Application.reload();
 						Authorization.reload();
 						Authorization.path(true);
 					} else {

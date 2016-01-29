@@ -225,6 +225,7 @@ var app = {};
 		// Resolve
 		function _resolve(config) {
 			config = config || {};
+
 			var resolve = {
 				Site: function (Site) {
 					return Site._promise();
@@ -267,7 +268,7 @@ var app = {};
 								Application.current(null);
 							}
 						}
-
+					}).finally(function() {
 						_deferred.resolve();
 					});
 
@@ -432,6 +433,10 @@ var app = {};
 					$wrapState.path("/dam");
 				}
 			}*/
+		});
+
+		$scope.$on('$stateChangeError', function (event, next, nextParam, current, currentParam, error) {
+			console.log("[Switch] Error", arguments);
 		});
 
 		// Get side bar navigation item class

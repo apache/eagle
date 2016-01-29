@@ -115,6 +115,8 @@
 				$q.all(_promiseList.concat(Application.list._promise)).finally(function() {
 					_deferred.resolve(Application);
 				});
+			}, function() {
+				_deferred.reject(Application);
 			});
 
 			return _deferred.promise;
