@@ -41,7 +41,7 @@ def kafka_close(kafka, producer):
 def send_output_message(producer, topic, kafka_dict, metric, value):
     kafka_dict["timestamp"] = int(round(time.time() * 1000))
     kafka_dict["metric"] = metric.lower()
-    kafka_dict["value"] = str(value)
+    kafka_dict["value"] = float(str(value))
     kafka_json = json.dumps(kafka_dict)
 
     if producer != None:

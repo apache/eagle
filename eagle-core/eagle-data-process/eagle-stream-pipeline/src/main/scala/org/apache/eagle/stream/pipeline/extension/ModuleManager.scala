@@ -9,7 +9,7 @@ import org.apache.eagle.datastream.core._
 import org.apache.eagle.partition.PartitionStrategy
 import org.apache.eagle.stream.pipeline.parser.Processor
 import org.apache.kafka.clients.producer.{Callback, KafkaProducer, ProducerRecord, RecordMetadata}
-import org.slf4j.LoggerFactory
+//import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
@@ -106,11 +106,16 @@ object AggregatorProducer extends ModuleMapper{
   }
 }
 
+object KafkaSinkExecutor{
+//  val LOG = LoggerFactory.getLogger(classOf[KafkaSinkExecutor])
+}
+
 /**
   * @todo currently support single topic now, should support topic selector
   * @param config
   */
 case class KafkaSinkExecutor(config:Map[String,AnyRef]) extends ((AnyRef) => Unit) with Serializable{
+
   val TOPIC_KEY = "topic"
   def getDefaultProps = {
     val props = new Properties()
@@ -132,19 +137,17 @@ case class KafkaSinkExecutor(config:Map[String,AnyRef]) extends ((AnyRef) => Uni
   @transient var topic:String = null
   @transient var timeoutMs:Long = 3000
 
-  val LOG = LoggerFactory.getLogger(classOf[KafkaSinkExecutor])
-
   private def init():Unit = {
     if(this.initialized != null && this.initialized.get()){
-      LOG.info("Already initialized, skip")
+//      LOG.info("Already initialized, skip")
       return
     }
     this.initialized = new AtomicBoolean(false)
     if (producer != null) {
-      LOG.info(s"Closing $producer")
+//      LOG.info(s"Closing $producer")
       producer.close()
     }
-    LOG.info("Initializing and creating Kafka Producer")
+//    LOG.info("Initializing and creating Kafka Producer")
     if (config.contains(TOPIC_KEY)) {
       this.topic = config.get(TOPIC_KEY).get.asInstanceOf[String]
     } else {
@@ -153,7 +156,7 @@ case class KafkaSinkExecutor(config:Map[String,AnyRef]) extends ((AnyRef) => Uni
     val props = getDefaultProps
     props.putAll((config - TOPIC_KEY).asJava)
     producer = new KafkaProducer[String, AnyRef](props)
-    LOG.info(s"Created new KafkaProducer: $producer")
+//    LOG.info(s"Created new KafkaProducer: $producer")
     initialized.set(true)
   }
 
@@ -174,7 +177,8 @@ case class KafkaSinkExecutor(config:Map[String,AnyRef]) extends ((AnyRef) => Uni
     producer.send(record,new Callback(){
       override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
         if(exception!=null){
-          LOG.error(s"Failed to send record $value to topic: $topic",exception)
+//          LOG.error(s"Failed to send record $value to topic: $topic",exception)
+          throw new IllegalStateException(s"Failed to send record $value to topic: $topic",exception)
         }
       }
     })
