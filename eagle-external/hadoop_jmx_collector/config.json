@@ -13,7 +13,7 @@
    "output": {
      "kafka": {
        "topic": "nn_jmx_metric_sandbox",
-       "brokerList": ["localhost:9092"]
+       "brokerList": ["sandbox.hortonworks.com:6667"]
      }
    }
 }
