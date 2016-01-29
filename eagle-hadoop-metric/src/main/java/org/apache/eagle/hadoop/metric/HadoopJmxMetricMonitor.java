@@ -30,8 +30,6 @@ public class HadoopJmxMetricMonitor {
         String streamName = "hadoopJmxMetricEventStream";
         StreamProducer sp = env.fromSpout(Utils.createProvider(env.getConfig())).withOutputFields(2).nameAs(streamName);
         sp.alertWithConsumer(streamName, "hadoopJmxMetricAlertExecutor");
-
         env.execute();
     }
-
 }

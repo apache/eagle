@@ -15,8 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#source $(dirname $0)/eagle-env.sh
-#eagle_bin=$EAGLE_HOME/bin
+source $(dirname $0)/eagle-env.sh
 
 #####################################################################
 #            Import stream metadata for HDFS
@@ -36,12 +35,11 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
            "dataSource":"hadoopJmxMetricDataSource"
         },
         "enabled": true,
-        "config":" just some description",
-        "desc":"just some description"
+        "config":"",
+        "desc":"hadoop"
      }
   ]
   '
-
 
 ## AlertStreamService: alert streams generated from data source
 echo ""
@@ -162,33 +160,6 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
  ]
  '
 
-##### add policies ##########
-echo ""
-echo "Importing AlertStreamSchemaService for HDFS... "
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
- "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDefinitionService" \
- -d '
- [
-     {
-       "prefix": "alertdef",
-       "tags": {
-         "site": "sandbox",
-         "dataSource": "hadoopJmxMetricDataSource",
-         "policyId": "NameNodeLagPolicy",
-         "executorId": "hadoopJmxMetricAlertExecutor",
-         "policyType": "siddhiCEPEngine"
-       },
-       "description": "jmx metric ",
-       "policyDef": "{\"expression\":\"from every a = hadoopJmxMetricEventStream[metric==\\\"hadoop.namenode.journaltransaction.lastappliedorwrittentxid\\\"] -> b = hadoopJmxMetricEventStream[metric==\\\"hadoop.namenode.journaltransaction.lastappliedorwrittentxid\\\" and b.host != a.host and (convert(a.value, \\\"long\\\") + 100) < convert(value, \\\"long\\\") ] within 5 min select a.host as hostA, a.value as transactIdA, b.host as hostB, b.value as transactIdB insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
-       "enabled": true,
-       "dedupeDef": "{\"alertDedupIntervalMin\":1,\"emailDedupIntervalMin\":1}",
-       "notificationDef": "[{\"sender\":\"liasu@ebay.com\",\"recipients\":\"liasu@ebay.com\",\"subject\":\"name node lag found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
-     }
- ]
- '
-
- ## Finished
+## Finished
 echo ""
 echo "Finished initialization for eagle topology"
-
-exit 0
