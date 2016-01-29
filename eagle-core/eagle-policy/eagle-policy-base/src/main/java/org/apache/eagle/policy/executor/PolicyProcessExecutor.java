@@ -250,7 +250,8 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			pe = (PolicyEvaluator<T>) evalCls
 					.getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
 					.newInstance(config, context, policyDef, sourceStreams, needValidation);
-            policyDefinitionDao.updatePolicyDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
+            if (pe.isMarkdownEnabled()) // updating markdown details only if the policy is found invalid
+                policyDefinitionDao.updatePolicyDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
 		} catch(Exception ex) {
 			LOG.error("Fail creating new policyEvaluator", ex);
 			LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
@@ -371,8 +372,11 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			LOG.info(executorId + ", partition " + partitionSeq + " policy really changed " + alertDef);
 			synchronized(this.policyEvaluators) {
 				PolicyEvaluator<T> pe = policyEvaluators.get(alertDef.getTags().get(Constants.POLICY_ID));
-				pe.onPolicyUpdate(alertDef);
-                policyDefinitionDao.updatePolicyDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
+				boolean previousMarkdown = pe.isMarkdownEnabled();
+                String previousMarkdownReason = pe.getMarkdownReason();
+                pe.onPolicyUpdate(alertDef);
+                if(isMarkdownUpdateRequired(previousMarkdown, pe.isMarkdownEnabled(), previousMarkdownReason, pe.getMarkdownReason()))
+                    policyDefinitionDao.updatePolicyDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
 			}
 		}
 	}
@@ -418,5 +422,24 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
     public void report() {
         PolicyDistroStatsLogReporter appender = new PolicyDistroStatsLogReporter();
         appender.reportPolicyMembership(executorId + "_" + partitionSeq, policyEvaluators.keySet());
+    }
+
+    /**
+     * Method to check if updating markdown details in DB is required.
+     * @param previousMarkdown: Markdown flag of previous PolicyEvaluator object
+     * @param presentMarkdown: Markdown flag of updated PolicyEvaluator object
+     * @param previousReason: Markdown reason of previous PolicyEvaluator object
+     * @param presentReason: Markdown reason of updated PolicyEvaluator object
+     * @return boolean: If markdown details needs to be updated for the policy
+     */
+    private boolean isMarkdownUpdateRequired (boolean previousMarkdown, boolean presentMarkdown, String previousReason, String presentReason) {
+        boolean isUpdateRequired = true;
+        if (!previousMarkdown && !presentMarkdown) { // not updating when previous/present policies are both valid
+            isUpdateRequired = false;
+        } else if (previousMarkdown && presentMarkdown) {
+            if (previousReason.equals(presentReason))
+                isUpdateRequired = false; // not updating when there is no change with the markdown reason
+        }
+        return isUpdateRequired;
     }
 }
