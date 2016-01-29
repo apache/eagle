@@ -140,7 +140,10 @@ def main():
         #start = time.clock()
 
         # read the kafka.ini
-        config = load_config('config.json')
+        if (len(sys.argv) > 1):
+            config = load_config(sys.argv[1])
+        else:
+            config = load_config('config.json')
         #print config
 
         site = config[u'env'].get('site').encode('utf-8')

@@ -189,8 +189,8 @@ public class TestHadoopMetricSiddhiQL {
 
         String ql = "define stream s (host string, timestamp long, metric string, component string, site string, value string);" +
                 " @info(name='query') " +
-                " from every (e1 = s[metric == 'hadoop.namenode.fsnamesystemstate.numlivedatanodes' ]) -> " +
-                "             e2 = s[metric == e1.metric and host == e1.host and (convert(e1.value, 'long') + 5) <= convert(value, 'long') ]" +
+                " from every (e1 = s[metric == \"hadoop.namenode.fsnamesystemstate.numlivedatanodes\" ]) -> " +
+                "             e2 = s[metric == e1.metric and host == e1.host and (convert(e1.value, \"long\") + 5) <= convert(value, \"long\") ]" +
                 " within 5 min " +
                 " select e1.metric, e1.host, e1.value as lowNum, e1.timestamp as start, e2.value as highNum, e2.timestamp as end " +
                 " insert into tmp;"
