@@ -68,7 +68,7 @@
 	var _modal = $.fn.modal;
 	$.fn.modal = function() {
 		setTimeout(function() {
-			$(this).find("input, textarea").focus();
+			$(this).find("input, textarea").filter(':visible:first').focus();
 		}.bind(this), 500);
 		_modal.apply(this, arguments);
 		return this;

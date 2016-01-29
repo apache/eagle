@@ -28,10 +28,8 @@
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
 
-		$scope._newFeatureName = null;
-		$scope._newFeatureLock = false;
+		$scope._pageLock = false;
 
-		// ================== Feature ==================
 		// Current feature
 		$scope.feature = Application.featureList[0];
 		$scope.setFeature = function (feature) {
@@ -46,57 +44,31 @@
 
 		// Create feature
 		$scope.newFeature = function() {
-			$("#featureMDL").modal();
-		};
-
-		$scope.newFeatureCheck = function() {
-			if($scope._newFeatureName === null) return "";
-
-			// Empty name
-			if($scope._newFeatureName === "") {
-				return "Feature can't be empty!";
-			}
-
-			// Conflict name
-			if($scope._newFeatureName && $.map($scope.features, function(feature, name) {
-					return name.toUpperCase() === $scope._newFeatureName.toUpperCase() ? true : null;
-				}).length) {
-				return "Feature name conflict!";
-			}
-			return "";
-		};
-
-		$scope.newFeatureConfirm = function() {
-			var _feature;
-			$scope._newFeatureLock = true;
-
-			_feature = {
-				tags: {
-					feature: $scope._newFeatureName
+			UI.createConfirm("Feature", {}, [
+				{name: "Feature Name", field: "name"}
+			], function(entity) {
+				if(entity.name && $.map($scope.features, function(feature, name) {
+						return name.toUpperCase() === entity.name.toUpperCase() ? true : null;
+					}).length) {
+					return "Feature name conflict!";
 				}
-			};
-
-			Entities.updateEntity(
-				"FeatureDescService",
-				_feature,
-				{timestamp: false}
-			)._promise.success(function() {
-				// Reload Page
-				$("#featureMDL").modal("hide")
-					.on("hidden.bs.modal", function() {
-						$(this).off("hidden.bs.modal");
-						location.reload();
-					});
-
-				$scope._newSiteName = null;
+			}).then(function(holder) {
+				Entities.updateEntity(
+					"FeatureDescService",
+					{tags: {feature: holder.entity.name}},
+					{timestamp: false}
+				)._promise.then(function() {
+					holder.closeFunc();
+					location.reload();
+				});
 			});
 		};
 
 		// Delete feature
 		$scope.deleteFeature = function(feature) {
-			UI.deleteConfirm(feature.tags.feature).then(function(colseFunc) {
+			UI.deleteConfirm(feature.tags.feature).then(function(holder) {
 				Entities.deleteEntity("FeatureDescService", feature)._promise.then(function() {
-					colseFunc();
+					holder.closeFunc();
 					location.reload();
 				});
 			});
@@ -104,7 +76,15 @@
 
 		// Save feature
 		$scope.saveAll = function() {
-			
+			$scope._pageLock = true;
+			var _list = $.map($scope.features, function(feature) {
+				return feature;
+			});
+			Entities.updateEntity("FeatureDescService", _list, {timestamp: false})._promise.success(function() {
+				location.reload();
+			}).finally(function() {
+				$scope._pageLock = false;
+			});
 		};
 	});
 

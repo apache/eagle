@@ -28,16 +28,26 @@
 	serviceModule.service('UI', function($rootScope, $q, $compile) {
 		var UI = {};
 
-		UI.deleteConfirm = function(name) {
+		/***
+		 * Create a creation confirm modal.
+		 * @param name			Name title
+		 * @param entity		bind entity
+		 * @param fieldList	Array. Format: {name, field, description(optional), optional(optional)}
+		 * @param checkFunc	Check logic function. Return string will prevent access
+		 */
+		UI.createConfirm = function(name, entity, fieldList, checkFunc) {
 			var _deferred, $mdl, $scope;
 
 			_deferred = $q.defer();
 			$scope = $rootScope.$new(true);
 			$scope.name = name;
+			$scope.entity = entity;
+			$scope.fieldList = fieldList;
+			$scope.checkFunc = checkFunc;
 			$scope.lock = false;
 
 			// Modal
-			$mdl = $(common.template(TMPL_DELETE, {name: name})).appendTo('body');
+			$mdl = $(TMPL_CREATE).appendTo('body');
 			$compile($mdl)($scope);
 			$mdl.modal();
 
@@ -48,11 +58,57 @@
 				$mdl.remove();
 			});
 
-			// function
+			// Function
+			$scope.emptyFieldList = function() {
+				var _emptyList = $.map(fieldList, function(field) {
+					if(!field.optional && !entity[field.field]) {
+						return field.field;
+					}
+				});
+				return _emptyList;
+			};
+
+			$scope.confirm = function() {
+				$scope.lock = true;
+				_deferred.resolve({
+					entity: entity,
+					closeFunc: function() {
+						$mdl.modal('hide');
+					}
+				});
+			};
+
+			return _deferred.promise;
+		};
+
+		UI.deleteConfirm = function(name) {
+			var _deferred, $mdl, $scope;
+
+			_deferred = $q.defer();
+			$scope = $rootScope.$new(true);
+			$scope.name = name;
+			$scope.lock = false;
+
+			// Modal
+			$mdl = $(TMPL_DELETE).appendTo('body');
+			$compile($mdl)($scope);
+			$mdl.modal();
+
+			$mdl.on("hide.bs.modal", function() {
+				_deferred.reject();
+			});
+			$mdl.on("hidden.bs.modal", function() {
+				$mdl.remove();
+			});
+
+			// Function
 			$scope.delete = function() {
 				$scope.lock = true;
-				_deferred.resolve(function() {
-					$mdl.modal('hide');
+				_deferred.resolve({
+					name: name,
+					closeFunc: function() {
+						$mdl.modal('hide');
+					}
 				});
 			};
 
@@ -65,6 +121,34 @@
 	// ===========================================================
 	// =                         Template                        =
 	// ===========================================================
+	var TMPL_CREATE =
+		'<div class="modal fade" tabindex="-1" role="dialog">' +
+			'<div class="modal-dialog" role="document">' +
+				'<div class="modal-content">' +
+					'<div class="modal-header">' +
+						'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+							'<span aria-hidden="true">&times;</span>' +
+						'</button>' +
+						'<h4 class="modal-title">New {{name}}</h4>' +
+					'</div>' +
+					'<div class="modal-body">' +
+						'<div class="form-group" ng-repeat="field in fieldList">' +
+							'<label for="featureName">' +
+								'<span ng-if="!field.optional">*</span> ' +
+								'{{field.name}}' +
+							'</label>' +
+							'<input type="text" class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]">' +
+						'</div>' +
+					'</div>' +
+					'<div class="modal-footer">' +
+						'<p class="pull-left text-danger">{{checkFunc(entity)}}</p>' +
+						'<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+						'<button type="button" class="btn btn-primary" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || _pageLock">Create</button>' +
+					'</div>' +
+				'</div>' +
+			'</div>' +
+		'</div>';
+
 	var TMPL_DELETE =
 		'<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
 			'<div class="modal-dialog">' +
