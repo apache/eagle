@@ -36,8 +36,8 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
            "dataSource":"hadoopJmxMetricDataSource"
         },
         "enabled": true,
-        "config":" just some description",
-        "desc":"just some description"
+        "config":" data node count",
+        "desc":"data node count"
      }
   ]
   '
@@ -174,15 +174,15 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
        "tags": {
          "site": "sandbox",
          "dataSource": "hadoopJmxMetricDataSource",
-         "policyId": "NameNodeLagPolicy",
+         "policyId": "dataNodeCountPolicy",
          "executorId": "hadoopJmxMetricAlertExecutor",
          "policyType": "siddhiCEPEngine"
        },
        "description": "jmx metric ",
-       "policyDef": "{\"expression\":\"from every a = hadoopJmxMetricEventStream[metric==\\\"hadoop.namenode.journaltransaction.lastappliedorwrittentxid\\\"] -> b = hadoopJmxMetricEventStream[metric==\\\"hadoop.namenode.journaltransaction.lastappliedorwrittentxid\\\" and b.host != a.host and (convert(a.value, \\\"long\\\") + 100) < convert(value, \\\"long\\\") ] within 5 min select a.host as hostA, a.value as transactIdA, b.host as hostB, b.value as transactIdB insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
+       "policyDef": "{\"expression\":\"from every (e1 = hadoopJmxMetricEventStream[metric == \\\"hadoop.namenode.fsnamesystemstate.numlivedatanodes\\\" ]) -> e2 = hadoopJmxMetricEventStream[metric == e1.metric and host == e1.host and (convert(e1.value, \\\"long\\\") + 5) <= convert(value, \\\"long\\\") ] within 5 min select e1.metric, e1.host, e1.value as lowNum, e1.timestamp as start, e2.value as highNum, e2.timestamp as end insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
        "enabled": true,
        "dedupeDef": "{\"alertDedupIntervalMin\":1,\"emailDedupIntervalMin\":1}",
-       "notificationDef": "[{\"sender\":\"liasu@ebay.com\",\"recipients\":\"liasu@ebay.com\",\"subject\":\"name node lag found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
+       "notificationDef": "[{\"sender\":\"liasu@ebay.com\",\"recipients\":\"liasu@ebay.com\",\"subject\":\"private file touched.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
      }
  ]
  '
