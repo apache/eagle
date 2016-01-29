@@ -34,10 +34,10 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
          "policyType": "siddhiCEPEngine"
        },
        "description": "jmx metric ",
-       "policyDef": "{\"expression\":\"from every a = hadoopJmxMetricEventStream[metric==\\\"hadoop.namenode.journaltransaction.lastappliedorwrittentxid\\\"] -> b = hadoopJmxMetricEventStream[metric==a.metric and b.host != a.host and (convert(e1.value, \\\"long\\\") + 0) <= convert(value, \\\"long\\\")] within 5 min select a.host as hostA, a.value as transactIdA, b.host as hostB, b.value as transactIdB insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
+       "policyDef": "{\"expression\":\"from every a = hadoopJmxMetricEventStream[metric==\\\"hadoop.namenode.journaltransaction.lastappliedorwrittentxid\\\"] -> b = hadoopJmxMetricEventStream[metric==a.metric and b.host != a.host and (convert(a.value, \\\"long\\\") + 0) <= convert(value, \\\"long\\\")] within 5 min select a.host as hostA, a.value as transactIdA, b.host as hostB, b.value as transactIdB insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
        "enabled": true,
        "dedupeDef": "{\"alertDedupIntervalMin\":1,\"emailDedupIntervalMin\":1}",
-       "notificationDef": "[{\"sender\":\"eagle@apache.org\",\"recipients\":\"eagle@apache.org\",\"subject\":\"name node lag found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
+       "notificationDef": "[{\"sender\":\"eagle@apache.org\",\"recipients\":\"liasu@ebay.com\",\"subject\":\"name node lag found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
      }
  ]
  '

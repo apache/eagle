@@ -153,7 +153,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
           "attrName": "value"
        },
        "attrDescription": "the metric value in string presentation",
-       "attrType": "string",
+       "attrType": "double",
        "category": "",
        "attrValueResolver": ""
     }
