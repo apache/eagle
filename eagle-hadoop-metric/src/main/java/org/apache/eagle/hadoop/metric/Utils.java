@@ -20,47 +20,44 @@ import backtype.storm.spout.SchemeAsMultiScheme;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
-import org.apache.eagle.datastream.ExecutionEnvironments;
-import org.apache.eagle.datastream.core.StreamProducer;
-import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created on 1/12/16.
+ * Created on 1/25/16.
  */
-public class NameNodeLagMonitor {
+public class Utils {
 
-    public static void main(String[] args) {
-        StormExecutionEnvironment env = ExecutionEnvironments.get(args, StormExecutionEnvironment.class);
-        String streamName = "hadoopJmxMetricEventStream";
-        StreamProducer sp = env.fromSpout(createProvider(env.getConfig())).withOutputFields(2).parallelism(1).nameAs(streamName);
-        sp.alertWithConsumer(streamName, "hadoopJmxMetricAlertExecutor");
-
-        env.execute();
-    }
-
-    // create a tuple kafka source
-    private static KafkaSourcedSpoutProvider createProvider(Config config) {
+    /**
+     * Creates a spout provider that have host-metric as the first tuple data, so that it's feasible for alert grouping.
+     *
+     * @param config
+     * @return
+     */
+    public static KafkaSourcedSpoutProvider createProvider(Config config) {
         String deserClsName = config.getString("dataSourceConfig.deserializerClass");
         final KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, config) {
+
             @Override
             public List<Object> deserialize(byte[] ser) {
                 Object tmp = deserializer.deserialize(ser);
-                Map<String, Object> map = (Map<String, Object>)tmp;
-                if(tmp == null) return null;
+                Map<String, Object> map = (Map<String, Object>) tmp;
+                if (tmp == null) return null;
                 // this is the key to be grouped by
                 return Arrays.asList(String.format("%s-%s", map.get("host"), map.get("metric")), tmp);
             }
+
         };
 
         KafkaSourcedSpoutProvider provider = new KafkaSourcedSpoutProvider() {
+
             @Override
             public SchemeAsMultiScheme getStreamScheme(String deserClsName, Config context) {
                 return new SchemeAsMultiScheme(scheme);
             }
+
         };
         return provider;
     }
