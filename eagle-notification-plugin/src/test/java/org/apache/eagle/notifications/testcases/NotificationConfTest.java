@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class NotificationConfTest {
 
-    public static void main(String[] args ) throws Exception {
+    /*public static void main(String[] args ) throws Exception {
         List<AlertDefinitionAPIEntity> list = NotificationPluginUtils.fetchActiveAlerts();
         for(AlertDefinitionAPIEntity entity : list )
             try {
@@ -46,11 +46,11 @@ public class NotificationConfTest {
                 ObjectMapper mapper = new ObjectMapper();
                 String tmp = mapper.writeValueAsString(e);
                 System.out.println(tmp);
-                /*CollectionType mapCollectionType = mapper.getTypeFactory().constructCollectionType(List.class, Map.class);
+                *//*CollectionType mapCollectionType = mapper.getTypeFactory().constructCollectionType(List.class, Map.class);
                 List<Map<String, String>> map = mapper.readValue(entity.getNotificationDef(), mapCollectionType);
-                System.out.println(map);*/
+                System.out.println(map);*//*
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-    }
+    }*/
 }
