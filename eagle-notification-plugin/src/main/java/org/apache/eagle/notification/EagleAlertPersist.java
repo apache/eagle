@@ -17,6 +17,7 @@
 
 package org.apache.eagle.notification;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
@@ -47,6 +48,13 @@ public class EagleAlertPersist {
 		this.eagleServicePort = eagleServicePort;
 		this.username = username;
 		this.password = password;
+	}
+
+	public EagleAlertPersist(Config config ) {
+		this.eagleServiceHost = config.getString("eagleProps.eagleService.host");
+		this.eagleServicePort = config.getInt("eagleProps.eagleService.port");
+		this.username = config.getString("eagleProps.eagleService.username");
+		this.password =config.getString("eagleProps.eagleService.password");
 	}
 
 	/**

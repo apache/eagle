@@ -14,36 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.notification.email;
 
-
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-
-import java.io.Serializable;
+package org.apache.eagle.notification;
 
 /**
- *
  */
+public class NotificationConstants {
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "flavor")
-public class NotificationConfig implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private String id;
-    private String flavor;
+    public static final String NOTIFICATION_TYPE = "notificationType";
 
-    public String getId() {
-        return id;
-    }
+    public static final String EMAIL_NOTIFICATION_RESOURCE_NM = "Email Notification";
+    public static final String KAFKA_STORE = "Kafka Store";
+    // email specific constants
+    public static final String SUBJECT = "subject";
+    public static final String SENDER = "sender";
+    public static final String RECIPIENTS = "recipients";
+    public static final String TPL_FILE_NAME = "tplFileName";
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    // Kafka Store Conf
+    public static final String KAFKA_TOPIC = "kafkaTopic";
 
-    public String getFlavor() {
-        return flavor;
-    }
-
-    public void setFlavor(String flavor) {
-        this.flavor = flavor;
-    }
 }

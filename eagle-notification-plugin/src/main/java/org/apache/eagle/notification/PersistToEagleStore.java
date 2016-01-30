@@ -19,13 +19,16 @@ package org.apache.eagle.notification;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.policy.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Responsible to persist Alerts to Eagle Storage
@@ -39,11 +42,22 @@ public class PersistToEagleStore implements  NotificationPlugin {
     private Config config;
     private EagleAlertPersist persist;
 
+    /**
+     * Initialize required objects for this Plugin
+     * @throws Exception
+     */
     @Override
     public void _init() throws Exception {
         config = EagleConfigFactory.load().getConfig();
-        this.persist = new EagleAlertPersist(config.getString("eagleProps.eagleService.host"),  config.getInt("eagleProps.eagleService.port"),
-                                             config.getString("eagleProps.eagleService.username"), config.getString("eagleProps.eagleService.password"));
+        this.persist = new EagleAlertPersist(config);
+    }
+
+    @Override
+    public void update(Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
+        if( isPolicyDelete ){
+            LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
+            return;
+        }
     }
 
     @Override
@@ -51,6 +65,10 @@ public class PersistToEagleStore implements  NotificationPlugin {
         return this.status;
     }
 
+    /**
+     * Persist AlertEntity to alert_details table
+     * @param alertEntity
+     */
     @Override
     public void onAlert(AlertAPIEntity alertEntity) {
         try{
@@ -61,7 +79,7 @@ public class PersistToEagleStore implements  NotificationPlugin {
             status.setNotificationSuccess(true);
         }catch (Exception ex ){
             status.setMessage(ex.getMessage());
-            LOG.error(" Exception when Posting Alert Entity to Eagle Service Topic. Reason : "+ex.getMessage());
+            LOG.error(" Exception when Posting Alert Entity to Eagle Service. Reason : "+ex.getMessage());
         }
     }
 }

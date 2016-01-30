@@ -47,7 +47,6 @@ public class Constants {
     public static final String ALERT_EVENT = "alertEvent";
 	public static final String POLICY_DETAIL_URL = "policyDetailUrl";
 	public static final String ALERT_DETAIL_URL = "alertDetailUrl";
-	public static final String NOTIFICATION_TYPE ="notificationType";
 	public static final String POLICY_DEFINITION = "policyDefinition";
 	public static final String POLICY_TYPE = "policyType";
 	public static final String STREAM_NAME = "streamName";

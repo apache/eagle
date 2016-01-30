@@ -93,41 +93,4 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 		return map;
 	}
 
-	/**
-	 * Find the active alerts by Notification Type
-	 * @param site
-	 * @param dataSource
-	 * @param notificationType
-	 * @return
-     * @throws Exception
-     */
-	@Override
-	public  Map<String, T> findActiveAlertDefsByNotification( String site, String dataSource , String notificationType ) throws Exception {
-		Map<String, T> map = new HashMap<String, T>();
-		try {
-			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\" AND @notificationType=\"" + notificationType + "\"]{*}";
-			GenericServiceAPIResponseEntity<T> response =  client.search()
-					.pageSize(Integer.MAX_VALUE)
-					.query(query)
-					.send();
-			client.close();
-			if (response.getException() != null) {
-				throw new Exception("Got an exception when query eagle service: " + response.getException());
-			}
-			List<T> list = response.getObj();
-			for (T entity : list) {
-				String policyId = entity.getTags().get(Constants.POLICY_ID);
-				if (map.get(policyId) == null) {
-					map.put(policyId, entity);
-				}
-			}
-		}
-		catch (Exception ex) {
-			LOG.error("Got an exception when query alert Def service", ex);
-			throw new IllegalStateException(ex);
-		}
-		return map;
-	}
-
 }

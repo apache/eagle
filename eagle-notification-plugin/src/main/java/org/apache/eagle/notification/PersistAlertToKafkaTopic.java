@@ -21,10 +21,12 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.typesafe.config.Config;
+import kafka.server.KafkaConfig;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
+import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,46 +47,61 @@ import java.util.concurrent.ConcurrentHashMap;
  *  Notification Implementation to persist events into KafkaBus  
  */
 
-@Resource(name = "Kafka Store" , description = "Persist Alert Entity to Kafka")
+@Resource(name = NotificationConstants.KAFKA_STORE , description = "Persist Alert Entity to Kafka")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class PersistAlertToKafkaTopic  implements NotificationPlugin {
 
 	private NotificationStatus status;
 
 	private static final Logger LOG = LoggerFactory.getLogger(PersistAlertToKafkaTopic.class);
-	private Map<String, AlertDefinitionAPIEntity> activeAlerts = new ConcurrentHashMap<String, AlertDefinitionAPIEntity>();
 	private Map<String, KafkaTopicConfig> kafaConfigs = new ConcurrentHashMap<String, KafkaTopicConfig>();
 	private Config config;
-	private PolicyDefinitionDAO policyDefinitionDao;
 
+	/**
+	 * Initialize all Instance required by this Plugin
+	 * @throws Exception
+     */
 	@Override
 	public void _init() throws  Exception  {
-		config = EagleConfigFactory.load().getConfig();
-		String site = config.getString("eagleProps.site");
-		String dataSource = config.getString("eagleProps.dataSource");
-		activeAlerts.clear();
 		kafaConfigs.clear();
-		policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(config) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
+		List<AlertDefinitionAPIEntity> activeAlerts = null;
 		try{
-			activeAlerts = policyDefinitionDao.findActiveAlertDefsByNotification( site , dataSource ,"Kafka Store");
+			activeAlerts = NotificationPluginUtils.fetchActiveAlerts();
 		}catch (Exception ex ){
 			LOG.error(ex.getMessage());
 			throw  new Exception(" Kafka Store  Cannot be initialized . Reason : "+ex.getMessage());
 		}
-		Set<String> policies = activeAlerts.keySet();
-		for( String policyId : policies )
-		{
-			Module module = new SimpleModule("notification").registerSubtypes(new NamedType(KafkaTopicConfig.class, "kafka topic"));
-			KafkaTopicConfig kafkaConfig = new KafkaTopicConfig();
-			try {
-				kafkaConfig = JsonSerDeserUtils.deserialize(activeAlerts.get(policyId).getNotificationDef(), KafkaTopicConfig.class, Arrays.asList(module));
-				this.kafaConfigs.put(policyId,kafkaConfig);
-			}catch (Exception ex){
-				LOG.error(" Exception when initializing PersistAlertToKafkaTopic. Reason : "+ex.getMessage());
+		for( AlertDefinitionAPIEntity entity : activeAlerts ) {
+			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
+			for( Map<String,String> notificationConfigMap : configMaps ){
+				// single policy can have multiple configs , only load Kafka Config's
+				if(notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE).equalsIgnoreCase(NotificationConstants.KAFKA_STORE)){
+					kafaConfigs.put( entity.getTags().get(Constants.POLICY_ID) ,createKafkaConfig(notificationConfigMap) );
+				}
 			}
 		}
 	}
 
+	/**
+	 * Update API to update policy delete/create/update in Notification Plug-ins
+	 * @param  notificationConf
+	 * @param isPolicyDelete
+	 * @throws Exception
+     */
+	@Override
+	public void update( Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
+		if( isPolicyDelete ){
+			LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
+			this.kafaConfigs.remove(notificationConf.get(Constants.POLICY_ID));
+			return;
+		}
+		kafaConfigs.put( notificationConf.get(Constants.POLICY_ID) ,createKafkaConfig(notificationConf) );
+	}
+
+	/**
+	 * Post Notification to KafkaTopic
+	 * @param alertEntity
+     */
 	@Override
 	public void onAlert(AlertAPIEntity alertEntity) {
 		try{
@@ -114,12 +132,28 @@ public class PersistAlertToKafkaTopic  implements NotificationPlugin {
 	 */
 	public ProducerRecord  createRecord(AlertAPIEntity entity ) throws Exception {
 		String policyId = entity.getTags().get(Constants.POLICY_ID);
-		ProducerRecord  record  = new ProducerRecord( this.kafaConfigs.get(policyId).getKafkaTopic(), entity.toString());
+		ProducerRecord  record  = new ProducerRecord( this.kafaConfigs.get(policyId).getKafkaTopic(), NotificationPluginUtils.objectToStr(entity));
 		return record;
 	}	
 	
 	@Override
-	public NotificationStatus getStatus() {		
+	public NotificationStatus getStatus() {
 		return status;
 	}
+
+	/**
+	 * Creates Kafka Config Object
+	 * @param notificationConfig
+	 * @return
+     */
+	private KafkaTopicConfig  createKafkaConfig( Map<String,String> notificationConfig ){
+		KafkaTopicConfig kafkaConfig = new KafkaTopicConfig();
+		try {
+			kafkaConfig.setKafkaTopic(notificationConfig.get(NotificationConstants.KAFKA_TOPIC));
+		}catch (Exception ex){
+			LOG.error(" Exception when initializing PersistAlertToKafkaTopic. Reason : "+ex.getMessage());
+		}
+		return kafkaConfig;
+	}
+
 }

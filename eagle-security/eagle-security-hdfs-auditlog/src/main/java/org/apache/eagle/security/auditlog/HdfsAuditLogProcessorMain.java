@@ -101,6 +101,7 @@ public class HdfsAuditLogProcessorMain {
     }
 
 	public static void main(String[] args) throws Exception{
+        args[0] = "/home/eagle/sandbox-hdfsAuditLog-application.conf";
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
         Config config = env.getConfig();
         KafkaSourcedSpoutProvider provider = createProvider(env.getConfig());

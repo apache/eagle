@@ -104,11 +104,13 @@ public class HBaseStorageAudit implements AuditListener {
     private List<GenericAuditEntity> buildAuditEntities(String operation, List<? extends TaggedLogAPIEntity> entities, List<String> encodedRowKeys, EntityDefinition entityDefinition) {
     	String serviceName = entityDefinition.getService();
     	long timestamp = System.currentTimeMillis()/1000L;
-    	
+		List<GenericAuditEntity> auditEntities = new ArrayList<GenericAuditEntity>();
     	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if( authentication == null )
+			return  auditEntities;
     	String userID = null != authentication.getName() ? authentication.getName() : "data not available"; // empty user
 
-    	List<GenericAuditEntity> auditEntities = new ArrayList<GenericAuditEntity>();
+
     	GenericAuditEntity auditEntity = new GenericAuditEntity();
     	
 		if (null != entities && 0 != entities.size())  {

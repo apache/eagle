@@ -18,9 +18,12 @@
 package org.apache.eagle.notification;
 
 import org.apache.eagle.alert.entity.AlertAPIEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+
+import java.util.Map;
 
 /**
- * Notification Plug-in interface which provide abstraction layer to notify different system 
+ * Notification Plug-in interface which provide abstraction layer to notify to different system
  */
 public interface NotificationPlugin {
 
@@ -29,11 +32,20 @@ public interface NotificationPlugin {
 	 * @throws Exception
      */
 	public void _init() throws  Exception;
+
+	/**
+	 * Update Plugin if any change in Policy Definition
+	 * @param  notificationConf
+	 * @throws Exception
+     */
+	public void update( Map<String,String> notificationConf , boolean isPolicyDelete ) throws  Exception;
 	/**
 	 * Post a notification for the given alertEntity 
 	 * @param alertEntity
+	 * @throws Exception
 	 */
-	public void onAlert( AlertAPIEntity alertEntity );
+
+	public void onAlert( AlertAPIEntity alertEntity ) throws  Exception;
 	
 	/**
 	 * Returns Status of Notification Post 

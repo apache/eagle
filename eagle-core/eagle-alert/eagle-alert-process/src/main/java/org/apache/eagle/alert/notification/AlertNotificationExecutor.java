@@ -54,8 +54,8 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 	private static final long serialVersionUID = 1690354365435407034L;
 	private static final Logger LOG = LoggerFactory.getLogger(AlertNotificationExecutor.class);
 	private Config config;
-	/** Notifcation Manager - Responsible for forward and invoke configured Notification Plugin **/
-	private static final NotificationManager notificationManager =  new NotificationManager();
+	/** Notification Manager - Responsible for forward and invoke configured Notification Plugin **/
+	private static final NotificationManager notificationManager =  NotificationManager.getInstance();
 
 	private List<String> alertExecutorIdList;
 	private PolicyDefinitionDAO dao;
@@ -65,8 +65,6 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		this.alertExecutorIdList = alertExecutorIdList;
 		this.dao = dao;
 	}
-
-
 
 	@Override
 	public void init() {
@@ -95,7 +93,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		if(LOG.isDebugEnabled()) LOG.debug(" alert notification config changed : " + added);
 		for(AlertDefinitionAPIEntity alertDef : added.values()){
 			LOG.info("alert notification config really changed " + alertDef);
-			notificationManager.updateNotificationPlugins( alertDef );
+			notificationManager.updateNotificationPlugins( alertDef , false );
 		}
 	}
 
@@ -104,7 +102,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		if(LOG.isDebugEnabled()) LOG.debug("alert notification config to be added : " + changed);
 		for(AlertDefinitionAPIEntity alertDef : changed.values()){
 			LOG.info("alert notification config really added " + alertDef);
-			notificationManager.updateNotificationPlugins( alertDef );
+			notificationManager.updateNotificationPlugins( alertDef , false );
 		}
 	}
 
@@ -113,7 +111,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		if(LOG.isDebugEnabled()) LOG.debug("alert notification config to be deleted : " + deleted);
 		for(AlertDefinitionAPIEntity alertDef : deleted.values()){
 			LOG.info("alert notification config really deleted " + alertDef);
-			notificationManager.updateNotificationPlugins( alertDef );
+			notificationManager.updateNotificationPlugins( alertDef , true );
 		}
 	}
 }

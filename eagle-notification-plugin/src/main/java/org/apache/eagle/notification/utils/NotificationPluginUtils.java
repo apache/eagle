@@ -18,14 +18,33 @@
 package org.apache.eagle.notification.utils;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
+import org.apache.eagle.service.client.EagleServiceConnector;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class NotificationPluginUtils {
 
-	public static ConfigObject _conf;
-	
+	private static ConfigObject _conf;
+	private static final ObjectMapper mapper = new ObjectMapper();
+	private static final CollectionType mapCollectionType = mapper.getTypeFactory().constructCollectionType(List.class, Map.class);
+
+	/**
+	 * Returns Notification Specific Conf Object
+	 * @return
+	 * @throws Exception
+     */
 	public static ConfigObject getNotificationConfigObj() throws Exception
 	{
 		Config config = EagleConfigFactory.load().getConfig();
@@ -33,11 +52,68 @@ public class NotificationPluginUtils {
 			throw new Exception("Eagle Notification Properties not found in application.conf ");
 		return config.getObject("eagleNotificationProps");
 	}
-		
+
+	/**
+	 * Fetch Notification specific property value
+	 * @param key
+	 * @return
+	 * @throws Exception
+     */
 	public static String getPropValue(String key ) throws Exception {
 
 		if (_conf == null)
 			_conf = getNotificationConfigObj();
 		return _conf.get(key).unwrapped().toString();
+	}
+
+	/**
+	 * Find all Active Alerts
+	 * @return
+	 * @throws Exception
+     */
+	public static List<AlertDefinitionAPIEntity> fetchActiveAlerts() throws Exception {
+		List<AlertDefinitionAPIEntity> result = null;
+		Config config = EagleConfigFactory.load().getConfig();
+		String site = config.getString("eagleProps.site");
+		String dataSource = config.getString("eagleProps.dataSource");
+		PolicyDefinitionDAO policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(config) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
+		try{
+			 result = policyDefinitionDao.findActivePolicies(site, dataSource );
+		}catch (Exception ex ){
+			throw  new Exception(ex.getMessage());
+		}
+		return result;
+	}
+
+	/**
+	 * Deserialize Notification Definition and convert all config to Key Value Pairs
+	 * @param notificationDef
+	 * @return
+	 * @throws Exception
+     */
+	public static List<Map<String,String>> deserializeNotificationConfig( String notificationDef ) throws Exception {
+		List<Map<String, String>> configList = null;
+		try{
+			configList = mapper.readValue( notificationDef , mapCollectionType);
+		}catch (Exception ex ){
+			throw  new Exception( ex.getMessage());
+		}
+		return configList;
+	}
+
+	/**
+	 * Object to JSON String
+	 * @param obj
+	 * @return
+	 * @throws Exception
+     */
+	public static String objectToStr( Object obj ) throws  Exception {
+		String result = null;
+		try{
+			result = mapper.writeValueAsString(obj);
+		}catch (Exception ex ){
+			throw  new Exception( ex.getMessage());
+		}
+		return result;
 	}
 }
