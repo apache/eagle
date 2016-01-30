@@ -23,13 +23,13 @@ import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by eagle on 29/1/16.
  */
 public class NotificationConfTest {
 
@@ -53,4 +53,9 @@ public class NotificationConfTest {
                 ex.printStackTrace();
             }
     }*/
+
+    @Test
+    public void testNotificationConf(){
+        
+    }
 }
