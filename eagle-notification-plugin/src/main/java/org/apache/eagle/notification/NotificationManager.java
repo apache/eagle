@@ -113,12 +113,12 @@ public class NotificationManager  {
     public void notifyAlert( AlertAPIEntity entity ) {
         try {
             Set<String> listOfNotifications = policyNotificationMapping.get(entity.getTags().get(Constants.POLICY_ID));
-            LOG.info(" Invoking Notification Plugin for the Policy : "+entity.getTags().get(Constants.POLICY_ID)+" . No of Plugins found ");
+            LOG.info(" Invoking Notification Plugin for the Policy : "+entity.getTags().get(Constants.POLICY_ID)+" . No of Plugins found : "+listOfNotifications.size());
             for(String notificationType : listOfNotifications ){
                 Object notificationPluginObj = getNotificationPluginAPI(notificationType);
-                notificationPluginObj.getClass().getMethod("onAlert" , new Class[]{AlertAPIEntity.class}).invoke( notificationPluginObj , entity);
-                LOG.info(" Successfully Notified ...");
+                notificationPluginObj.getClass().getMethod("onAlert", new Class[]{AlertAPIEntity.class}).invoke(notificationPluginObj, entity);
             }
+            LOG.info(" Successfully Notified ...");
         } catch ( Exception ex) {
             LOG.error(" Error in NotificationManager when invoking notifyAlert method  . Reason : "+ex.getMessage());
         }
@@ -141,31 +141,29 @@ public class NotificationManager  {
         try {
             // Update Notification Plugin about the change in AlertDefinition
             String policyId = entity.getTags().get(Constants.POLICY_ID);
-            synchronized (this){ // multiple threads may invoke this API to publish their updates about policy
-                List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
-                Set<String>  notifications = new HashSet<String>();
-                for( Map<String,String> notificationConf : notificationConfigCollection ) {
-                    String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
-                    if( isDeleteUpdate ){
-                        policyNotificationMapping.get(policyId).remove(notificationType);
-                    }
-                    if( !NotificationPluginLoader.getInstance().getNotificationMapping().containsKey(notificationType)){
-                        LOG.error(" Can't find Notification Type in Plugin Loader.. OOPS! Something went Wrong ");
-                    }
-                    // add policy id to config map , all plugins need policy id for maintaining their config obj
-                    notificationConf.put(Constants.POLICY_ID, policyId );
-                    try{
-                        Object  notificationObj = NotificationPluginLoader.getInstance().getNotificationMapping().get(notificationType);
-                        notificationObj.getClass().getMethod("update" , new Class[]{Map.class,Boolean.class}).invoke( notificationObj , notificationConf , isDeleteUpdate );
-                    }catch (Exception ex ){
-                        LOG.error(" Error in Updating Notification Config to Plugin , Policy Id : "+entity.getTags().get(Constants.POLICY_ID)+" .. Reason : "+ex.getMessage());
-                    }
-                    notifications.add(notificationType);
+            List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
+            Set<String>  notifications = new HashSet<String>();
+            for( Map<String,String> notificationConf : notificationConfigCollection ) {
+                String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
+                if( isDeleteUpdate ){
+                    policyNotificationMapping.get(policyId).remove(notificationType);
                 }
-                // update policy - notification types map
-                policyNotificationMapping.put(policyId, notifications);
-                LOG.info(" Successfully broad casted policy updates to all Notification Plugins ...");
+                if( !NotificationPluginLoader.getInstance().getNotificationMapping().containsKey(notificationType)){
+                    LOG.error(" Can't find Notification Type in Plugin Loader.. OOPS! Something went Wrong ");
+                }
+                // add policy id to config map , all plugins need policy id for maintaining their config obj
+                notificationConf.put(Constants.POLICY_ID, policyId );
+                try{
+                    Object  notificationObj = NotificationPluginLoader.getInstance().getNotificationMapping().get(notificationType);
+                    notificationObj.getClass().getMethod("update" , new Class[]{Map.class,Boolean.class}).invoke( notificationObj , notificationConf , isDeleteUpdate );
+                }catch (Exception ex ){
+                    LOG.error(" Error in Updating Notification Config to Plugin , Policy Id : "+entity.getTags().get(Constants.POLICY_ID)+" .. Reason : "+ex.getMessage());
+                }
+                notifications.add(notificationType);
             }
+            // update policy - notification types map
+            policyNotificationMapping.put(policyId, notifications);
+            LOG.info(" Successfully broad casted policy updates to all Notification Plugins ...");
         } catch (Exception e) {
             LOG.error(" Error in updateNotificationPlugins  . Reason : "+e.getMessage());
         }

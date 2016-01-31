@@ -56,6 +56,6 @@ public class NotificationConfTest {
 
     @Test
     public void testNotificationConf(){
-        
+
     }
 }
