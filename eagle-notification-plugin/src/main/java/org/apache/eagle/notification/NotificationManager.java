@@ -155,7 +155,7 @@ public class NotificationManager  {
                 notificationConf.put(Constants.POLICY_ID, policyId );
                 try{
                     Object  notificationObj = NotificationPluginLoader.getInstance().getNotificationMapping().get(notificationType);
-                    notificationObj.getClass().getMethod("update" , new Class[]{Map.class,Boolean.class}).invoke( notificationObj , notificationConf , isDeleteUpdate );
+                    notificationObj.getClass().getMethod("update" , new Class[]{Map.class,boolean.class}).invoke( notificationObj , notificationConf , isDeleteUpdate );
                 }catch (Exception ex ){
                     LOG.error(" Error in Updating Notification Config to Plugin , Policy Id : "+entity.getTags().get(Constants.POLICY_ID)+" .. Reason : "+ex.getMessage());
                 }

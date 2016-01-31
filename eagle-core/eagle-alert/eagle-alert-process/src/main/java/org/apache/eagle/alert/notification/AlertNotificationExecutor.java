@@ -26,6 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.eagle.alert.config.EmailNotificationConfig;
+import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.notification.NotificationManager;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
@@ -68,6 +69,26 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 
 	@Override
 	public void init() {
+		config = EagleConfigFactory.load().getConfig();
+		String site = config.getString("eagleProps.site");
+		String dataSource = config.getString("eagleProps.dataSource");
+		Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;
+		try {
+			initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId( site, dataSource );
+		}
+		catch (Exception ex) {
+			LOG.error("fail to initialize initialAlertDefs: ", ex);
+			throw new IllegalStateException("fail to initialize initialAlertDefs: ", ex);
+		}
+
+		if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
+			LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
+		}
+		DynamicPolicyLoader<AlertDefinitionAPIEntity> policyLoader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
+		policyLoader.init(initialAlertDefs, dao, config);
+		for (String alertExecutorId : alertExecutorIdList) {
+			policyLoader.addPolicyChangeListener(alertExecutorId, this);
+		}
 	}
 
 	@Override
