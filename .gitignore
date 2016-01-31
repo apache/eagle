@@ -73,7 +73,7 @@ logs/
 .DS_Store
 
 *.cache-tests
-development.conf
+application-local.conf
 
 *.orig
 **/*.pyc
