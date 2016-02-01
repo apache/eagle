@@ -23,7 +23,7 @@ source $(dirname $0)/eagle-env.sh
 
 echo "Creating hbase tables for eagle ... "
 
-hbase shell ${EAGLE_HOME}/bin/eagle-create-table.rb $EAGLE_TABLE_LIST
+hbase shell ${EAGLE_HOME}/bin/eagle-create-table.rb "$EAGLE_TABLE_LIST"
 
 if [ $? = 0 ];then
 	echo "==> Successfully created hbase tables"
