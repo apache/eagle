@@ -201,6 +201,19 @@ common.array.remove = function(val, list) {
 	}
 };
 
+common.array.insert = function(val, list, index) {
+	list.splice(index, 0, val);
+};
+
+common.array.moveOffset = function(item, list, offset) {
+	var _index = $.inArray(item, list);
+	var _tgtPos = _index + offset;
+	if(_tgtPos < 0 || _tgtPos >= list.length) return;
+
+	common.array.remove(item, list);
+	common.array.insert(item, list, _index + offset);
+};
+
 // ======================= Map ========================
 common.map = {};
 

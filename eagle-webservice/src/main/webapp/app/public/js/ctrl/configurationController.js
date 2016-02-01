@@ -27,9 +27,9 @@
 	eagleControllers.controller('configFeatureCtrl', function ($scope, PageConfig, Application, Entities, UI) {
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
-
 		$scope._pageLock = false;
 
+		// ================== Feature ==================
 		// Current feature
 		$scope.feature = Application.featureList[0];
 		$scope.setFeature = function (feature) {
@@ -89,39 +89,100 @@
 	});
 
 	// ======================== Application ========================
-	eagleControllers.controller('configApplicationCtrl', function ($scope, PageConfig, Application) {
+	eagleControllers.controller('configApplicationCtrl', function ($scope, $timeout, PageConfig, Application, Entities, UI) {
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
+		$scope._pageLock = false;
 
 		// ================ Application ================
-		$scope.application = Application.current() || Application.list[0];
+		// Current application
+		$scope.application = Application.list[0];
 		$scope.setApplication = function (application) {
 			$scope.application = application;
 		};
 
+		// Application list
 		$scope.applications = {};
-		$.each(Application.list, function(i, app) {
-			$scope.applications[app.tags.application] = {
-				feature: $.extend({}, app.feature)
-			};
+		$.each(Application.list, function(i, application) {
+			var _application = $scope.applications[application.tags.application] = $.extend({}, application, true);
+			_application.optionalFeatures = $.map(Application.featureList, function(feature) {
+				if(!common.array.find(feature.tags.feature, _application.features)) {
+					return feature.tags.feature;
+				}
+			});
 		});
 
-		$scope.saveAll = function() {
-			$.each(Application.list, function(i, app) {
-				app.feature = $scope.applications[app.tags.application].feature;
-
-				// TODO: Ajax update entities
+		// Create application
+		$scope.newApplication = function() {
+			UI.createConfirm("Application", {}, [
+				{name: "Application Name", field: "name"}
+			], function(entity) {
+				if(entity.name && $.map($scope.applications, function(application, name) {
+						return name.toUpperCase() === entity.name.toUpperCase() ? true : null;
+					}).length) {
+					return "Application name conflict!";
+				}
+			}).then(function(holder) {
+				Entities.updateEntity(
+					"ApplicationDescService",
+					{tags: {application: holder.entity.name}},
+					{timestamp: false}
+				)._promise.then(function() {
+					holder.closeFunc();
+					location.reload();
+				});
 			});
 		};
 
+		// Delete application
+		$scope.deleteApplication = function(application) {
+			UI.deleteConfirm(application.tags.application).then(function(holder) {
+				Entities.deleteEntity("ApplicationDescService", application)._promise.then(function() {
+					holder.closeFunc();
+					location.reload();
+				});
+			});
+		};
 
-		/*globalContent.setConfig(configPageConfig);
+		// ================= Function ==================
+		$scope._feature = "";
+		function highlightFeature(feature) {
+			$scope._feature = feature;
 
-		 // ================ Application ================
-		 $scope.application = Application.list[0];
-		 $scope.setApplication = function (application) {
-		 $scope.application = application;
-		 };*/
+			$timeout(function() {
+				$scope._feature = "";
+			}, 100);
+		}
+
+		$scope.addFeature = function(feature, application) {
+			application.features.push(feature);
+			common.array.remove(feature, application.optionalFeatures);
+			highlightFeature(feature);
+		};
+
+		$scope.removeFeature = function(feature, application) {
+			application.optionalFeatures.push(feature);
+			common.array.remove(feature, application.features);
+		};
+
+		$scope.moveFeature = function(feature, list, offset) {
+			common.array.moveOffset(feature, list, offset);
+			highlightFeature(feature);
+		};
+
+		// Save feature
+		$scope.saveAll = function() {
+			$scope._pageLock = true;
+
+			var _list = $.map($scope.applications, function(application) {
+				return application;
+			});
+			Entities.updateEntity("ApplicationDescService", _list, {timestamp: false})._promise.success(function() {
+				location.reload();
+			}).finally(function() {
+				$scope._pageLock = false;
+			});
+		};
 	});
 
 	// ============================ Site ===========================

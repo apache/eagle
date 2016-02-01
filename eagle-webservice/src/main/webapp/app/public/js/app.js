@@ -388,6 +388,7 @@ var app = {};
 		window.feature = $scope.Feature = Feature;
 		window.nvd3 = nvd3;
 		$scope.app = app;
+		$scope.common = common;
 
 		Object.defineProperty(window, "scope",{
 			get: function() {

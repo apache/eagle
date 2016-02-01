@@ -95,7 +95,8 @@
 					// Fill application set
 					$.each(Application.list, function(i, application) {
 						Application.list.set[application.tags.application] = application;
-						application.featureList = $.map(application.features, function(featureName) {
+						application.features = application.features || [];
+						var _appFeatureList = $.map(application.features, function(featureName) {
 							var _feature = Application.featureList.set[featureName];
 							if(!_feature) {
 								console.warn("[Application] Feature not mapping:", application.tags.application, "-", featureName);
@@ -105,9 +106,15 @@
 						});
 
 						// Find feature
-						application.featureList.find = function(featureName) {
-							return common.array.find(featureName, application.featureList, "tags.feature");
+						_appFeatureList.find = function(featureName) {
+							return common.array.find(featureName, _appFeatureList, "tags.feature");
 						};
+
+						Object.defineProperty(application, "featureList", {
+							get: function() {
+								return _appFeatureList;
+							}
+						});
 					});
 				});
 
