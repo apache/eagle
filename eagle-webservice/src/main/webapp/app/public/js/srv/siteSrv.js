@@ -74,14 +74,19 @@
 			_promise = $q.all([Site.list._promise, _applicationList._promise]).then(function() {
 				// Fill site set
 				$.each(Site.list, function(i, site) {
+					var _list = [];
+					_list.set = {};
 					Site.list.set[site.tags.site] = site;
-					site.applicationList = [];
-					site.applicationList.set = {};
 
 					// Find application
-					site.applicationList.find = function(applicationName) {
-						return common.array.find(applicationName, site.applicationList, "tags.application");
+					_list.find = function(applicationName) {
+						return common.array.find(applicationName, _list, "tags.application");
 					};
+					Object.defineProperty(site, "applicationList", {
+						get: function() {
+							return _list;
+						}
+					});
 				});
 
 				// Fill site application mapping
@@ -91,7 +96,7 @@
 						console.warn("[Site] Application not match site:", application.tags.application, "-", application.tags.site);
 					} else {
 						_site.applicationList.push(application);
-						_site.applicationList.set[application.tags.application] = application.enabled;
+						_site.applicationList.set[application.tags.application] = application;
 					}
 				});
 

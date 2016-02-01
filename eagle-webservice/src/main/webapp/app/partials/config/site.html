@@ -10,17 +10,16 @@
 		<div class="row">
 			<div class="col-md-3">
 				<ul class="nav nav-pills nav-stacked">
-					<li class="disabled">
-						<a>Site</a>
-					</li>
-					<li role="presentation" ng-repeat="_site in Site.list" ng-class="{active: site === _site}">
+					<li class="disabled"><a>Site</a></li>
+					<li role="presentation" ng-repeat="_site in Site.list track by $index" ng-class="{active: site === _site}">
 						<a ng-click="setSite(_site)">
 							<span class="fa fa-server"></span>
 							{{_site.tags.site}}
 						</a>
 					</li>
+
 					<li>
-						<a class="text-light-blue" ng-click="newSite()">
+						<a class="text-light-blue" ng-click="newSite()" ng-disabled="_pageLock">
 							<span class="fa fa-plus-square"></span>
 							New Site
 						</a>
@@ -29,72 +28,68 @@
 			</div>
 
 			<div class="col-md-9">
-				<a class="pull-right btn btn-danger btn-xs">
+				<a class="pull-right btn btn-danger btn-xs" ng-click="deleteSite(site)" ng-disabled="_pageLock">
 					<span class="fa fa-trash-o"></span>
 					Delete Site
 				</a>
 
+				<!-- Title -->
 				<h3 class="guideline">
-					Application
+					Site
 					<small>{{site.tags.site}}</small>
 				</h3>
+				<hr/>
 
-				<div ng-repeat="_app in Application.list track by $index">
-					<div class="panel box box-primary">
-						<div class="box-header with-border">
-							<label class="box-title">
-								<input type="checkbox" ng-checked="sites[site.tags.site].app[_app.tags.application]" ng-click="sites[site.tags.site].app[_app.tags.application] = !sites[site.tags.site].app[_app.tags.application];" />
-								{{_app.tags.application}}
-							</label>
-							<div class="box-tools pull-right">
-								<button class="btn btn-box-tool"><i class="fa fa-wrench"></i></button>
-							</div>
-						</div>
-						<div class="panel-collapse">
-							<div class="box-body">
-								{{_app.desc}}
-							</div>
-						</div>
+				<!-- Config -->
+				<!--div class="form-group">
+					<label for="applicationGroup">Group</label>
+					<input type="text" class="form-control" id="applicationGroup" placeholder="(Optional) Group name." ng-model="applications[application.tags.application].group">
+				</div-->
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" ng-checked="sites[site.tags.site].enabled" ng-click="sites[site.tags.site].enabled = !sites[site.tags.site].enabled">
+						<strong>Enabled</strong>
+					</label>
+				</div>
+				<hr/>
+
+				<!-- Application -->
+				<label>* Application</label>
+				<div class="row">
+					<div class="col-sm-6">
+						<h1 class="text-muted text-center" ng-show="sites[site.tags.site].applications.length === 0">No application in using</h1>
+						<ul class="products-list product-list-in-box fixed-height" ng-show="sites[site.tags.site].applications.length !== 0">
+							<li class="item" ng-repeat="application in sites[site.tags.site].applications track by $index" ng-class="{active: _application === application}">
+								<div class="product-operation single">
+									<span class="fa fa-cubes"></span>
+								</div>
+								<div class="product-info">
+									<a class="fa fa-times pull-right" ng-click="removeApplication(application, sites[site.tags.site])"></a>
+									<span class="product-title">{{application}}</span>
+									<span class="product-description">{{Application.list.set[application].desc}}</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="col-sm-6">
+						<ul class="products-list product-list-in-box fixed-height">
+							<li class="item" ng-repeat="application in sites[site.tags.site].optionalApplications track by $index">
+								<button class="btn btn-lg btn-primary pull-left" ng-click="addApplication(application, sites[site.tags.site])" ng-disabled="_pageLock">
+									<span class="fa fa-star-o"></span>
+								</button>
+								<div class="product-info">
+									<span class="product-title">{{application}}</span>
+									<span class="product-description">{{Application.list.set[application].desc}}</span>
+								</div>
+							</li>
+						</ul>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div><!-- /.box-body -->
 
-	<!--div class="overlay">
-		<i class="fa fa-refresh fa-spin"></i>
-	</div-->
-
 	<div class="box-footer clearfix">
-		<button class="btn btn-primary" ng-click="saveAll()">Save All</button>
-	</div>
-</div>
-
-
-
-<!-- Modal: Create / Edit site -->
-<div class="modal fade" id="siteMDL" tabindex="-1" role="dialog">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">New Site</h4>
-			</div>
-			<div class="modal-body">
-				<div class="form-group">
-					<label>* Site Name</label>
-					<input type="text" class="form-control" placeholder="Site name..." ng-model="_newSiteName" id="siteName">
-				</div>
-			</div>
-			<div class="modal-footer">
-				<p class="pull-left text-danger">{{newSiteCheck()}}</p>
-				<button type="button" class="btn btn-default" data-dismiss="modal">
-					Close
-				</button>
-				<button type="button" class="btn btn-primary" ng-click="newSiteConfirm()" ng-disabled="newSiteCheck() || !_newSiteName || _newSiteLock">Create</button>
-			</div>
-		</div>
+		<button class="btn btn-primary" ng-click="saveAll()" ng-disabled="_pageLock">Save All</button>
 	</div>
 </div>

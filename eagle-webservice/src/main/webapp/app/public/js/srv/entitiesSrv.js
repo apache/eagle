@@ -190,15 +190,19 @@
 			},
 
 			deleteEntity: function(serviceName, entities) {
-				if(!$.isArray(entities)) entities = [entities];
+				if (!$.isArray(entities)) entities = [entities];
 
-				var _entities = $.map(entities, function(entity) {
+				var _entities = $.map(entities, function (entity) {
 					return typeof entity === "object" ? entity.encodedRowkey : entity;
 				});
 				return _post(app.getURL("deleteEntity", {serviceName: serviceName}), _entities);
 			},
 			deleteEntities: function(serviceName, condition) {
 				return _delete(app.getURL("deleteEntities", {serviceName: serviceName, condition: new ParseCondition(condition).condition}));
+			},
+			delete: function(serviceName, kvs) {
+				var _deleteURL = app.getDeleteURL(serviceName);
+				return _delete(common.template(_deleteURL, kvs));
 			},
 
 			queryEntity: function(serviceName, encodedRowkey) {

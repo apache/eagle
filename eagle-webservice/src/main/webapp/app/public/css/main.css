@@ -385,6 +385,10 @@ ul.tree.tree-bordered > li > ul > li > a {
 	transition: none;
 }
 
+.products-list.fixed-height {
+	height: 402px;
+	overflow-y: auto;
+}
 
 .products-list .product-operation {
 	float: left;
@@ -396,10 +400,23 @@ ul.tree.tree-bordered > li > ul > li > a {
 .products-list .product-operation .fa {
 	display: block;
 	padding: 4px 16px;
+	color: #3c8dbc;
 }
-.products-list .product-operation .fa:hover {
+.products-list .product-operation a.fa:hover {
 	color: #FFFFFF;
 	background: #337ab7;
+}
+
+.products-list .product-operation.single .fa {
+	padding: 12px 12px;
+	font-size: 20px;
+}
+
+.products-list .item .product-info a.fa.fa-times {
+	display: none;
+}
+.products-list .item:hover .product-info a.fa.fa-times {
+	display: block;
 }
 
 /* Label */

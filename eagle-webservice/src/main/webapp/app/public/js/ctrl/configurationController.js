@@ -67,7 +67,7 @@
 		// Delete feature
 		$scope.deleteFeature = function(feature) {
 			UI.deleteConfirm(feature.tags.feature).then(function(holder) {
-				Entities.deleteEntity("FeatureDescService", feature)._promise.then(function() {
+				Entities.delete("FeatureDescService", {feature: feature.tags.feature})._promise.then(function() {
 					holder.closeFunc();
 					location.reload();
 				});
@@ -104,7 +104,7 @@
 		// Application list
 		$scope.applications = {};
 		$.each(Application.list, function(i, application) {
-			var _application = $scope.applications[application.tags.application] = $.extend({}, application, true);
+			var _application = $scope.applications[application.tags.application] = $.extend({}, application, {features: application.features.slice()}, true);
 			_application.optionalFeatures = $.map(Application.featureList, function(feature) {
 				if(!common.array.find(feature.tags.feature, _application.features)) {
 					return feature.tags.feature;
@@ -137,7 +137,7 @@
 		// Delete application
 		$scope.deleteApplication = function(application) {
 			UI.deleteConfirm(application.tags.application).then(function(holder) {
-				Entities.deleteEntity("ApplicationDescService", application)._promise.then(function() {
+				Entities.delete("ApplicationDescService", {application: application.tags.application})._promise.then(function() {
 					holder.closeFunc();
 					location.reload();
 				});
@@ -186,69 +186,110 @@
 	});
 
 	// ============================ Site ===========================
-	eagleControllers.controller('configSiteCtrl', function ($scope, PageConfig, Site) {
+	eagleControllers.controller('configSiteCtrl', function ($scope, $timeout, PageConfig, Site, Application, Entities, UI) {
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
+		$scope._pageLock = false;
 
-		$scope.site = Site.current() || Site.list[0];
-		$scope.sites = {};
-		$scope._newSiteName = null;
-		$scope._newSiteLock = false;
-		
-		// =================== Site ===================
+		// =================== Site ====================
+		// Current site
+		$scope.site = Site.list[0];
 		$scope.setSite = function (site) {
 			$scope.site = site;
 		};
 
+
+		// Site list
+		$scope.sites = {};
 		$.each(Site.list, function(i, site) {
-			$scope.sites[site.tags.site] = {
-				app: $.extend({}, site.applicationList.set)
-			};
+			var _site = $scope.sites[site.tags.site] = $.extend({}, site, true);
+			var _applications = [];
+			var _optionalApplications = [];
+
+			Object.defineProperties(_site, {
+				applications: {
+					get: function() {return _applications}
+				},
+				optionalApplications: {
+					get: function() {return _optionalApplications}
+				}
+			});
+
+			$.each(Application.list, function(i, application) {
+				var _application = site.applicationList.set[application.tags.application];
+				if(_application && _application.enabled) {
+					_site.applications.push(application.tags.application);
+				} else {
+					_site.optionalApplications.push(application.tags.application);
+				}
+			});
 		});
 
-		// ================= New Site =================
+		// Create site
 		$scope.newSite = function() {
-			$("#siteMDL").modal();
-			setTimeout(function() {
-				$("#siteName").focus();
-			}, 500);
-		};
-		$scope.newSiteCheck = function() {
-			if($scope._newSiteName === null) return "";
-
-			// Empty name
-			if($scope._newSiteName === "") {
-				return "Site can't be empty!";
-			}
-
-			// Conflict name
-			if($scope._newSiteName && $.map($scope.sites, function(site, name) {
-					return name.toUpperCase() === $scope._newSiteName.toUpperCase() ? true : null;
-				}).length) {
-				return "Site name conflict!";
-			}
-			return "";
-		};
-
-		$scope.newSiteConfirm = function() {
-			$scope._newSiteLock = true;
-
-			// TODO: Ajax create
-			$("#siteMDL").modal("hide")
-				.on("hidden.bs.modal", function() {
-					$("#siteMDL").off("hidden.bs.modal");
-					Site.reload();
+			UI.createConfirm("Site", {}, [
+				{name: "Site Name", field: "name"}
+			], function(entity) {
+				if(entity.name && $.map($scope.sites, function(site, name) {
+						return name.toUpperCase() === entity.name.toUpperCase() ? true : null;
+					}).length) {
+					return "Site name conflict!";
+				}
+			}).then(function(holder) {
+				Entities.updateEntity(
+					"SiteDescService",
+					{enabled: true, tags: {site: holder.entity.name}},
+					{timestamp: false}
+				)._promise.then(function() {
+					holder.closeFunc();
+					location.reload();
 				});
-
-			$scope._newSiteName = null;
+			});
 		};
 
-		// ================= Save Site ================
-		$scope.saveAll = function() {
-			$.each(Site.list, function(i, site) {
-				site.app = $scope.sites[site.tags.site].app;
+		// Delete site
+		$scope.deleteSite = function(site) {
+			UI.deleteConfirm(site.tags.site).then(function(holder) {
+				Entities.delete("SiteDescService", {site: site.tags.site})._promise.then(function() {
+					holder.closeFunc();
+					location.reload();
+				});
+			});
+		};
 
-				// TODO: Ajax update entities
+		// ================= Function ==================
+		$scope._application = "";
+		function highlightApplication(application) {
+			$scope._application = application;
+
+			$timeout(function() {
+				$scope._application = "";
+			}, 100);
+		}
+
+		$scope.addApplication = function(application, site) {
+			site.applications.push(application);
+			common.array.remove(application, site.optionalApplications);
+			highlightApplication(application);
+		};
+
+		$scope.removeApplication = function(application, site) {
+			site.optionalApplications.push(application);
+			common.array.remove(application, site.applications);
+		};
+
+		// Save feature
+		// TODO: Wait for api
+		$scope.saveAll = function() {
+			$scope._pageLock = true;
+
+			var _list = $.map($scope.sites, function(application) {
+				return application;
+			});
+			Entities.updateEntity("ApplicationDescService", _list, {timestamp: false})._promise.success(function() {
+				location.reload();
+			}).finally(function() {
+				$scope._pageLock = false;
 			});
 		};
 	});

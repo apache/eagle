@@ -39,14 +39,20 @@
 
 			userProfile: 'rest/authentication',
 			logout: 'logout',
+
+			DELETE_HOOK: {
+				FeatureDescService: 'rest/module/feature?feature=${feature}',
+				ApplicationDescService: 'rest/module/application?application=${application}',
+				SiteDescService: 'rest/module/site?site=${site}'
+			}
 		},
 
 		// ============================================================================
 		// =                               Data Sources                               =
 		// ============================================================================
 		dataSource: {
-			uiInvisibleList: ["userProfile"],
-		},
+			uiInvisibleList: ["userProfile"]
+		}
 	};
 
 	// ============================================================================
@@ -60,6 +66,20 @@
 		if(kvs !== undefined) {
 			_url = common.template(_url, kvs);
 		}
+		return _url;
+	};
+
+	/***
+	 * Eagle support delete function to process special entity delete. Which will delete all the relative entity.
+	 * @param serviceName
+	 * @param entityName
+	 */
+	app.getDeleteURL = function(serviceName) {
+		var _path = app.config.urls.DELETE_HOOK[serviceName];
+		if(!_path) return null;
+
+		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
+		var _url = (_host ? _host + "/" : '') + _path;
 		return _url;
 	};
 

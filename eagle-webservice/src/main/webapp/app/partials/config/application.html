@@ -52,27 +52,15 @@
 				</div>
 				<div class="form-group">
 					<label for="applicationDescription">Description</label>
-					<textarea id="applicationDescription" class="form-control" placeholder="(Optional) Application description." rows="5" ng-model="applications[application.tags.application].desc"></textarea>
+					<textarea id="applicationDescription" class="form-control" placeholder="(Optional) Application description." rows="3" ng-model="applications[application.tags.application].desc"></textarea>
 				</div>
 
 				<!-- Feature -->
 				<label>* Feature</label>
 				<div class="row">
 					<div class="col-sm-6">
-						<ul class="products-list product-list-in-box">
-							<li class="item" ng-repeat="feature in applications[application.tags.application].optionalFeatures track by $index">
-								<button class="btn btn-lg btn-primary pull-left" ng-click="addFeature(feature, applications[application.tags.application])" ng-disabled="_pageLock">
-									<span class="fa fa-star-o"></span>
-								</button>
-								<div class="product-info">
-									<span class="product-title">{{feature}}</span>
-									<span class="product-description">{{Application.featureList.set[feature].desc}}</span>
-								</div>
-							</li>
-						</ul>
-					</div>
-					<div class="col-sm-6">
-						<ul class="products-list product-list-in-box">
+						<h1 class="text-muted text-center" ng-show="applications[application.tags.application].features.length === 0">No feature in using</h1>
+						<ul class="products-list product-list-in-box fixed-height" ng-show="applications[application.tags.application].features.length !== 0">
 							<li class="item" ng-repeat="feature in applications[application.tags.application].features track by $index" ng-class="{active: _feature === feature}">
 								<div class="product-operation">
 									<a class="fa fa-chevron-up" ng-click="moveFeature(feature, applications[application.tags.application].features, -1)"></a>
@@ -80,6 +68,19 @@
 								</div>
 								<div class="product-info">
 									<a class="fa fa-times pull-right" ng-click="removeFeature(feature, applications[application.tags.application])"></a>
+									<span class="product-title">{{feature}}</span>
+									<span class="product-description">{{Application.featureList.set[feature].desc}}</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="col-sm-6">
+						<ul class="products-list product-list-in-box fixed-height">
+							<li class="item" ng-repeat="feature in applications[application.tags.application].optionalFeatures track by $index">
+								<button class="btn btn-lg btn-primary pull-left" ng-click="addFeature(feature, applications[application.tags.application])" ng-disabled="_pageLock">
+									<span class="fa fa-star-o"></span>
+								</button>
+								<div class="product-info">
 									<span class="product-title">{{feature}}</span>
 									<span class="product-description">{{Application.featureList.set[feature].desc}}</span>
 								</div>
