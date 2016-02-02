@@ -34,6 +34,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Common methods for Notification Plugin
+ */
 public class NotificationPluginUtils {
 
 	private static ConfigObject _conf;

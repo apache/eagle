@@ -93,7 +93,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 
 	@Override
 	public void prepareConfig(Config config) {
-
+		this.config = config;
 	}
 
 	@Override
