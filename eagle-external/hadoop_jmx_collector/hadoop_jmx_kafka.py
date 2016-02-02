@@ -97,7 +97,7 @@ def parse_hadoop_jmx(producer, topic, config, beans, dataMap, fat_bean):
         for key, value in bean.iteritems():
             #print key, value
             key = key.lower()
-            if not isNumber(value) or re.match(r'tag.*', key):
+            if re.match(r'tag.*', key):
                 continue
 
             if mbean_domain == 'hadoop' and re.match(r'^namespace', key):
@@ -111,8 +111,8 @@ def parse_hadoop_jmx(producer, topic, config, beans, dataMap, fat_bean):
                 key = items[1]
 
             metric = metric_prefix_name + '.' + key
-            send_output_message(producer, topic, kafka_dict, metric, value)
 
+            single_metric_callback(producer, topic, kafka_dict, metric, value)
 
 def get_jmx_beans(host, port, https):
     # port = inputConfig.get('port')
@@ -166,7 +166,7 @@ def main():
         default_metric = {"site": site, "host": host, "timestamp": '', "component": component, "metric": '', "value": ''}
         fat_bean = dict()
         parse_hadoop_jmx(producer, topic, config, beans, default_metric, fat_bean)
-        extend_jmx_metrics(producer, topic, default_metric, fat_bean)
+        metrics_bean_callback(producer, topic, default_metric, fat_bean)
     except Exception, e:
         print 'main except: ', e
     finally:

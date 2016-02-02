@@ -19,6 +19,29 @@
 from util_func import *
 import json
 
+# Metric Parsing Callback Entry
+def single_metric_callback(producer, topic, kafka_dict, metric, value):
+    if isNumber(value):
+        numeric_metric_callack(producer, topic, kafka_dict, metric, value)
+    else:
+        nonnumeric_metric_callack(producer, topic, kafka_dict, metric, value)
+def metrics_bean_callback(producer, topic, metric, bean):
+    cal_mem_usage(producer, topic, bean, metric, "hadoop.namenode.jvm")
+    journal_transaction_info(producer,topic,bean,metric,"hadoop.namenode.JournalTransaction")
+
+#################################################
+# Metric Parsing Extensions
+#################################################
+
+def numeric_metric_callack(producer, topic, kafka_dict, metric, value):
+    # Send out numeric value directly
+    send_output_message(producer, topic, kafka_dict, metric, value)
+
+def nonnumeric_metric_callack(producer, topic, kafka_dict, metric, value):
+    # Send out numeric value directly
+    # send_output_message(producer, topic, kafka_dict, metric, value)
+    pass
+
 def cal_mem_usage(producer, topic, bean, metricMap, metric_prefix_name):
     kafka_dict = metricMap.copy()
     PercentVal = None
@@ -47,6 +70,3 @@ def journal_transaction_info(producer, topic, bean, metric, metric_prefix_name):
     else:
         raise Exception("JournalTransactionInfo not found")
 
-def extend_jmx_metrics(producer, topic, metric, bean):
-    cal_mem_usage(producer, topic, bean, metric, "hadoop.namenode.jvm")
-    journal_transaction_info(producer,topic,bean,metric,"hadoop.namenode.JournalTransaction")

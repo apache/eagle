@@ -52,21 +52,20 @@ def send_output_message(producer, topic, kafka_dict, metric, value):
 def load_config(filename):
     # read the self-defined filters
 
-    script_dir = os.path.dirname(__file__)
-    rel_path = "./" + filename
-    abs_file_path = os.path.join(script_dir, rel_path)
-    f = open(abs_file_path, 'r')
-    json_file = f.read()
-    f.close()
-    #print json_file
-
     try:
+        script_dir = os.path.dirname(__file__)
+        rel_path = "./" + filename
+        abs_file_path = os.path.join(script_dir, rel_path)
+        if not os.path.isfile(abs_file_path):
+            print abs_file_path+" doesn't exist, please rename config-sample.json to config.json"
+            exit(1)
+        f = open(abs_file_path, 'r')
+        json_file = f.read()
+        f.close()
         config = json.loads(json_file)
-
     except ValueError:
         print "configuration file load error"
     return config
-
 
 def isNumber(str):
     try:
