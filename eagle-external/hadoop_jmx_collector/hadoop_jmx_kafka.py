@@ -135,6 +135,7 @@ def main():
     kafka = None
     producer = None
     topic = None
+    brokerList = None
 
     try:
         #start = time.clock()
@@ -157,12 +158,15 @@ def main():
         port = config[u'input'].get('port')
         https = config[u'input'].get('https')
         kafkaConfig = config[u'output'].get(u'kafka')
-        brokerList = kafkaConfig.get('brokerList')
-        topic = kafkaConfig.get('topic').encode('utf-8')
+        if kafkaConfig != None :
+            brokerList = kafkaConfig.get('brokerList')
+            topic = kafkaConfig.get('topic').encode('utf-8')
 
         beans = get_jmx_beans(host, port, https)
         #print brokerList
-        kafka, producer = kafka_connect(brokerList)
+        if brokerList != None:
+            kafka, producer = kafka_connect(brokerList)
+
         default_metric = {"site": site, "host": host, "timestamp": '', "component": component, "metric": '', "value": ''}
         fat_bean = dict()
         parse_hadoop_jmx(producer, topic, config, beans, default_metric, fat_bean)
