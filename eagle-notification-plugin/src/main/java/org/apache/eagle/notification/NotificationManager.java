@@ -149,9 +149,6 @@ public class NotificationManager  {
             Set<String>  notifications = new HashSet<String>();
             for( Map<String,String> notificationConf : notificationConfigCollection ) {
                 String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
-                if( isDeleteUpdate ){
-                    policyNotificationMapping.get(policyId).remove(notificationType);
-                }
                 if( !NotificationPluginLoader.getInstance().getNotificationMapping().containsKey(notificationType)){
                     LOG.error(" Can't find Notification Type in Plugin Loader.. OOPS! Something went Wrong ");
                 }
@@ -165,8 +162,11 @@ public class NotificationManager  {
                 }
                 notifications.add(notificationType);
             }
-            // update policy - notification types map
-            policyNotificationMapping.put(policyId, notifications);
+            if( isDeleteUpdate ){ // make sure to remove it from policyNotificationMapping
+                policyNotificationMapping.remove(policyId);
+            }else
+                policyNotificationMapping.put(policyId, notifications);// update policy - notification types map
+
             LOG.info(" Successfully broad casted policy updates to all Notification Plugins ...");
         } catch (Exception e) {
             LOG.error(" Error in updateNotificationPlugins  . Reason : "+e.getMessage());
