@@ -113,6 +113,10 @@ public class NotificationManager  {
     public void notifyAlert( AlertAPIEntity entity ) {
         try {
             Set<String> listOfNotifications = policyNotificationMapping.get(entity.getTags().get(Constants.POLICY_ID));
+            if( listOfNotifications == null || listOfNotifications.size() <= 0 ){
+                LOG.info("Notifications List is Null or Empty .. Policy might be deleted . Policy Id : "+entity.getTags().get(Constants.POLICY_ID));
+                return;
+            }
             LOG.info(" Invoking Notification Plugin for the Policy : "+entity.getTags().get(Constants.POLICY_ID)+" . No of Plugins found : "+listOfNotifications.size());
             for(String notificationType : listOfNotifications ){
                 Object notificationPluginObj = getNotificationPluginAPI(notificationType);
