@@ -38,7 +38,7 @@
 				_current = app;
 
 				if(sessionStorage && _current) {
-					sessionStorage.setItem("application", _current.name);
+					sessionStorage.setItem("application", _current.tags.application);
 				}
 
 				if(_prev) {
@@ -49,7 +49,7 @@
 			return _current;
 		};
 		Application.find = function(appName) {
-			return common.array.find(appName, Application.list, "name");
+			return common.array.find(appName, Application.list, "tags.application");
 		};
 
 		Application.reload = function() {

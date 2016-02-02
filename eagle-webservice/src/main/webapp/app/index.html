@@ -62,13 +62,13 @@
 							<li class="dropdown" ng-show="!PageConfig.hideSite && !PageConfig.lockSite">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-server"></i>
-									{{Site.current().name}}
+									{{Site.current().tags.site}}
 									<i class="fa fa-caret-down"></i>
 								</a>
 								<ul class="dropdown-menu">
-									<li ng-repeat="sites in Site.list">
-										<a ng-click="Site.current(sites);">
-											<span class="fa fa-database"></span> {{sites.name}}
+									<li ng-repeat="_site in Site.list">
+										<a ng-click="Site.current(_site);">
+											<span class="fa fa-database"></span> {{_site.tags.site}}
 										</a>
 									</li>
 								</ul>

@@ -252,11 +252,11 @@ var app = {};
 						var _app = Application.current();
 
 						// Check application
-						if(_site && (!_app || (_app && !_site.app[_app.name]))) {
+						if(_site && (!_app || (_app && !_site.applicationList.set[_app.tags.application]))) {
 							_match = false;
 
 							$.each(Application.list, function(i, app) {
-								if(_site.app[app.name]) {
+								if(_site.applicationList.set[app.tags.application]) {
 									_app = Application.current(app);
 									_match = true;
 									return false;
@@ -379,12 +379,13 @@ var app = {};
 	// ======================================================================================
 	// =                                   Main Controller                                  =
 	// ======================================================================================
-	eagleApp.controller('MainCtrl', function ($scope, $wrapState, $http, $injector, PageConfig, Site, Authorization, Entities, nvd3, Application, Feature) {
+	eagleApp.controller('MainCtrl', function ($scope, $wrapState, $http, $injector, PageConfig, FeaturePageConfig, Site, Authorization, Entities, nvd3, Application, Feature) {
 		window.site = $scope.Site = Site;
 		window.auth = $scope.Auth = Authorization;
 		window.entities = $scope.Entities = Entities;
 		window.application = $scope.Application = Application;
 		window.pageConfig = $scope.PageConfig = PageConfig;
+		window.featurePageConfig = $scope.FeaturePageConfig = FeaturePageConfig;
 		window.feature = $scope.Feature = Feature;
 		window.nvd3 = nvd3;
 		$scope.app = app;

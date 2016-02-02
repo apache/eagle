@@ -34,9 +34,9 @@
 				_currentSite = site;
 
 				// Keep current site and reload page
-				if(!_prev || _prev.name !== _currentSite.name) {
+				if(!_prev || _prev.name !== _currentSite.tags.site) {
 					if(sessionStorage) {
-						sessionStorage.setItem("site", _currentSite.name);
+						sessionStorage.setItem("site", _currentSite.tags.site);
 					}
 
 					if(!$wrapState.current.abstract && $wrapState.current.name !== "login") {
@@ -48,7 +48,7 @@
 			return _currentSite;
 		};
 		Site.find = function(siteName) {
-			return common.array.find(siteName, Site.list, "name");
+			return common.array.find(siteName, Site.list, "tags.site");
 		};
 		Site.url = function(site, url) {
 			console.warn("[Site] Site.url is a deprecated function.");
@@ -99,6 +99,13 @@
 						_site.applicationList.set[application.tags.application] = application;
 					}
 				});
+
+				// Set current site
+				if(sessionStorage && Site.find(sessionStorage.getItem("site"))) {
+					Site.current(Site.find(sessionStorage.getItem("site")));
+				} else {
+					Site.current(Site.list[0]);
+				}
 
 				return Site;
 			});

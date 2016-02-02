@@ -82,10 +82,9 @@
 				var _app = Application.current();
 				var _list = [];
 
-				if(_app && _app.feature) {
-					$.each(Application.featureList, function (i, feature) {
-						if(!_app.feature[feature.name]) return;
-						_list = _list.concat(config._navItemMapping[feature.name] || []);
+				if(_app && _app.features) {
+					$.each(_app.features, function(i, featureName) {
+						_list = _list.concat(config._navItemMapping[featureName] || []);
 					});
 				}
 
