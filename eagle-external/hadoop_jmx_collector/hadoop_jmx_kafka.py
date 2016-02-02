@@ -167,8 +167,8 @@ def main():
         fat_bean = dict()
         parse_hadoop_jmx(producer, topic, config, beans, default_metric, fat_bean)
         metrics_bean_callback(producer, topic, default_metric, fat_bean)
-    except Exception, e:
-        print 'main except: ', e
+    # except Exception, e:
+    #     print 'main except: ', e
     finally:
         if kafka != None and producer != None:
             kafka_close(kafka, producer)
