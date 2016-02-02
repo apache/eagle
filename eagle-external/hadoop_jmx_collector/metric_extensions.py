@@ -25,9 +25,10 @@ def single_metric_callback(producer, topic, kafka_dict, metric, value):
         numeric_metric_callack(producer, topic, kafka_dict, metric, value)
     else:
         nonnumeric_metric_callack(producer, topic, kafka_dict, metric, value)
+
 def metrics_bean_callback(producer, topic, metric, bean):
     cal_mem_usage(producer, topic, bean, metric, "hadoop.namenode.jvm")
-    journal_transaction_info(producer,topic,bean,metric,"hadoop.namenode.JournalTransaction")
+    journal_transaction_info(producer,topic,bean,metric,"hadoop.namenode.journaltransaction")
 
 #################################################
 # Metric Parsing Extensions
@@ -38,9 +39,16 @@ def numeric_metric_callack(producer, topic, kafka_dict, metric, value):
     send_output_message(producer, topic, kafka_dict, metric, value)
 
 def nonnumeric_metric_callack(producer, topic, kafka_dict, metric, value):
-    # Send out numeric value directly
-    # send_output_message(producer, topic, kafka_dict, metric, value)
-    pass
+    nn_safe_mode_metric(producer, topic, kafka_dict, metric, value)
+
+def nn_safe_mode_metric(producer, topic, kafka_dict, metric, value):
+    if metric == "hadoop.namenode.fsnamesystemstate.fsstate":
+        if value == "safeMode":
+            value = 1
+        else:
+            value = 0
+
+    send_output_message(producer, topic, kafka_dict, metric, value)
 
 def cal_mem_usage(producer, topic, bean, metricMap, metric_prefix_name):
     kafka_dict = metricMap.copy()

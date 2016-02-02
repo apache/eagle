@@ -70,8 +70,7 @@ def get_metric_prefix_name(mbean_attribute, context):
         name_index = [i[0] for i in mbean_list].index('name')
         mbean_list[name_index][1] = context
         metric_prefix_name = '.'.join([i[1] for i in mbean_list])
-    return DATA_TYPE + "." + metric_prefix_name
-
+    return (DATA_TYPE + "." + metric_prefix_name).replace(" ","").lower()
 
 def parse_hadoop_jmx(producer, topic, config, beans, dataMap, fat_bean):
     selected_group = [s.encode('utf-8') for s in config[u'filter'].get('monitoring.group.selected')]
