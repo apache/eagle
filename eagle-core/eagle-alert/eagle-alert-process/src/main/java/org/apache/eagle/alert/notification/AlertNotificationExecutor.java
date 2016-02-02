@@ -69,7 +69,6 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 
 	@Override
 	public void init() {
-		config = EagleConfigFactory.load().getConfig();
 		String site = config.getString("eagleProps.site");
 		String dataSource = config.getString("eagleProps.dataSource");
 		Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;
