@@ -14,10 +14,54 @@
 # limitations under the License.
 
 
-#!/usr/bin/python
+# !/usr/bin/python
 
 from util_func import *
 import json
+
+
+# Metric Parsing Callback Entry
+def single_metric_callback(producer, topic, kafka_dict, metric, value):
+    if isNumber(value):
+        numeric_metric_callack(producer, topic, kafka_dict, metric, value)
+    else:
+        nonnumeric_metric_callack(producer, topic, kafka_dict, metric, value)
+
+
+def metrics_bean_callback(producer, topic, metric, bean):
+    cal_mem_usage(producer, topic, bean, metric, "hadoop.namenode.jvm")
+    journal_transaction_info(producer, topic, bean, metric, "hadoop.namenode.journaltransaction")
+    nn_hastate(producer,topic,bean,metric,"hadoop.namenode.fsnamesystem")
+
+#################################################
+# Metric Parsing Extensions
+#################################################
+
+def numeric_metric_callack(producer, topic, kafka_dict, metric, value):
+    # Send out numeric value directly
+    send_output_message(producer, topic, kafka_dict, metric, value)
+
+
+def nonnumeric_metric_callack(producer, topic, kafka_dict, metric, value):
+    nn_safe_mode_metric(producer, topic, kafka_dict, metric, value)
+
+def nn_safe_mode_metric(producer, topic, kafka_dict, metric, value):
+    if metric == "hadoop.namenode.fsnamesystemstate.fsstate":
+        if value == "safeMode":
+            value = 1
+        else:
+            value = 0
+
+        send_output_message(producer, topic, kafka_dict, metric, value)
+
+def nn_hastate(producer, topic, bean, metricMap, metric_prefix_name="hadoop.namenode.fsnamesystem"):
+    kafka_dict = metricMap.copy()
+    if bean[u'tag.HAState'] == "active":
+        value = 0
+    else:
+        value = 1
+
+    send_output_message(producer, topic, kafka_dict, metric_prefix_name + ".hastate", value)
 
 def cal_mem_usage(producer, topic, bean, metricMap, metric_prefix_name):
     kafka_dict = metricMap.copy()
@@ -34,6 +78,7 @@ def cal_mem_usage(producer, topic, bean, metricMap, metric_prefix_name):
     PercentVal = round(float(bean['MemHeapCommittedM']) / float(bean['MemHeapMaxM']) * 100, 2)
     send_output_message(producer, topic, kafka_dict, metric_prefix_name + ".MemHeapCommittedUsage", PercentVal)
 
+
 def journal_transaction_info(producer, topic, bean, metric, metric_prefix_name):
     new_metric = metric.copy()
     if bean.has_key("JournalTransactionInfo"):
@@ -42,11 +87,9 @@ def journal_transaction_info(producer, topic, bean, metric, metric_prefix_name):
         LastAppliedOrWrittenTxId = int(JournalTransactionInfo.get("LastAppliedOrWrittenTxId"))
         MostRecentCheckpointTxId = int(JournalTransactionInfo.get("MostRecentCheckpointTxId"))
 
-        send_output_message(producer, topic, new_metric, metric_prefix_name + ".LastAppliedOrWrittenTxId", LastAppliedOrWrittenTxId)
-        send_output_message(producer, topic, new_metric, metric_prefix_name + ".MostRecentCheckpointTxId", MostRecentCheckpointTxId)
+        send_output_message(producer, topic, new_metric, metric_prefix_name + ".LastAppliedOrWrittenTxId",
+                            LastAppliedOrWrittenTxId)
+        send_output_message(producer, topic, new_metric, metric_prefix_name + ".MostRecentCheckpointTxId",
+                            MostRecentCheckpointTxId)
     else:
         raise Exception("JournalTransactionInfo not found")
-
-def extend_jmx_metrics(producer, topic, metric, bean):
-    cal_mem_usage(producer, topic, bean, metric, "hadoop.namenode.jvm")
-    journal_transaction_info(producer,topic,bean,metric,"hadoop.namenode.JournalTransaction")
