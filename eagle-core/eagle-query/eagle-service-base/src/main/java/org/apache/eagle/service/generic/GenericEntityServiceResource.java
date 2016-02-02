@@ -109,8 +109,8 @@ public class GenericEntityServiceResource {
     }
 
     public GenericServiceAPIResponseEntity updateEntities(List<? extends TaggedLogAPIEntity> entities, String serviceName) {
-        UpdateStatement updateStatement = new UpdateStatement(entities, serviceName);
-        GenericServiceAPIResponseEntity<String> response = updateDatabase(updateStatement);
+        CreateStatement createStatement = new CreateStatement(entities, serviceName);
+        GenericServiceAPIResponseEntity<String> response = updateDatabase(createStatement);
         return response;
     }
 

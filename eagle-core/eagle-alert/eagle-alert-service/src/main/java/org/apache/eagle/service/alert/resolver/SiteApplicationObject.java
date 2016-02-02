@@ -16,26 +16,23 @@
  *
  */
 
-package org.apache.eagle.alert.entity;
+package org.apache.eagle.service.alert.resolver;
 
 
+import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.meta.*;
-import org.apache.eagle.policy.common.Constants;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@Table("eagleSiteDesc")
-@ColumnFamily("f")
-@Prefix("eagleSiteDesc")
-@Service(Constants.SITE_DESCRIPTION_SERVICE_ENDPOINT_NAME)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@TimeSeries(false)
-@Tags({"site"})
-public class SiteDescServiceEntity extends TaggedLogAPIEntity {
-    @Column("a")
-    private Boolean enabled;
+import java.util.List;
+
+public class SiteApplicationObject extends TaggedLogAPIEntity {
+    public String getSite() {
+        return site;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
+        valueChanged("site");
+    }
 
     public Boolean getEnabled() {
         return enabled;
@@ -45,4 +42,17 @@ public class SiteDescServiceEntity extends TaggedLogAPIEntity {
         this.enabled = enabled;
         valueChanged("enabled");
     }
+
+    public List<SiteApplicationServiceEntity> getApplications() {
+        return applications;
+    }
+
+    public void setApplications(List<SiteApplicationServiceEntity> applications) {
+        this.applications = applications;
+        valueChanged("applicationList");
+    }
+
+    String site;
+    Boolean enabled;
+    List<SiteApplicationServiceEntity> applications;
 }
