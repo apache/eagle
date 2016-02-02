@@ -48,7 +48,7 @@ def nn_safe_mode_metric(producer, topic, kafka_dict, metric, value):
         else:
             value = 0
 
-    send_output_message(producer, topic, kafka_dict, metric, value)
+        send_output_message(producer, topic, kafka_dict, metric, value)
 
 def cal_mem_usage(producer, topic, bean, metricMap, metric_prefix_name):
     kafka_dict = metricMap.copy()
