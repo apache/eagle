@@ -78,6 +78,7 @@
 				$.each(Site.list, function(i, site) {
 					var _list = [];
 					var _appGrp = {};
+					var _appGrpList = [];
 					_list.set = {};
 					Site.list.set[site.tags.site] = site;
 
@@ -96,6 +97,11 @@
 						applicationGroup: {
 							get: function() {
 								return _appGrp;
+							}
+						},
+						applicationGroupList: {
+							get: function() {
+								return _appGrpList;
 							}
 						}
 					});
@@ -120,6 +126,27 @@
 					}
 				});
 
+				// Fill site application group attributes
+				$.each(Site.list, function(i, site) {
+					$.each(site.applicationGroup, function(grpName, grpList) {
+						var grp = {
+							name: grpName,
+							list: grpList,
+							enabledList: $.grep(grpList, function(application) {return site.applicationList.set[application.tags.application].enabled;}),
+							disabledList: $.grep(grpList, function(application) {return !site.applicationList.set[application.tags.application].enabled;})
+						};
+
+						site.applicationGroupList.push(grp);
+					});
+
+					site.applicationGroupList.sort(function(a, b) {
+						if(a.name === b.name) return 0;
+						if(a.name === "Others") return 1;
+						if(b.name === "Others") return -1;
+						return a.name < b.name ? -1 : 1;
+					});
+				});
+
 				// Set current site
 				if(sessionStorage && Site.find(sessionStorage.getItem("site"))) {
 					Site.current(Site.find(sessionStorage.getItem("site")));
@@ -131,57 +158,6 @@
 			});
 
 			return _promise;
-
-			/*
-			Site.list = [];
-			Site.list.set = {};
-
-			Site.dataSrcList = Entities.queryEntities("AlertDataSourceService", '');
-			Site.dataSrcList._promise.success(function() {
-				$.each(Site.dataSrcList, function(i, dataSrc) {
-					var _site = Site.list.set[dataSrc.tags.site];
-					if(!_site) {
-						_site = Site.list.set[dataSrc.tags.site] = {
-							name: dataSrc.tags.site,
-							dataSrcList: []
-						};
-						_site.dataSrcList.find = function(dataSrcName) {
-							return common.array.find(dataSrcName, _site.dataSrcList, "tags.dataSource");
-						};
-						Site.list.push(_site);
-					}
-					_site.dataSrcList.push(dataSrc);
-
-					// UI visible check
-					if($.inArray(dataSrc.tags.dataSource, app.config.dataSource.uiInvisibleList) !== -1) {
-						dataSrc.hide = true;
-					}
-				});
-
-				if(sessionStorage && Site.find(sessionStorage.getItem("site"))) {
-					Site.current(Site.find(sessionStorage.getItem("site")));
-				} else {
-					Site.current(Site.list[0]);
-				}
-
-				// TODO: Mock site application
-				$.each(Site.list, function(i, _site) {
-					_site.app = {
-						//DAM: true
-					};
-					if(_site.name === "sandbox") {
-						_site.app.DAM = true;
-						_site.app.JPA = true;
-						_site.app.TEST = true;
-					}
-				});
-			});
-
-			_promise = Site.dataSrcList._promise.then(function() {
-				return Site;
-			});
-
-			 return _promise;*/
 		};
 
 		Site._promise = function() {

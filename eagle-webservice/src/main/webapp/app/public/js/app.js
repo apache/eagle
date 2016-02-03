@@ -247,21 +247,27 @@ var app = {};
 					var _deferred = $q.defer();
 
 					$q.all(Site._promise(), Application._promise()).then(function() {
-						var _match;
+						var _match, i, tmpApp;
 						var _site = Site.current();
 						var _app = Application.current();
 
 						// Check application
-						if(_site && (!_app || (_app && !_site.applicationList.set[_app.tags.application]))) {
+						if(_site && (
+							!_app ||
+							!_site.applicationList.set[_app.tags.application] ||
+							!_site.applicationList.set[_app.tags.application].enabled
+							)
+						) {
 							_match = false;
 
-							$.each(Application.list, function(i, app) {
-								if(_site.applicationList.set[app.tags.application]) {
-									_app = Application.current(app);
+							for(i = 0 ; i < _site.applicationGroupList.length ; i += 1) {
+								tmpApp = _site.applicationGroupList[i].enabledList[0];
+								if(tmpApp) {
+									_app = Application.current(tmpApp);
 									_match = true;
-									return false;
+									break;
 								}
-							});
+							}
 
 							if(!_match) {
 								_app = null;

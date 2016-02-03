@@ -41,10 +41,6 @@
 				<hr/>
 
 				<!-- Config -->
-				<!--div class="form-group">
-					<label for="applicationGroup">Group</label>
-					<input type="text" class="form-control" id="applicationGroup" placeholder="(Optional) Group name." ng-model="applications[application.tags.application].group">
-				</div-->
 				<div class="checkbox">
 					<label>
 						<input type="checkbox" ng-checked="sites[site.tags.site].enabled" ng-click="sites[site.tags.site].enabled = !sites[site.tags.site].enabled">
@@ -65,8 +61,11 @@
 								</div>
 								<div class="product-info">
 									<a class="fa fa-times pull-right" ng-click="removeApplication(application, sites[site.tags.site])"></a>
-									<span class="product-title">{{application}}</span>
-									<span class="product-description">{{Application.list.set[application].desc}}</span>
+									<span class="product-title">
+										<a class="fa fa-cog" ng-click="setApplication(application)"></a>
+										{{application.tags.application}}
+									</span>
+									<span class="product-description">{{Application.list.set[application.tags.application].desc}}</span>
 								</div>
 							</li>
 						</ul>
@@ -78,8 +77,8 @@
 									<span class="fa fa-star-o"></span>
 								</button>
 								<div class="product-info">
-									<span class="product-title">{{application}}</span>
-									<span class="product-description">{{Application.list.set[application].desc}}</span>
+									<span class="product-title">{{application.tags.application}}</span>
+									<span class="product-description">{{Application.list.set[application.tags.application].desc}}</span>
 								</div>
 							</li>
 						</ul>

@@ -52,7 +52,7 @@
 					}).length) {
 					return "Feature name conflict!";
 				}
-			}).then(function(holder) {
+			}).then(null, null, function(holder) {
 				Entities.updateEntity(
 					"FeatureDescService",
 					{tags: {feature: holder.entity.name}},
@@ -66,7 +66,7 @@
 
 		// Delete feature
 		$scope.deleteFeature = function(feature) {
-			UI.deleteConfirm(feature.tags.feature).then(function(holder) {
+			UI.deleteConfirm(feature.tags.feature).then(null, null, function(holder) {
 				Entities.delete("FeatureDescService", {feature: feature.tags.feature})._promise.then(function() {
 					holder.closeFunc();
 					location.reload();
@@ -122,7 +122,7 @@
 					}).length) {
 					return "Application name conflict!";
 				}
-			}).then(function(holder) {
+			}).then(null, null, function(holder) {
 				Entities.updateEntity(
 					"ApplicationDescService",
 					{tags: {application: holder.entity.name}},
@@ -136,7 +136,7 @@
 
 		// Delete application
 		$scope.deleteApplication = function(application) {
-			UI.deleteConfirm(application.tags.application).then(function(holder) {
+			UI.deleteConfirm(application.tags.application).then(null, null, function(holder) {
 				Entities.delete("ApplicationDescService", {application: application.tags.application})._promise.then(function() {
 					holder.closeFunc();
 					location.reload();
@@ -218,9 +218,21 @@
 			$.each(Application.list, function(i, application) {
 				var _application = site.applicationList.set[application.tags.application];
 				if(_application && _application.enabled) {
-					_site.applications.push(application.tags.application);
+					_site.applications.push(_application);
 				} else {
-					_site.optionalApplications.push(application.tags.application);
+					if(_application) {
+						_site.optionalApplications.push(_application);
+					} else {
+						_site.optionalApplications.push({
+							prefix: "eagleSiteApplication",
+							config: "",
+							enabled: false,
+							tags: {
+								application: application.tags.application,
+								site: site.tags.site
+							}
+						});
+					}
 				}
 			});
 		});
@@ -235,7 +247,7 @@
 					}).length) {
 					return "Site name conflict!";
 				}
-			}).then(function(holder) {
+			}).then(null, null, function(holder) {
 				Entities.updateEntity(
 					"SiteDescService",
 					{enabled: true, tags: {site: holder.entity.name}},
@@ -249,7 +261,7 @@
 
 		// Delete site
 		$scope.deleteSite = function(site) {
-			UI.deleteConfirm(site.tags.site).then(function(holder) {
+			UI.deleteConfirm(site.tags.site).then(null, null, function(holder) {
 				Entities.delete("SiteDescService", {site: site.tags.site})._promise.then(function() {
 					holder.closeFunc();
 					location.reload();
@@ -270,26 +282,43 @@
 		$scope.addApplication = function(application, site) {
 			site.applications.push(application);
 			common.array.remove(application, site.optionalApplications);
+			application.enabled = true;
 			highlightApplication(application);
 		};
 
 		$scope.removeApplication = function(application, site) {
 			site.optionalApplications.push(application);
 			common.array.remove(application, site.applications);
+			application.enabled = false;
+		};
+
+		$scope.setApplication = function(application) {
+			UI.updateConfirm("Application", {config: application.config}, [
+				{name: "Configuration", field: "config", type: "blob"}
+			], function(entity) {
+				if(entity.config !== "" && !common.parseJSON(entity.config, false)) {
+					return "Invalid JSON format";
+				}
+			}).then(null, null, function(holder) {
+				application.config = holder.entity.config;
+				holder.closeFunc();
+			});
 		};
 
 		// Save feature
 		$scope.saveAll = function() {
 			$scope._pageLock = true;
 
-			var _list = $.map($scope.sites, function(application) {
-				return application;
+			var _list = $.map($scope.sites, function(site) {
+				var _clone = $.extend({applications: site.applications.concat(site.optionalApplications)}, site);
+				return _clone;
 			});
-			/*Entities.updateEntity("SiteDescService", _list, {timestamp: false})._promise.success(function() {
+
+			Entities.updateEntity("SiteDescService", _list, {timestamp: false, hook: true})._promise.success(function() {
 				location.reload();
 			}).finally(function() {
 				$scope._pageLock = false;
-			});*/
+			});
 		};
 	});
 })();

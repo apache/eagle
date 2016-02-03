@@ -28,14 +28,7 @@
 	serviceModule.service('UI', function($rootScope, $q, $compile) {
 		var UI = {};
 
-		/***
-		 * Create a creation confirm modal.
-		 * @param name			Name title
-		 * @param entity		bind entity
-		 * @param fieldList	Array. Format: {name, field, description(optional), optional(optional)}
-		 * @param checkFunc	Check logic function. Return string will prevent access
-		 */
-		UI.createConfirm = function(name, entity, fieldList, checkFunc) {
+		function _fieldDialog(create, name, entity, fieldList, checkFunc) {
 			var _deferred, $mdl, $scope;
 
 			_deferred = $q.defer();
@@ -45,9 +38,10 @@
 			$scope.fieldList = fieldList;
 			$scope.checkFunc = checkFunc;
 			$scope.lock = false;
+			$scope.create = create;
 
 			// Modal
-			$mdl = $(TMPL_CREATE).appendTo('body');
+			$mdl = $(TMPL_FIELDS).appendTo('body');
 			$compile($mdl)($scope);
 			$mdl.modal();
 
@@ -55,30 +49,57 @@
 				_deferred.reject();
 			});
 			$mdl.on("hidden.bs.modal", function() {
+				_deferred.resolve({
+					entity: entity
+				});
 				$mdl.remove();
 			});
 
 			// Function
 			$scope.emptyFieldList = function() {
-				var _emptyList = $.map(fieldList, function(field) {
+				return $.map(fieldList, function(field) {
 					if(!field.optional && !entity[field.field]) {
 						return field.field;
 					}
 				});
-				return _emptyList;
 			};
 
 			$scope.confirm = function() {
 				$scope.lock = true;
-				_deferred.resolve({
+				_deferred.notify({
 					entity: entity,
 					closeFunc: function() {
 						$mdl.modal('hide');
+					},
+					unlock: function() {
+						$scope.lock = false;
 					}
 				});
 			};
 
 			return _deferred.promise;
+		}
+
+		/***
+		 * Create a creation confirm modal.
+		 * @param name			Name title
+		 * @param entity		bind entity
+		 * @param fieldList	Array. Format: {name, field, description(optional), optional(optional)}
+		 * @param checkFunc	Check logic function. Return string will prevent access
+		 */
+		UI.createConfirm = function(name, entity, fieldList, checkFunc) {
+			return _fieldDialog(true, name, entity, fieldList, checkFunc);
+		};
+
+		/***
+		 * Create a update confirm modal.
+		 * @param name			Name title
+		 * @param entity		bind entity
+		 * @param fieldList	Array. Format: {name, field, description(optional), optional(optional)}
+		 * @param checkFunc	Check logic function. Return string will prevent access
+		 */
+		UI.updateConfirm = function(name, entity, fieldList, checkFunc) {
+			return _fieldDialog(false, name, entity, fieldList, checkFunc);
 		};
 
 		UI.deleteConfirm = function(name) {
@@ -98,16 +119,22 @@
 				_deferred.reject();
 			});
 			$mdl.on("hidden.bs.modal", function() {
+				_deferred.resolve({
+					name: name
+				});
 				$mdl.remove();
 			});
 
 			// Function
 			$scope.delete = function() {
 				$scope.lock = true;
-				_deferred.resolve({
+				_deferred.notify({
 					name: name,
 					closeFunc: function() {
 						$mdl.modal('hide');
+					},
+					unlock: function() {
+						$scope.lock = false;
 					}
 				});
 			};
@@ -121,7 +148,7 @@
 	// ===========================================================
 	// =                         Template                        =
 	// ===========================================================
-	var TMPL_CREATE =
+	var TMPL_FIELDS =
 		'<div class="modal fade" tabindex="-1" role="dialog">' +
 			'<div class="modal-dialog" role="document">' +
 				'<div class="modal-content">' +
@@ -129,21 +156,22 @@
 						'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
 							'<span aria-hidden="true">&times;</span>' +
 						'</button>' +
-						'<h4 class="modal-title">New {{name}}</h4>' +
+						'<h4 class="modal-title">{{create ? "New" : "Update"}} {{name}}</h4>' +
 					'</div>' +
 					'<div class="modal-body">' +
-						'<div class="form-group" ng-repeat="field in fieldList">' +
+						'<div class="form-group" ng-repeat="field in fieldList" ng-switch="field.type">' +
 							'<label for="featureName">' +
 								'<span ng-if="!field.optional">*</span> ' +
 								'{{field.name}}' +
 							'</label>' +
-							'<input type="text" class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]">' +
+							'<textarea class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
+							'<input type="text" class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]" ng-disabled="lock" ng-switch-default>' +
 						'</div>' +
 					'</div>' +
 					'<div class="modal-footer">' +
 						'<p class="pull-left text-danger">{{checkFunc(entity)}}</p>' +
-						'<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-						'<button type="button" class="btn btn-primary" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || _pageLock">Create</button>' +
+						'<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="lock">Close</button>' +
+						'<button type="button" class="btn btn-primary" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || lock">{{create ? "Create" : "Update"}}</button>' +
 					'</div>' +
 				'</div>' +
 			'</div>' +
