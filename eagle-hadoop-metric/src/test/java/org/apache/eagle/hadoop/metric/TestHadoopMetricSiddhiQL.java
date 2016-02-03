@@ -17,6 +17,7 @@
 package org.apache.eagle.hadoop.metric;
 
 import junit.framework.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -36,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TestHadoopMetricSiddhiQL {
 
+    @Ignore
     @Test
     public void testNameNodeLag() throws Exception {
         String ql = "define stream s (host string, timestamp long, metric string, component string, site string, value string);" +
@@ -50,6 +52,7 @@ public class TestHadoopMetricSiddhiQL {
         testQL(ql, generateNameNodeLagEvents(), 2, true);
     }
 
+    @Ignore
     @Test
     public void testNameNodeLag2_patternMatching() throws Exception {
         String ql =
@@ -184,6 +187,7 @@ public class TestHadoopMetricSiddhiQL {
             select e1.roomNo, e1.temp as initialTemp, e2.temp as finalTemp
             insert into AlertStream;
      */
+    @Ignore
     @Test
     public void testCase4_LiveDataNodeJoggle() throws Exception {
 
