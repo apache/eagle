@@ -20,8 +20,10 @@ package org.apache.eagle.datastream.core
 
 import java.util
 
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity
 import org.apache.eagle.alert.executor.AlertExecutorCreationUtils
-import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl
+import org.apache.eagle.policy.common.Constants
+import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl
 
 import scala.collection.JavaConversions.asScalaSet
 import scala.collection.mutable.ListBuffer
@@ -89,7 +91,9 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
         /**
          * step 2: partition alert executor by policy partitioner class
          */
-        val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config, new AlertDefinitionDAOImpl(new EagleServiceConnector(config)), upStreamNames, alertExecutorId)
+        val alertExecutors = AlertExecutorCreationUtils.createAlertExecutors(config,
+          new PolicyDefinitionEntityDAOImpl[AlertDefinitionAPIEntity](new EagleServiceConnector(config), Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME),
+          upStreamNames, alertExecutorId)
         var alertProducers = new scala.collection.mutable.MutableList[StreamProducer[Any]]
         alertExecutors.foreach(exec => {
           val t = FlatMapProducer(exec).nameAs(exec.getExecutorId + "_" + exec.getPartitionSeq).initWith(dag,config, hook = false)

@@ -28,10 +28,8 @@ import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.policy.PolicyEvaluationContext;
-import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl;
-import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
-import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
-import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.dao.*;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyDefinition;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
@@ -95,7 +93,8 @@ public class TestSiddhiEvaluator {
 							"insert into outputStream ;";
         policyDef.setExpression(expression);
 
-		PolicyDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, null)) {
+		PolicyDefinitionDAO alertDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(null, null),
+				Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME) {
 			@Override
 			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
 				return null;
