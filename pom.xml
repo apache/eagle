@@ -134,6 +134,7 @@
         <module>eagle-samples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
+        <module>eagle-qe</module>
     </modules>
     <properties>
         <!-- General Properties -->
@@ -158,6 +159,7 @@
         <maven-tomcat7.version>2.2</maven-tomcat7.version>
         <maven-apache-rat.version>0.11</maven-apache-rat.version>
         <maven-failsafe.version>2.6</maven-failsafe.version>
+        <maven-checkstyle.version>2.17</maven-checkstyle.version>
 
         <!-- Environment Versions-->
         <hadoop.version>2.6.0.2.2.5.1-3</hadoop.version>
@@ -249,6 +251,9 @@
         <scala-reflect.version>2.10.0</scala-reflect.version>
         <mockito.version>1.8.1-rc1</mockito.version>
         <tomcat.embed.version>7.0.55</tomcat.embed.version>
+        <jacoco.version>0.6.5.201403032054</jacoco.version>
+        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
+        <eagle-qe.version>1.0.0</eagle-qe.version>
 
         <!-- Machine Learning -->
         <ejml.version>0.25</ejml.version>
@@ -936,7 +941,59 @@
                      </execution>
                  </executions>
              </plugin>
-         </plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>eagle</groupId>
+                        <artifactId>eagle-qe</artifactId>
+                        <version>${eagle-qe.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <configuration>
+                            <configLocation>qe-config/checkstyle.xml</configLocation>
+                            <encoding>UTF-8</encoding>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>true</failsOnError>
+                            <linkXRef>false</linkXRef>
+                        </configuration>
+                        <goals>
+                            <goal>checkstyle-aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <destFile>${jacoco.ut.execution.data.file}</destFile>
+                    <dataFile>${jacoco.ut.execution.data.file}</dataFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
     <repositories>
         <repository>
