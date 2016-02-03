@@ -23,16 +23,9 @@ import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public class SiteApplicationObject extends TaggedLogAPIEntity {
-    public String getSite() {
-        return site;
-    }
-
-    public void setSite(String site) {
-        this.site = site;
-        valueChanged("site");
-    }
 
     public Boolean getEnabled() {
         return enabled;
@@ -52,7 +45,18 @@ public class SiteApplicationObject extends TaggedLogAPIEntity {
         valueChanged("applicationList");
     }
 
-    String site;
+    @Override
+    public Map<String, String> getTags() {
+        return tags;
+    }
+
+    @Override
+    public void setTags(Map<String, String> tags) {
+        this.tags = tags;
+        valueChanged("tags");
+    }
+
+    Map<String, String> tags;
     Boolean enabled;
     List<SiteApplicationServiceEntity> applications;
 }

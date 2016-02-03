@@ -134,12 +134,10 @@ public class SiteApplicationResource {
             List<SiteApplicationServiceEntity> applicationEntities = new LinkedList<>();
             Set<String> sites = new HashSet<>();
             for(SiteApplicationObject e : entities) {
-                sites.add(e.getSite());
-                Map<String, String> tags = new HashMap<>();
-                tags.put("site", e.getSite());
+                sites.add(e.getTags().get("site"));
                 SiteDescServiceEntity entity = new SiteDescServiceEntity();
                 entity.setEnabled(e.getEnabled());
-                entity.setTags(tags);
+                entity.setTags(e.getTags());
                 siteEntities.add(entity);
                 applicationEntities.addAll(e.getApplications());
             }
