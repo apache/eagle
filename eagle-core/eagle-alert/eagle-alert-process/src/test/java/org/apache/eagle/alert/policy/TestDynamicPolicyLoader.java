@@ -84,7 +84,7 @@ public class TestDynamicPolicyLoader {
 			}
 
 			@Override
-			public void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) { /* do nothing */ }
+			public void updatePolicyDetails(AlertDefinitionAPIEntity entity) { /* do nothing */ }
 		};
 		
 		DynamicPolicyLoader<AlertDefinitionAPIEntity> loader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);

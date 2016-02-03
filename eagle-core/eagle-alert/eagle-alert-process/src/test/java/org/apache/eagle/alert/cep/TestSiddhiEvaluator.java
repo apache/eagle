@@ -102,7 +102,7 @@ public class TestSiddhiEvaluator {
 			}
 
             @Override
-            public void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) { /* do nothing */ }
+            public void updatePolicyDetails(AlertDefinitionAPIEntity entity) { /* do nothing */ }
 		};
 
 		AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {

@@ -62,7 +62,7 @@ public class TestPolicyDistributionUpdater {
             }
 
             @Override
-            public void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) { /* do nothing */ }
+            public void updatePolicyDetails(AlertDefinitionAPIEntity entity) { /* do nothing */ }
         };
 
         AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId_1", new DefaultPolicyPartitioner(), 1, 0, alertDao, new String[]{"testStream"}){

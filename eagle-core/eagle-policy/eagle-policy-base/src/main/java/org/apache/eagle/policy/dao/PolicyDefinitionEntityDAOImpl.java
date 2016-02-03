@@ -17,7 +17,6 @@
 package org.apache.eagle.policy.dao;
 
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.client.EagleServiceClientException;
@@ -54,7 +53,7 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 	public List<T> findActivePolicies(String site, String dataSource) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = servicePointName + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
+			String query = servicePointName + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\" AND @enabled=\"true\"]{*}";
 			GenericServiceAPIResponseEntity<T> response = client.search()
 												                .pageSize(Integer.MAX_VALUE)
 												                .query(query)
@@ -97,25 +96,22 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 	}
 
     @Override
-    public void updatePolicyDetails(T entity, boolean markdownEnabled, String markdownReason) {
+    public void updatePolicyDetails(T entity) {
         IEagleServiceClient client = new EagleServiceClientImpl(connector);
 
-        List<AlertDefinitionAPIEntity> entityList = new ArrayList<>();
-        AlertDefinitionAPIEntity alertEntity = (AlertDefinitionAPIEntity) entity;
-        alertEntity.setMarkdownReason(null != markdownReason ? markdownReason : "");
-        alertEntity.setMarkdownEnabled(markdownEnabled);
-        entityList.add(alertEntity);
+        List<T> entityList = new ArrayList<>();
+        entityList.add(entity);
 
         try {
-            client.create(entityList, Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
+            client.create(entityList, servicePointName);
         } catch (IOException | EagleServiceClientException exception) {
-            LOG.error("Exception in updating markdown for policy in HBase", exception.getMessage());
+            LOG.error("Exception in updating markdown for policy in HBase ", exception);
         } finally {
             try {
                 if (null != client)
                     client.close();
             } catch (IOException exception) {
-                LOG.debug("Unable to close Eagle service client, " + exception.getMessage());
+                LOG.debug("Unable to close Eagle service client, " + exception);
             }
         }
     }

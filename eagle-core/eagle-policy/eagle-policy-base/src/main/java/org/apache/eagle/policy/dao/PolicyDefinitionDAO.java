@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 
 /**
  * @param <T> - Policy definition type
@@ -44,5 +43,5 @@ public interface PolicyDefinitionDAO<T extends AbstractPolicyDefinitionEntity> e
 	/**
 	 * Persists alert definition entity updated with markdown columns into HBase.
      */
-	void updatePolicyDetails(T entity, boolean markdownEnabled, String markdownReason);
+	void updatePolicyDetails(T entity);
 }

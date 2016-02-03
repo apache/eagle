@@ -39,16 +39,10 @@ import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
-import org.apache.eagle.service.client.EagleServiceClientException;
-import org.apache.eagle.service.client.EagleServiceConnector;
-import org.apache.eagle.service.client.IEagleServiceClient;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -251,7 +245,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 					.getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
 					.newInstance(config, context, policyDef, sourceStreams, needValidation);
             if (pe.isMarkdownEnabled()) // updating markdown details only if the policy is found invalid
-                policyDefinitionDao.updatePolicyDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
+                updateMarkdownDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
 		} catch(Exception ex) {
 			LOG.error("Fail creating new policyEvaluator", ex);
 			LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
@@ -376,7 +370,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
                 String previousMarkdownReason = pe.getMarkdownReason();
                 pe.onPolicyUpdate(alertDef);
                 if(isMarkdownUpdateRequired(previousMarkdown, pe.isMarkdownEnabled(), previousMarkdownReason, pe.getMarkdownReason()))
-                    policyDefinitionDao.updatePolicyDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
+                	updateMarkdownDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
 			}
 		}
 	}
@@ -442,4 +436,17 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
         }
         return isUpdateRequired;
     }
+
+    /**
+     * Method to invoke Eagle Service call to update the markdown details for the policy.
+     * @param entity
+     * @param markdownEnabled
+     * @param markdownReason
+     */
+	private void updateMarkdownDetails(T entity, boolean markdownEnabled, String markdownReason) {
+        AlertDefinitionAPIEntity alertEntity = (AlertDefinitionAPIEntity) entity;
+        alertEntity.setMarkdownEnabled(markdownEnabled);
+        alertEntity.setMarkdownReason(null != markdownReason ? markdownReason : "");
+		policyDefinitionDao.updatePolicyDetails(entity);
+	}
 }

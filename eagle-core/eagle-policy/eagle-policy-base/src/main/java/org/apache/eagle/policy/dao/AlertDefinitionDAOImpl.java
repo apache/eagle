@@ -87,24 +87,22 @@ public class AlertDefinitionDAOImpl implements PolicyDefinitionDAO<AlertDefiniti
 	}
 
 	@Override
-	public void updatePolicyDetails(AlertDefinitionAPIEntity entity, boolean markdownEnabled, String markdownReason) {
+	public void updatePolicyDetails(AlertDefinitionAPIEntity entity) {
 		IEagleServiceClient client = new EagleServiceClientImpl(connector);
 
 		List<AlertDefinitionAPIEntity> entityList = new ArrayList<>();
-		entity.setMarkdownReason(null != markdownReason ? markdownReason : "");
-		entity.setMarkdownEnabled(markdownEnabled);
 		entityList.add(entity);
 
 		try {
 			client.create(entityList, Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
 		} catch (IOException | EagleServiceClientException exception) {
-			LOG.error("Exception in updating markdown for policy in HBase", exception.getMessage());
+			LOG.error("Exception in updating markdown for policy in HBase ", exception);
 		} finally {
 			try {
 				if (null != client)
 					client.close();
 			} catch (IOException exception) {
-				LOG.debug("Unable to close Eagle service client, " + exception.getMessage());
+				LOG.debug("Unable to close Eagle service client, " + exception);
 			}
 		}
 	}
