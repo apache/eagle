@@ -111,7 +111,7 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
                 if (null != client)
                     client.close();
             } catch (IOException exception) {
-                LOG.debug("Unable to close Eagle service client, " + exception);
+                LOG.error("Unable to close Eagle service client, " + exception);
             }
         }
     }
