@@ -18,10 +18,11 @@ package org.apache.eagle.alert.dao;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,7 +55,8 @@ public class TestAlertDefinitionDAOImpl {
 
 		String site = "sandbox";
 		String dataSource = "UnitTest";
-		PolicyDefinitionDAO dao = new AlertDefinitionDAOImpl(new EagleServiceConnector(eagleServiceHost, eagleServicePort)) {
+		PolicyDefinitionDAO dao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(eagleServiceHost, eagleServicePort),
+				Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME) {
 			@Override
 			public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) throws Exception {
 				List<AlertDefinitionAPIEntity> list = new ArrayList<AlertDefinitionAPIEntity>();
