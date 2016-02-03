@@ -306,5 +306,4 @@ public class TestHadoopMetricSiddhiQL {
         return events;
     }
 
-
 }

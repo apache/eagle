@@ -18,8 +18,10 @@
 source $(dirname $0)/eagle-env.sh
 source $(dirname $0)/hadoop-metric-init.sh
 
+
+##### add policies ##########
 echo ""
-echo "Importing Policy: NameNodeLagPolicy"
+echo "Importing policy: haStatePolicy "
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
  "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDefinitionService" \
  -d '
@@ -29,15 +31,15 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
        "tags": {
          "site": "sandbox",
          "dataSource": "hadoopJmxMetricDataSource",
-         "policyId": "NameNodeLagPolicy",
+         "policyId": "haStatePolicy",
          "alertExecutorId": "hadoopJmxMetricAlertExecutor",
          "policyType": "siddhiCEPEngine"
        },
        "description": "jmx metric ",
-       "policyDef": "{\"expression\":\"from every a = hadoopJmxMetricEventStream[metric==\\\"hadoop.namenode.journaltransaction.lastappliedorwrittentxid\\\"] -> b = hadoopJmxMetricEventStream[metric==a.metric and b.host != a.host and (max(convert(a.value, \\\"long\\\")) + 100) <= max(convert(value, \\\"long\\\"))] within 5 min select a.host as hostA, a.value as transactIdA, b.host as hostB, b.value as transactIdB insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
+       "policyDef": "{\"expression\":\"from every a = hadoopJmxMetricEventStream[metric==\\\"hadoop.namenode.fsnamesystem.hastate\\\"] -> b = hadoopJmxMetricEventStream[metric==a.metric and b.host == a.host and (convert(a.value, \\\"long\\\") != convert(value, \\\"long\\\"))] within 10 min select a.host, a.value as oldHaState, b.value as newHaState, b.timestamp as timestamp, b.metric as metric, b.component as component, b.site as site insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
        "enabled": true,
        "dedupeDef": "{\"alertDedupIntervalMin\":10,\"emailDedupIntervalMin\":10}",
-       "notificationDef": "[{\"sender\":\"eagle@apache.org\",\"recipients\":\"eagle@apache.org\",\"subject\":\"name node lag found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
+       "notificationDef": "[{\"sender\":\"eagle@apache.org\",\"recipients\":\"eagle@apache.org\",\"subject\":\"missing block found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
      }
  ]
  '
