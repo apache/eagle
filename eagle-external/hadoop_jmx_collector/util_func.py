@@ -21,6 +21,7 @@ import re
 import time
 import json
 
+from kafka import KafkaClient, SimpleProducer, SimpleConsumer
 
 def kafka_connect(host):
     # To send messages synchronously
@@ -40,7 +41,7 @@ def kafka_close(kafka, producer):
 def send_output_message(producer, topic, kafka_dict, metric, value):
     kafka_dict["timestamp"] = int(round(time.time() * 1000))
     kafka_dict["metric"] = metric.lower()
-    kafka_dict["value"] = str(value)
+    kafka_dict["value"] = float(str(value))
     kafka_json = json.dumps(kafka_dict)
 
     if producer != None:
@@ -48,30 +49,23 @@ def send_output_message(producer, topic, kafka_dict, metric, value):
     else:
         print(kafka_json)
 
-
-def readFile(filename):
-    f = open(filename, 'r')
-    s = f.read()
-    f.close()
-    return s
-
-
-def loadConfigFile(filename):
+def load_config(filename):
     # read the self-defined filters
 
-    script_dir = os.path.dirname(__file__)
-    rel_path = "./" + filename
-    abs_file_path = os.path.join(script_dir, rel_path)
-    json_file = readFile(abs_file_path)
-    #print json_file
-
     try:
+        script_dir = os.path.dirname(__file__)
+        rel_path = "./" + filename
+        abs_file_path = os.path.join(script_dir, rel_path)
+        if not os.path.isfile(abs_file_path):
+            print abs_file_path+" doesn't exist, please rename config-sample.json to config.json"
+            exit(1)
+        f = open(abs_file_path, 'r')
+        json_file = f.read()
+        f.close()
         config = json.loads(json_file)
-
     except ValueError:
         print "configuration file load error"
     return config
-
 
 def isNumber(str):
     try:

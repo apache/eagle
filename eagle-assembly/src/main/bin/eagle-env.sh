@@ -37,3 +37,8 @@ export EAGLE_SERVICE_USER=admin
 # EAGLE_SERVICE_PASSWORD
 export EAGLE_SERVICE_PASSWD=secret
 
+export EAGLE_CLASSPATH=$EAGLE_HOME/conf
+# Add eagle shared library jars
+for file in $EAGLE_HOME/lib/share/*;do
+	EAGLE_CLASSPATH=$EAGLE_CLASSPATH:$file
+done

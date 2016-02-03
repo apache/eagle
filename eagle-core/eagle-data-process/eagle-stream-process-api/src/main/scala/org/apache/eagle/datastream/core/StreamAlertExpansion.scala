@@ -133,8 +133,7 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
           i += 1
         })
       }
-      case p: FlatMapProducer[AnyRef, AnyRef] =>
-        if(upStreamNames.size()>1) throw new IllegalStateException("More than 1 upStreamNames "+upStreamNames+" found for "+p){
+      case p: FlatMapProducer[AnyRef, AnyRef] => {
         newStreamProducers += replace(toBeAddedEdges, toBeRemovedVertex, dag, current, recognizeSingleStreamName(p,upStreamNames))
       }
       case p: MapperProducer[AnyRef,AnyRef] => {

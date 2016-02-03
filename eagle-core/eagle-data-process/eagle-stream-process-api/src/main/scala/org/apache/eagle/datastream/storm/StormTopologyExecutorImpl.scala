@@ -23,6 +23,7 @@ import backtype.storm.generated.StormTopology
 import backtype.storm.utils.Utils
 import backtype.storm.{Config, LocalCluster, StormSubmitter}
 import org.apache.eagle.datastream.core.AbstractTopologyExecutor
+import org.apache.thrift7.transport.TTransportException
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 
@@ -37,6 +38,7 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
     conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, Int.box(32))
     conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, Int.box(16384))
     conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, Int.box(16384))
+    conf.put(Config.NIMBUS_THRIFT_MAX_BUFFER_SIZE, Int.box(20480000))
 
     if(config.hasPath("envContextConfig.stormConfigFile")) {
       val file = new File(config.getString("envContextConfig.stormConfigFile"))
@@ -59,8 +61,32 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
 
     val topologyName = config.getString("envContextConfig.topologyName")
     if (!localMode) {
+      if(config.hasPath("envContextConfig.nimbusHost")) {
+        LOG.info(s"Setting ${backtype.storm.Config.NIMBUS_HOST} as ${config.getString("envContextConfig.nimbusHost")}")
+        conf.put(backtype.storm.Config.NIMBUS_HOST, config.getString("envContextConfig.nimbusHost"))
+      }
+
+      if(config.hasPath("envContextConfig.nimbusThriftPort")) {
+        LOG.info(s"Setting ${backtype.storm.Config.NIMBUS_THRIFT_PORT} as ${config.getString("envContextConfig.nimbusThriftPort")}")
+        conf.put(backtype.storm.Config.NIMBUS_THRIFT_PORT, config.getNumber("envContextConfig.nimbusThriftPort"))
+      }
+
+      if(config.hasPath("envContextConfig.jarFile")){
+        LOG.info(s"Setting storm.jar as ${config.getString("envContextConfig.jarFile")}")
+        System.setProperty("storm.jar",config.getString("envContextConfig.jarFile"))
+      }
+
       LOG.info("Submitting as cluster mode")
-      StormSubmitter.submitTopologyWithProgressBar(topologyName, conf, topology)
+      try {
+        StormSubmitter.submitTopologyWithProgressBar(topologyName, conf, topology)
+      } catch {
+        case e:TTransportException =>
+          LOG.error(s"Got thrift exception, type: ${e.getType}")
+          throw e
+      }
+      finally {
+        System.clearProperty("storm.jar")
+      }
     } else {
       LOG.info("Submitting as local mode")
       val cluster: LocalCluster = new LocalCluster
@@ -68,8 +94,7 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
       while(true) {
         try {
           Utils.sleep(Integer.MAX_VALUE)
-        }
-        catch {
+        } catch {
           case _: Throwable => () // Do nothing
         }
       }
