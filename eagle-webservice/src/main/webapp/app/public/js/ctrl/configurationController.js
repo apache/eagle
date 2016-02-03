@@ -279,18 +279,17 @@
 		};
 
 		// Save feature
-		// TODO: Wait for api
 		$scope.saveAll = function() {
 			$scope._pageLock = true;
 
 			var _list = $.map($scope.sites, function(application) {
 				return application;
 			});
-			Entities.updateEntity("ApplicationDescService", _list, {timestamp: false})._promise.success(function() {
+			/*Entities.updateEntity("SiteDescService", _list, {timestamp: false})._promise.success(function() {
 				location.reload();
 			}).finally(function() {
 				$scope._pageLock = false;
-			});
+			});*/
 		};
 	});
 })();

@@ -59,6 +59,7 @@
 		return Policy;
 	});
 
+	/*
 	// ==============================================================
 	// =                        Configuration                       =
 	// ==============================================================
@@ -227,6 +228,7 @@
 				});
 		};
 	});
+	*/
 
 	// ==============================================================
 	// =                          Policies                          =
@@ -234,10 +236,14 @@
 
 	// ======================= Policy Summary =======================
 	feature.navItem("summary", "Policies", "list");
-	feature.controller('summary', function(PageConfig, Site, $scope, $q, Entities) {
+	feature.controller('summary', function(PageConfig, Site, $scope, $q, Application, Entities) {
 		PageConfig.pageSubTitle = Site.current().name;
 
-		$scope.dataSources = {};
+		$scope.dataReady = false;
+		var _policyList = Entities.queryGroup("AlertDefinitionService", {dataSource:Application.current().tags.application, site: Site.current().name}, "@dataSource", "count");
+		console.log(_policyList);
+
+		/*$scope.dataSources = {};
 		$scope.dataReady = false;
 
 		var _policyList = Entities.queryGroup("AlertDefinitionService", {dataSource:null, site: Site.current().name}, "@dataSource", "count");
@@ -264,7 +270,7 @@
 			});
 
 			$scope.dataReady = true;
-		});
+		});*/
 	});
 
 	// ========================= Policy List ========================

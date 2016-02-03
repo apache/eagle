@@ -119,7 +119,7 @@
 				var _list = _originPageList;
 
 				$.each(Application.featureList, function(i, feature) {
-					_list = _list.concat(config._navItemMapping[feature.name] || []);
+					_list = _list.concat(config._navItemMapping[feature.tags.feature] || []);
 				});
 
 				return _list;

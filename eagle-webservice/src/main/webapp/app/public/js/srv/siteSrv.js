@@ -67,14 +67,17 @@
 		Site.reload = function() {
 			var _applicationList;
 
+			if(Site.list && Site.list._promise) Site.list._promise.abort();
+
 			Site.list = Entities.queryEntities("SiteDescService", '');
 			Site.list.set = {};
 			_applicationList = Entities.queryEntities("SiteApplicationService", '');
 
-			_promise = $q.all([Site.list._promise, _applicationList._promise]).then(function() {
+			_promise = $q.all([Site.list._promise, _applicationList._promise, Application._promise()]).then(function() {
 				// Fill site set
 				$.each(Site.list, function(i, site) {
 					var _list = [];
+					var _appGrp = {};
 					_list.set = {};
 					Site.list.set[site.tags.site] = site;
 
@@ -82,21 +85,38 @@
 					_list.find = function(applicationName) {
 						return common.array.find(applicationName, _list, "tags.application");
 					};
-					Object.defineProperty(site, "applicationList", {
-						get: function() {
-							return _list;
+
+					// Define properties
+					Object.defineProperties(site, {
+						applicationList: {
+							get: function() {
+								return _list;
+							}
+						},
+						applicationGroup: {
+							get: function() {
+								return _appGrp;
+							}
 						}
 					});
 				});
 
 				// Fill site application mapping
-				$.each(_applicationList, function(i, application) {
-					var _site = Site.list.set[application.tags.site];
+				$.each(_applicationList, function(i, siteApplication) {
+					var _site = Site.list.set[siteApplication.tags.site];
+					var _application = Application.find(siteApplication.tags.application);
+					var _appGroup;
+
 					if(!_site) {
-						console.warn("[Site] Application not match site:", application.tags.application, "-", application.tags.site);
+						console.warn("[Site] Application not match site:", siteApplication.tags.site, "-", siteApplication.tags.application);
+					} else if(!_application) {
+						console.warn("[Site] Application not found:", siteApplication.tags.site, "-", siteApplication.tags.application);
 					} else {
-						_site.applicationList.push(application);
-						_site.applicationList.set[application.tags.application] = application;
+						_site.applicationList.push(siteApplication);
+						_site.applicationList.set[siteApplication.tags.application] = siteApplication;
+
+						_appGroup = _site.applicationGroup[_application.groupName] = _site.applicationGroup[_application.groupName] || [];
+						_appGroup.push(_application);
 					}
 				});
 

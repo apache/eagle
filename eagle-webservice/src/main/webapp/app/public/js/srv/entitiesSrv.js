@@ -158,6 +158,7 @@
 			_post: _post,
 
 			updateEntity: function(serviceName, entities, config) {
+				var _url;
 				config = config || {};
 				if(!$.isArray(entities)) entities = [entities];
 
@@ -186,7 +187,14 @@
 					return _entity;
 				});
 
-				return _post(app.getURL("updateEntity", {serviceName: serviceName}), _entities);
+				// Check for url hook
+				if(config.hook) {
+					_url = app.getUpdateURL(serviceName);
+				} else {
+					_url = app.getURL("updateEntity", {serviceName: serviceName});
+				}
+
+				return _post(_url, _entities);
 			},
 
 			deleteEntity: function(serviceName, entities) {

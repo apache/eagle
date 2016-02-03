@@ -121,9 +121,22 @@
 						</button>
 						<div class="collapse navbar-collapse" id="moduleMenu">
 							<ul class="nav navbar-nav">
-								<li ng-repeat="_app in Application.list" ng-class="{active: Application.current() === _app}" ng-if="Site.current().app[_app.name]">
-									<a ng-click="Application.current(_app)">{{_app.name}}</a>
+								<li ng-repeat="(_appGrpName, _appGrp) in Site.current().applicationGroup" class="dropdown"
+									ng-class="{active: Application.current().groupName === _appGrpName}">
+									<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+										{{_appGrpName}}
+									</a>
+									<ul class="dropdown-menu">
+										<li ng-repeat="_app in _appGrp">
+											<a ng-click="Application.current(_app);">
+												<span class="fa fa-database"></span> {{_app.alias || _app.tags.application}}
+											</a>
+										</li>
+									</ul>
 								</li>
+								<!--li ng-repeat="_app in Application.list" ng-class="{active: Application.current() === _app}" ng-if="Site.current().app[_app.name]">
+									<a ng-click="Application.current(_app)">{{_app.name}}</a>
+								</li-->
 							</ul>
 						</div>
 					</div>
@@ -136,6 +149,7 @@
 				<!-- side bar: style can be found in sidebar.less -->
 				<section class="sidebar">
 					<ul class="sidebar-menu">
+						<li class="header">{{Application.current().alias || Application.current().tags.application || 'Features'}}</li>
 						<li ng-repeat="page in PageConfig.navConfig.pageList track by $index" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
 							<a href="{{page.url}}">
 								<i class="fa fa-{{page.icon}}"></i> <span>{{page.title}}</span> 

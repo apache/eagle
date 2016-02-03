@@ -438,7 +438,7 @@ var app = {};
 		});
 
 		$scope.$on('$stateChangeError', function (event, next, nextParam, current, currentParam, error) {
-			console.log("[Switch] Error", arguments);
+			console.error("[Switch] Error", arguments);
 		});
 
 		// Get side bar navigation item class

@@ -48,9 +48,9 @@
 				Authorization.login($scope.username, $scope.password).then(function (success) {
 					if (success) {
 						console.log("[Login] Login success! Reload data...");
-						Site.reload();
-						Application.reload();
-						Authorization.reload();
+						Authorization.reload().then(function() {}, function() {console.warn("Site error!");});
+						Application.reload().then(function() {}, function() {console.warn("Site error!");});
+						Site.reload().then(function() {}, function() {console.warn("Site error!");});
 						Authorization.path(true);
 					} else {
 						$.dialog({

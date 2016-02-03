@@ -492,13 +492,13 @@ body .box-body .nav-pills > li > a {
 	background: rgba(0, 0, 0, 0.1);
 }
 
-#moduleMenu ul li.active a {
+#moduleMenu > ul > li.active > a {
 	border-top: 3px solid rgba(255,255,255,0.8);
 	padding-top: 12px;
 }
 
 @media (max-width: 767px) {
-	#moduleMenu ul li.active a {
+	#moduleMenu > ul > li.active > a {
 		padding: 10px 15px;
 		border-top: none;
 		border-left: 3px solid rgba(255,255,255,0.8);

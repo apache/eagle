@@ -55,6 +55,9 @@
 		Application.reload = function() {
 			_deferred = $q.defer();
 
+			if(Application.list && Application.list._promise) Application.list._promise.abort();
+			if(Application.featureList && Application.featureList._promise) Application.featureList._promise.abort();
+
 			Application.list = Entities.queryEntities("ApplicationDescService", '');
 			Application.list.set = {};
 			Application.featureList = Entities.queryEntities("FeatureDescService", '');
@@ -110,12 +113,25 @@
 							return common.array.find(featureName, _appFeatureList, "tags.feature");
 						};
 
-						Object.defineProperty(application, "featureList", {
-							get: function() {
-								return _appFeatureList;
+						Object.defineProperties(application, {
+							featureList: {
+								get: function () {
+									return _appFeatureList;
+								}
+							},
+							// Get format group name. Will mark as 'Others' if no group defined
+							groupName: {
+								get: function () {
+									return this.group || "Others";
+								}
 							}
 						});
 					});
+
+					// Set current application
+					if(!Application.current() && sessionStorage && Application.find(sessionStorage.getItem("application"))) {
+						Application.current(Application.find(sessionStorage.getItem("application")));
+					}
 				});
 
 				// Process all promise
