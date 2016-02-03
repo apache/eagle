@@ -48,7 +48,7 @@ public class TestHadoopMetricSiddhiQL {
                 ;
 
         System.out.println("test name node log with multiple stream defined!");
-        testQL(ql, generateNameNodeLagEvents(), 2, true);
+        testQL(ql, generateNameNodeLagEvents(), -1, true);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class TestHadoopMetricSiddhiQL {
                     " and (convert(a.value, 'long') + 100) < convert(value, 'long') ] " +
             " within 5 min select a.host as hostA, b.host as hostB insert into tmp; ";
 
-        testQL(ql, generateNameNodeLagEvents(), 21);
+        testQL(ql, generateNameNodeLagEvents(), -1);
     }
 
     private void testQL(String ql, List<Event> events, int i) throws Exception {
@@ -112,7 +112,7 @@ public class TestHadoopMetricSiddhiQL {
         }
 
         latch.await(10, TimeUnit.SECONDS);
-        Thread.sleep(10000);
+        Thread.sleep(3000);
 
         System.out.println(count.get());
         if (eventHappenCount >= 0) {
@@ -201,7 +201,7 @@ public class TestHadoopMetricSiddhiQL {
                 " insert into tmp;"
                 ;
 
-        testQL(ql, generateDataNodeJoggleEvents(), 10);
+        testQL(ql, generateDataNodeJoggleEvents(), -1);
     }
 
     private List<Event> generateDataNodeJoggleEvents() {
