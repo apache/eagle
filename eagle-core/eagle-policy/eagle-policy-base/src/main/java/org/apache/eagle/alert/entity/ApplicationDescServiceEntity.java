@@ -44,6 +44,16 @@ public class ApplicationDescServiceEntity extends TaggedLogAPIEntity {
     private String group;
     @Column("d")
     private List<String> features;
+    @Column("e")
+    private String config;
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
 
     public String getDesc() {
         return desc;
