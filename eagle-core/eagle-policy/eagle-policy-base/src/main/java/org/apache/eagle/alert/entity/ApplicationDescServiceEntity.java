@@ -53,6 +53,7 @@ public class ApplicationDescServiceEntity extends TaggedLogAPIEntity {
 
     public void setConfig(String config) {
         this.config = config;
+        valueChanged("config");
     }
 
     public String getDesc() {
