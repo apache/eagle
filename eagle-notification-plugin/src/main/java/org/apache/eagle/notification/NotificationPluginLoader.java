@@ -25,6 +25,8 @@ import org.apache.eagle.notification.dao.AlertNotificationDAO;
 import org.apache.eagle.notification.dao.AlertNotificationDAOImpl;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +82,7 @@ public class NotificationPluginLoader {
         Set<Class<? extends NotificationPlugin>> subTypes = new HashSet<Class<? extends NotificationPlugin>>();
         try{
             LOG.info(" Scanning all classes which implements NotificationPlugin Interface ");
-            Reflections reflections = new Reflections("");
+            Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forJavaClassPath()));
             subTypes = reflections.getSubTypesOf(NotificationPlugin.class);
             LOG.info(" No of Plugins found : "+subTypes.size() );
             if( subTypes.size() <= 0 )
