@@ -23,7 +23,7 @@
 <!-- Step navigation -->
 <div ng-show="streamReady">
 	<div class="row step-cntr">
-		<div class="col-md-3" ng-repeat="step in steps">
+		<div class="col-sm-4" ng-repeat="step in steps">
 			<div class="step" ng-class="stepSelect($index + 1)">
 				<h1>{{$index + 1}}</h1>
 				<h2>Step {{$index + 1}}</h2>
@@ -42,17 +42,17 @@
 			<!-- ---------------------- Step Body Start ---------------------- -->
 
 			<!-- Step 1: Data Source -->
-			<div ng-show="step === 1">
+			<!--div ng-show="step === 1">
 				<div class="form-group">
 					<label>Select Data Source</label>
 					<select class="form-control" ng-model="policy.tags.dataSource">
 						<option ng-repeat="dataSource in Site.current().dataSrcList" ng-hide="dataSource.hide" value="{{dataSource.tags.dataSource}}">{{dataSource.desc || dataSource.tags.dataSource}}</option>
 					</select>
 				</div>
-			</div>
+			</div-->
 
-			<!-- Step 2: Stream -->
-			<div ng-show="step === 2">
+			<!-- Step 1: Stream -->
+			<div ng-show="step === 1">
 				<div class="pull-right" ng-show="policy.__.advanced === undefined">
 					<span class="text-muted">or</span>
 					<a ng-click="policy.__.advanced = true;">Advanced</a>
@@ -76,8 +76,8 @@
 				</div>
 			</div>
 
-			<!-- Step 3: Define Alert Policy -->
-			<div ng-show="step === 3 && !policy.__.advanced">
+			<!-- Step 2: Define Alert Policy -->
+			<div ng-show="step === 2 && !policy.__.advanced">
 				<!-- Criteria -->
 				<div>
 					<label>Match Criteria</label>
@@ -171,7 +171,7 @@
 					<div class="row">
 						<div class="col-md-4">
 							<div class="form-group">
-								<label for="window">Window</label>
+								<label>Window</label>
 								<select class="form-control" ng-model="policy.__.window"
 								uib-tooltip="{{getWindow().description}}" tooltip-animation="false">
 									<option ng-repeat="item in config.window" value="{{item.type}}">{{item.title}}</option>
@@ -182,7 +182,7 @@
 						<!-- fields -->
 						<div class="col-md-4" ng-repeat="field in getWindow().fields" ng-init="field.val = field.val || (field.defaultValue || '');" ng-hide="field.hide">
 							<div class="form-group" ng-class="{'has-warning' : !field.val || !field.val.match(field.regex)}">
-								<label for="window">Window - {{field.title}}</label>
+								<label>Window - {{field.title}}</label>
 								<input type="text" class="form-control" autocomplete="off" placeholder="{{field.description}}" ng-model="field.val" title="{{field.description}}">
 							</div>
 						</div>
@@ -192,7 +192,7 @@
 					<div class="row">
 						<div class="col-md-4">
 							<div class="form-group" ng-class="{'text-yellow' : (policy.__.groupAgg && !policy.__.groupAggPath)}">
-								<label for="window">Aggregation</label>
+								<label>Aggregation</label>
 								<div class="input-group">
 									<div class="input-group-btn">
 										<select class="form-control" ng-model="policy.__.groupAgg" ng-change="updateGroupAgg()">
@@ -209,7 +209,7 @@
 
 						<div class="col-md-4">
 							<div class="form-group" ng-class="{'text-yellow' : (!policy.__.groupCondOp || !policy.__.groupCondVal)}">
-								<label for="window">Condition</label>
+								<label>Condition</label>
 								<div class="input-group">
 									<div class="input-group-btn">
 										<select class="form-control" ng-model="policy.__.groupCondOp" ng-class="{'has-warning' : !policy.__.groupCondOp}">
@@ -223,7 +223,7 @@
 
 						<div class="col-md-4">
 							<div class="form-group">
-								<label for="window">Alias (Optional)</label>
+								<label>Alias (Optional)</label>
 								<input type="text" class="form-control" ng-model="policy.__.groupAggAlias" placeholder="Default: aggValue" />
 							</div>
 						</div>
@@ -233,7 +233,7 @@
 					<div class="row">
 						<div class="col-md-4">
 							<div class="form-group">
-								<label for="window">Group By</label>
+								<label>Group By</label>
 								<select class="form-control" ng-model="policy.__.group">
 									<option value="">None</option>
 									<option ng-repeat="meta in _stream.metas">{{meta.tags.attrName}}</option>
@@ -244,8 +244,8 @@
 				</div>
 			</div>
 
-			<!-- Step 3: Define Alert Policy -->
-			<div ng-show="step === 3 && policy.__.advanced">
+			<!-- Step 2: Define Alert Policy -->
+			<div ng-show="step === 2 && policy.__.advanced">
 				<div class="form-group">
 					<label>Query Expression</label>
 					<textarea class="form-control" ng-model="policy.__._expression"
@@ -253,8 +253,8 @@
 				</div>
 			</div>
 
-			<!-- Step 4: Email Notification -->
-			<div ng-show="step === 4">
+			<!-- Step 3: Email Notification -->
+			<div ng-show="step === 3">
 				<div class="row">
 					<div class="col-xs-4">
 						<div class="form-group" ng-class="{'has-warning' : !policy.tags.policyId}">

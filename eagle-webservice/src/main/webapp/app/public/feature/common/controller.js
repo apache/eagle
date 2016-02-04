@@ -59,245 +59,29 @@
 		return Policy;
 	});
 
-	/*
-	// ==============================================================
-	// =                        Configuration                       =
-	// ==============================================================
-	feature.configNavItem("dataSrcConfig", "Data Source", "database");
-	feature.configController('dataSrcConfig', function(PageConfig, Site, $scope, $q, Entities) {
-		PageConfig.hideSite = true;
-
-		$scope._siteEntity = null;
-		$scope._siteEntityLock = false;
-
-		$scope._dataSrcEntity = null;
-		$scope._dataSrcEntityLock = false;
-
-		$scope.dataSrcList = Entities.queryGroup("AlertStreamService", '@dataSource=~".*"', "@dataSource", "count");
-
-		// Policy statistic
-		$scope.policyStatistic = Entities.queryGroup("AlertDefinitionService", '@dataSource=~".*"', "@site,@dataSource", "count");
-		$scope.getPolicyCount = function(site, dataSource) {
-			for(var i = 0 ; i < $scope.policyStatistic.length ; i += 1) {
-				var _cur = $scope.policyStatistic[i];
-				if(_cur.key[0] === site && _cur.key[1] === dataSource) {
-					return _cur.value[0];
-				}
-			}
-			return 0;
-		};
-
-		// Alert statistic
-		$scope.alertStatistic = Entities.queryGroup("AlertService", {_duration: 1000 * 60 * 60 * 24 * 30}, "@site,@dataSource", "count");
-		$scope.getAlertCount = function(site, dataSource) {
-			for(var i = 0 ; i < $scope.alertStatistic.length ; i += 1) {
-				var _cur = $scope.alertStatistic[i];
-				if(_cur.key[0] === site && _cur.key[1] === dataSource) {
-					return _cur.value[0];
-				}
-			}
-			return 0;
-		};
-
-		// =========================================== Site ===========================================
-		$scope.showSiteEditor = function(site) {
-			$("#siteMDL").modal("show");
-			setTimeout(function() {
-				$("#siteName").focus();
-			}, 500);
-
-			$scope._siteEntity = {
-				dataSrcList: {}
-			};
-			$.each($scope.dataSrcList, function(i, item) {
-				$scope._siteEntity.dataSrcList[item.key[0]] = {
-					name: item.key[0],
-					enabled: false
-				};
-			});
-
-			if(site) {
-				$scope._siteEntity.srcSite = site;
-				$scope._siteEntity.name = site.name;
-
-				$.each(site.dataSrcList, function(i, dataSrc) {
-					$scope._siteEntity.dataSrcList[dataSrc.tags.dataSource].enabled = dataSrc.enabled === undefined ? true : dataSrc.enabled;
-				});
-			}
-		};
-		$scope.checkUpdateSite = function() {
-			if(!$scope._siteEntity || !$scope._siteEntity.dataSrcList) return false;
-
-			var _hasDataSrc = !!common.array.find(true, common.map.toArray($scope._siteEntity.dataSrcList), "enabled");
-			return $scope._siteEntity.name && _hasDataSrc && !$scope._siteEntityLock;
-		};
-		$scope.confirmUpateSite = function() {
-			var promiseList = [];
-			$scope._siteEntityLock = true;
-
-			if($scope._siteEntity.srcSite) {
-				promiseList = [];
-				$.each($scope._siteEntity.dataSrcList, function(name, dataSrc) {
-					var _entity = {
-						enabled: dataSrc.enabled,
-						tags: {
-							site: $scope._siteEntity.name,
-							dataSource: name
-						}
-					};
-
-					if(dataSrc.enabled) {
-						promiseList.push(Entities.updateEntity("AlertDataSourceService", _entity)._promise);
-					} else {
-						var _dataSrc = common.array.find(name, $scope._siteEntity.srcSite.dataSrcList, "tags.dataSource");
-						if(_dataSrc) {
-							_dataSrc.enabled = false;
-							promiseList.push(Entities.updateEntity("AlertDataSourceService", _entity)._promise);
-						}
-					}
-				});
-			} else {
-				$.each($scope._siteEntity.dataSrcList, function(name, dataSrc) {
-					if(!dataSrc.enabled) return;
-
-					var _entity = {
-						enabled: true,
-						tags: {
-							site: $scope._siteEntity.name,
-							dataSource: name
-						}
-					};
-					promiseList.push(Entities.updateEntity("AlertDataSourceService", _entity)._promise);
-				});
-			}
-
-			$q.all(promiseList).then(function() {
-				$("#siteMDL").modal("hide")
-					.on("hidden.bs.modal", function() {
-						$("#siteMDL").off("hidden.bs.modal");
-						Site.reload();
-					});
-			}).finally(function() {
-				$scope._siteEntityLock = false;
-			});
-		};
-
-		// ======================================= Data Source ========================================
-		$scope.showDataSourceEditor = function(dataSrc) {
-			$("#dataSrcMDL").modal("show");
-			setTimeout(function() {
-				$("#dataSrcConfig").focus();
-			}, 500);
-
-			$scope._dataSrcEntity = dataSrc;
-		};
-
-		$scope.confirmUpateDataSource = function() {
-			$scope._dataSrcEntityLock = true;
-			Entities.updateEntity("AlertDataSourceService", $scope._dataSrcEntity)._promise.then(function() {
-				$("#dataSrcMDL").modal("hide");
-			}).finally(function() {
-				$scope._dataSrcEntityLock = false;
-			});
-		};
-
-		$scope.confirmDeleteDataSource = function() {
-			console.log($scope._dataSrcEntity);
-			$("#dataSrcMDL").modal("hide")
-				.on('hidden.bs.modal', function () {
-					$("#dataSrcMDL").off('hidden.bs.modal');
-
-					var _additionalContent = Site.find($scope._dataSrcEntity.tags.site).dataSrcList.length > 1 ? "" : "<p class='text-muted' style='margin-left: 60px;'>(This site has only one source. Delete will remove site either.)</p>";
-
-					$.dialog({
-						title: "Delete Confirm",
-						content: "<span class='text-red fa fa-exclamation-triangle pull-left' style='font-size: 50px;'></span>" +
-						"<p>You are <strong class='text-red'>DELETING</strong> the data source '<strong>" + $scope._dataSrcEntity.tags.dataSource + "</strong>' of '" + $scope._dataSrcEntity.tags.site + "'!</p>" +
-						"<p>Proceed to delete?</p>" + _additionalContent,
-						buttons: [
-							{name: "Delete", class: "btn btn-danger", value: true},
-							{name: "Cancel", class: "btn btn-default", value: false}
-						]
-					}, function(ret) {
-						if(!ret) return;
-
-						Entities.deleteEntity("AlertDataSourceService", $scope._dataSrcEntity)._promise.then(function() {
-							Site.reload();
-						});
-					});
-				});
-		};
-	});
-	*/
-
 	// ==============================================================
 	// =                          Policies                          =
 	// ==============================================================
 
-	// ======================= Policy Summary =======================
-	feature.navItem("summary", "Policies", "list");
-	feature.controller('summary', function(PageConfig, Site, $scope, $q, Application, Entities) {
-		PageConfig.pageSubTitle = Site.current().name;
-
-		$scope.dataReady = false;
-		var _policyList = Entities.queryGroup("AlertDefinitionService", {dataSource:Application.current().tags.application, site: Site.current().name}, "@dataSource", "count");
-		console.log(_policyList);
-
-		/*$scope.dataSources = {};
-		$scope.dataReady = false;
-
-		var _policyList = Entities.queryGroup("AlertDefinitionService", {dataSource:null, site: Site.current().name}, "@dataSource", "count");
-
-		_policyList._promise.then(function() {
-			// List programs
-			$.each(_policyList, function(i, unit) {
-				var _dataSrc = Site.current().dataSrcList.find(unit.key[0]);
-				if(_dataSrc) {
-					_dataSrc.count = unit.value[0];
-				} else {
-					var _siteHref = $("<a>").attr('href', '#/common/siteList').text("Setup");
-					var _dlg = $.dialog({
-						title: "Data Source Not Found",
-						content: $("<div>")
-							.append("Data Source [" + unit.key[0] + "] not found. Please check your configuration in ")
-							.append(_siteHref)
-							.append(" page.")
-					});
-					_siteHref.click(function() {
-						_dlg.modal('hide');
-					});
-				}
-			});
-
-			$scope.dataReady = true;
-		});*/
-	});
-
 	// ========================= Policy List ========================
-	feature.controller('policyList', function(PageConfig, Site, $scope, $wrapState, Entities, Policy) {
+	feature.navItem("policyList", "Policies", "list");
+	feature.controller('policyList', function(PageConfig, Site, $scope, Application, Entities, Policy) {
 		PageConfig.pageTitle = "Policy List";
 		PageConfig.pageSubTitle = Site.current().name;
-		PageConfig
-			.addNavPath("Policy View", "/common/summary")
-			.addNavPath("Policy List");
 
 		// Initial load
 		$scope.policyList = [];
-		if($wrapState.param.filter) {
-			$scope.dataSource = Site.current().dataSrcList.find($wrapState.param.filter);
-		}
+		$scope.application = Application.current();
 
 		// List policies
-		var _policyList = Entities.queryEntities("AlertDefinitionService", {site: Site.current().name, dataSource: $wrapState.param.filter});
+		var _policyList = Entities.queryEntities("AlertDefinitionService", {site: Site.current().tags.site, dataSource: $scope.application.tags.application});
 		_policyList._promise.then(function() {
 			$.each(_policyList, function(i, policy) {
-				if($.inArray(policy.tags.dataSource, app.config.dataSource.uiInvisibleList) === -1) {
-					policy.__mailStr = common.getValueByPath(common.parseJSON(policy.notificationDef, {}), "0.recipients", "");
-					policy.__mailList = policy.__mailStr.trim() === "" ? [] : policy.__mailStr.split(/[,;]/);
-					policy.__expression = common.parseJSON(policy.policyDef, {}).expression;
+				policy.__mailStr = common.getValueByPath(common.parseJSON(policy.notificationDef, {}), "0.recipients", "");
+				policy.__mailList = policy.__mailStr.trim() === "" ? [] : policy.__mailStr.split(/[,;]/);
+				policy.__expression = common.parseJSON(policy.policyDef, {}).expression;
 
-					$scope.policyList.push(policy);
-				}
+				$scope.policyList.push(policy);
 			});
 		});
 		$scope.policyList._promise = _policyList._promise;
@@ -331,11 +115,9 @@
 		PageConfig.pageTitle = "Policy Detail";
 		PageConfig.lockSite = true;
 		PageConfig
-			.addNavPath("Policy View", "/common/summary")
 			.addNavPath("Policy List", "/common/policyList")
 			.addNavPath("Policy Detail");
 
-		$scope.common = common;
 		$scope.chartConfig = {
 			chart: "line",
 			xType: "time"
@@ -351,6 +133,7 @@
 				alertExecutorId: $wrapState.param.executor
 			});
 		}
+
 		$scope.policyList._promise.then(function() {
 			var policy = null;
 
@@ -398,7 +181,7 @@
 
 			// Alert list
 			$scope.alertList = Entities.queryEntities("AlertService", {
-				site: Site.current().name,
+				site: Site.current().tags.site,
 				dataSource: policy.tags.dataSource,
 				policyId: policy.tags.policyId,
 				_pageSize: MAX_PAGESIZE,
@@ -417,11 +200,10 @@
 	});
 
 	// ======================== Policy Edit =========================
-	function policyCtrl(create, PageConfig, Site, Policy, $scope, $wrapState, $q, Entities) {
+	function policyCtrl(create, PageConfig, Site, Policy, $scope, $wrapState, $q, Entities, Application, Authorization) {
 		PageConfig.pageTitle = create ? "Policy Create" : "Policy Edit";
-		PageConfig.pageSubTitle = Site.current().name;
+		PageConfig.pageSubTitle = Site.current().tags.site;
 		PageConfig
-			.addNavPath("Policy View", "/common/summary")
 			.addNavPath("Policy List", "/common/policyList")
 			.addNavPath("Policy Edit");
 
@@ -486,8 +268,8 @@
 		// =            Data Preparation            =
 		// ==========================================
 		// Steam list
-		var _streamList = Entities.queryEntities("AlertStreamService", '@streamName=~".*"');
-		var _executorList = Entities.queryEntities("AlertExecutorService", '@streamName=~".*"');
+		var _streamList = Entities.queryEntities("AlertStreamService", {dataSource: Application.current().tags.application});
+		var _executorList = Entities.queryEntities("AlertExecutorService", {dataSource: Application.current().tags.application});
 		$scope.streamList = _streamList;
 		$scope.executorList = _executorList;
 		$scope.streamReady = false;
@@ -530,20 +312,6 @@
 			// =              Step control              =
 			// ==========================================
 			$scope.steps = [
-				// >> Select data source
-				{
-					title: "Select Data Source",
-					ready: function() {
-						return $scope.streamReady;
-					},
-					init: function() {
-						if(create) $scope.policy.tags.dataSource = $scope.policy.tags.dataSource || Site.current().dataSrcList[0].tags.dataSource;
-					},
-					nextable: function() {
-						return common.getValueByPath($scope.policy, "tags.dataSource");
-					}
-				},
-
 				// >> Select stream
 				{
 					title: "Select Stream",
@@ -668,6 +436,7 @@
 						prefix: "alertdef",
 						remediationDef: "",
 						tags: {
+							dataSource: Application.current().tags.application,
 							policyType: "siddhiCEPEngine"
 						}
 					};
@@ -682,6 +451,10 @@
 							}, 1);
 						}
 					}
+
+					// Start step
+					$scope.changeStep(0, 1, false);
+					console.log($scope.policy);
 				} else {
 					var _policy = Entities.queryEntity("AlertDefinitionService", $scope.encodedRowkey);
 					_policy._promise.then(function() {
@@ -731,7 +504,7 @@
 
 							$scope.policy.__.streamName = _streamName;
 
-							//  > Conditions
+							// > Conditions
 							// Loop condition groups
 							if(_cond.trim() !== "" && /^\(.*\)$/.test(_cond)) {
 								var _condGrps = _cond.substring(1, _cond.length - 1).split(/\)\s+and\s+\(/);
@@ -817,14 +590,10 @@
 							}
 						}
 
-						$scope.changeStep(0, 3, false);
+						$scope.changeStep(0, 2, false);
+						console.log($scope.policy);
 					});
 				}
-
-				// Start step
-				$scope.changeStep(0, 1, false);
-
-				console.log($scope.policy, $scope);
 			});
 
 			// ==========================================
@@ -899,7 +668,7 @@
 			// Resolver
 			$scope.resolverTypeahead = function(value, resolver) {
 				var _resolverList = Entities.query("stream/attributeresolve", {
-					site: Site.current().name,
+					site: Site.current().tags.site,
 					resolver: resolver,
 					query: value
 				});
@@ -1068,14 +837,14 @@
 				}
 
 				// site
-				$scope.policy.tags.site = $scope.policy.tags.site || Site.current().name;
+				$scope.policy.tags.site = $scope.policy.tags.site || Site.current().tags.site;
+
+				// owner
+				$scope.policy.owner = Authorization.userProfile.username;
 
 				// Update function
 				function _updatePolicy() {
 					Entities.updateEntity("AlertDefinitionService", $scope.policy)._promise.success(function(data) {
-						$scope.create = create = false;
-						$scope.encodedRowkey = data.obj[0];
-
 						$.dialog({
 							title: "Success",
 							content: (create ? "Create" : "Update") + " success!"
@@ -1089,6 +858,9 @@
 								});
 							}
 						});
+
+						$scope.create = create = false;
+						$scope.encodedRowkey = data.obj[0];
 					}).error(function(data) {
 						$.dialog({
 							title: "OPS",
@@ -1132,12 +904,16 @@
 		});
 	}
 
-	feature.controller('policyCreate', function(PageConfig, Site, Policy, $scope, $wrapState, $q, Entities) {
-		policyCtrl(true, PageConfig, Site, Policy, $scope, $wrapState, $q, Entities);
+	feature.controller('policyCreate', function(PageConfig, Site, Policy, $scope, $wrapState, $q, Entities, Application, Authorization) {
+		var _args = [true];
+		_args.push.apply(_args, arguments);
+		policyCtrl.apply(this, _args);
 	}, "policyEdit");
-	feature.controller('policyEdit', function(PageConfig, Site, Policy, $scope, $wrapState, $q, Entities) {
+	feature.controller('policyEdit', function(PageConfig, Site, Policy, $scope, $wrapState, $q, Entities, Application, Authorization) {
 		PageConfig.lockSite = true;
-		policyCtrl(false, PageConfig, Site, Policy, $scope, $wrapState, $q, Entities);
+		var _args = [false];
+		_args.push.apply(_args, arguments);
+		policyCtrl.apply(this, _args);
 	});
 
 	// ==============================================================
@@ -1146,13 +922,13 @@
 
 	// ========================= Alert List =========================
 	feature.navItem("alertList", "Alerts", "exclamation-triangle");
-	feature.controller('alertList', function(PageConfig, Site, $scope, $wrapState, $interval, $timeout, Entities) {
-		PageConfig.pageSubTitle = Site.current().name;
+	feature.controller('alertList', function(PageConfig, Site, $scope, $wrapState, $interval, $timeout, Entities, Application) {
+		PageConfig.pageSubTitle = Site.current().tags.site;
 
 		var MAX_PAGESIZE = 10000;
 
 		// Initial load
-		$scope.dataSource = $wrapState.param.dataSource;
+		$scope.application = Application.current();
 
 		$scope.alertList = [];
 		$scope.alertList.ready = false;
@@ -1164,8 +940,8 @@
 			}
 
 			var _list = Entities.queryEntities("AlertService", {
-				site: Site.current().name,
-				dataSource: $scope.dataSource,
+				site: Site.current().tags.site,
+				dataSource: $scope.application.tags.application,
 				hostname: null,
 				_pageSize: MAX_PAGESIZE,
 				_duration: 1000 * 60 * 60 * 24 * 30,

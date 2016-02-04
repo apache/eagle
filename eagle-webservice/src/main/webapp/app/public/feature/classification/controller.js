@@ -84,7 +84,7 @@
 	// ==============================================================
 
 	// =================== Classification Summary ===================
-	feature.navItem("summary", "Classification", "user-secret");
+	/*feature.navItem("summary", "Classification", "user-secret");
 	feature.controller('summary', function(PageConfig, Site, $scope, SensitivityConfig, Entities) {
 		PageConfig.pageTitle = "Data Classification";
 		PageConfig.pageSubTitle = Site.current().name;
@@ -247,14 +247,15 @@
 				$scope.$apply();
 			});
 		};
-	});
+	});*/
 
 	// =============================================================
 	// =                        Sensitivity                        =
 	// =============================================================
+	feature.navItem("sensitivity", "Classification", "user-secret");
 	feature.controller('sensitivity', function(PageConfig, Site, $scope, $wrapState, SensitivityConfig) {
 		PageConfig.pageTitle = "Data Classification";
-		PageConfig.pageSubTitle = Site.current().name;
+		PageConfig.pageSubTitle = Site.current().tags.site;
 		$scope.config = SensitivityConfig;
 		$scope.ajaxId = Math.random();
 

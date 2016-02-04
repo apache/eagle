@@ -19,21 +19,7 @@
 	<div class="box-header with-border">
 		<i class="fa fa-list-alt"> </i>
 		<h3 class="box-title">
-			{{dataSource || "All Alerts"}}
-			<div class="btn-group">
-				<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-					<i class="fa fa-caret-down"></i>
-				</button>
-				<ul id="programList" class="dropdown-menu" role="menu">
-					<li ng-repeat="dataSrc in Site.current().dataSrcList">
-						<a href="#/common/alertList/{{dataSrc.tags.dataSource}}">{{dataSrc.tags.dataSource}}</a>
-					</li>
-					<li class="divider"></li>
-					<li>
-						<a href="#/common/alertList">All Policy List</a>
-					</li>
-				</ul>
-			</div>
+			{{application.alias || application.tags.application}}
 		</h3>
 	</div>
 	<div class="box-body">

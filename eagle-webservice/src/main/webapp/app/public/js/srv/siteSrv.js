@@ -34,7 +34,7 @@
 				_currentSite = site;
 
 				// Keep current site and reload page
-				if(!_prev || _prev.name !== _currentSite.tags.site) {
+				if(!_prev || _prev.tags.site !== _currentSite.tags.site) {
 					if(sessionStorage) {
 						sessionStorage.setItem("site", _currentSite.tags.site);
 					}

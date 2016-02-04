@@ -15,13 +15,14 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
+
 <div class="box box-info">
 	<div class="box-header with-border">
 		<h3 class="box-title">
 			{{policy.tags.policyId}}
 			<small>{{policy.tags.site}}</small>
 		</h3>
-	</div><!-- /.box-header -->
+	</div>
 
 	<div class="box-body">
 		<div class="row">
@@ -49,7 +50,7 @@
 				<button class="btn btn-danger" ng-click="deletePolicy(policy)">Delete</button>
 			</div>
 		</div>
-	</div><!-- /.box-body -->
+	</div>
 
 	<div class="overlay" ng-hide="policyList._promise.$$state.status === 1;">
 		<i class="fa fa-refresh fa-spin"></i>
@@ -93,7 +94,7 @@
 					<div nvd3="alertFailSeries" data-title="Alert Fail Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
 				</div>
 			</div>
-		</div><!-- /.tab-pane -->
+		</div>
 
 		<div class="tab-pane" data-id="statistics">
 			<div class="row">
@@ -104,7 +105,7 @@
 							<span class="info-box-text">Policy Eval Count</span>
 							<span class="info-box-number">{{common.array.sum(policyEvalSeries, "1")}} <small>(Monthly)</small></span>
 							<span class="info-box-number">{{policyEvalSeries[policyEvalSeries.length - 1][1]}} <small>(Daily)</small></span>
-						</div><!-- /.info-box-content -->
+						</div>
 					</div>
 				</div>
 				<div class="col-xs-3">
@@ -114,7 +115,7 @@
 							<span class="info-box-text">Policy Eval Fail Count</span>
 							<span class="info-box-number">{{common.array.sum(policyEvalFailSeries, "1")}} <small>(Monthly)</small></span>
 							<span class="info-box-number">{{policyEvalFailSeries[policyEvalFailSeries.length - 1][1]}} <small>(Daily)</small></span>
-						</div><!-- /.info-box-content -->
+						</div>
 					</div>
 				</div>
 				<div class="col-xs-3">
@@ -124,7 +125,7 @@
 							<span class="info-box-text">Alert Count</span>
 							<span class="info-box-number">{{common.array.sum(alertSeries, "1")}} <small>(Monthly)</small></span>
 							<span class="info-box-number">{{alertSeries[alertSeries.length - 1][1]}} <small>(Daily)</small></span>
-						</div><!-- /.info-box-content -->
+						</div>
 					</div>
 				</div>
 				<div class="col-xs-3">
@@ -134,11 +135,11 @@
 							<span class="info-box-text">Alert Fail Count</span>
 							<span class="info-box-number">{{common.array.sum(alertFailSeries, "1")}} <small>(Monthly)</small></span>
 							<span class="info-box-number">{{alertFailSeries[alertFailSeries.length - 1][1]}} <small>(Daily)</small></span>
-						</div><!-- /.info-box-content -->
+						</div>
 					</div>
 				</div>
 			</div>
-		</div><!-- /.tab-pane -->
+		</div>
 
 		<div class="tab-pane" data-id="alerts">
 			<div sorttable source="alertList" sort="-timestamp">
@@ -165,7 +166,7 @@
 					</tbody>
 				</table>
 			</div>
-		</div><!-- /.tab-pane -->
+		</div>
 
-	</div><!-- /.tab-content -->
+	</div>
 </div>

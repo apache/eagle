@@ -19,21 +19,7 @@
 	<div class="box-header with-border">
 		<i class="fa fa-list-alt"> </i>
 		<h3 class="box-title">
-			{{dataSource.desc || dataSource.tags.dataSource || "All Policies"}}
-			<div class="btn-group">
-				<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-					<i class="fa fa-caret-down"></i>
-				</button>
-				<ul id="programList" class="dropdown-menu" role="menu">
-					<li ng-repeat="dataSrc in Site.current().dataSrcList" ng-hide="dataSrc.hide">
-						<a href="#/common/policyList/{{dataSrc.tags.dataSource}}">{{dataSrc.desc || dataSrc.tags.dataSource}}</a>
-					</li>
-					<li class="divider"></li>
-					<li>
-						<a href="#/common/policyList">All Policy List</a>
-					</li>
-				</ul>
-			</div>
+			{{application.alias || application.tags.application}}
 		</h3>
 	</div>
 	<div class="box-body">
