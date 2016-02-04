@@ -145,6 +145,14 @@
 		};
 
 		// ================= Function ==================
+		// Configuration check
+		$scope.configCheck = function(config) {
+			if(config && !common.parseJSON(config, false)) {
+				return "Invalid JSON format";
+			}
+		};
+
+		// Feature
 		$scope._feature = "";
 		function highlightFeature(feature) {
 			$scope._feature = feature;

@@ -86,6 +86,8 @@ common.setValueByPath = function(unit, path, value) {
 
 common.parseJSON = function (str, defaultVal) {
 	try {
+		str = (str + "").trim();
+		if(Number(str).toString() === str) throw "Number format";
 		return JSON.parse(str);
 	} catch(err) {
 		if(defaultVal === undefined) {
