@@ -18,6 +18,7 @@ package org.apache.eagle.service.security.hdfs;
 
 import java.util.List;
 
+import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.generic.ListQueryResource;
 
 import org.apache.eagle.alert.entity.AlertDataSourceEntity;
@@ -34,7 +35,7 @@ public class HDFSResourceUtils {
 	public static HDFSResourceAccessConfig  getConfig(String siteId ) throws Exception
 	{
 		ListQueryResource resource = new ListQueryResource();
-		String queryFormat = "AlertDataSourceService[@dataSource=\""+HDFSResourceConstants.HDFS_DATA_SOURCE+"\" AND @site=\"%s\"]{*}";
+		String queryFormat = Constants.APPLICATION_DESCRIPTION_SERVICE_ENDPOINT_NAME+"[@application=\""+HDFSResourceConstants.HDFS_DATA_SOURCE+"\" AND @site=\"%s\"]{*}";
 		ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, siteId), null, null,Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null);
 		List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) ret.getObj();
 		if (list == null || list.size() == 0)
