@@ -96,13 +96,13 @@ public class AlertDefinitionDAOImpl implements PolicyDefinitionDAO<AlertDefiniti
 		try {
 			client.create(entityList, Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
 		} catch (IOException | EagleServiceClientException exception) {
-			LOG.error("Exception in updating markdown for policy in HBase ", exception);
+			LOG.error("Exception in updating markdown for policy in HBase", exception);
 		} finally {
 			try {
 				if (null != client)
 					client.close();
 			} catch (IOException exception) {
-				LOG.error("Unable to close Eagle service client, " + exception);
+				LOG.error("Unable to close Eagle service client", exception);
 			}
 		}
 	}
