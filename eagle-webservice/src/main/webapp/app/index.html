@@ -129,7 +129,7 @@
 									<ul class="dropdown-menu">
 										<li ng-repeat="_app in _grp.enabledList">
 											<a ng-click="Application.current(_app);">
-												<span class="fa fa-cubes"></span> {{_app.alias || _app.tags.application}}
+												<span class="fa fa-cubes"></span> {{_app.displayName}}
 											</a>
 										</li>
 									</ul>
@@ -148,7 +148,7 @@
 					<ul class="sidebar-menu">
 						<li class="header">
 							{{Application.current().groupName || 'Application'}} >
-							{{Application.current().alias || Application.current().tags.application || 'Features'}}
+							{{Application.current().displayName || 'Features'}}
 						</li>
 						<li ng-repeat="page in PageConfig.navConfig.pageList track by $index" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
 							<a href="{{page.url}}">

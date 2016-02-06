@@ -25,7 +25,7 @@
 	// ==============================================================
 	// =                          Function                          =
 	// ==============================================================
-	feature.service("SensitivityConfig", function(Site) {
+	/*feature.service("SensitivityConfig", function(Site) {
 		return {
 			list: [
 				{
@@ -77,7 +77,7 @@
 				}
 			]
 		};
-	});
+	});*/
 
 	// ==============================================================
 	// =                       Classification                       =
@@ -253,20 +253,16 @@
 	// =                        Sensitivity                        =
 	// =============================================================
 	feature.navItem("sensitivity", "Classification", "user-secret");
-	feature.controller('sensitivity', function(PageConfig, Site, $scope, $wrapState, SensitivityConfig) {
+	feature.controller('sensitivity', function(PageConfig, Site, $scope, Application) {
 		PageConfig.pageTitle = "Data Classification";
 		PageConfig.pageSubTitle = Site.current().tags.site;
-		$scope.config = SensitivityConfig;
 		$scope.ajaxId = Math.random();
+		$scope.viewConfig = Application.current().configObj.view;
 
-		// Check data source
-		$scope.dataSrc = common.array.find($wrapState.param.filter, $scope.config.list, "name");
-		if(!$scope.dataSrc) {
+		if(!$scope.viewConfig) {
 			$.dialog({
 				title: "OPS",
-				content: "Data Source '" + $wrapState.param.filter + "' not found!"
-			}, function() {
-				location.href = "#/classification/summary";
+				content: "View configuration not defined in Application."
 			});
 		}
 	});
@@ -304,7 +300,7 @@
 		$scope.updateItems = function(path) {
 			if(path) $scope.path = path;
 
-			$scope.items = Entities.query($scope.dataSrc.api, {site: Site.current().name, path: $scope.path});
+			$scope.items = Entities.query($scope.viewConfig.api, {site: Site.current().tags.site, path: $scope.path});
 			$scope.items._promise.success(function(data) {
 				Entities.dialog(data, function() {
 					if($scope.path !== "/") $scope.updateItems("/");
@@ -325,7 +321,7 @@
 			$scope._markItem = {
 				prefix: $scope.dataSrc.prefix,
 				tags: {
-					site: Site.current().name
+					site: Site.current().tags.site
 				},
 				sensitivityType: ""
 			};
@@ -350,7 +346,7 @@
 			}, function(ret) {
 				if(!ret) return;
 
-				var _cond = {site: Site.current().name};
+				var _cond = {site: Site.current().tags.site};
 				_cond[$scope.dataSrc.keys[0]] = item.resource;
 				Entities.deleteEntities($scope.dataSrc.service, _cond);
 
@@ -379,13 +375,13 @@
 			});
 		};
 
-		$scope.databases = Entities.query($scope.dataSrc.api.database, {site: Site.current().name});
+		$scope.databases = Entities.query($scope.dataSrc.api.database, {site: Site.current().tags.site});
 		_fillAttr($scope.databases, "database", $scope.dataSrc.mapping.database);
 
 		$scope.loadTables = function(database) {
 			if(database.tables) return;
 			var _qry = {
-				site: Site.current().name
+				site: Site.current().tags.site
 			};
 			_qry[$scope.dataSrc.mapping.database] = database[$scope.dataSrc.mapping.database];
 			database.tables = Entities.query($scope.dataSrc.api.table, _qry);
@@ -398,7 +394,7 @@
 
 			if(table.columns) return;
 			var _qry = {
-				site: Site.current().name
+				site: Site.current().tags.site
 			};
 			_qry[$scope.dataSrc.mapping.database] = database[$scope.dataSrc.mapping.database];
 			_qry[$scope.dataSrc.mapping.table] = table[$scope.dataSrc.mapping.table];
@@ -414,7 +410,7 @@
 			$scope._markItem = {
 				prefix: $scope.dataSrc.prefix,
 				tags: {
-					site: Site.current().name
+					site: Site.current().tags.site
 				},
 				sensitivityType: ""
 			};
@@ -442,7 +438,7 @@
 				if(!ret) return;
 
 				var _qry = {
-					site: Site.current().name
+					site: Site.current().tags.site
 				};
 				_qry[$scope.dataSrc.keys[0]] = item.resource;
 				Entities.deleteEntities($scope.dataSrc.service, _qry);

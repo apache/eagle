@@ -99,6 +99,7 @@
 					$.each(Application.list, function(i, application) {
 						Application.list.set[application.tags.application] = application;
 						application.features = application.features || [];
+						var _configObj = common.parseJSON(application.config, {});
 						var _appFeatureList = $.map(application.features, function(featureName) {
 							var _feature = Application.featureList.set[featureName];
 							if(!_feature) {
@@ -123,6 +124,16 @@
 							groupName: {
 								get: function () {
 									return this.group || "Others";
+								}
+							},
+							configObj: {
+								get: function() {
+									return _configObj;
+								}
+							},
+							displayName: {
+								get: function() {
+									return this.alias || this.tags.application;
 								}
 							}
 						});

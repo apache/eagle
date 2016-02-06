@@ -27,7 +27,7 @@
 	eagleControllers.controller('landingCtrl', function($scope, $wrapState, Site, Application, PageConfig, FeaturePageConfig, Feature) {
 		var _app = Application.current();
 
-		PageConfig.pageTitle = _app ? _app.alias || _app.tags.application : 'OPS';
+		PageConfig.pageTitle = _app ? _app.displayName : 'OPS';
 		PageConfig.pageSubTitle = Site.current().tags.site;
 
 		$scope.Application = Application;

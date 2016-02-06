@@ -15,18 +15,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<div class="nav-tabs-custom">
-	<!-- Tabs within a box -->
-	<ul class="nav nav-tabs pull-right ui-sortable-handle">
-		<li ng-repeat="entity in config.list | reverse" ng-class="{active: dataSrc.name === entity.name}">
-			<a ng-click="Feature.go('classification', 'sensitivity', entity.name)">{{entity.name}}</a>
-		</li>
-		<li class="pull-left header"><i class="fa fa-folder-open"></i> Sensitivity Browser</li>
-	</ul>
-	<div class="tab-content">
-		<!-- Morris chart - Sales -->
-		<div class="tab-pane active">
-			<ng-include src="'public/feature/classification/page/sensitivity/' + dataSrc.type + '.html?_=' + ajaxId"></ng-include>
-		</div>
+
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<i class="fa fa-folder-open"></i>
+		<h3 class="box-title ng-binding">{{Application.current().displayName}}</h3>
+		<ng-include src="'public/feature/classification/page/sensitivity/' + viewConfig.type + '.html?_=' + ajaxId"></ng-include>
+	</div>
+	<div class="box-body">
 	</div>
 </div>
