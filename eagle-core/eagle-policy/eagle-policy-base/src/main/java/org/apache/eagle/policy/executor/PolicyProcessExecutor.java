@@ -21,6 +21,7 @@ import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
@@ -243,7 +244,9 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 			pe = (PolicyEvaluator<T>) evalCls
 					.getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
 					.newInstance(config, context, policyDef, sourceStreams, needValidation);
-		} catch(Exception ex) {
+            if (pe.isMarkdownEnabled()) // updating markdown details only if the policy is found invalid
+                updateMarkdownDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
+        } catch(Exception ex) {
 			LOG.error("Fail creating new policyEvaluator", ex);
 			LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
 			throw new IllegalStateException(ex);
@@ -321,13 +324,14 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
                 for(Entry<String, PolicyEvaluator<T>> entry : policyEvaluators.entrySet()){
                     String policyId = entry.getKey();
                     PolicyEvaluator<T> evaluator = entry.getValue();
-                    updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
-                    try {
-                        evaluator.evaluate(new ValuesArray(outputCollector, input.get(1), input.get(2)));
-                    }
-                    catch (Exception ex) {
-                        LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
+                    if (!evaluator.isMarkdownEnabled()) { // not evaluated for a marked down policy
                         updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
+                        try {
+                            evaluator.evaluate(new ValuesArray(outputCollector, input.get(1), input.get(2)));
+                        } catch (Exception ex) {
+                            LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
+                            updateCounter(EAGLE_POLICY_EVAL_COUNT, getDimensions(policyId));
+                        }
                     }
                 }
             }
@@ -353,19 +357,23 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		}
 	}
 
-	@Override
-	public void onPolicyChanged(Map<String, T> changed) {
-		if(LOG.isDebugEnabled()) LOG.debug(executorId + ", partition " + partitionSeq + " policy changed : " + changed);
-		for(T alertDef : changed.values()){
-			if(!accept(alertDef))
-				continue;
-			LOG.info(executorId + ", partition " + partitionSeq + " policy really changed " + alertDef);
-			synchronized(this.policyEvaluators) {
-				PolicyEvaluator<T> pe = policyEvaluators.get(alertDef.getTags().get(Constants.POLICY_ID));
-				pe.onPolicyUpdate(alertDef);
-			}
-		}
-	}
+    @Override
+    public void onPolicyChanged(Map<String, T> changed) {
+        if(LOG.isDebugEnabled()) LOG.debug(executorId + ", partition " + partitionSeq + " policy changed : " + changed);
+        for(T alertDef : changed.values()){
+            if(!accept(alertDef))
+                continue;
+            LOG.info(executorId + ", partition " + partitionSeq + " policy really changed " + alertDef);
+            synchronized(this.policyEvaluators) {
+                PolicyEvaluator<T> pe = policyEvaluators.get(alertDef.getTags().get(Constants.POLICY_ID));
+                boolean previousMarkdown = pe.isMarkdownEnabled();
+                String previousMarkdownReason = pe.getMarkdownReason();
+                pe.onPolicyUpdate(alertDef);
+                if (isMarkdownUpdateRequired(previousMarkdown, pe.isMarkdownEnabled(), previousMarkdownReason, pe.getMarkdownReason()))
+                    updateMarkdownDetails(alertDef, pe.isMarkdownEnabled(), pe.getMarkdownReason());
+            }
+        }
+    }
 
 	@Override
 	public void onPolicyDeleted(Map<String, T> deleted) {
@@ -408,5 +416,30 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
     public void report() {
         PolicyDistroStatsLogReporter appender = new PolicyDistroStatsLogReporter();
         appender.reportPolicyMembership(executorId + "_" + partitionSeq, policyEvaluators.keySet());
+    }
+
+    /**
+     * Method to check if updating markdown details in DB is required.
+     * @return boolean: If markdown details needs to be updated for the policy
+     */
+    private boolean isMarkdownUpdateRequired (boolean previousMarkdown, boolean presentMarkdown, String previousReason, String presentReason) {
+        boolean isUpdateRequired = true;
+        if (!previousMarkdown && !presentMarkdown) { // not updating when previous/present policies are both valid
+            isUpdateRequired = false;
+        } else if (previousMarkdown && presentMarkdown) {
+            if (previousReason.equals(presentReason))
+                isUpdateRequired = false; // not updating when there is no change with the markdown reason
+        }
+        return isUpdateRequired;
+    }
+
+    /**
+     * Method to invoke Eagle Service call to update the markdown details for the policy.
+     */
+    private void updateMarkdownDetails(T entity, boolean markdownEnabled, String markdownReason) {
+        AlertDefinitionAPIEntity alertEntity = (AlertDefinitionAPIEntity) entity;
+        alertEntity.setMarkdownEnabled(markdownEnabled);
+        alertEntity.setMarkdownReason(null != markdownReason ? markdownReason : "");
+        policyDefinitionDao.updatePolicyDetails(entity);
     }
 }

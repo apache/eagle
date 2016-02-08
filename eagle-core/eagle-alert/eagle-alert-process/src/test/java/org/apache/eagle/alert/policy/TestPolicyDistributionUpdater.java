@@ -22,6 +22,7 @@ package org.apache.eagle.alert.policy;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.alert.executor.AlertExecutor;
@@ -61,6 +62,9 @@ public class TestPolicyDistributionUpdater {
                 entity.setPolicyDef("{\"type\":\"siddhiCEPEngine\",\"expression\":\"from testStream select name insert into outputStream ;\"}");
                 return map;
             }
+
+            @Override
+            public void updatePolicyDetails(AbstractPolicyDefinitionEntity entity) { /* do nothing */ }
         };
 
         AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId_1", new DefaultPolicyPartitioner(), 1, 0, alertDao, new String[]{"testStream"}){
