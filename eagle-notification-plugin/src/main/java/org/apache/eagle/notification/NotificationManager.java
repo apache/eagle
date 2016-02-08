@@ -121,15 +121,15 @@ public class NotificationManager  {
                 LOG.info("Notifications List is Null or Empty .. Policy might be deleted . Policy Id : "+entity.getTags().get(Constants.POLICY_ID));
                 return;
             }
-            LOG.info(" Invoking Notification Plugin for the Policy : "+entity.getTags().get(Constants.POLICY_ID)+" . No of Plugins found : "+listOfNotifications.size());
+            LOG.info(" Invoking Notification Plugin for the Policy : "+entity.getTags().get(Constants.POLICY_ID)+" . No of Plugins found : "+listOfNotifications.size() +" Plugins : "+listOfNotifications );
             for(String notificationType : listOfNotifications ){
                 Object notificationPluginObj = getNotificationPluginAPI(notificationType);
                 if( notificationPluginObj == null )
                     throw  new Exception(" Notification API is NULL .. Looks like Notification Plugins not loaded Properly ..  " +
-                            "Notifcation Type : "+notificationType +" Available Notifications : "+NotificationPluginLoader.getInstance(this._conf).getNotificationMapping());
+                            "Notification Type : "+notificationType +" Available Notifications : "+NotificationPluginLoader.getInstance(this._conf).getNotificationMapping());
                 notificationPluginObj.getClass().getMethod("onAlert", new Class[]{AlertAPIEntity.class}).invoke(notificationPluginObj, entity);
             }
-            LOG.info(" Successfully Notified ...");
+            LOG.info(" Successfully Notified for the alert for the policy id : "+entity.getTags().get(Constants.POLICY_ID));
         } catch ( Exception ex) {
             LOG.error(" Error in NotificationManager when invoking notifyAlert method  . Reason : "+ex.getMessage());
         }
