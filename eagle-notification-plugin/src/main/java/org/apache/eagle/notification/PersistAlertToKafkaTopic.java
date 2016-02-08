@@ -55,14 +55,13 @@ public class PersistAlertToKafkaTopic  implements NotificationPlugin {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PersistAlertToKafkaTopic.class);
 	private Map<String, KafkaTopicConfig> kafaConfigs = new ConcurrentHashMap<String, KafkaTopicConfig>();
-	private Config config;
 
 	/**
 	 * Initialize all Instance required by this Plugin
 	 * @throws Exception
      */
 	@Override
-	public void _init() throws  Exception  {
+	public void _init( Config config ) throws  Exception  {
 		kafaConfigs.clear();
 		List<AlertDefinitionAPIEntity> activeAlerts = null;
 		try{

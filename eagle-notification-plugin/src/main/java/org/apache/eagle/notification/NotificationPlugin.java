@@ -17,6 +17,7 @@
 
 package org.apache.eagle.notification;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 
@@ -31,7 +32,7 @@ public interface NotificationPlugin {
 	 * for initialization
 	 * @throws Exception
      */
-	public void _init() throws  Exception;
+	public void _init( Config config ) throws  Exception;
 
 	/**
 	 * Update Plugin if any change in Policy Definition

@@ -39,7 +39,6 @@ public class PersistToEagleStore implements  NotificationPlugin {
     private static final Logger LOG = LoggerFactory.getLogger(PersistToEagleStore.class);
     private NotificationStatus status;
 
-    private Config config;
     private EagleAlertPersist persist;
 
     /**
@@ -47,8 +46,7 @@ public class PersistToEagleStore implements  NotificationPlugin {
      * @throws Exception
      */
     @Override
-    public void _init() throws Exception {
-        config = EagleConfigFactory.load().getConfig();
+    public void _init(Config config) throws Exception {
         this.persist = new EagleAlertPersist(config);
     }
 

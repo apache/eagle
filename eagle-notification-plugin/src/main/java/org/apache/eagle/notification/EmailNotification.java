@@ -17,6 +17,7 @@
 
 package org.apache.eagle.notification;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
@@ -46,7 +47,7 @@ public class EmailNotification  implements NotificationPlugin {
 	 * Initializing required objects for email notification plug in
 	 * @throws Exception
      */
-	public void _init() throws  Exception {
+	public void _init(Config config) throws  Exception {
 		emailGenerators.clear();
 		List<AlertDefinitionAPIEntity> activeAlerts = new ArrayList<AlertDefinitionAPIEntity>();
 		// find out all policies and its notification Config

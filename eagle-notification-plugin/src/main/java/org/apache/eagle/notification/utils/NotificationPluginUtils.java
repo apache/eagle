@@ -21,14 +21,17 @@ package org.apache.eagle.notification.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigObject;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.notification.NotificationManager;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
 import org.apache.eagle.service.client.EagleServiceConnector;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,8 +43,18 @@ import java.util.Map;
 public class NotificationPluginUtils {
 
 	private static ConfigObject _conf;
+	private static Config   _config;
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final CollectionType mapCollectionType = mapper.getTypeFactory().constructCollectionType(List.class, Map.class);
+
+
+	/**
+	 * Initially Client should set the Config Object
+	 * @param config
+     */
+	public static void setConfig( Config config ){
+		_config = config;
+	}
 
 	/**
 	 * Returns Notification Specific Conf Object
@@ -50,10 +63,9 @@ public class NotificationPluginUtils {
      */
 	public static ConfigObject getNotificationConfigObj() throws Exception
 	{
-		Config config = EagleConfigFactory.load().getConfig();
-		if( config.getObject("eagleNotificationProps") == null )
+		if( _config.getObject("eagleNotificationProps") == null )
 			throw new Exception("Eagle Notification Properties not found in application.conf ");
-		return config.getObject("eagleNotificationProps");
+		return _config.getObject("eagleNotificationProps");
 	}
 
 	/**
@@ -76,10 +88,9 @@ public class NotificationPluginUtils {
      */
 	public static List<AlertDefinitionAPIEntity> fetchActiveAlerts() throws Exception {
 		List<AlertDefinitionAPIEntity> result = null;
-		Config config = EagleConfigFactory.load().getConfig();
-		String site = config.getString("eagleProps.site");
-		String dataSource = config.getString("eagleProps.dataSource");
-		PolicyDefinitionDAO policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(config) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
+		String site = _config.getString("eagleProps.site");
+		String dataSource = _config.getString("eagleProps.dataSource");
+		PolicyDefinitionDAO policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(_config) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
 		try{
 			 result = policyDefinitionDao.findActivePolicies(site, dataSource );
 		}catch (Exception ex ){

@@ -18,6 +18,7 @@
 package org.apache.eagle.notification;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertNotificationEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,17 +43,19 @@ public class NotificationPluginLoader {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationPluginLoader.class);
     private static Map<String,Object> notificationMapping = new ConcurrentHashMap<String,Object>();
-    private static NotificationPluginLoader _loader = new NotificationPluginLoader();
+    private static NotificationPluginLoader _loader;
+    private Config config;
 
-    private NotificationPluginLoader(){
+    private NotificationPluginLoader( Config config ){
+        this.config = config;
         loadPlugins();
     }
 
-    public static NotificationPluginLoader  getInstance(){
+    public static NotificationPluginLoader  getInstance( Config conf ){
 
         if( _loader == null ) synchronized (NotificationPluginLoader.class) {
             if (_loader == null)
-                _loader = new NotificationPluginLoader();
+                _loader = new NotificationPluginLoader( conf );
         }
         return  _loader;
     }
@@ -62,7 +66,6 @@ public class NotificationPluginLoader {
         try {
             LOG.info(" Start loading Plugins ");
             notificationMapping.clear();
-            Config config = EagleConfigFactory.load().getConfig();
             AlertNotificationDAO dao = new AlertNotificationDAOImpl(new EagleServiceConnector(config));
             dao.deleteAllAlertNotifications();
             dao.persistAlertNotificationTypes( buildAlertNotificationEntities() );
@@ -82,7 +85,7 @@ public class NotificationPluginLoader {
         Set<Class<? extends NotificationPlugin>> subTypes = new HashSet<Class<? extends NotificationPlugin>>();
         try{
             LOG.info(" Scanning all classes which implements NotificationPlugin Interface ");
-            Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forJavaClassPath()));
+            Reflections reflections = new Reflections();
             subTypes = reflections.getSubTypesOf(NotificationPlugin.class);
             LOG.info(" No of Plugins found : "+subTypes.size() );
             if( subTypes.size() <= 0 )

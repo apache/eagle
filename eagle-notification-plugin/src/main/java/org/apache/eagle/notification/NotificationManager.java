@@ -51,9 +51,11 @@ public class NotificationManager  {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationManager.class);
     private static Map<String, Set<String>> policyNotificationMapping = new ConcurrentHashMap<String,Set<String> >();
-    private static NotificationManager notificationManager = new NotificationManager();
+    private static NotificationManager notificationManager;
+    private Config _conf;
 
-    private NotificationManager(){
+    private NotificationManager( Config config ) throws  Exception {
+        this._conf = config;
         // initialize Manger here
         _init();
     }
@@ -62,11 +64,11 @@ public class NotificationManager  {
      * Create Single Instance of Object
      * @return
      */
-    public  static NotificationManager getInstance(){
+    public  static NotificationManager getInstance( Config config ) throws  Exception {
         if( notificationManager == null ) {
             synchronized (NotificationManager.class) {
                 if (notificationManager == null)
-                    notificationManager = new NotificationManager();
+                    notificationManager = new NotificationManager(config);
             }
         }
         return notificationManager;
@@ -75,22 +77,24 @@ public class NotificationManager  {
     /**
      * Initialization of Notification Manager
      */
-    private void _init() {
+    private void _init() throws  Exception {
         policyNotificationMapping.clear();
-        Set<String> plugins = NotificationPluginLoader.getInstance().getNotificationMapping().keySet();
+        //  Pass Config and set to all API's
+        NotificationPluginUtils.setConfig(this._conf);
+        Set<String> plugins = NotificationPluginLoader.getInstance( this._conf ).getNotificationMapping().keySet();
         for( String plugin : plugins ){
             try {
-                Object obj =  NotificationPluginLoader.getInstance().getNotificationMapping().get(plugin);
-                obj.getClass().getMethod("_init").invoke(obj); // invoke _init method of all notification plugins
+                Object obj =  NotificationPluginLoader.getInstance( this._conf ).getNotificationMapping().get(plugin);
+                obj.getClass().getMethod("_init" , new Class[]{Config.class}).invoke(obj , this._conf); // invoke _init method of all notification plugins
             } catch (Exception e) {
                 LOG.error(" Error in loading Plugins . Reason : "+e.getMessage());
+                throw new Exception(e);
             }
         }
-        Config config = EagleConfigFactory.load().getConfig();
-        String site = config.getString("eagleProps.site");
-        String dataSource = config.getString("eagleProps.dataSource");
+        String site = _conf.getString("eagleProps.site");
+        String dataSource = _conf.getString("eagleProps.dataSource");
         // find notification Types
-        PolicyDefinitionDAO  policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector( config ) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
+        PolicyDefinitionDAO  policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector( _conf ) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
         try{
             List<AlertDefinitionAPIEntity> activeAlerts = policyDefinitionDao.findActivePolicies( site , dataSource );
             for( AlertDefinitionAPIEntity entity : activeAlerts ){
@@ -120,6 +124,9 @@ public class NotificationManager  {
             LOG.info(" Invoking Notification Plugin for the Policy : "+entity.getTags().get(Constants.POLICY_ID)+" . No of Plugins found : "+listOfNotifications.size());
             for(String notificationType : listOfNotifications ){
                 Object notificationPluginObj = getNotificationPluginAPI(notificationType);
+                if( notificationPluginObj == null )
+                    throw  new Exception(" Notification API is NULL .. Looks like Notification Plugins not loaded Properly ..  " +
+                            "Notifcation Type : "+notificationType +" Available Notifications : "+NotificationPluginLoader.getInstance(this._conf).getNotificationMapping());
                 notificationPluginObj.getClass().getMethod("onAlert", new Class[]{AlertAPIEntity.class}).invoke(notificationPluginObj, entity);
             }
             LOG.info(" Successfully Notified ...");
@@ -134,7 +141,7 @@ public class NotificationManager  {
      * @return
      */
     private Object getNotificationPluginAPI( String type ){
-        return NotificationPluginLoader.getInstance().getNotificationMapping().get(type);
+        return NotificationPluginLoader.getInstance(this._conf).getNotificationMapping().get(type);
     }
 
     /**
@@ -149,13 +156,13 @@ public class NotificationManager  {
             Set<String>  notifications = new HashSet<String>();
             for( Map<String,String> notificationConf : notificationConfigCollection ) {
                 String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
-                if( !NotificationPluginLoader.getInstance().getNotificationMapping().containsKey(notificationType)){
+                if( !NotificationPluginLoader.getInstance(this._conf).getNotificationMapping().containsKey(notificationType)){
                     LOG.error(" Can't find Notification Type in Plugin Loader.. OOPS! Something went Wrong ");
                 }
                 // add policy id to config map , all plugins need policy id for maintaining their config obj
                 notificationConf.put(Constants.POLICY_ID, policyId );
                 try{
-                    Object  notificationObj = NotificationPluginLoader.getInstance().getNotificationMapping().get(notificationType);
+                    Object  notificationObj = NotificationPluginLoader.getInstance(this._conf).getNotificationMapping().get(notificationType);
                     notificationObj.getClass().getMethod("update" , new Class[]{Map.class,boolean.class}).invoke( notificationObj , notificationConf , isDeleteUpdate );
                 }catch (Exception ex ){
                     LOG.error(" Error in Updating Notification Config to Plugin , Policy Id : "+entity.getTags().get(Constants.POLICY_ID)+" .. Reason : "+ex.getMessage());

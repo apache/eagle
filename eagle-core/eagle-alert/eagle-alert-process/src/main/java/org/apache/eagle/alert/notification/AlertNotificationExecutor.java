@@ -56,7 +56,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 	private static final Logger LOG = LoggerFactory.getLogger(AlertNotificationExecutor.class);
 	private Config config;
 	/** Notification Manager - Responsible for forward and invoke configured Notification Plugin **/
-	private static final NotificationManager notificationManager =  NotificationManager.getInstance();
+	private NotificationManager notificationManager;
 
 	private List<String> alertExecutorIdList;
 	private PolicyDefinitionDAO dao;
@@ -83,6 +83,13 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
 			LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
 		}
+		try{
+			notificationManager = NotificationManager.getInstance( this.config );
+		}catch (Exception ex ){
+			LOG.error("Fail to initialize NotificationManager: ", ex);
+			throw new IllegalStateException("Fail to initialize NotificationManager: ", ex);
+		}
+
 		DynamicPolicyLoader<AlertDefinitionAPIEntity> policyLoader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
 		policyLoader.init(initialAlertDefs, dao, config);
 		for (String alertExecutorId : alertExecutorIdList) {
