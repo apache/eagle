@@ -18,6 +18,7 @@ package org.apache.eagle.alert.dao;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.policy.common.Constants;
@@ -66,6 +67,9 @@ public class TestAlertDefinitionDAOImpl {
 				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor2", "TestPolicyIDD", "TestPolicyTypeD"));
 				return list;
 			}
+
+            @Override
+			public void updatePolicyDetails(AbstractPolicyDefinitionEntity entity) { /* do nothing */ }
 		};
 
 		Map<String, Map<String, AlertDefinitionAPIEntity>> retMap = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);

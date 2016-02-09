@@ -19,12 +19,14 @@ package org.apache.eagle.policy.dao;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +53,7 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 	public List<T> findActivePolicies(String site, String dataSource) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = servicePointName + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
+			String query = servicePointName + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\" AND @enabled=\"true\"]{*}";
 			GenericServiceAPIResponseEntity<T> response = client.search()
 												                .pageSize(Integer.MAX_VALUE)
 												                .query(query)
@@ -93,4 +95,24 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 		return map;
 	}
 
+    @Override
+    public void updatePolicyDetails(T entity) {
+        IEagleServiceClient client = new EagleServiceClientImpl(connector);
+
+        List<T> entityList = new ArrayList<>();
+        entityList.add(entity);
+
+        try {
+            client.create(entityList, servicePointName);
+        } catch (IOException | EagleServiceClientException exception) {
+            LOG.error("Exception in updating markdown for policy in HBase ", exception);
+        } finally {
+            try {
+                if (null != client)
+                    client.close();
+            } catch (IOException exception) {
+                LOG.error("Unable to close Eagle service client ", exception);
+            }
+        }
+    }
 }

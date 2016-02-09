@@ -64,13 +64,17 @@ public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 	@Column("f")
 	private boolean enabled;
 	@Column("g")
-	private String owner;	
+	private String owner;
 	@Column("h")
 	private long lastModifiedDate;
 	@Column("i")
 	private long severity;
 	@Column("j")
 	private long createdTime;
+    @Column("k")
+    private boolean markdownEnabled;
+    @Column("l")
+    private String markdownReason;
 
 	public String getDesc() {
 		return desc;
@@ -142,6 +146,17 @@ public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 		this.createdTime = createdTime;
 		valueChanged("createdTime");
 	}
+    public boolean isMarkdownEnabled() { return markdownEnabled; }
+    public void setMarkdownEnabled(boolean markdownEnabled) {
+        this.markdownEnabled = markdownEnabled;
+        valueChanged("markdownEnabled");
+    }
+    public String getMarkdownReason() { return markdownReason; }
+    public void setMarkdownReason(String markdownReason) {
+        this.markdownReason = markdownReason;
+        valueChanged("markdownReason");
+    }
+
 	public boolean equals(Object o){
 		if(o == this)
 			return true;

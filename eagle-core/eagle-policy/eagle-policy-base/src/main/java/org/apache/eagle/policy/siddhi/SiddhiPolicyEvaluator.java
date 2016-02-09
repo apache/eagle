@@ -35,6 +35,7 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
+import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -64,6 +65,8 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
         SiddhiPolicyDefinition policyDef;
         List<String> outputFields;
         String executionPlanName;
+        boolean markdownEnabled;
+        String markdownReason;
     }
 
     public SiddhiPolicyEvaluator(Config config, PolicyEvaluationContext<T, K> context, AbstractPolicyDefinition policyDef, String[] sourceStreams) {
@@ -123,21 +126,33 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
             executionPlan = sb.toString() + " @info(name = '" + EXECUTION_PLAN_NAME + "') " + expression;
         }
 
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+        ExecutionPlanRuntime executionPlanRuntime = null;
 
-        for (String sourceStream : sourceStreams) {
-            siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
+        try {
+            executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+
+            for (String sourceStream : sourceStreams) {
+                siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
+            }
+
+            executionPlanRuntime.start();
+            LOG.info("Siddhi query: " + executionPlan);
+            attachCallback(runtime, executionPlanRuntime, context);
+
+            runtime.markdownEnabled = false;
+            runtime.markdownReason = null;
+        } catch (SiddhiParserException exception) { // process is not interrupted in case of an invalid policy defined by marking down
+            LOG.error("Exception in parsing Siddhi query: " + executionPlan + ", reason being: " + exception.getMessage());
+            runtime.queryCallback = null;
+            runtime.outputFields = null;
+            runtime.markdownEnabled = true;
+            runtime.markdownReason = exception.getMessage();
         }
-        executionPlanRuntime.start();
-
-        LOG.info("Siddhi query: " + executionPlan);
-
-        attachCallback(runtime, executionPlanRuntime, context);
 
         runtime.siddhiInputHandlers = siddhiInputHandlers;
         runtime.siddhiManager = siddhiManager;
         runtime.policyDef = policyDef;
-        runtime.executionPlanName = executionPlanRuntime.getName();
+        runtime.executionPlanName = (null != executionPlanRuntime) ? executionPlanRuntime.getName() : null; // executionPlanRuntime will be set to null in case of an invalid policy
         return runtime;
     }
 
@@ -187,18 +202,20 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     @SuppressWarnings({"rawtypes"})
     @Override
     public void evaluate(ValuesArray data) throws Exception {
-        if (LOG.isDebugEnabled()) LOG.debug("Siddhi policy evaluator consumers data :" + data);
-        Collector outputCollector = (Collector) data.get(0);
-        String streamName = (String) data.get(1);
-        SortedMap map = (SortedMap) data.get(2);
-        validateEventInRuntime(streamName, map);
-        synchronized (siddhiRuntime) {
-            // retain the collector in the context. This assignment is idempotent
-            context.outputCollector = outputCollector;
+        if (!siddhiRuntime.markdownEnabled) {
+            if (LOG.isDebugEnabled()) LOG.debug("Siddhi policy evaluator consumers data :" + data);
+            Collector outputCollector = (Collector) data.get(0);
+            String streamName = (String) data.get(1);
+            SortedMap map = (SortedMap) data.get(2);
+            validateEventInRuntime(streamName, map);
+            synchronized (siddhiRuntime) {
+                // retain the collector in the context. This assignment is idempotent
+                context.outputCollector = outputCollector;
 
-            List<Object> input = new ArrayList<>();
-            putAttrsIntoInputStream(input, streamName, map);
-            siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
+                List<Object> input = new ArrayList<>();
+                putAttrsIntoInputStream(input, streamName, map);
+                siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
+            }
         }
     }
 
@@ -248,7 +265,8 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
         SiddhiRuntime previous = siddhiRuntime;
         siddhiRuntime = createSiddhiRuntime((SiddhiPolicyDefinition) policyDef);
         synchronized (previous) {
-            previous.siddhiManager.getExecutionPlanRuntime(previous.executionPlanName).shutdown();
+            if (!previous.markdownEnabled) // condition to check if previous SiddhiRuntime was started after policy validation
+                previous.siddhiManager.getExecutionPlanRuntime(previous.executionPlanName).shutdown();
         }
     }
 
@@ -256,7 +274,8 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     public void onPolicyDelete() {
         synchronized (siddhiRuntime) {
             LOG.info("Going to shutdown siddhi execution plan, planName: " + siddhiRuntime.executionPlanName);
-            siddhiRuntime.siddhiManager.getExecutionPlanRuntime(siddhiRuntime.executionPlanName).shutdown();
+            if (!siddhiRuntime.markdownEnabled) // condition to check if previous SiddhiRuntime was started after policy validation
+                siddhiRuntime.siddhiManager.getExecutionPlanRuntime(siddhiRuntime.executionPlanName).shutdown();
             LOG.info("Siddhi execution plan " + siddhiRuntime.executionPlanName + " is successfully shutdown ");
         }
     }
@@ -287,4 +306,10 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     public List<String> getOutputStreamAttrNameList() {
         return siddhiRuntime.outputFields;
     }
+
+    @Override
+    public boolean isMarkdownEnabled() { return siddhiRuntime.markdownEnabled; }
+
+    @Override
+    public String getMarkdownReason() { return siddhiRuntime.markdownReason; }
 }

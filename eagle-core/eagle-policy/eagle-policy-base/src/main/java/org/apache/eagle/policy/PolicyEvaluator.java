@@ -48,4 +48,14 @@ public interface PolicyEvaluator<T extends AbstractPolicyDefinitionEntity> {
 	 * get additional context
 	 */	
 	public Map<String, String> getAdditionalContext();
+
+	/**
+	 * Get markdown status for the policy.
+	 */
+	public boolean isMarkdownEnabled();
+
+	/**
+	 * Get markdown reason for the given policy.
+	 */
+	public String getMarkdownReason();
 }

@@ -19,6 +19,7 @@ package org.apache.eagle.alert.cep;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
@@ -99,7 +100,10 @@ public class TestSiddhiEvaluator {
 			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
 				return null;
 			}
-		};
+
+            @Override
+            public void updatePolicyDetails(AbstractPolicyDefinitionEntity entity) { /* do nothing */ }
+        };
 
 		AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {
 			@Override
