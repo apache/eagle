@@ -14,20 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.entity;
 
-import org.apache.eagle.common.metric.AlertContext;
-import org.apache.eagle.log.entity.repo.EntityRepository;
+package org.apache.eagle.notifications.testcases;
 
-public class AlertEntityRepository extends EntityRepository {
-	public AlertEntityRepository() {
-		serDeserMap.put(AlertContext.class, new AlertContextSerDeser());
-		entitySet.add(AlertAPIEntity.class);
-		entitySet.add(AlertDefinitionAPIEntity.class);
-		entitySet.add(AlertStreamSchemaEntity.class);
-		entitySet.add(AlertStreamEntity.class);
-		entitySet.add(AlertDataSourceEntity.class);
-        entitySet.add(AlertExecutorEntity.class);
-		entitySet.add(AlertNotificationEntity.class);
+import com.typesafe.config.Config;
+import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
+import org.apache.eagle.service.client.EagleServiceConnector;
+import org.junit.Test;
+
+public class FindAlertByPolicyIdTestCase {
+
+	@Test
+	public void testFindAlertDefByPolicyId(){
+		Config config = EagleConfigFactory.load().getConfig();
+		PolicyDefinitionDAO dao = new PolicyDefinitionEntityDAOImpl<>(new EagleServiceConnector(config) , null);
+
 	}
 }

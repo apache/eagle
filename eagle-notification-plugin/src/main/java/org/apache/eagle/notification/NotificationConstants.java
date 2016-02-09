@@ -14,20 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.entity;
 
-import org.apache.eagle.common.metric.AlertContext;
-import org.apache.eagle.log.entity.repo.EntityRepository;
+package org.apache.eagle.notification;
 
-public class AlertEntityRepository extends EntityRepository {
-	public AlertEntityRepository() {
-		serDeserMap.put(AlertContext.class, new AlertContextSerDeser());
-		entitySet.add(AlertAPIEntity.class);
-		entitySet.add(AlertDefinitionAPIEntity.class);
-		entitySet.add(AlertStreamSchemaEntity.class);
-		entitySet.add(AlertStreamEntity.class);
-		entitySet.add(AlertDataSourceEntity.class);
-        entitySet.add(AlertExecutorEntity.class);
-		entitySet.add(AlertNotificationEntity.class);
-	}
+/**
+ */
+public class NotificationConstants {
+
+    public static final String NOTIFICATION_TYPE = "notificationType";
+
+    public static final String EMAIL_NOTIFICATION_RESOURCE_NM = "Email Notification";
+    public static final String KAFKA_STORE = "Kafka Store";
+    // email specific constants
+    public static final String SUBJECT = "subject";
+    public static final String SENDER = "sender";
+    public static final String RECIPIENTS = "recipients";
+    public static final String TPL_FILE_NAME = "tplFileName";
+
+    // Kafka Store Conf
+    public static final String KAFKA_TOPIC = "kafkaTopic";
+
 }

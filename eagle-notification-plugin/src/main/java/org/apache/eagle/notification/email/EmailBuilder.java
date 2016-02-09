@@ -14,46 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.notification;
 
-import java.util.concurrent.ThreadPoolExecutor;
+package org.apache.eagle.notification.email;
 
 import com.typesafe.config.ConfigObject;
 
-public class AlertEmailGeneratorBuilder {
-	private AlertEmailGenerator generator;
-	private AlertEmailGeneratorBuilder(){
-		generator = new AlertEmailGenerator();
+/**
+ * Email Builder API which helps to build EmailGen
+ */
+public class EmailBuilder {
+
+
+	private EmailGenerator generator;
+	private EmailBuilder(){
+		generator = new EmailGenerator();
 	}
-	public static AlertEmailGeneratorBuilder newBuilder(){
-		return new AlertEmailGeneratorBuilder();
+	public static EmailBuilder newBuilder(){
+		return new EmailBuilder();
 	}
-	public AlertEmailGeneratorBuilder withSubject(String subject){
+
+	public EmailBuilder withSubject(String subject){
 		generator.setSubject(subject);
 		return this;
 	}
-	public AlertEmailGeneratorBuilder withSender(String sender){
+	public EmailBuilder withSender(String sender){
 		generator.setSender(sender);
 		return this;
 	}
-	public AlertEmailGeneratorBuilder withRecipients(String recipients){
+	public EmailBuilder withRecipients(String recipients){
 		generator.setRecipients(recipients);
 		return this;
 	}
-	public AlertEmailGeneratorBuilder withTplFile(String tplFile){
+	public EmailBuilder withTplFile(String tplFile){
 		generator.setTplFile(tplFile);
 		return this;
 	}
-	public AlertEmailGeneratorBuilder withEagleProps(ConfigObject eagleProps) {
+	public EmailBuilder withEagleProps(ConfigObject eagleProps) {
 		generator.setEagleProps(eagleProps);
 		return this;
 	}
-    public AlertEmailGeneratorBuilder withExecutorPool(ThreadPoolExecutor threadPoolExecutor) {
-        generator.setExecutorPool(threadPoolExecutor);
-        return this;
-    }
 
-    public AlertEmailGenerator build(){
+	public EmailGenerator build(){
 		return this.generator;
 	}
 }
