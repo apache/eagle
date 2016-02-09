@@ -69,11 +69,6 @@
             <artifactId>eagle-hadoop-metric</artifactId>
             <version>${project.version}</version>
         </dependency>
-	<dependency>
-            <groupId>eagle</groupId>
-            <artifactId>eagle-notification-plugin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
