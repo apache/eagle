@@ -91,6 +91,7 @@ public class TestPolicyDistributionUpdater {
             }
         };
 
+
         Config config = ConfigFactory.load();
         alertExecutor.prepareConfig(config);
         alertExecutor.init();

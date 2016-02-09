@@ -19,6 +19,7 @@ package org.apache.eagle.alert.cep;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
@@ -28,10 +29,8 @@ import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.policy.PolicyEvaluationContext;
-import org.apache.eagle.policy.dao.AlertDefinitionDAOImpl;
-import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
-import org.apache.eagle.policy.dao.AlertStreamSchemaDAOImpl;
-import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
+import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.policy.dao.*;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyDefinition;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
@@ -57,7 +56,7 @@ public class TestSiddhiEvaluator {
 
 	@Test
 	public void test() throws Exception{
-        Config config = ConfigFactory.load("unittest.conf");
+		Config config = ConfigFactory.load("unittest.conf");
 		AlertStreamSchemaDAO streamDao = new AlertStreamSchemaDAOImpl(null, null) {
 			@Override
 			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception {
@@ -74,8 +73,8 @@ public class TestSiddhiEvaluator {
 				return list;
 			}
 		};
-        StreamMetadataManager.getInstance().reset();
-        StreamMetadataManager.getInstance().init(config, streamDao);
+		StreamMetadataManager.getInstance().reset();
+		StreamMetadataManager.getInstance().init(config, streamDao);
 
 		Map<String, Object> data1 =  new TreeMap<String, Object>(){{
 			put("cmd", "open");
@@ -88,18 +87,22 @@ public class TestSiddhiEvaluator {
 			put("sensitivityType", "");
 			put("allowed", "true");
 		}};
-        final SiddhiPolicyDefinition policyDef = new SiddhiPolicyDefinition();
-        policyDef.setType("siddhiCEPEngine");
-        String expression = "from hdfsAuditLogEventStream[cmd=='open'] " +
-							"select * " +
-							"insert into outputStream ;";
-        policyDef.setExpression(expression);
+		final SiddhiPolicyDefinition policyDef = new SiddhiPolicyDefinition();
+		policyDef.setType("siddhiCEPEngine");
+		String expression = "from hdfsAuditLogEventStream[cmd=='open'] " +
+				"select * " +
+				"insert into outputStream ;";
+		policyDef.setExpression(expression);
 
-		PolicyDefinitionDAO alertDao = new AlertDefinitionDAOImpl(new EagleServiceConnector(null, null)) {
+		PolicyDefinitionDAO alertDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(null, null),
+				Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME) {
 			@Override
 			public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
 				return null;
 			}
+
+			@Override
+			public void updatePolicyDetails(AbstractPolicyDefinitionEntity entity) { /* do nothing */ }
 		};
 
 		AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {
