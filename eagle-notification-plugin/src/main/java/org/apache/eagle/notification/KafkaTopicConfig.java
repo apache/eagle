@@ -14,20 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.entity;
 
-import org.apache.eagle.common.metric.AlertContext;
-import org.apache.eagle.log.entity.repo.EntityRepository;
 
-public class AlertEntityRepository extends EntityRepository {
-	public AlertEntityRepository() {
-		serDeserMap.put(AlertContext.class, new AlertContextSerDeser());
-		entitySet.add(AlertAPIEntity.class);
-		entitySet.add(AlertDefinitionAPIEntity.class);
-		entitySet.add(AlertStreamSchemaEntity.class);
-		entitySet.add(AlertStreamEntity.class);
-		entitySet.add(AlertDataSourceEntity.class);
-        entitySet.add(AlertExecutorEntity.class);
-		entitySet.add(AlertNotificationEntity.class);
-	}
+package org.apache.eagle.notification;
+
+/**
+ */
+public class KafkaTopicConfig {
+    private static final long serialVersionUID = 1L;
+
+    private String kafkaTopic;
+
+    public String getKafkaTopic() {
+        return kafkaTopic;
+    }
+
+    public void setKafkaTopic(String kafkaTopic) {
+        this.kafkaTopic = kafkaTopic;
+    }
 }
