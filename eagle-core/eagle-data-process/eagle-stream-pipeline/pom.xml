@@ -62,7 +62,6 @@
                 <exclusion>
                     <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
-		    <version>${slf4j.version}</version>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -73,7 +72,7 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
+            <artifactId>slf4j-api</artifactId>
             <scope>test</scope>
         </dependency>
         <!--<dependency>-->
