@@ -18,6 +18,7 @@ package org.apache.eagle.alert.dao;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.policy.common.Constants;
@@ -46,7 +47,7 @@ public class TestAlertDefinitionDAOImpl {
 		entity.setTags(tags);
 		return entity;
 	}
-	
+
 	@Test
 	public void test() throws Exception{
 		Config config = ConfigFactory.load();
@@ -55,7 +56,8 @@ public class TestAlertDefinitionDAOImpl {
 
 		String site = "sandbox";
 		String dataSource = "UnitTest";
-		PolicyDefinitionDAO dao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(eagleServiceHost, eagleServicePort) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME) {
+		PolicyDefinitionDAO dao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(eagleServiceHost, eagleServicePort),
+				Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME) {
 			@Override
 			public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) throws Exception {
 				List<AlertDefinitionAPIEntity> list = new ArrayList<AlertDefinitionAPIEntity>();
@@ -65,10 +67,13 @@ public class TestAlertDefinitionDAOImpl {
 				list.add(buildTestAlertDefEntity(site, dataSource, "TestExecutor2", "TestPolicyIDD", "TestPolicyTypeD"));
 				return list;
 			}
+
+			@Override
+			public void updatePolicyDetails(AbstractPolicyDefinitionEntity entity) { /* do nothing */ }
 		};
 
 		Map<String, Map<String, AlertDefinitionAPIEntity>> retMap = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);
-		
+
 		Assert.assertEquals(2, retMap.size());
 		Assert.assertEquals(2, retMap.get("TestExecutor1").size());
 		Assert.assertEquals(2, retMap.get("TestExecutor2").size());

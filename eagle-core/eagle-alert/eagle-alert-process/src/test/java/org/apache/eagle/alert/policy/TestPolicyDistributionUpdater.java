@@ -22,6 +22,7 @@ package org.apache.eagle.alert.policy;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.alert.executor.AlertExecutor;
@@ -45,7 +46,8 @@ public class TestPolicyDistributionUpdater {
 
     @Test
     public void testPolicyDistributionReporter() throws Exception{
-        PolicyDefinitionDAO alertDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(null, 1) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME) {
+        PolicyDefinitionDAO alertDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(null, 1),
+                Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME) {
             @Override
             public Map<String, Map<String, AlertDefinitionAPIEntity>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception {
                 final AlertDefinitionAPIEntity entity = new AlertDefinitionAPIEntity();
@@ -60,6 +62,9 @@ public class TestPolicyDistributionUpdater {
                 entity.setPolicyDef("{\"type\":\"siddhiCEPEngine\",\"expression\":\"from testStream select name insert into outputStream ;\"}");
                 return map;
             }
+
+            @Override
+            public void updatePolicyDetails(AbstractPolicyDefinitionEntity entity) { /* do nothing */ }
         };
 
         AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId_1", new DefaultPolicyPartitioner(), 1, 0, alertDao, new String[]{"testStream"}){
