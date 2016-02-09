@@ -31,12 +31,17 @@ public interface PolicyDefinitionDAO<T extends AbstractPolicyDefinitionEntity> e
 	 * @return
 	 */
 	List<T> findActivePolicies(String site, String dataSource) throws Exception;
-	
+
 	/**
 	 * find map from alertExecutorId to map from policy Id to alert definition for one specific site and dataSource
 	 * Map from alertExecutorId to map from policyId to policy definition
-       (site,dataSource) => Map[alertExecutorId,Map[policyId,alertDefinition]]
+	 (site,dataSource) => Map[alertExecutorId,Map[policyId,alertDefinition]]
 	 * @return
 	 */
 	Map<String, Map<String, T>> findActivePoliciesGroupbyExecutorId(String site, String dataSource) throws Exception;
+
+	/**
+	 * Persists alert definition entity updated with markdown columns into HBase.
+	 */
+	void updatePolicyDetails(T entity);
 }
