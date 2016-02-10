@@ -26,8 +26,8 @@ public class TestKafakaProducer {
 
 	@Test
 	public void test() throws Exception{
-		KafkaProducer<?, ?> producer = KafkaProducerSingleton.INSTANCE.getProducer();
+		/*KafkaProducer<?, ?> producer = KafkaProducerSingleton.INSTANCE.getProducer();
 		System.out.println(producer.toString());
-		System.out.println(producer.metrics());
+		System.out.println(producer.metrics());*/
 	}
 }
