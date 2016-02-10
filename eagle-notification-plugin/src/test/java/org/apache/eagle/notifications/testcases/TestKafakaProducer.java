@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.entity;
 
-import org.apache.eagle.common.metric.AlertContext;
-import org.apache.eagle.log.entity.repo.EntityRepository;
 
-public class AlertEntityRepository extends EntityRepository {
-	public AlertEntityRepository() {
-		serDeserMap.put(AlertContext.class, new AlertContextSerDeser());
-		entitySet.add(AlertAPIEntity.class);
-		entitySet.add(AlertDefinitionAPIEntity.class);
-		entitySet.add(AlertStreamSchemaEntity.class);
-		entitySet.add(AlertStreamEntity.class);
-		entitySet.add(AlertDataSourceEntity.class);
-        entitySet.add(AlertExecutorEntity.class);
-		entitySet.add(AlertNotificationEntity.class);
+package org.apache.eagle.notifications.testcases;
+
+import org.apache.eagle.notification.KafkaProducerSingleton;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.junit.Test;
+
+public class TestKafakaProducer {
+
+	@Test
+	public void test() throws Exception{
+		/*KafkaProducer<?, ?> producer = KafkaProducerSingleton.INSTANCE.getProducer();
+		System.out.println(producer.toString());
+		System.out.println(producer.metrics());*/
 	}
 }

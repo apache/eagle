@@ -14,20 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.entity;
 
-import org.apache.eagle.common.metric.AlertContext;
-import org.apache.eagle.log.entity.repo.EntityRepository;
+package org.apache.eagle.notification.dao;
 
-public class AlertEntityRepository extends EntityRepository {
-	public AlertEntityRepository() {
-		serDeserMap.put(AlertContext.class, new AlertContextSerDeser());
-		entitySet.add(AlertAPIEntity.class);
-		entitySet.add(AlertDefinitionAPIEntity.class);
-		entitySet.add(AlertStreamSchemaEntity.class);
-		entitySet.add(AlertStreamEntity.class);
-		entitySet.add(AlertDataSourceEntity.class);
-        entitySet.add(AlertExecutorEntity.class);
-		entitySet.add(AlertNotificationEntity.class);
-	}
+
+
+import org.apache.eagle.alert.entity.AlertNotificationEntity;
+
+import java.util.List;
+
+/**
+ * Alert Notification Data Access Obj Interface
+ */
+public interface AlertNotificationDAO {
+
+    /**
+     * Persist all Notifaction Types
+     * @param list
+     * @throws Exception
+     */
+    void persistAlertNotificationTypes( List<AlertNotificationEntity> list ) throws  Exception;
+
+    /**
+     * find the Alert Notification Types by querying alertNotifications Table
+     * @return
+     * @throws Exception
+     */
+    List<AlertNotificationEntity> findAlertNotificationTypes() throws Exception;
+
+    /**
+     * Wipe out all Notifications
+     * @throws Exception
+     */
+    void deleteAllAlertNotifications() throws Exception;
 }
