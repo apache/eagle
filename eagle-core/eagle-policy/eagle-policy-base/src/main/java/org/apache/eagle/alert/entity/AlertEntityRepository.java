@@ -28,5 +28,6 @@ public class AlertEntityRepository extends EntityRepository {
 		entitySet.add(AlertStreamEntity.class);
 		entitySet.add(AlertDataSourceEntity.class);
         entitySet.add(AlertExecutorEntity.class);
+		entitySet.add(AlertNotificationEntity.class);
 	}
 }

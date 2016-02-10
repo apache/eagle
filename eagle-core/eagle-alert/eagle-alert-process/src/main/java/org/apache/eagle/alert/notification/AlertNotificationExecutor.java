@@ -26,6 +26,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.eagle.alert.config.EmailNotificationConfig;
+import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.notification.NotificationManager;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
@@ -53,92 +55,41 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 	private static final long serialVersionUID = 1690354365435407034L;
 	private static final Logger LOG = LoggerFactory.getLogger(AlertNotificationExecutor.class);
 	private Config config;
+	/** Notification Manager - Responsible for forward and invoke configured Notification Plugin **/
+	private NotificationManager notificationManager;
 
 	private List<String> alertExecutorIdList;
-	private volatile CopyOnWriteHashMap<String, List<AlertEmailGenerator>> alertEmailGeneratorsMap;
 	private PolicyDefinitionDAO dao;
 
-    private final static int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
-    private final static int DEFAULT_THREAD_POOL_MAX_SIZE = 8;
-    private final static long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
-
-    private transient ThreadPoolExecutor executorPool;
 
     public AlertNotificationExecutor(List<String> alertExecutorIdList, PolicyDefinitionDAO dao){
 		this.alertExecutorIdList = alertExecutorIdList;
 		this.dao = dao;
 	}
-	
-	public List<AlertEmailGenerator> createAlertEmailGenerator(AlertDefinitionAPIEntity alertDef) {
-		Module module = new SimpleModule("notification").registerSubtypes(new NamedType(EmailNotificationConfig.class, "email"));
-		EmailNotificationConfig[] emailConfigs = new EmailNotificationConfig[0];
-		try {			
-			emailConfigs = JsonSerDeserUtils.deserialize(alertDef.getNotificationDef(), EmailNotificationConfig[].class, Arrays.asList(module));
+
+	@Override
+	public void init() {
+		String site = config.getString("eagleProps.site");
+		String dataSource = config.getString("eagleProps.dataSource");
+		Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;
+		try {
+			initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId( site, dataSource );
 		}
 		catch (Exception ex) {
-			LOG.warn("Initial emailConfig error, wrong format or it's error " + ex.getMessage());
+			LOG.error("fail to initialize initialAlertDefs: ", ex);
+			throw new IllegalStateException("fail to initialize initialAlertDefs: ", ex);
 		}
-		List<AlertEmailGenerator> gens = new ArrayList<AlertEmailGenerator>();
-		if (emailConfigs == null) {
-			return gens;		
-		}
-		for(EmailNotificationConfig emailConfig : emailConfigs) {
-			String tplFileName = emailConfig.getTplFileName();			
-			if (tplFileName == null || tplFileName.equals("")) { // empty tplFileName, use default tpl file name
-				tplFileName = "ALERT_DEFAULT.vm";
-			}
-			AlertEmailGenerator gen = AlertEmailGeneratorBuilder.newBuilder().
-																withEagleProps(config.getObject("eagleProps")).
-																withSubject(emailConfig.getSubject()).
-																withSender(emailConfig.getSender()).
-																withRecipients(emailConfig.getRecipients()).
-																withTplFile(tplFileName).
-                                                                withExecutorPool(executorPool).
-																build();
-			gens.add(gen);
-		}
-		return gens;
-	}
-	
-	/**
-	 * 1. register both file and database configuration
-	 * 2. create email generator from configuration
-	 */
-    @Override
-	public void init(){
-        executorPool = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_CORE_SIZE, DEFAULT_THREAD_POOL_MAX_SIZE, DEFAULT_THREAD_POOL_SHRINK_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
-		Map<String, List<AlertEmailGenerator>> tmpEmailGenerators = new HashMap<String, List<AlertEmailGenerator>> ();
-		
-        String site = config.getString("eagleProps.site");
-        String dataSource = config.getString("eagleProps.dataSource");
-	    Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;
-	    try {
-	 		initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);
-	    }
-	    catch (Exception ex) {
- 			LOG.error("fail to initialize initialAlertDefs: ", ex);
-	        throw new IllegalStateException("fail to initialize initialAlertDefs: ", ex);
-        }
- 	   
-        if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
-            LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
-        }
-        else {
-		    for (String alertExecutorId: alertExecutorIdList) {
-                if(initialAlertDefs.containsKey(alertExecutorId)) {
-                    for (AlertDefinitionAPIEntity alertDef : initialAlertDefs.get(alertExecutorId).values()) {
-                        List<AlertEmailGenerator> gens = createAlertEmailGenerator(alertDef);
-                        tmpEmailGenerators.put(alertDef.getTags().get("policyId"), gens);
-                    }
-                }else{
-                    LOG.info(String.format("No alert definitions found for site: %s, dataSource: %s, alertExecutorId: %s",site,dataSource,alertExecutorId));
-                }
-		    }
-        }
-		
-		alertEmailGeneratorsMap = new CopyOnWriteHashMap<String, List<AlertEmailGenerator>>();
-		alertEmailGeneratorsMap.putAll(tmpEmailGenerators);				
+		if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
+			LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
+		}
+		try{
+			notificationManager = NotificationManager.getInstance( this.config );
+		}catch (Exception ex ){
+			LOG.error("Fail to initialize NotificationManager: ", ex);
+			throw new IllegalStateException("Fail to initialize NotificationManager: ", ex);
+		}
+
 		DynamicPolicyLoader<AlertDefinitionAPIEntity> policyLoader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);
 		policyLoader.init(initialAlertDefs, dao, config);
 		for (String alertExecutorId : alertExecutorIdList) {
@@ -146,32 +97,21 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		}
 	}
 
-    @Override
+	@Override
 	public void prepareConfig(Config config) {
 		this.config = config;
 	}
 
-    @Override
-    public void flatMap(java.util.List<Object> input, Collector<Tuple1<String>> outputCollector){
-        String policyId = (String) input.get(0);
-        AlertAPIEntity alertEntity = (AlertAPIEntity) input.get(1);
-        processAlerts(policyId, Arrays.asList(alertEntity));
-    }
-	
-	//TODO: add a thread pool for email sender?
+	@Override
+	public void flatMap(java.util.List<Object> input, Collector<Tuple1<String>> outputCollector){
+		String policyId = (String) input.get(0);
+		AlertAPIEntity alertEntity = (AlertAPIEntity) input.get(1);
+		processAlerts(policyId, Arrays.asList(alertEntity));
+	}
+
 	private void processAlerts(String policyId, List<AlertAPIEntity> list) {
-		List<AlertEmailGenerator> generators;
-		synchronized(alertEmailGeneratorsMap) {		
-			generators = alertEmailGeneratorsMap.get(policyId);
-		}
-		if (generators == null) {
-			LOG.warn("Notification config of policyId " + policyId + " has been deleted");
-			return;
-		}
 		for (AlertAPIEntity entity : list) {
-			for(AlertEmailGenerator generator : generators){
-				generator.sendAlertEmail(entity);
-			}
+			notificationManager.notifyAlert(entity);
 		}
 	}
 
@@ -180,11 +120,8 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		if(LOG.isDebugEnabled()) LOG.debug(" alert notification config changed : " + added);
 		for(AlertDefinitionAPIEntity alertDef : added.values()){
 			LOG.info("alert notification config really changed " + alertDef);
-			List<AlertEmailGenerator> gens = createAlertEmailGenerator(alertDef);
-			synchronized(alertEmailGeneratorsMap) {		
-				alertEmailGeneratorsMap.put(alertDef.getTags().get("policyId"), gens);
-			}
-		}		
+			notificationManager.updateNotificationPlugins( alertDef , false );
+		}
 	}
 
 	@Override
@@ -192,11 +129,8 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		if(LOG.isDebugEnabled()) LOG.debug("alert notification config to be added : " + changed);
 		for(AlertDefinitionAPIEntity alertDef : changed.values()){
 			LOG.info("alert notification config really added " + alertDef);
-			List<AlertEmailGenerator> gens = createAlertEmailGenerator(alertDef);
-			synchronized(alertEmailGeneratorsMap) {					
-				alertEmailGeneratorsMap.put(alertDef.getTags().get("policyId"), gens);
-			}
-		}			
+			notificationManager.updateNotificationPlugins( alertDef , false );
+		}
 	}
 
 	@Override
@@ -204,9 +138,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		if(LOG.isDebugEnabled()) LOG.debug("alert notification config to be deleted : " + deleted);
 		for(AlertDefinitionAPIEntity alertDef : deleted.values()){
 			LOG.info("alert notification config really deleted " + alertDef);
-			synchronized(alertEmailGeneratorsMap) {		
-				alertEmailGeneratorsMap.remove(alertDef.getTags().get("policyId"));
-			}
-		}		
+			notificationManager.updateNotificationPlugins( alertDef , true );
+		}
 	}
 }
