@@ -22,8 +22,8 @@
     <groupId>eagle</groupId>
     <artifactId>eagle-data-process-parent</artifactId>
     <version>0.3.0</version>
-      <relativePath>../pom.xml</relativePath>
-  </parent>
+    <relativePath>../pom.xml</relativePath>
+</parent>
 
   <artifactId>eagle-stream-process-api</artifactId>
   <name>eagle-stream-process-api</name>
@@ -64,11 +64,6 @@
                   <artifactId>log4j-over-slf4j</artifactId>
               </exclusion>
           </exclusions>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.spark</groupId>
-          <artifactId>spark-streaming_2.10</artifactId>
-          <version>1.6.0</version>
       </dependency>
       <dependency>
           <groupId>eagle</groupId>
