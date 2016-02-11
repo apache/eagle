@@ -18,6 +18,7 @@ package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertNotificationEntity;
+import org.apache.eagle.notification.NotificationConstants;
 import org.apache.eagle.notification.NotificationPlugin;
 import org.apache.eagle.notification.dao.AlertNotificationDAO;
 import org.apache.eagle.notification.dao.AlertNotificationDAOImpl;
@@ -32,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created on 2/10/16.
- * don't support dynamic discovery
+ * don't support dynamic discovery as of 2/10
  */
 public class NewNotificationPluginLoader {
     private static final Logger LOG = LoggerFactory.getLogger(NewNotificationPluginLoader.class);
@@ -71,21 +72,17 @@ public class NewNotificationPluginLoader {
             Set<Class<? extends NotificationPlugin>> subTypes = scanNotificationPlugins();
             List<AlertNotificationEntity> result = new ArrayList<AlertNotificationEntity>();
             for( Class<? extends NotificationPlugin> clazz: subTypes  ){
-                try{
-                    String notificationType = clazz.getAnnotation(Resource.class).name();
-                    if( null != notificationType ) {
-                        AlertNotificationEntity entity = new AlertNotificationEntity();
-                        Map<String, String> tags = new HashMap<String, String>();
-                        tags.put("notificationType", notificationType);
-                        entity.setEnabled(true);
-                        entity.setTags(tags);
-                        result.add(entity);
-                        notificationMapping.put( notificationType, clazz.newInstance() );
-                    }else {
-                        throw new IllegalStateException("OOPs Something wrong in Notification Plugin Impl , Looks like Resource Annotation is missing ");
-                    }
-                }catch (Exception ex ){
-                    LOG.error(" Error in determining notification types", ex);
+                String notificationType = clazz.getAnnotation(Resource.class).name();
+                if( null != notificationType ) {
+                    AlertNotificationEntity entity = new AlertNotificationEntity();
+                    Map<String, String> tags = new HashMap<String, String>();
+                    tags.put(NotificationConstants.NOTIFICATION_TYPE, notificationType);
+                    entity.setEnabled(true);
+                    entity.setTags(tags);
+                    result.add(entity);
+                    notificationMapping.put( notificationType, clazz.newInstance() );
+                }else {
+                    LOG.error("Something wrong in Notification Plugin Impl , Looks like Resource Annotation is missing, ignoring this plugin and continue ");
                 }
             }
 
@@ -95,6 +92,7 @@ public class NewNotificationPluginLoader {
             LOG.info("Notification Plugins loaded successfully..");
         }catch ( Exception ex ){
             LOG.error("Error in loading Notification Plugins: ", ex);
+            throw new IllegalStateException(ex);
         }
     }
 
@@ -104,18 +102,19 @@ public class NewNotificationPluginLoader {
     private  Set<Class<? extends NotificationPlugin>> scanNotificationPlugins() {
         Set<Class<? extends NotificationPlugin>> subTypes = null;
         try{
-            LOG.info(" Scanning all classes which implements NotificationPlugin Interface ");
+            LOG.info("Scanning all classes which implements NotificationPlugin Interface ");
             Reflections reflections = new Reflections();
             subTypes = reflections.getSubTypesOf(NotificationPlugin.class);
             LOG.info("Number of Plugins found : " + subTypes.size() );
-            if( subTypes.size() <= 0 )
-                throw new IllegalStateException(" Notifications API not found in jar ");
+            if(subTypes.size() <= 0)
+                LOG.warn("Notifications API not found in jar ");
             for(Class<? extends NotificationPlugin> pluginCls : subTypes){
                 LOG.info("Notification Plugin class " + pluginCls.getName());
             }
         }
         catch ( Exception ex ){
             LOG.error(" Error in Scanning Plugins using Reflection API", ex);
+            throw new IllegalStateException(ex);
         }
         return  subTypes;
     }

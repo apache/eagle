@@ -16,34 +16,21 @@
  */
 package org.apache.eagle.alert.notification;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.eagle.alert.config.EmailNotificationConfig;
-import org.apache.eagle.common.config.EagleConfigFactory;
-import org.apache.eagle.notification.NotificationManager;
+import org.apache.eagle.notification.plugin.NewNotificationPluginManagerImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.policy.DynamicPolicyLoader;
 import org.apache.eagle.policy.PolicyLifecycleMethods;
-import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor1;
 import org.apache.eagle.datastream.Tuple1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 
 /**
@@ -54,7 +41,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 	private static final Logger LOG = LoggerFactory.getLogger(AlertNotificationExecutor.class);
 	private Config config;
 	/** Notification Manager - Responsible for forward and invoke configured Notification Plugin **/
-	private NotificationManager notificationManager;
+	private NewNotificationPluginManagerImpl notificationManager;
 
 	private List<String> alertExecutorIdList;
 	private PolicyDefinitionDAO dao;
@@ -82,7 +69,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 			LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
 		}
 		try{
-			notificationManager = NotificationManager.getInstance( this.config );
+			notificationManager = new NewNotificationPluginManagerImpl(config);
 		}catch (Exception ex ){
 			LOG.error("Fail to initialize NotificationManager: ", ex);
 			throw new IllegalStateException("Fail to initialize NotificationManager: ", ex);
@@ -102,12 +89,11 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 
 	@Override
 	public void flatMap(java.util.List<Object> input, Collector<Tuple1<String>> outputCollector){
-		String policyId = (String) input.get(0);
 		AlertAPIEntity alertEntity = (AlertAPIEntity) input.get(1);
-		processAlerts(policyId, Arrays.asList(alertEntity));
+		processAlerts(Arrays.asList(alertEntity));
 	}
 
-	private void processAlerts(String policyId, List<AlertAPIEntity> list) {
+	private void processAlerts(List<AlertAPIEntity> list) {
 		for (AlertAPIEntity entity : list) {
 			notificationManager.notifyAlert(entity);
 		}
