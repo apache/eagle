@@ -18,12 +18,10 @@
 
 package org.apache.eagle.notification;
 
-import com.sun.tools.internal.jxc.apt.Const;
 import com.typesafe.config.Config;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.notification.base.NotificationConstants;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;

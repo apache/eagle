@@ -18,7 +18,7 @@ package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertNotificationEntity;
-import org.apache.eagle.notification.NotificationConstants;
+import org.apache.eagle.notification.base.NotificationConstants;
 import org.apache.eagle.notification.NotificationPlugin;
 import org.apache.eagle.notification.dao.AlertNotificationDAO;
 import org.apache.eagle.notification.dao.AlertNotificationDAOImpl;

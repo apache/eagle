@@ -19,7 +19,7 @@ package org.apache.eagle.notification;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.notification.base.NotificationStatus;
 
 import java.util.Map;
 

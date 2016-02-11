@@ -18,8 +18,11 @@ package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.notification.NotificationStatus;
+import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.notification.base.NotificationMetadata;
+import org.apache.eagle.notification.base.NotificationStatus;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,10 +31,15 @@ import java.util.Map;
  */
 public interface NewNotificationPlugin {
     /**
+     * immutable metadata for this notification plugin
+     * @return
+     */
+    public NotificationMetadata getMetadata();
+    /**
      * for initialization
      * @throws Exception
      */
-    public void init( Config config ) throws  Exception;
+    public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws  Exception;
 
     /**
      * Update Plugin if any change in Policy Definition

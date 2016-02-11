@@ -15,67 +15,51 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.notification;
+package org.apache.eagle.notification.plugin;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.typesafe.config.Config;
-import kafka.server.KafkaConfig;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.common.config.EagleConfigFactory;
-import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
+import org.apache.eagle.notification.base.NotificationConstants;
+import org.apache.eagle.notification.base.NotificationMetadata;
+import org.apache.eagle.notification.base.NotificationStatus;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
-import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *  Notification Implementation to persist events into KafkaBus  
+ *  send alert to Kafka bus
  */
-
-@Resource(name = NotificationConstants.KAFKA_STORE , description = "Persist Alert Entity to Kafka")
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class PersistAlertToKafkaTopic  implements NotificationPlugin {
-
-	private NotificationStatus status;
-
-	private static final Logger LOG = LoggerFactory.getLogger(PersistAlertToKafkaTopic.class);
+public class AlertKafkaPlugin implements NewNotificationPlugin {
+	private static final Logger LOG = LoggerFactory.getLogger(AlertKafkaPlugin.class);
+	private NotificationStatus status = new NotificationStatus();
 	private Map<String, KafkaTopicConfig> kafaConfigs = new ConcurrentHashMap<String, KafkaTopicConfig>();
 
-	/**
-	 * Initialize all Instance required by this Plugin
-	 * @throws Exception
-     */
 	@Override
-	public void _init( Config config ) throws  Exception  {
-		kafaConfigs.clear();
-		List<AlertDefinitionAPIEntity> activeAlerts = null;
-		try{
-			activeAlerts = NotificationPluginUtils.fetchActiveAlerts();
-		}catch (Exception ex ){
-			LOG.error(ex.getMessage());
-			throw  new Exception(" Kafka Store  Cannot be initialized . Reason : "+ex.getMessage());
-		}
-		for( AlertDefinitionAPIEntity entity : activeAlerts ) {
+	public NotificationMetadata getMetadata() {
+		NotificationMetadata metadata = new NotificationMetadata();
+		metadata.name = NotificationConstants.KAFKA_STORE;
+		metadata.description = "send alert to Kafka bus";
+		return metadata;
+	}
+
+	@Override
+	public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
+		for( AlertDefinitionAPIEntity entity : initAlertDefs ) {
 			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
 			for( Map<String,String> notificationConfigMap : configMaps ){
 				// single policy can have multiple configs , only load Kafka Config's
 				if(notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE).equalsIgnoreCase(NotificationConstants.KAFKA_STORE)){
 					kafaConfigs.put( entity.getTags().get(Constants.POLICY_ID) ,createKafkaConfig(notificationConfigMap) );
+					break;
 				}
 			}
 		}
@@ -104,32 +88,24 @@ public class PersistAlertToKafkaTopic  implements NotificationPlugin {
 	@Override
 	public void onAlert(AlertAPIEntity alertEntity) {
 		try{
-			 status = new NotificationStatus();
-			processAlertEntity(alertEntity);
-			status.setNotificationSuccess(true);
+			KafkaProducer producer = KafkaProducerSingleton.INSTANCE.getProducer();
+			producer.send(createRecord(alertEntity));
+			status.successful = true;
+			status.errorMessage = "";
 		}catch(Exception ex ){
-			LOG.error(" Exception when Posting Alert Entity to Kafka Topic. Reason : "+ex.getMessage());
-			status.setMessage(ex.getMessage());
-		}		
+			LOG.error("fail writing alert to Kafka bus", ex);
+			status.successful = false;
+			status.errorMessage = ex.getMessage();
+		}
 	}
 
-	/**
-	 * Access KafkaProducer and send entity to Bus 
-	 * @param alertEntity
-	 * @throws Exception
-	 */
-	public void processAlertEntity( AlertAPIEntity alertEntity ) throws Exception {
-		KafkaProducer producer = KafkaProducerSingleton.INSTANCE.getProducer();
-		producer.send(createRecord(alertEntity));		
-	}
-	
 	/**
 	 * To Create  KafkaProducer Record 
 	 * @param entity
 	 * @return
 	 * @throws Exception
 	 */
-	public ProducerRecord  createRecord(AlertAPIEntity entity ) throws Exception {
+	private ProducerRecord  createRecord(AlertAPIEntity entity ) throws Exception {
 		String policyId = entity.getTags().get(Constants.POLICY_ID);
 		ProducerRecord  record  = new ProducerRecord( this.kafaConfigs.get(policyId).getKafkaTopic(), NotificationPluginUtils.objectToStr(entity));
 		return record;
@@ -147,12 +123,7 @@ public class PersistAlertToKafkaTopic  implements NotificationPlugin {
      */
 	private KafkaTopicConfig  createKafkaConfig( Map<String,String> notificationConfig ){
 		KafkaTopicConfig kafkaConfig = new KafkaTopicConfig();
-		try {
-			kafkaConfig.setKafkaTopic(notificationConfig.get(NotificationConstants.KAFKA_TOPIC));
-		}catch (Exception ex){
-			LOG.error(" Exception when initializing PersistAlertToKafkaTopic. Reason : "+ex.getMessage());
-		}
+		kafkaConfig.setKafkaTopic(notificationConfig.get(NotificationConstants.KAFKA_TOPIC));
 		return kafkaConfig;
 	}
-
 }

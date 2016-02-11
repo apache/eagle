@@ -15,17 +15,20 @@
  * limitations under the License.
  */
 
+package org.apache.eagle.notification.base;
 
-package org.apache.eagle.notifications.testcases;
+public class NotificationConstants {
+    public static final String NOTIFICATION_TYPE = "notificationType";
+    public static final String EMAIL_NOTIFICATION = "emailNotification";
+    public static final String KAFKA_STORE = "kafkaStore";
+    public static final String EAGLE_STORE = "eagleStore";
 
-import org.junit.Test;
+    // email specific constants
+    public static final String SUBJECT = "subject";
+    public static final String SENDER = "sender";
+    public static final String RECIPIENTS = "recipients";
+    public static final String TPL_FILE_NAME = "tplFileName";
 
-public class TestKafakaProducer {
-
-	@Test
-	public void test() throws Exception{
-		/*KafkaProducer<?, ?> producer = KafkaProducerSingleton.INSTANCE.getProducer();
-		System.out.println(producer.toString());
-		System.out.println(producer.metrics());*/
-	}
+    // Kafka Store Conf
+    public static final String KAFKA_TOPIC = "kafkaTopic";
 }

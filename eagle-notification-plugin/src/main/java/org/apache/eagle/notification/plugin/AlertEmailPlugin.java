@@ -15,12 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.notification;
+package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
+import org.apache.eagle.notification.base.NotificationConstants;
+import org.apache.eagle.notification.base.NotificationMetadata;
+import org.apache.eagle.notification.base.NotificationStatus;
 import org.apache.eagle.notification.email.EmailBuilder;
 import org.apache.eagle.notification.email.EmailGenerator;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
@@ -28,86 +31,72 @@ import org.apache.eagle.policy.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *  Email Notification API to send email/sms  
+ *  Send alert to email
  */
-@Resource(name = NotificationConstants.EMAIL_NOTIFICATION_RESOURCE_NM , description = "  Email Notification API to trigger email/sms ")
-public class EmailNotification  implements NotificationPlugin {
+public class AlertEmailPlugin implements NewNotificationPlugin {
+	private static final Logger LOG = LoggerFactory.getLogger(AlertEmailPlugin.class);
+	private Map<String, EmailGenerator> emailGenerators = new ConcurrentHashMap<>();
+	private NotificationStatus status = new NotificationStatus();
 
-	private static final Logger LOG = LoggerFactory.getLogger(EmailNotification.class);
-	private Map<String, List<EmailGenerator>> emailGenerators = new ConcurrentHashMap<String, List<EmailGenerator>>();
-	private NotificationStatus status ;
+	@Override
+	public NotificationMetadata getMetadata() {
+		NotificationMetadata metadata = new NotificationMetadata();
+		metadata.name = NotificationConstants.EMAIL_NOTIFICATION;
+		metadata.description = "Send alert to email";
+		return metadata;
+	}
 
-	/**
-	 * Initializing required objects for email notification plug in
-	 * @throws Exception
-     */
-	public void _init(Config config) throws  Exception {
-		emailGenerators.clear();
-		List<AlertDefinitionAPIEntity> activeAlerts = new ArrayList<AlertDefinitionAPIEntity>();
-		// find out all policies and its notification Config
-		try{
-			activeAlerts = NotificationPluginUtils.fetchActiveAlerts();
-		}catch (Exception ex ){
-			LOG.error(ex.getMessage());
-			throw  new Exception(" Email Notification Cannot be initialized . Reason : "+ex.getMessage());
-		}
+	@Override
+	public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
 		LOG.info(" Creating Email Generator... ");
-		// Create Email Generator
-		for( AlertDefinitionAPIEntity  entity : activeAlerts ){
-			// for each plugin
+		for( AlertDefinitionAPIEntity  entity : initAlertDefs ){
 			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
 			for( Map<String,String> notificationConfigMap : configMaps ){
 				// single policy can have multiple configs , only load Email Notifications
-				if(notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE).equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION_RESOURCE_NM)){
-					List<EmailGenerator> tmpList = createEmailGenerator(notificationConfigMap);
-					this.emailGenerators.put(entity.getTags().get(Constants.POLICY_ID) , tmpList);
+				if(notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE).equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)){
+					EmailGenerator generator = createEmailGenerator(notificationConfigMap);
+					this.emailGenerators.put(entity.getTags().get(Constants.POLICY_ID) , generator);
+					break;
 				}
-			} // end of for
+			}
 		}
 	}
 
 	/**
-	 * Update - API to update policy delete/create/update in Notification Plug-ins
 	 * @param notificationConf
 	 * @throws Exception
      */
 	@Override
 	public void update( Map<String,String> notificationConf  , boolean isPolicyDelete ) throws Exception {
-		// TODO: check if its delete request
 		if( isPolicyDelete ){
 			LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
 			this.emailGenerators.remove(notificationConf.get(Constants.POLICY_ID));
 			return;
 		}
-		List<EmailGenerator> tmpList = createEmailGenerator(notificationConf);
-		this.emailGenerators.put(notificationConf.get(Constants.POLICY_ID) , tmpList );
+		EmailGenerator generator = createEmailGenerator(notificationConf);
+		this.emailGenerators.put(notificationConf.get(Constants.POLICY_ID) , generator );
 	}
 
 	/**
-	 * API to send email/sms
+	 * API to send email
 	 * @param alertEntity
 	 * @throws Exception
      */
 	@Override
 	public void onAlert(AlertAPIEntity alertEntity) throws  Exception {
-		status = new NotificationStatus();
 		String policyId = alertEntity.getTags().get(Constants.POLICY_ID);
-		System.out.println(" Email Notification ");
-		List<EmailGenerator> generatorList = this.emailGenerators.get(policyId);
-		boolean isSuccess = false;
-		for( EmailGenerator gen : generatorList ) {
-			isSuccess = gen.sendAlertEmail(alertEntity);
-			if( !isSuccess ) {
-				status.setMessage(" Failed to send email ");
-				status.setNotificationSuccess(false);
-			}else
-				status.setNotificationSuccess(true);
+		EmailGenerator generator = this.emailGenerators.get(policyId);
+		boolean isSuccess = generator.sendAlertEmail(alertEntity);
+		if( !isSuccess ) {
+			status.errorMessage = "Failed to send email";
+			status.successful = false;
+		}else {
+			status.errorMessage = "";
+			status.successful = true;
 		}
 	}
 
@@ -121,11 +110,7 @@ public class EmailNotification  implements NotificationPlugin {
 	 * @param notificationConfig
 	 * @return
      */
-	public List<EmailGenerator> createEmailGenerator( Map<String,String> notificationConfig ) {
-		List<EmailGenerator> gens = new ArrayList<EmailGenerator>();
-		if (notificationConfig == null) {
-			return gens;
-		}
+	private EmailGenerator createEmailGenerator( Map<String,String> notificationConfig ) {
 		String tplFileName = notificationConfig.get(NotificationConstants.TPL_FILE_NAME);
 		if (tplFileName == null || tplFileName.equals("")) {
 			tplFileName = "ALERT_DEFAULT.vm";
@@ -136,7 +121,6 @@ public class EmailNotification  implements NotificationPlugin {
 				withSender(notificationConfig.get(NotificationConstants.SENDER)).
 				withRecipients(notificationConfig.get(NotificationConstants.RECIPIENTS)).
 				withTplFile(tplFileName).build();
-		gens.add(gen);
-		return gens;
+		return gen;
 	}
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.notification;
+package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -30,27 +30,26 @@ import java.util.List;
 /**
  * Alert API entity Persistor
  */
-public class EagleAlertPersist {
-
-	private static Logger LOG = LoggerFactory.getLogger(EagleAlertPersist.class);
+public class AlertEagleStorePersister {
+	private static Logger LOG = LoggerFactory.getLogger(AlertEagleStorePersister.class);
 	private String eagleServiceHost;
 	private int eagleServicePort;
 	private String username;
 	private String password;
 
 
-	public EagleAlertPersist(String eagleServiceHost, int eagleServicePort) {
+	public AlertEagleStorePersister(String eagleServiceHost, int eagleServicePort) {
 		this(eagleServiceHost, eagleServicePort, null, null);
 	}
 
-	public EagleAlertPersist(String eagleServiceHost, int eagleServicePort, String username, String password) {
+	public AlertEagleStorePersister(String eagleServiceHost, int eagleServicePort, String username, String password) {
 		this.eagleServiceHost = eagleServiceHost;
 		this.eagleServicePort = eagleServicePort;
 		this.username = username;
 		this.password = password;
 	}
 
-	public EagleAlertPersist(Config config ) {
+	public AlertEagleStorePersister(Config config ) {
 		this.eagleServiceHost = config.getString("eagleProps.eagleService.host");
 		this.eagleServicePort = config.getInt("eagleProps.eagleService.port");
 		this.username = config.getString("eagleProps.eagleService.username");
@@ -74,12 +73,12 @@ public class EagleAlertPersist {
 				return true;
 			}
 			else {
-				LOG.error("Fail to create entities");
+				LOG.error("Fail to create entities with exception " + response.getException());
 				return false;
 			}
 		}
 		catch (Exception ex) {
-			LOG.error("Got an exception in persisting entities" + ex.getMessage(), ex);
+			LOG.error("Got an exception in persisting entities", ex);
 			return false;
 		}
 	}

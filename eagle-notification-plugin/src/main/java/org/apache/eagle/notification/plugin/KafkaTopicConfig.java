@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.eagle.notification;
+package org.apache.eagle.notification.plugin;
 
 /**
  */

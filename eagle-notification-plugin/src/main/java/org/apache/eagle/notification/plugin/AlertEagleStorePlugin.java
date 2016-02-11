@@ -15,46 +15,47 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.notification;
+package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.common.config.EagleConfigFactory;
-import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.notification.base.NotificationConstants;
+import org.apache.eagle.notification.base.NotificationMetadata;
+import org.apache.eagle.notification.base.NotificationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Responsible to persist Alerts to Eagle Storage
+ * Plugin to persist alerts to Eagle Storage
  */
-@Resource(name = "Eagle Store" , description = "Persist Alert Entity to Eagle Store")
-public class PersistToEagleStore implements  NotificationPlugin {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PersistToEagleStore.class);
+public class AlertEagleStorePlugin implements NewNotificationPlugin {
+    private static final Logger LOG = LoggerFactory.getLogger(AlertEagleStorePlugin.class);
     private NotificationStatus status;
+    private AlertEagleStorePersister persist;
 
-    private EagleAlertPersist persist;
-
-    /**
-     * Initialize required objects for this Plugin
-     * @throws Exception
-     */
     @Override
-    public void _init(Config config) throws Exception {
-        this.persist = new EagleAlertPersist(config);
+    public NotificationMetadata getMetadata() {
+        NotificationMetadata metadata = new NotificationMetadata();
+        metadata.name = NotificationConstants.EAGLE_STORE;
+        metadata.description = "Persist Alert Entity to Eagle Store";
+        return metadata;
+    }
+
+    @Override
+    public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
+        this.persist = new AlertEagleStorePersister(config);
+        this.status = new NotificationStatus();
     }
 
     @Override
     public void update(Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
         if( isPolicyDelete ){
-            LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
-            return;
+            LOG.info("Deleted policy ...");
         }
     }
 
@@ -70,14 +71,15 @@ public class PersistToEagleStore implements  NotificationPlugin {
     @Override
     public void onAlert(AlertAPIEntity alertEntity) {
         try{
-            status = new NotificationStatus();
             List<AlertAPIEntity> list = new ArrayList<AlertAPIEntity>();
             list.add(alertEntity);
             persist.doPersist( list );
-            status.setNotificationSuccess(true);
+            status.successful = true;
+            status.errorMessage = "";
         }catch (Exception ex ){
-            status.setMessage(ex.getMessage());
-            LOG.error(" Exception when Posting Alert Entity to Eagle Service. Reason : "+ex.getMessage());
+            status.successful = false;
+            status.errorMessage = ex.getMessage();
+            LOG.error("Fail writing alert entity to Eagle Store", ex);
         }
     }
 }

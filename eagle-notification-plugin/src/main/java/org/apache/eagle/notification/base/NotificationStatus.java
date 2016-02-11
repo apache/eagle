@@ -15,23 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.notification;
+package org.apache.eagle.notification.base;
 
 /**
+ * Object that holds the status of Notification Posted to Notification Plugin  
  */
-public class NotificationConstants {
-
-    public static final String NOTIFICATION_TYPE = "notificationType";
-
-    public static final String EMAIL_NOTIFICATION_RESOURCE_NM = "Email Notification";
-    public static final String KAFKA_STORE = "Kafka Store";
-    // email specific constants
-    public static final String SUBJECT = "subject";
-    public static final String SENDER = "sender";
-    public static final String RECIPIENTS = "recipients";
-    public static final String TPL_FILE_NAME = "tplFileName";
-
-    // Kafka Store Conf
-    public static final String KAFKA_TOPIC = "kafkaTopic";
-
+public class NotificationStatus {
+	public boolean successful;
+	public String errorMessage;
 }

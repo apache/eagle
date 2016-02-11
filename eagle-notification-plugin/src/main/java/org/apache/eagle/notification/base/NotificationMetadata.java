@@ -14,30 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.eagle.notification;
+package org.apache.eagle.notification.base;
 
 /**
- * Object that holds the status of Notification Posted to Notification Plugin  
+ * Created on 2/11/16.
  */
-public class NotificationStatus {
-
-	private boolean isNotificationSuccess;
-	private String message;
-	
-	public NotificationStatus() {
-	 setNotificationSuccess(false);
-	}
-	public boolean isNotificationSuccess() {
-		return isNotificationSuccess;
-	}
-	public void setNotificationSuccess(boolean isNotificationSuccess) {
-		this.isNotificationSuccess = isNotificationSuccess;
-	}
-	public String getMessage() {
-		return message;
-	}
-	public void setMessage(String message) {
-		this.message = message;
-	}
+public class NotificationMetadata {
+    public String name;
+    public String description;
 }

@@ -18,7 +18,7 @@
 package org.apache.eagle.notifications.testcases;
 
 import org.apache.eagle.alert.entity.AlertAPIEntity;
-import org.apache.eagle.notification.KafkaProducerSingleton;
+import org.apache.eagle.notification.plugin.KafkaProducerSingleton;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;

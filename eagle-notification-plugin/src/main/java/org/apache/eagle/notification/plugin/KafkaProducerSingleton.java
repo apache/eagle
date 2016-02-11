@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.notification;
+package org.apache.eagle.notification.plugin;
 
 import java.util.Properties;
 
@@ -42,7 +42,7 @@ public enum KafkaProducerSingleton {
 		configMap.put("request.required.acks", "1");	     
 		configMap.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
 		configMap.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
-		 KafkaProducer<String, Object> producer = new KafkaProducer<>(configMap);
+		KafkaProducer<String, Object> producer = new KafkaProducer<>(configMap);
 		return producer;
 	}
 	

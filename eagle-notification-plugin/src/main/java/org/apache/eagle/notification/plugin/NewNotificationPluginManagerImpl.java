@@ -19,7 +19,7 @@ package org.apache.eagle.notification.plugin;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.notification.NotificationConstants;
+import org.apache.eagle.notification.base.NotificationConstants;
 import org.apache.eagle.notification.NotificationPlugin;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.eagle.policy.common.Constants;
@@ -81,13 +81,13 @@ public class NewNotificationPluginManagerImpl implements NewNotificationPluginMa
     }
 
     @Override
-    public void updateNotificationPlugins(AlertDefinitionAPIEntity entity, boolean isDelete) {
-        String policyId = entity.getTags().get(Constants.POLICY_ID);
+    public void updateNotificationPlugins(AlertDefinitionAPIEntity alertDef, boolean isDelete) {
+        String policyId = alertDef.getTags().get(Constants.POLICY_ID);
         if(isDelete){
             policyNotificationMapping.remove(policyId);
         }else{
             try {
-                policyNotificationMapping.put(policyId, pluginsForPolicy(entity));
+                policyNotificationMapping.put(policyId, pluginsForPolicy(alertDef));
             }catch(Exception ex){
                 LOG.warn("fail updating policyNotificationMapping, but continue to run", ex);
             }
