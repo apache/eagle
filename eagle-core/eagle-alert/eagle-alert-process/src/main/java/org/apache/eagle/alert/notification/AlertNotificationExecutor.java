@@ -47,11 +47,9 @@ import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
 
 /**
- * notify alert by email, sms or other means
- * currently we only implements email notification
+ * notify alert by email, kafka message, storage or other means
  */
 public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> implements PolicyLifecycleMethods<AlertDefinitionAPIEntity> {
-
 	private static final long serialVersionUID = 1690354365435407034L;
 	private static final Logger LOG = LoggerFactory.getLogger(AlertNotificationExecutor.class);
 	private Config config;

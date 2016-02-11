@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.policy.common;
 
-import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
-
 public class Constants {
 	public final static String ALERT_SERVICE_ENDPOINT_NAME = "AlertService";
 	public final static String ALERT_DEFINITION_SERVICE_ENDPOINT_NAME = "AlertDefinitionService";
