@@ -122,7 +122,7 @@ public class TestUserCommandReassembler {
             public void collect(Tuple2<String, Map> stringMapTuple2) {
                 String cmd = (String)stringMapTuple2.f1().get("cmd");
                 Assert.assertEquals("user:copyFromLocal", cmd);
-                Assert.assertEquals("user:appendToFile", cmd);
+                //Assert.assertEquals("user:appendToFile", cmd);
                 System.out.println("assert passed!!!");
             }
         };

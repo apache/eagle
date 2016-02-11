@@ -122,13 +122,13 @@ public class TestExternalBatchWindow {
 //                latch.countDown();
                 Assert.assertEquals(1, arg1.length);
                 recCount.incrementAndGet();
-                int avgCpu = (Integer)arg1[0].getData()[0];
+                int avgCpu = ((Double) arg1[0].getData()[0]).intValue();
                 if (recCount.get() == 1) {
                     Assert.assertEquals(15, avgCpu);
                 } else if (recCount.get() == 2) {
                     Assert.assertEquals(85, avgCpu);
                 }
-                int count = (Integer) arg1[0].getData()[1];
+                int count = ((Long) arg1[0].getData()[1]).intValue();
                 Assert.assertEquals(3, count);
             }
         });
