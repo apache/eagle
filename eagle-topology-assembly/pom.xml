@@ -71,7 +71,7 @@
         </dependency>
 <dependency>
             <groupId>eagle</groupId>
-            <artifactId>eagle-notification-plugin</artifactId>
+            <artifactId>eagle-alert-notification-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

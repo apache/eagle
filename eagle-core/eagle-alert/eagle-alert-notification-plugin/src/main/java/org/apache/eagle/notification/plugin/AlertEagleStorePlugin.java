@@ -73,9 +73,14 @@ public class AlertEagleStorePlugin implements NewNotificationPlugin {
         try{
             List<AlertAPIEntity> list = new ArrayList<AlertAPIEntity>();
             list.add(alertEntity);
-            persist.doPersist( list );
-            status.successful = true;
-            status.errorMessage = "";
+            boolean result = persist.doPersist( list );
+            if(result) {
+                status.successful = true;
+                status.errorMessage = "";
+            }else{
+                status.successful = false;
+                status.errorMessage = "";
+            }
         }catch (Exception ex ){
             status.successful = false;
             status.errorMessage = ex.getMessage();

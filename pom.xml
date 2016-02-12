@@ -134,7 +134,6 @@
         <module>eagle-samples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
-        <module>eagle-notification-plugin</module>
     </modules>
     <properties>
         <!-- General Properties -->
@@ -908,7 +907,8 @@
                                 <exclude>README*</exclude>
                                 <exclude>**/*.log</exclude>
                                 <exclude>**/eagle.log*</exclude>
-                                <exclude>**/resources/**/*.json</exclude>
+                                <!-- all json files should be excluded -->
+                                <exclude>**/*.json</exclude>
                                 <exclude>**/resources/eagle.siddhiext</exclude>
                                 <exclude>**/test/resources/securityAuditLog</exclude>
                                 <exclude>**/resources/**/ml-policyDef-UserProfile.txt</exclude>

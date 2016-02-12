@@ -14,22 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.notification.email;
 
-package org.apache.eagle.notifications.testcases;
+import org.apache.eagle.common.metric.AlertContext;
 
-import com.typesafe.config.Config;
-import org.apache.eagle.common.config.EagleConfigFactory;
-import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
-import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
-import org.apache.eagle.service.client.EagleServiceConnector;
-import org.junit.Test;
-
-public class FindAlertByPolicyIdTestCase {
-
-	@Test
-	public void testFindAlertDefByPolicyId(){
-		Config config = EagleConfigFactory.load().getConfig();
-		PolicyDefinitionDAO dao = new PolicyDefinitionEntityDAOImpl<>(new EagleServiceConnector(config) , null);
-
-	}
+/**
+ * Alert email component is one part of an email, which could be an individual alert
+ */
+public class AlertEmailComponent {
+    private AlertContext alertContext;
+    public AlertContext getAlertContext() {
+        return alertContext;
+    }
+    public void setAlertContext(AlertContext alertContext) {
+        this.alertContext = alertContext;
+    }
 }

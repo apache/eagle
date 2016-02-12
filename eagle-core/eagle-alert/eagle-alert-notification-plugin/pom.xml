@@ -20,12 +20,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>eagle</groupId>
-    <artifactId>eagle-parent</artifactId>
+    <artifactId>eagle-alert-parent</artifactId>
     <version>0.3.0</version>
   </parent>
   <groupId>eagle</groupId>
-  <artifactId>eagle-notification-plugin</artifactId>
-  <name>eagle-notification-plugin</name>
+  <artifactId>eagle-alert-notification-plugin</artifactId>
+  <name>eagle-alert-notification-plugin</name>
   <description>Apache Eagle Notification Plugin to  enable services to use custom or default notification </description>
   <dependencies>
   	<dependency>

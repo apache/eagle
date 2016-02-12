@@ -24,6 +24,8 @@ import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.notification.base.NotificationConstants;
 import org.apache.eagle.notification.base.NotificationMetadata;
 import org.apache.eagle.notification.base.NotificationStatus;
+import org.apache.eagle.notification.email.AlertEmailGenerator;
+import org.apache.eagle.notification.email.AlertEmailGeneratorBuilder;
 import org.apache.eagle.notification.email.EmailBuilder;
 import org.apache.eagle.notification.email.EmailGenerator;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
@@ -33,13 +35,20 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  Send alert to email
  */
 public class AlertEmailPlugin implements NewNotificationPlugin {
 	private static final Logger LOG = LoggerFactory.getLogger(AlertEmailPlugin.class);
-	private Map<String, EmailGenerator> emailGenerators = new ConcurrentHashMap<>();
+	private Map<String, AlertEmailGenerator> emailGenerators = new ConcurrentHashMap<>();
+	private final static int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
+	private final static int DEFAULT_THREAD_POOL_MAX_SIZE = 8;
+	private final static long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
+	private transient ThreadPoolExecutor executorPool;
 	private NotificationStatus status = new NotificationStatus();
 
 	@Override
@@ -52,13 +61,14 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 
 	@Override
 	public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
+		executorPool = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_CORE_SIZE, DEFAULT_THREAD_POOL_MAX_SIZE, DEFAULT_THREAD_POOL_SHRINK_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 		LOG.info(" Creating Email Generator... ");
 		for( AlertDefinitionAPIEntity  entity : initAlertDefs ){
 			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
 			for( Map<String,String> notificationConfigMap : configMaps ){
 				// single policy can have multiple configs , only load Email Notifications
 				if(notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE).equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)){
-					EmailGenerator generator = createEmailGenerator(notificationConfigMap);
+					AlertEmailGenerator generator = createEmailGenerator(notificationConfigMap);
 					this.emailGenerators.put(entity.getTags().get(Constants.POLICY_ID) , generator);
 					break;
 				}
@@ -77,7 +87,7 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 			this.emailGenerators.remove(notificationConf.get(Constants.POLICY_ID));
 			return;
 		}
-		EmailGenerator generator = createEmailGenerator(notificationConf);
+		AlertEmailGenerator generator = createEmailGenerator(notificationConf);
 		this.emailGenerators.put(notificationConf.get(Constants.POLICY_ID) , generator );
 	}
 
@@ -89,7 +99,7 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 	@Override
 	public void onAlert(AlertAPIEntity alertEntity) throws  Exception {
 		String policyId = alertEntity.getTags().get(Constants.POLICY_ID);
-		EmailGenerator generator = this.emailGenerators.get(policyId);
+		AlertEmailGenerator generator = this.emailGenerators.get(policyId);
 		boolean isSuccess = generator.sendAlertEmail(alertEntity);
 		if( !isSuccess ) {
 			status.errorMessage = "Failed to send email";
@@ -110,17 +120,18 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 	 * @param notificationConfig
 	 * @return
      */
-	private EmailGenerator createEmailGenerator( Map<String,String> notificationConfig ) {
+	private AlertEmailGenerator createEmailGenerator( Map<String,String> notificationConfig ) {
 		String tplFileName = notificationConfig.get(NotificationConstants.TPL_FILE_NAME);
 		if (tplFileName == null || tplFileName.equals("")) {
 			tplFileName = "ALERT_DEFAULT.vm";
 		}
-		EmailGenerator gen = EmailBuilder.newBuilder().
+		AlertEmailGenerator gen = AlertEmailGeneratorBuilder.newBuilder().
 				withEagleProps(EagleConfigFactory.load().getConfig().getObject("eagleProps")).
 				withSubject(notificationConfig.get(NotificationConstants.SUBJECT)).
 				withSender(notificationConfig.get(NotificationConstants.SENDER)).
 				withRecipients(notificationConfig.get(NotificationConstants.RECIPIENTS)).
-				withTplFile(tplFileName).build();
+				withTplFile(tplFileName).
+				withExecutorPool(this.executorPool).build();
 		return gen;
 	}
 }
