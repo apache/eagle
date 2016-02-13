@@ -360,7 +360,7 @@ def get_info_from_github(url):
     try:
         gh_req = url_lib.Request(url)
         response = url_lib.urlopen(gh_req)
-        pr_info = response.read().decode()
+        pr_info = response.read().decode(ENCODING)
         return json.loads(pr_info)
     except url_lib.HTTPError as e:
         exit_with_errmsg("failed to get data from URL: %s" % url, -1)
