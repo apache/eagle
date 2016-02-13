@@ -66,11 +66,17 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 		for( AlertDefinitionAPIEntity  entity : initAlertDefs ){
 			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
 			for( Map<String,String> notificationConfigMap : configMaps ){
-				// single policy can have multiple configs , only load Email Notifications
-				if(notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE).equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)){
-					AlertEmailGenerator generator = createEmailGenerator(notificationConfigMap);
-					this.emailGenerators.put(entity.getTags().get(Constants.POLICY_ID) , generator);
-					break;
+				String notificationType = notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE);
+				if(notificationType == null){
+					LOG.error("no notificationType field for this notification, ignoring and continue " + notificationConfigMap);
+					continue;
+				}else {
+					// single policy can have multiple configs , only load Email Notifications
+					if (notificationType.equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)) {
+						AlertEmailGenerator generator = createEmailGenerator(notificationConfigMap);
+						this.emailGenerators.put(entity.getTags().get(Constants.POLICY_ID), generator);
+						LOG.info("Successfully initialized email notification for policy " + entity.getTags().get(Constants.POLICY_ID) + ",with " + notificationConfigMap);
+					}
 				}
 			}
 		}

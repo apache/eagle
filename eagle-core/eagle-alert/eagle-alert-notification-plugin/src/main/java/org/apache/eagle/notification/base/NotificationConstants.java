@@ -19,7 +19,7 @@ package org.apache.eagle.notification.base;
 
 public class NotificationConstants {
     public static final String NOTIFICATION_TYPE = "notificationType";
-    public static final String EMAIL_NOTIFICATION = "emailNotification";
+    public static final String EMAIL_NOTIFICATION = "email";
     public static final String KAFKA_STORE = "kafkaStore";
     public static final String EAGLE_STORE = "eagleStore";
 

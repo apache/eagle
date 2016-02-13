@@ -18,22 +18,39 @@ package org.apache.eagle.notifications.testcases;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import junit.framework.Assert;
+import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.notification.plugin.AlertEmailPlugin;
+import org.apache.eagle.policy.common.Constants;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Created on 2/11/16.
  */
 public class TestAlertEmailPlugin {
+    @Ignore // only works when there is correct email setup and eagle service
     @Test
     public void testAlertEmailPlugin() throws Exception{
         AlertEmailPlugin plugin = new AlertEmailPlugin();
         Config config = ConfigFactory.load();
         AlertDefinitionAPIEntity def = new AlertDefinitionAPIEntity();
-        def.setNotificationDef("");
+        def.setTags(new HashMap<String, String>());
+        def.getTags().put(Constants.POLICY_ID, "testPolicyId");
+        def.setNotificationDef("[{\"notificationType\":\"email\",\"sender\":\"eagle@apache.org\",\"recipients\":\"eagle@apache.org\",\"subject\":\"last check point time lag found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]");
         plugin.init(config, Arrays.asList(def));
+
+        AlertAPIEntity alert = new AlertAPIEntity();
+        alert.setTags(new HashMap<String, String>());
+        alert.getTags().put(Constants.POLICY_ID, "testPolicyId");
+        alert.setDescription("");
+        alert.setAlertContext(new AlertContext());
+        plugin.onAlert(alert);
+        Assert.assertTrue(plugin.getStatus().successful);
     }
 }
