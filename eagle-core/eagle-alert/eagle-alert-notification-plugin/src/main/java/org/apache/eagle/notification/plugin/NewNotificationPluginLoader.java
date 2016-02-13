@@ -19,7 +19,6 @@ package org.apache.eagle.notification.plugin;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertNotificationEntity;
 import org.apache.eagle.notification.base.NotificationConstants;
-import org.apache.eagle.notification.NotificationPlugin;
 import org.apache.eagle.notification.dao.AlertNotificationDAO;
 import org.apache.eagle.notification.dao.AlertNotificationDAOImpl;
 import org.apache.eagle.service.client.EagleServiceConnector;
@@ -27,7 +26,6 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NewNotificationPluginLoader {
     private static final Logger LOG = LoggerFactory.getLogger(NewNotificationPluginLoader.class);
     private static NewNotificationPluginLoader instance = new NewNotificationPluginLoader();
-    private static Map<String,NotificationPlugin> notificationMapping = new ConcurrentHashMap<String,NotificationPlugin>();
+    private static Map<String,NewNotificationPlugin> notificationMapping = new ConcurrentHashMap<String,NewNotificationPlugin>();
 
     private Config config;
     private boolean initialized = false;
@@ -69,10 +67,11 @@ public class NewNotificationPluginLoader {
     private void loadPlugins(){
         try {
             LOG.info(" Start loading Plugins ");
-            Set<Class<? extends NotificationPlugin>> subTypes = scanNotificationPlugins();
+            Set<Class<? extends NewNotificationPlugin>> subTypes = scanNotificationPlugins();
             List<AlertNotificationEntity> result = new ArrayList<AlertNotificationEntity>();
-            for( Class<? extends NotificationPlugin> clazz: subTypes  ){
-                String notificationType = clazz.getAnnotation(Resource.class).name();
+            for( Class<? extends NewNotificationPlugin> clazz: subTypes  ){
+                NewNotificationPlugin plugin = clazz.newInstance();
+                String notificationType = plugin.getMetadata().name;
                 if( null != notificationType ) {
                     AlertNotificationEntity entity = new AlertNotificationEntity();
                     Map<String, String> tags = new HashMap<String, String>();
@@ -99,16 +98,16 @@ public class NewNotificationPluginLoader {
     /**
      * Scan Notification Plugins
      */
-    private  Set<Class<? extends NotificationPlugin>> scanNotificationPlugins() {
-        Set<Class<? extends NotificationPlugin>> subTypes = null;
+    private  Set<Class<? extends NewNotificationPlugin>> scanNotificationPlugins() {
+        Set<Class<? extends NewNotificationPlugin>> subTypes = null;
         try{
             LOG.info("Scanning all classes which implements NotificationPlugin Interface ");
             Reflections reflections = new Reflections();
-            subTypes = reflections.getSubTypesOf(NotificationPlugin.class);
+            subTypes = reflections.getSubTypesOf(NewNotificationPlugin.class);
             LOG.info("Number of Plugins found : " + subTypes.size() );
             if(subTypes.size() <= 0)
                 LOG.warn("Notifications API not found in jar ");
-            for(Class<? extends NotificationPlugin> pluginCls : subTypes){
+            for(Class<? extends NewNotificationPlugin> pluginCls : subTypes){
                 LOG.info("Notification Plugin class " + pluginCls.getName());
             }
         }
@@ -119,7 +118,7 @@ public class NewNotificationPluginLoader {
         return  subTypes;
     }
 
-    public Map<String, NotificationPlugin> getNotificationMapping() {
+    public Map<String, NewNotificationPlugin> getNotificationMapping() {
         ensureInitialized();
         return notificationMapping;
     }

@@ -28,11 +28,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-/**
- *
- */
-public class GetAllNotifications {
-
+public class TestGetAllNotifications {
     @Test
     public void  getAllNotification() throws Exception {
         Config config = EagleConfigFactory.load().getConfig();

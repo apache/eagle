@@ -20,7 +20,6 @@ import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.notification.base.NotificationConstants;
-import org.apache.eagle.notification.NotificationPlugin;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
@@ -38,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NewNotificationPluginManagerImpl implements NewNotificationPluginManager{
     private static final Logger LOG = LoggerFactory.getLogger(NewNotificationPluginManagerImpl.class);
     // mapping from policy Id to NotificationPlugin instance
-    private Map<String, List<NotificationPlugin>> policyNotificationMapping = new ConcurrentHashMap<>(1); //only one write thread
+    private Map<String, List<NewNotificationPlugin>> policyNotificationMapping = new ConcurrentHashMap<>(1); //only one write thread
     private Config config;
 
     public NewNotificationPluginManagerImpl(Config config){
@@ -54,7 +53,7 @@ public class NewNotificationPluginManagerImpl implements NewNotificationPluginMa
         try{
             List<AlertDefinitionAPIEntity> activeAlertDefs = policyDefinitionDao.findActivePolicies( site , dataSource );
             for( AlertDefinitionAPIEntity entity : activeAlertDefs ){
-                List<NotificationPlugin> plugins = pluginsForPolicy(entity);
+                List<NewNotificationPlugin> plugins = pluginsForPolicy(entity);
                 policyNotificationMapping.put(entity.getTags().get(Constants.POLICY_ID) , plugins);
             }
         }catch (Exception ex ){
@@ -66,12 +65,12 @@ public class NewNotificationPluginManagerImpl implements NewNotificationPluginMa
     @Override
     public void notifyAlert(AlertAPIEntity entity) {
         String policyId = entity.getTags().get(Constants.POLICY_ID);
-        List<NotificationPlugin> plugins = policyNotificationMapping.get(policyId);
+        List<NewNotificationPlugin> plugins = policyNotificationMapping.get(policyId);
         if(plugins == null || plugins.size() == 0) {
             LOG.debug("no plugin found for policy " + policyId);
             return;
         }
-        for(NotificationPlugin plugin : plugins){
+        for(NewNotificationPlugin plugin : plugins){
             try {
                 plugin.onAlert(entity);
             }catch(Exception ex){
@@ -94,11 +93,11 @@ public class NewNotificationPluginManagerImpl implements NewNotificationPluginMa
         }
     }
 
-    private List<NotificationPlugin> pluginsForPolicy(AlertDefinitionAPIEntity policy) throws Exception{
+    private List<NewNotificationPlugin> pluginsForPolicy(AlertDefinitionAPIEntity policy) throws Exception{
         NewNotificationPluginLoader loader = NewNotificationPluginLoader.getInstance();
         loader.init(config);
-        Map<String, NotificationPlugin> plugins = loader.getNotificationMapping();
-        List<NotificationPlugin>  notifications = new ArrayList<>();
+        Map<String, NewNotificationPlugin> plugins = loader.getNotificationMapping();
+        List<NewNotificationPlugin>  notifications = new ArrayList<>();
         List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(policy.getNotificationDef());
         for( Map<String,String> notificationConf : notificationConfigCollection ){
             String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);

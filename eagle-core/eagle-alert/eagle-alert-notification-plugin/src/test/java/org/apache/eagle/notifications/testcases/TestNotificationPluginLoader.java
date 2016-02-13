@@ -19,6 +19,7 @@ package org.apache.eagle.notifications.testcases;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
+import org.apache.eagle.notification.base.NotificationConstants;
 import org.apache.eagle.notification.plugin.NewNotificationPluginLoader;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,8 +34,8 @@ public class TestNotificationPluginLoader {
         Config config = ConfigFactory.load();
         NewNotificationPluginLoader loader = NewNotificationPluginLoader.getInstance();
         loader.init(config);
-        Assert.assertTrue(loader.getNotificationMapping().keySet().contains("Eagle Store"));
-        Assert.assertTrue(loader.getNotificationMapping().keySet().contains("Kafka Store"));
-        Assert.assertTrue(loader.getNotificationMapping().keySet().contains("Email Notification"));
+        Assert.assertTrue(loader.getNotificationMapping().keySet().contains(NotificationConstants.EAGLE_STORE));
+        Assert.assertTrue(loader.getNotificationMapping().keySet().contains(NotificationConstants.KAFKA_STORE));
+        Assert.assertTrue(loader.getNotificationMapping().keySet().contains(NotificationConstants.EMAIL_NOTIFICATION));
     }
 }

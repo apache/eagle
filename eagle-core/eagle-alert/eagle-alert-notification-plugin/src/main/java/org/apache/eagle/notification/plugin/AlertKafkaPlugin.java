@@ -17,6 +17,7 @@
 
 package org.apache.eagle.notification.plugin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
@@ -41,7 +42,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AlertKafkaPlugin implements NewNotificationPlugin {
 	private static final Logger LOG = LoggerFactory.getLogger(AlertKafkaPlugin.class);
 	private NotificationStatus status = new NotificationStatus();
-	private Map<String, KafkaTopicConfig> kafaConfigs = new ConcurrentHashMap<String, KafkaTopicConfig>();
+	private Map<String, Map<String, String>> kafaConfigs = new ConcurrentHashMap<>();
+	private Config config;
 
 	@Override
 	public NotificationMetadata getMetadata() {
@@ -53,13 +55,20 @@ public class AlertKafkaPlugin implements NewNotificationPlugin {
 
 	@Override
 	public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
+		this.config = config;
 		for( AlertDefinitionAPIEntity entity : initAlertDefs ) {
 			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
 			for( Map<String,String> notificationConfigMap : configMaps ){
-				// single policy can have multiple configs , only load Kafka Config's
-				if(notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE).equalsIgnoreCase(NotificationConstants.KAFKA_STORE)){
-					kafaConfigs.put( entity.getTags().get(Constants.POLICY_ID) ,createKafkaConfig(notificationConfigMap) );
-					break;
+				String notificationType = notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE);
+				if(notificationType == null){
+					LOG.error("no notificationType field for this notification, ignoring and continue " + notificationConfigMap);
+					continue;
+				}else {
+					// single policy can have multiple configs , only load Kafka Config's
+					if (notificationType.equalsIgnoreCase(NotificationConstants.KAFKA_STORE)) {
+						kafaConfigs.put(entity.getTags().get(Constants.POLICY_ID), notificationConfigMap);
+						break;
+					}
 				}
 			}
 		}
@@ -78,7 +87,7 @@ public class AlertKafkaPlugin implements NewNotificationPlugin {
 			this.kafaConfigs.remove(notificationConf.get(Constants.POLICY_ID));
 			return;
 		}
-		kafaConfigs.put( notificationConf.get(Constants.POLICY_ID) ,createKafkaConfig(notificationConf) );
+		kafaConfigs.put( notificationConf.get(Constants.POLICY_ID), notificationConf );
 	}
 
 	/**
@@ -88,7 +97,7 @@ public class AlertKafkaPlugin implements NewNotificationPlugin {
 	@Override
 	public void onAlert(AlertAPIEntity alertEntity) {
 		try{
-			KafkaProducer producer = KafkaProducerSingleton.INSTANCE.getProducer();
+			KafkaProducer producer = KafkaProducerSingleton.INSTANCE.getProducer(config);
 			producer.send(createRecord(alertEntity));
 			status.successful = true;
 			status.errorMessage = "";
@@ -107,23 +116,12 @@ public class AlertKafkaPlugin implements NewNotificationPlugin {
 	 */
 	private ProducerRecord  createRecord(AlertAPIEntity entity ) throws Exception {
 		String policyId = entity.getTags().get(Constants.POLICY_ID);
-		ProducerRecord  record  = new ProducerRecord( this.kafaConfigs.get(policyId).getKafkaTopic(), NotificationPluginUtils.objectToStr(entity));
+		ProducerRecord  record  = new ProducerRecord( this.kafaConfigs.get(policyId).get("topic"), NotificationPluginUtils.objectToStr(entity));
 		return record;
 	}	
 	
 	@Override
 	public NotificationStatus getStatus() {
 		return status;
-	}
-
-	/**
-	 * Creates Kafka Config Object
-	 * @param notificationConfig
-	 * @return
-     */
-	private KafkaTopicConfig  createKafkaConfig( Map<String,String> notificationConfig ){
-		KafkaTopicConfig kafkaConfig = new KafkaTopicConfig();
-		kafkaConfig.setKafkaTopic(notificationConfig.get(NotificationConstants.KAFKA_TOPIC));
-		return kafkaConfig;
 	}
 }

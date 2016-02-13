@@ -18,6 +18,7 @@ package org.apache.eagle.notification.plugin;
 
 import java.util.Properties;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 
@@ -26,17 +27,11 @@ import org.apache.kafka.clients.producer.KafkaProducer;
  */
 public enum KafkaProducerSingleton {
 	INSTANCE;	
-	
-	/**
-	 * Create single Instance in JVM
-	 * @return
-	 * @throws Exception
-	 */
-	public KafkaProducer<String, Object>  getProducer() throws Exception{		
+
+	public KafkaProducer<String, Object>  getProducer(Config config) throws Exception{
 		Properties configMap = new Properties();
-		configMap.put("bootstrap.servers", NotificationPluginUtils.getPropValue("kafka_broker"));
-		configMap.put("metadata.broker.list", NotificationPluginUtils.getPropValue("kafka_broker"));
-		//configMap.put("serializer.class", "kafka.serializer.StringEncoder");
+		configMap.put("bootstrap.servers", NotificationPluginUtils.getPropValue(config, "kafka_broker"));
+		configMap.put("metadata.broker.list", NotificationPluginUtils.getPropValue(config, "kafka_broker"));
 		configMap.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		configMap.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		configMap.put("request.required.acks", "1");	     
