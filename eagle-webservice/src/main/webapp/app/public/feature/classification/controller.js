@@ -322,18 +322,18 @@
 			});
 		};
 
-		$scope.databases = Entities.query($scope.dataSrc.api.database, {site: Site.current().tags.site});
-		_fillAttr($scope.databases, "database", $scope.dataSrc.mapping.database);
+		$scope.databases = Entities.query($scope.viewConfig.api.database, {site: Site.current().tags.site});
+		_fillAttr($scope.databases, "database", $scope.viewConfig.mapping.database);
 
 		$scope.loadTables = function(database) {
 			if(database.tables) return;
 			var _qry = {
 				site: Site.current().tags.site
 			};
-			_qry[$scope.dataSrc.mapping.database] = database[$scope.dataSrc.mapping.database];
-			database.tables = Entities.query($scope.dataSrc.api.table, _qry);
-			_fillAttr(database.tables, "table", $scope.dataSrc.mapping.table);
-			_fillAttr(database.tables, "database", $scope.dataSrc.mapping.database);
+			_qry[$scope.viewConfig.mapping.database] = database[$scope.viewConfig.mapping.database];
+			database.tables = Entities.query($scope.viewConfig.api.table, _qry);
+			_fillAttr(database.tables, "table", $scope.viewConfig.mapping.table);
+			_fillAttr(database.tables, "database", $scope.viewConfig.mapping.database);
 		};
 
 		$scope.loadColumns = function(database, table) {
@@ -343,10 +343,10 @@
 			var _qry = {
 				site: Site.current().tags.site
 			};
-			_qry[$scope.dataSrc.mapping.database] = database[$scope.dataSrc.mapping.database];
-			_qry[$scope.dataSrc.mapping.table] = table[$scope.dataSrc.mapping.table];
-			table.columns = Entities.query($scope.dataSrc.api.column, _qry);
-			_fillAttr(table.columns, "column", $scope.dataSrc.mapping.column);
+			_qry[$scope.viewConfig.mapping.database] = database[$scope.viewConfig.mapping.database];
+			_qry[$scope.viewConfig.mapping.table] = table[$scope.viewConfig.mapping.table];
+			table.columns = Entities.query($scope.viewConfig.api.column, _qry);
+			_fillAttr(table.columns, "column", $scope.viewConfig.mapping.column);
 		};
 
 		// =================== Sensitivity ===================
@@ -355,13 +355,13 @@
 
 			$scope._oriItem = item;
 			$scope._markItem = {
-				prefix: $scope.dataSrc.prefix,
+				prefix: $scope.viewConfig.prefix,
 				tags: {
 					site: Site.current().tags.site
 				},
 				sensitivityType: ""
 			};
-			$scope._markItem.tags[$scope.dataSrc.keys[0]] = item.resource;
+			$scope._markItem.tags[$scope.viewConfig.keys[0]] = item.resource;
 			$("#sensitivityMDL").modal();
 			setTimeout(function() {
 				$("#sensitiveType").focus();
@@ -369,7 +369,7 @@
 		};
 		$scope.confirmUpateSensitivity = function() {
 			$scope._oriItem.sensitiveType = $scope._markItem.sensitivityType;
-			Entities.updateEntity($scope.dataSrc.service, $scope._markItem, {timestamp: false})._promise.success(function(data) {
+			Entities.updateEntity($scope.viewConfig.service, $scope._markItem, {timestamp: false})._promise.success(function(data) {
 				Entities.dialog(data);
 			});
 			$("#sensitivityMDL").modal('hide');
@@ -387,8 +387,8 @@
 				var _qry = {
 					site: Site.current().tags.site
 				};
-				_qry[$scope.dataSrc.keys[0]] = item.resource;
-				Entities.deleteEntities($scope.dataSrc.service, _qry);
+				_qry[$scope.viewConfig.keys[0]] = item.resource;
+				Entities.deleteEntities($scope.viewConfig.service, _qry);
 
 				item.sensitiveType = null;
 				$scope.$apply();
