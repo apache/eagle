@@ -25,59 +25,6 @@
 	// ==============================================================
 	// =                          Function                          =
 	// ==============================================================
-	/*feature.service("SensitivityConfig", function(Site) {
-		return {
-			list: [
-				{
-					name: "HDFS",
-					dataSrc: common.array.find("hdfsAuditLog", Site.current().dataSrcList, "tags.dataSource"),
-					service: "FileSensitivityService",
-					keys: ["filedir", "sensitivityType"],
-
-					type: "folder",
-					prefix: "fileSensitivity",
-					api: "hdfsResource"
-				},
-				{
-					name: "Hive",
-					dataSrc: common.array.find("hiveQueryLog", Site.current().dataSrcList, "tags.dataSource"),
-					service: "HiveResourceSensitivityService",
-					keys: ["hiveResource", "sensitivityType"],
-
-					type: "table",
-					prefix: "hiveResourceSensitivity",
-					api: {
-						database: "hiveResource/databases",
-						table: "hiveResource/tables",
-						column: "hiveResource/columns"
-					},
-					mapping: {
-						database: "database",
-						table: "table",
-						column: "column"
-					}
-				},
-				{
-					name: "HBase",
-					dataSrc: common.array.find("hbaseSecurityLog", Site.current().dataSrcList, "tags.dataSource"),
-					service: "HbaseResourceSensitivityService",
-					keys: ["hbaseResource", "sensitivityType"],
-					type: "table",
-					prefix: "hbaseResourceSensitivity",
-					api: {
-						database: "hbaseResource/namespaces",
-						table: "hbaseResource/tables",
-						column: "hbaseResource/columns"
-					},
-					mapping: {
-						database: "namespace",
-						table: "table",
-						column: "columnFamily"
-					}
-				}
-			]
-		};
-	});*/
 
 	// ==============================================================
 	// =                       Classification                       =
@@ -319,13 +266,13 @@
 		$scope.markSensitivity = function(item) {
 			$scope._oriItem = item;
 			$scope._markItem = {
-				prefix: $scope.dataSrc.prefix,
+				prefix: $scope.viewConfig.prefix,
 				tags: {
 					site: Site.current().tags.site
 				},
 				sensitivityType: ""
 			};
-			$scope._markItem.tags[$scope.dataSrc.keys[0]] = item.resource;
+			$scope._markItem.tags[$scope.viewConfig.keys[0]] = item.resource;
 			$("#sensitivityMDL").modal();
 			setTimeout(function() {
 				$("#sensitiveType").focus();
@@ -333,7 +280,7 @@
 		};
 		$scope.confirmUpateSensitivity = function() {
 			$scope._oriItem.sensitiveType = $scope._markItem.sensitivityType;
-			Entities.updateEntity($scope.dataSrc.service, $scope._markItem, {timestamp: false})._promise.success(function(data) {
+			Entities.updateEntity($scope.viewConfig.service, $scope._markItem, {timestamp: false})._promise.success(function(data) {
 				Entities.dialog(data);
 			});
 			$("#sensitivityMDL").modal('hide');
@@ -347,8 +294,8 @@
 				if(!ret) return;
 
 				var _cond = {site: Site.current().tags.site};
-				_cond[$scope.dataSrc.keys[0]] = item.resource;
-				Entities.deleteEntities($scope.dataSrc.service, _cond);
+				_cond[$scope.viewConfig.keys[0]] = item.resource;
+				Entities.deleteEntities($scope.viewConfig.service, _cond);
 
 				item.sensitiveType = null;
 				$scope.$apply();
