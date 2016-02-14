@@ -20,8 +20,21 @@
 	<div class="box-header with-border">
 		<i class="fa fa-folder-open"></i>
 		<h3 class="box-title ng-binding">{{Application.current().displayName}}</h3>
-		<ng-include src="'public/feature/classification/page/sensitivity/' + viewConfig.type + '.html?_=' + ajaxId"></ng-include>
+		<div class="box-tools pull-right" ng-if="viewConfig">
+			<div class="btn-group">
+				<button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+					<span class="fa fa-wrench"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li><a ng-click="import()"><span class="fa fa-cloud-upload"></span> Import</a></li>
+					<li><a ng-click="export()"><span class="fa fa-cloud-download"></span> Export</a></li>
+					<li class="divider"></li>
+					<li class="danger"><a ng-click="deleteAll()"><span class="fa fa-trash"></span> Delete All</a></li>
+				</ul>
+			</div>
+		</div>
 	</div>
 	<div class="box-body">
+		<ng-include ng-if="viewConfig" src="'public/feature/classification/page/sensitivity/' + viewConfig.type + '.html?_=' + ajaxId"></ng-include>
 	</div>
 </div>

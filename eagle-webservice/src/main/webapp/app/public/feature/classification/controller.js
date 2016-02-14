@@ -200,7 +200,7 @@
 	// =                        Sensitivity                        =
 	// =============================================================
 	feature.navItem("sensitivity", "Classification", "user-secret");
-	feature.controller('sensitivity', function(PageConfig, Site, $scope, Application) {
+	feature.controller('sensitivity', function(PageConfig, Site, $scope, Application, Entities, UI) {
 		PageConfig.pageTitle = "Data Classification";
 		PageConfig.pageSubTitle = Site.current().tags.site;
 		$scope.ajaxId = Math.random();
@@ -211,7 +211,48 @@
 				title: "OPS",
 				content: "View configuration not defined in Application."
 			});
+			return;
 		}
+
+		// ===================== Function =====================
+		$scope.export = function() {
+			var _data = {};
+			UI.fieldConfirm({title: "Export Classification", confirm: false, size: "large"}, _data, [
+				{name: "Data", field: "data", type: "blob", rows: 20, optional: true, readonly: true}]
+			);
+
+			Entities.queryEntities($scope.viewConfig.service, {site: Site.current().name})._promise.then(function(data) {
+				_data.data = JSON.stringify(data, null, "\t");
+			});
+		};
+
+		$scope.import = function() {
+			UI.fieldConfirm({title: "Import Classification", size: "large"}, {}, [
+				{name: "Data", field: "data", type: "blob", rows: 20, optional: true}]
+			, function(entity) {
+				var _list = common.parseJSON(entity.data, false);
+				if(!_list) {
+					return "Invalid JSON format";
+				}
+				if(!$.isArray(_list)) {
+					return "Not an array";
+				}
+			}).then(null, null, function(holder) {
+				Entities.updateEntity($scope.viewConfig.service, common.parseJSON(holder.entity.data, []), {timestamp: false})._promise.then(function() {
+					holder.closeFunc();
+					location.reload();
+				});
+			});
+		};
+
+		$scope.deleteAll = function() {
+			UI.deleteConfirm("All the Classification Data").then(null, null, function(holder) {
+				Entities.deleteEntities($scope.viewConfig.service, {site: Site.current().name})._promise.then(function() {
+					holder.closeFunc();
+					location.reload();
+				});
+			});
+		};
 	});
 
 	// =============================================================

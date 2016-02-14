@@ -41,7 +41,7 @@
 		// ======================================== Algorithms ========================================
 		$scope.algorithmEntity = {};
 		Entities.queryEntities("AlertDefinitionService", {site: Site.current().name, dataSource: "userProfile"})._promise.then(function(data) {
-			$scope.algorithmEntity = common.getValueByPath(data, "data.obj[0]");
+			$scope.algorithmEntity = common.getValueByPath(data, "obj[0]");
 			$scope.algorithmEntity.policy = common.parseJSON($scope.algorithmEntity.policyDef);
 		});
 
@@ -157,7 +157,7 @@
 					if(!ret) return;
 
 					$mdl.modal('hide');
-					Entities.deleteEntity("ScheduleTaskService", task)._promise.then(function(data) {
+					Entities.deleteEntity("ScheduleTaskService", task)._promise.then(function() {
 						_loadTasks();
 					});
 				});

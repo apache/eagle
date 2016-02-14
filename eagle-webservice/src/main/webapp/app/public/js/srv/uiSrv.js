@@ -40,6 +40,8 @@
 			$scope.lock = false;
 			$scope.create = create;
 
+			$scope.config = typeof name === "object" ? name : {};
+
 			// Modal
 			$mdl = $(TMPL_FIELDS).appendTo('body');
 			$compile($mdl)($scope);
@@ -84,7 +86,7 @@
 		 * Create a creation confirm modal.
 		 * @param name			Name title
 		 * @param entity		bind entity
-		 * @param fieldList	Array. Format: {name, field, description(optional), optional(optional)}
+		 * @param fieldList	Array. Format: {name, field, type(optional: blob), rows(optional: number), description(optional), optional(optional), readonly(optional)}
 		 * @param checkFunc	Check logic function. Return string will prevent access
 		 */
 		UI.createConfirm = function(name, entity, fieldList, checkFunc) {
@@ -95,11 +97,26 @@
 		 * Create a update confirm modal.
 		 * @param name			Name title
 		 * @param entity		bind entity
-		 * @param fieldList	Array. Format: {name, field, description(optional), optional(optional)}
+		 * @param fieldList	Array. Format: {name, field, type(optional: blob), rows(optional: number), description(optional), optional(optional), readonly(optional)}
 		 * @param checkFunc	Check logic function. Return string will prevent access
 		 */
 		UI.updateConfirm = function(name, entity, fieldList, checkFunc) {
 			return _fieldDialog(false, name, entity, fieldList, checkFunc);
+		};
+
+		/***
+		 * Create a customize field confirm modal.
+		 * @param config		Configuration object
+		 * 			@param config.title			Title of dialog box
+		 * 			@param config.size				"large". Set dialog size
+		 * 			@param config.confirm			Boolean. Display or not confirm button
+		 * 			@param config.confirmDesc		Confirm button display description
+		 * @param entity		bind entity
+		 * @param fieldList	Array. Format: {name, field, type(optional: blob), rows(optional: number), description(optional), optional(optional), readonly(optional)}
+		 * @param checkFunc	Check logic function. Return string will prevent access
+		 */
+		UI.fieldConfirm = function(config, entity, fieldList, checkFunc) {
+			return _fieldDialog("field", config, entity, fieldList, checkFunc);
 		};
 
 		UI.deleteConfirm = function(name) {
@@ -150,13 +167,13 @@
 	// ===========================================================
 	var TMPL_FIELDS =
 		'<div class="modal fade" tabindex="-1" role="dialog">' +
-			'<div class="modal-dialog" role="document">' +
+			'<div class="modal-dialog" ng-class="{\'modal-lg\': config.size === \'large\'}" role="document">' +
 				'<div class="modal-content">' +
 					'<div class="modal-header">' +
 						'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
 							'<span aria-hidden="true">&times;</span>' +
 						'</button>' +
-						'<h4 class="modal-title">{{create ? "New" : "Update"}} {{name}}</h4>' +
+						'<h4 class="modal-title">{{config.title || (create ? "New" : "Update") + " " + name}}</h4>' +
 					'</div>' +
 					'<div class="modal-body">' +
 						'<div class="form-group" ng-repeat="field in fieldList" ng-switch="field.type">' +
@@ -164,14 +181,16 @@
 								'<span ng-if="!field.optional">*</span> ' +
 								'{{field.name}}' +
 							'</label>' +
-							'<textarea class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
-							'<input type="text" class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]" ng-disabled="lock" ng-switch-default>' +
+							'<textarea class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
+							'<input type="text" class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
 						'</div>' +
 					'</div>' +
 					'<div class="modal-footer">' +
 						'<p class="pull-left text-danger">{{checkFunc(entity)}}</p>' +
 						'<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="lock">Close</button>' +
-						'<button type="button" class="btn btn-primary" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || lock">{{create ? "Create" : "Update"}}</button>' +
+						'<button type="button" class="btn btn-primary" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || lock" ng-if="config.confirm !== false">' +
+							'{{config.confirmDesc || (create ? "Create" : "Update")}}' +
+						'</button>' +
 					'</div>' +
 				'</div>' +
 			'</div>' +

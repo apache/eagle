@@ -87,8 +87,9 @@
 
 			// AJAX
 			var canceler = $q.defer();
-			_list._promise = $http.get(_url, {timeout: canceler.promise}).success(function(data) {
-				_list.push.apply(_list, data.obj);
+			_list._promise = $http.get(_url, {timeout: canceler.promise}).then(function(status) {
+				_list.push.apply(_list, status.data.obj);
+				return _list;
 			});
 			_list._promise.abort = function() {
 				canceler.resolve();
