@@ -100,7 +100,7 @@ module.exports = function (grunt) {
 		cssmin: {
 			ui: {
 				files: {
-					'tmp/public/css/styles.css': ['app/public/css/main.css']
+					'tmp/public/css/styles.css': ['app/public/css/main.css', 'app/public/css/animation.css']
 				}
 			}
 		},

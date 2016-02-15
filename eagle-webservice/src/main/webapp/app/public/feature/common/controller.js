@@ -67,7 +67,7 @@
 	feature.navItem("policyList", "Policies", "list");
 	feature.controller('policyList', function(PageConfig, Site, $scope, Application, Entities, Policy) {
 		PageConfig.pageTitle = "Policy List";
-		PageConfig.pageSubTitle = Site.current().name;
+		PageConfig.pageSubTitle = Site.current().tags.site;
 
 		// Initial load
 		$scope.policyList = [];

@@ -22,7 +22,7 @@ var app = {};
 	'use strict';
 
 	/* App Module */
-	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'ui.router', 'eagleControllers', 'featureControllers', 'eagle.service']);
+	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'featureControllers', 'eagle.service']);
 
 	// ======================================================================================
 	// =                                   Feature Module                                   =
