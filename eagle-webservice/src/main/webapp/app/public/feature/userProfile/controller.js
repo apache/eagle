@@ -33,20 +33,20 @@
 	// ======================== Profile List ========================
 	feature.navItem("list", "User Profiles", "graduation-cap");
 	feature.controller('list', function(PageConfig, Site, $scope, $interval, Entities) {
-		PageConfig.pageSubTitle = Site.current().name;
+		PageConfig.pageSubTitle = Site.current().tags.site;
 
 		$scope.common = common;
 		$scope.algorithms = [];
 
 		// ======================================== Algorithms ========================================
 		$scope.algorithmEntity = {};
-		Entities.queryEntities("AlertDefinitionService", {site: Site.current().name, dataSource: "userProfile"})._promise.then(function(data) {
+		Entities.queryEntities("AlertDefinitionService", {site: Site.current().tags.site, dataSource: "userProfile"})._promise.then(function(data) {
 			$scope.algorithmEntity = common.getValueByPath(data, "obj[0]");
 			$scope.algorithmEntity.policy = common.parseJSON($scope.algorithmEntity.policyDef);
 		});
 
 		// ======================================= User profile =======================================
-		$scope.profileList = Entities.queryEntities("MLModelService", {site: Site.current().name}, ["user", "algorithm", "content", "version"]);
+		$scope.profileList = Entities.queryEntities("MLModelService", {site: Site.current().tags.site}, ["user", "algorithm", "content", "version"]);
 		$scope.profileList._promise.then(function() {
 			var _algorithms = {};
 			var _users = {};
@@ -82,7 +82,7 @@
 		$scope.tasks = [];
 		function _loadTasks() {
 			var _tasks = Entities.queryEntities("ScheduleTaskService", {
-				site: Site.current().name,
+				site: Site.current().tags.site,
 				_pageSize: 100,
 				_duration: 1000 * 60 * 60 * 24 * 14,
 				__ETD: 1000 * 60 * 60 * 24
@@ -124,7 +124,7 @@
 					status: "INITIALIZED",
 					detail: "Newly created command",
 					tags: {
-						site: Site.current().name,
+						site: Site.current().tags.site,
 						type: "USER_PROFILE_TRAINING"
 					},
 					timestamp: +new Date()
@@ -174,7 +174,7 @@
 	// ======================= Profile Detail =======================
 	feature.controller('detail', function(PageConfig, Site, $scope, $wrapState, Entities) {
 		PageConfig.pageTitle = "User Profile";
-		PageConfig.pageSubTitle = Site.current().name;
+		PageConfig.pageSubTitle = Site.current().tags.site;
 		PageConfig
 			.addNavPath("User Profile", "/userProfile/list")
 			.addNavPath("Detail");
@@ -183,7 +183,7 @@
 
 		// User profile
 		$scope.profiles = {};
-		$scope.profileList = Entities.queryEntities("MLModelService", {site: Site.current().name, user: $scope.user});
+		$scope.profileList = Entities.queryEntities("MLModelService", {site: Site.current().tags.site, user: $scope.user});
 		$scope.profileList._promise.then(function() {
 			$.each($scope.profileList, function(i, unit) {
 				unit._content = common.parseJSON(unit.content);

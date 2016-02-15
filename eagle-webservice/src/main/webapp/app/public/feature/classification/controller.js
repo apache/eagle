@@ -221,7 +221,7 @@
 				{name: "Data", field: "data", type: "blob", rows: 20, optional: true, readonly: true}]
 			);
 
-			Entities.queryEntities($scope.viewConfig.service, {site: Site.current().name})._promise.then(function(data) {
+			Entities.queryEntities($scope.viewConfig.service, {site: Site.current().tags.site})._promise.then(function(data) {
 				_data.data = JSON.stringify(data, null, "\t");
 			});
 		};
@@ -247,7 +247,7 @@
 
 		$scope.deleteAll = function() {
 			UI.deleteConfirm("All the Classification Data").then(null, null, function(holder) {
-				Entities.deleteEntities($scope.viewConfig.service, {site: Site.current().name})._promise.then(function() {
+				Entities.deleteEntities($scope.viewConfig.service, {site: Site.current().tags.site})._promise.then(function() {
 					holder.closeFunc();
 					location.reload();
 				});
