@@ -378,6 +378,9 @@ ul.tree.tree-bordered > li > ul > li > a {
 	-o-transition: background .5s linear;
 	transition: background .5s linear;
 }
+.product-list-in-box > .item.ng-animate {
+	transition: 0s;
+}
 .product-list-in-box > .item.active {
 	background: #F5FAFC;
 	-webkit-transition: none;
