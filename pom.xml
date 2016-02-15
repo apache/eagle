@@ -134,6 +134,7 @@
         <module>eagle-examples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
+        <module>eagle-qe</module>
     </modules>
     <properties>
         <!-- General Properties -->
@@ -935,11 +936,11 @@
                                 <exclude>**/webapp/**</exclude>
 
                             </excludes>
-                         </configuration>
-                     </execution>
-                 </executions>
-             </plugin>
-         </plugins>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
     <repositories>
         <repository>
