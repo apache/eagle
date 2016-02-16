@@ -228,8 +228,8 @@
 
 		$scope.import = function() {
 			UI.fieldConfirm({title: "Import Classification", size: "large"}, {}, [
-				{name: "Data", field: "data", type: "blob", rows: 20, optional: true}]
-			, function(entity) {
+				{name: "Data", field: "data", type: "blob", rows: 20, optional: true}
+			], function(entity) {
 				var _list = common.parseJSON(entity.data, false);
 				if(!_list) {
 					return "Invalid JSON format";

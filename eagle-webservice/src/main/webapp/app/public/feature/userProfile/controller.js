@@ -31,7 +31,7 @@
 	// ==============================================================
 
 	// ======================== Profile List ========================
-	feature.navItem("list", "User Profiles", "graduation-cap");
+	//feature.navItem("list", "User Profiles", "graduation-cap");
 	feature.controller('list', function(PageConfig, Site, $scope, $interval, Entities) {
 		PageConfig.pageSubTitle = Site.current().tags.site;
 

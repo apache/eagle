@@ -216,10 +216,10 @@
 
 			Object.defineProperties(_site, {
 				applications: {
-					get: function() {return _applications}
+					get: function() {return _applications;}
 				},
 				optionalApplications: {
-					get: function() {return _optionalApplications}
+					get: function() {return _optionalApplications;}
 				}
 			});
 

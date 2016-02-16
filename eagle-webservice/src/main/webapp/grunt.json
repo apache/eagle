@@ -29,8 +29,8 @@
 			"src": [
 				"node_modules/bootstrap/dist/css/bootstrap.min.css",
 				"node_modules/zombiej-bootstrap-components/bootstrap-components/css/bootstrap-components.min.css",
-				"node_modules/font-awesome/css/font-awesome.min.css",
 				"node_modules/zombiej-nvd3/build/nv.d3.min.css",
+				"node_modules/font-awesome/css/font-awesome.min.css",
 				"node_modules/admin-lte/dist/css/AdminLTE.min.css",
 				"node_modules/admin-lte/dist/css/skins/skin-blue.min.css",
 
