@@ -58,7 +58,6 @@ module.exports = function (grunt) {
 					'app/public/js/components/**/**.js',
 
 					'app/public/js/ctrl/main.js',
-					'app/public/js/ctrl/damController.js',
 					'app/public/js/ctrl/*.js',
 				],
 				dest: 'tmp/public/js/scripts.js'
@@ -93,9 +92,19 @@ module.exports = function (grunt) {
 				options: {
 					mangle: false
 				},
-				src: 'tmp/public/js/scripts.js',
-				dest: 'tmp/public/js/scripts.min.js'
-			}
+				files: [
+					{
+						src: 'tmp/public/js/scripts.js',
+						dest: 'tmp/public/js/scripts.min.js'
+					},
+					{
+						expand: true,
+						src: '**/*.js',
+						dest: 'tmp/feature',
+						cwd: 'app/public/feature'
+					}
+				]
+			},
 		},
 		cssmin: {
 			ui: {
@@ -111,6 +120,11 @@ module.exports = function (grunt) {
 			}
 		},
 		copy: {
+			feature: {
+				files: [
+					{expand: true, cwd: 'app/', src: ['public/feature/**'], dest: 'tmp'}
+				]
+			},
 			ui: {
 				files: [
 					{expand: true, cwd: 'tmp/', src: ['**'], dest: 'ui'},
@@ -137,6 +151,7 @@ module.exports = function (grunt) {
 		// Clean Env
 		'clean:build',
 		// Compress JS
+		'copy:feature',
 		'concat:app',
 		'regex-replace:strict',
 		'uglify',
@@ -146,7 +161,7 @@ module.exports = function (grunt) {
 		'concat:css',
 		// Pass HTML Resources
 		'htmlrefs',
-		'copy',
+		'copy:ui',
 		// Clean Env
 		'clean:tmp',
 	]);
