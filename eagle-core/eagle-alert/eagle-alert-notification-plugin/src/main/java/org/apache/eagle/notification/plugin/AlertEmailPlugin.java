@@ -18,6 +18,7 @@
 package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
@@ -50,12 +51,16 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 	private final static long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
 	private transient ThreadPoolExecutor executorPool;
 	private NotificationStatus status = new NotificationStatus();
+	private NotificationMetadata metadata;
+
+	public AlertEmailPlugin(){
+		metadata = new NotificationMetadata();
+		metadata.name = NotificationConstants.EMAIL_NOTIFICATION;
+		metadata.description = "Send alert to email";
+	}
 
 	@Override
 	public NotificationMetadata getMetadata() {
-		NotificationMetadata metadata = new NotificationMetadata();
-		metadata.name = NotificationConstants.EMAIL_NOTIFICATION;
-		metadata.description = "Send alert to email";
 		return metadata;
 	}
 
@@ -67,16 +72,11 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
 			for( Map<String,String> notificationConfigMap : configMaps ){
 				String notificationType = notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE);
-				if(notificationType == null){
-					LOG.error("no notificationType field for this notification, ignoring and continue " + notificationConfigMap);
-					continue;
-				}else {
-					// single policy can have multiple configs , only load Email Notifications
-					if (notificationType.equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)) {
-						AlertEmailGenerator generator = createEmailGenerator(notificationConfigMap);
+				// for backward compatibility, default notification is email
+				if(notificationType == null || notificationType.equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)){
+					AlertEmailGenerator generator = createEmailGenerator(notificationConfigMap);
 						this.emailGenerators.put(entity.getTags().get(Constants.POLICY_ID), generator);
 						LOG.info("Successfully initialized email notification for policy " + entity.getTags().get(Constants.POLICY_ID) + ",with " + notificationConfigMap);
-					}
 				}
 			}
 		}
@@ -87,14 +87,14 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 	 * @throws Exception
      */
 	@Override
-	public void update( Map<String,String> notificationConf  , boolean isPolicyDelete ) throws Exception {
+	public void update(String policyId, Map<String,String> notificationConf  , boolean isPolicyDelete ) throws Exception {
 		if( isPolicyDelete ){
 			LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
-			this.emailGenerators.remove(notificationConf.get(Constants.POLICY_ID));
+			this.emailGenerators.remove(policyId);
 			return;
 		}
 		AlertEmailGenerator generator = createEmailGenerator(notificationConf);
-		this.emailGenerators.put(notificationConf.get(Constants.POLICY_ID) , generator );
+		this.emailGenerators.put(policyId , generator );
 	}
 
 	/**
@@ -139,5 +139,22 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 				withTplFile(tplFileName).
 				withExecutorPool(this.executorPool).build();
 		return gen;
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder().append(metadata.name).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object o){
+		if(o == this)
+			return true;
+		if(!(o instanceof AlertEmailPlugin))
+			return false;
+		AlertEmailPlugin that = (AlertEmailPlugin)o;
+		if(that.metadata.name.equals(metadata.name))
+			return true;
+		return false;
 	}
 }

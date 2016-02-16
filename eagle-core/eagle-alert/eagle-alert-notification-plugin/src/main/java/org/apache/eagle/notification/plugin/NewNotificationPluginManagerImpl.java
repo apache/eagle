@@ -17,6 +17,7 @@
 package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.notification.base.NotificationConstants;
@@ -37,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NewNotificationPluginManagerImpl implements NewNotificationPluginManager{
     private static final Logger LOG = LoggerFactory.getLogger(NewNotificationPluginManagerImpl.class);
     // mapping from policy Id to NotificationPlugin instance
-    private Map<String, List<NewNotificationPlugin>> policyNotificationMapping = new ConcurrentHashMap<>(1); //only one write thread
+    private Map<String, Collection<NewNotificationPlugin>> policyNotificationMapping = new ConcurrentHashMap<>(1); //only one write thread
     private Config config;
 
     public NewNotificationPluginManagerImpl(Config config){
@@ -52,9 +53,15 @@ public class NewNotificationPluginManagerImpl implements NewNotificationPluginMa
         String dataSource = config.getString("eagleProps.dataSource");
         try{
             List<AlertDefinitionAPIEntity> activeAlertDefs = policyDefinitionDao.findActivePolicies( site , dataSource );
+            // initialize all loaded plugins
+            NewNotificationPluginLoader.getInstance().init(config);
+            for(NewNotificationPlugin plugin : NewNotificationPluginLoader.getInstance().getNotificationMapping().values()){
+                plugin.init(config, activeAlertDefs);
+            }
+            // build policy and plugin mapping
             for( AlertDefinitionAPIEntity entity : activeAlertDefs ){
-                List<NewNotificationPlugin> plugins = pluginsForPolicy(entity);
-                policyNotificationMapping.put(entity.getTags().get(Constants.POLICY_ID) , plugins);
+                Map<String, NewNotificationPlugin> plugins = pluginsForPolicy(entity);
+                policyNotificationMapping.put(entity.getTags().get(Constants.POLICY_ID) , plugins.values());
             }
         }catch (Exception ex ){
             LOG.error("Error initializing poliy/notification mapping ", ex);
@@ -65,7 +72,7 @@ public class NewNotificationPluginManagerImpl implements NewNotificationPluginMa
     @Override
     public void notifyAlert(AlertAPIEntity entity) {
         String policyId = entity.getTags().get(Constants.POLICY_ID);
-        List<NewNotificationPlugin> plugins = policyNotificationMapping.get(policyId);
+        Collection<NewNotificationPlugin> plugins = policyNotificationMapping.get(policyId);
         if(plugins == null || plugins.size() == 0) {
             LOG.debug("no plugin found for policy " + policyId);
             return;
@@ -81,30 +88,63 @@ public class NewNotificationPluginManagerImpl implements NewNotificationPluginMa
 
     @Override
     public void updateNotificationPlugins(AlertDefinitionAPIEntity alertDef, boolean isDelete) {
-        String policyId = alertDef.getTags().get(Constants.POLICY_ID);
-        if(isDelete){
-            policyNotificationMapping.remove(policyId);
-        }else{
-            try {
-                policyNotificationMapping.put(policyId, pluginsForPolicy(alertDef));
-            }catch(Exception ex){
-                LOG.warn("fail updating policyNotificationMapping, but continue to run", ex);
+        try {
+            // Update Notification Plugin about the change in AlertDefinition
+            String policyId = alertDef.getTags().get(Constants.POLICY_ID);
+            if(isDelete){
+                // iterate all plugins and delete this policy
+                for(NewNotificationPlugin plugin : policyNotificationMapping.get(policyId)){
+                    plugin.update(policyId, null, true);
+                }
+                policyNotificationMapping.remove(policyId);
+                return;
             }
+
+            Map<String, NewNotificationPlugin> plugins = pluginsForPolicy(alertDef);
+            // calculate difference between current plugins and previous plugin
+            Collection<NewNotificationPlugin> deletedPlugins = CollectionUtils.subtract(policyNotificationMapping.get(policyId), plugins.values());
+            for(NewNotificationPlugin plugin : deletedPlugins){
+                plugin.update(policyId, null, true);
+            }
+
+            // iterate current notifications and update it individually
+            List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(alertDef.getNotificationDef());
+            for( Map<String,String> notificationConf : notificationConfigCollection ) {
+                String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
+                // for backward compatibility, use email for default notification type
+                if(notificationType == null){
+                    notificationType = NotificationConstants.EMAIL_NOTIFICATION;
+                }
+                NewNotificationPlugin plugin = plugins.get(notificationType);
+                if(plugin != null){
+                    plugin.update(policyId, notificationConf, false);
+                }
+            }
+
+            policyNotificationMapping.put(policyId, plugins.values());// update policy - notification types map
+            LOG.info(" Successfully broad casted policy updates to all Notification Plugins ...");
+        } catch (Exception e) {
+            LOG.error("Error broadcasting policy notification changes ", e);
         }
     }
 
-    private List<NewNotificationPlugin> pluginsForPolicy(AlertDefinitionAPIEntity policy) throws Exception{
+    private Map<String, NewNotificationPlugin> pluginsForPolicy(AlertDefinitionAPIEntity policy) throws Exception{
         NewNotificationPluginLoader loader = NewNotificationPluginLoader.getInstance();
         loader.init(config);
         Map<String, NewNotificationPlugin> plugins = loader.getNotificationMapping();
-        List<NewNotificationPlugin>  notifications = new ArrayList<>();
+        // mapping from notificationType to plugin
+        Map<String, NewNotificationPlugin>  notifications = new HashMap<>();
         List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(policy.getNotificationDef());
         for( Map<String,String> notificationConf : notificationConfigCollection ){
             String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
-            if(!plugins.containsKey(notificationType)){
+            // for backward compatibility, by default notification type is email if notification type is not specified
+            if(notificationType == null){
+                LOG.warn("notificationType is null so use default notification type email for this policy  " + policy);
+                notifications.put(NotificationConstants.EMAIL_NOTIFICATION, plugins.get(NotificationConstants.EMAIL_NOTIFICATION));
+            }else if(!plugins.containsKey(notificationType)){
                 LOG.warn("No NotificationPlugin supports this notificationType " + notificationType);
             }else {
-                notifications.add(plugins.get(notificationType));
+                notifications.put(NotificationConstants.EMAIL_NOTIFICATION, plugins.get(notificationType));
             }
         }
         return notifications;

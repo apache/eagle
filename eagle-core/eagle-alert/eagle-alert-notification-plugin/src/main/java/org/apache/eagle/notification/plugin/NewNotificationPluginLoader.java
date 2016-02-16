@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NewNotificationPluginLoader {
     private static final Logger LOG = LoggerFactory.getLogger(NewNotificationPluginLoader.class);
     private static NewNotificationPluginLoader instance = new NewNotificationPluginLoader();
-    private static Map<String,NewNotificationPlugin> notificationMapping = new ConcurrentHashMap<String,NewNotificationPlugin>();
+    private static Map<String,NewNotificationPlugin> notificationMapping = new ConcurrentHashMap<>();
 
     private Config config;
     private boolean initialized = false;
@@ -68,13 +68,13 @@ public class NewNotificationPluginLoader {
         try {
             LOG.info(" Start loading Plugins ");
             Set<Class<? extends NewNotificationPlugin>> subTypes = scanNotificationPlugins();
-            List<AlertNotificationEntity> result = new ArrayList<AlertNotificationEntity>();
+            List<AlertNotificationEntity> result = new ArrayList<>();
             for( Class<? extends NewNotificationPlugin> clazz: subTypes  ){
                 NewNotificationPlugin plugin = clazz.newInstance();
                 String notificationType = plugin.getMetadata().name;
                 if( null != notificationType ) {
                     AlertNotificationEntity entity = new AlertNotificationEntity();
-                    Map<String, String> tags = new HashMap<String, String>();
+                    Map<String, String> tags = new HashMap<>();
                     tags.put(NotificationConstants.NOTIFICATION_TYPE, notificationType);
                     entity.setEnabled(true);
                     entity.setTags(tags);

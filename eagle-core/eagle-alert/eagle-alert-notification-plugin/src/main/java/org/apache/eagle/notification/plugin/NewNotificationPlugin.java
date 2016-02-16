@@ -43,10 +43,11 @@ public interface NewNotificationPlugin {
 
     /**
      * Update Plugin if any change in Policy Definition
+     * @param policy to be impacted
      * @param  notificationConf
      * @throws Exception
      */
-    public void update(Map<String,String> notificationConf , boolean isPolicyDelete ) throws  Exception;
+    public void update(String policy, Map<String,String> notificationConf , boolean isPolicyDelete ) throws  Exception;
 
     /**
      * Post a notification for the given alertEntity

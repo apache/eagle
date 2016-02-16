@@ -19,6 +19,7 @@ package org.apache.eagle.notification.plugin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.notification.base.NotificationConstants;
@@ -44,12 +45,16 @@ public class AlertKafkaPlugin implements NewNotificationPlugin {
 	private NotificationStatus status = new NotificationStatus();
 	private Map<String, Map<String, String>> kafaConfigs = new ConcurrentHashMap<>();
 	private Config config;
+	private NotificationMetadata metadata;
+
+	public AlertKafkaPlugin(){
+		metadata = new NotificationMetadata();
+		metadata.name = NotificationConstants.KAFKA_STORE;
+		metadata.description = "send alert to Kafka bus";
+	}
 
 	@Override
 	public NotificationMetadata getMetadata() {
-		NotificationMetadata metadata = new NotificationMetadata();
-		metadata.name = NotificationConstants.KAFKA_STORE;
-		metadata.description = "send alert to Kafka bus";
 		return metadata;
 	}
 
@@ -81,13 +86,13 @@ public class AlertKafkaPlugin implements NewNotificationPlugin {
 	 * @throws Exception
      */
 	@Override
-	public void update( Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
+	public void update(String policyId, Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
 		if( isPolicyDelete ){
 			LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
-			this.kafaConfigs.remove(notificationConf.get(Constants.POLICY_ID));
+			this.kafaConfigs.remove(policyId);
 			return;
 		}
-		kafaConfigs.put( notificationConf.get(Constants.POLICY_ID), notificationConf );
+		kafaConfigs.put(policyId, notificationConf );
 	}
 
 	/**
@@ -123,5 +128,22 @@ public class AlertKafkaPlugin implements NewNotificationPlugin {
 	@Override
 	public NotificationStatus getStatus() {
 		return status;
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder().append(metadata.name).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object o){
+		if(o == this)
+			return true;
+		if(!(o instanceof AlertKafkaPlugin))
+			return false;
+		AlertKafkaPlugin that = (AlertKafkaPlugin)o;
+		if(that.metadata.name.equals(metadata.name))
+			return true;
+		return false;
 	}
 }

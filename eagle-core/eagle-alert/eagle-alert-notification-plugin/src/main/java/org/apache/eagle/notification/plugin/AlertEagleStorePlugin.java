@@ -18,6 +18,7 @@
 package org.apache.eagle.notification.plugin;
 
 import com.typesafe.config.Config;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.notification.base.NotificationConstants;
@@ -37,12 +38,16 @@ public class AlertEagleStorePlugin implements NewNotificationPlugin {
     private static final Logger LOG = LoggerFactory.getLogger(AlertEagleStorePlugin.class);
     private NotificationStatus status;
     private AlertEagleStorePersister persist;
+    private NotificationMetadata metadata;
+
+    public AlertEagleStorePlugin(){
+        metadata = new NotificationMetadata();
+        metadata.name = NotificationConstants.EAGLE_STORE;
+        metadata.description = "Persist Alert Entity to Eagle Store";
+    }
 
     @Override
     public NotificationMetadata getMetadata() {
-        NotificationMetadata metadata = new NotificationMetadata();
-        metadata.name = NotificationConstants.EAGLE_STORE;
-        metadata.description = "Persist Alert Entity to Eagle Store";
         return metadata;
     }
 
@@ -53,7 +58,7 @@ public class AlertEagleStorePlugin implements NewNotificationPlugin {
     }
 
     @Override
-    public void update(Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
+    public void update(String policyId, Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
         if( isPolicyDelete ){
             LOG.info("Deleted policy ...");
         }
@@ -86,5 +91,22 @@ public class AlertEagleStorePlugin implements NewNotificationPlugin {
             status.errorMessage = ex.getMessage();
             LOG.error("Fail writing alert entity to Eagle Store", ex);
         }
+    }
+
+    @Override
+    public int hashCode(){
+        return new HashCodeBuilder().append(metadata.name).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o == this)
+            return true;
+        if(!(o instanceof AlertEagleStorePlugin))
+            return false;
+        AlertEagleStorePlugin that = (AlertEagleStorePlugin)o;
+        if(that.metadata.name.equals(metadata.name))
+            return true;
+        return false;
     }
 }
