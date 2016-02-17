@@ -225,5 +225,14 @@
                 <include>**</include>
             </includes>
         </fileSet>
+
+        <!-- copy hadoop metric configuration to assembly -->
+        <fileSet>
+            <directory>${project.basedir}/../eagle-hadoop-metric/src/main/resources</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>hadoop-metric-init.sh</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>
