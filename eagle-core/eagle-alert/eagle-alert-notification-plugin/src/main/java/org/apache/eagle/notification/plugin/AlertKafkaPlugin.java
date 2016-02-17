@@ -44,18 +44,6 @@ public class AlertKafkaPlugin implements NotificationPlugin {
 	private NotificationStatus status = new NotificationStatus();
 	private Map<String, Map<String, String>> kafaConfigs = new ConcurrentHashMap<>();
 	private Config config;
-	private NotificationMetadata metadata;
-
-	public AlertKafkaPlugin(){
-		metadata = new NotificationMetadata();
-		metadata.name = NotificationConstants.KAFKA_STORE;
-		metadata.description = "send alert to Kafka bus";
-	}
-
-	@Override
-	public NotificationMetadata getMetadata() {
-		return metadata;
-	}
 
 	@Override
 	public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
@@ -131,7 +119,7 @@ public class AlertKafkaPlugin implements NotificationPlugin {
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder().append(metadata.name).toHashCode();
+		return new HashCodeBuilder().append(getClass().getCanonicalName()).toHashCode();
 	}
 
 	@Override
@@ -140,9 +128,6 @@ public class AlertKafkaPlugin implements NotificationPlugin {
 			return true;
 		if(!(o instanceof AlertKafkaPlugin))
 			return false;
-		AlertKafkaPlugin that = (AlertKafkaPlugin)o;
-		if(that.metadata.name.equals(metadata.name))
-			return true;
-		return false;
+		return true;
 	}
 }

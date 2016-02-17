@@ -50,7 +50,7 @@ public class AlertNotificationDAOImpl implements  AlertNotificationDAO {
     public List<AlertNotificationEntity> findAlertNotificationTypes() throws Exception {
         try{
             IEagleServiceClient client = new EagleServiceClientImpl(connector);
-            String query = Constants.ALERT_NOTIFICATION_SERVICE_ENDPOINT_NAME+"[]{*}";
+            String query = Constants.ALERT_NOTIFICATION_SERVICE_ENDPOINT_NAME+"[@enabled=\"true\"]{*}";
             GenericServiceAPIResponseEntity response = client.search(query).startTime(0)
                     .endTime(10 * DateUtils.MILLIS_PER_DAY)
                     .pageSize(Integer.MAX_VALUE)

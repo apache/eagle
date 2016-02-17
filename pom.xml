@@ -131,7 +131,7 @@
         <module>eagle-external</module>
         <module>eagle-assembly</module>
         <module>eagle-topology-assembly</module>
-        <module>eagle-samples</module>
+        <module>eagle-examples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
     </modules>
@@ -907,6 +907,7 @@
                                 <exclude>README*</exclude>
                                 <exclude>**/*.log</exclude>
                                 <exclude>**/eagle.log*</exclude>
+                                <exclude>**/velocity.log*</exclude>
                                 <!-- all json files should be excluded -->
                                 <exclude>**/*.json</exclude>
                                 <exclude>**/resources/eagle.siddhiext</exclude>

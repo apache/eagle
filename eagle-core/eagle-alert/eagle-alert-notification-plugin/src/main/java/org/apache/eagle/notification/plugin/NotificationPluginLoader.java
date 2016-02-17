@@ -66,56 +66,18 @@ public class NotificationPluginLoader {
      */
     private void loadPlugins(){
         try {
-            LOG.info(" Start loading Plugins ");
-            Set<Class<? extends NotificationPlugin>> subTypes = scanNotificationPlugins();
-            List<AlertNotificationEntity> result = new ArrayList<>();
-            for( Class<? extends NotificationPlugin> clazz: subTypes  ){
-                NotificationPlugin plugin = clazz.newInstance();
-                String notificationType = plugin.getMetadata().name;
-                if( null != notificationType ) {
-                    AlertNotificationEntity entity = new AlertNotificationEntity();
-                    Map<String, String> tags = new HashMap<>();
-                    tags.put(NotificationConstants.NOTIFICATION_TYPE, notificationType);
-                    entity.setEnabled(true);
-                    entity.setTags(tags);
-                    result.add(entity);
-                    notificationMapping.put( notificationType, clazz.newInstance() );
-                }else {
-                    LOG.error("Something wrong in Notification Plugin Impl , Looks like Resource Annotation is missing, ignoring this plugin and continue ");
-                }
-            }
-
+            LOG.info("Start loading Plugins from eagle service ...");
             AlertNotificationDAO dao = new AlertNotificationDAOImpl(new EagleServiceConnector(config));
-            dao.deleteAllAlertNotifications();
-            dao.persistAlertNotificationTypes( result );
-            LOG.info("Notification Plugins loaded successfully..");
+            List<AlertNotificationEntity> activeNotificationPlugins = dao.findAlertNotificationTypes();
+            for(AlertNotificationEntity plugin : activeNotificationPlugins){
+                notificationMapping.put(plugin.getTags().get(NotificationConstants.NOTIFICATION_TYPE),
+                        (NotificationPlugin) Class.forName(plugin.getClassName()).newInstance());
+            }
+            LOG.info("successfully loaded Plugins from eagle service " + activeNotificationPlugins);
         }catch ( Exception ex ){
             LOG.error("Error in loading Notification Plugins: ", ex);
             throw new IllegalStateException(ex);
         }
-    }
-
-    /**
-     * Scan Notification Plugins
-     */
-    private  Set<Class<? extends NotificationPlugin>> scanNotificationPlugins() {
-        Set<Class<? extends NotificationPlugin>> subTypes = null;
-        try{
-            LOG.info("Scanning all classes which implements NotificationPlugin Interface ");
-            Reflections reflections = new Reflections();
-            subTypes = reflections.getSubTypesOf(NotificationPlugin.class);
-            LOG.info("Number of Plugins found : " + subTypes.size() );
-            if(subTypes.size() <= 0)
-                LOG.warn("Notifications API not found in jar ");
-            for(Class<? extends NotificationPlugin> pluginCls : subTypes){
-                LOG.info("Notification Plugin class " + pluginCls.getName());
-            }
-        }
-        catch ( Exception ex ){
-            LOG.error(" Error in Scanning Plugins using Reflection API", ex);
-            throw new IllegalStateException(ex);
-        }
-        return  subTypes;
     }
 
     public Map<String, NotificationPlugin> getNotificationMapping() {

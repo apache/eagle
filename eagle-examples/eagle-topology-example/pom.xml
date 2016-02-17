@@ -19,13 +19,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>eagle-samples</artifactId>
+        <artifactId>eagle-examples</artifactId>
         <groupId>eagle</groupId>
         <version>0.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>eagle-persist-sample</artifactId>
+    <artifactId>eagle-topology-example</artifactId>
     <dependencies>
         <dependency>
             <groupId>eagle</groupId>
@@ -49,8 +49,8 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <descriptor>src/assembly/eagle-persist-sample-assembly.xml</descriptor>
-                    <finalName>eagle-persist-sample-${project.version}</finalName>
+                    <descriptor>src/assembly/eagle-topology-example-assembly.xml</descriptor>
+                    <finalName>eagle-topology-example-${project.version}</finalName>
                 </configuration>
                 <executions>
                     <execution>

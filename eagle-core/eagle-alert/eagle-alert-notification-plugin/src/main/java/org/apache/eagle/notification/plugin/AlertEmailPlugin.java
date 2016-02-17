@@ -49,18 +49,6 @@ public class AlertEmailPlugin implements NotificationPlugin {
 	private final static long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
 	private transient ThreadPoolExecutor executorPool;
 	private NotificationStatus status = new NotificationStatus();
-	private NotificationMetadata metadata;
-
-	public AlertEmailPlugin(){
-		metadata = new NotificationMetadata();
-		metadata.name = NotificationConstants.EMAIL_NOTIFICATION;
-		metadata.description = "Send alert to email";
-	}
-
-	@Override
-	public NotificationMetadata getMetadata() {
-		return metadata;
-	}
 
 	@Override
 	public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
@@ -142,7 +130,7 @@ public class AlertEmailPlugin implements NotificationPlugin {
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder().append(metadata.name).toHashCode();
+		return new HashCodeBuilder().append(getClass().getCanonicalName()).toHashCode();
 	}
 
 	@Override
@@ -151,9 +139,6 @@ public class AlertEmailPlugin implements NotificationPlugin {
 			return true;
 		if(!(o instanceof AlertEmailPlugin))
 			return false;
-		AlertEmailPlugin that = (AlertEmailPlugin)o;
-		if(that.metadata.name.equals(metadata.name))
-			return true;
-		return false;
+		return true;
 	}
 }

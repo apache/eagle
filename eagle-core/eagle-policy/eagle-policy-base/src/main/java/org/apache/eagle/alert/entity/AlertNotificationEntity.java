@@ -43,7 +43,7 @@ public class AlertNotificationEntity extends TaggedLogAPIEntity {
         valueChanged("className");
     }
 
-    @Column("description")
+    @Column("b")
     private String description;
     public String getDescription(){
         return description;

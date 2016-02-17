@@ -31,11 +31,6 @@ import java.util.Map;
  */
 public interface NotificationPlugin {
     /**
-     * immutable metadata for this notification plugin
-     * @return
-     */
-    public NotificationMetadata getMetadata();
-    /**
      * for initialization
      * @throws Exception
      */

@@ -38,18 +38,6 @@ public class AlertEagleStorePlugin implements NotificationPlugin {
     private static final Logger LOG = LoggerFactory.getLogger(AlertEagleStorePlugin.class);
     private NotificationStatus status;
     private AlertEagleStorePersister persist;
-    private NotificationMetadata metadata;
-
-    public AlertEagleStorePlugin(){
-        metadata = new NotificationMetadata();
-        metadata.name = NotificationConstants.EAGLE_STORE;
-        metadata.description = "Persist Alert Entity to Eagle Store";
-    }
-
-    @Override
-    public NotificationMetadata getMetadata() {
-        return metadata;
-    }
 
     @Override
     public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
@@ -99,7 +87,7 @@ public class AlertEagleStorePlugin implements NotificationPlugin {
 
     @Override
     public int hashCode(){
-        return new HashCodeBuilder().append(metadata.name).toHashCode();
+        return new HashCodeBuilder().append(getClass().getCanonicalName()).toHashCode();
     }
 
     @Override
@@ -108,9 +96,6 @@ public class AlertEagleStorePlugin implements NotificationPlugin {
             return true;
         if(!(o instanceof AlertEagleStorePlugin))
             return false;
-        AlertEagleStorePlugin that = (AlertEagleStorePlugin)o;
-        if(that.metadata.name.equals(metadata.name))
-            return true;
-        return false;
+        return true;
     }
 }
