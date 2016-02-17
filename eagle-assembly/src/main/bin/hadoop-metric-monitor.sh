@@ -34,7 +34,7 @@ if [ "$active" ]; then
  ${EAGLE_HOME}/bin/eagle-topology.sh --topology sandbox-hadoopjmx-topology stop
 fi
 echo "start Eagle Hadoop Metric Monitoring topology"
-${EAGLE_HOME}/bin/eagle-topology.sh --main org.apache.eagle.hadoop.metric.HadoopJmxMetricMonitor --topology sandbox-hadoopjmx-topology --config ../conf/sandbox-hadoopjmx-topology.conf start
+${EAGLE_HOME}/bin/eagle-topology.sh --main org.apache.eagle.hadoop.metric.HadoopJmxMetricMonitor --topology sandbox-hadoopjmx-topology --config ${EAGLE_HOME}/conf/sandbox-hadoopjmx-topology.conf start
 
 ######################################################################
 ##            Setup minutely crontab job for HADOOP METRIC
@@ -43,8 +43,8 @@ echo "set up crontab script"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cp $DIR/../tools/hadoop_jmx_collector/config-sample.json $DIR/../tools/hadoop_jmx_collector/config.json
 command="python $DIR/../tools/hadoop_jmx_collector/hadoop_jmx_kafka.py"
-echo $job
 job="* * * * * $command >> $DIR/../logs/hadoop_metric.log"
+echo "$job"
 cat <(fgrep -i -v "$command" <(crontab -l)) <(echo "$job") | crontab -
 
 echo "$(crontab -l)"
