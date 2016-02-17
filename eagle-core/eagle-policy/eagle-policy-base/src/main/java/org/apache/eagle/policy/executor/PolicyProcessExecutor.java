@@ -228,18 +228,15 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
         boolean needValidation = !config.hasPath(needValidationConfigKey) || config.getBoolean(needValidationConfigKey);
 
 		AbstractPolicyDefinition policyDef = null;
-		try {
-			policyDef = JsonSerDeserUtils.deserialize(alertDef.getPolicyDef(), AbstractPolicyDefinition.class, 
-					PolicyManager.getInstance().getPolicyModules(policyType));
-		} catch (Exception ex) {
-			LOG.error("Fail initial alert policy def: "+alertDef.getPolicyDef(), ex);
-		}
 		PolicyEvaluator<T> pe;
-		PolicyEvaluationContext<T, K> context = new PolicyEvaluationContext<>();
-		context.policyId = alertDef.getTags().get("policyId");
-		context.alertExecutor = this;
-		context.resultRender = this.getResultRender();
 		try {
+			policyDef = JsonSerDeserUtils.deserialize(alertDef.getPolicyDef(), AbstractPolicyDefinition.class,
+					PolicyManager.getInstance().getPolicyModules(policyType));
+
+			PolicyEvaluationContext<T, K> context = new PolicyEvaluationContext<>();
+			context.policyId = alertDef.getTags().get("policyId");
+			context.alertExecutor = this;
+			context.resultRender = this.getResultRender();
 			// create evaluator instance
 			pe = (PolicyEvaluator<T>) evalCls
 					.getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)

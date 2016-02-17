@@ -56,5 +56,6 @@ createEagleTable(admin, 'appCommand')
 createEagleTable(admin, 'appDefinition')
 createEagleTable(admin, 'serviceAudit')
 createEagleTable(admin, 'aggregatedef')
+createEagleTable(admin, 'alertNotifications')
 
 exit
