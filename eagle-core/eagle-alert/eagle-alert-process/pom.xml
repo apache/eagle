@@ -113,6 +113,11 @@
             <artifactId>eagle-stream-process-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+	<dependency>
+            <groupId>eagle</groupId>
+            <artifactId>eagle-alert-notification-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 	</dependencies>
 
     <build>
