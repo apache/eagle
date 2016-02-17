@@ -44,7 +44,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cp $DIR/../tools/hadoop_jmx_collector/config-sample.json $DIR/../tools/hadoop_jmx_collector/config.json
 command="python $DIR/../tools/hadoop_jmx_collector/hadoop_jmx_kafka.py"
 job="* * * * * $command >> $DIR/../logs/hadoop_metric.log"
-echo $job
+echo "$job"
 cat <(fgrep -i -v "$command" <(crontab -l)) <(echo "$job") | crontab -
 
 echo "$(crontab -l)"
