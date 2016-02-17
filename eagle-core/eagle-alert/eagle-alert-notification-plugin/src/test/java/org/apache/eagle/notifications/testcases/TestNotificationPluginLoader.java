@@ -20,7 +20,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
 import org.apache.eagle.notification.base.NotificationConstants;
-import org.apache.eagle.notification.plugin.NewNotificationPluginLoader;
+import org.apache.eagle.notification.plugin.NotificationPluginLoader;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class TestNotificationPluginLoader {
     @Test
     public void testLoader(){
         Config config = ConfigFactory.load();
-        NewNotificationPluginLoader loader = NewNotificationPluginLoader.getInstance();
+        NotificationPluginLoader loader = NotificationPluginLoader.getInstance();
         loader.init(config);
         Assert.assertTrue(loader.getNotificationMapping().keySet().contains(NotificationConstants.EAGLE_STORE));
         Assert.assertTrue(loader.getNotificationMapping().keySet().contains(NotificationConstants.KAFKA_STORE));

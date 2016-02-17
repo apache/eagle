@@ -19,7 +19,7 @@ package org.apache.eagle.alert.notification;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.apache.eagle.notification.plugin.NewNotificationPluginManagerImpl;
+import org.apache.eagle.notification.plugin.NotificationPluginManagerImpl;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
@@ -41,7 +41,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 	private static final Logger LOG = LoggerFactory.getLogger(AlertNotificationExecutor.class);
 	private Config config;
 	/** Notification Manager - Responsible for forward and invoke configured Notification Plugin **/
-	private NewNotificationPluginManagerImpl notificationManager;
+	private NotificationPluginManagerImpl notificationManager;
 
 	private List<String> alertExecutorIdList;
 	private PolicyDefinitionDAO dao;
@@ -69,7 +69,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 			LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
 		}
 		try{
-			notificationManager = new NewNotificationPluginManagerImpl(config);
+			notificationManager = new NotificationPluginManagerImpl(config);
 		}catch (Exception ex ){
 			LOG.error("Fail to initialize NotificationManager: ", ex);
 			throw new IllegalStateException("Fail to initialize NotificationManager: ", ex);

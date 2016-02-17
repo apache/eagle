@@ -34,6 +34,26 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Tags({"notificationType"})
 public class AlertNotificationEntity extends TaggedLogAPIEntity {
     @Column("a")
+    private String className;
+    public String getClassName(){
+        return className;
+    }
+    public void setClassName(String className){
+        this.className = className;
+        valueChanged("className");
+    }
+
+    @Column("description")
+    private String description;
+    public String getDescription(){
+        return description;
+    }
+    public void setDescription(String description){
+        this.description = description;
+        valueChanged("description");
+    }
+
+    @Column("c")
     private boolean enabled;
     public boolean isEnabled() {
         return enabled;

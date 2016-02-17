@@ -17,7 +17,6 @@
 
 package org.apache.eagle.notification.plugin;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
@@ -40,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *  send alert to Kafka bus
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class AlertKafkaPlugin implements NewNotificationPlugin {
+public class AlertKafkaPlugin implements NotificationPlugin {
 	private static final Logger LOG = LoggerFactory.getLogger(AlertKafkaPlugin.class);
 	private NotificationStatus status = new NotificationStatus();
 	private Map<String, Map<String, String>> kafaConfigs = new ConcurrentHashMap<>();

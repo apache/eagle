@@ -27,8 +27,6 @@ import org.apache.eagle.notification.base.NotificationMetadata;
 import org.apache.eagle.notification.base.NotificationStatus;
 import org.apache.eagle.notification.email.AlertEmailGenerator;
 import org.apache.eagle.notification.email.AlertEmailGeneratorBuilder;
-import org.apache.eagle.notification.email.EmailBuilder;
-import org.apache.eagle.notification.email.EmailGenerator;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.eagle.policy.common.Constants;
 import org.slf4j.Logger;
@@ -43,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 /**
  *  Send alert to email
  */
-public class AlertEmailPlugin implements NewNotificationPlugin {
+public class AlertEmailPlugin implements NotificationPlugin {
 	private static final Logger LOG = LoggerFactory.getLogger(AlertEmailPlugin.class);
 	private Map<String, AlertEmailGenerator> emailGenerators = new ConcurrentHashMap<>();
 	private final static int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
@@ -95,6 +93,7 @@ public class AlertEmailPlugin implements NewNotificationPlugin {
 		}
 		AlertEmailGenerator generator = createEmailGenerator(notificationConf);
 		this.emailGenerators.put(policyId , generator );
+		LOG.info("created/updated email generator for updated policy " + policyId);
 	}
 
 	/**

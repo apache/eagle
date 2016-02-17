@@ -33,15 +33,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created on 2/10/16.
  * don't support dynamic discovery as of 2/10
  */
-public class NewNotificationPluginLoader {
-    private static final Logger LOG = LoggerFactory.getLogger(NewNotificationPluginLoader.class);
-    private static NewNotificationPluginLoader instance = new NewNotificationPluginLoader();
-    private static Map<String,NewNotificationPlugin> notificationMapping = new ConcurrentHashMap<>();
+public class NotificationPluginLoader {
+    private static final Logger LOG = LoggerFactory.getLogger(NotificationPluginLoader.class);
+    private static NotificationPluginLoader instance = new NotificationPluginLoader();
+    private static Map<String,NotificationPlugin> notificationMapping = new ConcurrentHashMap<>();
 
     private Config config;
     private boolean initialized = false;
 
-    public static NewNotificationPluginLoader getInstance(){
+    public static NotificationPluginLoader getInstance(){
         return instance;
     }
 
@@ -67,10 +67,10 @@ public class NewNotificationPluginLoader {
     private void loadPlugins(){
         try {
             LOG.info(" Start loading Plugins ");
-            Set<Class<? extends NewNotificationPlugin>> subTypes = scanNotificationPlugins();
+            Set<Class<? extends NotificationPlugin>> subTypes = scanNotificationPlugins();
             List<AlertNotificationEntity> result = new ArrayList<>();
-            for( Class<? extends NewNotificationPlugin> clazz: subTypes  ){
-                NewNotificationPlugin plugin = clazz.newInstance();
+            for( Class<? extends NotificationPlugin> clazz: subTypes  ){
+                NotificationPlugin plugin = clazz.newInstance();
                 String notificationType = plugin.getMetadata().name;
                 if( null != notificationType ) {
                     AlertNotificationEntity entity = new AlertNotificationEntity();
@@ -98,16 +98,16 @@ public class NewNotificationPluginLoader {
     /**
      * Scan Notification Plugins
      */
-    private  Set<Class<? extends NewNotificationPlugin>> scanNotificationPlugins() {
-        Set<Class<? extends NewNotificationPlugin>> subTypes = null;
+    private  Set<Class<? extends NotificationPlugin>> scanNotificationPlugins() {
+        Set<Class<? extends NotificationPlugin>> subTypes = null;
         try{
             LOG.info("Scanning all classes which implements NotificationPlugin Interface ");
             Reflections reflections = new Reflections();
-            subTypes = reflections.getSubTypesOf(NewNotificationPlugin.class);
+            subTypes = reflections.getSubTypesOf(NotificationPlugin.class);
             LOG.info("Number of Plugins found : " + subTypes.size() );
             if(subTypes.size() <= 0)
                 LOG.warn("Notifications API not found in jar ");
-            for(Class<? extends NewNotificationPlugin> pluginCls : subTypes){
+            for(Class<? extends NotificationPlugin> pluginCls : subTypes){
                 LOG.info("Notification Plugin class " + pluginCls.getName());
             }
         }
@@ -118,7 +118,7 @@ public class NewNotificationPluginLoader {
         return  subTypes;
     }
 
-    public Map<String, NewNotificationPlugin> getNotificationMapping() {
+    public Map<String, NotificationPlugin> getNotificationMapping() {
         ensureInitialized();
         return notificationMapping;
     }

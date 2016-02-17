@@ -23,7 +23,7 @@ import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 /**
  * Created on 2/10/16.
  */
-public interface NewNotificationPluginManager {
+public interface NotificationPluginManager {
     /**
      * notify alerts to plugins for one specific alert entity
      * @param entity

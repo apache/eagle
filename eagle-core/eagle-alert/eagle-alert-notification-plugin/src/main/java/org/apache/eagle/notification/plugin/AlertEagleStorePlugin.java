@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Plugin to persist alerts to Eagle Storage
  */
-public class AlertEagleStorePlugin implements NewNotificationPlugin {
+public class AlertEagleStorePlugin implements NotificationPlugin {
     private static final Logger LOG = LoggerFactory.getLogger(AlertEagleStorePlugin.class);
     private NotificationStatus status;
     private AlertEagleStorePersister persist;
@@ -55,13 +55,16 @@ public class AlertEagleStorePlugin implements NewNotificationPlugin {
     public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
         this.persist = new AlertEagleStorePersister(config);
         this.status = new NotificationStatus();
+        LOG.info("initialized plugin for EagleStorePlugin");
     }
 
     @Override
     public void update(String policyId, Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
         if( isPolicyDelete ){
             LOG.info("Deleted policy ...");
+            return;
         }
+        LOG.info("created/updated plugin ...");
     }
 
     @Override
@@ -75,6 +78,7 @@ public class AlertEagleStorePlugin implements NewNotificationPlugin {
      */
     @Override
     public void onAlert(AlertAPIEntity alertEntity) {
+        LOG.info("write alert to eagle storage " + alertEntity);
         try{
             List<AlertAPIEntity> list = new ArrayList<AlertAPIEntity>();
             list.add(alertEntity);

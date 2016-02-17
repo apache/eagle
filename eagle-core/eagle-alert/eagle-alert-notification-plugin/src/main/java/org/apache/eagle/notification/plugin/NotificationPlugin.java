@@ -29,7 +29,7 @@ import java.util.Map;
  * Created on 2/10/16.
  * Notification Plug-in interface which provide abstraction layer to notify to different system
  */
-public interface NewNotificationPlugin {
+public interface NotificationPlugin {
     /**
      * immutable metadata for this notification plugin
      * @return
