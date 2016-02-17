@@ -27,24 +27,10 @@ import java.util.List;
  * Alert Notification Data Access Obj Interface
  */
 public interface AlertNotificationDAO {
-
-    /**
-     * Persist all Notifaction Types
-     * @param list
-     * @throws Exception
-     */
-    void persistAlertNotificationTypes( List<AlertNotificationEntity> list ) throws  Exception;
-
     /**
      * find the Alert Notification Types by querying alertNotifications Table
      * @return
      * @throws Exception
      */
     List<AlertNotificationEntity> findAlertNotificationTypes() throws Exception;
-
-    /**
-     * Wipe out all Notifications
-     * @throws Exception
-     */
-    void deleteAllAlertNotifications() throws Exception;
 }

@@ -23,7 +23,6 @@ import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.notification.base.NotificationConstants;
-import org.apache.eagle.notification.base.NotificationMetadata;
 import org.apache.eagle.notification.base.NotificationStatus;
 import org.apache.eagle.notification.email.AlertEmailGenerator;
 import org.apache.eagle.notification.email.AlertEmailGeneratorBuilder;
@@ -109,7 +108,6 @@ public class AlertEmailPlugin implements NotificationPlugin {
 	}
 
 	/**
-	 * Create EmailGenerator for the given Config
 	 * @param notificationConfig
 	 * @return
      */

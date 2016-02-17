@@ -67,33 +67,4 @@ public class AlertNotificationDAOImpl implements  AlertNotificationDAO {
             throw new IllegalStateException(ex);
         }
     }
-
-    /**
-     * Delete entire Habse Table
-     * @throws Exception
-     */
-    @Override
-    public void deleteAllAlertNotifications() throws Exception {
-        IEagleServiceClient client = new EagleServiceClientImpl(connector);
-        String query = Constants.ALERT_NOTIFICATION_SERVICE_ENDPOINT_NAME+"[]{*}";
-        GenericServiceAPIResponseEntity response = client.delete()
-                .byQuery(query)
-                .startTime(0).endTime(System.currentTimeMillis()).pageSize(1000).send();
-        if(!response.isSuccess())
-            throw new Exception(" Alert Notification Entities deletion failed ");
-    }
-
-    /**
-     * Persist AlertNotification Entites
-     * @param list
-     * @throws Exception
-     */
-    @Override
-    public void persistAlertNotificationTypes(List<AlertNotificationEntity> list) throws Exception {
-        IEagleServiceClient client = new EagleServiceClientImpl(connector);
-        GenericServiceAPIResponseEntity<String> response = client.create(list);
-        client.close();
-        if( !response.isSuccess() )
-            throw new Exception(" Alert Notification Entities creation failed ");
-    }
 }

@@ -21,8 +21,6 @@ import com.typesafe.config.Config;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
-import org.apache.eagle.notification.base.NotificationConstants;
-import org.apache.eagle.notification.base.NotificationMetadata;
 import org.apache.eagle.notification.base.NotificationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
