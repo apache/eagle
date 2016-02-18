@@ -18,7 +18,6 @@ package org.apache.eagle.security.hive.jobrunning;
 
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.jobrunning.common.JobConstants;
 import org.apache.eagle.jobrunning.common.JobConstants.ResourceType;
 import org.apache.eagle.jobrunning.storm.JobRunningContentFilter;
@@ -26,6 +25,7 @@ import org.apache.eagle.jobrunning.storm.JobRunningContentFilterImpl;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;

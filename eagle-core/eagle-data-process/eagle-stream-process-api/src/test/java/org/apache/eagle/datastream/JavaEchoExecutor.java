@@ -19,6 +19,7 @@ package org.apache.eagle.datastream;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple1;
 
 public class JavaEchoExecutor extends JavaStormStreamExecutor1<String>{
     private static Logger LOG = LoggerFactory.getLogger(JavaEchoExecutor.class);

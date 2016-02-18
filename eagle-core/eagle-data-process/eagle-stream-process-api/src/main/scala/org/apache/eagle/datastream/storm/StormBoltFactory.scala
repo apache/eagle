@@ -29,12 +29,12 @@ object StormBoltFactory {
     implicit val streamInfo = producer.getInfo
     producer match{
       case FlatMapProducer(worker) => {
-        if(worker.isInstanceOf[JavaStormStreamExecutor[EagleTuple]]){
-          worker.asInstanceOf[JavaStormStreamExecutor[EagleTuple]].prepareConfig(config)
-          JavaStormBoltWrapper(worker.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
-        }else if(worker.isInstanceOf[StormStreamExecutor[EagleTuple]]){
-          worker.asInstanceOf[StormStreamExecutor[EagleTuple]].prepareConfig(config)
-          StormBoltWrapper(worker.asInstanceOf[StormStreamExecutor[EagleTuple]])
+        if(worker.isInstanceOf[JavaStormStreamExecutor[AnyRef]]){
+          worker.asInstanceOf[JavaStormStreamExecutor[AnyRef]].prepareConfig(config)
+          JavaStormBoltWrapper(worker.asInstanceOf[JavaStormStreamExecutor[AnyRef]])
+        }else if(worker.isInstanceOf[StormStreamExecutor[AnyRef]]){
+          worker.asInstanceOf[StormStreamExecutor[AnyRef]].prepareConfig(config)
+          StormBoltWrapper(worker.asInstanceOf[StormStreamExecutor[AnyRef]])
         }else if(worker.isInstanceOf[FlatMapperWrapper[Any]]){
           StormFlatFunctionWrapper(worker.asInstanceOf[FlatMapperWrapper[Any]].func)
         } else {
@@ -56,7 +56,7 @@ object StormBoltFactory {
       case persist : PersistProducer[Any] => {
         val persisExecutor = new PersistExecutor(persist.executorId, persist.storageType.toString)
         persisExecutor.prepareConfig(config)
-        JavaStormBoltWrapper(persisExecutor.asInstanceOf[JavaStormStreamExecutor[EagleTuple]])
+        JavaStormBoltWrapper(persisExecutor.asInstanceOf[JavaStormStreamExecutor[AnyRef]])
       }
       case _ => throw new UnsupportedOperationException(s"Unsupported producer: ${producer.toString}")
     }

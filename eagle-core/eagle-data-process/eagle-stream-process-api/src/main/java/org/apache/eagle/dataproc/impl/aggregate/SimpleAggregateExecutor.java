@@ -24,7 +24,6 @@ import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEnt
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.policy.PolicyEvaluator;
 import org.apache.eagle.policy.PolicyManager;
@@ -35,6 +34,7 @@ import org.apache.eagle.policy.siddhi.SiddhiEvaluationHandler;
 import org.apache.hadoop.hbase.util.MD5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.Date;
 import java.util.HashMap;

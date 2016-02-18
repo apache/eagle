@@ -29,6 +29,7 @@ import org.apache.eagle.gc.model.GCPausedEvent;
 import org.apache.eagle.metric.reportor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.*;
 

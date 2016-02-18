@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.security.userprofile.TimeWindow;
 import org.apache.eagle.security.userprofile.UserActivityAggregator;
 import org.apache.eagle.security.userprofile.UserProfileConstants;
@@ -29,6 +28,7 @@ import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.*;
 
@@ -126,10 +126,10 @@ public class UserActivityAggregatorImpl implements UserActivityAggregator {
 
         Map<String,Map<String,Double>> tmp = new HashMap<>();
         for(Map.Entry<Tuple2<String,String>,Double> entry:counter.entrySet()){
-            String user = entry.getKey().f0();
+            String user = entry.getKey()._1();
             Map<String,Double> cmdCount = tmp.get(user);
             if(cmdCount == null) cmdCount = new HashMap<>();
-            cmdCount.put(entry.getKey().f1(),entry.getValue());
+            cmdCount.put(entry.getKey()._2(),entry.getValue());
             tmp.put(user,cmdCount);
         }
 

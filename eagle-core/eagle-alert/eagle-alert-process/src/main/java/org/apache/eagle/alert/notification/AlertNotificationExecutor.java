@@ -34,7 +34,6 @@ import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor1;
-import org.apache.eagle.datastream.Tuple1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +42,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.typesafe.config.Config;
+import scala.Tuple1;
 
 /**
  * notify alert by email, sms or other means

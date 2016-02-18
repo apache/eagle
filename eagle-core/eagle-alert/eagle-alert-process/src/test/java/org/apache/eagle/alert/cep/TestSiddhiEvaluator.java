@@ -27,7 +27,6 @@ import org.apache.eagle.alert.executor.AlertExecutor;
 import org.apache.eagle.alert.siddhi.SiddhiAlertAPIEntityRender;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.policy.dao.*;
@@ -36,6 +35,7 @@ import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Test;
+import scala.Tuple2;
 
 import java.util.*;
 

@@ -22,13 +22,13 @@ package org.apache.eagle.gc.executor;
 import com.typesafe.config.Config;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.gc.model.GCPausedEvent;
 import org.apache.eagle.gc.stream.GCStreamBuilder;
 import org.apache.eagle.gc.parser.exception.IgnoredLogFormatException;
 import org.apache.eagle.gc.parser.exception.UnrecognizedLogFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.List;
 import java.util.Map;
