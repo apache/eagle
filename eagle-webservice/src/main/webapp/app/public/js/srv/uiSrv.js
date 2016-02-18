@@ -179,10 +179,10 @@
 						'<div class="form-group" ng-repeat="field in fieldList" ng-switch="field.type">' +
 							'<label for="featureName">' +
 								'<span ng-if="!field.optional">*</span> ' +
-								'{{field.name}}' +
+								'{{field.name || field.field}}' +
 							'</label>' +
-							'<textarea class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
-							'<input type="text" class="form-control" placeholder="{{field.description || field.name + \'...\'}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
+							'<textarea class="form-control" placeholder="{{field.description || field.name || field.field + \'...\'}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
+							'<input type="text" class="form-control" placeholder="{{field.description || field.name || field.field + \'...\'}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
 						'</div>' +
 					'</div>' +
 					'<div class="modal-footer">' +
