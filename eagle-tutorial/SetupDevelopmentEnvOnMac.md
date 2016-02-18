@@ -13,7 +13,7 @@ Make sure you have HomeBrew installed on your mac. If not, please run:
 
 you can find more information about HomeBrew at http://brew.sh/ .
 
-### Scala & SBT
+### - Scala & SBT
 Some core eagle modules are written with scala. To install Scala and SBT, just run:
 
 > $ brew install scala
