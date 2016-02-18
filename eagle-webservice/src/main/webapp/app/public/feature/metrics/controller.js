@@ -25,30 +25,6 @@
 	// ==============================================================
 	// =                       Initialization                       =
 	// ==============================================================
-	/*var MATRIX_LIST = [
-		{
-			name: "jmx",
-			list: [
-				{
-					sourcePrefix: "nn_jmx_metric_",
-					matrix: "hadoop.namenode.fsnamesystem.hastate",
-				},
-			]
-		},
-		{
-			name: "test",
-			list: [
-				{
-					sourcePrefix: "nn_jmx_metric_",
-					matrix: "hadoop.namenode.fsnamesystem.hastate",
-				},
-			]
-		}
-	];*/
-
-	// ==============================================================
-	// =                          Function                          =
-	// ==============================================================
 
 	// ==============================================================
 	// =                         Controller                         =
@@ -57,7 +33,7 @@
 	// ========================= Dashboard ==========================
 	feature.navItem("dashboard", "Metrics Dashboard", "line-chart");
 
-	feature.controller('dashboard', function(PageConfig, Site, $scope, $q, Application, Entities) {
+	feature.controller('dashboard', function(PageConfig, Site, $scope, UI) {
 		$scope.dashboard = {
 			groups: []
 		};
@@ -80,5 +56,13 @@
 				]
 			};
 		}, 100);
+
+		// ====================== Function ======================
+		$scope.menu = [
+			{icon: "plus", title: "New Group", func: function() {
+				UI.createConfirm("Group", {}, [{field: "name"}], function() {
+				});
+			}}
+		];
 	});
 })();
