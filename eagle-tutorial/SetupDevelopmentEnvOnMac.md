@@ -1,7 +1,7 @@
 How to setup the Eagle development environment on Mac
 ===============================================
 
-This tutorial is based Mac OS X. It can be used as a reference guide for other OS like linux or windows as well.  To save your time of jumping back and forth between different web pages, all necessary references will be point out. 
+This tutorial is based Mac OS X. It can be used as a reference guide for other OS like Linux or Windows as well.  To save your time of jumping back and forth between different web pages, all necessary references will be point out. 
 
 Prerequisite
 -------
@@ -47,7 +47,7 @@ you will see all available JDK versions and you can install multiple JDK version
 
 -
 > **Note:**
-> During this writing SBT has issue with JDK 8. This has been tested with: 
+> During this writing SBT has issue with JDK 8. This issue has been tested confirmed by using: 
 > -Java 1.8.0_66
 > -Maven 3.3.9
 > -Scala 2.11.7
