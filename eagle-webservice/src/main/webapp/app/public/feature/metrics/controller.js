@@ -33,11 +33,23 @@
 	// ========================= Dashboard ==========================
 	feature.navItem("dashboard", "Metrics Dashboard", "line-chart");
 
-	feature.controller('dashboard', function(PageConfig, Site, $scope, UI) {
+	feature.controller('dashboard', function(PageConfig, $scope, $http, UI, Site, Application) {
+		var _siteApp = Site.currentSiteApplication();
+		var _druidConfig = _siteApp.configObj.druid;
+
 		$scope.dashboard = {
 			groups: []
 		};
 
+		// ======================== Data ========================
+		$http.get(_druidConfig.coordinator + "/druid/coordinator/v1/metadata/datasources").then(function() {
+
+		}, function(err) {
+			console.log(err);
+		});
+		console.log(_druidConfig);
+
+		// ===================== Dashboard ======================
 		// TODO: Customize data load
 		setTimeout(function() {
 			// TODO: Mock for user data
@@ -57,12 +69,29 @@
 			};
 		}, 100);
 
-		// ====================== Function ======================
+		// ======================== Menu ========================
 		$scope.menu = [
 			{icon: "plus", title: "New Group", func: function() {
-				UI.createConfirm("Group", {}, [{field: "name"}], function() {
+				UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
+					if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
+						return "Group name conflict";
+					}
+				}).then(null, null, function(holder) {
+					$scope.dashboard.groups.push({
+						name: holder.entity.name,
+						charts: []
+					});
+					holder.closeFunc();
 				});
 			}}
 		];
+
+		// ======================= Groups =======================
+		$scope.deleteGroup = function(group) {
+			UI.deleteConfirm(group.name).then(null, null, function(holder) {
+				common.array.remove(group, $scope.dashboard.groups);
+				holder.closeFunc();
+			});
+		};
 	});
 })();

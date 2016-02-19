@@ -35,10 +35,26 @@
 </div-->
 
 <div tabs menu="menu">
-	<div pane title="11111">
-		P 11111
-	</div>
-	<div pane title="22222">
-		P 22222
+	<div pane ng-repeat="group in dashboard.groups" title="{{group.name}}">
+		<div class="clearfix">
+			<button class="pull-right btn btn-danger" ng-click="deleteGroup(group)" ng-if="dashboard.groups.length > 1">Delete Group</button>
+			<div class="dropdown pull-left">
+				<button data-toggle="dropdown" class="btn btn-success">
+					+ New Chart <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a>Item 1</a></li>
+					<li><a>Item 2</a></li>
+					<li class="dropdown-submenu">
+						<a tabindex="-1">Item 3</a>
+						<ul class="dropdown-menu">
+							<li><a>Sub Item 1</a></li>
+							<li><a>Sub Item 2</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+		{{group.name}}
 	</div>
 </div>

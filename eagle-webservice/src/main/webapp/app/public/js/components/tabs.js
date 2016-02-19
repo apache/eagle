@@ -85,6 +85,15 @@ eagleComponents.directive('tabs', function() {
 					$scope.setSelect(pane);
 				}
 			};
+
+			this.deletePane = function(pane) {
+				common.array.remove(pane, $scope.paneList);
+
+				if($scope.selectedPane === pane) {
+					$scope.selectedPane = $scope.paneList[0];
+					$scope.activePane = $scope.paneList[0];
+				}
+			};
 		},
 
 		template :
@@ -121,10 +130,14 @@ eagleComponents.directive('tabs', function() {
 		scope : {
 			title : '@'
 		},
-		controller: function($scope, $element, $timeout) {
+		controller: function($scope, $element, $animate) {
+			$animate.enabled(false, $element);
 		},
 		link : function(scope, element, attrs, tabsController) {
 			tabsController.addPane(scope);
+			scope.$on('$destroy', function() {
+				tabsController.deletePane(scope);
+			});
 		},
 		template : '<div class="tab-pane fade" ng-class="{active: active, in: in}" ng-transclude="parent"></div>',
 		replace : true
