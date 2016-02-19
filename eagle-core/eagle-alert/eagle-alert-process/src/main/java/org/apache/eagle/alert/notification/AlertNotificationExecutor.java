@@ -27,11 +27,11 @@ import org.apache.eagle.policy.DynamicPolicyLoader;
 import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor1;
-import org.apache.eagle.datastream.Tuple1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
+import scala.Tuple1;
 
 /**
  * notify alert by email, kafka message, storage or other means

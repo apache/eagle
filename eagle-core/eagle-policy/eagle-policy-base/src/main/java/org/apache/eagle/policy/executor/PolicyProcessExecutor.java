@@ -27,7 +27,6 @@ import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.metric.reportor.EagleCounterMetric;
 import org.apache.eagle.metric.reportor.EagleMetricListener;
 import org.apache.eagle.metric.reportor.EagleServiceReporterMetricListener;
@@ -41,6 +40,7 @@ import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;

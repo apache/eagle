@@ -78,5 +78,10 @@
           <artifactId>eagle-security-hdfs-auditlog</artifactId>
           <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-library</artifactId>
+        <version>${scala-lang.version}</version>
+    </dependency>
   </dependencies>
 </project>

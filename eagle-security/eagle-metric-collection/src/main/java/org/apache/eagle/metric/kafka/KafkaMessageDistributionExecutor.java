@@ -25,10 +25,10 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor1;
-import org.apache.eagle.datastream.Tuple1;
 import org.apache.eagle.metric.reportor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple1;
 
 import java.util.HashMap;
 import java.util.List;

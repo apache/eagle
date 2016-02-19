@@ -20,12 +20,12 @@ import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.security.userprofile.impl.UserActivityAggregatorImpl;
 import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.Arrays;
 import java.util.List;
