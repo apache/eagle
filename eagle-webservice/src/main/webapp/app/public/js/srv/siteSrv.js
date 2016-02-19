@@ -64,6 +64,13 @@
 			}
 		};
 
+		Site.currentSiteApplication = function() {
+			var _app = Application.current();
+			if(!_app) return null;
+
+			return _currentSite.applicationList.set[_app.tags.application];
+		};
+
 		Site.reload = function() {
 			var _applicationList;
 
@@ -111,13 +118,27 @@
 				$.each(_applicationList, function(i, siteApplication) {
 					var _site = Site.list.set[siteApplication.tags.site];
 					var _application = Application.find(siteApplication.tags.application);
-					var _appGroup;
+					var _appGroup, _configObj;
 
 					if(!_site) {
 						console.warn("[Site] Application not match site:", siteApplication.tags.site, "-", siteApplication.tags.application);
 					} else if(!_application) {
 						console.warn("[Site] Application not found:", siteApplication.tags.site, "-", siteApplication.tags.application);
 					} else {
+						_configObj = common.parseJSON(siteApplication.config, {});
+						Object.defineProperties(siteApplication, {
+							application: {
+								get: function () {
+									return _application;
+								}
+							},
+							configObj: {
+								get: function () {
+									return _configObj;
+								}
+							}
+						});
+
 						_site.applicationList.push(siteApplication);
 						_site.applicationList.set[siteApplication.tags.application] = siteApplication;
 
