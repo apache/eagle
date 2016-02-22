@@ -29,6 +29,7 @@ import socket
 import types
 import httplib
 import logging
+import threading
 
 # load six
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '', 'lib/six'))
@@ -38,12 +39,11 @@ import six
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '', 'lib/kafka-python'))
 from kafka import KafkaClient, SimpleProducer, SimpleConsumer
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-6s %(message)s',
                     datefmt='%m-%d %H:%M')
 
 class Helper:
-
     def __init__(self):
         pass
 
@@ -83,33 +83,33 @@ class Helper:
             return False
 
     @staticmethod
-    def http_get(url, https=False):
+    def http_get(host, port, https=False, path=None):
         """
         Read url by GET method
 
+        :param path:
         :param url:
         :param https:
         :return:
         """
+        url = ":".join([host, str(port)])
         result = None
         response = None
         try:
             if https:
-                logging.info("Reading https://" + str(url) + "/jmx?anonymous=true")
+                logging.info("Reading https://" + str(url) + path)
                 c = httplib.HTTPSConnection(url, timeout=57)
-                c.request("GET", "/jmx?anonymous=true")
+                c.request("GET", path)
                 response = c.getresponse()
             else:
-                logging.info("Reading http://" + str(url) + "/jmx?anonymous=true")
-                response = urllib2.urlopen("http://" + str(url) + '/jmx?anonymous=true', timeout=57)
+                logging.info("Reading http://" + str(url) + path)
+                response = urllib2.urlopen("http://" + str(url) + path, timeout=57)
             logging.debug("Got response")
-            # everything is fine
             result = response.read()
         finally:
             if response is not None:
                 response.close()
             return result
-
 
 
 class JmxReader(object):
@@ -119,31 +119,54 @@ class JmxReader(object):
         self.https = https
         self.jmx_json = None
         self.jmx_beans = None
-        self.read()
+        self.jmx_raw = None
 
-    def read(self):
+    def open(self):
+        """
+        :return: JmxReader
+        """
+        self.read_raw()
+        self.set_raw(self.jmx_raw)
+        return self
 
+    def read_raw(self):
         """
         transfer the json string into dict
         :param host:
         :param port:
         :param https:
-        :return:
+        :return: text
         """
-        url = ":".join([self.host,str(self.port)])
-        result = Helper.http_get(url, self.https)
-        if result is None:
-            raise Exception("Response from "+url+" is None")
-        self.jmx_json = json.loads(result)
+        self.jmx_raw = Helper.http_get(self.host, self.port, self.https, "/jmx?anonymous=true")
+        if self.jmx_raw is None:
+            raise Exception("Response from " + url + " is None")
+        return self
+
+    def set_raw(self, text):
+        self.jmx_json = json.loads(text)
         self.jmx_beans = self.jmx_json[u'beans']
+        self.jmx_raw = text
+        return self
 
     def get_jmx_beans(self):
         return self.jmx_beans
 
     def get_jmx_bean_by_name(self, name):
         for bean in self.jmx_beans:
-            if bean["name"] == name:
+            if bean.has_key("name") and bean["name"] == name:
                 return bean
+
+
+class YarnWSReader:
+    def __init__(self, host, port, https=False):
+        self.host = host
+        self.port = port
+        self.https = https
+
+    def read_cluster_info(self):
+        cluster_info = Helper.http_get(self.host, self.port, self.https, "/ws/v1/cluster/info")
+        logging.debug(cluster_info)
+        return json.loads(cluster_info)
 
 class MetricSender(object):
     def __init__(self, config):
@@ -185,8 +208,10 @@ class KafkaMetricSender(MetricSender):
             self.kafka_client.close()
 
 
-class MetricCollector(object):
+class MetricCollector(threading.Thread):
     def __init__(self):
+        threading.Thread.__init__(self)
+
         self.config = Helper.load_config()
         self.sender = KafkaMetricSender(self.config)
 
@@ -202,8 +227,22 @@ class MetricCollector(object):
             msg["timestamp"] = int(round(time.time() * 1000))
         if msg.has_key("value"):
             msg["value"] = float(str(msg["value"]))
+        if not msg.has_key("host") or len(msg["host"]) == 0:
+            msg["host"] = socket.getfqdn()
 
         self.sender.send(msg)
 
     def run(self):
         raise Exception("`run` method should be overrode by sub-class before being called")
+
+class Runner(object):
+    @staticmethod
+    def run(*threads):
+        """
+        Execute concurrently
+
+        :param threads:
+        :return:
+        """
+        for thread in threads:
+            thread.start()

@@ -16,7 +16,7 @@
 
 # !/usr/bin/python
 
-from base import MetricCollector, JmxReader
+from base import MetricCollector, JmxReader, YarnWSReader, Runner
 import logging
 
 
@@ -30,35 +30,95 @@ class HadoopNNHAChecker(MetricCollector):
         total_count = len(hosts)
 
         self.collect({
-            "host": ",".join(hosts),
             "component": "namenode",
             "metric": "hadoop.namenode.hastate.total.count",
             "value": total_count
         })
+
         active_count = 0
         standby_count = 0
+        failed_count = 0
 
         for host in hosts:
-            bean = JmxReader(host, port, https).get_jmx_bean_by_name("Hadoop:service=NameNode,name=FSNamesystem")
-            logging.debug(host + " is " + bean["tag.HAState"])
-            if bean["tag.HAState"] == "active":
-                active_count += 1
-            else:
-                standby_count += 1
+            try:
+                bean = JmxReader(host, port, https).open().get_jmx_bean_by_name(
+                        "Hadoop:service=NameNode,name=FSNamesystem")
+                logging.debug(host + " is " + bean["tag.HAState"])
+                if bean["tag.HAState"] == "active":
+                    active_count += 1
+                else:
+                    standby_count += 1
+            except Exception as e:
+                logging.exception("failed to read jmx from " + host)
+                failed_count += 1
 
         self.collect({
-            "host": ",".join(hosts),
             "component": "namenode",
             "metric": "hadoop.namenode.hastate.active.count",
             "value": active_count
         })
+
         self.collect({
-            "host": ",".join(hosts),
             "component": "namenode",
             "metric": "hadoop.namenode.hastate.standby.count",
             "value": standby_count
         })
 
+        self.collect({
+            "component": "namenode",
+            "metric": "hadoop.namenode.hastate.failed.count",
+            "value": failed_count
+        })
+
+
+class HadoopRMHAChecker(MetricCollector):
+    def run(self):
+        name_node_config = self.config["env"]["resource_manager"]
+        hosts = name_node_config["hosts"]
+        port = name_node_config["port"]
+        https = name_node_config["https"]
+
+        total_count = len(hosts)
+
+        self.collect({
+            "component": "namenode",
+            "metric": "hadoop.resourcemanager.hastate.total.count",
+            "value": total_count
+        })
+
+        active_count = 0
+        standby_count = 0
+        failed_count = 0
+
+        for host in hosts:
+            try:
+                cluster_info = YarnWSReader(host, port, https).read_cluster_info()
+                if cluster_info["clusterInfo"]["haState"] == "ACTIVE":
+                    active_count += 1
+                else:
+                    standby_count += 1
+            except Exception as e:
+                logging.exception("Failed to read yarn ws from " + host)
+                failed_count += 1
+
+        self.collect({
+            "component": "resourcemanager",
+            "metric": "hadoop.resourcemanager.hastate.active.count",
+            "value": active_count
+        })
+
+        self.collect({
+            "component": "resourcemanager",
+            "metric": "hadoop.resourcemanager.hastate.standby.count",
+            "value": standby_count
+        })
+
+        self.collect({
+            "component": "resourcemanager",
+            "metric": "hadoop.resourcemanager.hastate.failed.count",
+            "value": failed_count
+        })
 
 if __name__ == '__main__':
-    HadoopNNHAChecker().start()
+    # HadoopNNHAChecker().start()
+    Runner.run(HadoopNNHAChecker(), HadoopRMHAChecker())
