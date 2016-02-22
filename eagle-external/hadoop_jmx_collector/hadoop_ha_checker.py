@@ -22,6 +22,9 @@ import logging
 
 class HadoopNNHAChecker(MetricCollector):
     def run(self):
+        if not self.config["env"].has_key("name_node"):
+            logging.warn("Do nothing for HadoopNNHAChecker as config of env.name_node not found")
+            return
         name_node_config = self.config["env"]["name_node"]
         hosts = name_node_config["hosts"]
         port = name_node_config["port"]
@@ -73,6 +76,9 @@ class HadoopNNHAChecker(MetricCollector):
 
 class HadoopRMHAChecker(MetricCollector):
     def run(self):
+        if not self.config["env"].has_key("resource_manager"):
+            logging.warn("Do nothing for HadoopRMHAChecker as config of env.resource_manager not found")
+            return
         name_node_config = self.config["env"]["resource_manager"]
         hosts = name_node_config["hosts"]
         port = name_node_config["port"]
