@@ -229,6 +229,8 @@ class MetricCollector(threading.Thread):
             msg["value"] = float(str(msg["value"]))
         if not msg.has_key("host") or len(msg["host"]) == 0:
             msg["host"] = socket.getfqdn()
+        if not msg.has_key("site"):
+            msg["site"] = self.config["env"]["site"]
 
         self.sender.send(msg)
 
