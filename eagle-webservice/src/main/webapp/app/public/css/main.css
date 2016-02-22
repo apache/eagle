@@ -395,6 +395,7 @@ ul.tree.tree-bordered > li > ul > li > a {
 	transition: none;
 }
 
+.nav.fixed-height,
 .products-list.fixed-height {
 	height: 402px;
 	overflow-y: auto;
@@ -458,9 +459,18 @@ body .tab-content>.tab-pane.active {
 	overflow-y: visible;
 }
 
+body .modal-body .nav-pills > li > a,
 body .box-body .nav-pills > li > a {
 	padding: 5px 15px;
 	border: none;
+}
+
+body .modal-body .nav-stacked > li {
+	border-bottom: 1px solid #f4f4f4;
+	margin: 0;
+}
+body .modal-body .nav-stacked > li:last-child {
+	border-bottom: none;
 }
 
 body .box-body + .tab-content {

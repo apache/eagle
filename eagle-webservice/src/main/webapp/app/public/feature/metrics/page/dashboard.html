@@ -16,29 +16,67 @@
   limitations under the License.
   -->
 
-<div tabs menu="menu">
-	<pane ng-repeat="group in dashboard.groups" data-title="{{group.name}}">
-		{{group.name}}
-	</pane>
+<div tabs menu="menu" holder="tabHolder">
 	<header class="clearfix">
-		<button class="pull-right btn btn-danger" ng-click="deleteGroup(group)" ng-if="dashboard.groups.length > 1">Delete Group</button>
-		<div class="dropdown pull-left">
-			<button data-toggle="dropdown" class="btn btn-success" ng-disabled="!dataSourceListReady">
-				+ New Chart
-				<span ng-if="dataSourceListReady" class="caret"></span>
-				<span ng-if="!dataSourceListReady" class="fa fa-refresh fa-spin"></span>
-			</button>
-			<ul class="dropdown-menu">
-				<li><a>Item 1</a></li>
-				<li><a>Item 2</a></li>
-				<li class="dropdown-submenu">
-					<a tabindex="-1">Item 3</a>
-					<ul class="dropdown-menu">
-						<li><a>Sub Item 1</a></li>
-						<li><a>Sub Item 2</a></li>
-					</ul>
-				</li>
-			</ul>
-		</div>
+		<button class="pull-right btn btn-danger btn-sm" ng-click="deleteGroup()" ng-if="dashboard.groups.length > 1">Delete Group</button>
+		<button class="btn btn-success btn-sm" ng-disabled="!dataSourceListReady" ng-click="newChart()">
+			<span ng-if="dataSourceListReady" class="fa fa-plus"></span>
+			<span ng-if="!dataSourceListReady" class="fa fa-refresh fa-spin"></span>
+			New Chart
+		</button>
 	</header>
+	<pane ng-repeat="group in dashboard.groups" data-data="group" data-title="{{group.name}}">
+		<div></div>
+	</pane>
+</div>
+
+
+<!-- Modal: Metric selector -->
+<div class="modal fade" id="metricMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Select Metric</h4>
+			</div>
+			<div class="modal-body">
+				<div class="input-group" style="margin-bottom: 10px;">
+					<input type="text" class="form-control" placeholder="Filter..." ng-model="_newMetricFilter" />
+					<span class="input-group-btn">
+						<button class="btn btn-default btn-flat" ng-click="_newMetricFilter = '';"><span class="fa fa-times"></span></button>
+					</span>
+				</div>
+
+				<div class="row">
+					<div class="col-md-4">
+						<ul class="nav nav-pills nav-stacked fixed-height">
+							<li class="disabled"><a>Data Source</a></li>
+							<li ng-repeat="dataSrc in dataSourceList track by $index" ng-class="{active: _newMetricDataSrc === dataSrc}">
+								<a ng-click="newMetricSelectDataSource(dataSrc)">{{dataSrc.dataSource}}</a>
+							</li>
+						</ul>
+					</div>
+					<div class="col-md-8">
+						<ul class="nav nav-pills nav-stacked fixed-height">
+							<li class="disabled"><a>Metric</a></li>
+							<li ng-repeat="metric in dataSourceMetricList(_newMetricDataSrc, _newMetricFilter) track by $index" ng-class="{active: _newMetricDataMetric === metric}">
+								<a ng-click="newMetricSelectMetric(metric)">{{metric}}</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<span class="text-primary pull-left">{{_newMetricDataSrc.dataSource}} <span class="fa fa-arrow-right"></span> {{_newMetricDataMetric}}</span>
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmSelectMetric()">
+					Select
+				</button>
+			</div>
+		</div>
+	</div>
 </div>

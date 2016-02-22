@@ -30,6 +30,7 @@ eagleComponents.directive('tabs', function() {
 			title: "@?title",
 			icon: "@",
 			selected: "@?selected",
+			holder: "=?holder",
 
 			menuList: "=?menu"
 		},
@@ -111,6 +112,16 @@ eagleComponents.directive('tabs', function() {
 			$scope.hasFooter = function() {
 				return !!$footer.children().length;
 			};
+
+			// ================= Interface ==================
+			if($scope.holder) {
+				$scope.holder.scope = $scope;
+				Object.defineProperty($scope.holder, 'selectedPane', {
+					get: function() {
+						return $scope.selectedPane;
+					}
+				});
+			}
 		},
 
 		template :
@@ -147,7 +158,8 @@ eagleComponents.directive('tabs', function() {
 		restrict : 'AE',
 		transclude : true,
 		scope : {
-			title : '@'
+			title : '@',
+			data: '=?data'
 		},
 		controller: function($scope, $element, $animate) {
 			$animate.enabled(false, $element);

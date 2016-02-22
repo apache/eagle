@@ -43,16 +43,23 @@
 			groups: []
 		};
 
+		$scope._newMetricFilter = "";
+		$scope._newMetricDataSrc = null;
+		$scope._newMetricDataMetric = null;
+
+		$scope.tabHolder = {};
+
 		// ======================= Metric =======================
 		$http.get(_druidConfig.coordinator + "/druid/coordinator/v1/metadata/datasources", {withCredentials: false}).then(function(data) {
-			var _endTime = new moment();
-			var _startTime = _endTime.clone().subtract(1, "d");
+			// TODO: Hard code
+			var _endTime = new moment("2016-02-20 00:00:00").subtract(6, "hour");
+			var _startTime = _endTime.clone().subtract(3, "hour");
 			var _intervals = _startTime.toISOString() + "/" + _endTime.toISOString();
 
 			$scope.dataSourceList = $.map(data.data, function(dataSrc) {
 				return {
 					dataSource: dataSrc,
-					metrics: []
+					metricList: []
 				};
 			});
 
@@ -73,7 +80,7 @@
 				});
 
 				return $http.post(_druidConfig.broker + "/druid/v2", _data, {withCredentials: false}).then(function(response) {
-					dataSrc.metrics = $.map(response.data, function(entity) {
+					dataSrc.metricList = $.map(response.data, function(entity) {
 						return entity.event.metric;
 					});
 				});
@@ -81,6 +88,9 @@
 
 			$q.all(_metrixList_promiseList).finally(function() {
 				$scope.dataSourceListReady = true;
+
+				$scope._newMetricDataSrc = $scope.dataSourceList[0];
+				$scope._newMetricDataMetric = common.getValueByPath($scope._newMetricDataSrc, "metricList.0");
 			});
 		}, function() {
 			$.dialog({
@@ -88,26 +98,6 @@
 				content: "Fetch data source failed. Please check Site Application Metrics configuration."
 			});
 		});
-
-		// ===================== Dashboard ======================
-		// TODO: Customize data load
-		setTimeout(function() {
-			// TODO: Mock for user data
-			$scope.dashboard = {
-				groups: [
-					{
-						name: "JMX",
-						charts: [
-							{
-								dataSource: "nn_jmx_metric_sandbox",
-								metrics: "hadoop.namenode.dfs.missingblocks",
-								aggregations: ["max"]
-							},
-						]
-					}
-				]
-			};
-		}, 100);
 
 		// ======================== Menu ========================
 		$scope.menu = [
@@ -126,11 +116,66 @@
 			}}
 		];
 
+		// ===================== Dashboard ======================
+		// TODO: Customize data load
+		setTimeout(function() {
+			// TODO: Mock for user data
+			$scope.dashboard = {
+				groups: [
+					{
+						name: "JMX",
+						charts: [
+							{
+								dataSource: "nn_jmx_metric_sandbox",
+								metrics: "hadoop.namenode.dfs.missingblocks",
+								aggregations: ["max"]
+							}
+						]
+					}
+				]
+			};
+		}, 100);
+
 		// ======================= Groups =======================
-		$scope.deleteGroup = function(group) {
+		$scope.deleteGroup = function() {
+			var group = $scope.tabHolder.selectedPane.data;
 			UI.deleteConfirm(group.name).then(null, null, function(holder) {
 				common.array.remove(group, $scope.dashboard.groups);
 				holder.closeFunc();
+			});
+		};
+
+		// ======================= Chart ========================
+		$scope.newChart = function() {
+			$("#metricMDL").modal();
+		};
+
+		$scope.dataSourceMetricList = function(dataSrc, filter) {
+			filter = (filter || "").toLowerCase().trim().split(/\s+/);
+			return $.grep((dataSrc && dataSrc.metricList) || [], function(metric) {
+				for(var i = 0 ; i < filter.length ; i += 1) {
+					if(metric.toLowerCase().indexOf(filter[i]) === -1) return false;
+				}
+				return true;
+			});
+		};
+
+		$scope.newMetricSelectDataSource = function(dataSrc) {
+			if(dataSrc !== $scope._newMetricDataMetric) $scope._newMetricDataMetric = dataSrc.metricList[0];
+			$scope._newMetricDataSrc = dataSrc;
+		};
+		$scope.newMetricSelectMetric = function(metric) {
+			$scope._newMetricDataMetric = metric;
+		};
+
+		$scope.confirmSelectMetric = function() {
+			var group = $scope.tabHolder.selectedPane.data;
+			$("#metricMDL").modal('hide');
+
+			group.charts.push({
+				dataSource: $scope._newMetricDataSrc,
+				metrics: $scope._newMetricDataMetric,
+				aggregations: ["max"]
 			});
 		};
 	});
