@@ -43,6 +43,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-6s %(message)s',
                     datefmt='%m-%d %H:%M')
 
+
 class Helper:
     def __init__(self):
         pass
@@ -168,6 +169,7 @@ class YarnWSReader:
         logging.debug(cluster_info)
         return json.loads(cluster_info)
 
+
 class MetricSender(object):
     def __init__(self, config):
         pass
@@ -211,9 +213,13 @@ class KafkaMetricSender(MetricSender):
 class MetricCollector(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-
         self.config = Helper.load_config()
         self.sender = KafkaMetricSender(self.config)
+        self.fqdn = socket.getfqdn()
+        self.init(self.config)
+
+    def init(self, config):
+        pass
 
     def start(self):
         try:
@@ -228,7 +234,7 @@ class MetricCollector(threading.Thread):
         if msg.has_key("value"):
             msg["value"] = float(str(msg["value"]))
         if not msg.has_key("host") or len(msg["host"]) == 0:
-            msg["host"] = socket.getfqdn()
+            msg["host"] = self.fqdn
         if not msg.has_key("site"):
             msg["site"] = self.config["env"]["site"]
 
@@ -236,6 +242,7 @@ class MetricCollector(threading.Thread):
 
     def run(self):
         raise Exception("`run` method should be overrode by sub-class before being called")
+
 
 class Runner(object):
     @staticmethod
@@ -248,3 +255,103 @@ class Runner(object):
         """
         for thread in threads:
             thread.start()
+
+class JmxMetricCollector(MetricCollector):
+    selected_domain = None
+    component = None
+    https = False
+    port = None
+    listeners = []
+
+    def init(self, config):
+        if config["input"].has_key("host"):
+            self.host = config["input"]["host"]
+        else:
+            self.host = self.fqdn
+        self.port = config["input"]["port"]
+        self.https = config["input"]["https"]
+        self.component = config["input"]["component"]
+        self.selected_domain = [s.encode('utf-8') for s in config[u'filter'].get('monitoring.group.selected')]
+        self.listeners = []
+
+    def register(self, *listeners):
+        """
+        :param listeners: type of HadoopJmxListener
+        :return:
+        """
+        for listener in listeners:
+            listener.init(self)
+            self.listeners.append(listener)
+
+    def run(self):
+        try:
+            beans = JmxReader(self.host, self.port, self.https).open().get_jmx_beans()
+            self.on_beans(beans)
+        except Exception as e:
+            logging.exception("Failed to read jmx for " + self.host)
+
+    def filter_bean(self, bean, mbean_domain):
+        return mbean_domain in self.selected_domain
+
+    def on_beans(self, beans):
+        for bean in beans:
+            self.on_bean(bean)
+
+    def on_bean(self, bean):
+        # mbean is of the form "domain:key=value,...,foo=bar"
+        mbean = bean[u'name']
+        mbean_domain, mbean_attribute = mbean.rstrip().split(":", 1)
+        mbean_domain = mbean_domain.lower()
+
+        if not self.filter_bean(bean, mbean_domain):
+            return
+
+        context = bean.get("tag.Context", "")
+        metric_prefix_name = self.__build_metric_prefix(mbean_attribute, context)
+
+        # print kafka_dict
+        for key, value in bean.iteritems():
+            self.on_bean_kv(metric_prefix_name, key, value)
+
+        for listener in self.listeners:
+            listener.on_bean(bean.copy())
+
+    def on_bean_kv(self, prefix, key, value):
+        # Skip Tags
+        if re.match(r'tag.*', key):
+            return
+        metric_name = (prefix + '.' + key).lower()
+        self.on_metric({
+            "metric": metric_name,
+            "value": value
+        })
+
+    def on_metric(self, metric):
+        metric["component"] = self.component
+
+        if Helper.is_number(metric["value"]):
+            self.collect(metric)
+
+        for listener in self.listeners:
+            listener.on_metric(metric.copy())
+
+    def __build_metric_prefix(self, mbean_attribute, context):
+        mbean_list = list(prop.split("=", 1) for prop in mbean_attribute.split(","))
+        if context == "":
+            metric_prefix_name = '.'.join([i[1] for i in mbean_list])
+        else:
+            name_index = [i[0] for i in mbean_list].index('name')
+            mbean_list[name_index][1] = context
+            metric_prefix_name = '.'.join([i[1] for i in mbean_list])
+        return ("hadoop." + metric_prefix_name).replace(" ", "").lower()
+
+
+class JmxMetricListener:
+    def init(self, collector):
+        self.collector = collector
+
+    def on_bean(self, bean):
+        pass
+
+    def on_metric(self, metric):
+        pass
