@@ -14,21 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.eagle.service.security.hdfs.test;
 
+import org.apache.eagle.service.security.hdfs.HDFSResourceConstants;
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 
 import org.apache.eagle.service.security.hdfs.HDFSFileSystem;
 
 public class HDFSFileSystemTest {
-	//@Test
+	@Test
 	public void testHDFSFileSystem() throws Exception {
-		HDFSFileSystem fileSystem = new HDFSFileSystem("hdfs://sandbox.hortonworks.com:8020");
+		Configuration config = new Configuration();
+		config.set(HDFSResourceConstants.HDFS_FS_DEFAULT_NAME, "hdfs://sandbox.hortonworks.com:8020");
+		HDFSFileSystem fileSystem = new HDFSFileSystem(config);
 		System.out.println(fileSystem.browse("/"));
 	}
 
-	@Test
-	public void test() {
-
-	}
 }
