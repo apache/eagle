@@ -21,7 +21,11 @@ eagleComponents.directive('tabs', function() {
 
 	return {
 		restrict: 'AE',
-		transclude: true,
+		transclude: {
+			'header': '?header',
+			'pane': 'pane',
+			'footer': '?footer'
+		},
 		scope : {
 			title: "@?title",
 			icon: "@",
@@ -33,6 +37,8 @@ eagleComponents.directive('tabs', function() {
 		controller: function($scope, $element, $attrs, $timeout) {
 			var transDuration = $.fn.tab.Constructor.TRANSITION_DURATION;
 			var transTimer = null;
+
+			var $header, $footer;
 
 			$scope.paneList = [];
 			$scope.selectedPane = null;
@@ -94,6 +100,17 @@ eagleComponents.directive('tabs', function() {
 					$scope.activePane = $scope.paneList[0];
 				}
 			};
+
+			// ===================== UI =====================
+			$header = $element.find("> .nav-tabs-custom > .box-body");
+			$footer = $element.find("> .nav-tabs-custom > .box-footer");
+
+			$scope.hasHeader = function() {
+				return !!$header.children().length;
+			};
+			$scope.hasFooter = function() {
+				return !!$footer.children().length;
+			};
 		},
 
 		template :
@@ -117,7 +134,9 @@ eagleComponents.directive('tabs', function() {
 						'</a>' +
 					'</li>' +
 				'</ul>' +
-				'<div class="tab-content" ng-transclude></div>' +
+				'<div class="box-body" ng-transclude="header" ng-show="hasHeader()"></div>' +
+				'<div class="tab-content" ng-transclude="pane"></div>' +
+				'<div class="box-footer" ng-transclude="footer" ng-show="hasFooter()"></div>' +
 			'</div>'
 	};
 }).directive('pane', function() {
@@ -139,7 +158,20 @@ eagleComponents.directive('tabs', function() {
 				tabsController.deletePane(scope);
 			});
 		},
-		template : '<div class="tab-pane fade" ng-class="{active: active, in: in}" ng-transclude="parent"></div>',
+		template : '<div class="tab-pane fade" ng-class="{active: active, in: in}" ng-transclude></div>',
+		replace : true
+	};
+}).directive('footer', function() {
+	'use strict';
+
+	return {
+		require : '^tabs',
+		restrict : 'AE',
+		transclude : true,
+		scope : {},
+		controller: function($scope, $element) {
+		},
+		template : '<div ng-transclude></div>',
 		replace : true
 	};
 });

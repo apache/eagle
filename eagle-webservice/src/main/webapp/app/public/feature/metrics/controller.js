@@ -33,21 +33,61 @@
 	// ========================= Dashboard ==========================
 	feature.navItem("dashboard", "Metrics Dashboard", "line-chart");
 
-	feature.controller('dashboard', function(PageConfig, $scope, $http, UI, Site, Application) {
+	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Application) {
 		var _siteApp = Site.currentSiteApplication();
 		var _druidConfig = _siteApp.configObj.druid;
 
+		$scope.dataSourceListReady = false;
+		$scope.dataSourceList = [];
 		$scope.dashboard = {
 			groups: []
 		};
 
-		// ======================== Data ========================
-		$http.get(_druidConfig.coordinator + "/druid/coordinator/v1/metadata/datasources").then(function() {
+		// ======================= Metric =======================
+		$http.get(_druidConfig.coordinator + "/druid/coordinator/v1/metadata/datasources", {withCredentials: false}).then(function(data) {
+			var _endTime = new moment();
+			var _startTime = _endTime.clone().subtract(1, "d");
+			var _intervals = _startTime.toISOString() + "/" + _endTime.toISOString();
 
-		}, function(err) {
-			console.log(err);
+			$scope.dataSourceList = $.map(data.data, function(dataSrc) {
+				return {
+					dataSource: dataSrc,
+					metrics: []
+				};
+			});
+
+			// List dataSource metrics
+			var _metrixList_promiseList = $.map($scope.dataSourceList, function(dataSrc) {
+				var _data = JSON.stringify({
+					"queryType": "groupBy",
+					"dataSource": dataSrc.dataSource,
+					"granularity": "all",
+					"dimensions": ["metric"],
+					"aggregations": [
+						{
+							"type":"count",
+							"name":"count"
+						}
+					],
+					"intervals": [_intervals]
+				});
+
+				return $http.post(_druidConfig.broker + "/druid/v2", _data, {withCredentials: false}).then(function(response) {
+					dataSrc.metrics = $.map(response.data, function(entity) {
+						return entity.event.metric;
+					});
+				});
+			});
+
+			$q.all(_metrixList_promiseList).finally(function() {
+				$scope.dataSourceListReady = true;
+			});
+		}, function() {
+			$.dialog({
+				title: "OPS",
+				content: "Fetch data source failed. Please check Site Application Metrics configuration."
+			});
 		});
-		console.log(_druidConfig);
 
 		// ===================== Dashboard ======================
 		// TODO: Customize data load

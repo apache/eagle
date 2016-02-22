@@ -463,6 +463,10 @@ body .box-body .nav-pills > li > a {
 	border: none;
 }
 
+body .box-body + .tab-content {
+	padding-top: 0;
+}
+
 /* Box */
 .box .guideline {
 	margin-top: 0;
