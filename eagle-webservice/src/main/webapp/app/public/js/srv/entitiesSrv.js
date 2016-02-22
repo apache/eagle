@@ -226,7 +226,7 @@
 			querySeries: function(serviceName, condition, groupBy, fields, intervalmin) {
 				var _cond = new ParseCondition(condition);
 				var _list = _query("querySeries", {serviceName: serviceName, _condition: _cond, groupBy: groupBy, values: fields, intervalmin: intervalmin});
-				_list._promise.success(function() {
+				_list._promise.then(function() {
 					if(_list.length === 0) {
 						_list._empty = true;
 						_list._convert = true;
