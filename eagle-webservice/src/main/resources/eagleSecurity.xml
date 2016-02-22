@@ -23,7 +23,7 @@
 	http://www.springframework.org/schema/tx
     http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
-  <scr:http auto-config="true" use-expressions="true">
+    <scr:http auto-config="true" use-expressions="true">
         <!-- Support HTTP Basic Auth-->
         <scr:http-basic entry-point-ref="unauthorisedEntryPoint"/>
         <scr:intercept-url pattern="/rest/entities" method="POST" access="hasRole('ROLE_ADMIN')" />
@@ -39,50 +39,49 @@
     <bean id="logoutSuccessHandler" class="org.apache.eagle.service.security.auth.LogoutSuccessHandlerImpl" />
     <bean id="unauthorisedEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
 
-	<beans profile="default">
-		<bean id="ldapUserAuthProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
-			<constructor-arg>
-				<bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
-					<constructor-arg ref="ldapSource" />
-					<property name="userSearch">
-						<bean id="userSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
-							<constructor-arg index="0" value="${ldap.user.searchBase}" />
-							<constructor-arg index="1" value="${ldap.user.searchPattern}" />
-							<constructor-arg index="2" ref="ldapSource" />
-						</bean>
-					</property>
-				</bean>
-			</constructor-arg>
-			<constructor-arg>
-				<bean class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
-					<constructor-arg index="0" ref="ldapSource" />
-					<constructor-arg index="1" value="${ldap.user.groupSearchBase}" />
-					<property name="groupSearchFilter" value="uniqueMember={0}"/>
-					<property name="convertToUpperCase" value="true" />
-					<property name="rolePrefix" value="ROLE_" /> 
-				</bean>
-			</constructor-arg>
-		</bean>
+    <beans profile="default">
+        <bean id="ldapUserAuthProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+            <constructor-arg>
+                <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
+                    <constructor-arg ref="ldapSource" />
+                    <property name="userSearch">
+                        <bean id="userSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+                            <constructor-arg index="0" value="${ldap.user.searchBase}" />
+                            <constructor-arg index="1" value="${ldap.user.searchPattern}" />
+                            <constructor-arg index="2" ref="ldapSource" />
+                        </bean>
+                    </property>
+                </bean>
+            </constructor-arg>
+            <constructor-arg>
+                <bean class="org.apache.eagle.service.security.auth.AuthoritiesPopulator">
+                    <constructor-arg index="0" ref="ldapSource" />
+                    <constructor-arg index="1" value="${ldap.user.groupSearchBase}" />
+                    <constructor-arg index="2" value="${acl.adminRole}" />
+                    <constructor-arg index="3" value="${acl.defaultRole}" />
+                </bean>
+            </constructor-arg>
+        </bean>
 
-		<scr:authentication-manager alias="authenticationManager">
-			<!-- do user ldap auth -->
-			<scr:authentication-provider ref="ldapUserAuthProvider"></scr:authentication-provider>
-		</scr:authentication-manager>
+        <scr:authentication-manager alias="authenticationManager">
+            <!-- do user ldap auth -->
+            <scr:authentication-provider ref="ldapUserAuthProvider"></scr:authentication-provider>
+        </scr:authentication-manager>
 
-		<bean id="ldapSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
-			<constructor-arg value="${ldap.server}" />
-			<property name="userDn" value="${ldap.username}" />
-			<property name="password" value="${ldap.password}" />
-		</bean>
-	</beans>
+        <bean id="ldapSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+            <constructor-arg value="${ldap.server}" />
+            <property name="userDn" value="${ldap.username}" />
+            <property name="password" value="${ldap.password}" />
+        </bean>
+    </beans>
 
     <beans profile="sandbox,testing">
         <scr:authentication-manager alias="authenticationManager">
             <scr:authentication-provider>
                 <scr:user-service>
                     <!-- user admin has role ADMIN, user eagle has role USER, both have password "secret" -->
-                	<scr:user name="eagle" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_USER" />
-                    <scr:user name="admin" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_ADMIN, ROLE_USER" />
+                    <scr:user name="eagle" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_USER" />
+                    <scr:user name="admin" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_ADMIN" />
                 </scr:user-service>
                 <scr:password-encoder ref="passwordEncoder" />
             </scr:authentication-provider>
