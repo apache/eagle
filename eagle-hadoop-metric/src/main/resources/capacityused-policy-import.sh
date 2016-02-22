@@ -21,7 +21,7 @@ source $(dirname $0)/hadoop-metric-init.sh
 
 ##### add policies ##########
 echo ""
-echo "Importing policy: dataNodeCountPolicy "
+echo "Importing policy: capacityUsedPolicy "
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
  "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDefinitionService" \
  -d '
@@ -31,15 +31,15 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
        "tags": {
          "site": "sandbox",
          "dataSource": "hadoopJmxMetricDataSource",
-         "policyId": "dataNodeCountPolicy",
+         "policyId": "capacityUsedPolicy",
          "alertExecutorId": "hadoopJmxMetricAlertExecutor",
          "policyType": "siddhiCEPEngine"
        },
        "description": "jmx metric ",
-       "policyDef": "{\"expression\":\"from every (e1 = hadoopJmxMetricEventStream[metric == \\\"hadoop.namenode.fsnamesystemstate.numlivedatanodes\\\" ]) -> e2 = hadoopJmxMetricEventStream[metric == e1.metric and host == e1.host and (convert(e1.value, \\\"long\\\") - 5) >= convert(value, \\\"long\\\") ] within 5 min select e1.metric, e1.host, e1.value as highNum, e1.timestamp as start, e2.value as lowNum, e2.timestamp as end insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
+       "policyDef": "{\"expression\":\"from hadoopJmxMetricEventStream[metric == \\\"hadoop.namenode.fsnamesystemstate.capacityused\\\" and convert(value, \\\"long\\\") > 0]#window.externalTime(timestamp ,10 min) select metric, host, value, timestamp, component, site insert into tmp; \",\"type\":\"siddhiCEPEngine\"}",
        "enabled": true,
        "dedupeDef": "{\"alertDedupIntervalMin\":10,\"emailDedupIntervalMin\":10}",
-       "notificationDef": "[{\"sender\":\"eagle@apache.org\",\"recipients\":\"eagle@apache.org\",\"subject\":\"node count joggling found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
+       "notificationDef": "[{\"sender\":\"eagle@apache.org\",\"recipients\":\"eagle@apache.org\",\"subject\":\"missing block found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]"
      }
  ]
  '
