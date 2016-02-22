@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.security.util.LogParseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +76,7 @@ public class HbaseAuditLogParser implements Serializable {
         }
         ret.scope = scope;
         ret.action = auditMap.get(ACTION);
-        ret.user = auditMap.get(USER);
+        ret.user = LogParseUtil.parseUserFromUGI(auditMap.get(USER));
         ret.request = auditMap.get(REQUEST);
         ret.timestamp = DateTimeUtil.humanDateToMilliseconds(auditMap.get(LOGDATE));
         return ret;

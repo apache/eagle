@@ -26,7 +26,7 @@ eagle_bin=$EAGLE_HOME/bin
 ## AlertDataSource: data sources bound to sites
 echo "Importing AlertDataSourceService for HDFS... "
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDataSourceService" -d '[{"prefix":"alertDataSource","tags":{"site" : "sandbox", "dataSource":"hdfsAuditLog"}, "enabled": "true", "config" : "{\"hdfsEndpoint\":\"hdfs://sandbox.hortonworks.com:8020\"}", "desc":"HDFS"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDataSourceService" -d '[{"prefix":"alertDataSource","tags":{"site" : "sandbox", "dataSource":"hdfsAuditLog"}, "enabled": "true", "config" : "{\"fs.defaultFS\":\"hdfs://sandbox.hortonworks.com:8020\"}", "desc":"HDFS"}]'
 
 
 ## AlertStreamService: alert streams generated from data source
