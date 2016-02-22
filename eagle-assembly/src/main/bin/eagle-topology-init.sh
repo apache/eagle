@@ -60,7 +60,6 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"metrics"},"desc":"Metrics dashboard","version":"v0.3.0"}]'
 
 
-
 ## AlertStreamService: alert streams generated from data source
 echo ""
 echo "Importing AlertStreamService for HDFS... "
