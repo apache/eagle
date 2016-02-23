@@ -57,6 +57,7 @@ Eagle is built using [Apache Maven](https://maven.apache.org/). To build Eagle, 
 
     mvn -DskipTests clean package
 
+Note : currently, eagle is tested on jdk1.7.x. You may have compilation error with jdk1.8.x
 After successfully building, you will find eagle binary tarball under _eagle-assembly/target/_
 
 ## Get Help
