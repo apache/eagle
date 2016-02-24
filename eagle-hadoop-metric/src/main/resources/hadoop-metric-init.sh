@@ -49,7 +49,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
         },
         "desc":"hadoop jmx metric monitoring",
         "alias":"JmxMetric",
-        "group":"HadoopMetric",
+        "group":"HadoopMetricMonitoring",
         "config":"{}",
         "features":["common","metadata"]
      }
