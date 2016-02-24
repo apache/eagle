@@ -50,4 +50,5 @@ public class JsonSerDeserUtils {
 		}
 		return mapper.readValue(value, cls);	
 	}
+
 }

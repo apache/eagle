@@ -27,11 +27,9 @@ import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl
 
 import scala.collection.JavaConversions.asScalaSet
 import scala.collection.mutable.ListBuffer
-import org.apache.eagle.datastream.EagleTuple
 import org.apache.eagle.datastream.JavaStormExecutorForAlertWrapper
 import org.apache.eagle.datastream.JavaStormStreamExecutor
 import org.apache.eagle.datastream.StormStreamExecutor
-import org.apache.eagle.datastream.Tuple2
 import org.apache.eagle.datastream.storm.StormExecutorForAlertWrapper
 import org.apache.eagle.datastream.utils.AlertExecutorConsumerUtils
 import org.apache.eagle.service.client.EagleServiceConnector
@@ -159,11 +157,11 @@ case class StreamAlertExpansion(config: Config) extends StreamDAGExpansion(confi
       case _: FlatMapProducer[AnyRef, AnyRef] => {
         val mapper = current.asInstanceOf[FlatMapProducer[_, _]].mapper
         mapper match {
-          case a: JavaStormStreamExecutor[EagleTuple] => {
+          case a: JavaStormStreamExecutor[AnyRef] => {
             val newmapper = new JavaStormExecutorForAlertWrapper(a.asInstanceOf[JavaStormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
             newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false).stream(current.streamId)
           }
-          case b: StormStreamExecutor[EagleTuple] => {
+          case b: StormStreamExecutor[AnyRef] => {
             val newmapper = StormExecutorForAlertWrapper(b.asInstanceOf[StormStreamExecutor[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]]], upStreamName)
             newsp = FlatMapProducer(newmapper).initWith(dag,config,hook = false).stream(current.streamId)
           }

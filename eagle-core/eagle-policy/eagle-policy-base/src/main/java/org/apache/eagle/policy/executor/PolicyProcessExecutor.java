@@ -27,7 +27,6 @@ import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.metric.reportor.EagleCounterMetric;
 import org.apache.eagle.metric.reportor.EagleMetricListener;
 import org.apache.eagle.metric.reportor.EagleServiceReporterMetricListener;
@@ -41,6 +40,7 @@ import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
@@ -228,18 +228,15 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
         boolean needValidation = !config.hasPath(needValidationConfigKey) || config.getBoolean(needValidationConfigKey);
 
 		AbstractPolicyDefinition policyDef = null;
-		try {
-			policyDef = JsonSerDeserUtils.deserialize(alertDef.getPolicyDef(), AbstractPolicyDefinition.class, 
-					PolicyManager.getInstance().getPolicyModules(policyType));
-		} catch (Exception ex) {
-			LOG.error("Fail initial alert policy def: "+alertDef.getPolicyDef(), ex);
-		}
 		PolicyEvaluator<T> pe;
-		PolicyEvaluationContext<T, K> context = new PolicyEvaluationContext<>();
-		context.policyId = alertDef.getTags().get("policyId");
-		context.alertExecutor = this;
-		context.resultRender = this.getResultRender();
 		try {
+			policyDef = JsonSerDeserUtils.deserialize(alertDef.getPolicyDef(), AbstractPolicyDefinition.class,
+					PolicyManager.getInstance().getPolicyModules(policyType));
+
+			PolicyEvaluationContext<T, K> context = new PolicyEvaluationContext<>();
+			context.policyId = alertDef.getTags().get("policyId");
+			context.alertExecutor = this;
+			context.resultRender = this.getResultRender();
 			// create evaluator instance
 			pe = (PolicyEvaluator<T>) evalCls
 					.getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)

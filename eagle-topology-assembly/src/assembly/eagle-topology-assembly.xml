@@ -47,7 +47,6 @@
                 <exclude>asm:asm</exclude>
                 <exclude>org.apache.log4j.wso2:log4j</exclude>
                 <exclude>log4j:apache-log4j-extras</exclude>
-                <exclude>org.apache.zookeeper:zookeeper</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

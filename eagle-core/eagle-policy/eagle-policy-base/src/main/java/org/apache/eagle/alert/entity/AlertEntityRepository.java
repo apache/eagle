@@ -33,5 +33,6 @@ public class AlertEntityRepository extends EntityRepository {
 		entitySet.add(SiteDescServiceEntity.class);
 		entitySet.add(SiteApplicationServiceEntity.class);
 		this.registerEntity(GenericResourceEntity.class);
+		entitySet.add(AlertNotificationEntity.class);
 	}
 }

@@ -25,6 +25,7 @@ import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.Map;
 

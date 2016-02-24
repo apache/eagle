@@ -131,7 +131,7 @@
         <module>eagle-external</module>
         <module>eagle-assembly</module>
         <module>eagle-topology-assembly</module>
-        <module>eagle-samples</module>
+        <module>eagle-examples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
     </modules>
@@ -139,6 +139,7 @@
         <!-- General Properties -->
         <java.version>1.7</java.version>
         <scala.version>2.10</scala.version>
+        <scala-lang.version>2.10.4</scala-lang.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -164,6 +165,12 @@
         <hbase.version>0.98.4.2.2.5.1-3-hadoop2</hbase.version>
         <hive.version>1.2.1</hive.version>
         <spark.core.version>1.4.0</spark.core.version>
+
+        <!--  Client -->
+        <kafka-client.version>0.9.0.0</kafka-client.version>
+
+        <!-- Reflection -->
+        <reflections.version>0.9.8</reflections.version>
 
         <!-- Common Versions -->
         <commons-cli.version>1.2</commons-cli.version>
@@ -193,10 +200,9 @@
         <!-- Utility -->
         <joda-time.version>2.7</joda-time.version>
         <joda-convert.version>1.7</joda-convert.version>
-        <!--<log4j.version>1.2.17</log4j.version>-->
         <log4j.version>1.2.17</log4j.version>
-        <slf4j.version>1.6.5</slf4j.version>
-        <log4j-over-slf4j.version>1.6.6</log4j-over-slf4j.version>
+        <slf4j.version>1.7.5</slf4j.version>
+        <log4j-over-slf4j.version>1.7.2</log4j-over-slf4j.version>
         <quartz.version>2.2.1</quartz.version>
         <scopt.version>3.3.0</scopt.version>
         <akka.actor.version>2.3.14</akka.actor.version>
@@ -336,22 +342,17 @@
                 <version>${slf4j.version}</version>
                 <scope>compile</scope>
             </dependency>
-            <!--<dependency>-->
-                <!--<groupId>org.slf4j</groupId>-->
-                <!--<artifactId>slf4j-log4j12</artifactId>-->
-                <!--<version>${slf4j.version}</version>-->
-                <!--<scope>compile</scope>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>log4j-over-slf4j</artifactId>
-                <version>${log4j-over-slf4j.version}</version>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
+                <artifactId>log4j-over-slf4j</artifactId>
                 <version>${slf4j.version}</version>
-                <scope>test</scope>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
@@ -898,8 +899,6 @@
                                 <exclude>**/.metadata/</exclude>
                                 <!-- Maven working directory -->
                                 <exclude>**/target/**</exclude>
-                                <exclude>**/*.json</exclude>
-                                <exclude>**/*.json.*</exclude>
                                 <!-- Patch files which can be lying around -->
                                 <exclude>**/*.patch</exclude>
                                 <exclude>**/*.rej</exclude>
@@ -909,7 +908,9 @@
                                 <exclude>README*</exclude>
                                 <exclude>**/*.log</exclude>
                                 <exclude>**/eagle.log*</exclude>
-                                <exclude>**/resources/**/*.json</exclude>
+                                <exclude>**/velocity.log*</exclude>
+                                <!-- all json files should be excluded -->
+                                <exclude>**/*.json</exclude>
                                 <exclude>**/resources/eagle.siddhiext</exclude>
                                 <exclude>**/test/resources/securityAuditLog</exclude>
                                 <exclude>**/resources/**/ml-policyDef-UserProfile.txt</exclude>
@@ -918,7 +919,8 @@
                                 <exclude>**/dev-supports/**/*.json</exclude>
                                 <exclude>**/dev-supports/**/useractivity-agg-json.txt</exclude>
                                 <exclude>**/conf/sandbox-userprofile-topology.conf</exclude>
-                                <exclude>**/hadoop_jmx_collector/**</exclude>
+                                <exclude>**/kafka-python/**</exclude>
+                                <exclude>**/six/**</exclude>
                                 <!-- Fonts and Images -->
                                 <exclude>**/fonts/**</exclude>
                                 <exclude>**/images/**</exclude>
