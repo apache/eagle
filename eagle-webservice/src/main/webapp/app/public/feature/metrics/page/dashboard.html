@@ -21,6 +21,7 @@
 			ng-if="Auth.isRole('ROLE_ADMIN')"
 			ng-show="dashboard.groups.length"
 			ng-click="saveDashboard()"
+			ng-disabled="lock"
 	>
 		<span class="fa fa-floppy-o"></span>
 		Save
@@ -47,8 +48,8 @@
 
 <div tabs menu="menu" holder="tabHolder" ng-show="dashboard.groups.length">
 	<header class="clearfix" ng-if="Auth.isRole('ROLE_ADMIN')">
-		<button class="pull-right btn btn-danger btn-sm" ng-click="deleteGroup()">Delete Group</button>
-		<button class="btn btn-success btn-sm" ng-disabled="!dataSourceListReady" ng-click="newChart()">
+		<button class="pull-right btn btn-danger btn-sm" ng-click="deleteGroup()" ng-disabled="lock">Delete Group</button>
+		<button class="btn btn-success btn-sm" ng-disabled="!dataSourceListReady || lock" ng-click="newChart()">
 			<span ng-if="dataSourceListReady" class="fa fa-plus"></span>
 			<span ng-if="!dataSourceListReady" class="fa fa-refresh fa-spin"></span>
 			Add Metric

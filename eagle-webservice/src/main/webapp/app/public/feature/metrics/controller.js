@@ -149,6 +149,8 @@
 
 		// ======================== Menu ========================
 		$scope.newGroup = function() {
+			if($scope.lock) return;
+
 			UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
 				if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
 					return "Group name conflict";
