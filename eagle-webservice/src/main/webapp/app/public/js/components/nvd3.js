@@ -315,9 +315,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					// All watching mode
 					if ($scope.watching === "true") {
 						$scope.$watch("[chart, config]", function(newValue, oldValue) {
-							//noinspection JSValidateTypes
-							if (newValue === oldValue) return;
-
+							if(angular.equals(newValue, oldValue)) return;
 							initChart();
 						}, true);
 					}
@@ -344,7 +342,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 				get: function() {return _chart;}
 			});
 
-			$scope.$watch("holder", function(newValue, oldValue) {
+			$scope.$watch("holder", function() {
 				// Holder times update
 				setTimeout(function() {
 					_holder_updateTimes = 0;

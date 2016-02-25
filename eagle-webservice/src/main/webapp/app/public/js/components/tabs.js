@@ -38,6 +38,7 @@ eagleComponents.directive('tabs', function() {
 		controller: function($scope, $element, $attrs, $timeout) {
 			var transDuration = $.fn.tab.Constructor.TRANSITION_DURATION;
 			var transTimer = null;
+			var _holder, _holder_updateTimes;
 
 			var $header, $footer;
 
@@ -51,6 +52,10 @@ eagleComponents.directive('tabs', function() {
 			};
 
 			$scope.setSelect = function(pane) {
+				if(typeof pane === "string") {
+					pane = common.array.find(pane, $scope.paneList, "title");
+				}
+
 				$scope.activePane = $scope.selectedPane || pane;
 				$scope.selectedPane = pane;
 
@@ -114,14 +119,27 @@ eagleComponents.directive('tabs', function() {
 			};
 
 			// ================= Interface ==================
-			if($scope.holder) {
-				$scope.holder.scope = $scope;
-				Object.defineProperty($scope.holder, 'selectedPane', {
-					get: function() {
-						return $scope.selectedPane;
-					}
-				});
-			}
+			_holder_updateTimes = 0;
+			_holder = {
+				scope: $scope,
+				element: $element,
+				setSelect: $scope.setSelect
+			};
+
+			Object.defineProperty(_holder, 'selectedPane', {
+				get: function() {return $scope.selectedPane;}
+			});
+
+			$scope.$watch("holder", function(newValue, oldValue) {
+				// Holder times update
+				setTimeout(function() {
+					_holder_updateTimes = 0;
+				}, 0);
+				_holder_updateTimes += 1;
+				if(_holder_updateTimes > 100) throw "Holder conflict";
+
+				$scope.holder = _holder;
+			});
 		},
 
 		template :
@@ -145,9 +163,9 @@ eagleComponents.directive('tabs', function() {
 						'</a>' +
 					'</li>' +
 				'</ul>' +
-				'<div class="box-body" ng-transclude="header" ng-show="hasHeader()"></div>' +
+				'<div class="box-body" ng-transclude="header" ng-show="paneList.length && hasHeader()"></div>' +
 				'<div class="tab-content" ng-transclude="pane"></div>' +
-				'<div class="box-footer" ng-transclude="footer" ng-show="hasFooter()"></div>' +
+				'<div class="box-footer" ng-transclude="footer" ng-show="paneList.length && hasFooter()"></div>' +
 			'</div>'
 	};
 }).directive('pane', function() {
