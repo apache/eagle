@@ -30,72 +30,63 @@
 
 		<!-- ref:css public/css/styles.min.css -->
 		<link href="public/css/main.css" rel="stylesheet" type="text/css" media="screen">
-		<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen">
-		<link href="../node_modules/zombiej-bootstrap-components/bootstrap-components/css/bootstrap-components.min.css" rel="stylesheet" type="text/css" media="screen">
-		<link href="../node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-		<link href="../node_modules/zombiej-nvd3/build/nv.d3.min.css" rel="stylesheet" type="text/css" />
-		<link href="../node_modules/admin-lte/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
-		<link href="../node_modules/admin-lte/dist/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css" />
+		<link href="public/css/animation.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="../node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="../node_modules/zombiej-bootstrap-components/bootstrap-components/css/bootstrap-components.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="../node_modules/zombiej-nvd3/build/nv.d3.css" rel="stylesheet" type="text/css" />
+		<link href="../node_modules/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
+		<link href="../node_modules/admin-lte/dist/css/AdminLTE.css" rel="stylesheet" type="text/css" />
+		<link href="../node_modules/admin-lte/dist/css/skins/skin-blue.css" rel="stylesheet" type="text/css" />
 		<!-- endref -->
 	</head>
-	<body class="skin-blue sidebar-mini" ng-class="{'no-sidebar' : globalContent.hideSidebar}">
+	<body class="skin-blue sidebar-mini" ng-class="{'no-sidebar' : PageConfig.hideSidebar}">
 		<!-- Site wrapper -->
 		<div class="wrapper">
 			<header class="main-header">
 				<a href="#/" class="logo">
-					<span class="logo-mini">DAM</span>
-					<span class="logo-lg">Eagle <small>Data Activity Monitoring</small></span>
+					<span class="logo-mini"><img src="public/images/favicon_white.png" /></span>
+					<span class="logo-lg">Apache Eagle</span>
 				</a>
 				<!-- Header Navbar: style can be found in header.less -->
 				<nav class="navbar navbar-static-top" role="navigation">
 					<!-- Sidebar toggle button-->
-					<a ng-hide="globalContent.hideSidebar" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+					<a ng-hide="PageConfig.hideSidebar" class="sidebar-toggle" data-toggle="offcanvas" role="button">
 						<span class="sr-only">Toggle navigation</span>
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
+
 					<div class="navbar-custom-menu">
 						<ul class="nav navbar-nav">
 							<!-- Site -->
-							<li class="dropdown" ng-show="!globalContent.hideSite && !globalContent.lockSite">
+							<li class="dropdown" ng-show="!PageConfig.hideSite && !PageConfig.lockSite">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-server"></i>
-									{{site.current().name}}
+									{{Site.current().tags.site}}
 									<i class="fa fa-caret-down"></i>
 								</a>
 								<ul class="dropdown-menu">
-									<li ng-repeat="sites in site.list">
-										<a ng-click="site.current(sites);">
-											<span class="fa fa-database"></span> {{sites.name}}
+									<li ng-repeat="_site in Site.list" ng-if="_site.enabled">
+										<a ng-click="Site.current(_site);">
+											<span class="fa fa-database"></span> {{_site.tags.site}}
 										</a>
 									</li>
-									<!--li role="separator" class="divider"></li>
-									<li>
-										<a href="#/dam/siteList"><span class="fa fa-cog"></span>Config Sites</a>
-									</li-->
 								</ul>
 							</li>
-							<li class="dropdown" ng-show="globalContent.lockSite">
+							<li class="dropdown" ng-show="PageConfig.lockSite">
 								<a>
 									<i class="fa fa-server"></i>
-									{{site.current().name}}
+									{{Site.current().tags.site}}
 								</a>
 							</li>
 
 							<!-- User -->
-							<li class="dropdown user user-menu" ng-hide="globalContent.hideUser">
+							<li class="dropdown user user-menu" ng-hide="PageConfig.hideUser">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-user"></i>
-									{{auth.userProfile.username}}
+									{{Auth.userProfile.username}}
 								</a>
-								<!--ul class="dropdown-menu">
-									<li>
-										<a ng-click="logout();">
-											<span class="fa fa-sign-out"></span> Logout
-										</a>
-									</li>
-								</ul-->
 								<ul class="dropdown-menu">
 									<!-- User image -->
 									<li class="user-header">
@@ -103,14 +94,17 @@
 											<span class="fa fa-user" alt="User Image"></span>
 										</span>
 										<p>
-											{{auth.userProfile.username}}
+											{{Auth.userProfile.username}}
 											<small>
-												<span ng-repeat="role in auth.userProfile.authorities">{{role.authority}} </span>
+												<span ng-repeat="role in Auth.userProfile.authorities">{{role.authority}} </span>
 											</small>
 										</p>
 									</li>
 									<!-- Menu Footer-->
 									<li class="user-footer">
+										<div class="pull-left" ng-if="Auth.isRole('ROLE_ADMIN')">
+											<a href="#/config/site" class="btn btn-default btn-flat">Configuration</a>
+										</div>
 										<div class="pull-right">
 											<a ng-click="logout();" class="btn btn-default btn-flat">Sign out</a>
 										</div>
@@ -119,16 +113,45 @@
 							</li>
 						</ul>
 					</div>
+
+					<!-- Applications -->
+					<div ng-hide="PageConfig.hideApplication">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#moduleMenu">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="fa fa-map"></span>
+						</button>
+						<div class="collapse navbar-collapse" id="moduleMenu">
+							<ul class="nav navbar-nav">
+								<li ng-repeat="_grp in Site.current().applicationGroupList" ng-if="_grp.enabledList.length"
+									class="dropdown" ng-class="{active: Application.current().groupName === _grp.name}">
+									<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+										{{_grp.name}}
+									</a>
+									<ul class="dropdown-menu">
+										<li ng-repeat="_app in _grp.enabledList">
+											<a ng-click="Application.current(_app);">
+												<span class="fa fa-cubes"></span> {{_app.displayName}}
+											</a>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+					</div>
 				</nav>
 			</header>
 
 			<!-- =============================================== -->
 			<!-- Left side column. contains the side bar -->
-			<aside class="main-sidebar" ng-hide="globalContent.hideSidebar">
+			<aside class="main-sidebar" ng-hide="PageConfig.hideSidebar">
 				<!-- side bar: style can be found in sidebar.less -->
 				<section class="sidebar">
 					<ul class="sidebar-menu">
-						<li ng-repeat="page in globalContent.pageList" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
+						<li class="header">
+							{{Application.current().groupName || 'Application'}} >
+							{{Application.current().displayName || 'Features'}}
+						</li>
+						<li ng-repeat="page in PageConfig.navConfig.pageList track by $index" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
 							<a href="{{page.url}}">
 								<i class="fa fa-{{page.icon}}"></i> <span>{{page.title}}</span> 
 							</a>
@@ -142,17 +165,18 @@
 			<!-- Right side column. Contains the navbar and content of the page -->
 			<div class="content-wrapper">
 				<!-- Content Header (Page header) -->
-				<section class="content-header" ng-hide="globalContent.hideSidebar">
+				<section class="content-header" ng-hide="PageConfig.hideSidebar">
 					<h1>
-						<span class="pageTitle">{{globalContent.pageTitle}}</span>
-						<small class="pageSubTitle">{{globalContent.pageSubTitle}}</small>
+						<span class="pageTitle">{{PageConfig.pageTitle}}</span>
+						<small class="pageSubTitle">{{PageConfig.pageSubTitle}}</small>
 					</h1>
 
+
 					<ol class="breadcrumb">
-						<li ng-repeat="nav in globalContent.navPath">
-							<a ng-href="{{$last ? '' : globalContent.navMapping[nav]}}">
-								<span class="fa fa-home" ng-show="$first"></span>
-								{{nav}}
+						<li ng-repeat="navPath in PageConfig.navPath">
+							<a ng-href="#{{navPath.path}}">
+								<span class="fa fa-home" ng-if="$first"></span>
+								{{navPath.title || navPath.path}}
 							</a>
 						</li>
 					</ol>
@@ -160,7 +184,9 @@
 
 				<!-- Main content -->
 				<section class="content">
-					<div id="content" ng-view></div>
+					<div id="content">
+						<div ui-view></div>
+					</div>
 				</section><!-- /.content -->
 			</div><!-- /.content-wrapper -->
 		</div><!-- ./wrapper -->
@@ -176,12 +202,23 @@
 		<script src="../node_modules/angular/angular.js"></script>
 		<script src="../node_modules/angular-resource/angular-resource.js"></script>
 		<script src="../node_modules/angular-route/angular-route.js"></script>
-		<script src="../node_modules/angular-cookies/angular-cookies.js"></script>
+		<script src="../node_modules/angular-animate/angular-animate.js"></script>
 		<script src="../node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.js"></script>
+		<script src="../node_modules/angular-ui-router/release/angular-ui-router.js"></script>
 		<script src="../node_modules/d3/d3.js"></script>
 		<script src="../node_modules/zombiej-nvd3/build/nv.d3.js"></script>
 
+		<!-- Service -->
+		<script src="public/js/srv/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/applicationSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/authorizationSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/entitiesSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/siteSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/pageSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/wrapStateSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/uiSrv.js" type="text/javascript" charset="utf-8"></script>
 
+		<!-- Application -->
 		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/app.ui.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/app.time.js" type="text/javascript" charset="utf-8"></script>
@@ -189,6 +226,7 @@
 
 		<script src="public/js/common.js" type="text/javascript" charset="utf-8"></script>
 
+		<!-- Components -->
 		<script src="public/js/components/main.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/sortTable.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/tabs.js" type="text/javascript" charset="utf-8"></script>
@@ -196,15 +234,10 @@
 		<script src="public/js/components/charts/line3d.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/nvd3.js" type="text/javascript" charset="utf-8"></script>
 
-
-		<script src="public/js/ctrl/damController.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/ctrl/policyController.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/ctrl/siteController.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/ctrl/streamController.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/ctrl/alertController.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/ctrl/sensitivityController.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/ctrl/userProfileController.js" type="text/javascript" charset="utf-8"></script>
+		<!-- Controllers -->
+		<script src="public/js/ctrl/main.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrl/authController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/configurationController.js" type="text/javascript" charset="utf-8"></script>
 		<!-- endref -->
 	</body>
 </html>

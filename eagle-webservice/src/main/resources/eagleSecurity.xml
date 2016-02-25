@@ -28,6 +28,8 @@
         <scr:http-basic entry-point-ref="unauthorisedEntryPoint"/>
         <scr:intercept-url pattern="/rest/entities" method="POST" access="hasRole('ROLE_ADMIN')" />
         <scr:intercept-url pattern="/rest/entities/delete" method="POST" access="hasRole('ROLE_ADMIN')" />
+        <scr:intercept-url pattern="/rest/module/*" method="DELETE" access="hasRole('ROLE_ADMIN')" />
+        <scr:intercept-url pattern="/rest/module/*" method="POST" access="hasRole('ROLE_ADMIN')" />
         <scr:intercept-url pattern="/rest/list" method="POST" access="hasRole('ROLE_ADMIN')" />
         <scr:intercept-url pattern="/rest/status" method="GET" access="permitAll" />
         <scr:intercept-url pattern="/rest/*" access="isAuthenticated()" />
@@ -82,7 +84,7 @@
                 <scr:user-service>
                     <!-- user admin has role ADMIN, user eagle has role USER, both have password "secret" -->
                 	<scr:user name="eagle" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_USER" />
-                    <scr:user name="admin" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_ADMIN, ROLE_USER" />
+                    <scr:user name="admin" password="$2a$10$TwALMRHpSetDaeTurg9rj.DnIdOde4fkQGBSPG3fVqtH.G5ZH8sQK" authorities="ROLE_ADMIN" />
                 </scr:user-service>
                 <scr:password-encoder ref="passwordEncoder" />
             </scr:authentication-provider>

@@ -18,9 +18,10 @@ package org.apache.eagle.service.security.hdfs;
 
 import java.util.List;
 
+import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
+import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.generic.ListQueryResource;
 
-import org.apache.eagle.alert.entity.AlertDataSourceEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,9 +35,9 @@ public class HDFSResourceUtils {
 	public static HDFSResourceAccessConfig  getConfig(String siteId ) throws Exception
 	{
 		ListQueryResource resource = new ListQueryResource();
-		String queryFormat = "AlertDataSourceService[@dataSource=\""+HDFSResourceConstants.HDFS_DATA_SOURCE+"\" AND @site=\"%s\"]{*}";
+		String queryFormat = Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME+"[@application=\""+HDFSResourceConstants.HDFS_DATA_SOURCE+"\" AND @site=\"%s\"]{*}";
 		ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, siteId), null, null,Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null);
-		List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) ret.getObj();
+		List<SiteApplicationServiceEntity> list = (List<SiteApplicationServiceEntity>) ret.getObj();
 		if (list == null || list.size() == 0)
 			throw new Exception("Config is empty for site " + siteId +".");
 	    
