@@ -16,9 +16,38 @@
   limitations under the License.
   -->
 
-<div tabs menu="menu" holder="tabHolder">
+<div class="page-fixed">
+	<button class="btn btn-primary"
+			ng-if="Auth.isRole('ROLE_ADMIN')"
+			ng-show="dashboard.groups.length"
+			ng-click="saveDashboard()"
+	>
+		<span class="fa fa-floppy-o"></span>
+		Save
+	</button>
+</div>
+
+<div class="box box-default" ng-if="!dashboard.groups.length">
+	<div class="box-header with-border">
+		<h3 class="box-title">Empty Dashboard</h3>
+	</div>
+	<div class="box-body">
+		<div ng-show="dashboardList._promise.$$state.status !== 1">
+			Loading...
+		</div>
+		<div ng-show="dashboardList._promise.$$state.status === 1">
+			Current dashboard is empty.
+			<span ng-if="Auth.isRole('ROLE_ADMIN')">Click <a ng-click="newGroup()">here</a> to create a new group.</span>
+		</div>
+	</div>
+	<div class="overlay" ng-show="dashboardList._promise.$$state.status !== 1">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+</div>
+
+<div tabs menu="menu" holder="tabHolder" ng-show="dashboard.groups.length">
 	<header class="clearfix" ng-if="Auth.isRole('ROLE_ADMIN')">
-		<button class="pull-right btn btn-danger btn-sm" ng-click="deleteGroup()" ng-if="dashboard.groups.length > 1">Delete Group</button>
+		<button class="pull-right btn btn-danger btn-sm" ng-click="deleteGroup()">Delete Group</button>
 		<button class="btn btn-success btn-sm" ng-disabled="!dataSourceListReady" ng-click="newChart()">
 			<span ng-if="dataSourceListReady" class="fa fa-plus"></span>
 			<span ng-if="!dataSourceListReady" class="fa fa-refresh fa-spin"></span>
@@ -30,7 +59,7 @@
 			<div ng-repeat="chart in group.charts track by $index" class="col-md-6">
 				<div class="nvd3-chart-wrapper">
 					<div nvd3="chart._data" data-holder="chart._holder" data-title="{{chart.metric}}" data-watching="false"
-						 data-chart="{{chart.chart || 'line'}}" data-config="getChartConfig(configPreviewChart)" class="nvd3-chart-cntr"></div>
+						 data-chart="{{chart.chart || 'line'}}" data-config="getChartConfig(chart)" class="nvd3-chart-cntr"></div>
 					<div class="nvd3-chart-config" ng-if="Auth.isRole('ROLE_ADMIN')">
 						<a class="fa fa-cog" ng-click="configChart(chart)"></a>
 						<a class="fa fa-trash" ng-click="deleteChart(group, chart)"></a>
@@ -133,7 +162,7 @@
 							<tr>
 								<th>Minimum</th>
 								<td><input type="checkbox" ng-checked="configPreviewChart.min === 0" ng-disabled="configPreviewChart.chart === 'area' || configPreviewChart.chart === 'pie'"
-										   ng-click="configPreviewChart.min = configPreviewChart.min === 0 ? undefined : 0;" /></td>
+										   ng-click="configPreviewChartMinimumCheck()" /></td>
 							</tr>
 							<tr>
 								<th>Series</th>

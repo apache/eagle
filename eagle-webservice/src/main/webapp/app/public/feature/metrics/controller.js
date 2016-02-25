@@ -37,17 +37,29 @@
 		var _siteApp = Site.currentSiteApplication();
 		var _druidConfig = _siteApp.configObj.druid;
 
+		$scope.lock = false;
+
 		$scope.dataSourceListReady = false;
 		$scope.dataSourceList = [];
 		$scope.dashboard = {
 			groups: []
 		};
+		$scope.dashboardEntity = null;
 
 		$scope._newMetricFilter = "";
 		$scope._newMetricDataSrc = null;
 		$scope._newMetricDataMetric = null;
 
 		$scope.tabHolder = {};
+
+		// =================== Initialization ===================
+		if(!_druidConfig || !_druidConfig.coordinator || !_druidConfig.broker) {
+			$.dialog({
+				title: "OPS",
+				content: "Druid configuration can't be empty!"
+			});
+			return;
+		}
 
 		// ======================= Metric =======================
 		// Fetch metric data
@@ -136,56 +148,67 @@
 		};
 
 		// ======================== Menu ========================
-		$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
-			{icon: "plus", title: "New Group", func: function() {
-				UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
-					if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
-						return "Group name conflict";
-					}
-				}).then(null, null, function(holder) {
-					$scope.dashboard.groups.push({
-						name: holder.entity.name,
-						charts: []
-					});
-					holder.closeFunc();
+		$scope.newGroup = function() {
+			UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
+				if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
+					return "Group name conflict";
+				}
+			}).then(null, null, function(holder) {
+				$scope.dashboard.groups.push({
+					name: holder.entity.name,
+					charts: []
 				});
-			}}
+				holder.closeFunc();
+
+				setTimeout(function() {
+					$scope.tabHolder.setSelect(holder.entity.name);
+				}, 0);
+			});
+		};
+
+		$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
+			{icon: "plus", title: "New Group", func: $scope.newGroup}
 		] : [];
 
 		// ===================== Dashboard ======================
-		// TODO: Customize data load
-		setTimeout(function() {
-			// TODO: Mock for user data
-			$scope.dashboard = {
-				groups: [
-					{
-						name: "JMX",
-						charts: [
-							{
-								dataSource: "nn_jmx_metric_sandbox",
-								metric: "hadoop.namenode.dfs.missingblocks",
-								aggregations: ["max"]
-							},
-							{
-								dataSource: "nn_jmx_metric_sandbox",
-								metric: "hadoop.namenode.dfs.cachereportavgtime",
-								aggregations: ["max"]
-							},
-							{
-								dataSource: "nn_jmx_metric_sandbox",
-								metric: "hadoop.garbagecollector.psscavenge.collectiontime",
-								aggregations: ["max", "min"]
-							},
-							{
-								dataSource: "nn_jmx_metric_sandbox",
-								metric: "hadoop.operatingsystem.freephysicalmemorysize",
-								aggregations: ["max"]
-							}
-						]
+		$scope.dashboardList = Entities.queryEntities("GenericResourceService", {
+			site: Site.current().tags.site,
+			application: Application.current().tags.application
+		});
+		$scope.dashboardList._promise.then(function(list) {
+			$scope.dashboardEntity = list[0];
+			$scope.dashboard = $scope.dashboardEntity ? common.parseJSON($scope.dashboardEntity.value) : {groups: []};
+			$scope.chartRefresh();
+		});
+
+		$scope.saveDashboard = function() {
+			$scope.lock = true;
+
+			if(!$scope.dashboardEntity) {
+				$scope.dashboardEntity = {
+					tags: {
+						site: Site.current().tags.site,
+						application: Application.current().tags.application,
+						name: "/metric_dashboard/dashboard/default"
 					}
-				]
-			};
-		}, 100);
+				};
+			}
+			$scope.dashboardEntity.value = common.stringify($scope.dashboard);
+
+			Entities.updateEntity("GenericResourceService", $scope.dashboardEntity)._promise.then(function() {
+				$.dialog({
+					title: "Done",
+					content: "Save success!"
+				});
+			}, function() {
+				$.dialog({
+					title: "POS",
+					content: "Save failed. Please retry."
+				});
+			}).finally(function() {
+				$scope.lock = false;
+			});
+		};
 
 		// ======================= Groups =======================
 		$scope.deleteGroup = function() {
@@ -201,7 +224,7 @@
 		$scope.configPreviewChart = null;
 
 		$scope.chartConfig = {
-			xType: "time",
+			xType: "time"
 		};
 
 		$scope.chartTypeList = [
@@ -215,6 +238,11 @@
 			{name: "Min", series: "min"},
 			{name: "Max", series: "max"}
 		];
+
+		$scope.configPreviewChartMinimumCheck = function() {
+			$scope.configPreviewChart.min = $scope.configPreviewChart.min === 0 ? undefined : 0;
+			window.ccc1 = $scope.getChartConfig($scope.configPreviewChart);
+		};
 
 		$scope.seriesChecked = function(chart, series) {
 			if(!chart) return false;
@@ -252,6 +280,7 @@
 		$scope.configChart = function(chart) {
 			$scope.configTargetChart = chart;
 			$scope.configPreviewChart = $.extend({}, chart);
+			delete $scope.configPreviewChart._config;
 			$("#chartMDL").modal();
 			setTimeout(function() {
 				$(window).resize();
@@ -315,8 +344,5 @@
 				});
 			}, 0);
 		};
-
-		//$scope.chartRefresh();
-		setTimeout($scope.chartRefresh, 200);
 	});
 })();
