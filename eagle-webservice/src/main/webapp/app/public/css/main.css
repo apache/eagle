@@ -319,6 +319,11 @@ ul.nav.nav-tabs li .btn {
 	box-shadow: none;
 }
 
+.checkbox.noMargin {
+	margin-top: 0;
+	margin-bottom: 5px;
+}
+
 /* UL */
 ul.path {
 	margin-left: 0;
@@ -436,10 +441,45 @@ ul.tree.tree-bordered > li > ul > li > a {
 }
 
 /* Chart */
+.nvd3-chart-wrapper {
+	position: relative;
+	//border: 1px solid rgba(0,0,0,0);
+}
+.nvd3-chart-wrapper:hover {
+	//border-color: #F4F4F4;
+}
+
+.nvd3-chart-wrapper .nvd3-chart-config {
+	position: absolute;
+	top: 5px;
+	right: 10px;
+	display: none;
+	border-radius: 3px;
+	padding: 0 5px;
+	background: rgba(0,0,0,0.7);
+}
+.nvd3-chart-wrapper:hover .nvd3-chart-config {
+	display: block;
+}
+
+.nvd3-chart-wrapper .nvd3-chart-config a {
+	color: rgba(255,255,255, 0.9);
+	padding: 5px 5px 4px 5px;
+	font-size: 16px;
+}
+.nvd3-chart-wrapper .nvd3-chart-config a:hover {
+	color: #FFFFFF;
+}
+
+.nvd3-chart-cntr {
+	padding-top: 10px;
+}
+
 .nvd3-chart-cntr > h3 {
 	text-align: center;
 	font-size: 16px;
 	font-weight: bolder;
+	margin: 0;
 }
 
 .nvd3-chart-cntr > svg.nvd3-svg {

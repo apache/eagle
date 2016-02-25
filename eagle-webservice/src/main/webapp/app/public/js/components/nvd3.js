@@ -27,6 +27,11 @@ eagleComponents.service('nvd3', function() {
 	// ============================================
 	// =              Format Convert              =
 	// ============================================
+
+	/***
+	 * Format: [series:{key:name, value: [{x, y}]}]
+	 */
+
 	nvd3.convert = {};
 	nvd3.convert.eagle = function(seriesList) {
 		return $.map(seriesList, function(series) {
@@ -34,6 +39,35 @@ eagleComponents.service('nvd3', function() {
 			if(!seriesObj.key) seriesObj.key = "value";
 			return seriesObj;
 		});
+	};
+
+	nvd3.convert.druid = function(seriesList) {
+		var _seriesList = [];
+
+		$.each(seriesList, function(i, series) {
+			if(!series.length) return;
+
+			// Fetch keys
+			var _measure = series[0];
+			var _keys = $.map(_measure.event, function(value, key) {
+				return key !== "metric" ? key : null;
+			});
+
+			// Parse series
+			_seriesList.push.apply(_seriesList, $.map(_keys, function(key) {
+				return {
+					key: key,
+					values: $.map(series, function(unit) {
+						return {
+							x: new moment(unit.timestamp).valueOf(),
+							y: unit.event[key]
+						};
+					})
+				};
+			}));
+		});
+
+		return _seriesList;
 	};
 
 	// ============================================
@@ -55,11 +89,14 @@ eagleComponents.service('nvd3', function() {
 
 /**
  * config:
- * 		chart:		Defined chart type: line, column, area
- * 		xTitle:		Defined x axis title.
- * 		yTitle:		Defined y axis title.
- * 		xType:		Defined x axis label type: number, decimal, time
- * 		yType:		Defined y axis label type
+ * 		chart:			Defined chart type: line, column, area
+ * 		xTitle:			Defined x axis title.
+ * 		yTitle:			Defined y axis title.
+ * 		xType:			Defined x axis label type: number, decimal, time
+ * 		yType:			Defined y axis label type
+ * 		yMin:			Defined minimum of y axis
+ * 		yMax:			Defined maximum of y axis
+ * 		displayType:	Defined the chart display type. Each chart has own type.
  */
 eagleComponents.directive('nvd3', function(nvd3) {
 	'use strict';
@@ -71,12 +108,15 @@ eagleComponents.directive('nvd3', function(nvd3) {
 			title: "@?title",				// title
 			chart: "@?chart",				// Same as config.chart
 			config: "=?config",
-			watching: "@?watching"			// Default watching data(nvd3) only. true will also watching chart & config. false do not watching.
+			watching: "@?watching",			// Default watching data(nvd3) only. true will also watching chart & config. false do not watching.
+
+			holder: "=?holder"				// Container for holder to call the chart function
 		},
 		controller: function($scope, $element, $attrs, $timeout) {
 			var _config, _chartType;
 			var _chart;
 			var _chartCntr;
+			var _holder, _holder_updateTimes;
 
 			// Destroy
 			function destroy() {
@@ -152,11 +192,14 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					case "pie":
 						_chart = nv.models.dimensionalPieChart()
 							.x(function(d) { return d.key; })
-							.y(function(d) { return d.values[0].y; });
+							.y(function(d) { return d.values[d.values.length - 1].y; });
 						break;
 					default :
 						throw "Type not defined: " + _chartType;
 				}
+
+				// nvd3 display Type
+				// TODO: support type define
 
 				// Define title
 				if(_chartType !== 'pie') {
@@ -223,7 +266,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 
 			// Update chart data
 			function updateData() {
-				var _min, _max;
+				var _min = undefined, _max = undefined;
 
 				// Copy series to prevent Angular loop watching
 				var _data = $.map($scope.nvd3 || [], function(series, i) {
@@ -240,8 +283,11 @@ eagleComponents.directive('nvd3', function(nvd3) {
 							if(_max === undefined || unit.y > _max) _max = unit.y;
 						});
 					});
+
 					if(_min === 0 && _max === 0) {
 						_chart.forceY([0, 10]);
+					} else if(_config.yMin !== undefined || _config.yMax !== undefined) {
+						_chart.forceY([_config.yMin, _config.yMax]);
 					} else {
 						_chart.forceY([]);
 					}
@@ -278,6 +324,37 @@ eagleComponents.directive('nvd3', function(nvd3) {
 				}
 			});
 
+			// Holder inject
+			_holder_updateTimes = 0;
+			_holder = {
+				element: $element,
+				refresh: function() {
+					setTimeout(function() {
+						updateData();
+					}, 0);
+				},
+				refreshAll: function() {
+					setTimeout(function() {
+						initChart();
+					}, 0);
+				}
+			};
+
+			Object.defineProperty(_holder, 'chart', {
+				get: function() {return _chart;}
+			});
+
+			$scope.$watch("holder", function(newValue, oldValue) {
+				// Holder times update
+				setTimeout(function() {
+					_holder_updateTimes = 0;
+				}, 0);
+				_holder_updateTimes += 1;
+				if(_holder_updateTimes > 100) throw "Holder conflict";
+
+				$scope.holder = _holder;
+			});
+
 			// ================================================================
 			// =                           Start Up                           =
 			// ================================================================
@@ -293,7 +370,6 @@ eagleComponents.directive('nvd3', function(nvd3) {
 		template :
 		'<div>' +
 			'<h3>{{title || config.title}}</h3>' +
-			//'<svg style="min-height: 50px;"></svg>' +
 		'</div>',
 		replace: true
 	};

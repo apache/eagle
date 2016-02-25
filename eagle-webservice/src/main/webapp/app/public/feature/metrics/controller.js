@@ -33,7 +33,7 @@
 	// ========================= Dashboard ==========================
 	feature.navItem("dashboard", "Metrics Dashboard", "line-chart");
 
-	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Application) {
+	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Authorization, Application, Entities) {
 		var _siteApp = Site.currentSiteApplication();
 		var _druidConfig = _siteApp.configObj.druid;
 
@@ -50,6 +50,7 @@
 		$scope.tabHolder = {};
 
 		// ======================= Metric =======================
+		// Fetch metric data
 		$http.get(_druidConfig.coordinator + "/druid/coordinator/v1/metadata/datasources", {withCredentials: false}).then(function(data) {
 			// TODO: Hard code
 			var _endTime = new moment("2016-02-20 00:00:00").subtract(6, "hour");
@@ -99,8 +100,43 @@
 			});
 		});
 
+		// Filter data source
+		$scope.dataSourceMetricList = function(dataSrc, filter) {
+			filter = (filter || "").toLowerCase().trim().split(/\s+/);
+			return $.grep((dataSrc && dataSrc.metricList) || [], function(metric) {
+				for(var i = 0 ; i < filter.length ; i += 1) {
+					if(metric.toLowerCase().indexOf(filter[i]) === -1) return false;
+				}
+				return true;
+			});
+		};
+
+		// New metric select
+		$scope.newMetricSelectDataSource = function(dataSrc) {
+			if(dataSrc !== $scope._newMetricDataMetric) $scope._newMetricDataMetric = dataSrc.metricList[0];
+			$scope._newMetricDataSrc = dataSrc;
+		};
+		$scope.newMetricSelectMetric = function(metric) {
+			$scope._newMetricDataMetric = metric;
+		};
+
+		// Confirm new metric
+		$scope.confirmSelectMetric = function() {
+			var group = $scope.tabHolder.selectedPane.data;
+			$("#metricMDL").modal('hide');
+
+			group.charts.push({
+				chart: "line",
+				dataSource: $scope._newMetricDataSrc.dataSource,
+				metric: $scope._newMetricDataMetric,
+				aggregations: ["max"]
+			});
+
+			$scope.chartRefresh();
+		};
+
 		// ======================== Menu ========================
-		$scope.menu = [
+		$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
 			{icon: "plus", title: "New Group", func: function() {
 				UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
 					if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
@@ -114,7 +150,7 @@
 					holder.closeFunc();
 				});
 			}}
-		];
+		] : [];
 
 		// ===================== Dashboard ======================
 		// TODO: Customize data load
@@ -127,7 +163,22 @@
 						charts: [
 							{
 								dataSource: "nn_jmx_metric_sandbox",
-								metrics: "hadoop.namenode.dfs.missingblocks",
+								metric: "hadoop.namenode.dfs.missingblocks",
+								aggregations: ["max"]
+							},
+							{
+								dataSource: "nn_jmx_metric_sandbox",
+								metric: "hadoop.namenode.dfs.cachereportavgtime",
+								aggregations: ["max"]
+							},
+							{
+								dataSource: "nn_jmx_metric_sandbox",
+								metric: "hadoop.garbagecollector.psscavenge.collectiontime",
+								aggregations: ["max", "min"]
+							},
+							{
+								dataSource: "nn_jmx_metric_sandbox",
+								metric: "hadoop.operatingsystem.freephysicalmemorysize",
 								aggregations: ["max"]
 							}
 						]
@@ -146,37 +197,126 @@
 		};
 
 		// ======================= Chart ========================
+		$scope.configTargetChart = null;
+		$scope.configPreviewChart = null;
+
+		$scope.chartConfig = {
+			xType: "time",
+		};
+
+		$scope.chartTypeList = [
+			{icon: "line-chart", chart: "line"},
+			{icon: "area-chart", chart: "area"},
+			{icon: "bar-chart", chart: "column"},
+			{icon: "pie-chart", chart: "pie"}
+		];
+
+		$scope.chartSeriesList = [
+			{name: "Min", series: "min"},
+			{name: "Max", series: "max"}
+		];
+
+		$scope.seriesChecked = function(chart, series) {
+			if(!chart) return false;
+			return $.inArray(series, chart.aggregations || []) !== -1;
+		};
+		$scope.seriesCheckClick = function(chart, series) {
+			if(!chart) return;
+			if($scope.seriesChecked(chart, series)) {
+				common.array.remove(series, chart.aggregations);
+			} else {
+				chart.aggregations.push(series);
+			}
+			$scope.chartSeriesUpdate(chart);
+		};
+
+		$scope.chartSeriesUpdate = function(chart) {
+			chart._data = $.map(chart._oriData, function(series) {
+				if($.inArray(series.key, chart.aggregations) !== -1) return series;
+			});
+		};
+
+		$scope.getChartConfig = function(chart) {
+			if(!chart) return null;
+
+			var _config = chart._config = chart._config || $.extend({}, $scope.chartConfig);
+			_config.yMin = chart.min;
+
+			return _config;
+		};
+
 		$scope.newChart = function() {
 			$("#metricMDL").modal();
 		};
 
-		$scope.dataSourceMetricList = function(dataSrc, filter) {
-			filter = (filter || "").toLowerCase().trim().split(/\s+/);
-			return $.grep((dataSrc && dataSrc.metricList) || [], function(metric) {
-				for(var i = 0 ; i < filter.length ; i += 1) {
-					if(metric.toLowerCase().indexOf(filter[i]) === -1) return false;
-				}
-				return true;
+		$scope.configChart = function(chart) {
+			$scope.configTargetChart = chart;
+			$scope.configPreviewChart = $.extend({}, chart);
+			$("#chartMDL").modal();
+			setTimeout(function() {
+				$(window).resize();
+			}, 200);
+		};
+
+		$scope.confirmUpdateChart = function() {
+			$("#chartMDL").modal('hide');
+			common.extend($scope.configTargetChart, $scope.configPreviewChart);
+			$scope.chartSeriesUpdate($scope.configTargetChart);
+			$scope.configTargetChart._holder && $scope.configTargetChart._holder.refreshAll();
+		};
+
+		$scope.deleteChart = function(group, chart) {
+			UI.deleteConfirm(chart.metric).then(null, null, function(holder) {
+				common.array.remove(chart, group.charts);
+				holder.closeFunc();
+				$scope.chartRefresh();
 			});
 		};
 
-		$scope.newMetricSelectDataSource = function(dataSrc) {
-			if(dataSrc !== $scope._newMetricDataMetric) $scope._newMetricDataMetric = dataSrc.metricList[0];
-			$scope._newMetricDataSrc = dataSrc;
-		};
-		$scope.newMetricSelectMetric = function(metric) {
-			$scope._newMetricDataMetric = metric;
+		$scope.chartRefresh = function(forceRefresh) {
+			setTimeout(function() {
+				var _endTime = new moment();
+				var _startTime = _endTime.clone().subtract(1, "hour");
+				var _intervals = _startTime.toISOString() + "/" + _endTime.toISOString();
+
+				$.each($scope.dashboard.groups, function (i, group) {
+					$.each(group.charts, function (j, chart) {
+						var _data = JSON.stringify({
+							"queryType": "groupBy",
+							"dataSource": chart.dataSource,
+							"granularity": "minute",
+							"dimensions": ["metric"],
+							"filter": {"type": "selector", "dimension": "metric", "value": chart.metric},
+							"aggregations": [
+								{
+									"type": "max",
+									"name": "max",
+									"fieldName": "maxValue"
+								},
+								{
+									"type": "min",
+									"name": "min",
+									"fieldName": "maxValue"
+								}
+							],
+							"intervals": [_intervals]
+						});
+
+						if (!chart._data || forceRefresh) {
+							$http.post(_druidConfig.broker + "/druid/v2", _data, {withCredentials: false}).then(function (response) {
+								chart._oriData = nvd3.convert.druid([response.data]);
+								$scope.chartSeriesUpdate(chart);
+								chart._holder && chart._holder.refresh();
+							});
+						} else {
+							chart._holder && chart._holder.refresh();
+						}
+					});
+				});
+			}, 0);
 		};
 
-		$scope.confirmSelectMetric = function() {
-			var group = $scope.tabHolder.selectedPane.data;
-			$("#metricMDL").modal('hide');
-
-			group.charts.push({
-				dataSource: $scope._newMetricDataSrc,
-				metrics: $scope._newMetricDataMetric,
-				aggregations: ["max"]
-			});
-		};
+		//$scope.chartRefresh();
+		setTimeout($scope.chartRefresh, 200);
 	});
 })();

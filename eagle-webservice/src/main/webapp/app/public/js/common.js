@@ -97,12 +97,28 @@ common.parseJSON = function (str, defaultVal) {
 	return defaultVal === undefined ? null : defaultVal;
 };
 
+common.stringify = function(json) {
+	return JSON.stringify(json, function(key, value) {
+		if(/^(_|\$)/.test(key)) return undefined;
+		return value;
+	});
+};
+
 common.isEmpty = function(val) {
 	if($.isArray(val)) {
 		return val.length === 0;
 	} else {
 		return val === null || val === undefined;
 	}
+};
+
+common.extend = function(target, origin) {
+	$.each(origin, function(key, value) {
+		if(/^(_|\$)/.test(key)) return;
+
+		target[key] = value;
+	});
+	return target;
 };
 
 // ====================== Format ======================
