@@ -83,7 +83,7 @@
 		};
 
 		$scope.refreshTimeDisplay = function() {
-			PageConfig.pageSubTitle = common.format.date($scope.startTime, 'mixed') + " ~ " + common.format.date($scope.endTime, 'mixed') + " [refresh interval: 30s]";
+			PageConfig.pageSubTitle = common.format.date($scope.startTime) + " ~ " + common.format.date($scope.endTime) + " [refresh interval: 30s]";
 		};
 		$scope.refreshTimeDisplay();
 
