@@ -33,15 +33,15 @@
 		<h3 class="box-title">Empty Dashboard</h3>
 	</div>
 	<div class="box-body">
-		<div ng-show="dashboardList._promise.$$state.status !== 1">
+		<div ng-show="!dashboardReady">
 			Loading...
 		</div>
-		<div ng-show="dashboardList._promise.$$state.status === 1">
+		<div ng-show="dashboardReady">
 			Current dashboard is empty.
 			<span ng-if="Auth.isRole('ROLE_ADMIN')">Click <a ng-click="newGroup()">here</a> to create a new group.</span>
 		</div>
 	</div>
-	<div class="overlay" ng-show="dashboardList._promise.$$state.status !== 1">
+	<div class="overlay" ng-show="!dashboardReady">
 		<i class="fa fa-refresh fa-spin"></i>
 	</div>
 </div>

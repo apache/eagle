@@ -45,6 +45,7 @@
 			groups: []
 		};
 		$scope.dashboardEntity = null;
+		$scope.dashboardReady = false;
 
 		$scope._newMetricFilter = "";
 		$scope._newMetricDataSrc = null;
@@ -180,6 +181,8 @@
 			$scope.dashboardEntity = list[0];
 			$scope.dashboard = $scope.dashboardEntity ? common.parseJSON($scope.dashboardEntity.value) : {groups: []};
 			$scope.chartRefresh();
+		}).finally(function() {
+			$scope.dashboardReady = true;
 		});
 
 		$scope.saveDashboard = function() {
@@ -347,6 +350,7 @@
 		};
 
 		setInterval(function() {
+			if(!$scope.dashboardReady) return;
 			$scope.chartRefresh(true);
 		}, 1000 * 30);
 	});
