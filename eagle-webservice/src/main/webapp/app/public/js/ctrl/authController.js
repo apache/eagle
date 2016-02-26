@@ -35,7 +35,7 @@
 		$scope.loginSuccess = false;
 
 		if(localStorage) {
-			$scope.rememberUser = localStorage.getItem("rememberUser") !== false;
+			$scope.rememberUser = localStorage.getItem("rememberUser") !== "false";
 
 			if($scope.rememberUser) {
 				$scope.username = localStorage.getItem("username");
@@ -59,8 +59,13 @@
 					if (success) {
 						// Check user remember
 						localStorage.setItem("rememberUser", $scope.rememberUser);
-						localStorage.setItem("username", $scope.username);
-						localStorage.setItem("password", $scope.password);
+						if($scope.rememberUser) {
+							localStorage.setItem("username", $scope.username);
+							localStorage.setItem("password", $scope.password);
+						} else {
+							localStorage.removeItem("username");
+							localStorage.removeItem("password");
+						}
 
 						// Initial environment
 						$scope.loginSuccess = true;
