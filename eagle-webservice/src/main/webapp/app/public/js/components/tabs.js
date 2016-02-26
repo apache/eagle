@@ -59,7 +59,7 @@ eagleComponents.directive('tabs', function() {
 				$scope.activePane = $scope.selectedPane || pane;
 				$scope.selectedPane = pane;
 
-				transTimer && $timeout.cancel(transTimer);
+				if(transTimer) $timeout.cancel(transTimer);
 				transTimer = $timeout(function() {
 					$scope.activePane = $scope.selectedPane;
 				}, transDuration);

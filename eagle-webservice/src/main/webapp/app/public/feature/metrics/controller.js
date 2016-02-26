@@ -293,7 +293,7 @@
 			$("#chartMDL").modal('hide');
 			common.extend($scope.configTargetChart, $scope.configPreviewChart);
 			$scope.chartSeriesUpdate($scope.configTargetChart);
-			$scope.configTargetChart._holder && $scope.configTargetChart._holder.refreshAll();
+			if($scope.configTargetChart._holder) $scope.configTargetChart._holder.refreshAll();
 		};
 
 		$scope.deleteChart = function(group, chart) {
@@ -337,7 +337,7 @@
 							$http.post(_druidConfig.broker + "/druid/v2", _data, {withCredentials: false}).then(function (response) {
 								chart._oriData = nvd3.convert.druid([response.data]);
 								$scope.chartSeriesUpdate(chart);
-								chart._holder && chart._holder.refresh();
+								if(chart._holder) chart._holder.refresh();
 							});
 						} else {
 							chart._holder && chart._holder.refresh();

@@ -266,7 +266,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 
 			// Update chart data
 			function updateData() {
-				var _min = undefined, _max = undefined;
+				var _min, _max;
 
 				// Copy series to prevent Angular loop watching
 				var _data = $.map($scope.nvd3 || [], function(series, i) {
