@@ -340,7 +340,7 @@
 								if(chart._holder) chart._holder.refresh();
 							});
 						} else {
-							chart._holder && chart._holder.refresh();
+							if(chart._holder) chart._holder.refresh();
 						}
 					});
 				});
