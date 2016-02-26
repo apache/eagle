@@ -136,7 +136,7 @@
 					content.needLogin();
 				}
 			});
-		}, 1000 * 10);// 60 * 5);
+		}, 1000 * 60 * 5);
 
 		return content;
 	});
