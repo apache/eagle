@@ -55,6 +55,9 @@
 
 		$scope.tabHolder = {};
 
+		$scope.endTime = app.time.now();
+		$scope.startTime = $scope.endTime.clone();
+
 		// =================== Initialization ===================
 		if(!_druidConfig || !_druidConfig.coordinator || !_druidConfig.broker) {
 			$.dialog({
@@ -63,6 +66,26 @@
 			});
 			return;
 		}
+
+		$scope.autoRefreshList = [
+			{title: "Last 1 Month", timeDes: "day", getStartTime: function(endTime) {return endTime.clone().subtract(1, "month");}},
+			{title: "Last 1 Day", timeDes: "thirty_minute", getStartTime: function(endTime) {return endTime.clone().subtract(1, "day");}},
+			{title: "Last 6 Hour", timeDes: "fifteen_minute", getStartTime: function(endTime) {return endTime.clone().subtract(6, "hour");}},
+			{title: "Last 2 Hour", timeDes: "fifteen_minute", getStartTime: function(endTime) {return endTime.clone().subtract(2, "hour");}},
+			{title: "Last 1 Hour", timeDes: "minute", getStartTime: function(endTime) {return endTime.clone().subtract(1, "hour");}}
+		];
+		$scope.autoRefreshSelect = $scope.autoRefreshList[2];
+
+		// ====================== Function ======================
+		$scope.setAuthRefresh = function(item) {
+			$scope.autoRefreshSelect = item;
+			$scope.chartRefresh(true);
+		};
+
+		$scope.refreshTimeDisplay = function() {
+			PageConfig.pageSubTitle = common.format.date($scope.startTime, 'mixed') + " ~ " + common.format.date($scope.endTime, 'mixed') + " [refresh interval: 30s]";
+		};
+		$scope.refreshTimeDisplay();
 
 		// ======================= Metric =======================
 		// Fetch metric data
@@ -319,16 +342,18 @@
 
 		$scope.chartRefresh = function(forceRefresh) {
 			setTimeout(function() {
-				var _endTime = new moment();
-				var _startTime = _endTime.clone().subtract(1, "hour");
-				var _intervals = _startTime.toISOString() + "/" + _endTime.toISOString();
+				$scope.endTime = app.time.now();
+				$scope.startTime = $scope.autoRefreshSelect.getStartTime($scope.endTime);
+				var _intervals = $scope.startTime.toISOString() + "/" + $scope.endTime.toISOString();
+
+				$scope.refreshTimeDisplay();
 
 				$.each($scope.dashboard.groups, function (i, group) {
 					$.each(group.charts, function (j, chart) {
 						var _data = JSON.stringify({
 							"queryType": "groupBy",
 							"dataSource": chart.dataSource,
-							"granularity": "minute",
+							"granularity": $scope.autoRefreshSelect.timeDes,
 							"dimensions": ["metric"],
 							"filter": {"type": "selector", "dimension": "metric", "value": chart.metric},
 							"aggregations": [

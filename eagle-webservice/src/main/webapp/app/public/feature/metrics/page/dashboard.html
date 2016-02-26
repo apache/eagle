@@ -19,11 +19,15 @@
 <div class="page-fixed">
 	<div class="dropdown inline">
 		<button data-toggle="dropdown" class="btn btn-primary">
-			<span class="fa fa-clock-o"></span> Last 12 Hour
+			<span class="fa fa-clock-o"></span> {{autoRefreshSelect.title}}
 		</button>
 		<ul class="dropdown-menu">
-			<li><a>Last 12 Hour</a></li>
-			<li><a>Last 6 Hour</a></li>
+			<li ng-repeat="item in autoRefreshList track by $index">
+				<a ng-click="setAuthRefresh(item)">
+					<span class="fa fa-clock-o"></span>
+					<span ng-class="{'text-bold': item === autoRefreshSelect}">{{item.title}}</span>
+				</a>
+			</li>
 		</ul>
 	</div>
 

@@ -134,6 +134,14 @@ common.format.date = function(val, type) {
 		val = app.time.offset(val);
 	}
 	switch(type) {
+	case 'date':
+		return val.format("YYYY-MM-DD");
+	case 'time':
+		return val.format("HH:mm:ss");
+	case 'datetime':
+		return val.format("YYYY-MM-DD HH:mm:ss");
+	case 'mixed':
+		return val.format("YYYY-MM-DD HH:mm");
 	default:
 		return val.format("YYYY-MM-DD HH:mm:ss") + (val.utcOffset() === 0 ? '[UTC]' : '');
 	}
