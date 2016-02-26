@@ -64,9 +64,8 @@
 		// ======================= Metric =======================
 		// Fetch metric data
 		$http.get(_druidConfig.coordinator + "/druid/coordinator/v1/metadata/datasources", {withCredentials: false}).then(function(data) {
-			// TODO: Hard code
-			var _endTime = new moment("2016-02-20 00:00:00").subtract(6, "hour");
-			var _startTime = _endTime.clone().subtract(3, "hour");
+			var _endTime = new moment();
+			var _startTime = _endTime.clone().subtract(1, "day");
 			var _intervals = _startTime.toISOString() + "/" + _endTime.toISOString();
 
 			$scope.dataSourceList = $.map(data.data, function(dataSrc) {
@@ -346,5 +345,9 @@
 				});
 			}, 0);
 		};
+
+		setInterval(function() {
+			$scope.chartRefresh(true);
+		}, 1000 * 30);
 	});
 })();
