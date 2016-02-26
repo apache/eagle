@@ -21,7 +21,7 @@
 		<button data-toggle="dropdown" class="btn btn-primary">
 			<span class="fa fa-clock-o"></span> {{autoRefreshSelect.title}}
 		</button>
-		<ul class="dropdown-menu">
+		<ul class="dropdown-menu left">
 			<li ng-repeat="item in autoRefreshList track by $index">
 				<a ng-click="setAuthRefresh(item)">
 					<span class="fa fa-clock-o"></span>
@@ -69,6 +69,11 @@
 				</div>
 			</div>
 		</div>
+
+		<p ng-if="!group.charts.length">
+			Empty group.
+			<span ng-if="Auth.isRole('ROLE_ADMIN')">Click <a ng-click="newChart()">here</a> to add metric.</span>
+		</p>
 	</pane>
 </div>
 

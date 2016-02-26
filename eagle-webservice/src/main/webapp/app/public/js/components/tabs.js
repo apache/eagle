@@ -159,7 +159,7 @@ eagleComponents.directive('tabs', function() {
 								' uib-tooltip="{{menu.title}}" tooltip-enable="menu.title" tooltip-append-to-body="true">' +
 								'<span class="fa fa-{{menu.icon}}"></span>' +
 							'</button>' +
-							'<ul class="dropdown-menu" role="menu">' +
+							'<ul class="dropdown-menu left" role="menu">' +
 								'<li ng-repeat="item in menu.list track by $index" ng-class="{danger: item.danger, disabled: item.disabled}">' +
 									'<a ng-click="!item.disabled && item.func($event)">' +
 										'<span class="fa fa-{{item.icon}}"></span> {{item.title}}' +
@@ -197,9 +197,6 @@ eagleComponents.directive('tabs', function() {
 		scope : {
 			title : '@',
 			data: '=?data'
-		},
-		controller: function($scope, $element, $animate) {
-			$animate.enabled(false, $element);
 		},
 		link : function(scope, element, attrs, tabsController) {
 			tabsController.addPane(scope);

@@ -201,7 +201,7 @@
 			});
 		}
 
-		_menu_newChart = {title: "Add Metric", func: function() {$("#metricMDL").modal();}};
+		_menu_newChart = {title: "Add Metric", func: function() {$scope.newChart();}};
 		Object.defineProperties(_menu_newChart, {
 			icon: {
 				get: function() {return $scope.dataSourceListReady ? 'plus' : 'refresh fa-spin';}
@@ -280,6 +280,10 @@
 			{name: "Min", series: "min"},
 			{name: "Max", series: "max"}
 		];
+
+		$scope.newChart = function() {
+			$("#metricMDL").modal();
+		};
 
 		$scope.configPreviewChartMinimumCheck = function() {
 			$scope.configPreviewChart.min = $scope.configPreviewChart.min === 0 ? undefined : 0;
