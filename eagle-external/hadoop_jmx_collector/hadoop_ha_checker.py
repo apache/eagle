@@ -1,3 +1,5 @@
+# !/usr/bin/python
+#
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -12,13 +14,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-
-# !/usr/bin/python
-
-from base import MetricCollector, JmxReader, YarnWSReader, Runner
+from metric_collector import MetricCollector, JmxReader, YarnWSReader, Runner
 import logging
-
 
 class HadoopNNHAChecker(MetricCollector):
     def run(self):
@@ -126,5 +125,4 @@ class HadoopRMHAChecker(MetricCollector):
         })
 
 if __name__ == '__main__':
-    # HadoopNNHAChecker().start()
     Runner.run(HadoopNNHAChecker(), HadoopRMHAChecker())
