@@ -666,6 +666,12 @@ td.text-ellipsis {
 	display: table-cell;
 }
 
+.text-breakall {
+	max-width: 100%;
+	display: inline-block;
+	word-wrap: break-word;
+}
+
 .btn.btn-xs.sm {
 	font-size: 12px;
 	padding: 2px 6px;
