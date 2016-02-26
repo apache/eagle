@@ -17,14 +17,19 @@
   -->
 
 <div class="page-fixed">
-	<button class="btn btn-primary"
-			ng-if="Auth.isRole('ROLE_ADMIN')"
-			ng-show="dashboard.groups.length"
-			ng-click="saveDashboard()"
-			ng-disabled="lock"
-	>
-		<span class="fa fa-floppy-o"></span>
-		Save
+	<div class="dropdown inline">
+		<button data-toggle="dropdown" class="btn btn-primary">
+			<span class="fa fa-clock-o"></span> Last 12 Hour
+		</button>
+		<ul class="dropdown-menu">
+			<li><a>Last 12 Hour</a></li>
+			<li><a>Last 6 Hour</a></li>
+		</ul>
+	</div>
+
+	<button class="btn btn-primary" ng-if="Auth.isRole('ROLE_ADMIN')" ng-show="dashboard.groups.length"
+			ng-click="saveDashboard()" ng-disabled="lock">
+		<span class="fa fa-floppy-o"></span> Save
 	</button>
 </div>
 
@@ -47,14 +52,6 @@
 </div>
 
 <div tabs menu="menu" holder="tabHolder" ng-show="dashboard.groups.length">
-	<header class="clearfix" ng-if="Auth.isRole('ROLE_ADMIN')">
-		<button class="pull-right btn btn-danger btn-sm" ng-click="deleteGroup()" ng-disabled="lock">Delete Group</button>
-		<button class="btn btn-success btn-sm" ng-disabled="!dataSourceListReady || lock" ng-click="newChart()">
-			<span ng-if="dataSourceListReady" class="fa fa-plus"></span>
-			<span ng-if="!dataSourceListReady" class="fa fa-refresh fa-spin"></span>
-			Add Metric
-		</button>
-	</header>
 	<pane ng-repeat="group in dashboard.groups" data-data="group" data-title="{{group.name}}">
 		<div class="row">
 			<div ng-repeat="chart in group.charts track by $index" class="col-md-6">

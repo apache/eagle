@@ -31,11 +31,13 @@
 	// ==============================================================
 
 	// ========================= Dashboard ==========================
-	feature.navItem("dashboard", "Metrics Dashboard", "line-chart");
+	feature.navItem("dashboard", "Metrics", "line-chart");
 
 	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Authorization, Application, Entities) {
 		var _siteApp = Site.currentSiteApplication();
 		var _druidConfig = _siteApp.configObj.druid;
+
+		var _menu_newChart;
 
 		$scope.lock = false;
 
@@ -148,7 +150,7 @@
 		};
 
 		// ======================== Menu ========================
-		$scope.newGroup = function() {
+		function newGroup() {
 			if($scope.lock) return;
 
 			UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
@@ -166,10 +168,32 @@
 					$scope.tabHolder.setSelect(holder.entity.name);
 				}, 0);
 			});
-		};
+		}
+
+		function deleteGroup() {
+			var group = $scope.tabHolder.selectedPane.data;
+			UI.deleteConfirm(group.name).then(null, null, function(holder) {
+				common.array.remove(group, $scope.dashboard.groups);
+				holder.closeFunc();
+			});
+		}
+
+		_menu_newChart = {title: "Add Metric", func: function() {$("#metricMDL").modal();}};
+		Object.defineProperties(_menu_newChart, {
+			icon: {
+				get: function() {return $scope.dataSourceListReady ? 'plus' : 'refresh fa-spin';}
+			},
+			disabled: {
+				get: function() {return !$scope.dataSourceListReady;}
+			}
+		});
 
 		$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
-			{icon: "plus", title: "New Group", func: $scope.newGroup}
+			{icon: "cog", title: "Configuration", list: [
+				_menu_newChart,
+				{icon: "trash", title: "Delete Group", danger: true, func: deleteGroup}
+			]},
+			{icon: "plus", title: "New Group", func: newGroup}
 		] : [];
 
 		// ===================== Dashboard ======================
@@ -211,15 +235,6 @@
 				});
 			}).finally(function() {
 				$scope.lock = false;
-			});
-		};
-
-		// ======================= Groups =======================
-		$scope.deleteGroup = function() {
-			var group = $scope.tabHolder.selectedPane.data;
-			UI.deleteConfirm(group.name).then(null, null, function(holder) {
-				common.array.remove(group, $scope.dashboard.groups);
-				holder.closeFunc();
 			});
 		};
 
@@ -275,10 +290,6 @@
 			_config.yMin = chart.min;
 
 			return _config;
-		};
-
-		$scope.newChart = function() {
-			$("#metricMDL").modal();
 		};
 
 		$scope.configChart = function(chart) {

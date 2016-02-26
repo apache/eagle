@@ -144,6 +144,32 @@ eagleComponents.directive('tabs', function() {
 
 		template :
 			'<div class="nav-tabs-custom">' +
+				// Menu
+				'<div class="box-tools pull-right" ng-if="menuList && menuList.length">' +
+					'<div ng-repeat="menu in menuList track by $index" class="inline">' +
+						// Button
+						'<button class="btn btn-box-tool" ng-click="menu.func($event)" ng-if="!menu.list"' +
+							' uib-tooltip="{{menu.title}}" tooltip-enable="menu.title" tooltip-append-to-body="true">' +
+							'<span class="fa fa-{{menu.icon}}"></span>' +
+						'</button>' +
+
+						// Dropdown Group
+						'<div class="btn-group" ng-if="menu.list">' +
+							'<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"' +
+								' uib-tooltip="{{menu.title}}" tooltip-enable="menu.title" tooltip-append-to-body="true">' +
+								'<span class="fa fa-{{menu.icon}}"></span>' +
+							'</button>' +
+							'<ul class="dropdown-menu" role="menu">' +
+								'<li ng-repeat="item in menu.list track by $index" ng-class="{danger: item.danger, disabled: item.disabled}">' +
+									'<a ng-click="!item.disabled && item.func($event)">' +
+										'<span class="fa fa-{{item.icon}}"></span> {{item.title}}' +
+									'</a>' +
+								'</li>' +
+							'</ul>' +
+						'</div>' +
+					'</div>' +
+				'</div>' +
+
 				'<ul class="nav nav-tabs" ng-class="{\'pull-right\': title}">' +
 					// Tabs
 					'<li ng-repeat="pane in getPaneList() track by $index" ng-class="{active: selectedPane === pane}">' +
@@ -155,13 +181,6 @@ eagleComponents.directive('tabs', function() {
 						'<i class="fa fa-{{icon}}" ng-if="icon"></i> {{title}}' +
 					'</li>' +
 
-					// Menu
-					'<li class="pull-right" ng-if="menuList && menuList.length">' +
-						'<a ng-repeat="menu in menuList track by $index" class="text-muted" ng-click="menu.func($event)"' +
-							' uib-tooltip="{{menu.title}}" tooltip-enable="menu.title" tooltip-append-to-body="true">' +
-							'<span class="fa fa-{{menu.icon}}"></span>' +
-						'</a>' +
-					'</li>' +
 				'</ul>' +
 				'<div class="box-body" ng-transclude="header" ng-show="paneList.length && hasHeader()"></div>' +
 				'<div class="tab-content" ng-transclude="pane"></div>' +

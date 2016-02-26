@@ -522,6 +522,18 @@ body .box-body + .tab-content {
 	margin-top: 0;
 }
 
+/* Navigation Tab */
+.nav-tabs-custom .box-tools {
+	position: absolute;
+	right: 15px;
+	top: 8px;
+}
+
+.nav-tabs-custom > .box-tools.pull-right .dropdown-menu {
+	right: 0;
+	left: auto;
+}
+
 /* Customize */
 #content {
 	position: relative;
