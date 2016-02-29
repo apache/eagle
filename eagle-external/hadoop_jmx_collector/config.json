@@ -1,0 +1,29 @@
+{
+   "env": {
+    "site": "sandbox",
+     "name_node": {
+       "hosts":["sandbox.hortonworks.com"],
+       "port":50070,
+       "https":false
+     },
+     "resource_manager":{
+       "hosts":["sandbox.hortonworks.com"],
+       "port":50030,
+       "https":false
+     }
+   },
+   "input": {
+    "component": "namenode",
+    "port": "50070",
+    "https": false
+   },
+   "filter": {
+    "monitoring.group.selected": ["hadoop", "java.lang"]
+   },
+   "output": {
+     "kafka": {
+       "topic": "nn_jmx_metric_sandbox",
+       "brokerList": ["sandbox.hortonworks.com:6667"]
+     }
+   }
+}
