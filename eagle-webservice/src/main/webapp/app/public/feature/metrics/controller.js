@@ -36,6 +36,7 @@
 	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Authorization, Application, Entities) {
 		var _siteApp = Site.currentSiteApplication();
 		var _druidConfig = _siteApp.configObj.druid;
+		var _refreshInterval;
 
 		var _menu_newChart;
 
@@ -389,9 +390,14 @@
 			}, 0);
 		};
 
-		setInterval(function() {
+		_refreshInterval = setInterval(function() {
 			if(!$scope.dashboardReady) return;
 			$scope.chartRefresh(true);
 		}, 1000 * 30);
+
+		// ====================== Clean Up ======================
+		$scope.$on('$destroy', function() {
+			clearInterval(_refreshInterval);
+		});
 	});
 })();
