@@ -49,13 +49,15 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
 
 echo ""
 echo "Importing feature definitions ..."
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"common"},"desc":"Provide the Policy & Alert feature.","version":"01"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"common"},"desc":"Provide the Policy & Alert feature.","version":"v0.3.0"}]'
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"classification"},"desc":"Sensitivity browser of the data classification.","version":"01"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"classification"},"desc":"Sensitivity browser of the data classification.","version":"v0.3.0"}]'
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"userProfile"},"desc":"Machine learning of the user profile","version":"01"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"userProfile"},"desc":"Machine learning of the user profile","version":"v0.3.0"}]'
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"metadata"},"desc":"Stream metadata viewer","version":"01"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"metadata"},"desc":"Stream metadata viewer","version":"v0.3.0"}]'
+
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"metrics"},"desc":"Metrics dashboard","version":"v0.3.0"}]'
 
 
 ## AlertStreamService: alert streams generated from data source

@@ -64,7 +64,7 @@
 				<tbody>
 					<tr>
 						<td><span class='fa fa-square' ng-class="item.enabled ? 'text-green' : 'text-muted'"> </span></td>
-						<td><a href="#/common/policyDetail/{{item.encodedRowkey}}">{{item.tags.policyId}}</a></td>
+						<td><a href="#/common/policyDetail/{{item.encodedRowkey}}" style="width: 200px;" class="text-breakall">{{item.tags.policyId}}</a></td>
 						<td>{{item.desc}}</td>
 						<td>{{item.owner}}</td>
 						<td>{{common.format.date(item.lastModifiedDate) || "-"}}</td>
