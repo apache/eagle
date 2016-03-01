@@ -174,7 +174,7 @@
 		};
 
 		// ======================== Menu ========================
-		function newGroup() {
+		$scope.newGroup = function() {
 			if($scope.lock) return;
 
 			UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
@@ -217,7 +217,7 @@
 				_menu_newChart,
 				{icon: "trash", title: "Delete Group", danger: true, func: deleteGroup}
 			]},
-			{icon: "plus", title: "New Group", func: newGroup}
+			{icon: "plus", title: "New Group", func: $scope.newGroup}
 		] : [];
 
 		// ===================== Dashboard ======================
