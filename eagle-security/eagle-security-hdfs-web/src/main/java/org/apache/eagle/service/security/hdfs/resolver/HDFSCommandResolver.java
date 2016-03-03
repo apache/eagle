@@ -37,8 +37,6 @@ public class HDFSCommandResolver implements AttributeResolvable<GenericAttribute
             "mkdirs", "listStatus", "setReplication", "setOwner", "setPermission", "setTimes", "setXAttr", "removeXAttr", "getXAttrs",
             "contentSummary", "createEncryptionZone", "checkAccess"};
 
-    //private final static String [] cmdStrs = {"appendToFile","cat","checksum","chgrp","chmod","chown","copyFromLocal","copyToLocal","count","cp","createSnapshot","deleteSnapshot","df","du","dus","expunge","find","get","getfacl","getfattr","getmerge","help","ls","lsr","mkdir","moveFromLocal","moveToLocal","mv","put","renameSnapshot","rm","rmdir","rmr","setfacl","setfattr","setrep","stat","tail","test","text","touchz","truncate","usage"};
-
     private final static String HDFS_CMD_RESOLVE_FORMAT_HINT = String.format("hdfs command must be in {%s}", StringUtils.join(cmdStrs, ","));
 
     private final static List<String> commands = Arrays.asList(cmdStrs);

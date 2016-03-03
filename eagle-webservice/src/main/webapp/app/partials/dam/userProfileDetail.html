@@ -1,0 +1,87 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<i class="fa fa-user"> </i>
+		<h3 class="box-title">
+			{{user}}
+		</h3>
+	</div>
+	<div class="box-body">
+		<div>
+			<div class="inline-group">
+				<dl><dt>User</dt><dd>{{user}}</dd></dl>
+				<dl><dt>Site</dt><dd>{{site.current().name}}</dd></dl>
+			</div>
+			<div class="inline-group">
+				<dl><dt>Other Info</dt><dd class="text-muted">N/A</dd></dl>
+			</div>
+		</div>
+
+		<div class="overlay" ng-hide="profileList._promise.$$state.status === 1;">
+			<span class="fa fa-refresh fa-spin"></span>
+		</div>
+	</div>
+</div>
+
+<!-- Analysis -->
+<div class="nav-tabs-custom">
+	<ul class="nav nav-tabs">
+		<li class="active">
+			<a href="[data-id='DE']" data-toggle="tab" ng-click=" currentTab='DE'">DE</a>
+		</li>
+		<li>
+			<a href="[data-id='EigenDecomposition']" data-toggle="tab" ng-click=" currentTab='EigenDecomposition'">EigenDecomposition</a>
+		</li>
+		<li class="pull-right">
+			<button class="btn btn-primary" ng-click="showRawData(currentTab === 'EigenDecomposition' ? profiles.EigenDecomposition.content : profiles.DE.content)">Raw Data</button>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" data-id="DE">
+			<div class="row">
+				<div class="col-md-9">
+					<div nvd3="profiles.DE._chart.series" data-config="{chart: 'column', xType: 'text', height: 400}" class="nvd3-chart-cntr" height="400"></div>
+					<div class="inline-group text-center">
+						<dl ng-repeat="(key, value) in profiles.DE.estimates"><dt>{{key}}</dt><dd>{{value}}</dd></dl>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Command</th>
+								<th>Percentage</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="unit in profiles.DE.meanList">
+								<td>{{unit.command}}</td>
+								<td class="text-right">{{(unit.percentage*100).toFixed(2)}}%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div><!-- /.tab-pane -->
+		<div class="tab-pane" data-id="EigenDecomposition">
+			<div line3d-chart height="400" data="profiles.EigenDecomposition._chart.series"> </div>
+		</div><!-- /.tab-pane -->
+	</div><!-- /.tab-content -->
+</div>

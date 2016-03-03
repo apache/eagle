@@ -16,9 +16,8 @@
  */
 package org.apache.eagle.service.security.hive.dao;
 
-import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
+import org.apache.eagle.alert.entity.AlertDataSourceEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
-import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.generic.ListQueryResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -37,11 +36,11 @@ public class HiveMetadataAccessConfigDAOImpl implements HiveMetadataAccessConfig
         ListQueryResource resource = new ListQueryResource();
         /* parameters are: query, startTime, endTime, pageSzie, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing,
         * parallel, metricName*/
-        ListQueryAPIResponseEntity ret = resource.listQuery(Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME+"[@application=\"hiveQueryLog\"]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
+        ListQueryAPIResponseEntity ret = resource.listQuery("AlertDataSourceService[@dataSource=\"hiveQueryLog\"]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
                 0, null);
-        List<SiteApplicationServiceEntity> list = (List<SiteApplicationServiceEntity>) ret.getObj();
-        Map<String, HiveMetadataAccessConfig> siteHiveConfigs = new HashMap<>();
-        for(SiteApplicationServiceEntity hiveDataSource : list){
+        List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) ret.getObj();
+        Map<String, HiveMetadataAccessConfig> siteHiveConfigs = new HashMap<String, HiveMetadataAccessConfig>();
+        for(AlertDataSourceEntity hiveDataSource : list){
             siteHiveConfigs.put(hiveDataSource.getTags().get("site"), convert(hiveDataSource.getConfig()));
         }
         return siteHiveConfigs;
@@ -49,7 +48,7 @@ public class HiveMetadataAccessConfigDAOImpl implements HiveMetadataAccessConfig
 
     private HiveMetadataAccessConfig convert(String config){
         ObjectMapper mapper = new ObjectMapper();
-        HiveMetadataAccessConfig c;
+        HiveMetadataAccessConfig c = null;
         try {
             c = mapper.readValue(config, HiveMetadataAccessConfig.class);
         }catch(Exception ex){
@@ -65,10 +64,10 @@ public class HiveMetadataAccessConfigDAOImpl implements HiveMetadataAccessConfig
         ListQueryResource resource = new ListQueryResource();
         /* parameters are: query, startTime, endTime, pageSzie, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing,
         * parallel, metricName*/
-        String queryFormat = Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME+"[@application=\"hiveQueryLog\" AND @site=\"%s\"]{*}";
+        String queryFormat = "AlertDataSourceService[@dataSource=\"hiveQueryLog\" AND @site=\"%s\"]{*}";
         ListQueryAPIResponseEntity ret = resource.listQuery(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
                 0, null);
-        List<SiteApplicationServiceEntity> list = (List<SiteApplicationServiceEntity>) ret.getObj();
+        List<AlertDataSourceEntity> list = (List<AlertDataSourceEntity>) ret.getObj();
         if(list == null || list.size() ==0)
             throw new BadHiveMetadataAccessConfigException("config is empty for site " + site);
         return convert(list.get(0).getConfig());

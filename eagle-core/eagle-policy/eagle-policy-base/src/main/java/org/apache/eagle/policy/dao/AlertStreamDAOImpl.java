@@ -36,10 +36,10 @@ public class AlertStreamDAOImpl implements AlertStreamDAO{
         this.connector = connector;
     }
 
-    public List<AlertStreamEntity> findAlertStreamByDataSource(String application) throws Exception{
+    public List<AlertStreamEntity> findAlertStreamByDataSource(String dataSource) throws Exception{
         try {
             IEagleServiceClient client = new EagleServiceClientImpl(connector);
-            String query = Constants.ALERT_STREAM_SERVICE_ENDPOINT_NAME + "[@application=\"" + application + "\"]{*}";
+            String query = Constants.ALERT_STREAM_SERVICE_ENDPOINT_NAME + "[@dataSource=\"" + dataSource + "\"]{*}";
             GenericServiceAPIResponseEntity<AlertStreamEntity> response =  client.search()
                     .startTime(0)
                     .endTime(10 * DateUtils.MILLIS_PER_DAY)

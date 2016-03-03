@@ -46,7 +46,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "application", "alertExecutorId", "policyId", "policyType"})
+@Tags({"site", "dataSource", "alertExecutorId", "policyId", "policyType"})
 @Indexes({
 	@Index(name="Index_1_alertExecutorId", columns = { "alertExecutorID" }, unique = true),
 })

@@ -50,9 +50,9 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
         // iterate all policy ids, keep those notification which belong to plugins
         PolicyDefinitionDAO policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector( config ) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
         String site = config.getString("eagleProps.site");
-        String application = config.getString("eagleProps.application");
+        String dataSource = config.getString("eagleProps.dataSource");
         try{
-            List<AlertDefinitionAPIEntity> activeAlertDefs = policyDefinitionDao.findActivePolicies( site , application);
+            List<AlertDefinitionAPIEntity> activeAlertDefs = policyDefinitionDao.findActivePolicies( site , dataSource );
             // initialize all loaded plugins
             NotificationPluginLoader.getInstance().init(config);
             for(NotificationPlugin plugin : NotificationPluginLoader.getInstance().getNotificationMapping().values()){

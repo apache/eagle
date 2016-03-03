@@ -1,0 +1,150 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<div ng-controller="sensitivityViewTableCtrl">
+	<p ng-show="databases._promise.$$state.status !== 1">
+		<span class="fa fa-refresh fa-spin"> </span>
+		Loading...
+	</p>
+
+	<div ng-show="databases._promise.$$state.status === 1" class="row">
+		<div class="col-md-4">
+			<label>
+				Databases
+				({{databases.length}})
+			</label>
+			<ul class="tree tree-bordered" style="max-height: 500px; overflow-y: auto;">
+				<li ng-repeat="db in databases">
+					<span class="tree-item box-clickable text-primary" ng-click="db.show = !db.show; loadTables(db);">
+						<span ng-class="{'text-warning' : db.sensitiveType}">
+							<span class="fa fa-database"> </span>
+							{{db.database}}
+							<span ng-show="db.tables._promise.$$state.status === 1">({{db.tables.length}})</span>
+
+							<span ng-show="auth.isRole('ROLE_ADMIN')">
+								<a class="fa fa-eye text-muted hover" ng-click="markSensitivity(db, $event)" ng-show="!db.sensitiveType"
+								uib-tooltip="Mark as sensitivity data" tooltip-animation="false" tooltip-placement="right"></a>
+								<a class="fa fa-eye-slash text-muted hover" ng-click="unmarkSensitivity(db, $event)" ng-show="db.sensitiveType"
+								uib-tooltip="Remove the sensitivity mark" tooltip-animation="false" tooltip-placement="right"></a>
+							</span>
+
+							<span class="pull-right" ng-show="db.childSensitiveTypes.length">
+								<span class="fa fa-dot-circle-o" uib-tooltip="Contain child sensitivity defination" tooltip-placement="right" tooltip-append-to-body="true"> </span>
+							</span>
+							<span ng-show="db.sensitiveType" class="pull-right">[{{db.sensitiveType}}]</span>
+						</span>
+					</span>
+					<ul ng-show="db.show">
+						<li ng-show="db.tables._promise.$$state.status !== 1">
+							<span>
+								<span class="fa fa-refresh fa-spin"> </span>
+								Loading...
+							</span>
+						</li>
+						<li ng-repeat="tb in db.tables" ng-class="{active : tb === table}">
+							<span class="tree-item box-clickable text-primary" ng-click="loadColumns(db, tb)">
+								<span ng-class="{'text-warning' : tb.sensitiveType}">
+									<span class="fa fa-table"> </span>
+									{{tb.table}}
+
+									<span ng-show="auth.isRole('ROLE_ADMIN')">
+										<a class="fa fa-eye text-muted hover" ng-click="markSensitivity(tb, $event)" ng-show="!tb.sensitiveType"
+										uib-tooltip="Mark as sensitivity data" tooltip-animation="false" tooltip-placement="right"></a>
+										<a class="fa fa-eye-slash text-muted hover" ng-click="unmarkSensitivity(tb, $event)" ng-show="tb.sensitiveType"
+										uib-tooltip="Remove the sensitivity mark" tooltip-animation="false" tooltip-placement="right"></a>
+									</span>
+
+									<span class="pull-right" ng-show="tb.childSensitiveTypes.length">
+										<span class="fa fa-dot-circle-o" uib-tooltip="Contain child sensitivity defination" tooltip-placement="right" tooltip-append-to-body="true"> </span>
+									</span>
+									<span ng-show="tb.sensitiveType" class="pull-right">[{{tb.sensitiveType}}]</span>
+								</span>
+							</span>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<div class="col-md-8">
+			<label ng-show="table">Route: {{table.database}} > {{table.table}}</label>
+			<p ng-show="table && table.columns._promise.$$state.status !== 1">
+				<span class="fa fa-refresh fa-spin"> </span>
+				Loading...
+			</p>
+			<div ng-show="table && table.columns._promise.$$state.status === 1">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th width="40%">Column Name</th>
+							<th>Sensitivity Type</th>
+							<th width="10" ng-show="auth.isRole('ROLE_ADMIN')"> </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="col in table.columns" ng-class="{warning : col.sensitiveType}">
+							<td>{{col.column}}</td>
+							<td>{{col.sensitiveType}}</td>
+							<td ng-show="auth.isRole('ROLE_ADMIN')">
+								<button class="fa fa-eye btn btn-primary btn-xs" ng-click="markSensitivity(col)" ng-show="!col.sensitiveType"
+								uib-tooltip="Mark as sensitivity data" tooltip-animation="false" tooltip-placement="left"> </button>
+								<button class="fa fa-eye-slash btn btn-warning btn-xs" ng-click="unmarkSensitivity(col)" ng-show="col.sensitiveType"
+								uib-tooltip="Remove the sensitivity mark" tooltip-animation="false" tooltip-placement="left"> </button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+	<!-- Modal: Create / Edit site -->
+	<div class="modal fade" id="sensitivityMDL" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Mark Sensitivity Data</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label>Resource</label>
+						<input type="text" readonly="readonly" class="form-control" ng-model="_markItem.tags[dataSrc.keys[0]]" />
+					</div>
+					<div class="form-group">
+						<label>* Sensitivity Type</label>
+						<input type="text" class="form-control" ng-model="_markItem.sensitivityType" id="sensitiveType" />
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						Close
+					</button>
+					<button type="button" class="btn btn-primary" ng-click="confirmUpateSensitivity()" ng-disabled="!_markItem.sensitivityType">
+						Update
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,138 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<i class="fa fa-list-alt"> </i>
+		<h3 class="box-title">
+			User Profiles
+			<small><a data-toggle="collapse" href="[data-id='algorithms']">Detail</a></small>
+		</h3>
+		<div class="pull-right">
+			<a class="label label-primary" ng-class="runningTaskCount() ? 'label-primary' : 'label-default'" data-toggle="modal" data-target="#taskMDL">Update</a>
+		</div>
+	</div>
+	<div class="box-body">
+		<!-- Algorithms -->
+		<div data-id="algorithms" class="collapse">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<td>Feature</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="algorithm in algorithmEntity.policy.algorithms">
+						<td>{{algorithm.name}}</td>
+						<td>{{algorithm.features}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<hr/>
+		</div>
+
+		<!-- User Profile List -->
+		<p ng-show="profileList._promise.$$state.status !== 1">
+			<span class="fa fa-refresh fa-spin"> </span>
+			Loading...
+		</p>
+
+		<div sorttable source="profileList" ng-show="profileList._promise.$$state.status === 1">
+			<table class="table table-bordered" ng-non-bindable>
+				<thead>
+					<tr>
+						<th width="10%" sortpath="user">User</th>
+						<th>Most Predominat Feature</th>
+						<th width="10"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<a href="#/dam/userProfileDetail/{{item.user}}">{{item.user}}</a>
+						</td>
+						<td>
+							{{item.DE.topCommands.slice(0,3).join(", ")}}
+						</td>
+						<td>
+							<a href="#/dam/userProfileDetail/{{item.user}}">Detail</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: User profile Schedule Task -->
+<div class="modal fade" id="taskMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Training History</h4>
+			</div>
+			<div class="modal-body">
+				<div sorttable source="tasks">
+					<table class="table table-bordered" ng-non-bindable>
+						<thead>
+							<tr>
+								<th sortpath="tags.type">Command</th>
+								<th sortpath="timestamp">Start Time</th>
+								<th sortpath="updateTime">Update Time</th>
+								<th sortpath="duration">Duration</th>
+								<th sortpath="status">Status</th>
+								<th width="10"> </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{item.tags.type}}</td>
+								<td>{{common.format.date(item.timestamp) || "--"}}</td>
+								<td>{{common.format.date(item.updateTime) || "--"}}</td>
+								<td>{{item._duration}}</td>
+								<td class="text-nowrap">
+									<span class="fa fa-hourglass-start text-muted" ng-show="item.status === 'INITIALIZED'"></span>
+									<span class="fa fa-hourglass-half text-info" ng-show="item.status === 'PENDING'"></span>
+									<span class="fa fa-circle-o-notch text-primary" ng-show="item.status === 'EXECUTING'"></span>
+									<span class="fa fa-check-circle text-success" ng-show="item.status === 'SUCCEEDED'"></span>
+									<span class="fa fa-exclamation-circle text-danger" ng-show="item.status === 'FAILED'"></span>
+									<span class="fa fa-ban text-muted" ng-show="item.status === 'CANCELED'"></span>
+									{{item.status}}
+								</td>
+								<td>
+									<a ng-click="_parent.showTaskDetail(item)">Detail</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary pull-left" ng-click="updateTask()" ng-show="auth.isRole('ROLE_ADMIN')">
+					Update Now
+				</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

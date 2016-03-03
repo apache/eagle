@@ -25,33 +25,18 @@ source $(dirname $0)/eagle-env.sh
 echo "Importing AlertDataSourceService for persist... "
 
 curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
- "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" \
+ "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDataSourceService" \
   -d '
   [
      {
+        "prefix":"alertDataSource",
         "tags":{
            "site":"sandbox",
-           "application":"hadoopJmxMetricDataSource"
+           "dataSource":"hadoopJmxMetricDataSource"
         },
         "enabled": true,
-        "config": "{\"druid\": {\"coordinator\": \"coordinatorHost:port\", \"broker\": \"brokerHost:port\"}}"
-     }
-  ]
-  '
-
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
- "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=ApplicationDescService" \
-  -d '
-  [
-     {
-        "tags":{
-           "application":"hadoopJmxMetricDataSource"
-        },
-        "desc":"hadoop jmx metric monitoring",
-        "alias":"JmxMetricMonitor",
-        "group":"METRIC",
-        "config":"{}",
-        "features":["common","metadata"]
+        "config":"",
+        "desc":"hadoop"
      }
   ]
   '

@@ -21,5 +21,5 @@ import java.util.List;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 
 public interface AlertStreamSchemaDAO {
-	List<AlertStreamSchemaEntity> findAlertStreamSchemaByApplication(String application) throws Exception;
+	List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception;
 }

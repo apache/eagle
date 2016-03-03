@@ -30,7 +30,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
 @Tags({"site", "dataSource"})
-@Deprecated
 public class AlertDataSourceEntity extends TaggedLogAPIEntity{
     @Column("a")
     private boolean enabled;

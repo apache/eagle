@@ -46,7 +46,7 @@ public class TestSiddhiEvaluator {
 	public AlertStreamSchemaEntity createStreamMetaEntity(String attrName, String type) {
 		AlertStreamSchemaEntity entity = new AlertStreamSchemaEntity();
 		Map<String, String> tags = new HashMap<String, String>();
-		tags.put("application", "hdfsAuditLog");
+		tags.put("dataSource", "hdfsAuditLog");
 		tags.put("streamName", "hdfsAuditLogEventStream");
 		tags.put("attrName", attrName);
 		entity.setTags(tags);
@@ -59,7 +59,7 @@ public class TestSiddhiEvaluator {
         Config config = ConfigFactory.load("unittest.conf");
 		AlertStreamSchemaDAO streamDao = new AlertStreamSchemaDAOImpl(null, null) {
 			@Override
-			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByApplication(String dataSource) throws Exception {
+			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception {
 				List<AlertStreamSchemaEntity> list = new ArrayList<AlertStreamSchemaEntity>();
 				list.add(createStreamMetaEntity("cmd", "string"));
 				list.add(createStreamMetaEntity("dst", "string"));

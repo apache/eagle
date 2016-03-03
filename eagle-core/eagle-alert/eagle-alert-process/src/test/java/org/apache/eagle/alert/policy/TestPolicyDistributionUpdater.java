@@ -71,10 +71,10 @@ public class TestPolicyDistributionUpdater {
             public AlertStreamSchemaDAO getAlertStreamSchemaDAO(Config config){
                 return new AlertStreamSchemaDAO(){
                     @Override
-                    public List<AlertStreamSchemaEntity> findAlertStreamSchemaByApplication(String application) throws Exception {
+                    public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception {
                         AlertStreamSchemaEntity entity = new AlertStreamSchemaEntity();
                         entity.setTags(new HashMap<String, String>(){{
-                            put("application", "UnitTest");
+                            put("dataSource", "UnitTest");
                             put("streamName", "testStream");
                             put("attrName", "name");
                         }});
