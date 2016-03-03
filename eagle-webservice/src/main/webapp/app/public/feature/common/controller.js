@@ -74,7 +74,7 @@
 		$scope.application = Application.current();
 
 		// List policies
-		var _policyList = Entities.queryEntities("AlertDefinitionService", {site: Site.current().tags.site, dataSource: $scope.application.tags.application});
+		var _policyList = Entities.queryEntities("AlertDefinitionService", {site: Site.current().tags.site, application: $scope.application.tags.application});
 		_policyList._promise.then(function() {
 			$.each(_policyList, function(i, policy) {
 				policy.__mailStr = common.getValueByPath(common.parseJSON(policy.notificationDef, {}), "0.recipients", "");
@@ -161,7 +161,7 @@
 			var _endTime = app.time.now().hour(23).minute(59).second(59).millisecond(0);
 			var _startTime = _endTime.clone().subtract(1, "month").hour(0).minute(0).second(0).millisecond(0);
 			var _cond = {
-				dataSource: policy.tags.dataSource,
+				application: policy.tags.application,
 				policyId: policy.tags.policyId,
 				_startTime: _startTime,
 				_endTime: _endTime
@@ -182,7 +182,7 @@
 			// Alert list
 			$scope.alertList = Entities.queryEntities("AlertService", {
 				site: Site.current().tags.site,
-				dataSource: policy.tags.dataSource,
+				application: policy.tags.application,
 				policyId: policy.tags.policyId,
 				_pageSize: MAX_PAGESIZE,
 				_duration: 1000 * 60 * 60 * 24 * 30,
@@ -261,15 +261,15 @@
 		$scope.encodedRowkey = $wrapState.param.filter;
 
 		$scope.step = 0;
-		$scope.dataSources = {};
+		$scope.applications = {};
 		$scope.policy = {};
 
 		// ==========================================
 		// =            Data Preparation            =
 		// ==========================================
 		// Steam list
-		var _streamList = Entities.queryEntities("AlertStreamService", {dataSource: Application.current().tags.application});
-		var _executorList = Entities.queryEntities("AlertExecutorService", {dataSource: Application.current().tags.application});
+		var _streamList = Entities.queryEntities("AlertStreamService", {application: Application.current().tags.application});
+		var _executorList = Entities.queryEntities("AlertExecutorService", {application: Application.current().tags.application});
 		$scope.streamList = _streamList;
 		$scope.executorList = _executorList;
 		$scope.streamReady = false;
@@ -278,7 +278,7 @@
 			// Map executor with stream
 			$.each(_executorList, function(i, executor) {
 				$.each(_streamList, function(j, stream) {
-					if(stream.tags.dataSource === executor.tags.dataSource && stream.tags.streamName === executor.tags.streamName) {
+					if(stream.tags.application === executor.tags.application && stream.tags.streamName === executor.tags.streamName) {
 						stream.alertExecutor = executor;
 						return false;
 					}
@@ -287,7 +287,7 @@
 
 			// Fill stream list
 			$.each(_streamList, function(i, unit) {
-				var _srcStreamList = $scope.dataSources[unit.tags.dataSource] = $scope.dataSources[unit.tags.dataSource] || [];
+				var _srcStreamList = $scope.applications[unit.tags.application] = $scope.applications[unit.tags.application] || [];
 				_srcStreamList.push(unit);
 			});
 
@@ -296,8 +296,8 @@
 			// ==========================================
 			// =                Function                =
 			// ==========================================
-			function _findStream(dataSource, streamName) {
-				var _streamList = $scope.dataSources[dataSource];
+			function _findStream(application, streamName) {
+				var _streamList = $scope.applications[application];
 				if(!_streamList) return null;
 
 				for(var i = 0 ; i < _streamList.length ; i += 1) {
@@ -320,14 +320,14 @@
 					},
 					init: function() {
 						$scope.policy.__.streamName = $scope.policy.__.streamName ||
-							common.array.find($scope.policy.tags.dataSource, _streamList, "tags.dataSource").tags.streamName;
+							common.array.find($scope.policy.tags.application, _streamList, "tags.application").tags.streamName;
 					},
 					nextable: function() {
 						var _streamName = common.getValueByPath($scope.policy, "__.streamName");
 						if(!_streamName) return false;
 
 						// Detect stream in current data source list
-						return !!common.array.find(_streamName, $scope.dataSources[$scope.policy.tags.dataSource], "tags.streamName");
+						return !!common.array.find(_streamName, $scope.applications[$scope.policy.tags.application], "tags.streamName");
 					}
 				},
 
@@ -337,11 +337,11 @@
 					init: function() {
 						// Normal mode will fetch meta list
 						if(!$scope.policy.__.advanced) {
-							var _stream = _findStream($scope.policy.tags.dataSource, $scope.policy.__.streamName);
+							var _stream = _findStream($scope.policy.tags.application, $scope.policy.__.streamName);
 							$scope._stream = _stream;
 
 							if(!_stream.metas) {
-								_stream.metas = Entities.queryEntities("AlertStreamSchemaService", {dataSource: $scope.policy.tags.dataSource, streamName: $scope.policy.__.streamName});
+								_stream.metas = Entities.queryEntities("AlertStreamSchemaService", {application: $scope.policy.tags.application, streamName: $scope.policy.__.streamName});
 								_stream.metas._promise.then(function() {
 									_stream.metas.sort(function(a, b) {
 										if(a.tags.attrName < b.tags.attrName) {
@@ -365,7 +365,7 @@
 						if($scope.policy.__.advanced) {
 							// Check stream source
 							$scope._stream = null;
-							$.each($scope.dataSources[$scope.policy.tags.dataSource], function(i, stream) {
+							$.each($scope.applications[$scope.policy.tags.application], function(i, stream) {
 								if(($scope.policy.__._expression || "").indexOf(stream.tags.streamName) !== -1) {
 									$scope._stream = stream;
 									return false;
@@ -436,15 +436,15 @@
 						prefix: "alertdef",
 						remediationDef: "",
 						tags: {
-							dataSource: Application.current().tags.application,
+							application: Application.current().tags.application,
 							policyType: "siddhiCEPEngine"
 						}
 					};
 
 					// If configured data source
-					if($wrapState.param.dataSrc) {
-						$scope.policy.tags.dataSource = $wrapState.param.dataSrc;
-						if(common.array.find($wrapState.param.dataSrc, Site.current().dataSrcList, "tags.dataSource")) {
+					if($wrapState.param.app) {
+						$scope.policy.tags.application = $wrapState.param.app;
+						if(common.array.find($wrapState.param.app, Site.current().applicationList, "tags.application")) {
 							setTimeout(function() {
 								$scope.changeStep(0, 2, false);
 								$scope.$apply();
@@ -877,7 +877,7 @@
 						alertExecutorId: $scope.policy.tags.alertExecutorId,
 						policyId: $scope.policy.tags.policyId,
 						policyType: "siddhiCEPEngine",
-						dataSource: $scope.policy.tags.dataSource
+						application: $scope.policy.tags.application
 					});
 					_checkList._promise.then(function() {
 						if(_checkList.length) {
@@ -941,7 +941,7 @@
 
 			var _list = Entities.queryEntities("AlertService", {
 				site: Site.current().tags.site,
-				dataSource: $scope.application.tags.application,
+				application: $scope.application.tags.application,
 				hostname: null,
 				_pageSize: MAX_PAGESIZE,
 				_duration: 1000 * 60 * 60 * 24 * 30,

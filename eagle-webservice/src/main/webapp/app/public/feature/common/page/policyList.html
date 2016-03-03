@@ -37,7 +37,7 @@
 				</div>
 			</div>
 			<div class="col-xs-3 text-right">
-				<a class="btn btn-primary" href="#/common/policyCreate/{{!dataSource ? '' : '?dataSrc=' + dataSource.tags.dataSource}}" ng-show="Auth.isRole('ROLE_ADMIN')">
+				<a class="btn btn-primary" href="#/common/policyCreate/{{!application ? '' : '?app=' + application.tags.application}}" ng-show="Auth.isRole('ROLE_ADMIN')">
 					New Policy
 					<i class="fa fa-plus-circle"> </i>
 				</a>
