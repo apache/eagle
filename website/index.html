@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<head>
+<title>Apache Eagle - Secure Hadoop in Real Time</title>
+<meta name="keywords" content="Apache Eagle, Hadoop, Security, Real Time">
+<meta name="description" content="Apache Eagle - Secure Hadoop in Real Time">
+<meta name="author" content="eBay Inc">
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1">
+
+<!-- Style Sheets -->
+<link rel="stylesheet" href="css/animate.css">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/misc.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/colorbox.css">
+<link rel="shortcut icon" href="images/favicon.png">
+<script src="//load.sumome.com/" data-sumo-site-id="4f1f82ddde38afb72321e7c702051b89fb2ab9d54d314434184ebe0ea5b5fa37" async></script>
+
+  <!-- Baidu Analytics Tracking-->
+  <script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?fedc55df2ea52777a679192e8f849ece";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+  </script>
+  
+  <!-- Google Analytics Tracking -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-68929805-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+<!-- header start -->
+<div id="home_page">
+  <div class="topbar">
+    <div class="container">
+      <div class="row" >
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"> 
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              <a class="navbar-brand" href="#"><img src="images/logo2.png" height="44px" style="margin-top:-7px"></a> </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right" id="top-menu">
+                <li><a class="menu" href="#home_page">HOME</a></li>
+                <li><a class="menu" href="#about_page">ABOUT</a></li>
+                <li><a class="menu" href="#diagram_page">ARCHITECTURE</a></li>
+                <li><a class="menu" href="#modules_page">MODULES</a></li>
+                <li><a class="menu" href="#usecase_page">USE CASES</a></li>
+                <li><a class="menu" href="#community_page">COMMUNITY</a></li>
+              </ul>
+            </div>
+            <!-- /.navbar-collapse --> 
+          </div>
+          <!-- /.container-fluid --> 
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="headerimage">
+    <div class="flexslider">
+
+      <ul class="slides">
+      
+        <li><img src="images/slider/3.jpg" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+    <div class="particles"> </div><!---particles-->
+  <div class="slider-caption">
+    <div class="homewrapper">
+      <div class="hometitle"> <img src="images/feather.png" height="60px"> </div>
+      <div class="hometext">
+        <h2 style="font-weight:500;">Apache Eagle</h2>
+        <h3>Secure Hadoop in Real Time</h3>
+     </div>
+    </div>
+    
+     <div class="download"><a href="https://github.com/apache/incubator-eagle" target="_blank" title="Github">GITHUB</a></div>   <div class="download" style="margin-left:10px;" title="Documents"><a href="docs/">DOCS</a></div>
+  </div>
+</div>
+
+<!-- header end -->
+
+<!-- team start -->
+
+
+<!-- team start -->
+<div class="workwrapper" id="about_page">
+  <div class="container">
+    <div class="row">
+      <h2 class="sectiontile">ABOUT EAGLE</h2>
+      <div class="col-md-12">
+        <p style="width:80%; margin-left:auto; margin-right:auto;"> Apache Eagle is an Open Source Monitoring solution, contributed by <a href="http://www.ebayinc.com/">eBay Inc</a>, to instantly identify access to sensitive data, recognize attacks, malicious activities in Hadoop and take actions in real time.
+</p> 
+<div class="sepline">
+ <a class='youtube' width="560" height="315"  href="https://www.youtube.com/embed/6j5jXgAgjv8"><div class="video">Watch the Intro Video</div></a> 
+ </div>
+<!--<iframe width="560" height="315" src="https://www.youtube.com/embed/6j5jXgAgjv8" frameborder="0" allowfullscreen></iframe>-->
+
+        <P>Eagle has been accepted as an Apache Incubator Project on Oct 26, 2015.</P>
+        <p>Eagle secures Hadoop in realtime in 3 steps:</p>
+      </div>
+    </div>
+    <section id="cd-timeline" class="cd-container" style="margin-top:-3px;">
+      <div class="cd-timeline-block">
+        <div class="cd-timeline-img cd-picture"> <img src="images/step1.png" alt="Picture"> </div>
+        <div class="cd-timeline-content service-box-content">
+          <h3>Step 1</h3>
+          <p>Listens to the various user generated signals by streaming through the Hadoop Audit and System logs. </p>
+        </div>
+      </div>
+      <div class="cd-timeline-block">
+        <div class="cd-timeline-img cd-movie"> <img src="images/step2.png" alt="Picture"> </div>
+        <div class="cd-timeline-content service-box-content">
+          <h3>Step 2</h3>
+          <p>Analyzes these signals to detect anomalies based on predefined security policies and machine learning models according to the user's past behavior.</p>
+        </div>
+      </div>
+      <div class="cd-timeline-block">
+        <div class="cd-timeline-img cd-icon"> <img src="images/step3.png" alt="Picture"> </div>
+        <div class="cd-timeline-content service-box-content">
+          <h3>Step 3</h3>
+          <p>Generates Alerts on detection of anomalies and remediates user activity/access if necessary. </p>
+        </div>
+      </div>
+      <div class="cd-timeline-block">
+        <div class="cd-timeline-img cd-location"> <img src="images/step4.png" alt="Picture"> </div>
+        <div class="cd-timeline-content service-box-content">
+          <h3>Additional Bonus</h3>
+          <p>Eagle also provides an extensible architecture and framework for developers to easily onboard new use cases into the framework.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</div>
+
+<!-- team end -->
+
+<div class="clear"></div>
+
+<div class="servicewrapper" id="about_page">
+  <div class="container">
+
+    <div class="row">
+        
+      <div class="row" style="margin-top:50px;">
+        <div class="col-md-3 workmargin">
+       
+          <h3 class="featuretext">Ease Of Use</h3>
+          <h4 class="featureexplain"> Start using Eagle in few minutes</h4>
+          <p>Eagle can be installed as an Ambari plugin. And you can use one instance of eagle to monitor multiple clusters.</p>
+        </div>
+        <div class="col-md-3 workmargin">
+        
+         <h3 class="featuretext">Policy Management</h3>
+          <h4 class="featureexplain"> Create complex monitoring policies</h4>
+          <p>Eagle offers wide variety of policies on HDFS, Hive data sets. It is easy to create and deploy policies with few clicks. </p>
+        </div>
+        <div class="col-md-3 workmargin">
+         
+         <h3 class="featuretext">Scalability</h3>
+          <h4 class="featureexplain"> Scale for Big Data </h4>
+          <p> Eagle processes access events in a scalable way to support billions of events and thousands of policies.</p>
+        </div>
+        <div class="col-md-3 workmargin">
+         
+         <h3 class="featuretext">Extensibility</h3>
+          <h4 class="featureexplain"> Eagle is extensible at all levels </h4>
+          <p>Easy to integrate with data classification and hadoop access control products. Eagle backend can support data sources other than hadoop.</p>
+        </div>
+      </div>
+    </div>
+   
+  </div>
+</div>
+
+
+<!-- team end --> 
+
+
+<div class="clear"></div>
+
+<!-- diagram start -->
+
+<div class="workwrapper" id="diagram_page">
+  <div class="container">
+    <div class="row">
+      <h2 class="sectiontile">ARCHITECTURE</h2>
+      <p style="width:80%; margin-left:auto; margin-right:auto;">Apache Eagle</p>
+      <div class="col-md-12 marginbot"> <img src="images/diagram2.png" style="border-radius: 10px; margin-top:10px;"> </div>
+    </div>
+  </div>
+</div>
+<!-- diagram end -->
+
+<div class="clear"></div>
+<!-- diagram start -->
+
+<div class="client_wrapper" id="modules_page">
+  <div class="container">
+    <div class="row">
+      <h2 class="sectiontile">MODULES</h2>
+      <p style="width:80%; margin-left:auto; margin-right:auto;">Eagle is built using big data open source products to scale for big data use cases.</p>
+    </div>
+    <div class="row" style="margin-top:20px;">
+      <div class="col-md-4">
+        <div class="well2">
+          <h4>Processing Engine</h4>
+          <p>Eagle stream processing API is an abstraction of Apache Storm, extensible with other streaming engine. Eagle processing is built to scale to large number of events and policies.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="well2">
+          <h4>Alerting Framework</h4>
+          <p>Eagle’s extensible policy engine framework allows developer to plugin a new policy engine with a few lines of codes. Eagle supports WSO2 Siddhi CEP engine.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="well2">
+          <h4>Machine Learning module</h4>
+         
+          <p>Eagle provides capabilities to define user profiles for Hadoop users based on the user behavior. Eagle uses Spark for data training and Storm for near real-time anomaly detection.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="well2">
+          <h4>Data Classification</h4>
+          <p>Eagle allows you to easily classify HDFS and Hive data based on sensitivity of the data. Eagle can also be easily extended to import data classification from other tools. </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="well2">
+          <h4>Policy Manager</h4>
+          <p>Eagle policy manager provides a easy to use interface and Restful API for user to define policy with a few clicks. Eagle supports window functions to create complex policies.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="well2">
+          <h4>Query Service</h4>
+          <p>Eagle provides SQL-like service API to support comprehensive computation for huge set of data, for example filtering, aggregation, histogram, sorting, top, arithmetical expression, pagination etc.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- diagram end -->
+
+<div class="clear"></div>
+
+<!-- team start -->
+<div class="workwrapper" id="usecase_page">
+  <div class="container">
+    <div class="row">
+      <h2 class="sectiontile">USE CASES</h2>
+      <div class="row" style="margin-top:50px;">
+        <div class="col-md-3 workmargin">
+          <div><img src="images/usecases/1.png" class="usecaseimage"></div>
+          <h4>Data loss prevention</h4>
+          <p>Prevent a user with malicious intent to move, copy, delete sensitive data from hadoop.</p>
+        </div>
+        <div class="col-md-3 workmargin">
+          <div><img src="images/usecases/3.png" class="usecaseimage"></div>
+          <h4>Active Access monitoring  </h4>
+          <p>Monitor every single user access to hadoop data sets in HDFS and Hive in realtime.</p>
+        </div>
+        <div class="col-md-3 workmargin">
+          <div><img src="images/usecases/4.png" class="usecaseimage"></div>
+          <h4>User Profiles</h4>
+          <p>Create user profiles based on the user behavior using machine learning algorithms. And use these models to detect and alert on anomalies.</p>
+        </div>
+        <div class="col-md-3 workmargin">
+          <div><img src="images/usecases/2.png" class="usecaseimage"></div>
+          <h4>Unauthorized Access</h4>
+          <p>Identify, alert and stop an unauthorized user trying to access sensitive data stored in the hadoop cluster. </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="clear"></div>
+<!-- team start -->
+<div class="client_wrapper" id="community_page">
+  <div class="container">
+    <div class="row">
+      <h2 class="sectiontile">WHO USES EAGLE</h2>
+      <div class="row" style="margin-top:50px;">
+        <div class="workmargin">
+          <a href="http://www.ebay.com/"><img style="width: 130px" src="/images/ebay.png" class="usecaseimage"></a>
+          <a href="https://www.paypal.com"><img style="width: 160px;margin-left:60px;" src="/images/paypal.svg" class="usecaseimage"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- team end --> 
+
+<div class="clear"></div>
+
+<!-- team start -->
+<div class="workwrapper" id="community_page">
+  <div class="container">
+    <div class="row">
+      <h2 class="sectiontile">COMMUNITY</h2>
+      <div class="row" style="margin-top:50px;">
+        <div class="col-md-4 workmargin">
+          <h4>Discussion and Contribute</h4>
+          <div style="text-align:left">
+          <p>Get help using Eagle or contribute to the project</p>
+          <ul>
+            <li>
+              <a href="/docs/community.html"><b>Mailing Lists</b></a>
+            </li>
+            <li>
+              <a href="https://issues.apache.org/jira/browse/EAGLE"><b>Issues Tracking</b></a>
+            </li>
+            <li>
+              <a href="https://github.com/eBay/Eagle/wiki/How-to-Contribute"><b>How to Contribute</b></a>
+            </li>
+          </ul>
+          </div>
+        </div>
+        <div class="col-md-4 workmargin">
+          <h4>Events and Meetups</h4>
+          <div style="text-align:left">
+            <p>Learn more about Eagle from Conferences</p>
+            <ul>
+              <li><a href="/docs/community.html"><b>Conferences</b></a></li>
+              <li><a href="/docs/community.html"><b>Meetups</b></a></li>
+              <li><a href="/docs/community.html"><b>News</b></a></li>
+            </ul>
+          </div>
+            <!-- <button type="button" class="btn btn-primary" onclick="window.location='https://github.com/pulsarIO/realtime-analytics/wiki/Get-Started'">Learn More Events</button> -->
+        </div>
+        <div class="col-md-4 workmargin">
+          <h4>Find Us at</h4>
+          <div style="text-align:left">
+            
+
+            <p>Learn latest updates about Eagle through:</p>
+        <div class="row">
+          <div class="col-md-6">
+<iframe src="https://ghbtns.com/github-btn.html?user=apache&repo=incubator-eagle&type=star&count=true" frameborder="0" scrolling="0" width="150px" height="20px"></iframe>
+                <iframe src="https://ghbtns.com/github-btn.html?user=apache&repo=incubator-eagle&type=fork&count=true" frameborder="0" scrolling="0" width="150px" height="20px"></iframe>
+<br/>
+
+<a href="https://twitter.com/TheApacheEagle" class="twitter-follow-button" data-show-count="false">Follow @TheApacheEagle</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<br/>
+
+<div class="fb-like" data-href="https://www.facebook.com/TheApacheEagle" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>
+
+          </div>
+          <div class="col-md-6">
+            <image width="110px" height="110px" src="/images/qrcode-8cm.jpg"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- footer start -->
+<div class="footerwrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12"><div style="margin-left:auto; margin-right:auto; text-align:center;font-size:12px;">
+<div>
+Apache Eagle is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.
+</div>
+<div>
+<a href="http://www.apache.org">
+<img id="asf-logo" alt="Apache Software Foundation" src="/images/apache-logo-small.gif">
+</a>
+<a href="http://incubator.apache.org">
+<img id="incubator-logo" alt="Apache Incubator" src="/images/apache-incubator-logo-small.png">
+</a>
+</div>
+<div>
+Copyright © 2015 <a href="http://www.apache.org">The Apache Software Foundation</a>, Licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.
+</div>
+<div>
+Apache Eagle, Eagle, Apache, the Apache feather logo, and the Apache Incubator project logo are trademarks of The Apache Software Foundation.
+</div>
+</div></div>
+    </div>
+  </div>
+</div>
+<!-- footer end --> 
+
+<!-- JavaScripts -->
+
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/jquery.singlePageNav.js"></script>
+<script src="js/jquery.flexslider.js"></script>
+<script src="js/custom.js"></script>
+<script src="js/jquery.colorbox.js"></script>
+<script src="js/modernizr.min.js"></script>
+<script src="js/svg.js"></script>
+
+<script>
+$(".youtube").colorbox({iframe:true, innerWidth:728, innerHeight:410});
+
+var lastId,
+    topMenu = $("#top-menu"),
+    topMenuHeight = topMenu.outerHeight() + 15,
+    // All list items
+    menuItems = topMenu.find("a"),
+    // Anchors corresponding to menu items
+    scrollItems = menuItems.map(function() {
+        var item = $($(this).attr("href"));
+        if (item.length) {
+            return item;
+        }
+    });
+
+menuItems.click(function(e) {
+    var href = $(this).attr("href"),
+        offsetTop = href === "#" ? 0 : $(href).offset().top - topMenuHeight + 1;
+    $('html, body').stop().animate({
+        scrollTop: offsetTop
+    }, 300);
+    e.preventDefault();
+});
+// Bind to scroll
+$(window).scroll(function() {
+  
+
+    // Get container scroll position
+    var fromTop = $(this).scrollTop() + topMenuHeight;
+    // Get id of current scroll item
+    var cur = scrollItems.map(function() {
+        if ($(this).offset().top < fromTop)
+            return this;
+    });
+    // Get the id of the current element
+    cur = cur[cur.length - 1];
+    var id = cur && cur.length ? cur[0].id : "";
+    if (lastId !== id) {
+        lastId = id;
+        // Set/remove active class
+        menuItems
+            .parent().removeClass("active")
+            .end().filter("[href=#" + id + "]").parent().addClass("active");
+    }
+});
+</script>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+</body>
+</html>

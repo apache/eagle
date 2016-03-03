@@ -1,0 +1,61 @@
+# Site settings
+title: Eagle
+email: cn.haochen@gmail.com
+description: Eagle - Secure Hadoop in Real Time
+
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://goeagle.io" # the base hostname & protocol for your site
+# twitter_username: eagle
+# github_username:  eagle
+
+# Build settings
+markdown: kramdown
+permalink: date
+
+documentations:
+  - category: Getting Started
+    links:
+      - title: Introduction
+        url: /docs/index.html
+      - title: Quick Start
+        url: /docs/quick-start.html
+      - title: Terminology
+        url: /docs/terminology.html
+      - title: Ecosystem
+        url: /docs/ecosystem.html
+      - title: Community
+        url: /docs/community.html
+      - title: FAQ
+        url: /docs/FAQ.html
+  - category: Installation
+    links:
+      - title: Deploy Eagle in Sandbox
+        url: /docs/deployment-in-sandbox.html
+      - title: Deploy Eagle in the Production
+        url: /docs/deployment-in-production.html
+      - title: Stream Log Data into Kafka
+        url: /docs/import-hdfs-auditLog.html
+      - title: Install Eagle Ambari Plugin
+        url: /docs/ambari-plugin-install.html
+      - title: Configuration
+        url: /docs/configuration.html
+  - category: Tutorial
+    links: 
+      - title: Site Management Tutorial
+        url: /docs/tutorial/setup.html
+      - title: Eagle Policy Tutorial
+        url: /docs/tutorial/policy.html
+      - title: User Profile Tutorial
+        url: /docs/tutorial/userprofile.html
+      - title: Data Classification Tutorial
+        url: /docs/tutorial/classification.html
+      - title: Eagle LDAP Tutorial
+        url: /docs/tutorial/ldap.html
+  - category: Advanced
+    links: 
+      - title: Eagle Architecture Highlights
+        url: /docs/architecture-highlights.html
+      - title: Policy API Design
+        url: /docs/policy-api.html
+      - title: User Profile Machine Learning
+        url: /docs/user-profile-ml.html

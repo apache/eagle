@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{% include head.html %}
+<body>
+<!-- header start -->
+<div id="home_page">
+  {% include header.html %}
+  <div class="headerimage">
+    <div class="flexslider">
+      <ul class="slides">
+        <li><img src="{{ "/images/slider/4.jpg" | prepend: site.baseurl }}" alt="Slide 1"></li>
+      </ul>
+    </div>
+  </div>
+  <div class="particles" style="height:40%"> </div><!---particles-->
+  <div class="slider-caption" style="top:80px;">
+    <div class="homewrapper">
+      <div class="hometitle"> 
+        <a href="{{ "/" }}">
+          <img src="{{ "/images/feather.png" | prepend: site.baseurl }}" height="80px">
+        </a>
+      </div>
+      <div class="hometext">
+        <h2>Secure Hadoop in Real Time</h2>
+        <div class="social-buttons">
+          <!-- <a href="https://github.com/ebay/eagle"><i class="fa fa-github"></i></a>
+          <a href="http://twitter.com/TheApacheEagle"><i class="fa fa-twitter"></i></a>
+          <a href="https://www.facebook.com/TheApacheEagle/"><i class="fa fa-facebook"></i></a>
+          <a href="#"><i class="fa fa-weixin"></i></a> -->
+          <!-- <a href="https://www.weibo.com/ApacheEagle/"><i class="fa fa-weibo"></i></a> -->
+        </div>
+     </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+{{ content }}
+
+{% include footer.html %}
+
+<script>
+    /************** FlexSlider *********************/
+    $('.flexslider').flexslider({
+        animation: "fade",
+        directionNav: false
+    });
+</script>
+</body>
+</html>
