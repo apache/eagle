@@ -30,7 +30,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
        "prefix": "alertdef",
        "tags": {
          "site": "sandbox",
-         "application": "hadoopJmxMetricDataSource",
+         "dataSource": "hadoopJmxMetricDataSource",
          "policyId": "haStatePolicy",
          "alertExecutorId": "hadoopJmxMetricAlertExecutor",
          "policyType": "siddhiCEPEngine"

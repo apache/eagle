@@ -31,7 +31,7 @@ public class TestSchemaDao {
     @Test
     public void test() throws Exception {
         AlertStreamSchemaDAO dao = new AlertStreamSchemaDAOImpl("localhost", 9099, "admin", "secret");
-        List<AlertStreamSchemaEntity> entities = dao.findAlertStreamSchemaByApplication("hdfsAuditLog");
+        List<AlertStreamSchemaEntity> entities = dao.findAlertStreamSchemaByDataSource("hdfsAuditLog");
         System.out.print(entities);
     }
 }

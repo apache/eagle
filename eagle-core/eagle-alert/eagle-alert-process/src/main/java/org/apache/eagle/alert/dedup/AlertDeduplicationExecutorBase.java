@@ -88,7 +88,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 	@Override
 	public void init() {		
         String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
-        String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION);
+        String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 	    Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;	    	    
 	    try {
 	 		initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId(site, dataSource);

@@ -48,11 +48,9 @@ public class AlertEmailPlugin implements NotificationPlugin {
 	private final static long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
 	private transient ThreadPoolExecutor executorPool;
 	private NotificationStatus status = new NotificationStatus();
-	private Config config;
 
 	@Override
 	public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
-		this.config = config;
 		executorPool = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_CORE_SIZE, DEFAULT_THREAD_POOL_MAX_SIZE, DEFAULT_THREAD_POOL_SHRINK_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 		LOG.info(" Creating Email Generator... ");
 		for( AlertDefinitionAPIEntity  entity : initAlertDefs ){
@@ -61,7 +59,7 @@ public class AlertEmailPlugin implements NotificationPlugin {
 				String notificationType = notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE);
 				// for backward compatibility, default notification is email
 				if(notificationType == null || notificationType.equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)){
-					AlertEmailGenerator generator = createEmailGenerator( notificationConfigMap );
+					AlertEmailGenerator generator = createEmailGenerator(notificationConfigMap);
 						this.emailGenerators.put(entity.getTags().get(Constants.POLICY_ID), generator);
 						LOG.info("Successfully initialized email notification for policy " + entity.getTags().get(Constants.POLICY_ID) + ",with " + notificationConfigMap);
 				}
@@ -119,7 +117,7 @@ public class AlertEmailPlugin implements NotificationPlugin {
 			tplFileName = "ALERT_DEFAULT.vm";
 		}
 		AlertEmailGenerator gen = AlertEmailGeneratorBuilder.newBuilder().
-				withEagleProps(this.config.getObject("eagleProps")).
+				withEagleProps(EagleConfigFactory.load().getConfig().getObject("eagleProps")).
 				withSubject(notificationConfig.get(NotificationConstants.SUBJECT)).
 				withSender(notificationConfig.get(NotificationConstants.SENDER)).
 				withRecipients(notificationConfig.get(NotificationConstants.RECIPIENTS)).

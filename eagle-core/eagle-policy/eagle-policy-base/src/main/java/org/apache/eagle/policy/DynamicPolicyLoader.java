@@ -190,7 +190,7 @@ public class DynamicPolicyLoader<T extends AbstractPolicyDefinitionEntity> {
 					":" + config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT) );
 			Map<String, Map<String, M>> newAlertDefs = 
 					dao.findActivePoliciesGroupbyExecutorId(config.getString("eagleProps.site"),
-                            config.getString("eagleProps.application"));
+                            config.getString("eagleProps.dataSource"));
 			
 			// compare runtime alertDefs with cachedAlertDefs and figure out what are added/deleted/updated
 			Map<String, Object> added = new HashMap<String, Object>();

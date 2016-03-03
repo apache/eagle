@@ -55,10 +55,10 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 	@Override
 	public void init() {
 		String site = config.getString("eagleProps.site");
-		String application = config.getString("eagleProps.application");
+		String dataSource = config.getString("eagleProps.dataSource");
 		Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;
 		try {
-			initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId( site, application );
+			initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId( site, dataSource );
 		}
 		catch (Exception ex) {
 			LOG.error("fail to initialize initialAlertDefs: ", ex);
@@ -66,7 +66,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		}
 
 		if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
-			LOG.warn("No alert definitions found for site: "+site+", application: "+ application);
+			LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
 		}
 		try{
 			notificationManager = new NotificationPluginManagerImpl(config);

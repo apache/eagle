@@ -39,15 +39,13 @@
 
 			userProfile: 'rest/authentication',
 			logout: 'logout',
+		},
 
-			DELETE_HOOK: {
-				FeatureDescService: 'rest/module/feature?feature=${feature}',
-				ApplicationDescService: 'rest/module/application?application=${application}',
-				SiteDescService: 'rest/module/site?site=${site}'
-			},
-			UPDATE_HOOK: {
-				SiteDescService: 'rest/module/siteApplication'
-			}
+		// ============================================================================
+		// =                               Data Sources                               =
+		// ============================================================================
+		dataSource: {
+			uiInvisibleList: ["userProfile"],
 		},
 	};
 
@@ -63,31 +61,6 @@
 			_url = common.template(_url, kvs);
 		}
 		return _url;
-	};
-
-	function getHookURL(hookType, serviceName) {
-		var _path = app.config.urls[hookType][serviceName];
-		if(!_path) return null;
-
-		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
-		var _url = (_host ? _host + "/" : '') + _path;
-		return _url;
-	}
-
-	/***
-	 * Eagle support delete function to process special entity delete. Which will delete all the relative entity.
-	 * @param serviceName
-	 */
-	app.getDeleteURL = function(serviceName) {
-		return getHookURL('DELETE_HOOK', serviceName);
-	};
-
-	/***
-	 * Eagle support update function to process special entity update. Which will update all the relative entity.
-	 * @param serviceName
-	 */
-	app.getUpdateURL = function(serviceName) {
-		return getHookURL('UPDATE_HOOK', serviceName);
 	};
 
 	app._Host = function(host) {

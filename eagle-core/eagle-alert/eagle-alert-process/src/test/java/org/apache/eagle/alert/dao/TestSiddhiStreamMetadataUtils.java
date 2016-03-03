@@ -36,8 +36,8 @@ public class TestSiddhiStreamMetadataUtils {
         StreamMetadataManager.getInstance().reset();
         StreamMetadataManager.getInstance().init(config, new AlertStreamSchemaDAO() {
             @Override
-            public List<AlertStreamSchemaEntity> findAlertStreamSchemaByApplication(
-                    String application) {
+            public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(
+                    String dataSource) {
                 return Arrays.asList(generateStreamMetadataAPIEntity("attrName1", "STRING"),
                         generateStreamMetadataAPIEntity("attrName2", "LONG")
                 );

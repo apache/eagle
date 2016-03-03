@@ -39,10 +39,10 @@ public class ServiceAuditDAOImpl implements ServiceAuditDAO {
     }
 
 	@Override
-    public List<GenericAuditEntity> findPolicyAudit(String site, String application) throws Exception {
+    public List<GenericAuditEntity> findPolicyAudit(String site, String dataSource) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDefinitionService\" AND @site=\"" + site + "\" AND @application=\"" + application + "\"]{*}";
+			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDefinitionService\" AND @site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
             GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {
@@ -73,10 +73,10 @@ public class ServiceAuditDAOImpl implements ServiceAuditDAO {
     }
     
 	@Override
-    public List<GenericAuditEntity> findDataSourceAudit(String application) throws Exception {
+    public List<GenericAuditEntity> findDataSourceAudit(String dataSource) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDataSourceService\" AND @application=\"" + application + "\"]{*}";
+			String query = AuditConstants.AUDIT_SERVICE_ENDPOINT + "[@serviceName=\"AlertDataSourceService\" AND @dataSource=\"" + dataSource + "\"]{*}";
             GenericServiceAPIResponseEntity<GenericAuditEntity> response =  client.search().startTime(0).endTime(10 * DateUtils.MILLIS_PER_DAY).pageSize(Integer.MAX_VALUE).query(query).send();
             client.close();
             if (response.getException() != null) {

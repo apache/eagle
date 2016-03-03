@@ -153,7 +153,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		baseDimensions.put(Constants.ALERT_EXECUTOR_ID, executorId);
 		baseDimensions.put(Constants.PARTITIONSEQ, String.valueOf(partitionSeq));
 		baseDimensions.put(Constants.SOURCE, ManagementFactory.getRuntimeMXBean().getName());
-		baseDimensions.put(EagleConfigConstants.APPLICATION, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION));
+		baseDimensions.put(EagleConfigConstants.DATA_SOURCE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE));
 		baseDimensions.put(EagleConfigConstants.SITE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE));
 
 		dimensionsMap = new HashMap<String, Map<String, String>>();
@@ -171,16 +171,16 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		Map<String, PolicyEvaluator<T>> tmpPolicyEvaluators = new HashMap<String, PolicyEvaluator<T>>();
 		
         String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
-		String application = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION);
+		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 		try {
-			initialAlertDefs = policyDefinitionDao.findActivePoliciesGroupbyExecutorId(site, application);
+			initialAlertDefs = policyDefinitionDao.findActivePoliciesGroupbyExecutorId(site, dataSource);
 		}
 		catch (Exception ex) {
 			LOG.error("fail to initialize initialAlertDefs: ", ex);
             throw new IllegalStateException("fail to initialize initialAlertDefs: ", ex);
 		}
         if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
-            LOG.warn("No alert definitions was found for site: " + site + ", application: " + application);
+            LOG.warn("No alert definitions was found for site: " + site + ", dataSource: " + dataSource);
         }
         else if (initialAlertDefs.get(executorId) != null) { 
 			for(T alertDef : initialAlertDefs.get(executorId).values()){

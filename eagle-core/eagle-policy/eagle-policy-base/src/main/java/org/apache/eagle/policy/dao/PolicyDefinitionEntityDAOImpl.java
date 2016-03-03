@@ -50,10 +50,10 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 	}
 
     @Override
-	public List<T> findActivePolicies(String site, String application) throws Exception {
+	public List<T> findActivePolicies(String site, String dataSource) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = servicePointName + "[@site=\"" + site + "\" AND @application=\"" + application + "\" AND @enabled=\"true\"]{*}";
+			String query = servicePointName + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\" AND @enabled=\"true\"]{*}";
 			GenericServiceAPIResponseEntity<T> response = client.search()
 												                .pageSize(Integer.MAX_VALUE)
 												                .query(query)
@@ -78,9 +78,9 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
     
 
     @Override
-	public Map<String, Map<String, T>> findActivePoliciesGroupbyExecutorId(String site, String application)
+	public Map<String, Map<String, T>> findActivePoliciesGroupbyExecutorId(String site, String dataSource)
 			throws Exception {
-		List<T> list = findActivePolicies(site, application);
+		List<T> list = findActivePolicies(site, dataSource);
 		Map<String, Map<String, T>> map = new HashMap<String, Map<String, T>>();
 		for (T entity : list) {
 			// support both executorId and legacy alertExecutorId

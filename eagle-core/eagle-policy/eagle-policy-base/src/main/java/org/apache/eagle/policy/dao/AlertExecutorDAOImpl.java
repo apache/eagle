@@ -39,10 +39,10 @@ public class AlertExecutorDAOImpl implements AlertExecutorDAO{
     }
 
     @Override
-    public List<AlertExecutorEntity> findAlertExecutorByDataSource(String application) throws Exception{
+    public List<AlertExecutorEntity> findAlertExecutorByDataSource(String dataSource) throws Exception{
         try {
             IEagleServiceClient client = new EagleServiceClientImpl(connector);
-            String query = Constants.ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME + "[@application=\"" + application + "\"]{*}";
+            String query = Constants.ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME + "[@dataSource=\"" + dataSource + "\"]{*}";
             GenericServiceAPIResponseEntity<AlertExecutorEntity> response =  client.search()
                     .startTime(0)
                     .endTime(10 * DateUtils.MILLIS_PER_DAY)
@@ -62,10 +62,10 @@ public class AlertExecutorDAOImpl implements AlertExecutorDAO{
     }
 
     @Override
-    public List<AlertExecutorEntity> findAlertExecutor(String application, String alertExecutorId) throws Exception{
+    public List<AlertExecutorEntity> findAlertExecutor(String dataSource, String alertExecutorId) throws Exception{
         try {
             IEagleServiceClient client = new EagleServiceClientImpl(connector);
-            String query = Constants.ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME + "[@application=\"" + application + "\""
+            String query = Constants.ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME + "[@dataSource=\"" + dataSource + "\""
                     + " AND @alertExecutorId=\"" + alertExecutorId + "\""
                     + "]{*}";
             GenericServiceAPIResponseEntity<AlertExecutorEntity> response =  client.search()

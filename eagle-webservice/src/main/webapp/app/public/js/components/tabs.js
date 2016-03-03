@@ -20,204 +20,89 @@ eagleComponents.directive('tabs', function() {
 	'use strict';
 
 	return {
-		restrict: 'AE',
-		transclude: {
-			'header': '?header',
-			'pane': 'pane',
-			'footer': '?footer'
-		},
+		restrict : 'AE',
+		transclude : true,
 		scope : {
-			title: "@?title",
+			title: "@",
 			icon: "@",
 			selected: "@?selected",
-			holder: "=?holder",
 
-			menuList: "=?menu"
+			inner: "=?inner"
 		},
-
 		controller: function($scope, $element, $attrs, $timeout) {
-			var transDuration = $.fn.tab.Constructor.TRANSITION_DURATION;
-			var transTimer = null;
-			var _holder, _holder_updateTimes;
+			var _selected = null;
 
-			var $header, $footer;
+			var panes = $scope.panes = [];
 
-			$scope.paneList = [];
-			$scope.selectedPane = null;
-			$scope.activePane = null;
-
-			// ================== Function ==================
-			$scope.getPaneList = function() {
-				return !$scope.title ? $scope.paneList : $scope.paneList.slice().reverse();
-			};
-
-			$scope.setSelect = function(pane) {
-				if(typeof pane === "string") {
-					pane = common.array.find(pane, $scope.paneList, "title");
+			$scope.getList = function() {
+				if($scope.inner) {
+					return $scope.panes;
+				} else {
+					return $scope.panes.slice().reverse();
 				}
-
-				$scope.activePane = $scope.selectedPane || pane;
-				$scope.selectedPane = pane;
-
-				if(transTimer) $timeout.cancel(transTimer);
-				transTimer = $timeout(function() {
-					$scope.activePane = $scope.selectedPane;
-				}, transDuration);
 			};
 
-			// =================== Linker ===================
-			function _linkerProperties(pane) {
-				Object.defineProperties(pane, {
-					selected: {
-						get: function () {
-							return $scope.selectedPane === this;
-						}
-					},
-					active: {
-						get: function () {
-							return $scope.activePane === this;
-						}
-					},
-					in: {
-						get: function () {
-							return $scope.selectedPane === this;
-						}
-					}
+			$scope.select = function(pane, updateBind) {
+				angular.forEach(panes, function(pane) {
+					pane.selected = false;
 				});
-			}
+				pane.selected = true;
+				_selected = pane;
+
+				if(updateBind !== false && $attrs.selected) {
+					$scope.$parent[$attrs.selected] = _selected.title;
+				}
+			};
 
 			this.addPane = function(pane) {
-				$scope.paneList.push(pane);
-
-				// Register properties
-				_linkerProperties(pane);
-
-				// Update select pane
-				if(pane.title === $scope.selected || !$scope.selectedPane) {
-					$scope.setSelect(pane);
+				if (panes.length === 0 || ($attrs.selected && $scope.$parent[$attrs.selected] === pane.title)) {
+					$scope.select(pane, false);
 				}
+				panes.push(pane);
 			};
 
-			this.deletePane = function(pane) {
-				common.array.remove(pane, $scope.paneList);
-
-				if($scope.selectedPane === pane) {
-					$scope.selectedPane = $scope.paneList[0];
-					$scope.activePane = $scope.paneList[0];
-				}
-			};
-
-			// ===================== UI =====================
-			$header = $element.find("> .nav-tabs-custom > .box-body");
-			$footer = $element.find("> .nav-tabs-custom > .box-footer");
-
-			$scope.hasHeader = function() {
-				return !!$header.children().length;
-			};
-			$scope.hasFooter = function() {
-				return !!$footer.children().length;
-			};
-
-			// ================= Interface ==================
-			_holder_updateTimes = 0;
-			_holder = {
-				scope: $scope,
-				element: $element,
-				setSelect: $scope.setSelect
-			};
-
-			Object.defineProperty(_holder, 'selectedPane', {
-				get: function() {return $scope.selectedPane;}
-			});
-
-			$scope.$watch("holder", function(newValue, oldValue) {
-				// Holder times update
-				setTimeout(function() {
-					_holder_updateTimes = 0;
-				}, 0);
-				_holder_updateTimes += 1;
-				if(_holder_updateTimes > 100) throw "Holder conflict";
-
-				$scope.holder = _holder;
-			});
+			// Listen tab selected change
+			if($attrs.selected) {
+				$scope.$parent.$watch($attrs.selected, function(value) {
+					$.each(panes, function(i, pane) {
+						if(value === pane.title) {
+							$scope.select(pane, false);
+							return false;
+						}
+					});
+				});
+			}
 		},
-
-		template :
-			'<div class="nav-tabs-custom">' +
-				// Menu
-				'<div class="box-tools pull-right" ng-if="menuList && menuList.length">' +
-					'<div ng-repeat="menu in menuList track by $index" class="inline">' +
-						// Button
-						'<button class="btn btn-box-tool" ng-click="menu.func($event)" ng-if="!menu.list"' +
-							' uib-tooltip="{{menu.title}}" tooltip-enable="menu.title" tooltip-append-to-body="true">' +
-							'<span class="fa fa-{{menu.icon}}"></span>' +
-						'</button>' +
-
-						// Dropdown Group
-						'<div class="btn-group" ng-if="menu.list">' +
-							'<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"' +
-								' uib-tooltip="{{menu.title}}" tooltip-enable="menu.title" tooltip-append-to-body="true">' +
-								'<span class="fa fa-{{menu.icon}}"></span>' +
-							'</button>' +
-							'<ul class="dropdown-menu left" role="menu">' +
-								'<li ng-repeat="item in menu.list track by $index" ng-class="{danger: item.danger, disabled: item.disabled}">' +
-									'<a ng-click="!item.disabled && item.func($event)">' +
-										'<span class="fa fa-{{item.icon}}"></span> {{item.title}}' +
-									'</a>' +
-								'</li>' +
-							'</ul>' +
-						'</div>' +
-					'</div>' +
-				'</div>' +
-
-				'<ul class="nav nav-tabs" ng-class="{\'pull-right\': title}">' +
-					// Tabs
-					'<li ng-repeat="pane in getPaneList() track by $index" ng-class="{active: selectedPane === pane}">' +
-						'<a ng-click="setSelect(pane);">{{pane.title}}</a>' +
-					'</li>' +
-
-					// Title
-					'<li class="pull-left header" ng-if="title">' +
-						'<i class="fa fa-{{icon}}" ng-if="icon"></i> {{title}}' +
-					'</li>' +
-
-				'</ul>' +
-				'<div class="box-body" ng-transclude="header" ng-show="paneList.length && hasHeader()"></div>' +
-				'<div class="tab-content" ng-transclude="pane"></div>' +
-				'<div class="box-footer" ng-transclude="footer" ng-show="paneList.length && hasFooter()"></div>' +
-			'</div>'
+		template : '<div ng-class="inner ? \'\' : \'nav-tabs-custom\'">' +
+			'<ul class="nav nav-tabs ui-sortable-handle" ng-class="inner ? \'\' : \'pull-right\'">' +
+				'<li ng-repeat="pane in getList()" ng-class="{active:pane.selected}">' +
+					'<a href="" ng-click="select(pane)">{{pane.title}}</a>' +
+				'</li>' +
+				'<li class="pull-left header"><i class="fa fa-{{icon}}"></i> {{title}}</li>' +
+			'</ul>' +
+			'<div class="tab-content" ng-transclude></div>' +
+		'</div>',
+		replace : true
 	};
 }).directive('pane', function() {
-	'use strict';
-
 	return {
 		require : '^tabs',
 		restrict : 'AE',
 		transclude : true,
 		scope : {
-			title : '@',
-			data: '=?data'
+			title : '@'
+		},
+		controller: function($scope, $element, $timeout) {
+			// Initialization
+			var $innerScope = angular.element($element).scope();
+			$innerScope.app = app;
+			$innerScope.common = common;
+			$innerScope._parent = $scope.$parent.$parent.$parent;
 		},
 		link : function(scope, element, attrs, tabsController) {
 			tabsController.addPane(scope);
-			scope.$on('$destroy', function() {
-				tabsController.deletePane(scope);
-			});
 		},
-		template : '<div class="tab-pane fade" ng-class="{active: active, in: in}" ng-transclude></div>',
-		replace : true
-	};
-}).directive('footer', function() {
-	'use strict';
-
-	return {
-		require : '^tabs',
-		restrict : 'AE',
-		transclude : true,
-		scope : {},
-		controller: function($scope, $element) {
-		},
-		template : '<div ng-transclude></div>',
+		template : '<div class="tab-pane" ng-class="{active: selected}" ng-transclude="parent">' + '</div>',
 		replace : true
 	};
 });
