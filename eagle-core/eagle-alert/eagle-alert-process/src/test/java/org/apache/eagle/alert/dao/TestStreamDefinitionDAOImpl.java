@@ -49,7 +49,7 @@ public class TestStreamDefinitionDAOImpl {
 	public void test() throws Exception{
         Config config = ConfigFactory.load();
 		AlertStreamSchemaDAO dao = new AlertStreamSchemaDAOImpl(null, null) {
-			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception {
+			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByApplication(String application) throws Exception {
 				List<AlertStreamSchemaEntity> list = new ArrayList<AlertStreamSchemaEntity>();
 				String programId = "UnitTest";
 				list.add(buildTestStreamDefEntity(programId, "TestStream", "Attr1"));

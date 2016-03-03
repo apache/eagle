@@ -21,6 +21,6 @@ import org.apache.eagle.alert.entity.AlertExecutorEntity;
 import java.util.List;
 
 public interface AlertExecutorDAO {
-    List<AlertExecutorEntity> findAlertExecutorByDataSource(String dataSource) throws Exception;
-    List<AlertExecutorEntity> findAlertExecutor(String dataSource, String alertExecutorId) throws Exception;
+    List<AlertExecutorEntity> findAlertExecutorByDataSource(String application) throws Exception;
+    List<AlertExecutorEntity> findAlertExecutor(String application, String alertExecutorId) throws Exception;
 }

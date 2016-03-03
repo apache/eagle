@@ -41,7 +41,7 @@ import org.apache.eagle.log.entity.meta.TimeSeries;
 @Service(Constants.ALERT_STREAM_SCHEMA_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"dataSource", "streamName", "attrName"})
+@Tags({"application", "streamName", "attrName"})
 public class AlertStreamSchemaEntity extends TaggedLogAPIEntity{
 	@Column("a")
 	private String attrType;

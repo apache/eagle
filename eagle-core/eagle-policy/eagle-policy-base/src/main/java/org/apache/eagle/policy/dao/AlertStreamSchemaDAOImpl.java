@@ -60,10 +60,10 @@ public class AlertStreamSchemaDAOImpl implements AlertStreamSchemaDAO {
 	}
 	
 	@Override
-	public List<AlertStreamSchemaEntity> findAlertStreamSchemaByDataSource(String dataSource) throws Exception {
+	public List<AlertStreamSchemaEntity> findAlertStreamSchemaByApplication(String application) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
-			String query = Constants.ALERT_STREAM_SCHEMA_SERVICE_ENDPOINT_NAME + "[@dataSource=\"" + dataSource + "\"]{*}";
+			String query = Constants.ALERT_STREAM_SCHEMA_SERVICE_ENDPOINT_NAME + "[@application=\"" + application + "\"]{*}";
 			GenericServiceAPIResponseEntity<AlertStreamSchemaEntity> response =  client.search()
 																		                .startTime(0)
 																		                .endTime(10 * DateUtils.MILLIS_PER_DAY)
