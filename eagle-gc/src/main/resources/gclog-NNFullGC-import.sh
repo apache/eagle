@@ -17,7 +17,7 @@
 # limitations under the License.
 
 source $(dirname $0)/eagle-env.sh
-source $(dirname $0)/gclog-init-apolloqa.sh
+source $(dirname $0)/gclog-init-sandbox.sh
 ##### add policies ##########
 echo " Creating policy NNFullGC for GCLog Monitoring "
 
