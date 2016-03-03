@@ -30,7 +30,7 @@
 	// =                          Metadata                          =
 	// ==============================================================
 
-	// ======================= Policy Summary =======================
+	// ======================= Metadata List ========================
 	feature.navItem("streamList", "Metadata", "bullseye");
 	feature.controller('streamList', function(PageConfig, Site, $scope, $q, Application, Entities) {
 		PageConfig.hideSite = true;
@@ -40,25 +40,25 @@
 		$scope._streamEntityLock = false;
 
 		// =========================================== List ===========================================
-		var _streamList = Entities.queryEntities("AlertStreamService", {dataSource: Application.current().tags.application});
-		var _streamSchemaList = Entities.queryEntities("AlertStreamSchemaService", {dataSource: Application.current().tags.application});
+		var _streamList = Entities.queryEntities("AlertStreamService", {application: Application.current().tags.application});
+		var _streamSchemaList = Entities.queryEntities("AlertStreamSchemaService", {application: Application.current().tags.application});
 		$scope.streamList = _streamList;
 		$scope.streamSchemaList = _streamSchemaList;
 
 		_streamList._promise.then(function() {
 			$.each(_streamList, function(i, stream) {
 				stream.metaList = [];
-				$scope.streams[stream.tags.dataSource + "_" + stream.tags.streamName] = stream;
+				$scope.streams[stream.tags.application + "_" + stream.tags.streamName] = stream;
 			});
 		});
 
 		$q.all([_streamList._promise, _streamSchemaList._promise]).then(function() {
 			$.each(_streamSchemaList, function(i, meta) {
-				var _stream = $scope.streams[meta.tags.dataSource + "_" + meta.tags.streamName];
+				var _stream = $scope.streams[meta.tags.application + "_" + meta.tags.streamName];
 				if(_stream) {
 					_stream.metaList.push(meta);
 				} else {
-					console.warn("[Meta] Stream not match:", meta.tags.dataSource + "_" + meta.tags.streamName);
+					console.warn("[Meta] Stream not match:", meta.tags.application + "_" + meta.tags.streamName);
 				}
 			});
 		});

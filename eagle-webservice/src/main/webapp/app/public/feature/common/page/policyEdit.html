@@ -41,16 +41,6 @@
 		<div class="box-body">
 			<!-- ---------------------- Step Body Start ---------------------- -->
 
-			<!-- Step 1: Data Source -->
-			<!--div ng-show="step === 1">
-				<div class="form-group">
-					<label>Select Data Source</label>
-					<select class="form-control" ng-model="policy.tags.dataSource">
-						<option ng-repeat="dataSource in Site.current().dataSrcList" ng-hide="dataSource.hide" value="{{dataSource.tags.dataSource}}">{{dataSource.desc || dataSource.tags.dataSource}}</option>
-					</select>
-				</div>
-			</div-->
-
 			<!-- Step 1: Stream -->
 			<div ng-show="step === 1">
 				<div class="pull-right" ng-show="policy.__.advanced === undefined">
@@ -61,7 +51,7 @@
 				<div class="form-group">
 					<label>Select Stream</label>
 					<select class="form-control" ng-model="policy.__.streamName" ng-show="!policy.__.advanced">
-						<option ng-repeat="stream in dataSources[policy.tags.dataSource]">{{stream.tags.streamName}}</option>
+						<option ng-repeat="stream in applications[policy.tags.application]">{{stream.tags.streamName}}</option>
 					</select>
 					<select class="form-control" ng-show="policy.__.advanced" disabled="disabled">
 						<option>[Advanced Mode]</option>
