@@ -56,6 +56,14 @@ class MemortUsageMetric(JmxMetricListener):
             self.collector.on_bean_kv(self.PREFIX, "memheapcommittedusage", memheapcommittedusage)
 
 
+class NNCapacityUsageMetric(JmxMetricListener):
+    PREFIX = "hadoop.namenode.fsnamesystemstate"
+
+    def on_bean(self, bean):
+        if bean["name"] == "Hadoop:service=NameNode,name=FSNamesystemState":
+            capacityusage = round(float(bean['CapacityUsed']) / float(bean['CapacityTotal']) * 100, 2)
+            self.collector.on_bean_kv(self.PREFIX, "capacityusage", capacityusage)
+
 class JournalTransactionInfoMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.journaltransaction"
 
@@ -74,6 +82,7 @@ if __name__ == '__main__':
             NNSafeModeMetric(),
             NNHAMetric(),
             MemortUsageMetric(),
-            JournalTransactionInfoMetric()
+            JournalTransactionInfoMetric(),
+            NNCapacityUsageMetric()
     )
     Runner.run(collector)
