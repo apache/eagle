@@ -202,7 +202,7 @@
 			});
 
 			refreshSeries();
-			seriesRefreshInterval = $interval(refreshSeries, 30000);
+			seriesRefreshInterval = $interval(refreshSeries, 60000);
 		});
 
 		// Function
