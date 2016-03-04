@@ -109,8 +109,9 @@
 	});
 
 	// ======================= Policy Detail ========================
-	feature.controller('policyDetail', function(PageConfig, Site, $scope, $wrapState, Entities, Policy, nvd3) {
+	feature.controller('policyDetail', function(PageConfig, Site, $scope, $wrapState, $interval, Entities, Policy, nvd3) {
 		var MAX_PAGESIZE = 10000;
+		var seriesRefreshInterval;
 
 		PageConfig.pageTitle = "Policy Detail";
 		PageConfig.lockSite = true;
@@ -167,17 +168,28 @@
 				_endTime: _endTime
 			};
 
-			// > eagle.policy.eval.count
-			$scope.policyEvalSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
+			function _loadSeries(seriesName, metricName) {
+				var list = Entities.querySeries("GenericMetricService", $.extend({_metricName: metricName}, _cond), "@cluster", "sum(value)", 60 * 24);
+				var seriesList = nvd3.convert.eagle([list]);
+				if(!$scope[seriesName]) $scope[seriesName] = seriesList;
+				list._promise.then(function() {
+					$scope[seriesName] = seriesList;
+				});
+			}
 
-			// > eagle.policy.eval.fail.count
-			$scope.policyEvalFailSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.policy.eval.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
+			function refreshSeries() {
+				// > eagle.policy.eval.count
+				_loadSeries("policyEvalSeries", "eagle.policy.eval.count");
 
-			// > eagle.alert.count
-			$scope.alertSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
+				// > eagle.policy.eval.fail.count
+				_loadSeries("policyEvalFailSeries", "eagle.policy.eval.fail.count");
 
-			// > eagle.alert.fail.count
-			$scope.alertFailSeries = nvd3.convert.eagle([Entities.querySeries("GenericMetricService", $.extend({_metricName: "eagle.alert.fail.count"}, _cond), "@cluster", "sum(value)", 60 * 24)]);
+				// > eagle.alert.count
+				_loadSeries("alertSeries", "eagle.alert.count");
+
+				// > eagle.alert.fail.count
+				_loadSeries("alertFailSeries", "eagle.alert.fail.count");
+			}
 
 			// Alert list
 			$scope.alertList = Entities.queryEntities("AlertService", {
@@ -188,6 +200,9 @@
 				_duration: 1000 * 60 * 60 * 24 * 30,
 				__ETD: 1000 * 60 * 60 * 24
 			});
+
+			refreshSeries();
+			seriesRefreshInterval = $interval(refreshSeries, 30000);
 		});
 
 		// Function
@@ -197,6 +212,11 @@
 				location.href = "#/common/policyList";
 			});
 		};
+
+		// Clean up
+		$scope.$on('$destroy', function() {
+			$interval.cancel(seriesRefreshInterval);
+		});
 	});
 
 	// ======================== Policy Edit =========================
