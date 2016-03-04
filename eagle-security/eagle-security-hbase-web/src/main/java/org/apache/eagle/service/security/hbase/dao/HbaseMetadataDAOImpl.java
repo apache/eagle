@@ -19,6 +19,7 @@
 package org.apache.eagle.service.security.hbase.dao;
 
 
+import org.apache.eagle.security.util.HadoopSecurityUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
@@ -33,16 +34,17 @@ public class HbaseMetadataDAOImpl {
     private final static Logger LOG = LoggerFactory.getLogger(HbaseMetadataDAOImpl.class);
 
     private Configuration hBaseConfiguration;
-    private HbaseMetadataAccessConfig config;
 
-    public HbaseMetadataDAOImpl(HbaseMetadataAccessConfig config) {
-        this.config = config;
+
+    public HbaseMetadataDAOImpl(Configuration config) {
         this.hBaseConfiguration = HBaseConfiguration.create();
-        this.hBaseConfiguration.set("hbase.zookeeper.quorum", this.config.getZkQuorum());
-        this.hBaseConfiguration.set("hbase.zookeeper.property.clientPort", this.config.getZkClientPort());
+        this.hBaseConfiguration.addResource(config);
+        //this.hBaseConfiguration.set("hbase.zookeeper.quorum", this.config.getZkQuorum());
+        //this.hBaseConfiguration.set("hbase.zookeeper.property.clientPort", this.config.getZkClientPort());
     }
 
     private HBaseAdmin getHBaseAdmin() throws IOException {
+        HadoopSecurityUtil.login(hBaseConfiguration);
         return new HBaseAdmin(this.hBaseConfiguration);
     }
 
