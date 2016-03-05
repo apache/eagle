@@ -1,0 +1,107 @@
+Release Notes - Eagle - Version 0.3.0
+
+** Highlights **  
+    * Hadoop JMX metric monitoring.
+    * NameNode log monitoring for GC alerts.
+    * Eagle UI Modularization (With new customizable UI options).
+    * Generic Notification Plugin Framework for integrating alerts with various third parties.
+    * Docker Image for Eagle.
+    * Provide analytic DSL support.
+ 
+
+** New Feature
+    * [EAGLE-15] - HBase auditlog integration for HBase security monitoring
+    * [EAGLE-17] - HDFS security log integration for HDFS security monitoring
+    * [EAGLE-46] - track the work before moving code to apache site
+    * [EAGLE-47] - Ability to audit who made changes to Eagle policies
+    * [EAGLE-53] - Docker Image for Eagle
+    * [EAGLE-79] - Provide analytic DSL support
+    * [EAGLE-81] - Notification Plugin Framework
+    * [EAGLE-100] - provide tools to collect hadoop jmx metrics
+    * [EAGLE-122] - Create a generic notification plugin for integrating alerts
+
+
+** Bug
+    * [EAGLE-4] - configure parallelism with bolt/spout friendly name
+    * [EAGLE-6] - group-by user between bolts and spouts for hdfs/hive audit log monitoring
+    * [EAGLE-10] - Bad way to check kafka installation in eagle-check-env.sh
+    * [EAGLE-28] - Znode root should be configurable.
+    * [EAGLE-30] - Topology run in storm local mode should not terminate after Integer.MAX_VALUE milliseconds
+    * [EAGLE-41] - Eagle policy engine supports customizable ExceptionHandler instead of using FetalExceptionHandler
+    * [EAGLE-48] - Alert message time is wrong in some cases
+    * [EAGLE-56] - Building failed for artifact jdk.tools:jdk.tools:jar:1.7 not found
+    * [EAGLE-69] - http 404 bug in accessing http://localhost:9099/eagle-service
+    * [EAGLE-70] - Fix Goovy into Groovy in pom
+    * [EAGLE-74] - in sandbox setup, change package name from eagle. to org.apache.eagle
+    * [EAGLE-76] - Disable creating newStream for common user role
+    * [EAGLE-85] - Fix unit test failure.
+    * [EAGLE-94] - fix the bug of eagle docker in Mac
+    * [EAGLE-95] - DAM HDFS topology fails to start, if there is invalid policy.
+    * [EAGLE-104] - Fix the unit test TestHDFSSecuritylogParser
+    * [EAGLE-118] - Siddhi contains is neither a function extension nor an aggregated attribute extension
+    * [EAGLE-119] - fix unit testing bugs
+    * [EAGLE-125] - Add LICENSE in eagle external
+    * [EAGLE-128] - Fix unit test failure
+    * [EAGLE-141] - fix some unit testing exception which is thrown within annoymous class
+    * [EAGLE-142] - Replace AlertDefinitionDAOImpl with PolicyDefinitionDAOImpl
+    * [EAGLE-148] - Master build failure due to siddhi ql test
+    * [EAGLE-163] - HDFS topology not working.
+
+
+** Improvement
+    * [EAGLE-7] - expose storm config as individual eagle topology config
+    * [EAGLE-13] - Eagle machine learning no longer needs hourly aggregation
+    * [EAGLE-14] - Re-assemble high level hdfs commands for better policy
+    * [EAGLE-24] - Load skew issue when partition by user
+    * [EAGLE-29] - Update Alert page for display more infomation
+    * [EAGLE-38] - reminder for Alerts in the UI
+    * [EAGLE-40] - Policy detail page support alert list display
+    * [EAGLE-42] - Customized partition support for Kafka spout
+    * [EAGLE-44] - previous page should be reloaded after login session is timed out and re-login
+    * [EAGLE-50] - Eagle internal metric framework
+    * [EAGLE-52] - Eagle framework should support custom group by function in addition to group by fields
+    * [EAGLE-55] - JobCompletedConfigServiceURLBuilderImpl in hive running spout miss anonymous paramter
+    * [EAGLE-58] - Enhance Hive query parse model
+    * [EAGLE-62] - Add jshint for front end UI building
+    * [EAGLE-66] - Eagle TypeSafe Stream Processing DSL
+    * [EAGLE-80] - remove httpd directory
+    * [EAGLE-86] - Rewrite HDFSAuditLogParser to a non-regular expression version
+    * [EAGLE-88] - Eagle web-service should have status url
+    * [EAGLE-99] - policy distribution statistics to be printed in log
+    * [EAGLE-106] - UI use same chart component
+    * [EAGLE-107] - Build Status Icon has been enabled for our github repo, please apply it to readme.md
+    * [EAGLE-108] - a tool tests performace between mongodb3.0 and couchDB1.6.1
+    * [EAGLE-109] - add hdfs related ports mapping from docker container to host
+    * [EAGLE-112] - Should support sum aggregation in front end for slide window function
+    * [EAGLE-114] - Enable RAT check and fix missing license headers
+    * [EAGLE-138] - Extend JMX Collector to support "hadoop.namenode.JournalTransaction"
+    * [EAGLE-143] - Create Eagle release 0.3.0
+    * [EAGLE-149] - Enable hadoop jmx metric cases
+    * [EAGLE-152] - hadoop-metric monitoring automation script
+    * [EAGLE-158] - Disable org.apache.eagle.datastream.EagleTuple
+    * [EAGLE-166] - Enhance metric collector script to extract hadoop ha status as metric
+ 
+
+** Task
+    * [EAGLE-83] - Integrate Jenkins with GitHub for checking pull requests
+    * [EAGLE-84] - Create scripts for merging PRs automatically
+    * [EAGLE-102] - ask jenkins-admin's help to setup "Embeddable Build Status Plugin" and make the status visible in Readme.md of incubator-eagle.git
+    * [EAGLE-117] - update Build Status Link and make it point to CI job building upon master
+    * [EAGLE-131] - make eagle main CI build pass
+    * [EAGLE-136] - Setup hadoop metric application
+    * [EAGLE-154] - hadoop-metric monitoring sandbox starter script
+    * [EAGLE-164] - Tutorial for setting up the development environment on mac
+    * [EAGLE-165] - Add more jmx metric cases
+
+
+** Sub-task
+    * [EAGLE-51] - Clean and manage external licensed static resource dependencies in eagle web with npm and grunt
+    * [EAGLE-60] - HBase sensitivity UI
+    * [EAGLE-63] - Improve docker image for quick preview
+    * [EAGLE-64] - Push eagle docker image to docker hub
+    * [EAGLE-65] - Eagle docker consistent port mapping
+    * [EAGLE-71] - Fix eagle docker run command
+    * [EAGLE-75] - Leverage dropwizard metrics for generating Eagle Topology and DataSource Metrics
+    * [EAGLE-78] - eagle-lib.sh script not work for mac osx and windows
+    * [EAGLE-130] - Eagle Pipeline DSL: Parser, Compiler, Runner
+    * [EAGLE-140] - Eagle Pipeline Package and Script
