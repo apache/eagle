@@ -109,8 +109,8 @@
   <tr>
     <td class="foot" width="800">
       <span class="outlook">
-         Copyright &copy; 2013 <a href="http://123.dc1.xyz.com:9090/eagle-web/ui/eagle.html"
-                  target ="_blank" title="Hadoop Eagle">Hadoop Eagle</a>
+         Apache Eagle <a href="http://<Eagle-Host>:9090/eagle-web/ui/eagle.html"
+                  target ="_blank" title="Hadoop Eagle">Apache Eagle</a>
       </span>
     </td>
   </tr>
