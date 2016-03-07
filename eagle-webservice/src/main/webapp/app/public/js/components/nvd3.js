@@ -314,7 +314,11 @@ eagleComponents.directive('nvd3', function(nvd3) {
 
 					// All watching mode
 					if ($scope.watching === "true") {
-						$scope.$watch("[chart, config]", function(newValue, oldValue) {
+						$scope.$watch("chart", function(newValue, oldValue) {
+							if(angular.equals(newValue, oldValue)) return;
+							initChart();
+						});
+						$scope.$watch("config", function(newValue, oldValue) {
 							if(angular.equals(newValue, oldValue)) return;
 							initChart();
 						}, true);

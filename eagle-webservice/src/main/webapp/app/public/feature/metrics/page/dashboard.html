@@ -57,12 +57,14 @@
 
 <div tabs menu="menu" holder="tabHolder" ng-show="dashboard.groups.length">
 	<pane ng-repeat="group in dashboard.groups" data-data="group" data-title="{{group.name}}">
-		<div class="row">
-			<div ng-repeat="chart in group.charts track by $index" class="col-md-6">
+		<div sortable class="row">
+			<div ng-repeat="chart in group.charts track by $index" class="col-md-{{chart.size || 6}}">
 				<div class="nvd3-chart-wrapper">
 					<div nvd3="chart._data" data-holder="chart._holder" data-title="{{chart.metric}}" data-watching="false"
 						 data-chart="{{chart.chart || 'line'}}" data-config="getChartConfig(chart)" class="nvd3-chart-cntr"></div>
 					<div class="nvd3-chart-config" ng-if="Auth.isRole('ROLE_ADMIN')">
+						<a class="fa fa-minus" ng-click="configChartSize(chart, -1)"></a>
+						<a class="fa fa-plus" ng-click="configChartSize(chart, 1)"></a>
 						<a class="fa fa-cog" ng-click="configChart(chart)"></a>
 						<a class="fa fa-trash" ng-click="deleteChart(group, chart)"></a>
 					</div>
@@ -145,7 +147,7 @@
 				<div class="row">
 					<div class="col-md-6">
 						<div class="nvd3-chart-wrapper">
-							<div nvd3="configPreviewChart._data" data-title="{{configPreviewChart.metric}}" data-holder="configPreviewChart._holder"
+							<div nvd3="configPreviewChart._data" data-title="{{configPreviewChart.metric}}"
 								 data-watching="true" data-chart="{{configPreviewChart.chart || 'line'}}" data-config="getChartConfig(configPreviewChart)" class="nvd3-chart-cntr"></div>
 						</div>
 					</div>

@@ -470,7 +470,7 @@ ul.tree.tree-bordered > li > ul > li > a {
 
 .nvd3-chart-wrapper .nvd3-chart-config a {
 	color: rgba(255,255,255, 0.9);
-	padding: 5px 5px 4px 5px;
+	padding: 5px 2px 4px 2px;
 	font-size: 16px;
 }
 .nvd3-chart-wrapper .nvd3-chart-config a:hover {

@@ -229,6 +229,10 @@
 			$scope.dashboardEntity = list[0];
 			$scope.dashboard = $scope.dashboardEntity ? common.parseJSON($scope.dashboardEntity.value) : {groups: []};
 			$scope.chartRefresh();
+
+			setTimeout(function() {
+				$(window).resize();
+			}, 1);
 		}).finally(function() {
 			$scope.dashboardReady = true;
 		});
@@ -288,7 +292,6 @@
 
 		$scope.configPreviewChartMinimumCheck = function() {
 			$scope.configPreviewChart.min = $scope.configPreviewChart.min === 0 ? undefined : 0;
-			window.ccc1 = $scope.getChartConfig($scope.configPreviewChart);
 		};
 
 		$scope.seriesChecked = function(chart, series) {
@@ -322,7 +325,7 @@
 
 		$scope.configChart = function(chart) {
 			$scope.configTargetChart = chart;
-			$scope.configPreviewChart = $.extend({}, chart);
+			$scope.configPreviewChart = $.extend({}, chart, {aggregations: (chart.aggregations || []).slice()});
 			delete $scope.configPreviewChart._config;
 			$("#chartMDL").modal();
 			setTimeout(function() {
@@ -394,6 +397,16 @@
 			if(!$scope.dashboardReady) return;
 			$scope.chartRefresh(true);
 		}, 1000 * 30);
+
+		// > Chart UI
+		$scope.configChartSize = function(chart, sizeOffset) {
+			chart.size = (chart.size || 6) + sizeOffset;
+			if(chart.size <= 0) chart.size = 1;
+			if(chart.size > 12) chart.size = 12;
+			setTimeout(function() {
+				$(window).resize();
+			}, 1);
+		};
 
 		// ====================== Clean Up ======================
 		$scope.$on('$destroy', function() {
