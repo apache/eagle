@@ -24,6 +24,11 @@ var app = {};
 	/* App Module */
 	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'featureControllers', 'eagle.service']);
 
+	// GRUNT REPLACEMENT: eagleApp.buildTimestamp = TIMESTAMP
+	eagleApp._TRS = function() {
+		return eagleApp.buildTimestamp || Math.random();
+	};
+
 	// ======================================================================================
 	// =                                   Feature Module                                   =
 	// ======================================================================================
@@ -289,7 +294,7 @@ var app = {};
 		var _featureBase = {
 			templateUrl: function ($stateParams) {
 				var _htmlTemplate = featureControllerCustomizeHtmlTemplate[$stateParams.feature + "_" + $stateParams.page];
-				return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + Math.random();
+				return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + eagleApp._TRS();
 			},
 			controllerProvider: function ($stateParams) {
 				return $stateParams.feature + "_" + $stateParams.page;
@@ -303,7 +308,7 @@ var app = {};
 			// =================== Landing ===================
 			.state('landing', {
 				url: "/landing",
-				templateUrl: "partials/landing.html?_=" + Math.random(),
+				templateUrl: "partials/landing.html?_=" + eagleApp._TRS(),
 				controller: "landingCtrl",
 				resolve: _resolve({featureCheck: true})
 			})
@@ -311,7 +316,7 @@ var app = {};
 			// ================ Authorization ================
 			.state('login', {
 				url: "/login",
-				templateUrl: "partials/login.html?_=" + Math.random(),
+				templateUrl: "partials/login.html?_=" + eagleApp._TRS(),
 				controller: "authLoginCtrl",
 				access: {skipCheck: true}
 			})
@@ -320,7 +325,7 @@ var app = {};
 			// Site
 			.state('configSite', {
 				url: "/config/site",
-				templateUrl: "partials/config/site.html?_=" + Math.random(),
+				templateUrl: "partials/config/site.html?_=" + eagleApp._TRS(),
 				controller: "configSiteCtrl",
 				pageConfig: "ConfigPageConfig",
 				resolve: _resolve({roleType: 'ROLE_ADMIN'})
@@ -329,7 +334,7 @@ var app = {};
 			// Application
 			.state('configApplication', {
 				url: "/config/application",
-				templateUrl: "partials/config/application.html?_=" + Math.random(),
+				templateUrl: "partials/config/application.html?_=" + eagleApp._TRS(),
 				controller: "configApplicationCtrl",
 				pageConfig: "ConfigPageConfig",
 				resolve: _resolve({roleType: 'ROLE_ADMIN'})
@@ -338,7 +343,7 @@ var app = {};
 			// Feature
 			.state('configFeature', {
 				url: "/config/feature",
-				templateUrl: "partials/config/feature.html?_=" + Math.random(),
+				templateUrl: "partials/config/feature.html?_=" + eagleApp._TRS(),
 				controller: "configFeatureCtrl",
 				pageConfig: "ConfigPageConfig",
 				resolve: _resolve({roleType: 'ROLE_ADMIN'})
@@ -348,7 +353,7 @@ var app = {};
 			.state('configFeatureDetail', $.extend({url: "/config/:feature/:page"}, {
 				templateUrl: function ($stateParams) {
 					var _htmlTemplate = featureControllerCustomizeHtmlTemplate[$stateParams.feature + "_" + $stateParams.page];
-					return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + Math.random();
+					return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + eagleApp._TRS();
 				},
 				controllerProvider: function ($stateParams) {
 					return "config_" + $stateParams.feature + "_" + $stateParams.page;

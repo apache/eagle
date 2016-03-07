@@ -21,6 +21,7 @@
 
 	var featureControllers = angular.module('featureControllers');
 	var feature = featureControllers.register("classification");
+	var eagleApp = angular.module('eagleApp');
 
 	// ==============================================================
 	// =                          Function                          =
@@ -33,7 +34,7 @@
 	feature.controller('sensitivity', function(PageConfig, Site, $scope, Application, Entities, UI) {
 		PageConfig.pageTitle = "Data Classification";
 		PageConfig.pageSubTitle = Site.current().tags.site;
-		$scope.ajaxId = Math.random();
+		$scope.ajaxId = eagleApp._TRS();
 		$scope.viewConfig = Application.current().configObj.view;
 
 		if(!$scope.viewConfig) {
