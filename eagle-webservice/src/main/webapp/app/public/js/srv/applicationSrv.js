@@ -125,7 +125,7 @@
 							// Get format group name. Will mark as 'Others' if no group defined
 							groupName: {
 								get: function () {
-									return this.group || "Others";
+									return this.groupName || "Others";
 								}
 							},
 							configObj: {

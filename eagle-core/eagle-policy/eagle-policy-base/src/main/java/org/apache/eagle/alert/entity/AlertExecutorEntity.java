@@ -43,6 +43,6 @@ public class AlertExecutorEntity extends TaggedLogAPIEntity{
 
     public void setDescription(String desc) {
         this.description = desc;
-        valueChanged("desc");
+        valueChanged("description");
     }
 }
