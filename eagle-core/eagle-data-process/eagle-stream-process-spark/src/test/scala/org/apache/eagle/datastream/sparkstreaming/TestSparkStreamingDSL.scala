@@ -16,7 +16,8 @@
   */
 package org.apache.eagle.datastream.sparkstreaming
 
-import org.apache.eagle.datastream.ExecutionEnvironments
+import org.apache.eagle.datastream.core.StreamProducer
+import org.apache.eagle.datastream.{FlatMapper, Collector, ExecutionEnvironments}
 
 
 case class Entity(name:String,value:Double,var inc:Int=0){
@@ -36,18 +37,14 @@ object TestSparkStreamingDSL extends App{
     Entity("d", 3)
   )
 
-  val tmp  = Array("ebay","zqin","twen","arsenal")
+  val tmp  = Seq("eBay ADI SPARK","SJTU CS","QZK TW","arsenal","SPARK")
 
-  env.from(tuples,recycle = true)
-    .map(o => {o.inc += 2;o})
-    .filter(o => !o.name.equals("c"))
-    .foreach(println)
 
   env.from(tmp,recycle = true)
-  .map(t => t+" from test")
-  .filter(t => !t.contains("al"))
-  .foreach(println)
-
+    .flatMap(_.split(" "))
+    .map(o => (o,1))
+    .filter(o => !o._1.contains("zqin"))
+    .foreach(println)
   env.execute()
 
 }

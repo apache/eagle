@@ -16,9 +16,11 @@
   */
 package org.apache.eagle.datastream.sparkstreaming
 
+import org.apache.eagle.datastream.FlatMapperWrapperForSpark
 import org.apache.eagle.datastream.core._
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.dstream.PairDStreamFunctions
 
 object DStreamFactory {
 
@@ -37,11 +39,12 @@ object DStreamFactory {
   def createDStreamsByDFS(graph: StreamProducerGraph, from: DStream[Any], to: StreamProducer[Any]): Unit = {
     implicit val streamInfo = to.getInfo
     val dStream = to match {
-
-      case FlatMapProducer(worker) => {
-
+      case  FlatMapProducer(flatMapper) => {
+        val func = flatMapper.asInstanceOf[FlatMapperWrapperForSpark[Any,Any]].func
+        from.flatMap(func)
       }
       case filter: FilterProducer[Any] => {
+        //from.asInstanceOf[DStream[(String,Integer)]].reduceByKey(_ + _)
         from.filter(filter.fn)
       }
       case mapper: MapperProducer[Any, Any] => {
@@ -51,6 +54,9 @@ object DStreamFactory {
         from.foreachRDD(rdd => {
           rdd.collect().foreach(foreach.fn)
         })
+      }
+      case reduceByKeyer: ReduceByKeyProducer[Any,Any] => {
+        from.asInstanceOf[DStream[(Any,Any)]].reduceByKey(reduceByKeyer.fn)
       }
       case _ => throw new UnsupportedOperationException(s"Unsupported producer: ${to.toString}")
     }

@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
-import org.apache.eagle.datastream.{FlatMapperWrapper, Collector, FlatMapper}
+import org.apache.eagle.datastream.{FlatMapperWrapperForSpark, FlatMapperWrapper, Collector, FlatMapper}
 import org.apache.eagle.partition.PartitionStrategy
 import org.apache.eagle.policy.common.Constants
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
@@ -60,7 +60,8 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   
   /**
    * Get stream pure metadata info
-   * @return
+    *
+    * @return
    */
   override def getInfo:StreamInfo = this.asInstanceOf[StreamInfo]
 
@@ -82,6 +83,18 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   }
   override def flatMap[R](func:(Any,Collector[R])=>Unit): StreamProducer[R] = {
     val ret = FlatMapProducer[T,R](FlatMapperWrapper[R](func))
+    connect(this, ret)
+    ret
+  }
+
+  def flatMap[R](func:T => Traversable[R]): StreamProducer[R] = {
+    val ret = FlatMapProducer[T,R](FlatMapperWrapperForSpark[T,R](func))
+    connect(this, ret)
+    ret
+  }
+
+  def reduceByKey[K,V](func: (V,V) => V) : StreamProducer[(K,V)] = {
+    val ret = ReduceByKeyProducer[K,V](func)
     connect(this, ret)
     ret
   }
@@ -274,6 +287,10 @@ case class FlatMapProducer[T, R](var mapper: FlatMapper[R]) extends StreamProduc
   override def toString: String = mapper.toString
 }
 
+case class ReduceByKeyProducer[K,V](var fn: (V,V) => V) extends StreamProducer[(K,V)]{
+  override def toString: String = s"ReduceByKeyProducer"
+}
+
 case class MapperProducer[T,R](numOutputFields : Int, var fn : T => R) extends StreamProducer[R]{
   override def toString: String = s"MapperProducer"
 }
@@ -301,7 +318,8 @@ case class StormSourceProducer[T](source: BaseRichSpout) extends StreamProducer[
   /**
     * rename outputfields to f0, f1, f2, ...
    * if one spout declare some field names, those fields names will be modified
-   * @param n
+    *
+    * @param n
    */
   def withOutputFields(n : Int): StormSourceProducer[T] ={
     this.numFields = n
