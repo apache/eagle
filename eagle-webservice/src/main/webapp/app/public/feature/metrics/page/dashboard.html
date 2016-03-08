@@ -1,0 +1,201 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="page-fixed">
+	<div class="dropdown inline">
+		<button data-toggle="dropdown" class="btn btn-primary">
+			<span class="fa fa-clock-o"></span> {{autoRefreshSelect.title}}
+		</button>
+		<ul class="dropdown-menu left">
+			<li ng-repeat="item in autoRefreshList track by $index">
+				<a ng-click="setAuthRefresh(item)">
+					<span class="fa fa-clock-o"></span>
+					<span ng-class="{'text-bold': item === autoRefreshSelect}">{{item.title}}</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<button class="btn btn-primary" ng-if="Auth.isRole('ROLE_ADMIN')"
+			ng-click="saveDashboard()" ng-disabled="lock">
+		<span class="fa fa-floppy-o"></span> Save
+	</button>
+</div>
+
+<div class="box box-default" ng-if="!dashboard.groups.length">
+	<div class="box-header with-border">
+		<h3 class="box-title">Empty Dashboard</h3>
+	</div>
+	<div class="box-body">
+		<div ng-show="!dashboardReady">
+			Loading...
+		</div>
+		<div ng-show="dashboardReady">
+			Current dashboard is empty.
+			<span ng-if="Auth.isRole('ROLE_ADMIN')">Click <a ng-click="newGroup()">here</a> to create a new group.</span>
+		</div>
+	</div>
+	<div class="overlay" ng-show="!dashboardReady">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+</div>
+
+<div tabs menu="menu" holder="tabHolder" ng-show="dashboard.groups.length">
+	<pane ng-repeat="group in dashboard.groups" data-data="group" data-title="{{group.name}}">
+		<div class="row">
+			<div ng-repeat="chart in group.charts track by $index" class="col-md-6">
+				<div class="nvd3-chart-wrapper">
+					<div nvd3="chart._data" data-holder="chart._holder" data-title="{{chart.metric}}" data-watching="false"
+						 data-chart="{{chart.chart || 'line'}}" data-config="getChartConfig(chart)" class="nvd3-chart-cntr"></div>
+					<div class="nvd3-chart-config" ng-if="Auth.isRole('ROLE_ADMIN')">
+						<a class="fa fa-cog" ng-click="configChart(chart)"></a>
+						<a class="fa fa-trash" ng-click="deleteChart(group, chart)"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<p ng-if="!group.charts.length">
+			Empty group.
+			<span ng-if="Auth.isRole('ROLE_ADMIN')">Click <a ng-click="newChart()">here</a> to add metric.</span>
+		</p>
+	</pane>
+</div>
+
+
+
+<!-- Modal: Metric selector -->
+<div class="modal fade" id="metricMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Select Metric</h4>
+			</div>
+			<div class="modal-body">
+				<div class="input-group" style="margin-bottom: 10px;">
+					<input type="text" class="form-control" placeholder="Filter..." ng-model="_newMetricFilter" />
+					<span class="input-group-btn">
+						<button class="btn btn-default btn-flat" ng-click="_newMetricFilter = '';"><span class="fa fa-times"></span></button>
+					</span>
+				</div>
+
+				<div class="row">
+					<div class="col-md-4">
+						<ul class="nav nav-pills nav-stacked fixed-height">
+							<li class="disabled"><a>Data Source</a></li>
+							<li ng-repeat="dataSrc in dataSourceList track by $index" ng-class="{active: _newMetricDataSrc === dataSrc}">
+								<a ng-click="newMetricSelectDataSource(dataSrc)">{{dataSrc.dataSource}}</a>
+							</li>
+						</ul>
+					</div>
+					<div class="col-md-8">
+						<ul class="nav nav-pills nav-stacked fixed-height">
+							<li class="disabled"><a>Metric</a></li>
+							<li ng-repeat="metric in dataSourceMetricList(_newMetricDataSrc, _newMetricFilter) track by $index" ng-class="{active: _newMetricDataMetric === metric}">
+								<a ng-click="newMetricSelectMetric(metric)">{{metric}}</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<span class="text-primary pull-left">{{_newMetricDataSrc.dataSource}} <span class="fa fa-arrow-right"></span> {{_newMetricDataMetric}}</span>
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmSelectMetric()">
+					Select
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- Modal: Chart configuration -->
+<div class="modal fade" id="chartMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Chart Configuration</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="nvd3-chart-wrapper">
+							<div nvd3="configPreviewChart._data" data-title="{{configPreviewChart.metric}}" data-holder="configPreviewChart._holder"
+								 data-watching="true" data-chart="{{configPreviewChart.chart || 'line'}}" data-config="getChartConfig(configPreviewChart)" class="nvd3-chart-cntr"></div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<!-- Chart Configuration -->
+						<table class="table">
+							<tbody>
+							<tr>
+								<th width="100">Chart Type</th>
+								<td>
+									<div class="btn-group" data-toggle="buttons">
+										<label class="btn btn-default btn-xs" ng-class="{active: (configPreviewChart.chart || 'line') === type.chart}"
+											   ng-repeat="type in chartTypeList track by $index" ng-click="configPreviewChart.chart = type.chart;">
+											<input type="radio" name="chartType" autocomplete="off"
+												   ng-checked="(configPreviewChart.chart || 'line') === type.chart">
+											<span class="fa fa-{{type.icon}}"></span>
+										</label>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th>Minimum</th>
+								<td><input type="checkbox" ng-checked="configPreviewChart.min === 0" ng-disabled="configPreviewChart.chart === 'area' || configPreviewChart.chart === 'pie'"
+										   ng-click="configPreviewChartMinimumCheck()" /></td>
+							</tr>
+							<tr>
+								<th>Series</th>
+								<td>
+									<div class="checkbox noMargin" ng-repeat="series in chartSeriesList track by $index">
+										<label>
+											<input type="checkbox" ng-checked="seriesChecked(configPreviewChart, series.series)"
+												   ng-click="seriesCheckClick(configPreviewChart, series.series)" />
+											{{series.name}}
+										</label>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmUpdateChart()">
+					Confirm
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

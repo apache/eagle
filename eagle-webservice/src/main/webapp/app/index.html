@@ -103,7 +103,7 @@
 									<!-- Menu Footer-->
 									<li class="user-footer">
 										<div class="pull-left" ng-if="Auth.isRole('ROLE_ADMIN')">
-											<a href="#/config/site" class="btn btn-default btn-flat">Configuration</a>
+											<a href="#/config/site" class="btn btn-default btn-flat">Management</a>
 										</div>
 										<div class="pull-right">
 											<a ng-click="logout();" class="btn btn-default btn-flat">Sign out</a>
@@ -203,10 +203,13 @@
 		<script src="../node_modules/angular-resource/angular-resource.js"></script>
 		<script src="../node_modules/angular-route/angular-route.js"></script>
 		<script src="../node_modules/angular-animate/angular-animate.js"></script>
-		<script src="../node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.js"></script>
+		<script src="../node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
 		<script src="../node_modules/angular-ui-router/release/angular-ui-router.js"></script>
 		<script src="../node_modules/d3/d3.js"></script>
 		<script src="../node_modules/zombiej-nvd3/build/nv.d3.js"></script>
+
+		<!-- Application -->
+		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Service -->
 		<script src="public/js/srv/main.js" type="text/javascript" charset="utf-8"></script>
@@ -218,8 +221,7 @@
 		<script src="public/js/srv/wrapStateSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/uiSrv.js" type="text/javascript" charset="utf-8"></script>
 
-		<!-- Application -->
-		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>
+		<!-- Misc -->
 		<script src="public/js/app.ui.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/app.time.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/app.config.js" type="text/javascript" charset="utf-8"></script>

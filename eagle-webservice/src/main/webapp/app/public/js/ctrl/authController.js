@@ -32,6 +32,16 @@
 		$scope.username = "";
 		$scope.password = "";
 		$scope.lock = false;
+		$scope.loginSuccess = false;
+
+		if(localStorage) {
+			$scope.rememberUser = localStorage.getItem("rememberUser") !== "false";
+
+			if($scope.rememberUser) {
+				$scope.username = localStorage.getItem("username");
+				$scope.password = localStorage.getItem("password");
+			}
+		}
 
 		// UI
 		setTimeout(function () {
@@ -47,6 +57,18 @@
 
 				Authorization.login($scope.username, $scope.password).then(function (success) {
 					if (success) {
+						// Check user remember
+						localStorage.setItem("rememberUser", $scope.rememberUser);
+						if($scope.rememberUser) {
+							localStorage.setItem("username", $scope.username);
+							localStorage.setItem("password", $scope.password);
+						} else {
+							localStorage.removeItem("username");
+							localStorage.removeItem("password");
+						}
+
+						// Initial environment
+						$scope.loginSuccess = true;
 						console.log("[Login] Login success! Reload data...");
 						Authorization.reload().then(function() {}, function() {console.warn("Site error!");});
 						Application.reload().then(function() {}, function() {console.warn("Site error!");});

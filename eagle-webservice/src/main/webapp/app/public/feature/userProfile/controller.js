@@ -40,7 +40,7 @@
 
 		// ======================================== Algorithms ========================================
 		$scope.algorithmEntity = {};
-		Entities.queryEntities("AlertDefinitionService", {site: Site.current().tags.site, dataSource: "userProfile"})._promise.then(function(data) {
+		Entities.queryEntities("AlertDefinitionService", {site: Site.current().tags.site, application: "userProfile"})._promise.then(function(data) {
 			$scope.algorithmEntity = common.getValueByPath(data, "obj[0]");
 			$scope.algorithmEntity.policy = common.parseJSON($scope.algorithmEntity.policyDef);
 		});

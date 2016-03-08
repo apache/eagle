@@ -21,6 +21,7 @@
 
 	var featureControllers = angular.module('featureControllers');
 	var feature = featureControllers.register("classification");
+	var eagleApp = angular.module('eagleApp');
 
 	// ==============================================================
 	// =                          Function                          =
@@ -33,7 +34,7 @@
 	feature.controller('sensitivity', function(PageConfig, Site, $scope, Application, Entities, UI) {
 		PageConfig.pageTitle = "Data Classification";
 		PageConfig.pageSubTitle = Site.current().tags.site;
-		$scope.ajaxId = Math.random();
+		$scope.ajaxId = eagleApp._TRS();
 		$scope.viewConfig = Application.current().configObj.view;
 
 		if(!$scope.viewConfig) {
@@ -145,9 +146,6 @@
 			};
 			$scope._markItem.tags[$scope.viewConfig.keys[0]] = item.resource;
 			$("#sensitivityMDL").modal();
-			setTimeout(function() {
-				$("#sensitiveType").focus();
-			}, 500);
 		};
 		$scope.confirmUpateSensitivity = function() {
 			$scope._oriItem.sensitiveType = $scope._markItem.sensitivityType;
@@ -178,6 +176,7 @@
 	// =                    Sensitivity - Table                    =
 	// =============================================================
 	feature.controller('sensitivityViewTable', function(Site, $scope, Entities) {
+		$scope.databases = null;
 		$scope.table = null;
 
 		// Mark sensitivity
@@ -191,20 +190,39 @@
 					unit[key] = unit[target];
 				});
 			});
+			return list._promise;
 		};
 
-		$scope.databases = Entities.query($scope.viewConfig.api.database, {site: Site.current().tags.site});
-		_fillAttr($scope.databases, "database", $scope.viewConfig.mapping.database);
+		$scope.loadDatabases = function(database) {
+			var _dbs = Entities.query($scope.viewConfig.api.database, {site: Site.current().tags.site});
+			return _fillAttr(_dbs, "database", $scope.viewConfig.mapping.database).then(function() {
+				if($scope.databases) {
+					$.each($scope.databases, function(i, oriDB) {
+						var db = common.array.find(oriDB.resource, _dbs, "resource");
+						if(db) {
+							db.show = oriDB.show;
+							db.tables = oriDB.tables;
+						}
+					});
+				}
+				$scope.databases = _dbs;
+			});
+		};
+		$scope.loadDatabases();
 
-		$scope.loadTables = function(database) {
-			if(database.tables) return;
-			var _qry = {
+		$scope.loadTables = function(database, force) {
+			var _tables, _qry;
+			if(database.tables && !force) return;
+			_qry = {
 				site: Site.current().tags.site
 			};
 			_qry[$scope.viewConfig.mapping.database] = database[$scope.viewConfig.mapping.database];
-			database.tables = Entities.query($scope.viewConfig.api.table, _qry);
-			_fillAttr(database.tables, "table", $scope.viewConfig.mapping.table);
-			_fillAttr(database.tables, "database", $scope.viewConfig.mapping.database);
+			_tables = Entities.query($scope.viewConfig.api.table, _qry);
+			if(!database.tables) database.tables = _tables;
+			_fillAttr(_tables, "table", $scope.viewConfig.mapping.table);
+			return _fillAttr(_tables, "database", $scope.viewConfig.mapping.database).then(function() {
+				database.tables = _tables;
+			});
 		};
 
 		$scope.loadColumns = function(database, table) {
@@ -218,6 +236,21 @@
 			_qry[$scope.viewConfig.mapping.table] = table[$scope.viewConfig.mapping.table];
 			table.columns = Entities.query($scope.viewConfig.api.column, _qry);
 			_fillAttr(table.columns, "column", $scope.viewConfig.mapping.column);
+		};
+
+		$scope.refreshData = function() {
+			$scope.loadDatabases().then(function() {
+				if(!$scope.table) return;
+
+				var _table = $scope.table;
+				var _db = common.array.find($scope.table.database, $scope.databases, "database");
+				if(_db) {
+					$scope.loadTables(_db, true).then(function() {
+						$scope.table = common.array.find(_table.table, _db.tables, "table");
+						$scope.table.columns = _table.columns;
+					});
+				}
+			});
 		};
 
 		// =================== Sensitivity ===================
@@ -234,14 +267,12 @@
 			};
 			$scope._markItem.tags[$scope.viewConfig.keys[0]] = item.resource;
 			$("#sensitivityMDL").modal();
-			setTimeout(function() {
-				$("#sensitiveType").focus();
-			}, 500);
 		};
 		$scope.confirmUpateSensitivity = function() {
 			$scope._oriItem.sensitiveType = $scope._markItem.sensitivityType;
 			Entities.updateEntity($scope.viewConfig.service, $scope._markItem, {timestamp: false})._promise.success(function(data) {
 				Entities.dialog(data);
+				$scope.refreshData();
 			});
 			$("#sensitivityMDL").modal('hide');
 		};
@@ -259,7 +290,9 @@
 					site: Site.current().tags.site
 				};
 				_qry[$scope.viewConfig.keys[0]] = item.resource;
-				Entities.deleteEntities($scope.viewConfig.service, _qry);
+				Entities.deleteEntities($scope.viewConfig.service, _qry)._promise.then(function() {
+					$scope.refreshData();
+				});
 
 				item.sensitiveType = null;
 				$scope.$apply();

@@ -21,40 +21,42 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
-import org.apache.eagle.service.security.hdfs.HDFSResourceAccessConfig;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.eagle.service.security.hdfs.HDFSFileSystem;
 import org.apache.eagle.service.security.hdfs.HDFSResourceConstants;
-import org.apache.eagle.service.security.hdfs.HDFSResourceUtils;
+
 
 /**
- * HDFS Resource Resolver 
+ * HDFS Resource Resolver
  *
- * Generic Resolver Will invoke this HDFS Resolvers 
+ * Generic Resolver Will invoke this HDFS Resolvers
  * Query HINT : HDFS Resource resolve must be {\"site\":\"${site}\", \"query\"=\"{directory path}\"}
  */
 public class HDFSResourceResolver  implements AttributeResolvable<GenericAttributeResolveRequest,String> {
 	private final static Logger LOG = LoggerFactory.getLogger(HDFSResourceResolver.class);
 	/**
 	 * HDFS Resource Resolve API
-     *
+	 *
 	 * returns listOfPaths
 	 */
 	@Override
 	public List<String> resolve(GenericAttributeResolveRequest request)
 			throws AttributeResolveException {
-        List<String> result = new ArrayList<>();
+		List<String> result = new ArrayList<>();
+		MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
 		try {
-			HDFSResourceAccessConfig config = HDFSResourceUtils.getConfig(request.getSite().trim());
-			HDFSFileSystem fileSystem = new HDFSFileSystem(config.getHdfsEndpoint());
+			Configuration config = repo.getConfig(HDFSResourceConstants.HDFS_APPLICATION, request.getSite().trim());
+			HDFSFileSystem fileSystem = new HDFSFileSystem(config);
 			String query = request.getQuery().trim();
 			List<FileStatus> fileStatuses = null;
 			if(query.endsWith("/")) {
@@ -70,9 +72,9 @@ public class HDFSResourceResolver  implements AttributeResolvable<GenericAttribu
 					throw new BadAttributeResolveRequestException(HDFSResourceConstants.HDFS_RESOURCE_RESOLVE_FORMAT_HINT);
 				}
 			}
-            for(FileStatus status: fileStatuses){
-                result.add(status.getPath().toUri().getPath());
-            }
+			for(FileStatus status: fileStatuses){
+				result.add(status.getPath().toUri().getPath());
+			}
 
 			LOG.info("Successfully browsed files in HDFS .");
 			return result;
@@ -81,15 +83,15 @@ public class HDFSResourceResolver  implements AttributeResolvable<GenericAttribu
 			throw new AttributeResolveException(e);
 		}
 	}
-	
+
 	/**
 	 * Validate the Passed Request Object
-	 * It should have Site Id and File Path 
+	 * It should have Site Id and File Path
 	 */
 	@Override
 	public void validateRequest(GenericAttributeResolveRequest request)
 			throws BadAttributeResolveRequestException {
-        if(LOG.isDebugEnabled()) LOG.debug(" validating HDFS Resource Resolve  request ...");
+		if(LOG.isDebugEnabled()) LOG.debug(" validating HDFS Resource Resolve  request ...");
 		String siteId = request.getSite();
 		if( null == siteId )
 			throw new BadAttributeResolveRequestException(HDFSResourceConstants.HDFS_RESOURCE_RESOLVE_FORMAT_HINT);
@@ -115,7 +117,7 @@ public class HDFSResourceResolver  implements AttributeResolvable<GenericAttribu
 		return result;
 	}
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	public Class<GenericAttributeResolveRequest> getRequestClass() {

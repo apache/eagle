@@ -29,26 +29,27 @@ module.exports = function (grunt) {
 				globals: {
 					$: true,
 					jQuery: true,
-					moment: true,
-				},
+					moment: true
+				}
 			},
 			all: [
 				'app/**/*.js'
-			],
+			]
 		},
 
 		clean: {
 			build: ['ui/', 'tmp/'],
 			tmp: ['tmp/'],
-			ui: ['ui/'],
+			ui: ['ui/']
 		},
 		concat: {
 			app: {
 				src: [
+					'app/public/js/app.js',
+
 					'app/public/js/srv/main.js',
 					'app/public/js/srv/**.js',
 
-					'app/public/js/app.js',
 					'app/public/js/app.*.js',
 
 					'app/public/js/common.js',
@@ -58,7 +59,7 @@ module.exports = function (grunt) {
 					'app/public/js/components/**/**.js',
 
 					'app/public/js/ctrl/main.js',
-					'app/public/js/ctrl/*.js',
+					'app/public/js/ctrl/*.js'
 				],
 				dest: 'tmp/public/js/scripts.js'
 			},
@@ -71,7 +72,7 @@ module.exports = function (grunt) {
 					}
 				},
 				src: '<%= config.concat.css.src %>',
-				dest: '<%= config.concat.css.dest %>',
+				dest: '<%= config.concat.css.dest %>'
 			}
 		},
 		'regex-replace': {
@@ -83,9 +84,15 @@ module.exports = function (grunt) {
 						search: '\\\'use strict\\\';?',
 						replace: '',
 						flags: 'gmi'
+					},
+					{
+						name: 'build timestamp',
+						search: '\\/\\/ GRUNT REPLACEMENT\\: eagleApp\\.buildTimestamp \\= TIMESTAMP',
+						replace: 'eagleApp.buildTimestamp = ' + (+new Date()) + ';',
+						flags: 'gmi'
 					}
 				]
-			},
+			}
 		},
 		uglify: {
 			ui: {
@@ -104,7 +111,7 @@ module.exports = function (grunt) {
 						cwd: 'app/public/feature'
 					}
 				]
-			},
+			}
 		},
 		cssmin: {
 			ui: {
@@ -116,7 +123,7 @@ module.exports = function (grunt) {
 		htmlrefs: {
 			ui: {
 				src: 'app/index.html',
-				dest: "tmp/index.html",
+				dest: "tmp/index.html"
 			}
 		},
 		copy: {
@@ -130,7 +137,7 @@ module.exports = function (grunt) {
 					{expand: true, cwd: 'tmp/', src: ['**'], dest: 'ui'},
 					{expand: true, cwd: 'app/', src: ['public/images/**', 'partials/**'], dest: 'ui'},
 					{expand: true, cwd: 'node_modules/font-awesome/', src: ['fonts/**'], dest: 'ui/public'},
-					{expand: true, cwd: 'node_modules/bootstrap/', src: ['fonts/**'], dest: 'ui/public'},
+					{expand: true, cwd: 'node_modules/bootstrap/', src: ['fonts/**'], dest: 'ui/public'}
 				]
 			}
 		}
@@ -163,6 +170,6 @@ module.exports = function (grunt) {
 		'htmlrefs',
 		'copy:ui',
 		// Clean Env
-		'clean:tmp',
+		'clean:tmp'
 	]);
 };

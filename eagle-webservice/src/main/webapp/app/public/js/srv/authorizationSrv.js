@@ -126,6 +126,18 @@
 			return _deferred.promise;
 		};
 
+		// Call web service to keep session
+		setInterval(function() {
+			if(!content.isLogin) return;
+
+			$http.get(app.getURL('userProfile')).then(null, function (response) {
+				if(response.status === 403) {
+					console.log("[Session] Out of date...", response);
+					content.needLogin();
+				}
+			});
+		}, 1000 * 60 * 5);
+
 		return content;
 	});
 })();

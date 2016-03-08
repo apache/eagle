@@ -97,12 +97,28 @@ common.parseJSON = function (str, defaultVal) {
 	return defaultVal === undefined ? null : defaultVal;
 };
 
+common.stringify = function(json) {
+	return JSON.stringify(json, function(key, value) {
+		if(/^(_|\$)/.test(key)) return undefined;
+		return value;
+	});
+};
+
 common.isEmpty = function(val) {
 	if($.isArray(val)) {
 		return val.length === 0;
 	} else {
 		return val === null || val === undefined;
 	}
+};
+
+common.extend = function(target, origin) {
+	$.each(origin, function(key, value) {
+		if(/^(_|\$)/.test(key)) return;
+
+		target[key] = value;
+	});
+	return target;
 };
 
 // ====================== Format ======================
@@ -118,6 +134,14 @@ common.format.date = function(val, type) {
 		val = app.time.offset(val);
 	}
 	switch(type) {
+	case 'date':
+		return val.format("YYYY-MM-DD");
+	case 'time':
+		return val.format("HH:mm:ss");
+	case 'datetime':
+		return val.format("YYYY-MM-DD HH:mm:ss");
+	case 'mixed':
+		return val.format("YYYY-MM-DD HH:mm");
 	default:
 		return val.format("YYYY-MM-DD HH:mm:ss") + (val.utcOffset() === 0 ? '[UTC]' : '');
 	}

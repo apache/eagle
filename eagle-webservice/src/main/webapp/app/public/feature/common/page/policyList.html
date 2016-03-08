@@ -37,7 +37,7 @@
 				</div>
 			</div>
 			<div class="col-xs-3 text-right">
-				<a class="btn btn-primary" href="#/common/policyCreate/{{!dataSource ? '' : '?dataSrc=' + dataSource.tags.dataSource}}" ng-show="Auth.isRole('ROLE_ADMIN')">
+				<a class="btn btn-primary" href="#/common/policyCreate/{{!application ? '' : '?app=' + application.tags.application}}" ng-show="Auth.isRole('ROLE_ADMIN')">
 					New Policy
 					<i class="fa fa-plus-circle"> </i>
 				</a>
@@ -64,7 +64,7 @@
 				<tbody>
 					<tr>
 						<td><span class='fa fa-square' ng-class="item.enabled ? 'text-green' : 'text-muted'"> </span></td>
-						<td><a href="#/common/policyDetail/{{item.encodedRowkey}}">{{item.tags.policyId}}</a></td>
+						<td><a href="#/common/policyDetail/{{item.encodedRowkey}}" style="width: 200px;" class="text-breakall">{{item.tags.policyId}}</a></td>
 						<td>{{item.desc}}</td>
 						<td>{{item.owner}}</td>
 						<td>{{common.format.date(item.lastModifiedDate) || "-"}}</td>

@@ -45,7 +45,7 @@ public class EagleConfigHelper {
         return config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
     }
 
-    public static String getDataSource(Config config) {
-        return config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
+    public static String getApplication(Config config) {
+        return config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION);
     }
 }

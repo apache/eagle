@@ -62,7 +62,7 @@ public class GCMetricGeneratorExecutor extends JavaStormStreamExecutor2<String, 
         listener = new EagleServiceReporterMetricListener(host, port, username, password);
         dimensions = new HashMap<>();
         dimensions.put(EagleConfigConstants.SITE, EagleConfigHelper.getSite(config));
-        dimensions.put(EagleConfigConstants.DATA_SOURCE, EagleConfigHelper.getDataSource(config));
+        dimensions.put(EagleConfigConstants.APPLICATION, EagleConfigHelper.getApplication(config));
         gcPausedTimeMetricName = MetricKeyCodeDecoder.codeMetricKey(GCConstants.GC_PAUSE_TIME_METRIC_NAME, dimensions);
     }
 

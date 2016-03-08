@@ -20,8 +20,8 @@
 	<div class="login-logo">
 		<a href="#/">Apache Eagle</a>
 	</div>
-	<!-- /.login-logo -->
-	<div class="login-box-body">
+
+	<div class="login-box-body" ng-show="!loginSuccess">
 		<p class="login-box-msg">Sign in to start your session</p>
 		<div class="form-group has-feedback">
 			<input type="text" class="form-control" placeholder="User Name" ng-model="username" ng-keypress="login($event)" autocomplete="off" id="username">
@@ -33,17 +33,22 @@
 		</div>
 		<div class="row">
 			<div class="col-xs-8">
-				<!--div class="checkbox">
-					<label> <input type="checkbox" /> Remember Me
+				<div class="checkbox">
+					<label> <input type="checkbox" ng-checked="rememberUser" ng-click="rememberUser = !rememberUser;" /> Remember Me
 					</label>
-				</div-->
+				</div>
 			</div>
-			<!-- /.col -->
 			<div class="col-xs-4">
 				<button class="btn btn-primary btn-block btn-flat" ng-click="login($event, true)" ng-disabled="lock">Sign In</button>
 			</div>
-			<!-- /.col -->
 		</div>
 	</div>
-	<!-- /.login-box-body -->
+
+	<div class="login-box-body text-center" ng-show="loginSuccess">
+		<p class="login-box-msg">Login success</p>
+		<p>
+			<span class="fa fa-refresh fa-spin"></span>
+			Loading environment...
+		</p>
+	</div>
 </div>

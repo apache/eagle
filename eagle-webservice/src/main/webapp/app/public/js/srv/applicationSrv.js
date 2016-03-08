@@ -20,6 +20,8 @@
 	'use strict';
 
 	var serviceModule = angular.module('eagle.service');
+	var eagleApp = angular.module('eagleApp');
+
 	serviceModule.service('Application', function($q, $location, $wrapState, Entities) {
 		var Application = {};
 		var _current;
@@ -74,7 +76,7 @@
 					_ajax_deferred = $q.defer();
 					_script = document.createElement('script');
 					_script.type = 'text/javascript';
-					_script.src = "public/feature/" + feature.tags.feature + "/controller.js?_=" + Math.random();
+					_script.src = "public/feature/" + feature.tags.feature + "/controller.js?_=" + eagleApp._TRS();
 					document.head.appendChild(_script);
 					_script.onload = function() {
 						feature._loaded = true;
