@@ -86,13 +86,14 @@ public class JdbcEntityDefinitionManager {
      * @see java.sql.Types
      *
      * @param fieldType entity field type class
-     * @return java.sql.Types
+     * @return java.sql.Types, return Types.NULL if not found
      */
     public static Integer getJdbcType(Class<?> fieldType) {
-        if(!_classJdbcType.containsKey(fieldType)){
-            LOG.debug("Unable to locate simple jdbc type for: {}, treat as java object",fieldType);
-            // IllegalArgumentException("Unable to locate jdbc type for: "+fieldType);
-            return Types.BINARY;
+        if(fieldType == null){
+            return Types.NULL;
+        } else if(!_classJdbcType.containsKey(fieldType)){
+            LOG.debug("Unable to locate simple jdbc type for: {}, return type as JAVA_OBJECT",fieldType);
+            return Types.JAVA_OBJECT;
         }
         return _classJdbcType.get(fieldType);
     }

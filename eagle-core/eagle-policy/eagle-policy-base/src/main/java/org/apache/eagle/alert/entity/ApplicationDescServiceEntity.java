@@ -37,11 +37,11 @@ import java.util.List;
 @Tags({"application"})
 public class ApplicationDescServiceEntity extends TaggedLogAPIEntity {
     @Column("a")
-    private String desc;
+    private String description;
     @Column("b")
     private String alias;
     @Column("c")
-    private String group;
+    private String groupName;
     @Column("d")
     private List<String> features;
     @Column("e")
@@ -56,22 +56,22 @@ public class ApplicationDescServiceEntity extends TaggedLogAPIEntity {
         valueChanged("config");
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
-        valueChanged("desc");
+    public void setDescription(String description) {
+        this.description = description;
+        valueChanged("description");
     }
 
-    public String getGroup() {
-        return group;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
-        valueChanged("group");
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+        valueChanged("groupName");
     }
 
     public String getAlias() {

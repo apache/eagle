@@ -19,6 +19,7 @@ package org.apache.eagle.storage.jdbc.schema;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.Qualifier;
+import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
 
 /**
@@ -52,7 +53,14 @@ public class JdbcEntityDefinition {
     }
 
     public Class<?> getColumnType(String fieldName) throws NoSuchFieldException {
-        return internal.getEntityClass().getField(fieldName).getType();
+        if (fieldName.equals(JdbcConstants.TIMESTAMP_COLUMN_NAME)){
+            return Long.class;
+        }else if(fieldName.equals(JdbcConstants.ROW_KEY_COLUMN_NAME)) {
+            return String.class;
+        }else if(fieldName.equals(JdbcConstants.METRIC_NAME_COLUMN_NAME)){
+            return String.class;
+        }
+        return internal.getEntityClass().getDeclaredField(fieldName).getType();
     }
 
     /**

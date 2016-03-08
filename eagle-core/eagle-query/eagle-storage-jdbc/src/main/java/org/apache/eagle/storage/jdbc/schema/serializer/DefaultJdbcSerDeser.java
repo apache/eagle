@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.storage.jdbc.schema.serializer;
 
+import org.apache.eagle.log.entity.meta.Qualifier;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
 import org.apache.torque.util.JdbcTypedValue;
@@ -23,6 +24,7 @@ import org.apache.torque.util.JdbcTypedValue;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * @since 3/26/15
@@ -30,10 +32,14 @@ import java.sql.SQLException;
 public class DefaultJdbcSerDeser<T,R> implements JdbcSerDeser<T> {
 
     @Override
-    public T readValue(ResultSet result, String fieldName, JdbcEntityDefinition JdbcEntityDefinition) throws IOException {
+    public T readValue(ResultSet result, Class<?> fieldType, String fieldName,Qualifier qualifier) throws IOException {
         try {
-            Object val = result.getObject(fieldName);
-            return (T) val;
+            if(Types.JAVA_OBJECT == JdbcEntityDefinitionManager.getJdbcType(fieldType)){
+                byte[] bytes = result.getBytes(fieldName);
+                return (T) qualifier.getSerDeser().deserialize(bytes);
+            }else {
+                return (T) result.getObject(fieldName);
+            }
         } catch (SQLException e) {
             throw new IOException(e);
         }
@@ -46,7 +52,12 @@ public class DefaultJdbcSerDeser<T,R> implements JdbcSerDeser<T> {
      * @return
      */
     @Override
-    public JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType) {
-        return new JdbcTypedValue(fieldValue, JdbcEntityDefinitionManager.getJdbcType(fieldType));
+    public JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType, Qualifier qualifier) {
+        if(Types.JAVA_OBJECT == JdbcEntityDefinitionManager.getJdbcType(fieldType)){
+            byte[] bytes = qualifier.getSerDeser().serialize(fieldValue);
+            return new JdbcTypedValue(bytes, Types.BINARY);
+        } else {
+            return new JdbcTypedValue(fieldValue, JdbcEntityDefinitionManager.getJdbcType(fieldType));
+        }
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.storage.jdbc.schema.serializer;
 
+import org.apache.eagle.log.entity.meta.Qualifier;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.torque.util.JdbcTypedValue;
 
@@ -30,12 +31,10 @@ public interface JdbcSerDeser<T> {
      * for entity read
      * convert value from jdbc storage into user-typed object
      * @param result
-     * @param fieldName
-     * @param JdbcEntityDefinition
      * @return
      * @throws IOException
      */
-    T readValue(ResultSet result, String fieldName, JdbcEntityDefinition JdbcEntityDefinition) throws IOException;
+    T readValue(ResultSet result, Class<?> fieldType,String fieldName, Qualifier qualifier) throws IOException;
 
     /**
      * for write entity
@@ -44,5 +43,5 @@ public interface JdbcSerDeser<T> {
      * @param fieldType
      * @return
      */
-    JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType);
+    JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType, Qualifier qualifier);
 }

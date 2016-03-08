@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.storage.jdbc.schema.serializer;
 
+import org.apache.eagle.log.entity.meta.Qualifier;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.torque.util.JdbcTypedValue;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -33,21 +34,19 @@ public class JsonJdbcSerDeser<T extends Object> implements JdbcSerDeser<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public T readValue(ResultSet result, String fieldName, JdbcEntityDefinition jdbcEntityDefinition) throws IOException {
+    public T readValue(ResultSet result, Class<?> fieldType,String fieldName, Qualifier qualifier) throws IOException {
         try {
             String jsonString = result.getString(fieldName);
-            return (T) objectMapper.readValue(jsonString, jdbcEntityDefinition.getColumnType(fieldName));
+            return (T) objectMapper.readValue(jsonString, fieldType);
         } catch (IOException e) {
            throw e;
         } catch (SQLException e) {
-            throw new IOException(e);
-        } catch (NoSuchFieldException e) {
             throw new IOException(e);
         }
     }
 
     @Override
-    public JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType) {
+    public JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType, Qualifier qualifier) {
         try {
             return new JdbcTypedValue(objectMapper.writeValueAsString(objectMapper.writeValueAsString(fieldValue)), Types.VARCHAR);
         } catch (IOException e) {
