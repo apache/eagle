@@ -21,6 +21,8 @@ import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntitySerDeser;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
 import org.apache.eagle.storage.jdbc.schema.serializer.DefaultJdbcSerDeser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Types;
 import java.util.HashMap;
@@ -33,6 +35,7 @@ import java.util.Map;
  * @since 3/27/15
  */
 public class JdbcEntityDefinitionManager {
+    private final static Logger LOG = LoggerFactory.getLogger(JdbcEntityDefinitionManager.class);
     private final static Map<Class<? extends TaggedLogAPIEntity>,JdbcEntityDefinition> sqlEntityDefinitionCache = new HashMap<Class<? extends TaggedLogAPIEntity>,JdbcEntityDefinition>();
 
     public static JdbcEntityDefinition getJdbcEntityDefinition(EntityDefinition entityDefinition){
@@ -87,7 +90,9 @@ public class JdbcEntityDefinitionManager {
      */
     public static Integer getJdbcType(Class<?> fieldType) {
         if(!_classJdbcType.containsKey(fieldType)){
-            throw new IllegalArgumentException("Unable to locate jdbc type for: "+fieldType);
+            LOG.debug("Unable to locate simple jdbc type for: {}, treat as java object",fieldType);
+            // IllegalArgumentException("Unable to locate jdbc type for: "+fieldType);
+            return Types.BINARY;
         }
         return _classJdbcType.get(fieldType);
     }
