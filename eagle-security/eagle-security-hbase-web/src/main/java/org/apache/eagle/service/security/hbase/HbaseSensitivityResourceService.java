@@ -19,10 +19,8 @@ package org.apache.eagle.service.security.hbase;
 
 
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
-import org.apache.eagle.security.hbase.HbaseResourceSensitivityAPIEntity;
+import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
-import org.apache.eagle.service.generic.ListQueryResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

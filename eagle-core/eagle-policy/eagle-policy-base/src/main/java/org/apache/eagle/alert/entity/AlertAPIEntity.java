@@ -73,9 +73,18 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 	public String getAlertContext() {
 		return alertContext;
 	}
+
+	public AlertContext getWrappedAlertContext() {
+		return AlertContext.fromJsonString(alertContext);
+	}
 	
 	public void setAlertContext(String alertContext) {
 		this.alertContext = alertContext;
+		_pcs.firePropertyChange("alertContext", null, null);
+	}
+
+	public void setAlertContext(AlertContext alertContext) {
+		if(alertContext != null) this.alertContext = alertContext.toJsonString();
 		_pcs.firePropertyChange("alertContext", null, null);
 	}
 
