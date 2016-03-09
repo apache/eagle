@@ -24,7 +24,6 @@ import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.stream.application.AppManagerConstants;
 import org.apache.eagle.stream.application.model.TopologyDescriptionModel;
-import org.apache.eagle.stream.application.model.TopologyOperationModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 

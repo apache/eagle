@@ -55,7 +55,7 @@ public final class EagleConfigConstants {
     @Deprecated
     public final static String DATA_SOURCE = "dataSource";
     public final static String APPLICATION = "application";
-    
+
     public final static String WEB_CONFIG = "web";
     public final static String APP_CONFIG = "app";
 
