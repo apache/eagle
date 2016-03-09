@@ -23,8 +23,8 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
 import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.datastream.Tuple2;
 import org.junit.Test;
-import scala.Tuple2;
 
 import java.util.*;
 
@@ -54,7 +54,7 @@ public class TestUserCommandReassembler {
         Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
             @Override
             public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");Assert.assertEquals("user:appendToFile", cmd);
+                String cmd = (String)stringMapTuple2.f1().get("cmd");Assert.assertEquals("user:appendToFile", cmd);
                 System.out.println("assert passed!!!");
             }
         };
@@ -83,7 +83,7 @@ public class TestUserCommandReassembler {
         Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
             @Override
             public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");
+                String cmd = (String)stringMapTuple2.f1().get("cmd");
                 Assert.assertEquals("user:read", cmd);
                 System.out.println("assert passed!!!");
             }
@@ -120,9 +120,9 @@ public class TestUserCommandReassembler {
         Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
             @Override
             public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");
+                String cmd = (String)stringMapTuple2.f1().get("cmd");
                 Assert.assertEquals("user:copyFromLocal", cmd);
-                //Assert.assertEquals("user:appendToFile", cmd);
+                Assert.assertEquals("user:appendToFile", cmd);
                 System.out.println("assert passed!!!");
             }
         };

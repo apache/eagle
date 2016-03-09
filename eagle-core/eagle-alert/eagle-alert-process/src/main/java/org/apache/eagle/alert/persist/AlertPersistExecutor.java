@@ -21,7 +21,7 @@ import com.typesafe.config.Config;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor1;
-import scala.Tuple1;
+import org.apache.eagle.datastream.Tuple1;
 
 import java.util.Arrays;
 

@@ -44,13 +44,12 @@ public class AggregateExecutorFactory {
 	public static final AggregateExecutorFactory Instance = new AggregateExecutorFactory();
 
 
-	public IPolicyExecutor[] createExecutors(List<String> streamNames, String cql) throws Exception {
+	public IPolicyExecutor[] createExecutors(String cql) throws Exception {
 		int numPartitions = 1; //loadExecutorConfig(config, executorId, partitionerCls);
 
 		IPolicyExecutor[] executors = new IPolicyExecutor[numPartitions];
-		String[] upStreams = streamNames.toArray(new String[0]);
 		for (int i = 0; i < numPartitions ; i++ ) {
-			executors[i] = new SimpleAggregateExecutor(upStreams, cql, "siddhiCEPEngine", i, numPartitions);
+			executors[i] = new SimpleAggregateExecutor(cql, "siddhiCEPEngine", i, numPartitions);
 		}
 
 		return executors;
@@ -59,8 +58,11 @@ public class AggregateExecutorFactory {
 	public IPolicyExecutor[] createExecutors(Config config, List<String> streamNames, String executorId) throws Exception {
 		StringBuilder partitionerCls = new StringBuilder(DefaultPolicyPartitioner.class.getCanonicalName());
         int numPartitions = loadExecutorConfig(config, executorId, partitionerCls);
-		PolicyDefinitionDAO<AggregateDefinitionAPIEntity> policyDefDao = new PolicyDefinitionEntityDAOImpl<>(
+        
+		PolicyDefinitionDAO<AggregateDefinitionAPIEntity> policyDefDao = new PolicyDefinitionEntityDAOImpl<AggregateDefinitionAPIEntity>(
 				new EagleServiceConnector(config), Constants.AGGREGATE_DEFINITION_SERVICE_ENDPOINT_NAME);
+		
+		
 		return newAggregateExecutors(policyDefDao, streamNames, executorId, numPartitions, partitionerCls.toString());
 	}
 	
@@ -84,6 +86,7 @@ public class AggregateExecutorFactory {
         return numPartitions;
 	}
 
+
 //	private List<String> findStreamNames(Config config, String executorId, String dataSource) throws Exception {
 //		// Get map from alertExecutorId to alert stream
 //		// (dataSource) => Map[alertExecutorId:String,streamName:List[String]]
@@ -101,12 +104,12 @@ public class AggregateExecutorFactory {
 	private AggregateExecutor[] newAggregateExecutors(PolicyDefinitionDAO<AggregateDefinitionAPIEntity> alertDefDAO,
 			List<String> sourceStreams, String executorID, int numPartitions, String partitionerCls)
 					throws Exception {
-		LOG.info("Creating aggregator executors with executorID: " + executorID + ", numPartitions: "
+		LOG.info("Creating alert executors with executorID: " + executorID + ", numPartitions: "
 				+ numPartitions + ", Partition class is: " + partitionerCls);
 
 		PolicyPartitioner partitioner = (PolicyPartitioner) Class.forName(partitionerCls).newInstance();
 		AggregateExecutor[] alertExecutors = new AggregateExecutor[numPartitions];
-		String[] _sourceStreams = sourceStreams.toArray(new String[sourceStreams.size()]);
+		String[] _sourceStreams = sourceStreams.toArray(new String[0]);
 
 		for (int i = 0; i < numPartitions; i++) {
 			alertExecutors[i] = new AggregateExecutor(executorID, partitioner, numPartitions, i, alertDefDAO,
@@ -114,4 +117,5 @@ public class AggregateExecutorFactory {
 		}
 		return alertExecutors;
 	}
+
 }

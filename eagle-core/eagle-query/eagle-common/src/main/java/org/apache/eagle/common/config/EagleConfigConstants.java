@@ -52,8 +52,5 @@ public final class EagleConfigConstants {
     public final static String PASSWORD = "password";
 
     public final static String SITE = "site";
-    @Deprecated
     public final static String DATA_SOURCE = "dataSource";
-    public final static String APPLICATION = "application";
-
 }

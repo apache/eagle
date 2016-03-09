@@ -16,9 +16,10 @@
  */
 package org.apache.eagle.policy.siddhi;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.policy.PolicyEvaluationContext;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.event.Event;
@@ -36,14 +37,14 @@ import java.util.List;
  */
 public class SiddhiQueryCallbackImpl<T extends AbstractPolicyDefinitionEntity, K> extends QueryCallback{
 
-	private static final Logger LOG = LoggerFactory.getLogger(SiddhiQueryCallbackImpl.class);
-
-	private final Config config;
-	private final PolicyEvaluationContext<T, K> siddhiEvaluateContext;
-
-	public SiddhiQueryCallbackImpl(Config config, PolicyEvaluationContext<T, K> siddhiContext) {
-		this.config = config;
-		this.siddhiEvaluateContext = siddhiContext;
+	private SiddhiPolicyEvaluator<T, K> evaluator;
+	public static final Logger LOG = LoggerFactory.getLogger(SiddhiQueryCallbackImpl.class);
+	public static final ObjectMapper mapper = new ObjectMapper();	
+	public Config config;
+	
+	public SiddhiQueryCallbackImpl(Config config, SiddhiPolicyEvaluator<T, K> evaluator) {
+		this.config = config;		
+		this.evaluator = evaluator;
 	}
 	
 	public static List<String> convertToString(List<Object> data) {
@@ -71,14 +72,14 @@ public class SiddhiQueryCallbackImpl<T extends AbstractPolicyDefinitionEntity, K
 	}
 
 	public static List<Object> getOutputObject(Object[] data) {
-		List<Object> rets = new ArrayList<>(data.length);
-//		boolean isFirst = true;
+		List<Object> rets = new ArrayList<Object>();
+		boolean isFirst = true;
 		for (Object object : data) {
-//			// The first field is siddhiAlertContext, skip it
-//			if (isFirst) {
-//				isFirst = false;
-//				continue;
-//			}
+			// The first field is siddhiAlertContext, skip it
+			if (isFirst) {
+				isFirst = false;
+				continue;
+			}
 			rets.add(object);
 		}
 		return rets;
@@ -87,9 +88,11 @@ public class SiddhiQueryCallbackImpl<T extends AbstractPolicyDefinitionEntity, K
 	@SuppressWarnings("unchecked")
 	@Override
 	public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+		Object[] data = inEvents[0].getData();
+		PolicyEvaluationContext<T, K> siddhiAlertContext = (PolicyEvaluationContext<T, K>)data[0];
 		List<Object> rets = getOutputObject(inEvents[0].getData());
-		K alert = siddhiEvaluateContext.resultRender.render(config, rets, siddhiEvaluateContext, timeStamp);
-		SiddhiEvaluationHandler<T, K> handler = siddhiEvaluateContext.alertExecutor;
-		handler.onEvalEvents(siddhiEvaluateContext, Arrays.asList(alert));
+		K alert = siddhiAlertContext.resultRender.render(config, rets, siddhiAlertContext, timeStamp);
+		SiddhiEvaluationHandler<T, K> handler = siddhiAlertContext.alertExecutor;
+		handler.onEvalEvents(siddhiAlertContext, Arrays.asList(alert));
 	}
 }

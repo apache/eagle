@@ -21,6 +21,8 @@ import java.util
 import org.apache.eagle.datastream.Collector
 import org.apache.eagle.datastream.StormStreamExecutor
 import org.apache.eagle.datastream.StormStreamExecutor3
+import org.apache.eagle.datastream.Tuple2
+import org.apache.eagle.datastream.Tuple3
 
 import com.typesafe.config.Config
 
@@ -37,7 +39,7 @@ case class StormExecutorForAlertWrapper(delegate: StormStreamExecutor[Tuple2[Str
   override def flatMap(input: Seq[AnyRef], collector: Collector[Tuple3[String, String, util.SortedMap[Object, Object]]]): Unit = {
     delegate.flatMap(input, new Collector[Tuple2[String, util.SortedMap[AnyRef, AnyRef]]] {
       override def collect(r: Tuple2[String, util.SortedMap[AnyRef, AnyRef]]): Unit = {
-        collector.collect(Tuple3(r._1, streamName, r._2))
+        collector.collect(Tuple3(r.f0, streamName, r.f1))
       }
     })
   }

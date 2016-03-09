@@ -63,14 +63,14 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
 
     private AlertAPIEntity renderAlert(MLCallbackResult aResult,PolicyEvaluationContext alertContext){
         String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
-        String applicatioin = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION);
+        String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 
         AlertAPIEntity entity = new AlertAPIEntity();
         entity.setDescription(aResult.toString());
 
         Map<String, String> tags = new HashMap<>();
         tags.put(EagleConfigConstants.SITE, site);
-        tags.put(EagleConfigConstants.APPLICATION, applicatioin);
+        tags.put(EagleConfigConstants.DATA_SOURCE, dataSource);
         tags.put(Constants.SOURCE_STREAMS, (String)alertContext.evaluator.getAdditionalContext().get(Constants.SOURCE_STREAMS));
         tags.put(Constants.POLICY_ID, alertContext.policyId);
         tags.put(Constants.ALERT_SOURCE, source);
@@ -90,18 +90,18 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
 
         try {
             site = config.getString("eagleProps.site");
-            applicatioin = config.getString("eagleProps.application");
-            context.addProperty(EagleConfigConstants.APPLICATION, applicatioin);
+            dataSource = config.getString("eagleProps.dataSource");
+            context.addProperty(EagleConfigConstants.DATA_SOURCE, dataSource);
             context.addProperty(EagleConfigConstants.SITE, site);
         } catch (Exception ex) {
             LOG.error("site, dataSource not set in config file, ", ex);
         }
 
-        context.addProperty(EagleConfigConstants.APPLICATION, applicatioin);
+        context.addProperty(EagleConfigConstants.DATA_SOURCE, dataSource);
         context.addProperty(EagleConfigConstants.SITE, site);
         context.addProperty(Constants.POLICY_NAME, alertContext.policyId);
 
-        entity.setAlertContext(context);
+        entity.setAlertContext(context.toJsonString());
         return entity;
     }
 }

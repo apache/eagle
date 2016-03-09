@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.service.security.hdfs.rest;
 
-import org.apache.eagle.security.entity.FileStatusEntity;
+import org.apache.eagle.security.hdfs.entity.FileStatusEntity;
 
 import java.util.List;
 

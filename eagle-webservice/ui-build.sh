@@ -38,3 +38,5 @@ npm install
 # grunt build
 echo "grunt building..."
 npm run grunt
+
+echo "================ Web APP Building End ================"

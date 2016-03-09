@@ -16,17 +16,14 @@
  */
 package org.apache.eagle.policy.dao;
 
-import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.service.client.EagleServiceClientException;
+import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +38,7 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOG = LoggerFactory.getLogger(PolicyDefinitionEntityDAOImpl.class);
+	public static final String ALERT_EXECUTOR_ID = "alertExecutorId";
 	private final EagleServiceConnector connector;
 	private final String servicePointName;
 
@@ -50,10 +48,10 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 	}
 
     @Override
-	public List<T> findActivePolicies(String site, String application) throws Exception {
+	public List<T> findActivePolicies(String site, String dataSource) throws Exception {
 		try {
 			IEagleServiceClient client = new EagleServiceClientImpl(connector);
-			String query = servicePointName + "[@site=\"" + site + "\" AND @application=\"" + application + "\" AND @enabled=\"true\"]{*}";
+			String query = servicePointName + "[@site=\"" + site + "\" AND @dataSource=\"" + dataSource + "\"]{*}";
 			GenericServiceAPIResponseEntity<T> response = client.search()
 												                .pageSize(Integer.MAX_VALUE)
 												                .query(query)
@@ -78,14 +76,14 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
     
 
     @Override
-	public Map<String, Map<String, T>> findActivePoliciesGroupbyExecutorId(String site, String application)
+	public Map<String, Map<String, T>> findActivePoliciesGroupbyExecutorId(String site, String dataSource)
 			throws Exception {
-		List<T> list = findActivePolicies(site, application);
+		List<T> list = findActivePolicies(site, dataSource);
 		Map<String, Map<String, T>> map = new HashMap<String, Map<String, T>>();
 		for (T entity : list) {
 			// support both executorId and legacy alertExecutorId
-			String executorID = entity.getTags().containsKey(Constants.EXECUTOR_ID) ? entity.getTags().get(Constants.EXECUTOR_ID)
-					: entity.getTags().get(Constants.ALERT_EXECUTOR_ID);
+			String executorID = entity.getTags().containsKey("executorId") ? entity.getTags().get("executorId")
+					: entity.getTags().get(ALERT_EXECUTOR_ID);
 
 			if (map.get(executorID) == null) {
 				map.put(executorID, new HashMap<String, T>());
@@ -95,24 +93,4 @@ public class PolicyDefinitionEntityDAOImpl<T extends AbstractPolicyDefinitionEnt
 		return map;
 	}
 
-    @Override
-    public void updatePolicyDetails(T entity) {
-        IEagleServiceClient client = new EagleServiceClientImpl(connector);
-
-        List<T> entityList = new ArrayList<>();
-        entityList.add(entity);
-
-        try {
-            client.create(entityList, servicePointName);
-        } catch (IOException | EagleServiceClientException exception) {
-            LOG.error("Exception in updating markdown for policy in HBase ", exception);
-        } finally {
-            try {
-                if (null != client)
-                    client.close();
-            } catch (IOException exception) {
-                LOG.error("Unable to close Eagle service client ", exception);
-            }
-        }
-    }
 }

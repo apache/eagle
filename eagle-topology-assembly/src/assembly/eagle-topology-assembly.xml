@@ -46,7 +46,6 @@
                 <exclude>log4j:log4j</exclude>
                 <exclude>asm:asm</exclude>
                 <exclude>org.apache.log4j.wso2:log4j</exclude>
-                <exclude>log4j:apache-log4j-extras</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

@@ -1,0 +1,171 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<div class="box box-info">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			{{policy.tags.policyId}}
+			<small>{{policy.tags.site}}</small>
+		</h3>
+	</div><!-- /.box-header -->
+
+	<div class="box-body">
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="inline-group">
+					<dl><dt>Data Source</dt><dd>{{policy.tags.dataSource}}</dd></dl>
+					<dl><dt>Status</dt><dd>
+						<span ng-show="policy.enabled" class="text-muted"><i class="fa fa-square text-green"></i> Enabled</span>
+						<span ng-show="!policy.enabled" class="text-muted"><i class="fa fa-square text-muted"></i> Disabled</span>
+					</dd></dl>
+				</div>
+				<div class="inline-group">
+					<dl><dt>Description</dt><dd>{{policy.description}}</dd></dl>
+				</div>
+				<div class="inline-group">
+					<dl><dt>Alert</dt><dd>
+						<a href="mailto:{{mail}}" ng-repeat="mail in policy.__mailList track by $index" style="margin-right: 10px;">{{mail}}</a>
+					</dd></dl>
+				</div>
+			</div>
+			<div class="col-xs-4 text-right" ng-show="auth.isRole('ROLE_ADMIN')">
+				<a class="btn btn-primary" href="#/dam/policyEdit/{{policy.encodedRowkey}}">Edit</a>
+				<button class="btn btn-warning" ng-show="!policy.enabled" ng-click="updatePolicyStatus(policy, true)">Enable</button>
+				<button class="btn btn-warning" ng-show="policy.enabled" ng-click="updatePolicyStatus(policy, false)">Disable</button>
+				<button class="btn btn-danger" ng-click="deletePolicy(policy)">Delete</button>
+			</div>
+		</div>
+	</div><!-- /.box-body -->
+
+	<div class="overlay" ng-hide="policyList._promise.$$state.status === 1;">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+
+	<div class="box-footer clearfix">
+		<a data-toggle="collapse" href="[data-id='query']">
+			View Query
+		</a>
+		<div data-id="query" class="collapse in">
+			<pre>{{policy.__expression}}</pre>
+		</div>
+	</div>
+</div>
+
+<div class="nav-tabs-custom">
+	<ul class="nav nav-tabs">
+		<li class="active">
+			<a href="[data-id='visualization']" data-toggle="tab">Visualization</a>
+		</li>
+		<li>
+			<a href="[data-id='statistics']" data-toggle="tab">Statistics</a>
+		</li>
+		<li>
+			<a href="[data-id='alerts']" data-toggle="tab">Alerts</a>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" data-id="visualization">
+			<div class="row">
+				<div class="col-xs-6">
+					<div nvd3="policyEvalSeries" data-title="Policy Eval Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
+				</div>
+				<div class="col-xs-6">
+					<div nvd3="policyEvalFailSeries" data-title="Policy Eval Fail Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
+				</div>
+				<div class="col-xs-6">
+					<div nvd3="alertSeries" data-title="Alert Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
+				</div>
+				<div class="col-xs-6">
+					<div nvd3="alertFailSeries" data-title="Alert Fail Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
+				</div>
+			</div>
+		</div><!-- /.tab-pane -->
+
+		<div class="tab-pane" data-id="statistics">
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="info-box bg-aqua">
+						<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+						<div class="info-box-content">
+							<span class="info-box-text">Policy Eval Count</span>
+							<span class="info-box-number">{{common.array.sum(policyEvalSeries, "1")}} <small>(Monthly)</small></span>
+							<span class="info-box-number">{{policyEvalSeries[policyEvalSeries.length - 1][1]}} <small>(Daily)</small></span>
+						</div><!-- /.info-box-content -->
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="info-box bg-red">
+						<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+						<div class="info-box-content">
+							<span class="info-box-text">Policy Eval Fail Count</span>
+							<span class="info-box-number">{{common.array.sum(policyEvalFailSeries, "1")}} <small>(Monthly)</small></span>
+							<span class="info-box-number">{{policyEvalFailSeries[policyEvalFailSeries.length - 1][1]}} <small>(Daily)</small></span>
+						</div><!-- /.info-box-content -->
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="info-box bg-aqua">
+						<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+						<div class="info-box-content">
+							<span class="info-box-text">Alert Count</span>
+							<span class="info-box-number">{{common.array.sum(alertSeries, "1")}} <small>(Monthly)</small></span>
+							<span class="info-box-number">{{alertSeries[alertSeries.length - 1][1]}} <small>(Daily)</small></span>
+						</div><!-- /.info-box-content -->
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="info-box bg-red">
+						<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+						<div class="info-box-content">
+							<span class="info-box-text">Alert Fail Count</span>
+							<span class="info-box-number">{{common.array.sum(alertFailSeries, "1")}} <small>(Monthly)</small></span>
+							<span class="info-box-number">{{alertFailSeries[alertFailSeries.length - 1][1]}} <small>(Daily)</small></span>
+						</div><!-- /.info-box-content -->
+					</div>
+				</div>
+			</div>
+		</div><!-- /.tab-pane -->
+
+		<div class="tab-pane" data-id="alerts">
+			<div sorttable source="alertList" sort="-timestamp">
+				<table class="table table-bordered" ng-non-bindable>
+					<thead>
+						<tr>
+							<th width="170" sortpath="timestamp">Alert Time</th>
+							<th width="170" sortpath="alertContext.properties.timestamp">Message Time</th>
+							<th width="60" sortpath="alertContext.properties.user">User</th>
+							<th width="150" sortpath="alertContext.properties.host">Host</th>
+							<th sortpath="alertContext.properties.emailMessage">Description</th>
+							<th width="50"> </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-class="{info : item.__new}">
+							<td>{{common.format.date(item.timestamp)}}</td>
+							<td>{{common.format.date(item.alertContext.properties.timestamp)}}</td>
+							<td>{{item.alertContext.properties.user}}</td>
+							<td>{{item.alertContext.properties.host}}</td>
+							<td>{{item.alertContext.properties.alertMessage}}</td>
+							<td><a href="#/dam/alertDetail/{{item.encodedRowkey}}">Detail</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div><!-- /.tab-pane -->
+
+	</div><!-- /.tab-content -->
+</div>

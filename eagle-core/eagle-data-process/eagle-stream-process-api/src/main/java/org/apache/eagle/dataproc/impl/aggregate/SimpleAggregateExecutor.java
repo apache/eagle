@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.dataproc.impl.aggregate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
@@ -24,6 +23,7 @@ import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateDefinitionAPIEnt
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.policy.PolicyEvaluator;
 import org.apache.eagle.policy.PolicyManager;
@@ -34,16 +34,12 @@ import org.apache.eagle.policy.siddhi.SiddhiEvaluationHandler;
 import org.apache.hadoop.hbase.util.MD5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Only one policy for one simple aggregate executor
- *
  * Created on 1/10/16.
  */
 public class SimpleAggregateExecutor
@@ -56,17 +52,15 @@ public class SimpleAggregateExecutor
     private final int partitionSeq;
     private final int totalPartitionNum;
 
-    private final String[] upStreamNames;
     private String policyId;
     private String executorId;
     private Config config;
     private AggregateDefinitionAPIEntity aggDef;
     private PolicyEvaluator<AggregateDefinitionAPIEntity> evaluator;
 
-    public SimpleAggregateExecutor(String[] upStreams, String cql, String policyType, int partitionSeq, int totalPartitionNum) {
+    public SimpleAggregateExecutor(String cql, String policyType, int partitionSeq, int totalPartitionNum) {
         this.cql = cql;
         this.partitionSeq = partitionSeq;
-        this.upStreamNames = upStreams;
         this.totalPartitionNum = totalPartitionNum;
         // create an fixed definition policy api entity, and indicate it has full definition
         aggDef = new AggregateDefinitionAPIEntity();
@@ -74,13 +68,10 @@ public class SimpleAggregateExecutor
         aggDef.getTags().put(Constants.POLICY_TYPE, policyType);
         // TODO make it more general, not only hard code siddhi cep support here.
         try {
-            Map<String,Object> template = new HashMap<>();
-            template.put("type","siddhiCEPEngine");
-            template.put("expression",this.cql);
-            template.put("containsDefinition",true);
-            aggDef.setPolicyDef(new ObjectMapper().writer().writeValueAsString(template));
+            String template = "{\"type\":\"siddhiCEPEngine\", \"expression\":\"%s\", \"containsDefintion\": true }";
+            aggDef.setPolicyDef(String.format(template, this.cql));
         } catch (Exception e) {
-            LOG.error("Simple aggregate generate policy definition failed!", e);
+            LOG.error("simple aggregate generate policy definition failed!", e);
         }
         aggDef.setCreatedTime(new Date().getTime());
         aggDef.setLastModifiedDate(new Date().getTime());
@@ -128,15 +119,11 @@ public class SimpleAggregateExecutor
         }
 
         PolicyEvaluator<AggregateDefinitionAPIEntity> pe;
-        PolicyEvaluationContext<AggregateDefinitionAPIEntity, AggregateEntity> context = new PolicyEvaluationContext<>();
-        context.policyId = alertDef.getTags().get("policyId");
-        context.alertExecutor = this;
-        context.resultRender = new AggregateResultRender();
         try {
-            // create evaluator instances
+            // Create evaluator instances
             pe = (PolicyEvaluator<AggregateDefinitionAPIEntity>) evalCls
-                    .getConstructor(Config.class, PolicyEvaluationContext.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
-                    .newInstance(config, context, policyDef, upStreamNames, false);
+                    .getConstructor(Config.class, String.class, AbstractPolicyDefinition.class, String[].class, boolean.class)
+                    .newInstance(config, alertDef.getTags().get(Constants.POLICY_ID), policyDef, new String[]{Constants.EAGLE_DEFAULT_POLICY_NAME}, false);
         } catch (Exception ex) {
             LOG.error("Fail creating new policyEvaluator", ex);
             LOG.warn("Broken policy definition and stop running : " + alertDef.getPolicyDef());
@@ -153,7 +140,13 @@ public class SimpleAggregateExecutor
         if (LOG.isDebugEnabled()) LOG.debug("Current policyEvaluators: " + evaluator);
 
         try {
-            evaluator.evaluate(new ValuesArray(collector, input.get(1), input.get(2)));
+            PolicyEvaluationContext<AggregateDefinitionAPIEntity, AggregateEntity> evaluationContext = new PolicyEvaluationContext<>();
+            evaluationContext.alertExecutor = this;
+            evaluationContext.policyId = policyId;
+            evaluationContext.evaluator = evaluator;
+            evaluationContext.outputCollector = collector;
+            evaluationContext.resultRender = new AggregateResultRender();
+            evaluator.evaluate(new ValuesArray(evaluationContext, input.get(1), input.get(2)));
         } catch (Exception ex) {
             LOG.error("Got an exception, but continue to run " + input.get(2).toString(), ex);
         }

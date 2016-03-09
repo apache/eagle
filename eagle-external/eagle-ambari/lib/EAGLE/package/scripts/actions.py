@@ -64,7 +64,7 @@ def eagle_topology_exec(action="start"):
 def eagle_hive_topology_exec(action="start"):
     import params
 
-    main_class="org.apache.eagle.security.hive.jobrunning.HiveJobRunningMonitoringMain"
+    main_class="eagle.security.hive.jobrunning.HiveJobRunningMonitoringMain"
     topology_name=format("{eagle_site}-hiveQueryRunningTopology")
     config_file=format("{eagle_conf}/{eagle_site}-hiveQueryLog-application.conf")
     eagle_topology_shell=format("{eagle_bin}/eagle-topology.sh")
@@ -89,7 +89,7 @@ def eagle_hive_topology_exec(action="start"):
 def eagle_hdfs_topology_exec(action="start"):
     import params
 
-    main_class="org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain"
+    main_class="eagle.security.auditlog.HdfsAuditLogProcessorMain"
     topology_name=format("{eagle_site}-hdfsAuditLog-topology")
     config_file=format("{eagle_conf}/{eagle_site}-hdfsAuditLog-application.conf")
 
@@ -114,7 +114,7 @@ def eagle_hdfs_topology_exec(action="start"):
 def eagle_userprofile_topology_exec(action="start"):
     import params
 
-    main_class="org.apache.eagle.security.userprofile.UserProfileDetectionMain"
+    main_class="eagle.security.userprofile.UserProfileDetectionMain"
     topology_name=format("{eagle_site}-userprofile-topology")
     config_file=format("{eagle_conf}/{eagle_site}-userprofile-topology.conf")
 

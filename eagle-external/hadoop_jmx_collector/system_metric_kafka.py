@@ -355,7 +355,7 @@ def main(argv):
     topic = None
     try:
         # read the kafka.ini
-        config = load_config('config.json')
+        config = loadConfigFile('eagle-collector.conf')
         print config
 
         site = config[u'env'].get('site').encode('utf-8')

@@ -19,20 +19,18 @@
 package org.apache.eagle.service.security.hbase.resolver;
 
 
-import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
-import org.apache.eagle.service.security.hbase.HbaseMetadataBrowseWebResource;
+import org.apache.eagle.service.security.hbase.dao.HbaseMetadataAccessConfig;
+import org.apache.eagle.service.security.hbase.dao.HbaseMetadataAccessConfigDAOImpl;
 import org.apache.eagle.service.security.hbase.dao.HbaseMetadataDAOImpl;
-import org.apache.hadoop.conf.Configuration;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
 
 public class HbaseMetadataResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
     @Override
@@ -42,8 +40,7 @@ public class HbaseMetadataResolver implements AttributeResolvable<GenericAttribu
         String[] subResources = query.split(":");
 
         try {
-            MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
-            Configuration config = repo.getConfig(HbaseMetadataBrowseWebResource.HBASE_APPLICATION, site);
+            HbaseMetadataAccessConfig config = new HbaseMetadataAccessConfigDAOImpl().getConfig(site);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(config);
 
             switch (subResources.length) {

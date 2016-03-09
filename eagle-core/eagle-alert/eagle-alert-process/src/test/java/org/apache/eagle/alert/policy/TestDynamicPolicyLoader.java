@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.policy.DynamicPolicyLoader;
 import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
@@ -83,9 +82,6 @@ public class TestDynamicPolicyLoader {
 			public List<AlertDefinitionAPIEntity> findActivePolicies(String site, String dataSource) {
 				return null;
 			}
-
-            @Override
-            public void updatePolicyDetails(AlertDefinitionAPIEntity entity) { /* do nothing */ }
 		};
 		
 		DynamicPolicyLoader<AlertDefinitionAPIEntity> loader = DynamicPolicyLoader.getInstanceOf(AlertDefinitionAPIEntity.class);

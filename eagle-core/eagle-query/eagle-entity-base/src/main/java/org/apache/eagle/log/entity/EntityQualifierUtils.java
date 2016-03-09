@@ -161,8 +161,6 @@ public class EntityQualifierUtils {
 			}else if(Float.class.equals(type) || float.class.equals(type)){
 				obj = Float.parseFloat(value);
 				// if((Double) obj < 0) throw new IllegalArgumentException("Don't support negative Float yet: "+obj);
-			}else if(Boolean.class.equals(type) || boolean.class.equals(type)) {
-				obj = Boolean.valueOf(value);
 			}
 			if(obj != null) return obj;
 		}catch (NumberFormatException ex){

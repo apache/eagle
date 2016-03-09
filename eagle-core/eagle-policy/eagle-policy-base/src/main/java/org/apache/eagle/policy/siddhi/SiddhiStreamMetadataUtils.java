@@ -35,7 +35,7 @@ public class SiddhiStreamMetadataUtils {
 	public static SortedMap<String, AlertStreamSchemaEntity> getAttrMap(String streamName) {
 		SortedMap<String, AlertStreamSchemaEntity> map = StreamMetadataManager.getInstance().getMetadataEntityMapForStream(streamName);
 		if(map == null || map.size() == 0){
-			throw new IllegalStateException("Alert stream schema ["+streamName+"] should never be empty");
+			throw new IllegalStateException("alert stream schema should never be empty");
 		}
 		return map;
 	}
@@ -49,7 +49,7 @@ public class SiddhiStreamMetadataUtils {
 	public static String convertToStreamDef(String streamName){
 		SortedMap<String, AlertStreamSchemaEntity> map = getAttrMap(streamName);
 		StringBuilder sb = new StringBuilder();
-//		sb.append(EAGLE_ALERT_CONTEXT_FIELD + " object, ");
+		sb.append(EAGLE_ALERT_CONTEXT_FIELD + " object, ");
 		for(Map.Entry<String, AlertStreamSchemaEntity> entry : map.entrySet()){
             appendAttributeNameType(sb, entry.getKey(), entry.getValue().getAttrType());
 		}

@@ -73,47 +73,6 @@ public class GenericEntityServiceResource {
         return objectMapper.readValue(inputStream, TypeFactory.defaultInstance().constructCollectionType(LinkedList.class, String.class));
     }
 
-
-    public GenericServiceAPIResponseEntity updateDatabase(Statement<ModifyResult<String>> statement) {
-        GenericServiceAPIResponseEntity<String> response = new GenericServiceAPIResponseEntity<>();
-        Map<String,Object> meta = new HashMap<>();
-        StopWatch stopWatch = new StopWatch();
-
-        try {
-            stopWatch.start();
-            DataStorage dataStorage = DataStorageManager.getDataStorageByEagleConfig();
-            if(dataStorage == null){
-                LOG.error("Data storage is null");
-                throw new IllegalDataStorageException("Data storage is null");
-            }
-            ModifyResult<String> result = statement.execute(dataStorage);
-            if(result.isSuccess()) {
-                List<String> keys =result.getIdentifiers();
-                if(keys != null) {
-                    response.setObj(keys, String.class);
-                    meta.put(TOTAL_RESULTS, keys.size());
-                } else {
-                    meta.put(TOTAL_RESULTS, 0);
-                }
-                meta.put(ELAPSEDMS,stopWatch.getTime());
-                response.setMeta(meta);
-                response.setSuccess(true);
-            }
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            response.setException(e);
-        }finally {
-            stopWatch.stop();
-        }
-        return response;
-    }
-
-    public GenericServiceAPIResponseEntity updateEntities(List<? extends TaggedLogAPIEntity> entities, String serviceName) {
-        CreateStatement createStatement = new CreateStatement(entities, serviceName);
-        GenericServiceAPIResponseEntity<String> response = updateDatabase(createStatement);
-        return response;
-    }
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

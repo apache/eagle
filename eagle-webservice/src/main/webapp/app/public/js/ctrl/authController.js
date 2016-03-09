@@ -16,76 +16,48 @@
  * limitations under the License.
  */
 
-(function() {
+// =============================================================
+// =                     User Profile List                     =
+// =============================================================
+damControllers.controller('authLoginCtrl', function(globalContent, Site, Authorization, $scope) {
 	'use strict';
 
-	var eagleControllers = angular.module('eagleControllers');
-	// =============================================================
-	// =                     User Profile List                     =
-	// =============================================================
-	eagleControllers.controller('authLoginCtrl', function (PageConfig, Site, Authorization, Application, $scope) {
-		PageConfig.hideSidebar = true;
-		PageConfig.hideApplication = true;
-		PageConfig.hideSite = true;
-		PageConfig.hideUser = true;
+	globalContent.hideSidebar = true;
+	globalContent.hideSite = true;
+	globalContent.hideUser = true;
 
-		$scope.username = "";
-		$scope.password = "";
-		$scope.lock = false;
-		$scope.loginSuccess = false;
+	$scope.username = "";
+	$scope.password = "";
+	$scope.lock = false;
 
-		if(localStorage) {
-			$scope.rememberUser = localStorage.getItem("rememberUser") !== "false";
-
-			if($scope.rememberUser) {
-				$scope.username = localStorage.getItem("username");
-				$scope.password = localStorage.getItem("password");
-			}
-		}
-
-		// UI
-		setTimeout(function () {
-			$("#username").focus();
-		});
-
-		// Login
-		$scope.login = function (event, forceSubmit) {
-			if ($scope.lock) return;
-
-			if (event.which === 13 || forceSubmit) {
-				$scope.lock = true;
-
-				Authorization.login($scope.username, $scope.password).then(function (success) {
-					if (success) {
-						// Check user remember
-						localStorage.setItem("rememberUser", $scope.rememberUser);
-						if($scope.rememberUser) {
-							localStorage.setItem("username", $scope.username);
-							localStorage.setItem("password", $scope.password);
-						} else {
-							localStorage.removeItem("username");
-							localStorage.removeItem("password");
-						}
-
-						// Initial environment
-						$scope.loginSuccess = true;
-						console.log("[Login] Login success! Reload data...");
-						Authorization.reload().then(function() {}, function() {console.warn("Site error!");});
-						Application.reload().then(function() {}, function() {console.warn("Site error!");});
-						Site.reload().then(function() {}, function() {console.warn("Site error!");});
-						Authorization.path(true);
-					} else {
-						$.dialog({
-							title: "OPS",
-							content: "User name or password not correct."
-						}).on("hidden.bs.modal", function () {
-							$("#username").focus();
-						});
-					}
-				}).finally(function () {
-					$scope.lock = false;
-				});
-			}
-		};
+	// UI
+	setTimeout(function() {
+		$("#username").focus();
 	});
-})();
+
+	// Login
+	$scope.login = function(event, forceSubmit) {
+		if($scope.lock) return;
+
+		if(event.which === 13 || forceSubmit) {
+			$scope.lock = true;
+
+			Authorization.login($scope.username, $scope.password).then(function(success) {
+				if(success) {
+					Site.refresh();
+					Authorization.refresh();
+					Authorization.path(true);
+				} else {
+					$.dialog({
+						title: "OPS",
+						content: "User name or password not correct."
+					}).on("hidden.bs.modal", function() {
+						$("#username").focus();
+					});
+				}
+			}).finally(function() {
+				$scope.lock = false;
+			});
+		}
+	};
+});

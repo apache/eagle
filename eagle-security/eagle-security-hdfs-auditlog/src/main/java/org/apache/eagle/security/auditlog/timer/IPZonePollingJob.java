@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.security.util.ExternalDataCache;
+import org.apache.eagle.security.util.ExternalDataCache;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -29,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.security.entity.IPZoneEntity;
+import org.apache.eagle.security.hdfs.entity.IPZoneEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import com.google.common.base.Function;

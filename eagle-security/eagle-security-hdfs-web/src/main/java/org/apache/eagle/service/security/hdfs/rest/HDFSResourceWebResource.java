@@ -26,46 +26,45 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.eagle.security.entity.FileStatusEntity;
-import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
+import org.apache.eagle.service.security.hdfs.HDFSResourceAccessConfig;
 import org.apache.eagle.service.security.hdfs.HDFSResourceConstants;
 import org.apache.eagle.service.security.hdfs.HDFSResourceSensitivityDataJoiner;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.eagle.service.security.hdfs.HDFSFileSystem;
+import org.apache.eagle.service.security.hdfs.HDFSResourceUtils;
+import org.apache.eagle.security.hdfs.entity.FileStatusEntity;
 
 
 /**
  * REST Web Service to browse files and Paths in HDFS
  */
 @Path(HDFSResourceConstants.HDFS_RESOURCE)
-public class HDFSResourceWebResource
+public class HDFSResourceWebResource 
 {
 	private static Logger LOG = LoggerFactory.getLogger(HDFSResourceWebResource.class);
-
-	@GET
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
+	
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)	
 	public HDFSResourceWebResponse  getHDFSResource( @QueryParam("site") String site , @QueryParam("path") String filePath )
 	{
 		LOG.info("Starting HDFS Resource Browsing.  Query Parameters ==> Site :"+site+"  Path : "+filePath );
-		HDFSResourceWebResponse response = new HDFSResourceWebResponse();
-		HDFSResourceWebRequestValidator validator = new HDFSResourceWebRequestValidator();
-		MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
-		List<FileStatusEntity> result = new ArrayList<>();
+		HDFSResourceWebResponse response = new HDFSResourceWebResponse();		
+		HDFSResourceWebRequestValidator validator = new HDFSResourceWebRequestValidator();		
+		List<FileStatusEntity> result = new ArrayList<>();		
 		List<FileStatus> fileStatuses = null;
 		try {
-			validator.validate(site, filePath); // First Step would be validating Request
-			Configuration config = repo.getConfig(HDFSResourceConstants.HDFS_APPLICATION, site);
-			HDFSFileSystem fileSystem = new HDFSFileSystem(config);
+			validator.validate(site, filePath); // First Step would be validating Request 
+			HDFSResourceAccessConfig config = HDFSResourceUtils.getConfig(site);
+			HDFSFileSystem fileSystem = new HDFSFileSystem(config.getHdfsEndpoint());
 			fileStatuses = fileSystem.browse(filePath);
 			// Join with File Sensitivity Info
 			HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner();
-			result = joiner.joinFileSensitivity(site, fileStatuses);
+            result = joiner.joinFileSensitivity(site, fileStatuses);
 			LOG.info("Successfully browsed files in HDFS .");
 		} catch( Exception ex ) {
 			response.setException(EagleExceptionWrapper.wrap(ex));

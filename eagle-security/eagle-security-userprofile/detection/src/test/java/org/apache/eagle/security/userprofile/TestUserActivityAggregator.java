@@ -21,13 +21,13 @@ package org.apache.eagle.security.userprofile;
 
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.security.userprofile.impl.UserActivityAggregatorImpl;
 import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import scala.Tuple2;
 
 import java.text.ParseException;
 import java.util.*;
@@ -57,8 +57,8 @@ public class TestUserActivityAggregator {
         aggregator_0.accumulate(event(DateTimeUtil.humanDateToMilliseconds("2015-09-29 01:02:02,000"),"user2","open"),collector);
 
         Assert.assertEquals(2, collector.getResult().size());
-        Assert.assertEquals("user2",collector.getResult().get(0)._1());
-        Assert.assertEquals("user1",collector.getResult().get(1)._1());
+        Assert.assertEquals("user2",collector.getResult().get(0).f0());
+        Assert.assertEquals("user1",collector.getResult().get(1).f0());
     }
 
     @Test
@@ -76,8 +76,8 @@ public class TestUserActivityAggregator {
         aggregator_1.accumulate(event(DateTimeUtil.humanDateToMilliseconds("2015-09-29 01:06:02,000"),"user2","open"),collector); //  outside safe-window
 
         Assert.assertEquals(4, collector.getResult().size());
-        Assert.assertEquals("user2",collector.getResult().get(0)._1());
-        Assert.assertEquals("user1",collector.getResult().get(1)._1());
+        Assert.assertEquals("user2",collector.getResult().get(0).f0());
+        Assert.assertEquals("user1",collector.getResult().get(1).f0());
     }
 
 

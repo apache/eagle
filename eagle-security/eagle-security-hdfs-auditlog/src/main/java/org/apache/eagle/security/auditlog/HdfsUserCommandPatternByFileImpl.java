@@ -18,7 +18,7 @@
  */
 package org.apache.eagle.security.auditlog;
 
-import org.apache.eagle.security.entity.HdfsUserCommandPatternEntity;
+import org.apache.eagle.security.hdfs.entity.HdfsUserCommandPatternEntity;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;

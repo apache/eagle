@@ -29,7 +29,6 @@ import org.apache.eagle.gc.model.GCPausedEvent;
 import org.apache.eagle.metric.reportor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.util.*;
 
@@ -62,7 +61,7 @@ public class GCMetricGeneratorExecutor extends JavaStormStreamExecutor2<String, 
         listener = new EagleServiceReporterMetricListener(host, port, username, password);
         dimensions = new HashMap<>();
         dimensions.put(EagleConfigConstants.SITE, EagleConfigHelper.getSite(config));
-        dimensions.put(EagleConfigConstants.APPLICATION, EagleConfigHelper.getApplication(config));
+        dimensions.put(EagleConfigConstants.DATA_SOURCE, EagleConfigHelper.getDataSource(config));
         gcPausedTimeMetricName = MetricKeyCodeDecoder.codeMetricKey(GCConstants.GC_PAUSE_TIME_METRIC_NAME, dimensions);
     }
 

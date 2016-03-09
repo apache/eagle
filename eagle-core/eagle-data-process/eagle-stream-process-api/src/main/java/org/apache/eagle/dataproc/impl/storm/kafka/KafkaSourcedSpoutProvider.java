@@ -37,36 +37,26 @@ public class KafkaSourcedSpoutProvider implements StormSpoutProvider {
 		return new SchemeAsMultiScheme(new KafkaSourcedSpoutScheme(deserClsName, context));
 	}
 
-    private String configPrefix = "dataSourceConfig";
-
-    public KafkaSourcedSpoutProvider(){}
-
-    public KafkaSourcedSpoutProvider(String prefix){
-        this.configPrefix = prefix;
-    }
-
 	@Override
-	public BaseRichSpout getSpout(Config config){
-        Config context = config;
-        if(this.configPrefix!=null) context = config.getConfig(configPrefix);
+	public BaseRichSpout getSpout(Config context){
 		// Kafka topic
-		String topic = context.getString("topic");
+		String topic = context.getString("dataSourceConfig.topic");
 		// Kafka consumer group id
-		String groupId = context.getString("consumerGroupId");
+		String groupId = context.getString("dataSourceConfig.consumerGroupId");
 		// Kafka fetch size
-		int fetchSize = context.getInt("fetchSize");
+		int fetchSize = context.getInt("dataSourceConfig.fetchSize");
 		// Kafka deserializer class
-		String deserClsName = context.getString("deserializerClass");
+		String deserClsName = context.getString("dataSourceConfig.deserializerClass");
 		// Kafka broker zk connection
-		String zkConnString = context.getString("zkConnection");
+		String zkConnString = context.getString("dataSourceConfig.zkConnection");
 		// transaction zkRoot
-		String zkRoot = context.getString("transactionZKRoot");
+		String zkRoot = context.getString("dataSourceConfig.transactionZKRoot");
 
         LOG.info(String.format("Use topic id: %s",topic));
 
         String brokerZkPath = null;
-        if(context.hasPath("brokerZkPath")) {
-            brokerZkPath = context.getString("brokerZkPath");
+        if(context.hasPath("dataSourceConfig.brokerZkPath")) {
+            brokerZkPath = context.getString("dataSourceConfig.brokerZkPath");
         }
 
         BrokerHosts hosts;
@@ -82,20 +72,20 @@ public class KafkaSourcedSpoutProvider implements StormSpoutProvider {
 				groupId);
 		
 		// transaction zkServers
-		spoutConfig.zkServers = Arrays.asList(context.getString("transactionZKServers").split(","));
+		spoutConfig.zkServers = Arrays.asList(context.getString("dataSourceConfig.transactionZKServers").split(","));
 		// transaction zkPort
-		spoutConfig.zkPort = context.getInt("transactionZKPort");
+		spoutConfig.zkPort = context.getInt("dataSourceConfig.transactionZKPort");
 		// transaction update interval
-		spoutConfig.stateUpdateIntervalMs = context.getLong("transactionStateUpdateMS");
+		spoutConfig.stateUpdateIntervalMs = context.getLong("dataSourceConfig.transactionStateUpdateMS");
 		// Kafka fetch size
 		spoutConfig.fetchSizeBytes = fetchSize;		
 		// "startOffsetTime" is for test usage, prod should not use this
-		if (context.hasPath("startOffsetTime")) {
-			spoutConfig.startOffsetTime = context.getInt("startOffsetTime");
+		if (context.hasPath("dataSourceConfig.startOffsetTime")) {
+			spoutConfig.startOffsetTime = context.getInt("dataSourceConfig.startOffsetTime");
 		}		
 		// "forceFromStart" is for test usage, prod should not use this 
-		if (context.hasPath("forceFromStart")) {
-			spoutConfig.forceFromStart = context.getBoolean("forceFromStart");
+		if (context.hasPath("dataSourceConfig.forceFromStart")) {
+			spoutConfig.forceFromStart = context.getBoolean("dataSourceConfig.forceFromStart");
 		}
 		
 		spoutConfig.scheme = getStreamScheme(deserClsName, context);

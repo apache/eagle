@@ -33,7 +33,7 @@ object UnionForAlert extends App{
   val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependForAlertExecutor("test")).map2(a => ("key1",a))
   val tail2 = env.fromSpout(TestSpout()).flatMap(WordAppendForAlertExecutor("test")).map2(a => ("key2",a))
   tail1.streamUnion(List(tail2)).alert(Seq("s1","s2"), "alert1", consume = false)
-  env.execute()
+  //env.execute
 }
 
 /**

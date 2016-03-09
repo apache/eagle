@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory
  * @param streamInfo
  * @tparam T
  */
-abstract class AbstractStreamBolt[T](val fieldsNum:Int=1, val ack:Boolean = true)(implicit streamInfo:StreamInfo) extends BaseRichBolt{
+abstract class AbstractStreamBolt[T](val fieldsNum:Int=0, val ack:Boolean = true)(implicit streamInfo:StreamInfo) extends BaseRichBolt{
   private var _collector: OutputCollector = null
   private val LOG = LoggerFactory.getLogger(classOf[AbstractStreamBolt[T]])
 

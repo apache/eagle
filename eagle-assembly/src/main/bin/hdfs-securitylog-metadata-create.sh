@@ -21,19 +21,19 @@ echo "Importing metadata for HDFS security log... "
 
 #### AlertStreamService: alert streams generated from data source
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamService" -d '[{"prefix":"alertStream","tags":{"application":"hdfsSecurityLog","streamName":"hdfsSecurityLogEventStream"},"desc":"alert event stream from HDFS security audit log"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamService" -d '[{"prefix":"alertStream","tags":{"dataSource":"hdfsSecurityLog","streamName":"hdfsSecurityLogEventStream"},"desc":"alert event stream from HDFS security audit log"}]'
 
 
 #### AlertExecutorService: what alert streams are consumed by alert executor
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertExecutorService" -d '[{"prefix":"alertExecutor","tags":{"application":"hdfsSecurityLog","alertExecutorId":"hdfsSecurityLogAlertExecutor","streamName":"hdfsSecurityLogEventStream"},"desc":"alert executor for HDFS security log event stream"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertExecutorService" -d '[{"prefix":"alertExecutor","tags":{"dataSource":"hdfsSecurityLog","alertExecutorId":"hdfsSecurityLogAlertExecutor","streamName":"hdfsSecurityLogEventStream"},"desc":"alert executor for HDFS security log event stream"}]'
 
 
 #### AlertStreamSchemaService: schema for event from alert stream
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamSchemaService" -d '[{"prefix":"alertStreamSchema","tags":{"application":"hdfsSecurityLog","streamName":"hdfsSecurityLogEventStream","attrName":"timestamp"},"attrDescription":"milliseconds of the datetime","attrType":"long","category":"","attrValueResolver":""},{"prefix":"alertStreamSchema","tags":{"application":"hdfsSecurityLog","streamName":"hdfsSecurityLogEventStream","attrName":"user"},"attrDescription":"","attrType":"string","category":"","attrValueResolver":""},{"prefix":"alertStreamSchema","tags":{"application":"hdfsSecurityLog","streamName":"hdfsSecurityLogEventStream","attrName":"allowed"},"attrDescription":"true, false or none","attrType":"bool","category":"","attrValueResolver":""}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamSchemaService" -d '[{"prefix":"alertStreamSchema","tags":{"dataSource":"hdfsSecurityLog","streamName":"hdfsSecurityLogEventStream","attrName":"timestamp"},"attrDescription":"milliseconds of the datetime","attrType":"long","category":"","attrValueResolver":""},{"prefix":"alertStreamSchema","tags":{"dataSource":"hdfsSecurityLog","streamName":"hdfsSecurityLogEventStream","attrName":"user"},"attrDescription":"","attrType":"string","category":"","attrValueResolver":""},{"prefix":"alertStreamSchema","tags":{"dataSource":"hdfsSecurityLog","streamName":"hdfsSecurityLogEventStream","attrName":"allowed"},"attrDescription":"true, false or none","attrType":"bool","category":"","attrValueResolver":""}]'
 
-curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDataSourceService" -d '[{"prefix":"alertDataSource","tags":{"site":"sandbox","application":"hdfsSecurityLog"},"enabled":"true","desc":"HDFS Security"}]'
+curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertDataSourceService" -d '[{"prefix":"alertDataSource","tags":{"site":"sandbox","dataSource":"hdfsSecurityLog"},"enabled":"true","desc":"HDFS Security"}]'
 
 
 echo ""

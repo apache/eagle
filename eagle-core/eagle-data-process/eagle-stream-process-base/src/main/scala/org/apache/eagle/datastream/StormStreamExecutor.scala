@@ -19,13 +19,13 @@ package org.apache.eagle.datastream
 import com.typesafe.config.Config
 import scala.collection.JavaConverters._
 
-trait StormStreamExecutor[R <: Any] extends FlatMapper[R] {
+trait StormStreamExecutor[R <: EagleTuple] extends FlatMapper[R] {
   def prepareConfig(config : Config)
   def init
   def fields : Array[String]
 }
 
-trait JavaStormStreamExecutor[R <: AnyRef] extends FlatMapper[R] {
+trait JavaStormStreamExecutor[R <: EagleTuple] extends FlatMapper[R] {
   def prepareConfig(config : Config)
   def init
   def fields : Array[String]

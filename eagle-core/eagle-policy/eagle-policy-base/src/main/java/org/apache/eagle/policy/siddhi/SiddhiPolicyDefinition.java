@@ -32,14 +32,14 @@ import org.apache.eagle.policy.config.AbstractPolicyDefinition;
 public class SiddhiPolicyDefinition extends AbstractPolicyDefinition {
 	private String expression;
 
-	private boolean containsDefinition;
+	private boolean containsDefintion;
 
-	public boolean isContainsDefinition() {
-		return containsDefinition;
+	public boolean isContainsDefintion() {
+		return containsDefintion;
 	}
 
-	public void setContainsDefinition(boolean containsDefinition) {
-		this.containsDefinition = containsDefinition;
+	public void setContainsDefintion(boolean containsDefintion) {
+		this.containsDefintion = containsDefintion;
 	}
 
 	public String getExpression() {

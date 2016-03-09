@@ -27,12 +27,12 @@ import java.util.Map;
  */
 public abstract class AbstractConfigOptionParser {
 
-    // private final Options options;
+    private final Options options;
     private final Parser parser;
 
     public AbstractConfigOptionParser(){
         parser = parser();
-        //options = options();
+        options = options();
     }
 
     /**
@@ -63,6 +63,6 @@ public abstract class AbstractConfigOptionParser {
     }
 
     public CommandLine parse(String[] arguments) throws ParseException {
-        return this.parser.parse(this.options(),arguments);
+        return this.parser.parse(this.options,arguments);
     }
 }

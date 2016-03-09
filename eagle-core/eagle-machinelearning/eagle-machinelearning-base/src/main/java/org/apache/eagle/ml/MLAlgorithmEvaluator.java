@@ -16,10 +16,9 @@
  */
 package org.apache.eagle.ml;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.ml.model.MLAlgorithm;
-import org.apache.eagle.policy.PolicyEvaluationContext;
+import com.typesafe.config.Config;
 
 /**
  * Machine Learning Algorithm Evaluator
@@ -30,7 +29,7 @@ public interface MLAlgorithmEvaluator {
      *
      * @param algorithm MLAlgorithm instance
      */
-    public void init(MLAlgorithm algorithm, Config config, PolicyEvaluationContext context);
+    public void init(MLAlgorithm algorithm, Config config);
 
     /**
      * Evaluate input user profile model

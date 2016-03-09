@@ -52,8 +52,8 @@ public class StreamMetadataManager {
 	
 	private void internalInit(Config config, AlertStreamSchemaDAO dao){
 		try{
-			String application = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION);
-			List<AlertStreamSchemaEntity> list = dao.findAlertStreamSchemaByApplication(application);
+			String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
+			List<AlertStreamSchemaEntity> list = dao.findAlertStreamSchemaByDataSource(dataSource);
 			if(list == null)
 				return;
 			for (AlertStreamSchemaEntity entity : list) {

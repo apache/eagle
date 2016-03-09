@@ -40,10 +40,7 @@ public class ConfigOptionParser extends AbstractConfigOptionParser {
     @Override
     public Map<String,String> parseConfig(String[] arguments) throws ParseException {
         CommandLine cmd = parse(arguments);
-        return parseCommand(cmd);
-    }
 
-    protected Map<String,String> parseCommand(CommandLine cmd) throws ParseException {
         Map<String,String> result = new HashMap<>();
         if(cmd.hasOption(CONFIG_OPT_FLAG)){
             String[] values = cmd.getOptionValues(CONFIG_OPT_FLAG);

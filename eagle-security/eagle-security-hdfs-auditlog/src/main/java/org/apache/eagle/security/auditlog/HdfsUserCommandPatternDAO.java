@@ -19,7 +19,7 @@
 
 package org.apache.eagle.security.auditlog;
 
-import org.apache.eagle.security.entity.HdfsUserCommandPatternEntity;
+import org.apache.eagle.security.hdfs.entity.HdfsUserCommandPatternEntity;
 
 import java.util.List;
 

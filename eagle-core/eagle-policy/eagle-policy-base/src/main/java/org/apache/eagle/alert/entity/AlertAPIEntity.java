@@ -16,15 +16,10 @@
  */
 package org.apache.eagle.alert.entity;
 
+import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.meta.Column;
-import org.apache.eagle.log.entity.meta.ColumnFamily;
-import org.apache.eagle.log.entity.meta.Prefix;
-import org.apache.eagle.log.entity.meta.Service;
-import org.apache.eagle.log.entity.meta.Table;
-import org.apache.eagle.log.entity.meta.TimeSeries;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -35,6 +30,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.ALERT_SERVICE_ENDPOINT_NAME)
 @TimeSeries(true)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Tags({"site", "hostname", "dataSource", "policyId", "sourceStreams", "alertSource", "alertExecutorId"})
 public class AlertAPIEntity extends TaggedLogAPIEntity{
 	@Column("description")
 	private String description;
@@ -43,7 +39,7 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 	@Column("remediationCallback")
 	private String remediationCallback;
 	@Column("alertContext")
-	private AlertContext alertContext;
+	private String alertContext;
 	@Column("streamId")
 	private String streamId;
 
@@ -74,11 +70,11 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 		_pcs.firePropertyChange("remediationCallback", null, null);
 	}
 
-	public AlertContext getAlertContext() {
+	public String getAlertContext() {
 		return alertContext;
 	}
 	
-	public void setAlertContext(AlertContext alertContext) {
+	public void setAlertContext(String alertContext) {
 		this.alertContext = alertContext;
 		_pcs.firePropertyChange("alertContext", null, null);
 	}

@@ -97,8 +97,6 @@ public class AlertExecutorCreationUtils {
                                                           String alertExecutorID, int numPartitions, String partitionerCls) throws Exception{
 		LOG.info("Creating alert executors with alertExecutorID: " + alertExecutorID + ", numPartitions: " + numPartitions + ", Partition class is: "+ partitionerCls);
 
-        // TODO: Create sourceStreams with alertExecutorID into AlertExecutorService
-
 		PolicyPartitioner partitioner = (PolicyPartitioner)Class.forName(partitionerCls).newInstance();
 		AlertExecutor[] alertExecutors = new AlertExecutor[numPartitions];
         String[] _sourceStreams = sourceStreams.toArray(new String[0]);

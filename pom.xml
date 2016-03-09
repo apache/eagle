@@ -131,15 +131,13 @@
         <module>eagle-external</module>
         <module>eagle-assembly</module>
         <module>eagle-topology-assembly</module>
-        <module>eagle-examples</module>
+        <module>eagle-samples</module>
         <module>eagle-gc</module>
-        <module>eagle-hadoop-metric</module>
     </modules>
     <properties>
         <!-- General Properties -->
         <java.version>1.7</java.version>
         <scala.version>2.10</scala.version>
-        <scala-lang.version>2.10.4</scala-lang.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -165,12 +163,6 @@
         <hbase.version>0.98.4.2.2.5.1-3-hadoop2</hbase.version>
         <hive.version>1.2.1</hive.version>
         <spark.core.version>1.4.0</spark.core.version>
-
-        <!--  Client -->
-        <kafka-client.version>0.9.0.0</kafka-client.version>
-
-        <!-- Reflection -->
-        <reflections.version>0.9.8</reflections.version>
 
         <!-- Common Versions -->
         <commons-cli.version>1.2</commons-cli.version>
@@ -205,8 +197,6 @@
         <log4j-over-slf4j.version>1.7.2</log4j-over-slf4j.version>
         <quartz.version>2.2.1</quartz.version>
         <scopt.version>3.3.0</scopt.version>
-        <akka.actor.version>2.3.14</akka.actor.version>
-        <reflections.version>0.9.10</reflections.version>
 
         <!-- Streaming -->
         <kafka.version>0.8.1.2.2.0.0-2041</kafka.version>
@@ -378,12 +368,6 @@
                 <groupId>com.github.scopt</groupId>
                 <artifactId>scopt_${scala.version}</artifactId>
                 <version>${scopt.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.reflections</groupId>
-                <artifactId>reflections</artifactId>
-                <version>${reflections.version}</version>
             </dependency>
 
             <!-- Serialization -->
@@ -889,7 +873,6 @@
                                 <exclude>.gitignore</exclude>
                                 <!-- IDE specific files-->
                                 <exclude>**/.idea/</exclude>
-                                <exclude>**/.cache-main</exclude>
                                 <exclude>**/.scalastyle/</exclude>
                                 <exclude>**/*.iml</exclude>
                                 <exclude>**/nb-configuration.xml</exclude>
@@ -908,9 +891,7 @@
                                 <exclude>README*</exclude>
                                 <exclude>**/*.log</exclude>
                                 <exclude>**/eagle.log*</exclude>
-                                <exclude>**/velocity.log*</exclude>
-                                <!-- all json files should be excluded -->
-                                <exclude>**/*.json</exclude>
+                                <exclude>**/resources/**/*.json</exclude>
                                 <exclude>**/resources/eagle.siddhiext</exclude>
                                 <exclude>**/test/resources/securityAuditLog</exclude>
                                 <exclude>**/resources/**/ml-policyDef-UserProfile.txt</exclude>

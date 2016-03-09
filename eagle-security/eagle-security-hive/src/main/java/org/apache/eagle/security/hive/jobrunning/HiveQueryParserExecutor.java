@@ -19,11 +19,11 @@ package org.apache.eagle.security.hive.jobrunning;
 import com.typesafe.config.Config;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.security.hive.ql.HiveQLParserContent;
 import org.apache.eagle.security.hive.ql.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.util.Map;
 import java.util.Map.Entry;

@@ -71,16 +71,25 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
         return new Criterion(left,right,op);
     }
 
-    private Object toColumn(TokenType tokenType,String value,ComparisonOperator op){
-        if(op.equals(ComparisonOperator.CONTAINS) && tokenType.equals(TokenType.STRING)){
-            return "%"+value+"%";
-        }else if(tokenType.equals(TokenType.ID)){
-            return new ColumnImpl(this.tableName,parseEntityAttribute(value));
-        }else if(!tokenType.equals(TokenType.ID) && op.equals(ComparisonOperator.IN)){
+    /**
+     * this place is used for rewriting query for jdbc connection
+     * @param tokenType
+     * @param value
+     * @param op
+     * @return
+     */
+    private Object toColumn(TokenType tokenType,String value,ComparisonOperator op) {
+        if (op.equals(ComparisonOperator.CONTAINS) && tokenType.equals(TokenType.STRING)) {
+            return "%" + value + "%";
+        } else if (tokenType.equals(TokenType.ID)) {
+            return new ColumnImpl(this.tableName, parseEntityAttribute(value));
+        } else if (!tokenType.equals(TokenType.ID) && op.equals(ComparisonOperator.IN)) {
             return EntityQualifierUtils.parseList(value);
-        }else if(tokenType.equals(TokenType.NUMBER)){
+        } else if (tokenType.equals(TokenType.NUMBER)) {
             // TODO: currently only treat all number value as double
             return Double.parseDouble(value);
+        } else if (op.equals(ComparisonOperator.LIKE) && value.equals(".*")){
+            return "%";
         }else{
             // TODO: parse type according entity field type
             return value;

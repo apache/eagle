@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.SortedMap;
 
 import com.typesafe.config.Config;
-import scala.Tuple2;
-import scala.Tuple3;
 
 public class JavaStormExecutorForAlertWrapper extends JavaStormStreamExecutor3<String, String, SortedMap<Object, Object>>{
     private JavaStormStreamExecutor<Tuple2<String, SortedMap<Object, Object>>> delegate;
@@ -49,7 +47,7 @@ public class JavaStormExecutorForAlertWrapper extends JavaStormStreamExecutor3<S
             @Override
             public void collect(Object o) {
                 Tuple2 tuple2 = (Tuple2)o;
-                collector.collect(new Tuple3(tuple2._1, streamName, tuple2._2));
+                collector.collect(new Tuple3(tuple2.f0(), streamName, tuple2.f1()));
             }
         };
         delegate.flatMap(input, delegateCollector);

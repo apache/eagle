@@ -19,7 +19,8 @@
 
 package org.apache.eagle.security.auditlog;
 
-import org.apache.eagle.security.entity.HdfsUserCommandPatternEntity;
+import org.apache.eagle.security.hdfs.entity.HdfsUserCommandPatternEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Test;
 
 import java.util.List;

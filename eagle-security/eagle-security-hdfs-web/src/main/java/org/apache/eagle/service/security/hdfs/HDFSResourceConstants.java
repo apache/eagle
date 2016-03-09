@@ -20,6 +20,6 @@ public class HDFSResourceConstants {
 
 	public static final String HDFS_RESOURCE="/hdfsResource";
 	public static final String HDFS_FS_DEFAULT_NAME="fs.defaultFS";
-	public static final String HDFS_APPLICATION="hdfsAuditLog";
+	public static final String HDFS_DATA_SOURCE="hdfsAuditLog";
 	public static final String HDFS_RESOURCE_RESOLVE_FORMAT_HINT ="HDFS Resource must be start with /";
 }

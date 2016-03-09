@@ -22,10 +22,12 @@ import backtype.storm.task.{OutputCollector, TopologyContext}
 import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.topology.base.BaseRichBolt
 import backtype.storm.tuple.{Fields, Tuple}
-import org.apache.eagle.datastream.{Collector, JavaStormStreamExecutor}
+import org.apache.eagle.datastream.{Collector, EagleTuple, JavaStormStreamExecutor}
 import org.slf4j.LoggerFactory
 
-case class JavaStormBoltWrapper(worker : JavaStormStreamExecutor[AnyRef]) extends BaseRichBolt{
+import scala.collection.JavaConverters._
+
+case class JavaStormBoltWrapper(worker : JavaStormStreamExecutor[EagleTuple]) extends BaseRichBolt{
   val LOG = LoggerFactory.getLogger(StormBoltWrapper.getClass)
   var _collector : OutputCollector = null
 
@@ -35,9 +37,9 @@ case class JavaStormBoltWrapper(worker : JavaStormStreamExecutor[AnyRef]) extend
   }
 
   override def execute(input : Tuple): Unit ={
-    worker.flatMap(input.getValues, new Collector[AnyRef](){
-      def collect(t: AnyRef): Unit ={
-        _collector.emit(input, StormWrapperUtils.productAsJavaList(t.asInstanceOf[Product]))
+    worker.flatMap(input.getValues, new Collector[EagleTuple](){
+      def collect(t: EagleTuple): Unit ={
+        _collector.emit(input, t.getList.asJava)
       }
     })
     _collector.ack(input)

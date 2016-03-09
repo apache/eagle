@@ -17,7 +17,7 @@
 package org.apache.eagle.service.security.hive.res;
 
 import org.apache.eagle.service.common.EagleExceptionWrapper;
-import org.apache.eagle.security.entity.HiveResourceEntity;
+import org.apache.eagle.security.hive.entity.HiveResourceEntity;
 import org.apache.eagle.service.security.hive.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

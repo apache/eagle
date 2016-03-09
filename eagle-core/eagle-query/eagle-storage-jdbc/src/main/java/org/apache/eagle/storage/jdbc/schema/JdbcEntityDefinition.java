@@ -87,7 +87,7 @@ public class JdbcEntityDefinition {
 
     @SuppressWarnings("unchecked")
     public JdbcSerDeser getJdbcSerDeser(String columnName) {
-        Qualifier qualifier = this.internal.getQualifierNameMap().get(columnName);
+        Qualifier qualifier = this.internal.getDisplayNameMap().get(columnName);
         if(qualifier == null){
             return JdbcEntityDefinitionManager.DEFAULT_JDBC_SERDESER;
         }else {

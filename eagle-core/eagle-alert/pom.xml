@@ -33,6 +33,5 @@
 		<module>eagle-alert-base</module>
 		<module>eagle-alert-process</module>
 		<module>eagle-alert-service</module>
-		<module>eagle-alert-notification-plugin</module>
-	</modules>
+    </modules>
 </project>
