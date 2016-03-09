@@ -229,6 +229,7 @@
         <mysql-connector-java.version>5.1.34</mysql-connector-java.version>
         <ddlutils.version>1.0</ddlutils.version>
         <torque.version>4.0</torque.version>
+        <derby.version>10.10.2.0</derby.version>
 
         <!-- REST Service-->
         <jersey.version>1.8</jersey.version>
@@ -687,6 +688,11 @@
                 <groupId>org.apache.torque</groupId>
                 <artifactId>torque-runtime</artifactId>
                 <version>${torque.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${derby.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
