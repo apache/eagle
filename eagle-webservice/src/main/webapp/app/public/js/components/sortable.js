@@ -127,7 +127,6 @@ eagleComponents.directive('sortable', function($rootScope) {
 
 			$element.on("mousemove", ">", function(event) {
 				if(_selectElement && !_move && common.math.distance(_mouseDownPageX, _mouseDownPageY, event.pageX, event.pageY) > 10) {
-					console.log("RRRT",common.math.distance(_mouseDownPageX, _mouseDownPageY, event.pageX, event.pageY));
 					_move = true;
 					_overElement = _selectElement;
 					_overElement.addClass("sortable-enter");

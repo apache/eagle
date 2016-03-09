@@ -404,8 +404,13 @@
 		};
 
 		$scope.chartSwitchRefresh = function(source, target) {
+			var _oriSize = source.size;
+			source.size = target.size;
+			target.size = _oriSize;
+
 			if(source._holder) source._holder.refreshAll();
 			if(target._holder) target._holder.refreshAll();
+
 		};
 
 		_refreshInterval = setInterval(function() {
