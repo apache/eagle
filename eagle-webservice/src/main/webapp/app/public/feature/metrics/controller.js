@@ -229,10 +229,6 @@
 			$scope.dashboardEntity = list[0];
 			$scope.dashboard = $scope.dashboardEntity ? common.parseJSON($scope.dashboardEntity.value) : {groups: []};
 			$scope.chartRefresh();
-
-			setTimeout(function() {
-				$(window).resize();
-			}, 1);
 		}).finally(function() {
 			$scope.dashboardReady = true;
 		});
@@ -344,11 +340,11 @@
 			UI.deleteConfirm(chart.metric).then(null, null, function(holder) {
 				common.array.remove(chart, group.charts);
 				holder.closeFunc();
-				$scope.chartRefresh();
+				$scope.chartRefresh(false, true);
 			});
 		};
 
-		$scope.chartRefresh = function(forceRefresh) {
+		$scope.chartRefresh = function(forceRefresh, refreshAll) {
 			setTimeout(function() {
 				$scope.endTime = app.time.now();
 				$scope.startTime = $scope.autoRefreshSelect.getStartTime($scope.endTime);
@@ -383,14 +379,33 @@
 							$http.post(_druidConfig.broker + "/druid/v2", _data, {withCredentials: false}).then(function (response) {
 								chart._oriData = nvd3.convert.druid([response.data]);
 								$scope.chartSeriesUpdate(chart);
-								if(chart._holder) chart._holder.refresh();
+								if(chart._holder) {
+									if(refreshAll) {
+										chart._holder.refreshAll();
+									} else {
+										chart._holder.refresh();
+									}
+								}
 							});
 						} else {
-							if(chart._holder) chart._holder.refresh();
+							if(chart._holder) {
+								if(refreshAll) {
+									chart._holder.refreshAll();
+								} else {
+									chart._holder.refresh();
+								}
+							}
 						}
 					});
 				});
+
+				$(window).resize();
 			}, 0);
+		};
+
+		$scope.chartSwitchRefresh = function(source, target) {
+			if(source._holder) source._holder.refreshAll();
+			if(target._holder) target._holder.refreshAll();
 		};
 
 		_refreshInterval = setInterval(function() {

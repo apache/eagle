@@ -57,10 +57,10 @@
 
 <div tabs menu="menu" holder="tabHolder" ng-show="dashboard.groups.length">
 	<pane ng-repeat="group in dashboard.groups" data-data="group" data-title="{{group.name}}">
-		<div sortable class="row">
+		<div sortable class="row narrow" ng-model="group.charts" update-func="chartSwitchRefresh" ng-show="group.charts.length">
 			<div ng-repeat="chart in group.charts track by $index" class="col-md-{{chart.size || 6}}">
 				<div class="nvd3-chart-wrapper">
-					<div nvd3="chart._data" data-holder="chart._holder" data-title="{{chart.metric}}" data-watching="false"
+					<div nvd3="chart._data" data-holder="chart._holder" data-title="{{chart.title || chart.metric}}" data-watching="false"
 						 data-chart="{{chart.chart || 'line'}}" data-config="getChartConfig(chart)" class="nvd3-chart-cntr"></div>
 					<div class="nvd3-chart-config" ng-if="Auth.isRole('ROLE_ADMIN')">
 						<a class="fa fa-minus" ng-click="configChartSize(chart, -1)"></a>
@@ -74,7 +74,12 @@
 
 		<p ng-if="!group.charts.length">
 			Empty group.
-			<span ng-if="Auth.isRole('ROLE_ADMIN')">Click <a ng-click="newChart()">here</a> to add metric.</span>
+			<span ng-if="Auth.isRole('ROLE_ADMIN')">
+				Click
+				<span ng-hide="dataSourceListReady" class="fa fa-refresh fa-spin"></span>
+				<a ng-show="dataSourceListReady" ng-click="newChart()">here</a>
+				to add metric.
+			</span>
 		</p>
 	</pane>
 </div>
@@ -147,7 +152,7 @@
 				<div class="row">
 					<div class="col-md-6">
 						<div class="nvd3-chart-wrapper">
-							<div nvd3="configPreviewChart._data" data-title="{{configPreviewChart.metric}}"
+							<div nvd3="configPreviewChart._data" data-title="{{configPreviewChart.title || configPreviewChart.metric}}"
 								 data-watching="true" data-chart="{{configPreviewChart.chart || 'line'}}" data-config="getChartConfig(configPreviewChart)" class="nvd3-chart-cntr"></div>
 						</div>
 					</div>
@@ -156,7 +161,11 @@
 						<table class="table">
 							<tbody>
 							<tr>
-								<th width="100">Chart Type</th>
+								<th width="100">Name</th>
+								<td><input type="text" class="form-control input-xs" ng-model="configPreviewChart.title" placeholder="Default: {{configPreviewChart.metric}}" /></td>
+							</tr>
+							<tr>
+								<th>Chart Type</th>
 								<td>
 									<div class="btn-group" data-toggle="buttons">
 										<label class="btn btn-default btn-xs" ng-class="{active: (configPreviewChart.chart || 'line') === type.chart}"
