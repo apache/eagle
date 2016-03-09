@@ -123,7 +123,7 @@
 						<div class="collapse navbar-collapse" id="moduleMenu">
 							<ul class="nav navbar-nav">
 								<li ng-repeat="_grp in Site.current().applicationGroupList" ng-if="_grp.enabledList.length"
-									class="dropdown" ng-class="{active: Application.current().groupName === _grp.name}">
+									class="dropdown" ng-class="{active: Application.current().group === _grp.name}">
 									<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 										{{_grp.name}}
 									</a>
