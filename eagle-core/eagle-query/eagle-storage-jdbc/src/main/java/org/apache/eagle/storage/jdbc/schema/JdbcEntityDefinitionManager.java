@@ -38,8 +38,11 @@ import java.util.Map;
 public class JdbcEntityDefinitionManager {
     private final static Logger LOG = LoggerFactory.getLogger(JdbcEntityDefinitionManager.class);
     private final static Map<Class<? extends TaggedLogAPIEntity>,JdbcEntityDefinition> sqlEntityDefinitionCache = new HashMap<Class<? extends TaggedLogAPIEntity>,JdbcEntityDefinition>();
+    private static Boolean initialized = false;
 
     public static JdbcEntityDefinition getJdbcEntityDefinition(EntityDefinition entityDefinition){
+        checkInit();
+
         Class<? extends TaggedLogAPIEntity> entityClass = entityDefinition.getEntityClass();
         JdbcEntityDefinition jdbcEntityDefinition = sqlEntityDefinitionCache.get(entityClass);
         if(jdbcEntityDefinition == null){
@@ -49,13 +52,37 @@ public class JdbcEntityDefinitionManager {
         return jdbcEntityDefinition;
     }
 
+    public static Map<Class<? extends TaggedLogAPIEntity>,JdbcEntityDefinition> getJdbcEntityDefinitionMap(){
+        checkInit();
+        return sqlEntityDefinitionCache;
+    }
+
     public static JdbcEntityDefinition getJdbcEntityDefinition(Class<? extends TaggedLogAPIEntity> clazz) throws IllegalAccessException, InstantiationException {
+        checkInit();
         return getJdbcEntityDefinition(EntityDefinitionManager.getEntityDefinitionByEntityClass(clazz));
     }
 
+    private static void checkInit(){
+        if (!initialized) {
+            try {
+                Map<String,EntityDefinition> entries = EntityDefinitionManager.entities();
+                for (Map.Entry<String, EntityDefinition> entry : entries.entrySet()) {
+                    Class<? extends TaggedLogAPIEntity> entityClass = entry.getValue().getEntityClass();
+                    JdbcEntityDefinition jdbcEntityDefinition = sqlEntityDefinitionCache.get(entityClass);
+                    if(jdbcEntityDefinition == null){
+                        jdbcEntityDefinition = new JdbcEntityDefinition(entry.getValue());
+                        sqlEntityDefinitionCache.put(entityClass, jdbcEntityDefinition);
+                    }
+                }
+                initialized = true;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public static void load(){
-        // TODO: 1. load all SQLEntityDefinition on init
-        // TODO: 2. do more initializing works
+        checkInit();
     }
 
     public static DefaultJdbcSerDeser DEFAULT_JDBC_SERDESER = new DefaultJdbcSerDeser();
@@ -102,6 +129,7 @@ public class JdbcEntityDefinitionManager {
         }
         return _classJdbcType.get(fieldType);
     }
+
 
     /**
      * Register fieldType with SQL types

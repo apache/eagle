@@ -17,7 +17,6 @@
 package org.apache.eagle.storage.jdbc.schema.serializer;
 
 import org.apache.eagle.log.entity.meta.Qualifier;
-import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.torque.util.JdbcTypedValue;
 import org.codehaus.jackson.map.ObjectMapper;
 

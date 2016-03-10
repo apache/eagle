@@ -273,6 +273,10 @@ public class EntityDefinitionManager {
 		}
 	}
 
+	public static void load() throws IllegalAccessException, InstantiationException {
+		checkInit();
+	}
+
 	/**
 	 * User can register their own field SerDeser
 	 * @param clazz class of the the SerDeser 

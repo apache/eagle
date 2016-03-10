@@ -63,34 +63,22 @@ public class JdbcEntityDefinition {
         return internal.getEntityClass().getDeclaredField(fieldName).getType();
     }
 
-    /**
-     *
-     * TODO: Generate table schema DDL according entity definition
-     *
-     * @link https://db.apache.org/ddlutils/
-     *
-     * CREATE TABLE ${prefix}${tableName}{
-     *      prefix prefix;
-     *      encodedRowkey varchar;
-     *      intField1 int;
-     *      longField bitint;
-     *      tag varchar;
-     * } PRIMARY KEY(encodedRowkey);
-     *
-     * CREATE TABLE ${metricTable}{
-     *      encodedRowkey varchar;
-     *      prefix varchar;
-     *      intField1 int;
-     *      longField bitint;
-     *      tag varchar;
-     * } PRIMARY KEY(rowkey,prefix);
-     *
-     * @param tagsFields
-     * @return
-     */
-    @SuppressWarnings("unused")
-    public String getJdbcSchemaDDL(String[] tagsFields){
-        throw new RuntimeException("TODO: not implemented yet");
+    public Class<?> getColumnTypeOrNull(String fieldName){
+        try {
+            return getColumnType(fieldName);
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
+    }
+
+    public Integer getJdbcColumnTypeCodeOrNull(String fieldName){
+        Class<?> columnType;
+        try {
+            columnType = getColumnType(fieldName);
+            return JdbcEntityDefinitionManager.getJdbcType(columnType);
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")

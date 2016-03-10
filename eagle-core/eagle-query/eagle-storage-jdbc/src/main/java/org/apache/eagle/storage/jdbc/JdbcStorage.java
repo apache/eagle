@@ -30,6 +30,7 @@ import org.apache.eagle.storage.jdbc.entity.impl.JdbcEntityUpdaterImpl;
 import org.apache.eagle.storage.jdbc.entity.impl.JdbcEntityWriterImpl;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
+import org.apache.eagle.storage.jdbc.schema.ddl.JdbcEntityDDLManager;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
@@ -52,8 +53,9 @@ public class JdbcStorage extends DataStorageBase {
         try {
             JdbcEntityDefinitionManager.load();
             ConnectionManagerFactory.getInstance();
+            JdbcEntityDDLManager.getInstance().init();
         } catch (Exception e) {
-            LOG.error("Failed to initialize connection manager",e);
+            LOG.error("Failed to start connection manager",e);
             throw new IOException(e);
         }
     }

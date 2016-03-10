@@ -51,7 +51,7 @@ public class TestConnectionFactory {
 
     public static void main(String[] args) throws Exception {
         /**
-         * before run this integration test, you can do the following stesp in mysql setup
+         * before run this integration test, you can do the following stesp in mysql init
          * create user eagle identified by 'eagle';
          * create database eagle;
          * grant all on eagle.* to 'eagle';

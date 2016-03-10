@@ -26,6 +26,7 @@ import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import org.apache.eagle.storage.DataStorageManager;
 import org.apache.eagle.storage.exception.QueryCompileException;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManagerFactory;
+import org.apache.eagle.storage.jdbc.schema.ddl.JdbcEntityDDLManager;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
@@ -41,44 +42,24 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.*;
 
-/**
- * create table unittest_testtsentity (uuid varchar(100), cluster varchar(10), datacenter varchar(10), field1 int, field2 int, field3 bigint, field4 bigint, field5 double, field6 double, field7 varchar(100), timestamp bigint)
- */
 public class TestJdbcStorage {
-
     JdbcStorage storage;
     EntityDefinition entityDefinition;
     long baseTimestamp;
     final static Logger LOG = LoggerFactory.getLogger(TestJdbcStorage.class);
-    final static String DDL_SQL_RESOURCE="/unittest_ddl.derby.sql";
-
-    static {
-        try {
-            initDatabase();
-        } catch (Exception ex) {
-            LOG.warn("Failed to create database and tables, skip",ex.getMessage());
-        }
-    }
 
     @Before
     public void setUp() throws Exception {
+        entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
+        entityDefinition.setTags(new String[]{"cluster","datacenter","random"});
         storage = (JdbcStorage) DataStorageManager.getDataStorageByEagleConfig();
         storage.init();
-        entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
         GregorianCalendar gc = new GregorianCalendar();
         gc.clear();
         gc.set(2014, 1, 6, 1, 40, 12);
         gc.setTimeZone(TimeZone.getTimeZone("UTC"));
         baseTimestamp = gc.getTime().getTime();
         System.out.println("timestamp:" + baseTimestamp);
-    }
-
-    private static void initDatabase() throws Exception {
-        Connection conn = ConnectionManagerFactory.getInstance().getConnection();
-        Statement stmt = conn.createStatement();
-        String ddl = FileUtils.readFileToString(new File(TestJdbcStorage.class.getResource(DDL_SQL_RESOURCE).getPath()));
-        LOG.info(ddl+"\n");
-        stmt.execute(ddl);
     }
 
     @Test
@@ -262,7 +243,7 @@ public class TestJdbcStorage {
         instance.setTags(new HashMap<String, String>() {{
             put("cluster", "c4ut");
             put("datacenter", "d4ut");
-            put("random_tag",UUID.randomUUID().toString());
+            put("random",UUID.randomUUID().toString());
         }});
         instance.setTimestamp(System.currentTimeMillis());
         return instance;
