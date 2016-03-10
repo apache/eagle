@@ -46,9 +46,10 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
         this.jdbcEntityDefinition = jdbcEntityDefinition;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <E extends Object> List<E> query(CompiledQuery query) throws Exception {
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition.getJdbcTableName());
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         String displaySql = SqlBuilder.buildQuery(criteria).getDisplayString();
 

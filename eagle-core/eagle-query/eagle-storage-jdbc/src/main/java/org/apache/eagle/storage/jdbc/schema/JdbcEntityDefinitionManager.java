@@ -18,6 +18,7 @@ package org.apache.eagle.storage.jdbc.schema;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
+import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.meta.EntitySerDeser;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
 import org.apache.eagle.storage.jdbc.schema.serializer.DefaultJdbcSerDeser;
@@ -46,6 +47,10 @@ public class JdbcEntityDefinitionManager {
             sqlEntityDefinitionCache.put(entityClass, jdbcEntityDefinition);
         }
         return jdbcEntityDefinition;
+    }
+
+    public static JdbcEntityDefinition getJdbcEntityDefinition(Class<? extends TaggedLogAPIEntity> clazz) throws IllegalAccessException, InstantiationException {
+        return getJdbcEntityDefinition(EntityDefinitionManager.getEntityDefinitionByEntityClass(clazz));
     }
 
     public static void load(){

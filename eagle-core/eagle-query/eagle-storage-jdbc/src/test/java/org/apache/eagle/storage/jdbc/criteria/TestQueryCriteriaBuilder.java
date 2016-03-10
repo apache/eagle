@@ -16,9 +16,12 @@
  */
 package org.apache.eagle.storage.jdbc.criteria;
 
+import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import org.apache.eagle.storage.exception.QueryCompileException;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManagerFactory;
 import org.apache.eagle.storage.jdbc.criteria.impl.QueryCriteriaBuilder;
+import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
+import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.torque.criteria.Criteria;
@@ -32,10 +35,12 @@ import org.slf4j.LoggerFactory;
  */
 public class TestQueryCriteriaBuilder {
     private final static Logger LOG = LoggerFactory.getLogger(TestQueryCriteriaBuilder.class);
+    private JdbcEntityDefinition jdbcEntityDefinition;
 
     @Before
     public void setUp() throws Exception {
         ConnectionManagerFactory.getInstance();
+        jdbcEntityDefinition = JdbcEntityDefinitionManager.getJdbcEntityDefinition(TestTimeSeriesAPIEntity.class);
     }
 
     @Test
@@ -47,7 +52,7 @@ public class TestQueryCriteriaBuilder {
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
 
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,"test");
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         LOG.info(criteria.toString());
     }
@@ -61,7 +66,7 @@ public class TestQueryCriteriaBuilder {
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
 
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,"test");
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         LOG.info(criteria.toString());
     }
@@ -76,7 +81,7 @@ public class TestQueryCriteriaBuilder {
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
 
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,"test");
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         LOG.info(criteria.toString());
     }
