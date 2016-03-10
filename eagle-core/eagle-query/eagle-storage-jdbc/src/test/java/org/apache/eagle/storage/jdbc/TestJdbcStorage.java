@@ -55,8 +55,8 @@ public class TestJdbcStorage {
     static {
         try {
             initDatabase();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            LOG.warn("Failed to create database and tables, skip",ex.getMessage());
         }
     }
 
@@ -71,14 +71,13 @@ public class TestJdbcStorage {
         gc.setTimeZone(TimeZone.getTimeZone("UTC"));
         baseTimestamp = gc.getTime().getTime();
         System.out.println("timestamp:" + baseTimestamp);
-
     }
 
     private static void initDatabase() throws Exception {
         Connection conn = ConnectionManagerFactory.getInstance().getConnection();
         Statement stmt = conn.createStatement();
         String ddl = FileUtils.readFileToString(new File(TestJdbcStorage.class.getResource(DDL_SQL_RESOURCE).getPath()));
-        LOG.info(ddl);
+        LOG.info(ddl+"\n");
         stmt.execute(ddl);
     }
 
@@ -109,10 +108,11 @@ public class TestJdbcStorage {
     @Test
     public void testWrite() throws IOException {
         List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
-
         int i= 0;
         while( i++ < 1000){
-            entityList.add(newInstance());
+            TestTimeSeriesAPIEntity entity = newInstance();
+
+            entityList.add(entity);
         }
         ModifyResult<String> result = storage.create(entityList, entityDefinition);
         Assert.assertTrue(result.getSize() > 0);
@@ -133,12 +133,12 @@ public class TestJdbcStorage {
         // record insertion finish time
         long endTime = System.currentTimeMillis();
 
-            // init read in time range [startTime, endTime)
+        // init read in time range [startTime, endTime)
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[]{*}");
         rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1));
-        rawQuery.setPageSize(1000000);
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1000));
+        rawQuery.setPageSize(10000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult queryResult = storage.query(query, entityDefinition);
         Assert.assertTrue(queryResult.getSize() >= 1000);
@@ -163,7 +163,7 @@ public class TestJdbcStorage {
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[]<@cluster,@datacenter>{count,max(@field1),min(@field2),sum(@field3)}");
         rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1000));
         rawQuery.setPageSize(1000000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult queryResult = storage.query(query, entityDefinition);
@@ -188,8 +188,8 @@ public class TestJdbcStorage {
         // delete in time range [startTime, endTime)
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[]{*}");
-        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime));
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime-1000));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1000));
         rawQuery.setPageSize(1000000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         ModifyResult<String> queryResult = storage.delete(query, entityDefinition);
@@ -220,7 +220,7 @@ public class TestJdbcStorage {
      *
      * @throws IOException
      */
-    //@Test
+//    @Test
     public void testWriterPerformance() throws IOException {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -251,8 +251,9 @@ public class TestJdbcStorage {
         instance.setTags(new HashMap<String, String>() {{
             put("cluster", "c4ut");
             put("datacenter", "d4ut");
+            put("random_tag",UUID.randomUUID().toString());
         }});
-        instance.setTimestamp(baseTimestamp + 1000);
+        instance.setTimestamp(System.currentTimeMillis());
         return instance;
     }
 

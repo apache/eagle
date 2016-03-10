@@ -33,6 +33,7 @@ CREATE TABLE `unittest_testtsentity` (
   `field6` double DEFAULT NULL,
   `field7` varchar(255) DEFAULT NULL,
   `cluster` varchar(255) DEFAULT NULL,
+  `random_tag` VARCHAR(255) DEFAULT NULL,
   `datacenter` varchar(255) DEFAULT NULL,
   `timestamp` bigint(20) DEFAULT NULL,
   `jobid` varchar(255) DEFAULT NULL,

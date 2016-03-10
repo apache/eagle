@@ -44,7 +44,7 @@ public class PrimaryKeyCriteriaBuilder implements CriteriaBuilder {
             root = root.or(new Criterion(new ColumnImpl(this.tableName, JdbcConstants.ROW_KEY_COLUMN_NAME),key, SqlEnum.EQUAL));
         }
 
-        root.addSelectColumn(new ColumnImpl(this.tableName, "*"));
+        // root.addSelectColumn(new ColumnImpl(this.tableName, "*"));
 
         return root;
     }

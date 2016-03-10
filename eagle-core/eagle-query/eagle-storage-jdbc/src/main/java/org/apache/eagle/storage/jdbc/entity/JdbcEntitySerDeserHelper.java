@@ -76,26 +76,26 @@ public class JdbcEntitySerDeserHelper {
         }
         Map<String, Qualifier> rawmap = ed.getDisplayNameMap();
         // rdbms may contains field which is not case insensitive, we need convert all into lower case
-        Map<String, Qualifier> map = new HashMap<String, Qualifier>();
+        Map<String, Qualifier> map = new HashMap<>();
         for(Map.Entry<String, Qualifier> e : rawmap.entrySet()){
             map.put(e.getKey().toLowerCase(), e.getValue());
         }
         for(Map.Entry<String, Object> entry : row.entrySet()){
             // timestamp;
-            if(JdbcConstants.TIMESTAMP_COLUMN_NAME.equals(entry.getKey())){
+            if(JdbcConstants.TIMESTAMP_COLUMN_NAME.equalsIgnoreCase(entry.getKey())){
                 obj.setTimestamp((Long) entry.getValue());
                 continue;
             }
 
             // set metric as prefix for generic metric
             if(entityDefinition.getInternal().getService().equals(GenericMetricEntity.GENERIC_METRIC_SERVICE) &&
-                    JdbcConstants.METRIC_NAME_COLUMN_NAME.equals(entry.getKey())){
+                    JdbcConstants.METRIC_NAME_COLUMN_NAME.equalsIgnoreCase(entry.getKey())){
                 obj.setPrefix((String) entry.getValue());
                 continue;
             }
 
             // rowkey: uuid
-            if(JdbcConstants.ROW_KEY_COLUMN_NAME.equals(entry.getKey())){
+            if(JdbcConstants.ROW_KEY_COLUMN_NAME.equalsIgnoreCase(entry.getKey())){
                 obj.setEncodedRowkey((String) entry.getValue());
                 continue;
             }
@@ -110,13 +110,18 @@ public class JdbcEntitySerDeserHelper {
                 String key = null;
                 if(ed.getTags() != null) {
                     for (String tag : ed.getTags()) {
-                        if (tag.toLowerCase().equals(entry.getKey().toLowerCase())) {
+                        if (tag.equalsIgnoreCase(entry.getKey())) {
                             key = tag;
                             break;
                         }
                     }
                 }
-                obj.getTags().put(key == null ? entry.getKey() : key, (String) entry.getValue());
+                try {
+                    obj.getTags().put(key == null ? entry.getKey() : key, (String) entry.getValue());
+                }catch (ClassCastException ex){
+                    LOG.error("Tag value {} = {} is not String",key,entry.getValue(),ex);
+                    throw ex;
+                }
                 continue;
             }
 
