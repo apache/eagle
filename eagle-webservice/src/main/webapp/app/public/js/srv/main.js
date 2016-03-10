@@ -16,4 +16,57 @@
  * limitations under the License.
  */
 
-angular.module('eagle.service', []);
+(function() {
+	'use strict';
+
+	var eagleSrv = angular.module('eagle.service', []);
+
+	eagleSrv.provider('ServiceError', function() {
+		var errorContainer = {
+			list: [],
+			newError: function(err) {
+				err._read = false;
+				errorContainer.list.unshift(err);
+			},
+			showError: function(err) {
+				err._read = true;
+				$.dialog({
+					size: "large",
+					title: err.title,
+					content: $("<pre>").html(err.description)
+				});
+			},
+			clearAll: function() {
+				errorContainer.list = [];
+			}
+		};
+
+		Object.defineProperty(errorContainer, 'hasUnread', {
+			get: function() {
+				return !!common.array.find(false, errorContainer.list, "_read")
+			}
+		});
+
+		this.$get = function() {
+			return errorContainer;
+		};
+	});
+
+	eagleSrv.config(function ($httpProvider, ServiceErrorProvider) {
+		$httpProvider.interceptors.push(function ($q, $timeout) {
+			return {
+				response: function (response) {
+					var data = response.data;
+					if(data.exception) {
+						console.log(response);
+						ServiceErrorProvider.$get().newError({
+							title: "Http Request Error",
+							description: "URL:\n" + response.config.url + "\n\nParams:\n" + JSON.stringify(response.config.params, null, "\t") + "\n\nException:\n" + data.exception
+						});
+					}
+					return response;
+				}
+			};
+		});
+	});
+})();
