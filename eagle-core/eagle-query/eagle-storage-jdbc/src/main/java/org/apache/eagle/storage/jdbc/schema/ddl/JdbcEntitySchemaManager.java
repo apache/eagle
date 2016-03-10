@@ -194,18 +194,19 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
 
         // TAGS
         if(entityDefinition.getInternal().getTags() != null) {
-            Index index = new UniqueIndex();
+//            Index index = new UniqueIndex();
             for (String tag : entityDefinition.getInternal().getTags()) {
                 Column tagColumn = createTagColumn(tag);
                 table.addColumn(tagColumn);
 
-                IndexColumn indexColumn = new IndexColumn();
-                indexColumn.setName(tag);
-                indexColumn.setOrdinalPosition(0);
-                index.addColumn(indexColumn);
-                index.setName(entityDefinition.getJdbcTableName()+"_tags_unique_index");
+//                IndexColumn indexColumn = new IndexColumn();
+//                indexColumn.setName(tag);
+//                indexColumn.setOrdinalPosition(0);
+//                index.addColumn(indexColumn);
+//                index.setName(entityDefinition.getJdbcTableName()+"_tags_unique_index");
             }
-            table.addIndex(index);
+//            TODO: enable index when experiencing performance issue on tag filtering.
+//            table.addIndex(index);
         }
 
         for(Map.Entry<String,Qualifier> entry: entityDefinition.getInternal().getDisplayNameMap().entrySet()){
