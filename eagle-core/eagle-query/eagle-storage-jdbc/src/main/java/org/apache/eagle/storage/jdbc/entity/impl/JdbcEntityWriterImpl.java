@@ -78,6 +78,7 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
                         keys.add(entity.getEncodedRowkey());
                     }
                 } catch (ClassCastException ex) {
+                    assert key != null;
                     throw new RuntimeException("Key is not in type of String (VARCHAR) , but JdbcType (java.sql.Types): " + key.getJdbcType() + ", value: " + key.getValue(), ex);
                 }
             }

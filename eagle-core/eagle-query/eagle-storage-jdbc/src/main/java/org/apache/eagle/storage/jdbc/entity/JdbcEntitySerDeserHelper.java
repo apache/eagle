@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.storage.jdbc.entity;
 
-import org.apache.commons.collections.map.UnmodifiableMap;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
@@ -136,7 +135,7 @@ public class JdbcEntitySerDeserHelper {
                 }
             } catch (Exception ex){
                 LOG.error("Failed to set value  {} = {}",fieldName,entry.getValue(),ex);
-                throw new IOException(ex);
+                throw new IOException(String.format("Failed to set value  %s = %s",fieldName,entry.getValue()),ex);
             }
         }
 
@@ -204,15 +203,15 @@ public class JdbcEntitySerDeserHelper {
             }
             Object value;
 
-            if (entityDefinition.getInternal().getDisplayNameMap().containsKey(columnName)) {
+            if (entityDefinition.isField(columnName)) {
                 try {
-                    value = serDeser.readValue(resultSet, entityDefinition.getColumnType(columnName), columnName, entityDefinition.getInternal().getDisplayNameMap().get(columnName));
+                    value = serDeser.toJavaTypedValue(resultSet, entityDefinition.getColumnType(columnName), columnName, entityDefinition.getColumnQualifier(columnName));
                 } catch (NoSuchFieldException e) {
                     LOG.error("No field {} in entity {}", columnName, entityDefinition.getInternal().getEntityClass());
                     throw new IOException(String.format("No field %s in entity %s", columnName, entityDefinition.getInternal().getEntityClass()), e);
                 }
             }else{
-                // treat as tag
+                // treat as tag or others
                 value = resultSet.getObject(columnName);
             }
             row.put(columnName,value);
@@ -254,7 +253,7 @@ public class JdbcEntitySerDeserHelper {
             Class<?> fieldType = qualifier.getSerDeser().type();
             JdbcSerDeser jdbcSerDeser = JdbcEntityDefinitionManager.getJdbcSerDeser(fieldType);
 
-            JdbcTypedValue jdbcTypedValue = jdbcSerDeser.getJdbcTypedValue(fieldValue, fieldType, qualifier);
+            JdbcTypedValue jdbcTypedValue = jdbcSerDeser.toJdbcTypedValue(fieldValue, fieldType, qualifier);
             columnValues.put(new ColumnImpl(tableName,displayName),jdbcTypedValue);
         }
 

@@ -36,7 +36,7 @@ import org.apache.eagle.log.entity.meta.TimeSeries;
 @Service(Constants.ALERT_STREAM_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"application", "streamName"})
+@Tags({"site","application", "streamName"})
 public class AlertStreamEntity extends TaggedLogAPIEntity{
 	@Column("a")
 	private String description;
@@ -44,8 +44,8 @@ public class AlertStreamEntity extends TaggedLogAPIEntity{
 	public String getDescription() {
 		return description;
 	}
-	public void setDescription(String desc) {
-		this.description = desc;
-		valueChanged("desc");
+	public void setDescription(String description) {
+		this.description = description;
+		valueChanged("description");
 	}
 }

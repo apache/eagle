@@ -1,4 +1,4 @@
-package org.apache.eagle.storage.jdbc.schema.ddl;
+package org.apache.eagle.storage.jdbc.schema;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -26,8 +26,6 @@ import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.conn.ConnectionConfig;
 import org.apache.eagle.storage.jdbc.conn.ConnectionConfigFactory;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManagerFactory;
-import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
-import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,14 +73,13 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
 
     @Override
     public void init() {
-        LOG.info("Initialize database tables");
         Connection connection = null;
         try {
             Database _database = identifyNewTables();
             if(_database.getTableCount() >0 ) {
                 LOG.info("Creating {} new tables (totally {} tables)", _database.getTableCount(),database.getTableCount());
                 connection = ConnectionManagerFactory.getInstance().getConnection();
-                this.platform.createTables(connection,_database, false, false);
+                this.platform.createTables(connection,_database, false, true);
                 LOG.info("Created {} new tables: ",_database.getTableCount(),_database.getTables());
             } else {
                 LOG.debug("All the {} tables have already been created, no new tables", database.getTableCount());
@@ -125,7 +122,7 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
         try {
             identifyNewTables();
             connection = ConnectionManagerFactory.getInstance().getConnection();
-            this.platform.createTables(connection,database, true, false);
+            this.platform.createTables(connection,database, true, true);
         } catch (Exception e) {
             LOG.error(e.getMessage(),e);
             throw new IllegalStateException(e);
@@ -158,7 +155,7 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
         tagColumn.setTypeCode(Types.VARCHAR);
         tagColumn.setJavaName(tagName);
 //        tagColumn.setScale(1024);
-        tagColumn.setSize("1024");
+        tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
         tagColumn.setDefaultValue(null);
         tagColumn.setDescription("eagle entity tag column for "+tagName);
         return tagColumn;
@@ -182,6 +179,9 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
         pkColumn.setPrimaryKey(true);
         pkColumn.setRequired(true);
         pkColumn.setTypeCode(Types.VARCHAR);
+        pkColumn.setSize("1024");
+//        pkColumn.setSizeAndScale(1024,10240);
+
         pkColumn.setDescription("eagle entity row-key column");
         table.addColumn(pkColumn);
 
@@ -197,8 +197,8 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
 //            Index index = new UniqueIndex();
             for (String tag : entityDefinition.getInternal().getTags()) {
                 Column tagColumn = createTagColumn(tag);
+                tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
                 table.addColumn(tagColumn);
-
 //                IndexColumn indexColumn = new IndexColumn();
 //                indexColumn.setName(tag);
 //                indexColumn.setOrdinalPosition(0);
@@ -213,9 +213,9 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
             Column fieldColumn = new Column();
             fieldColumn.setName(entry.getKey());
             fieldColumn.setJavaName(entry.getKey());
-            fieldColumn.setSize("1024");
             Integer typeCode = entityDefinition.getJdbcColumnTypeCodeOrNull(entry.getKey());
             typeCode = typeCode == null? Types.VARCHAR:typeCode;
+            if(typeCode == Types.VARCHAR) fieldColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
             fieldColumn.setTypeCode(typeCode);
             fieldColumn.setDescription("eagle field column "+entry.getKey()+":"+entityDefinition.getColumnTypeOrNull(entry.getKey()));
             table.addColumn(fieldColumn);

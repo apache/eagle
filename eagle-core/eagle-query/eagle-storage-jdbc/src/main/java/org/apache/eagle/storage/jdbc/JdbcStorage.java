@@ -30,7 +30,7 @@ import org.apache.eagle.storage.jdbc.entity.impl.JdbcEntityUpdaterImpl;
 import org.apache.eagle.storage.jdbc.entity.impl.JdbcEntityWriterImpl;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
-import org.apache.eagle.storage.jdbc.schema.ddl.JdbcEntitySchemaManager;
+import org.apache.eagle.storage.jdbc.schema.JdbcEntitySchemaManager;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
@@ -72,7 +72,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -88,9 +88,9 @@ public class JdbcStorage extends DataStorageBase {
             result.setSize(keys.size());
             result.setSuccess(true);
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e.getCause());
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -107,7 +107,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -125,7 +125,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -142,7 +142,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -172,7 +172,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -197,7 +197,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }

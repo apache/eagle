@@ -33,7 +33,7 @@ public class JsonJdbcSerDeser<T extends Object> implements JdbcSerDeser<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public T readValue(ResultSet result, Class<?> fieldType,String fieldName, Qualifier qualifier) throws IOException {
+    public T toJavaTypedValue(ResultSet result, Class<?> fieldType, String fieldName, Qualifier qualifier) throws IOException {
         try {
             String jsonString = result.getString(fieldName);
             return (T) objectMapper.readValue(jsonString, fieldType);
@@ -45,7 +45,7 @@ public class JsonJdbcSerDeser<T extends Object> implements JdbcSerDeser<T> {
     }
 
     @Override
-    public JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType, Qualifier qualifier) {
+    public JdbcTypedValue toJdbcTypedValue(Object fieldValue, Class<?> fieldType, Qualifier qualifier) {
         try {
             return new JdbcTypedValue(objectMapper.writeValueAsString(objectMapper.writeValueAsString(fieldValue)), Types.VARCHAR);
         } catch (IOException e) {

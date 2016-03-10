@@ -81,8 +81,9 @@ public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 	}
 	public void setDescription(String desc) {
 		this.description = desc;
-		valueChanged("desc");
+		valueChanged("description");
 	}
+
 	public String getPolicyDef() {
 		return policyDef;
 	}

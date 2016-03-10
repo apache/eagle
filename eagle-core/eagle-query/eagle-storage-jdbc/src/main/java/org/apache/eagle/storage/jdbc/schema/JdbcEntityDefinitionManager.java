@@ -158,8 +158,10 @@ public class JdbcEntityDefinitionManager {
         registerJdbcType(double.class, Types.DOUBLE);
         registerJdbcType(long.class, Types.BIGINT);
         registerJdbcType(short.class, Types.INTEGER);
-        registerJdbcType(char[].class, Types.VARCHAR);
+       //  registerJdbcType(char[].class, Types.VARCHAR);
         registerJdbcType(char.class, Types.CHAR);
+
         registerJdbcType(Boolean.class, Types.BOOLEAN);
+        registerJdbcType(boolean.class, Types.BOOLEAN);
     }
 }

@@ -22,6 +22,9 @@ import org.apache.eagle.log.entity.meta.Qualifier;
 import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @since 3/26/15
  */
@@ -60,7 +63,12 @@ public class JdbcEntityDefinition {
         }else if(fieldName.equals(JdbcConstants.METRIC_NAME_COLUMN_NAME)){
             return String.class;
         }
-        return internal.getEntityClass().getDeclaredField(fieldName).getType();
+        for(String realField:internal.getDisplayNameMap().keySet()){
+            if(realField.equalsIgnoreCase(fieldName)){
+                return internal.getEntityClass().getDeclaredField(realField).getType();
+            }
+        }
+        throw new NoSuchFieldException(fieldName);
     }
 
     public Class<?> getColumnTypeOrNull(String fieldName){
@@ -83,7 +91,7 @@ public class JdbcEntityDefinition {
 
     @SuppressWarnings("unchecked")
     public JdbcSerDeser getJdbcSerDeser(String columnName) {
-        Qualifier qualifier = this.internal.getDisplayNameMap().get(columnName);
+        Qualifier qualifier = this.getColumnQualifier(columnName);
         if(qualifier == null){
             return JdbcEntityDefinitionManager.DEFAULT_JDBC_SERDESER;
         }else {
@@ -93,5 +101,23 @@ public class JdbcEntityDefinition {
 
     public boolean isGenericMetric(){
         return this.internal.getEntityClass().equals(GenericMetricEntity.class);
+    }
+
+    public boolean isField(String columnName){
+        for(String name:this.internal.getDisplayNameMap().keySet()){
+            if(name.equalsIgnoreCase(columnName)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Qualifier getColumnQualifier(String columnName) {
+        for(Map.Entry<String,Qualifier> entry:this.internal.getDisplayNameMap().entrySet()){
+            if(entry.getKey().equalsIgnoreCase(columnName)){
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 }

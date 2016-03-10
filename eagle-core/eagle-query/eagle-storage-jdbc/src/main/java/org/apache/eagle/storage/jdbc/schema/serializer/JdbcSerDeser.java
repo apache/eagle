@@ -34,7 +34,7 @@ public interface JdbcSerDeser<T> {
      * @return
      * @throws IOException
      */
-    T readValue(ResultSet result, Class<?> fieldType,String fieldName, Qualifier qualifier) throws IOException;
+    T toJavaTypedValue(ResultSet result, Class<?> fieldType, String fieldName, Qualifier qualifier) throws IOException;
 
     /**
      * for write entity
@@ -43,5 +43,5 @@ public interface JdbcSerDeser<T> {
      * @param fieldType
      * @return
      */
-    JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType, Qualifier qualifier);
+    JdbcTypedValue toJdbcTypedValue(Object fieldValue, Class<?> fieldType, Qualifier qualifier);
 }
