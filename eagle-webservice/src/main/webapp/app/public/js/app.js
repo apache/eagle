@@ -393,7 +393,8 @@ var app = {};
 	// ======================================================================================
 	// =                                   Main Controller                                  =
 	// ======================================================================================
-	eagleApp.controller('MainCtrl', function ($scope, $wrapState, $http, $injector, PageConfig, FeaturePageConfig, Site, Authorization, Entities, nvd3, Application, Feature, UI) {
+	eagleApp.controller('MainCtrl', function ($scope, $wrapState, $http, $injector, ServiceError, PageConfig, FeaturePageConfig, Site, Authorization, Entities, nvd3, Application, Feature, UI) {
+		window.serviceError = $scope.ServiceError = ServiceError;
 		window.site = $scope.Site = Site;
 		window.auth = $scope.Auth = Authorization;
 		window.entities = $scope.Entities = Entities;

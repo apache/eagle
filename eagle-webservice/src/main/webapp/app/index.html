@@ -59,6 +59,28 @@
 
 					<div class="navbar-custom-menu">
 						<ul class="nav navbar-nav">
+							<!-- Admin error list -->
+							<li class="dropdown" ng-show="ServiceError.list.length">
+								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<i class="fa fa-exclamation-triangle" ng-class="{blink: ServiceError.hasUnread}"></i>
+								</a>
+								<ul class="dropdown-menu">
+									<li ng-repeat="error in ServiceError.list">
+										<a ng-click="ServiceError.showError(error);">
+											<span class="fa" ng-class="{'fa-envelope': !error._read, 'fa-check': error._read}"></span>
+											{{error.title}}
+										</a>
+									</li>
+									<li role="separator" class="divider"></li>
+									<li>
+										<a ng-click="ServiceError.clearAll();">
+											<span class="fa fa-trash"></span>
+											Clear All
+										</a>
+									</li>
+								</ul>
+							</li>
+
 							<!-- Site -->
 							<li class="dropdown" ng-show="!PageConfig.hideSite && !PageConfig.lockSite">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -189,6 +211,19 @@
 					</div>
 				</section><!-- /.content -->
 			</div><!-- /.content-wrapper -->
+
+			<footer class="main-footer">
+				<div class="pull-right hidden-xs">
+					<b>License</b>
+					<a href="http://www.apache.org/licenses/LICENSE-2.0" class="text-muted">Apache-2.0</a>
+				</div>
+				<strong>
+					Apache Eagle
+					<a target="_blank" href="https://eagle.incubator.apache.org/">Home</a> /
+					<a target="_blank" href="https://eagle.incubator.apache.org/docs/community.html">Community</a> /
+					<a target="_blank" href="https://cwiki.apache.org/confluence/display/EAG/FAQ">FAQ</a>
+				</strong>
+			</footer>
 		</div><!-- ./wrapper -->
 
 		<!-- ref:js public/js/doc.js -->

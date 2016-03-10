@@ -727,3 +727,11 @@ td.text-ellipsis {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 }
+
+.blink {
+	animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+	50% {opacity: 0.0;}
+}
