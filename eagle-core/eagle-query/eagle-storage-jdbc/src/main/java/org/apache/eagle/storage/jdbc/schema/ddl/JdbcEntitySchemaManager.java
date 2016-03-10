@@ -89,6 +89,7 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(),e);
+            throw new IllegalStateException(e);
         } finally {
             if(connection != null){
                 try {
@@ -127,6 +128,7 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
             this.platform.createTables(connection,database, true, false);
         } catch (Exception e) {
             LOG.error(e.getMessage(),e);
+            throw new IllegalStateException(e);
         } finally {
             if(connection != null){
                 try {
@@ -201,7 +203,7 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
                 indexColumn.setName(tag);
                 indexColumn.setOrdinalPosition(0);
                 index.addColumn(indexColumn);
-                index.setName("tags_unique_index");
+                index.setName(entityDefinition.getJdbcTableName()+"_tags_unique_index");
             }
             table.addIndex(index);
         }
