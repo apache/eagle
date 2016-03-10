@@ -43,7 +43,7 @@
 
 		Object.defineProperty(errorContainer, 'hasUnread', {
 			get: function() {
-				return !!common.array.find(false, errorContainer.list, "_read")
+				return !!common.array.find(false, errorContainer.list, "_read");
 			}
 		});
 
