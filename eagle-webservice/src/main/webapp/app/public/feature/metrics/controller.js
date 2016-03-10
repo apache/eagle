@@ -288,7 +288,6 @@
 
 		$scope.configPreviewChartMinimumCheck = function() {
 			$scope.configPreviewChart.min = $scope.configPreviewChart.min === 0 ? undefined : 0;
-			window.ccc1 = $scope.getChartConfig($scope.configPreviewChart);
 		};
 
 		$scope.seriesChecked = function(chart, series) {
@@ -322,7 +321,7 @@
 
 		$scope.configChart = function(chart) {
 			$scope.configTargetChart = chart;
-			$scope.configPreviewChart = $.extend({}, chart);
+			$scope.configPreviewChart = $.extend({}, chart, {aggregations: (chart.aggregations || []).slice()});
 			delete $scope.configPreviewChart._config;
 			$("#chartMDL").modal();
 			setTimeout(function() {
@@ -341,11 +340,11 @@
 			UI.deleteConfirm(chart.metric).then(null, null, function(holder) {
 				common.array.remove(chart, group.charts);
 				holder.closeFunc();
-				$scope.chartRefresh();
+				$scope.chartRefresh(false, true);
 			});
 		};
 
-		$scope.chartRefresh = function(forceRefresh) {
+		$scope.chartRefresh = function(forceRefresh, refreshAll) {
 			setTimeout(function() {
 				$scope.endTime = app.time.now();
 				$scope.startTime = $scope.autoRefreshSelect.getStartTime($scope.endTime);
@@ -380,20 +379,54 @@
 							$http.post(_druidConfig.broker + "/druid/v2", _data, {withCredentials: false}).then(function (response) {
 								chart._oriData = nvd3.convert.druid([response.data]);
 								$scope.chartSeriesUpdate(chart);
-								if(chart._holder) chart._holder.refresh();
+								if(chart._holder) {
+									if(refreshAll) {
+										chart._holder.refreshAll();
+									} else {
+										chart._holder.refresh();
+									}
+								}
 							});
 						} else {
-							if(chart._holder) chart._holder.refresh();
+							if(chart._holder) {
+								if(refreshAll) {
+									chart._holder.refreshAll();
+								} else {
+									chart._holder.refresh();
+								}
+							}
 						}
 					});
 				});
+
+				$(window).resize();
 			}, 0);
+		};
+
+		$scope.chartSwitchRefresh = function(source, target) {
+			var _oriSize = source.size;
+			source.size = target.size;
+			target.size = _oriSize;
+
+			if(source._holder) source._holder.refreshAll();
+			if(target._holder) target._holder.refreshAll();
+
 		};
 
 		_refreshInterval = setInterval(function() {
 			if(!$scope.dashboardReady) return;
 			$scope.chartRefresh(true);
 		}, 1000 * 30);
+
+		// > Chart UI
+		$scope.configChartSize = function(chart, sizeOffset) {
+			chart.size = (chart.size || 6) + sizeOffset;
+			if(chart.size <= 0) chart.size = 1;
+			if(chart.size > 12) chart.size = 12;
+			setTimeout(function() {
+				$(window).resize();
+			}, 1);
+		};
 
 		// ====================== Clean Up ======================
 		$scope.$on('$destroy', function() {

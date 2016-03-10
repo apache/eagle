@@ -226,7 +226,7 @@ var app = {};
 	// ======================================================================================
 	// =                                   Router config                                    =
 	// ======================================================================================
-	eagleApp.config(function ($stateProvider, $urlRouterProvider) {
+	eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
 		// Resolve
 		function _resolve(config) {
 			config = config || {};
@@ -367,6 +367,9 @@ var app = {};
 			.state('page', $.extend({url: "/:feature/:page"}, _featureBase))
 			.state('pageFilter', $.extend({url: "/:feature/:page/:filter"}, _featureBase))
 		;
+
+		// Animation
+		$animateProvider.classNameFilter(/^((?!(fa-spin)).)*$/);
 	});
 
 	eagleApp.filter('parseJSON', function () {

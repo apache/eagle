@@ -446,10 +446,40 @@ ul.tree.tree-bordered > li > ul > li > a {
 	color: #FFFFFF;
 }
 
+/* Row */
+.row.narrow {
+	margin-left: -5px;
+	margin-right: -5px;
+	margin-bottom: -10px;
+}
+
+.row.narrow>.col-xs-1, .row.narrow>.col-sm-1, .row.narrow>.col-md-1, .row.narrow>.col-lg-1, .row.narrow>.col-xs-2, .row.narrow>.col-sm-2, .row.narrow>.col-md-2, .row.narrow>.col-lg-2, .row.narrow>.col-xs-3, .row.narrow>.col-sm-3, .row.narrow>.col-md-3, .row.narrow>.col-lg-3, .row.narrow>.col-xs-4, .row.narrow>.col-sm-4, .row.narrow>.col-md-4, .row.narrow>.col-lg-4, .row.narrow>.col-xs-5, .row.narrow>.col-sm-5, .row.narrow>.col-md-5, .row.narrow>.col-lg-5, .row.narrow>.col-xs-6, .row.narrow>.col-sm-6, .row.narrow>.col-md-6, .row.narrow>.col-lg-6, .row.narrow>.col-xs-7, .row.narrow>.col-sm-7, .row.narrow>.col-md-7, .row.narrow>.col-lg-7, .row.narrow>.col-xs-8, .row.narrow>.col-sm-8, .row.narrow>.col-md-8, .row.narrow>.col-lg-8, .row.narrow>.col-xs-9, .row.narrow>.col-sm-9, .row.narrow>.col-md-9, .row.narrow>.col-lg-9, .row.narrow>.col-xs-10, .row.narrow>.col-sm-10, .row.narrow>.col-md-10, .row.narrow>.col-lg-10, .row.narrow>.col-xs-11, .row.narrow>.col-sm-11, .row.narrow>.col-md-11, .row.narrow>.col-lg-11, .row.narrow>.col-xs-12, .row.narrow>.col-sm-12, .row.narrow>.col-md-12, .row.narrow>.col-lg-12 {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.row.narrow > [class^="col-"],
+.row.narrow > [class*=" col-"] {
+	margin-bottom: 10px;
+}
+
 /* Chart */
+.sortable-mock-element .nvd3-chart-wrapper {
+	background: #FFFFFF;
+	opacity: 0.8;
+}
+
+.sortable-enter .nvd3-chart-wrapper {
+	border-color: #3c8dbc;
+	pointer-events: none;
+}
+.sortable-enter .nvd3-chart-wrapper .nvtooltip {
+	display: none;
+}
+
 .nvd3-chart-wrapper {
 	position: relative;
-	//border: 1px solid rgba(0,0,0,0);
+	border: 1px solid rgba(0,0,0,0.1);
 }
 .nvd3-chart-wrapper:hover {
 	//border-color: #F4F4F4;
@@ -457,10 +487,10 @@ ul.tree.tree-bordered > li > ul > li > a {
 
 .nvd3-chart-wrapper .nvd3-chart-config {
 	position: absolute;
-	top: 5px;
-	right: 10px;
+	top: 1px;
+	right: 1px;
 	display: none;
-	border-radius: 3px;
+	border-radius: 0;
 	padding: 0 5px;
 	background: rgba(0,0,0,0.7);
 }
@@ -470,7 +500,7 @@ ul.tree.tree-bordered > li > ul > li > a {
 
 .nvd3-chart-wrapper .nvd3-chart-config a {
 	color: rgba(255,255,255, 0.9);
-	padding: 5px 5px 4px 5px;
+	padding: 5px 2px 4px 2px;
 	font-size: 16px;
 }
 .nvd3-chart-wrapper .nvd3-chart-config a:hover {
@@ -478,7 +508,7 @@ ul.tree.tree-bordered > li > ul > li > a {
 }
 
 .nvd3-chart-cntr {
-	padding-top: 10px;
+	padding: 5px;
 }
 
 .nvd3-chart-cntr > h3 {
@@ -486,6 +516,11 @@ ul.tree.tree-bordered > li > ul > li > a {
 	font-size: 16px;
 	font-weight: bolder;
 	margin: 0;
+	padding: 5px 0;
+
+	overflow:hidden;
+	text-overflow:ellipsis;
+
 }
 
 .nvd3-chart-cntr > svg.nvd3-svg {
@@ -675,6 +710,13 @@ td.text-ellipsis {
 .btn.btn-xs.sm {
 	font-size: 12px;
 	padding: 2px 6px;
+}
+
+.form-control.input-xs {
+	height: 24px;
+	padding: 2px 8px;
+	font-size: 12px;
+	line-height: 100%;
 }
 
 .noSelect {
