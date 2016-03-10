@@ -60,7 +60,7 @@
 					<div class="navbar-custom-menu">
 						<ul class="nav navbar-nav">
 							<!-- Admin error list -->
-							<li class="dropdown" ng-if="Auth.isRole('ROLE_ADMIN')" ng-show="ServiceError.list.length">
+							<li class="dropdown" ng-show="ServiceError.list.length">
 								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 									<i class="fa fa-exclamation-triangle" ng-class="{blink: ServiceError.hasUnread}"></i>
 								</a>
