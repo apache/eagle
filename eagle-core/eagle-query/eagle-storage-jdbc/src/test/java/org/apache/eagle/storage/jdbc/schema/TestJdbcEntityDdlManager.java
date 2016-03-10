@@ -1,6 +1,6 @@
 package org.apache.eagle.storage.jdbc.schema;
 
-import org.apache.eagle.storage.jdbc.schema.ddl.JdbcEntityDDLManager;
+import org.apache.eagle.storage.jdbc.schema.ddl.JdbcEntitySchemaManager;
 import org.junit.Test;
 
 /**
@@ -22,7 +22,7 @@ import org.junit.Test;
 public class TestJdbcEntityDDLManager {
     @Test
     public void testSetup(){
-        JdbcEntityDDLManager.getInstance().init();
-        JdbcEntityDDLManager.getInstance().init();
+        JdbcEntitySchemaManager.getInstance().init();
+        JdbcEntitySchemaManager.getInstance().init();
     }
 }

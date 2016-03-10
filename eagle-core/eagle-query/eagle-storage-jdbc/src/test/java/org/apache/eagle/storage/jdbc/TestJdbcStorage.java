@@ -17,7 +17,6 @@
 package org.apache.eagle.storage.jdbc;
 
 import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
@@ -25,8 +24,6 @@ import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import org.apache.eagle.storage.DataStorageManager;
 import org.apache.eagle.storage.exception.QueryCompileException;
-import org.apache.eagle.storage.jdbc.conn.ConnectionManagerFactory;
-import org.apache.eagle.storage.jdbc.schema.ddl.JdbcEntityDDLManager;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
@@ -36,10 +33,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.Statement;
 import java.util.*;
 
 public class TestJdbcStorage {

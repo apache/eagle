@@ -37,14 +37,14 @@ import java.sql.Types;
 import java.util.Collection;
 import java.util.Map;
 
-public class JdbcEntityDDLManager implements IJdbcEntityDDLManager {
-    private final static Logger LOG = LoggerFactory.getLogger(JdbcEntityDDLManager.class);
+public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
+    private final static Logger LOG = LoggerFactory.getLogger(JdbcEntitySchemaManager.class);
     private Database database;
     private Platform platform;
 
     private static IJdbcEntityDDLManager instance;
 
-    private JdbcEntityDDLManager(){
+    private JdbcEntitySchemaManager(){
         instance = null;
         ConnectionConfig config = ConnectionConfigFactory.getFromEagleConfig();
         this.platform = PlatformFactory.createNewPlatformInstance(config.getAdapter());
@@ -68,7 +68,7 @@ public class JdbcEntityDDLManager implements IJdbcEntityDDLManager {
 
     public static IJdbcEntityDDLManager getInstance(){
         if(instance == null){
-            instance = new JdbcEntityDDLManager();
+            instance = new JdbcEntitySchemaManager();
         }
         return instance;
     }
