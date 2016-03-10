@@ -27,7 +27,7 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 @Prefix("testTSEntity")
 @Service("TestTimeSeriesAPIEntity")
 @TimeSeries(true)
-//@Tags({"cluster","datacenter","random"})
+@Tags({"cluster","datacenter","random"})
 public class TestTimeSeriesAPIEntity extends TaggedLogAPIEntity {
 
 	@Column("a")
