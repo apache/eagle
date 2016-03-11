@@ -96,7 +96,7 @@
 				var _value = common.getValueByPath(item, path, "").toLowerCase();
 				return _value.indexOf(_key) !== -1;
 			}
-			return _hasKey(item, "tags.policyId") || _hasKey(item, "__expression") || _hasKey(item, "desc") || _hasKey(item, "owner") || _hasKey(item, "__mailStr");
+			return _hasKey(item, "tags.policyId") || _hasKey(item, "__expression") || _hasKey(item, "description") || _hasKey(item, "owner") || _hasKey(item, "__mailStr");
 		};
 
 		$scope.updatePolicyStatus = Policy.updatePolicyStatus;

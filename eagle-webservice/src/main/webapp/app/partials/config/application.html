@@ -52,7 +52,7 @@
 				</div>
 				<div class="form-group">
 					<label for="applicationDescription">Description</label>
-					<textarea id="applicationDescription" class="form-control" placeholder="(Optional) Application description" rows="2" ng-model="applications[application.tags.application].desc"></textarea>
+					<textarea id="applicationDescription" class="form-control" placeholder="(Optional) Application description" rows="2" ng-model="applications[application.tags.application].description"></textarea>
 				</div>
 				<div class="form-group">
 					<label for="applicationConfiguration">Configuration</label>
@@ -74,7 +74,7 @@
 								<div class="product-info">
 									<a class="fa fa-times pull-right" ng-click="removeFeature(feature, applications[application.tags.application])"></a>
 									<span class="product-title">{{feature}}</span>
-									<span class="product-description">{{Application.featureList.set[feature].desc}}</span>
+									<span class="product-description">{{Application.featureList.set[feature].description}}</span>
 								</div>
 							</li>
 						</ul>
@@ -87,7 +87,7 @@
 								</button>
 								<div class="product-info">
 									<span class="product-title">{{feature}}</span>
-									<span class="product-description">{{Application.featureList.set[feature].desc}}</span>
+									<span class="product-description">{{Application.featureList.set[feature].description}}</span>
 								</div>
 							</li>
 						</ul>
