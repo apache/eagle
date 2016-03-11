@@ -93,12 +93,11 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     ret
   }
 
-  def reduceByKey[K,V](func: (V,V) => V) : StreamProducer[(K,V)] = {
-    val ret = ReduceByKeyProducer[K,V](func)
+  def reduceByKey[V](fn: (V,V) => V) : StreamProducer[T] = {
+    val ret = ReduceByKeyProducer[T,V](fn)
     connect(this, ret)
     ret
   }
-
 
   override def foreach(fn : T => Unit) : Unit = {
     val ret = ForeachProducer[T](fn)
@@ -287,7 +286,7 @@ case class FlatMapProducer[T, R](var mapper: FlatMapper[R]) extends StreamProduc
   override def toString: String = mapper.toString
 }
 
-case class ReduceByKeyProducer[K,V](var fn: (V,V) => V) extends StreamProducer[(K,V)]{
+case class ReduceByKeyProducer[T,V](fn: (V,V) => V) extends StreamProducer[T]{
   override def toString: String = s"ReduceByKeyProducer"
 }
 

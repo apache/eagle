@@ -16,8 +16,7 @@
   */
 package org.apache.eagle.datastream.sparkstreaming
 
-import org.apache.eagle.datastream.core.StreamProducer
-import org.apache.eagle.datastream.{FlatMapper, Collector, ExecutionEnvironments}
+import org.apache.eagle.datastream. ExecutionEnvironments
 
 
 case class Entity(name:String,value:Double,var inc:Int=0){
@@ -43,6 +42,7 @@ object TestSparkStreamingDSL extends App{
   env.from(tmp,recycle = true)
     .flatMap(_.split(" "))
     .map(o => (o,1))
+    .reduceByKey((x:Int, y:Int) => x+y)
     .filter(o => !o._1.contains("zqin"))
     .foreach(println)
   env.execute()
