@@ -66,7 +66,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
     {
        "prefix":"alertStream",
        "tags":{
-          "dataSource":"hadoopJmxMetricDataSource",
+          "application":"hadoopJmxMetricDataSource",
           "streamName":"hadoopJmxMetricEventStream"
        },
        "desc":"hadoop"
@@ -84,7 +84,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
     {
        "prefix":"alertExecutor",
        "tags":{
-          "dataSource":"hadoopJmxMetricDataSource",
+          "application":"hadoopJmxMetricDataSource",
           "alertExecutorId":"hadoopJmxMetricAlertExecutor",
           "streamName":"hadoopJmxMetricEventStream"
        },
@@ -103,7 +103,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
     {
        "prefix": "alertStreamSchema",
        "tags": {
-          "dataSource": "hadoopJmxMetricDataSource",
+          "application": "hadoopJmxMetricDataSource",
           "streamName": "hadoopJmxMetricEventStream",
           "attrName": "host"
        },
@@ -115,7 +115,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
     {
        "prefix": "alertStreamSchema",
        "tags": {
-          "dataSource": "hadoopJmxMetricDataSource",
+          "application": "hadoopJmxMetricDataSource",
           "streamName": "hadoopJmxMetricEventStream",
           "attrName": "timestamp"
        },
@@ -127,7 +127,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
     {
        "prefix": "alertStreamSchema",
        "tags": {
-          "dataSource": "hadoopJmxMetricDataSource",
+          "application": "hadoopJmxMetricDataSource",
           "streamName": "hadoopJmxMetricEventStream",
           "attrName": "metric"
        },
@@ -139,7 +139,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
     {
        "prefix": "alertStreamSchema",
        "tags": {
-          "dataSource": "hadoopJmxMetricDataSource",
+          "application": "hadoopJmxMetricDataSource",
           "streamName": "hadoopJmxMetricEventStream",
           "attrName": "component"
        },
@@ -151,7 +151,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
     {
        "prefix": "alertStreamSchema",
        "tags": {
-          "dataSource": "hadoopJmxMetricDataSource",
+          "application": "hadoopJmxMetricDataSource",
           "streamName": "hadoopJmxMetricEventStream",
           "attrName": "site"
        },
@@ -163,7 +163,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
     {
        "prefix": "alertStreamSchema",
        "tags": {
-          "dataSource": "hadoopJmxMetricDataSource",
+          "application": "hadoopJmxMetricDataSource",
           "streamName": "hadoopJmxMetricEventStream",
           "attrName": "value"
        },
