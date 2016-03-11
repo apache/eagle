@@ -266,7 +266,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 
 			// Update chart data
 			function updateData() {
-				var _min, _max;
+				var _min = null, _max = null;
 
 				// Copy series to prevent Angular loop watching
 				var _data = $.map($scope.nvd3 || [], function(series, i) {
@@ -279,8 +279,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 				if(($scope.chart || _config.chart) !== "pie") {
 					$.each(_data, function(i, series) {
 						$.each(series.values, function(j, unit) {
-							if(_min === undefined || unit.y < _min) _min = unit.y;
-							if(_max === undefined || unit.y > _max) _max = unit.y;
+							if(_min === null || unit.y < _min) _min = unit.y;
+							if(_max === null || unit.y > _max) _max = unit.y;
 						});
 					});
 
@@ -297,6 +297,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 				d3.select(_chartCntr)						//Select the <svg> element you want to render the chart in.
 					.datum(_data)							//Populate the <svg> element with chart data...
 					.call(_chart);							//Finally, render the chart!
+
+				setTimeout(_chart.update, 10);
 			}
 
 			// ================================================================
@@ -305,9 +307,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 			// Ignore initial checking
 			$timeout(function() {
 				if ($scope.watching !== "false") {
-					$scope.$watch("nvd3", function(newValue, oldValue) {
-						//noinspection JSValidateTypes
-						if (newValue === oldValue) return;
+					$scope.$watch("[nvd3, nvd3.length]", function(newValue, oldValue) {
+						if (newValue[0] === oldValue[0] && newValue[1] === oldValue[1]) return;
 
 						updateData();
 					}, true);

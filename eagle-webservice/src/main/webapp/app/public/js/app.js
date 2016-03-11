@@ -370,6 +370,7 @@ var app = {};
 
 		// Animation
 		$animateProvider.classNameFilter(/^((?!(fa-spin)).)*$/);
+		$animateProvider.classNameFilter(/^((?!(tab-pane)).)*$/);
 	});
 
 	eagleApp.filter('parseJSON', function () {

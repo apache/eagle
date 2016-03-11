@@ -44,6 +44,7 @@ eagleComponents.directive('tabs', function() {
 
 			$scope.paneList = [];
 			$scope.selectedPane = null;
+			$scope.inPane = null;
 			$scope.activePane = null;
 
 			// ================== Function ==================
@@ -58,11 +59,20 @@ eagleComponents.directive('tabs', function() {
 
 				$scope.activePane = $scope.selectedPane || pane;
 				$scope.selectedPane = pane;
+				$scope.inPane = null;
 
 				if(transTimer) $timeout.cancel(transTimer);
 				transTimer = $timeout(function() {
 					$scope.activePane = $scope.selectedPane;
+					$scope.inPane = $scope.selectedPane;
 				}, transDuration);
+			};
+
+			$scope.getMenuList = function() {
+				if($scope.selectedPane && $scope.selectedPane.menuList) {
+					return $scope.selectedPane.menuList;
+				}
+				return $scope.menuList;
 			};
 
 			// =================== Linker ===================
@@ -80,7 +90,7 @@ eagleComponents.directive('tabs', function() {
 					},
 					in: {
 						get: function () {
-							return $scope.selectedPane === this;
+							return $scope.inPane === this;
 						}
 					}
 				});
@@ -102,8 +112,7 @@ eagleComponents.directive('tabs', function() {
 				common.array.remove(pane, $scope.paneList);
 
 				if($scope.selectedPane === pane) {
-					$scope.selectedPane = $scope.paneList[0];
-					$scope.activePane = $scope.paneList[0];
+					$scope.selectedPane = $scope.activePane = $scope.inPane = $scope.paneList[0];
 				}
 			};
 
@@ -145,8 +154,8 @@ eagleComponents.directive('tabs', function() {
 		template :
 			'<div class="nav-tabs-custom">' +
 				// Menu
-				'<div class="box-tools pull-right" ng-if="menuList && menuList.length">' +
-					'<div ng-repeat="menu in menuList track by $index" class="inline">' +
+				'<div class="box-tools pull-right" ng-if="getMenuList() && getMenuList().length">' +
+					'<div ng-repeat="menu in getMenuList() track by $index" class="inline">' +
 						// Button
 						'<button class="btn btn-box-tool" ng-click="menu.func($event)" ng-if="!menu.list"' +
 							' uib-tooltip="{{menu.title}}" tooltip-enable="menu.title" tooltip-append-to-body="true">' +
@@ -161,7 +170,7 @@ eagleComponents.directive('tabs', function() {
 							'</button>' +
 							'<ul class="dropdown-menu left" role="menu">' +
 								'<li ng-repeat="item in menu.list track by $index" ng-class="{danger: item.danger, disabled: item.disabled}">' +
-									'<a ng-click="!item.disabled && item.func($event)">' +
+									'<a ng-click="!item.disabled && item.func($event)" ng-class="{strong: item.strong}">' +
 										'<span class="fa fa-{{item.icon}}"></span> {{item.title}}' +
 									'</a>' +
 								'</li>' +
@@ -196,7 +205,8 @@ eagleComponents.directive('tabs', function() {
 		transclude : true,
 		scope : {
 			title : '@',
-			data: '=?data'
+			data: '=?data',
+			menuList: "=?menu"
 		},
 		link : function(scope, element, attrs, tabsController) {
 			tabsController.addPane(scope);
