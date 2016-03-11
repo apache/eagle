@@ -331,8 +331,26 @@ eagleComponents.directive('nvd3', function(nvd3) {
 			// Ignore initial checking
 			$timeout(function() {
 				if ($scope.watching !== "false") {
-					$scope.$watch("nvd3", function(newValue, oldValue) {
-						if (newValue === oldValue) return;
+					$scope.$watch(function() {
+						if(!$scope.nvd3) return [];
+
+						var _hashList = $.map($scope.nvd3, function(series) {
+							if(!series.values) return 0;
+							var unit = {
+								x: 0,
+								y: 0
+							};
+
+							$.each(series.values, function(j, item) {
+								unit.x += item.x;
+								unit.y += item.y;
+							});
+
+							return unit;
+						});
+
+						return _hashList;
+					}, function() {
 						updateData();
 					}, true);
 
