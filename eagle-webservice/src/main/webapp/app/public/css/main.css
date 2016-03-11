@@ -27,6 +27,10 @@ body.no-sidebar .content-wrapper {
 	transition: none;
 }
 
+body.no-sidebar .main-footer {
+	margin-left: 0;
+}
+
 /* Navigation */
 .navbar-nav > .user-menu > .dropdown-menu > li.user-header .img-circle {
 	display: inline-block;
