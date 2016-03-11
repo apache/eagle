@@ -76,7 +76,7 @@ eagleComponents.service('nvd3', function() {
 	// Resize with refresh
 	function chartResize() {
 		$.each(nvd3.charts, function(i, chart) {
-			if(chart) chart.update();
+			if(chart) chart.nvd3Update();
 		});
 	}
 	$(window).on("resize.components.nvd3", chartResize);
@@ -237,6 +237,24 @@ eagleComponents.directive('nvd3', function(nvd3) {
 						case "time":
 							if(_chartType !== 'column') {
 								_chart[axis + "Scale"](d3.time.scale());
+								(function () {
+									var measureSeries = null;
+									$.each($scope.nvd3 || [], function(i, series) {
+										var _len = (series.values || []).length;
+										if(_len === 0) return;
+										if(measureSeries === null || measureSeries.values.length < _len) measureSeries = series;
+									});
+
+									var width = $element.width() - 35;// Use default nvd3 margin. Hard code.
+									if(!measureSeries || width <= 0) return;
+									var count = Math.floor(width / 80);
+									var countDes = Math.floor(measureSeries.values.length / count);
+									var tickValues = [];
+									for(var loc = 0 ; loc < measureSeries.values.length ; loc += countDes) {
+										tickValues.push(measureSeries.values[loc].x);
+									}
+									_chart[axis + "Axis"].tickValues(tickValues);
+								})();
 							}
 							_axis.tickFormat(function(d) {
 								return _tickMultiFormat(app.time.offset(d).toDate(true));
@@ -260,6 +278,12 @@ eagleComponents.directive('nvd3', function(nvd3) {
 				} else {
 					nvd3.charts[_preIndex] = _chart;
 				}
+
+				// Use customize update function to update the view
+				_chart.nvd3Update = function() {
+					if(_config.xType === "time") _defineLabelType("x", _config.xType);
+					_chart.update();
+				};
 
 				updateData();
 			}
@@ -298,7 +322,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					.datum(_data)							//Populate the <svg> element with chart data...
 					.call(_chart);							//Finally, render the chart!
 
-				setTimeout(_chart.update, 10);
+				setTimeout(_chart.nvd3Update, 10);
 			}
 
 			// ================================================================
@@ -307,9 +331,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 			// Ignore initial checking
 			$timeout(function() {
 				if ($scope.watching !== "false") {
-					$scope.$watch("[nvd3, nvd3.length]", function(newValue, oldValue) {
-						if (newValue[0] === oldValue[0] && newValue[1] === oldValue[1]) return;
-
+					$scope.$watch("nvd3", function(newValue, oldValue) {
+						if (newValue === oldValue) return;
 						updateData();
 					}, true);
 
