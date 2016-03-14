@@ -27,6 +27,10 @@ body.no-sidebar .content-wrapper {
 	transition: none;
 }
 
+body.no-sidebar .main-footer {
+	margin-left: 0;
+}
+
 /* Navigation */
 .navbar-nav > .user-menu > .dropdown-menu > li.user-header .img-circle {
 	display: inline-block;
@@ -539,9 +543,6 @@ body .tab-content>.tab-pane.active {
 	overflow-x: visible;
 	overflow-y: visible;
 }
-body .tab-content>.tab-pane.ng-animate {
-	transition: 0s;
-}
 
 body .modal-body .nav-pills > li > a,
 body .box-body .nav-pills > li > a {
@@ -563,10 +564,18 @@ body .modal-body .nav-stacked > li:last-child {
 }
 
 /* Navigation Tab */
+.nav-tabs-custom {
+	position: relative;
+}
+
 .nav-tabs-custom .box-tools {
 	position: absolute;
 	right: 15px;
 	top: 8px;
+}
+
+.nav-tabs-custom .box-tools .strong {
+	font-weight: bolder;
 }
 
 /* Customize */

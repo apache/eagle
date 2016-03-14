@@ -159,17 +159,29 @@
 			}
 
 			// Visualization
-			var _endTime = app.time.now().hour(23).minute(59).second(59).millisecond(0);
-			var _startTime = _endTime.clone().subtract(1, "month").hour(0).minute(0).second(0).millisecond(0);
-			var _cond = {
-				application: policy.tags.application,
-				policyId: policy.tags.policyId,
-				_startTime: _startTime,
-				_endTime: _endTime
-			};
+			var _intervalType = 0;
+			var _intervalList = [
+				["Daily", 1440, function() {
+					var _endTime = app.time.now().hour(23).minute(59).second(59).millisecond(0);
+					var _startTime = _endTime.clone().subtract(1, "month").hour(0).minute(0).second(0).millisecond(0);
+					return [_startTime, _endTime];
+				}],
+				["Hourly", 60, function() {
+					var _endTime = app.time.now().minute(59).second(59).millisecond(0);
+					var _startTime = _endTime.clone().subtract(48, "hour").minute(0).second(0).millisecond(0);
+					return [_startTime, _endTime];
+				}],
+				["Every 5 minutes", 5, function() {
+					var _endTime = app.time.now().second(59).millisecond(0);
+					var _minute = Math.floor(_endTime.minute() / 5) * 5;
+					var _startTime = _endTime.clone().minute(_minute).subtract(5 * 30, "minute").second(0).millisecond(0);
+					_endTime.minute(_minute + 4);
+					return [_startTime, _endTime];
+				}]
+			];
 
-			function _loadSeries(seriesName, metricName) {
-				var list = Entities.querySeries("GenericMetricService", $.extend({_metricName: metricName}, _cond), "@cluster", "sum(value)", 60 * 24);
+			function _loadSeries(seriesName, metricName, condition) {
+				var list = Entities.querySeries("GenericMetricService", $.extend({_metricName: metricName}, condition), "@cluster", "sum(value)", _intervalList[_intervalType][1]);
 				var seriesList = nvd3.convert.eagle([list]);
 				if(!$scope[seriesName]) $scope[seriesName] = seriesList;
 				list._promise.then(function() {
@@ -178,17 +190,28 @@
 			}
 
 			function refreshSeries() {
+				var _timeRange = _intervalList[_intervalType][2]();
+				var _startTime = _timeRange[0];
+				var _endTime = _timeRange[1];
+				var _cond = {
+					application: policy.tags.application,
+					policyId: policy.tags.policyId,
+					_startTime: _startTime,
+					_endTime: _endTime
+				};
+				console.log("Range:", common.format.date(_startTime, "datetime"), common.format.date(_endTime, "datetime"));
+
 				// > eagle.policy.eval.count
-				_loadSeries("policyEvalSeries", "eagle.policy.eval.count");
+				_loadSeries("policyEvalSeries", "eagle.policy.eval.count", _cond);
 
 				// > eagle.policy.eval.fail.count
-				_loadSeries("policyEvalFailSeries", "eagle.policy.eval.fail.count");
+				_loadSeries("policyEvalFailSeries", "eagle.policy.eval.fail.count", _cond);
 
 				// > eagle.alert.count
-				_loadSeries("alertSeries", "eagle.alert.count");
+				_loadSeries("alertSeries", "eagle.alert.count", _cond);
 
 				// > eagle.alert.fail.count
-				_loadSeries("alertFailSeries", "eagle.alert.fail.count");
+				_loadSeries("alertFailSeries", "eagle.alert.fail.count", _cond);
 			}
 
 			// Alert list
@@ -203,6 +226,22 @@
 
 			refreshSeries();
 			seriesRefreshInterval = $interval(refreshSeries, 60000);
+
+			// Menu
+			$scope.visualizationMenu = [
+				{icon: "clock-o", title: "Interval", list:
+					$.map(_intervalList, function(item, index) {
+						var _item = {icon: "clock-o", title: item[0], func: function() {
+							_intervalType = index;
+							refreshSeries();
+						}};
+						Object.defineProperty(_item, 'strong', {
+							get: function() {return _intervalType === index;}
+						});
+						return _item;
+					})
+				}
+			];
 		});
 
 		// Function

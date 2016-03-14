@@ -76,7 +76,7 @@ eagleComponents.service('nvd3', function() {
 	// Resize with refresh
 	function chartResize() {
 		$.each(nvd3.charts, function(i, chart) {
-			if(chart) chart.update();
+			if(chart) chart.nvd3Update();
 		});
 	}
 	$(window).on("resize.components.nvd3", chartResize);
@@ -237,6 +237,24 @@ eagleComponents.directive('nvd3', function(nvd3) {
 						case "time":
 							if(_chartType !== 'column') {
 								_chart[axis + "Scale"](d3.time.scale());
+								(function () {
+									var measureSeries = null;
+									$.each($scope.nvd3 || [], function(i, series) {
+										var _len = (series.values || []).length;
+										if(_len === 0) return;
+										if(measureSeries === null || measureSeries.values.length < _len) measureSeries = series;
+									});
+
+									var width = $element.width() - 35;// Use default nvd3 margin. Hard code.
+									if(!measureSeries || width <= 0) return;
+									var count = Math.floor(width / 80);
+									var countDes = Math.floor(measureSeries.values.length / count);
+									var tickValues = [];
+									for(var loc = 0 ; loc < measureSeries.values.length ; loc += countDes) {
+										tickValues.push(measureSeries.values[loc].x);
+									}
+									_chart[axis + "Axis"].tickValues(tickValues);
+								})();
 							}
 							_axis.tickFormat(function(d) {
 								return _tickMultiFormat(app.time.offset(d).toDate(true));
@@ -261,12 +279,18 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					nvd3.charts[_preIndex] = _chart;
 				}
 
+				// Use customize update function to update the view
+				_chart.nvd3Update = function() {
+					if(_config.xType === "time") _defineLabelType("x", _config.xType);
+					_chart.update();
+				};
+
 				updateData();
 			}
 
 			// Update chart data
 			function updateData() {
-				var _min, _max;
+				var _min = null, _max = null;
 
 				// Copy series to prevent Angular loop watching
 				var _data = $.map($scope.nvd3 || [], function(series, i) {
@@ -279,8 +303,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 				if(($scope.chart || _config.chart) !== "pie") {
 					$.each(_data, function(i, series) {
 						$.each(series.values, function(j, unit) {
-							if(_min === undefined || unit.y < _min) _min = unit.y;
-							if(_max === undefined || unit.y > _max) _max = unit.y;
+							if(_min === null || unit.y < _min) _min = unit.y;
+							if(_max === null || unit.y > _max) _max = unit.y;
 						});
 					});
 
@@ -297,6 +321,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 				d3.select(_chartCntr)						//Select the <svg> element you want to render the chart in.
 					.datum(_data)							//Populate the <svg> element with chart data...
 					.call(_chart);							//Finally, render the chart!
+
+				setTimeout(_chart.nvd3Update, 10);
 			}
 
 			// ================================================================
@@ -305,10 +331,26 @@ eagleComponents.directive('nvd3', function(nvd3) {
 			// Ignore initial checking
 			$timeout(function() {
 				if ($scope.watching !== "false") {
-					$scope.$watch("nvd3", function(newValue, oldValue) {
-						//noinspection JSValidateTypes
-						if (newValue === oldValue) return;
+					$scope.$watch(function() {
+						if(!$scope.nvd3) return [];
 
+						var _hashList = $.map($scope.nvd3, function(series) {
+							if(!series.values) return 0;
+							var unit = {
+								x: 0,
+								y: 0
+							};
+
+							$.each(series.values, function(j, item) {
+								unit.x += item.x;
+								unit.y += item.y;
+							});
+
+							return unit;
+						});
+
+						return _hashList;
+					}, function() {
 						updateData();
 					}, true);
 

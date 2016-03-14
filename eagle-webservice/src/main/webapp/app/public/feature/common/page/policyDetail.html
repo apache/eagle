@@ -66,107 +66,91 @@
 	</div>
 </div>
 
-<div class="nav-tabs-custom">
-	<ul class="nav nav-tabs">
-		<li class="active">
-			<a href="[data-id='visualization']" data-toggle="tab">Visualization</a>
-		</li>
-		<li>
-			<a href="[data-id='statistics']" data-toggle="tab">Statistics</a>
-		</li>
-		<li>
-			<a href="[data-id='alerts']" data-toggle="tab">Alerts</a>
-		</li>
-	</ul>
-	<div class="tab-content">
-		<div class="tab-pane active" data-id="visualization">
-			<div class="row">
-				<div class="col-xs-6">
-					<div nvd3="policyEvalSeries" data-title="Policy Eval Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
-				</div>
-				<div class="col-xs-6">
-					<div nvd3="policyEvalFailSeries" data-title="Policy Eval Fail Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
-				</div>
-				<div class="col-xs-6">
-					<div nvd3="alertSeries" data-title="Alert Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
-				</div>
-				<div class="col-xs-6">
-					<div nvd3="alertFailSeries" data-title="Alert Fail Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
-				</div>
+<div tabs>
+	<pane data-title="Visualization" menu="visualizationMenu">
+		<div class="row">
+			<div class="col-xs-6">
+				<div nvd3="policyEvalSeries" data-title="Policy Eval Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
+			</div>
+			<div class="col-xs-6">
+				<div nvd3="policyEvalFailSeries" data-title="Policy Eval Fail Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
+			</div>
+			<div class="col-xs-6">
+				<div nvd3="alertSeries" data-title="Alert Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
+			</div>
+			<div class="col-xs-6">
+				<div nvd3="alertFailSeries" data-title="Alert Fail Count" data-config="chartConfig" class="nvd3-chart-cntr"></div>
 			</div>
 		</div>
-
-		<div class="tab-pane" data-id="statistics">
-			<div class="row">
-				<div class="col-xs-3">
-					<div class="info-box bg-aqua">
-						<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
-						<div class="info-box-content">
-							<span class="info-box-text">Policy Eval Count</span>
-							<span class="info-box-number">{{common.array.sum(policyEvalSeries, "1")}} <small>(Monthly)</small></span>
-							<span class="info-box-number">{{policyEvalSeries[policyEvalSeries.length - 1][1]}} <small>(Daily)</small></span>
-						</div>
+	</pane>
+	<pane data-title="Statistics">
+		<div class="row">
+			<div class="col-xs-3">
+				<div class="info-box bg-aqua">
+					<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+					<div class="info-box-content">
+						<span class="info-box-text">Policy Eval Count</span>
+						<span class="info-box-number">{{common.array.sum(policyEvalSeries, "1")}} <small>(Monthly)</small></span>
+						<span class="info-box-number">{{policyEvalSeries[policyEvalSeries.length - 1][1]}} <small>(Daily)</small></span>
 					</div>
 				</div>
-				<div class="col-xs-3">
-					<div class="info-box bg-red">
-						<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
-						<div class="info-box-content">
-							<span class="info-box-text">Policy Eval Fail Count</span>
-							<span class="info-box-number">{{common.array.sum(policyEvalFailSeries, "1")}} <small>(Monthly)</small></span>
-							<span class="info-box-number">{{policyEvalFailSeries[policyEvalFailSeries.length - 1][1]}} <small>(Daily)</small></span>
-						</div>
+			</div>
+			<div class="col-xs-3">
+				<div class="info-box bg-red">
+					<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+					<div class="info-box-content">
+						<span class="info-box-text">Policy Eval Fail Count</span>
+						<span class="info-box-number">{{common.array.sum(policyEvalFailSeries, "1")}} <small>(Monthly)</small></span>
+						<span class="info-box-number">{{policyEvalFailSeries[policyEvalFailSeries.length - 1][1]}} <small>(Daily)</small></span>
 					</div>
 				</div>
-				<div class="col-xs-3">
-					<div class="info-box bg-aqua">
-						<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
-						<div class="info-box-content">
-							<span class="info-box-text">Alert Count</span>
-							<span class="info-box-number">{{common.array.sum(alertSeries, "1")}} <small>(Monthly)</small></span>
-							<span class="info-box-number">{{alertSeries[alertSeries.length - 1][1]}} <small>(Daily)</small></span>
-						</div>
+			</div>
+			<div class="col-xs-3">
+				<div class="info-box bg-aqua">
+					<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+					<div class="info-box-content">
+						<span class="info-box-text">Alert Count</span>
+						<span class="info-box-number">{{common.array.sum(alertSeries, "1")}} <small>(Monthly)</small></span>
+						<span class="info-box-number">{{alertSeries[alertSeries.length - 1][1]}} <small>(Daily)</small></span>
 					</div>
 				</div>
-				<div class="col-xs-3">
-					<div class="info-box bg-red">
-						<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
-						<div class="info-box-content">
-							<span class="info-box-text">Alert Fail Count</span>
-							<span class="info-box-number">{{common.array.sum(alertFailSeries, "1")}} <small>(Monthly)</small></span>
-							<span class="info-box-number">{{alertFailSeries[alertFailSeries.length - 1][1]}} <small>(Daily)</small></span>
-						</div>
+			</div>
+			<div class="col-xs-3">
+				<div class="info-box bg-red">
+					<span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+					<div class="info-box-content">
+						<span class="info-box-text">Alert Fail Count</span>
+						<span class="info-box-number">{{common.array.sum(alertFailSeries, "1")}} <small>(Monthly)</small></span>
+						<span class="info-box-number">{{alertFailSeries[alertFailSeries.length - 1][1]}} <small>(Daily)</small></span>
 					</div>
 				</div>
 			</div>
 		</div>
-
-		<div class="tab-pane" data-id="alerts">
-			<div sorttable source="alertList" sort="-timestamp">
-				<table class="table table-bordered" ng-non-bindable>
-					<thead>
-						<tr>
-							<th width="170" sortpath="timestamp">Alert Time</th>
-							<th width="170" sortpath="alertContext.properties.timestamp">Message Time</th>
-							<th width="60" sortpath="alertContext.properties.user">User</th>
-							<th width="150" sortpath="alertContext.properties.host">Host</th>
-							<th sortpath="alertContext.properties.emailMessage">Description</th>
-							<th width="50"> </th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-class="{info : item.__new}">
-							<td>{{common.format.date(item.timestamp)}}</td>
-							<td>{{common.format.date(item.alertContext.properties.timestamp)}}</td>
-							<td>{{item.alertContext.properties.user}}</td>
-							<td>{{item.alertContext.properties.host}}</td>
-							<td>{{item.alertContext.properties.alertMessage}}</td>
-							<td><a href="#/common/alertDetail/{{item.encodedRowkey}}">Detail</a></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+	</pane>
+	<pane data-title="Alerts">
+		<div sorttable source="alertList" sort="-timestamp">
+			<table class="table table-bordered" ng-non-bindable>
+				<thead>
+				<tr>
+					<th width="170" sortpath="timestamp">Alert Time</th>
+					<th width="170" sortpath="alertContext.properties.timestamp">Message Time</th>
+					<th width="60" sortpath="alertContext.properties.user">User</th>
+					<th width="150" sortpath="alertContext.properties.host">Host</th>
+					<th sortpath="alertContext.properties.emailMessage">Description</th>
+					<th width="50"> </th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-class="{info : item.__new}">
+					<td>{{common.format.date(item.timestamp)}}</td>
+					<td>{{common.format.date(item.alertContext.properties.timestamp)}}</td>
+					<td>{{item.alertContext.properties.user}}</td>
+					<td>{{item.alertContext.properties.host}}</td>
+					<td>{{item.alertContext.properties.alertMessage}}</td>
+					<td><a href="#/common/alertDetail/{{item.encodedRowkey}}">Detail</a></td>
+				</tr>
+				</tbody>
+			</table>
 		</div>
-
-	</div>
+	</pane>
 </div>
