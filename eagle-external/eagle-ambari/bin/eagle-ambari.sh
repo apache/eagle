@@ -101,6 +101,9 @@ function install(){
 
 	# 3. Install eagle quick links
 	echo "> Installing eagle quick links"
+	if [ ! -e lib/EAGLE/package/patches/app.js.gz ];then
+		gzip lib/EAGLE/package/patches/app.js lib/EAGLE/package/patches/app.js.gz
+	fi
 	cp lib/EAGLE/package/patches/app.js.gz $AMBARI_SERVER_APP_JS
 
 	# create
