@@ -30,7 +30,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.ALERT_SERVICE_ENDPOINT_NAME)
 @TimeSeries(true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Tags({"site", "hostname", "dataSource", "policyId", "sourceStreams", "alertSource", "alertExecutorId"})
+@Tags({"site", "hostname", "application", "policyId", "sourceStreams", "alertSource", "alertExecutorId"})
 public class AlertAPIEntity extends TaggedLogAPIEntity{
 	@Column("description")
 	private String description;

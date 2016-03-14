@@ -82,7 +82,7 @@ public class JdbcStorage extends DataStorageBase {
 
     @Override
     public <E extends TaggedLogAPIEntity> ModifyResult<String> create(List<E> entities, EntityDefinition entityDefinition) throws IOException {
-        ModifyResult<String> result = new ModifyResult<String>();
+        ModifyResult<String> result = new ModifyResult<>();
         try {
             JdbcEntityDefinition jdbcEntityDefinition =  JdbcEntityDefinitionManager.getJdbcEntityDefinition(entityDefinition);
             JdbcEntityWriter writer = new JdbcEntityWriterImpl(jdbcEntityDefinition);
@@ -90,20 +90,6 @@ public class JdbcStorage extends DataStorageBase {
             result.setIdentifiers(keys);
             result.setSize(keys.size());
             result.setSuccess(true);
-        } catch (ConstraintViolationException e){
-            // Update entities instead if having duplicated key
-            if(e.getMessage().contains("The statement was aborted because it would have caused a duplicate key value in a unique or primary key constraint or unique index identified by")){
-                result = this.update(entities,entityDefinition);
-                List<String> keys = new LinkedList<>();
-                for(E entity:entities){
-                    keys.add(entity.getEncodedRowkey());
-                }
-                result.setIdentifiers(keys);
-            }else{
-                LOG.error(e.getMessage(), e.getCause());
-                result.setSuccess(false);
-                throw new IOException(e.getCause());
-            }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e.getCause());
             result.setSuccess(false);
