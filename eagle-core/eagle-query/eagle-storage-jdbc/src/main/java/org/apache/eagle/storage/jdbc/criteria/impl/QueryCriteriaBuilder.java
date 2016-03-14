@@ -23,6 +23,7 @@ import org.apache.eagle.query.parser.ORExpression;
 import org.apache.eagle.storage.jdbc.criteria.CriteriaBuilder;
 import org.apache.eagle.storage.jdbc.criteria.CriterionBuilder;
 import org.apache.eagle.storage.jdbc.JdbcConstants;
+import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.torque.ColumnImpl;
 import org.apache.torque.criteria.Criteria;
@@ -38,10 +39,18 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
 
     private final CompiledQuery query;
     private final String tableName;
+    private final Boolean limitEnabled;
+    private final JdbcEntityDefinition jdbcEntityDefinition;
 
-    public QueryCriteriaBuilder(CompiledQuery query, String tableName){
+    public QueryCriteriaBuilder(CompiledQuery query, JdbcEntityDefinition entityDefinition){
+        this(query,entityDefinition,true);
+    }
+
+    public QueryCriteriaBuilder(CompiledQuery query, JdbcEntityDefinition entityDefinition, Boolean limitEnabled){
         this.query = query;
-        this.tableName = tableName;
+        this.tableName = entityDefinition.getJdbcTableName();
+        this.limitEnabled = limitEnabled;
+        this.jdbcEntityDefinition = entityDefinition;
     }
 
     @Override
@@ -87,7 +96,7 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
                         .and(new Criterion(new ColumnImpl(this.tableName, JdbcConstants.TIMESTAMP_COLUMN_NAME),query.getEndTime(), SqlEnum.LESS_THAN));
         ORExpression expression = searchCondition.getQueryExpression();
         if(expression!=null){
-            CriterionBuilder criterionBuilder = new ExpressionCriterionBuilder(expression,tableName);
+            CriterionBuilder criterionBuilder = new ExpressionCriterionBuilder(expression,this.jdbcEntityDefinition);
             where = where.and(criterionBuilder.build());
         }
 
@@ -98,8 +107,10 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
 
         root.where(where);
 
-        // LIMITED BY $pageSize
-        root.setLimit((int) searchCondition.getPageSize());
+        if(this.limitEnabled) {
+            // LIMITED BY $pageSize
+            root.setLimit((int) searchCondition.getPageSize());
+        }
 
         // TODO: GROUP BY
         if(query.isHasAgg()){

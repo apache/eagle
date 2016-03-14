@@ -66,7 +66,7 @@ public class DataStorageManager {
      *
      * @throws IllegalDataStorageTypeException
      */
-    public static DataStorage getDataStorageByEagleConfig(boolean cache) throws IllegalDataStorageTypeException{
+    public synchronized static DataStorage getDataStorageByEagleConfig(boolean cache) throws IllegalDataStorageTypeException{
         String storageType = EagleConfigFactory.load().getStorageType();
 
         if(!cache)
@@ -87,7 +87,7 @@ public class DataStorageManager {
      *
      * @throws IllegalDataStorageTypeException
      */
-    public static DataStorage getDataStorageByEagleConfig() throws IllegalDataStorageTypeException{
+    public synchronized static DataStorage getDataStorageByEagleConfig() throws IllegalDataStorageTypeException{
         return getDataStorageByEagleConfig(true);
     }
 

@@ -30,13 +30,17 @@ import org.apache.eagle.storage.jdbc.entity.impl.JdbcEntityUpdaterImpl;
 import org.apache.eagle.storage.jdbc.entity.impl.JdbcEntityWriterImpl;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
+import org.apache.eagle.storage.jdbc.schema.JdbcEntitySchemaManager;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
+import org.apache.torque.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +56,9 @@ public class JdbcStorage extends DataStorageBase {
         try {
             JdbcEntityDefinitionManager.load();
             ConnectionManagerFactory.getInstance();
+            JdbcEntitySchemaManager.getInstance().init();
         } catch (Exception e) {
-            LOG.error("Failed to initialize connection manager",e);
+            LOG.error("Failed to start connection manager",e);
             throw new IOException(e);
         }
     }
@@ -70,7 +75,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -85,10 +90,24 @@ public class JdbcStorage extends DataStorageBase {
             result.setIdentifiers(keys);
             result.setSize(keys.size());
             result.setSuccess(true);
+        } catch (ConstraintViolationException e){
+            // Update entities instead if having duplicated key
+            if(e.getMessage().contains("The statement was aborted because it would have caused a duplicate key value in a unique or primary key constraint or unique index identified by")){
+                result = this.update(entities,entityDefinition);
+                List<String> keys = new LinkedList<>();
+                for(E entity:entities){
+                    keys.add(entity.getEncodedRowkey());
+                }
+                result.setIdentifiers(keys);
+            }else{
+                LOG.error(e.getMessage(), e.getCause());
+                result.setSuccess(false);
+                throw new IOException(e.getCause());
+            }
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e.getCause());
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -105,7 +124,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -123,7 +142,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -140,7 +159,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -170,7 +189,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -195,7 +214,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }

@@ -24,11 +24,7 @@ import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.notification.plugin.AlertKafkaPlugin;
-import org.apache.eagle.notification.plugin.KafkaProducerSingleton;
-import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.eagle.policy.common.Constants;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -53,7 +49,7 @@ public class TestAlertKafkaPlugin {
 		alert.setTags(new HashMap<String, String>());
 		alert.getTags().put(Constants.POLICY_ID, "testPolicyId");
 		alert.setDescription("");
-		alert.setAlertContext(new AlertContext());
+		alert.setAlertContext(new AlertContext().toJsonString());
 		plugin.onAlert(alert);
 		Thread.sleep(1000); // wait for message sent out
 		Assert.assertTrue(plugin.getStatus().successful);

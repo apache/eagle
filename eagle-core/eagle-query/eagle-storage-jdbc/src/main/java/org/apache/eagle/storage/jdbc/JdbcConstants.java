@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.storage.jdbc;
 
+import java.sql.Types;
+
 /**
  * Jdbc Storage Constants
  */
@@ -24,6 +26,9 @@ public class JdbcConstants {
     public static final String TIMESTAMP_COLUMN_NAME = "timestamp";
     public static final String METRIC_NAME_COLUMN_NAME = "metric";
     public static final String ROW_KEY_COLUMN_NAME = "uuid";
+
+    public static final int DEFAULT_TYPE_FOR_COMPLEX_TYPE = Types.BLOB;
+    public static final int DEFAULT_VARCHAR_SIZE =1024;
 
     // Eagle JDBC Storage Configuration
     public final static String EAGLE_DB_USERNAME = "eagle.service.storage-username";
@@ -34,4 +39,8 @@ public class JdbcConstants {
     public final static String EAGLE_DATABASE= "eagle.service.storage-database";
     public final static String EAGLE_DRIVER_CLASS= "eagle.service.storage-driver-class";
     public final static String EAGLE_CONN_MAX_SIZE= "eagle.service.storage-connection-max";
+
+    public static final boolean isReservedField(String columnName){
+        return TIMESTAMP_COLUMN_NAME.equals(columnName) || METRIC_NAME_COLUMN_NAME.equals(columnName) || ROW_KEY_COLUMN_NAME.equals(columnName);
+    }
 }

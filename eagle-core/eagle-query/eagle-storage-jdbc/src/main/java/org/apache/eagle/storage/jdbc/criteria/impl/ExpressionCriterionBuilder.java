@@ -19,6 +19,7 @@ package org.apache.eagle.storage.jdbc.criteria.impl;
 import org.apache.eagle.log.entity.EntityQualifierUtils;
 import org.apache.eagle.storage.jdbc.criteria.CriterionBuilder;
 import org.apache.eagle.query.parser.*;
+import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.torque.ColumnImpl;
 import org.apache.torque.criteria.Criterion;
 import org.apache.torque.criteria.SqlEnum;
@@ -33,10 +34,12 @@ import java.util.regex.Matcher;
 public class ExpressionCriterionBuilder implements CriterionBuilder {
     private final String tableName;
     private final ORExpression expression;
+    private final JdbcEntityDefinition jdbcEntityDefinition;
 
-    public ExpressionCriterionBuilder(ORExpression expression,String tableName) {
+    public ExpressionCriterionBuilder(ORExpression expression, JdbcEntityDefinition entityDefinition) {
         this.expression = expression;
-        this.tableName = tableName;
+        this.tableName = entityDefinition.getJdbcTableName();
+        this.jdbcEntityDefinition = entityDefinition;
     }
 
     @Override
@@ -65,22 +68,54 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
     }
 
     private Criterion toAtomicCriterion(AtomicExpression atomic){
-        Object left = toColumn(atomic.getKeyType(), atomic.getKey(),atomic.getOp());
-        Object right = toColumn(atomic.getValueType(), atomic.getValue(),atomic.getOp());
+        Class<?> columnType = locateColumnType(atomic);
+        Object left = toColumn(atomic.getKeyType(), atomic.getKey(),atomic.getOp(),columnType);
+        Object right = toColumn(atomic.getValueType(), atomic.getValue(), atomic.getOp(),columnType);
         SqlEnum op = toSqlEnum(atomic.getOp());
         return new Criterion(left,right,op);
     }
 
-    private Object toColumn(TokenType tokenType,String value,ComparisonOperator op){
-        if(op.equals(ComparisonOperator.CONTAINS) && tokenType.equals(TokenType.STRING)){
-            return "%"+value+"%";
-        }else if(tokenType.equals(TokenType.ID)){
-            return new ColumnImpl(this.tableName,parseEntityAttribute(value));
-        }else if(!tokenType.equals(TokenType.ID) && op.equals(ComparisonOperator.IN)){
+    private Class<?> locateColumnType(AtomicExpression atomic) {
+        String columnName = null;
+        if(atomic.getKeyType().equals(TokenType.ID)){
+            columnName =  parseEntityAttribute(atomic.getKey());
+        }else if(atomic.getValueType().equals(TokenType.ID)){
+            columnName = parseEntityAttribute(atomic.getValue());
+        }
+        if(jdbcEntityDefinition.getInternal().getDisplayNameMap().containsKey(columnName)){
+            try {
+                return jdbcEntityDefinition.getColumnType(columnName);
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * this place is used for rewriting query for jdbc connection
+     * @param tokenType
+     * @param value
+     * @param op
+     * @return
+     */
+    private Object toColumn(TokenType tokenType,String value,ComparisonOperator op, Class<?> columnType) {
+        if (op.equals(ComparisonOperator.CONTAINS) && tokenType.equals(TokenType.STRING)) {
+            return "%" + value + "%";
+        } else if (tokenType.equals(TokenType.ID)) {
+            return new ColumnImpl(this.tableName, parseEntityAttribute(value));
+        } else if (!tokenType.equals(TokenType.ID) && op.equals(ComparisonOperator.IN)) {
             return EntityQualifierUtils.parseList(value);
-        }else if(tokenType.equals(TokenType.NUMBER)){
+        } else if (tokenType.equals(TokenType.NUMBER)) {
             // TODO: currently only treat all number value as double
-            return Double.parseDouble(value);
+            if(columnType.equals(Long.class)) {
+                return Long.parseLong(value);
+            } else {
+                return Double.parseDouble(value);
+            }
+        } else if (op.equals(ComparisonOperator.LIKE) && value.equals(".*")){
+            return "%";
         }else{
             // TODO: parse type according entity field type
             return value;

@@ -55,7 +55,7 @@
 					<tr>
 						<th width="30" sortpath="enabled"> </th>
 						<th width="200" sortpath="tags.policyId">Policy Name</th>
-						<th sortpath="desc">Description</th>
+						<th sortpath="description">Description</th>
 						<th width="150" sortpath="owner">Owner</th>
 						<th width="170" sortpath="lastModifiedDate">Last Modified</th>
 						<th width="95" ng-show="_parent.Auth.isRole('ROLE_ADMIN')">Action</th>
@@ -65,7 +65,7 @@
 					<tr>
 						<td><span class='fa fa-square' ng-class="item.enabled ? 'text-green' : 'text-muted'"> </span></td>
 						<td><a href="#/common/policyDetail/{{item.encodedRowkey}}" style="width: 200px;" class="text-breakall">{{item.tags.policyId}}</a></td>
-						<td>{{item.desc}}</td>
+						<td>{{item.description}}</td>
 						<td>{{item.owner}}</td>
 						<td>{{common.format.date(item.lastModifiedDate) || "-"}}</td>
 						<td ng-show="_parent.Auth.isRole('ROLE_ADMIN')">

@@ -32,17 +32,17 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"application", "alertExecutorId", "streamName"})
+@Tags({"site","application", "alertExecutorId", "streamName"})
 public class AlertExecutorEntity extends TaggedLogAPIEntity{
     @Column("a")
-    private String desc;
+    private String description;
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
-        valueChanged("desc");
+    public void setDescription(String desc) {
+        this.description = desc;
+        valueChanged("description");
     }
 }
