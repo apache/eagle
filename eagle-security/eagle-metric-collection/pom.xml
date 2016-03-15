@@ -20,7 +20,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>eagle</groupId>
+    <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-security-parent</artifactId>
     <version>0.3.0-incubating</version>
     <relativePath>../pom.xml</relativePath>
@@ -31,12 +31,12 @@
   <url>http://maven.apache.org</url>
   <dependencies>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-metric</artifactId>
           <version>${project.version}</version>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-security-hdfs-auditlog</artifactId>
           <version>${project.version}</version>
       </dependency>
@@ -77,17 +77,17 @@
           </exclusions>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-alert-process</artifactId>
           <version>${project.version}</version>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-stream-process-base</artifactId>
           <version>${project.version}</version>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-stream-process-api</artifactId>
           <version>${project.version}</version>
       </dependency>

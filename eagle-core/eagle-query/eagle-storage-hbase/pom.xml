@@ -21,7 +21,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>eagle-query-parent</artifactId>
-        <groupId>eagle</groupId>
+        <groupId>org.apache.eagle</groupId>
         <version>0.3.0-incubating</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -37,18 +37,18 @@
 			<version>${spring.framework.version}</version>
 		</dependency> 
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-audit-base</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-storage-base</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -61,13 +61,13 @@
             <artifactId>hbase-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-embed-hbase</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-embed-hbase</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
