@@ -116,7 +116,10 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
             }
         } else if (op.equals(ComparisonOperator.LIKE) && value.equals(".*")){
             return "%";
-        }else{
+        } else{
+            if((boolean.class.equals(columnType) || Boolean.class.equals(columnType)) && value != null){
+                return Boolean.valueOf(value);
+            }
             // TODO: parse type according entity field type
             return value;
         }
