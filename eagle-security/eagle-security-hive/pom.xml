@@ -20,7 +20,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>eagle</groupId>
+    <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-security-parent</artifactId>
     <version>0.3.0-incubating</version>
   </parent>
@@ -31,7 +31,7 @@
 
   <dependencies>
   	  <dependency>
-	      <groupId>eagle</groupId>
+	      <groupId>org.apache.eagle</groupId>
 	  	  <artifactId>eagle-storm-jobrunning-spout</artifactId>
           <version>${project.version}</version>
 	   </dependency>	   
@@ -48,33 +48,33 @@
 	  	  <artifactId>curator-client</artifactId>
 	   </dependency>
 	  <dependency>
-	      <groupId>eagle</groupId>
+	      <groupId>org.apache.eagle</groupId>
 	  	  <artifactId>eagle-embed-server</artifactId>
           <version>${project.version}</version>
           <scope>test</scope>
 	   </dependency>
 	   <dependency>
-	      <groupId>eagle</groupId>
+	      <groupId>org.apache.eagle</groupId>
 	   	  <artifactId>eagle-embed-server</artifactId>
            <version>${project.version}</version>
 	   	  <classifier>tests</classifier>
 	   	  <scope>test</scope>
 	   </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-embed-hbase</artifactId>
           <version>${project.version}</version>
           <classifier>tests</classifier>
           <scope>test</scope>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-embed-hbase</artifactId>
           <version>${project.version}</version>
           <scope>test</scope>
       </dependency>
 	   <dependency>
-	  	  <groupId>eagle</groupId>
+	  	  <groupId>org.apache.eagle</groupId>
 	  	  <artifactId>eagle-security-common</artifactId>
            <version>${project.version}</version>
 	   </dependency>

@@ -20,7 +20,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>eagle</groupId>
+		<groupId>org.apache.eagle</groupId>
 		<artifactId>eagle-core</artifactId>
 		<version>0.3.0-incubating</version>
         <relativePath>../pom.xml</relativePath>
@@ -37,12 +37,12 @@
 			<version>3.1.2</version>
 		</dependency>
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-entity-base</artifactId>
             <version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-client-base</artifactId>
             <version>${project.version}</version>
 		</dependency>

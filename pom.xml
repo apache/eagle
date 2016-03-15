@@ -22,7 +22,7 @@
         <artifactId>apache</artifactId>
         <version>14</version>
     </parent>
-    <groupId>eagle</groupId>
+    <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-parent</artifactId>
     <version>0.3.0-incubating</version>
     <packaging>pom</packaging>
