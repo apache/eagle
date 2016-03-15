@@ -15,7 +15,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>eagle</groupId>
+		<groupId>org.apache.eagle</groupId>
 		<artifactId>eagle-parent</artifactId>
 		<version>0.3.0-incubating</version>
 		<relativePath>../pom.xml</relativePath>
@@ -26,7 +26,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-service-base</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
@@ -46,7 +46,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-storage-hbase</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
@@ -73,7 +73,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-security-hbase-web</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
@@ -104,7 +104,7 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-security-hive-web</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
@@ -136,14 +136,14 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-security-hdfs-web</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<!-- eagle user profile common dependency -->
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-security-userprofile-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -153,13 +153,13 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-machinelearning-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-alert-base</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
@@ -170,7 +170,7 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-alert-service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
