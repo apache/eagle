@@ -27,7 +27,32 @@
   <artifactId>eagle-security-common</artifactId>
   <name>eagle-security-common</name>
   <packaging>jar</packaging>
+    <repositories>
+    <repository>
+        <id>mapr-releases</id>
+        <url>http://repository.mapr.com/maven/</url>
+        <snapshots><enabled>false</enabled></snapshots>
+        <releases><enabled>true</enabled></releases>
+    </repository>
+    </repositories>
   <dependencies>
+
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-core</artifactId>
+          <version>1.0.3-mapr-5.0.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+          <version>2.7.0-mapr-1506</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-auth</artifactId>
+          <version>2.7.0-mapr-1506</version>
+      </dependency>
+
     <dependency>
 		<groupId>org.quartz-scheduler</groupId>
 		<artifactId>quartz</artifactId>

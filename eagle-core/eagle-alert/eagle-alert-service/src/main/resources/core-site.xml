@@ -19,6 +19,6 @@
 <configuration>
 	<property>
         <name>fs.defaultFS</name>
-        <value>hdfs://NN URL:8020</value>
+        <value>hdfs://mapr1.da.dg:7222</value>
 	</property>
 </configuration>
