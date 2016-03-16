@@ -14,24 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.storage.jdbc.entity;
+package org.apache.eagle.common.metric;
 
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import junit.framework.Assert;
+import org.junit.Test;
 
-import java.util.List;
+import java.util.HashMap;
 
 /**
- * @since 3/27/15
+ * since 1/20/16.
  */
-public interface JdbcEntityWriter<E extends TaggedLogAPIEntity> {
-    /**
-     * <h2>Consistency Guarantee</h2>
-     *
-     * Rollback all changes if any single entity throws exception to make sure consistency guarantee
-     *
-     * @param entities entities to write
-     * @return primary keys' list
-     * @throws Exception
-     */
-    List<String> write(List<E> entities) throws Exception;
+public class TestAlertContext {
+    @Test
+    public void test(){
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        AlertContext context = new AlertContext();
+        context.addAll(map);
+        String json = context.toJsonString();
+        System.out.println(json);
+        Assert.assertEquals(map, AlertContext.fromJsonString(json).getProperties());
+    }
 }

@@ -35,7 +35,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Tags({"feature"})
 public class FeatureDescServiceEntity extends TaggedLogAPIEntity {
     @Column("a")
-    private String desc;
+    private String description;
     @Column("b")
     private String version;
 
@@ -48,12 +48,12 @@ public class FeatureDescServiceEntity extends TaggedLogAPIEntity {
         valueChanged("version");
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
-        valueChanged("desc");
+    public void setDescription(String description) {
+        this.description = description;
+        valueChanged("description");
     }
 }

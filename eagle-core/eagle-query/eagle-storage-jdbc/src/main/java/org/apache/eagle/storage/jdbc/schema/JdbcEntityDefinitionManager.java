@@ -18,9 +18,12 @@ package org.apache.eagle.storage.jdbc.schema;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
+import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.meta.EntitySerDeser;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
 import org.apache.eagle.storage.jdbc.schema.serializer.DefaultJdbcSerDeser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Types;
 import java.util.HashMap;
@@ -33,9 +36,13 @@ import java.util.Map;
  * @since 3/27/15
  */
 public class JdbcEntityDefinitionManager {
+    private final static Logger LOG = LoggerFactory.getLogger(JdbcEntityDefinitionManager.class);
     private final static Map<Class<? extends TaggedLogAPIEntity>,JdbcEntityDefinition> sqlEntityDefinitionCache = new HashMap<Class<? extends TaggedLogAPIEntity>,JdbcEntityDefinition>();
+    private static Boolean initialized = false;
 
     public static JdbcEntityDefinition getJdbcEntityDefinition(EntityDefinition entityDefinition){
+        checkInit();
+
         Class<? extends TaggedLogAPIEntity> entityClass = entityDefinition.getEntityClass();
         JdbcEntityDefinition jdbcEntityDefinition = sqlEntityDefinitionCache.get(entityClass);
         if(jdbcEntityDefinition == null){
@@ -45,9 +52,37 @@ public class JdbcEntityDefinitionManager {
         return jdbcEntityDefinition;
     }
 
+    public static Map<Class<? extends TaggedLogAPIEntity>,JdbcEntityDefinition> getJdbcEntityDefinitionMap(){
+        checkInit();
+        return sqlEntityDefinitionCache;
+    }
+
+    public static JdbcEntityDefinition getJdbcEntityDefinition(Class<? extends TaggedLogAPIEntity> clazz) throws IllegalAccessException, InstantiationException {
+        checkInit();
+        return getJdbcEntityDefinition(EntityDefinitionManager.getEntityDefinitionByEntityClass(clazz));
+    }
+
+    private static void checkInit(){
+        if (!initialized) {
+            try {
+                Map<String,EntityDefinition> entries = EntityDefinitionManager.entities();
+                for (Map.Entry<String, EntityDefinition> entry : entries.entrySet()) {
+                    Class<? extends TaggedLogAPIEntity> entityClass = entry.getValue().getEntityClass();
+                    JdbcEntityDefinition jdbcEntityDefinition = sqlEntityDefinitionCache.get(entityClass);
+                    if(jdbcEntityDefinition == null){
+                        jdbcEntityDefinition = new JdbcEntityDefinition(entry.getValue());
+                        sqlEntityDefinitionCache.put(entityClass, jdbcEntityDefinition);
+                    }
+                }
+                initialized = true;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public static void load(){
-        // TODO: 1. load all SQLEntityDefinition on init
-        // TODO: 2. do more initializing works
+        checkInit();
     }
 
     public static DefaultJdbcSerDeser DEFAULT_JDBC_SERDESER = new DefaultJdbcSerDeser();
@@ -83,14 +118,18 @@ public class JdbcEntityDefinitionManager {
      * @see java.sql.Types
      *
      * @param fieldType entity field type class
-     * @return java.sql.Types
+     * @return java.sql.Types, return Types.NULL if not found
      */
     public static Integer getJdbcType(Class<?> fieldType) {
-        if(!_classJdbcType.containsKey(fieldType)){
-            throw new IllegalArgumentException("Unable to locate jdbc type for: "+fieldType);
+        if(fieldType == null){
+            return Types.NULL;
+        } else if(!_classJdbcType.containsKey(fieldType)){
+            LOG.debug("Unable to locate simple jdbc type for: {}, return type as JAVA_OBJECT",fieldType);
+            return Types.JAVA_OBJECT;
         }
         return _classJdbcType.get(fieldType);
     }
+
 
     /**
      * Register fieldType with SQL types
@@ -119,7 +158,10 @@ public class JdbcEntityDefinitionManager {
         registerJdbcType(double.class, Types.DOUBLE);
         registerJdbcType(long.class, Types.BIGINT);
         registerJdbcType(short.class, Types.INTEGER);
-        registerJdbcType(char[].class, Types.VARCHAR);
+       //  registerJdbcType(char[].class, Types.VARCHAR);
         registerJdbcType(char.class, Types.CHAR);
+
+        registerJdbcType(Boolean.class, Types.BOOLEAN);
+        registerJdbcType(boolean.class, Types.BOOLEAN);
     }
 }

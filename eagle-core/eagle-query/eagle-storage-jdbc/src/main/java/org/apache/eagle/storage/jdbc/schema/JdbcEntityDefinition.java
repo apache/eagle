@@ -19,7 +19,11 @@ package org.apache.eagle.storage.jdbc.schema;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.Qualifier;
+import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @since 3/26/15
@@ -52,42 +56,42 @@ public class JdbcEntityDefinition {
     }
 
     public Class<?> getColumnType(String fieldName) throws NoSuchFieldException {
-        return internal.getEntityClass().getField(fieldName).getType();
+        if (fieldName.equals(JdbcConstants.TIMESTAMP_COLUMN_NAME)){
+            return Long.class;
+        }else if(fieldName.equals(JdbcConstants.ROW_KEY_COLUMN_NAME)) {
+            return String.class;
+        }else if(fieldName.equals(JdbcConstants.METRIC_NAME_COLUMN_NAME)){
+            return String.class;
+        }
+        for(String realField:internal.getDisplayNameMap().keySet()){
+            if(realField.equalsIgnoreCase(fieldName)){
+                return internal.getEntityClass().getDeclaredField(realField).getType();
+            }
+        }
+        throw new NoSuchFieldException(fieldName);
     }
 
-    /**
-     *
-     * TODO: Generate table schema DDL according entity definition
-     *
-     * @link https://db.apache.org/ddlutils/
-     *
-     * CREATE TABLE ${prefix}${tableName}{
-     *      prefix prefix;
-     *      encodedRowkey varchar;
-     *      intField1 int;
-     *      longField bitint;
-     *      tag varchar;
-     * } PRIMARY KEY(encodedRowkey);
-     *
-     * CREATE TABLE ${metricTable}{
-     *      encodedRowkey varchar;
-     *      prefix varchar;
-     *      intField1 int;
-     *      longField bitint;
-     *      tag varchar;
-     * } PRIMARY KEY(rowkey,prefix);
-     *
-     * @param tagsFields
-     * @return
-     */
-    @SuppressWarnings("unused")
-    public String getJdbcSchemaDDL(String[] tagsFields){
-        throw new RuntimeException("TODO: not implemented yet");
+    public Class<?> getColumnTypeOrNull(String fieldName){
+        try {
+            return getColumnType(fieldName);
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
+    }
+
+    public Integer getJdbcColumnTypeCodeOrNull(String fieldName){
+        Class<?> columnType;
+        try {
+            columnType = getColumnType(fieldName);
+            return JdbcEntityDefinitionManager.getJdbcType(columnType);
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
     public JdbcSerDeser getJdbcSerDeser(String columnName) {
-        Qualifier qualifier = this.internal.getQualifierNameMap().get(columnName);
+        Qualifier qualifier = this.getColumnQualifier(columnName);
         if(qualifier == null){
             return JdbcEntityDefinitionManager.DEFAULT_JDBC_SERDESER;
         }else {
@@ -97,5 +101,23 @@ public class JdbcEntityDefinition {
 
     public boolean isGenericMetric(){
         return this.internal.getEntityClass().equals(GenericMetricEntity.class);
+    }
+
+    public boolean isField(String columnName){
+        for(String name:this.internal.getDisplayNameMap().keySet()){
+            if(name.equalsIgnoreCase(columnName)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Qualifier getColumnQualifier(String columnName) {
+        for(Map.Entry<String,Qualifier> entry:this.internal.getDisplayNameMap().entrySet()){
+            if(entry.getKey().equalsIgnoreCase(columnName)){
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 }

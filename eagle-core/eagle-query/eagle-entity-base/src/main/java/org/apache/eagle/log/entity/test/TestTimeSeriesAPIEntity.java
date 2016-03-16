@@ -16,15 +16,10 @@
  */
 package org.apache.eagle.log.entity.test;
 
-import org.apache.eagle.log.entity.meta.ColumnFamily;
-import org.apache.eagle.log.entity.meta.Service;
-import org.apache.eagle.log.entity.meta.Column;
-import org.apache.eagle.log.entity.meta.TimeSeries;
+import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.meta.Prefix;
-import org.apache.eagle.log.entity.meta.Table;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("unittest")
@@ -32,6 +27,7 @@ import org.apache.eagle.log.entity.meta.Table;
 @Prefix("testTSEntity")
 @Service("TestTimeSeriesAPIEntity")
 @TimeSeries(true)
+@Tags({"cluster","datacenter","random"})
 public class TestTimeSeriesAPIEntity extends TaggedLogAPIEntity {
 
 	@Column("a")

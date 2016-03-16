@@ -16,13 +16,15 @@
  */
 package org.apache.eagle.storage.jdbc.schema.serializer;
 
-import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
+import org.apache.eagle.log.entity.meta.Qualifier;
+import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
 import org.apache.torque.util.JdbcTypedValue;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * @since 3/26/15
@@ -30,12 +32,19 @@ import java.sql.SQLException;
 public class DefaultJdbcSerDeser<T,R> implements JdbcSerDeser<T> {
 
     @Override
-    public T readValue(ResultSet result, String fieldName, JdbcEntityDefinition JdbcEntityDefinition) throws IOException {
+    public T toJavaTypedValue(ResultSet result, Class<?> fieldType, String fieldName, Qualifier qualifier) throws IOException {
+        int jdbcType = JdbcEntityDefinitionManager.getJdbcType(fieldType);
         try {
-            Object val = result.getObject(fieldName);
-            return (T) val;
+            if(Types.JAVA_OBJECT == jdbcType){
+                byte[] bytes = result.getBytes(fieldName);
+                return (T) qualifier.getSerDeser().deserialize(bytes);
+            } else if(Types.BOOLEAN == jdbcType){
+                return (T) new Boolean(result.getBoolean(fieldName));
+            } else {
+                return (T) result.getObject(fieldName);
+            }
         } catch (SQLException e) {
-            throw new IOException(e);
+            throw new IOException("Field: "+fieldName+", java type:"+fieldType+", jdbc type: "+jdbcType,e);
         }
     }
 
@@ -46,7 +55,13 @@ public class DefaultJdbcSerDeser<T,R> implements JdbcSerDeser<T> {
      * @return
      */
     @Override
-    public JdbcTypedValue getJdbcTypedValue(Object fieldValue, Class<?> fieldType) {
-        return new JdbcTypedValue(fieldValue, JdbcEntityDefinitionManager.getJdbcType(fieldType));
+    public JdbcTypedValue toJdbcTypedValue(Object fieldValue, Class<?> fieldType, Qualifier qualifier) {
+        int jdbcTypeCode = JdbcEntityDefinitionManager.getJdbcType(fieldType);
+        if(Types.JAVA_OBJECT == jdbcTypeCode){
+            byte[] bytes = qualifier.getSerDeser().serialize(fieldValue);
+            return new JdbcTypedValue(bytes, JdbcConstants.DEFAULT_TYPE_FOR_COMPLEX_TYPE);
+        } else {
+            return new JdbcTypedValue(fieldValue, jdbcTypeCode);
+        }
     }
 }

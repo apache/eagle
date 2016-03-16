@@ -24,6 +24,7 @@ import org.apache.eagle.storage.jdbc.entity.JdbcEntityReader;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.torque.ColumnImpl;
 import org.apache.torque.criteria.Criteria;
 import org.apache.torque.om.mapper.RecordMapper;
 import org.apache.torque.sql.SqlBuilder;
@@ -46,9 +47,10 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
         this.jdbcEntityDefinition = jdbcEntityDefinition;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <E extends Object> List<E> query(CompiledQuery query) throws Exception {
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition.getJdbcTableName());
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         String displaySql = SqlBuilder.buildQuery(criteria).getDisplayString();
 
@@ -88,6 +90,7 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
         try {
             stopWatch.start();
             TorqueStatementPeerImpl peer = ConnectionManagerFactory.getInstance().getStatementExecutor();
+            criteria.addSelectColumn(new ColumnImpl(jdbcEntityDefinition.getJdbcTableName(),"*"));
             result = peer.delegate().doSelect(criteria, recordMapper);
             LOG.info(String.format("Read %s records in %s ms (sql: %s)",result.size(),stopWatch.getTime(),displaySql));
         }catch (Exception ex){

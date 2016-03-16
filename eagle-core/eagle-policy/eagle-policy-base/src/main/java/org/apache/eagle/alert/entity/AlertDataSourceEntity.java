@@ -37,7 +37,7 @@ public class AlertDataSourceEntity extends TaggedLogAPIEntity{
     @Column("b")
     private String config;
     @Column("c")
-    private String desc;
+    private String description;
 
     public String getConfig() {
         return config;
@@ -57,12 +57,12 @@ public class AlertDataSourceEntity extends TaggedLogAPIEntity{
         valueChanged("enabled");
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDescription(String desc) {
+        this.description = desc;
         valueChanged("desc");
     }
 }
