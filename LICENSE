@@ -223,12 +223,6 @@ This product bundles "Google Fonts: Source Sans Pro", which is available under a
 
 For details, see https://www.google.com/fonts/attribution and http://scripts.sil.org/OFL.
 
-==============================================================================
-For kafka-python: Kafka Python client
-==============================================================================
-This product bundles "kafka-python: Kafka Python client", which is available under a " Apache License Version 2.0" license. 
-
-For details, see https://github.com/dpkp/kafka-python and https://pypi.python.org/pypi/kafka-python.
 
 ==============================================================================
 For six: Python 2 and 3 compatibility library
