@@ -88,6 +88,12 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
             }
         }
 
+        // If no columns are specified, then select * by default
+        if(root.getSelectColumns() == null || root.getSelectColumns().size() ==0){
+            // SELECT *
+            root.addSelectColumn(new ColumnImpl(this.tableName, "*"));
+        }
+
         // FROM $tableName
         root.addFrom(this.tableName);
 
