@@ -273,6 +273,10 @@ public class EntityDefinitionManager {
 		}
 	}
 
+	public static void load() throws IllegalAccessException, InstantiationException {
+		checkInit();
+	}
+
 	/**
 	 * User can register their own field SerDeser
 	 * @param clazz class of the the SerDeser 
@@ -424,7 +428,13 @@ public class EntityDefinitionManager {
 				ed.setServiceCreationPath(path.path());
 			}
 		}
-		
+
+		final Tags tags = cls.getAnnotation(Tags.class);
+		if(tags != null) {
+			String[] tagNames = tags.value();
+			ed.setTags(tagNames);
+		}
+
 		return ed;
 	}
 	

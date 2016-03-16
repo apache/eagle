@@ -62,7 +62,7 @@
 					</span>
 				</td>
 				<td>{{item.owner}}</td>
-				<td>{{item.group}}</td>
+				<td>{{item.groupName}}</td>
 				<td>{{item.sensitiveType}}</td>
 				<td ng-show="Auth.isRole('ROLE_ADMIN')">
 					<button class="fa fa-eye btn btn-primary btn-xs" ng-click="markSensitivity(item)" ng-show="!item.sensitiveType"

@@ -13,12 +13,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-package org.apache.eagle.storage.jdbc.schema.ddl;
 
-/**
- * @since 3/27/15
- */
-public interface JdbcEntityDdlManager {
-    void init();
-}
+CREATE TABLE UNITTEST_TESTTSENTITY (
+  uuid varchar(255) NOT NULL,
+  field1 int DEFAULT NULL,
+  field2 int DEFAULT NULL,
+  field3 BIGINT DEFAULT NULL,
+  field4 BIGINT DEFAULT NULL,
+  field5 double DEFAULT NULL,
+  field6 double DEFAULT NULL,
+  field7 varchar(255) DEFAULT NULL,
+  cluster varchar(255) DEFAULT NULL,
+  datacenter varchar(255) DEFAULT NULL,
+  random_tag VARCHAR(255) DEFAULT NULL,
+  timestamp BIGINT DEFAULT NULL,
+  jobid varchar(255) DEFAULT NULL,
+  PRIMARY KEY (uuid)
+)

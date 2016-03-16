@@ -51,5 +51,9 @@
             <groupId>org.apache.torque</groupId>
             <artifactId>torque-runtime</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+        </dependency>
     </dependencies>
 </project>
