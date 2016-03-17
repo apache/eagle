@@ -45,7 +45,8 @@ public class TorqueStatementPeerImpl<T> implements StatementExecutor {
         this.basePeer.setTableMap(tableMap);
     }
 
-    private static PrimaryKeyBuilder<String> _primaryKeyBuilderInstance = new UUIDPrimaryKeyBuilder();;
+    private static PrimaryKeyBuilder<String> _primaryKeyBuilderInstance = new EncodedRowkeyPrimaryKeyBuilder();
+
     @Override
     public PrimaryKeyBuilder<String> getPrimaryKeyBuilder() {
         return _primaryKeyBuilderInstance;

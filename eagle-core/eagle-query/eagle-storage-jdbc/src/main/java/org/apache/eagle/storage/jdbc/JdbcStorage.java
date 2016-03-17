@@ -30,13 +30,17 @@ import org.apache.eagle.storage.jdbc.entity.impl.JdbcEntityUpdaterImpl;
 import org.apache.eagle.storage.jdbc.entity.impl.JdbcEntityWriterImpl;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
+import org.apache.eagle.storage.jdbc.schema.JdbcEntitySchemaManager;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
+import org.apache.torque.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +56,9 @@ public class JdbcStorage extends DataStorageBase {
         try {
             JdbcEntityDefinitionManager.load();
             ConnectionManagerFactory.getInstance();
+            JdbcEntitySchemaManager.getInstance().init();
         } catch (Exception e) {
-            LOG.error("Failed to initialize connection manager",e);
+            LOG.error("Failed to start connection manager",e);
             throw new IOException(e);
         }
     }
@@ -70,14 +75,14 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
 
     @Override
     public <E extends TaggedLogAPIEntity> ModifyResult<String> create(List<E> entities, EntityDefinition entityDefinition) throws IOException {
-        ModifyResult<String> result = new ModifyResult<String>();
+        ModifyResult<String> result = new ModifyResult<>();
         try {
             JdbcEntityDefinition jdbcEntityDefinition =  JdbcEntityDefinitionManager.getJdbcEntityDefinition(entityDefinition);
             JdbcEntityWriter writer = new JdbcEntityWriterImpl(jdbcEntityDefinition);
@@ -86,9 +91,9 @@ public class JdbcStorage extends DataStorageBase {
             result.setSize(keys.size());
             result.setSuccess(true);
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e.getCause());
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -105,7 +110,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -123,7 +128,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -140,7 +145,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -170,7 +175,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }
@@ -195,7 +200,7 @@ public class JdbcStorage extends DataStorageBase {
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             result.setSuccess(false);
-            throw new IOException(e);
+            throw new IOException(e.getCause());
         }
         return result;
     }

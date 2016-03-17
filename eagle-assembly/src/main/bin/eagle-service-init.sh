@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-eagle_bin=$(dirname $0)
+source $(dirname $0)/eagle-env.sh
 
 ###################################################
 ###        create hbase tables for eagle
@@ -23,7 +23,7 @@ eagle_bin=$(dirname $0)
 
 echo "Creating hbase tables for eagle ... "
 
-hbase shell $eagle_bin/eagle-create-table.rb
+hbase shell ${EAGLE_HOME}/bin/eagle-create-table.rb "$EAGLE_TABLE_LIST"
 
 if [ $? = 0 ];then
 	echo "==> Successfully created hbase tables"
@@ -31,7 +31,5 @@ else
 	echo "==> Failed creating hbase tables"
 	exit 1
 fi
-
-echo "Finished initializing for eagle service"
 
 exit 0

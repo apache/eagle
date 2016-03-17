@@ -19,9 +19,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>eagle</groupId>
+		<groupId>org.apache.eagle</groupId>
 		<artifactId>eagle-core</artifactId>
-		<version>0.3.0</version>
+		<version>0.3.0-incubating</version>
         <relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -33,5 +33,6 @@
 		<module>eagle-alert-base</module>
 		<module>eagle-alert-process</module>
 		<module>eagle-alert-service</module>
-    </modules>
+		<module>eagle-alert-notification-plugin</module>
+	</modules>
 </project>

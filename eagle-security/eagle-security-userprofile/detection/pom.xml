@@ -20,9 +20,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>eagle</groupId>
+    <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-security-userprofile-parent</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.0-incubating</version>
   <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>eagle-security-userprofile-detection</artifactId>
@@ -32,17 +32,17 @@
   
   <dependencies>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-security-userprofile-common</artifactId>
           <version>${project.version}</version>
       </dependency>
     <dependency>
-      <groupId>eagle</groupId>
+      <groupId>org.apache.eagle</groupId>
       <artifactId>eagle-security-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>eagle</groupId>
+      <groupId>org.apache.eagle</groupId>
       <artifactId>eagle-alert-process</artifactId>
       <version>${project.version}</version>
         <exclusions>
@@ -69,14 +69,19 @@
         </exclusions>
     </dependency>
     <dependency>
-      <groupId>eagle</groupId>
+      <groupId>org.apache.eagle</groupId>
       <artifactId>eagle-machinelearning-base</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-security-hdfs-auditlog</artifactId>
           <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-library</artifactId>
+        <version>${scala-lang.version}</version>
     </dependency>
   </dependencies>
 </project>

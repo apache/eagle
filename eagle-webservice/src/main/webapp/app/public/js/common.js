@@ -86,6 +86,8 @@ common.setValueByPath = function(unit, path, value) {
 
 common.parseJSON = function (str, defaultVal) {
 	try {
+		str = (str + "").trim();
+		if(Number(str).toString() === str) throw "Number format";
 		return JSON.parse(str);
 	} catch(err) {
 		if(defaultVal === undefined) {
@@ -95,12 +97,28 @@ common.parseJSON = function (str, defaultVal) {
 	return defaultVal === undefined ? null : defaultVal;
 };
 
+common.stringify = function(json) {
+	return JSON.stringify(json, function(key, value) {
+		if(/^(_|\$)/.test(key)) return undefined;
+		return value;
+	});
+};
+
 common.isEmpty = function(val) {
 	if($.isArray(val)) {
 		return val.length === 0;
 	} else {
 		return val === null || val === undefined;
 	}
+};
+
+common.extend = function(target, origin) {
+	$.each(origin, function(key, value) {
+		if(/^(_|\$)/.test(key)) return;
+
+		target[key] = value;
+	});
+	return target;
 };
 
 // ====================== Format ======================
@@ -116,6 +134,14 @@ common.format.date = function(val, type) {
 		val = app.time.offset(val);
 	}
 	switch(type) {
+	case 'date':
+		return val.format("YYYY-MM-DD");
+	case 'time':
+		return val.format("HH:mm:ss");
+	case 'datetime':
+		return val.format("YYYY-MM-DD HH:mm:ss");
+	case 'mixed':
+		return val.format("YYYY-MM-DD HH:mm");
 	default:
 		return val.format("YYYY-MM-DD HH:mm:ss") + (val.utcOffset() === 0 ? '[UTC]' : '');
 	}
@@ -201,6 +227,19 @@ common.array.remove = function(val, list) {
 	}
 };
 
+common.array.insert = function(val, list, index) {
+	list.splice(index, 0, val);
+};
+
+common.array.moveOffset = function(item, list, offset) {
+	var _index = $.inArray(item, list);
+	var _tgtPos = _index + offset;
+	if(_tgtPos < 0 || _tgtPos >= list.length) return;
+
+	common.array.remove(item, list);
+	common.array.insert(item, list, _index + offset);
+};
+
 // ======================= Map ========================
 common.map = {};
 
@@ -208,4 +247,13 @@ common.map.toArray = function(map) {
 	return $.map(map, function(unit) {
 		return unit;
 	});
+};
+
+// ======================= Math =======================
+common.math = {};
+
+common.math.distance = function(x1,y1,x2,y2) {
+	var a = x1 - x2;
+	var b = y1 - y2;
+	return Math.sqrt(a * a + b * b);
 };

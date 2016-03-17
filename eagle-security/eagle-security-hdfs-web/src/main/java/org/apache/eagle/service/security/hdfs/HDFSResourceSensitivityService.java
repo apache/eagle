@@ -21,7 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
+import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.apache.eagle.service.generic.ListQueryResource;
 import org.apache.eagle.security.entity.FileSensitivityAPIEntity;
 import org.slf4j.Logger;
@@ -40,8 +42,8 @@ public class HDFSResourceSensitivityService {
 	@SuppressWarnings("unchecked")
 	public Map<String, Map<String, String>>  getAllFileSensitivityMap()
 	{
-		  ListQueryResource resource = new ListQueryResource();
-		  ListQueryAPIResponseEntity ret = resource.listQuery("FileSensitivityService[]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null);
+		  GenericEntityServiceResource resource = new GenericEntityServiceResource();
+		  GenericServiceAPIResponseEntity ret = resource.search("FileSensitivityService[]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null, false);
 	      List<FileSensitivityAPIEntity> list = (List<FileSensitivityAPIEntity>) ret.getObj();
 	      if( list == null )
 	        	return Collections.emptyMap();
@@ -69,9 +71,9 @@ public class HDFSResourceSensitivityService {
 	@SuppressWarnings("unchecked")
 	public Map<String, String> getFileSensitivityMapBySite ( String site )
 	{
-		ListQueryResource resource = new ListQueryResource();
-		ListQueryAPIResponseEntity ret = resource.listQuery(String.format("FileSensitivityService[@site=\"%s\"]{*}", site ), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null);
-	    List<FileSensitivityAPIEntity> list = (List<FileSensitivityAPIEntity>) ret.getObj();	    
+		GenericEntityServiceResource resource = new GenericEntityServiceResource();
+		GenericServiceAPIResponseEntity ret = resource.search(String.format("FileSensitivityService[@site=\"%s\"]{*}", site ), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null, false);
+	    List<FileSensitivityAPIEntity> list = (List<FileSensitivityAPIEntity>) ret.getObj();
 	    if( list == null )
         	return Collections.emptyMap();
 	    Map<String, String>  fileSensitivityMap = new HashMap <String, String> ();	
@@ -91,8 +93,8 @@ public class HDFSResourceSensitivityService {
 	@SuppressWarnings("unchecked")
 	public List<FileSensitivityAPIEntity>  filterSensitivity ( String site , String resourceFilter )
 	{
-		ListQueryResource resource = new ListQueryResource();
-		ListQueryAPIResponseEntity ret = resource.listQuery(String.format("FileSensitivityService[@site=\"%s\"]{@filedir="+resourceFilter+".*}", site ), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null);
+		GenericEntityServiceResource resource = new GenericEntityServiceResource();
+		GenericServiceAPIResponseEntity ret = resource.search(String.format("FileSensitivityService[@site=\"%s\"]{@filedir="+resourceFilter+".*}", site ), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null, false);
 	    List<FileSensitivityAPIEntity> list = (List<FileSensitivityAPIEntity>) ret.getObj();
 	    if( list == null )
         	return Collections.emptyList();	    

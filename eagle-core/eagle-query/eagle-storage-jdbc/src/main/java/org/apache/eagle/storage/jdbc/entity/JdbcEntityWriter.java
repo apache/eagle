@@ -33,5 +33,5 @@ public interface JdbcEntityWriter<E extends TaggedLogAPIEntity> {
      * @return primary keys' list
      * @throws Exception
      */
-    public List<String> write(List<E> entities) throws Exception;
+    List<String> write(List<E> entities) throws Exception;
 }

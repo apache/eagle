@@ -1,5 +1,5 @@
-#!/usr/bin/python
-
+# !/usr/bin/python
+#
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -14,173 +14,75 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-import os
-import re
-import time
+from metric_collector import JmxMetricCollector,JmxMetricListener,Runner
 import json
-import urllib2
-import sys
-import socket
-import types
-import httplib
 
-# load six
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '', 'lib/six'))
-import six
-
-# load kafka-python
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '', 'lib/kafka-python'))
-from kafka import KafkaClient, SimpleProducer, SimpleConsumer
-
-from util_func import *
-from add_extended_metrics import *
+class NNSafeModeMetric(JmxMetricListener):
+    def on_metric(self, metric):
+        if metric["metric"] == "hadoop.namenode.fsnamesystemstate.fsstate":
+            if metric["value"] == "safeMode":
+                metric["value"] = 1
+            else:
+                metric["value"] = 0
+            self.collector.collect(metric)
 
 
-DATA_TYPE = "hadoop"
+class NNHAMetric(JmxMetricListener):
+    PREFIX = "hadoop.namenode.fsnamesystem"
 
-def readUrl(url, https=False):
-    jmxjson = 'error'
-    try:
-        if https:
-            print "Reading https://" + str(url) + "/jmx?anonymous=true"
-            c = httplib.HTTPSConnection(url, timeout=57)
-            c.request("GET", "/jmx?anonymous=true")
-            response = c.getresponse()
-        else:
-            print "Reading http://" + str(url) + "/jmx?anonymous=true"
-            response = urllib2.urlopen("http://" + url + '/jmx?anonymous=true', timeout=57)
-    except Exception, e:
-        print 'Reason: ', e
-    else:
-        # everything is fine
-        jmxjson = response.read()
-        response.close()
-    finally:
-        return jmxjson
+    def on_bean(self, bean):
+        if bean["name"] == "Hadoop:service=NameNode,name=FSNamesystem":
+            if bean[u"tag.HAState"] == "active":
+                self.collector.on_bean_kv(self.PREFIX, "hastate", 0)
+            else:
+                self.collector.on_bean_kv(self.PREFIX, "hastate", 1)
 
 
-def get_metric_prefix_name(mbean_attribute, context):
-    mbean_list = list(prop.split("=", 1)
-                      for prop in mbean_attribute.split(","))
-    metric_prefix_name = None
-    if context == "":
-        metric_prefix_name = '.'.join([i[1] for i in mbean_list])
-    else:
-        name_index = [i[0] for i in mbean_list].index('name')
-        mbean_list[name_index][1] = context
-        metric_prefix_name = '.'.join([i[1] for i in mbean_list])
-    return DATA_TYPE + "." + metric_prefix_name
+class MemortUsageMetric(JmxMetricListener):
+    PREFIX = "hadoop.namenode.jvm"
+
+    def on_bean(self, bean):
+        if bean["name"] == "Hadoop:service=NameNode,name=JvmMetrics":
+            memnonheapusedusage = round(float(bean['MemNonHeapUsedM']) / float(bean['MemNonHeapMaxM']) * 100.0, 2)
+            self.collector.on_bean_kv(self.PREFIX, "memnonheapusedusage", memnonheapusedusage)
+            memnonheapcommittedusage = round(float(bean['MemNonHeapCommittedM']) / float(bean['MemNonHeapMaxM']) * 100,
+                                             2)
+            self.collector.on_bean_kv(self.PREFIX, "memnonheapcommittedusage", memnonheapcommittedusage)
+            memheapusedusage = round(float(bean['MemHeapUsedM']) / float(bean['MemHeapMaxM']) * 100, 2)
+            self.collector.on_bean_kv(self.PREFIX, "memheapusedusage", memheapusedusage)
+            memheapcommittedusage = round(float(bean['MemHeapCommittedM']) / float(bean['MemHeapMaxM']) * 100, 2)
+            self.collector.on_bean_kv(self.PREFIX, "memheapcommittedusage", memheapcommittedusage)
 
 
-def getHadoopData(producer, topic, config, beans, dataMap, fat_bean):
-    selected_group = [s.encode('utf-8') for s in config[u'filter'].get('monitoring.group.selected')]
-    #print selected_group
+class NNCapacityUsageMetric(JmxMetricListener):
+    PREFIX = "hadoop.namenode.fsnamesystemstate"
 
-    for bean in beans:
-        kafka_dict = dataMap.copy()
+    def on_bean(self, bean):
+        if bean["name"] == "Hadoop:service=NameNode,name=FSNamesystemState":
+            capacityusage = round(float(bean['CapacityUsed']) / float(bean['CapacityTotal']) * 100, 2)
+            self.collector.on_bean_kv(self.PREFIX, "capacityusage", capacityusage)
 
-        # mbean is of the form "domain:key=value,...,foo=bar"
-        mbean = bean[u'name']
-        mbean_domain, mbean_attribute = mbean.rstrip().split(":", 1)
-        mbean_domain = mbean_domain.lower()
+class JournalTransactionInfoMetric(JmxMetricListener):
+    PREFIX = "hadoop.namenode.journaltransaction"
 
-        # print mbean_domain
-        if mbean_domain not in selected_group:
-            # print "Unexpected mbean domain = %s on %s" % (mbean_domain, mbean)
-            continue
-
-        fat_bean.update(bean)
-
-        context = bean.get("tag.Context", "")
-        metric_prefix_name = get_metric_prefix_name(mbean_attribute, context)
-
-        # print kafka_dict
-        for key, value in bean.iteritems():
-            #print key, value
-            key = key.lower()
-            if not isNumber(value) or re.match(r'tag.*', key):
-                continue
-
-            if mbean_domain == 'hadoop' and re.match(r'^namespace', key):
-                #print key
-                items = re.split('_table_', key)
-                key = items[1]
-                items = re.split('_region_', key)
-                kafka_dict['table'] = items[0]
-                items = re.split('_metric_', items[1])
-                kafka_dict['region'] = items[0]
-                key = items[1]
-
-            metric = metric_prefix_name + '.' + key
-            send_output_message(producer, topic, kafka_dict, metric, value)
+    def on_bean(self, bean):
+        if bean.has_key("JournalTransactionInfo"):
+            JournalTransactionInfo = json.loads(bean.get("JournalTransactionInfo"))
+            LastAppliedOrWrittenTxId = float(JournalTransactionInfo.get("LastAppliedOrWrittenTxId"))
+            MostRecentCheckpointTxId = float(JournalTransactionInfo.get("MostRecentCheckpointTxId"))
+            self.collector.on_bean_kv(self.PREFIX, "LastAppliedOrWrittenTxId", LastAppliedOrWrittenTxId)
+            self.collector.on_bean_kv(self.PREFIX, "MostRecentCheckpointTxId", MostRecentCheckpointTxId)
 
 
-def loadJmxData(host, inputConfig):
-    port = inputConfig.get('port')
-    https = inputConfig.get('https')
-
-    url = host + ':' + port
-    #print url
-
-    jmxjson = readUrl(url, https)
-
-    if jmxjson == 'error':
-        print 'jmx load error'
-
-    # transfer the json string into dict
-    jmx = json.loads(jmxjson)
-    beans = jmx[u'beans']
-
-    return beans
-
-
-def main():
-    kafka = None
-    producer = None
-    topic = None
-
-    try:
-        #start = time.clock()
-
-        # read the kafka.ini
-        config = loadConfigFile('eagle-collector.conf')
-        #print config
-
-        site = config[u'env'].get('site').encode('utf-8')
-        component = config[u'input'].get('component').encode('utf-8')
-        host = socket.getfqdn()
-        #host="10.249.66.185"
-
-        beans = loadJmxData(host, config[u'input'])
-
-        outputs = [s.encode('utf-8') for s in config[u'output']]
-        #print outputs
-
-        if('kafka' in outputs):
-            kafkaConfig = config[u'output'].get(u'kafka')
-            brokerList = kafkaConfig.get('brokerList')
-            topic = kafkaConfig.get('topic')
-            #print brokerList
-            kafka, producer = kafka_connect(brokerList)
-
-        dataMap = {"site": site, "host": host, "timestamp": '', "component": component, "metric": '', "value": ''}
-        fat_bean = dict()
-        getHadoopData(producer, topic, config, beans, dataMap, fat_bean)
-        add_extended_metrics(producer, topic, dataMap, fat_bean)
-
-    except Exception, e:
-        print 'main except: ', e
-
-    finally:
-        if kafka != None and producer != None:
-            kafka_close(kafka, producer)
-
-        #elapsed = (time.clock() - start)
-        #print("Time used:",elapsed)
-
-
-if __name__ == "__main__":
-    main()
-
-
+if __name__ == '__main__':
+    collector = JmxMetricCollector()
+    collector.register(
+            NNSafeModeMetric(),
+            NNHAMetric(),
+            MemortUsageMetric(),
+            JournalTransactionInfoMetric(),
+            NNCapacityUsageMetric()
+    )
+    Runner.run(collector)

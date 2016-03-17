@@ -16,7 +16,7 @@
   */
 package org.apache.eagle.datastream.sparkstreaming
 
-import org.apache.eagle.datastream. ExecutionEnvironments
+import org.apache.eagle.datastream.ExecutionEnvironments
 
 
 case class Entity(name:String,value:Double,var inc:Int=0){

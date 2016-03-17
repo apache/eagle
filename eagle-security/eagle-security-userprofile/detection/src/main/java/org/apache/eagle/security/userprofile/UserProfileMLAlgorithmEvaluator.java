@@ -16,8 +16,9 @@
  */
 package org.apache.eagle.security.userprofile;
 
-import org.apache.eagle.policy.PolicyEvaluationContext;
+import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.ml.MLAlgorithmEvaluator;
 import org.apache.eagle.ml.MLAnomalyCallback;
 import org.apache.eagle.ml.MLModelDAO;
@@ -25,9 +26,9 @@ import org.apache.eagle.ml.impl.MLModelDAOImpl;
 import org.apache.eagle.ml.model.MLAlgorithm;
 import org.apache.eagle.ml.model.MLCallbackResult;
 import org.apache.eagle.ml.model.MLModelAPIEntity;
+import org.apache.eagle.policy.PolicyEvaluationContext;
 import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.apache.eagle.security.userprofile.model.UserProfileModel;
-import com.typesafe.config.Config;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +43,10 @@ public abstract class UserProfileMLAlgorithmEvaluator<M extends UserProfileModel
     private final static Logger LOG = LoggerFactory.getLogger(UserProfileMLAlgorithmEvaluator.class);
     private transient MLModelDAO mlDAO;
     private transient UserProfileAnomalyDetector<M> detector;
+    private transient PolicyEvaluationContext evalContext;
 
     @Override
-    public void init(MLAlgorithm algorithm, Config config) {
+    public void init(MLAlgorithm algorithm, Config config, PolicyEvaluationContext context) {
         this.algorithm = algorithm;
         this.callbacks = new ArrayList<>();
         this.config = config;
@@ -67,7 +69,8 @@ public abstract class UserProfileMLAlgorithmEvaluator<M extends UserProfileModel
      */
     @Override
     public void evaluate(ValuesArray data) throws Exception {
-        PolicyEvaluationContext alertContext = (PolicyEvaluationContext)data.get(0);
+        Collector collector = (Collector)data.get(0);
+        evalContext.outputCollector = collector;
         String streamName = (String)data.get(1);
 
         UserActivityAggModelEntity userActivityAggModelEntity = (UserActivityAggModelEntity) data.get(2);
@@ -90,7 +93,7 @@ public abstract class UserProfileMLAlgorithmEvaluator<M extends UserProfileModel
                 //LOG.info("executing algorithm: " + );
                 List<MLCallbackResult> callbackResults = this.detector.detect(user, algorithm, UserActivityAggModelEntity.toModel(userActivityAggModelEntity), model);
                 if (callbackResults != null && callbackResults.size() >0) {
-                    notifyCallbacks(callbackResults, alertContext);
+                    notifyCallbacks(callbackResults, evalContext);
                 } else {
                     LOG.info(String.format("No anomaly activities detected for user [%s] by algorithm [%s] ",user,algorithm));
                 }

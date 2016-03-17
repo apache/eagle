@@ -27,6 +27,7 @@ public class LogParseUtil {
      * 1)user@APD.xyz.com
      * 2)hadoop/123.dc1.xyz.com@xyz.com (auth:KERBEROS)
      * 3)hadoop (auth:KERBEROS)
+     * 4)hadoop
      */
     public static String parseUserFromUGI(String ugi) {
         if(ugi == null) return null;

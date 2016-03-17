@@ -20,18 +20,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>eagle-data-process-parent</artifactId>
-        <groupId>eagle</groupId>
-        <version>0.3.0</version>
+        <groupId>org.apache.eagle</groupId>
+        <version>0.3.0-incubating</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>eagle-stream-pipeline</artifactId>
     <dependencies>
+        <!--<dependency>-->
+            <!--<groupId>org.reflections</groupId>-->
+            <!--<artifactId>reflections</artifactId>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-service-base</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -59,48 +59,52 @@
                     <artifactId>servlet-api</artifactId>
                     <groupId>javax.servlet</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-storage-base</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
+	<dependency>
+       		<groupId>log4j</groupId>
+		<artifactId>log4j</artifactId>
+      	</dependency>
+<!--        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
-            <version>${scala.version}.0</version>
-        </dependency>
+-->
+        <!--<dependency>-->
+            <!--<groupId>org.scala-lang</groupId>-->
+            <!--<artifactId>scala-reflect</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.scala-lang</groupId>-->
+            <!--<artifactId>scala-compiler</artifactId>-->
+            <!--<version>${scala.version}.0</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.version}</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-stream-process-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor_${scala.version}</artifactId>
-            <version>${akka.actor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-testkit_${scala.version}</artifactId>
-            <version>${akka.actor.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>compile</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.typesafe.akka</groupId>-->
+            <!--<artifactId>akka-testkit_${scala.version}</artifactId>-->
+            <!--<version>${akka.actor.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
     </dependencies>
     <build>
         <plugins>

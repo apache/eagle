@@ -63,4 +63,14 @@
 			_fadeToggle.apply(this, arguments);
 		}
 	};
+
+	// Modal
+	var _modal = $.fn.modal;
+	$.fn.modal = function() {
+		setTimeout(function() {
+			$(this).find("input[type='text'], textarea").filter(':not([readonly]):enabled:visible:first').focus();
+		}.bind(this), 500);
+		_modal.apply(this, arguments);
+		return this;
+	};
 })();

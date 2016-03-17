@@ -21,10 +21,10 @@ import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.apache.eagle.dataproc.impl.persist.druid.KafkaPersistService;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.datastream.core.StorageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.text.MessageFormat;
 import java.util.List;

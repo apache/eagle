@@ -46,13 +46,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "dataSource", "alertExecutorId", "policyId", "policyType"})
+@Tags({"site", "application", "alertExecutorId", "policyId", "policyType"})
 @Indexes({
 	@Index(name="Index_1_alertExecutorId", columns = { "alertExecutorID" }, unique = true),
 })
 public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 	@Column("a")
-	private String desc;
+	private String description;
 	@Column("b")
 	private String policyDef;
 	@Column("c")
@@ -64,21 +64,26 @@ public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 	@Column("f")
 	private boolean enabled;
 	@Column("g")
-	private String owner;	
+	private String owner;
 	@Column("h")
 	private long lastModifiedDate;
 	@Column("i")
 	private long severity;
 	@Column("j")
 	private long createdTime;
+    @Column("k")
+    private boolean markdownEnabled;
+    @Column("l")
+    private String markdownReason;
 
-	public String getDesc() {
-		return desc;
+	public String getDescription() {
+		return description;
 	}
-	public void setDesc(String desc) {
-		this.desc = desc;
-		valueChanged("desc");
+	public void setDescription(String desc) {
+		this.description = desc;
+		valueChanged("description");
 	}
+
 	public String getPolicyDef() {
 		return policyDef;
 	}
@@ -142,6 +147,17 @@ public class AlertDefinitionAPIEntity extends AbstractPolicyDefinitionEntity {
 		this.createdTime = createdTime;
 		valueChanged("createdTime");
 	}
+    public boolean isMarkdownEnabled() { return markdownEnabled; }
+    public void setMarkdownEnabled(boolean markdownEnabled) {
+        this.markdownEnabled = markdownEnabled;
+        valueChanged("markdownEnabled");
+    }
+    public String getMarkdownReason() { return markdownReason; }
+    public void setMarkdownReason(String markdownReason) {
+        this.markdownReason = markdownReason;
+        valueChanged("markdownReason");
+    }
+
 	public boolean equals(Object o){
 		if(o == this)
 			return true;

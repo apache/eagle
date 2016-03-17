@@ -1,0 +1,82 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="box box-info">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			<span class="fa fa-cogs"></span>
+			Configuration
+		</h3>
+	</div><!-- /.box-header -->
+
+	<div class="box-body">
+		<div class="row">
+			<div class="col-md-3">
+				<ul class="nav nav-pills nav-stacked">
+					<li class="disabled">
+						<a>Feature</a>
+					</li>
+					<li role="presentation" ng-repeat="_feature in Application.featureList" ng-class="{active: feature === _feature}">
+						<a ng-click="setFeature(_feature)">
+							<span class="fa fa-leaf" ng-class="{'text-danger': _feature._loaded === false}" uib-tooltip="Module load failed!" tooltip-enable="_feature._loaded === false"></span>
+							{{_feature.tags.feature}}
+						</a>
+					</li>
+					<li>
+						<a class="text-light-blue" ng-click="newFeature()" ng-disabled="_pageLock">
+							<span class="fa fa-plus-square"></span>
+							New Feature
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="col-md-9">
+				<a class="pull-right btn btn-danger btn-xs" ng-click="deleteFeature(feature)" ng-disabled="_pageLock">
+					<span class="fa fa-trash-o"></span>
+					Delete Feature
+				</a>
+
+				<h3 class="guideline">
+					<span class="fa fa-exclamation-triangle text-danger" uib-tooltip="Module load failed!" ng-show="feature._loaded === false"></span>
+					{{feature.tags.feature}}
+				</h3>
+				<hr/>
+
+				<p class="text text-muted">
+					Will load the start up file <code>controller.js</code> from <code>public/feature/{{feature.tags.feature}}</code>.
+					If you are developing customized feature, please reference provided feature.
+				</p>
+
+				<!-- Config -->
+				<div class="form-group">
+					<label for="featureVersion">Version</label>
+					<input id="featureVersion" type="text" class="form-control" placeholder="(Optional) Feature version." ng-model="features[feature.tags.feature].version">
+				</div>
+				<div class="form-group">
+					<label for="featureDescription">Description</label>
+					<textarea id="featureDescription" class="form-control" placeholder="(Optional) Feature description." rows="10" ng-model="features[feature.tags.feature].description"></textarea>
+				</div>
+			</div>
+		</div>
+	</div><!-- /.box-body -->
+
+	<div class="box-footer clearfix">
+		<button class="btn btn-primary" ng-click="saveAll()" ng-disabled="_pageLock">Save All</button>
+	</div>
+</div>

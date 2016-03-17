@@ -16,6 +16,10 @@
  */
 package org.apache.eagle.common.metric;
 
+import org.apache.log4j.spi.LoggerFactory;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +28,8 @@ import java.util.Map;
  * not thread safe
  */
 public class AlertContext implements Serializable{
+	private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(AlertContext.class);
+
 	private Map<String, String> properties = new HashMap<String, String>();
 	
 	public AlertContext(){
@@ -47,7 +53,30 @@ public class AlertContext implements Serializable{
 		this.properties.putAll(propHash);
 		return this;
 	}
-	
+
+	public String toJsonString(){
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			return objectMapper.writeValueAsString(properties);
+		}catch(Exception ex){
+			LOG.error("fail converting alertcontext into string", ex);
+			return null;
+		}
+	}
+
+	public static AlertContext fromJsonString(String json){
+		ObjectMapper objectMapper = new ObjectMapper();
+		try{
+			Map m = objectMapper.readValue(json, Map.class);
+			AlertContext c = new AlertContext();
+			c.addAll(m);
+			return c;
+		}catch(Exception ex){
+			LOG.error("fail converting string into alertcontext", ex);
+			return null;
+		}
+	}
+
 	public String getProperty(String name){
 		return properties.get(name);
 	}
@@ -55,7 +84,7 @@ public class AlertContext implements Serializable{
 	public String toString(){
 		return properties.toString();
 	}
-	
+
 	public Map<String, String> getProperties(){
 		return properties;
 	}

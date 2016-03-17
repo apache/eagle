@@ -17,8 +17,8 @@
 package org.apache.eagle.security.userprofile;
 
 import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
+import scala.Tuple2;
 
 import java.util.Map;
 

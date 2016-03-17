@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.policy.common;
 
-import org.apache.eagle.policy.dao.PolicyDefinitionEntityDAOImpl;
-
 public class Constants {
 	public final static String ALERT_SERVICE_ENDPOINT_NAME = "AlertService";
 	public final static String ALERT_DEFINITION_SERVICE_ENDPOINT_NAME = "AlertDefinitionService";
@@ -25,8 +23,16 @@ public class Constants {
 	public final static String ALERT_DATA_SOURCE_SERVICE_ENDPOINT_NAME = "AlertDataSourceService";
 	public final static String ALERT_EXECUTOR_SERVICE_ENDPOINT_NAME = "AlertExecutorService";
 	public final static String ALERT_STREAM_SERVICE_ENDPOINT_NAME = "AlertStreamService";
+	public final static String ALERT_NOTIFICATION_SERVICE_ENDPOINT_NAME = "AlertNotificationService";
 	public static final String ALERT_EMAIL_ORIGIN_PROPERTY = "alertEmailOrigin";
 	public static final String ALERT_TIMESTAMP_PROPERTY = "alertTimestamp";
+
+	public static final String SITE_APPLICATION_SERVICE_ENDPOINT_NAME = "SiteApplicationService";
+	public static final String SITE_DESCRIPTION_SERVICE_ENDPOINT_NAME = "SiteDescService";
+	public static final String APPLICATION_DESCRIPTION_SERVICE_ENDPOINT_NAME = "ApplicationDescService";
+	public static final String FEATURE_DESCRIPTION_SERVICE_ENDPOINT_NAME = "FeatureDescService";
+
+	public static final String GENERIC_RESOURCE_SERVICE_ENDPOINT_NAME = "GenericResourceService";
 	
 	public final static String AGGREGATE_DEFINITION_SERVICE_ENDPOINT_NAME = "AggregateDefinitionService";
 
@@ -38,7 +44,7 @@ public class Constants {
 	public static final String ALERT_SOURCE = "alertSource";
 	public static final String ALERT_MESSAGE = "alertMessage";
 	public static final String SUBJECT = "subject";
-	public static final String ALERT_EXECUTOR_ID = PolicyDefinitionEntityDAOImpl.ALERT_EXECUTOR_ID;// "alertExecutorId";
+	public static final String ALERT_EXECUTOR_ID = "alertExecutorId";
 	public static final String POLICY_NAME = "policyName";
 	public static final String POLICY_ID = "policyId";
     public static final String SOURCE_STREAMS = "sourceStreams";
@@ -56,8 +62,7 @@ public class Constants {
 	public static final String PARTITIONER = "partitioner";
 	public static final String SOURCE = "source";
 	public static final String PARTITIONSEQ = "partitionSeq";
-	// policy definition status
-	public static final String EAGLE_DEFAULT_POLICY_NAME = "eagleQuery";
+	public static final String EXECUTOR_ID = "executorId";
 
 	public enum policyType {
 		siddhiCEPEngine,
