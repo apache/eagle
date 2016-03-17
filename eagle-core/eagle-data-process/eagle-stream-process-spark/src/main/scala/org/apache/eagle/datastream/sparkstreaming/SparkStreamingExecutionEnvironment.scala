@@ -17,10 +17,16 @@
 package org.apache.eagle.datastream.sparkstreaming
 
 import com.typesafe.config.Config
-import org.apache.eagle.datastream.core.{StreamDAG, ExecutionEnvironment}
+import org.apache.eagle.datastream.core.{StormSourceProducer, StreamDAG, ExecutionEnvironment}
 
 class SparkStreamingExecutionEnvironment (private val conf:Config) extends ExecutionEnvironment(conf){
   override def execute(dag: StreamDAG) : Unit = {
     SparkStreamingCompiler(config.get, dag).buildTopology.execute
+  }
+
+  def fromKafka[T](): StormSourceProducer[T] = {
+    val ret = StormSourceProducer[T](source)
+    ret.initWith(dag,config.get)
+    ret
   }
 }

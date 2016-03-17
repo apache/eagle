@@ -326,6 +326,10 @@ case class StormSourceProducer[T](source: BaseRichSpout) extends StreamProducer[
   }
 }
 
+case class SparkStreamingSourceProducer[T]() extends StreamProducer[T]{
+
+}
+
 case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]{
   override def toString: String = s"IterableStreamProducer(${iterable.getClass.getSimpleName}))"
 }

@@ -20,8 +20,6 @@ import org.apache.eagle.datastream.FlatMapperWrapperForSpark
 import org.apache.eagle.datastream.core._
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
-import org.apache.spark.streaming.dstream.PairDStreamFunctions
-
 object DStreamFactory {
 
   def createInputDStream(ssc: StreamingContext, from: StreamProducer[Any]): DStream[Any] = {
@@ -44,7 +42,6 @@ object DStreamFactory {
         from.flatMap(func)
       }
       case filter: FilterProducer[Any] => {
-        //from.asInstanceOf[DStream[(String,Integer)]].reduceByKey(_ + _)
         from.filter(filter.fn)
       }
       case mapper: MapperProducer[Any, Any] => {
@@ -56,7 +53,12 @@ object DStreamFactory {
         })
       }
       case reduceByKeyer: ReduceByKeyProducer[Any,Any] => {
-        from.asInstanceOf[DStream[(Any,Any)]].reduceByKey(reduceByKeyer.fn)
+        if(from.isInstanceOf[DStream[(Any,Any)]]){
+          from.asInstanceOf[DStream[(Any,Any)]].reduceByKey(reduceByKeyer.fn)
+        }
+        else{
+          throw new UnsupportedOperationException(s"Unsupported DStream: ${from.toString}")
+        }
       }
       case _ => throw new UnsupportedOperationException(s"Unsupported producer: ${to.toString}")
     }

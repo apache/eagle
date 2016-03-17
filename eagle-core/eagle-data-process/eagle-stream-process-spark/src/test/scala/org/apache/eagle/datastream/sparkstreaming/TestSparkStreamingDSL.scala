@@ -36,7 +36,8 @@ object TestSparkStreamingDSL extends App{
     Entity("d", 3)
   )
 
-  val tmp  = Seq("eBay ADI SPARK","SJTU CS","QZK TW","arsenal","SPARK")
+  val tmp  = Seq("eBay ADI SPARK","SJTU CS","QZK TW zqin","arsenal","SPARK")
+
 
 
   env.from(tmp,recycle = true)
