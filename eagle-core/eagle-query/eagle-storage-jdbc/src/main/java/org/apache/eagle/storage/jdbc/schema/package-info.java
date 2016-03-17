@@ -14,24 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.storage.jdbc.entity;
-
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-
-import java.util.List;
-
 /**
- * @since 3/27/15
+ * Manage RDBMS schemas according java entity definition
+ *
+ * TODO: not implemented yet
+ *
+ * @since 3/31/15
  */
-public interface JdbcEntityWriter<E extends TaggedLogAPIEntity> {
-    /**
-     * <h2>Consistency Guarantee</h2>
-     *
-     * Rollback all changes if any single entity throws exception to make sure consistency guarantee
-     *
-     * @param entities entities to write
-     * @return primary keys' list
-     * @throws Exception
-     */
-    List<String> write(List<E> entities) throws Exception;
-}
+package org.apache.eagle.storage.jdbc.schema;

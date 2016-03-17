@@ -65,6 +65,12 @@
 			</exclusions>
 		</dependency>
 
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-storage-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 		<!-- jersey needs asm3, so use extcos 0.3b -->
 		<dependency>
 			<groupId>net.sf.extcos</groupId>

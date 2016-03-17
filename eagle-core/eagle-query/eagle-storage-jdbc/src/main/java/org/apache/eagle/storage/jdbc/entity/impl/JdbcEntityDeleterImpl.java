@@ -61,7 +61,7 @@ public class JdbcEntityDeleterImpl<E extends TaggedLogAPIEntity> implements Jdbc
 
     @Override
     public int deleteByQuery(CompiledQuery query) throws Exception {
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition.getJdbcTableName());
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition,false);
         Criteria criteria = criteriaBuilder.build();
         return deleteByCriteria(criteria);
     }

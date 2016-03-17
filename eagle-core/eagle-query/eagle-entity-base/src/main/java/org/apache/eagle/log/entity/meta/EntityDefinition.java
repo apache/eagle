@@ -52,6 +52,7 @@ public class EntityDefinition implements Writable{
 	private Map<String, Qualifier> displayNameMap = new HashMap<String, Qualifier>();
 	private Map<String, Qualifier> qualifierNameMap = new HashMap<String, Qualifier>();
 	private Map<String, Method> qualifierGetterMap = new HashMap<String, Method>();
+	private String[] tags;
 	private boolean isTimeSeries;
 	private MetricDefinition metricDefinition;
 	private IndexDefinition[] indexes;
@@ -143,6 +144,13 @@ public class EntityDefinition implements Writable{
 	public void setQualifierGetterMap(Map<String, Method> qualifierGetterMap) {
 		this.qualifierGetterMap = qualifierGetterMap;
 	}
+	public String[] getTags(){
+		return tags;
+	}
+	public void setTags(String[] tags){
+		this.tags = tags;
+	}
+
 //	public Map<String,String> getQualifierDisplayNameMap(){
 //		Map<String,String> qualifierDisplayNameMap = new HashMap<String, String>();
 //		for(Map.Entry<String,Qualifier> entry: qualifierNameMap.entrySet()){

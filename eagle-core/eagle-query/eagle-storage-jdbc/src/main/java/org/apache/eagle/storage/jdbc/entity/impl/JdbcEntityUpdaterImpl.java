@@ -16,7 +16,10 @@
  */
 package org.apache.eagle.storage.jdbc.entity.impl;
 
+import org.apache.commons.configuration.ConfigurationFactory;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
+import org.apache.eagle.log.entity.old.RowkeyHelper;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManager;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManagerFactory;
 import org.apache.eagle.storage.jdbc.conn.impl.TorqueStatementPeerImpl;
@@ -33,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -59,7 +63,11 @@ public class JdbcEntityUpdaterImpl<E extends TaggedLogAPIEntity> implements Jdbc
         try {
             for (E entity : entities) {
                 String primaryKey = entity.getEncodedRowkey();
-                PrimaryKeyCriteriaBuilder pkBuilder = new PrimaryKeyCriteriaBuilder(Arrays.asList(primaryKey), this.jdbcEntityDefinition.getJdbcTableName());
+                if(primaryKey==null) {
+                    primaryKey = ConnectionManagerFactory.getInstance().getStatementExecutor().getPrimaryKeyBuilder().build(entity);
+                    entity.setEncodedRowkey(primaryKey);
+                }
+                PrimaryKeyCriteriaBuilder pkBuilder = new PrimaryKeyCriteriaBuilder(Collections.singletonList(primaryKey), this.jdbcEntityDefinition.getJdbcTableName());
                 Criteria selectCriteria = pkBuilder.build();
                 if(LOG.isDebugEnabled()) LOG.debug("Updating by query: "+SqlBuilder.buildQuery(selectCriteria).getDisplayString());
                 ColumnValues columnValues = JdbcEntitySerDeserHelper.buildColumnValues(entity, this.jdbcEntityDefinition);

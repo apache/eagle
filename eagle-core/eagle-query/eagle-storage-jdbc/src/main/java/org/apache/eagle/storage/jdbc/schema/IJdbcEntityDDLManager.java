@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.storage.jdbc.schema;
+
 /**
- * Manage RDBMS schemas according java entity definition
- *
- * TODO: not implemented yet
- *
- * @since 3/31/15
+ * @since 3/27/15
  */
-package org.apache.eagle.storage.jdbc.schema.ddl;
+public interface IJdbcEntityDDLManager {
+    void init();
+    void reinit();
+    void shutdown();
+}
