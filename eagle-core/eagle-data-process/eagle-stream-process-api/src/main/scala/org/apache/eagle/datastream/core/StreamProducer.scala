@@ -294,7 +294,6 @@ case class MapperProducer[T,R](numOutputFields : Int, var fn : T => R) extends S
 }
 
 case class ForeachProducer[T](var fn : T => Unit) extends StreamProducer[T]
-
 abstract class GroupByProducer[T] extends StreamProducer[T]
 case class GroupByFieldProducer[T](fields : Seq[Int]) extends GroupByProducer[T]
 case class GroupByStrategyProducer[T](partitionStrategy: PartitionStrategy) extends GroupByProducer[T]
