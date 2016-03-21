@@ -22,13 +22,15 @@ import java.util.concurrent.atomic.AtomicInteger
 import backtype.storm.topology.base.BaseRichSpout
 import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.AlertAPIEntity
-import org.apache.eagle.datastream.{FlatMapperWrapperForSpark, FlatMapperWrapper, Collector, FlatMapper}
+import org.apache.eagle.datastream.{FlatMapperWrapper, Collector, FlatMapper}
 import org.apache.eagle.partition.PartitionStrategy
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConversions.{asScalaBuffer, seqAsJavaList}
 import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.mutable
+
 /**
  * StreamProducer = StreamInfo + StreamProtocol
  *
@@ -87,7 +89,13 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   }
 
   def flatMap[R](func:T => Traversable[R]): StreamProducer[R] = {
-    val ret = FlatMapProducer[T,R](FlatMapperWrapperForSpark[T,R](func))
+    val flatMapper = new FlatMapper[R](){
+      override def flatMap(input: Seq[AnyRef], collector: Collector[R]): Unit = {
+        input.foreach( s =>{func(s.asInstanceOf[T]).foreach(collector.collect)})
+         // func(input.get(0).asInstanceOf[T]).foreach(collector.collect)
+      }
+    }
+    val ret = this.flatMap(flatMapper)
     connect(this, ret)
     ret
   }
@@ -324,8 +332,8 @@ case class StormSourceProducer[T](source: BaseRichSpout) extends StreamProducer[
   }
 }
 
-case class SparkStreamingSourceProducer[T]() extends StreamProducer[T]{
-
+case class SparkStreamingKafkaSourceProducer[T]() extends StreamProducer[T]{
+  override def toString: String = s"SparkStreamingKafkaSourceProducer"
 }
 
 case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]{

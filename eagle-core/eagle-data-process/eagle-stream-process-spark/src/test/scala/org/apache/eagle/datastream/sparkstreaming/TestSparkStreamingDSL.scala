@@ -48,4 +48,10 @@ object TestSparkStreamingDSL extends App{
     .foreach(println)
   env.execute()
 
+ /* val streamName = env.config.get[String]("eagle.stream.name","eventStream")
+  val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")
+  env.fromKafka().parallelism(1).nameAs(streamName) ! (Seq(streamName),streamExecutorId)
+  System.out.println("gg")
+  env.execute()*/
+
 }

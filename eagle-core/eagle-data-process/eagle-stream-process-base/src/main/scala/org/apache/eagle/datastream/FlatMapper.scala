@@ -23,8 +23,3 @@ trait FlatMapper[T] extends Serializable {
 case class FlatMapperWrapper[T](func:(Any,Collector[T]) => Unit) extends FlatMapper[T]{
   override def flatMap(input: Seq[AnyRef], collector: Collector[T]): Unit = func(input,collector)
 }
-
-case class FlatMapperWrapperForSpark[T,R](func:T => Traversable[R]) extends FlatMapper[R]{
-  override def flatMap(input: Seq[AnyRef], collector: Collector[R]): Unit = (input,collector)
-  def flatMap() = func
-}

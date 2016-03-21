@@ -16,10 +16,14 @@
   */
 package org.apache.eagle.datastream.sparkstreaming
 
-import org.apache.eagle.datastream.FlatMapperWrapperForSpark
+import org.apache.eagle.datastream.{FlatMapper, Collector, FlatMapperWrapper}
 import org.apache.eagle.datastream.core._
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.kafka.KafkaUtils
+
+import scala.collection.mutable
+
 object DStreamFactory {
 
   def createInputDStream(ssc: StreamingContext, from: StreamProducer[Any]): DStream[Any] = {
@@ -29,8 +33,19 @@ object DStreamFactory {
       case p@IterableStreamProducer(iterable, recycle) => {
         ssc.receiverStream(new IterableReceiver(iterable, recycle))
       }
+
+      case p@SparkStreamingKafkaSourceProducer() =>{
+        val D = KafkaUtils.createStream(ssc,"localhost:2181","1",Map("noise" -> 1))
+        D.asInstanceOf[DStream[Any]]
+    }
       case _ =>
         throw new IllegalArgumentException(s"Cannot compile unknown $from to a Storm Spout")
+    }
+  }
+
+  class TraversableCollector(buffer: mutable.ListBuffer[Any]) extends Collector[Any]{
+    override def collect(r: Any): Unit = {
+      buffer += r
     }
   }
 
@@ -38,8 +53,13 @@ object DStreamFactory {
     implicit val streamInfo = to.getInfo
     val dStream = to match {
       case  FlatMapProducer(flatMapper) => {
-        val func = flatMapper.asInstanceOf[FlatMapperWrapperForSpark[Any,Any]].func
-        from.flatMap(func)
+        //val flatMapperWrapper = flatMapper.asInstanceOf[FlatMapper[Any]]
+        from.flatMap(input => {
+          val result= mutable.ListBuffer[Any]()
+          val flatMapperInput = Seq(input)
+          flatMapper.flatMap(flatMapperInput.asInstanceOf[Seq[AnyRef]],new TraversableCollector(result))
+          result
+        })
       }
       case filter: FilterProducer[Any] => {
         from.filter(filter.fn)
