@@ -27,13 +27,45 @@
 	// ==============================================================
 
 	// ==============================================================
+	// =                          Function                          =
+	// ==============================================================
+	// Format dashboard unit. Will adjust format with old version and add miss attributes.
+	feature.service("DashboardFormatter", function() {
+		var DashboardFormatter = function(unit) {
+			unit = unit || {};
+			unit.groups = unit.groups || [];
+
+			$.each(unit.groups, function(i, group) {
+				group.charts = group.charts || [];
+				$.each(group.charts, function(i, chart) {
+					if(!chart.metrics && chart.metric) {
+						chart.metrics = [{
+							aggregations: chart.aggregations,
+							dataSource: chart.dataSource,
+							metric: chart.metric
+						}];
+
+						// TODO: Delete attributes
+					} else if(!chart.metrics) {
+						chart.metrics = [];
+					}
+				});
+			});
+
+			return unit;
+		};
+
+		return DashboardFormatter;
+	});
+
+	// ==============================================================
 	// =                         Controller                         =
 	// ==============================================================
 
 	// ========================= Dashboard ==========================
 	feature.navItem("dashboard", "Metrics", "line-chart");
 
-	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Authorization, Application, Entities) {
+	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Authorization, Application, Entities, DashboardFormatter) {
 		var _siteApp = Site.currentSiteApplication();
 		var _druidConfig = _siteApp.configObj.druid;
 		var _refreshInterval;
@@ -227,7 +259,7 @@
 		});
 		$scope.dashboardList._promise.then(function(list) {
 			$scope.dashboardEntity = list[0];
-			$scope.dashboard = $scope.dashboardEntity ? common.parseJSON($scope.dashboardEntity.value) : {groups: []};
+			$scope.dashboard = DashboardFormatter(common.parseJSON($scope.dashboardEntity.value));
 			$scope.chartRefresh();
 		}).finally(function() {
 			$scope.dashboardReady = true;
@@ -305,8 +337,11 @@
 		};
 
 		$scope.chartSeriesUpdate = function(chart) {
-			chart._data = $.map(chart._oriData, function(series) {
-				if($.inArray(series.key, chart.aggregations) !== -1) return series;
+			chart._data = $.map(chart._oriData, function(groupData, i) {
+				var metric = chart.metrics[i];
+				return $.map(groupData, function(series) {
+					if($.inArray(series.key, metric.aggregations) !== -1) return series;
+				});
 			});
 		};
 
@@ -345,6 +380,16 @@
 		};
 
 		$scope.chartRefresh = function(forceRefresh, refreshAll) {
+			function _refreshChart(chart) {
+				if (chart._holder) {
+					if (refreshAll) {
+						chart._holder.refreshAll();
+					} else {
+						chart._holder.refresh();
+					}
+				}
+			}
+
 			setTimeout(function() {
 				$scope.endTime = app.time.now();
 				$scope.startTime = $scope.autoRefreshSelect.getStartTime($scope.endTime);
@@ -354,47 +399,48 @@
 
 				$.each($scope.dashboard.groups, function (i, group) {
 					$.each(group.charts, function (j, chart) {
-						var _data = JSON.stringify({
-							"queryType": "groupBy",
-							"dataSource": chart.dataSource,
-							"granularity": $scope.autoRefreshSelect.timeDes,
-							"dimensions": ["metric"],
-							"filter": {"type": "selector", "dimension": "metric", "value": chart.metric},
-							"aggregations": [
-								{
-									"type": "max",
-									"name": "max",
-									"fieldName": "maxValue"
-								},
-								{
-									"type": "min",
-									"name": "min",
-									"fieldName": "maxValue"
-								}
-							],
-							"intervals": [_intervals]
-						});
+						// Each Chart
+						var _tmpData, _metricPromiseList;
 
-						if (!chart._data || forceRefresh) {
-							$http.post(_druidConfig.broker + "/druid/v2", _data, {withCredentials: false}).then(function (response) {
-								chart._oriData = nvd3.convert.druid([response.data]);
-								$scope.chartSeriesUpdate(chart);
-								if(chart._holder) {
-									if(refreshAll) {
-										chart._holder.refreshAll();
-									} else {
-										chart._holder.refresh();
-									}
-								}
-							});
+						if (chart._data && !forceRefresh) {
+							// Refresh chart without reload
+							_refreshChart(chart);
 						} else {
-							if(chart._holder) {
-								if(refreshAll) {
-									chart._holder.refreshAll();
-								} else {
-									chart._holder.refresh();
-								}
-							}
+							// Refresh chart with reload
+							_tmpData = [];
+							_metricPromiseList = $.map(chart.metrics, function (metric, k) {
+								// Each Metric
+								var _query = JSON.stringify({
+									"queryType": "groupBy",
+									"dataSource": metric.dataSource,
+									"granularity": $scope.autoRefreshSelect.timeDes,
+									"dimensions": ["metric"],
+									"filter": {"type": "selector", "dimension": "metric", "value": metric.metric},
+									"aggregations": [
+										{
+											"type": "max",
+											"name": "max",
+											"fieldName": "maxValue"
+										},
+										{
+											"type": "min",
+											"name": "min",
+											"fieldName": "maxValue"
+										}
+									],
+									"intervals": [_intervals]
+								});
+
+								return $http.post(_druidConfig.broker + "/druid/v2", _query, {withCredentials: false}).then(function (response) {
+									_tmpData[k] =  nvd3.convert.druid([response.data]);
+								});
+							});
+
+							$q.all(_metricPromiseList).then(function() {
+								chart._oriData = _tmpData;
+								$scope.chartSeriesUpdate(chart);
+								_refreshChart(chart);
+							});
 						}
 					});
 				});
