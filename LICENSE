@@ -209,45 +209,29 @@ subcomponents is subject to the terms and conditions of the following
 licenses.
 
 ==============================================================================
-For AdminLTE:
+For "six": eagle-external/hadoop_jmx_collector/lib/six/
 ==============================================================================
-This product bundles AdminLTE, which is available under a
-"MIT" license. 
+This product bundles "six: a Python 2 and 3 compatibility library", which is available under
 
-For details, see https://github.com/almasaeed2010/AdminLTE/blob/master/LICENSE.
+"
+Copyright (c) 2010-2016 Benjamin Peterson
 
-==============================================================================
-For Google Fonts: Source Sans Pro
-==============================================================================
-This product bundles "Google Fonts: Source Sans Pro", which is available under a "SIL Open Font License, 1.1" license. 
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-For details, see https://www.google.com/fonts/attribution and http://scripts.sil.org/OFL.
-
-==============================================================================
-For kafka-python: Kafka Python client
-==============================================================================
-This product bundles "kafka-python: Kafka Python client", which is available under a " Apache License Version 2.0" license. 
-
-For details, see https://github.com/dpkp/kafka-python and https://pypi.python.org/pypi/kafka-python.
-
-==============================================================================
-For six: Python 2 and 3 compatibility library
-==============================================================================
-This product bundles "six: a Python 2 and 3 compatibility library", which is avaiblable under Copyright (c) 2010-2014 Benjamin Peterson. 
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"
 
-For details, see https://pypi.python.org/pypi/six
-
-
-
+For details, see https://bitbucket.org/gutworth/six/raw/a9b120c9c49734c1bd7a95e7f371fd3bf308f107/LICENSE.
