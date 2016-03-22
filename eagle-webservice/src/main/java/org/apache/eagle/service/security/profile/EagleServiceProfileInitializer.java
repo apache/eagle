@@ -17,6 +17,7 @@
 package org.apache.eagle.service.security.profile;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.stream.application.scheduler.ApplicationScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
@@ -37,5 +38,7 @@ public class EagleServiceProfileInitializer implements ApplicationContextInitial
         logger.info("Eagle service use env: " + profile);
         applicationContext.getEnvironment().setActiveProfiles(profile);
         applicationContext.refresh();
+
+        new ApplicationScheduler().startDeamon();
     }
 }

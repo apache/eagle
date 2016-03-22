@@ -146,6 +146,11 @@
 			<artifactId>eagle-security-hdfs-web</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>eagle</groupId>
+			<artifactId>eagle-stream-application-manager</artifactId>
+			<version>0.3.0-incubating</version>
+		</dependency>
 
 		<!-- eagle user profile common dependency -->
 		<dependency>

@@ -22,8 +22,14 @@ package org.apache.eagle.stream.application.entity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.stream.application.AppManagerConstants;
+import org.apache.eagle.stream.application.model.TopologyDescriptionModel;
+import org.apache.eagle.stream.application.model.TopologyOperationModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
@@ -33,7 +39,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.TOPOLOGY_DESCRIPTION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"application", "topology"})
+@Tags({"topology"})
 public class TopologyDescriptionEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String exeClass;
@@ -80,4 +86,32 @@ public class TopologyDescriptionEntity extends TaggedLogAPIEntity {
         valueChanged("version");
     }
 
+    public final static class TYPE {
+        public final static String DYNAMIC = "DYNAMIC";
+        public final static String CLASS = "CLASS";
+    }
+
+    public static TopologyDescriptionModel toModel(final TopologyDescriptionEntity entity){
+        TopologyDescriptionModel model = new TopologyDescriptionModel(
+                entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
+                entity.getExeClass(),
+                null,
+                entity.getType(),
+                entity.getDescription(),
+                entity.getVersion());
+        return model;
+    }
+
+    public static TopologyDescriptionEntity fromModel(final TopologyDescriptionModel model){
+        TopologyDescriptionEntity entity = new TopologyDescriptionEntity();
+        Map<String,String> tags = new HashMap<String,String>(){{
+            put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
+        }};
+        entity.setExeClass(model.exeClass());
+        entity.setDescription(model.description());
+        entity.setType(model.topoType());
+        entity.setVersion(model.version());
+        entity.setTags(tags);
+        return entity;
+    }
 }
