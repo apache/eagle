@@ -22,38 +22,23 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
-import org.apache.eagle.storage.DataStorageManager;
 import org.apache.eagle.storage.exception.QueryCompileException;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
-import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
 
-public class TestJdbcStorage {
-    JdbcStorage storage;
+public class TestJdbcStorage extends JdbcStorageTestBase {
     EntityDefinition entityDefinition;
-    long baseTimestamp;
-    final static Logger LOG = LoggerFactory.getLogger(TestJdbcStorage.class);
-
-    @Before
+    @Override
     public void setUp() throws Exception {
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
         entityDefinition.setTags(new String[]{"cluster","datacenter","random"});
-        storage = (JdbcStorage) DataStorageManager.getDataStorageByEagleConfig();
-        storage.init();
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.clear();
-        gc.set(2014, 1, 6, 1, 40, 12);
-        gc.setTimeZone(TimeZone.getTimeZone("UTC"));
-        baseTimestamp = gc.getTime().getTime();
-        System.out.println("timestamp:" + baseTimestamp);
+        super.setUp();
     }
 
     @Test
@@ -243,8 +228,10 @@ public class TestJdbcStorage {
         return instance;
     }
 
+
     @Test
     public void testInitSuccessfully() {
 
     }
+
 }
