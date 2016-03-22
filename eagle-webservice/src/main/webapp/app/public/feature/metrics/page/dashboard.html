@@ -135,10 +135,12 @@
 								<td>
 									<div ng-repeat="metric in configPreviewChart.metrics" class="box inner-box">
 										<div class="box-tools">
-											<button class="btn btn-box-tool"><span class="fa fa-times"></span></button>
+											<button class="btn btn-box-tool" ng-click="configRemoveMetric(metric)">
+												<span class="fa fa-times"></span>
+											</button>
 										</div>
 
-										<label>{{metric.metric}}</label>
+										<h3 class="box-title">{{metric.metric}}</h3>
 										<div class="checkbox noMargin" ng-repeat="series in chartSeriesList track by $index">
 											<label>
 												<input type="checkbox" ng-checked="seriesChecked(metric, series.series)"

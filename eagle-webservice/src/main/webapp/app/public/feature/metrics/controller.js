@@ -31,7 +31,7 @@
 	// ==============================================================
 	// Format dashboard unit. Will adjust format with old version and add miss attributes.
 	feature.service("DashboardFormatter", function() {
-		var DashboardFormatter = function(unit) {
+		return function DashboardFormatter(unit) {
 			unit = unit || {};
 			unit.groups = unit.groups || [];
 
@@ -56,8 +56,6 @@
 
 			return unit;
 		};
-
-		return DashboardFormatter;
 	});
 
 	// ==============================================================
@@ -321,7 +319,10 @@
 
 		$scope.chartSeriesList = [
 			{name: "Min", series: "min"},
-			{name: "Max", series: "max"}
+			{name: "Max", series: "max"},
+			{name: "Avg", series: "avg"},
+			{name: "Count", series: "count"},
+			{name: "Sum", series: "sum"}
 		];
 
 		$scope.newChart = function() {
@@ -359,6 +360,10 @@
 		$scope.configAddMetric = function() {
 			$scope.metricForConfigChart = true;
 			$("#metricMDL").modal();
+		};
+
+		$scope.configRemoveMetric = function(metric) {
+			common.array.remove(metric, $scope.configPreviewChart.metrics);
 		};
 
 		$scope.getChartConfig = function(chart) {
@@ -438,6 +443,24 @@
 								"type": "min",
 								"name": "min",
 								"fieldName": "maxValue"
+							},
+							{
+								"type": "count",
+								"name": "count",
+								"fieldName": "maxValue"
+							},
+							{
+								"type": "longSum",
+								"name": "sum",
+								"fieldName": "maxValue"
+							}
+						],
+						"postAggregations" : [
+							{
+								"type": "javascript",
+								"name": "avg",
+								"fieldNames": ["sum", "count"],
+								"function": "function(sum, cnt) { return sum / cnt;}"
 							}
 						],
 						"intervals": [_intervals]
