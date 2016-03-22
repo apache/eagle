@@ -41,6 +41,7 @@ import java.util.Set;
  */
 public class CompiledQuery {
     private final static Logger LOG = LoggerFactory.getLogger(CompiledQuery.class);
+    private boolean timeSeries;
 
     public boolean isHasAgg() {
         return hasAgg;
@@ -202,6 +203,7 @@ public class CompiledQuery {
         this.sortFunctions = compiler.sortFunctions();
         this.groupByFields = compiler.groupbyFields();
         this.aggregateFields = compiler.aggregateFields();
+        this.timeSeries = this.getRawQuery().isTimeSeries();
 
         final List<String[]> partitionValues = compiler.getQueryPartitionValues();
         if (partitionValues != null) {
@@ -254,5 +256,17 @@ public class CompiledQuery {
                 LOG.debug("Output fields: " + StringUtils.join(outputFields, ","));
             }
         }
+    }
+
+    public boolean isTimeSeries() {
+        return timeSeries;
+    }
+
+    public void setTimeSeries(boolean timeSeries) {
+        this.timeSeries = timeSeries;
+    }
+
+    public long getIntervalMin(){
+        return this.getRawQuery().getIntervalmin();
     }
 }

@@ -178,6 +178,14 @@ public abstract class AbstractAggregator implements Aggregator, EntityCreationLi
 				return new Double(0.0);
 			}
 		}
+		if(obj instanceof double[]){
+			double[] value = (double[]) obj;
+			if(value.length > 0){
+				return new Double(value[0]);
+			}else{
+				return new Double(0.0);
+			}
+		}
 		
 		throw new IllegalAggregateFieldTypeException(obj.getClass().toString() + " type is not support. The aggregated field must be numeric type, int, long or double");
 	}
