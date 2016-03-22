@@ -29,6 +29,10 @@
 		PageConfig.hideSite = true;
 		$scope._pageLock = false;
 
+		PageConfig
+			.addNavPath("Home", "/")
+			.addNavPath("Feature Config");
+
 		// ================== Feature ==================
 		// Current feature
 		$scope.feature = Application.featureList[0];
@@ -93,6 +97,10 @@
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
 		$scope._pageLock = false;
+
+		PageConfig
+			.addNavPath("Home", "/")
+			.addNavPath("Application Config");
 
 		// ================ Application ================
 		// Current application
@@ -198,6 +206,10 @@
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
 		$scope._pageLock = false;
+
+		PageConfig
+			.addNavPath("Home", "/")
+			.addNavPath("Site Config");
 
 		// =================== Site ====================
 		// Current site
