@@ -379,7 +379,7 @@
 			$scope.configTargetChart = chart;
 			$scope.configPreviewChart = $.extend({}, chart);
 			$scope.configPreviewChart.metrics = $.map(chart.metrics, function(metric) {
-				return $.extend({}, metric, (metric.aggregations || []).slice());
+				return $.extend({}, metric, {aggregations: (metric.aggregations || []).slice()});
 			});
 			delete $scope.configPreviewChart._config;
 			$("#chartMDL").modal();
