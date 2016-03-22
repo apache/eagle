@@ -16,11 +16,17 @@
  *
  */
 
-package org.apache.eagle.stream.application.impl
+package org.apache.eagle.stream.application
 
-/**
- * Created by qingwzhao on 3/9/16.
- */
-class TopologyDescriptionModel {
+import com.typesafe.config.Config
+import org.apache.eagle.datastream.core.StreamContext
+import org.apache.eagle.stream.pipeline.Pipeline
+
+
+trait AbstractDynamicApplication extends TopologyExecutable {
+  def compileStream(application: String, config: Config): StreamContext = {
+    val pipeline = Pipeline.parseStringWithConfig(application, config)
+    Pipeline.compile(pipeline)
+  }
 
 }

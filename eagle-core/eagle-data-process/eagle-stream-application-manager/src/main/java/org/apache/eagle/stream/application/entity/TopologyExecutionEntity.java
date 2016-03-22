@@ -21,8 +21,15 @@ package org.apache.eagle.stream.application.entity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.stream.application.AppManagerConstants;
+import org.apache.eagle.stream.application.ApplicationManager;
+import org.apache.eagle.stream.application.model.TopologyExecutionModel;
+import org.apache.eagle.stream.application.model.TopologyOperationModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
@@ -32,7 +39,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.TOPOLOGY_EXECUTION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "topology"})
+@Tags({"site", "application", "topology", "fullName"})
 public class TopologyExecutionEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String url;
@@ -79,4 +86,39 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
         valueChanged("lastUpdateTime");
     }
 
+    public final static class TOPOLOGY_STATUS {
+        public final static String STOPPED = "STOPPED";
+        public final static String STARTED = "STARTED";
+        public final static String EXECUTING = "EXECUTING";
+        public final static String INITIALIZED = "INITIALIZED";
+    }
+
+    public static TopologyExecutionModel toModel(final TopologyExecutionEntity entity){
+        TopologyExecutionModel model = new TopologyExecutionModel (
+                entity.getTags().get(AppManagerConstants.SITE_TAG),
+                entity.getTags().get(AppManagerConstants.APPLICATION_TAG),
+                entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
+                entity.getTags().get(AppManagerConstants.NAME_TAG),
+                entity.getUrl(),
+                entity.getDeploy(),
+                entity.getStatus(),
+                entity.getLastUpdateTime());
+        return model;
+    }
+
+    public static TopologyExecutionEntity fromModel(final TopologyExecutionModel model){
+        TopologyExecutionEntity entity = new TopologyExecutionEntity();
+        Map<String,String> tags = new HashMap<String,String>(){{
+            put(AppManagerConstants.SITE_TAG, model.site());
+            put(AppManagerConstants.APPLICATION_TAG, model.application());
+            put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
+            put(AppManagerConstants.NAME_TAG, model.fullName());
+        }};
+        entity.setUrl(model.url());
+        entity.setDeploy(model.url());
+        entity.setStatus(model.status());
+        entity.setLastUpdateTime(model.lastUpdateTime());
+        entity.setTags(tags);
+        return entity;
+    }
 }
