@@ -22,7 +22,6 @@ import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.Qualifier;
 import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
-import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.torque.ColumnImpl;
@@ -211,6 +210,7 @@ public class JdbcEntitySerDeserHelper {
                     throw new IOException(String.format("No field %s in entity %s", columnName, entityDefinition.getInternal().getEntityClass()), e);
                 }
             }else{
+                columnName = entityDefinition.getOriginalJavaTagName(columnName);
                 // treat as tag or others
                 value = resultSet.getObject(columnName);
             }
@@ -251,7 +251,7 @@ public class JdbcEntitySerDeserHelper {
             Object fieldValue = getMethod.invoke(entity);
 
             Class<?> fieldType = qualifier.getSerDeser().type();
-            JdbcSerDeser jdbcSerDeser = JdbcEntityDefinitionManager.getJdbcSerDeser(fieldType);
+            JdbcSerDeser jdbcSerDeser = jdbcEntityDefinition.getJdbcSerDeser(displayName);
 
             JdbcTypedValue jdbcTypedValue = jdbcSerDeser.toJdbcTypedValue(fieldValue, fieldType, qualifier);
             columnValues.put(new ColumnImpl(tableName,displayName),jdbcTypedValue);
