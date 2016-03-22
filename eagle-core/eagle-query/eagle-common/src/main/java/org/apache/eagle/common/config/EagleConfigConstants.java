@@ -56,4 +56,7 @@ public final class EagleConfigConstants {
     public final static String DATA_SOURCE = "dataSource";
     public final static String APPLICATION = "application";
 
+    public final static String WEB_CONFIG = "webConfig";
+    public final static String APP_CONFIG = "appConfig";
+
 }

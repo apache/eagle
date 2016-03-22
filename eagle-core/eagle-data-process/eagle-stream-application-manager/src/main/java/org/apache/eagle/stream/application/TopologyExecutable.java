@@ -16,11 +16,12 @@
  *
  */
 
-package org.apache.eagle.stream.application.impl
+package org.apache.eagle.stream.application;
 
-/**
- * Created by qingwzhao on 3/9/16.
- */
-class TopologyExecutionModel {
 
+import com.typesafe.config.Config;
+
+
+public interface TopologyExecutable {
+    void submit(String topology, Config config);
 }

@@ -21,8 +21,13 @@ package org.apache.eagle.stream.application.entity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.stream.application.AppManagerConstants;
+import org.apache.eagle.stream.application.model.TopologyOperationModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
@@ -38,6 +43,8 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
     private String topology;
     @Column("b")
     private String status;
+    @Column("c")
+    private long lastUpdateTime;
 
     public String getTopology() {
         return topology;
@@ -55,5 +62,57 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
     public void setStatus(String status) {
         this.status = status;
         valueChanged("status");
+    }
+
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+        valueChanged("lastUpdateTime");
+    }
+
+    public final static class OPERATION {
+        public final static String START = "START";
+        public final static String STOP = "STOP";
+        public final static String STATUS = "STATUS";
+    }
+
+    public final static class OPERATION_STATUS {
+        public final static String PENDING = "PENDING";
+        public final static String INITIALIZED = "INITIALIZED";
+        public final static String SUCCESS = "SUCCESS";
+        public final static String FAILED = "FAILED";
+    }
+
+    public static TopologyOperationModel toModel(final TopologyOperationEntity entity){
+        TopologyOperationModel model = new TopologyOperationModel(
+                entity.getTags().get(AppManagerConstants.SITE_TAG),
+                entity.getTags().get(AppManagerConstants.APPLICATION_TAG),
+                entity.getTags().get(AppManagerConstants.COMMAND_ID_TAG),
+                entity.getTags().get(AppManagerConstants.COMMAND_TYPE_TAG),
+                entity.getTopology(),
+                entity.getStatus(),
+                entity.getLastUpdateTime());
+        return model;
+    }
+
+    public static TopologyOperationEntity fromModel(final TopologyOperationModel model){
+        TopologyOperationEntity entity = new TopologyOperationEntity();
+        entity.setTopology(model.topology());
+        entity.setStatus(model.status());
+        Map<String,String> tags = new HashMap<String,String>(){{
+            put(AppManagerConstants.SITE_TAG, model.site());
+            put(AppManagerConstants.COMMAND_ID_TAG,model.uuid());
+            put(AppManagerConstants.COMMAND_TYPE_TAG, model.operation());
+            put(AppManagerConstants.APPLICATION_TAG, model.application());
+
+        }};
+        entity.setLastUpdateTime(model.lastUpdateTime());
+        entity.setTopology(model.topology());
+        entity.setStatus(model.status());
+        entity.setTags(tags);
+        return entity;
     }
 }
