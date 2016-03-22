@@ -567,6 +567,26 @@ body .modal-body .nav-stacked > li:last-child {
 	margin-top: 0;
 }
 
+.box.inner-box {
+	border: none;
+	box-shadow: none;
+	padding: 5px 10px;
+	margin: 0;
+	border-bottom: 1px solid #f4f4f4;
+	position: relative;
+	border-radius: 0;
+}
+
+.box.inner-box .box-tools {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.box.inner-box:last-child {
+	border-bottom: none;
+}
+
 /* Navigation Tab */
 .nav-tabs-custom {
 	position: relative;

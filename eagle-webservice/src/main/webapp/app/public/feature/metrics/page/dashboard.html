@@ -60,7 +60,7 @@
 		<div sortable class="row narrow" ng-model="group.charts" update-func="chartSwitchRefresh" ng-show="group.charts.length">
 			<div ng-repeat="chart in group.charts track by $index" class="col-md-{{chart.size || 6}}">
 				<div class="nvd3-chart-wrapper">
-					<div nvd3="chart._data" data-holder="chart._holder" data-title="{{chart.title || chart.metric}}" data-watching="false"
+					<div nvd3="chart._data" data-holder="chart._holder" data-title="{{chart.title || chart.metrics[0].metric}}" data-watching="false"
 						 data-chart="{{chart.chart || 'line'}}" data-config="getChartConfig(chart)" class="nvd3-chart-cntr"></div>
 					<div class="nvd3-chart-config" ng-if="Auth.isRole('ROLE_ADMIN')">
 						<a class="fa fa-minus" ng-click="configChartSize(chart, -1)"></a>
@@ -82,6 +82,89 @@
 			</span>
 		</p>
 	</pane>
+</div>
+
+
+
+<!-- Modal: Chart configuration -->
+<div class="modal fade" id="chartMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Chart Configuration</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="nvd3-chart-wrapper">
+							<div nvd3="configPreviewChart._data" data-title="{{configPreviewChart.title || configPreviewChart.metrics[0].metric}}"
+								 data-watching="true" data-chart="{{configPreviewChart.chart || 'line'}}" data-config="getChartConfig(configPreviewChart)" class="nvd3-chart-cntr"></div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<!-- Chart Configuration -->
+						<table class="table">
+							<tbody>
+							<tr>
+								<th width="100">Name</th>
+								<td><input type="text" class="form-control input-xs" ng-model="configPreviewChart.title" placeholder="Default: {{configPreviewChart.metrics[0].metric}}" /></td>
+							</tr>
+							<tr>
+								<th>Chart Type</th>
+								<td>
+									<div class="btn-group" data-toggle="buttons">
+										<label class="btn btn-default btn-xs" ng-class="{active: (configPreviewChart.chart || 'line') === type.chart}"
+											   ng-repeat="type in chartTypeList track by $index" ng-click="configPreviewChart.chart = type.chart;">
+											<input type="radio" name="chartType" autocomplete="off"
+												   ng-checked="(configPreviewChart.chart || 'line') === type.chart">
+											<span class="fa fa-{{type.icon}}"></span>
+										</label>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th>Minimum</th>
+								<td><input type="checkbox" ng-checked="configPreviewChart.min === 0" ng-disabled="configPreviewChart.chart === 'area' || configPreviewChart.chart === 'pie'"
+										   ng-click="configPreviewChartMinimumCheck()" /></td>
+							</tr>
+							<tr>
+								<th>Metrics</th>
+								<td>
+									<div ng-repeat="metric in configPreviewChart.metrics" class="box inner-box">
+										<div class="box-tools">
+											<button class="btn btn-box-tool"><span class="fa fa-times"></span></button>
+										</div>
+
+										<label>{{metric.metric}}</label>
+										<div class="checkbox noMargin" ng-repeat="series in chartSeriesList track by $index">
+											<label>
+												<input type="checkbox" ng-checked="seriesChecked(metric, series.series)"
+													   ng-click="seriesCheckClick(metric, series.series, configPreviewChart)" />
+												{{series.name}}
+											</label>
+										</div>
+									</div>
+									<a ng-click="configAddMetric()">+ Add Metric</a>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmUpdateChart()">
+					Confirm
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 
@@ -130,81 +213,6 @@
 				</button>
 				<button type="button" class="btn btn-primary" ng-click="confirmSelectMetric()">
 					Select
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-
-<!-- Modal: Chart configuration -->
-<div class="modal fade" id="chartMDL" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">Chart Configuration</h4>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-md-6">
-						<div class="nvd3-chart-wrapper">
-							<div nvd3="configPreviewChart._data" data-title="{{configPreviewChart.title || configPreviewChart.metric}}"
-								 data-watching="true" data-chart="{{configPreviewChart.chart || 'line'}}" data-config="getChartConfig(configPreviewChart)" class="nvd3-chart-cntr"></div>
-						</div>
-					</div>
-					<div class="col-md-6">
-						<!-- Chart Configuration -->
-						<table class="table">
-							<tbody>
-							<tr>
-								<th width="100">Name</th>
-								<td><input type="text" class="form-control input-xs" ng-model="configPreviewChart.title" placeholder="Default: {{configPreviewChart.metric}}" /></td>
-							</tr>
-							<tr>
-								<th>Chart Type</th>
-								<td>
-									<div class="btn-group" data-toggle="buttons">
-										<label class="btn btn-default btn-xs" ng-class="{active: (configPreviewChart.chart || 'line') === type.chart}"
-											   ng-repeat="type in chartTypeList track by $index" ng-click="configPreviewChart.chart = type.chart;">
-											<input type="radio" name="chartType" autocomplete="off"
-												   ng-checked="(configPreviewChart.chart || 'line') === type.chart">
-											<span class="fa fa-{{type.icon}}"></span>
-										</label>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<th>Minimum</th>
-								<td><input type="checkbox" ng-checked="configPreviewChart.min === 0" ng-disabled="configPreviewChart.chart === 'area' || configPreviewChart.chart === 'pie'"
-										   ng-click="configPreviewChartMinimumCheck()" /></td>
-							</tr>
-							<tr>
-								<th>Series</th>
-								<td>
-									<div class="checkbox noMargin" ng-repeat="series in chartSeriesList track by $index">
-										<label>
-											<input type="checkbox" ng-checked="seriesChecked(configPreviewChart, series.series)"
-												   ng-click="seriesCheckClick(configPreviewChart, series.series)" />
-											{{series.name}}
-										</label>
-									</div>
-								</td>
-							</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">
-					Close
-				</button>
-				<button type="button" class="btn btn-primary" ng-click="confirmUpdateChart()">
-					Confirm
 				</button>
 			</div>
 		</div>
