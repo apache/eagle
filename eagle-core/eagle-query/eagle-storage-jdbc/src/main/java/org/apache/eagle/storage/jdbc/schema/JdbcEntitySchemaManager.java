@@ -179,8 +179,7 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
         pkColumn.setPrimaryKey(true);
         pkColumn.setRequired(true);
         pkColumn.setTypeCode(Types.VARCHAR);
-        pkColumn.setSize("1024");
-//        pkColumn.setSizeAndScale(1024,10240);
+//        pkColumn.setSize("256");
 
         pkColumn.setDescription("eagle entity row-key column");
         table.addColumn(pkColumn);

@@ -58,17 +58,32 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
         Criteria root = new Criteria();
         SearchCondition searchCondition = query.getSearchCondition();
 
-        // SELECT
+
+
         if(query.isHasAgg()){
-            List<String> aggFields = query.getAggregateFields();
-            List<AggregateFunctionType> aggFuncs = query.getAggregateFunctionTypes();
-            for(int i=0;i<aggFuncs.size();i++){
-                AggregateFunctionType aggFunc = aggFuncs.get(i);
-                String aggField = aggFields.get(i);
-                if(aggFunc.equals(AggregateFunctionType.count)){
-                    root.addSelectColumn(new ColumnImpl(aggFunc.name()+"(*)"));
-                }else{
-                    root.addSelectColumn(new ColumnImpl(String.format("%s(%s.%s)",aggFunc.name(),this.tableName,aggField)));
+            if(this.jdbcEntityDefinition.getInternal().isTimeSeries() && query.isTimeSeries()) {
+                // SELECT
+                root.addSelectColumn(new ColumnImpl(this.tableName,JdbcConstants.TIMESTAMP_COLUMN_NAME));
+                List<String> aggFields = query.getAggregateFields();
+                for(String field:aggFields){
+                    root.addSelectColumn(new ColumnImpl(this.tableName,field));
+                }
+
+                List<String> groupByFieldsFields = query.getGroupByFields();
+                for(String field:groupByFieldsFields){
+                    root.addSelectColumn(new ColumnImpl(this.tableName,field));
+                }
+            } else {
+                List<String> aggFields = query.getAggregateFields();
+                List<AggregateFunctionType> aggFuncs = query.getAggregateFunctionTypes();
+                for (int i = 0; i < aggFuncs.size(); i++) {
+                    AggregateFunctionType aggFunc = aggFuncs.get(i);
+                    String aggField = aggFields.get(i);
+                    if (aggFunc.equals(AggregateFunctionType.count)) {
+                        root.addSelectColumn(new ColumnImpl(aggFunc.name() + "(*)"));
+                    } else {
+                        root.addSelectColumn(new ColumnImpl(String.format("%s(%s.%s)", aggFunc.name(), this.tableName, aggField)));
+                    }
                 }
             }
         } else if(searchCondition.isOutputAll()){
@@ -86,12 +101,6 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
             if(!outputFields.contains(JdbcConstants.TIMESTAMP_COLUMN_NAME)) {
                 root.addSelectColumn(new ColumnImpl(this.tableName, JdbcConstants.TIMESTAMP_COLUMN_NAME));
             }
-        }
-
-        // If no columns are specified, then select * by default
-        if(root.getSelectColumns() == null || root.getSelectColumns().size() ==0){
-            // SELECT *
-            root.addSelectColumn(new ColumnImpl(this.tableName, "*"));
         }
 
         // FROM $tableName
@@ -119,7 +128,7 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
         }
 
         // TODO: GROUP BY
-        if(query.isHasAgg()){
+        if(query.isHasAgg() && !query.isTimeSeries()){
             for(String groupByField:query.getGroupByFields()){
                 root.addGroupByColumn(new ColumnImpl(this.tableName,groupByField));
             }
@@ -127,6 +136,11 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
 
         // TODO: ORDER BY
 
+        // If no columns are specified, then select * by default
+        if(root.getSelectColumns() == null || root.getSelectColumns().size() ==0){
+            // SELECT *
+            root.addSelectColumn(new ColumnImpl(this.tableName, "*"));
+        }
         return root;
     }
 }
