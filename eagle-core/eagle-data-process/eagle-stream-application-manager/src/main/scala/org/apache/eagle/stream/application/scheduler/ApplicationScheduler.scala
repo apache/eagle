@@ -222,11 +222,11 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
               case Some(topology) =>
                 val topologyConfig: Config = ConfigFactory.parseString(topology.config)
                 if(topologyConfig.hasPath(EagleConfigConstants.APP_CONFIG)) {
-                  var config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
+                  val config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
                   executionModel.fullName = generateTopologyFullName(executionModel)
                   val extConfig = ConfigFactory.parseString("envContextConfig.topologyName=" + executionModel.fullName)
-                  config = ConfigFactory.parseString("envContextConfig.topologyName=" + executionModel.fullName).withFallback(config)
-                  ret = _streamAppManager.start(topology, config)
+                  val appConfig = extConfig.withFallback(config)
+                  ret = _streamAppManager.start(topology, appConfig)
                   nextState = if(ret) TOPOLOGY_STATUS.STARTED else TOPOLOGY_STATUS.STOPPED
                   updateStatus(operationModel, executionModel, ret, nextState)
                 }
@@ -237,11 +237,11 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
             log.error(s"Fail to load topology with site=${operationModel.site} and application=${operationModel.application}")
         }
       case OPERATION.STOP =>
-        ret = _streamAppManager.stop(executionModel, _config)
+        ret = _streamAppManager.stop(generateTopologyFullName(executionModel), _config)
         nextState = if(ret) TOPOLOGY_STATUS.STOPPED else TOPOLOGY_STATUS.STARTED
         updateStatus(operationModel, executionModel, ret, nextState)
       case OPERATION.STATUS =>
-        ret = _streamAppManager.status(executionModel, _config)
+        ret = _streamAppManager.status(generateTopologyFullName(executionModel), _config)
         nextState = if(ret) TOPOLOGY_STATUS.STARTED else TOPOLOGY_STATUS.STOPPED
         updateStatus(operationModel, executionModel, ret, nextState)
       case m@_ =>

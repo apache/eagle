@@ -22,7 +22,9 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.stream.application.AppManagerConstants;
+import org.apache.eagle.stream.application.ApplicationManager;
 import org.apache.eagle.stream.application.model.TopologyExecutionModel;
+import org.apache.eagle.stream.application.model.TopologyOperationModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 

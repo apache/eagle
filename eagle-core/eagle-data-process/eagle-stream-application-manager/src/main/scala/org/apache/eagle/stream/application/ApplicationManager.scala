@@ -19,11 +19,11 @@
 package org.apache.eagle.stream.application
 
 import com.typesafe.config.Config
-import org.apache.eagle.stream.application.model.{TopologyDescriptionModel, TopologyExecutionModel}
+import org.apache.eagle.stream.application.model.TopologyDescriptionModel
 
 
 trait ApplicationManager {
   def start(topologyDesc: TopologyDescriptionModel, config: Config): Boolean
-  def stop(topologyExecution: TopologyExecutionModel, config: Config): Boolean
-  def status(topologyExecution: TopologyExecutionModel, config: Config): Boolean
+  def stop(name: String, config: Config): Boolean
+  def status(name: String, config: Config): Boolean
 }
