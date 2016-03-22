@@ -74,8 +74,8 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
             TorqueStatementPeerImpl peer = ConnectionManagerFactory.getInstance().getStatementExecutor();
             result = peer.delegate().doSelect(criteria, recordMapper);
             LOG.info(String.format("Read %s records in %s ms (sql: %s)",result.size(),stopWatch.getTime(),displaySql));
-            if(query.isTimeSeries()){
-                result = Lists.newArrayList((E) timeseriesAggregate(result,query));
+            if(result.size() > 0 && query.isTimeSeries()){
+                    result = Lists.newArrayList((E) timeseriesAggregate(result, query));
             }
         }catch (Exception ex){
             LOG.error("Failed to query by: "+displaySql+", due to: "+ex.getMessage(),ex);

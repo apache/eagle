@@ -181,7 +181,7 @@
 			];
 
 			function _loadSeries(seriesName, metricName, condition) {
-				var list = Entities.querySeries("GenericMetricService", $.extend({_metricName: metricName}, condition), "@cluster", "sum(value)", _intervalList[_intervalType][1]);
+				var list = Entities.querySeries("GenericMetricService", $.extend({_metricName: metricName}, condition), "@site", "sum(value)", _intervalList[_intervalType][1]);
 				var seriesList = nvd3.convert.eagle([list]);
 				if(!$scope[seriesName]) $scope[seriesName] = seriesList;
 				list._promise.then(function() {
