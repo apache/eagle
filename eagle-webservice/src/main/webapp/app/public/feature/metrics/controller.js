@@ -307,6 +307,7 @@
 		$scope.configTargetChart = null;
 		$scope.configPreviewChart = null;
 		$scope.metricForConfigChart = false;
+		$scope.viewChart = null;
 
 		$scope.chartConfig = {
 			xType: "time"
@@ -404,6 +405,14 @@
 				holder.closeFunc();
 				$scope.refreshAllChart(false, true);
 			});
+		};
+
+		$scope.showChart = function(chart) {
+			$scope.viewChart = chart;
+			$("#chartViewMDL").modal();
+			setTimeout(function() {
+				$(window).resize();
+			}, 200);
 		};
 
 		$scope.refreshChart = function(chart, forceRefresh, refreshAll) {
@@ -537,6 +546,10 @@
 			if($(".modal-backdrop").length) {
 				$("body").addClass("modal-open");
 			}
+		});
+
+		$("#chartViewMDL").on('hidden.bs.modal', function () {
+			$scope.viewChart = null;
 		});
 
 		// ====================== Clean Up ======================
