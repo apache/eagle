@@ -31,30 +31,32 @@
 	// ==============================================================
 	// Format dashboard unit. Will adjust format with old version and add miss attributes.
 	feature.service("DashboardFormatter", function() {
-		return function DashboardFormatter(unit) {
-			unit = unit || {};
-			unit.groups = unit.groups || [];
+		return {
+			parse: function(unit) {
+				unit = unit || {};
+				unit.groups = unit.groups || [];
 
-			$.each(unit.groups, function(i, group) {
-				group.charts = group.charts || [];
-				$.each(group.charts, function(i, chart) {
-					if(!chart.metrics && chart.metric) {
-						chart.metrics = [{
-							aggregations: chart.aggregations,
-							dataSource: chart.dataSource,
-							metric: chart.metric
-						}];
+				$.each(unit.groups, function (i, group) {
+					group.charts = group.charts || [];
+					$.each(group.charts, function (i, chart) {
+						if (!chart.metrics && chart.metric) {
+							chart.metrics = [{
+								aggregations: chart.aggregations,
+								dataSource: chart.dataSource,
+								metric: chart.metric
+							}];
 
-						delete chart.aggregations;
-						delete chart.dataSource;
-						delete chart.metric;
-					} else if(!chart.metrics) {
-						chart.metrics = [];
-					}
+							delete chart.aggregations;
+							delete chart.dataSource;
+							delete chart.metric;
+						} else if (!chart.metrics) {
+							chart.metrics = [];
+						}
+					});
 				});
-			});
 
-			return unit;
+				return unit;
+			}
 		};
 	});
 
@@ -266,7 +268,7 @@
 		});
 		$scope.dashboardList._promise.then(function(list) {
 			$scope.dashboardEntity = list[0];
-			$scope.dashboard = DashboardFormatter(common.parseJSON($scope.dashboardEntity.value));
+			$scope.dashboard = DashboardFormatter.parse(common.parseJSON($scope.dashboardEntity.value));
 			$scope.refreshAllChart();
 		}).finally(function() {
 			$scope.dashboardReady = true;
