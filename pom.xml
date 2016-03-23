@@ -889,6 +889,7 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <useDefaultExcludes>true</useDefaultExcludes>
                             <excludes>
                                 <!-- Git specific files -->
                                 <exclude>.git/</exclude>
