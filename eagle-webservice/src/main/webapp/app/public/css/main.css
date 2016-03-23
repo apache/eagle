@@ -450,6 +450,10 @@ ul.tree.tree-bordered > li > ul > li > a {
 	color: #FFFFFF;
 }
 
+.label.label-sm {
+	padding: .0em .4em .1em;
+}
+
 /* Row */
 .row.narrow {
 	margin-left: -5px;

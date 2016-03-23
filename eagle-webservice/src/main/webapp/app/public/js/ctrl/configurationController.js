@@ -20,6 +20,21 @@
 	'use strict';
 
 	var eagleControllers = angular.module('eagleControllers');
+
+	// =============================================================
+	// =                         Function                          =
+	// =============================================================
+	function watchEdit($scope, key) {
+		$scope.changed = false;
+		setTimeout(function() {
+			var _func = $scope.$watch(key, function(newValue, oldValue) {
+				if(angular.equals(newValue, oldValue)) return;
+				$scope.changed = true;
+				_func();
+			}, true);
+		}, 100);
+	}
+
 	// =============================================================
 	// =                       Configuration                       =
 	// =============================================================
@@ -90,6 +105,9 @@
 				$scope._pageLock = false;
 			});
 		};
+
+		// Watch config update
+		watchEdit($scope, "features");
 	});
 
 	// ======================== Application ========================
@@ -174,16 +192,19 @@
 			application.features.push(feature);
 			common.array.remove(feature, application.optionalFeatures);
 			highlightFeature(feature);
+			$scope.changed = true;
 		};
 
 		$scope.removeFeature = function(feature, application) {
 			application.optionalFeatures.push(feature);
 			common.array.remove(feature, application.features);
+			$scope.changed = true;
 		};
 
 		$scope.moveFeature = function(feature, list, offset) {
 			common.array.moveOffset(feature, list, offset);
 			highlightFeature(feature);
+			$scope.changed = true;
 		};
 
 		// Save feature
@@ -199,6 +220,9 @@
 				$scope._pageLock = false;
 			});
 		};
+
+		// Watch config update
+		watchEdit($scope, "applications");
 	});
 
 	// ============================ Site ===========================
@@ -304,16 +328,19 @@
 			common.array.remove(application, site.optionalApplications);
 			application.enabled = true;
 			highlightApplication(application);
+			$scope.changed = true;
 		};
 
 		$scope.removeApplication = function(application, site) {
 			site.optionalApplications.push(application);
 			common.array.remove(application, site.applications);
 			application.enabled = false;
+			$scope.changed = true;
 		};
 
 		$scope.setApplication = function(application) {
-			UI.updateConfirm("Application", {config: application.config}, [
+			var _oriConfig = application.config;
+			UI.updateConfirm("Application", {config: _oriConfig}, [
 				{name: "Configuration", field: "config", type: "blob"}
 			], function(entity) {
 				if(entity.config !== "" && !common.parseJSON(entity.config, false)) {
@@ -322,6 +349,7 @@
 			}).then(null, null, function(holder) {
 				application.config = holder.entity.config;
 				holder.closeFunc();
+				if(_oriConfig !== application.config) $scope.changed = true;
 			});
 		};
 
@@ -340,5 +368,8 @@
 				$scope._pageLock = false;
 			});
 		};
+
+		// Watch config update
+		watchEdit($scope, "sites");
 	});
 })();
