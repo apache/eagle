@@ -28,6 +28,14 @@
 	serviceModule.service('UI', function($rootScope, $q, $compile) {
 		var UI = {};
 
+		function _bindShortcut($dialog) {
+			$dialog.on("keydown", function (event) {
+				if(event.which === 13) {
+					$dialog.find(".confirmBtn").click();
+				}
+			});
+		}
+
 		function _fieldDialog(create, name, entity, fieldList, checkFunc) {
 			var _deferred, $mdl, $scope;
 
@@ -78,6 +86,8 @@
 					}
 				});
 			};
+
+			_bindShortcut($mdl);
 
 			return _deferred.promise;
 		}
@@ -188,7 +198,7 @@
 					'<div class="modal-footer">' +
 						'<p class="pull-left text-danger">{{checkFunc(entity)}}</p>' +
 						'<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="lock">Close</button>' +
-						'<button type="button" class="btn btn-primary" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || lock" ng-if="config.confirm !== false">' +
+						'<button type="button" class="btn btn-primary confirmBtn" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || lock" ng-if="config.confirm !== false">' +
 							'{{config.confirmDesc || (create ? "Create" : "Update")}}' +
 						'</button>' +
 					'</div>' +
