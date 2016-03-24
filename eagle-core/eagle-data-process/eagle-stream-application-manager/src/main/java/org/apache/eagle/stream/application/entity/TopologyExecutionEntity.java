@@ -39,16 +39,26 @@ import java.util.Map;
 @Service(Constants.TOPOLOGY_EXECUTION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "application", "topology", "fullName"})
+@Tags({"site", "application", "topology"})
 public class TopologyExecutionEntity extends TaggedLogAPIEntity {
     @Column("a")
-    private String url;
+    private String fullName;
     @Column("b")
-    private String deploy;
+    private String url;
     @Column("c")
-    private String status;
+    private String deploy;
     @Column("d")
+    private String status;
+    @Column("e")
     private long lastUpdateTime;
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
     public String getUrl() {
         return url;
@@ -89,8 +99,8 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
     public final static class TOPOLOGY_STATUS {
         public final static String STOPPED = "STOPPED";
         public final static String STARTED = "STARTED";
-        public final static String EXECUTING = "EXECUTING";
-        public final static String INITIALIZED = "INITIALIZED";
+        public final static String PENDING = "PENDING";
+        public final static String NEW = "NEW";
     }
 
     public static TopologyExecutionModel toModel(final TopologyExecutionEntity entity){
@@ -98,7 +108,7 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
                 entity.getTags().get(AppManagerConstants.SITE_TAG),
                 entity.getTags().get(AppManagerConstants.APPLICATION_TAG),
                 entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
-                entity.getTags().get(AppManagerConstants.NAME_TAG),
+                entity.getFullName(),
                 entity.getUrl(),
                 entity.getDeploy(),
                 entity.getStatus(),
@@ -112,10 +122,10 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
             put(AppManagerConstants.SITE_TAG, model.site());
             put(AppManagerConstants.APPLICATION_TAG, model.application());
             put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
-            put(AppManagerConstants.NAME_TAG, model.fullName());
         }};
+        entity.setFullName(model.fullName());
         entity.setUrl(model.url());
-        entity.setDeploy(model.url());
+        entity.setDeploy(model.deploy());
         entity.setStatus(model.status());
         entity.setLastUpdateTime(model.lastUpdateTime());
         entity.setTags(tags);

@@ -20,22 +20,29 @@ package org.apache.eagle.stream.application;
 
 
 import com.typesafe.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.Array;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public final class ClassTopologyFactory {
-    private final static Map<String, TopologyExecutable> fieldResolvableCache = Collections.synchronizedMap(new HashMap<String, TopologyExecutable>());
+public final class TopologyFactory {
+    public static Logger LOG = LoggerFactory.getLogger(TopologyFactory.class);
+    private final static Map<String, TopologyExecutable> topologyCache = Collections.synchronizedMap(new HashMap<String, TopologyExecutable>());
     public static TopologyExecutable getTopologyInstance(String topologyClass) throws TopologyException {
         TopologyExecutable instance;
-        if(fieldResolvableCache.containsKey(topologyClass)){
-            instance = fieldResolvableCache.get(topologyClass);
+        if(topologyCache.containsKey(topologyClass)){
+            instance = topologyCache.get(topologyClass);
         } else {
             try {
                 instance = (TopologyExecutable) Class.forName(topologyClass).newInstance();
-                fieldResolvableCache.put(topologyClass, instance);
+                topologyCache.put(topologyClass, instance);
             } catch (ClassNotFoundException e) {
                 throw new TopologyException("Topology in type of " + topologyClass + " is not found",e);
             } catch (InstantiationException | IllegalAccessException e) {
