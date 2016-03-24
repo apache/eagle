@@ -25,7 +25,7 @@ public class AppManagerConstants {
     public final static String COMMAND_TYPE_TAG = "operation";
     public final static String COMMAND_ID_TAG = "UUID";
     public final static String TOPOLOGY_TAG = "topology";
-    public final static String NAME_TAG = "name";
+    public final static String NAME_TAG = "fullName";
 
     public final static String EAGLE_CLUSTER_STORM = "storm";
     public final static String EAGLE_CLUSTER_SPARK = "spark";
