@@ -220,6 +220,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					if(!_chart) return;
 
 					var _axis = _chart[axis + "Axis"];
+					if(!_axis) return;
+
 					switch(type) {
 						case "decimal":
 						case "decimals":
