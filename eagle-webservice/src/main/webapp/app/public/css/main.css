@@ -535,6 +535,10 @@ ul.tree.tree-bordered > li > ul > li > a {
 	height: 200px;
 }
 
+.nvd3-chart-cntr.lg > svg.nvd3-svg {
+	height: 400px;
+}
+
 /* Tab */
 body .tab-content>.tab-pane {
 	display: block;
