@@ -205,6 +205,11 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
     }
   }
 
+  def generateTopologyFullName(topologyExecutionModel: TopologyExecutionModel) = {
+    val fullName = "eagle-%s-%s-%s".format(topologyExecutionModel.site, topologyExecutionModel.application, topologyExecutionModel.topology)
+    fullName
+  }
+
   def execute(operationModel: TopologyOperationModel, executionModel: TopologyExecutionModel): Unit = {
     var ret = true
     var nextState = TOPOLOGY_STATUS.STARTED
@@ -217,7 +222,11 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
               case Some(topology) =>
                 val topologyConfig: Config = ConfigFactory.parseString(topology.config)
                 if(topologyConfig.hasPath(EagleConfigConstants.APP_CONFIG)) {
-                  val config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
+                  var config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
+                  if(executionModel.status == TOPOLOGY_STATUS.NEW) {
+                    executionModel.fullName = generateTopologyFullName(executionModel)
+                    config = ConfigFactory.parseString("envContextConfig.topologyName=" + executionModel.fullName).withFallback(config)
+                  }
                   ret = _streamAppManager.start(topology, config)
                   nextState = if(ret) TOPOLOGY_STATUS.STARTED else TOPOLOGY_STATUS.STOPPED
                   updateStatus(operationModel, executionModel, ret, nextState)
@@ -248,7 +257,11 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
       _dao = new ApplicationServiceDAO(config, context.dispatcher)
 
     case SchedulerCommand(executionModel, operationModel) =>
-      execute(operationModel, executionModel)
+
+      if(executionModel.status != TOPOLOGY_STATUS.NEW)
+      _dao.updateTopologyExecutionStatus(TopologyExecutionEntity.fromModel(executionModel),TOPOLOGY_STATUS.PENDING) onComplete {
+        case _ => execute(operationModel, executionModel)
+      }
     case m@_ =>
       log.warning("Unsupported operation $m")
   }

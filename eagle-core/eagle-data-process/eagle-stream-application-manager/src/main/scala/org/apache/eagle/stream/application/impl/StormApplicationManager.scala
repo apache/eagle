@@ -18,18 +18,23 @@
 
 package org.apache.eagle.stream.application.impl
 
+import java.net.URLDecoder
+import java.nio.file.{Paths, Files}
+
 import backtype.storm.Config
 import backtype.storm.generated.InvalidTopologyException
 import backtype.storm.utils.{NimbusClient, Utils}
 import com.typesafe.config
+import org.apache.eagle.datastream.storm.StormTopologyExecutorImpl
 import org.apache.eagle.stream.application.entity.TopologyDescriptionEntity
 import org.apache.eagle.stream.application.model.{TopologyDescriptionModel, TopologyExecutionModel}
-import org.apache.eagle.stream.application.{ClassTopologyFactory, AppManagerConstants, ApplicationManager}
+import org.apache.eagle.stream.application.{TopologyFactory, AppManagerConstants, ApplicationManager}
 import org.slf4j.LoggerFactory
 
 
 class StormApplicationManager extends ApplicationManager {
-  val logger = LoggerFactory.getLogger(classOf[StormApplicationManager])
+  val LOG = LoggerFactory.getLogger(classOf[StormApplicationManager])
+
 
   private def getNimbusClient(clusterConfig: com.typesafe.config.Config): NimbusClient = {
     val conf = Utils.readStormConfig().asInstanceOf[java.util.HashMap[String, Object]]
@@ -44,9 +49,18 @@ class StormApplicationManager extends ApplicationManager {
   override def start(topologyDesc: TopologyDescriptionModel, conf: config.Config): Boolean = {
       var ret = true
       try {
+        val stormJarPath: String = URLDecoder.decode(classOf[StormTopologyExecutorImpl].getProtectionDomain.getCodeSource.getLocation.getPath, "UTF-8")
+        if (stormJarPath == null || !Files.exists(Paths.get(stormJarPath)) || !stormJarPath.endsWith(".jar")) {
+          val errMsg = s"storm jar file $stormJarPath does not exists, or is a invalid jar file"
+          LOG.error(errMsg)
+          throw new Exception(errMsg)
+        }
+        LOG.info(s"Detected a storm.jar location at: $stormJarPath")
+        System.setProperty("storm.jar", stormJarPath)
+
         topologyDesc.topoType match {
           case TopologyDescriptionEntity.TYPE.CLASS =>
-            ClassTopologyFactory.submit(topologyDesc.exeClass, conf)
+            TopologyFactory.submit(topologyDesc.exeClass, conf)
           case TopologyDescriptionEntity.TYPE.DYNAMIC =>
             StormDynamicTopology.submit(topologyDesc.exeClass, conf)
           case m@_ =>
@@ -63,7 +77,7 @@ class StormApplicationManager extends ApplicationManager {
   override def stop(topologyExecution: TopologyExecutionModel, conf: config.Config): Boolean = {
     var ret = true
     try {
-      getNimbusClient(conf).getClient.killTopology(topologyExecution.topology)
+      getNimbusClient(conf).getClient.killTopology(topologyExecution.fullName)
     } catch {
       case e: Throwable =>
         LOG.error(e.toString)
@@ -75,12 +89,12 @@ class StormApplicationManager extends ApplicationManager {
   override def status(topologyExecution: TopologyExecutionModel, conf: config.Config): Boolean = {
     var ret = true
     try {
-      getNimbusClient(conf).getClient.getTopology(topologyExecution.topology)
+      getNimbusClient(conf).getClient.getTopology(topologyExecution.fullName)
     } catch {
       case e: Throwable =>
         LOG.error(e.toString)
         ret = false
-    }fdddD
+    }
     ret
   }
 }

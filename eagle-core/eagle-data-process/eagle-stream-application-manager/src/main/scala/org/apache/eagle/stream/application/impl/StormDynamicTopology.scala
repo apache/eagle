@@ -18,13 +18,10 @@
 
 package org.apache.eagle.stream.application.impl
 
-import java.net.URLDecoder
-import java.nio.file.{Files, Paths}
-
 import com.typesafe.config.Config
 import org.apache.eagle.datastream.ExecutionEnvironments
 import org.apache.eagle.datastream.storm.StormExecutionEnvironment
-import org.apache.eagle.stream.application.{ApplicationManager, AbstractDynamicApplication}
+import org.apache.eagle.stream.application.AbstractDynamicApplication
 import org.slf4j.LoggerFactory
 
 
@@ -36,13 +33,6 @@ object StormDynamicTopology extends AbstractDynamicApplication {
     var ret = true
 
     try {
-      val stormJarPath: String = URLDecoder.decode(classOf[ApplicationManager].getProtectionDomain.getCodeSource.getLocation.getPath, "UTF-8")
-      if (stormJarPath == null || !Files.exists(Paths.get(stormJarPath)) || !stormJarPath.endsWith(".jar")) {
-        val errMsg = s"storm jar file $stormJarPath does not exists, or is a invalid jar file"
-        LOG.error(errMsg)
-        throw new Exception(errMsg)
-      }
-      System.setProperty("storm.jar", stormJarPath)
       val stormEnv = ExecutionEnvironments.getWithConfig[StormExecutionEnvironment](stream.getConfig)
       stream.submit(stormEnv)
     } catch {
