@@ -31,6 +31,7 @@ eagleComponents.directive('tabs', function() {
 			icon: "@",
 			selected: "@?selected",
 			holder: "=?holder",
+			sortableModel: "=?sortableModel",
 
 			menuList: "=?menu"
 		},
@@ -73,6 +74,16 @@ eagleComponents.directive('tabs', function() {
 					return $scope.selectedPane.menuList;
 				}
 				return $scope.menuList;
+			};
+
+			$scope.tabSwitchUpdate = function (src, tgt) {
+				var _srcIndex = $.inArray(src.data, $scope.sortableModel);
+				var _tgtIndex = $.inArray(tgt.data, $scope.sortableModel);
+
+				if(_srcIndex !== -1 && _tgtIndex !== -1) {
+					$scope.sortableModel[_srcIndex] = tgt.data;
+					$scope.sortableModel[_tgtIndex] = src.data;
+				}
 			};
 
 			// =================== Linker ===================
@@ -179,7 +190,7 @@ eagleComponents.directive('tabs', function() {
 					'</div>' +
 				'</div>' +
 
-				'<ul class="nav nav-tabs" ng-class="{\'pull-right\': title}">' +
+				'<ul uie-sortable sortable-enabled="!!sortableModel" sortable-update-func="tabSwitchUpdate" ng-model="paneList" class="nav nav-tabs" ng-class="{\'pull-right\': title}">' +
 					// Tabs
 					'<li ng-repeat="pane in getPaneList() track by $index" ng-class="{active: selectedPane === pane}">' +
 						'<a ng-click="setSelect(pane);">{{pane.title}}</a>' +

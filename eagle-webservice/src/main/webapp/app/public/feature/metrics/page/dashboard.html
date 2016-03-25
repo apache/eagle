@@ -55,9 +55,9 @@
 	</div>
 </div>
 
-<div tabs menu="menu" holder="tabHolder" ng-show="dashboard.groups.length">
+<div tabs menu="menu" holder="tabHolder" ng-show="dashboard.groups.length" data-sortable-model="Auth.isRole('ROLE_ADMIN') ? dashboard.groups : null">
 	<pane ng-repeat="group in dashboard.groups" data-data="group" data-title="{{group.name}}">
-		<div sortable class="row narrow" ng-model="group.charts" update-func="chartSwitchRefresh" ng-show="group.charts.length">
+		<div uie-sortable ng-model="group.charts" class="row narrow" sortable-update-func="chartSwitchRefresh" ng-show="group.charts.length">
 			<div ng-repeat="chart in group.charts track by $index" class="col-md-{{chart.size || 6}}">
 				<div class="nvd3-chart-wrapper">
 					<div nvd3="chart._data" data-holder="chart._holder" data-title="{{chart.title || chart.metrics[0].metric}}" data-watching="false"
