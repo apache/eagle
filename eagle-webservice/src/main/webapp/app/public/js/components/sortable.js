@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-eagleComponents.directive('sortable', function($rootScope) {
+eagleComponents.directive('uieSortable', function($rootScope) {
 	'use strict';
+
+	var COLLECTION_MATCH = /^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/;
 
 	var _move = false;
 	var _selectElement;
@@ -73,17 +75,26 @@ eagleComponents.directive('sortable', function($rootScope) {
 
 			if(_overElement[0] !== _selectElement[0]) {
 				// Process switch
-				var _oriIndex = angular.element(_selectElement).scope().$index;
-				var _tgtIndex = angular.element(_overElement).scope().$index;
 				var _oriHolder = _selectElement.holder;
 				var _tgtHolder = _overElement.holder;
-				var _oriScope = _oriHolder.scope;
-				var _tgtScope = _tgtHolder.scope;
+				var _oriSortableScope = _oriHolder.scope;
+				var _tgtSortableScope = _tgtHolder.scope;
+				var _oriScope = angular.element(_selectElement).scope();
+				var _tgtScope = angular.element(_overElement).scope();
 
-				var _oriUnit = _oriScope.ngModel[_oriIndex];
-				var _tgtUnit = _tgtScope.ngModel[_tgtIndex];
-				_oriScope.ngModel[_oriIndex] = _tgtUnit;
-				_tgtScope.ngModel[_tgtIndex] = _oriUnit;
+				var _oriRepeat = _selectElement.closest("[ng-repeat]").attr("ng-repeat");
+				var _tgtRepeat = _overElement.closest("[ng-repeat]").attr("ng-repeat");
+				var _oriMatch = _oriRepeat.match(COLLECTION_MATCH)[2];
+				var _tgtMatch = _tgtRepeat.match(COLLECTION_MATCH)[2];
+				var _oriCollection = _oriScope.$parent.$eval(_oriMatch);
+				var _tgtCollection = _tgtScope.$parent.$eval(_tgtMatch);
+				var _oriIndex = $.inArray(_oriCollection[_oriScope.$index], _oriSortableScope.ngModel);
+				var _tgtIndex = $.inArray(_tgtCollection[_tgtScope.$index], _tgtSortableScope.ngModel);
+
+				var _oriUnit = _oriSortableScope.ngModel[_oriIndex];
+				var _tgtUnit = _tgtSortableScope.ngModel[_tgtIndex];
+				_oriSortableScope.ngModel[_oriIndex] = _tgtUnit;
+				_tgtSortableScope.ngModel[_tgtIndex] = _oriUnit;
 
 				// Trigger event
 				_oriHolder.change(_oriUnit, _tgtUnit);
@@ -105,17 +116,20 @@ eagleComponents.directive('sortable', function($rootScope) {
 		restrict : 'AE',
 		scope: {
 			ngModel: "=",
-			updateFunc: "=?updateFunc"
+			sortableEnabled: "=?sortableEnabled",
+			sortableUpdateFunc: "=?sortableUpdateFunc"
 		},
 		link: function($scope, $element, $attrs, $ctrl) {
 			var _holder = {
 				scope: $scope,
 				change: function(source, target) {
-					if($scope.updateFunc) $scope.updateFunc(source, target);
+					if($scope.sortableUpdateFunc) $scope.sortableUpdateFunc(source, target);
 				}
 			};
 
 			$element.on("mousedown", ">", function(event) {
+				if($scope.sortableEnabled === false) return;
+
 				_selectElement = $(this);
 				_selectElement.holder = _holder;
 
