@@ -220,6 +220,8 @@ eagleComponents.directive('nvd3', function(nvd3) {
 					if(!_chart) return;
 
 					var _axis = _chart[axis + "Axis"];
+					if(!_axis) return;
+
 					switch(type) {
 						case "decimal":
 						case "decimals":
@@ -409,7 +411,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 		},
 		template :
 		'<div>' +
-			'<h3>{{title || config.title}}</h3>' +
+			'<h3 title="{{title || config.title}}">{{title || config.title}}</h3>' +
 		'</div>',
 		replace: true
 	};
