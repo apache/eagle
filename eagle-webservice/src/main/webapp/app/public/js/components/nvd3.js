@@ -411,7 +411,7 @@ eagleComponents.directive('nvd3', function(nvd3) {
 		},
 		template :
 		'<div>' +
-			'<h3>{{title || config.title}}</h3>' +
+			'<h3 title="{{title || config.title}}">{{title || config.title}}</h3>' +
 		'</div>',
 		replace: true
 	};

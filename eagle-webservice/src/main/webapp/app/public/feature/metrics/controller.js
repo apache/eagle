@@ -215,14 +215,16 @@
 		};
 
 		// ======================== Menu ========================
+		function _checkGroupName(entity) {
+			if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
+				return "Group name conflict";
+			}
+		}
+
 		$scope.newGroup = function() {
 			if($scope.lock) return;
 
-			UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
-				if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
-					return "Group name conflict";
-				}
-			}).then(null, null, function(holder) {
+			UI.createConfirm("Group", {}, [{field: "name"}], _checkGroupName).then(null, null, function(holder) {
 				$scope.dashboard.groups.push({
 					name: holder.entity.name,
 					charts: []
@@ -234,6 +236,14 @@
 				}, 0);
 			});
 		};
+
+		function renameGroup() {
+			var group = $scope.tabHolder.selectedPane.data;
+			UI.updateConfirm("Group", {}, [{field: "name", name: "New Name"}], _checkGroupName).then(null, null, function(holder) {
+				group.name = holder.entity.name;
+				holder.closeFunc();
+			});
+		}
 
 		function deleteGroup() {
 			var group = $scope.tabHolder.selectedPane.data;
@@ -256,6 +266,7 @@
 		$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
 			{icon: "cog", title: "Configuration", list: [
 				_menu_newChart,
+				{icon: "pencil", title: "Rename Group", func: renameGroup},
 				{icon: "trash", title: "Delete Group", danger: true, func: deleteGroup}
 			]},
 			{icon: "plus", title: "New Group", func: $scope.newGroup}

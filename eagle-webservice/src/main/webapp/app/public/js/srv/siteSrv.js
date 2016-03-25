@@ -142,7 +142,7 @@
 						_site.applicationList.push(siteApplication);
 						_site.applicationList.set[siteApplication.tags.application] = siteApplication;
 
-						_appGroup = _site.applicationGroup[_application.group] = _site.applicationGroup[_application.group] || [];
+						_appGroup = _site.applicationGroup[_application.groupName] = _site.applicationGroup[_application.groupName] || [];
 						_appGroup.push(_application);
 					}
 				});
