@@ -19,17 +19,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>eagle</groupId>
+    <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-alert-parent</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.0-incubating</version>
   </parent>
-  <groupId>eagle</groupId>
   <artifactId>eagle-alert-notification-plugin</artifactId>
   <name>eagle-alert-notification-plugin</name>
   <description>Apache Eagle Notification Plugin to  enable services to use custom or default notification </description>
   <dependencies>
   	<dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-policy-base</artifactId>
           <version>${project.version}</version>
           <exclusions>

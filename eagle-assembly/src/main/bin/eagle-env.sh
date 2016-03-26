@@ -42,3 +42,7 @@ export EAGLE_CLASSPATH=$EAGLE_HOME/conf
 for file in $EAGLE_HOME/lib/share/*;do
 	EAGLE_CLASSPATH=$EAGLE_CLASSPATH:$file
 done
+
+# EAGLE_TABLE_LIST
+export EAGLE_TABLE_LIST='alertdef ipzone streamMetadata alertdetail fileSensitivity eaglehdfs_alert streamdef eagle_metric alertExecutor alertStream alertStreamSchema hiveResourceSensitivity hbaseResourceSensitivity mlmodel userprofile hfdsusercommandpattern appCommand appDefinition serviceAudit aggregatedef alertNotifications eagleSiteDesc eagleSiteApplication eagleApplicationDesc eagleFeatureDesc eagle_metadata'
+

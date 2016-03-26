@@ -19,9 +19,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>eagle</groupId>
+    <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-data-process-parent</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.0-incubating</version>
       <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -66,12 +66,12 @@
           </exclusions>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-alert-process</artifactId>
           <version>${project.version}</version>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-stream-process-base</artifactId>
           <version>${project.version}</version>
       </dependency>

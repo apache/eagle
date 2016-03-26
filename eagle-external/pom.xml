@@ -21,8 +21,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>eagle-parent</artifactId>
-        <groupId>eagle</groupId>
-        <version>0.3.0</version>
+        <groupId>org.apache.eagle</groupId>
+        <version>0.3.0-incubating</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>

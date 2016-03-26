@@ -27,7 +27,6 @@ import org.apache.eagle.dataproc.core.JsonSerDeserUtils;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
-import org.apache.eagle.datastream.Tuple2;
 import org.apache.eagle.metric.reportor.EagleCounterMetric;
 import org.apache.eagle.metric.reportor.EagleMetricListener;
 import org.apache.eagle.metric.reportor.EagleServiceReporterMetricListener;
@@ -41,6 +40,7 @@ import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
@@ -153,7 +153,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		baseDimensions.put(Constants.ALERT_EXECUTOR_ID, executorId);
 		baseDimensions.put(Constants.PARTITIONSEQ, String.valueOf(partitionSeq));
 		baseDimensions.put(Constants.SOURCE, ManagementFactory.getRuntimeMXBean().getName());
-		baseDimensions.put(EagleConfigConstants.DATA_SOURCE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE));
+		baseDimensions.put(EagleConfigConstants.APPLICATION, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION));
 		baseDimensions.put(EagleConfigConstants.SITE, config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE));
 
 		dimensionsMap = new HashMap<String, Map<String, String>>();
@@ -171,16 +171,16 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		Map<String, PolicyEvaluator<T>> tmpPolicyEvaluators = new HashMap<String, PolicyEvaluator<T>>();
 		
         String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
-		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
+		String application = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION);
 		try {
-			initialAlertDefs = policyDefinitionDao.findActivePoliciesGroupbyExecutorId(site, dataSource);
+			initialAlertDefs = policyDefinitionDao.findActivePoliciesGroupbyExecutorId(site, application);
 		}
 		catch (Exception ex) {
 			LOG.error("fail to initialize initialAlertDefs: ", ex);
             throw new IllegalStateException("fail to initialize initialAlertDefs: ", ex);
 		}
         if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
-            LOG.warn("No alert definitions was found for site: " + site + ", dataSource: " + dataSource);
+            LOG.warn("No alert definitions was found for site: " + site + ", application: " + application);
         }
         else if (initialAlertDefs.get(executorId) != null) { 
 			for(T alertDef : initialAlertDefs.get(executorId).values()){

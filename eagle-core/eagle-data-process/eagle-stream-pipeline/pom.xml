@@ -20,8 +20,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>eagle-data-process-parent</artifactId>
-        <groupId>eagle</groupId>
-        <version>0.3.0</version>
+        <groupId>org.apache.eagle</groupId>
+        <version>0.3.0-incubating</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>eagle-stream-pipeline</artifactId>
@@ -31,7 +31,7 @@
             <!--<artifactId>reflections</artifactId>-->
         <!--</dependency>-->
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-service-base</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -66,7 +66,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-storage-base</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -95,7 +95,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-stream-process-api</artifactId>
             <version>${project.version}</version>
         </dependency>

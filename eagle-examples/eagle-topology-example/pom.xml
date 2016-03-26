@@ -20,20 +20,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>eagle-examples</artifactId>
-        <groupId>eagle</groupId>
-        <version>0.3.0</version>
+        <groupId>org.apache.eagle</groupId>
+        <version>0.3.0-incubating</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-topology-example</artifactId>
     <dependencies>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-stream-process-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-query-base</artifactId>
             <version>${project.version}</version>
         </dependency>

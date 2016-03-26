@@ -82,19 +82,19 @@ public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionA
 		String policyId = context.getProperty(Constants.POLICY_ID);
 		String alertMessage = "The Policy \"" + policyId + "\" has been detected with the below information: " + sb.toString() ;
 		String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
-		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
+		String application = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION);
 		String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
 		Integer port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
 
 		context.addProperty(Constants.ALERT_EVENT, sb.toString());
 		context.addProperty(Constants.ALERT_MESSAGE, alertMessage);
 		context.addProperty(Constants.ALERT_TIMESTAMP_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds(System.currentTimeMillis()));
-		context.addProperty(EagleConfigConstants.DATA_SOURCE, dataSource);
+		context.addProperty(EagleConfigConstants.APPLICATION, application);
 		context.addProperty(EagleConfigConstants.SITE, site);
 		entity.setTimestamp(timestamp);
 		/** If we need to add severity tag, we should add severity filed in AbstractpolicyDefinition, and pass it down **/
 		tags.put(EagleConfigConstants.SITE, site);
-		tags.put(EagleConfigConstants.DATA_SOURCE, dataSource);
+		tags.put(EagleConfigConstants.APPLICATION, application);
 		tags.put(Constants.SOURCE_STREAMS, context.getProperty(Constants.SOURCE_STREAMS));
 		tags.put(Constants.POLICY_ID, context.getProperty(Constants.POLICY_ID));
 		tags.put(Constants.ALERT_SOURCE, source);
@@ -103,7 +103,7 @@ public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionA
 
 		context.addProperty(Constants.POLICY_DETAIL_URL, UrlBuilder.buiildPolicyDetailUrl(host, port, tags));
 		context.addProperty(Constants.ALERT_DETAIL_URL, UrlBuilder.buildAlertDetailUrl(host, port, entity));
-		entity.setAlertContext(context);
+		entity.setAlertContext(context.toJsonString());
 		return entity;
 	}	
 }

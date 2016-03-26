@@ -18,693 +18,477 @@
 
 var app = {};
 
-/* App Module */
-var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngCookies', 'damControllers']);
-
-eagleApp.config(function($routeProvider) {
+(function() {
 	'use strict';
 
-	$routeProvider.when('/dam/summary', {
-		templateUrl : 'partials/dam/summary.html',
-		controller : 'summaryCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
+	/* App Module */
+	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'featureControllers', 'eagle.service']);
 
-	// Authorization
-	}).when('/dam/login', {
-		templateUrl : 'partials/dam/login.html',
-		controller : 'authLoginCtrl',
-		access: {skipCheck: true},
+	// GRUNT REPLACEMENT: eagleApp.buildTimestamp = TIMESTAMP
+	eagleApp._TRS = function() {
+		return eagleApp.buildTimestamp || Math.random();
+	};
 
-	// Policy
-	}).when('/dam/policyList', {
-		templateUrl : 'partials/dam/policyList.html',
-		controller : 'policyListCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/policyList/:dataSource', {
-		templateUrl : 'partials/dam/policyList.html',
-		controller : 'policyListCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/policyDetail/', {
-		templateUrl : 'partials/dam/policyDetail.html',
-		controller : 'policyDetailCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/policyDetail/:encodedRowkey', {
-		templateUrl : 'partials/dam/policyDetail.html',
-		controller : 'policyDetailCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/policyEdit/:encodedRowkey', {
-		templateUrl : 'partials/dam/policyEdit.html',
-		controller : 'policyEditCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/policyCreate/', {
-		templateUrl : 'partials/dam/policyEdit.html',
-		controller : 'policyCreateCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
+	// ======================================================================================
+	// =                                   Feature Module                                   =
+	// ======================================================================================
+	var FN_ARGS = /^[^\(]*\(\s*([^\)]*)\)/m;
+	var FN_ARG_SPLIT = /,/;
+	var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
+	var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 
-	// Alert
-	}).when('/dam/alertList', {
-		templateUrl : 'partials/dam/alertList.html',
-		controller : 'alertListCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/alertList/:dataSource', {
-		templateUrl : 'partials/dam/alertList.html',
-		controller : 'alertListCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/alertDetail/:encodedRowkey', {
-		templateUrl : 'partials/dam/alertDetail.html',
-		controller : 'alertDetailCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
+	var featureControllers = angular.module('featureControllers', ['ui.bootstrap', 'eagle.components']);
+	var featureControllerCustomizeHtmlTemplate = {};
+	var featureControllerProvider;
+	var featureProvider;
 
-	// Stream
-	}).when('/dam/streamList', {
-		templateUrl : 'partials/dam/streamList.html',
-		controller : 'streamListCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-
-	// Site
-	}).when('/dam/siteList', {
-		templateUrl : 'partials/dam/siteList.html',
-		controller : 'siteListCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-		access: {roles: ["ROLE_ADMIN"]},
-
-	// Sensitivity
-	}).when('/dam/sensitivitySummary', {
-		templateUrl : 'partials/dam/sensitivitySummary.html',
-		controller : 'sensitivitySummaryCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/sensitivity/:dataSrc', {
-		templateUrl : 'partials/dam/sensitivity.html',
-		controller : 'sensitivityCtrl',
-		reloadOnSearch: false,
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-
-	// User Profile
-	}).when('/dam/userProfileList', {
-		templateUrl : 'partials/dam/userProfileList.html',
-		controller : 'userProfileListCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-	}).when('/dam/userProfileDetail/:user', {
-		templateUrl : 'partials/dam/userProfileDetail.html',
-		controller : 'userProfileDetailCtrl',
-		resolve: {
-			site: function(Site) {return Site._promise();},
-			auth: function(Authorization) {return Authorization._promise();},
-		},
-
-	}).otherwise({
-		redirectTo : '/dam/summary'
+	featureControllers.config(function ($controllerProvider, $provide) {
+		featureControllerProvider = $controllerProvider;
+		featureProvider = $provide;
 	});
-});
 
-eagleApp.service('globalContent', function(Entities, $rootScope, $route, $location) {
-	'use strict';
+	featureControllers.service("Feature", function($wrapState, PageConfig, ConfigPageConfig, FeaturePageConfig) {
+		var _features = {};
+		var _services = {};
 
-	var content = {
-		pageTitle: "",
-		pageSubTitle: "",
-		pageList: [],
-		navPath: [],
-		navMapping: {},
-
-		hideSite: false,
-		lockSite: false,
-
-		dataSrcList: [],
-
-		setConfig: function(config) {
-			// Clean up
-			content.navPath = [];
-
-			// Fill configuration
-			$.extend(content, config);
-		},
-	};
-
-	return content;
-});
-
-// Site
-eagleApp.service('Site', function(Authorization, Entities, $rootScope, $route, $location, $q) {
-	'use strict';
-
-	var _currentSite;
-	var content = {};
-
-	content.list = [];
-	content.list.set = {};
-	content.dataSrcList = [];
-
-	content.current = function(site) {
-		if(site) {
-			var _prev = _currentSite;
-			_currentSite = site;
-
-			// Broadcast if site update
-			if(!_prev || _prev.name !== _currentSite.name) {
-				if(sessionStorage) {
-					sessionStorage.setItem("site", _currentSite.name);
-				}
-
-				if(!content.hideSite) $route.reload();
-			}
-		}
-		return _currentSite;
-	};
-	content.find = function(siteName) {
-		return common.array.find(siteName, content.list, "name");
-	};
-	content.url = function(site, url) {
-		if(arguments.length == 1) {
-			url = site;
-		} else {
-			content.current(site);
-		}
-		$location.url(url);
-
-		if ($rootScope.$$phase != '$apply' && $rootScope.$$phase != '$digest') {
-			$rootScope.$apply();
-		}
-	};
-
-	var _promise;
-	content.refresh = function() {
-		content.list = [];
-		content.list.set = {};
-
-		content.dataSrcList = Entities.queryEntities("AlertDataSourceService", '');
-		content.dataSrcList._promise.success(function() {
-			$.each(content.dataSrcList, function(i, dataSrc) {
-				var _site = content.list.set[dataSrc.tags.site];
-				if(!_site) {
-					_site = content.list.set[dataSrc.tags.site] = {
-						name: dataSrc.tags.site,
-						dataSrcList: []
-					};
-					_site.dataSrcList.find = function(dataSrcName) {
-						return common.array.find(dataSrcName, _site.dataSrcList, "tags.dataSource");
-					};
-					content.list.push(_site);
-				}
-				_site.dataSrcList.push(dataSrc);
-
-				// UI visible check
-				if($.inArray(dataSrc.tags.dataSource, app.config.dataSource.uiInvisibleList) !== -1) {
-					dataSrc.hide = true;
-				}
-			});
-
-			if(sessionStorage && content.find(sessionStorage.getItem("site"))) {
-				content.current(content.find(sessionStorage.getItem("site")));
-			} else {
-				content.current(content.list[0]);
-			}
-		});
-
-		_promise = content.dataSrcList._promise;
-		return _promise;
-	};
-
-	content._promise = function() {
-		if(!_promise) {
-			content.refresh();
-		}
-		return _promise;
-	};
-
-	return content;
-});
-
-// Authorization
-eagleApp.service('Authorization', function($http, $location, $cookies) {
-	'use strict';
-
-	$http.defaults.withCredentials = true;
-
-	var _path = "";
-	var _userProfile = null;
-
-	var content = {
-		isLogin: true,	// Status mark. Work for UI status check, changed when eagle api return 403 authorization failure.
-		needLogin: function() {
-			_path = _path || $location.path();
-			content.isLogin = false;
-			$location.path("/dam/login");
-		},
-		login: function(username, password) {
-			var _hash = btoa(username + ':' + password);
-			return $http({
-				url : app.getURL('userProfile'),
-				method : "GET",
-				headers: {
-					'Authorization': "Basic " + _hash
-				}
-			}).then(function() {
-				content.isLogin = true;
-				return true;
-			}, function() {
-				return false;
-			});
-		},
-		logout: function() {
-			$http({
-				url : app.getURL('logout'),
-				method : "GET",
-			});
-		},
-		path: function(path) {
-			if(typeof path === "string") {
-				_path = path;
-			} else if(path === true) {
-				$location.path(_path || "");
-				_path = "";
-			}
-		},
-	};
-
-	var _promise;
-	content.userProfile = {};
-	content.isRole = function(role) {
-		if(!content.userProfile.roles) return null;
-
-		return content.userProfile.roles[role] === true;
-	};
-
-	content.refresh = function() {
-		_promise = $http({
-			url : app.getURL('userProfile'),
-			method : "GET",
-		}).then(function(data) {
-			content.userProfile = data.data;
-
-			// Role
-			content.userProfile.roles = {};
-			$.each(content.userProfile.authorities, function(i, role) {
-				content.userProfile.roles[role.authority] = true;
-			});
-		});
-		return _promise;
-	};
-
-	content._promise = function() {
-		if(!_promise) {
-			content.refresh();
-		}
-		return _promise;
-	};
-
-	return content;
-});
-
-eagleApp.service('Entities', function($http, $q, $rootScope, $location, Authorization) {
-	'use strict';
-
-	// Query
-	function _query(name, kvs) {
-		kvs = kvs || {};
-		var _list = [];
-		var _condition = kvs._condition || {};
-		var _addtionalCondition = _condition.additionalCondition || {};
-		var _startTime, _endTime;
-		var _startTimeStr, _endTimeStr;
-
-		// Initial
-		// > Condition
-		delete kvs._condition;
-		if(_condition) {
-			kvs.condition = _condition.condition;
-		}
-
-		// > Values
-		if(!kvs.values) {
-			kvs.values = "*";
-		} else if($.isArray(kvs.values)) {
-			kvs.values = $.map(kvs.values, function(field) {
-				return (field[0] === "@" ? '' : '@') + field;
-			}).join(",");
-		}
-
-		var _url = app.getURL(name, kvs);
-
-		// Fill special parameters
-		// > Query by time duration
-		if(_addtionalCondition._duration) {
-			_endTime = app.time.now();
-			_startTime = _endTime.clone().subtract(_addtionalCondition._duration, "ms");
-
-			// Debug usage. Extend more time duration for end time
-			if(_addtionalCondition.__ETD) {
-				_endTime.add(_addtionalCondition.__ETD, "ms");
-			}
-
-			_addtionalCondition._startTime = _startTime;
-			_addtionalCondition._endTime = _endTime;
-
-			_startTimeStr = _startTime.format("YYYY-MM-DD HH:mm:ss");
-			_endTimeStr = _endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
-
-			_url += "&startTime=" + _startTimeStr + "&endTime=" + _endTimeStr;
-		} else if(_addtionalCondition._startTime && _addtionalCondition._endTime) {
-			_startTimeStr = _addtionalCondition._startTime.format("YYYY-MM-DD HH:mm:ss");
-			_endTimeStr = _addtionalCondition._endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
-
-			_url += "&startTime=" + _startTimeStr + "&endTime=" + _endTimeStr;
-		}
-
-		// > Query contains metric name
-		if(_addtionalCondition._metricName) {
-			_url += "&metricName=" + _addtionalCondition._metricName;
-		}
-
-		// > Customize page size
-		if(_addtionalCondition._pageSize) {
-			_url = _url.replace(/pageSize=\d+/, "pageSize=" + _addtionalCondition._pageSize);
-		}
-
-		// AJAX
-		var canceler = $q.defer();
-		_list._promise = $http.get(_url, {timeout: canceler.promise}).success(function(data) {
-			_list.push.apply(_list, data.obj);
-		});
-		_list._promise.abort = function() {
-			canceler.resolve();
+		var Feature = function(name, version) {
+			this.name = name;
+			this.version = version;
+			this.features = {};
 		};
 
-		_list._promise.then(function() {}, function(data) {
-			if(data.status === 403) {
-				Authorization.needLogin();
+		/***
+		 * Inner function. Replace the dependency of constructor.
+		 * @param constructor
+		 * @private
+		 */
+		Feature.prototype._replaceDependencies = function(constructor) {
+			var i, srvName;
+			var _constructor, _$inject;
+			var fnText, argDecl;
+
+			if($.isArray(constructor)) {
+				_constructor = constructor[constructor.length - 1];
+				_$inject = constructor.slice(0, -1);
+			} else if(constructor.$inject) {
+				_constructor = constructor;
+				_$inject = constructor.$inject;
+			} else {
+				_$inject = [];
+				_constructor = constructor;
+				fnText = constructor.toString().replace(STRIP_COMMENTS, '');
+				argDecl = fnText.match(FN_ARGS);
+				$.each(argDecl[1].split(FN_ARG_SPLIT), function(i, arg) {
+					arg.replace(FN_ARG, function(all, underscore, name) {
+						_$inject.push(name);
+					});
+				});
+			}
+			_constructor.$inject = _$inject;
+
+			for(i = 0 ; i < _$inject.length ; i += 1) {
+				srvName = _$inject[i];
+				_$inject[i] = this.features[srvName] || _$inject[i];
+			}
+
+			return _constructor;
+		};
+
+		/***
+		 * Register a common service for feature usage. Common service will share between the feature. If you are coding customize feature, use 'Feature.service' is the better way.
+		 * @param name
+		 * @param constructor
+		 */
+		Feature.prototype.commonService = function(name, constructor) {
+			if(!_services[name]) {
+				featureProvider.service(name, constructor);
+				_services[name] = this.name;
+			} else {
+				throw "Service '" + name + "' has already be registered by feature '" + _services[name] + "'";
+			}
+		};
+
+		/***
+		 * Register a service for feature usage.
+		 * @param name
+		 * @param constructor
+		 */
+		Feature.prototype.service = function(name, constructor) {
+			var _serviceName;
+			if(!this.features[name]) {
+				_serviceName = "__FEATURE_" + this.name + "_" + name;
+				featureProvider.service(_serviceName, this._replaceDependencies(constructor));
+				this.features[name] = _serviceName;
+			} else {
+				console.warn("Service '" + name + "' has already be registered.");
+			}
+		};
+
+		/***
+		 * Create an navigation item in left navigation bar
+		 * @param path
+		 * @param title
+		 * @param icon use Font Awesome. Needn't with 'fa fa-'.
+		 */
+		Feature.prototype.navItem = function(path, title, icon) {
+			title = title || path;
+			icon = icon || "question";
+
+			FeaturePageConfig.addNavItem(this.name, {
+				icon: icon,
+				title: title,
+				url: "#/" + this.name + "/" + path
+			});
+		};
+
+		/***
+		 * Register a controller.
+		 * @param name
+		 * @param constructor
+		 */
+		Feature.prototype.controller = function(name, constructor, htmlTemplatePath) {
+			var _name = this.name + "_" + name;
+
+			// Replace feature registered service
+			constructor = this._replaceDependencies(constructor);
+
+			// Register controller
+			featureControllerProvider.register(_name, constructor);
+			if(htmlTemplatePath) {
+				featureControllerCustomizeHtmlTemplate[_name] = htmlTemplatePath;
+			}
+
+			return _name;
+		};
+
+		/***
+		 * Register a configuration controller for admin usage.
+		 * @param name
+		 * @param constructor
+		 */
+		Feature.prototype.configController = function(name, constructor, htmlTemplatePath) {
+			var _name = "config_" + this.name + "_" + name;
+
+			// Replace feature registered service
+			constructor = this._replaceDependencies(constructor);
+
+			// Register controller
+			featureControllerProvider.register(_name, constructor);
+			if(htmlTemplatePath) {
+				featureControllerCustomizeHtmlTemplate[_name] = htmlTemplatePath;
+			}
+
+			return _name;
+		};
+
+		/***
+		 * Create an navigation item in left navigation bar for admin configuraion page
+		 * @param path
+		 * @param title
+		 * @param icon use Font Awesome. Needn't with 'fa fa-'.
+		 */
+		Feature.prototype.configNavItem = function(path, title, icon) {
+			title = title || path;
+			icon = icon || "question";
+
+			ConfigPageConfig.addNavItem(this.name, {
+				icon: icon,
+				title: title,
+				url: "#/config/" + this.name + "/" + path
+			});
+		};
+
+		// Register
+		featureControllers.register = Feature.register = function(featureName) {
+			_features[featureName] = _features[featureName] || new Feature(featureName);
+			return _features[featureName];
+		};
+
+		// Page go
+		Feature.go = function(feature, page, filter) {
+			if(!filter) {
+				$wrapState.go("page", {
+					feature: feature,
+					page: page
+				}, 2);
+			} else {
+				$wrapState.go("pageFilter", {
+					feature: feature,
+					page: page,
+					filter: filter
+				}, 2);
+			}
+		};
+
+		return Feature;
+	});
+
+	// ======================================================================================
+	// =                                   Router config                                    =
+	// ======================================================================================
+	eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
+		// Resolve
+		function _resolve(config) {
+			config = config || {};
+
+			var resolve = {
+				Site: function (Site) {
+					return Site._promise();
+				},
+				Authorization: function (Authorization) {
+					if(!config.roleType) {
+						return Authorization._promise();
+					} else {
+						return Authorization.rolePromise(config.roleType);
+					}
+				},
+				Application: function (Application) {
+					return Application._promise();
+				}
+			};
+
+			if(config.featureCheck) {
+				resolve._navigationCheck = function($q, $wrapState, Site, Application) {
+					var _deferred = $q.defer();
+
+					$q.all(Site._promise(), Application._promise()).then(function() {
+						var _match, i, tmpApp;
+						var _site = Site.current();
+						var _app = Application.current();
+
+						// Check application
+						if(_site && (
+							!_app ||
+							!_site.applicationList.set[_app.tags.application] ||
+							!_site.applicationList.set[_app.tags.application].enabled
+							)
+						) {
+							_match = false;
+
+							for(i = 0 ; i < _site.applicationGroupList.length ; i += 1) {
+								tmpApp = _site.applicationGroupList[i].enabledList[0];
+								if(tmpApp) {
+									_app = Application.current(tmpApp);
+									_match = true;
+									break;
+								}
+							}
+
+							if(!_match) {
+								_app = null;
+								Application.current(null);
+							}
+						}
+					}).finally(function() {
+						_deferred.resolve();
+					});
+
+					return _deferred.promise;
+				};
+			}
+
+			return resolve;
+		}
+
+		// Router
+		var _featureBase = {
+			templateUrl: function ($stateParams) {
+				var _htmlTemplate = featureControllerCustomizeHtmlTemplate[$stateParams.feature + "_" + $stateParams.page];
+				return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + eagleApp._TRS();
+			},
+			controllerProvider: function ($stateParams) {
+				return $stateParams.feature + "_" + $stateParams.page;
+			},
+			resolve: _resolve({featureCheck: true}),
+			pageConfig: "FeaturePageConfig"
+		};
+
+		$urlRouterProvider.otherwise("/landing");
+		$stateProvider
+			// =================== Landing ===================
+			.state('landing', {
+				url: "/landing",
+				templateUrl: "partials/landing.html?_=" + eagleApp._TRS(),
+				controller: "landingCtrl",
+				resolve: _resolve({featureCheck: true})
+			})
+
+			// ================ Authorization ================
+			.state('login', {
+				url: "/login",
+				templateUrl: "partials/login.html?_=" + eagleApp._TRS(),
+				controller: "authLoginCtrl",
+				access: {skipCheck: true}
+			})
+
+			// ================ Configuration ================
+			// Site
+			.state('configSite', {
+				url: "/config/site",
+				templateUrl: "partials/config/site.html?_=" + eagleApp._TRS(),
+				controller: "configSiteCtrl",
+				pageConfig: "ConfigPageConfig",
+				resolve: _resolve({roleType: 'ROLE_ADMIN'})
+			})
+
+			// Application
+			.state('configApplication', {
+				url: "/config/application",
+				templateUrl: "partials/config/application.html?_=" + eagleApp._TRS(),
+				controller: "configApplicationCtrl",
+				pageConfig: "ConfigPageConfig",
+				resolve: _resolve({roleType: 'ROLE_ADMIN'})
+			})
+
+			// Feature
+			.state('configFeature', {
+				url: "/config/feature",
+				templateUrl: "partials/config/feature.html?_=" + eagleApp._TRS(),
+				controller: "configFeatureCtrl",
+				pageConfig: "ConfigPageConfig",
+				resolve: _resolve({roleType: 'ROLE_ADMIN'})
+			})
+
+			// Feature configuration page
+			.state('configFeatureDetail', $.extend({url: "/config/:feature/:page"}, {
+				templateUrl: function ($stateParams) {
+					var _htmlTemplate = featureControllerCustomizeHtmlTemplate[$stateParams.feature + "_" + $stateParams.page];
+					return  "public/feature/" + $stateParams.feature + "/page/" + (_htmlTemplate ||  $stateParams.page) + ".html?_=" + eagleApp._TRS();
+				},
+				controllerProvider: function ($stateParams) {
+					return "config_" + $stateParams.feature + "_" + $stateParams.page;
+				},
+				pageConfig: "ConfigPageConfig",
+				resolve: _resolve({roleType: 'ROLE_ADMIN'})
+			}))
+
+			// =================== Feature ===================
+			// Dynamic feature page
+			.state('page', $.extend({url: "/:feature/:page"}, _featureBase))
+			.state('pageFilter', $.extend({url: "/:feature/:page/:filter"}, _featureBase))
+		;
+
+		// Animation
+		$animateProvider.classNameFilter(/^((?!(fa-spin)).)*$/);
+		$animateProvider.classNameFilter(/^((?!(tab-pane)).)*$/);
+	});
+
+	eagleApp.filter('parseJSON', function () {
+		return function (input, defaultVal) {
+			return common.parseJSON(input, defaultVal);
+		};
+	});
+
+	eagleApp.filter('split', function () {
+		return function (input, regex) {
+			return input.split(regex);
+		};
+	});
+
+	eagleApp.filter('reverse', function () {
+		return function (items) {
+			return items.slice().reverse();
+		};
+	});
+
+	// ======================================================================================
+	// =                                   Main Controller                                  =
+	// ======================================================================================
+	eagleApp.controller('MainCtrl', function ($scope, $wrapState, $http, $injector, ServiceError, PageConfig, FeaturePageConfig, Site, Authorization, Entities, nvd3, Application, Feature, UI) {
+		window.serviceError = $scope.ServiceError = ServiceError;
+		window.site = $scope.Site = Site;
+		window.auth = $scope.Auth = Authorization;
+		window.entities = $scope.Entities = Entities;
+		window.application = $scope.Application = Application;
+		window.pageConfig = $scope.PageConfig = PageConfig;
+		window.featurePageConfig = $scope.FeaturePageConfig = FeaturePageConfig;
+		window.feature = $scope.Feature = Feature;
+		window.ui = $scope.UI = UI;
+		window.nvd3 = nvd3;
+		$scope.app = app;
+		$scope.common = common;
+
+		Object.defineProperty(window, "scope",{
+			get: function() {
+				return angular.element("[ui-view]").scope();
 			}
 		});
 
-		return _list;
-	}
-	function _post(url, entities) {
-		var _list = [];
-		_list._promise = $http({
-			method: 'POST',
-			url: url,
-			headers: {
-				"Content-Type": "application/json"
-			},
-			data: entities
-		}).success(function(data) {
-			_list.push.apply(_list, data.obj);
-		});
-		return _list;
-	}
-	function _delete(url) {
-		var _list = [];
-		_list._promise = $http({
-			method: 'DELETE',
-			url: url,
-			headers: {
-				"Content-Type": "application/json"
-			},
-		}).success(function(data) {
-			_list.push.apply(_list, data.obj);
-		});
-		return _list;
-	}
-	function ParseCondition(condition) {
-		var _this = this;
-		_this.condition = "";
-		_this.additionalCondition = {};
+		// Clean up
+		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
+			console.log("[Switch] current ->", current, currentParam);
+			console.log("[Switch] next ->", next, nextParam);
+			// Page initialization
+			PageConfig.reset();
 
-		if(typeof condition === "string") {
-			_this.condition = condition;
-		} else {
-			_this.condition = $.map(condition, function(value, key) {
-				if(!key.match(/^_/)) {
-					if(value === undefined || value === null) {
-						return '@' + key + '=~".*"';
-					} else {
-						return '@' + key + '="' + value + '"';
-					}
-				} else {
-					_this.additionalCondition[key] = value;
-					return null;
+			// Dynamic navigation list
+			if(next.pageConfig) {
+				$scope.PageConfig.navConfig = $injector.get(next.pageConfig);
+			} else {
+				$scope.PageConfig.navConfig = {};
+			}
+
+			// Authorization
+			// > Login check
+			if (!common.getValueByPath(next, "access.skipCheck", false)) {
+				if (!Authorization.isLogin) {
+					console.log("[Authorization] Need access. Redirect...");
+					$wrapState.go("login");
 				}
-			}).join(" AND ");
-		}
-		return _this;
-	}
+			}
 
-	var pkg = {
-		_query: _query,
-		_post: _post,
-
-		updateEntity: function(serviceName, entities, config) {
-			config = config || {};
-			if(!$.isArray(entities)) entities = [entities];
-
-			// Post clone entities
-			var _entities = $.map(entities, function(entity) {
-				var _entity = {};
-
-				// Clone variables
-				$.each(entity, function(key, value) {
-					// Skip inner variables
-					if(!key.match(/^__/)) {
-						_entity[key] = entity[key];
+			// > Role control
+			/*var _roles = common.getValueByPath(next, "access.roles", []);
+			if (_roles.length && Authorization.userProfile.roles) {
+				var _roleMatch = false;
+				$.each(_roles, function (i, roleName) {
+					if (Authorization.isRole(roleName)) {
+						_roleMatch = true;
+						return false;
 					}
 				});
 
-				// Add timestamp
-				if(config.timestamp !== false) {
-					if(config.createTime !== false && !_entity.createdTime) {
-						_entity.createdTime = new moment().valueOf();
-					}
-					if(config.lastModifiedDate !== false) {
-						_entity.lastModifiedDate = new moment().valueOf();
-					}
+				if (!_roleMatch) {
+					$wrapState.path("/dam");
 				}
+			}*/
+		});
 
-				return _entity;
-			});
+		$scope.$on('$stateChangeError', function (event, next, nextParam, current, currentParam, error) {
+			console.error("[Switch] Error", arguments);
+		});
 
-			return _post(app.getURL("updateEntity", {serviceName: serviceName}), _entities);
-		},
+		// Get side bar navigation item class
+		$scope.getNavClass = function (page) {
+			var path = page.url.replace(/^#/, '');
 
-		deleteEntity: function(serviceName, entities) {
-			if(!$.isArray(entities)) entities = [entities];
-
-			var _entities = $.map(entities, function(entity) {
-				return typeof entity === "object" ? entity.encodedRowkey : entity;
-			});
-			return _post(app.getURL("deleteEntity", {serviceName: serviceName}), _entities);
-		},
-		deleteEntities: function(serviceName, condition) {
-			return _delete(app.getURL("deleteEntities", {serviceName: serviceName, condition: new ParseCondition(condition).condition}));
-		},
-
-		queryEntity: function(serviceName, encodedRowkey) {
-			return _query("queryEntity", {serviceName: serviceName, encodedRowkey: encodedRowkey});
-		},
-		queryEntities: function(serviceName, condition, fields) {
-			return _query("queryEntities", {serviceName: serviceName, _condition: new ParseCondition(condition), values: fields});
-		},
-		queryGroup: function(serviceName, condition, groupBy, fields) {
-			return _query("queryGroup", {serviceName: serviceName, _condition: new ParseCondition(condition), groupBy: groupBy, values: fields});
-		},
-		querySeries: function(serviceName, condition, groupBy, fields, intervalmin) {
-			var _cond = new ParseCondition(condition);
-			var _list = _query("querySeries", {serviceName: serviceName, _condition: _cond, groupBy: groupBy, values: fields, intervalmin: intervalmin});
-			_list._promise.success(function() {
-				if(_list.length === 0) {
-					_list._empty = true;
-					_list._convert = true;
-
-					for(var i = 0; i <= (_cond.additionalCondition._endTime.valueOf() - _cond.additionalCondition._startTime.valueOf()) / (1000 * 60 * intervalmin); i += 1) {
-						_list.push(0);
-					}
-				} else if(_list.length === 1) {
-					_list._convert = true;
-					var _unit = _list.pop();
-					_list.push.apply(_list, _unit.value[0]);
-				}
-
-				if(_list._convert) {
-					var _current = _cond.additionalCondition._startTime.clone();
-					$.each(_list, function(i, value) {
-						_list[i] = {
-							x: _current.valueOf(),
-							y: value
-						};
-						_current.add(intervalmin, "m");
-					});
-				}
-			});
-			return _list;
-		},
-
-		query: function(path, params) {
-			var _list = [];
-			_list._promise = $http({
-				method: 'GET',
-				url: app.getURL("query") + path,
-				params: params
-			}).success(function(data) {
-				_list.push.apply(_list, data.obj);
-			});
-			return _list;
-		},
-
-		dialog: function(data, callback) {
-			if(data.success === false || (data.exception || "").trim()) {
-				return $.dialog({
-					title: "OPS",
-					content: $("<pre>").html(data.exception)
-				}, callback);
+			if ($wrapState.path() === path) {
+				PageConfig.pageTitle = PageConfig.pageTitle || page.title;
+				return "active";
+			} else {
+				return "";
 			}
+		};
+
+		// Get side bar navigation item class visible
+		$scope.getNavVisible = function (page) {
+			if (!page.roles) return true;
+
+			for (var i = 0; i < page.roles.length; i += 1) {
+				var roleName = page.roles[i];
+				if (Authorization.isRole(roleName)) {
+					return true;
+				}
+			}
+
 			return false;
-		},
-	};
-	return pkg;
-});
-
-eagleApp.filter('parseJSON', function() {
-	'use strict';
-
-	return function(input, defaultVal) {
-		return common.parseJSON(input, defaultVal);
-	};
-});
-
-eagleApp.filter('split', function() {
-	'use strict';
-
-	return function(input, regex) {
-		return input.split(regex);
-	};
-});
-
-eagleApp.filter('reverse', function() {
-	'use strict';
-
-	return function(items) {
-		return items.slice().reverse();
-	};
-});
-
-eagleApp.controller('MainCtrl', function($scope, $location, $http, globalContent, Site, Authorization, Entities, nvd3) {
-	'use strict';
-
-	window.globalContent = $scope.globalContent = globalContent;
-	window.site = $scope.site = Site;
-	window.auth = $scope.auth = Authorization;
-	window.entities = $scope.entities = Entities;
-	window.nvd3 = nvd3;
-	$scope.app = app;
-
-	// Clean up
-	$scope.$on('$routeChangeStart', function(event, next, current) {
-		// Page initialization
-		globalContent.pageTitle = "";
-		globalContent.pageSubTitle = "";
-		globalContent.hideSite = false;
-		globalContent.lockSite = false;
-		globalContent.hideSidebar = false;
-		globalContent.hideUser = false;
+		};
 
 		// Authorization
-		// > Login check
-		if(!common.getValueByPath(next, "access.skipCheck", false)) {
-			if(!Authorization.isLogin) {
-				$location.path("/dam/login");
-			}
-		}
-
-		// > Role control
-		var _roles = common.getValueByPath(next, "access.roles", []);
-		if(_roles.length && Authorization.userProfile.roles) {
-			var _roleMatch = false;
-			$.each(_roles, function(i, roleName) {
-				if(Authorization.isRole(roleName)) {
-					_roleMatch = true;
-					return false;
-				}
-			});
-
-			if(!_roleMatch) {
-				$location.path("/dam");
-			}
-		}
+		$scope.logout = function () {
+			console.log("[Authorization] Logout. Redirect...");
+			Authorization.logout();
+			$wrapState.go("login");
+		};
 	});
-
-	// Get side bar navigation item class
-	$scope.getNavClass = function(page) {
-		var path = page.url.replace(/^#/, '');
-
-		if ($location.path() == path) {
-			globalContent.pageTitle = globalContent.pageTitle || page.title;
-			return "active";
-		} else {
-			return "";
-		}
-	};
-
-	// Get side bar navigation item class visible
-	$scope.getNavVisible = function(page) {
-		if(!page.roles) return true;
-
-		for(var i = 0 ; i < page.roles.length ; i += 1) {
-			var roleName = page.roles[i];
-			if(Authorization.isRole(roleName)) {
-				return true;
-			}
-		}
-
-		return false;
-	};
-
-	// Authorization
-	$scope.logout = function() {
-		Authorization.logout();
-		$location.path("/dam/login");
-	};
-});
+})();

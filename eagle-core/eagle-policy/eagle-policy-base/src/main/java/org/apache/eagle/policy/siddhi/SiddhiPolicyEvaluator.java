@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.policy.siddhi;
 
+import com.lmax.disruptor.ExceptionHandler;
+import com.lmax.disruptor.FatalExceptionHandler;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
@@ -37,6 +39,7 @@ import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 import org.wso2.siddhi.query.compiler.exception.SiddhiParserException;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -130,6 +133,7 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 
         try {
             executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+            executionPlanRuntime.handleExceptionWith(new SiddhiPolicyExceptionHandler());
 
             for (String sourceStream : sourceStreams) {
                 siddhiInputHandlers.put(sourceStream, executionPlanRuntime.getInputHandler(sourceStream));
@@ -312,4 +316,20 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
 
     @Override
     public String getMarkdownReason() { return siddhiRuntime.markdownReason; }
+
+    private static class SiddhiPolicyExceptionHandler implements Serializable, ExceptionHandler<Object> {
+        private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyExceptionHandler.class);
+
+        public void handleEventException(Throwable ex, long sequence, Object event) {
+            LOG.warn("Exception processing event: " + sequence + " " + event, ex);
+        }
+
+        public void handleOnStartException(Throwable ex) {
+            LOG.warn("Exception during onStart()", ex);
+        }
+
+        public void handleOnShutdownException(Throwable ex) {
+            LOG.warn("Exception during onShutdown()", ex);
+        }
+    }
 }

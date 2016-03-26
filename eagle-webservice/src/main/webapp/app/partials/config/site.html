@@ -1,0 +1,115 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="box box-info">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			<span class="fa fa-cogs"></span>
+			Configuration
+			<small class="text-danger" ng-show="changed">
+				<span class="label label-warning label-sm">Unsaved</span>
+			</small>
+		</h3>
+	</div><!-- /.box-header -->
+
+	<div class="box-body">
+		<div class="row">
+			<div class="col-md-3">
+				<ul class="nav nav-pills nav-stacked">
+					<li class="disabled"><a>Site</a></li>
+					<li role="presentation" ng-repeat="_site in Site.list track by $index" ng-class="{active: site === _site}">
+						<a ng-click="setSite(_site)">
+							<span class="fa fa-server"></span>
+							{{_site.tags.site}}
+						</a>
+					</li>
+
+					<li>
+						<a class="text-light-blue" ng-click="newSite()" ng-disabled="_pageLock">
+							<span class="fa fa-plus-square"></span>
+							New Site
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="col-md-9">
+				<a class="pull-right btn btn-danger btn-xs" ng-click="deleteSite(site)" ng-disabled="_pageLock">
+					<span class="fa fa-trash-o"></span>
+					Delete Site
+				</a>
+
+				<!-- Title -->
+				<h3 class="guideline">
+					Site
+					<small>{{site.tags.site}}</small>
+				</h3>
+				<hr/>
+
+				<!-- Config -->
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" ng-checked="sites[site.tags.site].enabled" ng-click="sites[site.tags.site].enabled = !sites[site.tags.site].enabled">
+						<strong>Enabled</strong>
+					</label>
+				</div>
+				<hr/>
+
+				<!-- Application -->
+				<label>* Application</label>
+				<div class="row">
+					<div class="col-sm-6">
+						<h1 class="text-muted text-center" ng-show="sites[site.tags.site].applications.length === 0">No application in using</h1>
+						<ul class="products-list product-list-in-box fixed-height" ng-show="sites[site.tags.site].applications.length !== 0">
+							<li class="item" ng-repeat="application in sites[site.tags.site].applications track by $index" ng-class="{active: _application === application}">
+								<div class="product-operation single">
+									<span class="fa fa-cubes"></span>
+								</div>
+								<div class="product-info">
+									<a class="fa fa-times pull-right" ng-click="removeApplication(application, sites[site.tags.site])"></a>
+									<span class="product-title">
+										<a class="fa fa-cog" ng-click="setApplication(application)"></a>
+										{{application.tags.application}}
+									</span>
+									<span class="product-description">{{Application.list.set[application.tags.application].description}}</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="col-sm-6">
+						<ul class="products-list product-list-in-box fixed-height">
+							<li class="item" ng-repeat="application in sites[site.tags.site].optionalApplications track by $index">
+								<button class="btn btn-lg btn-primary pull-left" ng-click="addApplication(application, sites[site.tags.site])" ng-disabled="_pageLock">
+									<span class="fa fa-star-o"></span>
+								</button>
+								<div class="product-info">
+									<span class="product-title">{{application.tags.application}}</span>
+									<span class="product-description">{{Application.list.set[application.tags.application].description}}</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div><!-- /.box-body -->
+
+	<div class="box-footer clearfix">
+		<button class="btn btn-primary" ng-click="saveAll()" ng-disabled="_pageLock">Save All</button>
+	</div>
+</div>

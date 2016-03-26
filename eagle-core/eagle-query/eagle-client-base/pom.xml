@@ -21,9 +21,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>eagle</groupId>
+		<groupId>org.apache.eagle</groupId>
 		<artifactId>eagle-query-parent</artifactId>
-		<version>0.3.0</version>
+		<version>0.3.0-incubating</version>
         <relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -33,18 +33,18 @@
 
 	<dependencies>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-entity-base</artifactId>
             <version>${project.version}</version>
         </dependency>
 		<dependency>
-			<groupId>eagle</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-embed-server</artifactId>
             <version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-embed-hbase</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>

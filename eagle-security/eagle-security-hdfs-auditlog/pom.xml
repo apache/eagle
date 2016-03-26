@@ -20,9 +20,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>eagle</groupId>
+    <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-security-parent</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.0-incubating</version>
   </parent>
   <artifactId>eagle-security-hdfs-auditlog</artifactId>
   <packaging>jar</packaging>
@@ -30,32 +30,32 @@
   <url>http://maven.apache.org</url>
   <dependencies>
 	<dependency>
-  		<groupId>eagle</groupId>
+  		<groupId>org.apache.eagle</groupId>
   		<artifactId>eagle-security-common</artifactId>
         <version>${project.version}</version>
   	</dependency>
     <dependency>
-        	<groupId>eagle</groupId>
+        	<groupId>org.apache.eagle</groupId>
     		<artifactId>eagle-embed-server</artifactId>
             <version>${project.version}</version>
     	    <classifier>tests</classifier>
     	    <scope>test</scope>
     </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-embed-server</artifactId>
           <version>${project.version}</version>
           <scope>test</scope>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-embed-hbase</artifactId>
           <version>${project.version}</version>
           <classifier>tests</classifier>
           <scope>test</scope>
       </dependency>
       <dependency>
-          <groupId>eagle</groupId>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-embed-hbase</artifactId>
           <version>${project.version}</version>
           <scope>test</scope>

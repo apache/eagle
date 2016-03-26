@@ -16,6 +16,9 @@
  */
 package org.apache.eagle.storage.jdbc.entity.impl;
 
+import com.google.common.collect.Lists;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.query.aggregate.timeseries.TimeSeriesAggregator;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManagerFactory;
 import org.apache.eagle.storage.jdbc.conn.impl.TorqueStatementPeerImpl;
 import org.apache.eagle.storage.jdbc.criteria.impl.PrimaryKeyCriteriaBuilder;
@@ -24,6 +27,7 @@ import org.apache.eagle.storage.jdbc.entity.JdbcEntityReader;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.torque.ColumnImpl;
 import org.apache.torque.criteria.Criteria;
 import org.apache.torque.om.mapper.RecordMapper;
 import org.apache.torque.sql.SqlBuilder;
@@ -31,7 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @since 3/27/15
@@ -46,16 +52,17 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
         this.jdbcEntityDefinition = jdbcEntityDefinition;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <E extends Object> List<E> query(CompiledQuery query) throws Exception {
-        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition.getJdbcTableName());
+        QueryCriteriaBuilder criteriaBuilder = new QueryCriteriaBuilder(query,this.jdbcEntityDefinition);
         Criteria criteria = criteriaBuilder.build();
         String displaySql = SqlBuilder.buildQuery(criteria).getDisplayString();
 
         if(LOG.isDebugEnabled()) LOG.debug("Querying: " + displaySql);
 
         RecordMapper<E> recordMapper;
-        if(query.isHasAgg()) {
+        if(query.isHasAgg() && !query.isTimeSeries()) {
             recordMapper = (RecordMapper<E>) new AggreagteRecordMapper(query, jdbcEntityDefinition);
         }else{
             recordMapper = new EntityRecordMapper(jdbcEntityDefinition);
@@ -67,6 +74,9 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
             TorqueStatementPeerImpl peer = ConnectionManagerFactory.getInstance().getStatementExecutor();
             result = peer.delegate().doSelect(criteria, recordMapper);
             LOG.info(String.format("Read %s records in %s ms (sql: %s)",result.size(),stopWatch.getTime(),displaySql));
+            if(result.size() > 0 && query.isTimeSeries()){
+                    result = Lists.newArrayList((E) timeseriesAggregate(result, query));
+            }
         }catch (Exception ex){
             LOG.error("Failed to query by: "+displaySql+", due to: "+ex.getMessage(),ex);
             throw new IOException("Failed to query by: "+displaySql,ex);
@@ -74,6 +84,22 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
             stopWatch.stop();
         }
         return result;
+    }
+
+    private <E> Map timeseriesAggregate(List<E> result, CompiledQuery query) throws Exception {
+        TimeSeriesAggregator aggregator = new TimeSeriesAggregator(query.getGroupByFields(),
+            query.getAggregateFunctionTypes(),
+            query.getAggregateFields(),
+            query.getStartTime(), query.getEndTime(),
+            query.getIntervalMin()
+        );
+        for(E entity: result)
+            aggregator.accumulate((TaggedLogAPIEntity) entity);
+        if(this.jdbcEntityDefinition.isGenericMetric()) {
+            return aggregator.getMetric();
+        } else {
+            return aggregator.result();
+        }
     }
 
     @Override
@@ -88,6 +114,7 @@ public class JdbcEntityReaderImpl implements JdbcEntityReader {
         try {
             stopWatch.start();
             TorqueStatementPeerImpl peer = ConnectionManagerFactory.getInstance().getStatementExecutor();
+            criteria.addSelectColumn(new ColumnImpl(jdbcEntityDefinition.getJdbcTableName(),"*"));
             result = peer.delegate().doSelect(criteria, recordMapper);
             LOG.info(String.format("Read %s records in %s ms (sql: %s)",result.size(),stopWatch.getTime(),displaySql));
         }catch (Exception ex){

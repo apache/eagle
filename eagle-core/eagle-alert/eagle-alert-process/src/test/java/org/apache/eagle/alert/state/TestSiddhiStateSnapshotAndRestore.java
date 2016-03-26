@@ -275,6 +275,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         inputHandler.send(new Object[]{curTime + 1000, "user", "open"});
         inputHandler.send(new Object[]{curTime + 2000, "user", "open"});
         inputHandler.send(new Object[]{curTime + 3000, "user", "open"});
+        Thread.sleep(1000);
 
         byte[] state = executionPlanRuntime.snapshot();
         int length = state.length;

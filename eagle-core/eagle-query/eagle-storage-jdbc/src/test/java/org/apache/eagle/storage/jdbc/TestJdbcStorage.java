@@ -22,73 +22,74 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
-import org.apache.eagle.storage.DataStorageManager;
-import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
 import org.apache.eagle.storage.exception.QueryCompileException;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
-import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-public class TestJdbcStorage {
-
-    JdbcStorage storage;
+public class TestJdbcStorage extends JdbcStorageTestBase {
     EntityDefinition entityDefinition;
-    final static Logger LOG = LoggerFactory.getLogger(TestJdbcStorage.class);
-
-    @Before
-    public void setUp() throws IOException, IllegalAccessException, InstantiationException, IllegalDataStorageTypeException {
-        storage = (JdbcStorage) DataStorageManager.getDataStorageByEagleConfig();
-        storage.init();
+    @Override
+    public void setUp() throws Exception {
         entityDefinition = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestTimeSeriesAPIEntity.class);
+        entityDefinition.setTags(new String[]{"cluster","datacenter","random"});
+        super.setUp();
     }
 
-    //@Test
+    @Test
     public void testReadBySimpleQuery() throws QueryCompileException, IOException {
         RawQuery rawQuery = new RawQuery();
-        rawQuery.setQuery("TestTimeSeriesAPIEntity[]{*}");
-        rawQuery.setStartTime("2014-01-06 01:40:02");
-        rawQuery.setEndTime("2016-01-06 01:40:02");
+        rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"c4ut\"]{*}");
+        System.out.println(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithMilliseconds(baseTimestamp+2000));
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult<TestTimeSeriesAPIEntity> result = storage.query(query, entityDefinition);
         Assert.assertNotNull(result);
     }
 
-//    @Test
+    @Test
     public void testReadByComplexQuery() throws QueryCompileException, IOException {
         RawQuery rawQuery = new RawQuery();
-        rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"cluster\" AND @field4 > 1000 AND @field7 CONTAINS \"subtext\" OR @jobID =\"jobID\" ]{@field1,@field2}");
-        rawQuery.setStartTime("2015-01-06 01:40:02");
-        rawQuery.setEndTime("2016-01-06 01:40:02");
+        rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"c4ut\" AND @field4 > 1000 OR @datacenter =\"d4ut\" ]{@field1,@field2}");
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp + 2000));
         rawQuery.setPageSize(1000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         storage.query(query,entityDefinition);
     }
 
-    //@Test
+    @Test
+    public void testReadByComplexQueryWithLike() throws QueryCompileException, IOException {
+        RawQuery rawQuery = new RawQuery();
+        rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"c4ut\" AND @field4 > 1000 AND @field7 CONTAINS \"99404f47e309\" OR @datacenter =\"d4ut\" ]{@field1,@field2}");
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp + 2000));
+        rawQuery.setPageSize(1000);
+        CompiledQuery query = new CompiledQuery(rawQuery);
+        storage.query(query,entityDefinition);
+    }
+
+    @Test
     public void testWrite() throws IOException {
         List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
-
         int i= 0;
         while( i++ < 1000){
-            entityList.add(newInstance());
+            TestTimeSeriesAPIEntity entity = newInstance();
+
+            entityList.add(entity);
         }
         ModifyResult<String> result = storage.create(entityList, entityDefinition);
         Assert.assertTrue(result.getSize() > 0);
     }
 
-    //@Test
+    @Test
     public void testWriteAndRead() throws IOException, QueryCompileException {
         // record insert init time
         long startTime = System.currentTimeMillis();
@@ -103,18 +104,18 @@ public class TestJdbcStorage {
         // record insertion finish time
         long endTime = System.currentTimeMillis();
 
-            // init read in time range [startTime, endTime)
+        // init read in time range [startTime, endTime)
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[]{*}");
         rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1));
-        rawQuery.setPageSize(1000000);
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1000));
+        rawQuery.setPageSize(10000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult queryResult = storage.query(query, entityDefinition);
         Assert.assertTrue(queryResult.getSize() >= 1000);
     }
 
-    //@Test
+    @Test
     public void testWriteAndAggregation() throws IOException, QueryCompileException {
         // record insert init time
         long startTime = System.currentTimeMillis();
@@ -133,14 +134,14 @@ public class TestJdbcStorage {
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[]<@cluster,@datacenter>{count,max(@field1),min(@field2),sum(@field3)}");
         rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1000));
         rawQuery.setPageSize(1000000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult queryResult = storage.query(query, entityDefinition);
         Assert.assertTrue(queryResult.getSize() >= 1);
     }
 
-    //@Test
+    @Test
     public void testWriteAndDelete() throws IOException, QueryCompileException {
         // record insert init time
         long startTime = System.currentTimeMillis();
@@ -158,15 +159,15 @@ public class TestJdbcStorage {
         // delete in time range [startTime, endTime)
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[]{*}");
-        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime));
-        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime));
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(startTime-1000));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(endTime+1000));
         rawQuery.setPageSize(1000000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         ModifyResult<String> queryResult = storage.delete(query, entityDefinition);
         Assert.assertTrue(queryResult.getSize() >= 1000);
     }
 
-    //@Test
+    @Test
     public void testWriteAndUpdate() throws IOException, QueryCompileException {
         // Write 1000 entities
         List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
@@ -190,7 +191,7 @@ public class TestJdbcStorage {
      *
      * @throws IOException
      */
-    //@Test
+//    @Test
     public void testWriterPerformance() throws IOException {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -221,13 +222,16 @@ public class TestJdbcStorage {
         instance.setTags(new HashMap<String, String>() {{
             put("cluster", "c4ut");
             put("datacenter", "d4ut");
+            put("random",UUID.randomUUID().toString());
         }});
         instance.setTimestamp(System.currentTimeMillis());
         return instance;
     }
 
+
     @Test
-    public void test() {
+    public void testInitSuccessfully() {
 
     }
+
 }

@@ -264,7 +264,7 @@
 						<tr>
 							<!-- Copyright -->
 							<td align="center">
-								<p><a href="http://123.xyz.com/alerts/alertlist.html">Copyright 2014 @ Hadoop Eagle</a></p>
+								<p><a href="http://<Eagle-Host>/alerts/alertlist.html">Apache Eagle</a></p>
 							</td>
 						</tr>
 					</table>

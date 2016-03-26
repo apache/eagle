@@ -22,12 +22,13 @@ import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.Qualifier;
 import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
-import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinitionManager;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.torque.ColumnImpl;
 import org.apache.torque.util.ColumnValues;
 import org.apache.torque.util.JdbcTypedValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
@@ -44,6 +45,7 @@ import java.util.Map;
  * @since 3/26/15
  */
 public class JdbcEntitySerDeserHelper {
+    private final static Logger LOG = LoggerFactory.getLogger(JdbcEntitySerDeserHelper.class);
     /**
      *
      * @param row
@@ -55,7 +57,7 @@ public class JdbcEntitySerDeserHelper {
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
      */
-    public static <E extends TaggedLogAPIEntity> E buildEntity(Map<String, Object> row, JdbcEntityDefinition entityDefinition) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+    public static <E extends TaggedLogAPIEntity> E buildEntity(Map<String, Object> row, JdbcEntityDefinition entityDefinition) throws IOException {
         EntityDefinition ed = entityDefinition.getInternal();
 
         Class<? extends TaggedLogAPIEntity> clazz = ed.getEntityClass();
@@ -63,24 +65,35 @@ public class JdbcEntitySerDeserHelper {
             throw new NullPointerException("Entity class of service "+ed.getService()+" is null");
         }
 
-        TaggedLogAPIEntity obj = clazz.newInstance();
-        Map<String, Qualifier> map = ed.getDisplayNameMap();
+        TaggedLogAPIEntity obj = null;
+        try {
+            obj = clazz.newInstance();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(),e.getCause());
+            throw new IOException(e);
+        }
+        Map<String, Qualifier> rawmap = ed.getDisplayNameMap();
+        // rdbms may contains field which is not case insensitive, we need convert all into lower case
+        Map<String, Qualifier> map = new HashMap<>();
+        for(Map.Entry<String, Qualifier> e : rawmap.entrySet()){
+            map.put(e.getKey().toLowerCase(), e.getValue());
+        }
         for(Map.Entry<String, Object> entry : row.entrySet()){
             // timestamp;
-            if(JdbcConstants.TIMESTAMP_COLUMN_NAME.equals(entry.getKey())){
+            if(JdbcConstants.TIMESTAMP_COLUMN_NAME.equalsIgnoreCase(entry.getKey())){
                 obj.setTimestamp((Long) entry.getValue());
                 continue;
             }
 
             // set metric as prefix for generic metric
             if(entityDefinition.getInternal().getService().equals(GenericMetricEntity.GENERIC_METRIC_SERVICE) &&
-                    JdbcConstants.METRIC_NAME_COLUMN_NAME.equals(entry.getKey())){
+                    JdbcConstants.METRIC_NAME_COLUMN_NAME.equalsIgnoreCase(entry.getKey())){
                 obj.setPrefix((String) entry.getValue());
                 continue;
             }
 
             // rowkey: uuid
-            if(JdbcConstants.ROW_KEY_COLUMN_NAME.equals(entry.getKey())){
+            if(JdbcConstants.ROW_KEY_COLUMN_NAME.equalsIgnoreCase(entry.getKey())){
                 obj.setEncodedRowkey((String) entry.getValue());
                 continue;
             }
@@ -91,16 +104,37 @@ public class JdbcEntitySerDeserHelper {
                 if(obj.getTags() == null){
                     obj.setTags(new HashMap<String, String>());
                 }
-                obj.getTags().put(entry.getKey(), (String) entry.getValue());
+                // get normalized tag name, not efficient, but we need make it work first
+                String key = null;
+                if(ed.getTags() != null) {
+                    for (String tag : ed.getTags()) {
+                        if (tag.equalsIgnoreCase(entry.getKey())) {
+                            key = tag;
+                            break;
+                        }
+                    }
+                }
+                try {
+                    obj.getTags().put(key == null ? entry.getKey() : key, (String) entry.getValue());
+                }catch (ClassCastException ex){
+                    LOG.error("Tag value {} = {} is not String",key,entry.getValue(),ex);
+                    throw ex;
+                }
                 continue;
             }
 
             // parse different types of qualifiers
             String fieldName = q.getDisplayName();
             // PropertyDescriptor pd = PropertyUtils.getPropertyDescriptor(obj, fieldName);
-            PropertyDescriptor pd = getPropertyDescriptor(obj,fieldName);
-            if(entry.getValue() != null){
-                pd.getWriteMethod().invoke(obj, entry.getValue());
+            PropertyDescriptor pd = null;
+            try {
+                pd = getPropertyDescriptor(obj,fieldName);
+                if(entry.getValue() != null) {
+                    pd.getWriteMethod().invoke(obj, entry.getValue());
+                }
+            } catch (Exception ex){
+                LOG.error("Failed to set value  {} = {}",fieldName,entry.getValue(),ex);
+                throw new IOException(String.format("Failed to set value  %s = %s",fieldName,entry.getValue()),ex);
             }
         }
 
@@ -166,7 +200,20 @@ public class JdbcEntitySerDeserHelper {
             if(serDeser==null){
                 throw new IOException("SQLSerDeser for column: "+columnName+" is null");
             }
-            Object value = serDeser.readValue(resultSet, columnName, entityDefinition);
+            Object value;
+
+            if (entityDefinition.isField(columnName)) {
+                try {
+                    value = serDeser.toJavaTypedValue(resultSet, entityDefinition.getColumnType(columnName), columnName, entityDefinition.getColumnQualifier(columnName));
+                } catch (NoSuchFieldException e) {
+                    LOG.error("No field {} in entity {}", columnName, entityDefinition.getInternal().getEntityClass());
+                    throw new IOException(String.format("No field %s in entity %s", columnName, entityDefinition.getInternal().getEntityClass()), e);
+                }
+            }else{
+                columnName = entityDefinition.getOriginalJavaTagName(columnName);
+                // treat as tag or others
+                value = resultSet.getObject(columnName);
+            }
             row.put(columnName,value);
         }
         return row;
@@ -204,8 +251,9 @@ public class JdbcEntitySerDeserHelper {
             Object fieldValue = getMethod.invoke(entity);
 
             Class<?> fieldType = qualifier.getSerDeser().type();
-            JdbcSerDeser jdbcSerDeser = JdbcEntityDefinitionManager.getJdbcSerDeser(fieldType);
-            JdbcTypedValue jdbcTypedValue = jdbcSerDeser.getJdbcTypedValue(fieldValue, fieldType);
+            JdbcSerDeser jdbcSerDeser = jdbcEntityDefinition.getJdbcSerDeser(displayName);
+
+            JdbcTypedValue jdbcTypedValue = jdbcSerDeser.toJdbcTypedValue(fieldValue, fieldType, qualifier);
             columnValues.put(new ColumnImpl(tableName,displayName),jdbcTypedValue);
         }
 

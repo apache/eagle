@@ -30,7 +30,7 @@ public interface PolicyDefinitionDAO<T extends AbstractPolicyDefinitionEntity> e
 	 * find list of active alert definitions for one specific site and dataSource
 	 * @return
 	 */
-	List<T> findActivePolicies(String site, String dataSource) throws Exception;
+	List<T> findActivePolicies(String site, String application) throws Exception;
 	
 	/**
 	 * find map from alertExecutorId to map from policy Id to alert definition for one specific site and dataSource

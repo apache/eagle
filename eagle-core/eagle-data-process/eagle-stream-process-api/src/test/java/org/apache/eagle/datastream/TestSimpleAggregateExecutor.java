@@ -22,6 +22,7 @@ import junit.framework.Assert;
 import org.apache.eagle.dataproc.impl.aggregate.SimpleAggregateExecutor;
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.junit.Test;
+import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class TestSimpleAggregateExecutor {
         sae.flatMap(tuple, new Collector<Tuple2<String, AggregateEntity>>(){
             @Override
             public void collect(Tuple2<String, AggregateEntity> stringAggregateEntityTuple2) {
-                System.out.print(stringAggregateEntityTuple2.f0());
+                System.out.print(stringAggregateEntityTuple2._1());
                 count.incrementAndGet();
             }
         });

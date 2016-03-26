@@ -27,11 +27,11 @@ import org.apache.eagle.policy.DynamicPolicyLoader;
 import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor1;
-import org.apache.eagle.datastream.Tuple1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
+import scala.Tuple1;
 
 /**
  * notify alert by email, kafka message, storage or other means
@@ -55,10 +55,10 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 	@Override
 	public void init() {
 		String site = config.getString("eagleProps.site");
-		String dataSource = config.getString("eagleProps.dataSource");
+		String application = config.getString("eagleProps.application");
 		Map<String, Map<String, AlertDefinitionAPIEntity>> initialAlertDefs;
 		try {
-			initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId( site, dataSource );
+			initialAlertDefs = dao.findActivePoliciesGroupbyExecutorId( site, application );
 		}
 		catch (Exception ex) {
 			LOG.error("fail to initialize initialAlertDefs: ", ex);
@@ -66,7 +66,7 @@ public class AlertNotificationExecutor extends JavaStormStreamExecutor1<String> 
 		}
 
 		if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
-			LOG.warn("No alert definitions found for site: "+site+", dataSource: "+dataSource);
+			LOG.warn("No alert definitions found for site: "+site+", application: "+ application);
 		}
 		try{
 			notificationManager = new NotificationPluginManagerImpl(config);

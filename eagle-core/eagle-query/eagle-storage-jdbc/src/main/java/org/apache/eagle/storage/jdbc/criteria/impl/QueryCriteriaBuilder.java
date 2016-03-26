@@ -23,6 +23,7 @@ import org.apache.eagle.query.parser.ORExpression;
 import org.apache.eagle.storage.jdbc.criteria.CriteriaBuilder;
 import org.apache.eagle.storage.jdbc.criteria.CriterionBuilder;
 import org.apache.eagle.storage.jdbc.JdbcConstants;
+import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.torque.ColumnImpl;
 import org.apache.torque.criteria.Criteria;
@@ -38,10 +39,18 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
 
     private final CompiledQuery query;
     private final String tableName;
+    private final Boolean limitEnabled;
+    private final JdbcEntityDefinition jdbcEntityDefinition;
 
-    public QueryCriteriaBuilder(CompiledQuery query, String tableName){
+    public QueryCriteriaBuilder(CompiledQuery query, JdbcEntityDefinition entityDefinition){
+        this(query,entityDefinition,true);
+    }
+
+    public QueryCriteriaBuilder(CompiledQuery query, JdbcEntityDefinition entityDefinition, Boolean limitEnabled){
         this.query = query;
-        this.tableName = tableName;
+        this.tableName = entityDefinition.getJdbcTableName();
+        this.limitEnabled = limitEnabled;
+        this.jdbcEntityDefinition = entityDefinition;
     }
 
     @Override
@@ -49,17 +58,32 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
         Criteria root = new Criteria();
         SearchCondition searchCondition = query.getSearchCondition();
 
-        // SELECT
+
+
         if(query.isHasAgg()){
-            List<String> aggFields = query.getAggregateFields();
-            List<AggregateFunctionType> aggFuncs = query.getAggregateFunctionTypes();
-            for(int i=0;i<aggFuncs.size();i++){
-                AggregateFunctionType aggFunc = aggFuncs.get(i);
-                String aggField = aggFields.get(i);
-                if(aggFunc.equals(AggregateFunctionType.count)){
-                    root.addSelectColumn(new ColumnImpl(aggFunc.name()+"(*)"));
-                }else{
-                    root.addSelectColumn(new ColumnImpl(String.format("%s(%s.%s)",aggFunc.name(),this.tableName,aggField)));
+            if(this.jdbcEntityDefinition.getInternal().isTimeSeries() && query.isTimeSeries()) {
+                // SELECT
+                root.addSelectColumn(new ColumnImpl(this.tableName,JdbcConstants.TIMESTAMP_COLUMN_NAME));
+                List<String> aggFields = query.getAggregateFields();
+                for(String field:aggFields){
+                    root.addSelectColumn(new ColumnImpl(this.tableName,field));
+                }
+
+                List<String> groupByFieldsFields = query.getGroupByFields();
+                for(String field:groupByFieldsFields){
+                    root.addSelectColumn(new ColumnImpl(this.tableName,field));
+                }
+            } else {
+                List<String> aggFields = query.getAggregateFields();
+                List<AggregateFunctionType> aggFuncs = query.getAggregateFunctionTypes();
+                for (int i = 0; i < aggFuncs.size(); i++) {
+                    AggregateFunctionType aggFunc = aggFuncs.get(i);
+                    String aggField = aggFields.get(i);
+                    if (aggFunc.equals(AggregateFunctionType.count)) {
+                        root.addSelectColumn(new ColumnImpl(aggFunc.name() + "(*)"));
+                    } else {
+                        root.addSelectColumn(new ColumnImpl(String.format("%s(%s.%s)", aggFunc.name(), this.tableName, aggField)));
+                    }
                 }
             }
         } else if(searchCondition.isOutputAll()){
@@ -87,7 +111,7 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
                         .and(new Criterion(new ColumnImpl(this.tableName, JdbcConstants.TIMESTAMP_COLUMN_NAME),query.getEndTime(), SqlEnum.LESS_THAN));
         ORExpression expression = searchCondition.getQueryExpression();
         if(expression!=null){
-            CriterionBuilder criterionBuilder = new ExpressionCriterionBuilder(expression,tableName);
+            CriterionBuilder criterionBuilder = new ExpressionCriterionBuilder(expression,this.jdbcEntityDefinition);
             where = where.and(criterionBuilder.build());
         }
 
@@ -98,11 +122,13 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
 
         root.where(where);
 
-        // LIMITED BY $pageSize
-        root.setLimit((int) searchCondition.getPageSize());
+        if(this.limitEnabled) {
+            // LIMITED BY $pageSize
+            root.setLimit((int) searchCondition.getPageSize());
+        }
 
         // TODO: GROUP BY
-        if(query.isHasAgg()){
+        if(query.isHasAgg() && !query.isTimeSeries()){
             for(String groupByField:query.getGroupByFields()){
                 root.addGroupByColumn(new ColumnImpl(this.tableName,groupByField));
             }
@@ -110,6 +136,11 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
 
         // TODO: ORDER BY
 
+        // If no columns are specified, then select * by default
+        if(root.getSelectColumns() == null || root.getSelectColumns().size() ==0){
+            // SELECT *
+            root.addSelectColumn(new ColumnImpl(this.tableName, "*"));
+        }
         return root;
     }
 }

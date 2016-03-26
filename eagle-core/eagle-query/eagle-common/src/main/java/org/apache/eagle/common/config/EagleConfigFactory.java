@@ -61,7 +61,9 @@ public class EagleConfigFactory implements EagleConfig {
 
 	private EagleConfigFactory(){
 		init();
-		this.pool = new HTablePool(this.hbaseConf, 10);
+		if(this.getStorageType() == null || this.getStorageType().equalsIgnoreCase("hbase")) {
+			this.pool = new HTablePool(this.hbaseConf, 10);
+		}
 	}
 	
 	public static EagleConfig load(){

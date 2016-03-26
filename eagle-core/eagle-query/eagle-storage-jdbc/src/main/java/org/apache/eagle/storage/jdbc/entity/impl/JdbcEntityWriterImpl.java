@@ -20,17 +20,22 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManager;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManagerFactory;
 import org.apache.eagle.storage.jdbc.conn.impl.TorqueStatementPeerImpl;
+import org.apache.eagle.storage.jdbc.criteria.impl.PrimaryKeyCriteriaBuilder;
 import org.apache.eagle.storage.jdbc.entity.JdbcEntitySerDeserHelper;
 import org.apache.eagle.storage.jdbc.entity.JdbcEntityWriter;
 import org.apache.eagle.storage.jdbc.schema.JdbcEntityDefinition;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.torque.ConstraintViolationException;
+import org.apache.torque.criteria.Criteria;
 import org.apache.torque.om.ObjectKey;
+import org.apache.torque.sql.SqlBuilder;
 import org.apache.torque.util.ColumnValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -68,17 +73,33 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
                 entity.setEncodedRowkey(peer.getPrimaryKeyBuilder().build(entity));
                 ColumnValues columnValues = JdbcEntitySerDeserHelper.buildColumnValues(entity, this.jdbcEntityDefinition);
 
-                // TODO: implement batch insert for better performance
-                ObjectKey key = peer.delegate().doInsert(columnValues,connection);
-
+                ObjectKey key = null;
                 try {
+                    // TODO: implement batch insert for better performance
+                    key = peer.delegate().doInsert(columnValues,connection);
+
                     if (key != null) {
                         keys.add((String) key.getValue());
                     } else {
                         keys.add(entity.getEncodedRowkey());
                     }
                 } catch (ClassCastException ex) {
+                    assert key != null;
                     throw new RuntimeException("Key is not in type of String (VARCHAR) , but JdbcType (java.sql.Types): " + key.getJdbcType() + ", value: " + key.getValue(), ex);
+                } catch (ConstraintViolationException e){
+                    // Override with updating if duplicated key exception
+                    if(e.getMessage().contains("The statement was aborted because it would have caused a duplicate key value in a unique or primary key constraint or unique index identified by")){
+                        String primaryKey = entity.getEncodedRowkey();
+                        if(primaryKey==null) {
+                            primaryKey = ConnectionManagerFactory.getInstance().getStatementExecutor().getPrimaryKeyBuilder().build(entity);
+                            entity.setEncodedRowkey(primaryKey);
+                        }
+                        PrimaryKeyCriteriaBuilder pkBuilder = new PrimaryKeyCriteriaBuilder(Collections.singletonList(primaryKey), this.jdbcEntityDefinition.getJdbcTableName());
+                        Criteria selectCriteria = pkBuilder.build();
+                        if(LOG.isDebugEnabled()) LOG.debug("Updating by query: "+ SqlBuilder.buildQuery(selectCriteria).getDisplayString());
+                        peer.delegate().doUpdate(selectCriteria, columnValues, connection);
+                        keys.add(primaryKey);
+                    }
                 }
             }
 

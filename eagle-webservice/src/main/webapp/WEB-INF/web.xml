@@ -102,4 +102,8 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
+    <session-config>
+        <!-- in minutes -->
+        <session-timeout>60</session-timeout>
+    </session-config>
 </web-app>
