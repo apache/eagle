@@ -167,7 +167,7 @@
                 <exclude>WEB-INF/classes/config.properties</exclude>
                 <exclude>WEB-INF/lib/servlet-api-*.jar</exclude>
                 <exclude>WEB-INF/lib/jsp-api-*.jar</exclude>
-                <exclude>WEB-INF/lib/storm-*.jar</exclude>
+                <!--<exclude>WEB-INF/lib/storm-*.jar</exclude> -->
                 <exclude>WEB-INF/lib/kafka_*.jar</exclude>
                 <exclude>WEB-INF/lib/kafka-*.jar</exclude>
                 <exclude>WEB-INF/lib/*-tests.jar</exclude>
