@@ -19,16 +19,15 @@
 package org.apache.eagle.stream.application.impl
 
 import java.net.URLDecoder
-import java.nio.file.{Paths, Files}
+import java.nio.file.{Files, Paths}
 
 import backtype.storm.Config
 import backtype.storm.generated.InvalidTopologyException
 import backtype.storm.utils.{NimbusClient, Utils}
 import com.typesafe.config
-import org.apache.eagle.datastream.storm.StormTopologyExecutorImpl
 import org.apache.eagle.stream.application.entity.TopologyDescriptionEntity
 import org.apache.eagle.stream.application.model.{TopologyDescriptionModel, TopologyExecutionModel}
-import org.apache.eagle.stream.application.{TopologyFactory, AppManagerConstants, ApplicationManager}
+import org.apache.eagle.stream.application.{AppManagerConstants, ApplicationManager, TopologyFactory}
 import org.slf4j.LoggerFactory
 
 
@@ -49,7 +48,7 @@ class StormApplicationManager extends ApplicationManager {
   override def start(topologyDesc: TopologyDescriptionModel, conf: config.Config): Boolean = {
       var ret = true
       try {
-        val stormJarPath: String = URLDecoder.decode(classOf[StormTopologyExecutorImpl].getProtectionDomain.getCodeSource.getLocation.getPath, "UTF-8")
+        val stormJarPath: String = URLDecoder.decode(classOf[ApplicationManager].getProtectionDomain.getCodeSource.getLocation.getPath, "UTF-8")
         if (stormJarPath == null || !Files.exists(Paths.get(stormJarPath)) || !stormJarPath.endsWith(".jar")) {
           val errMsg = s"storm jar file $stormJarPath does not exists, or is a invalid jar file"
           LOG.error(errMsg)
