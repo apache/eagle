@@ -223,10 +223,9 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
                 val topologyConfig: Config = ConfigFactory.parseString(topology.config)
                 if(topologyConfig.hasPath(EagleConfigConstants.APP_CONFIG)) {
                   var config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
-                  if(executionModel.status == TOPOLOGY_STATUS.NEW) {
-                    executionModel.fullName = generateTopologyFullName(executionModel)
-                    config = ConfigFactory.parseString("envContextConfig.topologyName=" + executionModel.fullName).withFallback(config)
-                  }
+                  executionModel.fullName = generateTopologyFullName(executionModel)
+                  val extConfig = ConfigFactory.parseString("envContextConfig.topologyName=" + executionModel.fullName)
+                  config = ConfigFactory.parseString("envContextConfig.topologyName=" + executionModel.fullName).withFallback(config)
                   ret = _streamAppManager.start(topology, config)
                   nextState = if(ret) TOPOLOGY_STATUS.STARTED else TOPOLOGY_STATUS.STOPPED
                   updateStatus(operationModel, executionModel, ret, nextState)
@@ -257,11 +256,8 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
       _dao = new ApplicationServiceDAO(config, context.dispatcher)
 
     case SchedulerCommand(executionModel, operationModel) =>
+      execute(operationModel, executionModel)
 
-      if(executionModel.status != TOPOLOGY_STATUS.NEW)
-      _dao.updateTopologyExecutionStatus(TopologyExecutionEntity.fromModel(executionModel),TOPOLOGY_STATUS.PENDING) onComplete {
-        case _ => execute(operationModel, executionModel)
-      }
     case m@_ =>
       log.warning("Unsupported operation $m")
   }

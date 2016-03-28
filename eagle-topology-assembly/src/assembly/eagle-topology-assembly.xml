@@ -56,8 +56,8 @@
             <directory>${project.build.outputDirectory}</directory>
             <outputDirectory>/</outputDirectory>
             <excludes>
-                <exclude>application.conf</exclude>
-                <exclude>log4j.properties</exclude>
+                <exclude>**/application.conf</exclude>
+                <exclude>**/log4j.properties</exclude>
                 <exclude>**/storm.yaml.1</exclude>
             </excludes>
             <includes>

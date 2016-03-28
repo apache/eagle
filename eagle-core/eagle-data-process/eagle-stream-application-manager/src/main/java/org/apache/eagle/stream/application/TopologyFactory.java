@@ -41,6 +41,7 @@ public final class TopologyFactory {
             instance = topologyCache.get(topologyClass);
         } else {
             try {
+                LOG.info("load class " + topologyClass + "with classLoad " + TopologyFactory.class.getClassLoader().toString());
                 instance = (TopologyExecutable) Class.forName(topologyClass).newInstance();
                 topologyCache.put(topologyClass, instance);
             } catch (ClassNotFoundException e) {
