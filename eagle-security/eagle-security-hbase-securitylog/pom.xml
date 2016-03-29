@@ -37,9 +37,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-stream-application-manager</artifactId>
-            <version>0.3.0-incubating</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
