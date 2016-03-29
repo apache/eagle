@@ -22,11 +22,6 @@ package org.apache.eagle.stream.application;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Array;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +36,7 @@ public final class TopologyFactory {
             instance = topologyCache.get(topologyClass);
         } else {
             try {
-                LOG.info("load class " + topologyClass + "with classLoad " + TopologyFactory.class.getClassLoader().toString());
+                LOG.info("load class " + topologyClass + "with classLoader " + TopologyFactory.class.getClassLoader().toString());
                 instance = (TopologyExecutable) Class.forName(topologyClass).newInstance();
                 topologyCache.put(topologyClass, instance);
             } catch (ClassNotFoundException e) {

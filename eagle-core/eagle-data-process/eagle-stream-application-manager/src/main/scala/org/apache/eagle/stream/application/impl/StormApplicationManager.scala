@@ -21,26 +21,30 @@ package org.apache.eagle.stream.application.impl
 import java.net.URLDecoder
 import java.nio.file.{Files, Paths}
 
-import backtype.storm.Config
 import backtype.storm.generated.InvalidTopologyException
 import backtype.storm.utils.{NimbusClient, Utils}
 import com.typesafe.config
 import org.apache.eagle.stream.application.entity.TopologyDescriptionEntity
-import org.apache.eagle.stream.application.model.{TopologyDescriptionModel, TopologyExecutionModel}
-import org.apache.eagle.stream.application.{AppManagerConstants, ApplicationManager, TopologyFactory}
+import org.apache.eagle.stream.application.model.TopologyDescriptionModel
+import org.apache.eagle.stream.application.{ApplicationManager, TopologyFactory}
 import org.slf4j.LoggerFactory
 
 
 class StormApplicationManager extends ApplicationManager {
   val LOG = LoggerFactory.getLogger(classOf[StormApplicationManager])
 
-
-  private def getNimbusClient(clusterConfig: com.typesafe.config.Config): NimbusClient = {
+  private def getNimbusClient(appConfig: com.typesafe.config.Config): NimbusClient = {
     val conf = Utils.readStormConfig().asInstanceOf[java.util.HashMap[String, Object]]
     conf.putAll(Utils.readCommandLineOpts().asInstanceOf[java.util.HashMap[String, Object]])
-    conf.put(Config.NIMBUS_HOST, clusterConfig.getString(AppManagerConstants.EAGLE_STORM_NIMBUS))
-    if(clusterConfig.hasPath(AppManagerConstants.EAGLE_STORM_NIMBUS_PORT)) {
-      conf.put(Config.NIMBUS_THRIFT_PORT, clusterConfig.getNumber(AppManagerConstants.EAGLE_STORM_NIMBUS_PORT))
+
+    if(appConfig.hasPath("envContextConfig.nimbusHost")) {
+      LOG.info(s"Setting ${backtype.storm.Config.NIMBUS_HOST} as ${appConfig.getString("envContextConfig.nimbusHost")}")
+      conf.put(backtype.storm.Config.NIMBUS_HOST, appConfig.getString("envContextConfig.nimbusHost"))
+    }
+
+    if(appConfig.hasPath("envContextConfig.nimbusThriftPort")) {
+      LOG.info(s"Setting ${backtype.storm.Config.NIMBUS_THRIFT_PORT} as ${appConfig.getString("envContextConfig.nimbusThriftPort")}")
+      conf.put(backtype.storm.Config.NIMBUS_THRIFT_PORT, appConfig.getNumber("envContextConfig.nimbusThriftPort"))
     }
     NimbusClient.getConfiguredClient(conf)
   }
@@ -73,10 +77,10 @@ class StormApplicationManager extends ApplicationManager {
       ret
   }
 
-  override def stop(topologyExecution: TopologyExecutionModel, conf: config.Config): Boolean = {
+  override def stop(name: String, appConf: config.Config): Boolean = {
     var ret = true
     try {
-      getNimbusClient(conf).getClient.killTopology(topologyExecution.fullName)
+      getNimbusClient(appConf).getClient.killTopology(name)
     } catch {
       case e: Throwable =>
         LOG.error(e.toString)
@@ -85,10 +89,10 @@ class StormApplicationManager extends ApplicationManager {
     ret
   }
 
-  override def status(topologyExecution: TopologyExecutionModel, conf: config.Config): Boolean = {
+  override def status(name: String, appConf: config.Config): Boolean = {
     var ret = true
     try {
-      getNimbusClient(conf).getClient.getTopology(topologyExecution.fullName)
+      getNimbusClient(appConf).getClient.getTopology(name)
     } catch {
       case e: Throwable =>
         LOG.error(e.toString)
