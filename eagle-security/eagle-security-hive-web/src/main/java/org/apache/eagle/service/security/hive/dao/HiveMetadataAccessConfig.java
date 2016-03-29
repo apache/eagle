@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.service.security.hive.dao;
 
+import com.typesafe.config.Config;
+
 public class HiveMetadataAccessConfig {
     private String accessType;
     private String user;
@@ -67,4 +69,34 @@ public class HiveMetadataAccessConfig {
     public String toString(){
         return "user:" + user +",jdbcDriverClassName:" + jdbcDriverClassName + ",jdbcUrl:" + jdbcUrl;
     }
+
+    public final static class HIVECONF {
+        public final static String ACCESSTYPE = "accessType";
+        public final static String USER = "user";
+        public final static String PASSWD = "password";
+        public final static String JDBCDRIVER = "jdbcDriverClassName";
+        public final static String JDBCURL = "jdbcUrl";
+    }
+
+    public static HiveMetadataAccessConfig config2Entity(Config config) {
+        HiveMetadataAccessConfig hiveConf = new HiveMetadataAccessConfig();
+        if(config.hasPath(HIVECONF.ACCESSTYPE)) {
+            hiveConf.setAccessType(config.getString(HIVECONF.ACCESSTYPE));
+        }
+        if(config.hasPath(HIVECONF.USER)) {
+            hiveConf.setUser(config.getString(HIVECONF.USER));
+        }
+        if(config.hasPath(HIVECONF.PASSWD)) {
+            hiveConf.setPassword(config.getString(HIVECONF.PASSWD));
+        }
+        if(config.hasPath(HIVECONF.JDBCDRIVER)) {
+            hiveConf.setJdbcDriverClassName(config.getString(HIVECONF.JDBCDRIVER));
+        }
+        if(config.hasPath(HIVECONF.JDBCURL)) {
+            hiveConf.setJdbcUrl(config.getString(HIVECONF.JDBCURL));
+        }
+        return hiveConf;
+    }
 }
+
+

@@ -170,7 +170,7 @@
 				<section class="sidebar">
 					<ul class="sidebar-menu">
 						<li class="header">
-							{{Application.current().groupName || 'Application'}} >
+							{{Application.current().group || 'Application'}} >
 							{{Application.current().displayName || 'Features'}}
 						</li>
 						<li ng-repeat="page in PageConfig.navConfig.pageList track by $index" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
