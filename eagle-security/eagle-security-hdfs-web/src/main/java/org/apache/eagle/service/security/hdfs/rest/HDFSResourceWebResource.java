@@ -26,6 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.security.entity.FileStatusEntity;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
@@ -60,8 +61,9 @@ public class HDFSResourceWebResource
 		List<FileStatus> fileStatuses = null;
 		try {
 			validator.validate(site, filePath); // First Step would be validating Request
-			Configuration config = repo.getConfig(HDFSResourceConstants.HDFS_APPLICATION, site);
-			HDFSFileSystem fileSystem = new HDFSFileSystem(config);
+			Config config = repo.getConfig(HDFSResourceConstants.HDFS_APPLICATION, site);
+			Configuration conf = repo.convert(config);
+			HDFSFileSystem fileSystem = new HDFSFileSystem(conf);
 			fileStatuses = fileSystem.browse(filePath);
 			// Join with File Sensitivity Info
 			HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner();

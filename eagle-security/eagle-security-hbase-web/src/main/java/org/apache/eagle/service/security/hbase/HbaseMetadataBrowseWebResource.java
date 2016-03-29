@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.service.security.hbase;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.security.entity.HbaseResourceEntity;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
@@ -46,8 +47,9 @@ public class HbaseMetadataBrowseWebResource {
         List<HbaseResourceEntity> values = new ArrayList<>();
         HbaseMetadataBrowseWebResponse response = new HbaseMetadataBrowseWebResponse();
         try {
-            Configuration config = repo.getConfig(HBASE_APPLICATION, site);
-            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(config);
+            Config config = repo.getConfig(HBASE_APPLICATION, site);
+            Configuration conf = repo.convert(config);
+            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
             namespaces = dao.getNamespaces();
 
         } catch (Exception e) {
@@ -74,8 +76,9 @@ public class HbaseMetadataBrowseWebResource {
         List<String> tables = null;
         List<HbaseResourceEntity> values = new ArrayList<>();
         try {
-            Configuration config = repo.getConfig(HBASE_APPLICATION, site);
-            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(config);
+            Config config = repo.getConfig(HBASE_APPLICATION, site);
+            Configuration conf = repo.convert(config);
+            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
             tables = dao.getTables(namespace);
         }catch(Exception ex){
             LOG.error("fail getting databases", ex);
@@ -104,8 +107,9 @@ public class HbaseMetadataBrowseWebResource {
         List<String> columns = null;
         List<HbaseResourceEntity> values = new ArrayList<>();
         try {
-            Configuration config = repo.getConfig(HBASE_APPLICATION, site);
-            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(config);
+            Config config = repo.getConfig(HBASE_APPLICATION, site);
+            Configuration conf = repo.convert(config);
+            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
             String tableName = String.format("%s:%s", namespace, table);
             columns = dao.getColumnFamilies(tableName);
         }catch(Exception ex){

@@ -19,8 +19,11 @@
 package org.apache.eagle.security.resolver;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValue;
 import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
+import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
@@ -35,24 +38,26 @@ import java.util.Map;
 public class MetadataAccessConfigRepo {
     private static Logger LOG = LoggerFactory.getLogger(MetadataAccessConfigRepo.class);
 
-    public Configuration getConfig(String application, String siteId) throws Exception {
+    public Config getConfig(String application, String siteId) throws Exception {
 
         GenericEntityServiceResource resource = new GenericEntityServiceResource();
         String queryFormat = Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME + "[@application=\"%s\" AND @site=\"%s\"]{*}";
-        GenericServiceAPIResponseEntity ret = resource.search(String.format(queryFormat, application, siteId), null, null,Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
+        GenericServiceAPIResponseEntity ret = resource.search(String.format(queryFormat, application, siteId), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
         List<SiteApplicationServiceEntity> list = (List<SiteApplicationServiceEntity>) ret.getObj();
         if (list == null || list.size() == 0)
             throw new Exception("Config is empty for site=" + siteId +" application=" + application + ".");
-
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, String> configMap = mapper.readValue(list.get(0).getConfig(), Map.class);
-        return convert(configMap);
+        String originalConfigStr = list.get(0).getConfig();
+        Config originalConfig = ConfigFactory.parseString(originalConfigStr);
+        if(!originalConfig.hasPath(EagleConfigConstants.WEB_CONFIG)) {
+            throw new Exception("Fail to get WEB_CONFIG configurations for data classification");
+        }
+        return originalConfig.getConfig(EagleConfigConstants.WEB_CONFIG);
     }
 
-    private Configuration convert(Map<String, String> configMap) throws Exception {
+    public Configuration convert(Config originalConfig) throws Exception {
         Configuration config = new Configuration();
-        for (Map.Entry<String, String> entry : configMap.entrySet()) {
-            config.set(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, ConfigValue> entry : originalConfig.entrySet()) {
+            config.set(entry.getKey().toString(), entry.getValue().unwrapped().toString());
         }
         return config;
     }

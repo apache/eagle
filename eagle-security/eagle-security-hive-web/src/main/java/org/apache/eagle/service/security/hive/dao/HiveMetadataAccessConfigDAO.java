@@ -19,8 +19,7 @@ package org.apache.eagle.service.security.hive.dao;
 import java.util.Map;
 
 public interface HiveMetadataAccessConfigDAO {
-    // site to HiveMetadataAccessConfig
-    Map<String, HiveMetadataAccessConfig> getAllConfigs() throws Exception;
+
     // HiveMetadataAccessConfig for one site
     HiveMetadataAccessConfig getConfig(String site) throws Exception;
 }
