@@ -31,7 +31,9 @@
 		function _bindShortcut($dialog) {
 			$dialog.on("keydown", function (event) {
 				if(event.which === 13) {
-					$dialog.find(".confirmBtn").click();
+					if(!$(":focus").is("textarea")) {
+						$dialog.find(".confirmBtn:enabled").click();
+					}
 				}
 			});
 		}

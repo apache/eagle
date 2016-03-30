@@ -69,7 +69,7 @@
 
 	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Authorization, Application, Entities, DashboardFormatter) {
 		var _siteApp = Site.currentSiteApplication();
-		var _druidConfig = _siteApp.configObj.druid;
+		var _druidConfig = _siteApp.configObj.getValueByPath("web.druid");
 		var _refreshInterval;
 
 		var _menu_newChart;

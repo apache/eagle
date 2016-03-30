@@ -343,8 +343,8 @@
 			UI.updateConfirm("Application", {config: _oriConfig}, [
 				{name: "Configuration", field: "config", type: "blob"}
 			], function(entity) {
-				if(entity.config !== "" && !common.parseJSON(entity.config, false)) {
-					return "Invalid JSON format";
+				if(entity.config !== "" && !common.properties.check(entity.config)) {
+					return "Invalid Properties format";
 				}
 			}).then(null, null, function(holder) {
 				application.config = holder.entity.config;
