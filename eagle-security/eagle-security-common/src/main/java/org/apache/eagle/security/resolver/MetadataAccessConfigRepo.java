@@ -19,9 +19,7 @@
 package org.apache.eagle.security.resolver;
 
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigValue;
+import com.typesafe.config.*;
 import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
@@ -47,7 +45,10 @@ public class MetadataAccessConfigRepo {
         if (list == null || list.size() == 0)
             throw new Exception("Config is empty for site=" + siteId +" application=" + application + ".");
         String originalConfigStr = list.get(0).getConfig();
-        Config originalConfig = ConfigFactory.parseString(originalConfigStr);
+        ConfigParseOptions options = ConfigParseOptions.defaults()
+                .setSyntax(ConfigSyntax.PROPERTIES)
+                .setAllowMissing(false);
+        Config originalConfig = ConfigFactory.parseString(originalConfigStr, options);
         if(!originalConfig.hasPath(EagleConfigConstants.WEB_CONFIG)) {
             throw new Exception("Fail to get WEB_CONFIG configurations for data classification");
         }

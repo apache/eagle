@@ -19,9 +19,7 @@
 package org.apache.eagle.security.crawler.audit;
 
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigValue;
+import com.typesafe.config.*;
 import junit.framework.Assert;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.junit.Test;
@@ -32,24 +30,35 @@ public class TestMetaDataAccessConfigRepo {
 
     @Test
     public void testStringToConfig() {
-        String hdfsConfigStr = "web.fs.defaultFS: \"hdfs://sandbox.hortonworks.com:8020\"";
-        Config config = ConfigFactory.parseString(hdfsConfigStr);
+        String hdfsConfigStr = "web.fs.defaultFS=hdfs://sandbox.hortonworks.com:8020";
+        ConfigParseOptions options = ConfigParseOptions.defaults()
+                .setSyntax(ConfigSyntax.PROPERTIES)
+                .setAllowMissing(false);
+        Config config = ConfigFactory.parseString(hdfsConfigStr, options);
         Assert.assertTrue(config.hasPath(EagleConfigConstants.WEB_CONFIG));
 
-        String hiveConfigStr = "web.accessType:\"metastoredb_jdbc\",web.password:\"hive\",web.user:\"hive\",web.jdbcDriverClassName:\"com.mysql.jdbc.Driver\",web.jdbcUrl:\"jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true\"";
-        config = ConfigFactory.parseString(hiveConfigStr);
+        String hiveConfigStr = "web.accessType=metastoredb_jdbc\nweb.password=hive\nweb.user=hive\nweb.jdbcDriverClassName=com.mysql.jdbc.Driver\nweb.jdbcUrl=jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true";
+        config = ConfigFactory.parseString(hiveConfigStr, options);
         Config hiveConfig = null;
         if(config.hasPath(EagleConfigConstants.WEB_CONFIG)) {
             hiveConfig = config.getConfig(EagleConfigConstants.WEB_CONFIG);
             Assert.assertTrue(hiveConfig.getString("accessType").equals("metastoredb_jdbc"));
         }
 
-        String hbaseConfigStr = "web.hbase.zookeeper.property.clientPort: \"2181\", web.hbase.zookeeper.quorum: \"localhost\"";
-        config = ConfigFactory.parseString(hbaseConfigStr);
+        String hbaseConfigStr = "web.hbase.zookeeper.property.clientPort=2181\nweb.hbase.zookeeper.quorum=localhost";
+        config = ConfigFactory.parseString(hbaseConfigStr, options);
         Config hbaseConfig = null;
         if(config.hasPath(EagleConfigConstants.WEB_CONFIG)) {
             hbaseConfig = config.getConfig(EagleConfigConstants.WEB_CONFIG);
             Assert.assertTrue(hbaseConfig.getString("hbase.zookeeper.property.clientPort").equals("2181"));
+        }
+
+        String appConfigStr = "web.hbase.zookeeper.property.clientPort=2181\nweb.hbase.zookeeper.quorum=sandbox.hortonworks.com\n\napp.envContextConfig.env=storm\napp.envContextConfig.mode=cluster\napp.dataSourceConfig.topic=sandbox_hbase_security_log\napp.dataSourceConfig.zkConnection=127.0.0.1:2181\napp.dataSourceConfig.zkConnectionTimeoutMS=15000\napp.dataSourceConfig.brokerZkPath=/brokers\napp.dataSourceConfig.fetchSize=1048586\napp.dataSourceConfig.transactionZKServers=127.0.0.1\napp.dataSourceConfig.transactionZKPort=2181\napp.dataSourceConfig.transactionZKRoot=/consumers\napp.dataSourceConfig.consumerGroupId=eagle.hbasesecurity.consumer\napp.dataSourceConfig.transactionStateUpdateMS=2000\napp.dataSourceConfig.deserializerClass=org.apache.eagle.security.hbase.parse.HbaseAuditLogKafkaDeserializer\napp.eagleProps.site=sandbox\napp.eagleProps.application=hbaseSecurityLog\napp.eagleProps.dataJoinPollIntervalSec=30\napp.eagleProps.mailHost=mailHost.com\napp.eagleProps.mailSmtpPort=25\napp.eagleProps.mailDebug=true\napp.eagleProps.eagleService.host=localhost\napp.eagleProps.eagleService.port=9099\napp.eagleProps.eagleService.username=admin\napp.eagleProps.eagleService.password=secret";
+        config = ConfigFactory.parseString(appConfigStr, options);
+        Config appConfig = null;
+        if(config.hasPath(EagleConfigConstants.APP_CONFIG)) {
+            appConfig = config.getConfig(EagleConfigConstants.APP_CONFIG);
+            Assert.assertTrue(appConfig.getString("envContextConfig.mode").equals("cluster"));
         }
     }
 }
