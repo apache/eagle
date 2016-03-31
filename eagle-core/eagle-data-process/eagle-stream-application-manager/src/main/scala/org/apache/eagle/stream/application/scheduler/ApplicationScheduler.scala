@@ -19,7 +19,7 @@
 package org.apache.eagle.stream.application.scheduler
 
 import akka.actor._
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{ConfigSyntax, ConfigParseOptions, Config, ConfigFactory}
 import org.apache.eagle.common.config.EagleConfigConstants
 import org.apache.eagle.stream.application.ApplicationServiceDAO
 import org.apache.eagle.stream.application.entity.TopologyExecutionEntity.TOPOLOGY_STATUS
@@ -213,6 +213,7 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
   def execute(operationModel: TopologyOperationModel, executionModel: TopologyExecutionModel): Unit = {
     var ret = true
     var nextState = TOPOLOGY_STATUS.STARTED
+    val options: ConfigParseOptions = ConfigParseOptions.defaults.setSyntax(ConfigSyntax.PROPERTIES).setAllowMissing(false)
 
     operationModel.operation match {
       case OPERATION.START =>
@@ -220,7 +221,7 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
           case Success(optionalTopology) =>
             optionalTopology match {
               case Some(topology) =>
-                val topologyConfig: Config = ConfigFactory.parseString(topology.config)
+                val topologyConfig: Config = ConfigFactory.parseString(topology.config, options)
                 if(topologyConfig.hasPath(EagleConfigConstants.APP_CONFIG)) {
                   val config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
                   executionModel.fullName = generateTopologyFullName(executionModel)
