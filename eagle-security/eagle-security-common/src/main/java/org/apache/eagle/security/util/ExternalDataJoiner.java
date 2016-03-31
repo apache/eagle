@@ -85,11 +85,12 @@ public class ExternalDataJoiner {
 		
 		// for trigger
 		Object interval = jobDataMap.get(DATA_JOIN_POLL_INTERVALSEC);
+        int dataJoinPollIntervalSec = Integer.parseInt(interval.toString());
 		Trigger trigger = TriggerBuilder.newTrigger() 
 			  .withIdentity(jobCls.getName() + ".trigger", QUARTZ_GROUP_NAME) 
 		      .startNow() 
 		      .withSchedule(SimpleScheduleBuilder.simpleSchedule() 
-		          .withIntervalInSeconds(interval == null ? defaultIntervalSeconds : ((Integer)interval).intValue()) 
+		          .withIntervalInSeconds(interval == null ? defaultIntervalSeconds : dataJoinPollIntervalSec)
 		          .repeatForever()) 
 		      .build(); 
 		try{

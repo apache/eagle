@@ -20,6 +20,8 @@ package org.apache.eagle.security.hbase;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigParseOptions;
+import com.typesafe.config.ConfigSyntax;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.junit.Test;
 
@@ -28,11 +30,15 @@ public class TestHbaseAuditLogProcessTopology {
     @Test
     public void test() throws Exception {
         //Config baseConfig = ConfigFactory.load("eagle-scheduler.conf");
-        String topoConfigStr = "webConfig{\"hbase.zookeeper.property.clientPort\":\"2181\", \"hbase.zookeeper.quorum\":\"localhost\"}\nappConfig{\n  \"envContextConfig\" : {\n    \"env\" : \"storm\",\n    \"mode\" : \"cluster\",\n    \"topologyName\" : \"sandbox-hbaseSecurityLog-topology\",\n    \"stormConfigFile\" : \"security-auditlog-storm.yaml\",\n    \"parallelismConfig\" : {\n      \"kafkaMsgConsumer\" : 1,\n      \"hbaseSecurityLogAlertExecutor*\" : 1\n    }\n  },\n  \"dataSourceConfig\": {\n    \"topic\" : \"sandbox_hbase_security_log\",\n    \"zkConnection\" : \"127.0.0.1:2181\",\n    \"zkConnectionTimeoutMS\" : 15000,\n    \"brokerZkPath\" : \"/brokers\",\n    \"fetchSize\" : 1048586,\n    \"deserializerClass\" : \"org.apache.eagle.security.hbase.parse.HbaseAuditLogKafkaDeserializer\",\n    \"transactionZKServers\" : \"127.0.0.1\",\n    \"transactionZKPort\" : 2181,\n    \"transactionZKRoot\" : \"/consumers\",\n    \"consumerGroupId\" : \"eagle.hbasesecurity.consumer\",\n    \"transactionStateUpdateMS\" : 2000\n  },\n  \"alertExecutorConfigs\" : {\n     \"hbaseSecurityLogAlertExecutor\" : {\n       \"parallelism\" : 1,\n       \"partitioner\" : \"org.apache.eagle.policy.DefaultPolicyPartitioner\"\n       \"needValidation\" : \"true\"\n     }\n  },\n  \"eagleProps\" : {\n    \"site\" : \"sandbox\",\n    \"application\": \"hbaseSecurityLog\",\n    \"dataJoinPollIntervalSec\" : 30,\n    \"mailHost\" : \"mailHost.com\",\n    \"mailSmtpPort\":\"25\",\n    \"mailDebug\" : \"true\",\n    \"eagleService\": {\n      \"host\": \"localhost\",\n      \"port\": 9099\n      \"username\": \"admin\",\n      \"password\": \"secret\"\n    }\n  },\n  \"dynamicConfigSource\" : {\n    \"enabled\" : true,\n    \"initDelayMillis\" : 0,\n    \"delayMillis\" : 30000\n  }\n}";
+        ConfigParseOptions options = ConfigParseOptions.defaults()
+                .setSyntax(ConfigSyntax.PROPERTIES)
+                .setAllowMissing(false);
+        String topoConfigStr = "web.hbase.zookeeper.property.clientPort=2181\nweb.hbase.zookeeper.quorum=sandbox.hortonworks.com\n\napp.envContextConfig.env=storm\napp.envContextConfig.mode=local\napp.dataSourceConfig.topic=sandbox_hbase_security_log\napp.dataSourceConfig.zkConnection=sandbox.hortonworks.com:2181\napp.dataSourceConfig.zkConnectionTimeoutMS=15000\napp.dataSourceConfig.brokerZkPath=/brokers\napp.dataSourceConfig.fetchSize=1048586\napp.dataSourceConfig.transactionZKServers=sandbox.hortonworks.com\napp.dataSourceConfig.transactionZKPort=2181\napp.dataSourceConfig.transactionZKRoot=/consumers\napp.dataSourceConfig.consumerGroupId=eagle.hbasesecurity.consumer\napp.dataSourceConfig.transactionStateUpdateMS=2000\napp.dataSourceConfig.deserializerClass=org.apache.eagle.security.hbase.parse.HbaseAuditLogKafkaDeserializer\napp.eagleProps.site=sandbox\napp.eagleProps.application=hbaseSecurityLog\napp.eagleProps.dataJoinPollIntervalSec=30\napp.eagleProps.mailHost=mailHost.com\napp.eagleProps.mailSmtpPort=25\napp.eagleProps.mailDebug=true\napp.eagleProps.eagleService.host=localhost\napp.eagleProps.eagleService.port=9098\napp.eagleProps.eagleService.username=admin\napp.eagleProps.eagleService.password=secret";
 
-        Config topoConfig = ConfigFactory.parseString(topoConfigStr);
+        Config topoConfig = ConfigFactory.parseString(topoConfigStr, options);
         Config conf = topoConfig.getConfig(EagleConfigConstants.APP_CONFIG);
+
         HbaseAuditLogProcessorTopology topology = new HbaseAuditLogProcessorTopology();
-        topology.submit("", conf);
+        //topology.submit("", conf);
     }
 }
