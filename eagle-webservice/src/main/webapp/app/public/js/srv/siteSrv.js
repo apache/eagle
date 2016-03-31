@@ -125,7 +125,7 @@
 					} else if(!_application) {
 						console.warn("[Site] Application not found:", siteApplication.tags.site, "-", siteApplication.tags.application);
 					} else {
-						_configObj = common.parseJSON(siteApplication.config, {});
+						_configObj = common.properties.parse(siteApplication.config, {});
 						Object.defineProperties(siteApplication, {
 							application: {
 								get: function () {
