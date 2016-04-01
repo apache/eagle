@@ -18,6 +18,7 @@
 package org.apache.eagle.security.hbase.parse;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -36,111 +37,70 @@ public class HbaseAuditLogParser implements Serializable {
     private final static int LOGDATE_INDEX = 1;
     private final static int LOGLEVEL_INDEX = 2;
     private final static int LOGATTRS_INDEX = 3;
-    private final static String LOGDATE="logdate";
-    private final static String LOGLEVEL="loglevel";
-    private final static String CONTROLLER = "SecurityLogger.org.apache.hadoop.hbase.security.access.AccessController";
-    private final static String REASON = "reason";
-    private final static String ADDRESS = "address";
-    private final static String REQUEST = "request";
     private final static String ALLOWED = "allowed";
     private final static String DENIED = "denied";
-    private final static String USER = "user";
-    private final static String SCOPE = "scope";
-    private final static String FAMILY = "family";
-    private final static String ACTION = "action";
     private final static Pattern loggerPattern = Pattern.compile("^([\\d\\s\\-:,]+)\\s+(\\w+)\\s+(.*)");
-    private final static Pattern loggerAttributesPattern = Pattern.compile("([\\w\\.]+:[/\\w\\.\\s\\\\]+);\\s+");
-    private final static Pattern loggerContextPattern = Pattern.compile("\\((.*)\\)");
+    private final static Pattern loggerContextPattern = Pattern.compile("\\w+:\\s*\\(user=(.*),\\s*scope=(.*),\\s*family=(.*),\\s*action=(.*)\\)");
     private final static Pattern allowedPattern = Pattern.compile(ALLOWED);
 
 
-    public HbaseAuditLogObject parse(String logLine) throws Exception {
+    public HbaseAuditLogObject parse(String logLine) {
         HbaseAuditLogObject ret = new HbaseAuditLogObject();
-        Map<String, String> auditMap = parseAudit(logLine);
-        if(auditMap == null) return null;
-
-        String status = auditMap.get(CONTROLLER);
-        if(StringUtils.isNotEmpty(status)) {
-            ret.status = allowedPattern.matcher(status).find() ? ALLOWED : DENIED;
-        }
-
-        String scope = auditMap.get(SCOPE);
-        String family = auditMap.get(FAMILY);
-        if(StringUtils.isNotEmpty(family)) {
-            if(!scope.contains(":")) scope = "default:" + scope;
-            scope = String.format("%s:%s", scope, family);
-        }
-        String ip = auditMap.get(ADDRESS);
-        if(StringUtils.isNotEmpty(ip)) {
-            ret.host = ip.substring(1);
-        }
-        ret.scope = scope;
-        ret.action = auditMap.get(ACTION);
-        ret.user = LogParseUtil.parseUserFromUGI(auditMap.get(USER));
-        ret.request = auditMap.get(REQUEST);
-        ret.timestamp = DateTimeUtil.humanDateToMilliseconds(auditMap.get(LOGDATE));
-        return ret;
-    }
-
-    Map<String, String> parseContext(String logLine) {
-        Matcher loggerMatcher = loggerContextPattern.matcher(logLine);
-        Map<String, String> ret = new HashMap<>();
-        if(loggerMatcher.find()) {
-            String context = loggerMatcher.group(1);
-            String [] kvs = context.split(",");
-            for(String kv : kvs){
-                String [] vals = kv.split("=");
-                if(vals.length > 1) {
-                    ret.put(vals[0].trim(), vals[1].trim());
-                } else {
-                    ret.put(vals[0].trim(), "");
-                }
-            }
-        }
-        return ret;
-    }
-
-    Map<String, String> parseAttribute(String logLine) {
-        Map<String, String> ret = new HashMap<>();
-        Matcher loggerMatcher = loggerAttributesPattern.matcher(logLine);
-        while(loggerMatcher.find()) {
-            String kv = loggerMatcher.group(1);
-            String[] kvs = kv.split(":");
-            if(kvs.length > 1) {
-                ret.put(kvs[0].trim(), kvs[1].trim());
-            } else {
-                ret.put(kvs[0].trim(), "");
-            }
-        }
-        return ret;
-    }
-
-    Map<String, String> parseAudit(String logLine) {
-        Map<String, String> ret = null;
+        String timestamp = "";
+        String user = "";
+        String scope = "";
+        String action = "";
+        String ip = "";
+        String request = "";
+        String family = "";
+        String context = "";
 
         Matcher loggerMatcher = loggerPattern.matcher(logLine);
         if(loggerMatcher.find()) {
             try {
-                ret = new HashMap<>();
-                ret.put(LOGDATE, loggerMatcher.group(LOGDATE_INDEX));
-                ret.put(LOGLEVEL, loggerMatcher.group(LOGLEVEL_INDEX));
-                String logAttr = loggerMatcher.group(LOGATTRS_INDEX);
-                Map<String, String> attrs = parseAttribute(logAttr);
-                ret.put(CONTROLLER, attrs.get(CONTROLLER));
-                ret.put(REASON, attrs.get(REASON));
-                ret.put(ADDRESS, attrs.get(ADDRESS));
-                ret.put(REQUEST, attrs.get(REQUEST));
-                Map<String, String> contextMap = parseContext(logAttr);
-                ret.put(USER, contextMap.get(USER));
-                ret.put(SCOPE, contextMap.get(SCOPE));
-                ret.put(FAMILY, contextMap.get(FAMILY));
-                ret.put(ACTION, contextMap.get(ACTION));
-            } catch(IndexOutOfBoundsException e) {
+                timestamp = loggerMatcher.group(LOGDATE_INDEX);
+                String [] attrs = loggerMatcher.group(LOGATTRS_INDEX).split(";");
+                ret.status = allowedPattern.matcher(attrs[0]).find() ? ALLOWED : DENIED;
+                try {
+                    ip = attrs[2].split(":")[1].trim();
+                } catch (Exception e) {
+                    ip = "";
+                }
+                try {
+                    request = attrs[3].split(":")[1].trim();
+                } catch (Exception e) {
+                    request = "";
+                }
+                try {
+                    context = attrs[4].trim();
+                } catch (Exception e) {
+                    context = "";
+                }
+                Matcher contextMatcher = loggerContextPattern.matcher(context);
+                if(contextMatcher.find()) {
+                    user = contextMatcher.group(1);
+                    scope = contextMatcher.group(2);
+                    family = contextMatcher.group(3);
+                    action = contextMatcher.group(4);
+                }
+                if(StringUtils.isNotEmpty(family)) {
+                    if(!scope.contains(":")) scope = "default:" + scope;
+                    scope = String.format("%s:%s", scope, family);
+                }
+                if(StringUtils.isNotEmpty(ip)) {
+                    ret.host = ip.substring(1);
+                }
+                ret.timestamp = DateTimeUtil.humanDateToMilliseconds(timestamp);
+                ret.scope = scope;
+                ret.action = action;
+                ret.user = LogParseUtil.parseUserFromUGI(user);
+                ret.request = request;
+                return ret;
+            } catch(Exception e) {
                 LOG.error("Got exception when parsing audit log:" + logLine + ", exception:" + e.getMessage(), e);
-                ret = null;
             }
         }
-        return ret;
+        return null;
     }
 }
 
