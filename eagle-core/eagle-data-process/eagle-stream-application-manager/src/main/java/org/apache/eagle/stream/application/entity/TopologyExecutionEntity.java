@@ -46,11 +46,11 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
     @Column("b")
     private String url;
     @Column("c")
-    private String deploy;
+    private String description;
     @Column("d")
     private String status;
     @Column("e")
-    private long lastUpdateTime;
+    private long lastModifiedDate;
 
     public String getFullName() {
         return fullName;
@@ -69,13 +69,13 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
         valueChanged("url");
     }
 
-    public String getDeploy() {
-        return deploy;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDeploy(String deploy) {
-        this.deploy = deploy;
-        valueChanged("deploy");
+    public void setDescription(String description) {
+        this.description = description;
+        valueChanged("description");
     }
 
     public String getStatus() {
@@ -87,13 +87,13 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
         valueChanged("status");
     }
 
-    public long getLastUpdateTime() {
-        return lastUpdateTime;
+    public long getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
-    public void setLastUpdateTime(long lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
-        valueChanged("lastUpdateTime");
+    public void setLastModifiedDate(long lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+        valueChanged("lastModifiedDate");
     }
 
     public final static class TOPOLOGY_STATUS {
@@ -110,9 +110,9 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
                 entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
                 entity.getFullName(),
                 entity.getUrl(),
-                entity.getDeploy(),
+                entity.getDescription(),
                 entity.getStatus(),
-                entity.getLastUpdateTime());
+                entity.getLastModifiedDate());
         return model;
     }
 
@@ -125,9 +125,9 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
         }};
         entity.setFullName(model.fullName());
         entity.setUrl(model.url());
-        entity.setDeploy(model.deploy());
+        entity.setDescription(model.description());
         entity.setStatus(model.status());
-        entity.setLastUpdateTime(model.lastUpdateTime());
+        entity.setLastModifiedDate(model.lastModifiedDate());
         entity.setTags(tags);
         return entity;
     }

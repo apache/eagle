@@ -37,23 +37,12 @@ import java.util.Map;
 @Service(Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(false)
-@Tags({"site", "application", "uuid", "operation"})
+@Tags({"site", "application", "topology", "uuid", "operation"})
 public class TopologyOperationEntity extends TaggedLogAPIEntity {
     @Column("a")
-    private String topology;
-    @Column("b")
     private String status;
-    @Column("c")
-    private long lastUpdateTime;
-
-    public String getTopology() {
-        return topology;
-    }
-
-    public void setTopology(String topology) {
-        this.topology = topology;
-        valueChanged("topology");
-    }
+    @Column("b")
+    private long lastModifiedDate;
 
     public String getStatus() {
         return status;
@@ -64,13 +53,13 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
         valueChanged("status");
     }
 
-    public long getLastUpdateTime() {
-        return lastUpdateTime;
+    public long getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
-    public void setLastUpdateTime(long lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
-        valueChanged("lastUpdateTime");
+    public void setLastModifiedDate(long lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+        valueChanged("lastModifiedDate");
     }
 
     public final static class OPERATION {
@@ -90,27 +79,24 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
         TopologyOperationModel model = new TopologyOperationModel(
                 entity.getTags().get(AppManagerConstants.SITE_TAG),
                 entity.getTags().get(AppManagerConstants.APPLICATION_TAG),
+                entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
                 entity.getTags().get(AppManagerConstants.COMMAND_ID_TAG),
                 entity.getTags().get(AppManagerConstants.COMMAND_TYPE_TAG),
-                entity.getTopology(),
                 entity.getStatus(),
-                entity.getLastUpdateTime());
+                entity.getLastModifiedDate());
         return model;
     }
 
     public static TopologyOperationEntity fromModel(final TopologyOperationModel model){
         TopologyOperationEntity entity = new TopologyOperationEntity();
-        entity.setTopology(model.topology());
-        entity.setStatus(model.status());
         Map<String,String> tags = new HashMap<String,String>(){{
             put(AppManagerConstants.SITE_TAG, model.site());
             put(AppManagerConstants.COMMAND_ID_TAG,model.uuid());
             put(AppManagerConstants.COMMAND_TYPE_TAG, model.operation());
             put(AppManagerConstants.APPLICATION_TAG, model.application());
-
+            put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
         }};
-        entity.setLastUpdateTime(model.lastUpdateTime());
-        entity.setTopology(model.topology());
+        entity.setLastModifiedDate(model.lastModifiedDate());
         entity.setStatus(model.status());
         entity.setTags(tags);
         return entity;
