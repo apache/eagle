@@ -19,6 +19,7 @@
 package org.apache.eagle.service.security.hbase.resolver;
 
 
+import com.typesafe.config.Config;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
@@ -43,8 +44,9 @@ public class HbaseMetadataResolver implements AttributeResolvable<GenericAttribu
 
         try {
             MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
-            Configuration config = repo.getConfig(HbaseMetadataBrowseWebResource.HBASE_APPLICATION, site);
-            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(config);
+            Config config = repo.getConfig(HbaseMetadataBrowseWebResource.HBASE_APPLICATION, site);
+            Configuration conf = repo.convert(config);
+            HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
 
             switch (subResources.length) {
                 case 1:

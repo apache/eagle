@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
@@ -55,8 +56,9 @@ public class HDFSResourceResolver  implements AttributeResolvable<GenericAttribu
 		List<String> result = new ArrayList<>();
 		MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
 		try {
-			Configuration config = repo.getConfig(HDFSResourceConstants.HDFS_APPLICATION, request.getSite().trim());
-			HDFSFileSystem fileSystem = new HDFSFileSystem(config);
+			Config config = repo.getConfig(HDFSResourceConstants.HDFS_APPLICATION, request.getSite().trim());
+			Configuration conf = repo.convert(config);
+			HDFSFileSystem fileSystem = new HDFSFileSystem(conf);
 			String query = request.getQuery().trim();
 			List<FileStatus> fileStatuses = null;
 			if(query.endsWith("/")) {
