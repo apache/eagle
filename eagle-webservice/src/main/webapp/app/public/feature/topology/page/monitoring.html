@@ -1,0 +1,51 @@
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<i class="fa fa-eye"></i>
+		<a class="pull-right" href="#/config/topology/management"><span class="fa fa-angle-right"></span> Management</a>
+		<h3 class="box-title">
+			Monitoring
+		</h3>
+	</div>
+	<div class="box-body">
+		<div sorttable source="topologyExecutionList">
+			<table class="table table-bordered" ng-non-bindable>
+				<thead>
+				<tr>
+					<th width="70" sortpath="status">Status</th>
+					<th width="60" sortpath="tags.site">Site</th>
+					<th width="100" sortpath="tags.application">Application</th>
+					<th width="90" sortpath="tags.topology">Topology</th>
+					<th sortpath="description">Description</th>
+					<th width="70"></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>{{item.status}}</td>
+					<td>{{item.tags.site}}</td>
+					<td>{{item.tags.application}}</td>
+					<td>{{item.tags.topology}}</td>
+					<td>{{item.tags.description}}</td>
+					<td class="text-center">
+						<button ng-if="item.status === 'STOPPED'" class="fa fa-play sm btn btn-default btn-xs" uib-tooltip="Start" tooltip-animation="false" ng-click="_parent.startTopologyOperation(item)"> </button>
+						<button ng-if="item.status === 'STARTED'" class="fa fa-stop sm btn btn-default btn-xs" uib-tooltip="Stop" tooltip-animation="false" ng-click="_parent.stopTopologyOperation(item)"> </button>
+						<button ng-if="item.status !== 'STARTED' && item.status !== 'STOPPED'" class="fa fa-ban sm btn btn-default btn-xs" disabled="disabled"> </button>
+						<button class="rm fa fa-trash-o btn btn-danger btn-xs" uib-tooltip="Delete" tooltip-animation="false" ng-click="_parent.deleteTopologyExecution(item)"> </button>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="box-footer">
+		<button class="btn btn-primary pull-right" ng-click="newTopologyExecution()">
+			New Topology Execution
+			<i class="fa fa-plus-circle"> </i>
+		</button>
+	</div>
+
+	<div class="overlay" ng-hide="topologyExecutionList._promise.$$state.status === 1;">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+</div>

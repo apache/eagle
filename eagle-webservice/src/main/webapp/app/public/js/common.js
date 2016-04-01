@@ -237,10 +237,16 @@ common.array.top = function(list, path, count) {
 	return !count ? _list : _list.slice(0, count);
 };
 
-common.array.find = function(val, list, path, findAll) {
+common.array.find = function(val, list, path, findAll, caseSensitive) {
 	path = path || "";
+	val = caseSensitive === false ? (val || "").toUpperCase() : val;
+
 	var _list = $.grep(list, function(unit) {
-		return val === common.getValueByPath(unit, path);
+		if(caseSensitive === false) {
+			return val === (common.getValueByPath(unit, path) || "").toUpperCase();
+		} else {
+			return val === common.getValueByPath(unit, path);
+		}
 	});
 	return findAll ? _list : (_list.length === 0 ? null : _list[0]);
 };
