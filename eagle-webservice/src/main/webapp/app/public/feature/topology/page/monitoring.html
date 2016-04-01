@@ -12,9 +12,9 @@
 				<thead>
 				<tr>
 					<th width="70" sortpath="status">Status</th>
+					<th width="90" sortpath="tags.topology">Topology</th>
 					<th width="60" sortpath="tags.site">Site</th>
 					<th width="100" sortpath="tags.application">Application</th>
-					<th width="90" sortpath="tags.topology">Topology</th>
 					<th sortpath="description">Description</th>
 					<th width="70"></th>
 				</tr>
@@ -22,9 +22,9 @@
 				<tbody>
 				<tr>
 					<td>{{item.status}}</td>
+					<td>{{item.tags.topology}}</td>
 					<td>{{item.tags.site}}</td>
 					<td>{{item.tags.application}}</td>
-					<td>{{item.tags.topology}}</td>
 					<td>{{item.tags.description}}</td>
 					<td class="text-center">
 						<button ng-if="item.status === 'STOPPED'" class="fa fa-play sm btn btn-default btn-xs" uib-tooltip="Start" tooltip-animation="false" ng-click="_parent.startTopologyOperation(item)"> </button>
