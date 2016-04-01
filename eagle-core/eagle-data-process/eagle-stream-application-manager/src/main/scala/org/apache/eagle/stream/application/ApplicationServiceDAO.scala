@@ -113,7 +113,7 @@ class ApplicationServiceDAO(config: Config, ex: ExecutionContext) {
         if(LOG.isDebugEnabled()) LOG.debug(s"Updating status of command[$operation] as $status")
         val client = getEagleServiceClient()
         operation.setStatus(status)
-        operation.setLastUpdateTime(System.currentTimeMillis())
+        operation.setLastModifiedDate(System.currentTimeMillis())
         if(client != null) client.close()
         val response= client.update(java.util.Arrays.asList(operation), classOf[TopologyOperationEntity])
         if(response.isSuccess) {
@@ -133,7 +133,7 @@ class ApplicationServiceDAO(config: Config, ex: ExecutionContext) {
         if(LOG.isDebugEnabled()) LOG.debug(s"Updating status of app[$topology] as $status")
         val client = getEagleServiceClient()
         topology.setStatus(status)
-        topology.setLastUpdateTime(System.currentTimeMillis())
+        topology.setLastModifiedDate(System.currentTimeMillis())
         if(client != null) client.close()
         val response= client.update(java.util.Arrays.asList(topology), classOf[TopologyExecutionEntity])
         if(response.isSuccess) {

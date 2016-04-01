@@ -21,7 +21,7 @@ package org.apache.eagle.stream.application.model
 import org.apache.eagle.stream.application.entity.TopologyOperationEntity
 
 
-case class TopologyOperationModel(site: String, application: String, uuid: String, operation: String, topology: String, status: String, lastUpdateTime: Long) extends EntityConversion[TopologyOperationEntity] {
+case class TopologyOperationModel(site: String, application: String, topology: String, uuid: String, operation: String, status: String, lastUpdateTime: Long) extends EntityConversion[TopologyOperationEntity] {
   override def toEntity: TopologyOperationEntity = TopologyOperationEntity.fromModel(this)
   override def fromEntity(entity: TopologyOperationEntity) = TopologyOperationEntity.toModel(entity)
 }
