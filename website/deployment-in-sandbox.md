@@ -36,15 +36,19 @@ To install Eagle on a sandbox you need to run a HDP sandbox image in a virtual m
 
     * **Option 1**: Download eagle jar from [here](http://66.211.190.194/eagle-0.1.0.tar.gz).
 
-    * **Option 2**: Build form source code [eagle github](https://github.com/eBay/Eagle). After successful build, ‘eagle-xxx-bin.tar.gz’ will be generated under `./eagle-assembly/target`
+* **Option 2**: Build form source code [eagle github](https://github.com/eBay/Eagle). After successful build, ‘eagle-xxx-bin.tar.gz’ will be generated under `./eagle-assembly/target` (please refer to[Setup Development Environment on Mac](https://github.com/apache/incubator-eagle/blob/master/eagle-tutorial/SetupDevelopmentEnvOnMac.md) if you have any issues during the maven build.)
 
           # installed npm is required before compiling
           $ mvn clean install -DskipTests=true
 * **Copy and extract the package to sandbox**
 
-      #extract
-      $ tar -zxvf eagle-0.1.0-bin.tar.gz
-      $ mv eagle-0.1.0 /usr/hdp/current/eagle
+      #copy the file to the sandbox. Please run this command on your local machine. you will be asked for the password. Please enter "hadoop" - the default password for root in the sandbox
+      <local_machine>$ scp <eagle_path>/eagle-assembly/target/eagle-xxx-bin.tar.gz -p 2222 root@<sandbox_IP>:/usr/hdp/current
+
+      #Now you can login into the sandbox, got the hdp/current directory and extract the package
+      $ cd /usr/hdp/current
+      $ tar -zxvf eagle-0.3.0-bin.tar.gz
+      $ mv eagle-0.3.0 eagle
 
 <br/>
 
