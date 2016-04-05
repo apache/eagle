@@ -33,9 +33,9 @@ import java.util.regex.Pattern;
 public class HDFSCommandResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
     private final static Logger LOG = LoggerFactory.getLogger(HDFSCommandResolver.class);
 
-    private final static String [] cmdStrs = {"open", "create", "append", "delete", "listfileinfo", "rename",
-            "mkdirs", "listStatus", "setReplication", "setOwner", "setPermission", "setTimes", "setXAttr", "removeXAttr", "getXAttrs",
-            "contentSummary", "createEncryptionZone", "checkAccess"};
+    private final static String [] cmdStrs = {"CHGRP", "CHOWN", "CHPERM","CREATE", "DELETE",
+            "DISABLEAUDIT", "ENABLEAUDIT", "GETATTR","LOOKUP", "MKDIR", "READ", "READDIR",
+            "RENAME", "RMDIR", "SETATTR", "WRITE"};
 
     //private final static String [] cmdStrs = {"appendToFile","cat","checksum","chgrp","chmod","chown","copyFromLocal","copyToLocal","count","cp","createSnapshot","deleteSnapshot","df","du","dus","expunge","find","get","getfacl","getfattr","getmerge","help","ls","lsr","mkdir","moveFromLocal","moveToLocal","mv","put","renameSnapshot","rm","rmdir","rmr","setfacl","setfattr","setrep","stat","tail","test","text","touchz","truncate","usage"};
 

@@ -30,7 +30,6 @@
   <name>eagle-security-parent</name>
   <description>eagle security data activity monitoring project</description>
   <packaging>pom</packaging>
-
   <modules>
     <module>eagle-security-common</module>
 	<module>eagle-security-hdfs-auditlog</module>

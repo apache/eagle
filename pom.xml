@@ -749,30 +749,51 @@
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.hadoop</groupId>
-                        <artifactId>hadoop-common</artifactId>
-                        <version>${hadoop.version}</version>
+                        <artifactId>hadoop-core</artifactId>
+                        <version>1.0.3-mapr-5.0.0</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-common</artifactId>
+                        <version>2.7.0-mapr-1506</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-auth</artifactId>
+                        <version>2.7.0-mapr-1506</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mapr.hadoop</groupId>
+                        <artifactId>maprfs</artifactId>
+                        <version>5.0.0-mapr</version>
+                    </dependency>
+
+                    <!--<dependency>-->
+                        <!--<groupId>org.apache.hadoop</groupId>-->
+                        <!--<artifactId>hadoop-common</artifactId>-->
+                        <!--<version>${hadoop.version}</version>-->
+                    <!--</dependency>-->
 
                     <dependency>
                         <groupId>org.apache.hbase</groupId>
                         <artifactId>hbase-client</artifactId>
                         <version>${hbase.version}</version>
                     </dependency>
-                    <dependency>
-                        <groupId>org.apache.hadoop</groupId>
-                        <artifactId>hadoop-hdfs</artifactId>
-                        <version>${hadoop.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.hadoop</groupId>
-                        <artifactId>hadoop-client</artifactId>
-                        <version>${hadoop.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.hadoop</groupId>
-                        <artifactId>hadoop-auth</artifactId>
-                        <version>${hadoop.version}</version>
-                    </dependency>
+                    <!--<dependency>-->
+                        <!--<groupId>org.apache.hadoop</groupId>-->
+                        <!--<artifactId>hadoop-hdfs</artifactId>-->
+                        <!--<version>${hadoop.version}</version>-->
+                    <!--</dependency>-->
+                    <!--<dependency>-->
+                        <!--<groupId>org.apache.hadoop</groupId>-->
+                        <!--<artifactId>hadoop-client</artifactId>-->
+                        <!--<version>${hadoop.version}</version>-->
+                    <!--</dependency>-->
+                    <!--<dependency>-->
+                        <!--<groupId>org.apache.hadoop</groupId>-->
+                        <!--<artifactId>hadoop-auth</artifactId>-->
+                        <!--<version>${hadoop.version}</version>-->
+                    <!--</dependency>-->
                     <dependency>
                         <groupId>org.apache.hbase</groupId>
                         <artifactId>hbase-server</artifactId>
@@ -951,6 +972,12 @@
          </plugins>
     </build>
     <repositories>
+        <repository>
+            <id>mapr-releases</id>
+            <url>http://repository.mapr.com/maven/</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
+        </repository>
         <repository>
             <id>HDP Release Repository</id>
             <url>http://repo.hortonworks.com/content/repositories/releases/</url>
