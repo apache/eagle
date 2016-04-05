@@ -98,7 +98,7 @@
 		 * Create a creation confirm modal.
 		 * @param name			Name title
 		 * @param entity		bind entity
-		 * @param fieldList	Array. Format: {name, field, type(optional: blob), rows(optional: number), description(optional), optional(optional), readonly(optional)}
+		 * @param fieldList	Array. Format: {name, field, type(optional: select, blob), rows(optional: number), description(optional), optional(optional), readonly(optional), valueList(optional)}
 		 * @param checkFunc	Check logic function. Return string will prevent access
 		 */
 		UI.createConfirm = function(name, entity, fieldList, checkFunc) {
@@ -109,7 +109,7 @@
 		 * Create a update confirm modal.
 		 * @param name			Name title
 		 * @param entity		bind entity
-		 * @param fieldList	Array. Format: {name, field, type(optional: blob), rows(optional: number), description(optional), optional(optional), readonly(optional)}
+		 * @param fieldList	Array. Format: {name, field, type(optional: select, blob), rows(optional: number), description(optional), optional(optional), readonly(optional), valueList(optional)}
 		 * @param checkFunc	Check logic function. Return string will prevent access
 		 */
 		UI.updateConfirm = function(name, entity, fieldList, checkFunc) {
@@ -124,7 +124,7 @@
 		 * 			@param config.confirm			Boolean. Display or not confirm button
 		 * 			@param config.confirmDesc		Confirm button display description
 		 * @param entity		bind entity
-		 * @param fieldList	Array. Format: {name, field, type(optional: blob), rows(optional: number), description(optional), optional(optional), readonly(optional)}
+		 * @param fieldList	Array. Format: {name, field, type(optional: select, blob), rows(optional: number), description(optional), optional(optional), readonly(optional), valueList(optional)}
 		 * @param checkFunc	Check logic function. Return string will prevent access
 		 */
 		UI.fieldConfirm = function(config, entity, fieldList, checkFunc) {
@@ -193,8 +193,11 @@
 								'<span ng-if="!field.optional">*</span> ' +
 								'{{field.name || field.field}}' +
 							'</label>' +
-							'<textarea class="form-control" placeholder="{{field.description || field.name || field.field + \'...\'}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
-							'<input type="text" class="form-control" placeholder="{{field.description || field.name || field.field + \'...\'}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
+							'<textarea class="form-control" placeholder="{{field.description || (field.name || field.field) + \'...\'}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
+							'<select class="form-control" ng-model="entity[field.field]" ng-init="entity[field.field] = field.valueList[0]" ng-switch-when="select">' +
+								'<option ng-repeat="value in field.valueList">{{value}}</option>' +
+							'</select>' +
+							'<input type="text" class="form-control" placeholder="{{field.description || (field.name || field.field) + \'...\'}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
 						'</div>' +
 					'</div>' +
 					'<div class="modal-footer">' +
