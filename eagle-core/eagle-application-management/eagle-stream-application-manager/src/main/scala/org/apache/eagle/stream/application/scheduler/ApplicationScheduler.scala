@@ -128,7 +128,7 @@ private[scheduler] class AppCommandLoader extends Actor with ActorLogging {
       _dao = new ApplicationServiceDAO(config, context.dispatcher)
     case CommandLoaderEvent => {
       val _sender = sender()
-      _dao.readNewInitializedCommandByType() onComplete {
+      _dao.readOperationsByStatus(OPERATION_STATUS.INITIALIZED) onComplete {
         case Success(optionalEntities) =>
           optionalEntities match {
             case Some(commands) => {

@@ -80,6 +80,7 @@ public class ApplicationManagementResource {
             response.setSuccess(false);
             response.setException(e);
         }
+        response.setSuccess(true);
         return response;
     }
 

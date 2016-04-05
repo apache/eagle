@@ -29,9 +29,7 @@ import org.apache.eagle.policy.common.Constants
 import org.apache.eagle.service.application.entity.{TopologyDescriptionEntity, TopologyExecutionEntity, TopologyOperationEntity}
 import org.apache.eagle.service.client.EagleServiceConnector
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl
-import org.apache.eagle.service.application.entity.TopologyOperationEntity.OPERATION_STATUS
 import org.apache.eagle.stream.application.model.TopologyDescriptionModel
-
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.concurrent.ExecutionContext
@@ -45,11 +43,11 @@ class ApplicationServiceDAO(config: Config, ex: ExecutionContext) {
     return new EagleServiceClientImpl(connector)
   }
 
-  def readNewInitializedCommandByType() = {
+  def readOperationsByStatus(status: String) = {
     Futures.future(new Callable[Option[util.List[TopologyOperationEntity]]]{
       override def call(): Option[util.List[TopologyOperationEntity]] = {
         val client = getEagleServiceClient()
-        val query = "%s[@status=\"%s\"]{*}".format(Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME, OPERATION_STATUS.INITIALIZED)
+        val query = "%s[@status=\"%s\"]{*}".format(Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME, status)
         val response: GenericServiceAPIResponseEntity[TopologyOperationEntity] = client.search(query).pageSize(Int.MaxValue).send()
         if(client != null) client.close()
         if(response.getObj != null && response.getObj.size() != 0) Option(response.getObj) else None

@@ -39,6 +39,6 @@ public class EagleServiceProfileInitializer implements ApplicationContextInitial
         applicationContext.getEnvironment().setActiveProfiles(profile);
         applicationContext.refresh();
 
-        //new ApplicationScheduler().startDeamon();
+        new ApplicationScheduler().startDeamon();
     }
 }
