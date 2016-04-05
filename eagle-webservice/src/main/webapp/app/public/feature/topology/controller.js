@@ -47,6 +47,9 @@
 
 		$scope.topologyExecutionList = null;
 
+		$scope.currentTopologyExecution = null;
+		$scope.currentTopologyExecutionActionList = [];
+
 		// ======================= Function =======================
 		function refreshExecutionList() {
 			var _list = Entities.queryEntities("TopologyExecutionService");
@@ -54,6 +57,13 @@
 				$scope.topologyExecutionList = _list;
 			});
 		}
+
+		$scope.showTopologyDetail = function (topologyExecution) {
+			$scope.currentTopologyExecution = topologyExecution;
+			$("#topologyMDL").modal();
+
+			$scope.currentTopologyExecutionActionList = Entities.queryEntities("TopologyOperationService", {_pageSize: 10});
+		};
 
 		// ==================== Initialization ====================
 		refreshExecutionList();

@@ -22,14 +22,14 @@
 				<tbody>
 				<tr>
 					<td>{{item.status}}</td>
-					<td>{{item.tags.topology}}</td>
+					<td><a ng-click="_parent.showTopologyDetail(item)">{{item.tags.topology}}</a></td>
 					<td>{{item.tags.site}}</td>
 					<td>{{item.tags.application}}</td>
 					<td>{{item.tags.description}}</td>
 					<td class="text-center">
-						<button ng-if="item.status === 'STOPPED'" class="fa fa-play sm btn btn-default btn-xs" uib-tooltip="Start" tooltip-animation="false" ng-click="_parent.startTopologyOperation(item)"> </button>
+						<button ng-if="item.status === 'NEW' || item.status === 'STOPPED'" class="fa fa-play sm btn btn-default btn-xs" uib-tooltip="Start" tooltip-animation="false" ng-click="_parent.startTopologyOperation(item)"> </button>
 						<button ng-if="item.status === 'STARTED'" class="fa fa-stop sm btn btn-default btn-xs" uib-tooltip="Stop" tooltip-animation="false" ng-click="_parent.stopTopologyOperation(item)"> </button>
-						<button ng-if="item.status !== 'STARTED' && item.status !== 'STOPPED'" class="fa fa-ban sm btn btn-default btn-xs" disabled="disabled"> </button>
+						<button ng-if="item.status !== 'NEW' && item.status !== 'STARTED' && item.status !== 'STOPPED'" class="fa fa-ban sm btn btn-default btn-xs" disabled="disabled"> </button>
 						<button class="rm fa fa-trash-o btn btn-danger btn-xs" uib-tooltip="Delete" tooltip-animation="false" ng-click="_parent.deleteTopologyExecution(item)"> </button>
 					</td>
 				</tr>
@@ -47,5 +47,89 @@
 
 	<div class="overlay" ng-hide="topologyExecutionList._promise.$$state.status === 1;">
 		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+</div>
+
+
+
+
+<!-- Modal: Topology Detail -->
+<div class="modal fade" id="topologyMDL" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Topology Detail</h4>
+			</div>
+			<div class="modal-body">
+				<h3>Detail</h3>
+				<table class="table">
+					<tbody>
+						<tr>
+							<th>Site</th>
+							<td>{{currentTopologyExecution.tags.site}}</td>
+						</tr>
+						<tr>
+							<th>Application</th>
+							<td>{{currentTopologyExecution.tags.application}}</td>
+						</tr>
+						<tr>
+							<th>Topology</th>
+							<td>{{currentTopologyExecution.tags.topology}}</td>
+						</tr>
+						<tr>
+							<th>Full Name</th>
+							<td>{{currentTopologyExecution.fullName || "-"}}</td>
+						</tr>
+						<tr>
+							<th>Status</th>
+							<td>{{currentTopologyExecution.status || "-"}}</td>
+						</tr>
+						<tr>
+							<th>Url</th>
+							<td>{{currentTopologyExecution.url || "-"}}</td>
+						</tr>
+						<tr>
+							<th>Description</th>
+							<td>{{currentTopologyExecution.description || "-"}}</td>
+						</tr>
+						<tr>
+							<th>Last Modified Date</th>
+							<td>{{common.format.date(currentTopologyExecution.lastModifiedDate) || "-"}}</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<h3>Last 10 Actions</h3>
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Date Time</th>
+							<th>Operation</th>
+							<th>UUID</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="action in currentTopologyExecutionActionList track by $index">
+							<td>{{common.format.date(action.lastModifiedDate) || "-"}}</td>
+							<td>{{action.tags.operation}}</td>
+							<td>{{action.tags.uuid}}</td>
+							<td>{{action.status}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="confirmUpdateChart()">
+					Confirm
+				</button>
+			</div>
+		</div>
 	</div>
 </div>

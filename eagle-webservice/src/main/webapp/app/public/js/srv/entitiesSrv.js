@@ -28,7 +28,7 @@
 			kvs = kvs || {};
 			var _list = [];
 			var _condition = kvs._condition || {};
-			var _addtionalCondition = _condition.additionalCondition || {};
+			var _additionalCondition = _condition.additionalCondition || {};
 			var _startTime, _endTime;
 			var _startTimeStr, _endTimeStr;
 
@@ -52,37 +52,37 @@
 
 			// Fill special parameters
 			// > Query by time duration
-			if(_addtionalCondition._duration) {
+			if(_additionalCondition._duration) {
 				_endTime = app.time.now();
-				_startTime = _endTime.clone().subtract(_addtionalCondition._duration, "ms");
+				_startTime = _endTime.clone().subtract(_additionalCondition._duration, "ms");
 
 				// Debug usage. Extend more time duration for end time
-				if(_addtionalCondition.__ETD) {
-					_endTime.add(_addtionalCondition.__ETD, "ms");
+				if(_additionalCondition.__ETD) {
+					_endTime.add(_additionalCondition.__ETD, "ms");
 				}
 
-				_addtionalCondition._startTime = _startTime;
-				_addtionalCondition._endTime = _endTime;
+				_additionalCondition._startTime = _startTime;
+				_additionalCondition._endTime = _endTime;
 
 				_startTimeStr = _startTime.format("YYYY-MM-DD HH:mm:ss");
 				_endTimeStr = _endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
 
 				_url += "&startTime=" + _startTimeStr + "&endTime=" + _endTimeStr;
-			} else if(_addtionalCondition._startTime && _addtionalCondition._endTime) {
-				_startTimeStr = _addtionalCondition._startTime.format("YYYY-MM-DD HH:mm:ss");
-				_endTimeStr = _addtionalCondition._endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
+			} else if(_additionalCondition._startTime && _additionalCondition._endTime) {
+				_startTimeStr = _additionalCondition._startTime.format("YYYY-MM-DD HH:mm:ss");
+				_endTimeStr = _additionalCondition._endTime.clone().add(1, "s").format("YYYY-MM-DD HH:mm:ss");
 
 				_url += "&startTime=" + _startTimeStr + "&endTime=" + _endTimeStr;
 			}
 
 			// > Query contains metric name
-			if(_addtionalCondition._metricName) {
-				_url += "&metricName=" + _addtionalCondition._metricName;
+			if(_additionalCondition._metricName) {
+				_url += "&metricName=" + _additionalCondition._metricName;
 			}
 
 			// > Customize page size
-			if(_addtionalCondition._pageSize) {
-				_url = _url.replace(/pageSize=\d+/, "pageSize=" + _addtionalCondition._pageSize);
+			if(_additionalCondition._pageSize) {
+				_url = _url.replace(/pageSize=\d+/, "pageSize=" + _additionalCondition._pageSize);
 			}
 
 			// AJAX
