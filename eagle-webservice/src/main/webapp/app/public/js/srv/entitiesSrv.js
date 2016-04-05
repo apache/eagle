@@ -190,7 +190,7 @@
 
 				// Check for url hook
 				if(config.hook) {
-					_url = app.getUpdateURL(serviceName);
+					_url = app.getUpdateURL(serviceName) || app.packageURL(serviceName);
 				} else {
 					_url = app.getURL("updateEntity", {serviceName: serviceName});
 				}

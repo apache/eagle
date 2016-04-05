@@ -67,7 +67,7 @@
 
 		// ==================== Initialization ====================
 		refreshExecutionList();
-		topologyRefreshInterval = $interval(refreshExecutionList, 5 * 1000);
+		topologyRefreshInterval = $interval(refreshExecutionList, 10 * 1000);
 
 		$scope.topologyList = Entities.queryEntities("TopologyDescriptionService");
 		$scope.topologyList._promise.then(function () {
@@ -139,33 +139,29 @@
 				});
 
 				list._promise.then(function () {
-					var operation = common.array.find(operation, list, "tags.operation");
-					if(operation && (operation.status !== "INITIALIZED" || operation.status !== "PENDING")) {
+					var lastOperation = common.array.find(operation, list, "tags.operation");
+					if(lastOperation && (lastOperation.status !== "INITIALIZED" || lastOperation.status !== "PENDING")) {
 						refreshExecutionList();
 						return;
 					}
 
-					// TODO: do some operation
+					Entities.updateEntity("rest/app/operation", {
+						tags: {
+							site: topologyExecution.tags.site,
+							application: topologyExecution.tags.application,
+							topology: topologyExecution.tags.topology,
+							operation: operation
+						},
+						status: "INITIALIZED"
+					}, {timestamp: false, hook: true});
 				});
-
-				/*var _entity = {
-				 tags: {
-				 operation: "START",
-				 uuid: +new Date() + "_" + (Math.ceil(Math.random() * 10000))
-				 },
-				 status: "INITIALIZED"
-				 };
-				 $.extend(_entity.tags, topologyExecution.tags);
-				 Entities.updateEntity("TopologyOperationService", _entity)._promise.then(function() {
-				 refreshExecutionList();
-				 });*/
 			});
 		};
 
 		$scope.startTopologyOperation = function (topologyExecution) {
 			$scope.doTopologyOperation(topologyExecution, "START");
 		};
-		$scope.stopTopologyOperation = function () {
+		$scope.stopTopologyOperation = function (topologyExecution) {
 			$scope.doTopologyOperation(topologyExecution, "STOP");
 		};
 
