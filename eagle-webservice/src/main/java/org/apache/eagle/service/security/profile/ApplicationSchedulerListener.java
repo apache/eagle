@@ -16,16 +16,20 @@
  *
  */
 
-package org.apache.eagle.service.application.dao;
+package org.apache.eagle.service.security.profile;
 
 
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.service.application.entity.TopologyOperationEntity;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
-import java.util.List;
+public class ApplicationSchedulerListener implements ServletContextListener {
+    @Override
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
 
-public interface ApplicationManagerDAO {
-    String loadTopologyExecutionStatus(String site, String application, String topology);
-    int loadTopologyOperationsInRunning(String site, String application, String topology) throws Exception;
-    GenericServiceAPIResponseEntity createOperation(List<TopologyOperationEntity> entities) throws Exception;
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+
+    }
 }

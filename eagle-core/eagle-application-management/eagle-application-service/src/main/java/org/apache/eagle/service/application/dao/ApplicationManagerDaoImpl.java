@@ -64,14 +64,13 @@ public class ApplicationManagerDaoImpl implements ApplicationManagerDAO {
     }
 
     @Override
-    public void createOperation(List<TopologyOperationEntity> entities) throws Exception {
+    public GenericServiceAPIResponseEntity createOperation(List<TopologyOperationEntity> entities) throws Exception {
         if(entities.size() == 0) {
             LOG.info("TopologyOperationEntity set is empty.");
         }
         GenericServiceAPIResponseEntity response = resource.updateEntities(entities, Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME);
-        if(!response.isSuccess()) {
-            throw new Exception(response.getException());
-        }
+        return response;
     }
+
 }
 

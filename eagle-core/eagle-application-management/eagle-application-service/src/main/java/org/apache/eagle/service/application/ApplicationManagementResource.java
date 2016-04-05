@@ -75,12 +75,11 @@ public class ApplicationManagementResource {
                     throw new Exception(String.format("%s is an invalid operation, as the topology's current status is %s", operation.operation(), status));
                 }
             }
-            dao.createOperation(operations);
+            response = dao.createOperation(operations);
         } catch (Exception e) {
             response.setSuccess(false);
             response.setException(e);
         }
-        response.setSuccess(true);
         return response;
     }
 

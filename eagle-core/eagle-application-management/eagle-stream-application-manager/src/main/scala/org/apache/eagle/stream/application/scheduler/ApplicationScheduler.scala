@@ -24,7 +24,7 @@ import org.apache.eagle.common.config.EagleConfigConstants
 import org.apache.eagle.service.application.entity.TopologyExecutionEntity.TOPOLOGY_STATUS
 import org.apache.eagle.service.application.entity.{TopologyExecutionEntity, TopologyOperationEntity}
 import org.apache.eagle.service.application.entity.TopologyOperationEntity.{OPERATION, OPERATION_STATUS}
-import org.apache.eagle.stream.application.ApplicationServiceDAO
+import org.apache.eagle.stream.application.ApplicationSchedulerAsyncDAO
 import org.apache.eagle.stream.application.impl.StormApplicationManager
 import org.apache.eagle.stream.application.model.{TopologyOperationModel, TopologyExecutionModel}
 
@@ -38,7 +38,7 @@ private[scheduler] case class InitializationEvent(config: Config) extends Schedu
 private[scheduler] case class TerminatedEvent() extends ScheduleEvent
 private[scheduler] case class CommandLoaderEvent() extends ScheduleEvent
 private[scheduler] case class HealthCheckerEvent() extends ScheduleEvent
-private[scheduler] case class ResultCountEvent(value: Int) extends ScheduleEvent
+private[scheduler] case class ClearPendingOperation() extends ScheduleEvent
 private[scheduler] case class SchedulerCommand(executionModel: TopologyExecutionModel, operationModel:TopologyOperationModel) extends ScheduleEvent
 
 case class EagleServiceUnavailableException(message:String) extends Exception(message)
@@ -71,7 +71,8 @@ class ApplicationScheduler  {
 
     val coordinator = system.actorOf(Props[StreamAppCoordinator])
     system.scheduler.scheduleOnce(0 seconds, coordinator, InitializationEvent(config))
-    system.scheduler.schedule(1.seconds, 5.seconds, coordinator, CommandLoaderEvent)
+    system.scheduler.scheduleOnce(1 seconds, coordinator, ClearPendingOperation)
+    system.scheduler.schedule(2.seconds, 5.seconds, coordinator, CommandLoaderEvent)
     system.scheduler.schedule(600.seconds, 600.seconds, coordinator, HealthCheckerEvent)
 
     /*
@@ -90,6 +91,7 @@ private[scheduler] class StreamAppCoordinator extends Actor with ActorLogging {
   var commandLoader: ActorRef = null
   var commandExecutor: ActorRef = null
 
+
   override def preStart(): Unit = {
     commandLoader = context.actorOf(Props[AppCommandLoader], "command-loader")
     commandExecutor = context.actorOf(Props[AppCommandExecutor], "command-worker")
@@ -98,9 +100,12 @@ private[scheduler] class StreamAppCoordinator extends Actor with ActorLogging {
   override def receive = {
     case InitializationEvent(config) => {
       log.info(s"Config updated: $config")
+
       commandLoader ! InitializationEvent(config)
       commandExecutor ! InitializationEvent(config)
     }
+    case ClearPendingOperation =>
+      commandLoader ! ClearPendingOperation
     case CommandLoaderEvent =>
       commandLoader ! CommandLoaderEvent
     case command: SchedulerCommand =>
@@ -118,14 +123,18 @@ private[scheduler] class StreamAppCoordinator extends Actor with ActorLogging {
 
 private[scheduler] class AppCommandLoader extends Actor with ActorLogging {
   @volatile var _config: Config = null
-  @volatile var _dao: ApplicationServiceDAO = null
+  @volatile var _dao: ApplicationSchedulerAsyncDAO = null
 
   import context.dispatcher
 
   override def receive = {
     case InitializationEvent(config: Config) =>
       _config = config
-      _dao = new ApplicationServiceDAO(config, context.dispatcher)
+      _dao = new ApplicationSchedulerAsyncDAO(config, context.dispatcher)
+    case ClearPendingOperation =>
+      if(_dao != null) {
+        _dao.clearPendingOperations()
+      }
     case CommandLoaderEvent => {
       val _sender = sender()
       _dao.readOperationsByStatus(OPERATION_STATUS.INITIALIZED) onComplete {
@@ -189,7 +198,7 @@ private[scheduler] class AppCommandLoader extends Actor with ActorLogging {
 
 private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
   @volatile var _config: Config = _
-  @volatile var _dao: ApplicationServiceDAO = _
+  @volatile var _dao: ApplicationSchedulerAsyncDAO = _
   @volatile var _streamAppManager = new StormApplicationManager
 
   import context.dispatcher
@@ -254,7 +263,7 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
   override def receive = {
     case InitializationEvent(config: Config) =>
       _config = config
-      _dao = new ApplicationServiceDAO(config, context.dispatcher)
+      _dao = new ApplicationSchedulerAsyncDAO(config, context.dispatcher)
 
     case SchedulerCommand(executionModel, operationModel) =>
       execute(operationModel, executionModel)

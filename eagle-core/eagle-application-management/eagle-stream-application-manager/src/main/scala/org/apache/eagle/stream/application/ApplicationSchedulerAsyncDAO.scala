@@ -32,11 +32,12 @@ import org.apache.eagle.service.client.impl.EagleServiceClientImpl
 import org.apache.eagle.stream.application.model.TopologyDescriptionModel
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.collection.JavaConversions
 import scala.concurrent.ExecutionContext
 
 
-class ApplicationServiceDAO(config: Config, ex: ExecutionContext) {
-  private val LOG: Logger = LoggerFactory.getLogger(classOf[ApplicationServiceDAO])
+class ApplicationSchedulerAsyncDAO(config: Config, ex: ExecutionContext) {
+  private val LOG: Logger = LoggerFactory.getLogger(classOf[ApplicationSchedulerAsyncDAO])
   private val connector: EagleServiceConnector = new EagleServiceConnector(config)
 
   def getEagleServiceClient(): EagleServiceClientImpl = {
@@ -142,6 +143,34 @@ class ApplicationServiceDAO(config: Config, ex: ExecutionContext) {
           throw new RuntimeException(s"Failed to update application due to exception: ${response.getException}")
         }
         response
+      }
+    }, ex)
+  }
+
+  def clearPendingOperations() = {
+    Futures.future(new Callable[GenericServiceAPIResponseEntity[String]]{
+      override def call(): GenericServiceAPIResponseEntity[String] = {
+        LOG.info("start to clear operation")
+        val query: String = "%s[@status=\"%s\"]{*}".format(Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME, TopologyOperationEntity.OPERATION_STATUS.PENDING)
+        val client = getEagleServiceClient()
+        val response: GenericServiceAPIResponseEntity[TopologyOperationEntity] = client.search(query).pageSize(Int.MaxValue).send()
+        var ret: GenericServiceAPIResponseEntity[String] = new GenericServiceAPIResponseEntity[String]()
+        if (response.isSuccess && response.getObj.size != 0) {
+          val pendingOperations: util.List[TopologyOperationEntity] = response.getObj
+          val failedOperations: util.List[TopologyOperationEntity] = new util.ArrayList[TopologyOperationEntity]
+          JavaConversions.collectionAsScalaIterable(pendingOperations) foreach { operation =>
+            operation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
+            failedOperations.add(operation)
+          }
+          ret = client.update(failedOperations, Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME)
+          if (client != null) client.close()
+          if (ret.isSuccess) {
+            LOG.info(s"Successfully clear ${failedOperations.size()} pending operations")
+          } else {
+            LOG.error(s"Failed to clear pending operations due to exception:" + ret.getException)
+          }
+        }
+        ret
       }
     }, ex)
   }
