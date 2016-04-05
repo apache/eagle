@@ -48,7 +48,7 @@
 		$scope.topologyExecutionList = null;
 
 		$scope.currentTopologyExecution = null;
-		$scope.currentTopologyExecutionActionList = [];
+		$scope.currentTopologyExecutionOptList = [];
 
 		// ======================= Function =======================
 		function refreshExecutionList() {
@@ -62,12 +62,12 @@
 			$scope.currentTopologyExecution = topologyExecution;
 			$("#topologyMDL").modal();
 
-			$scope.currentTopologyExecutionActionList = Entities.queryEntities("TopologyOperationService", {_pageSize: 10});
+			$scope.currentTopologyExecutionOptList = Entities.queryEntities("TopologyOperationService", {_pageSize: 20});
 		};
 
 		// ==================== Initialization ====================
 		refreshExecutionList();
-		topologyRefreshInterval = $interval(refreshExecutionList, 10 * 1000);
+		topologyRefreshInterval = $interval(refreshExecutionList, 5 * 1000);
 
 		$scope.topologyList = Entities.queryEntities("TopologyDescriptionService");
 		$scope.topologyList._promise.then(function () {
@@ -123,30 +123,50 @@
 		};
 
 		// ================== Topology Operation ==================
-		$scope.startTopologyOperation = function (topologyExecution) {
-			// TODO: Do start!
-			/*$.dialog({
-				title: "Start Confirm",
-				content: "Do you want to start '" + topologyExecution.tags.topology + "'?",
+		$scope.doTopologyOperation = function (topologyExecution, operation) {
+			$.dialog({
+				title: operation + " Confirm",
+				content: "Do you want to " + operation + " '" + topologyExecution.tags.topology + "'?",
 				confirm: true
 			}, function (ret) {
 				if(!ret) return;
 
-				var _entity = {
-					tags: {
-						operation: "START",
-						uuid: +new Date() + "_" + (Math.ceil(Math.random() * 10000))
-					},
-					status: "INITIALIZED"
-				};
-				$.extend(_entity.tags, topologyExecution.tags);
-				Entities.updateEntity("TopologyOperationService", _entity)._promise.then(function() {
-					refreshExecutionList();
+				var list = Entities.queryEntities("TopologyOperationService", {
+					site: topologyExecution.tags.site,
+					application: topologyExecution.tags.application,
+					topology: topologyExecution.tags.topology,
+					_pageSize: 20
 				});
-			});*/
+
+				list._promise.then(function () {
+					var operation = common.array.find(operation, list, "tags.operation");
+					if(operation && (operation.status !== "INITIALIZED" || operation.status !== "PENDING")) {
+						refreshExecutionList();
+						return;
+					}
+
+					// TODO: do some operation
+				});
+
+				/*var _entity = {
+				 tags: {
+				 operation: "START",
+				 uuid: +new Date() + "_" + (Math.ceil(Math.random() * 10000))
+				 },
+				 status: "INITIALIZED"
+				 };
+				 $.extend(_entity.tags, topologyExecution.tags);
+				 Entities.updateEntity("TopologyOperationService", _entity)._promise.then(function() {
+				 refreshExecutionList();
+				 });*/
+			});
+		};
+
+		$scope.startTopologyOperation = function (topologyExecution) {
+			$scope.doTopologyOperation(topologyExecution, "START");
 		};
 		$scope.stopTopologyOperation = function () {
-			// TODO: Do stop!
+			$scope.doTopologyOperation(topologyExecution, "STOP");
 		};
 
 		// ======================= Clean Up =======================

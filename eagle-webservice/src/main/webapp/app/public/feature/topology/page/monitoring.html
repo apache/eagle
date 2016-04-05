@@ -102,7 +102,7 @@
 					</tbody>
 				</table>
 
-				<h3>Last 10 Actions</h3>
+				<h3>Latest Operations</h3>
 				<table class="table table-bordered">
 					<thead>
 						<tr>
@@ -113,7 +113,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="action in currentTopologyExecutionActionList track by $index">
+						<tr ng-repeat="action in currentTopologyExecutionOptList track by $index">
 							<td>{{common.format.date(action.lastModifiedDate) || "-"}}</td>
 							<td>{{action.tags.operation}}</td>
 							<td>{{action.tags.uuid}}</td>
