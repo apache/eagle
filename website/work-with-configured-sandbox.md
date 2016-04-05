@@ -1,7 +1,7 @@
 ---
 layout: doc
 title:  "Work with configed Sandbox"
-permalink: /docs/work-with-configed-sandbox.html
+permalink: /docs/work-with-configured-sandbox.html
 ---
 
 After Eagle has been deployed into the sandbox and all configuration has been done, you should have no issue to have a running eagle on your machine. But if you restart the sandbox, following steps have to be done to let you have the running eagle again:

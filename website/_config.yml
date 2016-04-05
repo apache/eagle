@@ -31,6 +31,8 @@ documentations:
     links:
       - title: Deploy Eagle in Sandbox
         url: /docs/deployment-in-sandbox.html
+      - title: Work with configured Sandbox
+        url: /docs/work-with-configured-sandbox.html
       - title: Deploy Eagle in the Production
         url: /docs/deployment-in-production.html
       - title: Stream Log Data into Kafka
