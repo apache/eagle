@@ -50,7 +50,7 @@ public class ApplicationManagerDaoImpl implements ApplicationManagerDAO {
     }
 
     @Override
-    public int loadTopologyOperationInRunning(String site, String application, String topology) throws Exception {
+    public int loadTopologyOperationsInRunning(String site, String application, String topology) throws Exception {
         int ret = 0;
         String query = String.format("%s[@site=\"%s\" AND @application=\"%s\" AND @topology=\"%s\" AND (@status=\"%s\" OR @status=\"%s\")]{*}", Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME, site, application, topology, TopologyOperationEntity.OPERATION_STATUS.INITIALIZED, TopologyOperationEntity.OPERATION_STATUS.PENDING);
         GenericServiceAPIResponseEntity<TopologyExecutionEntity> response = resource.search(query, null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);

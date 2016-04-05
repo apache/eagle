@@ -25,6 +25,6 @@ import java.util.List;
 
 public interface ApplicationManagerDAO {
     String loadTopologyExecutionStatus(String site, String application, String topology);
-    int loadTopologyOperationInRunning(String site, String application, String topology) throws Exception;
+    int loadTopologyOperationsInRunning(String site, String application, String topology) throws Exception;
     void createOperation(List<TopologyOperationEntity> entities) throws Exception;
 }

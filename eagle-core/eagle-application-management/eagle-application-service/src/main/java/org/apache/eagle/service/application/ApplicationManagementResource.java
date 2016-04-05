@@ -61,7 +61,7 @@ public class ApplicationManagementResource {
                 if(status == null) {
                     throw new Exception(String.format("Fail to fetch the topology execution status by site=%s, application=%s, topology=%s", operation.site(), operation.application(), operation.topology()));
                 }
-                int operationsInRunning = dao.loadTopologyOperationInRunning(operation.site(), operation.application(), operation.topology());
+                int operationsInRunning = dao.loadTopologyOperationsInRunning(operation.site(), operation.application(), operation.topology());
                 if(operationsInRunning !=0) {
                     throw new Exception(operationsInRunning + "operations are running, please wait for a minute");
                 }
