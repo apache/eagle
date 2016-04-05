@@ -31,7 +31,7 @@ public final class MAPRAuditLogParser {
     public MAPRAuditLogParser(){
     }
 
-    public HDFSAuditLogObject maprParser(String log) throws JSONException, ParseException {
+    public HDFSAuditLogObject parse(String log) throws JSONException, ParseException {
         JSONObject jsonObject = new JSONObject(log);
         String timestamp = jsonObject.getJSONObject("timestamp").getString("$date");
         String cmd = jsonObject.getString("operation");
