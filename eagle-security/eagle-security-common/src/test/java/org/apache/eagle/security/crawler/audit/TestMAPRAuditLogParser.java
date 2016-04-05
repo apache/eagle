@@ -31,7 +31,7 @@ public class TestMAPRAuditLogParser {
                 "\"10.10.104.51\",\"parentFid\":\"2049.51.131248\",\"childFid\":\"2049.56.131258\",\"childName\":\n" +
                 "\"ycsbTmp_1433587462796\",\"volumeId\":68048396,\"status\":0}";
         MAPRAuditLogParser parser = new MAPRAuditLogParser();
-        HDFSAuditLogObject entity = parser.maprParser(log);
+        HDFSAuditLogObject entity = parser.parse(log);
         Assert.assertEquals("MKDIR",entity.cmd);
         Assert.assertEquals("0",entity.user);
         Assert.assertEquals("10.10.104.51",entity.host);
@@ -40,7 +40,7 @@ public class TestMAPRAuditLogParser {
         Assert.assertEquals(new Boolean(true), entity.allowed);
 
         log = "{\"timestamp\":{\"$date\":\"2016-02-19T01:50:01.962Z\"},\"operation\":\"LOOKUP\",\"uid\":5000,\"ipAddress\":\"192.168.6.148\",\"srcFid\":\"2049.40.131192\",\"dstFid\":\"2049.1032.133268\",\"srcName\":\"share\",\"volumeId\":186635570,\"status\":0}\n";
-        entity = parser.maprParser(log);
+        entity = parser.parse(log);
         Assert.assertEquals("LOOKUP",entity.cmd);
         Assert.assertEquals("5000",entity.user);
         Assert.assertEquals("192.168.6.148",entity.host);
