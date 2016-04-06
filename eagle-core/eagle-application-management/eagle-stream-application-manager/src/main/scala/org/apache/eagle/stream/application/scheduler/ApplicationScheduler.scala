@@ -52,6 +52,8 @@ case class LoadTopologyFailureException(message:String) extends Exception(messag
  */
 class ApplicationScheduler  {
   val config = ConfigFactory.load()
+  val DEFAULT_COMMAND_LOADER_INTERVAL = 5
+  val DEFAULT_HEALTH_CHECK = 10
 
   def startDeamon(): Unit ={
     val thread = new Thread(new Runnable {
@@ -68,12 +70,12 @@ class ApplicationScheduler  {
     system.log.info(s"Started actor system: $system")
 
     import system.dispatcher
-
+    
     val coordinator = system.actorOf(Props[StreamAppCoordinator])
     system.scheduler.scheduleOnce(0 seconds, coordinator, InitializationEvent(config))
     system.scheduler.scheduleOnce(1 seconds, coordinator, ClearPendingOperation)
     system.scheduler.schedule(2.seconds, 5.seconds, coordinator, CommandLoaderEvent)
-    system.scheduler.schedule(600.seconds, 600.seconds, coordinator, HealthCheckerEvent)
+    system.scheduler.schedule(10.seconds, 10.seconds, coordinator, HealthCheckerEvent)
 
     /*
      registerOnTermination is called when you have shut down the ActorSystem (system.shutdown),
