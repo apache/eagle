@@ -84,7 +84,8 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
                 entity.getTags().get(AppManagerConstants.UUID),
                 entity.getTags().get(AppManagerConstants.OPERATION),
                 entity.getStatus(),
-                entity.getLastModifiedDate());
+                entity.getLastModifiedDate(),
+                entity.getTimestamp());
         return model;
     }
 
@@ -97,6 +98,7 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
             put(AppManagerConstants.APPLICATION_TAG, model.application());
             put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
         }};
+        entity.setTimestamp(model.timestamp());
         entity.setLastModifiedDate(model.lastModifiedDate());
         entity.setStatus(model.status());
         entity.setTags(tags);
