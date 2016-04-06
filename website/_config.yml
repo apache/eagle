@@ -53,6 +53,10 @@ documentations:
         url: /docs/tutorial/classification.html
       - title: Eagle LDAP Tutorial
         url: /docs/tutorial/ldap.html
+  - category: Developer
+    links:
+      - title: set up development environment
+        url: /docs/development.html
   - category: Advanced
     links: 
       - title: Eagle Architecture Highlights
