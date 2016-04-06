@@ -237,9 +237,11 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
                   val extConfig = ConfigFactory.parseString("envContextConfig.topologyName=" + executionModel.fullName)
                   val appConfig = extConfig.withFallback(config)
                   ret = _streamAppManager.start(topology, appConfig)
-                  nextState = if(ret) TOPOLOGY_STATUS.STARTED else TOPOLOGY_STATUS.STOPPED
-                  updateStatus(operationModel, executionModel, ret, nextState)
+                } else {
+                  ret = false
                 }
+                nextState = if(ret) TOPOLOGY_STATUS.STARTED else TOPOLOGY_STATUS.STOPPED
+                updateStatus(operationModel, executionModel, ret, nextState)
               case None =>
                 log.error(s"load 0 topologies with site=${operationModel.site} and application=${operationModel.application}")
             }
