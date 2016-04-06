@@ -237,16 +237,18 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
                   val extConfig = ConfigFactory.parseString("envContextConfig.topologyName=" + executionModel.fullName)
                   val appConfig = extConfig.withFallback(config)
                   ret = _streamAppManager.start(topology, appConfig)
+                  nextState = if(ret) TOPOLOGY_STATUS.STARTED else TOPOLOGY_STATUS.STOPPED
+                  updateStatus(operationModel, executionModel, ret, nextState)
                 } else {
-                  ret = false
+                  _dao.updateOperationStatus(TopologyOperationEntity.fromModel(operationModel), OPERATION_STATUS.FAILED)
                 }
-                nextState = if(ret) TOPOLOGY_STATUS.STARTED else TOPOLOGY_STATUS.STOPPED
-                updateStatus(operationModel, executionModel, ret, nextState)
               case None =>
                 log.error(s"load 0 topologies with site=${operationModel.site} and application=${operationModel.application}")
+                _dao.updateOperationStatus(TopologyOperationEntity.fromModel(operationModel), OPERATION_STATUS.FAILED)
             }
           case Failure(ex) =>
             log.error(s"Fail to load topology with site=${operationModel.site} and application=${operationModel.application}")
+            _dao.updateOperationStatus(TopologyOperationEntity.fromModel(operationModel), OPERATION_STATUS.FAILED)
         }
       case OPERATION.STOP =>
         ret = _streamAppManager.stop(generateTopologyFullName(executionModel), _config)
@@ -258,7 +260,7 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
         updateStatus(operationModel, executionModel, ret, nextState)
       case m@_ =>
         log.warning("Unsupported operation: " + operationModel)
-        return
+        _dao.updateOperationStatus(TopologyOperationEntity.fromModel(operationModel), OPERATION_STATUS.FAILED)
     }
   }
 
