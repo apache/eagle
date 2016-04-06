@@ -67,9 +67,10 @@ public class ApplicationManagementResource {
                 }
                 if (validateOperation(operation.operation(), status)) {
                     Map<String, String> tags = entity.getTags();
-                    tags.put("uuid", UUID.randomUUID().toString());
+                    tags.put(AppManagerConstants.UUID, UUID.randomUUID().toString());
                     entity.setTags(tags);
                     entity.setLastModifiedDate(System.currentTimeMillis());
+                    entity.setTimestamp(System.currentTimeMillis());
                     operations.add(entity);
                 } else {
                     throw new Exception(String.format("%s is an invalid operation, as the topology's current status is %s", operation.operation(), status));

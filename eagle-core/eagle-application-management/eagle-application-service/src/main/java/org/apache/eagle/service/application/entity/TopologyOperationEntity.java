@@ -81,8 +81,8 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
                 entity.getTags().get(AppManagerConstants.SITE_TAG),
                 entity.getTags().get(AppManagerConstants.APPLICATION_TAG),
                 entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
-                entity.getTags().get(AppManagerConstants.COMMAND_ID_TAG),
-                entity.getTags().get(AppManagerConstants.COMMAND_TYPE_TAG),
+                entity.getTags().get(AppManagerConstants.UUID),
+                entity.getTags().get(AppManagerConstants.OPERATION),
                 entity.getStatus(),
                 entity.getLastModifiedDate());
         return model;
@@ -92,8 +92,8 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
         TopologyOperationEntity entity = new TopologyOperationEntity();
         Map<String,String> tags = new HashMap<String,String>(){{
             put(AppManagerConstants.SITE_TAG, model.site());
-            put(AppManagerConstants.COMMAND_ID_TAG,model.uuid());
-            put(AppManagerConstants.COMMAND_TYPE_TAG, model.operation());
+            put(AppManagerConstants.UUID,model.uuid());
+            put(AppManagerConstants.OPERATION, model.operation());
             put(AppManagerConstants.APPLICATION_TAG, model.application());
             put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
         }};
