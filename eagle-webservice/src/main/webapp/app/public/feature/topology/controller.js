@@ -66,7 +66,8 @@
 				site: topologyExecution.tags.site,
 				application: topologyExecution.tags.application,
 				topology: topologyExecution.tags.topology,
-				_pageSize: 20
+				_pageSize: 20,
+				_duration: 1000 * 60 * 60 * 24 * 30
 			});
 		};
 
