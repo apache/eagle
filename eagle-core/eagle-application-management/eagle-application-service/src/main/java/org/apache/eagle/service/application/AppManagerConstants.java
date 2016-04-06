@@ -23,7 +23,7 @@ public class AppManagerConstants {
     public final static String SITE_TAG = "site";
     public final static String APPLICATION_TAG = "application";
     public final static String COMMAND_TYPE_TAG = "operation";
-    public final static String COMMAND_ID_TAG = "UUID";
+    public final static String COMMAND_ID_TAG = "uuid";
     public final static String TOPOLOGY_TAG = "topology";
     public final static String NAME_TAG = "fullName";
 
