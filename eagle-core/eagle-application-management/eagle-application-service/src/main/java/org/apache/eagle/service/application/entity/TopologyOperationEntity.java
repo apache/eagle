@@ -37,7 +37,7 @@ import java.util.Map;
 @Prefix("topologyOperation")
 @Service(Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@TimeSeries(false)
+@TimeSeries(true)
 @Tags({"site", "application", "topology", "uuid", "operation"})
 public class TopologyOperationEntity extends TaggedLogAPIEntity {
     @Column("a")
