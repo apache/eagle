@@ -87,8 +87,8 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
                     assert key != null;
                     throw new RuntimeException("Key is not in type of String (VARCHAR) , but JdbcType (java.sql.Types): " + key.getJdbcType() + ", value: " + key.getValue(), ex);
                 } catch (ConstraintViolationException e){
-                    // Override with updating if duplicated key exception
-                    if(e.getMessage().contains("The statement was aborted because it would have caused a duplicate key value in a unique or primary key constraint or unique index identified by")){
+                    //this message will be different in each DB type ...using duplicate keyword to catch for broader set of DBs. moreover we are already inside ConstraintViolationException exception, do we even need this check?
+                    if(e.getMessage().toLowerCase().contains("duplicate")){
                         String primaryKey = entity.getEncodedRowkey();
                         if(primaryKey==null) {
                             primaryKey = ConnectionManagerFactory.getInstance().getStatementExecutor().getPrimaryKeyBuilder().build(entity);
