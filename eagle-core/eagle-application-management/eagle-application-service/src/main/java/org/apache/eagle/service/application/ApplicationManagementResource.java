@@ -87,11 +87,11 @@ public class ApplicationManagementResource {
         boolean ret = true;
         switch (operation) {
             case TopologyOperationEntity.OPERATION.START:
-                if(status == TopologyExecutionEntity.TOPOLOGY_STATUS.STARTED || status == TopologyExecutionEntity.TOPOLOGY_STATUS.PENDING)
+                if(status.equals(TopologyExecutionEntity.TOPOLOGY_STATUS.STARTED) || status.equals(TopologyExecutionEntity.TOPOLOGY_STATUS.PENDING))
                     ret = false;
                 break;
             case TopologyOperationEntity.OPERATION.STOP:
-                if(status != TopologyExecutionEntity.TOPOLOGY_STATUS.STARTED)
+                if(!status.equals(TopologyExecutionEntity.TOPOLOGY_STATUS.STARTED))
                     ret = false;
                 break;
             default: break;
