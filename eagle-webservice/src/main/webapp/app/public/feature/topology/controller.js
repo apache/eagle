@@ -146,7 +146,7 @@
 
 				list._promise.then(function () {
 					var lastOperation = common.array.find(operation, list, "tags.operation");
-					if(lastOperation && (lastOperation.status !== "INITIALIZED" || lastOperation.status !== "PENDING")) {
+					if(lastOperation && (lastOperation.status === "INITIALIZED" || lastOperation.status === "PENDING")) {
 						refreshExecutionList();
 						return;
 					}
