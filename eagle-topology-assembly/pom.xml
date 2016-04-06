@@ -70,7 +70,7 @@
             <version>${project.version}</version>
         </dependency>
 	<dependency>
-            <groupId>eagle</groupId>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-gc</artifactId>
             <version>${project.version}</version>
         </dependency>
