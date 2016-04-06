@@ -62,7 +62,12 @@
 			$scope.currentTopologyExecution = topologyExecution;
 			$("#topologyMDL").modal();
 
-			$scope.currentTopologyExecutionOptList = Entities.queryEntities("TopologyOperationService", {_pageSize: 20});
+			$scope.currentTopologyExecutionOptList = Entities.queryEntities("TopologyOperationService", {
+				site: topologyExecution.tags.site,
+				application: topologyExecution.tags.application,
+				topology: topologyExecution.tags.topology,
+				_pageSize: 20
+			});
 		};
 
 		// ==================== Initialization ====================
@@ -109,6 +114,7 @@
 				Entities.updateEntity("TopologyExecutionService", _entity)._promise.then(function() {
 					holder.closeFunc();
 					$scope.topologyExecutionList.push(_entity);
+					refreshExecutionList();
 				});
 			});
 		};
