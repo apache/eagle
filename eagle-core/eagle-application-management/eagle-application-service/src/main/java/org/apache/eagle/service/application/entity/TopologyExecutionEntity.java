@@ -57,6 +57,7 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+        valueChanged("fullName");
     }
 
     public String getUrl() {
