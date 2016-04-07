@@ -65,7 +65,7 @@ class ApplicationScheduler  {
     thread.start()
   }
 
-  def start():Unit = {
+  def start() = {
     val system = ActorSystem("application-manager-scheduler", config)
     system.log.info(s"Started actor system: $system")
 
@@ -86,6 +86,7 @@ class ApplicationScheduler  {
         coordinator ! TerminatedEvent
       }
     })
+    system
   }
 }
 
