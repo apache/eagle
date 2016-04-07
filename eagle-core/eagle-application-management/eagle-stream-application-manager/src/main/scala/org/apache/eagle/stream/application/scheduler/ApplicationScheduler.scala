@@ -180,10 +180,10 @@ private[scheduler] class AppCommandLoader extends Actor with ActorLogging {
         case Success(optionalEntities) =>
           optionalEntities match {
             case Some(topologies) =>
-              log.info(s"Load ${topologies.size()} new commands")
+              log.info(s"Load ${topologies.size()} topologies in execution")
               JavaConversions.collectionAsScalaIterable(topologies) foreach { topology =>
                 val topologyExecutionModel = TopologyExecutionEntity.toModel(topology)
-                val checkStatusOperation = new TopologyOperationModel(topologyExecutionModel.site, topologyExecutionModel.application, java.util.UUID.randomUUID.toString, TopologyOperationEntity.OPERATION.STATUS, topologyExecutionModel.topology, OPERATION_STATUS.INITIALIZED, System.currentTimeMillis(), System.currentTimeMillis())
+                val checkStatusOperation = new TopologyOperationModel(topologyExecutionModel.site, topologyExecutionModel.application, topologyExecutionModel.topology, java.util.UUID.randomUUID.toString, TopologyOperationEntity.OPERATION.STATUS, OPERATION_STATUS.INITIALIZED, System.currentTimeMillis(), System.currentTimeMillis())
                 _sender ! SchedulerCommand(topologyExecutionModel, checkStatusOperation)
               }
             case None =>

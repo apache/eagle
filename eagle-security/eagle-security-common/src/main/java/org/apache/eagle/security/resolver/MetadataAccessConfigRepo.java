@@ -49,10 +49,10 @@ public class MetadataAccessConfigRepo {
                 .setSyntax(ConfigSyntax.PROPERTIES)
                 .setAllowMissing(false);
         Config originalConfig = ConfigFactory.parseString(originalConfigStr, options);
-        if(!originalConfig.hasPath(EagleConfigConstants.WEB_CONFIG)) {
-            throw new Exception("Fail to get WEB_CONFIG configurations for data classification");
+        if(!originalConfig.hasPath(EagleConfigConstants.CLASSIFICATION_CONFIG)) {
+            throw new Exception("Fail to get CLASSIFICATION_CONFIG for data classification");
         }
-        return originalConfig.getConfig(EagleConfigConstants.WEB_CONFIG);
+        return originalConfig.getConfig(EagleConfigConstants.CLASSIFICATION_CONFIG);
     }
 
     public Configuration convert(Config originalConfig) throws Exception {

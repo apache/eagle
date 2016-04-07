@@ -92,10 +92,11 @@ class StormApplicationManager extends ApplicationManager {
   override def status(name: String, appConf: config.Config): Boolean = {
     var ret = true
     try {
-      getNimbusClient(appConf).getClient.getTopology(name)
+      val topologyInfo = getNimbusClient(appConf).getClient.getTopologyInfo(name)
+      topologyInfo.get_status()
     } catch {
       case e: Throwable =>
-        LOG.error(e.toString)
+        LOG.error(e.getMessage)
         ret = false
     }
     ret
