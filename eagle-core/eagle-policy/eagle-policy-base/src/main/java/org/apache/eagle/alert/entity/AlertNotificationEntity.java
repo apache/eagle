@@ -66,7 +66,7 @@ public class AlertNotificationEntity extends TaggedLogAPIEntity {
 
     @Column("d")
     private String fieldList;
-    public String isFieldList() {
+    public String getFieldList() {
         return fieldList;
     }
 

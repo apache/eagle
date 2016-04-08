@@ -74,7 +74,7 @@ public class AlertEmailPlugin implements NotificationPlugin {
 	 * @throws Exception
      */
 	@Override
-	public void update(String policyId, Map<String,String> notificationConf  , boolean isPolicyDelete ) throws Exception {
+	public void update(String policyId, Map<String,String> notificationConf, boolean isPolicyDelete ) throws Exception {
 		if( isPolicyDelete ){
 			LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
 			this.emailGenerators.remove(policyId);
