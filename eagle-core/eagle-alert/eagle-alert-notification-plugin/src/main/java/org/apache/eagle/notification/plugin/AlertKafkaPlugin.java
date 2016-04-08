@@ -88,7 +88,8 @@ public class AlertKafkaPlugin implements NotificationPlugin {
 	@Override
 	public void onAlert(AlertAPIEntity alertEntity) {
 		try{
-			KafkaProducer producer = KafkaProducerSingleton.INSTANCE.getProducer(config);
+			String policyId = alertEntity.getTags().get(Constants.POLICY_ID);
+			KafkaProducer producer = KafkaProducerSingleton.INSTANCE.getProducer(this.kafaConfigs.get(policyId));
 			producer.send(createRecord(alertEntity));
 			status.successful = true;
 			status.errorMessage = "";
@@ -107,7 +108,7 @@ public class AlertKafkaPlugin implements NotificationPlugin {
 	 */
 	private ProducerRecord  createRecord(AlertAPIEntity entity ) throws Exception {
 		String policyId = entity.getTags().get(Constants.POLICY_ID);
-		ProducerRecord  record  = new ProducerRecord( this.kafaConfigs.get(policyId).get("topic"), NotificationPluginUtils.objectToStr(entity));
+		ProducerRecord  record  = new ProducerRecord( this.kafaConfigs.get(policyId).get(NotificationConstants.TOPIC), NotificationPluginUtils.objectToStr(entity));
 		return record;
 	}	
 	
