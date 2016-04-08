@@ -302,18 +302,25 @@
 
 				<hr/>
 
-				<div class="form-group">
-					<label>Sender</label>
-					<input type="text" class="form-control" value="noreply-hadoop-eagle@company1.com" placeholder="Enter Sender. e.g. sender@eaxmple.com" ng-model="policy.__.notification[0].sender">
+				<label>Notification</label>
+				<div tabs menu="menu" holder="notificationTabHolder" ng-show="policy.__.notification.length">
+					<pane ng-repeat="notification in policy.__.notification track by $index" data-data="notification" data-title="{{notification.notificationType}}">
+						<div class="form-group" ng-if="field.value === undefined"
+							 ng-repeat="field in Notification.map[notification.notificationType].fieldList track by $index">
+							<label>{{field.name}}</label>
+							<input type="text" class="form-control" ng-model="notification[field.name]">
+						</div>
+						<p class="text-muted" ng-if="Notification.map[notification.notificationType].fieldList.length === 0">No configuration required</p>
+					</pane>
 				</div>
-				<div class="form-group">
-					<label>Recipients</label>
-					<input type="text" class="form-control" placeholder="Enter Recipients. Split with ','. e.g. usera@example.com, userb@example.com" ng-model="policy.__.notification[0].recipients">
-				</div>
-				<div class="form-group">
-					<label>Subject</label>
-					<input type="text" class="form-control" placeholder="Enter Subject" ng-model="policy.__.notification[0].subject">
-				</div>
+				<ul ng-show="policy.__.notification.length === 0">
+					<li ng-repeat="notification in Notification.list track by $index">
+						<a ng-click="newNotification(notification.name)">+ New {{notification.name}} Notification</a>
+					</li>
+				</ul>
+
+				<hr/>
+
 				<div class="form-group">
 					<label>Description</label>
 					<textarea class="form-control" placeholder="Policy description" ng-model="policy.description"></textarea>
