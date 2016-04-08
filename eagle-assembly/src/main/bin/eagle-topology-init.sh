@@ -137,8 +137,13 @@ echo "Importing AlertStreamService for USERPROFILE"
 curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H "Content-Type: application/json"  "http://$EAGLE_SERVICE_HOST:$EAGLE_SERVICE_PORT/eagle-service/rest/entities?serviceName=AlertStreamService" \
      -d '[ { "prefix": "alertStream", "tags": { "streamName": "userActivity", "site":"sandbox", "application":"userProfile" }, "alertExecutorIdList": [ "userProfileAnomalyDetectionExecutor" ] } ]'
 
-echo "Importing notification plugin configurations ... "
+#####################################################################
+#     Import notification plugin configuration into Eagle Service   #
+#####################################################################
 
+## AlertNotificationService : schema for notifcation plugin configuration
+echo ""
+echo "Importing notification plugin configurations ... "
 curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
  "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertNotificationService" \
  -d '
@@ -150,7 +155,8 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
        },
        "className": "org.apache.eagle.notification.plugin.AlertEmailPlugin",
        "description": "send alert to email",
-       "enabled":true
+       "enabled":true,
+       "fields": "[{\"name\":\"sender\"},{\"name\":\"recipients\"},{\"name\":\"subject\"}]"
      },
      {
        "prefix": "alertNotifications",
@@ -159,7 +165,8 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
        },
        "className": "org.apache.eagle.notification.plugin.AlertKafkaPlugin",
        "description": "send alert to kafka bus",
-       "enabled":true
+       "enabled":true,
+       "fields": "[{\"name\":\"kafka_broker\",\"value\":\"sandbox.hortonworks.com:6667\"},{\"name\":\"topic\"}]"
      },
      {
        "prefix": "alertNotifications",
@@ -172,11 +179,6 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
      }
  ]
  '
-
-## Finished
-echo ""
-echo "Finished initialization for alert notification plugins"
-
 
 ## Finished
 echo ""
