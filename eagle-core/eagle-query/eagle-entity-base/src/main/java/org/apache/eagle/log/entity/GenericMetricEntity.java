@@ -17,16 +17,8 @@
 package org.apache.eagle.log.entity;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.log.entity.meta.Column;
-import org.apache.eagle.log.entity.meta.ColumnFamily;
-import org.apache.eagle.log.entity.meta.Service;
-import org.apache.eagle.log.entity.meta.ServicePath;
+import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-
-import org.apache.eagle.log.entity.meta.Metric;
-import org.apache.eagle.log.entity.meta.Prefix;
-import org.apache.eagle.log.entity.meta.Table;
-import org.apache.eagle.log.entity.meta.TimeSeries;
 
 /**
  * GenericMetricEntity should use prefix field which is extended from TaggedLogAPIEntity as metric name
@@ -40,6 +32,8 @@ import org.apache.eagle.log.entity.meta.TimeSeries;
 @TimeSeries(true)
 @Metric(interval=60000)
 @ServicePath(path = "/metric")
+// TODO:
+@Tags({"site","application","policyId"})
 public class GenericMetricEntity extends TaggedLogAPIEntity {
 	public static final String GENERIC_METRIC_SERVICE = "GenericMetricService";
 	public static final String GENERIC_METRIC_PREFIX_PLACE_HOLDER = "GENERIC_METRIC_PREFIX_PLACEHODLER";
