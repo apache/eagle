@@ -29,6 +29,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>eagle-topology-example</module>
+        <module>eagle-example-tools</module>
     </modules>
 
 
