@@ -214,7 +214,7 @@
             </includes>
             <excludes>
                 <exclude>slf4j-log4j12-*.jar</exclude>
-                <include>asm-*.jar</include>
+                <exclude>asm-*.jar</exclude>
             </excludes>
         </fileSet>
 
