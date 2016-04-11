@@ -150,7 +150,7 @@ public class JdbcEntityDefinitionManager {
     // Intially bind basic java types with SQL types
     //================================================
     static {
-        registerJdbcType(String.class, Types.VARCHAR);
+        registerJdbcType(String.class, Types.LONGVARCHAR);
         registerJdbcType(Integer.class, Types.INTEGER);
         registerJdbcType(Double.class, Types.DOUBLE);
         registerJdbcType(Float.class, Types.FLOAT);
