@@ -65,13 +65,15 @@ public class AlertNotificationEntity extends TaggedLogAPIEntity {
     }
 
     @Column("d")
-    private String fieldList;
-    public String getFieldList() {
-        return fieldList;
+    private String fields;
+    public String getFields() {
+        return fields;
     }
 
-    public void setFieldList(String fieldList) {
-        this.fieldList = fieldList;
-        valueChanged("fieldList");
+    public void setFields(String fields) {
+        this.fields = fields;
+        valueChanged("fields");
     }
+
+
 }
