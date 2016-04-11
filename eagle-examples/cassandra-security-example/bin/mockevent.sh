@@ -14,18 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The java implementation to use. please use jdk 1.7 or later
-# export JAVA_HOME=${JAVA_HOME}
-# export JAVA_HOME=/usr/java/jdk1.7.0_80/
+export EAGLE_BASE_DIR=$(dirname $0)/../../../
+export EAGLE_BUILD_DIR=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
+cd $EAGLE_BUILD_DIR/
 
-# EAGLE_SERVICE_HOST, default is `hostname -f`
-export EAGLE_SERVICE_HOST=localhost
-
-# EAGLE_SERVICE_PORT, default is 9099
-export EAGLE_SERVICE_PORT=9099
-
-# EAGLE_SERVICE_USER
-export EAGLE_SERVICE_USER=admin
-
-# EAGLE_SERVICE_PASSWORD
-export EAGLE_SERVICE_PASSWD=secret
+bin/kafka-producer.sh --broker-list localhost:6667 \
+	--topic cassandra_querylog_local \
+	--data '{"host": "/192.168.6.227","source": "/192.168.6.227","user": "jaspa","timestamp": 1455574202864, "category": "QUERY","type": "CQL_SELECT","ks": "dg_keyspace","cf": "customer_details","operation": "CQL_SELECT","masked_columns": "bank|ccno|email|ip|name|sal|ssn|tel|url","other_columns": "id|npi"}'

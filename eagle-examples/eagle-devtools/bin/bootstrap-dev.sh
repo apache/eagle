@@ -14,18 +14,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The java implementation to use. please use jdk 1.7 or later
-# export JAVA_HOME=${JAVA_HOME}
-# export JAVA_HOME=/usr/java/jdk1.7.0_80/
+export EAGLE_BASE_DIR=$(dirname $0)/../../../
+export EAGLE_BUILD_DIR=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
 
-# EAGLE_SERVICE_HOST, default is `hostname -f`
-export EAGLE_SERVICE_HOST=localhost
+ls ${EAGLE_BUILD_DIR} 1>/dev/null 2>/dev/null
+if [ "$?" != "0" ];then
+	echo "$EAGLE_BUILD_DIR not exist, build now"
+	cd $EAGLE_BASE_DIR
+	mvn package -DskipTests
+fi
 
-# EAGLE_SERVICE_PORT, default is 9099
-export EAGLE_SERVICE_PORT=9099
+cd $EAGLE_BUILD_DIR/
 
-# EAGLE_SERVICE_USER
-export EAGLE_SERVICE_USER=admin
+bin/eagle-service.sh status
 
-# EAGLE_SERVICE_PASSWORD
-export EAGLE_SERVICE_PASSWD=secret
+if [ "$?" != "0" ];then
+	echo "Starting eagle service ..."
+	bin/eagle-service.sh start
+	echo "Wait 5 seconds for eagle service to be ready .. "
+	sleep 5
+else
+	echo "Eagle service has already started"
+fi
+
+bin/eagle-topology-init.sh
+
+echo "Starting zookeeper"
+bin/zookeeper-server-start.sh -daemon conf/zookeeper-server.properties
+sleep 1
+
+echo "Starting kafka"
+bin/kafka-server-start.sh -daemon conf/kafka-server.properties
+sleep 1

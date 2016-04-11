@@ -14,18 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The java implementation to use. please use jdk 1.7 or later
-# export JAVA_HOME=${JAVA_HOME}
-# export JAVA_HOME=/usr/java/jdk1.7.0_80/
+if [ "x$EAGLE_HEAP_OPTS" = "x" ]; then
+    export EAGLE_HEAP_OPTS="-Xmx512M"
+fi
 
-# EAGLE_SERVICE_HOST, default is `hostname -f`
-export EAGLE_SERVICE_HOST=localhost
-
-# EAGLE_SERVICE_PORT, default is 9099
-export EAGLE_SERVICE_PORT=9099
-
-# EAGLE_SERVICE_USER
-export EAGLE_SERVICE_USER=admin
-
-# EAGLE_SERVICE_PASSWORD
-export EAGLE_SERVICE_PASSWD=secret
+exec $(dirname $0)/eagle-run-class.sh org.apache.eagle.contrib.kafka.ProducerTool "$@"

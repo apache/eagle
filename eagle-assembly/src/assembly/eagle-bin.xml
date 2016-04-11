@@ -151,7 +151,13 @@
                 <include>**</include>
             </includes>
         </fileSet>
-
+        <fileSet>
+            <directory>${project.basedir}/../eagle-external/eagle-kafka/target</directory>
+            <outputDirectory>lib/share</outputDirectory>
+            <includes>
+                <include>eagle-kafka-*.jar</include>
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>${project.build.directory}/lib</directory>
             <outputDirectory>lib/tomcat/lib</outputDirectory>
@@ -159,7 +165,6 @@
                 <include>tomcat*</include>
             </includes>
         </fileSet>
-
         <fileSet>
             <directory>${project.basedir}/../eagle-webservice/target/eagle-service</directory>
             <outputDirectory>lib/tomcat/webapps/eagle-service</outputDirectory>
@@ -211,9 +216,9 @@
                 <include>slf4j-*.jar</include>
                 <include>log4j-*.jar</include>
                 <include>commons-math3-*.jar</include>
+                <include>slf4j-log4j12-*.jar</include>
             </includes>
             <excludes>
-                <exclude>slf4j-log4j12-*.jar</exclude>
                 <exclude>asm-*.jar</exclude>
             </excludes>
         </fileSet>

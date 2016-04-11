@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -16,16 +15,16 @@
 # limitations under the License.
 
 export EAGLE_BASE_DIR=$(dirname $0)/../../../
-export EAGLE_ASSEMBLY_TARGET=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
+export EAGLE_BUILD_DIR=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
 
-ls ${EAGLE_ASSEMBLY_TARGET} 1>/dev/null 2>/dev/null
+ls ${EAGLE_BUILD_DIR} 1>/dev/null 2>/dev/null
 if [ "$?" != "0" ];then
-	echo "$EAGLE_ASSEMBLY_TARGET not exist, build now"
+	echo "$EAGLE_BUILD_DIR not exist, build now"
 	cd $EAGLE_BASE_DIR
 	mvn package -DskipTests
 fi
 
-cd $EAGLE_ASSEMBLY_TARGET/
+cd $EAGLE_BUILD_DIR/
 
 bin/eagle-service.sh status
 
@@ -40,10 +39,21 @@ fi
 
 bin/eagle-topology-init.sh
 
+echo "Starting zookeeper"
+bin/zookeeper-server-start.sh -daemon conf/zookeeper-server.properties
+sleep 1
+
+echo "Starting kafka"
+bin/kafka-server-start.sh -daemon conf/kafka-server.properties
+sleep 1
+
+echo "Creating kafka topic: cassandra_querylog_local"
+bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic cassandra_querylog_local --partitions 3 --replication-factor 1
+
 cd $(dirname $0)/../
 
 chmod +x bin/*.sh
 
 bin/init.sh
 
-$EAGLE_ASSEMBLY_TARGET/bin/kafka-stream-monitor.sh cassandraQueryLogStream cassandraQueryLogExecutor $(dirname $0)/../conf/cassandra-security-local.conf
+$EAGLE_BUILD_DIR/bin/kafka-stream-monitor.sh cassandraQueryLogStream cassandraQueryLogExecutor $(dirname $0)/../conf/cassandra-security-local.conf

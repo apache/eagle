@@ -14,18 +14,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The java implementation to use. please use jdk 1.7 or later
-# export JAVA_HOME=${JAVA_HOME}
-# export JAVA_HOME=/usr/java/jdk1.7.0_80/
+if [ $# -lt 1 ];
+then
+	echo "USAGE: $0 [-daemon] conf/zookeeper-server.properties"
+	exit 1
+fi
+base_dir=$(dirname $0)
 
-# EAGLE_SERVICE_HOST, default is `hostname -f`
-export EAGLE_SERVICE_HOST=localhost
+if [ "x$EAGLE_LOG4J_OPTS" = "x" ]; then
+    export EAGLE_LOG4J_OPTS="-Dlog4j.configuration=file:$base_dir/../conf/log4j.properties"
+fi
 
-# EAGLE_SERVICE_PORT, default is 9099
-export EAGLE_SERVICE_PORT=9099
+if [ "x$EAGLE_HEAP_OPTS" = "x" ]; then
+    export EAGLE_HEAP_OPTS="-Xmx512M -Xms512M"
+fi
 
-# EAGLE_SERVICE_USER
-export EAGLE_SERVICE_USER=admin
+EXTRA_ARGS="-name zookeeper -loggc"
 
-# EAGLE_SERVICE_PASSWORD
-export EAGLE_SERVICE_PASSWD=secret
+COMMAND=$1
+case $COMMAND in
+  -daemon)
+     EXTRA_ARGS="-daemon "$EXTRA_ARGS
+     shift
+     ;;
+ *)
+     ;;
+esac
+
+$base_dir/zookeeper-server-status.sh 1>/dev/null 2>&1
+if [ "$?" == "" ];then
+	echo "Zookeeper is still running, please stop firstly before starting"
+	exit 0
+else
+	exec $base_dir/eagle-run-class.sh $EXTRA_ARGS org.apache.zookeeper.server.quorum.QuorumPeerMain "$@"
+fi

@@ -16,17 +16,18 @@
 
 if [ $# -lt 1 ];
 then
-	echo "USAGE: $0 [-daemon] server.properties [--override property=value]*"
+	echo "USAGE: $0 [-daemon] conf/kafka-server.properties [--override property=value]*"
 	exit 1
 fi
+
 base_dir=$(dirname $0)
 
-if [ "x$KAFKA_LOG4J_OPTS" = "x" ]; then
+if [ "x$EAGLE_LOG4J_OPTS" = "x" ]; then
     export KAFKA_LOG4J_OPTS="-Dlog4j.configuration=file:$base_dir/../conf/log4j.properties"
 fi
 
-if [ "x$KAFKA_HEAP_OPTS" = "x" ]; then
-    export KAFKA_HEAP_OPTS="-Xmx1G -Xms1G"
+if [ "x$EAGLE_HEAP_OPTS" = "x" ]; then
+    export EAGLE_HEAP_OPTS="-Xmx1G -Xms1G"
 fi
 
 EXTRA_ARGS="-name kafkaServer -loggc"
@@ -41,8 +42,10 @@ case $COMMAND in
     ;;
 esac
 
-if [ "$#" == "0" ];then
-	exec $base_dir/eagle-run-class.sh $EXTRA_ARGS kafka.Kafka "$base_dir/../conf/kafka-server.properties" "$@"
+$base_dir/kafka-server-status.sh 1>/dev/null 2>&1
+if [ "$?" == "" ];then
+	echo "Kafka is still running, please stop firstly before starting"
+	exit 0
 else
 	exec $base_dir/eagle-run-class.sh $EXTRA_ARGS kafka.Kafka "$@"
 fi
