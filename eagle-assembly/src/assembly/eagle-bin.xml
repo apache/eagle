@@ -210,11 +210,11 @@
                 <include>scala-library-*</include>
                 <include>slf4j-*.jar</include>
                 <include>log4j-*.jar</include>
-                <include>commons-math3-3.5.jar</include>
-                <include>asm-3.1.jar</include>
+                <include>commons-math3-*.jar</include>
             </includes>
             <excludes>
                 <exclude>slf4j-log4j12-*.jar</exclude>
+                <exclude>asm-*.jar</exclude>
             </excludes>
         </fileSet>
 
