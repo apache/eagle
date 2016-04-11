@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export EAGLE_BASE_DIR=$(dirname $0)/../../../
+export EAGLE_BASE_DIR=$(dirname $0)/../
 export EAGLE_BUILD_DIR=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
 
 ls ${EAGLE_BUILD_DIR} 1>/dev/null 2>/dev/null
