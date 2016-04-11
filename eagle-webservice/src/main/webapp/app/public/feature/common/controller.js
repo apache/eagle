@@ -327,8 +327,8 @@
 		// =            Data Preparation            =
 		// ==========================================
 		// Steam list
-		var _streamList = Entities.queryEntities("AlertStreamService", {application: Application.current().tags.application});
-		var _executorList = Entities.queryEntities("AlertExecutorService", {application: Application.current().tags.application});
+		var _streamList = Entities.queryEntities("AlertStreamService");
+		var _executorList = Entities.queryEntities("AlertExecutorService");
 		$scope.streamList = _streamList;
 		$scope.executorList = _executorList;
 		$scope.streamReady = false;
@@ -534,6 +534,13 @@
 							});
 							return;
 						}
+
+						/*var _application = Application.current();
+						if(_application.tags.application !== $scope.policy.tags.application) {
+							_application = Application.find($scope.policy.tags.application);
+							Application.current(_application, false);
+						}
+						console.log("1 >>>>>",Application.current());*/
 
 						// === Revert inner data ===
 						// >> De-dupe
