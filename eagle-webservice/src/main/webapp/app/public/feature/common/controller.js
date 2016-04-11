@@ -327,8 +327,8 @@
 		// =            Data Preparation            =
 		// ==========================================
 		// Steam list
-		var _streamList = Entities.queryEntities("AlertStreamService");
-		var _executorList = Entities.queryEntities("AlertExecutorService");
+		var _streamList = Entities.queryEntities("AlertStreamService", {application: Application.current().tags.application});
+		var _executorList = Entities.queryEntities("AlertExecutorService", {application: Application.current().tags.application});
 		$scope.streamList = _streamList;
 		$scope.executorList = _executorList;
 		$scope.streamReady = false;
@@ -398,6 +398,14 @@
 						if(!$scope.policy.__.advanced) {
 							var _stream = _findStream($scope.policy.tags.application, $scope.policy.__.streamName);
 							$scope._stream = _stream;
+
+							if(!_stream) {
+								$.dialog({
+									title: "OPS",
+									content: "Stream not found! Current application don't match any stream."
+								});
+								return;
+							}
 
 							if(!_stream.metas) {
 								_stream.metas = Entities.queryEntities("AlertStreamSchemaService", {application: $scope.policy.tags.application, streamName: $scope.policy.__.streamName});
@@ -535,12 +543,24 @@
 							return;
 						}
 
-						/*var _application = Application.current();
+						var _application = Application.current();
 						if(_application.tags.application !== $scope.policy.tags.application) {
 							_application = Application.find($scope.policy.tags.application);
-							Application.current(_application, false);
+							if(_application) {
+								Application.current(_application, false);
+								console.log("Application not match. Do reload...");
+								$wrapState.reload();
+							} else {
+								$.dialog({
+									title: "OPS",
+									content: "Application not found! Current policy don't match any application."
+								}, function() {
+									$location.path("/common/policyList");
+									$scope.$apply();
+								});
+							}
+							return;
 						}
-						console.log("1 >>>>>",Application.current());*/
 
 						// === Revert inner data ===
 						// >> De-dupe
