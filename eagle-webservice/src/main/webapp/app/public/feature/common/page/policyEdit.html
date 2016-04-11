@@ -314,7 +314,7 @@
 				</div>
 				<ul ng-show="policy.__.notification.length === 0">
 					<li ng-repeat="notification in Notification.list track by $index">
-						<a ng-click="newNotification(notification.name)">+ New {{notification.name}} Notification</a>
+						<a ng-click="newNotification(notification.tags.notificationType)">+ New {{notification.tags.notificationType}} Notification</a>
 					</li>
 				</ul>
 

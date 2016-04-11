@@ -74,6 +74,8 @@
 			});
 		});
 
+		Notification.promise = Notification.list._promise;
+
 		return Notification;
 	});
 
@@ -358,30 +360,32 @@
 			$scope.policy.__.notification.push(__notification);
 		};
 
-		$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
-			{icon: "cog", title: "Configuration", list: [
-				{icon: "trash", title: "Delete", danger: true, func: function () {
-					var notification = $scope.notificationTabHolder.selectedPane.data;
-					UI.deleteConfirm(notification.notificationType).then(null, null, function(holder) {
-						common.array.remove(notification, $scope.policy.__.notification);
-						holder.closeFunc();
-					});
-				}}
-			]},
-			{icon: "plus", title: "New", list: $.map(Notification.list, function(notification) {
-				return {
-					icon: "plus",
-					title: notification.tags.notificationType,
-					func: function () {
-						$scope.newNotification(notification.tags.notificationType);
-						setTimeout(function() {
-							$scope.notificationTabHolder.setSelect(-1);
-							$scope.$apply();
-						}, 0);
-					}
-				};
-			})}
-		] : [];
+		Notification.promise.then(function () {
+			$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
+				{icon: "cog", title: "Configuration", list: [
+					{icon: "trash", title: "Delete", danger: true, func: function () {
+						var notification = $scope.notificationTabHolder.selectedPane.data;
+						UI.deleteConfirm(notification.notificationType).then(null, null, function(holder) {
+							common.array.remove(notification, $scope.policy.__.notification);
+							holder.closeFunc();
+						});
+					}}
+				]},
+				{icon: "plus", title: "New", list: $.map(Notification.list, function(notification) {
+					return {
+						icon: "plus",
+						title: notification.tags.notificationType,
+						func: function () {
+							$scope.newNotification(notification.tags.notificationType);
+							setTimeout(function() {
+								$scope.notificationTabHolder.setSelect(-1);
+								$scope.$apply();
+							}, 0);
+						}
+					};
+				})}
+			] : [];
+		});
 
 		// ==========================================
 		// =            Data Preparation            =
