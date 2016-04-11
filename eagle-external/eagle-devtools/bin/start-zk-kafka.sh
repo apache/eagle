@@ -26,23 +26,12 @@ fi
 
 cd $EAGLE_BUILD_DIR/
 
-bin/eagle-service.sh status
-
-if [ "$?" != "0" ];then
-	echo "Starting eagle service ..."
-	bin/eagle-service.sh start
-	echo "Wait 5 seconds for eagle service to be ready .. "
-	sleep 5
-else
-	echo "Eagle service has already started"
-fi
-
-bin/eagle-topology-init.sh
-
 echo "Starting zookeeper"
 bin/zookeeper-server-start.sh -daemon conf/zookeeper-server.properties
 sleep 1
+bin/zookeeper-server-status.sh
 
 echo "Starting kafka"
 bin/kafka-server-start.sh -daemon conf/kafka-server.properties
 sleep 1
+bin/kafka-server-status.sh
