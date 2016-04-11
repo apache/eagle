@@ -33,7 +33,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Metric(interval=60000)
 @ServicePath(path = "/metric")
 // TODO:
-@Tags({"site","application","policyId"})
+@Tags({"site","application","policyId","alertExecutorId", "streamName","source","partitionSeq"})
 public class GenericMetricEntity extends TaggedLogAPIEntity {
 	public static final String GENERIC_METRIC_SERVICE = "GenericMetricService";
 	public static final String GENERIC_METRIC_PREFIX_PLACE_HOLDER = "GENERIC_METRIC_PREFIX_PLACEHODLER";

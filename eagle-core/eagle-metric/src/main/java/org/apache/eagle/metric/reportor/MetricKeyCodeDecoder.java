@@ -22,33 +22,50 @@ package org.apache.eagle.metric.reportor;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * TODO: Refactor metric implementation, which is not very solid.
+ *
+ * metricKey = metricName[/[key=char|whitespace]*]*
+ */
+@Deprecated
 public class MetricKeyCodeDecoder {
-
+    private final static String SEPERATOR = "/";
     public static String codeMetricKey(String metricName, Map<String, String> tags) {
         StringBuilder sb = new StringBuilder();
         sb.append(metricName);
         for (Map.Entry<String, String> entry : tags.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            sb.append(" " + key + ":" + value);
+            if(key.contains(SEPERATOR)||value.contains(SEPERATOR)){
+                throw new IllegalStateException("Invalid metric tag pair <"+key+":"+value+"> which contains reserved char: "+SEPERATOR);
+            }
+            sb.append(SEPERATOR).append(key).append(":").append(value);
         }
         return sb.toString();
     }
 
+    /**
+     * @param name metricName[/[key=char|whitespace]*]*
+     * @return
+     */
     public static EagleMetricKey decodeMetricKey(String name) {
         EagleMetricKey metricName = new EagleMetricKey();
-        String[] parts = name.split(" ");
+        String[] parts = name.split(SEPERATOR);
         metricName.metricName = parts[0];
         metricName.tags = new HashMap<>();
         for (int i = 1; i < parts.length; i++) {
             String[] keyValue = parts[i].split(":");
-            metricName.tags.put(keyValue[0], keyValue[1]);
+            if(keyValue.length >1) {
+                metricName.tags.put(keyValue[0], keyValue[1]);
+            } else {
+                throw new IllegalStateException("Failed to decode metric name '"+name+"', because '"+parts[i]+"' is invalid, expected in format: 'key:value'");
+            }
         }
         return metricName;
     }
 
     public static String addTimestampToMetricKey(long timestamp, String metricKey) {
-        return timestamp + " " + metricKey;
+        return timestamp + SEPERATOR + metricKey;
     }
 
     public static String codeTSMetricKey(long timestamp, String metricName, Map<String, String> tags) {
@@ -56,7 +73,7 @@ public class MetricKeyCodeDecoder {
     }
 
     public static EagleMetricKey decodeTSMetricKey(String name) {
-        Integer index = name.indexOf(" ");
+        Integer index = name.indexOf(SEPERATOR);
         EagleMetricKey metricKey = decodeMetricKey(name.substring(index + 1));
         metricKey.timestamp = Long.valueOf(name.substring(0, index));
         return metricKey;

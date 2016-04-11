@@ -1,3 +1,4 @@
+#!/bin/bash
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -13,17 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-eagle {
-	service {
-		storage-type="jdbc"
-		storage-adapter="derby"
-		storage-username="eagle"
-		storage-password=eagle
-		storage-database=eagle
-		# Derby database location: $TOMCAT_HOME/data/eagle
-		storage-connection-url="jdbc:derby:/tmp/eagle-db-local;create=true"
-		storage-connection-props="encoding=UTF-8"
-		storage-driver-class="org.apache.derby.jdbc.EmbeddedDriver"
-		storage-connection-max=8
-	}
-}
+export EAGLE_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/../
+export EAGLE_BUILD_DIR=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
+chmod +x $EAGLE_BASE_DIR/eagle-assembly/src/main/bin/*
+
+echo "Stopping eagle service"
+ls ${EAGLE_BUILD_DIR} 1>/dev/null 2>/dev/null
+if [ "$?" != "0" ];then
+	echo "$EAGLE_BUILD_DIR not exist, do nothing"
+else
+	$EAGLE_BUILD_DIR/bin/eagle-service.sh stop
+fi
+echo "Stopping zookeeper"
+$EAGLE_BASE_DIR/eagle-assembly/src/main/bin/kafka-server-stop.sh
+echo "Stopping kafka"
+$EAGLE_BASE_DIR/eagle-assembly/src/main/bin/zookeeper-server-stop.sh
