@@ -28,25 +28,25 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Plugin to persist alerts to Eagle Storage
  */
 public class AlertEagleStorePlugin implements NotificationPlugin {
     private static final Logger LOG = LoggerFactory.getLogger(AlertEagleStorePlugin.class);
-    private NotificationStatus status;
+    private List<NotificationStatus> statusList = new Vector<>();
     private AlertEagleStorePersister persist;
 
     @Override
     public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws Exception {
         this.persist = new AlertEagleStorePersister(config);
-        this.status = new NotificationStatus();
         LOG.info("initialized plugin for EagleStorePlugin");
     }
 
     @Override
-    public void update(String policyId, Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
-        if( isPolicyDelete ){
+    public void update(String policyId, List<Map<String,String>> notificationConfigCollection , boolean isPolicyDelete ) throws Exception {
+        if(isPolicyDelete){
             LOG.info("Deleted policy ...");
             return;
         }
@@ -54,8 +54,8 @@ public class AlertEagleStorePlugin implements NotificationPlugin {
     }
 
     @Override
-    public NotificationStatus getStatus() {
-        return this.status;
+    public List<NotificationStatus> getStatusList() {
+        return this.statusList;
     }
 
     /**
@@ -65,10 +65,11 @@ public class AlertEagleStorePlugin implements NotificationPlugin {
     @Override
     public void onAlert(AlertAPIEntity alertEntity) {
         LOG.info("write alert to eagle storage " + alertEntity);
+        NotificationStatus status = new NotificationStatus();
         try{
             List<AlertAPIEntity> list = new ArrayList<AlertAPIEntity>();
             list.add(alertEntity);
-            boolean result = persist.doPersist( list );
+            boolean result = persist.doPersist(list);
             if(result) {
                 status.successful = true;
                 status.errorMessage = "";
@@ -81,6 +82,7 @@ public class AlertEagleStorePlugin implements NotificationPlugin {
             status.errorMessage = ex.getMessage();
             LOG.error("Fail writing alert entity to Eagle Store", ex);
         }
+        this.statusList.add(status);
     }
 
     @Override

@@ -42,12 +42,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class AlertEmailPlugin implements NotificationPlugin {
 	private static final Logger LOG = LoggerFactory.getLogger(AlertEmailPlugin.class);
-	private Map<String, AlertEmailGenerator> emailGenerators = new ConcurrentHashMap<>();
+	private Map<String, List<AlertEmailGenerator>> emailGenerators = new ConcurrentHashMap<>();
 	private final static int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
 	private final static int DEFAULT_THREAD_POOL_MAX_SIZE = 8;
 	private final static long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
 	private transient ThreadPoolExecutor executorPool;
-	private NotificationStatus status = new NotificationStatus();
+	private Vector<NotificationStatus> statusList = new Vector<>();
 	private Config config;
 
 	@Override
@@ -57,32 +57,33 @@ public class AlertEmailPlugin implements NotificationPlugin {
 		LOG.info(" Creating Email Generator... ");
 		for( AlertDefinitionAPIEntity  entity : initAlertDefs ){
 			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
-			for( Map<String,String> notificationConfigMap : configMaps ){
-				String notificationType = notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE);
-				// for backward compatibility, default notification is email
-				if(notificationType == null || notificationType.equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)){
-					AlertEmailGenerator generator = createEmailGenerator( notificationConfigMap );
-						this.emailGenerators.put(entity.getTags().get(Constants.POLICY_ID), generator);
-						LOG.info("Successfully initialized email notification for policy " + entity.getTags().get(Constants.POLICY_ID) + ",with " + notificationConfigMap);
-				}
-			}
+			this.update(entity.getTags().get(Constants.POLICY_ID), configMaps, false);
 		}
 	}
 
 	/**
-	 * @param notificationConf
+	 * @param notificationConfigCollection
 	 * @throws Exception
      */
 	@Override
-	public void update(String policyId, Map<String,String> notificationConf, boolean isPolicyDelete ) throws Exception {
-		if( isPolicyDelete ){
+	public void update(String policyId, List<Map<String,String>> notificationConfigCollection, boolean isPolicyDelete) throws Exception {
+		if(isPolicyDelete){
 			LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
 			this.emailGenerators.remove(policyId);
 			return;
 		}
-		AlertEmailGenerator generator = createEmailGenerator(notificationConf);
-		this.emailGenerators.put(policyId , generator );
-		LOG.info("created/updated email generator for updated policy " + policyId);
+		Vector<AlertEmailGenerator> generators = new Vector<>();
+		for(Map<String, String> notificationConf: notificationConfigCollection) {
+			String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
+			if(notificationType.equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)) {
+				AlertEmailGenerator generator = createEmailGenerator(notificationConf);
+				generators.add(generator);
+			}
+		}
+		if(generators.size() != 0) {
+			this.emailGenerators.put(policyId, generators);
+			LOG.info("created/updated email generators for policy " + policyId);
+		}
 	}
 
 	/**
@@ -93,20 +94,24 @@ public class AlertEmailPlugin implements NotificationPlugin {
 	@Override
 	public void onAlert(AlertAPIEntity alertEntity) throws  Exception {
 		String policyId = alertEntity.getTags().get(Constants.POLICY_ID);
-		AlertEmailGenerator generator = this.emailGenerators.get(policyId);
-		boolean isSuccess = generator.sendAlertEmail(alertEntity);
-		if( !isSuccess ) {
-			status.errorMessage = "Failed to send email";
-			status.successful = false;
-		}else {
-			status.errorMessage = "";
-			status.successful = true;
+		List<AlertEmailGenerator> generators = this.emailGenerators.get(policyId);
+		for(AlertEmailGenerator generator: generators) {
+			boolean isSuccess = generator.sendAlertEmail(alertEntity);
+			NotificationStatus status = new NotificationStatus();
+			if( !isSuccess ) {
+				status.errorMessage = "Failed to send email";
+				status.successful = false;
+			}else {
+				status.errorMessage = "";
+				status.successful = true;
+			}
+			this.statusList.add(status);
 		}
 	}
 
 	@Override
-	public NotificationStatus getStatus() {
-		return this.status;
+	public List<NotificationStatus> getStatusList() {
+		return this.statusList;
 	}
 
 	/**
