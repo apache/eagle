@@ -549,7 +549,7 @@
 						__: {
 							toJSON: jQuery.noop,
 							conditions: {},
-							notification: [{notificationType: Notification.list[0].tags.notificationType}],
+							notification: Notification.list[0] ? [{notificationType: Notification.list[0].tags.notificationType}] : [],
 							dedupe: {
 								alertDedupIntervalMin: 10,
 								emailDedupIntervalMin: 10
