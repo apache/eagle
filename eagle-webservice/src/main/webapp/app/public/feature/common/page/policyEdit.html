@@ -305,8 +305,7 @@
 				<label>Notification</label>
 				<div tabs menu="menu" holder="notificationTabHolder" ng-show="policy.__.notification.length">
 					<pane ng-repeat="notification in policy.__.notification track by $index" data-data="notification" data-title="{{notification.notificationType}}">
-						<div class="form-group" ng-if="field.value === undefined"
-							 ng-repeat="field in Notification.map[notification.notificationType].fieldList track by $index">
+						<div class="form-group" ng-repeat="field in Notification.map[notification.notificationType].fieldList track by $index">
 							<label>{{field.name}}</label>
 							<input type="text" class="form-control" ng-model="notification[field.name]">
 						</div>

@@ -59,35 +59,19 @@
 		return Policy;
 	});
 
-	feature.service("Notification", function() {
+	feature.service("Notification", function(Entities) {
 		var Notification = function () {};
-
-		Notification.list = [
-			{
-				name: "email",
-				fieldList: ["sender","recipients","subject",{name: "flavor", value: "email"},{name: "id", value: "email_1"}, {name: "tplFileName", value: ""}]
-			},
-			{
-				name: "kafka",
-				fieldList: ["topic"]
-			},
-			{
-				name: "eagleStore"
-			}
-		];
-
-		// Notification format
 		Notification.map = {};
-		$.each(Notification.list, function (i, notification) {
-			notification.fieldList = $.map(notification.fieldList || [], function (field) {
-				if(typeof field === "string") {
-					field = {
-						name: field
-					};
-				}
-				return field;
+
+		Notification.list = Entities.queryEntities("AlertNotificationService");
+		Notification.list._promise.then(function () {
+			$.each(Notification.list, function (i, notification) {
+				// Parse fields
+				notification.fieldList = common.parseJSON(notification.fields, []);
+
+				// Fill map
+				Notification.map[notification.tags.notificationType] = notification;
 			});
-			Notification.map[notification.name] = notification;
 		});
 
 		return Notification;
@@ -363,9 +347,15 @@
 		$scope.notificationTabHolder = null;
 
 		$scope.newNotification = function (notificationType) {
-			$scope.policy.__.notification.push({
+			var __notification = {
 				notificationType: notificationType
+			};
+
+			$.each(Notification.map[notificationType].fieldList, function (i, field) {
+				__notification[field.name] = field.value || "";
 			});
+
+			$scope.policy.__.notification.push(__notification);
 		};
 
 		$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
@@ -381,9 +371,9 @@
 			{icon: "plus", title: "New", list: $.map(Notification.list, function(notification) {
 				return {
 					icon: "plus",
-					title: notification.name,
+					title: notification.tags.notificationType,
 					func: function () {
-						$scope.newNotification(notification.name);
+						$scope.newNotification(notification.tags.notificationType);
 						setTimeout(function() {
 							$scope.notificationTabHolder.setSelect(-1);
 							$scope.$apply();
@@ -555,7 +545,7 @@
 						__: {
 							toJSON: jQuery.noop,
 							conditions: {},
-							notification: [{notificationType: Notification.list[0].name}],
+							notification: [{notificationType: Notification.list[0].tags.notificationType}],
 							dedupe: {
 								alertDedupIntervalMin: 10,
 								emailDedupIntervalMin: 10
@@ -607,7 +597,7 @@
 								title: "OPS",
 								content: "Policy not found!"
 							}, function() {
-								$location.path("/common/policyList");
+								$wrapState.path("/common/policyList");
 								$scope.$apply();
 							});
 							return;
@@ -964,14 +954,6 @@
 
 				// notificationDef
 				$scope.policy.__.notification = $scope.policy.__.notification || [];
-				$.each($scope.policy.__.notification, function (i, notificationUnit) {
-					var notificationConfig = Notification.map[notificationUnit.notificationType];
-					$.each(notificationConfig.fieldList, function (i, field) {
-						if(!notificationUnit[field.name] && field.value !== undefined) {
-							notificationUnit[field.name] = field.value;
-						}
-					});
-				});
 
 				$scope.policy.notificationDef = JSON.stringify($scope.policy.__.notification);
 
