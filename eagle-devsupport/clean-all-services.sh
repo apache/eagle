@@ -15,7 +15,7 @@
 # limitations under the License.
 
 echo "Stopping all service ..."
-$(dirname $0)/stop-all.sh
+$(dirname $0)/stop-all-services.sh
 echo "Cleaning tmp files (including local db, zookeeper data, kafka log, etc.) ..."
 rm -rf /tmp/eagle-*
 echo "Done."

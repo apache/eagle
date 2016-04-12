@@ -33,3 +33,11 @@ How to Start
         bin/send-sample-querylog.sh
 
 4. Visit alert page at [http://localhost:9099/eagle-service/ui/#/common/alertList](http://localhost:9099/eagle-service/ui/#/common/alertList)
+
+FAQ
+---
+#### 1. UNKNOWN_TOPIC_OR_PARTITION
+
+> storm.kafka.FailedFetchException: Error fetching data from [Partition{host=localhost:6667, partition=2}] for topic [cassandra_querylog_local]: [UNKNOWN_TOPIC_OR_PARTITION]
+     
+__Solution__: Execute `eagle-devsupport/clean-all.sh` and retry from first step.

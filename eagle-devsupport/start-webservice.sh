@@ -37,13 +37,3 @@ else
 fi
 
 bin/eagle-topology-init.sh
-
-echo "Starting zookeeper"
-bin/zookeeper-server-start.sh -daemon conf/zookeeper-server.properties
-sleep 1
-bin/zookeeper-server-status.sh
-
-echo "Starting kafka"
-bin/kafka-server-start.sh -daemon conf/kafka-server.properties
-sleep 1
-bin/kafka-server-status.sh
