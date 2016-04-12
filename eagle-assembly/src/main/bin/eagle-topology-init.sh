@@ -137,6 +137,47 @@ echo "Importing AlertStreamService for USERPROFILE"
 curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H "Content-Type: application/json"  "http://$EAGLE_SERVICE_HOST:$EAGLE_SERVICE_PORT/eagle-service/rest/entities?serviceName=AlertStreamService" \
      -d '[ { "prefix": "alertStream", "tags": { "streamName": "userActivity", "site":"sandbox", "application":"userProfile" }, "alertExecutorIdList": [ "userProfileAnomalyDetectionExecutor" ] } ]'
 
+echo "Importing notification plugin configurations ... "
+
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' \
+ "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertNotificationService" \
+ -d '
+ [
+     {
+       "prefix": "alertNotifications",
+       "tags": {
+         "notificationType": "email"
+       },
+       "className": "org.apache.eagle.notification.plugin.AlertEmailPlugin",
+       "description": "send alert to email",
+       "enabled":true
+     },
+     {
+       "prefix": "alertNotifications",
+       "tags": {
+         "notificationType": "kafka"
+       },
+       "className": "org.apache.eagle.notification.plugin.AlertKafkaPlugin",
+       "description": "send alert to kafka bus",
+       "enabled":true
+     },
+     {
+       "prefix": "alertNotifications",
+       "tags": {
+         "notificationType": "eagleStore"
+       },
+       "className": "org.apache.eagle.notification.plugin.AlertEagleStorePlugin",
+       "description": "send alert to eagle store",
+       "enabled":true
+     }
+ ]
+ '
+
+## Finished
+echo ""
+echo "Finished initialization for alert notification plugins"
+
+
 ## Finished
 echo ""
 echo "Finished initialization for eagle topology"
