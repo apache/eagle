@@ -14,25 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export EAGLE_BASE_DIR=$(dirname $0)/../../../
-export EAGLE_BUILD_DIR=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
+export EAGLE_CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export EAGLE_BASE_DIR=$EAGLE_CURRENT_DIR/../../..
+export EAGLE_ASSEMBLY_DIR=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
 
-ls ${EAGLE_BUILD_DIR} 1>/dev/null 2>/dev/null
+ls ${EAGLE_ASSEMBLY_DIR} 1>/dev/null 2>/dev/null
 if [ "$?" != "0" ];then
-	echo "$EAGLE_BUILD_DIR not exist, build now"
+	echo "$EAGLE_ASSEMBLY_DIR not exist, build now"
 	cd $EAGLE_BASE_DIR
 	mvn package -DskipTests
 fi
 
-cd $EAGLE_BUILD_DIR/
+cd $EAGLE_ASSEMBLY_DIR/
 
 bin/eagle-service.sh status
 
 if [ "$?" != "0" ];then
 	echo "Starting eagle service ..."
 	bin/eagle-service.sh start
-	echo "Wait 5 seconds for eagle service to be ready .. "
-	sleep 5
+	sleep 1
 else
 	echo "Eagle service has already started"
 fi
@@ -50,10 +50,6 @@ sleep 1
 echo "Creating kafka topic: cassandra_querylog_local"
 bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic cassandra_querylog_local --partitions 3 --replication-factor 1
 
-cd $(dirname $0)/../
-
-chmod +x bin/*.sh
-
-bin/init.sh
-
-$EAGLE_BUILD_DIR/bin/kafka-stream-monitor.sh cassandraQueryLogStream cassandraQueryLogExecutor $(dirname $0)/../conf/cassandra-security-local.conf
+$EAGLE_CURRENT_DIR/init.sh
+$EAGLE_CURRENT_DIR/send-sample-querylog.sh
+$EAGLE_ASSEMBLY_DIR/bin/kafka-stream-monitor.sh cassandraQueryLogStream cassandraQueryLogExecutor $EAGLE_CURRENT_DIR/../conf/cassandra-security-local.conf

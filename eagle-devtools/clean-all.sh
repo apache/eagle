@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -13,12 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-PIDS=$(ps ax | grep java | grep -i QuorumPeerMain | grep -v grep | awk '{print $1}')
 
-if [ -z "$PIDS" ]; then
-  echo "No zookeeper server is running"
-  exit 1
-else
-  echo "Zookeeper server is running at $PIDS"
-  exit 0
-fi
+echo "Stopping all service ..."
+$(dirname $0)/stop-all.sh
+echo "Cleaning tmp files (including local db, zookeeper data, kafka log, etc.) ..."
+rm -rf /tmp/eagle-*
+echo "Done."

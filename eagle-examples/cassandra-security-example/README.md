@@ -20,12 +20,16 @@ limitations under the License.
 Cassandra Security Monitoring Example
 =====================================
 
-Quick Start
------------
+How to Start 
+------------
+1. Quickly start all services including zookeeper, kafka, webservice and topology with single script
 
     bin/quick-start.sh
+    
+2. Visit eagle web at [http://localhost:9099/eagle-service](http://localhost:9099/eagle-service/ui/#/common/policyList)
 
-Trigger Alert with Sample Data
-------------------------------
+3. Send sample data in another terminal with:
 
-    bin/send-sample-event.sh
+    bin/send-sample-querylog.sh
+
+4. Visit alert page at [http://localhost:9099/eagle-service/ui/#/common/alertList](http://localhost:9099/eagle-service/ui/#/common/alertList)
