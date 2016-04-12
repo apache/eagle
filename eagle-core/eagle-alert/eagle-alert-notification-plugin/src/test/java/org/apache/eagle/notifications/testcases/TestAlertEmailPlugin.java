@@ -49,7 +49,7 @@ public class TestAlertEmailPlugin {
         alert.setTags(new HashMap<String, String>());
         alert.getTags().put(Constants.POLICY_ID, "testPolicyId");
         alert.setDescription("");
-        alert.setAlertContext(new AlertContext());
+        alert.setDecodedAlertContext(new AlertContext());
         plugin.onAlert(alert);
         Assert.assertTrue(plugin.getStatus().successful);
     }

@@ -181,7 +181,7 @@
 			];
 
 			function _loadSeries(seriesName, metricName, condition) {
-				var list = Entities.querySeries("GenericMetricService", $.extend({_metricName: metricName}, condition), "@cluster", "sum(value)", _intervalList[_intervalType][1]);
+				var list = Entities.querySeries("GenericMetricService", $.extend({_metricName: metricName}, condition), "@site", "sum(value)", _intervalList[_intervalType][1]);
 				var seriesList = nvd3.convert.eagle([list]);
 				if(!$scope[seriesName]) $scope[seriesName] = seriesList;
 				list._promise.then(function() {
@@ -399,6 +399,14 @@
 							var _stream = _findStream($scope.policy.tags.application, $scope.policy.__.streamName);
 							$scope._stream = _stream;
 
+							if(!_stream) {
+								$.dialog({
+									title: "OPS",
+									content: "Stream not found! Current application don't match any stream."
+								});
+								return;
+							}
+
 							if(!_stream.metas) {
 								_stream.metas = Entities.queryEntities("AlertStreamSchemaService", {application: $scope.policy.tags.application, streamName: $scope.policy.__.streamName});
 								_stream.metas._promise.then(function() {
@@ -532,6 +540,25 @@
 								$location.path("/common/policyList");
 								$scope.$apply();
 							});
+							return;
+						}
+
+						var _application = Application.current();
+						if(_application.tags.application !== $scope.policy.tags.application) {
+							_application = Application.find($scope.policy.tags.application);
+							if(_application) {
+								Application.current(_application, false);
+								console.log("Application not match. Do reload...");
+								$wrapState.reload();
+							} else {
+								$.dialog({
+									title: "OPS",
+									content: "Application not found! Current policy don't match any application."
+								}, function() {
+									$location.path("/common/policyList");
+									$scope.$apply();
+								});
+							}
 							return;
 						}
 

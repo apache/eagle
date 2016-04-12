@@ -22,6 +22,7 @@ import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.log.entity.meta.EntitySerDeser;
 import org.apache.eagle.storage.jdbc.schema.serializer.JdbcSerDeser;
 import org.apache.eagle.storage.jdbc.schema.serializer.DefaultJdbcSerDeser;
+import org.apache.eagle.storage.jdbc.schema.serializer.MetricJdbcSerDeser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +86,8 @@ public class JdbcEntityDefinitionManager {
         checkInit();
     }
 
-    public static DefaultJdbcSerDeser DEFAULT_JDBC_SERDESER = new DefaultJdbcSerDeser();
+    public static JdbcSerDeser DEFAULT_JDBC_SERDESER = new DefaultJdbcSerDeser();
+    public static JdbcSerDeser METRIC_JDBC_SERDESER = new MetricJdbcSerDeser();
     private final static Map<Class<?>,JdbcSerDeser> _columnTypeSerDeserMapping = new HashMap<Class<?>, JdbcSerDeser>();
 
     /**
@@ -124,7 +126,8 @@ public class JdbcEntityDefinitionManager {
         if(fieldType == null){
             return Types.NULL;
         } else if(!_classJdbcType.containsKey(fieldType)){
-            LOG.debug("Unable to locate simple jdbc type for: {}, return type as JAVA_OBJECT",fieldType);
+            if(LOG.isDebugEnabled())
+                LOG.debug("Unable to locate simple jdbc type for: {}, return type as JAVA_OBJECT",fieldType);
             return Types.JAVA_OBJECT;
         }
         return _classJdbcType.get(fieldType);
@@ -147,7 +150,7 @@ public class JdbcEntityDefinitionManager {
     // Intially bind basic java types with SQL types
     //================================================
     static {
-        registerJdbcType(String.class, Types.VARCHAR);
+        registerJdbcType(String.class, Types.LONGVARCHAR);
         registerJdbcType(Integer.class, Types.INTEGER);
         registerJdbcType(Double.class, Types.DOUBLE);
         registerJdbcType(Float.class, Types.FLOAT);

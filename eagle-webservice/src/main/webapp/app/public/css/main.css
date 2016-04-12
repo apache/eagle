@@ -450,6 +450,10 @@ ul.tree.tree-bordered > li > ul > li > a {
 	color: #FFFFFF;
 }
 
+.label.label-sm {
+	padding: .0em .4em .1em;
+}
+
 /* Row */
 .row.narrow {
 	margin-left: -5px;
@@ -531,6 +535,10 @@ ul.tree.tree-bordered > li > ul > li > a {
 	height: 200px;
 }
 
+.nvd3-chart-cntr.lg > svg.nvd3-svg {
+	height: 400px;
+}
+
 /* Tab */
 body .tab-content>.tab-pane {
 	display: block;
@@ -561,6 +569,35 @@ body .modal-body .nav-stacked > li:last-child {
 /* Box */
 .box .guideline {
 	margin-top: 0;
+}
+
+.box.inner-box {
+	border: none;
+	box-shadow: none;
+	padding: 5px 10px;
+	margin: 0;
+	border-bottom: 1px solid #f4f4f4;
+	position: relative;
+	border-radius: 0;
+}
+
+.box.inner-box .box-title {
+	margin: 0 5px 5px 0;
+	padding: 0;
+	font-size: 16px;
+	font-weight: bolder;
+	display: inline-block;
+	word-break: break-all;
+}
+
+.box.inner-box .box-tools {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.box.inner-box:last-child {
+	border-bottom: none;
 }
 
 /* Navigation Tab */

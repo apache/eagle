@@ -30,7 +30,15 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.ALERT_SERVICE_ENDPOINT_NAME)
 @TimeSeries(true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Tags({"site", "hostname", "application", "policyId", "sourceStreams", "alertSource", "alertExecutorId"})
+@Tags({
+		"site",
+		"hostname",
+		"application",
+		"policyId",
+		"sourceStreams",
+		"alertSource",
+		"alertExecutorId"
+})
 public class AlertAPIEntity extends TaggedLogAPIEntity{
 	@Column("description")
 	private String description;
@@ -83,7 +91,7 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 		_pcs.firePropertyChange("alertContext", null, null);
 	}
 
-	public void setAlertContext(AlertContext alertContext) {
+	public void setDecodedAlertContext(AlertContext alertContext) {
 		if(alertContext != null) this.alertContext = alertContext.toJsonString();
 		_pcs.firePropertyChange("alertContext", null, null);
 	}

@@ -32,8 +32,8 @@
 			deleteEntity: 'rest/entities/delete?serviceName=${serviceName}&byId=true',
 			deleteEntities: 'rest/entities?query=${serviceName}[${condition}]{*}&pageSize=100000',
 
-			queryGroup: 'rest/list?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000',
-			querySeries: 'rest/list?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000&timeSeries=true&intervalmin=${intervalmin}',
+			queryGroup: 'rest/entities?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000',
+			querySeries: 'rest/entities?query=${serviceName}[${condition}]<${groupBy}>{${values}}&pageSize=100000&timeSeries=true&intervalmin=${intervalmin}',
 
 			query: 'rest/',
 

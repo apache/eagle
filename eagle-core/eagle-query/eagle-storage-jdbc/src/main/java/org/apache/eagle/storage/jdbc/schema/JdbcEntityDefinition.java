@@ -48,7 +48,7 @@ public class JdbcEntityDefinition {
      * @return jdbc table name in lowercase
      */
     public String getJdbcTableName(){
-        if(this.internal.getService().equals(GenericMetricEntity.GENERIC_METRIC_SERVICE)){
+        if(isGenericMetric()){
             return this.internal.getTable().toLowerCase();
         }else {
             return String.format("%s_%s", this.internal.getTable(),this.internal.getPrefix()).toLowerCase();
@@ -56,11 +56,11 @@ public class JdbcEntityDefinition {
     }
 
     public Class<?> getColumnType(String fieldName) throws NoSuchFieldException {
-        if (fieldName.equals(JdbcConstants.TIMESTAMP_COLUMN_NAME)){
+        if (fieldName.equalsIgnoreCase(JdbcConstants.TIMESTAMP_COLUMN_NAME)){
             return Long.class;
-        }else if(fieldName.equals(JdbcConstants.ROW_KEY_COLUMN_NAME)) {
+        }else if(fieldName.equalsIgnoreCase(JdbcConstants.ROW_KEY_COLUMN_NAME)) {
             return String.class;
-        }else if(fieldName.equals(JdbcConstants.METRIC_NAME_COLUMN_NAME)){
+        }else if(fieldName.equalsIgnoreCase(JdbcConstants.METRIC_NAME_COLUMN_NAME)){
             return String.class;
         }
         for(String realField:internal.getDisplayNameMap().keySet()){
@@ -80,6 +80,9 @@ public class JdbcEntityDefinition {
     }
 
     public Integer getJdbcColumnTypeCodeOrNull(String fieldName){
+        if(this.isGenericMetric() && GenericMetricEntity.VALUE_FIELD.equalsIgnoreCase(fieldName)){
+            return JdbcEntityDefinitionManager.getJdbcType(double.class);
+        }
         Class<?> columnType;
         try {
             columnType = getColumnType(fieldName);
@@ -91,6 +94,10 @@ public class JdbcEntityDefinition {
 
     @SuppressWarnings("unchecked")
     public JdbcSerDeser getJdbcSerDeser(String columnName) {
+        if(this.isGenericMetric() && GenericMetricEntity.VALUE_FIELD.equalsIgnoreCase(columnName)){
+            return JdbcEntityDefinitionManager.METRIC_JDBC_SERDESER;
+        }
+
         Qualifier qualifier = this.getColumnQualifier(columnName);
         if(qualifier == null){
             return JdbcEntityDefinitionManager.DEFAULT_JDBC_SERDESER;
@@ -110,6 +117,33 @@ public class JdbcEntityDefinition {
             }
         }
         return false;
+    }
+
+    /**
+     * TODO: Optimize with hashmap
+     */
+     public String getJavaEntityFieldName(String jdbcColumnName){
+        for(String javaEntityFieldName:this.internal.getDisplayNameMap().keySet()){
+            if(javaEntityFieldName.equalsIgnoreCase(jdbcColumnName)){
+                return javaEntityFieldName;
+            }
+        }
+        throw new IllegalArgumentException("Can't map jdbc column '"+jdbcColumnName+"' with entity: "+this.getInternal().getEntityClass());
+    }
+
+    /**
+     * TODO: Optimize with hashmap
+     *
+     * @param jdbcTagName
+     * @return
+     */
+    public String getOriginalJavaTagName(String jdbcTagName){
+        for(String tag:this.getInternal().getTags()){
+            if(tag.equalsIgnoreCase(jdbcTagName)){
+                return tag;
+            }
+        }
+        return jdbcTagName.toLowerCase();
     }
 
     public Qualifier getColumnQualifier(String columnName) {
