@@ -24,12 +24,12 @@ How to Start
 ------------
 1. Quickly start all services including zookeeper, kafka, webservice and topology with single script
 
-    bin/quick-start.sh
+        bin/quick-start.sh
     
 2. Visit eagle web at [http://localhost:9099/eagle-service](http://localhost:9099/eagle-service/ui/#/common/policyList)
 
 3. Send sample data in another terminal with:
 
-    bin/send-sample-querylog.sh
+        bin/send-sample-querylog.sh
 
 4. Visit alert page at [http://localhost:9099/eagle-service/ui/#/common/alertList](http://localhost:9099/eagle-service/ui/#/common/alertList)
