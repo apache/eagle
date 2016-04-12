@@ -29,7 +29,4 @@ class SparkStreamingExecutionEnvironment (private val conf:Config) extends Execu
     ret.initWith(dag,config.get)
     ret
   }
-
-
-
 }

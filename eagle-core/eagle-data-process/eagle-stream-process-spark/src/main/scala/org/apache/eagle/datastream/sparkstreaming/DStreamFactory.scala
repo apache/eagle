@@ -16,7 +16,8 @@
   */
 package org.apache.eagle.datastream.sparkstreaming
 
-import org.apache.eagle.datastream.{FlatMapper, Collector, FlatMapperWrapper}
+import org.apache.eagle.alert.executor.AlertExecutor
+import org.apache.eagle.datastream.Collector
 import org.apache.eagle.datastream.core._
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
@@ -33,9 +34,12 @@ object DStreamFactory {
       case p@IterableStreamProducer(iterable, recycle) => {
         ssc.receiverStream(new IterableReceiver(iterable, recycle))
       }
-
       case p@SparkStreamingKafkaSourceProducer() =>{
-        val D = KafkaUtils.createStream(ssc,"localhost:2181","1",Map("noise" -> 1))
+        val topic = p.config.getString("dataSourceConfig.topic");
+        val zkConnection = p.config.getString("dataSourceConfig.zkConnection");
+        val groupId = p.config.getString("dataSourceConfig.consumerGroupId");
+
+        val D = KafkaUtils.createStream(ssc,zkConnection,groupId,Map(topic -> 1))
         D.asInstanceOf[DStream[Any]]
     }
       case _ =>
@@ -54,9 +58,14 @@ object DStreamFactory {
     val dStream = to match {
       case  FlatMapProducer(flatMapper) => {
         //val flatMapperWrapper = flatMapper.asInstanceOf[FlatMapper[Any]]
+        if(flatMapper.isInstanceOf[AlertExecutor]){
+          flatMapper.asInstanceOf[AlertExecutor].prepareConfig(to.config)
+        }
+
         from.flatMap(input => {
           val result= mutable.ListBuffer[Any]()
           val flatMapperInput = Seq(input)
+
           flatMapper.flatMap(flatMapperInput.asInstanceOf[Seq[AnyRef]],new TraversableCollector(result))
           result
         })
@@ -84,6 +93,11 @@ object DStreamFactory {
     }
 
     val edges = graph.outgoingEdgesOf(to)
+    if(edges.size == 0){
+      dStream.asInstanceOf[DStream[Any]].foreachRDD(rdd => {
+        rdd.collect().foreach(println)
+      })
+    }
     edges.foreach(sc => {
       val producer = graph.getNodeByName(sc.to.name)
       producer match {

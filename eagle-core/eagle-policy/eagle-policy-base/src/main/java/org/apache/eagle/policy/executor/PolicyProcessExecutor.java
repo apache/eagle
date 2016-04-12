@@ -203,6 +203,7 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
         LOG.info("All policy evaluators: " + policyEvaluators);
 		
 		initMetricReportor();
+		this.initialized = true;
 	}
 
     /**
@@ -299,7 +300,9 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
 		}
 		return dimensionsMap.get(policyId);
 	}
-	
+
+	private transient boolean initialized = false;
+
     /**
      * within this single executor, execute all PolicyEvaluator sequentially
      * the contract for input:
@@ -310,6 +313,12 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
      */
     @Override
     public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, K>> outputCollector){
+		if(!initialized) init();
+		java.util.List<Object> input1 = new java.util.ArrayList<>();
+		input1.add("test");
+		input1.add("spark-streaming-kafka");
+		input1.add(input.get(0));
+		input = input1;
         if(input.size() != 3)
             throw new IllegalStateException("AlertExecutor always consumes exactly 3 fields: key, stream name and value(SortedMap)");
         if(LOG.isDebugEnabled()) LOG.debug("Msg is coming " + input.get(2));

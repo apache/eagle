@@ -50,5 +50,4 @@ class IterableReceiver (iterable: Iterable[Any],recycle:Boolean ) (implicit info
       }
     }
   }
-
 }

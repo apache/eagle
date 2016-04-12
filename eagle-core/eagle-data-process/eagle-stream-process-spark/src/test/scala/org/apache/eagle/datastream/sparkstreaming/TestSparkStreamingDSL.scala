@@ -17,6 +17,7 @@
 package org.apache.eagle.datastream.sparkstreaming
 
 import org.apache.eagle.datastream.ExecutionEnvironments
+import org.apache.eagle.datastream.storm.JsonMessageDeserializer
 
 
 case class Entity(name:String,value:Double,var inc:Int=0){
@@ -40,18 +41,18 @@ object TestSparkStreamingDSL extends App{
 
 
 
-  env.from(tmp,recycle = true)
+  /*env.from(tmp,recycle = true)
     .flatMap(_.split(" "))
     .map(o => (o,1))
     .reduceByKey((x:Int, y:Int) => x+y)
     .filter(o => !o._1.contains("zqin"))
     .foreach(println)
-  env.execute()
-
- /* val streamName = env.config.get[String]("eagle.stream.name","eventStream")
-  val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")
-  env.fromKafka().parallelism(1).nameAs(streamName) ! (Seq(streamName),streamExecutorId)
-  System.out.println("gg")
   env.execute()*/
 
+  val streamName = env.config.get[String]("eagle.stream.name","eventStream")
+  val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")
+  env.config.set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
+  env.fromKafka().parallelism(1).nameAs(streamName) ! (Seq(streamName),streamExecutorId)
+  //env.fromKafka().foreach(println)
+  env.execute()
 }
