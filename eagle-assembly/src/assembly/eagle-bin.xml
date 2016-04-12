@@ -218,9 +218,14 @@
                 <include>commons-math3-*.jar</include>
                 <include>slf4j-log4j12-*.jar</include>
             </includes>
-            <excludes>
-                <exclude>asm-*.jar</exclude>
-            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/target/lib</directory>
+            <outputDirectory>lib/storm</outputDirectory>
+            <includes>
+                <include>storm-core-*.jar</include>
+                <include>asm-*.jar</include>
+            </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../eagle-external/eagle-ambari</directory>
