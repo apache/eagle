@@ -17,8 +17,15 @@ limitations under the License.
 {% endcomment %}
 -->
 
+Cassandra Security Monitoring Example
+=====================================
+
+Quick Start
+-----------
+
+    bin/quick-start.sh
+
 Trigger Alert with Sample Data
 ------------------------------
 
-    bin/kafka-producer.sh --topic cassandra_querylog_sandbox --broker-list localhost:9092
-
+    bin/send-sample-event.sh
