@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export EAGLE_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export EAGLE_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 export EAGLE_BUILD_DIR=${EAGLE_BASE_DIR}/eagle-assembly/target/eagle-*-bin/eagle-*/
 
 ls ${EAGLE_BUILD_DIR} 1>/dev/null 2>/dev/null
@@ -31,8 +31,7 @@ bin/eagle-service.sh status
 if [ "$?" != "0" ];then
 	echo "Starting eagle service ..."
 	bin/eagle-service.sh start
-	echo "Wait 5 seconds for eagle service to be ready .. "
-	sleep 5
+	sleep 1
 else
 	echo "Eagle service has already started"
 fi
@@ -42,7 +41,9 @@ bin/eagle-topology-init.sh
 echo "Starting zookeeper"
 bin/zookeeper-server-start.sh -daemon conf/zookeeper-server.properties
 sleep 1
+bin/zookeeper-server-status.sh
 
 echo "Starting kafka"
 bin/kafka-server-start.sh -daemon conf/kafka-server.properties
 sleep 1
+bin/kafka-server-status.sh
