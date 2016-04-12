@@ -551,8 +551,7 @@
 							conditions: {},
 							notification: [],
 							dedupe: {
-								alertDedupIntervalMin: 10,
-								emailDedupIntervalMin: 10
+								alertDedupIntervalMin: 10
 							},
 							policy: {},
 							window: "externalTime",
