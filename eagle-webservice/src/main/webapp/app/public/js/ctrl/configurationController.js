@@ -342,11 +342,7 @@
 			var _oriConfig = application.config;
 			UI.updateConfirm("Application", {config: _oriConfig}, [
 				{name: "Configuration", field: "config", type: "blob"}
-			], function(entity) {
-				if(entity.config !== "" && !common.parseJSON(entity.config, false)) {
-					return "Invalid JSON format";
-				}
-			}).then(null, null, function(holder) {
+			]).then(null, null, function(holder) {
 				application.config = holder.entity.config;
 				holder.closeFunc();
 				if(_oriConfig !== application.config) $scope.changed = true;
