@@ -1099,6 +1099,7 @@
 					for(index = 0 ; index < _list.length ; index += 1) {
 						var _alert = _list[index];
 						_alert.__new = true;
+						_alert.alertContext = common.parseJSON(_alert.alertContext, {});
 						if(_alert.encodedRowkey === $scope.alertList[0].encodedRowkey) {
 							break;
 						}
@@ -1117,6 +1118,9 @@
 				} else {
 					// List all alerts
 					$scope.alertList.push.apply($scope.alertList, _list);
+					$.each($scope.alertList, function(i, alert) {
+						alert.alertContext = common.parseJSON(alert.alertContext, {});
+					});
 				}
 
 				$scope.alertList.ready = true;
@@ -1153,6 +1157,7 @@
 			} else {
 				$scope.alert = $scope.alertList[0];
 				$scope.alert.alertContext = common.parseJSON($scope.alert.alertContext, {});
+				$scope.alert.rawAlertContext = JSON.stringify($scope.alert.alertContext, null, "\t");
 				Site.current(Site.find($scope.alert.tags.site));
 				console.log($scope.alert);
 			}
@@ -1160,7 +1165,7 @@
 
 		// UI
 		$scope.getMessageTime = function(alert) {
-			var _time = common.getValueByPath(alert, "alertContext.properties.timestamp");
+			var _time = common.getValueByPath(alert, "alertContext.timestamp");
 			return Number(_time);
 		};
 	});
