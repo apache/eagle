@@ -16,11 +16,14 @@
  */
 package org.apache.eagle.alert.entity;
 
+
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
@@ -78,19 +81,22 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 		_pcs.firePropertyChange("remediationCallback", null, null);
 	}
 
+    @JsonIgnore
 	public String getAlertContext() {
 		return alertContext;
 	}
 
+    @JsonProperty("alertContext")
 	public AlertContext getWrappedAlertContext() {
 		return AlertContext.fromJsonString(alertContext);
 	}
-	
+
+    @JsonIgnore
 	public void setAlertContext(String alertContext) {
 		this.alertContext = alertContext;
 		_pcs.firePropertyChange("alertContext", null, null);
 	}
-
+    @JsonProperty("alertContext")
 	public void setDecodedAlertContext(AlertContext alertContext) {
 		if(alertContext != null) this.alertContext = alertContext.toJsonString();
 		_pcs.firePropertyChange("alertContext", null, null);
