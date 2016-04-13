@@ -64,7 +64,7 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
                 policyNotificationMapping.put(entity.getTags().get(Constants.POLICY_ID) , plugins.values());
             }
         }catch (Exception ex ){
-            LOG.error("Error initializing poliy/notification mapping ", ex);
+            LOG.error("Error initializing policy/notification mapping ", ex);
             throw new IllegalStateException(ex);
         }
     }
@@ -139,6 +139,7 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
             if(notificationType == null){
                 LOG.warn("notificationType is null so use default notification type email for this policy  " + policy);
                 notifications.put(NotificationConstants.EMAIL_NOTIFICATION, plugins.get(NotificationConstants.EMAIL_NOTIFICATION));
+                notifications.put(NotificationConstants.EAGLE_STORE, plugins.get(NotificationConstants.EAGLE_STORE));
             }else if(!plugins.containsKey(notificationType)){
                 LOG.warn("No NotificationPlugin supports this notificationType " + notificationType);
             }else {
