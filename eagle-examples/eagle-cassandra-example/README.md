@@ -40,4 +40,4 @@ FAQ
 
 > storm.kafka.FailedFetchException: Error fetching data from [Partition{host=localhost:6667, partition=2}] for topic [cassandra_querylog_local]: [UNKNOWN_TOPIC_OR_PARTITION]
      
-__Solution__: Execute `eagle-devsupport/clean-all.sh` and retry from first step.
+__Solution__: Execute `eagle-dev/clean-all.sh` and retry from first step.
