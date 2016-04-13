@@ -75,7 +75,7 @@ public class AlertEmailPlugin implements NotificationPlugin {
 		Vector<AlertEmailGenerator> generators = new Vector<>();
 		for(Map<String, String> notificationConf: notificationConfigCollection) {
 			String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
-			if(notificationType.equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)) {
+			if(notificationType == null || notificationType.equalsIgnoreCase(NotificationConstants.EMAIL_NOTIFICATION)) {
 				AlertEmailGenerator generator = createEmailGenerator(notificationConf);
 				generators.add(generator);
 			}
