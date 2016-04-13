@@ -22,6 +22,7 @@ TOPOLOGY_NAME_SET=0
 function print_help() {
 	echo "Usage: $0 options {start | stop | status}"
 	echo "Options:                       Description:"
+	echo "  --jar      <fatJar path>       (Optional) Default is ${EAGLE_HOME}/lib/topology/eagle-topology-*-assembly.jar"
 	echo "  --main     <main class>        Default is org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain"
 	echo "  --topology <topology name>     Default is sandbox-hdfsAuditLog-topology"
 	echo "  --config   <file path>         Default is $EAGLE_HOME/conf/sandbox-hdfsAuditLog-application.conf"
@@ -63,6 +64,14 @@ case $1 in
         cmd=$1
         shift
         ;;
+    --jar)
+        if [ $# -lt 3 ]; then
+            print_help
+            exit 1
+        fi
+        jarName=$2
+        shift 2
+        ;;
     --main)
         if [ $# -lt 3 ]; then
             print_help
@@ -101,11 +110,8 @@ case $1 in
 done
 
 
-jarName=$(ls ${EAGLE_HOME}/lib/topology/eagle-topology-*-assembly.jar)
-
 if [ -z "$jarName" ]; then
-    echo "Error: jar file is not found"
-    exit 1
+    jarName=$(ls ${EAGLE_HOME}/lib/topology/eagle-topology-*-assembly.jar)
 fi
 
 if [ -z "$mainClass" ]; then
