@@ -151,7 +151,13 @@
                 <include>**</include>
             </includes>
         </fileSet>
-
+        <fileSet>
+            <directory>${project.basedir}/../eagle-external/eagle-kafka/target</directory>
+            <outputDirectory>lib/share</outputDirectory>
+            <includes>
+                <include>eagle-kafka-*.jar</include>
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>${project.build.directory}/lib</directory>
             <outputDirectory>lib/tomcat/lib</outputDirectory>
@@ -159,7 +165,6 @@
                 <include>tomcat*</include>
             </includes>
         </fileSet>
-
         <fileSet>
             <directory>${project.basedir}/../eagle-webservice/target/eagle-service</directory>
             <outputDirectory>lib/tomcat/webapps/eagle-service</outputDirectory>
@@ -210,14 +215,18 @@
                 <include>scala-library-*</include>
                 <include>slf4j-*.jar</include>
                 <include>log4j-*.jar</include>
-                <include>commons-math3-3.5.jar</include>
-                <include>asm-3.1.jar</include>
+                <include>commons-math3-*.jar</include>
+                <include>slf4j-log4j12-*.jar</include>
             </includes>
-            <excludes>
-                <exclude>slf4j-log4j12-*.jar</exclude>
-            </excludes>
         </fileSet>
-
+        <fileSet>
+            <directory>${project.basedir}/target/lib</directory>
+            <outputDirectory>lib/storm</outputDirectory>
+            <includes>
+                <include>storm-core-*.jar</include>
+                <include>asm-*.jar</include>
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>${project.basedir}/../eagle-external/eagle-ambari</directory>
             <outputDirectory>lib/ambari</outputDirectory>
@@ -225,7 +234,6 @@
                 <include>**</include>
             </includes>
         </fileSet>
-
         <!-- copy hadoop metric configuration to assembly -->
         <fileSet>
             <directory>${project.basedir}/../eagle-hadoop-metric/src/main/resources</directory>

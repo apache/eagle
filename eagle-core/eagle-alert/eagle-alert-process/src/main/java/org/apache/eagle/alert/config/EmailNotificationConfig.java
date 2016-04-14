@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.config;
 
+@Deprecated
 public class EmailNotificationConfig extends NotificationConfig{
 	private static final long serialVersionUID = 1L;
 	private String sender;

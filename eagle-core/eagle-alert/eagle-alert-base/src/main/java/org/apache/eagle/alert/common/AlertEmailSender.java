@@ -33,6 +33,7 @@ import org.apache.eagle.common.email.EagleMailClient;
 import com.netflix.config.ConcurrentMapConfiguration;
 import com.typesafe.config.ConfigObject;
 
+@Deprecated
 public class AlertEmailSender implements Runnable {
 	
 	protected final List<Map<String, String>> alertContexts = new ArrayList<Map<String, String>>();

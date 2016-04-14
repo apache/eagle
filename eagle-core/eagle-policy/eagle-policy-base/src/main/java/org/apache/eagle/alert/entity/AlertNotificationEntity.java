@@ -63,4 +63,17 @@ public class AlertNotificationEntity extends TaggedLogAPIEntity {
         this.enabled = enabled;
         valueChanged("enabled");
     }
+
+    @Column("d")
+    private String fields;
+    public String getFields() {
+        return fields;
+    }
+
+    public void setFields(String fields) {
+        this.fields = fields;
+        valueChanged("fields");
+    }
+
+
 }

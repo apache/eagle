@@ -58,6 +58,24 @@
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-metric-collection</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-all</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
@@ -67,6 +85,11 @@
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-hadoop-metric</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+	    <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-gc</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

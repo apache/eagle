@@ -34,7 +34,7 @@
 		Application.featureList.set = {};
 
 		// Set current application
-		Application.current = function(app) {
+		Application.current = function(app, reload) {
 			if(arguments.length && _current !== app) {
 				var _prev = _current;
 				_current = app;
@@ -43,7 +43,7 @@
 					sessionStorage.setItem("application", _current.tags.application);
 				}
 
-				if(_prev) {
+				if(_prev && reload !== false) {
 					console.log("[Application] Switch. Redirect to landing page.");
 					$wrapState.go('landing', true);
 				}
