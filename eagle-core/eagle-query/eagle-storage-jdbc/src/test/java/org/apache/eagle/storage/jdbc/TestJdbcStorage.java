@@ -55,6 +55,19 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
     }
 
     @Test
+    public void testReadByNotEqualCondition() throws QueryCompileException, IOException {
+        RawQuery rawQuery = new RawQuery();
+        rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster!=\"c4ut_not_found\" AND @field1 != 0]{*}");
+        System.out.println(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithMilliseconds(baseTimestamp+2000));
+        rawQuery.setPageSize(1000);
+        CompiledQuery query = new CompiledQuery(rawQuery);
+        QueryResult<TestTimeSeriesAPIEntity> result = storage.query(query, entityDefinition);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
     public void testReadByComplexQuery() throws QueryCompileException, IOException {
         RawQuery rawQuery = new RawQuery();
         rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"c4ut\" AND @field4 > 1000 OR @datacenter =\"d4ut\" ]{@field1,@field2}");
