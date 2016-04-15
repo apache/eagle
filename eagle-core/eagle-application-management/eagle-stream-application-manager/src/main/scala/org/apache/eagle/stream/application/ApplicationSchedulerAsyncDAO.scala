@@ -26,10 +26,9 @@ import com.typesafe.config.Config
 import org.apache.eagle.alert.entity.SiteApplicationServiceEntity
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity
 import org.apache.eagle.policy.common.Constants
-import org.apache.eagle.service.application.entity.{TopologyDescriptionEntity, TopologyExecutionEntity, TopologyOperationEntity}
+import org.apache.eagle.service.application.entity.{TopologyDescriptionEntity, TopologyExecutionEntity, TopologyExecutionStatus, TopologyOperationEntity}
 import org.apache.eagle.service.client.EagleServiceConnector
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl
-import org.apache.eagle.stream.application.model.TopologyDescriptionModel
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConversions
@@ -45,81 +44,84 @@ class ApplicationSchedulerAsyncDAO(config: Config, ex: ExecutionContext) {
   }
 
   def readOperationsByStatus(status: String) = {
-    Futures.future(new Callable[Option[util.List[TopologyOperationEntity]]]{
-      override def call(): Option[util.List[TopologyOperationEntity]] = {
+    Futures.future(new Callable[util.List[TopologyOperationEntity]]{
+      override def call(): util.List[TopologyOperationEntity] = {
         val client = getEagleServiceClient()
         val query = "%s[@status=\"%s\"]{*}".format(Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME, status)
         val response: GenericServiceAPIResponseEntity[TopologyOperationEntity] = client.search(query).pageSize(Int.MaxValue).send()
         if(client != null) client.close()
-        if(response.getObj != null && response.getObj.size() != 0) Option(response.getObj) else None
+        if(!response.isSuccess || response.getObj == null)
+          throw new Exception(s"Fail to load operations with status $status")
+        response.getObj
       }
     }, ex)
   }
 
   def loadAllTopologyExecutionEntities() = {
-    Futures.future(new Callable[Option[util.List[TopologyExecutionEntity]]]{
-      override def call(): Option[util.List[TopologyExecutionEntity]] = {
+    Futures.future(new Callable[util.List[TopologyExecutionEntity]]{
+      override def call(): util.List[TopologyExecutionEntity] = {
         val client = getEagleServiceClient()
-        val query = "%s[@status != \"%s\"]{*}".format(Constants.TOPOLOGY_EXECUTION_SERVICE_ENDPOINT_NAME, TopologyExecutionEntity.TOPOLOGY_STATUS.NEW)
+        val query = "%s[@status != \"%s\"]{*}".format(Constants.TOPOLOGY_EXECUTION_SERVICE_ENDPOINT_NAME, TopologyExecutionStatus.NEW)
         val response: GenericServiceAPIResponseEntity[TopologyExecutionEntity] = client.search(query).pageSize(Int.MaxValue).send()
         if(client != null) client.close()
-        if(response.isSuccess && response.getObj != null && response.getObj.size() != 0) Option(response.getObj) else None
+        if(!response.isSuccess || response.getObj == null) throw new Exception(response.getException)
+        response.getObj
       }
     }, ex)
   }
 
   def loadTopologyExecutionByName(site: String, appName: String, topologyName: String) = {
-    Futures.future(new Callable[Option[TopologyExecutionEntity]]{
-      override def call(): Option[TopologyExecutionEntity] = {
+    Futures.future(new Callable[TopologyExecutionEntity]{
+      override def call(): TopologyExecutionEntity = {
         val client = getEagleServiceClient()
         val query = "%s[@site=\"%s\" AND @application=\"%s\" AND @topology=\"%s\"]{*}".format(Constants.TOPOLOGY_EXECUTION_SERVICE_ENDPOINT_NAME, site, appName, topologyName)
         LOG.info(s"query=$query")
         val response: GenericServiceAPIResponseEntity[TopologyExecutionEntity] = client.search(query).pageSize(Int.MaxValue).send()
         if(client != null) client.close()
-        if(response.isSuccess && response.getObj != null && response.getObj.size() != 0) Option(response.getObj.get(0)) else None
+        if(!response.isSuccess || response.getObj == null)
+          throw new Exception(s"Fail to load topologyExecutionEntity with application=$appName topology=$topologyName due to Exception: ${response.getException}")
+        if(response.getObj.size() == 0 || response.getObj.size() > 1) {
+          throw new Exception(s"Get 0 or more than 1 topologyExecutionEntity with application=$appName topology=$topologyName")
+        }
+        response.getObj.get(0)
       }
     }, ex)
   }
 
   def loadTopologyDescriptionByName(site: String, application: String, topologyName: String) = {
-    Futures.future(new Callable[Option[TopologyDescriptionModel]]{
-      override def call(): Option[TopologyDescriptionModel] = {
+    Futures.future(new Callable[TopologyDescriptionEntity]{
+      override def call(): TopologyDescriptionEntity = {
         val client = getEagleServiceClient()
         var query = "%s[@topology=\"%s\"]{*}".format(Constants.TOPOLOGY_DESCRIPTION_SERVICE_ENDPOINT_NAME, topologyName)
         val response: GenericServiceAPIResponseEntity[TopologyDescriptionEntity] = client.search(query).pageSize(Int.MaxValue).send()
-        var topologyDescriptionModel: TopologyDescriptionModel = null
+        if(!response.isSuccess || response.getObj == null || response.getObj.size() == 0)
+          throw new Exception(s"Fail to load TopologyDescriptionEntity with site=$site application=$application topology=$topologyName due to Exception: ${response.getException}")
+        val topologyDescriptionEntity = response.getObj.get(0)
 
-        if(response.isSuccess) {
-          val topologyDescriptionEntity = response.getObj.get(0)
-          topologyDescriptionModel = TopologyDescriptionEntity.toModel(topologyDescriptionEntity)
-          query = "%s[@site=\"%s\" AND @application=\"%s\"]{*}".format(Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME, site, application)
-          val configResponse: GenericServiceAPIResponseEntity[SiteApplicationServiceEntity] = client.search(query).pageSize(Int.MaxValue).send()
-          if (client != null) client.close()
-          if (configResponse.getObj != null && configResponse.getObj.size() != 0) {
-            val siteApplicationEntity = configResponse.getObj.get(0)
-            topologyDescriptionModel.config = siteApplicationEntity.getConfig
-          }
-          if(configResponse.isSuccess && topologyDescriptionModel != null) Option(topologyDescriptionModel) else None
-        } else {
-          None
-        }
+        query = "%s[@site=\"%s\" AND @application=\"%s\"]{*}".format(Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME, site, application)
+        val configResponse: GenericServiceAPIResponseEntity[SiteApplicationServiceEntity] = client.search(query).pageSize(Int.MaxValue).send()
+        if (client != null) client.close()
+        if(configResponse.isSuccess || configResponse.getObj == null || configResponse.getObj.size() == 0)
+          throw new Exception(s"Fail to load topology configuration with query=$query due to Exception: ${configResponse.getException}")
+        val siteApplicationEntity = configResponse.getObj.get(0)
+        topologyDescriptionEntity.setContext(siteApplicationEntity.getConfig)
+        topologyDescriptionEntity
       }
     }, ex)
   }
 
-  def updateOperationStatus(operation: TopologyOperationEntity, status: String) = {
+  def updateOperationStatus(operation: TopologyOperationEntity) = {
     Futures.future(new Callable[GenericServiceAPIResponseEntity[String]]{
       override def call(): GenericServiceAPIResponseEntity[String] = {
-        if(LOG.isDebugEnabled()) LOG.debug(s"Updating status of command[$operation] as $status")
+        if(LOG.isDebugEnabled()) LOG.debug(s"Updating status of command[$operation] as ${operation.getStatus}")
         val client = getEagleServiceClient()
-        operation.setStatus(status)
         operation.setLastModifiedDate(System.currentTimeMillis())
-        if(client != null) client.close()
         val response= client.update(java.util.Arrays.asList(operation), classOf[TopologyOperationEntity])
+        if(client != null) client.close()
         if(response.isSuccess) {
-          LOG.info(s"Updated operation status [$operation] as: $status")
+          LOG.info(s"Updated operation status [$operation] as: ${operation.getStatus}")
         } else {
-          LOG.error(s"Failed to update status as $status of command[$operation]")
+          LOG.error(s"Failed to update status as ${operation.getStatus} of command[$operation]")
           throw new RuntimeException(s"Failed to update command due to exception: ${response.getException}")
         }
         response
@@ -127,20 +129,18 @@ class ApplicationSchedulerAsyncDAO(config: Config, ex: ExecutionContext) {
     }, ex)
   }
 
-  def updateTopologyExecutionStatus(topology: TopologyExecutionEntity, status: String) = {
+  def updateTopologyExecutionStatus(topology: TopologyExecutionEntity) = {
     Futures.future(new Callable[GenericServiceAPIResponseEntity[String]]{
       override def call(): GenericServiceAPIResponseEntity[String] = {
-        if(LOG.isDebugEnabled()) LOG.debug(s"Updating status of app[$topology] as $status")
+        if(LOG.isDebugEnabled()) LOG.debug(s"Updating status of app[$topology] as ${topology.getStatus}")
         val client = getEagleServiceClient()
-        topology.setStatus(status)
         topology.setLastModifiedDate(System.currentTimeMillis())
         if(client != null) client.close()
         val response= client.update(java.util.Arrays.asList(topology), classOf[TopologyExecutionEntity])
         if(response.isSuccess) {
-          LOG.info(s"Updated status application[$topology] as: $status")
+          LOG.info(s"Updated status application[$topology] as: ${topology.getStatus}")
         } else {
-          LOG.error(s"Failed to update status as $status of application[$topology]")
-          throw new RuntimeException(s"Failed to update application due to exception: ${response.getException}")
+          LOG.error(s"Failed to update status as ${topology.getStatus} of application[$topology] due to ${response.getException}")
         }
         response
       }

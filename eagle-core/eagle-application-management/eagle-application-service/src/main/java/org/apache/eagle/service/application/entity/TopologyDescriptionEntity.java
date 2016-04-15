@@ -23,7 +23,6 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.application.AppManagerConstants;
-import org.apache.eagle.stream.application.model.TopologyDescriptionModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -48,6 +47,14 @@ public class TopologyDescriptionEntity extends TaggedLogAPIEntity {
     private String description;
     @Column("d")
     private String version;
+    private String context;
+    public String getContext() {
+        return context;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
+    }
 
     public String getExeClass() {
         return exeClass;
@@ -85,32 +92,13 @@ public class TopologyDescriptionEntity extends TaggedLogAPIEntity {
         valueChanged("version");
     }
 
+    public String getTopology() {
+        return this.getTags().get(AppManagerConstants.TOPOLOGY_TAG);
+    }
+
     public final static class TYPE {
         public final static String DYNAMIC = "DYNAMIC";
         public final static String CLASS = "CLASS";
     }
 
-    public static TopologyDescriptionModel toModel(final TopologyDescriptionEntity entity){
-        TopologyDescriptionModel model = new TopologyDescriptionModel(
-                entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
-                entity.getExeClass(),
-                null,
-                entity.getType(),
-                entity.getDescription(),
-                entity.getVersion());
-        return model;
-    }
-
-    public static TopologyDescriptionEntity fromModel(final TopologyDescriptionModel model){
-        TopologyDescriptionEntity entity = new TopologyDescriptionEntity();
-        Map<String,String> tags = new HashMap<String,String>(){{
-            put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
-        }};
-        entity.setExeClass(model.exeClass());
-        entity.setDescription(model.description());
-        entity.setType(model.topoType());
-        entity.setVersion(model.version());
-        entity.setTags(tags);
-        return entity;
-    }
 }

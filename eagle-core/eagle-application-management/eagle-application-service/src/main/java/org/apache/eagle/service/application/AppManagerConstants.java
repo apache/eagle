@@ -22,10 +22,13 @@ package org.apache.eagle.service.application;
 public class AppManagerConstants {
     public final static String SITE_TAG = "site";
     public final static String APPLICATION_TAG = "application";
-    public final static String OPERATION = "operation";
-    public final static String UUID = "uuid";
+    public final static String OPERATION_TAG = "operation";
+    public final static String OPERATION_ID_TAG = "operationID";
     public final static String TOPOLOGY_TAG = "topology";
-    public final static String NAME_TAG = "fullName";
+    public final static String FULLNAME = "fullName";
+    public final static String APPLICATION_ID = "id";
+
+    public final static String CLUSTER_TYPE = "envContextConfig.mode";
 
     public final static String EAGLE_CLUSTER_STORM = "storm";
     public final static String EAGLE_CLUSTER_SPARK = "spark";

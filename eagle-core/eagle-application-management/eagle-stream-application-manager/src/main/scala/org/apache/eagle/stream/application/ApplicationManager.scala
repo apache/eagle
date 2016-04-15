@@ -18,12 +18,90 @@
 
 package org.apache.eagle.stream.application
 
-import com.typesafe.config.Config
-import org.apache.eagle.stream.application.model.TopologyDescriptionModel
+import java.util
+import java.util.concurrent._
+import com.google.common.base.Preconditions
+import org.apache.eagle.service.application.entity.TopologyExecutionStatus
+import org.slf4j.{LoggerFactory, Logger}
 
 
-trait ApplicationManager {
-  def start(topologyDesc: TopologyDescriptionModel, config: Config): Boolean
-  def stop(name: String, config: Config): Boolean
-  def status(name: String, config: Config): Boolean
+object ApplicationManager {
+  private val LOG: Logger = LoggerFactory.getLogger(ApplicationManager.getClass)
+  private val threadPoolCoreSize: Int = 10
+  private val threadPoolMaxSize: Int = 20
+  private val threadPoolShrinkTime: Long = 60000L
+
+  private val workerMap: util.Map[AnyRef, Thread] = new util.TreeMap[AnyRef, Thread]
+  val executorService: ExecutorService = new ThreadPoolExecutor(threadPoolCoreSize, threadPoolMaxSize, threadPoolShrinkTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue[Runnable])
+
+
+  def getWorkerMap: util.Map[AnyRef, Thread] = {
+    return workerMap
+  }
+
+  def submit(id: AnyRef, runnable: Runnable): Thread = {
+    if (workerMap.containsKey(id)) {
+      val executor: Thread = workerMap.get(id)
+      if (!executor.isAlive || executor.getState.equals() ) {
+        LOG.info("Replacing dead executor: {}", executor)
+        workerMap.remove(id)
+      }
+      else {
+        throw new IllegalArgumentException("Duplicated id '" + id + "'")
+      }
+    }
+    val worker: Thread = new Thread(runnable)
+    LOG.info("Registering new executor %s: %s".format(id, worker))
+    workerMap.put(id, worker)
+    worker.setName(id.toString)
+    worker.setDaemon(true)
+    worker.start
+    return worker
+  }
+
+  def get(id: AnyRef): Thread = {
+    Preconditions.checkArgument(workerMap.containsKey(id))
+    return workerMap.get(id)
+  }
+
+  @throws(classOf[Exception])
+  def stop(id: AnyRef): Thread = {
+    val worker: Thread = get(id)
+    worker.interrupt
+    this.workerMap.remove(id)
+    return worker
+  }
+
+  def getWorkerStatus(state: Thread.State): String = {
+    if (whereIn(state, java.lang.Thread.State.RUNNABLE, java.lang.Thread.State.TIMED_WAITING, java.lang.Thread.State.WAITING)) {
+      return TopologyExecutionStatus.STARTED
+    }
+    else if (whereIn(state, java.lang.Thread.State.NEW)) {
+      return TopologyExecutionStatus.STARTING
+    }
+    else if (whereIn(state, java.lang.Thread.State.TERMINATED)) {
+      return TopologyExecutionStatus.STOPPED
+    }
+    throw new IllegalStateException("Unknown state: " + state)
+  }
+
+  private def whereIn(state: Thread.State, inStates: Thread.State*): Boolean = {
+    for (_state <- inStates) {
+      if (_state eq state) {
+        return true
+      }
+    }
+    return false
+  }
+
+  def remove(id: AnyRef) {
+    val executor: Thread = this.get(id)
+    if (executor.isAlive) {
+      throw new RuntimeException("Failed to remove alive executor '" + id + "'")
+    }
+    else {
+      this.workerMap.remove(id)
+    }
+  }
+
 }

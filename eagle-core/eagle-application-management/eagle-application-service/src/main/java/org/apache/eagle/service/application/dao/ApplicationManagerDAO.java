@@ -20,6 +20,7 @@ package org.apache.eagle.service.application.dao;
 
 
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.service.application.entity.TopologyExecutionStatus;
 import org.apache.eagle.service.application.entity.TopologyOperationEntity;
 
 import java.util.List;

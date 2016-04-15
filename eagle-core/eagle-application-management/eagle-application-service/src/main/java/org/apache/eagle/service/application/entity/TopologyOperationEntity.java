@@ -23,7 +23,6 @@ import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 
 import org.apache.eagle.service.application.AppManagerConstants;
-import org.apache.eagle.stream.application.model.TopologyOperationModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -38,11 +37,13 @@ import java.util.Map;
 @Service(Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(true)
-@Tags({"site", "application", "topology", "uuid", "operation"})
+@Tags({"site", "application", "topology", "operationID", "operation"})
 public class TopologyOperationEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String status;
     @Column("b")
+    private String message;
+    @Column("c")
     private long lastModifiedDate;
 
     public String getStatus() {
@@ -52,6 +53,15 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
     public void setStatus(String status) {
         this.status = status;
         valueChanged("status");
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+        valueChanged("message");
     }
 
     public long getLastModifiedDate() {
@@ -76,32 +86,20 @@ public class TopologyOperationEntity extends TaggedLogAPIEntity {
         public final static String FAILED = "FAILED";
     }
 
-    public static TopologyOperationModel toModel(final TopologyOperationEntity entity){
-        TopologyOperationModel model = new TopologyOperationModel(
-                entity.getTags().get(AppManagerConstants.SITE_TAG),
-                entity.getTags().get(AppManagerConstants.APPLICATION_TAG),
-                entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
-                entity.getTags().get(AppManagerConstants.UUID),
-                entity.getTags().get(AppManagerConstants.OPERATION),
-                entity.getStatus(),
-                entity.getLastModifiedDate(),
-                entity.getTimestamp());
-        return model;
+    public String getSite() {
+        return this.getTags().get(AppManagerConstants.SITE_TAG);
     }
 
-    public static TopologyOperationEntity fromModel(final TopologyOperationModel model){
-        TopologyOperationEntity entity = new TopologyOperationEntity();
-        Map<String,String> tags = new HashMap<String,String>(){{
-            put(AppManagerConstants.SITE_TAG, model.site());
-            put(AppManagerConstants.UUID,model.uuid());
-            put(AppManagerConstants.OPERATION, model.operation());
-            put(AppManagerConstants.APPLICATION_TAG, model.application());
-            put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
-        }};
-        entity.setTimestamp(model.timestamp());
-        entity.setLastModifiedDate(model.lastModifiedDate());
-        entity.setStatus(model.status());
-        entity.setTags(tags);
-        return entity;
+    public String getApplication() {
+        return this.getTags().get(AppManagerConstants.APPLICATION_TAG);
     }
+
+    public String getTopology() {
+        return this.getTags().get(AppManagerConstants.TOPOLOGY_TAG);
+    }
+
+    public String getOperation() {
+        return this.getTags().get(AppManagerConstants.OPERATION_TAG);
+    }
+
 }

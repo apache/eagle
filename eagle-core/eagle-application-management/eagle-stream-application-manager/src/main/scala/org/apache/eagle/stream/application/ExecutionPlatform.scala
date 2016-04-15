@@ -16,12 +16,15 @@
  *
  */
 
-package org.apache.eagle.stream.application.model
+package org.apache.eagle.stream.application
 
-import org.apache.eagle.service.application.entity.TopologyDescriptionEntity
+import com.typesafe.config.Config
+import org.apache.eagle.service.application.entity.{TopologyExecutionEntity, TopologyDescriptionEntity}
 
 
-case class TopologyDescriptionModel(topology: String, exeClass: String, var config: String, topoType: String, description: String, version: String) extends EntityConversion[TopologyDescriptionEntity]{
-  override def toEntity: TopologyDescriptionEntity = TopologyDescriptionEntity.fromModel(this)
-  override def fromEntity(entity: TopologyDescriptionEntity) = TopologyDescriptionEntity.toModel(entity)
+trait ExecutionPlatform {
+  def start(topology: TopologyDescriptionEntity, topologyExecution: TopologyExecutionEntity, config: Config)
+  def stop(topologyExecution: TopologyExecutionEntity, config: Config)
+  def status(topologyExecutions: java.util.List[TopologyExecutionEntity], config: Config)
+  def status(topologyExecution: TopologyExecutionEntity, config: Config)
 }

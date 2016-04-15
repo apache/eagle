@@ -23,9 +23,8 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.application.dao.ApplicationManagerDAO;
 import org.apache.eagle.service.application.dao.ApplicationManagerDaoImpl;
-import org.apache.eagle.service.application.entity.TopologyExecutionEntity;
+import org.apache.eagle.service.application.entity.TopologyExecutionStatus;
 import org.apache.eagle.service.application.entity.TopologyOperationEntity;
-import org.apache.eagle.stream.application.model.TopologyOperationModel;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 
@@ -56,24 +55,23 @@ public class ApplicationManagementResource {
                 throw new IllegalArgumentException("inputStream cannot convert to TopologyOperationEntity");
             }
             for (TopologyOperationEntity entity : entities) {
-                TopologyOperationModel operation = TopologyOperationEntity.toModel(entity);
-                String status = dao.loadTopologyExecutionStatus(operation.site(), operation.application(), operation.topology());
+                String status = dao.loadTopologyExecutionStatus(entity.getSite(), entity.getApplication(), entity.getTopology());
                 if(status == null) {
-                    throw new Exception(String.format("Fail to fetch the topology execution status by site=%s, application=%s, topology=%s", operation.site(), operation.application(), operation.topology()));
+                    throw new Exception(String.format("Fail to fetch the topology execution status by site=%s, application=%s, topology=%s", entity.getSite(), entity.getApplication(), entity.getTopology()));
                 }
-                int operationsInRunning = dao.loadTopologyOperationsInRunning(operation.site(), operation.application(), operation.topology());
+                int operationsInRunning = dao.loadTopologyOperationsInRunning(entity.getSite(), entity.getApplication(), entity.getTopology());
                 if(operationsInRunning !=0) {
                     throw new Exception(operationsInRunning + "operations are running, please wait for a minute");
                 }
-                if (validateOperation(operation.operation(), status)) {
+                if (validateOperation(entity.getOperation(), status)) {
                     Map<String, String> tags = entity.getTags();
-                    tags.put(AppManagerConstants.UUID, UUID.randomUUID().toString());
+                    tags.put(AppManagerConstants.OPERATION_ID_TAG, UUID.randomUUID().toString());
                     entity.setTags(tags);
                     entity.setLastModifiedDate(System.currentTimeMillis());
                     entity.setTimestamp(System.currentTimeMillis());
                     operations.add(entity);
                 } else {
-                    throw new Exception(String.format("%s is an invalid operation, as the topology's current status is %s", operation.operation(), status));
+                    throw new Exception(String.format("%s is an invalid operation, as the topology's current status is %s", entity.getOperation(), status));
                 }
             }
             response = dao.createOperation(operations);
@@ -85,16 +83,12 @@ public class ApplicationManagementResource {
     }
 
     private boolean validateOperation(String operation, String status) {
-        boolean ret = true;
+        boolean ret = false;
         switch (operation) {
             case TopologyOperationEntity.OPERATION.START:
-                if(status.equals(TopologyExecutionEntity.TOPOLOGY_STATUS.STARTED) || status.equals(TopologyExecutionEntity.TOPOLOGY_STATUS.PENDING))
-                    ret = false;
-                break;
+                return TopologyExecutionStatus.isReadyToStart(status);
             case TopologyOperationEntity.OPERATION.STOP:
-                if(!status.equals(TopologyExecutionEntity.TOPOLOGY_STATUS.STARTED))
-                    ret = false;
-                break;
+                return TopologyExecutionStatus.isReadyToStop(status);
             default: break;
         }
         return ret;

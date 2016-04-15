@@ -22,6 +22,7 @@ package org.apache.eagle.service.application.dao;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.application.entity.TopologyExecutionEntity;
+import org.apache.eagle.service.application.entity.TopologyExecutionStatus;
 import org.apache.eagle.service.application.entity.TopologyOperationEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.slf4j.Logger;

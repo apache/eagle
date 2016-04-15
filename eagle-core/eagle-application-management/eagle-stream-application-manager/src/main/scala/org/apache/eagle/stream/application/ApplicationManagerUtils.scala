@@ -16,12 +16,16 @@
  *
  */
 
-package org.apache.eagle.stream.application.model
+package org.apache.eagle.stream.application
 
-import org.apache.eagle.service.application.entity.TopologyOperationEntity
+import org.apache.eagle.service.application.entity.TopologyExecutionEntity
 
 
-case class TopologyOperationModel(site: String, application: String, topology: String, uuid: String, operation: String, status: String, lastModifiedDate: Long, timestamp: Long) extends EntityConversion[TopologyOperationEntity] {
-  override def toEntity: TopologyOperationEntity = TopologyOperationEntity.fromModel(this)
-  override def fromEntity(entity: TopologyOperationEntity) = TopologyOperationEntity.toModel(entity)
+object ApplicationManagerUtils {
+
+  def generateTopologyFullName(topologyExecution: TopologyExecutionEntity) = {
+    val fullName = "eagle-%s-%s-%s".format(topologyExecution.getSite, topologyExecution.getApplication, topologyExecution.getTopology)
+    fullName
+  }
+
 }

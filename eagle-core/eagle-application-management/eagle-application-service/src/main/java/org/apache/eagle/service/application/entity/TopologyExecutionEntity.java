@@ -23,7 +23,6 @@ import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 
 import org.apache.eagle.service.application.AppManagerConstants;
-import org.apache.eagle.stream.application.model.TopologyExecutionModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -43,13 +42,37 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String fullName;
     @Column("b")
-    private String url;
+    private String id;
     @Column("c")
-    private String description;
+    private String url;
     @Column("d")
-    private String status;
+    private String description;
     @Column("e")
+    private String status;
+    @Column("f")
     private long lastModifiedDate;
+    @Column("g")
+    private String mode;
+    @Column("h")
+    private String environment;
+
+    public String getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(String environment) {
+        this.environment = environment;
+        valueChanged("environment");
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+        valueChanged("mode");
+    }
 
     public String getFullName() {
         return fullName;
@@ -58,6 +81,15 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
     public void setFullName(String fullName) {
         this.fullName = fullName;
         valueChanged("fullName");
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        valueChanged("id");
     }
 
     public String getUrl() {
@@ -96,39 +128,16 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
         valueChanged("lastModifiedDate");
     }
 
-    public final static class TOPOLOGY_STATUS {
-        public final static String STOPPED = "STOPPED";
-        public final static String STARTED = "STARTED";
-        public final static String PENDING = "PENDING";
-        public final static String NEW = "NEW";
+    public String getSite() {
+        return this.getTags().get(AppManagerConstants.SITE_TAG);
     }
 
-    public static TopologyExecutionModel toModel(final TopologyExecutionEntity entity){
-        TopologyExecutionModel model = new TopologyExecutionModel(
-                entity.getTags().get(AppManagerConstants.SITE_TAG),
-                entity.getTags().get(AppManagerConstants.APPLICATION_TAG),
-                entity.getTags().get(AppManagerConstants.TOPOLOGY_TAG),
-                entity.getFullName(),
-                entity.getUrl(),
-                entity.getDescription(),
-                entity.getStatus(),
-                entity.getLastModifiedDate());
-        return model;
+    public String getApplication() {
+        return this.getTags().get(AppManagerConstants.APPLICATION_TAG);
     }
 
-    public static TopologyExecutionEntity fromModel(final TopologyExecutionModel model){
-        TopologyExecutionEntity entity = new TopologyExecutionEntity();
-        Map<String,String> tags = new HashMap<String,String>(){{
-            put(AppManagerConstants.SITE_TAG, model.site());
-            put(AppManagerConstants.APPLICATION_TAG, model.application());
-            put(AppManagerConstants.TOPOLOGY_TAG, model.topology());
-        }};
-        entity.setFullName(model.fullName());
-        entity.setUrl(model.url());
-        entity.setDescription(model.description());
-        entity.setStatus(model.status());
-        entity.setLastModifiedDate(model.lastModifiedDate());
-        entity.setTags(tags);
-        return entity;
+    public String getTopology() {
+        return this.getTags().get(AppManagerConstants.TOPOLOGY_TAG);
     }
+
 }
