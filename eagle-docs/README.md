@@ -58,24 +58,27 @@ Guides on applying site-wide [configuration](http://www.mkdocs.org/user-guide/co
 
 Deployment is done in two steps.  First all documentation is statically generatd into HTML files and then it is deployed to the eagle website.  For more details on how conversion to HTML works see [MkDocs documentation](http://www.mkdocs.org/).
 
-1.  Go to release branch of the repository and execute the following command to build the docs.  **Note**: Until [mkdocs #859](https://github.com/mkdocs/mkdocs/issues/859) is resolved and available for download, use mkdocs built against [master](https://github.com/mkdocs/mkdocs).
 
-```bash
-# set project version
-EAGLE_VERSION=0.3.0
+1.  Go to release branch of the repository and execute the following command to build the docs.  
 
-# build docs under site foolder
-mkdocs build --clean
-
-# copy docs from site into target folder on eagle-site
-cd ../incubator-eagle-svn
-cp -r ../incubator-eagle/site site/docs/${EAGLE_VERSION}
-# Set this to be latest available docs version
-git add -A
-git commit -m "Adding eagle-${EAGLE_VERSION} documentation"
-git push
-```
+    > **Note**: Until [mkdocs #859](https://github.com/mkdocs/mkdocs/issues/859) is resolved and available for download, use mkdocs built against [master](https://github.com/mkdocs/mkdocs).
+    
+    ```bash
+    # set project version
+    EAGLE_VERSION=0.3.0
+    
+    # build docs under site foolder
+    mkdocs build --clean
+    
+    # copy docs from site into target folder on eagle-site
+    cd ../incubator-eagle-svn
+    cp -r ../incubator-eagle/site site/docs/${EAGLE_VERSION}
+    # Set this to be latest available docs version
+    git add -A
+    git commit -m "Adding eagle-${EAGLE_VERSION} documentation"
+    git push
+    ```
 
 2. Add link to landing site
 
-> `TODO`
+    > `TODO`
