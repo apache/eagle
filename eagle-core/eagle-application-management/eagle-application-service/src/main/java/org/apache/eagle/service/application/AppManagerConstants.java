@@ -32,17 +32,11 @@ public class AppManagerConstants {
 
     public final static String EAGLE_CLUSTER_STORM = "storm";
     public final static String EAGLE_CLUSTER_SPARK = "spark";
-    public final static String EAGLE_CLUSTER_TYPE = "type";
 
-    public final static String EAGLE_CONFIG_FILE = "eagle-scheduler.conf";
-    public final static String EAGLE_SERVICE_CONFIG = "eagle.service";
-    public final static String EAGLE_SCHEDULER_CONFIG = "eagle.scheduler";
-    public final static String EAGLE_STORM_JARFILE = "storm.jar";
-    public final static String EAGLE_STORM_NIMBUS = "nimbus.host";
-    public final static String EAGLE_STORM_NIMBUS_PORT = "nimbus.thrift.port";
-    //public final static String EAGLE_STORM_THRIFT_TRANSPORT_PLUGIN = "storm.thrift.transport";
-    public final static String SCHEDULE_SYSTEM = "scheduleSystem";
-    public final static String SCHEDULE_INTERVAL = "scheduleInterval";
-    public final static String SCHEDULE_NUM_WORKERS = "scheduleNumWorkers";
-    public final static String SERVICE_TIMEOUT = "serviceWaitTimeOut";
+    public final static String APP_WORKER_THREADS_CORE_SIZE = "appWorkerThreadPoolCoreSize";
+    public final static String APP_WORKER_THREADS_MAX_SIZE = "appWorkerThreadPoolMaxSize";
+
+    public final static String APP_COMMAND_LOADER_INTERVAL = "appCommandLoaderInterval";
+    public final static String APP_HEALTH_CHECK_INTERVAL = "appHealthCheckInterval";
+
 }

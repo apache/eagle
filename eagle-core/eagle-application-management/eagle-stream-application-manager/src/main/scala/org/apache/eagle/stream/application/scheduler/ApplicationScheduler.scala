@@ -20,6 +20,7 @@ package org.apache.eagle.stream.application.scheduler
 
 import akka.actor.{Props, ActorSystem}
 import com.typesafe.config.{ConfigFactory, Config}
+import org.apache.eagle.service.application.AppManagerConstants
 import org.apache.eagle.service.application.entity.{TopologyExecutionEntity, TopologyOperationEntity}
 import scala.concurrent.duration._
 
@@ -45,7 +46,7 @@ case class LoadTopologyFailureException(message:String) extends Exception(messag
 class ApplicationScheduler {
   val config = ConfigFactory.load()
   val DEFAULT_COMMAND_LOADER_INTERVAL = 5
-  val DEFAULT_HEALTH_CHECK = 10
+  val DEFAULT_HEALTH_CHECK_INTERVAL = 10
 
   def start() = {
     val system = ActorSystem("application-manager-scheduler", config)
@@ -53,11 +54,14 @@ class ApplicationScheduler {
 
     import system.dispatcher
 
+    val commandLoaderInterval: Long = if(config.hasPath(AppManagerConstants.APP_COMMAND_LOADER_INTERVAL)) config.getLong(AppManagerConstants.APP_COMMAND_LOADER_INTERVAL) else DEFAULT_COMMAND_LOADER_INTERVAL
+    val healthCheckInterval: Long = if(config.hasPath(AppManagerConstants.APP_HEALTH_CHECK_INTERVAL)) config.getLong(AppManagerConstants.APP_HEALTH_CHECK_INTERVAL) else DEFAULT_HEALTH_CHECK_INTERVAL
+
     val coordinator = system.actorOf(Props[StreamAppCoordinator])
     system.scheduler.scheduleOnce(0 seconds, coordinator, InitializationEvent(config))
     system.scheduler.scheduleOnce(1 seconds, coordinator, ClearPendingOperation)
-    system.scheduler.schedule(2.seconds, 5.seconds, coordinator, CommandLoaderEvent)
-    system.scheduler.schedule(10.seconds, 10.seconds, coordinator, HealthCheckerEvent)
+    system.scheduler.schedule(2.seconds, commandLoaderInterval.seconds, coordinator, CommandLoaderEvent)
+    system.scheduler.schedule(10.seconds, healthCheckInterval.seconds, coordinator, HealthCheckerEvent)
 
     /*
      registerOnTermination is called when you have shut down the ActorSystem (system.shutdown),
