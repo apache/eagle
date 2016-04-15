@@ -2,7 +2,7 @@
 
 Eagle documentation repository for content available on http://eagle.incubator.apache.org/docs/
 
-Documentation is written in [Markdown](https://guides.github.com/features/mastering-markdown/) format and statically generated into HTML using [MkDocs](http://www.mkdocs.org/).  All documentation is located in the [docs](docs) directory, and [mkdocs.yml](mkdocs.yml) file describes the navigation structure of the published documentation.
+Documentation is written in [Markdown](https://guides.github.com/features/mastering-markdown/) format and statically generated into HTML using [MkDocs](http://www.mkdocs.org/).  All documentation is located in the [eagle-docs](.) directory, and [mkdocs.yml](../mkdocs.yml) file describes the navigation structure of the published documentation.
 
 ## Requirements
 * Python 2.x: https://www.python.org/
