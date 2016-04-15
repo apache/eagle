@@ -4,24 +4,39 @@ Eagle documentation repository for content available on http://eagle.incubator.a
 
 Documentation is written in [Markdown](https://guides.github.com/features/mastering-markdown/) format and statically generated into HTML using [MkDocs](http://www.mkdocs.org/).  All documentation is located in the [docs](docs) directory, and [mkdocs.yml](mkdocs.yml) file describes the navigation structure of the published documentation.
 
-## Installation & Preview
-1. Install `MkDocs`: [http://www.mkdocs.org/#installation](http://www.mkdocs.org/#installation)
+## Requirements
+* Python 2.x: https://www.python.org/
+* MkDoc: http://www.mkdocs.org/
+
+## Installation
+1. Validate versions of Python (tested under `python 2.7`) and python package management tool
+    
+        $ python --version
+
+        # At least one of follow python package management tools should be installed
+        $ easy_install --version
+        $ pip --version
+
+  > __NOTES__
+  >
   > MkDocs is built upon Python, before starting to install MkDocs, please make sure you verify at least one python package management tool like `easy_install` or `pip` has been installed
   >- How to install easy_install? https://pypi.python.org/pypi/setuptools#installation-instructions
   >- How to install pipe? https://pip.readthedocs.org/en/stable/installing/#install-pip
   
-     sudo easy_install install mkdocs
+2. Install `MkDocs`: [http://www.mkdocs.org/#installation](http://www.mkdocs.org/#installation)
+  
+        sudo easy_install install mkdocs
   
   or 
   
       sudo pip install mkdocs
-  
-2. Validate and preview existing documents
 
-  cd incubator-eagle
-  mkdocs serve -s
+## Reading
 
-3. Open [http://127.0.0.1:8000](http://127.0.0.1:8000) 
+Execute `mkdocs serve` under project base where [`mkdocs.yml`](../mkdocs.yml) is and open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) to start reading.
+
+    cd incubator-eagle
+    mkdocs serve
 
 ## Authoring
 
