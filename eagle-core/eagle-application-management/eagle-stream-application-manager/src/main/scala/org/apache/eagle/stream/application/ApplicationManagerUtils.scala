@@ -18,6 +18,8 @@
 
 package org.apache.eagle.stream.application
 
+import com.typesafe.config.Config
+import org.apache.eagle.service.application.AppManagerConstants
 import org.apache.eagle.service.application.entity.TopologyExecutionEntity
 
 
@@ -28,4 +30,9 @@ object ApplicationManagerUtils {
     fullName
   }
 
+  def buildStormTopologyURL(config: Config, topologyID: String): String = {
+    val clusterURL = if(config.hasPath(AppManagerConstants.CLUSTER_URL)) config.getString(AppManagerConstants.CLUSTER_URL) else AppManagerConstants.DEFAULT_CLUSTER_URL
+    val topologyURL = clusterURL + "/" + topologyID
+    topologyURL
+  }
 }

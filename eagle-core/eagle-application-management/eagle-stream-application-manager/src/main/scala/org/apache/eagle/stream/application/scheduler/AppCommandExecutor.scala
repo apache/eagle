@@ -29,6 +29,7 @@ import org.apache.eagle.service.application.entity.TopologyOperationEntity.OPERA
 import org.apache.eagle.service.application.entity.{TopologyExecutionEntity, TopologyExecutionStatus, TopologyOperationEntity}
 import org.apache.eagle.stream.application.{ApplicationManager, ApplicationSchedulerAsyncDAO, ExecutionPlatformFactory}
 
+import scala.collection.JavaConversions
 import scala.util.{Failure, Success}
 
 
@@ -96,21 +97,15 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
     }
   }
 
-  def status(topologyExecution: TopologyExecutionEntity, topologyOperation: TopologyOperationEntity) = {
-    val clusterType = topologyExecution.getEnvironment;
+  def status(topologyExecution: TopologyExecutionEntity) = {
+    val clusterType = topologyExecution.getEnvironment
 
     Futures.future(new Callable[TopologyExecutionEntity]{
       override def call(): TopologyExecutionEntity = {
         ExecutionPlatformFactory.getApplicationManager(clusterType).status(topologyExecution, _config)
         topologyExecution
       }
-    }, context.dispatcher) onComplete {
-      case Success(topologyExecutionEntity) =>
-        topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
-      case Failure(ex) =>
-        topologyOperation.setMessage(ex.getMessage)
-        topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
-    }
+    }, context.dispatcher)
   }
 
 
@@ -121,8 +116,6 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
           start(topologyExecution, topologyOperation)
         case OPERATION.STOP =>
           stop(topologyExecution, topologyOperation)
-        case OPERATION.STATUS =>
-          status(topologyExecution, topologyOperation)
         case m@_ =>
           log.warning("Unsupported operation: " + topologyOperation)
           throw new Exception("Unsupported operation: " + topologyOperation)
@@ -144,9 +137,20 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
     case SchedulerCommand(topologyExecution, topologyOperation) =>
       execute(topologyExecution, topologyOperation)
     case HealthCheckerEvent =>
-
-    case m@_ =>
+      _dao.loadAllTopologyExecutionEntities() onComplete {
+        case Success(topologyExecutions) =>
+          log.info(s"Load ${topologyExecutions.size()} topologies in execution")
+          JavaConversions.collectionAsScalaIterable(topologyExecutions) foreach { topologyExecution =>
+            status(topologyExecution)
+          }
+        case Failure(ex) =>
+          log.error(s"Fail to load any topologyExecutionEntity due to Exception: ${ex.getMessage}")
+      }
+    case TerminatedEvent =>
+      log.info("Going to shutdown executorService ...")
       ApplicationManager.executorService.shutdownNow()
+      context.stop(self)
+    case m@_ =>
       log.warning("Unsupported operation $m")
   }
 

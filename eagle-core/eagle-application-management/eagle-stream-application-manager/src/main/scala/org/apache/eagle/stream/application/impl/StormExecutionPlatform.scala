@@ -25,7 +25,7 @@ import backtype.storm.generated.InvalidTopologyException
 import backtype.storm.utils.{NimbusClient, Utils}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.eagle.common.config.EagleConfigConstants
-import org.apache.eagle.service.application.entity.{TopologyExecutionStatus, TopologyDescriptionEntity, TopologyExecutionEntity}
+import org.apache.eagle.service.application.entity.{TopologyDescriptionEntity, TopologyExecutionEntity, TopologyExecutionStatus}
 import org.apache.eagle.stream.application.{ApplicationManager, ApplicationManagerUtils, ExecutionPlatform, TopologyFactory}
 import org.slf4j.LoggerFactory
 
@@ -122,16 +122,43 @@ class StormExecutionPlatform extends ExecutionPlatform {
     ApplicationManager.remove(name)
   }
 
+
+  def getTopology(topologyName: String, config: Config) = {
+    val topologySummery = getNimbusClient(config).getClient.getClusterInfo.get_topologies
+    JavaConversions.collectionAsScalaIterable(topologySummery).find { t => t.get_name.equals(topologyName) }
+    match {
+      case Some(t) => Some(t)
+      case None    => None
+    }
+  }
+
   override def status(topologyExecution: TopologyExecutionEntity, config: Config): Unit = {
     val name: String = ApplicationManagerUtils.generateTopologyFullName(topologyExecution)
 
     if(topologyExecution.getEnvironment.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
       statusLocal(name, topologyExecution)
     }
+    val topology = getTopology(name, config)
+    topology match {
+      case Some(topology) =>
+        topologyExecution.setStatus(topology.get_status())
+        topologyExecution.setUrl(ApplicationManagerUtils.buildStormTopologyURL(config, topology.get_id()))
+        topologyExecution.setDescription(topology.toString)
+      case None =>
+        topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
+        topologyExecution.setUrl("")
+        topologyExecution.setDescription(s"Fail to find topology: $name")
+    }
   }
 
   def statusLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
-
+    val currentStatus = topologyExecution.getStatus()
+    val newStatus = ApplicationManager.getWorkerStatus(ApplicationManager.get(name).getState())
+    if (!currentStatus.equals(newStatus)) {
+      LOG.info("Status of topology: %s changed from %s to %s".format(topologyExecution.getFullName, currentStatus, newStatus))
+      topologyExecution.setStatus(newStatus)
+      topologyExecution.setDescription(String.format("Status of topology: %s changed from %s to %s", name, currentStatus, newStatus))
+    }
   }
 
   override def status(topologyExecutions: java.util.List[TopologyExecutionEntity], config: Config): Unit = {

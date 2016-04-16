@@ -29,6 +29,8 @@ public class AppManagerConstants {
     public final static String APPLICATION_ID = "id";
 
     public final static String CLUSTER_TYPE = "envContextConfig.mode";
+    public final static String CLUSTER_URL = "envContextConfig.url";
+    public final static String DEFAULT_CLUSTER_URL = "http://sandbox.hortonworks.com:8447";
 
     public final static String EAGLE_CLUSTER_STORM = "storm";
     public final static String EAGLE_CLUSTER_SPARK = "spark";
@@ -38,5 +40,10 @@ public class AppManagerConstants {
 
     public final static String APP_COMMAND_LOADER_INTERVAL = "appCommandLoaderInterval";
     public final static String APP_HEALTH_CHECK_INTERVAL = "appHealthCheckInterval";
+
+    private static final int CONNECTION_TIMEOUT = 10000;
+    private static final int READ_TIMEOUT = 10000;
+    private static final String XML_HTTP_HEADER = "Accept";
+    private static final String XML_FORMAT = "application/xml";
 
 }

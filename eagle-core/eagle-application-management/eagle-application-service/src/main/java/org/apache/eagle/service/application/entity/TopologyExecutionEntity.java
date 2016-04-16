@@ -42,18 +42,16 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
     @Column("a")
     private String fullName;
     @Column("b")
-    private String id;
-    @Column("c")
     private String url;
-    @Column("d")
+    @Column("c")
     private String description;
-    @Column("e")
+    @Column("d")
     private String status;
-    @Column("f")
+    @Column("e")
     private long lastModifiedDate;
-    @Column("g")
+    @Column("f")
     private String mode;
-    @Column("h")
+    @Column("g")
     private String environment;
 
     public String getEnvironment() {
@@ -81,15 +79,6 @@ public class TopologyExecutionEntity extends TaggedLogAPIEntity {
     public void setFullName(String fullName) {
         this.fullName = fullName;
         valueChanged("fullName");
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-        valueChanged("id");
     }
 
     public String getUrl() {
