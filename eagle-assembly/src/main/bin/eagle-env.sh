@@ -43,6 +43,13 @@ for file in $EAGLE_HOME/lib/share/*;do
 	EAGLE_CLASSPATH=$EAGLE_CLASSPATH:$file
 done
 
-# EAGLE_TABLE_LIST
-export EAGLE_TABLE_LIST='alertdef ipzone streamMetadata alertdetail fileSensitivity eaglehdfs_alert streamdef eagle_metric alertExecutor alertStream alertStreamSchema hiveResourceSensitivity hbaseResourceSensitivity mlmodel userprofile hfdsusercommandpattern appCommand appDefinition serviceAudit aggregatedef alertNotifications eagleSiteDesc eagleSiteApplication eagleApplicationDesc eagleFeatureDesc eagle_metadata'
+# Add eagle storm library jars
+# Separate out of share directory because of asm version conflict
+export EAGLE_STORM_CLASSPATH=$EAGLE_CLASSPATH
+for file in $EAGLE_HOME/lib/storm/*;do
+	EAGLE_STORM_CLASSPATH=$EAGLE_STORM_CLASSPATH:$file
+done
 
+# EAGLE_TABLE_LIST
+# TODO: Automatically create hbase table when initializing
+export EAGLE_TABLE_LIST='alertdef ipzone streamMetadata alertdetail fileSensitivity eaglehdfs_alert streamdef eagle_metric alertExecutor alertStream alertStreamSchema hiveResourceSensitivity hbaseResourceSensitivity mlmodel userprofile hfdsusercommandpattern appCommand appDefinition serviceAudit aggregatedef alertNotifications eagleSiteDesc eagleSiteApplication eagleApplicationDesc eagleFeatureDesc eagle_metadata'

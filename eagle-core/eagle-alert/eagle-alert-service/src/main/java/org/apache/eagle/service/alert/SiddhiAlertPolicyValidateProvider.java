@@ -122,7 +122,7 @@ public class SiddhiAlertPolicyValidateProvider extends AlertPolicyValidateProvid
 	
 	@Override
 	public String PolicyType() {
-		return "siddhiCEPEngine";
+		return Constants.policyType.siddhiCEPEngine.name();
 	}
 	
 	@Override

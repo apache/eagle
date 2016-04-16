@@ -59,6 +59,26 @@
 		return Policy;
 	});
 
+	feature.service("Notification", function(Entities) {
+		var Notification = function () {};
+		Notification.map = {};
+
+		Notification.list = Entities.queryEntities("AlertNotificationService");
+		Notification.list._promise.then(function () {
+			$.each(Notification.list, function (i, notification) {
+				// Parse fields
+				notification.fieldList = common.parseJSON(notification.fields, []);
+
+				// Fill map
+				Notification.map[notification.tags.notificationType] = notification;
+			});
+		});
+
+		Notification.promise = Notification.list._promise;
+
+		return Notification;
+	});
+
 	// ==============================================================
 	// =                          Policies                          =
 	// ==============================================================
@@ -77,8 +97,6 @@
 		var _policyList = Entities.queryEntities("AlertDefinitionService", {site: Site.current().tags.site, application: $scope.application.tags.application});
 		_policyList._promise.then(function() {
 			$.each(_policyList, function(i, policy) {
-				policy.__mailStr = common.getValueByPath(common.parseJSON(policy.notificationDef, {}), "0.recipients", "");
-				policy.__mailList = policy.__mailStr.trim() === "" ? [] : policy.__mailStr.split(/[,;]/);
 				policy.__expression = common.parseJSON(policy.policyDef, {}).expression;
 
 				$scope.policyList.push(policy);
@@ -96,7 +114,7 @@
 				var _value = common.getValueByPath(item, path, "").toLowerCase();
 				return _value.indexOf(_key) !== -1;
 			}
-			return _hasKey(item, "tags.policyId") || _hasKey(item, "__expression") || _hasKey(item, "description") || _hasKey(item, "owner") || _hasKey(item, "__mailStr");
+			return _hasKey(item, "tags.policyId") || _hasKey(item, "__expression") || _hasKey(item, "description") || _hasKey(item, "owner");
 		};
 
 		$scope.updatePolicyStatus = Policy.updatePolicyStatus;
@@ -149,8 +167,8 @@
 			} else {
 				policy = $scope.policyList[0];
 
-				policy.__mailStr = common.getValueByPath(common.parseJSON(policy.notificationDef, {}), "0.recipients", "");
-				policy.__mailList = policy.__mailStr.trim() === "" ? [] : policy.__mailStr.split(/[,;]/);
+				policy.__notificationList = common.parseJSON(policy.notificationDef, []);
+
 				policy.__expression = common.parseJSON(policy.policyDef, {}).expression;
 
 				$scope.policy = policy;
@@ -259,7 +277,7 @@
 	});
 
 	// ======================== Policy Edit =========================
-	function policyCtrl(create, PageConfig, Site, Policy, $scope, $wrapState, $q, Entities, Application, Authorization) {
+	function policyCtrl(create, PageConfig, Site, Policy, $scope, $wrapState, $q, UI, Entities, Application, Authorization, Notification) {
 		PageConfig.pageTitle = create ? "Policy Create" : "Policy Edit";
 		PageConfig.pageSubTitle = Site.current().tags.site;
 		PageConfig
@@ -316,12 +334,58 @@
 			]
 		};
 
+		$scope.Notification = Notification;
+
 		$scope.create = create;
 		$scope.encodedRowkey = $wrapState.param.filter;
 
 		$scope.step = 0;
 		$scope.applications = {};
 		$scope.policy = {};
+
+		// ==========================================
+		// =              Notification              =
+		// ==========================================
+		$scope.notificationTabHolder = null;
+
+		$scope.newNotification = function (notificationType) {
+			var __notification = {
+				notificationType: notificationType
+			};
+
+			$.each(Notification.map[notificationType].fieldList, function (i, field) {
+				__notification[field.name] = field.value || "";
+			});
+
+			$scope.policy.__.notification.push(__notification);
+		};
+
+		Notification.promise.then(function () {
+			$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
+				{icon: "cog", title: "Configuration", list: [
+					{icon: "trash", title: "Delete", danger: true, func: function () {
+						var notification = $scope.notificationTabHolder.selectedPane.data;
+						UI.deleteConfirm(notification.notificationType).then(null, null, function(holder) {
+							common.array.remove(notification, $scope.policy.__.notification);
+							holder.closeFunc();
+						});
+					}}
+				]},
+				{icon: "plus", title: "New", list: $.map(Notification.list, function(notification) {
+					return {
+						icon: "plus",
+						title: notification.tags.notificationType,
+						func: function () {
+							$scope.newNotification(notification.tags.notificationType);
+							setTimeout(function() {
+								$scope.notificationTabHolder.setSelect(-1);
+								$scope.$apply();
+							}, 0);
+						}
+					};
+				})}
+			] : [];
+		});
 
 		// ==========================================
 		// =            Data Preparation            =
@@ -487,8 +551,7 @@
 							conditions: {},
 							notification: [],
 							dedupe: {
-								alertDedupIntervalMin: 10,
-								emailDedupIntervalMin: 10
+								alertDedupIntervalMin: 10
 							},
 							policy: {},
 							window: "externalTime",
@@ -537,7 +600,7 @@
 								title: "OPS",
 								content: "Policy not found!"
 							}, function() {
-								$location.path("/common/policyList");
+								$wrapState.path("/common/policyList");
 								$scope.$apply();
 							});
 							return;
@@ -894,12 +957,7 @@
 
 				// notificationDef
 				$scope.policy.__.notification = $scope.policy.__.notification || [];
-				var _notificationUnit = $scope.policy.__.notification[0];
-				if(_notificationUnit) {
-					_notificationUnit.flavor = "email";
-					_notificationUnit.id = "email_1";
-					_notificationUnit.tplFileName = "";
-				}
+
 				$scope.policy.notificationDef = JSON.stringify($scope.policy.__.notification);
 
 				// policyDef
@@ -990,12 +1048,12 @@
 		});
 	}
 
-	feature.controller('policyCreate', function(PageConfig, Site, Policy, $scope, $wrapState, $q, Entities, Application, Authorization) {
+	feature.controller('policyCreate', function(PageConfig, Site, Policy, $scope, $wrapState, $q, UI, Entities, Application, Authorization, Notification) {
 		var _args = [true];
 		_args.push.apply(_args, arguments);
 		policyCtrl.apply(this, _args);
 	}, "policyEdit");
-	feature.controller('policyEdit', function(PageConfig, Site, Policy, $scope, $wrapState, $q, Entities, Application, Authorization) {
+	feature.controller('policyEdit', function(PageConfig, Site, Policy, $scope, $wrapState, $q, UI, Entities, Application, Authorization, Notification) {
 		PageConfig.lockSite = true;
 		var _args = [false];
 		_args.push.apply(_args, arguments);
@@ -1028,7 +1086,6 @@
 			var _list = Entities.queryEntities("AlertService", {
 				site: Site.current().tags.site,
 				application: $scope.application.tags.application,
-				hostname: null,
 				_pageSize: MAX_PAGESIZE,
 				_duration: 1000 * 60 * 60 * 24 * 30,
 				__ETD: 1000 * 60 * 60 * 24
@@ -1073,7 +1130,7 @@
 		});
 	});
 
-	// ========================= Alert List =========================
+	// ======================== Alert Detail ========================
 	feature.controller('alertDetail', function(PageConfig, Site, $scope, $wrapState, Entities) {
 		PageConfig.pageTitle = "Alert Detail";
 		PageConfig.lockSite = true;
@@ -1095,6 +1152,7 @@
 				});
 			} else {
 				$scope.alert = $scope.alertList[0];
+				$scope.alert.rawAlertContext = JSON.stringify($scope.alert.alertContext, null, "\t");
 				Site.current(Site.find($scope.alert.tags.site));
 				console.log($scope.alert);
 			}
@@ -1102,7 +1160,7 @@
 
 		// UI
 		$scope.getMessageTime = function(alert) {
-			var _time = common.getValueByPath(alert, "alertContext.properties.timestamp");
+			var _time = common.getValueByPath(alert, "alertContext.timestamp");
 			return Number(_time);
 		};
 	});

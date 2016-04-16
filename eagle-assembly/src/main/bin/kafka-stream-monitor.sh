@@ -41,15 +41,7 @@ if [ "$#" == "2" ];then
 	alert_executor="${alert_stream}Executor"
 fi
 
-which storm >/dev/null 2>&1
-if [ $? != 0 ];then
-    echo "ERROR: storm not found"
-    exit 1
-else
-	export EAGLE_CLASSPATH=$EAGLE_CLASSPATH:$jar_name:`storm classpath`
-fi
-
-cmd="java -cp $EAGLE_CLASSPATH $main_class -D eagle.stream.name=$alert_stream -D eagle.stream.executor=$alert_executor -D config.file=$config_file -D envContextConfig.jarFile=$jar_name"
+cmd="java -cp $EAGLE_STORM_CLASSPATH:$jar_name $main_class -D eagle.stream.name=$alert_stream -D eagle.stream.executor=$alert_executor -D config.file=$config_file -D envContextConfig.jarFile=$jar_name"
 
 echo "=========="
 echo "Alert Stream: $alert_stream"
