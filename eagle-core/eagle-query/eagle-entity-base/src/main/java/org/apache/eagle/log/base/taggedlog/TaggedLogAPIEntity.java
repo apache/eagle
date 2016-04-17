@@ -35,7 +35,6 @@ import org.codehaus.jackson.map.annotate.JsonFilter;
 import org.codehaus.jackson.map.ser.BeanPropertyFilter;
 import org.codehaus.jackson.map.ser.BeanPropertyWriter;
 import org.codehaus.jackson.map.ser.FilterProvider;
-import org.codehaus.jackson.map.ser.impl.SimpleBeanPropertyFilter;
 import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +71,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
 
     private String encodedRowkey;
     // track what qualifiers are changed
-    private Set<String> _modifiedProperties = new HashSet<>();
+    private final Set<String> _modifiedProperties = new HashSet<>();
     protected PropertyChangeSupport _pcs = new PropertyChangeSupport(this);
 
     public TaggedLogAPIEntity() {
@@ -85,10 +84,6 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
 
     public void propertyChange(PropertyChangeEvent evt) {
         _modifiedProperties.add(evt.getPropertyName());
-    }
-
-    public Set<String> modifiedQualifiers() {
-        return this._modifiedProperties;
     }
 
     private static Set<String> getPropertyNames() {
@@ -154,7 +149,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
         public void serializeAsField(Object bean, JsonGenerator jgen, SerializerProvider provider, BeanPropertyWriter writer) throws Exception {
             if (bean instanceof TaggedLogAPIEntity) {
                 TaggedLogAPIEntity entity = (TaggedLogAPIEntity) bean;
-                Set<String> modified = entity.modifiedQualifiers();
+                Set<String> modified = entity.getModifiedQualifiers();
                 Set<String> basePropertyNames = getPropertyNames();
                 String writerName = writer.getName();
                 if (modified.contains(writerName) || basePropertyNames.contains(writerName)) {
@@ -185,6 +180,10 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
                 writer.serializeAsField(bean, jgen, provider);
             }
         }
+    }
+
+    public Set<String> getModifiedQualifiers() {
+        return this._modifiedProperties;
     }
 
     public void setExp(Map<String, Object> exp) {
