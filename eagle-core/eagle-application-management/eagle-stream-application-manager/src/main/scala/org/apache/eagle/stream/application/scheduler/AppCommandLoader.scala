@@ -60,7 +60,7 @@ private[scheduler] class AppCommandLoader extends Actor with ActorLogging {
                     _dao.updateOperationStatus(command)
                 }
               case Failure(ex) =>
-                log.error(s"Got an exception to update command $command: ${ex.getMessage}")
+                log.error(s"Got an exception to update command status $command: ${ex.getMessage}")
                 command.setMessage(ex.getMessage)
                 command.setStatus(OPERATION_STATUS.FAILED)
                 _dao.updateOperationStatus(command)

@@ -28,10 +28,11 @@ public class AppManagerConstants {
     public final static String FULLNAME = "fullName";
     public final static String APPLICATION_ID = "id";
 
-    public final static String CLUSTER_TYPE = "envContextConfig.mode";
+    public final static String CLUSTER_ENV = "envContextConfig.env";
     public final static String CLUSTER_URL = "envContextConfig.url";
-    public final static String DEFAULT_CLUSTER_URL = "http://sandbox.hortonworks.com:8447";
+    public final static String DEFAULT_CLUSTER_URL = "http://sandbox.hortonworks.com:8744";
 
+    public final static String RUNNING_MODE = "envContextConfig.mode";
     public final static String EAGLE_CLUSTER_STORM = "storm";
     public final static String EAGLE_CLUSTER_SPARK = "spark";
 

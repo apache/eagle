@@ -19,9 +19,9 @@ package org.apache.eagle.stream.application.scheduler
 
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{TestActorRef, TestKit}
-import org.scalatest.{BeforeAndAfterAll, MustMatchers, WordSpecLike}
+import org.scalatest.{Ignore, BeforeAndAfterAll, MustMatchers, WordSpecLike}
 
-
+@Ignore
 class TestSchedulerSpec extends TestKit(ActorSystem("stream-app-scheduler"))
 with WordSpecLike with MustMatchers with BeforeAndAfterAll {
 
@@ -47,6 +47,7 @@ with WordSpecLike with MustMatchers with BeforeAndAfterAll {
   }
 }
 
+@Ignore
 object TestStreamAppScheduler extends App {
   val conf: String = """
                           akka.loglevel = "DEBUG"

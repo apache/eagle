@@ -31,8 +31,8 @@ import org.apache.eagle.stream.application.TopologyExecutable;
 public class HbaseAuditLogProcessorTopology implements TopologyExecutable {
     @Override
     public void submit(String application, Config config) {
-        Config baseConfig = ConfigFactory.load();
-        config = (config != null) ? config.withFallback(baseConfig): baseConfig;
+        //Config baseConfig = ConfigFactory.load();
+        //config = (config != null) ? config.withFallback(baseConfig): baseConfig;
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(config);
         env.fromSpout(new KafkaSourcedSpoutProvider()).withOutputFields(1).nameAs("kafkaMsgConsumer")
                 .flatMap(new HbaseResourceSensitivityDataJoinExecutor())

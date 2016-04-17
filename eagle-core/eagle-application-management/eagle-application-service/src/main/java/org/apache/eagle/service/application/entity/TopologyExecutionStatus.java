@@ -34,25 +34,5 @@ public class TopologyExecutionStatus {
         return status.equals(STARTED);
     }
 
-    public static String getNextStatus(String status, Boolean isSuccess) {
-        switch (status) {
-            case STARTED:
-                if(isSuccess) return STOPPED;
-                else return STARTED;
-            case STOPPED:
-                if(isSuccess) return STARTED;
-                else return STOPPED;
-            case NEW:
-                if(isSuccess) return STARTED;
-                else return STOPPED;
-            case STARTING:
-                if(isSuccess) return STARTED;
-                else return STOPPED;
-            case STOPPING:
-                if(isSuccess) return STOPPED;
-                else return STARTED;
-            default: return STOPPED;
-        }
-    }
 }
 

@@ -85,6 +85,13 @@ object ApplicationManager {
     throw new IllegalStateException("Unknown state: " + state)
   }
 
+  def getTopologyStatus(status: String): String = {
+    if(!status.equalsIgnoreCase(TopologyExecutionStatus.STOPPED))
+      TopologyExecutionStatus.STARTED
+    else
+      TopologyExecutionStatus.STOPPED
+  }
+
   private def whereIn(state: Thread.State, inStates: Thread.State*): Boolean = {
     for (_state <- inStates) {
       if (_state eq state) {

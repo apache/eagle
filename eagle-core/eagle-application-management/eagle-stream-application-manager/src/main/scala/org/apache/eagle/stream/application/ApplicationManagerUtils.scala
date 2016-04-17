@@ -32,7 +32,7 @@ object ApplicationManagerUtils {
 
   def buildStormTopologyURL(config: Config, topologyID: String): String = {
     val clusterURL = if(config.hasPath(AppManagerConstants.CLUSTER_URL)) config.getString(AppManagerConstants.CLUSTER_URL) else AppManagerConstants.DEFAULT_CLUSTER_URL
-    val topologyURL = clusterURL + "/" + topologyID
+    val topologyURL = clusterURL + "/topology.html?id=" + topologyID
     topologyURL
   }
 }

@@ -41,7 +41,7 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
 
   def start(topologyExecution: TopologyExecutionEntity, topologyOperation: TopologyOperationEntity) = {
     val options: ConfigParseOptions = ConfigParseOptions.defaults.setSyntax(ConfigSyntax.PROPERTIES).setAllowMissing(false)
-    _dao.loadTopologyDescriptionByName(topologyOperation.getSite, topologyOperation.getOperation, topologyOperation.getTopology) onComplete {
+    _dao.loadTopologyDescriptionByName(topologyOperation.getSite, topologyOperation.getApplication, topologyOperation.getTopology) onComplete {
       case Success(topology) =>
         val topologyConfig: Config = ConfigFactory.parseString(topology.getContext, options)
 
@@ -49,7 +49,7 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
           throw new Exception("Fail to detect topology configuration")
         }
         val config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
-        val clusterType = if(config.hasPath(AppManagerConstants.CLUSTER_TYPE)) config.getString(AppManagerConstants.CLUSTER_TYPE) else AppManagerConstants.EAGLE_CLUSTER_STORM
+        val clusterType = if(config.hasPath(AppManagerConstants.CLUSTER_ENV)) config.getString(AppManagerConstants.CLUSTER_ENV) else AppManagerConstants.EAGLE_CLUSTER_STORM
         topologyExecution.setEnvironment(clusterType)
 
         Futures.future(new Callable[TopologyExecutionEntity]{
@@ -64,23 +64,26 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
           case Success(topologyExecutionEntity) =>
             topologyExecution.setStatus(TopologyExecutionStatus.STARTED)
             topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
+            updateStatus(topologyExecution, topologyOperation)
           case Failure(ex) =>
-            topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
             topologyOperation.setMessage(ex.getMessage)
             topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
+            _dao.updateOperationStatus(topologyOperation)
         }
 
       case Failure(ex) =>
-        throw new Exception(s"Fail to load topology description with $topologyOperation")
+        topologyOperation.setMessage(ex.getMessage)
+        topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
+        _dao.updateOperationStatus(topologyOperation)
     }
   }
 
   def stop(topologyExecution: TopologyExecutionEntity, topologyOperation: TopologyOperationEntity) = {
-    val clusterType = topologyExecution.getEnvironment;
+    val clusterType = topologyExecution.getEnvironment
 
     Futures.future(new Callable[TopologyExecutionEntity]{
       override def call(): TopologyExecutionEntity = {
-        topologyExecution.setStatus(TopologyExecutionStatus.STARTING)
+        topologyExecution.setStatus(TopologyExecutionStatus.STOPPING)
         _dao.updateTopologyExecutionStatus(topologyExecution)
         ExecutionPlatformFactory.getApplicationManager(clusterType).stop(topologyExecution, _config)
         topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
@@ -90,10 +93,11 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
       case Success(topologyExecutionEntity) =>
         topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
         topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
+        updateStatus(topologyExecution, topologyOperation)
       case Failure(ex) =>
-        topologyExecution.setStatus(TopologyExecutionStatus.STARTED)
         topologyOperation.setMessage(ex.getMessage)
         topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
+        _dao.updateOperationStatus(topologyOperation)
     }
   }
 
@@ -105,9 +109,16 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
         ExecutionPlatformFactory.getApplicationManager(clusterType).status(topologyExecution, _config)
         topologyExecution
       }
-    }, context.dispatcher)
+    }, context.dispatcher) onComplete {
+      case _ =>
+        _dao.updateTopologyExecutionStatus(topologyExecution)
+    }
   }
 
+  def updateStatus(topologyExecution: TopologyExecutionEntity, topologyOperation: TopologyOperationEntity): Unit = {
+    _dao.updateOperationStatus(topologyOperation)
+    _dao.updateTopologyExecutionStatus(topologyExecution)
+  }
 
   def execute(topologyExecution: TopologyExecutionEntity, topologyOperation: TopologyOperationEntity): Unit = {
     try {
@@ -124,10 +135,8 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
       case e: Throwable =>
         topologyOperation.setMessage(e.getMessage)
         topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
+        _dao.updateOperationStatus(topologyOperation)
     }
-    _dao.updateOperationStatus(topologyOperation)
-    _dao.updateTopologyExecutionStatus(topologyExecution)
-
   }
 
   override def receive = {
@@ -141,7 +150,12 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
         case Success(topologyExecutions) =>
           log.info(s"Load ${topologyExecutions.size()} topologies in execution")
           JavaConversions.collectionAsScalaIterable(topologyExecutions) foreach { topologyExecution =>
-            status(topologyExecution)
+            try{
+              status(topologyExecution)
+            } catch {
+              case ex: Throwable =>
+                log.error(ex.getMessage)
+            }
           }
         case Failure(ex) =>
           log.error(s"Fail to load any topologyExecutionEntity due to Exception: ${ex.getMessage}")

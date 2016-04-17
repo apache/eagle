@@ -33,7 +33,6 @@ private[scheduler] class StreamAppCoordinator extends Actor with ActorLogging {
   override def receive = {
     case InitializationEvent(config) => {
       log.info(s"Config updated: $config")
-
       commandLoader ! InitializationEvent(config)
       commandExecutor ! InitializationEvent(config)
     }

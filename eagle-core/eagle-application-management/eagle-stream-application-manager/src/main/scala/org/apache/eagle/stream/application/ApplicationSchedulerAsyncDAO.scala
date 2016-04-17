@@ -101,7 +101,7 @@ class ApplicationSchedulerAsyncDAO(config: Config, ex: ExecutionContext) {
         query = "%s[@site=\"%s\" AND @application=\"%s\"]{*}".format(Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME, site, application)
         val configResponse: GenericServiceAPIResponseEntity[SiteApplicationServiceEntity] = client.search(query).pageSize(Int.MaxValue).send()
         if (client != null) client.close()
-        if(configResponse.isSuccess || configResponse.getObj == null || configResponse.getObj.size() == 0)
+        if(!configResponse.isSuccess || configResponse.getObj == null || configResponse.getObj.size() == 0)
           throw new Exception(s"Fail to load topology configuration with query=$query due to Exception: ${configResponse.getException}")
         val siteApplicationEntity = configResponse.getObj.get(0)
         topologyDescriptionEntity.setContext(siteApplicationEntity.getConfig)

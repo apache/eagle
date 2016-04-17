@@ -25,6 +25,7 @@ import backtype.storm.generated.InvalidTopologyException
 import backtype.storm.utils.{NimbusClient, Utils}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.eagle.common.config.EagleConfigConstants
+import org.apache.eagle.service.application.AppManagerConstants
 import org.apache.eagle.service.application.entity.{TopologyDescriptionEntity, TopologyExecutionEntity, TopologyExecutionStatus}
 import org.apache.eagle.stream.application.{ApplicationManager, ApplicationManagerUtils, ExecutionPlatform, TopologyFactory}
 import org.slf4j.LoggerFactory
@@ -82,11 +83,13 @@ class StormExecutionPlatform extends ExecutionPlatform {
     System.setProperty("storm.jar", stormJarPath)
 
     val fullName = ApplicationManagerUtils.generateTopologyFullName(topologyExecution)
-    val extConfigStr = "envContextConfig.topologyName=%s, envContextConfig.mode=%s".format(fullName, topologyExecution.getMode)
+    val extConfigStr = "envContextConfig.topologyName=%s".format(fullName)
     val extConfig = ConfigFactory.parseString(extConfigStr)
     val conf = extConfig.withFallback(config)
 
-    if (topologyExecution.getEnvironment.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
+    val mode = if(config.hasPath(AppManagerConstants.RUNNING_MODE)) config.getString(AppManagerConstants.RUNNING_MODE) else EagleConfigConstants.LOCAL_MODE
+    topologyExecution.setMode(mode)
+    if (topologyExecution.getMode.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
       startLocal(fullName, topology, topologyExecution, config)
       return
     }
@@ -108,7 +111,7 @@ class StormExecutionPlatform extends ExecutionPlatform {
   override def stop(topologyExecution: TopologyExecutionEntity, config: Config): Unit = {
     val name: String = ApplicationManagerUtils.generateTopologyFullName(topologyExecution)
 
-    if(topologyExecution.getEnvironment.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
+    if(topologyExecution.getMode.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
       stopLocal(name, topologyExecution)
     }
 
@@ -135,13 +138,13 @@ class StormExecutionPlatform extends ExecutionPlatform {
   override def status(topologyExecution: TopologyExecutionEntity, config: Config): Unit = {
     val name: String = ApplicationManagerUtils.generateTopologyFullName(topologyExecution)
 
-    if(topologyExecution.getEnvironment.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
+    if(topologyExecution.getStatus.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
       statusLocal(name, topologyExecution)
     }
     val topology = getTopology(name, config)
     topology match {
       case Some(topology) =>
-        topologyExecution.setStatus(topology.get_status())
+        topologyExecution.setStatus(ApplicationManager.getTopologyStatus(topology.get_status()))
         topologyExecution.setUrl(ApplicationManagerUtils.buildStormTopologyURL(config, topology.get_id()))
         topologyExecution.setDescription(topology.toString)
       case None =>

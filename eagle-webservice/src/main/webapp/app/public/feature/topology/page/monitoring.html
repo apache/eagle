@@ -88,6 +88,14 @@
 							<td>{{currentTopologyExecution.status || "-"}}</td>
 						</tr>
 						<tr>
+							<th>Mode</th>
+							<td>{{currentTopologyExecution.mode || "-"}}</td>
+						</tr>
+						<tr>
+							<th>Environment</th>
+							<td>{{currentTopologyExecution.environment || "-"}}</td>
+						</tr>
+						<tr>
 							<th>Url</th>
 							<td>{{currentTopologyExecution.url || "-"}}</td>
 						</tr>
@@ -108,16 +116,18 @@
 						<tr>
 							<th>Date Time</th>
 							<th>Operation</th>
-							<th>UUID</th>
+							<th>Operation ID</th>
 							<th>Status</th>
+                            <th>Message</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr ng-repeat="action in currentTopologyExecutionOptList track by $index">
 							<td>{{common.format.date(action.lastModifiedDate) || "-"}}</td>
 							<td>{{action.tags.operation}}</td>
-							<td>{{action.tags.uuid}}</td>
+							<td>{{action.tags.operationID}}</td>
 							<td>{{action.status}}</td>
+                            <td>{{action.message}}</td>
 						</tr>
 					</tbody>
 				</table>
