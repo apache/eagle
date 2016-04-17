@@ -32,6 +32,7 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.annotate.JsonFilter;
+import org.codehaus.jackson.map.ser.BeanPropertyFilter;
 import org.codehaus.jackson.map.ser.BeanPropertyWriter;
 import org.codehaus.jackson.map.ser.FilterProvider;
 import org.codehaus.jackson.map.ser.impl.SimpleBeanPropertyFilter;
@@ -103,7 +104,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
     public static FilterProvider getFilterProvider() {
         if (_filterProvider == null) {
             SimpleFilterProvider _provider = new SimpleFilterProvider();
-            _provider.addFilter(PropertyBeanFilterName, new BeanPropertyFilter());
+            _provider.addFilter(PropertyBeanFilterName, new DefaultBeanPropertyFilter());
             _filterProvider = _provider;
         }
         return _filterProvider;
@@ -117,7 +118,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("prefix:");
         sb.append(prefix);
         sb.append(", timestamp:");
@@ -136,7 +137,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
         return sb.toString();
     }
 
-    private static class BeanPropertyFilter extends SimpleBeanPropertyFilter {
+    private static class DefaultBeanPropertyFilter implements BeanPropertyFilter {
         private final static String prefix = "prefix";
         private final static String encodedRowkey = "encodedRowkey";
         private final static String exp = "exp";
@@ -146,6 +147,8 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
             add(prefix);
             add(encodedRowkey);
         }};
+
+        private DefaultBeanPropertyFilter() {}
 
         @Override
         public void serializeAsField(Object bean, JsonGenerator jgen, SerializerProvider provider, BeanPropertyWriter writer) throws Exception {
@@ -192,7 +195,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
         return this.exp;
     }
 
-    public Map<String, String> getSerializeAlias() {
+    private Map<String, String> getSerializeAlias() {
         return _serializeAlias;
     }
 
@@ -200,7 +203,7 @@ public class TaggedLogAPIEntity implements PropertyChangeListener, Serializable 
         this._serializeAlias = _serializeAlias;
     }
 
-    public boolean isSerializeVerbose() {
+    private boolean isSerializeVerbose() {
         return _serializeVerbose;
     }
 
