@@ -159,8 +159,10 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
           log.error(s"Fail to load any topologyExecutionEntity due to Exception: ${ex.getMessage}")
       }
     case TerminatedEvent =>
-      log.info("Going to shutdown executorService ...")
-      ApplicationManager.executorService.shutdownNow()
+      if(ApplicationManager.executorService != null && !ApplicationManager.executorService.isShutdown) {
+        log.info("Going to shutdown executorService ...")
+        ApplicationManager.executorService.shutdownNow()
+      }
       context.stop(self)
     case m@_ =>
       log.warning("Unsupported operation $m")

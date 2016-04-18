@@ -64,11 +64,14 @@ class StormExecutionPlatform extends ExecutionPlatform {
             case m@_ =>
               throw new InvalidTopologyException("Unsupported topology type: " + topology.getType)
           }
+        } catch {
+          case ex: Throwable =>
+            LOG.error(s"Starting topology $topologyName in local failed due to ${ex.getMessage}")
         }
-        topologyExecution.setFullName(topologyName)
-        topologyExecution.setStatus(TopologyExecutionStatus.STARTED)
       }
     })
+    topologyExecution.setFullName(topologyName)
+    topologyExecution.setStatus(ApplicationManager.getWorkerStatus(worker.getState))
     topologyExecution.setDescription("Running inside " + worker.toString + " in local mode")
   }
 
@@ -85,21 +88,21 @@ class StormExecutionPlatform extends ExecutionPlatform {
     val fullName = ApplicationManagerUtils.generateTopologyFullName(topologyExecution)
     val extConfigStr = "envContextConfig.topologyName=%s".format(fullName)
     val extConfig = ConfigFactory.parseString(extConfigStr)
-    val conf = extConfig.withFallback(config)
+    val newConfig = extConfig.withFallback(config)
 
     val mode = if(config.hasPath(AppManagerConstants.RUNNING_MODE)) config.getString(AppManagerConstants.RUNNING_MODE) else EagleConfigConstants.LOCAL_MODE
     topologyExecution.setMode(mode)
     if (topologyExecution.getMode.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
-      startLocal(fullName, topology, topologyExecution, config)
+      startLocal(fullName, topology, topologyExecution, newConfig)
       return
     }
 
     try {
       topology.getType match {
         case TopologyDescriptionEntity.TYPE.CLASS =>
-          TopologyFactory.submit(topology.getExeClass, conf)
+          TopologyFactory.submit(topology.getExeClass, newConfig)
         case TopologyDescriptionEntity.TYPE.DYNAMIC =>
-          StormDynamicTopology.submit(topology.getExeClass, conf)
+          StormDynamicTopology.submit(topology.getExeClass, newConfig)
         case m@_ =>
           throw new InvalidTopologyException("Unsupported topology type: " + topology.getType)
       }
@@ -121,7 +124,12 @@ class StormExecutionPlatform extends ExecutionPlatform {
   }
 
   def stopLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
-    ApplicationManager.stop(name)
+    try{
+      ApplicationManager.stop(name)
+    } catch {
+      case ex: Throwable =>
+        LOG.error(ex.getMessage)
+    }
     topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
     topologyExecution.setDescription("")
     ApplicationManager.remove(name)
@@ -158,12 +166,18 @@ class StormExecutionPlatform extends ExecutionPlatform {
   }
 
   def statusLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
-    val currentStatus = topologyExecution.getStatus()
-    val newStatus = ApplicationManager.getWorkerStatus(ApplicationManager.get(name).getState())
-    if (!currentStatus.equals(newStatus)) {
-      LOG.info("Status of topology: %s changed from %s to %s".format(topologyExecution.getFullName, currentStatus, newStatus))
-      topologyExecution.setStatus(newStatus)
-      topologyExecution.setDescription(String.format("Status of topology: %s changed from %s to %s", name, currentStatus, newStatus))
+    try {
+      val currentStatus = topologyExecution.getStatus()
+      val newStatus = ApplicationManager.getWorkerStatus(ApplicationManager.get(name).getState())
+      if (!currentStatus.equals(newStatus)) {
+        LOG.info("Status of topology: %s changed from %s to %s".format(topologyExecution.getFullName, currentStatus, newStatus))
+        topologyExecution.setStatus(newStatus)
+        topologyExecution.setDescription(String.format("Status of topology: %s changed from %s to %s", name, currentStatus, newStatus))
+      }
+    }catch {
+      case ex: Throwable =>
+        topologyExecution.setDescription(ex.getMessage)
+        topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
     }
   }
 

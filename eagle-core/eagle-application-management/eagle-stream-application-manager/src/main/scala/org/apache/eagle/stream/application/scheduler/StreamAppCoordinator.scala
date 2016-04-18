@@ -19,6 +19,7 @@
 package org.apache.eagle.stream.application.scheduler
 
 import akka.actor.{Props, ActorRef, ActorLogging, Actor}
+import org.apache.eagle.stream.application.ApplicationManager
 
 private[scheduler] class StreamAppCoordinator extends Actor with ActorLogging {
   var commandLoader: ActorRef = null
@@ -41,11 +42,15 @@ private[scheduler] class StreamAppCoordinator extends Actor with ActorLogging {
     case CommandLoaderEvent =>
       commandLoader ! CommandLoaderEvent
     case command: SchedulerCommand =>
-      log.info(s"Executing comamnd: $SchedulerCommand")
+      log.info(s"Executing command: $SchedulerCommand")
       commandExecutor ! command
     case HealthCheckerEvent =>
       commandExecutor ! HealthCheckerEvent
     case TerminatedEvent =>
+      if(ApplicationManager.executorService != null && !ApplicationManager.executorService.isShutdown) {
+        log.info("Going to shutdown executorService by StreamAppCoordinator...")
+        ApplicationManager.executorService.shutdown()
+      }
       log.info("Coordinator exit ...")
       context.stop(self)
     case m@_ =>

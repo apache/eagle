@@ -41,7 +41,7 @@ public class ApplicationSchedulerListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         //Get the actor system from the spring context
         //SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-        Config config = ConfigFactory.load("eagleScheduler.conf");
+        Config config = ConfigFactory.load("eagle-scheduler.conf");
         system = new ApplicationScheduler().start(config);
     }
 

@@ -34,6 +34,7 @@ export CATALINA_LOGDIR=$EAGLE_HOME/logs
 export CATALINA_TMPDIR=$EAGLE_HOME/temp
 export CATALINA_OUT=$CATALINA_LOGDIR/eagle-service.out
 export CATALINA_PID=$CATALINA_TMPDIR/service.pid
+export JAVA_OPTS=-Xmx3072m -XX:MaxPermSize=1024m
 
 # CLASSPATH
 export CLASSPATH=$CLASSPATH:$EAGLE_HOME/conf
@@ -51,6 +52,7 @@ fi
 
 EAGLE_SERVICE_CONF="eagle-service.conf"
 EAGLE_LDAP_CONF="ldap.properties"
+EAGLE_SCHEDULER_CONF="eagle-scheduler.conf"
 
 # Always copy conf/eagle-service.properties to lib/tomcat/webapps/eagle-service/WEB-INF/classes/application.conf before starting
 if [ ! -e ${EAGLE_HOME}/conf/${EAGLE_SERVICE_CONF} ]
@@ -64,6 +66,11 @@ if [ -e ${EAGLE_HOME}/conf/${EAGLE_LDAP_CONF} ]
 then
 	cp -f $EAGLE_HOME/conf/$EAGLE_LDAP_CONF ${EAGLE_HOME}/lib/tomcat/webapps/eagle-service/WEB-INF/classes/
 fi
+if [ -e ${EAGLE_HOME}/conf/${EAGLE_SCHEDULER_CONF} ]
+then
+	cp -f $EAGLE_HOME/conf/$EAGLE_SCHEDULER_CONF ${EAGLE_HOME}/lib/tomcat/webapps/eagle-service/WEB-INF/classes/
+fi
+
 
 case $1 in
 "start")
