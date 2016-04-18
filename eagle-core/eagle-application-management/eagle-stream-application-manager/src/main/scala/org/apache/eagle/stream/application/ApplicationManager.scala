@@ -27,8 +27,8 @@ import org.slf4j.{LoggerFactory, Logger}
 
 object ApplicationManager {
   private val LOG: Logger = LoggerFactory.getLogger(ApplicationManager.getClass)
-  private val threadPoolCoreSize: Int = 10
-  private val threadPoolMaxSize: Int = 20
+  private val threadPoolCoreSize: Int = 20
+  private val threadPoolMaxSize: Int = 30
   private val threadPoolShrinkTime: Long = 60000L
 
   private val workerMap: util.Map[AnyRef, Thread] = new util.TreeMap[AnyRef, Thread]

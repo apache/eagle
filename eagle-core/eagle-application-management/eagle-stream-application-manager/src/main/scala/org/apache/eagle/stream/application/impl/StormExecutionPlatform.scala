@@ -113,11 +113,11 @@ class StormExecutionPlatform extends ExecutionPlatform {
 
     if(topologyExecution.getMode.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
       stopLocal(name, topologyExecution)
+    } else {
+      getNimbusClient(config).getClient.killTopology(name)
+      topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
+      topologyExecution.setDescription("")
     }
-
-    getNimbusClient(config).getClient.killTopology(name)
-    topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
-    topologyExecution.setDescription("")
   }
 
   def stopLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
@@ -142,17 +142,18 @@ class StormExecutionPlatform extends ExecutionPlatform {
 
     if(topologyExecution.getMode.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
       statusLocal(name, topologyExecution)
-    }
-    val topology = getTopology(name, config)
-    topology match {
-      case Some(topology) =>
-        topologyExecution.setStatus(ApplicationManager.getTopologyStatus(topology.get_status()))
-        topologyExecution.setUrl(ApplicationManagerUtils.buildStormTopologyURL(config, topology.get_id()))
-        topologyExecution.setDescription(topology.toString)
-      case None =>
-        topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
-        topologyExecution.setUrl("")
-        topologyExecution.setDescription(s"Fail to find topology: $name")
+    } else {
+      val topology = getTopology(name, config)
+      topology match {
+        case Some(topology) =>
+          topologyExecution.setStatus(ApplicationManager.getTopologyStatus(topology.get_status()))
+          topologyExecution.setUrl(ApplicationManagerUtils.buildStormTopologyURL(config, topology.get_id()))
+          topologyExecution.setDescription(topology.toString)
+        case None =>
+          topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
+          topologyExecution.setUrl("")
+          topologyExecution.setDescription(s"Fail to find topology: $name")
+      }
     }
   }
 
