@@ -18,10 +18,11 @@
 
 package org.apache.eagle.stream.application.scheduler
 
-import akka.actor.{Props, ActorSystem}
-import com.typesafe.config.{ConfigFactory, Config}
+import akka.actor.{ActorSystem, Props}
+import com.typesafe.config.Config
 import org.apache.eagle.service.application.AppManagerConstants
 import org.apache.eagle.service.application.entity.{TopologyExecutionEntity, TopologyOperationEntity}
+
 import scala.concurrent.duration._
 
 
@@ -44,11 +45,11 @@ case class LoadTopologyFailureException(message:String) extends Exception(messag
  * 3. Actor execute command as requested
  */
 class ApplicationScheduler {
-  val config = ConfigFactory.load()
+  //val config = ConfigFactory.load()
   val DEFAULT_COMMAND_LOADER_INTERVAL = 5
   val DEFAULT_HEALTH_CHECK_INTERVAL = 10
 
-  def start() = {
+  def start(config: Config) = {
     val system = ActorSystem("application-manager-scheduler", config)
     system.log.info(s"Started actor system: $system")
 

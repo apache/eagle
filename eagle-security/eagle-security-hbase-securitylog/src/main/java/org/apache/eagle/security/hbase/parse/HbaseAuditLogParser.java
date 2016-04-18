@@ -45,6 +45,8 @@ public class HbaseAuditLogParser implements Serializable {
 
 
     public HbaseAuditLogObject parse(String logLine) {
+        if(logLine == null || logLine.isEmpty()) return null;
+
         HbaseAuditLogObject ret = new HbaseAuditLogObject();
         String timestamp = "";
         String user = "";

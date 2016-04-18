@@ -117,11 +117,13 @@ class StormExecutionPlatform extends ExecutionPlatform {
 
     getNimbusClient(config).getClient.killTopology(name)
     topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
+    topologyExecution.setDescription("")
   }
 
   def stopLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
     ApplicationManager.stop(name)
     topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
+    topologyExecution.setDescription("")
     ApplicationManager.remove(name)
   }
 
@@ -138,7 +140,7 @@ class StormExecutionPlatform extends ExecutionPlatform {
   override def status(topologyExecution: TopologyExecutionEntity, config: Config): Unit = {
     val name: String = ApplicationManagerUtils.generateTopologyFullName(topologyExecution)
 
-    if(topologyExecution.getStatus.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
+    if(topologyExecution.getMode.equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)) {
       statusLocal(name, topologyExecution)
     }
     val topology = getTopology(name, config)

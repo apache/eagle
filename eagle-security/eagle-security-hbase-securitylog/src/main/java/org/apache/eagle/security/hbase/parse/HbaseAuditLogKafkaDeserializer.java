@@ -40,26 +40,23 @@ public class HbaseAuditLogKafkaDeserializer implements SpoutKafkaMessageDeserial
         String logLine = new String(arg0);
 
         HbaseAuditLogParser parser = new HbaseAuditLogParser();
-        HbaseAuditLogObject entity = null;
         try{
-            entity = parser.parse(logLine);
+            HbaseAuditLogObject entity = parser.parse(logLine);
+            if(entity == null) return null;
+
+            Map<String, Object> map = new TreeMap<String, Object>();
+            map.put("action", entity.action);
+            map.put("host", entity.host);
+            map.put("status", entity.status);
+            map.put("request", entity.request);
+            map.put("scope", entity.scope);
+            map.put("user", entity.user);
+            map.put("timestamp", entity.timestamp);
+            return map;
         }catch(Exception ex){
-            LOG.error("Failing parse audit log message", ex);
-        }
-        if(entity == null){
-            LOG.warn("Event ignored as it can't be correctly parsed, the log is ", logLine);
+            LOG.error("Failing parse audit log:" + logLine, ex);
             return null;
         }
-        Map<String, Object> map = new TreeMap<String, Object>();
-        map.put("action", entity.action);
-        map.put("host", entity.host);
-        map.put("status", entity.status);
-        map.put("request", entity.request);
-        map.put("scope", entity.scope);
-        map.put("user", entity.user);
-        map.put("timestamp", entity.timestamp);
-
-        return map;
     }
 
 }

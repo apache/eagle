@@ -62,7 +62,6 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
           }
         }, context.dispatcher) onComplete {
           case Success(topologyExecutionEntity) =>
-            topologyExecution.setStatus(TopologyExecutionStatus.STARTED)
             topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
             updateStatus(topologyExecution, topologyOperation)
           case Failure(ex) =>
@@ -91,7 +90,6 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
       }
     }, context.dispatcher) onComplete {
       case Success(topologyExecutionEntity) =>
-        topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
         topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
         updateStatus(topologyExecution, topologyOperation)
       case Failure(ex) =>

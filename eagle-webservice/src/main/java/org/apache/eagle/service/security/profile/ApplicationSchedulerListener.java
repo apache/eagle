@@ -20,11 +20,11 @@ package org.apache.eagle.service.security.profile;
 
 
 import akka.actor.ActorSystem;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.stream.application.scheduler.ApplicationScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import scala.concurrent.duration.Duration;
 
 import javax.servlet.ServletContextEvent;
@@ -41,7 +41,8 @@ public class ApplicationSchedulerListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         //Get the actor system from the spring context
         //SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-        system = new ApplicationScheduler().start();
+        Config config = ConfigFactory.load();
+        system = new ApplicationScheduler().start(config);
     }
 
     @Override

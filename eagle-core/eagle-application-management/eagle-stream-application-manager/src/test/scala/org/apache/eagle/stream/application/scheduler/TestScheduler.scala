@@ -19,6 +19,7 @@ package org.apache.eagle.stream.application.scheduler
 
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{TestActorRef, TestKit}
+import com.typesafe.config.ConfigFactory
 import org.scalatest.{Ignore, BeforeAndAfterAll, MustMatchers, WordSpecLike}
 
 @Ignore
@@ -56,5 +57,5 @@ object TestStreamAppScheduler extends App {
                             lifecycle = on
                           }
                      """
-  new ApplicationScheduler().start()
+  new ApplicationScheduler().start(ConfigFactory.parseString(conf))
 }
