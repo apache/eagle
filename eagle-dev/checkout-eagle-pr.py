@@ -36,7 +36,7 @@ EAGLE_HOME = os.environ.get("EAGLE_HOME", os.getcwd())
 # Remote name which points to the Gihub site
 PR_REMOTE_NAME = os.environ.get("PR_REMOTE_NAME", "apache-github")
 # Remote name which points to Apache git
-PUSH_REMOTE_NAME = os.environ.get("PUSH_REMOTE_NAME", "apache")
+PUSH_REMOTE_NAME = os.environ.get("PUSH_REMOTE_NAME", "apache-git")
 # OAuth key used for issuing requests against the GitHub API. If this is not defined, then requests
 # will be unauthenticated. You should only need to configure this if you find yourself regularly
 # exceeding your IP's unauthenticated request rate limit. You can create an OAuth key at
@@ -47,6 +47,10 @@ GITHUB_BASE = "https://github.com/apache/incubator-eagle/pull"
 GITHUB_API_BASE = "https://api.github.com/repos/apache/incubator-eagle"
 JIRA_BASE = "https://issues.apache.org/jira/browse"
 JIRA_API_BASE = "https://issues.apache.org/jira"
+
+PR_REPO = "https://github.com/apache/incubator-eagle.git"
+PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/incubator-eagle.git"
+
 # Prefix added to temporary branches
 BRANCH_PREFIX = "PR_TOOL"
 
@@ -93,11 +97,24 @@ def get_current_ref():
         return ref
 
 
+def check_init():
+    try:
+        run_cmd("git config --get remote.%s.url" % PR_REMOTE_NAME)
+    except:
+        run_cmd("git remote add %s %s" % (PR_REMOTE_NAME, PR_REPO))
+    try:
+        run_cmd("git config --get remote.%s.url" % PUSH_REMOTE_NAME)
+    except:
+        run_cmd("git remote add %s %s" % (PUSH_REMOTE_NAME, PUSH_REPO))
+
+
 def main():
     global original_head
 
     os.chdir(EAGLE_HOME)
     original_head = get_current_ref()
+
+    check_init()
 
     branches = get_json("%s/branches" % GITHUB_API_BASE)
     branch_names = filter(lambda x: x.startswith("branch-"), [x['name'] for x in branches])

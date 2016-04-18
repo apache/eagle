@@ -1086,7 +1086,6 @@
 			var _list = Entities.queryEntities("AlertService", {
 				site: Site.current().tags.site,
 				application: $scope.application.tags.application,
-				hostname: null,
 				_pageSize: MAX_PAGESIZE,
 				_duration: 1000 * 60 * 60 * 24 * 30,
 				__ETD: 1000 * 60 * 60 * 24
@@ -1131,7 +1130,7 @@
 		});
 	});
 
-	// ========================= Alert List =========================
+	// ======================== Alert Detail ========================
 	feature.controller('alertDetail', function(PageConfig, Site, $scope, $wrapState, Entities) {
 		PageConfig.pageTitle = "Alert Detail";
 		PageConfig.lockSite = true;
@@ -1153,6 +1152,7 @@
 				});
 			} else {
 				$scope.alert = $scope.alertList[0];
+				$scope.alert.rawAlertContext = JSON.stringify($scope.alert.alertContext, null, "\t");
 				Site.current(Site.find($scope.alert.tags.site));
 				console.log($scope.alert);
 			}
@@ -1160,7 +1160,7 @@
 
 		// UI
 		$scope.getMessageTime = function(alert) {
-			var _time = common.getValueByPath(alert, "alertContext.properties.timestamp");
+			var _time = common.getValueByPath(alert, "alertContext.timestamp");
 			return Number(_time);
 		};
 	});

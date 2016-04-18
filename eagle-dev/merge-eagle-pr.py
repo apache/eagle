@@ -33,6 +33,7 @@ import urllib2
 
 try:
     import jira.client
+
     JIRA_IMPORTED = True
 except ImportError:
     JIRA_IMPORTED = False
@@ -42,7 +43,7 @@ EAGLE_HOME = os.environ.get("EAGLE_HOME", os.getcwd())
 # Remote name which points to the Gihub site
 PR_REMOTE_NAME = os.environ.get("PR_REMOTE_NAME", "apache-github")
 # Remote name which points to Apache git
-PUSH_REMOTE_NAME = os.environ.get("PUSH_REMOTE_NAME", "apache")
+PUSH_REMOTE_NAME = os.environ.get("PUSH_REMOTE_NAME", "apache-git")
 # ASF JIRA username
 JIRA_USERNAME = os.environ.get("JIRA_USERNAME", "")
 # ASF JIRA password
@@ -53,13 +54,15 @@ JIRA_PASSWORD = os.environ.get("JIRA_PASSWORD", "")
 # https://github.com/settings/tokens. This script only requires the "public_repo" scope.
 GITHUB_OAUTH_KEY = os.environ.get("GITHUB_OAUTH_KEY")
 
-
 GITHUB_BASE = "https://github.com/apache/incubator-eagle/pull"
 GITHUB_API_BASE = "https://api.github.com/repos/apache/incubator-eagle"
 JIRA_BASE = "https://issues.apache.org/jira/browse"
 JIRA_API_BASE = "https://issues.apache.org/jira"
 # Prefix added to temporary branches
 BRANCH_PREFIX = "PR_TOOL"
+
+PR_REPO = "https://github.com/apache/incubator-eagle.git"
+PUSH_REPO = "https://git-wip-us.apache.org/repos/asf/incubator-eagle.git"
 
 
 def get_json(url):
@@ -96,6 +99,7 @@ def continue_maybe(prompt):
     result = raw_input("\n%s (y/n): " % prompt)
     if result.lower() != "y":
         fail("Okay, exiting")
+
 
 def clean_up():
     print "Restoring head pointer to %s" % original_head
@@ -282,8 +286,8 @@ def resolve_jira_issue(merge_branches, comment, default_jira_id=""):
     resolve = filter(lambda a: a['name'] == "Resolve Issue", asf_jira.transitions(jira_id))[0]
     resolution = filter(lambda r: r.raw['name'] == "Fixed", asf_jira.resolutions())[0]
     asf_jira.transition_issue(
-            jira_id, resolve["id"], fixVersions = jira_fix_versions,
-            comment = comment, resolution = {'id': resolution.raw['id']})
+            jira_id, resolve["id"], fixVersions=jira_fix_versions,
+            comment=comment, resolution={'id': resolution.raw['id']})
 
     print "Successfully resolved %s with fixVersions=%s!" % (jira_id, fix_versions)
 
@@ -342,11 +346,24 @@ def get_current_ref():
         return ref
 
 
+def check_init():
+    try:
+        run_cmd("git config --get remote.%s.url" % PR_REMOTE_NAME)
+    except:
+        run_cmd("git remote add %s %s" % (PR_REMOTE_NAME, PR_REPO))
+    try:
+        run_cmd("git config --get remote.%s.url" % PUSH_REMOTE_NAME)
+    except:
+        run_cmd("git remote add %s %s" % (PUSH_REMOTE_NAME, PUSH_REPO))
+
+
 def main():
     global original_head
 
     os.chdir(EAGLE_HOME)
     original_head = get_current_ref()
+
+    check_init()
 
     branches = get_json("%s/branches" % GITHUB_API_BASE)
     branch_names = filter(lambda x: x.startswith("branch-"), [x['name'] for x in branches])
@@ -431,8 +448,10 @@ def main():
         print "Could not find jira-python library. Run 'sudo pip install jira' to install."
         print "Exiting without trying to close the associated JIRA."
 
+
 if __name__ == "__main__":
     import doctest
+
     (failure_count, test_count) = doctest.testmod()
     if failure_count:
         exit(-1)
@@ -441,4 +460,3 @@ if __name__ == "__main__":
     except:
         clean_up()
         raise
-
