@@ -34,7 +34,7 @@ export CATALINA_LOGDIR=$EAGLE_HOME/logs
 export CATALINA_TMPDIR=$EAGLE_HOME/temp
 export CATALINA_OUT=$CATALINA_LOGDIR/eagle-service.out
 export CATALINA_PID=$CATALINA_TMPDIR/service.pid
-export JAVA_OPTS=-Xmx3072m -XX:MaxPermSize=1024m
+export JAVA_OPTS="-Xmx3072m -XX:MaxPermSize=1024m"
 
 # CLASSPATH
 export CLASSPATH=$CLASSPATH:$EAGLE_HOME/conf

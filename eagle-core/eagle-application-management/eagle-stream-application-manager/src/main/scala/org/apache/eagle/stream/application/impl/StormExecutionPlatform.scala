@@ -176,7 +176,7 @@ class StormExecutionPlatform extends ExecutionPlatform {
       }
     }catch {
       case ex: Throwable =>
-        topologyExecution.setDescription(ex.getMessage)
+        topologyExecution.setDescription("")
         topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
     }
   }

@@ -31,15 +31,15 @@ object ApplicationManager {
   private val threadPoolMaxSize: Int = 80
   private val threadPoolShrinkTime: Long = 60000L
 
-  private val workerMap: util.Map[AnyRef, Thread] = new util.TreeMap[AnyRef, Thread]
+  private val workerMap: util.Map[AnyRef, TaskExecutor] = new util.TreeMap[AnyRef, TaskExecutor]
   val executorService: ExecutorService = new ThreadPoolExecutor(threadPoolCoreSize, threadPoolMaxSize, threadPoolShrinkTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue[Runnable])
 
 
-  def getWorkerMap: util.Map[AnyRef, Thread] = {
+  def getWorkerMap: util.Map[AnyRef, TaskExecutor] = {
     return workerMap
   }
 
-  def submit(id: AnyRef, runnable: Runnable): Thread = {
+  def submit(id: AnyRef, runnable: Runnable): TaskExecutor = {
     if (workerMap.containsKey(id)) {
       val executor: Thread = workerMap.get(id)
       if (!executor.isAlive || executor.getState.equals() ) {
@@ -50,7 +50,7 @@ object ApplicationManager {
         throw new IllegalArgumentException("Duplicated id '" + id + "'")
       }
     }
-    val worker: Thread = new Thread(runnable)
+    val worker: TaskExecutor = new TaskExecutor(runnable)
     LOG.info("Registering new executor %s: %s".format(id, worker))
     workerMap.put(id, worker)
     worker.setName(id.toString)
@@ -59,14 +59,14 @@ object ApplicationManager {
     return worker
   }
 
-  def get(id: AnyRef): Thread = {
+  def get(id: AnyRef): TaskExecutor = {
     Preconditions.checkArgument(workerMap.containsKey(id))
     return workerMap.get(id)
   }
 
   @throws(classOf[Exception])
-  def stop(id: AnyRef): Thread = {
-    val worker: Thread = get(id)
+  def stop(id: AnyRef): TaskExecutor = {
+    val worker: TaskExecutor = get(id)
     worker.interrupt
     this.workerMap.remove(id)
     return worker
@@ -102,7 +102,7 @@ object ApplicationManager {
   }
 
   def remove(id: AnyRef) {
-    val executor: Thread = this.get(id)
+    val executor: TaskExecutor = this.get(id)
     if (executor.isAlive) {
       throw new RuntimeException("Failed to remove alive executor '" + id + "'")
     }
