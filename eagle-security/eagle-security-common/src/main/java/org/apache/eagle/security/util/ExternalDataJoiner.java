@@ -19,6 +19,7 @@ package org.apache.eagle.security.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.eagle.common.config.EagleConfigConstants;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
@@ -77,7 +78,7 @@ public class ExternalDataJoiner {
 	
 	public void start(){
 		// for job
-		String group = String.format("%s.%s.%s", QUARTZ_GROUP_NAME, jobDataMap.getString("site"), jobDataMap.getString("dataSource"));
+		String group = String.format("%s.%s.%s", QUARTZ_GROUP_NAME, jobDataMap.getString(EagleConfigConstants.SITE), jobDataMap.getString(EagleConfigConstants.APPLICATION));
 		JobDetail job = JobBuilder.newJob(jobCls)
 		     .withIdentity(jobCls.getName() + ".job", group)
 		     .setJobData(jobDataMap)

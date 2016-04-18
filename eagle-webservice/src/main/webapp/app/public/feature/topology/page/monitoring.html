@@ -25,7 +25,7 @@
 					<td><a ng-click="_parent.showTopologyDetail(item)">{{item.tags.topology}}</a></td>
 					<td>{{item.tags.site}}</td>
 					<td>{{item.tags.application}}</td>
-					<td>{{item.tags.description}}</td>
+					<td>{{item.description}}</td>
 					<td class="text-center">
 						<button ng-if="item.status === 'NEW' || item.status === 'STOPPED'" class="fa fa-play sm btn btn-default btn-xs" uib-tooltip="Start" tooltip-animation="false" ng-click="_parent.startTopologyOperation(item)"> </button>
 						<button ng-if="item.status === 'STARTED'" class="fa fa-stop sm btn btn-default btn-xs" uib-tooltip="Stop" tooltip-animation="false" ng-click="_parent.stopTopologyOperation(item)"> </button>
@@ -116,7 +116,6 @@
 						<tr>
 							<th>Date Time</th>
 							<th>Operation</th>
-							<th>Operation ID</th>
 							<th>Status</th>
                             <th>Message</th>
 						</tr>
@@ -125,7 +124,6 @@
 						<tr ng-repeat="action in currentTopologyExecutionOptList track by $index">
 							<td>{{common.format.date(action.lastModifiedDate) || "-"}}</td>
 							<td>{{action.tags.operation}}</td>
-							<td>{{action.tags.operationID}}</td>
 							<td>{{action.status}}</td>
                             <td>{{action.message}}</td>
 						</tr>
