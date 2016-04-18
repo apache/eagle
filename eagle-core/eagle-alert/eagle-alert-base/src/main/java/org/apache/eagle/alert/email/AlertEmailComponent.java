@@ -21,6 +21,7 @@ import org.apache.eagle.common.metric.AlertContext;
 /**
  * Alert email component is one part of an email, which could be an individual alert
  */
+@Deprecated
 public class AlertEmailComponent {
 	private AlertContext alertContext;
 	public AlertContext getAlertContext() {

@@ -33,15 +33,15 @@ public interface NotificationPlugin {
      * for initialization
      * @throws Exception
      */
-    public void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws  Exception;
+    void init(Config config, List<AlertDefinitionAPIEntity> initAlertDefs) throws  Exception;
 
     /**
      * Update Plugin if any change in Policy Definition
      * @param policy to be impacted
-     * @param  notificationConf
+     * @param  notificationConfCollection
      * @throws Exception
      */
-    public void update(String policy, Map<String,String> notificationConf , boolean isPolicyDelete ) throws  Exception;
+    void update(String policy, List<Map<String,String>> notificationConfCollection , boolean isPolicyDelete) throws  Exception;
 
     /**
      * Post a notification for the given alertEntity
@@ -49,11 +49,11 @@ public interface NotificationPlugin {
      * @throws Exception
      */
 
-    public void onAlert( AlertAPIEntity alertEntity ) throws  Exception;
+    void onAlert(AlertAPIEntity alertEntity) throws  Exception;
 
     /**
      * Returns Status of Notification Post
      * @return
      */
-    public NotificationStatus getStatus();
+    List<NotificationStatus> getStatusList();
 }

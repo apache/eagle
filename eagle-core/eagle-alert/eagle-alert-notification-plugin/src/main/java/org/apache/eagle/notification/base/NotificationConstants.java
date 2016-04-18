@@ -28,4 +28,8 @@ public class NotificationConstants {
     public static final String SENDER = "sender";
     public static final String RECIPIENTS = "recipients";
     public static final String TPL_FILE_NAME = "tplFileName";
+
+    // kafka specific constants
+    public static final String TOPIC = "topic";
+    public static final String BROKER_LIST = "kafka_broker";
 }
