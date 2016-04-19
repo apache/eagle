@@ -81,7 +81,7 @@ public class ExternalDataJoiner {
 		String group = String.format("%s.%s.%s", QUARTZ_GROUP_NAME, jobDataMap.getString(EagleConfigConstants.SITE), jobDataMap.getString(EagleConfigConstants.APPLICATION));
 		JobDetail job = JobBuilder.newJob(jobCls)
 		     .withIdentity(jobCls.getName() + ".job", group)
-		     .setJobData(jobDataMap)
+		     .usingJobData(jobDataMap)
 		     .build();
 		
 		// for trigger

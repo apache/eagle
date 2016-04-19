@@ -19,21 +19,15 @@
 package org.apache.eagle.stream.application
 
 import java.util
-import java.util.concurrent._
+
 import com.google.common.base.Preconditions
 import org.apache.eagle.service.application.entity.TopologyExecutionStatus
-import org.slf4j.{LoggerFactory, Logger}
+import org.slf4j.{Logger, LoggerFactory}
 
 
 object ApplicationManager {
   private val LOG: Logger = LoggerFactory.getLogger(ApplicationManager.getClass)
-  private val threadPoolCoreSize: Int = 50
-  private val threadPoolMaxSize: Int = 80
-  private val threadPoolShrinkTime: Long = 60000L
-
   private val workerMap: util.Map[AnyRef, TaskExecutor] = new util.TreeMap[AnyRef, TaskExecutor]
-  val executorService: ExecutorService = new ThreadPoolExecutor(threadPoolCoreSize, threadPoolMaxSize, threadPoolShrinkTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue[Runnable])
-
 
   def getWorkerMap: util.Map[AnyRef, TaskExecutor] = {
     return workerMap

@@ -27,7 +27,7 @@ import org.apache.eagle.common.config.EagleConfigConstants
 import org.apache.eagle.service.application.AppManagerConstants
 import org.apache.eagle.service.application.entity.TopologyOperationEntity.OPERATION
 import org.apache.eagle.service.application.entity.{TopologyExecutionEntity, TopologyExecutionStatus, TopologyOperationEntity}
-import org.apache.eagle.stream.application.{ApplicationManager, ApplicationSchedulerAsyncDAO, ExecutionPlatformFactory}
+import org.apache.eagle.stream.application.{ApplicationSchedulerAsyncDAO, ExecutionPlatformFactory}
 
 import scala.collection.JavaConversions
 import scala.util.{Failure, Success}
@@ -46,28 +46,31 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
         val topologyConfig: Config = ConfigFactory.parseString(topology.getContext, options)
 
         if(!topologyConfig.hasPath(EagleConfigConstants.APP_CONFIG)) {
-          throw new Exception("Fail to detect topology configuration")
-        }
-        val config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
-        val clusterType = if(config.hasPath(AppManagerConstants.CLUSTER_ENV)) config.getString(AppManagerConstants.CLUSTER_ENV) else AppManagerConstants.EAGLE_CLUSTER_STORM
-        topologyExecution.setEnvironment(clusterType)
+          topologyOperation.setMessage("Fail to detect topology configuration")
+          topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
+          _dao.updateOperationStatus(topologyOperation)
+        } else {
+          val config = topologyConfig.getConfig(EagleConfigConstants.APP_CONFIG).withFallback(_config)
+          val clusterType = if(config.hasPath(AppManagerConstants.CLUSTER_ENV)) config.getString(AppManagerConstants.CLUSTER_ENV) else AppManagerConstants.EAGLE_CLUSTER_STORM
+          topologyExecution.setEnvironment(clusterType)
 
-        Futures.future(new Callable[TopologyExecutionEntity]{
-          override def call(): TopologyExecutionEntity = {
-            topologyExecution.setStatus(TopologyExecutionStatus.STARTING)
-            _dao.updateTopologyExecutionStatus(topologyExecution)
-            ExecutionPlatformFactory.getApplicationManager(clusterType).start(topology, topologyExecution, config)
-            topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
-            topologyExecution
+          Futures.future(new Callable[TopologyExecutionEntity]{
+            override def call(): TopologyExecutionEntity = {
+              topologyExecution.setStatus(TopologyExecutionStatus.STARTING)
+              _dao.updateTopologyExecutionStatus(topologyExecution)
+              ExecutionPlatformFactory.getApplicationManager(clusterType).start(topology, topologyExecution, config)
+              topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
+              topologyExecution
+            }
+          }, context.dispatcher) onComplete {
+            case Success(topologyExecutionEntity) =>
+              topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
+              updateStatus(topologyExecution, topologyOperation)
+            case Failure(ex) =>
+              topologyOperation.setMessage(ex.getMessage)
+              topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
+              _dao.updateOperationStatus(topologyOperation)
           }
-        }, context.dispatcher) onComplete {
-          case Success(topologyExecutionEntity) =>
-            topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
-            updateStatus(topologyExecution, topologyOperation)
-          case Failure(ex) =>
-            topologyOperation.setMessage(ex.getMessage)
-            topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
-            _dao.updateOperationStatus(topologyOperation)
         }
 
       case Failure(ex) =>
@@ -159,10 +162,6 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
           log.error(s"Fail to load any topologyExecutionEntity due to Exception: ${ex.getMessage}")
       }
     case TerminatedEvent =>
-      if(ApplicationManager.executorService != null && !ApplicationManager.executorService.isShutdown) {
-        log.info("Going to shutdown executorService ...")
-        ApplicationManager.executorService.shutdownNow()
-      }
       context.stop(self)
     case m@_ =>
       log.warning("Unsupported operation $m")

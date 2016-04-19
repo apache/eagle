@@ -97,15 +97,13 @@ class StormExecutionPlatform extends ExecutionPlatform {
       return
     }
 
-    try {
-      topology.getType match {
-        case TopologyDescriptionEntity.TYPE.CLASS =>
-          TopologyFactory.submit(topology.getExeClass, newConfig)
-        case TopologyDescriptionEntity.TYPE.DYNAMIC =>
-          StormDynamicTopology.submit(topology.getExeClass, newConfig)
-        case m@_ =>
-          throw new InvalidTopologyException("Unsupported topology type: " + topology.getType)
-      }
+    topology.getType match {
+      case TopologyDescriptionEntity.TYPE.CLASS =>
+        TopologyFactory.submit(topology.getExeClass, newConfig)
+      case TopologyDescriptionEntity.TYPE.DYNAMIC =>
+        StormDynamicTopology.submit(topology.getExeClass, newConfig)
+      case m@_ =>
+        throw new InvalidTopologyException("Unsupported topology type: " + topology.getType)
     }
     topologyExecution.setFullName(fullName)
     topologyExecution.setStatus(TopologyExecutionStatus.STARTED)
@@ -124,15 +122,10 @@ class StormExecutionPlatform extends ExecutionPlatform {
   }
 
   def stopLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
-    try{
-      ApplicationManager.stop(name)
-    } catch {
-      case ex: Throwable =>
-        LOG.error(ex.getMessage)
-    }
+    ApplicationManager.stop(name)
+    ApplicationManager.remove(name)
     topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
     topologyExecution.setDescription("")
-    ApplicationManager.remove(name)
   }
 
 

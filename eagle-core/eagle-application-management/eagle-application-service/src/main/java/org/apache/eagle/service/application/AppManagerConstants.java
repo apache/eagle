@@ -36,15 +36,7 @@ public class AppManagerConstants {
     public final static String EAGLE_CLUSTER_STORM = "storm";
     public final static String EAGLE_CLUSTER_SPARK = "spark";
 
-    public final static String APP_WORKER_THREADS_CORE_SIZE = "appWorkerThreadPoolCoreSize";
-    public final static String APP_WORKER_THREADS_MAX_SIZE = "appWorkerThreadPoolMaxSize";
-
     public final static String APP_COMMAND_LOADER_INTERVAL = "appCommandLoaderInterval";
     public final static String APP_HEALTH_CHECK_INTERVAL = "appHealthCheckInterval";
-
-    private static final int CONNECTION_TIMEOUT = 10000;
-    private static final int READ_TIMEOUT = 10000;
-    private static final String XML_HTTP_HEADER = "Accept";
-    private static final String XML_FORMAT = "application/xml";
 
 }
