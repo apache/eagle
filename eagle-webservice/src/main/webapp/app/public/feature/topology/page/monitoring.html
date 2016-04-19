@@ -21,7 +21,9 @@
 				</thead>
 				<tbody>
 				<tr>
-					<td>{{item.status}}</td>
+					<td class="text-center">
+						<span class="label label-{{_parent.getStatusClass(item.status)}}">{{item.status}}</span>
+					</td>
 					<td><a ng-click="_parent.showTopologyDetail(item)">{{item.tags.topology}}</a></td>
 					<td>{{item.tags.site}}</td>
 					<td>{{item.tags.application}}</td>
@@ -85,7 +87,9 @@
 						</tr>
 						<tr>
 							<th>Status</th>
-							<td>{{currentTopologyExecution.status || "-"}}</td>
+							<td>
+								<span class="label label-{{getStatusClass(currentTopologyExecution.status)}}">{{currentTopologyExecution.status}}</span>
+							</td>
 						</tr>
 						<tr>
 							<th>Mode</th>
@@ -97,7 +101,10 @@
 						</tr>
 						<tr>
 							<th>Url</th>
-							<td>{{currentTopologyExecution.url || "-"}}</td>
+							<td>
+								<a ng-if="currentTopologyExecution.url" href="{{currentTopologyExecution.url}}" target="_blank">{{currentTopologyExecution.url}}</a>
+								<span ng-if="!currentTopologyExecution.url">-</span>
+							</td>
 						</tr>
 						<tr>
 							<th>Description</th>

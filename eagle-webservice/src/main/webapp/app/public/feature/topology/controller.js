@@ -71,6 +71,22 @@
 			});
 		};
 
+		$scope.getStatusClass = function (status) {
+			switch (status) {
+				case "NEW":
+					return "info";
+				case "STARTING":
+				case "STOPPING":
+					return "warning";
+				case "STARTED":
+					return "success";
+				case "STOPPED":
+					return "danger";
+				default:
+					return "default";
+			}
+		};
+
 		// ==================== Initialization ====================
 		refreshExecutionList();
 		topologyRefreshInterval = $interval(refreshExecutionList, 10 * 1000);
