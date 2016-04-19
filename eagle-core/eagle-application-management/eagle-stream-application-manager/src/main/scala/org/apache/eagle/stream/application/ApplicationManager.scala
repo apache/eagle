@@ -22,6 +22,7 @@ import java.util
 
 import com.google.common.base.Preconditions
 import org.apache.eagle.service.application.entity.TopologyExecutionStatus
+import org.apache.eagle.stream.application.impl.StormExecutionPlatform
 import org.slf4j.{Logger, LoggerFactory}
 
 
@@ -80,12 +81,19 @@ object ApplicationManager {
   }
 
   def getTopologyStatus(status: String): String = {
-    if(!status.equalsIgnoreCase(TopologyExecutionStatus.STOPPED))
-      TopologyExecutionStatus.STARTED
-    else
-      TopologyExecutionStatus.STOPPED
+    if(whereIn(status, StormExecutionPlatform.KILLED))
+      return TopologyExecutionStatus.STOPPING
+    return TopologyExecutionStatus.STARTED
   }
 
+  private def whereIn(status: String, inStatuses: String*): Boolean = {
+    for (_status <- inStatuses) {
+      if (_status.equalsIgnoreCase(status)) {
+        return true
+      }
+    }
+    return false
+  }
   private def whereIn(state: Thread.State, inStates: Thread.State*): Boolean = {
     for (_state <- inStates) {
       if (_state eq state) {

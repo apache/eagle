@@ -32,6 +32,12 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConversions
 
+object StormExecutionPlatform {
+  val ACTIVE: String = "ACTIVE"
+  val INACTIVE: String = "INACTIVE"
+  val KILLED: String = "KILLED"
+  val REBALANCING: String = "REBALANCING"
+}
 
 class StormExecutionPlatform extends ExecutionPlatform {
   val LOG = LoggerFactory.getLogger(classOf[StormExecutionPlatform])
@@ -116,13 +122,18 @@ class StormExecutionPlatform extends ExecutionPlatform {
       stopLocal(name, topologyExecution)
     } else {
       getNimbusClient(config).getClient.killTopology(name)
-      topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
-      topologyExecution.setDescription("")
+      topologyExecution.setStatus(TopologyExecutionStatus.STOPPING)
+      //topologyExecution.setDescription("")
     }
   }
 
   def stopLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
-    ApplicationManager.stop(name)
+    try{
+      ApplicationManager.stop(name)
+    } catch {
+      case ex: Throwable =>
+        LOG.warn(s"catch a stopLocal exception due to $ex")
+    }
     ApplicationManager.remove(name)
     topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
     topologyExecution.setDescription("")

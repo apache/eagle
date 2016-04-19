@@ -46,8 +46,8 @@ case class LoadTopologyFailureException(message:String) extends Exception(messag
  */
 class ApplicationScheduler {
   //val config = ConfigFactory.load()
-  val DEFAULT_COMMAND_LOADER_INTERVAL = 5
-  val DEFAULT_HEALTH_CHECK_INTERVAL = 10
+  val DEFAULT_COMMAND_LOADER_INTERVAL = 2
+  val DEFAULT_HEALTH_CHECK_INTERVAL = 5
 
   def start(config: Config) = {
     val system = ActorSystem("application-manager-scheduler", config)
