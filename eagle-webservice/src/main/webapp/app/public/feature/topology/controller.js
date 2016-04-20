@@ -211,7 +211,7 @@
 			{field: "version", optional: true},
 			{field: "description", optional: true, type: "blob"}
 		];
-		var topologyUpdateAttrs = $.extend(topologyDefineAttrs, [{field: "topology", name: "name", readonly: true}]);
+		var topologyUpdateAttrs = $.extend(topologyDefineAttrs.concat(), [{field: "topology", name: "name", readonly: true}]);
 
 		$scope.topologyList = Entities.queryEntities("TopologyDescriptionService");
 
