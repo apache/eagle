@@ -200,16 +200,23 @@
 		PageConfig.hideSite = true;
 		PageConfig.pageTitle = "Topology";
 
+		var typeList = ["CLASS", "DYNAMIC"];
+		var topologyDefineAttrs = [
+			{field: "topology", name: "name"},
+			{field: "type", type: "select", valueList: typeList},
+			{field: "exeClass", name: "execution entry", description: function (entity) {
+				if(entity.type === "CLASS") return "Class implement interface 'org.apache.eagle.stream.application.TopologyExecutable'";
+				if(entity.type === "DYNAMIC") return "DSL based topology definition";
+			}, type: "blob", rows: 5},
+			{field: "version", optional: true},
+			{field: "description", optional: true, type: "blob"}
+		];
+		var topologyUpdateAttrs = $.extend(topologyDefineAttrs, [{field: "topology", name: "name", readonly: true}]);
+
 		$scope.topologyList = Entities.queryEntities("TopologyDescriptionService");
 
 		$scope.newTopology = function () {
-			UI.createConfirm("Topology", {}, [
-				{field: "topology", name: "name"},
-				{field: "exeClass", name: "execution class", type: "blob", rows: 5},
-				{field: "type"},
-				{field: "version", optional: true},
-				{field: "description", optional: true, type: "blob"}
-			], function (entity) {
+			UI.createConfirm("Topology", {}, topologyDefineAttrs, function (entity) {
 				if(common.array.find(entity.topology, $scope.topologyList, "tags.topology", false, false)) {
 					return "Topology name conflict!";
 				}
@@ -225,13 +232,7 @@
 		};
 
 		$scope.updateTopology = function (topology) {
-			UI.updateConfirm("Topology", $.extend({}, topology, {topology: topology.tags.topology}), [
-				{field: "topology", name: "name", readonly: true},
-				{field: "exeClass", name: "execution class", type: "blob", rows: 5},
-				{field: "type"},
-				{field: "version", optional: true},
-				{field: "description", optional: true, type: "blob"}
-			]).then(null, null, function(holder) {
+			UI.updateConfirm("Topology", $.extend({}, topology, {topology: topology.tags.topology}), topologyUpdateAttrs).then(null, null, function(holder) {
 				holder.entity.tags = {
 					topology: holder.entity.topology
 				};

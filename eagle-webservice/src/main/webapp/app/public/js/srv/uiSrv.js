@@ -68,6 +68,13 @@
 			});
 
 			// Function
+			$scope.getFieldDescription = function (field) {
+				if(typeof field.description === "function") {
+					return field.description($scope.entity);
+				}
+				return field.description || ((field.name || field.field) + '...');
+			};
+
 			$scope.emptyFieldList = function() {
 				return $.map(fieldList, function(field) {
 					if(!field.optional && !entity[field.field]) {
@@ -193,11 +200,11 @@
 								'<span ng-if="!field.optional">*</span> ' +
 								'{{field.name || field.field}}' +
 							'</label>' +
-							'<textarea class="form-control" placeholder="{{field.description || (field.name || field.field) + \'...\'}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
-							'<select class="form-control" ng-model="entity[field.field]" ng-init="entity[field.field] = field.valueList[0]" ng-switch-when="select">' +
+							'<textarea class="form-control" placeholder="{{getFieldDescription(field)}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
+							'<select class="form-control" ng-model="entity[field.field]" ng-init="entity[field.field] = entity[field.field] || field.valueList[0]" ng-switch-when="select">' +
 								'<option ng-repeat="value in field.valueList">{{value}}</option>' +
 							'</select>' +
-							'<input type="text" class="form-control" placeholder="{{field.description || (field.name || field.field) + \'...\'}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
+							'<input type="text" class="form-control" placeholder="{{getFieldDescription(field)}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
 						'</div>' +
 					'</div>' +
 					'<div class="modal-footer">' +

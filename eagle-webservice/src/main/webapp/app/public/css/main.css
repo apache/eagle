@@ -779,6 +779,14 @@ td.text-ellipsis {
 	line-height: 100%;
 }
 
+pre.noWrap {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	margin: 0;
+	padding: 0;
+}
+
 .noSelect {
 	-khtml-user-select: none;
 	-moz-user-select: none;

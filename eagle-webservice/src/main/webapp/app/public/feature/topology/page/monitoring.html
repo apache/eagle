@@ -57,7 +57,7 @@
 
 <!-- Modal: Topology Detail -->
 <div class="modal fade" id="topologyMDL" tabindex="-1" role="dialog">
-	<div class="modal-dialog" role="document">
+	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -118,24 +118,26 @@
 				</table>
 
 				<h3>Latest Operations</h3>
-				<table class="table table-bordered">
-					<thead>
-						<tr>
-							<th>Date Time</th>
-							<th>Operation</th>
-							<th>Status</th>
-                            <th>Message</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="action in currentTopologyExecutionOptList track by $index">
-							<td>{{common.format.date(action.lastModifiedDate) || "-"}}</td>
-							<td>{{action.tags.operation}}</td>
-							<td>{{action.status}}</td>
-                            <td>{{action.message}}</td>
-						</tr>
-					</tbody>
-				</table>
+				<div class="table-responsive">
+					<table class="table table-bordered table-sm margin-bottom-none">
+						<thead>
+							<tr>
+								<th>Date Time</th>
+								<th>Operation</th>
+								<th>Status</th>
+								<th>Message</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="action in currentTopologyExecutionOptList track by $index">
+								<td>{{common.format.date(action.lastModifiedDate) || "-"}}</td>
+								<td>{{action.tags.operation}}</td>
+								<td>{{action.status}}</td>
+								<td><pre class="noWrap">{{action.message}}</pre></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">
