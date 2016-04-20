@@ -17,11 +17,11 @@
 
 package org.apache.eagle.notification.utils;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.CollectionType;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +30,7 @@ import java.util.Map;
  * Common methods for Notification Plugin
  */
 public class NotificationPluginUtils {
+	private final static ObjectMapper OBJECT_MAPPER = TaggedLogAPIEntity.buildObjectMapper();
 	/**
 	 * Fetch Notification specific property value
 	 * @param key
@@ -50,9 +51,8 @@ public class NotificationPluginUtils {
 	 * @throws Exception
      */
 	public static List<Map<String,String>> deserializeNotificationConfig( String notificationDef ) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		CollectionType mapCollectionType = mapper.getTypeFactory().constructCollectionType(List.class, Map.class);
-		return mapper.readValue( notificationDef , mapCollectionType);
+		CollectionType mapCollectionType = OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, Map.class);
+		return OBJECT_MAPPER.readValue(notificationDef, mapCollectionType);
 	}
 
 	/**
@@ -62,7 +62,6 @@ public class NotificationPluginUtils {
 	 * @throws Exception
      */
 	public static String objectToStr( Object obj ) throws  Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(obj);
+		return OBJECT_MAPPER.writeValueAsString(obj);
 	}
 }

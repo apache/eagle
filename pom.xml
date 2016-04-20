@@ -182,6 +182,7 @@
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <commons-beanutils.version>1.8.0</commons-beanutils.version>
         <commons-collections4.version>4.0</commons-collections4.version>
+        <commons-io.version>2.4</commons-io.version>
 
         <!-- Configuration -->
         <archaius.version>0.6.1</archaius.version>
@@ -318,6 +319,11 @@
                 <groupId>commons-dbcp</groupId>
                 <artifactId>commons-dbcp</artifactId>
                 <version>${commons-dbcp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scala-lang</groupId>

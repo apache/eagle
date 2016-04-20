@@ -37,10 +37,27 @@
 				<div class="inline-group">
 					<dl><dt>Description</dt><dd>{{policy.description}}</dd></dl>
 				</div>
-				<div class="inline-group">
+				<!--div class="inline-group">
 					<dl><dt>Alert</dt><dd>
 						<a href="mailto:{{mail}}" ng-repeat="mail in policy.__mailList track by $index" style="margin-right: 10px;">{{mail}}</a>
+						<div tabs>
+							<pane ng-repeat="notification in policy.__notificationList track by $index" data-title="{{notification.notificationType}}">
+							</pane>
+						</div>
 					</dd></dl>
+				</div-->
+				<label>Notification</label>
+				<div tabs>
+					<pane ng-repeat="notification in policy.__notificationList track by $index" data-title="{{notification.notificationType}}">
+						<table class="table table-bordered">
+							<tbody>
+								<tr ng-repeat="(key, value) in notification track by $index">
+									<th width="30%">{{key}}</th>
+									<td>{{value}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</pane>
 				</div>
 			</div>
 			<div class="col-xs-4 text-right" ng-show="Auth.isRole('ROLE_ADMIN')">

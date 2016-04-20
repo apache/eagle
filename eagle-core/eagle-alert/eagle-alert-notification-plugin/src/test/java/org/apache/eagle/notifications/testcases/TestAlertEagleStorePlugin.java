@@ -21,6 +21,7 @@ import com.typesafe.config.ConfigFactory;
 import junit.framework.Assert;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.notification.plugin.AlertEagleStorePlugin;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,7 +43,8 @@ public class TestAlertEagleStorePlugin {
 
         AlertAPIEntity alert = new AlertAPIEntity();
         alert.setDescription("");
+        alert.setAlertContext(new AlertContext().toJsonString());
         plugin.onAlert(alert);
-        Assert.assertTrue(plugin.getStatus().successful);
+        Assert.assertTrue(plugin.getStatusList().get(0).successful);
     }
 }

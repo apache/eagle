@@ -42,7 +42,7 @@ public class TestAlertKafkaPlugin {
 		AlertDefinitionAPIEntity def = new AlertDefinitionAPIEntity();
 		def.setTags(new HashMap<String, String>());
 		def.getTags().put(Constants.POLICY_ID, "testPolicyId");
-		def.setNotificationDef("[{\"notificationType\":\"kafka\",\"topic\":\"testTopic\"}]");
+		def.setNotificationDef("[{\"notificationType\":\"kafka\",\"kafka_broker\":\"sandbox.hortonworks.com:6667\",\"topic\":\"sandbox_hdfs_audit_log\"}]");
 		plugin.init(config, Arrays.asList(def));
 
 		AlertAPIEntity alert = new AlertAPIEntity();
@@ -52,6 +52,6 @@ public class TestAlertKafkaPlugin {
 		alert.setAlertContext(new AlertContext().toJsonString());
 		plugin.onAlert(alert);
 		Thread.sleep(1000); // wait for message sent out
-		Assert.assertTrue(plugin.getStatus().successful);
+		Assert.assertTrue(plugin.getStatusList().get(0).successful);
 	}
 }
