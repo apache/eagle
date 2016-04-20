@@ -132,7 +132,7 @@ class StormExecutionPlatform extends ExecutionPlatform {
   def stopLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
       val taskWorker = ApplicationManager.stop(name)
       topologyExecution.setStatus(ApplicationManager.getWorkerStatus(taskWorker.getState))
-      topologyExecution.setDescription(s"topology status is ${taskWorker.getState} during its stopping")
+      topologyExecution.setDescription(s"topology status is ${taskWorker.getState}")
       /*try{
         ApplicationManager.remove(name)
       } catch {

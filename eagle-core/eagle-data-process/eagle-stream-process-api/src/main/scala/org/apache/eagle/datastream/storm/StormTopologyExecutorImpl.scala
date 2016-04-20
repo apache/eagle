@@ -97,7 +97,9 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
           Utils.sleep(Integer.MAX_VALUE)
         } catch {
           case _: Throwable =>
-            throw new Exception("Catch a runtime exception during sleeping")
+            cluster.killTopology(topologyName)
+            cluster.shutdown
+            //throw new Exception("Catch a runtime exception during sleeping")
         }
       }
     }
