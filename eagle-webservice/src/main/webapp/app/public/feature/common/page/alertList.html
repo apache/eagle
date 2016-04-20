@@ -35,10 +35,9 @@
 						<th width="170" sortpath="timestamp">Alert Time</th>
 						<th width="170" sortpath="alertContext.properties.timestamp">Message Time</th>
 						<th width="105" sortpath="tags.application">Application</th>
-						<!--th width="70" sortpath="severity">Type</th-->
 						<th width="150" sortpath="tags.policyId">Policy Name</th>
 						<th width="60" sortpath="alertContext.properties.user">User</th>
-						<th width="150" sortpath="alertContext.properties.host">Host</th>
+						<th width="150" sortpath="tags.alertSource">Source</th>
 						<th sortpath="alertContext.properties.emailMessage">Description</th>
 						<th width="50"> </th>
 					</tr>
@@ -48,14 +47,13 @@
 						<td>{{common.format.date(item.timestamp)}}</td>
 						<td>{{common.format.date(item.alertContext.properties.timestamp)}}</td>
 						<td>{{item.tags.application}}</td>
-						<!--td>{{item.severity}}</td-->
 						<td class="text-nowrap">
 							<a class="fa fa-share-square-o" ng-show="item.tags.policyId"
 							href="#/common/policyDetail/?policy={{item.tags.policyId}}&site={{item.tags.site}}&executor={{item.tags.alertExecutorId}}"> </a>
 							{{item.tags.policyId}}
 						</td>
 						<td>{{item.alertContext.properties.user}}</td>
-						<td>{{item.alertContext.properties.host}}</td>
+						<td>{{item.tags.alertSource}}</td>
 						<td>{{item.alertContext.properties.alertMessage}}</td>
 						<td><a href="#/common/alertDetail/{{item.encodedRowkey}}">Detail</a></td>
 					</tr>
