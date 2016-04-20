@@ -38,7 +38,7 @@ public class TestHbaseAuditLogProcessTopology {
         Config topoConfig = ConfigFactory.parseString(topoConfigStr, options);
         Config conf = topoConfig.getConfig(EagleConfigConstants.APP_CONFIG);
 
-        HbaseAuditLogProcessorTopology topology = new HbaseAuditLogProcessorTopology();
+        HbaseAuditLogMonitoringTopology topology = new HbaseAuditLogMonitoringTopology();
         //topology.submit("", conf);
     }
 }

@@ -28,7 +28,7 @@ import org.apache.eagle.security.hbase.sensitivity.HbaseResourceSensitivityDataJ
 import org.apache.eagle.stream.application.TopologyExecutable;
 
 
-public class HbaseAuditLogProcessorTopology implements TopologyExecutable {
+public class HbaseAuditLogMonitoringTopology implements TopologyExecutable {
     @Override
     public void submit(String application, Config config) {
         //Config baseConfig = ConfigFactory.load();
