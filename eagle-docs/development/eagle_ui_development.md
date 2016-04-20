@@ -20,8 +20,8 @@ limitations under the License.
 Eagle UI Development Guide
 -----------------------------------------------------
 Eagle provide easy way for customize UI development.
-If you want to build customize page, you can follow [Customize Pages](#customizePage)
+If you want to build customize page, you can follow [Customize Pages](customize-pages)
 
 ###
 
-### <a name="customizePage"></a>Customize Pages
+### Customize Pages
