@@ -112,7 +112,7 @@ class StormExecutionPlatform extends ExecutionPlatform {
         throw new InvalidTopologyException("Unsupported topology type: " + topology.getType)
     }
     topologyExecution.setFullName(fullName)
-    topologyExecution.setStatus(TopologyExecutionStatus.STARTED)
+    //topologyExecution.setStatus(TopologyExecutionStatus.STARTED)
   }
 
   override def stop(topologyExecution: TopologyExecutionEntity, config: Config): Unit = {
@@ -128,15 +128,16 @@ class StormExecutionPlatform extends ExecutionPlatform {
   }
 
   def stopLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
-    try{
-      ApplicationManager.stop(name)
-    } catch {
-      case ex: Throwable =>
-        LOG.warn(s"catch a stopLocal exception due to $ex")
-    }
-    ApplicationManager.remove(name)
-    topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
-    topologyExecution.setDescription("")
+      val taskWorker = ApplicationManager.stop(name)
+      topologyExecution.setStatus(ApplicationManager.getWorkerStatus(taskWorker.getState))
+      topologyExecution.setDescription("")
+      try{
+        ApplicationManager.remove(name)
+      } catch {
+        case ex: IllegalArgumentException =>
+          LOG.warn(s"ApplicationManager.remove($name) failed as it has been removed")
+      }
+
   }
 
 
