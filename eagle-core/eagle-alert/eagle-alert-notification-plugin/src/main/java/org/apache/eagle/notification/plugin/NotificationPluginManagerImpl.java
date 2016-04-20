@@ -64,7 +64,7 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
                 policyNotificationMapping.put(entity.getTags().get(Constants.POLICY_ID) , plugins.values());
             }
         }catch (Exception ex ){
-            LOG.error("Error initializing poliy/notification mapping ", ex);
+            LOG.error("Error initializing policy/notification mapping ", ex);
             throw new IllegalStateException(ex);
         }
     }
@@ -74,7 +74,7 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
         String policyId = entity.getTags().get(Constants.POLICY_ID);
         Collection<NotificationPlugin> plugins = policyNotificationMapping.get(policyId);
         if(plugins == null || plugins.size() == 0) {
-            LOG.debug("no plugin found for policy " + policyId);
+            LOG.warn("no alert notification plugins found for policy " + policyId);
             return;
         }
         for(NotificationPlugin plugin : plugins){
@@ -115,20 +115,12 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
 
             // iterate current notifications and update it individually
             List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(alertDef.getNotificationDef());
-            for( Map<String,String> notificationConf : notificationConfigCollection ) {
-                String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
-                // for backward compatibility, use email for default notification type
-                if(notificationType == null){
-                    notificationType = NotificationConstants.EMAIL_NOTIFICATION;
-                }
-                NotificationPlugin plugin = plugins.get(notificationType);
-                if(plugin != null){
-                    plugin.update(policyId, notificationConf, false);
-                }
+            for(NotificationPlugin plugin: plugins.values()) {
+                plugin.update(policyId, notificationConfigCollection, false);
             }
 
             policyNotificationMapping.put(policyId, plugins.values());// update policy - notification types map
-            LOG.info("Successfully broadcasted policy updates to all Notification Plugins ...");
+            LOG.info("Successfully broadcast policy updates to all Notification Plugins ...");
         } catch (Exception e) {
             LOG.error("Error broadcasting policy notification changes ", e);
         }
@@ -141,12 +133,13 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
         // mapping from notificationType to plugin
         Map<String, NotificationPlugin>  notifications = new HashMap<>();
         List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(policy.getNotificationDef());
-        for( Map<String,String> notificationConf : notificationConfigCollection ){
+        for(Map<String,String> notificationConf : notificationConfigCollection ){
             String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
             // for backward compatibility, by default notification type is email if notification type is not specified
             if(notificationType == null){
                 LOG.warn("notificationType is null so use default notification type email for this policy  " + policy);
                 notifications.put(NotificationConstants.EMAIL_NOTIFICATION, plugins.get(NotificationConstants.EMAIL_NOTIFICATION));
+                notifications.put(NotificationConstants.EAGLE_STORE, plugins.get(NotificationConstants.EAGLE_STORE));
             }else if(!plugins.containsKey(notificationType)){
                 LOG.warn("No NotificationPlugin supports this notificationType " + notificationType);
             }else {

@@ -109,9 +109,12 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
             return EntityQualifierUtils.parseList(value);
         } else if (tokenType.equals(TokenType.NUMBER)) {
             // TODO: currently only treat all number value as double
-            if(columnType.equals(Long.class)) {
+            // NOTE: Must use Number Object instead of primitive type
+            if(columnType.equals(Long.class) || columnType.equals(long.class)) {
                 return Long.parseLong(value);
-            } else {
+            } else if(columnType.equals(int.class) || columnType.equals(Integer.class)){
+                return Integer.parseInt(value);
+            }else {
                 return Double.parseDouble(value);
             }
         } else if (op.equals(ComparisonOperator.LIKE) && value.equals(".*")){
@@ -145,6 +148,7 @@ public class ExpressionCriterionBuilder implements CriterionBuilder {
     static{
         _opSqlEnum.put(ComparisonOperator.CONTAINS, SqlEnum.LIKE);
         _opSqlEnum.put(ComparisonOperator.EQUAL, SqlEnum.EQUAL);
+        _opSqlEnum.put(ComparisonOperator.NOT_EQUAL, SqlEnum.NOT_EQUAL);
         _opSqlEnum.put(ComparisonOperator.GREATER, SqlEnum.GREATER_THAN);
         _opSqlEnum.put(ComparisonOperator.GREATER_OR_EQUAL, SqlEnum.GREATER_EQUAL);
         _opSqlEnum.put(ComparisonOperator.IN, SqlEnum.IN);

@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+@Deprecated
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "flavor", visible=true)
 public class NotificationConfig implements Serializable{
 	private static final long serialVersionUID = 1L;

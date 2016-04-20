@@ -16,9 +16,11 @@
  */
 package org.apache.eagle.notification.plugin;
 
+import java.util.Map;
 import java.util.Properties;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.notification.base.NotificationConstants;
 import org.apache.eagle.notification.utils.NotificationPluginUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 
@@ -28,10 +30,11 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 public enum KafkaProducerSingleton {
 	INSTANCE;	
 
-	public KafkaProducer<String, Object>  getProducer(Config config) throws Exception{
+	public KafkaProducer<String, Object>  getProducer(Map<String, String> config) throws Exception{
 		Properties configMap = new Properties();
-		configMap.put("bootstrap.servers", NotificationPluginUtils.getPropValue(config, "kafka_broker"));
-		configMap.put("metadata.broker.list", NotificationPluginUtils.getPropValue(config, "kafka_broker"));
+		String broker_list = config.get(NotificationConstants.BROKER_LIST);
+		configMap.put("bootstrap.servers", broker_list);
+		configMap.put("metadata.broker.list", broker_list);
 		configMap.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		configMap.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		configMap.put("request.required.acks", "1");	     

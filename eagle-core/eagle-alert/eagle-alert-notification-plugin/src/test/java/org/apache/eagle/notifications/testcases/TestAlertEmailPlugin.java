@@ -42,15 +42,15 @@ public class TestAlertEmailPlugin {
         AlertDefinitionAPIEntity def = new AlertDefinitionAPIEntity();
         def.setTags(new HashMap<String, String>());
         def.getTags().put(Constants.POLICY_ID, "testPolicyId");
-        def.setNotificationDef("[{\"notificationType\":\"email\",\"sender\":\"eagle@apache.org\",\"recipients\":\"eagle@apache.org\",\"subject\":\"last check point time lag found.\",\"flavor\":\"email\",\"id\":\"email_1\",\"tplFileName\":\"\"}]");
+        def.setNotificationDef("[{\"notificationType\":\"email\",\"sender\":\"eagle@apache.org\",\"recipients\":\"eagle@apache.org\",\"subject\":\"last check point time lag found.\",\"tplFileName\":\"\"}]");
         plugin.init(config, Arrays.asList(def));
 
         AlertAPIEntity alert = new AlertAPIEntity();
         alert.setTags(new HashMap<String, String>());
         alert.getTags().put(Constants.POLICY_ID, "testPolicyId");
         alert.setDescription("");
-        alert.setAlertContext(new AlertContext());
+        alert.setDecodedAlertContext(new AlertContext());
         plugin.onAlert(alert);
-        Assert.assertTrue(plugin.getStatus().successful);
+        Assert.assertTrue(plugin.getStatusList().get(0).successful);
     }
 }
