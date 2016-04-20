@@ -54,6 +54,25 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
         Assert.assertNotNull(result);
     }
 
+    /**
+     * To make sure not exception like Comparisons between 'LONG VARCHAR (UCS_BASIC)' and 'LONG VARCHAR (UCS_BASIC)' are not supported
+     *
+     * @throws QueryCompileException
+     * @throws IOException
+     */
+    @Test
+    public void testReadByStringTypedField() throws QueryCompileException, IOException {
+        RawQuery rawQuery = new RawQuery();
+        rawQuery.setQuery("TestTimeSeriesAPIEntity[@cluster=\"c4ut\" AND @field7 =\"some_field7_value\"]{*}");
+        System.out.println(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(baseTimestamp));
+        rawQuery.setEndTime(DateTimeUtil.millisecondsToHumanDateWithMilliseconds(baseTimestamp+2000));
+        rawQuery.setPageSize(1000);
+        CompiledQuery query = new CompiledQuery(rawQuery);
+        QueryResult<TestTimeSeriesAPIEntity> result = storage.query(query, entityDefinition);
+        Assert.assertNotNull(result);
+    }
+
     @Test
     public void testReadByNotEqualCondition() throws QueryCompileException, IOException {
         RawQuery rawQuery = new RawQuery();
