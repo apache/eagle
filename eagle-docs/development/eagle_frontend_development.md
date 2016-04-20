@@ -17,11 +17,11 @@ limitations under the License.
 {% endcomment %}
 -->
 
-Eagle UI Development Guide
+Eagle Frontend Development Guide
 -----------------------------------------------------
 Eagle provide easy way for customize UI development.
-If you want to build customize page, you can follow [Customize Pages](customize-pages)
+If you want to build customize page, you can follow [Customize Pages](#customize-pages)
 
-###
+### 
 
 ### Customize Pages
