@@ -16,11 +16,14 @@
  */
 package org.apache.eagle.alert.entity;
 
+
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
@@ -30,7 +33,15 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.ALERT_SERVICE_ENDPOINT_NAME)
 @TimeSeries(true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Tags({"site", "hostname", "application", "policyId", "sourceStreams", "alertSource", "alertExecutorId"})
+@Tags({
+		"site",
+		"hostname",
+		"application",
+		"policyId",
+		"sourceStreams",
+		"alertSource",
+		"alertExecutorId"
+})
 public class AlertAPIEntity extends TaggedLogAPIEntity{
 	@Column("description")
 	private String description;
@@ -70,20 +81,23 @@ public class AlertAPIEntity extends TaggedLogAPIEntity{
 		_pcs.firePropertyChange("remediationCallback", null, null);
 	}
 
+    @JsonIgnore
 	public String getAlertContext() {
 		return alertContext;
 	}
 
+    @JsonProperty("alertContext")
 	public AlertContext getWrappedAlertContext() {
 		return AlertContext.fromJsonString(alertContext);
 	}
-	
+
+    @JsonIgnore
 	public void setAlertContext(String alertContext) {
 		this.alertContext = alertContext;
 		_pcs.firePropertyChange("alertContext", null, null);
 	}
-
-	public void setAlertContext(AlertContext alertContext) {
+    @JsonProperty("alertContext")
+	public void setDecodedAlertContext(AlertContext alertContext) {
 		if(alertContext != null) this.alertContext = alertContext.toJsonString();
 		_pcs.firePropertyChange("alertContext", null, null);
 	}

@@ -33,6 +33,7 @@ import com.typesafe.config.ConfigObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 public class AlertEmailGenerator{
 	private String tplFile;
 	private String sender;
