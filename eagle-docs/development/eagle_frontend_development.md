@@ -50,7 +50,10 @@ You can see the original pages provided by Eagle frontend are also designed as `
 After maven building, all the features will compress in the tar file.
 But you can also just copy feature into `lib/tomcat/webapps/eagle-service/ui/feature/` and restart tomcat. It will also works.
 
-#### Build a Customize Feature
+#### Build a Customize Feature Page
+After reading follow steps, we recommend you can view the features already in Eagle.
+Which can help your understanding more fast.
+
 ##### Step 1
 Create a folder under `eagle-webservice/src/main/webapp/app/public/feature`. create follow files in it:
 * controller.js
@@ -60,6 +63,41 @@ Create a folder under `eagle-webservice/src/main/webapp/app/public/feature`. cre
 In `controller.js` code the feature entry function.
 ``` javascript
 (function() {
-	'use strict';
+    'use strict';
+
+    var featureControllers = angular.module("featureControllers");
+    var feature = featureControllers.register("yourFeatureName");
 });
 ```
+`featureControllers` provide the `register` function to register the feature in frontend.
+When call the `feature`, Eagle will transform the request to the feature.
+
+##### Step 3
+Same as native angularJS, using `controller` to create a page controller.
+``` javascript
+feature.controller('yourCustomizePageName', function($scope, PageConfig, Site, Application, ...) {
+    // do something
+});
+```
+
+After register the `controller`, Eagle will auto create the route mapping for the page. Like `#/yourFeatureName/yourCustomizePageName`.
+Now create the `yourCustomizePageName.html` in `page` folder and Eagle will automatic link the controller with it.
+
+This document do not provide the angularJS guide.
+If you are not familiar with angularJS, please click [HERE](https://angularjs.org/) for study.
+
+##### Step 4
+After build pages, register them in navigation sidebar:
+``` javascript
+feature.navItem("yourCustomizePageName", "navigationDisplayName", "navigationDisplayIcon");
+```
+
+`navigationDisplayIcon` use the icon from [Font Awesome](https://fortawesome.github.io/Font-Awesome/).
+You can set the icon name without `fa fa-` prefix.
+
+PS: You need not register all the pages in navigation bar.
+Just register some of the pages and use link with others to keep your side navigation clean.
+
+#### Build a Customize Management Feature Page
+Most of them are the same as [Build a Customize Feature Page](#build-a-customize-feature-page),
+just change to use `configController` to register the page controller and `configNavItem` to register management side navigation.
