@@ -62,7 +62,8 @@ class StormExecutionPlatform extends ExecutionPlatform {
     val worker: Thread = ApplicationManager.submit(topologyName, new Runnable {
       override def run(): Unit = {
         try {
-          topology.getType match {
+          val topologyType = topology.getType.toUpperCase()
+          topologyType match {
             case TopologyDescriptionEntity.TYPE.CLASS =>
               TopologyFactory.submit(topology.getExeClass, config)
             case TopologyDescriptionEntity.TYPE.DYNAMIC =>
@@ -103,7 +104,8 @@ class StormExecutionPlatform extends ExecutionPlatform {
       return
     }
 
-    topology.getType match {
+    val topologyType = topology.getType.toUpperCase()
+    topologyType match {
       case TopologyDescriptionEntity.TYPE.CLASS =>
         TopologyFactory.submit(topology.getExeClass, newConfig)
       case TopologyDescriptionEntity.TYPE.DYNAMIC =>
@@ -130,14 +132,13 @@ class StormExecutionPlatform extends ExecutionPlatform {
   def stopLocal(name: String, topologyExecution: TopologyExecutionEntity): Unit = {
       val taskWorker = ApplicationManager.stop(name)
       topologyExecution.setStatus(ApplicationManager.getWorkerStatus(taskWorker.getState))
-      topologyExecution.setDescription("")
-      try{
+      topologyExecution.setDescription(s"topology status is ${taskWorker.getState} during its stopping")
+      /*try{
         ApplicationManager.remove(name)
       } catch {
         case ex: IllegalArgumentException =>
           LOG.warn(s"ApplicationManager.remove($name) failed as it has been removed")
-      }
-
+      }*/
   }
 
 
@@ -178,6 +179,8 @@ class StormExecutionPlatform extends ExecutionPlatform {
         LOG.info("Status of topology: %s changed from %s to %s".format(topologyExecution.getFullName, currentStatus, newStatus))
         topologyExecution.setStatus(newStatus)
         topologyExecution.setDescription(String.format("Status of topology: %s changed from %s to %s", name, currentStatus, newStatus))
+      } else if(currentStatus.equalsIgnoreCase(TopologyExecutionStatus.STOPPED)) {
+        ApplicationManager.remove(name)
       }
     }catch {
       case ex: Throwable =>

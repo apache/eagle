@@ -96,7 +96,8 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
         try {
           Utils.sleep(Integer.MAX_VALUE)
         } catch {
-          case _: Throwable => () // Do nothing
+          case _: Throwable =>
+            throw new Exception("Catch a runtime exception during sleeping")
         }
       }
     }

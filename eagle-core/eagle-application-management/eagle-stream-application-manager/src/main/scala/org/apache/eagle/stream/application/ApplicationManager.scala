@@ -63,7 +63,7 @@ object ApplicationManager {
   def stop(id: AnyRef): TaskExecutor = {
     val worker: TaskExecutor = get(id)
     worker.interrupt
-    this.workerMap.remove(id)
+    //this.workerMap.remove(id)
     return worker
   }
 

@@ -96,7 +96,7 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
         topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.SUCCESS)
         updateStatus(topologyExecution, topologyOperation)
       case Failure(ex) =>
-        topologyOperation.setMessage(ex.getMessage)
+        topologyOperation.setMessage(ex.toString)
         topologyOperation.setStatus(TopologyOperationEntity.OPERATION_STATUS.FAILED)
         _dao.updateOperationStatus(topologyOperation)
     }
@@ -130,7 +130,7 @@ private[scheduler] class AppCommandExecutor extends Actor with ActorLogging {
           stop(topologyExecution, topologyOperation)
         case m@_ =>
           log.warning("Unsupported operation: " + topologyOperation)
-          throw new Exception("Unsupported operation: " + topologyOperation)
+          throw new Exception(s"Unsupported operation: ${topologyOperation.getOperation}, possible values are START/STOP")
       }
     } catch {
       case e: Throwable =>
