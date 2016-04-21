@@ -21,9 +21,9 @@ Guide To Install Eagle Hortonworks sandbox.
 ===============================================
 * Prerequisite
 * Download + Patch + Build
-* Setup Hadoop Environment In Sandbox
-* Injection of hdfs-audit.logs to Kafka.
-* Install Eagle In Sandbox
+* Setup Hadoop Environment.
+* Stream HDFS audit logs into Kafka.
+* Install Eagle.
 * Demos "HDFS File System" & "Hive" monitoring
 
 ### **Prerequisite**
@@ -60,8 +60,7 @@ Guide To Install Eagle Hortonworks sandbox.
 
 <br/>
 
-### **Injection of hdfs-audit.logs to Kafka (This section is only for "HDFS File System" Monitoring)**   
-Stream HDFS audit log into Kafka.
+### **Stream HDFS audit logs into Kafka (This section is only needed for "HDFS File System" Monitoring)**   
 
 * **Step 1**: Configure Advanced hadoop-log4j via <a href="http://localhost:8080/#/main/services/HDFS/configs" target="_blank">Ambari UI</a>, and add below "KAFKA_HDFS_AUDIT" log4j appender to hdfs audit logging.
 
@@ -100,7 +99,7 @@ Stream HDFS audit log into Kafka.
       
 <br/>
 
-### **Install Eagle In Sandbox**
+### **Install Eagle **
 The following installation actually contains installing and setting up a sandbox site with HdfsAuditLog & HiveQueryLog  data sources. 
     
     >$ scp -P 2222  /eagle-assembly/target/eagle-0.3.0-incubating-bin.tar.gz root@127.0.0.1:/root/ <br/>
@@ -134,6 +133,6 @@ The following installation actually contains installing and setting up a sandbox
        >$ use xademo; <br/>
        >$ select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number; <br/>
 
-   4. From UI click on alert tab and you should see alert for your attempt to dfsf read restricted column.  
+    From UI click on alert tab and you should see alert for your attempt to dfsf read restricted column.  
 
 <br/>
