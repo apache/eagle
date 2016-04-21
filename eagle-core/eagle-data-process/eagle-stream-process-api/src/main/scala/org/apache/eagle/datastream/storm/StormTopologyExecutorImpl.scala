@@ -92,15 +92,15 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
       LOG.info("Submitting as local mode")
       val cluster: LocalCluster = new LocalCluster
       cluster.submitTopology(topologyName, conf, topology)
-      while(true) {
-        try {
+      try {
+        while(true) {
           Utils.sleep(Integer.MAX_VALUE)
-        } catch {
-          case _: Throwable =>
-            cluster.killTopology(topologyName)
-            cluster.shutdown
-            //throw new Exception("Catch a runtime exception during sleeping")
         }
+      } catch {
+        case ex: Throwable =>
+          LOG.warn("Sleep is interrupted with " + ex.toString)
+          cluster.killTopology(topologyName)
+          cluster.shutdown
       }
     }
   }

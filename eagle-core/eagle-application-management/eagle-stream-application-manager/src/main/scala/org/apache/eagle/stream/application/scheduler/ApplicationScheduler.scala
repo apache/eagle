@@ -22,6 +22,7 @@ import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.Config
 import org.apache.eagle.service.application.AppManagerConstants
 import org.apache.eagle.service.application.entity.{TopologyExecutionEntity, TopologyOperationEntity}
+import org.apache.eagle.stream.application.ApplicationManager
 
 import scala.concurrent.duration._
 
@@ -71,6 +72,7 @@ class ApplicationScheduler {
     system.registerOnTermination(new Runnable {
       override def run(): Unit = {
         coordinator ! TerminatedEvent
+        ApplicationManager.stopAll()
       }
     })
     system

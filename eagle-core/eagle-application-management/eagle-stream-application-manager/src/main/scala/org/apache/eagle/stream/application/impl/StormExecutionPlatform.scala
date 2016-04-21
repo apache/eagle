@@ -69,11 +69,11 @@ class StormExecutionPlatform extends ExecutionPlatform {
             case TopologyDescriptionEntity.TYPE.DYNAMIC =>
               StormDynamicTopology.submit(topology.getExeClass, config)
             case m@_ =>
-              throw new InvalidTopologyException("Unsupported topology type: " + topology.getType)
+              LOG.error("Unsupported topology type: " + topology.getType)
           }
         } catch {
           case ex: Throwable =>
-            LOG.error(s"Starting topology $topologyName in local failed due to ${ex.getMessage}")
+            LOG.error(s"topology $topologyName in local mode is interrupted with ${ex.toString}")
         }
       }
     })

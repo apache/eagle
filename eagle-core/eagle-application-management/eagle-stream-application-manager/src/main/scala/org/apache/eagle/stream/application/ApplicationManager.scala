@@ -25,6 +25,8 @@ import org.apache.eagle.service.application.entity.TopologyExecutionStatus
 import org.apache.eagle.stream.application.impl.StormExecutionPlatform
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.collection.JavaConversions
+
 
 object ApplicationManager {
   private val LOG: Logger = LoggerFactory.getLogger(ApplicationManager.getClass)
@@ -110,6 +112,14 @@ object ApplicationManager {
     }
     else {
       this.workerMap.remove(id)
+    }
+  }
+
+  def stopAll(): Unit ={
+    JavaConversions.collectionAsScalaIterable(workerMap.values()) foreach { worker =>
+      if(!worker.isInterrupted) {
+        worker.interrupt()
+      }
     }
   }
 
