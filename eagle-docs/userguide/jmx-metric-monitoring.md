@@ -43,8 +43,8 @@ JMX metric for hadoop namenode url [http://127.0.0.1:50070/jmx](http://127.0.0.1
 ### **Setup**
 From Hortonworks sandbox just run below setup script to Install Pyton JMX script, Create Kafka topic, update Hbase tables and deploy "hadoopjmx" storm topology. 
 
-    >$ /usr/hdp/current/eagle/examples/hadoop-metric-sandbox-starter.sh <br/>
-    >$ /usr/hdp/current/eagle/examples/hadoop-metric-policy-create.sh <br/>
+    $ /usr/hdp/current/eagle/examples/hadoop-metric-sandbox-starter.sh
+    $ /usr/hdp/current/eagle/examples/hadoop-metric-policy-create.sh
 
 <br/>
 
@@ -67,11 +67,11 @@ You should see safeModePolicy policy.
 
 * First make sure that Kafka topic "nn_jmx_metric_sandbox" is populated with JMX metric data periodically.(To make sure that python script is running)
  
-        >$ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --zookeeper sandbox.hortonworks.com:2181 --topic nn_jmx_metric_sandbox
+        $ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --zookeeper sandbox.hortonworks.com:2181 --topic nn_jmx_metric_sandbox
 
 * Genrate Alert by producing alert triggering message in Kafka topic.  
 
 
-        >$ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-producer.sh --broker-list sandbox.hortonworks.com:6667 --topic nn_jmx_metric_sandbox <br/>
-        >$ {"host": "localhost", "timestamp": 1457033916718, "metric": "hadoop.namenode.fsnamesystemstate.fsstate", "component": "namenode", "site": "sandbox", "value": 1.0}
+        $ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-producer.sh --broker-list sandbox.hortonworks.com:6667 --topic nn_jmx_metric_sandbox
+        $ {"host": "localhost", "timestamp": 1457033916718, "metric": "hadoop.namenode.fsnamesystemstate.fsstate", "component": "namenode", "site": "sandbox", "value": 1.0}
   
