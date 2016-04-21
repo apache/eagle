@@ -21,8 +21,8 @@ Guide To Install Eagle Hortonworks sandbox.
 ===============================================
 * Prerequisite
 * Download + Patch + Build
-* Injection of hdfs-audit.logs to Kafka.
 * Setup Hadoop Environment In Sandbox
+* Injection of hdfs-audit.logs to Kafka.
 * Install Eagle In Sandbox
 * Demos "HDFS File System" & "Hive" monitoring
 
@@ -38,11 +38,11 @@ Guide To Install Eagle Hortonworks sandbox.
 * Download latest Eagle source released From Apache [[Tar]](http://www-us.apache.org/dist/incubator/eagle/apache-eagle-0.3.0-incubating/apache-eagle-0.3.0-incubating-src.tar.gz) , [[MD5]](http://www-us.apache.org/dist/incubator/eagle/apache-eagle-0.3.0-incubating/apache-eagle-0.3.0-incubating-src.tar.gz.md5) 
 * Build manually with [Apache Maven](https://maven.apache.org/):
 
-	  >$ tar -zxvf apache-eagle-0.3.0-incubating-src.tar.gz
-	  >$ cd incubator-eagle-release-0.3.0-rc3  
-	  >$ curl -O https://patch-diff.githubusercontent.com/raw/apache/incubator-eagle/pull/150.patch
-	  >$ git apply 150.patch
-	  >$ mvn clean package -DskipTests
+	 > tar -zxvf apache-eagle-0.3.0-incubating-src.tar.gz
+	 > cd incubator-eagle-release-0.3.0-rc3  
+	 > curl -O https://patch-diff.githubusercontent.com/raw/apache/incubator-eagle/pull/150.patch
+     > git apply 150.patch
+	 > mvn clean package -DskipTests
 
 	After building successfully, you will get the tarball under `eagle-assembly/target/` named as `eagle-0.3.0-incubating-bin.tar.gz`
 <br/>
@@ -96,19 +96,20 @@ Stream HDFS audit log into Kafka.
 
 * **Step 7**: Check whether logs from are flowing into topic `sandbox_hdfs_audit_log`
       
-      >$ /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --zookeeper sandbox.hortonworks.com:2181 --topic sandbox_hdfs_audit_log      
+      > /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --zookeeper sandbox.hortonworks.com:2181 --topic sandbox_hdfs_audit_log      
       
 <br/>
 
 ### **Install Eagle In Sandbox**
 The following installation actually contains installing and setting up a sandbox site with HdfsAuditLog & HiveQueryLog  data sources. 
-   >$ scp -P 2222  /eagle-assembly/target/eagle-0.3.0-incubating-bin.tar.gz root@127.0.0.1:/root/ 
-   >$ ssh root@127.0.0.1 -p 2222
-   >$ tar -zxvf eagle-0.3.0-incubating-bin.tar.gz
-   >$ mv eagle-0.3.0-incubating eagle
-   >$ mv eagle /usr/hdp/current/      
-   >$ cd /usr/hdp/current/eagle
-   >$ examples/eagle-sandbox-starter.sh
+    
+    > scp -P 2222  /eagle-assembly/target/eagle-0.3.0-incubating-bin.tar.gz root@127.0.0.1:/root/ 
+    > ssh root@127.0.0.1 -p 2222
+    > tar -zxvf eagle-0.3.0-incubating-bin.tar.gz
+    > mv eagle-0.3.0-incubating eagle
+    > mv eagle /usr/hdp/current/      
+    > cd /usr/hdp/current/eagle
+    > examples/eagle-sandbox-starter.sh
 
 <br/>
 
@@ -119,7 +120,7 @@ The following installation actually contains installing and setting up a sandbox
 	2. You should see policy with name "viewPrivate". This Policy generates alert when any user reads HDFS file name "private" under "tmp" folder.
 	3. In sandbox read restricted HDFS file "/tmp/private" by using command 
 	
-	   $ hadoop fs -cat "/tmp/private"
+	   > hadoop fs -cat "/tmp/private"
 
 	 From UI click on alert tab and you should see alert for the attempt to read restricted file.  
 * **Hive**:
@@ -127,11 +128,11 @@ The following installation actually contains installing and setting up a sandbox
 	2. You should see policy with name "queryPhoneNumber". This Policy generates alert when hive table with sensitivity(Phone_Number) information is queried. 
 	3. In sandbox read restricted sensitive HIVE column.
 	
-      >$ su hive
-      >$ hive
-      >$ set hive.execution.engine=mr;
-      >$ use xademo;
-      >$ select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number;
+      > su hive
+      > hive
+      > set hive.execution.engine=mr;
+      > use xademo;
+      > select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number;
 
     From UI click on alert tab and you should see alert for your attempt to dfsf read restricted column.  
 <br/>
