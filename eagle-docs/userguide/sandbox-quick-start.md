@@ -128,11 +128,11 @@ The following installation actually contains installing and setting up a sandbox
 	2. You should see policy with name "queryPhoneNumber". This Policy generates alert when hive table with sensitivity(Phone_Number) information is queried. 
 	3. In sandbox read restricted sensitive HIVE column.
 	
-       > su hive
-       > hive
-       > set hive.execution.engine=mr;
-       > use xademo;
-       > select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number;
+       > su hive <br/>
+       > hive <br/>
+       > set hive.execution.engine=mr; <br/>
+       > use xademo; <br/>
+       > select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number; <br/>
 
    4. From UI click on alert tab and you should see alert for your attempt to dfsf read restricted column.  
 
