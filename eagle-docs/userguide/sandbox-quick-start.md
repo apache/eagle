@@ -39,10 +39,10 @@ Guide To Install Eagle Hortonworks sandbox.
 * Build manually with [Apache Maven](https://maven.apache.org/):
 
      > tar -zxvf apache-eagle-0.3.0-incubating-src.tar.gz
-	 > cd incubator-eagle-release-0.3.0-rc3  
-	 > curl -O https://patch-diff.githubusercontent.com/raw/apache/incubator-eagle/pull/150.patch
+     > cd incubator-eagle-release-0.3.0-rc3  
+     > curl -O https://patch-diff.githubusercontent.com/raw/apache/incubator-eagle/pull/150.patch
      > git apply 150.patch
-	 > mvn clean package -DskipTests
+     > mvn clean package -DskipTests
 
 	After building successfully, you will get the tarball under `eagle-assembly/target/` named as `eagle-0.3.0-incubating-bin.tar.gz`
 <br/>
@@ -128,7 +128,7 @@ The following installation actually contains installing and setting up a sandbox
 	2. You should see policy with name "queryPhoneNumber". This Policy generates alert when hive table with sensitivity(Phone_Number) information is queried. 
 	3. In sandbox read restricted sensitive HIVE column.
 	
-	   > su hive
+       > su hive
        > hive
        > set hive.execution.engine=mr;
        > use xademo;
