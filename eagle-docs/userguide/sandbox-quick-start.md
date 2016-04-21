@@ -43,8 +43,8 @@ Guide To Install Eagle Hortonworks sandbox.
      > curl -O https://patch-diff.githubusercontent.com/raw/apache/incubator-eagle/pull/150.patch
      > git apply 150.patch
      > mvn clean package -DskipTests
-
-	After building successfully, you will get the tarball under `eagle-assembly/target/` named as `eagle-0.3.0-incubating-bin.tar.gz`
+     
+* After building successfully, you will get the tarball under `eagle-assembly/target/` named as `eagle-0.3.0-incubating-bin.tar.gz`
 <br/>
 
 ### **Setup Hadoop Environment In Sandbox**
@@ -134,6 +134,6 @@ The following installation actually contains installing and setting up a sandbox
        > use xademo;
        > select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number;
 
-    
-	From UI click on alert tab and you should see alert for your attempt to dfsf read restricted column.  
+   4. From UI click on alert tab and you should see alert for your attempt to dfsf read restricted column.  
+
 <br/>
