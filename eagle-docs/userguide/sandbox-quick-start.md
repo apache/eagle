@@ -38,7 +38,7 @@ Guide To Install Eagle Hortonworks sandbox.
 * Download latest Eagle source released From Apache [[Tar]](http://www-us.apache.org/dist/incubator/eagle/apache-eagle-0.3.0-incubating/apache-eagle-0.3.0-incubating-src.tar.gz) , [[MD5]](http://www-us.apache.org/dist/incubator/eagle/apache-eagle-0.3.0-incubating/apache-eagle-0.3.0-incubating-src.tar.gz.md5) 
 * Build manually with [Apache Maven](https://maven.apache.org/):
 
-	 > tar -zxvf apache-eagle-0.3.0-incubating-src.tar.gz
+     > tar -zxvf apache-eagle-0.3.0-incubating-src.tar.gz
 	 > cd incubator-eagle-release-0.3.0-rc3  
 	 > curl -O https://patch-diff.githubusercontent.com/raw/apache/incubator-eagle/pull/150.patch
      > git apply 150.patch
@@ -122,17 +122,18 @@ The following installation actually contains installing and setting up a sandbox
 	
 	   > hadoop fs -cat "/tmp/private"
 
-	 From UI click on alert tab and you should see alert for the attempt to read restricted file.  
+	From UI click on alert tab and you should see alert for the attempt to read restricted file.  
 * **Hive**:
 	1. Click on menu "DAM" and select "Hive" to view Hive policy
 	2. You should see policy with name "queryPhoneNumber". This Policy generates alert when hive table with sensitivity(Phone_Number) information is queried. 
 	3. In sandbox read restricted sensitive HIVE column.
 	
-      > su hive
-      > hive
-      > set hive.execution.engine=mr;
-      > use xademo;
-      > select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number;
+	   > su hive
+       > hive
+       > set hive.execution.engine=mr;
+       > use xademo;
+       > select a.phone_number from customer_details a, call_detail_records b where a.phone_number=b.phone_number;
 
-    From UI click on alert tab and you should see alert for your attempt to dfsf read restricted column.  
+    
+	From UI click on alert tab and you should see alert for your attempt to dfsf read restricted column.  
 <br/>
