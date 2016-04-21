@@ -53,7 +53,7 @@ From Hortonworks sandbox just run below setup script to Install Pyton JMX script
 1. Login to Eagle UI [http://localhost:9099/eagle-service/](http://localhost:9099/eagle-service/) username and password as "admin" and "secret"
 2. Click on "Admin" from top right and click "Management" button.
 3. On Admin management page add "New Site" name "hadoopJmxMetricDataSource" by clicking on "New Site" link.
-![add superuser](images/new-site.png)
+![add superuser](https://github.com/hdendukuri/incubator-eagle/blob/master/new-site.png)
 4. Save the changes.
 5. On eagle home page you should see new tab called "METRIC", besides "DAM".
 6. Click on "JmxMetricMonitor" under "METRIC".
