@@ -53,15 +53,17 @@ Guide To Install Eagle Hortonworks sandbox.
    * Login to Ambari UI http://127.0.0.1:8080/ with username and password as "admin"
 2. Grant root as HBase superuser via Ambari
 ![add superuser](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/hbase-superuser.png)
-3. Start HBase,Storm & Kafka from Ambari.Showing Storm as an example below. 
+3. Start HBase,Storm & Kafka from Ambari. Showing Storm as an example below. 
 ![Restart Services](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/start-storm.png "Services")
 4. If the NAT network is used in a virtual machine, it's required to add port 9099 to forwarding ports
   ![Forwarding Port](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/eagle-service.png)
 
 <br/>
 
-### **Stream HDFS audit logs into Kafka (This section is only needed for "HDFS File System" Monitoring)**   
-
+### **Stream HDFS audit logs into Kafka**   
+ 
+**Note**: This section is only needed for "HDFS File System" Monitoring.
+ 
 * **Step 1**: Configure Advanced hadoop-log4j via <a href="http://localhost:8080/#/main/services/HDFS/configs" target="_blank">Ambari UI</a>, and add below "KAFKA_HDFS_AUDIT" log4j appender to hdfs audit logging.
 
 	log4j.appender.KAFKA_HDFS_AUDIT=org.apache.eagle.log4j.kafka.KafkaLog4jAppender
@@ -99,7 +101,7 @@ Guide To Install Eagle Hortonworks sandbox.
       
 <br/>
 
-### **Install Eagle **
+### **Install Eagle**
 The following installation actually contains installing and setting up a sandbox site with HdfsAuditLog & HiveQueryLog  data sources. 
     
     >$ scp -P 2222  /eagle-assembly/target/eagle-0.3.0-incubating-bin.tar.gz root@127.0.0.1:/root/ <br/>
