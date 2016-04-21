@@ -15,6 +15,7 @@
 					<th width="90" sortpath="tags.topology">Topology</th>
 					<th width="60" sortpath="tags.site">Site</th>
 					<th width="100" sortpath="tags.application">Application</th>
+					<th width="60" sortpath="mode">Mode</th>
 					<th sortpath="description">Description</th>
 					<th width="70" style="min-width: 70px;"></th>
 				</tr>
@@ -27,6 +28,7 @@
 					<td><a ng-click="_parent.showTopologyDetail(item)">{{item.tags.topology}}</a></td>
 					<td>{{item.tags.site}}</td>
 					<td>{{item.tags.application}}</td>
+					<td>{{item.mode}}</td>
 					<td>{{item.description}}</td>
 					<td class="text-center">
 						<button ng-if="item.status === 'NEW' || item.status === 'STOPPED'" class="fa fa-play sm btn btn-default btn-xs" uib-tooltip="Start" tooltip-animation="false" ng-click="_parent.startTopologyOperation(item)"> </button>
