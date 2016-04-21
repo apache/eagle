@@ -52,11 +52,11 @@ Guide To Install Eagle Hortonworks sandbox.
    * Enable Ambari in sandbox http://127.0.0.1:8000 (Click on Enable Button)
    * Login to Ambari UI http://127.0.0.1:8080/ with username and password as "admin"
 2. Grant root as HBase superuser via Ambari
-![add superuser](images/hbase-superuser.png)
+![add superuser](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/hbase-superuser.png)
 3. Start HBase,Storm & Kafka from Ambari.Showing Storm as an example below. 
-![Restart Services](images/start-storm.png "Services")
+![Restart Services](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/start-storm.png "Services")
 4. If the NAT network is used in a virtual machine, it's required to add port 9099 to forwarding ports
-  ![Forwarding Port](images/eagle-service.png)
+  ![Forwarding Port](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/eagle-service.png)
 
 <br/>
 
@@ -73,26 +73,26 @@ Stream HDFS audit log into Kafka.
 	log4j.appender.KAFKA_HDFS_AUDIT.Layout.ConversionPattern=%d{ISO8601} %p %c{2}: %m%n
 	log4j.appender.KAFKA_HDFS_AUDIT.ProducerType=async
 
-    ![HDFS LOG4J Configuration](images/hdfs-log4j-conf.png "hdfslog4jconf")
+    ![HDFS LOG4J Configuration](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/hdfs-log4j-conf.png "hdfslog4jconf")
 
 * **Step 2**: Edit Advanced hadoop-env via <a href="http://localhost:8080/#/main/services/HDFS/configs" target="_blank">Ambari UI</a>, and add the reference to KAFKA_HDFS_AUDIT to HADOOP_NAMENODE_OPTS.
 
       -Dhdfs.audit.logger=INFO,DRFAAUDIT,KAFKA_HDFS_AUDIT
 
-    ![HDFS Environment Configuration](images/hdfs-env-conf.png "hdfsenvconf")
+    ![HDFS Environment Configuration](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/hdfs-env-conf.png "hdfsenvconf")
 
 * **Step 3**: Edit Advanced hadoop-env via <a href="http://localhost:8080/#/main/services/HDFS/configs" target="_blank">Ambari UI</a>, and append the following command to it.
 
       export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:/usr/hdp/current/eagle/lib/log4jkafka/lib/*
 
-    ![HDFS Environment Configuration](images/hdfs-env-conf2.png "hdfsenvconf2")
+    ![HDFS Environment Configuration](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/hdfs-env-conf2.png "hdfsenvconf2")
 
 * **Step 4**: save the changes 
 
 * **Step 5**: "Restart All" Storm & Kafka from Ambari. (Similar to starting server in pervious step except make sure to click on "Restart All")
 
 * **Step 6**: Restart name node 
-![Restart Services](images/nn-restart.png "Services")
+![Restart Services](https://github.com/hdendukuri/incubator-eagle/blob/master/eagle-docs/images/nn-restart.png "Services")
 
 * **Step 7**: Check whether logs from are flowing into topic `sandbox_hdfs_audit_log`
       
