@@ -205,7 +205,7 @@
 			{field: "topology", name: "name"},
 			{field: "type", type: "select", valueList: typeList},
 			{field: "exeClass", name: "execution entry", description: function (entity) {
-				if(entity.type === "CLASS") return "Class implement interface 'org.apache.eagle.stream.application.TopologyExecutable'";
+				if(entity.type === "CLASS") return "Class implements interface TopologyExecutable";
 				if(entity.type === "DYNAMIC") return "DSL based topology definition";
 			}, type: "blob", rows: 5},
 			{field: "version", optional: true},
