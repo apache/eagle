@@ -47,8 +47,8 @@ case class LoadTopologyFailureException(message:String) extends Exception(messag
  */
 class ApplicationScheduler {
   //val config = ConfigFactory.load()
-  val DEFAULT_COMMAND_LOADER_INTERVAL = 2
-  val DEFAULT_HEALTH_CHECK_INTERVAL = 5
+  val DEFAULT_COMMAND_LOADER_INTERVAL_SECS = 2
+  val DEFAULT_HEALTH_CHECK_INTERVAL_SECS = 5
 
   def start(config: Config) = {
     val system = ActorSystem("application-manager-scheduler", config)
@@ -56,14 +56,14 @@ class ApplicationScheduler {
 
     import system.dispatcher
 
-    val commandLoaderInterval: Long = if(config.hasPath(AppManagerConstants.APP_COMMAND_LOADER_INTERVAL)) config.getLong(AppManagerConstants.APP_COMMAND_LOADER_INTERVAL) else DEFAULT_COMMAND_LOADER_INTERVAL
-    val healthCheckInterval: Long = if(config.hasPath(AppManagerConstants.APP_HEALTH_CHECK_INTERVAL)) config.getLong(AppManagerConstants.APP_HEALTH_CHECK_INTERVAL) else DEFAULT_HEALTH_CHECK_INTERVAL
+    val commandLoaderIntervalSecs: Long = if(config.hasPath(AppManagerConstants.APP_COMMAND_LOADER_INTERVAL_SECS)) config.getLong(AppManagerConstants.APP_COMMAND_LOADER_INTERVAL_SECS) else DEFAULT_COMMAND_LOADER_INTERVAL_SECS
+    val healthCheckIntervalSecs: Long = if(config.hasPath(AppManagerConstants.APP_HEALTH_CHECK_INTERVAL_SECS)) config.getLong(AppManagerConstants.APP_HEALTH_CHECK_INTERVAL_SECS) else DEFAULT_HEALTH_CHECK_INTERVAL_SECS
 
     val coordinator = system.actorOf(Props[StreamAppCoordinator])
     system.scheduler.scheduleOnce(0 seconds, coordinator, InitializationEvent(config))
     system.scheduler.scheduleOnce(1 seconds, coordinator, ClearPendingOperation)
-    system.scheduler.schedule(2.seconds, commandLoaderInterval.seconds, coordinator, CommandLoaderEvent)
-    system.scheduler.schedule(10.seconds, healthCheckInterval.seconds, coordinator, HealthCheckerEvent)
+    system.scheduler.schedule(2.seconds, commandLoaderIntervalSecs.seconds, coordinator, CommandLoaderEvent)
+    system.scheduler.schedule(10.seconds, healthCheckIntervalSecs.seconds, coordinator, HealthCheckerEvent)
 
     /*
      registerOnTermination is called when you have shut down the ActorSystem (system.shutdown),
