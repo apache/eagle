@@ -26,9 +26,10 @@ Eagle Notification Plugin provides an interface for users to consume Eagle alert
 	* **topic**: kafka topic 
 * email: Alert emial will be sent out. Configurations are required:
 	* **sender**: email sender address
-	* **recipients**: email receipients, comma separated address strings
+	* **recipients**: email recipients, comma separated address strings
 	* **subject**: email subject
-
+	
+![notificationPlugin](/images/notificationPlugin.png)
 ### Customized Notification Plugin
 
 To integrate a customized notification plugin, we must implement an interface 
@@ -64,7 +65,7 @@ To integrate a customized notification plugin, we must implement an interface
 	}
 Examples: AlertKafkaPlugin, AlertEmailPlugin, and AlertEagleStorePlugin.
 
-The second and importance step is to register the configurations of the customized plugin. In other words, we need persist the configuration template into database in order to expose the configurations to users in the front end. 
+The second and crucial step is to register the configurations of the customized plugin. In other words, we need persist the configuration template into database in order to expose the configurations to users in the front end. 
 
 Examples:
 
@@ -78,7 +79,7 @@ Examples:
        "enabled":true,
        "fields": "[{\"name\":\"kafka_broker\",\"value\":\"sandbox.hortonworks.com:6667\"},{\"name\":\"topic\"}]"
      }
-
+'fields' is the configuration for notification type 'kafka'
 
 How can we do that? [Here](https://github.com/apache/incubator-eagle/blob/master/eagle-assembly/src/main/bin/eagle-topology-init.sh) are Eagle other notification plugin configurations. Just append yours to it, and run this script when Eagle service is up. 
 
