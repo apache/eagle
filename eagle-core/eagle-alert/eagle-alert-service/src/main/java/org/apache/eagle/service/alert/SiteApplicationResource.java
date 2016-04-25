@@ -16,15 +16,15 @@
  *
  */
 
-package org.apache.eagle.service.alert.resolver;
+package org.apache.eagle.service.alert;
 
-import org.apache.eagle.alert.entity.ApplicationDescServiceEntity;
-import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
-import org.apache.eagle.alert.entity.SiteDescServiceEntity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.policy.common.Constants;
+import org.apache.eagle.alert.entity.SiteDescServiceEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
+import org.apache.eagle.alert.entity.ApplicationDescServiceEntity;
+import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.slf4j.Logger;
