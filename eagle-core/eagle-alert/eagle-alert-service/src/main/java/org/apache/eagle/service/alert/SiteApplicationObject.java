@@ -16,11 +16,11 @@
  *
  */
 
-package org.apache.eagle.service.alert.resolver;
+package org.apache.eagle.service.alert;
 
 
-import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
 
 import java.util.List;
 import java.util.Map;
