@@ -17,7 +17,7 @@ limitations under the License.
 
 ### Eagle Notification Plugins
 
-Eagle Notification Plugin provides an interface for users to consume Eagle alerts. When define a policy, a user can add any number of notification plugin instances. By default, Eagle supports three types of notification: EagleStore, Kafka and Email
+[Eagle Notification Plugin](https://cwiki.apache.org/confluence/display/EAG/Alert+notification+plugin) provides an interface for users to consume Eagle alerts. When define a policy, a user can add any number of notification plugin instances. By default, Eagle supports three types of notification: EagleStore, Kafka and Email
 
 * EagleStore: Alerts will be persisted into underlying database via eagle. 
 	* no configuration is needed. 
