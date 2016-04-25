@@ -19,14 +19,14 @@ limitations under the License.
 
 [Eagle Notification Plugin](https://cwiki.apache.org/confluence/display/EAG/Alert+notification+plugin) provides an interface for users to consume Eagle alerts. When define a policy, a user can add any number of notification plugin instances. By default, Eagle supports three types of notification: EagleStore, Kafka and Email
 
-* EagleStore: Alerts will be persisted into underlying database via eagle. 
+* EagleStore: Alerts will be persisted into the underlying database via eagle. 
 	* no configuration is needed. 
 * Kafka: Alerts will flow into Kafka. Configurations are required:
 	* **kafka_broker**: <hostname:port,..., REQUIRED: The list of hostname and hostname:port> port of the server to connect to. 
 	* **topic**: kafka topic 
-* email: Alert emial will be sent out. Configurations are required:
+* email: Alert email will be sent out. Configurations are required:
 	* **sender**: email sender address
-	* **recipients**: email recipients, comma separated address strings
+	* **recipients**: email recipients, multiple email address with comma separated
 	* **subject**: email subject
 	
 ![notificationPlugin](/images/notificationPlugin.png)
