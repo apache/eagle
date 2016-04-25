@@ -209,7 +209,7 @@
 											<p>$elem["site"]</p>
 										</td>
 										<td>
-											<p>$elem["dataSource"]</p>
+											<p>$elem["application"]</p>
 										</td>
 									</tr>
 									<tr>
