@@ -58,5 +58,8 @@ public final class EagleConfigConstants {
 
     public final static String WEB_CONFIG = "web";
     public final static String APP_CONFIG = "app";
+    public final static String CLASSIFICATION_CONFIG = "classification";
 
+    public final static String LOCAL_MODE = "local";
+    public final static String CLUSTER_MODE = "cluster";
 }

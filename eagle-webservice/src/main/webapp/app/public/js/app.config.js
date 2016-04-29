@@ -55,10 +55,9 @@
 	// =                                   URLs                                   =
 	// ============================================================================
 	app.getURL = function(name, kvs) {
-		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
 		var _path = app.config.urls[name];
 		if(!_path) throw "URL:'" + name + "' not exist!";
-		var _url = (_host ? _host + "/" : '') + _path;
+		var _url = app.packageURL(_path);
 		if(kvs !== undefined) {
 			_url = common.template(_url, kvs);
 		}
@@ -69,9 +68,7 @@
 		var _path = app.config.urls[hookType][serviceName];
 		if(!_path) return null;
 
-		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
-		var _url = (_host ? _host + "/" : '') + _path;
-		return _url;
+		return app.packageURL(_path);
 	}
 
 	/***
@@ -88,6 +85,11 @@
 	 */
 	app.getUpdateURL = function(serviceName) {
 		return getHookURL('UPDATE_HOOK', serviceName);
+	};
+
+	app.packageURL = function (path) {
+		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
+		return (_host ? _host + "/" : '') + path;
 	};
 
 	app._Host = function(host) {

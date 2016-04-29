@@ -32,6 +32,10 @@ public class Constants {
 	public static final String APPLICATION_DESCRIPTION_SERVICE_ENDPOINT_NAME = "ApplicationDescService";
 	public static final String FEATURE_DESCRIPTION_SERVICE_ENDPOINT_NAME = "FeatureDescService";
 
+	public static final String TOPOLOGY_EXECUTION_SERVICE_ENDPOINT_NAME = "TopologyExecutionService";
+	public static final String TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME = "TopologyOperationService";
+	public static final String TOPOLOGY_DESCRIPTION_SERVICE_ENDPOINT_NAME = "TopologyDescriptionService";
+
 	public static final String GENERIC_RESOURCE_SERVICE_ENDPOINT_NAME = "GenericResourceService";
 	
 	public final static String AGGREGATE_DEFINITION_SERVICE_ENDPOINT_NAME = "AggregateDefinitionService";
