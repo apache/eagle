@@ -19,6 +19,7 @@
 package org.apache.eagle.contrib.connector.policy.policyobject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.eagle.contrib.connector.policy.common.PolicyConstants;
 import org.apache.eagle.contrib.connector.policy.notification.EmailNotification;
 import org.apache.eagle.contrib.connector.policy.notification.NotificationDef;
 import org.apache.eagle.contrib.connector.policy.policydef.PolicyDefBase;
@@ -117,8 +118,8 @@ public abstract class PolicyObjectBase {
         if(policyDef != null) policyEntries.add(policyDef.toJSONEntry());
         if(notificationDef != null) policyEntries.add(notificationDef.toJSONEntry());
 
-        //Todo: Bug or wrong format?  need to be changed in future, for now just leave dupe setting as empty
-        //policyEntries.add("\"dedupeDef\":{\\\"" + PolicyConstants.ALERT_DEDUP_INTERVAL_MIN + "\\\":" + String.valueOf(dedupeDef) + "}");
+
+        policyEntries.add("\"dedupeDef\":\"{\\\"" + PolicyConstants.ALERT_DEDUP_INTERVAL_MIN + "\\\":" + String.valueOf(dedupeDef) + "}\"");
         policyEntries.add("\"enabled\":"+String.valueOf(enabled));
 
 

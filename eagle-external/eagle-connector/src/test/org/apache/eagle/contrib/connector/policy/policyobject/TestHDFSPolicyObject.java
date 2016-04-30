@@ -73,6 +73,7 @@ public class TestHDFSPolicyObject {
                         .addKafkaNotification("sandbox.hortonworks.com:6667", "test")
                         .addEagleStore().addEagleStore()
                         .setDescription("test")
+                        .setDedupeDef(20)
                         .setEnabled(true);
 
         System.out.println(hdfsPolicyObject.toJSONData());
