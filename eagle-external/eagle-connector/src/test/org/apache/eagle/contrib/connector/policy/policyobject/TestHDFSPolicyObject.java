@@ -31,11 +31,11 @@ public class TestHDFSPolicyObject {
                 .setCmdEqualsTo("a")
                 .setCmdNotEqualsTo("b")
                 .setCmdContains("c")
-                .setCmdRgexp("d")
+                .setCmdRegex("d")
                 .setDstEqualsTo("a")
                 .setDstNotEqualsTo("b")
                 .setDstContains("c")
-                .setDstRgexp("d")
+                .setDstRegex("d")
                 .setHostEqualsTo("a")
                 .setHostNotEqualsTo("b")
                 .setHostContains("c")
@@ -69,7 +69,7 @@ public class TestHDFSPolicyObject {
                 .addRecipient("b@example.com").addRecipient("c@example.com")
                 .addSubject("test");
 
-        hdfsPolicyObject.addEmailNotificaiton(emailNotification)
+        hdfsPolicyObject.addEmailNotification(emailNotification)
                         .addKafkaNotification("sandbox.hortonworks.com:6667", "test")
                         .addEagleStore().addEagleStore()
                         .setDescription("test")

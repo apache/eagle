@@ -24,10 +24,6 @@ import org.apache.eagle.contrib.connector.policy.field.TimestampField;
 
 public class HDFSPolicyDef extends PolicyDefBase{
 
-
-
-
-
     //for allowed
     public void setAllowed(boolean allowed){
         String key = PolicyConstants.HDFS_ALLOWED;
@@ -37,11 +33,12 @@ public class HDFSPolicyDef extends PolicyDefBase{
         }
         ((AllowedField)parameterHashMap.get(key)).setAllowed(allowed);
     }
-    private AllowedField getAllowedField(){
+
+    public AllowedField getAllowedField(){
         String key = PolicyConstants.HDFS_ALLOWED;
+        // "allowed" field may not be set by user, so it may not be in the json data sent to Eagle service.
         if(!parameterHashMap.containsKey(key)){
-            AllowedField allowedField = new AllowedField();
-            parameterHashMap.put(key,allowedField);
+            return null;
         }
         return (AllowedField)parameterHashMap.get(key);
     }

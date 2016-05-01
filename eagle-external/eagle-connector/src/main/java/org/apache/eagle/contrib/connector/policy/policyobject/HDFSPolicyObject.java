@@ -30,9 +30,8 @@ public class HDFSPolicyObject extends PolicyObjectBase {
             policyDef = new HDFSPolicyDef();
         }
     }
-
-
-    //initialize hdfspolicyObject
+    
+    //initialize hdfs policy Object
     public HDFSPolicyObject(){
         policyTags = new HDFSPolicyTags();
     }
@@ -71,7 +70,7 @@ public class HDFSPolicyObject extends PolicyObjectBase {
         ((HDFSPolicyDef) policyDef).cmdContains(cmd);
         return this;
     }
-    public HDFSPolicyObject setCmdRgexp(String cmd){
+    public HDFSPolicyObject setCmdRegex(String cmd){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).cmdRegexp(cmd);
         return this;
@@ -93,7 +92,7 @@ public class HDFSPolicyObject extends PolicyObjectBase {
         ((HDFSPolicyDef) policyDef).dstContains(dst);
         return this;
     }
-    public HDFSPolicyObject setDstRgexp(String dst){
+    public HDFSPolicyObject setDstRegex(String dst){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).dstRegexp(dst);
         return this;
@@ -242,7 +241,7 @@ public class HDFSPolicyObject extends PolicyObjectBase {
     }
 
     //Override functions for adding notification and return a HDFSPolicyObject
-    public HDFSPolicyObject addEmailNotificaiton(EmailNotification emailNotification){
+    public HDFSPolicyObject addEmailNotification(EmailNotification emailNotification){
         checkNotificationDef();
         notificationDef.addEmailNotification(emailNotification);
         return this;

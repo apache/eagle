@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 public class PolicyTagsBase {
     public final static Logger LOG = org.slf4j.LoggerFactory.getLogger(PolicyTagsBase.class);
     protected String site;
-    protected String applicaiton;
+    protected String application;
     protected String policyId;
     protected String alertExecutorId;
     protected String policyType;
@@ -46,12 +46,12 @@ public class PolicyTagsBase {
         return policyId;
     }
 
-    public void setApplicaiton(String applicaiton){
-        this.applicaiton = applicaiton;
+    public void setApplication(String application){
+        this.application = application;
     }
 
-    public String getApplicaiton(){
-        return applicaiton;
+    public String getApplication(){
+        return application;
     }
 
     public void setAlertExecutorId(){
@@ -63,11 +63,11 @@ public class PolicyTagsBase {
     }
 
     public String toJSONEntry(){
-        if(site == null || policyId == null || applicaiton == null) LOG.info("Invalid policy created. Valid policy must set site, application and policyId ");
+        if(site == null || policyId == null || application == null) LOG.info("Invalid policy created. Valid policy must set site, application and policyId ");
         StringBuilder tags = new StringBuilder(100);
         tags.append("\"tags\":{");
         tags.append("\"site\":").append("\""+site+"\",")
-                .append("\"application\":").append("\""+applicaiton+"\",")
+                .append("\"application\":").append("\""+ application +"\",")
                 .append("\"policyId\":").append("\""+policyId+"\",")
                 .append("\"alertExecutorId\":").append("\""+alertExecutorId+"\",")
                 .append("\"policyType\":").append("\""+policyType+"\"")

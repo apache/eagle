@@ -24,10 +24,10 @@ import org.apache.eagle.contrib.connector.policy.common.PolicyConstants;
  * Store alert messages in Eagle
  * */
 public class EagleStore implements Notification{
-    private String jsondDta = "{\\\"notificationType\\\":\\\"" + PolicyConstants.EAGLE_STORE + "\\\"}";
+    private String jsonData = "{\\\"notificationType\\\":\\\"" + PolicyConstants.EAGLE_STORE + "\\\"}";
 
     @Override
     public String toJSONString() {
-        return jsondDta;
+        return jsonData;
     }
 }

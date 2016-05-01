@@ -21,7 +21,7 @@ package org.apache.eagle.contrib.connector.policy.notification;
 import java.util.ArrayList;
 
 /**
- * NotificationDef refers to json entry "notificaitonDef" in policy's JSON format,
+ * NotificationDef refers to json entry "notificationDef" in policy's JSON format,
  * it contains all the notifications setting
  * */
 public class NotificationDef {

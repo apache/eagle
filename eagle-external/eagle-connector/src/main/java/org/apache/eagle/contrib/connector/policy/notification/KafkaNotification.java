@@ -44,7 +44,7 @@ public class KafkaNotification implements Notification{
         this.kafkaBroker = kafkaBroker;
         return this;
     }
-    public String getGetKafkaBroker() {
+    public String getKafkaBroker() {
         return kafkaBroker;
     }
 

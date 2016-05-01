@@ -19,11 +19,11 @@
 package org.apache.eagle.contrib.connector.policy.notification;
 
 /**
- * Notification refers to a notification (kafka notification, email notificaition, eagleStore)
+ * Notification refers to a notification (kafka notification, email notification, eagleStore)
  * */
 public interface Notification {
     /**
-     * return notification in ihe format of json, located in json entry "nofificationDef" in policy's json format
+     * return notification in ihe format of json, located in json entry "notificationDef" in policy's json format
      * */
     String toJSONString();
 }

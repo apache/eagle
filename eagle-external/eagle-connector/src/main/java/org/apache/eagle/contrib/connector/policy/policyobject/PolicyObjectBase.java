@@ -29,12 +29,8 @@ import java.util.ArrayList;
 
 
 public abstract class PolicyObjectBase {
-//// parameter hashmap
-//    /**In the parameterHashMap each entry stores a Match Criteria */
-//    public HashMap<String,Set<Field>> parameterHashMap = new HashMap<String, Set<Field>>();
-
     /**
-     * poliyTags contains "site, applicaiton, policyId, alertExecutorId, policyType"
+     * poliyTags contains "site, application, policyId, alertExecutorId, policyType"
      * */
     protected   PolicyTagsBase policyTags;
     protected   PolicyDefBase policyDef;
@@ -80,7 +76,7 @@ public abstract class PolicyObjectBase {
         return enabled;
     }
 
-//Todo: duble check the key word for dedupef
+
     public PolicyObjectBase setDedupeDef(int min){
         this.dedupeDef = min;
         return this;
@@ -91,7 +87,7 @@ public abstract class PolicyObjectBase {
 
 
 // Need to be override  to return child object
-    public PolicyObjectBase addEmailNotificaiton(EmailNotification emailNotification){
+    public PolicyObjectBase addEmailNotification(EmailNotification emailNotification){
         checkNotificationDef();
         notificationDef.addEmailNotification(emailNotification);
         return this;
@@ -118,10 +114,8 @@ public abstract class PolicyObjectBase {
         if(policyDef != null) policyEntries.add(policyDef.toJSONEntry());
         if(notificationDef != null) policyEntries.add(notificationDef.toJSONEntry());
 
-
         policyEntries.add("\"dedupeDef\":\"{\\\"" + PolicyConstants.ALERT_DEDUP_INTERVAL_MIN + "\\\":" + String.valueOf(dedupeDef) + "}\"");
         policyEntries.add("\"enabled\":"+String.valueOf(enabled));
-
 
         String value = StringUtils.join(policyEntries,",");
         StringBuilder jsonData = new StringBuilder(200);
