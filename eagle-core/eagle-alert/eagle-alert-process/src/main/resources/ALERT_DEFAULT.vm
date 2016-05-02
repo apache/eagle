@@ -136,7 +136,7 @@
 						<tr>
 							<!-- Title -->
 							<td align="center">
-								<h1>$elem["dataSource"] Alert Detected</h1>
+								<h1>$elem["application"] Alert Detected</h1>
 							</td>
 						</tr>
 						<tr>
@@ -206,7 +206,7 @@
 											<p>$elem["site"]</p>
 										</td>
 										<td>
-											<p>$elem["dataSource"]</p>
+											<p>$elem["application"]</p>
 										</td>
 									</tr>
 									<tr>
@@ -249,7 +249,7 @@
 						<tr>
 							<!-- Possible Root Causes Content -->
 							<td class="panel" valign="top" style="background: #F4F4F4; border: 1px solid #AAAAAA; padding: 10px 10px 12px 10px;">
-								<p> $elem["dataSource"] alert found, please check.</p>
+								<p> $elem["application"] alert found, please check.</p>
 							</td>
 						</tr>
 						<tr>
