@@ -51,9 +51,9 @@ var app = {};
 		var _features = {};
 		var _services = {};
 
-		var Feature = function(name, version) {
+		var Feature = function(name, config) {
 			this.name = name;
-			this.version = version;
+			this.config = config || {};
 			this.features = {};
 		};
 
@@ -199,8 +199,8 @@ var app = {};
 		};
 
 		// Register
-		featureControllers.register = Feature.register = function(featureName) {
-			_features[featureName] = _features[featureName] || new Feature(featureName);
+		featureControllers.register = Feature.register = function(featureName, config) {
+			_features[featureName] = _features[featureName] || new Feature(featureName, config);
 			return _features[featureName];
 		};
 
@@ -218,6 +218,11 @@ var app = {};
 					filter: filter
 				}, 2);
 			}
+		};
+
+		// Get feature by name
+		Feature.get = function (featureName) {
+			return _features[featureName];
 		};
 
 		return Feature;

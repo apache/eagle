@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.eagle</groupId>
         <artifactId>eagle-parent</artifactId>
-        <version>0.3.0-incubating</version>
+        <version>0.4.0-incubating-SNAPSHOT</version>
     </parent>
     <artifactId>eagle-topology-assembly</artifactId>
     <name>eagle-topology-assembly</name>

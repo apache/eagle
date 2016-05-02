@@ -207,17 +207,25 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
     @Override
     public void evaluate(ValuesArray data) throws Exception {
         if (!siddhiRuntime.markdownEnabled) {
-            if (LOG.isDebugEnabled()) LOG.debug("Siddhi policy evaluator consumers data :" + data);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Siddhi policy evaluator consumers data :" + data);
+            }
             Collector outputCollector = (Collector) data.get(0);
             String streamName = (String) data.get(1);
-            SortedMap map = (SortedMap) data.get(2);
-            validateEventInRuntime(streamName, map);
+            SortedMap dataMap = (SortedMap) data.get(2);
+
+            // Get metadata keyset for the stream.
+            Set<String> metadataKeys = StreamMetadataManager.getInstance()
+                    .getMetadataEntityMapForStream(streamName).keySet();
+
+            validateEventInRuntime(streamName, dataMap, metadataKeys);
+
             synchronized (siddhiRuntime) {
                 // retain the collector in the context. This assignment is idempotent
                 context.outputCollector = outputCollector;
 
-                List<Object> input = new ArrayList<>();
-                putAttrsIntoInputStream(input, streamName, map);
+                List<Object> input = new ArrayList<Object>();
+                putAttrsIntoInputStream(input, streamName, metadataKeys, dataMap);
                 siddhiRuntime.siddhiInputHandlers.get(streamName).send(input.toArray(new Object[0]));
             }
         }
@@ -232,28 +240,41 @@ public class SiddhiPolicyEvaluator<T extends AbstractPolicyDefinitionEntity, K> 
      * @param data         input event
      * @see <a href="https://issues.apache.org/jira/browse/EAGLE-49">https://issues.apache.org/jira/browse/EAGLE-49</a>
      */
-    private void validateEventInRuntime(String sourceStream, SortedMap data) {
-        if (!needValidation)
+    private void validateEventInRuntime(String sourceStream, SortedMap data, Set<String> metadataKeys) {
+        if (!needValidation) {
             return;
-        SortedMap<String, AlertStreamSchemaEntity> map = StreamMetadataManager.getInstance().getMetadataEntityMapForStream(sourceStream);
-        if (!map.keySet().equals(data.keySet())) {
+        }
+
+        if (!metadataKeys.equals(data.keySet())) {
             Set<Object> badKeys = new TreeSet<>();
-            for (Object key : data.keySet()) if (!map.containsKey(key)) badKeys.add(key);
-            LOG.warn(String.format("Ignore invalid fields %s in event: %s from stream: %s, valid fields are: %s", badKeys.toString(), data.toString(), sourceStream, map.keySet().toString()));
-            for (Object key : badKeys) data.remove(key);
+            for (Object key : data.keySet()) {
+                if (!metadataKeys.contains(key)) {
+                    badKeys.add(key);
+                }
+            }
+            LOG.warn(String.format("Ignore invalid fields %s in event: %s from stream: %s, valid fields are: %s",
+                    badKeys.toString(), data.toString(), sourceStream, metadataKeys.toString()));
+
+            for (Object key : badKeys) {
+                data.remove(key);
+            }
         }
     }
 
-    private void putAttrsIntoInputStream(List<Object> input, String streamName, SortedMap map) {
+    private void putAttrsIntoInputStream(List<Object> input, String streamName, Set<String> metadataKeys, SortedMap dataMap) {
         if (!needValidation) {
-            input.addAll(map.values());
+            input.addAll(dataMap.values());
             return;
         }
-        for (Object key : map.keySet()) {
-            Object value = map.get(key);
+
+        // If a metadata field is not set, we put null for the field's value.
+        for (String key : metadataKeys) {
+            Object value = dataMap.get(key);
             if (value == null) {
-                input.add(SiddhiStreamMetadataUtils.getAttrDefaultValue(streamName, (String) key));
-            } else input.add(value);
+                input.add(SiddhiStreamMetadataUtils.getAttrDefaultValue(streamName, key));
+            } else {
+                input.add(value);
+            }
         }
     }
 
