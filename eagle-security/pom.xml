@@ -23,7 +23,7 @@
   <parent>
 		<groupId>org.apache.eagle</groupId>
 		<artifactId>eagle-parent</artifactId>
-		<version>0.3.0-incubating</version>
+		<version>0.4.0-incubating-SNAPSHOT</version>
       <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>eagle-security-parent</artifactId>
@@ -34,6 +34,8 @@
     <modules>
         <module>eagle-security-common</module>
         <module>eagle-security-hdfs-auditlog</module>
+        <module>eagle-security-maprfs-auditlog</module>
+        <module>eagle-security-maprfs-web</module>
         <module>eagle-security-userprofile</module>
         <module>eagle-security-hive</module>
         <module>eagle-security-hive-web</module>
