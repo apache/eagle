@@ -25,7 +25,13 @@ import java.util.ArrayList;
  * it contains all the notifications setting
  * */
 public class NotificationDef {
-    private ArrayList<Notification> notificationList = new ArrayList<>();
+    private ArrayList<Notification> notificationList;
+
+    public NotificationDef(){
+        notificationList = new ArrayList<>();
+        // by default we use eagle store notification
+        notificationList.add(new EagleStore());
+    }
 
     public NotificationDef addKafkaNotification(String kafkaBroker, String topic){
         KafkaNotification kafkaNotification = new KafkaNotification();
