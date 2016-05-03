@@ -154,10 +154,10 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
         tagColumn.setName(tagName);
         tagColumn.setTypeCode(Types.VARCHAR);
         tagColumn.setJavaName(tagName);
-//        tagColumn.setScale(1024);
-        tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
+ //     tagColumn.setScale(1024);
+	tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
         tagColumn.setDefaultValue(null);
-        tagColumn.setDescription("eagle entity tag column for "+tagName);
+	tagColumn.setDescription("eagle entity tag column for "+tagName);
         return tagColumn;
     }
 
