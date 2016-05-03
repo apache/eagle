@@ -24,8 +24,8 @@ import org.junit.Test;
 public class TestHDFSPolicyObject {
     @Test
     public void TestCreateHDFSPolicyObject(){
-        HDFSPolicyObject hdfsPolicyObject = new HDFSPolicyObject();
-        hdfsPolicyObject.setSite("sandbox")
+        HDFSPolicy hdfsPolicy = new HDFSPolicy();
+        hdfsPolicy.setSite("sandbox")
                 .setPolicyId("testHDFSPolicyCreation")
                 .setAllowed(true)
                 .setCmdEqualsTo("a")
@@ -69,14 +69,14 @@ public class TestHDFSPolicyObject {
                 .addRecipient("b@example.com").addRecipient("c@example.com")
                 .addSubject("test");
 
-        hdfsPolicyObject.addEmailNotification(emailNotification)
+        hdfsPolicy.addEmailNotification(emailNotification)
                         .addKafkaNotification("sandbox.hortonworks.com:6667", "test")
                         .addEagleStore().addEagleStore()
                         .setDescription("test")
                         .setDedupeDef(20)
                         .setEnabled(true);
 
-        System.out.println(hdfsPolicyObject.toJSONData());
+        System.out.println(hdfsPolicy.toJSONData());
 
 
     }

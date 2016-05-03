@@ -19,11 +19,13 @@
 package org.apache.eagle.contrib.connector.policy.tag;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Refers to json entry "tags" in policy's json format
  * */
 public class PolicyTagsBase {
-    public final static Logger LOG = org.slf4j.LoggerFactory.getLogger(PolicyTagsBase.class);
+    public final static Logger LOG = LoggerFactory.getLogger(PolicyTagsBase.class);
     protected String site;
     protected String application;
     protected String policyId;

@@ -28,7 +28,7 @@ import org.apache.eagle.contrib.connector.policy.tag.PolicyTagsBase;
 import java.util.ArrayList;
 
 
-public abstract class PolicyObjectBase {
+public abstract class PolicyBase {
     /**
      * poliyTags contains "site, application, policyId, alertExecutorId, policyType"
      * */
@@ -59,7 +59,7 @@ public abstract class PolicyObjectBase {
         }
     }
 
-    public PolicyObjectBase setDescription(String description){
+    public PolicyBase setDescription(String description){
         this.description = description;
         return this;
     }
@@ -68,7 +68,7 @@ public abstract class PolicyObjectBase {
     }
 
 
-    public PolicyObjectBase setEnabled(boolean enabled){
+    public PolicyBase setEnabled(boolean enabled){
         this.enabled = enabled;
         return this;
     }
@@ -77,7 +77,7 @@ public abstract class PolicyObjectBase {
     }
 
 
-    public PolicyObjectBase setDedupeDef(int min){
+    public PolicyBase setDedupeDef(int min){
         this.dedupeDef = min;
         return this;
     }
@@ -87,17 +87,17 @@ public abstract class PolicyObjectBase {
 
 
 // Need to be override  to return child object
-    public PolicyObjectBase addEmailNotification(EmailNotification emailNotification){
+    public PolicyBase addEmailNotification(EmailNotification emailNotification){
         checkNotificationDef();
         notificationDef.addEmailNotification(emailNotification);
         return this;
     }
-    public PolicyObjectBase addKafkaNotification(String kafkaBroker, String topic){
+    public PolicyBase addKafkaNotification(String kafkaBroker, String topic){
         checkNotificationDef();
         notificationDef.addKafkaNotification(kafkaBroker, topic);
         return this;
     }
-    public PolicyObjectBase addEagleStore(){
+    public PolicyBase addEagleStore(){
         checkNotificationDef();
         notificationDef.addEgleStore();
         return this;
@@ -119,15 +119,8 @@ public abstract class PolicyObjectBase {
 
         String value = StringUtils.join(policyEntries,",");
         StringBuilder jsonData = new StringBuilder(200);
-        jsonData.append("[{").append(value).append("}]");
+        jsonData.append("{").append(value).append("}");
 
         return jsonData.toString();
     }
-
-
-
-
-
-
-
 }
