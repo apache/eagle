@@ -39,7 +39,7 @@ public class UrlBuilder {
     }
 
     public static String buildAlertDetailUrl(String host, int port, AlertAPIEntity entity) {
-        String baseUrl = "http://" + host + ":" + String.valueOf(port) + "/eagle-service/#/dam/alertDetail/";
+        String baseUrl = "http://" + host + ":" + String.valueOf(port) + "/eagle-service/ui/#/common/alertDetail/";
         try {
             return baseUrl + UrlEncoded.encodeString(getEncodedRowkey(entity));
         }
@@ -50,7 +50,7 @@ public class UrlBuilder {
     }
 
     public static String buiildPolicyDetailUrl(String host, int port, Map<String, String> tags) {
-        String baseUrl = "http://" + host + ":" + String.valueOf(port) + "/eagle-service/#/dam/policyDetail?";
+        String baseUrl = "http://" + host + ":" + String.valueOf(port) + "/eagle-service/ui/#/common/policyDetail/?";
         String format = "policy=%s&site=%s&executor=%s";
         String policy = tags.get(Constants.POLICY_ID);
         String site = tags.get(EagleConfigConstants.SITE);

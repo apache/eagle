@@ -34,7 +34,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
            "application":"hadoopJmxMetricDataSource"
         },
         "enabled": true,
-        "config": "{\"druid\": {\"coordinator\": \"coordinatorHost:port\", \"broker\": \"brokerHost:port\"}}"
+        "config": "web.druid.coordinator=coordinatorHost:port\nweb.druid.broker=brokerHost:port"
      }
   ]
   '

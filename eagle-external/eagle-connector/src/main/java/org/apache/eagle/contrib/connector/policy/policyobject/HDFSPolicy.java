@@ -23,236 +23,235 @@ import org.apache.eagle.contrib.connector.policy.policydef.HDFSPolicyDef;
 import org.apache.eagle.contrib.connector.policy.tag.HDFSPolicyTags;
 
 
-public class HDFSPolicyObject extends PolicyObjectBase {
+public class HDFSPolicy extends PolicyBase {
 
     private void checkHDFSPolicyDef(){
         if (policyDef == null){
             policyDef = new HDFSPolicyDef();
         }
     }
-
-
-    //initialize hdfspolicyObject
-    public HDFSPolicyObject(){
+    
+    //initialize hdfs policy Object
+    public HDFSPolicy(){
         policyTags = new HDFSPolicyTags();
     }
 
-    public HDFSPolicyObject setSite(String site){
+    public HDFSPolicy setSite(String site){
         policyTags.setSite(site);
         return this;
     }
 
-    public HDFSPolicyObject setPolicyId(String policyId){
+    public HDFSPolicy setPolicyId(String policyId){
         policyTags.setPolicyId(policyId);
         return this;
     }
 
     //================set PolicyDef====================//
     //set allowed
-    public HDFSPolicyObject setAllowed(boolean allowed){
+    public HDFSPolicy setAllowed(boolean allowed){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).setAllowed(allowed);
         return this;
     }
 
     //set cmd
-    public HDFSPolicyObject setCmdEqualsTo(String cmd){
+    public HDFSPolicy setCmdEqualsTo(String cmd){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).cmdEqualsTo(cmd);
         return this;
     }
-    public HDFSPolicyObject setCmdNotEqualsTo(String cmd){
+    public HDFSPolicy setCmdNotEqualsTo(String cmd){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).cmdNotEqualsTo(cmd);
         return this;
     }
-    public HDFSPolicyObject setCmdContains(String cmd){
+    public HDFSPolicy setCmdContains(String cmd){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).cmdContains(cmd);
         return this;
     }
-    public HDFSPolicyObject setCmdRgexp(String cmd){
+    public HDFSPolicy setCmdRegex(String cmd){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).cmdRegexp(cmd);
         return this;
     }
 
     //set dst
-    public HDFSPolicyObject setDstEqualsTo(String dst){
+    public HDFSPolicy setDstEqualsTo(String dst){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).dstEqualsTo(dst);
         return this;
     }
-    public HDFSPolicyObject setDstNotEqualsTo(String dst){
+    public HDFSPolicy setDstNotEqualsTo(String dst){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).dstNotEqualsTo(dst);
         return this;
     }
-    public HDFSPolicyObject setDstContains(String dst){
+    public HDFSPolicy setDstContains(String dst){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).dstContains(dst);
         return this;
     }
-    public HDFSPolicyObject setDstRgexp(String dst){
+    public HDFSPolicy setDstRegex(String dst){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).dstRegexp(dst);
         return this;
     }
 
     //set host
-    public HDFSPolicyObject setHostEqualsTo(String host){
+    public HDFSPolicy setHostEqualsTo(String host){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).hostEqualsTo(host);
         return this;
     }
-    public HDFSPolicyObject setHostNotEqualsTo(String host){
+    public HDFSPolicy setHostNotEqualsTo(String host){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).hostNotEqualsTo(host);
         return this;
     }
-    public HDFSPolicyObject setHostContains(String host){
+    public HDFSPolicy setHostContains(String host){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).hostContains(host);
         return this;
     }
-    public HDFSPolicyObject setHostRgexp(String host){
+    public HDFSPolicy setHostRgexp(String host){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).hostRegexp(host);
         return this;
     }
 
     //set securityZone
-    public HDFSPolicyObject setSecurityZoneEqualsTo(String securityZone){
+    public HDFSPolicy setSecurityZoneEqualsTo(String securityZone){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).securityZoneEqualsTo(securityZone);
         return this;
     }
-    public HDFSPolicyObject setSecurityZoneNotEqualsTo(String securityZone){
+    public HDFSPolicy setSecurityZoneNotEqualsTo(String securityZone){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).securityZoneNotEqualsTo(securityZone);
         return this;
     }
-    public HDFSPolicyObject setSecurityZoneContains(String securityZone){
+    public HDFSPolicy setSecurityZoneContains(String securityZone){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).securityZoneContains(securityZone);
         return this;
     }
-    public HDFSPolicyObject setSecurityZoneRgexp(String securityZone){
+    public HDFSPolicy setSecurityZoneRgexp(String securityZone){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).securityZoneRegexp(securityZone);
         return this;
     }
 
     //set sensitivityType
-    public HDFSPolicyObject setSensitivityTypeEqualsTo(String sensitivityType){
+    public HDFSPolicy setSensitivityTypeEqualsTo(String sensitivityType){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).sensitivityTypeEqualsTo(sensitivityType);
         return this;
     }
-    public HDFSPolicyObject setSensitivityTypeNotEqualsTo(String sensitivityType){
+    public HDFSPolicy setSensitivityTypeNotEqualsTo(String sensitivityType){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).sensitivityTypeNotEqualsTo(sensitivityType);
         return this;
     }
-    public HDFSPolicyObject setSensitivityTypeContains(String sensitivityType){
+    public HDFSPolicy setSensitivityTypeContains(String sensitivityType){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).sensitivityTypeContains(sensitivityType);
         return this;
     }
-    public HDFSPolicyObject setSensitivityTypeRgexp(String sensitivityType){
+    public HDFSPolicy setSensitivityTypeRgexp(String sensitivityType){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).sensitivityTypeRegexp(sensitivityType);
         return this;
     }
 
     //set src
-    public HDFSPolicyObject setSrcEqualsTo(String src){
+    public HDFSPolicy setSrcEqualsTo(String src){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).srcEqualsTo(src);
         return this;
     }
-    public HDFSPolicyObject setSrcNotEqualsTo(String src){
+    public HDFSPolicy setSrcNotEqualsTo(String src){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).srcNotEqualsTo(src);
         return this;
     }
-    public HDFSPolicyObject setSrcContains(String src){
+    public HDFSPolicy setSrcContains(String src){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).srcContains(src);
         return this;
     }
-    public HDFSPolicyObject setSrcRgexp(String src){
+    public HDFSPolicy setSrcRgexp(String src){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).srcRegexp(src);
         return this;
     }
 
     //set timestamp
-    public HDFSPolicyObject setTimestampEqualsTo(int timestamp){
+    public HDFSPolicy setTimestampEqualsTo(int timestamp){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).timestampEqualsTo(timestamp);
         return this;
     }
-    public HDFSPolicyObject setTimestampNotEqualsTo(int timestamp){
+    public HDFSPolicy setTimestampNotEqualsTo(int timestamp){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).timestampNotEqualsTo(timestamp);
         return this;
     }
-    public HDFSPolicyObject setTimestampLargerThan(int timestamp){
+    public HDFSPolicy setTimestampLargerThan(int timestamp){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).timestampLargerThan(timestamp);
         return this;
     }
-    public HDFSPolicyObject setTimestampLargerThanOrEqualTo(int timestamp){
+    public HDFSPolicy setTimestampLargerThanOrEqualTo(int timestamp){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).timestampLargerThanOrEqualsTo(timestamp);
         return this;
     }
-    public HDFSPolicyObject setTimestampLessThan(int timestamp){
+    public HDFSPolicy setTimestampLessThan(int timestamp){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).timestampLessThan(timestamp);
         return this;
     }
-    public HDFSPolicyObject setTimestampLessThanOrEqualTo(int timestamp){
+    public HDFSPolicy setTimestampLessThanOrEqualTo(int timestamp){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef)policyDef).timestampLessThanOrEqualsTo(timestamp);
         return this;
     }
 
     //set user
-    public HDFSPolicyObject setUserEqualsTo(String user){
+    public HDFSPolicy setUserEqualsTo(String user){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).userEqualsTo(user);
         return this;
     }
-    public HDFSPolicyObject setUserNotEqualsTo(String user){
+    public HDFSPolicy setUserNotEqualsTo(String user){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).userNotEqualsTo(user);
         return this;
     }
-    public HDFSPolicyObject setUserContains(String user){
+    public HDFSPolicy setUserContains(String user){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).userContains(user);
         return this;
     }
-    public HDFSPolicyObject setUserRgexp(String user){
+    public HDFSPolicy setUserRgexp(String user){
         checkHDFSPolicyDef();
         ((HDFSPolicyDef) policyDef).userRegexp(user);
         return this;
     }
 
-    //Override functions for adding notification and return a HDFSPolicyObject
-    public HDFSPolicyObject addEmailNotificaiton(EmailNotification emailNotification){
+    //Override functions for adding notification and return a HDFSPolicy
+    public HDFSPolicy addEmailNotification(EmailNotification emailNotification){
         checkNotificationDef();
         notificationDef.addEmailNotification(emailNotification);
         return this;
     }
-    public HDFSPolicyObject addKafkaNotification(String kafkaBroker, String topic){
+    public HDFSPolicy addKafkaNotification(String kafkaBroker, String topic){
         checkNotificationDef();
         notificationDef.addKafkaNotification(kafkaBroker, topic);
         return this;
     }
-    public HDFSPolicyObject addEagleStore(){
+    public HDFSPolicy addEagleStore(){
         checkNotificationDef();
         notificationDef.addEgleStore();
         return this;

@@ -24,7 +24,7 @@ import org.apache.eagle.contrib.connector.policy.common.PolicyConstants;
 public class HDFSPolicyTags extends PolicyTagsBase{
 
     public HDFSPolicyTags(){
-        applicaiton = PolicyConstants.HDFS_APPLICATION;
+        application = PolicyConstants.HDFS_APPLICATION;
         alertExecutorId = PolicyConstants.HDFS_ALERTEXECUTORID;
         policyType = PolicyConstants.HDFS_POLICYTYPE;
     }

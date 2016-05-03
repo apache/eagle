@@ -55,5 +55,7 @@ pages:
     - Apache Eagle Development Environment Setup: development/eagle_development_setup.md
 - Tutorial:
    - Getting started with Eagle: tutorial/getting_started_with_eagle.md
+   - Application Manager Tutorial: tutorial/application_manager_tutorial.md
+   - Alert Notification Plugin tutorial: tutorial/alert_notification_plugin_tutorial.md
 - User Guide:
    - Installation: userguide/installation.md

@@ -19,6 +19,7 @@
 package org.apache.eagle.contrib.connector.policy.policyobject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.eagle.contrib.connector.policy.common.PolicyConstants;
 import org.apache.eagle.contrib.connector.policy.notification.EmailNotification;
 import org.apache.eagle.contrib.connector.policy.notification.NotificationDef;
 import org.apache.eagle.contrib.connector.policy.policydef.PolicyDefBase;
@@ -27,13 +28,9 @@ import org.apache.eagle.contrib.connector.policy.tag.PolicyTagsBase;
 import java.util.ArrayList;
 
 
-public abstract class PolicyObjectBase {
-//// parameter hashmap
-//    /**In the parameterHashMap each entry stores a Match Criteria */
-//    public HashMap<String,Set<Field>> parameterHashMap = new HashMap<String, Set<Field>>();
-
+public abstract class PolicyBase {
     /**
-     * poliyTags contains "site, applicaiton, policyId, alertExecutorId, policyType"
+     * poliyTags contains "site, application, policyId, alertExecutorId, policyType"
      * */
     protected   PolicyTagsBase policyTags;
     protected   PolicyDefBase policyDef;
@@ -62,7 +59,7 @@ public abstract class PolicyObjectBase {
         }
     }
 
-    public PolicyObjectBase setDescription(String description){
+    public PolicyBase setDescription(String description){
         this.description = description;
         return this;
     }
@@ -71,7 +68,7 @@ public abstract class PolicyObjectBase {
     }
 
 
-    public PolicyObjectBase setEnabled(boolean enabled){
+    public PolicyBase setEnabled(boolean enabled){
         this.enabled = enabled;
         return this;
     }
@@ -79,8 +76,8 @@ public abstract class PolicyObjectBase {
         return enabled;
     }
 
-//Todo: duble check the key word for dedupef
-    public PolicyObjectBase setDedupeDef(int min){
+
+    public PolicyBase setDedupeDef(int min){
         this.dedupeDef = min;
         return this;
     }
@@ -90,17 +87,17 @@ public abstract class PolicyObjectBase {
 
 
 // Need to be override  to return child object
-    public PolicyObjectBase addEmailNotificaiton(EmailNotification emailNotification){
+    public PolicyBase addEmailNotification(EmailNotification emailNotification){
         checkNotificationDef();
         notificationDef.addEmailNotification(emailNotification);
         return this;
     }
-    public PolicyObjectBase addKafkaNotification(String kafkaBroker, String topic){
+    public PolicyBase addKafkaNotification(String kafkaBroker, String topic){
         checkNotificationDef();
         notificationDef.addKafkaNotification(kafkaBroker, topic);
         return this;
     }
-    public PolicyObjectBase addEagleStore(){
+    public PolicyBase addEagleStore(){
         checkNotificationDef();
         notificationDef.addEgleStore();
         return this;
@@ -117,22 +114,13 @@ public abstract class PolicyObjectBase {
         if(policyDef != null) policyEntries.add(policyDef.toJSONEntry());
         if(notificationDef != null) policyEntries.add(notificationDef.toJSONEntry());
 
-        //Todo: Bug or wrong format?  need to be changed in future, for now just leave dupe setting as empty
-        //policyEntries.add("\"dedupeDef\":{\\\"" + PolicyConstants.ALERT_DEDUP_INTERVAL_MIN + "\\\":" + String.valueOf(dedupeDef) + "}");
+        policyEntries.add("\"dedupeDef\":\"{\\\"" + PolicyConstants.ALERT_DEDUP_INTERVAL_MIN + "\\\":" + String.valueOf(dedupeDef) + "}\"");
         policyEntries.add("\"enabled\":"+String.valueOf(enabled));
-
 
         String value = StringUtils.join(policyEntries,",");
         StringBuilder jsonData = new StringBuilder(200);
-        jsonData.append("[{").append(value).append("}]");
+        jsonData.append("{").append(value).append("}");
 
         return jsonData.toString();
     }
-
-
-
-
-
-
-
 }
