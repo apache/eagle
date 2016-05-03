@@ -152,12 +152,12 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
     private Column createTagColumn(String tagName){
         Column tagColumn = new Column();
         tagColumn.setName(tagName);
-        tagColumn.setTypeCode(Types.LONGVARCHAR); //equivalent to MySql mediumtext (size in chars 16,777,215 (224−1) bytes = 16 MiB)
+        tagColumn.setTypeCode(Types.VARCHAR);
         tagColumn.setJavaName(tagName);
-//        tagColumn.setScale(1024);
-        //tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
+ //     tagColumn.setScale(1024);
+	tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
         tagColumn.setDefaultValue(null);
-        tagColumn.setDescription("eagle entity tag column for "+tagName);
+	tagColumn.setDescription("eagle entity tag column for "+tagName);
         return tagColumn;
     }
 
