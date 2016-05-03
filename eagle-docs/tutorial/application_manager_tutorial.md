@@ -51,17 +51,17 @@ After the configuration is ready, start Eagle service `bin/eagle-service.sh star
   
 #### Step 2: add topologies on UI
 1. First of all, go to admin page 
-   ![admin page](/images/appManager/admin-page.png)
-   ![admin page](/images/appManager/topology-monitor.png)
+   ![admin-page](/images/appManager/admin-page.png)
+   ![topology-monitor](/images/appManager/topology-monitor.png)
     
 2. Go to management page, and create a topology description. There are three required fields
     * name: topology name
     * type: topology type [CLASS, DYNAMIC]
     * execution entry: either the class which implement interface TopologyExecutable or eagle [DSL](https://github.com/apache/incubator-eagle/blob/master/eagle-assembly/src/main/conf/sandbox-hadoopjmx-pipeline.conf) based topology definition
-   ![admin page](/images/appManager/topology-description.png)
+   ![topology-description](/images/appManager/topology-description.png)
    
 3. Back to monitoring page, and choose the site/application to deploy the topology 
-   ![admin page](/images/appManager/topology-execution.png)
+   ![topology-execution](/images/appManager/topology-execution.png)
    
 4. Go to site page, and edit site->application and add some new configurations. Blow are some example configurations for [site=sandbox, applicatoin=hbaseSecurityLog]
    `These configurations have a higher priority than those in eagle-scheduler.conf`
@@ -94,16 +94,16 @@ After the configuration is ready, start Eagle service `bin/eagle-service.sh star
            app.eagleProps.eagleService.port=9099
            app.eagleProps.eagleService.username=admin
            app.eagleProps.eagleService.password=secret
-   ![admin page](/images/appManager/topology-configuration-1.png)
-   ![admin page](/images/appManager/topology-configuration-2.png)
+   ![topology-configuration-1](/images/appManager/topology-configuration-1.png)
+   ![topology-configuration-2](/images/appManager/topology-configuration-2.png)
    
 5. Go to monitoring page, and start topologies
-   ![admin page](/images/appManager/start-topology-1.png)
-   ![admin page](/images/appManager/start-topology-2.png)
+   ![start-topology-1](/images/appManager/start-topology-1.png)
+   ![start-topology-2](/images/appManager/start-topology-2.png)
    
 6. stop topologies on monitoring page
-   ![admin page](/images/appManager/stop-topology-1.png)
-   ![admin page](/images/appManager/stop-topology-2.png)
-   ![admin page](/images/appManager/stop-topology-3.png)
+   ![stop-topology-1](/images/appManager/stop-topology-1.png)
+   ![stop-topology-2](/images/appManager/stop-topology-2.png)
+   ![stop-topology-3](/images/appManager/stop-topology-3.png)
 
  
