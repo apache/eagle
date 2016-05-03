@@ -29,7 +29,7 @@ public class NotificationDef {
 
     public NotificationDef(){
         notificationList = new ArrayList<>();
-        // by default we use eagle store notification
+        // by default use eagle store notification
         notificationList.add(new EagleStore());
     }
 
