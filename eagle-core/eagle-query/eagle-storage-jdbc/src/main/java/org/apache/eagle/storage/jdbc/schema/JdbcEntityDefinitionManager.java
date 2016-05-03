@@ -147,7 +147,7 @@ public class JdbcEntityDefinitionManager {
     }
 
     //================================================
-    // Intially bind basic java types with SQL types
+    // Initially bind basic java types with SQL types
     //================================================
     static {
         registerJdbcType(String.class, Types.LONGVARCHAR);

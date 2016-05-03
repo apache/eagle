@@ -33,5 +33,6 @@
     <modules>
         <module>eagle-log4jkafka</module>
         <module>eagle-kafka</module>
+        <module>eagle-connector</module>
     </modules>
 </project>

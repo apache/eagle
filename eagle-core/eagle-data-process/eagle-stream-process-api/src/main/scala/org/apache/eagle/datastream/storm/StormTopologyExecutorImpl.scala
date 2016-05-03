@@ -22,6 +22,7 @@ import _root_.storm.trident.spout.RichSpoutBatchExecutor
 import backtype.storm.generated.StormTopology
 import backtype.storm.utils.Utils
 import backtype.storm.{Config, LocalCluster, StormSubmitter}
+import org.apache.eagle.common.config.EagleConfigConstants
 import org.apache.eagle.datastream.core.AbstractTopologyExecutor
 import org.apache.thrift7.transport.TTransportException
 import org.slf4j.LoggerFactory
@@ -31,7 +32,7 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
   val LOG = LoggerFactory.getLogger(classOf[StormTopologyExecutorImpl])
   @throws(classOf[Exception])
   def execute {
-    val localMode: Boolean = config.getString("envContextConfig.mode").equalsIgnoreCase("local")
+    val localMode: Boolean = config.getString("envContextConfig.mode").equalsIgnoreCase(EagleConfigConstants.LOCAL_MODE)
     val conf: Config = new Config
     conf.put(RichSpoutBatchExecutor.MAX_BATCH_SIZE_CONF, Int.box(64 * 1024))
     conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, Int.box(8))
@@ -91,12 +92,15 @@ case class StormTopologyExecutorImpl(topology: StormTopology, config: com.typesa
       LOG.info("Submitting as local mode")
       val cluster: LocalCluster = new LocalCluster
       cluster.submitTopology(topologyName, conf, topology)
-      while(true) {
-        try {
+      try {
+        while(true) {
           Utils.sleep(Integer.MAX_VALUE)
-        } catch {
-          case _: Throwable => () // Do nothing
         }
+      } catch {
+        case ex: Throwable =>
+          LOG.warn("Sleep is interrupted with " + ex.toString)
+          cluster.killTopology(topologyName)
+          cluster.shutdown
       }
     }
   }

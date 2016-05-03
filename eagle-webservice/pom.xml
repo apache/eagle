@@ -140,12 +140,28 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-security-hdfs-web</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.apache.eagle</groupId>
+			<artifactId>eagle-stream-application-manager</artifactId>
+			<version>${project.version}</version>
+		</dependency> -->
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-topology-assembly</artifactId>
+            <version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.quartz-scheduler</groupId>
+					<artifactId>quartz</artifactId>
+				</exclusion>
+			</exclusions>
+        </dependency>
 
 		<!-- eagle user profile common dependency -->
 		<dependency>
@@ -163,7 +179,6 @@
 			<artifactId>eagle-machinelearning-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-alert-base</artifactId>
