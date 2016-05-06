@@ -38,32 +38,34 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NotificationPluginManagerImpl implements NotificationPluginManager {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationPluginManagerImpl.class);
     // mapping from policy Id to NotificationPlugin instance
-    private Map<String, Collection<NotificationPlugin>> policyNotificationMapping = new ConcurrentHashMap<>(1); //only one write thread
+    //only one write thread
+    private Map<String, Collection<NotificationPlugin>> policyNotificationMapping = new ConcurrentHashMap<>(1);
     private Config config;
 
-    public NotificationPluginManagerImpl(Config config){
+    public NotificationPluginManagerImpl(Config config) {
         this.config = config;
         internalInit();
     }
 
-    private void internalInit(){
+    private void internalInit() {
         // iterate all policy ids, keep those notification which belong to plugins
-        PolicyDefinitionDAO policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector( config ) , Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
+        PolicyDefinitionDAO policyDefinitionDao = new PolicyDefinitionEntityDAOImpl(
+                new EagleServiceConnector(config), Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME);
         String site = config.getString("eagleProps.site");
         String application = config.getString("eagleProps.application");
-        try{
-            List<AlertDefinitionAPIEntity> activeAlertDefs = policyDefinitionDao.findActivePolicies( site , application);
+        try {
+            List<AlertDefinitionAPIEntity> activeAlertDefs = policyDefinitionDao.findActivePolicies(site, application);
             // initialize all loaded plugins
             NotificationPluginLoader.getInstance().init(config);
-            for(NotificationPlugin plugin : NotificationPluginLoader.getInstance().getNotificationMapping().values()){
+            for (NotificationPlugin plugin : NotificationPluginLoader.getInstance().getNotificationMapping().values()) {
                 plugin.init(config, activeAlertDefs);
             }
             // build policy and plugin mapping
-            for( AlertDefinitionAPIEntity entity : activeAlertDefs ){
+            for (AlertDefinitionAPIEntity entity : activeAlertDefs) {
                 Map<String, NotificationPlugin> plugins = pluginsForPolicy(entity);
-                policyNotificationMapping.put(entity.getTags().get(Constants.POLICY_ID) , plugins.values());
+                policyNotificationMapping.put(entity.getTags().get(Constants.POLICY_ID), plugins.values());
             }
-        }catch (Exception ex ){
+        } catch (Exception ex) {
             LOG.error("Error initializing policy/notification mapping ", ex);
             throw new IllegalStateException(ex);
         }
@@ -73,15 +75,16 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
     public void notifyAlert(AlertAPIEntity entity) {
         String policyId = entity.getTags().get(Constants.POLICY_ID);
         Collection<NotificationPlugin> plugins = policyNotificationMapping.get(policyId);
-        if(plugins == null || plugins.size() == 0) {
+        if (plugins == null || plugins.size() == 0) {
             LOG.warn("no alert notification plugins found for policy " + policyId);
             return;
         }
-        for(NotificationPlugin plugin : plugins){
+
+        for (NotificationPlugin plugin : plugins) {
             try {
                 LOG.info("execute notification plugin " + plugin);
                 plugin.onAlert(entity);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 LOG.error("fail invoking plugin's onAlert, continue ", ex);
             }
         }
@@ -105,7 +108,7 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
             Map<String, NotificationPlugin> plugins = pluginsForPolicy(alertDef);
             // calculate difference between current plugins and previous plugin
             Collection<NotificationPlugin> previousPlugins = policyNotificationMapping.get(policyId);
-            if(previousPlugins != null) {
+            if (previousPlugins != null) {
                 Collection<NotificationPlugin> deletedPlugins = CollectionUtils.subtract(previousPlugins, plugins.values());
                 LOG.info("Going to delete plugins " + deletedPlugins + ", for policy " + policyId);
                 for (NotificationPlugin plugin : deletedPlugins) {
@@ -114,8 +117,9 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
             }
 
             // iterate current notifications and update it individually
-            List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(alertDef.getNotificationDef());
-            for(NotificationPlugin plugin: plugins.values()) {
+            List<Map<String,String>> notificationConfigCollection =
+                    NotificationPluginUtils.deserializeNotificationConfig(alertDef.getNotificationDef());
+            for (NotificationPlugin plugin: plugins.values()) {
                 plugin.update(policyId, notificationConfigCollection, false);
             }
 
@@ -126,26 +130,43 @@ public class NotificationPluginManagerImpl implements NotificationPluginManager 
         }
     }
 
-    private Map<String, NotificationPlugin> pluginsForPolicy(AlertDefinitionAPIEntity policy) throws Exception{
+    private Map<String, NotificationPlugin> pluginsForPolicy(AlertDefinitionAPIEntity policy) throws Exception {
         NotificationPluginLoader loader = NotificationPluginLoader.getInstance();
         loader.init(config);
         Map<String, NotificationPlugin> plugins = loader.getNotificationMapping();
         // mapping from notificationType to plugin
-        Map<String, NotificationPlugin>  notifications = new HashMap<>();
-        List<Map<String,String>> notificationConfigCollection = NotificationPluginUtils.deserializeNotificationConfig(policy.getNotificationDef());
-        for(Map<String,String> notificationConf : notificationConfigCollection ){
+        Map<String, NotificationPlugin> notifications = new HashMap<>();
+
+        // Make eagleStore as the default notification method.
+        // If "eagleNotificationProps.eagleStoreEnabled" is not set, we still make eagleStore default.
+        String eagleStorePath = "eagleNotificationProps.eagleStoreEnabled";
+        if (config.hasPath(eagleStorePath)) {
+            if (config.getBoolean(eagleStorePath)) {
+                LOG.info("eagleNotificationProps.eagleStoreEnabled = true");
+                notifications.put(NotificationConstants.EAGLE_STORE, plugins.get(NotificationConstants.EAGLE_STORE));
+            }
+        } else {
+            // "eagleNotificationProps.eagleStoreEnabled" is not set. We still make eagleStore default.
+            LOG.info("eagleNotificationProps.eagleStoreEnabled is not set. Make eagleStore default.");
+            notifications.put(NotificationConstants.EAGLE_STORE, plugins.get(NotificationConstants.EAGLE_STORE));
+        }
+
+        List<Map<String,String>> notificationConfigCollection =
+                NotificationPluginUtils.deserializeNotificationConfig(policy.getNotificationDef());
+
+        for (Map<String,String> notificationConf : notificationConfigCollection) {
             String notificationType = notificationConf.get(NotificationConstants.NOTIFICATION_TYPE);
             // for backward compatibility, by default notification type is email if notification type is not specified
-            if(notificationType == null){
+            if (notificationType == null) {
                 LOG.warn("notificationType is null so use default notification type email for this policy  " + policy);
                 notifications.put(NotificationConstants.EMAIL_NOTIFICATION, plugins.get(NotificationConstants.EMAIL_NOTIFICATION));
-                notifications.put(NotificationConstants.EAGLE_STORE, plugins.get(NotificationConstants.EAGLE_STORE));
-            }else if(!plugins.containsKey(notificationType)){
+            } else if (!plugins.containsKey(notificationType)) {
                 LOG.warn("No NotificationPlugin supports this notificationType " + notificationType);
-            }else {
+            } else {
                 notifications.put(notificationType, plugins.get(notificationType));
             }
         }
+
         return notifications;
     }
 }
