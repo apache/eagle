@@ -162,8 +162,12 @@
 
         <!-- Environment Versions-->
         <hadoop.version>2.6.0.2.2.5.1-3</hadoop.version>
+        <mapr-hadoop.version>2.7.0-mapr-1506</mapr-hadoop.version>
+        <maprfs.version>5.0.0-mapr</maprfs.version>
         <hbase.version>0.98.4.2.2.5.1-3-hadoop2</hbase.version>
+        <mapr-hbase.version>0.98.9-mapr-1503</mapr-hbase.version>
         <hive.version>1.2.1</hive.version>
+        <mapr-hive.version>1.2.0-mapr-1510</mapr-hive.version>
         <spark.core.version>1.4.0</spark.core.version>
 
         <!--  Client -->
@@ -212,9 +216,12 @@
         <!-- Streaming -->
         <kafka.version>0.8.1.2.2.0.0-2041</kafka.version>
         <kafka-clients.version>0.8.2.0</kafka-clients.version>
+        <mapr-kafka-clients.version>0.8.3-mapr-1509</mapr-kafka-clients.version>
         <jgrapht.version>0.9.0</jgrapht.version>
         <storm-kafka.version>0.9.3.2.2.0.0-2041</storm-kafka.version>
+        <mapr-storm-kafka.version>0.9.3-mapr-1509</mapr-storm-kafka.version>
         <storm.version>0.9.3</storm.version>
+        <mapr-storm.version>0.9.3-mapr-1509</mapr-storm.version>
         <curator.version>2.8.0</curator.version>
 
         <!-- Query -->
@@ -239,7 +246,7 @@
         <jaxb-impl.version>2.2.6</jaxb-impl.version>
         <stax-api.version>1.0.1</stax-api.version>
         <org.mortbay.jetty.version>6.1.26</org.mortbay.jetty.version>
-                
+
         <!-- servlet  -->
         <servlet-api.version>2.5</servlet-api.version>
 
@@ -802,6 +809,60 @@
                 </dependencies>
             </dependencyManagement>
         </profile>
+
+        <profile>
+            <id>mapr</id>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-common</artifactId>
+                        <version>${mapr-hadoop.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.hbase</groupId>
+                        <artifactId>hbase-client</artifactId>
+                        <version>${mapr-hbase.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mapr.hadoop</groupId>
+                        <artifactId>maprfs</artifactId>
+                        <version>${maprfs.version}}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-client</artifactId>
+                        <version>${mapr-hadoop.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-auth</artifactId>
+                        <version>${mapr-hadoop.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hbase</groupId>
+                        <artifactId>hbase-server</artifactId>
+                        <version>${mapr-hbase.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hbase</groupId>
+                        <artifactId>hbase-testing-util</artifactId>
+                        <version>${mapr-hbase.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hive</groupId>
+                        <artifactId>hive-exec</artifactId>
+                        <version>${mapr-hive.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hive</groupId>
+                        <artifactId>hive-jdbc</artifactId>
+                        <version>${mapr-hive.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
     </profiles>
     <build>
         <pluginManagement>
@@ -950,11 +1011,11 @@
                                 <exclude>**/webapp/**</exclude>
 
                             </excludes>
-                         </configuration>
-                     </execution>
-                 </executions>
-             </plugin>
-         </plugins>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
     <repositories>
         <repository>
@@ -975,6 +1036,12 @@
             </releases>
             <name>HDP Central</name>
             <layout>default</layout>
+        </repository>
+        <repository>
+            <id>mapr-releases</id>
+            <url>http://repository.mapr.com/maven/</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
         </repository>
         <repository>
             <id>Maven Repo1 Repository</id>
