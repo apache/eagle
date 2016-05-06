@@ -22,6 +22,7 @@ package org.apache.eagle.alert.state;
 import org.apache.eagle.common.DateTimeUtil;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -158,7 +159,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         return executionPlanRuntime;
     }
 
-    @Test
+    @Ignore
     public void testLengthSlideWindowWithGroupby() throws Exception{
         String tmpdir = System.getProperty("java.io.tmpdir");
         System.out.println("temporary directory: " + tmpdir);
