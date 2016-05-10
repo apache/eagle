@@ -192,7 +192,7 @@
 					$scope.tabHolder.setSelect(holder.entity.name);
 				}, 0);
 			});
-		}
+		};
 
 		function deleteGroup() {
 			var group = $scope.tabHolder.selectedPane.data;
