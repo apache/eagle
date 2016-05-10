@@ -16,7 +16,11 @@
   */
 package org.apache.eagle.datastream.sparkstreaming
 
+import java.util
+import java.util.Properties
+
 import org.apache.eagle.alert.executor.AlertExecutor
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme
 import org.apache.eagle.datastream.Collector
 import org.apache.eagle.datastream.core._
 import org.apache.spark.streaming.StreamingContext
@@ -39,8 +43,26 @@ object DStreamFactory {
         val zkConnection = p.config.getString("dataSourceConfig.zkConnection");
         val groupId = p.config.getString("dataSourceConfig.consumerGroupId");
 
+        val deserClsName = p.config.getString("dataSourceConfig.deserializerClass")
+        val deserializer = new KafkaSourcedSpoutScheme(deserClsName,p.config)
+
+        val prop: Properties = new Properties
+        if (p.config.hasPath("eagleProps")) {
+          prop.putAll(p.config.getObject("eagleProps"))
+         }
+
+         //val deserializer = new JsonMessageDeserializer(prop);
         val D = KafkaUtils.createStream(ssc,zkConnection,groupId,Map(topic -> 1))
-        D.asInstanceOf[DStream[Any]]
+        D.asInstanceOf[DStream[Any]].map(o => o match {
+          case Tuple2(a,b) => {
+            if(b.isInstanceOf[String]) {
+              val result = deserializer.deserialize(b.asInstanceOf[String].getBytes())
+              Tuple2(a, result.get(0))
+            }
+            else Tuple2(a,b)
+          }
+          case a => a
+         })
     }
       case _ =>
         throw new IllegalArgumentException(s"Cannot compile unknown $from to a Storm Spout")
@@ -53,22 +75,40 @@ object DStreamFactory {
     }
   }
 
+  def tupleToSeq(tuple:Any):Seq[AnyRef]={
+    tuple match {
+      case scala.Tuple1(a) => Seq(util.Arrays.asList(a.asInstanceOf[AnyRef]))
+      case scala.Tuple2(a, b) => Seq(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef]))
+      case scala.Tuple3(a, b, c) => {
+
+        if(a == null) Seq("test", b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef])
+        else Seq(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef]))
+      }
+      case scala.Tuple4(a, b, c, d) => Seq(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef], d.asInstanceOf[AnyRef]))
+      case a => Seq(util.Arrays.asList(a.asInstanceOf[AnyRef]))
+    }
+  }
+
   def createDStreamsByDFS(graph: StreamProducerGraph, from: DStream[Any], to: StreamProducer[Any]): Unit = {
     implicit val streamInfo = to.getInfo
     val dStream = to match {
       case  FlatMapProducer(flatMapper) => {
-        //val flatMapperWrapper = flatMapper.asInstanceOf[FlatMapper[Any]]
-        if(flatMapper.isInstanceOf[AlertExecutor]){
+        if (flatMapper.isInstanceOf[AlertExecutor]) {
           flatMapper.asInstanceOf[AlertExecutor].prepareConfig(to.config)
+
+          from.flatMap(input => {
+            val result = mutable.ListBuffer[Any]()
+            flatMapper.flatMap(tupleToSeq(input),new TraversableCollector(result))
+            result
+          })
         }
-
-        from.flatMap(input => {
-          val result= mutable.ListBuffer[Any]()
-          val flatMapperInput = Seq(input)
-
-          flatMapper.flatMap(flatMapperInput.asInstanceOf[Seq[AnyRef]],new TraversableCollector(result))
-          result
-        })
+        else {
+          from.flatMap(input => {
+            val result = mutable.ListBuffer[Any]()
+            flatMapper.flatMap(Seq(input).asInstanceOf[Seq[AnyRef]],new TraversableCollector(result))
+            result
+          })
+        }
       }
       case filter: FilterProducer[Any] => {
         from.filter(filter.fn)
@@ -93,7 +133,8 @@ object DStreamFactory {
     }
 
     val edges = graph.outgoingEdgesOf(to)
-    if(edges.size == 0){
+    //if no output, force to output!
+    if(edges.size == 0 && dStream.isInstanceOf[DStream[Any]]){
       dStream.asInstanceOf[DStream[Any]].foreachRDD(rdd => {
         rdd.collect().foreach(println)
       })

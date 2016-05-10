@@ -43,9 +43,7 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -314,11 +312,6 @@ public abstract class PolicyProcessExecutor<T extends AbstractPolicyDefinitionEn
     @Override
     public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, K>> outputCollector){
 		if(!initialized) init();
-		java.util.List<Object> input1 = new java.util.ArrayList<>();
-		input1.add("test");
-		input1.add("spark-streaming-kafka");
-		input1.add(input.get(0));
-		input = input1;
         if(input.size() != 3)
             throw new IllegalStateException("AlertExecutor always consumes exactly 3 fields: key, stream name and value(SortedMap)");
         if(LOG.isDebugEnabled()) LOG.debug("Msg is coming " + input.get(2));

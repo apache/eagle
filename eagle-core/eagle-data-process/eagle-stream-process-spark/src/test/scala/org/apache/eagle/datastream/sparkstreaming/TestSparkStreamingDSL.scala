@@ -25,7 +25,6 @@ case class Entity(name:String,value:Double,var inc:Int=0){
     "name="+name+","+"value="+value+","+"inc="+inc
   }
 }
-
 object TestSparkStreamingDSL extends App{
   val env = ExecutionEnvironments.get[SparkStreamingExecutionEnvironment](args)
   val tuples = Seq(
@@ -39,20 +38,22 @@ object TestSparkStreamingDSL extends App{
 
   val tmp  = Seq("eBay ADI SPARK","SJTU CS","QZK TW zqin","arsenal","SPARK")
 
-
-
-  /*env.from(tmp,recycle = true)
+  env.from(tmp,recycle = true)
     .flatMap(_.split(" "))
     .map(o => (o,1))
     .reduceByKey((x:Int, y:Int) => x+y)
     .filter(o => !o._1.contains("zqin"))
     .foreach(println)
-  env.execute()*/
+  env.execute()
+}
 
-  val streamName = env.config.get[String]("eagle.stream.name","eventStream")
-  val streamExecutorId = env.config.get[String]("eagle.stream.executor",s"${streamName}Executor")
+object TestSparkStreamingWithAlertDSL extends App{
+  val env = ExecutionEnvironments.get[SparkStreamingExecutionEnvironment](args)
+  val streamName = "cassandraQueryLogStream"
+  val streamExecutorId = "cassandraQueryLogExecutor"
   env.config.set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
-  env.fromKafka().parallelism(1).nameAs(streamName) ! (Seq(streamName),streamExecutorId)
-  //env.fromKafka().foreach(println)
+  env.fromKafka().parallelism(1).nameAs(streamName).! (Seq(streamName),streamExecutorId)
+  //env.fromKafka().parallelism(1).nameAs(streamName).map(a => new Tuple3("test",streamName,a)) ! (Seq(streamName),streamExecutorId)
+  //env.fromKafka().parallelism(1).nameAs(streamName).filter(o => true)
   env.execute()
 }

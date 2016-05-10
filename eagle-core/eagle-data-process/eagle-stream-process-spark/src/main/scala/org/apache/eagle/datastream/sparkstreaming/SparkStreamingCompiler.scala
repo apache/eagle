@@ -51,6 +51,7 @@ case class SparkStreamingCompiler (config: Config, graph: StreamProducerGraph) e
           producer match {
             case Some(p) => {
               if (dStream.isInstanceOf[DStream[Any]]) {
+                //dStream.map(o => o)
                 DStreamFactory.createDStreamsByDFS(graph, dStream.asInstanceOf[DStream[Any]], p)
               }
               else {
