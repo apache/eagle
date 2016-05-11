@@ -34,6 +34,7 @@
   <modules>
     <module>eagle-security-common</module>
 	<module>eagle-security-hdfs-auditlog</module>
+    <module>eagle-security-maprfs-auditlog</module>
     <module>eagle-security-userprofile</module>
     <module>eagle-security-hive</module>
     <module>eagle-security-hive-web</module>
