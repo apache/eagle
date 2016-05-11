@@ -21,7 +21,7 @@
     <parent>
         <artifactId>eagle-query-parent</artifactId>
         <groupId>org.apache.eagle</groupId>
-        <version>0.3.0-incubating</version>
+        <version>0.4.0-incubating-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
