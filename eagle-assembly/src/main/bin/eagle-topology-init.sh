@@ -33,11 +33,12 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
 
 echo ""
 echo "Importing applications for sample site ..."
-curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hdfsAuditLog"}, "enabled": true, "config" : "web.fs.defaultFS: \"hdfs://sandbox.hortonworks.com:8020\""}]'
 
-curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hbaseSecurityLog"}, "enabled": true, "config" : "web.hbase.zookeeper.property.clientPort: \"2181\", web.hbase.zookeeper.quorum: \"localhost\""}]'
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hdfsAuditLog"}, "enabled": true, "config" : "classification.fs.defaultFS=hdfs://sandbox.hortonworks.com:8020"}]'
 
-curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hiveQueryLog"}, "enabled": true, "config":"web.accessType:\"metastoredb_jdbc\",web.password:\"hive\",web.user:\"hive\",web.jdbcDriverClassName:\"com.mysql.jdbc.Driver\",web.jdbcUrl:\"jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true\""}]'
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hbaseSecurityLog"}, "enabled": true, "config" : "classification.hbase.zookeeper.property.clientPort=2181\nclassification.hbase.zookeeper.quorum=localhost"}]'
+
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hiveQueryLog"}, "enabled": true, "config":"classification.accessType=metastoredb_jdbc\nclassification.password=hive\nclassification.user=hive\nclassification.jdbcDriverClassName=com.mysql.jdbc.Driver\nclassification.jdbcUrl=jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true"}]'
 
 echo ""
 echo "Importing application definitions ..."
