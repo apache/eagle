@@ -17,10 +17,10 @@ limitations under the License.
 
 > Application manager aims to manage topology status on EAGLE UI. Users can easily start/start topologies remotely or locally without shell commands.
 
-This tutorial will go through all parts of appliaction manager and then give an example to use it. 
+This tutorial will go through all parts of application manager and then give an example to use it.
 
 ### Design
-Briefly speaking, Application manager consists of a deamon scheduler and the application manager. The scheduler loads user operations(start/stop), and the applicaiton manager is responsible to execute these operations. For more details, please refer to [here](https://cwiki.apache.org/confluence/display/EAG/Application+Management)
+Briefly speaking, Application manager consists of a deamon scheduler and the application manager. The scheduler loads user operations(start/stop), and the application manager is responsible to execute these operations. For more details, please refer to [here](https://cwiki.apache.org/confluence/display/EAG/Application+Management)
 
 ### Manual
 
