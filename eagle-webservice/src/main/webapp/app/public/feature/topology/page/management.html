@@ -1,0 +1,52 @@
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<i class="fa fa-cog"></i>
+		<a class="pull-right" href="#/config/topology/monitoring"><span class="fa fa-angle-right"></span> Monitoring</a>
+		<h3 class="box-title">
+			Management
+		</h3>
+	</div>
+	<div class="box-body">
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th width="20%">Execution Class</th>
+					<th>Type</th>
+					<th width="50%">Description</th>
+					<th>Version</th>
+					<th width="70"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="item in topologyList">
+					<td>{{item.tags.topology}}</td>
+					<td><pre class="noWrap">{{item.exeClass}}</pre></td>
+					<td>{{item.type}}</td>
+					<td>{{item.description}}</td>
+					<td>{{item.version}}</td>
+					<td class="text-center">
+						<button class="rm fa fa-pencil btn btn-default btn-xs" uib-tooltip="Edit" tooltip-animation="false" ng-click="updateTopology(item)"> </button>
+						<button class="rm fa fa-trash-o btn btn-danger btn-xs" uib-tooltip="Delete" tooltip-animation="false" ng-click="deleteTopology(item)"> </button>
+					</td>
+				</tr>
+				<tr ng-if="topologyList.length === 0">
+					<td colspan="6">
+						<span class="text-muted">Empty list</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="box-footer">
+		<button class="btn btn-primary pull-right" ng-click="newTopology()">
+			New Topology
+			<i class="fa fa-plus-circle"> </i>
+		</button>
+	</div>
+
+	<div class="overlay" ng-hide="topologyList._promise.$$state.status === 1;">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+</div>

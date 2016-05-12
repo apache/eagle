@@ -80,9 +80,9 @@ public class HdfsAuditLogProcessorMain {
     @SuppressWarnings("unchecked")
     public static void execWithDefaultPartition(StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
         StreamProducer source = env.fromSpout(provider).withOutputFields(2).nameAs("kafkaMsgConsumer").groupBy(Arrays.asList(0));
-        StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
-        source.streamUnion(reassembler)
-              .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
+        //StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
+        //source.streamUnion(reassembler)
+        source.flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
               .flatMap(new IPZoneDataJoinExecutor())
               .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();
@@ -92,9 +92,9 @@ public class HdfsAuditLogProcessorMain {
     public static void execWithBalancedPartition(StormExecutionEnvironment env, KafkaSourcedSpoutProvider provider) {
         PartitionStrategy strategy = createStrategy(env.getConfig());
         StreamProducer source = env.fromSpout(provider).withOutputFields(2).nameAs("kafkaMsgConsumer").groupBy(strategy);
-        StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
-        source.streamUnion(reassembler)
-                .flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
+        //StreamProducer reassembler = source.flatMap(new HdfsUserCommandReassembler()).groupBy(Arrays.asList(0));
+        //source.streamUnion(reassembler)
+        source.flatMap(new FileSensitivityDataJoinExecutor()).groupBy(Arrays.asList(0))
                 .flatMap(new IPZoneDataJoinExecutor())
                 .alertWithConsumer("hdfsAuditLogEventStream", "hdfsAuditLogAlertExecutor");
         env.execute();

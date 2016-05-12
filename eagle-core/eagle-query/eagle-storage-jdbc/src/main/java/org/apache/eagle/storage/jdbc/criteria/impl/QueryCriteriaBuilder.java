@@ -107,7 +107,7 @@ public class QueryCriteriaBuilder implements CriteriaBuilder {
         root.addFrom(this.tableName);
 
         // WHERE timestamp in time range
-        Criterion where = new Criterion(new ColumnImpl(this.tableName, JdbcConstants.TIMESTAMP_COLUMN_NAME),query.getStartTime(), SqlEnum.GREATER_EQUAL)
+        Criterion where = new Criterion(new ColumnImpl(this.tableName, JdbcConstants.TIMESTAMP_COLUMN_NAME), query.getStartTime(), SqlEnum.GREATER_EQUAL)
                         .and(new Criterion(new ColumnImpl(this.tableName, JdbcConstants.TIMESTAMP_COLUMN_NAME),query.getEndTime(), SqlEnum.LESS_THAN));
         ORExpression expression = searchCondition.getQueryExpression();
         if(expression!=null){
