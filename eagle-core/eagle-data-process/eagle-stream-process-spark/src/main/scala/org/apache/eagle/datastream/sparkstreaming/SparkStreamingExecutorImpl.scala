@@ -14,12 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.datastream
+package org.apache.eagle.datastream.sparkstreaming
 
-trait FlatMapper[T] extends Serializable {
-  def flatMap(input : Seq[AnyRef], collector : Collector[T])
-}
+import org.apache.eagle.datastream.core.AbstractTopologyExecutor
+import org.apache.spark.streaming.StreamingContext
+import org.slf4j.LoggerFactory
 
-case class FlatMapperWrapper[T](func:(Any,Collector[T]) => Unit) extends FlatMapper[T]{
-  override def flatMap(input: Seq[AnyRef], collector: Collector[T]): Unit = func(input,collector)
+case class SparkStreamingExecutorImpl(ssc: StreamingContext, config: com.typesafe.config.Config) extends AbstractTopologyExecutor {
+  val LOG = LoggerFactory.getLogger(classOf[SparkStreamingExecutorImpl])
+  @throws(classOf[Exception])
+  def execute {
+    ssc.start()             // Start the computation
+    ssc.awaitTermination()  // Wait for the computation to terminate
+  }
 }
