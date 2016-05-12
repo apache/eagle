@@ -20,14 +20,15 @@ import org.apache.eagle.datastream.ExecutionEnvironments
 import org.apache.eagle.datastream.storm.JsonMessageDeserializer
 
 
-case class Entity(name:String,value:Double,var inc:Int=0){
+case class Entity(name: String, value: Double, var inc: Int = 0) {
   override def toString = {
-    "name="+name+","+"value="+value+","+"inc="+inc
+    "name=" + name + "," + "value=" + value + "," + "inc=" + inc
   }
 }
-object TestSparkStreamingDSL extends App{
+
+object TestSparkStreamingDSL extends App {
   val env = ExecutionEnvironments.get[SparkStreamingExecutionEnvironment](args)
-  val tuples = Seq(
+  val tuple = Seq(
     Entity("a", 1),
     Entity("a", 2),
     Entity("a", 3),
@@ -36,24 +37,35 @@ object TestSparkStreamingDSL extends App{
     Entity("d", 3)
   )
 
-  val tmp  = Seq("eBay ADI SPARK","SJTU CS","QZK TW zqin","arsenal","SPARK")
+  val tmp = Seq("STORM KAFKA", "ZOOKEEPER LOG", "SPARK STREAMING", "SPARK HADOOP")
 
-  env.from(tmp,recycle = true)
+  env.from(tuple, recycle = true)
+    .groupByKey(_.name)
+    .map(o => {
+      o.inc += 2; o
+    })
+    .filter(_.name != "b")
+    .filter(_.name != "c")
+    .groupByKey(o => (o.name, o.value))
+    .map(o => (o.name, o))
+    .map(o => (o._1, o._2.value, o._2.inc))
+    .foreach(println)
+
+  env.from(tmp, recycle = true)
     .flatMap(_.split(" "))
-    .map(o => (o,1))
-    .reduceByKey((x:Int, y:Int) => x+y)
+    .map(o => (o, 1))
+    .reduceByKey((x: Int, y: Int) => x + y)
     .filter(o => !o._1.contains("zqin"))
     .foreach(println)
+
   env.execute()
 }
 
-object TestSparkStreamingWithAlertDSL extends App{
+object TestSparkStreamingWithAlertDSL extends App {
   val env = ExecutionEnvironments.get[SparkStreamingExecutionEnvironment](args)
   val streamName = "cassandraQueryLogStream"
   val streamExecutorId = "cassandraQueryLogExecutor"
-  env.config.set("dataSourceConfig.deserializerClass",classOf[JsonMessageDeserializer].getCanonicalName)
-  env.fromKafka().parallelism(1).nameAs(streamName).! (Seq(streamName),streamExecutorId)
-  //env.fromKafka().parallelism(1).nameAs(streamName).map(a => new Tuple3("test",streamName,a)) ! (Seq(streamName),streamExecutorId)
-  //env.fromKafka().parallelism(1).nameAs(streamName).filter(o => true)
+  env.config.set("dataSourceConfig.deserializerClass", classOf[JsonMessageDeserializer].getCanonicalName)
+  env.fromKafka().parallelism(1).nameAs(streamName).!(Seq(streamName), streamExecutorId)
   env.execute()
 }

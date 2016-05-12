@@ -30,16 +30,19 @@ case class SparkStreamingCompiler (config: Config, graph: StreamProducerGraph) e
     val appName = config.getString("envContextConfig.topologyName")
     val conf = new SparkConf().setAppName(appName)
     val localMode: Boolean = config.getString("envContextConfig.mode").equalsIgnoreCase("local")
+
+    var master = "local[8]";
     if (!localMode) {
       LOG.info("Running in cluster mode")
-
+      master = "spark://" + config.getString("envContextConfig.masterUrl") + ":" + config.getString("envContextConfig.masterPort")
     } else {
       LOG.info("Running in local mode")
       //System.setProperty("hadoop.home.dir", "C:\\hadoop-common-2.2.0-bin-master\\hadoop-common-2.2.0-bin-master");
-      conf.setMaster("local[8]")
     }
+    conf.setMaster(master)
 
-    val ssc = new StreamingContext(conf, Seconds(1))
+    val window = config.getLong("envContextConfig.window")
+    val ssc = new StreamingContext(conf, Seconds(window))
     val iter = graph.iterator()
     while(iter.hasNext){
       val from = iter.next()
@@ -51,7 +54,6 @@ case class SparkStreamingCompiler (config: Config, graph: StreamProducerGraph) e
           producer match {
             case Some(p) => {
               if (dStream.isInstanceOf[DStream[Any]]) {
-                //dStream.map(o => o)
                 DStreamFactory.createDStreamsByDFS(graph, dStream.asInstanceOf[DStream[Any]], p)
               }
               else {

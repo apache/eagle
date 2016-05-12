@@ -31,6 +31,13 @@ import scala.collection.mutable
 
 object DStreamFactory {
 
+  //help to collect data for flatMap
+  class TraversableCollector(buffer: mutable.ListBuffer[Any]) extends Collector[Any] {
+    override def collect(r: Any): Unit = {
+      buffer += r
+    }
+  }
+
   def createInputDStream(ssc: StreamingContext, from: StreamProducer[Any]): DStream[Any] = {
     implicit val streamInfo = from.getInfo
 
@@ -38,50 +45,52 @@ object DStreamFactory {
       case p@IterableStreamProducer(iterable, recycle) => {
         ssc.receiverStream(new IterableReceiver(iterable, recycle))
       }
-      case p@SparkStreamingKafkaSourceProducer() =>{
+      case p@SparkStreamingKafkaSourceProducer() => {
         val topic = p.config.getString("dataSourceConfig.topic");
         val zkConnection = p.config.getString("dataSourceConfig.zkConnection");
         val groupId = p.config.getString("dataSourceConfig.consumerGroupId");
 
         val deserClsName = p.config.getString("dataSourceConfig.deserializerClass")
-        val deserializer = new KafkaSourcedSpoutScheme(deserClsName,p.config)
+        val deserializer = new KafkaSourcedSpoutScheme(deserClsName, p.config)
 
         val prop: Properties = new Properties
         if (p.config.hasPath("eagleProps")) {
           prop.putAll(p.config.getObject("eagleProps"))
-         }
+        }
 
-         //val deserializer = new JsonMessageDeserializer(prop);
-        val D = KafkaUtils.createStream(ssc,zkConnection,groupId,Map(topic -> 1))
-        D.asInstanceOf[DStream[Any]].map(o => o match {
-          case Tuple2(a,b) => {
-            if(b.isInstanceOf[String]) {
-              val result = deserializer.deserialize(b.asInstanceOf[String].getBytes())
-              Tuple2(a, result.get(0))
+        val Source = KafkaUtils.createStream(ssc, zkConnection, groupId, Map(topic -> 1))
+
+        //Change Json String to TreeMap using map operation
+        Source.asInstanceOf[DStream[Any]].map(o => o match {
+          case Tuple2(a, b) => {
+            if (a.isInstanceOf[String] || b.isInstanceOf[String]) {
+              if (a.isInstanceOf[String] && b.isInstanceOf[String]) {
+                Tuple2(deserializer.deserialize(a.asInstanceOf[String].getBytes()).get(0), deserializer.deserialize(b.asInstanceOf[String].getBytes()).get(0))
+              }
+              else if (a.isInstanceOf[String]) {
+                Tuple2(deserializer.deserialize(a.asInstanceOf[String].getBytes()).get(0), b)
+              }
+              else {
+                Tuple2(a, deserializer.deserialize(b.asInstanceOf[String].getBytes()).get(0))
+              }
             }
-            else Tuple2(a,b)
+            else Tuple2(a, b)
           }
-          case a => a
-         })
-    }
+          case other => other
+        })
+      }
       case _ =>
         throw new IllegalArgumentException(s"Cannot compile unknown $from to a Storm Spout")
     }
   }
 
-  class TraversableCollector(buffer: mutable.ListBuffer[Any]) extends Collector[Any]{
-    override def collect(r: Any): Unit = {
-      buffer += r
-    }
-  }
 
-  def tupleToSeq(tuple:Any):Seq[AnyRef]={
+  def tupleToSeq(tuple: Any): Seq[AnyRef] = {
     tuple match {
       case scala.Tuple1(a) => Seq(util.Arrays.asList(a.asInstanceOf[AnyRef]))
       case scala.Tuple2(a, b) => Seq(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef]))
       case scala.Tuple3(a, b, c) => {
-
-        if(a == null) Seq("test", b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef])
+        if (a == null) Seq("test", b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef])
         else Seq(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef]))
       }
       case scala.Tuple4(a, b, c, d) => Seq(util.Arrays.asList(a.asInstanceOf[AnyRef], b.asInstanceOf[AnyRef], c.asInstanceOf[AnyRef], d.asInstanceOf[AnyRef]))
@@ -92,20 +101,20 @@ object DStreamFactory {
   def createDStreamsByDFS(graph: StreamProducerGraph, from: DStream[Any], to: StreamProducer[Any]): Unit = {
     implicit val streamInfo = to.getInfo
     val dStream = to match {
-      case  FlatMapProducer(flatMapper) => {
+      case FlatMapProducer(flatMapper) => {
         if (flatMapper.isInstanceOf[AlertExecutor]) {
           flatMapper.asInstanceOf[AlertExecutor].prepareConfig(to.config)
 
           from.flatMap(input => {
             val result = mutable.ListBuffer[Any]()
-            flatMapper.flatMap(tupleToSeq(input),new TraversableCollector(result))
+            flatMapper.flatMap(tupleToSeq(input), new TraversableCollector(result))
             result
           })
         }
         else {
           from.flatMap(input => {
             val result = mutable.ListBuffer[Any]()
-            flatMapper.flatMap(Seq(input).asInstanceOf[Seq[AnyRef]],new TraversableCollector(result))
+            flatMapper.flatMap(Seq(input).asInstanceOf[Seq[AnyRef]], new TraversableCollector(result))
             result
           })
         }
@@ -121,11 +130,11 @@ object DStreamFactory {
           rdd.collect().foreach(foreach.fn)
         })
       }
-      case reduceByKeyer: ReduceByKeyProducer[Any,Any] => {
-        if(from.isInstanceOf[DStream[(Any,Any)]]){
-          from.asInstanceOf[DStream[(Any,Any)]].reduceByKey(reduceByKeyer.fn)
+      case reduceByKeyer: ReduceByKeyProducer[Any, Any] => {
+        if (from.isInstanceOf[DStream[(Any, Any)]]) {
+          from.asInstanceOf[DStream[(Any, Any)]].reduceByKey(reduceByKeyer.fn)
         }
-        else{
+        else {
           throw new UnsupportedOperationException(s"Unsupported DStream: ${from.toString}")
         }
       }
@@ -133,8 +142,8 @@ object DStreamFactory {
     }
 
     val edges = graph.outgoingEdgesOf(to)
-    //if no output, force to output!
-    if(edges.size == 0 && dStream.isInstanceOf[DStream[Any]]){
+    //if no action DStream in the tail, force to output!
+    if (edges.size == 0 && dStream.isInstanceOf[DStream[Any]]) {
       dStream.asInstanceOf[DStream[Any]].foreachRDD(rdd => {
         rdd.collect().foreach(println)
       })
