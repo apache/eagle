@@ -36,6 +36,7 @@ public class AppManagerConstants {
     public final static String EAGLE_CLUSTER_STORM = "storm";
     public final static String EAGLE_CLUSTER_SPARK = "spark";
 
+    public final static String APP_COMMAND_LOADER_ENABLED = "appCommandLoaderEnabled";
     public final static String APP_COMMAND_LOADER_INTERVAL_SECS = "appCommandLoaderIntervalSecs";
     public final static String APP_HEALTH_CHECK_INTERVAL_SECS = "appHealthCheckIntervalSecs";
 

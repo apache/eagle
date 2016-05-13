@@ -22,7 +22,9 @@ package org.apache.eagle.service.security.profile;
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.service.application.AppManagerConstants;
 import org.apache.eagle.stream.application.scheduler.ApplicationScheduler;
+import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
@@ -42,7 +44,9 @@ public class ApplicationSchedulerListener implements ServletContextListener {
         //Get the actor system from the spring context
         //SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         Config config = ConfigFactory.load("eagle-scheduler.conf");
-        system = new ApplicationScheduler().start(config);
+        if(config.hasPath(AppManagerConstants.APP_COMMAND_LOADER_ENABLED) && config.getBoolean(AppManagerConstants.APP_COMMAND_LOADER_ENABLED)) {
+            system = new ApplicationScheduler().start(config);
+        }
     }
 
     @Override
@@ -52,7 +56,7 @@ public class ApplicationSchedulerListener implements ServletContextListener {
             system.shutdown();
             system.awaitTermination(Duration.create(15, TimeUnit.SECONDS));
         } else {
-            LOG.warn("No actor system loaded, yet trying to shut down. Check AppContext config and consider if you need this listener.");
+            LOG.warn("No actor system loaded, yet trying to shut down. Check eagle-scheduler.conf and consider if you need this listener.");
         }
     }
 
