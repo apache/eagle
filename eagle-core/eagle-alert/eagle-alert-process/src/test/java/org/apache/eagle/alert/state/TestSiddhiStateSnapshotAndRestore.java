@@ -71,6 +71,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         String stateFile = tmpdir + "/siddhi-state";
         ExecutionPlanRuntime executionPlanRuntime = setupRuntimeForSimple();
         executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii"});
+        Thread.sleep(100);
         byte[] state = executionPlanRuntime.snapshot();
         int length = state.length;
         FileOutputStream output = new FileOutputStream(stateFile);
@@ -120,6 +121,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_2"});
         executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_3"});
         executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_4"});
+        Thread.sleep(100);
         byte[] state = executionPlanRuntime.snapshot();
         int length = state.length;
         FileOutputStream output = new FileOutputStream(stateFile);
@@ -169,6 +171,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_2"});
         executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_3"});
         executionPlanRuntime.getInputHandler("testStream").send(new Object[]{"rename", "/tmp/pii_4"});
+        Thread.sleep(100);
         byte[] state = executionPlanRuntime.snapshot();
         int length = state.length;
         FileOutputStream output = new FileOutputStream(stateFile);
@@ -218,7 +221,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         inputHandler.send(new Object[]{curTime + 1000, "user", "open"});
         inputHandler.send(new Object[]{curTime + 2000, "user", "open"});
         inputHandler.send(new Object[]{curTime + 3000, "user", "open"});
-
+        Thread.sleep(100);
         byte[] state = executionPlanRuntime.snapshot();
         int length = state.length;
         FileOutputStream output = new FileOutputStream(stateFile);

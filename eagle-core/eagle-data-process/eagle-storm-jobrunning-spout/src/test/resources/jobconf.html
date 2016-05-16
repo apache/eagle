@@ -1,0 +1,214 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <meta http-equiv="X-UA-Compatible" content="IE=8">
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <style type="text/css">
+    #conf_paginate span {font-weight:normal}
+    #conf .progress {width:8em}
+    #conf_processing {top:-1.5em; font-size:1em;
+      color:#000; background:rgba(255, 255, 255, 0.8)}
+  </style>
+  <title>
+    Configuration for MapReduce Job job_1462444563491_89969
+  </title>
+  <link rel="stylesheet" href="/static/yarn.css">
+  <style type="text/css">
+    #layout { height: 100%; }
+    #layout thead td { height: 3em; }
+    #layout #navcell { width: 11em; padding: 0 1em; }
+    #layout td.content { padding-top: 0 }
+    #layout tbody { vertical-align: top; }
+    #layout tfoot td { height: 4em; }
+  </style>
+  <link rel="stylesheet" href="/static/jquery/themes-1.9.1/base/jquery-ui.css">
+  <link rel="stylesheet" href="/static/dt-1.9.4/css/jui-dt.css">
+  <script type="text/javascript" src="/static/jquery/jquery-1.8.2.min.js">
+  </script>
+  <script type="text/javascript" src="/static/jquery/jquery-ui-1.9.1.custom.min.js">
+  </script>
+  <script type="text/javascript" src="/static/dt-1.9.4/js/jquery.dataTables.min.js">
+  </script>
+  <script type="text/javascript" src="/static/yarn.dt.plugins.js">
+  </script>
+  <style type="text/css">
+    #jsnotice { padding: 0.2em; text-align: center; }
+    .ui-progressbar { height: 1em; min-width: 5em }
+  </style>
+  <script type="text/javascript">
+    $(function() {
+      $('#nav').accordion({autoHeight:false, active:1});
+    confDataTable =  $('#conf').dataTable({bStateSave : true, "fnStateSave": function (oSettings, oData) { sessionStorage.setItem( oSettings.sTableId, JSON.stringify(oData) ); }, "fnStateLoad": function (oSettings) { return JSON.parse( sessionStorage.getItem(oSettings.sTableId) );}, bJQueryUI:true, sPaginationType: 'full_numbers', iDisplayLength:20, aLengthMenu:[20, 40, 60, 80, 100]}).fnSetFilteringDelay(188);
+    var confInitVals = new Array();
+$('tfoot input').keyup( function () 
+{  confDataTable.fnFilter( this.value, $('tfoot input').index(this) );
+} );
+$('tfoot input').each( function (i) {
+  confInitVals[i] = this.value;
+} );
+$('tfoot input').focus( function () {
+  if ( this.className == 'search_init' )
+  {
+    this.className = '';
+    this.value = '';
+  }
+} );
+$('tfoot input').blur( function (i) {
+  if ( this.value == '' )
+  {
+    this.className = 'search_init';
+    this.value = confInitVals[$('tfoot input').index(this)];
+  }
+} );
+
+    });
+  </script>
+  <div id="jsnotice" class="ui-state-error">
+    This page works best with javascript enabled.
+  </div>
+  <script type="text/javascript">
+    $('#jsnotice').hide();
+  </script>
+  <table id="layout" class="ui-widget-content">
+    <thead>
+      <tr>
+        <td colspan="2">
+          <div id="header" class="ui-widget">
+            <div id="user">
+              Logged in as: dr.who
+            </div>
+            <div id="logo">
+              <img src="/static/hadoop-st.png">
+            </div>
+            <h1>
+              Configuration for MapReduce Job job_1462444563491_89969
+            </h1>
+          </div>
+        </td>
+      </tr>
+    </thead>
+    <tfoot>
+      <tr>
+        <td colspan="2">
+          <div id="footer" class="ui-widget">
+          </div>
+        </td>
+      </tr>
+    </tfoot>
+    <tbody>
+      <tr>
+        <td id="navcell">
+          <div id="nav">
+            <h3>
+              Application
+            </h3>
+            <ul>
+              <li>
+                <a href="/jobhistory/about">About</a>
+              <li>
+                <a href="/jobhistory/app">Jobs</a>
+            </ul>
+            <h3>
+              Job
+            </h3>
+            <ul>
+              <li>
+                <a href="/jobhistory/job/job_1462444563491_89969">Overview</a>
+              <li>
+                <a href="/jobhistory/jobcounters/job_1462444563491_89969">Counters</a>
+              <li>
+                <a href="/jobhistory/conf/job_1462444563491_89969">Configuration</a>
+              <li>
+                <a href="/jobhistory/tasks/job_1462444563491_89969/m">Map tasks</a>
+              <li>
+                <a href="/jobhistory/tasks/job_1462444563491_89969/r">Reduce tasks</a>
+            </ul>
+            <h3>
+              Tools
+            </h3>
+            <ul>
+              <li>
+                <a href="/conf">Configuration</a>
+              <li>
+                <a href="/logs">Local logs</a>
+              <li>
+                <a href="/stacks">Server stacks</a>
+              <li>
+                <a href="/metrics">Server metrics</a>
+            </ul>
+          </div>
+        </td>
+        <td class="content">
+          <div>
+            <h3>
+              viewfs://xxx/user/history/done/2016/05/13/000089/job_1462444563491_89969_conf.xml
+            </h3>
+          </div>
+          <table id="conf">
+            <thead>
+              <tr>
+                <th class="ui-state-default">
+                  key
+                </th>
+                <th class="ui-state-default">
+                  value
+                </th>
+                <th class="ui-state-default">
+                  source chain
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>
+                mapreduce.workflow.name
+              </td>
+              <td>
+                CREATE TABLE XXX.XXX  as SELECT /*+ MAPJOIN(XXX,XXX) */ trim(x.XXX)  AS   hc.XXX, hc.XXX, SUM(x.XXX)  AS  XXX FROM XXX.XXX x INNER   JOIN XXX.XXX XXX ON x.XXX = XXX.XXX AND XXX.XXX = 1 INNER  JOIN XXX.XXX dp ON XXX.XXX = XXX.XXX AND XXX.XXX = 1 INNER JOIN XXX.XXX hc ON XXX.XXX = XXX.XXX AND XXX.XXX=1 LEFT   OUTER JOIN XXX.XXX hsc ON hsc.XXX = hc.XXX AND hsc.XXX=1 WHERE x.ds = 'XXX' AND length(x.XXX) &gt; 0 AND x.XXX = 51 GROUP BY trim(x.XXX), hc.XXX, hc.XXX
+              </td>
+              <td>
+                job.xml &#11013; programatically
+              </td>
+            </tr>
+            <tr>
+              <td>
+                dfs.namenode.http-address
+              </td>
+              <td>
+                0.0.0.0:50070
+              </td>
+              <td>
+                job.xml &#11013; hdfs-default.xml
+              </td>
+            </tr>
+            <tr>
+              <td>
+                hive.repl.task.factory
+              </td>
+              <td>
+                org.apache.hive.hcatalog.api.repl.exim.EximReplicationTaskFactory
+              </td>
+              <td>
+                job.xml &#11013; org.apache.hadoop.hive.conf.LoopingByteArrayInputStream@61284cb6 &#11013; programatically
+              </td>
+            </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>
+                  <input class="search_init" type="text" name="key" value="key">
+                </th>
+                <th>
+                  <input class="search_init" type="text" name="value" value="value">
+                </th>
+                <th>
+                  <input class="search_init" type="text" name="source chain" value="source chain">
+                </th>
+              </tr>
+            </tfoot>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</html>
