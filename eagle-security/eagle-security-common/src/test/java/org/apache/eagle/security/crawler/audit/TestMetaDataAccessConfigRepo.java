@@ -51,5 +51,16 @@ public class TestMetaDataAccessConfigRepo {
             hbaseConfig = config.getConfig(EagleConfigConstants.WEB_CONFIG);
             Assert.assertTrue(hbaseConfig.getString("hbase.zookeeper.property.clientPort").equals("2181"));
         }
+
+        String oozieConfigStr = "web.accessType:\"oozie_api\",web.oozieUrl:\"http://localhost:11000/oozie\",web.filter:\"status=RUNNING\",web.authType:\"SIMPLE\"";
+        config = ConfigFactory.parseString(oozieConfigStr);
+        Config oozieConfig = null;
+        if(config.hasPath(EagleConfigConstants.WEB_CONFIG)) {
+            oozieConfig = config.getConfig(EagleConfigConstants.WEB_CONFIG);
+            Assert.assertTrue(oozieConfig.getString("accessType").equals("oozie_api"));
+            Assert.assertTrue(oozieConfig.getString("oozieUrl").equals("http://localhost:11000/oozie"));
+            Assert.assertTrue(oozieConfig.getString("filter").equals("status=RUNNING"));
+            Assert.assertTrue(oozieConfig.getString("authType").equals("SIMPLE"));
+        }
     }
 }
