@@ -60,7 +60,7 @@
       			<groupId>ch.qos.logback</groupId>
         		<artifactId>logback-classic</artifactId>
       		</exclusion>
-      	</exclusions> 
+      	</exclusions>
   	</dependency>
   </dependencies>
 </project>

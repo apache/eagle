@@ -32,7 +32,22 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>eagle-jpm-spark-running</module>
-	<module>eagle-jpm-spark-history</module>
+        <module>eagle-jpm-spark-running</module>
+        <module>eagle-jpm-spark-history</module>
+         <module>eagle-jpm-entity</module>
+        <module>eagle-jpm-util</module>
   </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-entity-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-client-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
