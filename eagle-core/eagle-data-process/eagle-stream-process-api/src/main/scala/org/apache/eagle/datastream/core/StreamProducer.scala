@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConversions.{asScalaBuffer, seqAsJavaList}
 import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.mutable
+
 /**
  * StreamProducer = StreamInfo + StreamProtocol
  *
@@ -59,7 +61,8 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
   
   /**
    * Get stream pure metadata info
-   * @return
+    *
+    * @return
    */
   override def getInfo:StreamInfo = this.asInstanceOf[StreamInfo]
 
@@ -85,6 +88,23 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     ret
   }
 
+  def flatMap[R](func:T => Traversable[R]): StreamProducer[R] = {
+    val flatMapper = new FlatMapper[R](){
+      override def flatMap(input: Seq[AnyRef], collector: Collector[R]): Unit = {
+        input.foreach( s =>{func(s.asInstanceOf[T]).foreach(collector.collect)})
+         // func(input.get(0).asInstanceOf[T]).foreach(collector.collect)
+      }
+    }
+    val ret = this.flatMap(flatMapper)
+    connect(this, ret)
+    ret
+  }
+
+  def reduceByKey[V](fn: (V,V) => V) : StreamProducer[T] = {
+    val ret = ReduceByKeyProducer[T,V](fn)
+    connect(this, ret)
+    ret
+  }
 
   override def foreach(fn : T => Unit) : Unit = {
     val ret = ForeachProducer[T](fn)
@@ -273,12 +293,15 @@ case class FlatMapProducer[T, R](var mapper: FlatMapper[R]) extends StreamProduc
   override def toString: String = mapper.toString
 }
 
+case class ReduceByKeyProducer[T,V](fn: (V,V) => V) extends StreamProducer[T]{
+  override def toString: String = s"ReduceByKeyProducer"
+}
+
 case class MapperProducer[T,R](numOutputFields : Int, var fn : T => R) extends StreamProducer[R]{
   override def toString: String = s"MapperProducer"
 }
 
 case class ForeachProducer[T](var fn : T => Unit) extends StreamProducer[T]
-
 abstract class GroupByProducer[T] extends StreamProducer[T]
 case class GroupByFieldProducer[T](fields : Seq[Int]) extends GroupByProducer[T]
 case class GroupByStrategyProducer[T](partitionStrategy: PartitionStrategy) extends GroupByProducer[T]
@@ -300,12 +323,17 @@ case class StormSourceProducer[T](source: BaseRichSpout) extends StreamProducer[
   /**
     * rename outputfields to f0, f1, f2, ...
    * if one spout declare some field names, those fields names will be modified
-   * @param n
+    *
+    * @param n
    */
   def withOutputFields(n : Int): StormSourceProducer[T] ={
     this.numFields = n
     this
   }
+}
+
+case class SparkStreamingKafkaSourceProducer[T]() extends StreamProducer[T]{
+  override def toString: String = s"SparkStreamingKafkaSourceProducer"
 }
 
 case class IterableStreamProducer[T](iterable: Iterable[T],recycle:Boolean = false) extends StreamProducer[T]{

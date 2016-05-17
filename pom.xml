@@ -922,10 +922,11 @@
                                 <exclude>README*</exclude>
                                 <exclude>**/*.log</exclude>
                                 <exclude>**/eagle.log*</exclude>
+                                <exclude>**/resources/**/*.json</exclude>
                                 <exclude>**/velocity.log*</exclude>
                                 <!-- all json files should be excluded -->
                                 <exclude>**/*.json</exclude>
-                                <exclude>**/resources/eagle.siddhiext</exclude>
+
                                 <exclude>**/test/resources/securityAuditLog</exclude>
                                 <exclude>**/resources/**/ml-policyDef-UserProfile.txt</exclude>
                                 <exclude>**/test/resources/onelinehiveauditlog.txt</exclude>
