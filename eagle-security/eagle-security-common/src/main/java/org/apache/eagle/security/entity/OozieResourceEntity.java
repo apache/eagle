@@ -31,6 +31,10 @@ public class OozieResourceEntity implements Serializable {
         this.sensitiveType = sensitiveType;
     }
 
+    public OozieResourceEntity(String jobId, String name) {
+        this(jobId,name,null);
+    }
+
     public String getJobId() {
         return jobId;
     }
@@ -64,6 +68,15 @@ public class OozieResourceEntity implements Serializable {
         return Objects.equal(this.jobId, other.jobId)
                 && this.name.equals(other.name)
                 && this.sensitiveType.equals(other.sensitiveType);
+    }
+
+    @Override
+    public String toString() {
+        return "OozieResourceEntity{" +
+                "jobId='" + jobId + '\'' +
+                ", name='" + name + '\'' +
+                ", sensitiveType='" + sensitiveType + '\'' +
+                '}';
     }
 }
 
