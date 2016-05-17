@@ -56,6 +56,9 @@ eagleComponents.directive('tabs', function() {
 			$scope.setSelect = function(pane) {
 				if(typeof pane === "string") {
 					pane = common.array.find(pane, $scope.paneList, "title");
+				} else if(typeof pane === "number") {
+					pane = (pane + $scope.paneList.length) % $scope.paneList.length;
+					pane = $scope.paneList[pane];
 				}
 
 				$scope.activePane = $scope.selectedPane || pane;

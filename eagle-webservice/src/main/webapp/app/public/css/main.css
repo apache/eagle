@@ -566,6 +566,20 @@ body .modal-body .nav-stacked > li:last-child {
 	border-bottom: none;
 }
 
+body .box-body .nav-tabs-custom {
+	box-shadow: none;
+	margin-bottom: 0;
+}
+body .box-body .nav-tabs-custom > .nav-tabs > li:first-of-type.active > a {
+	border-left-color: #f4f4f4;
+}
+body .box-body .nav-tabs-custom > .nav-tabs > li > a {
+	padding: 8px 15px;
+}
+body .box-body .nav-tabs-custom > .tab-content {
+	padding: 10px 0;
+}
+
 /* Box */
 .box .guideline {
 	margin-top: 0;
@@ -763,6 +777,14 @@ td.text-ellipsis {
 	padding: 2px 8px;
 	font-size: 12px;
 	line-height: 100%;
+}
+
+pre.noWrap {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	margin: 0;
+	padding: 0;
 }
 
 .noSelect {

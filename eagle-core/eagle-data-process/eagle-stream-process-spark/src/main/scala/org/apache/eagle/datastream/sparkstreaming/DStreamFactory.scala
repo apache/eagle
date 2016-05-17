@@ -80,7 +80,7 @@ object DStreamFactory {
         })
       }
       case _ =>
-        throw new IllegalArgumentException(s"Cannot compile unknown $from to a Storm Spout")
+        throw new IllegalArgumentException(s"Cannot compile unknown $from to a DStream")
     }
   }
 

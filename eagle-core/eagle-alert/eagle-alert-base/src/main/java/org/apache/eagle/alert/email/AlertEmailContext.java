@@ -22,6 +22,7 @@ import java.util.List;
  * alert email bean
  * one email consists of a list of email component
  */
+@Deprecated
 public class AlertEmailContext {
 	private List<AlertEmailComponent> components;
 	private String sender;

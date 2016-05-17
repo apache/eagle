@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -40,8 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class AlertKafkaPlugin implements NotificationPlugin {
 	private static final Logger LOG = LoggerFactory.getLogger(AlertKafkaPlugin.class);
-	private NotificationStatus status = new NotificationStatus();
-	private Map<String, Map<String, String>> kafaConfigs = new ConcurrentHashMap<>();
+	private List<NotificationStatus> statusList = new Vector<>();
+	private Map<String, List<Map<String, String>>> kafaConfigs = new ConcurrentHashMap<>();
 	private Config config;
 
 	@Override
@@ -49,36 +50,39 @@ public class AlertKafkaPlugin implements NotificationPlugin {
 		this.config = config;
 		for( AlertDefinitionAPIEntity entity : initAlertDefs ) {
 			List<Map<String,String>>  configMaps = NotificationPluginUtils.deserializeNotificationConfig(entity.getNotificationDef());
-			for( Map<String,String> notificationConfigMap : configMaps ){
-				String notificationType = notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE);
-				if(notificationType == null){
-					LOG.error("no notificationType field for this notification, ignoring and continue " + notificationConfigMap);
-					continue;
-				}else {
-					// single policy can have multiple configs , only load Kafka Config's
-					if (notificationType.equalsIgnoreCase(NotificationConstants.KAFKA_STORE)) {
-						kafaConfigs.put(entity.getTags().get(Constants.POLICY_ID), notificationConfigMap);
-						break;
-					}
-				}
-			}
+			this.update(entity.getTags().get(Constants.POLICY_ID), configMaps, false);
 		}
 	}
 
 	/**
 	 * Update API to update policy delete/create/update in Notification Plug-ins
-	 * @param  notificationConf
+	 * @param  notificationConfigCollection
 	 * @param isPolicyDelete
 	 * @throws Exception
      */
 	@Override
-	public void update(String policyId, Map<String,String> notificationConf , boolean isPolicyDelete ) throws Exception {
+	public void update(String policyId, List<Map<String,String>> notificationConfigCollection, boolean isPolicyDelete ) throws Exception {
 		if( isPolicyDelete ){
 			LOG.info(" Policy been deleted.. Removing reference from Notification Plugin ");
 			this.kafaConfigs.remove(policyId);
 			return;
 		}
-		kafaConfigs.put(policyId, notificationConf );
+		Vector<Map<String, String>> kafkaConfigList = new Vector<>();
+		for(Map<String,String> notificationConfigMap : notificationConfigCollection){
+			String notificationType = notificationConfigMap.get(NotificationConstants.NOTIFICATION_TYPE);
+			if(notificationType == null){
+				LOG.error("invalid notificationType for this notification, ignoring and continue " + notificationConfigMap);
+				continue;
+			}else {
+				// single policy can have multiple configs , only load Kafka Config's
+				if (notificationType.equalsIgnoreCase(NotificationConstants.KAFKA_STORE)) {
+					kafkaConfigList.add(notificationConfigMap);
+				}
+			}
+		}
+		if(kafkaConfigList.size() != 0) {
+			kafaConfigs.put(policyId, kafkaConfigList);
+		}
 	}
 
 	/**
@@ -87,15 +91,20 @@ public class AlertKafkaPlugin implements NotificationPlugin {
      */
 	@Override
 	public void onAlert(AlertAPIEntity alertEntity) {
-		try{
-			KafkaProducer producer = KafkaProducerSingleton.INSTANCE.getProducer(config);
-			producer.send(createRecord(alertEntity));
-			status.successful = true;
-			status.errorMessage = "";
-		}catch(Exception ex ){
-			LOG.error("fail writing alert to Kafka bus", ex);
-			status.successful = false;
-			status.errorMessage = ex.getMessage();
+		String policyId = alertEntity.getTags().get(Constants.POLICY_ID);
+		for(Map<String, String> kafkaConfig: this.kafaConfigs.get(policyId)) {
+			NotificationStatus status = new NotificationStatus();
+			try{
+				KafkaProducer producer = KafkaProducerSingleton.INSTANCE.getProducer(kafkaConfig);
+				producer.send(createRecord(alertEntity, kafkaConfig.get(NotificationConstants.TOPIC)));
+				status.successful = true;
+				status.errorMessage = "";
+			}catch(Exception ex ){
+				LOG.error("fail writing alert to Kafka bus", ex);
+				status.successful = false;
+				status.errorMessage = ex.getMessage();
+			}
+			this.statusList.add(status);
 		}
 	}
 
@@ -105,15 +114,14 @@ public class AlertKafkaPlugin implements NotificationPlugin {
 	 * @return
 	 * @throws Exception
 	 */
-	private ProducerRecord  createRecord(AlertAPIEntity entity ) throws Exception {
-		String policyId = entity.getTags().get(Constants.POLICY_ID);
-		ProducerRecord  record  = new ProducerRecord( this.kafaConfigs.get(policyId).get("topic"), NotificationPluginUtils.objectToStr(entity));
+	private ProducerRecord  createRecord(AlertAPIEntity entity, String topic) throws Exception {
+		ProducerRecord  record  = new ProducerRecord(topic, NotificationPluginUtils.objectToStr(entity));
 		return record;
 	}	
 	
 	@Override
-	public NotificationStatus getStatus() {
-		return status;
+	public List<NotificationStatus> getStatusList() {
+		return statusList;
 	}
 
 	@Override

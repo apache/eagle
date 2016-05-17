@@ -34,9 +34,6 @@
 			<dl><dt>Alert Time</dt><dd>{{common.format.date(alert.timestamp)}}</dd></dl>
 			<dl><dt>Message Time</dt><dd>{{common.format.date(alert.alertContext.properties.timestamp)}}</dd></dl>
 		</div>
-		<!--div class="inline-group">
-			<dl><dt>Severity</dt><dd>{{alert.alertContext.properties.severity}}</dd></dl>
-		</div-->
 		<div class="inline-group">
 			<dl><dt>Stream Name</dt><dd>{{alert.tags.sourceStreams}}</dd></dl>
 		</div>
@@ -57,5 +54,14 @@
 
 	<div class="overlay" ng-hide="alertList._promise.$$state.status === 1;">
 		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+
+	<div class="box-footer clearfix">
+		<a data-toggle="collapse" href="[data-id='rawAlertContext']">
+			Raw Alert Context
+		</a>
+		<div data-id="rawAlertContext" class="collapse">
+			<pre>{{alert.rawAlertContext}}</pre>
+		</div>
 	</div>
 </div>

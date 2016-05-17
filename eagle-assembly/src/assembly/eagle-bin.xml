@@ -164,9 +164,9 @@
                 <exclude>WEB-INF/classes/config.properties</exclude>
                 <exclude>WEB-INF/lib/servlet-api-*.jar</exclude>
                 <exclude>WEB-INF/lib/jsp-api-*.jar</exclude>
-                <exclude>WEB-INF/lib/storm-*.jar</exclude>
-                <exclude>WEB-INF/lib/kafka_*.jar</exclude>
-                <exclude>WEB-INF/lib/kafka-*.jar</exclude>
+                <!--<exclude>WEB-INF/lib/storm-*.jar</exclude> -->
+                <!--<exclude>WEB-INF/lib/kafka_*.jar</exclude> -->
+                <exclude>WEB-INF/lib/slf4j-log4j12-*.jar</exclude>
                 <exclude>WEB-INF/lib/*-tests.jar</exclude>
                 <exclude>WEB-INF/lib/hadoop-mapreduce-*.jar</exclude>
                 <exclude>WEB-INF/lib/hadoop-minicluster-*.jar</exclude>
@@ -208,8 +208,10 @@
                 <include>slf4j-*.jar</include>
                 <include>log4j-*.jar</include>
                 <include>commons-math3-*.jar</include>
-                <include>slf4j-log4j12-*.jar</include>
             </includes>
+            <excludes>
+                <exclude>slf4j-log4j12-*.jar</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/target/lib</directory>
