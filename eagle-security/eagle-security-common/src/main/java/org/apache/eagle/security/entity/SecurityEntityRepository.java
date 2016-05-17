@@ -28,5 +28,6 @@ public class SecurityEntityRepository extends EntityRepository {
         entitySet.add(IPZoneEntity.class);
         entitySet.add(HdfsUserCommandPatternEntity.class);
         entitySet.add(HiveResourceSensitivityAPIEntity.class);
+        entitySet.add(OozieResourceSensitivityAPIEntity.class);
     }
 }
