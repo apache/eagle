@@ -32,5 +32,6 @@
     	<module>eagle-job-common</module>
         <module>eagle-stream-process-api</module>
         <module>eagle-stream-pipeline</module>
+        <module>eagle-stream-process-spark</module>
     </modules>
 </project>

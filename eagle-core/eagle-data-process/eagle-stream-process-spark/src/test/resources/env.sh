@@ -1,3 +1,4 @@
+#!/bin/bash
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -13,18 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-eagle {
-	service {
-		storage-type = "jdbc"
-		storage-adapter = "derby"
-		storage-username = "eagle"
-		storage-password = eagle
-		storage-database = eagle
-		storage-connection-url = "jdbc:derby:eagle-db-dev;create=true"
-		storage-connection-props = "encoding=UTF-8"
-		storage-driver-class = "org.apache.derby.jdbc.EmbeddedDriver"
-		storage-connection-max = 8
-	}
-}
+# The java implementation to use. please use jdk 1.7 or later
+# export JAVA_HOME=${JAVA_HOME}
+# export JAVA_HOME=/usr/java/jdk1.7.0_80/
 
+# EAGLE_SERVICE_HOST, default is `hostname -f`
+export EAGLE_SERVICE_HOST=localhost
 
+# EAGLE_SERVICE_PORT, default is 9099
+export EAGLE_SERVICE_PORT=9099
+
+# EAGLE_SERVICE_USER
+export EAGLE_SERVICE_USER=admin
+
+# EAGLE_SERVICE_PASSWORD
+export EAGLE_SERVICE_PASSWD=secret
