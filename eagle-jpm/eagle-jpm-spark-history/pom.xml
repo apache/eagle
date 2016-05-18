@@ -62,21 +62,4 @@
 		  </exclusions>
 	  </dependency>
   </dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptors>
-						<descriptor>src/assembly/eagle-jpm-history-assembly.xml</descriptor>
-					</descriptors>
-					<archive>
-						<manifest>
-							<mainClass>org.apache.eagle.jpm.spark.history.storm.SparkHistoryTopology</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

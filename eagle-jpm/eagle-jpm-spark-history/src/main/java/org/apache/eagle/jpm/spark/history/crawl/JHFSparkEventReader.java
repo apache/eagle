@@ -19,6 +19,7 @@ package org.apache.eagle.jpm.spark.history.crawl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import jline.internal.Log;
 import org.apache.eagle.jpm.entity.*;
 import org.apache.eagle.jpm.util.JSONUtil;
 import org.apache.eagle.jpm.util.JobNameNormalization;
@@ -68,6 +69,7 @@ public class JHFSparkEventReader{
         executors = new HashMap<String, SparkExecutor>();
         stageTaskStatusMap = new HashMap<>();
         conf = ConfigFactory.load();
+        this.initiateClient();
     }
 
     public void read(JSONObject eventObj)throws Exception{
@@ -277,6 +279,20 @@ public class JHFSparkEventReader{
         Integer stageAttemptId = JSONUtil.getInt(stageInfo, "Stage Attempt ID");
         String key = this.generateStageKey(stageId.toString(), stageAttemptId.toString());
         stageTaskStatusMap.put(key, new HashMap<Integer, Boolean>());
+
+        if(!stages.containsKey(this.generateStageKey(stageId.toString(),stageAttemptId.toString()))){
+            //may be further attempt for one stage
+            String baseAttempt = this.generateStageKey(stageId.toString(), "0");
+            if(stages.containsKey(baseAttempt)){
+                SparkStage stage = stages.get(baseAttempt);
+                String jobId = stage.getTags().get(SparkJobTagName.SPARK_JOB_ID.toString());
+
+                String stageName = JSONUtil.getString(event, "Stage Name");
+                int numTasks = JSONUtil.getInt(stageInfo, "Number of Tasks");
+                this.initiateStage(Integer.parseInt(jobId), stageId, stageAttemptId, stageName, numTasks);
+            }
+        }
+
     }
 
     private void handleStageComplete(JSONObject event){
@@ -341,7 +357,7 @@ public class JHFSparkEventReader{
             if(stage.getSubmitTime() == 0 || stage.getCompleteTime() == 0){
                 SparkJob job = this.jobs.get(jobId);
                 job.setNumSkippedStages(job.getNumSkippedStages() + 1);
-                job.setNumSkippedTasks(job.getNumCompletedTasks());
+                job.setNumSkippedTasks(job.getNumSkippedTasks() + stage.getNumTasks());
             }else{
                 this.aggregateToJob(stage);
                 this.aggregateStageToApp(stage);
@@ -370,6 +386,8 @@ public class JHFSparkEventReader{
             }
         }
         this.flushEntities(executors.values(), false);
+        //spark code...tricky
+        app.setSkippedTasks(app.getCompleteTasks());
         this.flushEntities(app, true);
     }
 
@@ -377,6 +395,7 @@ public class JHFSparkEventReader{
     //aggregate job level metrics
         app.setNumJobs(app.getNumJobs() + 1);
         app.setTotalTasks(app.getTotalTasks() + job.getNumTask());
+        app.setCompleteTasks(app.getCompleteTasks() + job.getNumCompletedTasks());
         app.setSkippedTasks(app.getSkippedTasks() + job.getNumSkippedTasks());
         app.setFailedTasks(app.getFailedTasks() + job.getNumFailedTasks());
         app.setTotalStages(app.getTotalStages() + job.getNumStages());
@@ -476,11 +495,28 @@ public class JHFSparkEventReader{
         job.setNumCompletedTasks(job.getNumCompletedTasks() + stage.getNumCompletedTasks());
         job.setNumFailedTasks(job.getNumFailedTasks() + stage.getNumFailedTasks());
         job.setNumTask(job.getNumTask() + stage.getNumTasks());
+
+
         if(stage.getStatus().equalsIgnoreCase(SparkEntityConstant.SPARK_STAGE_STATUS.COMPLETE.toString())){
-            job.setNumCompletedStages(job.getNumCompletedStages()+1);
+            //if multiple attempts succeed, just count one
+            if(!hasStagePriorAttemptSuccess(stage)){
+                job.setNumCompletedStages(job.getNumCompletedStages()+1);
+            }
+
         }else {
             job.setNumFailedStages(job.getNumFailedStages() + 1);
         }
+    }
+
+    private boolean hasStagePriorAttemptSuccess(SparkStage stage){
+        Integer stageAttemptId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString()));
+        for(Integer i = 0 ;i < stageAttemptId; i++){
+            SparkStage previousStage = stages.get(this.generateStageKey(stage.getTags().get(SparkJobTagName.SPARK_SATGE_ID.toString()), i.toString()));
+            if(previousStage.getStatus().equalsIgnoreCase(SparkEntityConstant.SPARK_STAGE_STATUS.COMPLETE.toString())){
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -529,14 +565,20 @@ public class JHFSparkEventReader{
     }
 
     private long parseExecutorMemory(String memory) throws Exception{
-        if(memory.endsWith("G") || memory.endsWith("g")){
+        if(null == memory){
+            Log.error("No memory configuration in the app");
+            return 0l;
+        }else if(memory.endsWith("G") || memory.endsWith("g")){
             int executorGB = Integer.parseInt(memory.substring(0, memory.length() - 1));
             return 1024l * 1024 * 1024 * executorGB;
         }else if(memory.endsWith("M") || memory.endsWith("m")){
             int executorMB = Integer.parseInt(memory.substring(0, memory.length() - 1));
             return 1024l * 1024 * executorMB;
+        }else{
+            Log.error("Cannot parse executor memory  " + memory);
+            return 0l;
         }
-        throw new Exception("Cannot parse executor memory  " + memory);
+
     }
 
     private void flushEntities(Object entity, boolean forceFlush){
@@ -570,8 +612,18 @@ public class JHFSparkEventReader{
     }
 
     private void doFlush(List entities)throws Exception{
-        //client.create(entities);
-
+        client.create(entities);
+//        for(Object entity: entities){
+//            if(entity instanceof SparkExecutor){
+//                for (Field field : entity.getClass().getDeclaredFields()) {
+//                    field.setAccessible(true); // You might want to set modifier to public first.
+//                    Object value = field.get(entity);
+//                    if (value != null) {
+//                        System.out.println(field.getName() + "=" + value);
+//                    }
+//                }
+//            }
+//        }
     }
 
 

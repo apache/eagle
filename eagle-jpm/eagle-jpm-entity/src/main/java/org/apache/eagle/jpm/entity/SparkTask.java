@@ -182,14 +182,17 @@ public class SparkTask extends TaggedLogAPIEntity{
 
     public void setTaskId(int taskId) {
         this.taskId = taskId;
+        valueChanged("taskId");
     }
 
     public void setLaunchTime(long launchTime) {
         this.launchTime = launchTime;
+        valueChanged("launchTime");
     }
 
     public void setExecutorId(String executorId) {
         this.executorId = executorId;
+        valueChanged("executorId");
     }
 
     public void setHost(String host) {

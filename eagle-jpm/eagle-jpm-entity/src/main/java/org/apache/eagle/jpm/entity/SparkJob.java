@@ -117,6 +117,7 @@ public class SparkJob extends TaggedLogAPIEntity{
 
     public void setSubmissionTime(long submissionTime) {
         this.submissionTime = submissionTime;
+        this.valueChanged("submissionTime");
     }
 
     public void setCompletionTime(long completionTime) {

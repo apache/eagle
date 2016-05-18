@@ -50,7 +50,7 @@ public class SparkHistoryFileInputStreamReaderImpl implements JHFInputStreamRead
 
     public static void main(String[] args) throws Exception{
         SparkHistoryFileInputStreamReaderImpl impl = new SparkHistoryFileInputStreamReaderImpl("apollo-phx", new SparkApplicationInfo());
-        impl.read(new FileInputStream(new File("E:\\eagle\\success_spark_job")));
+        impl.read(new FileInputStream(new File("E:\\eagle\\application_1459803563374_535667_1")));
     }
 
 }

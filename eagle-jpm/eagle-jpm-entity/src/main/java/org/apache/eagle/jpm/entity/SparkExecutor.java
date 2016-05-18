@@ -194,6 +194,7 @@ public class SparkExecutor extends TaggedLogAPIEntity{
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+        valueChanged("startTime");
     }
 
     public long getEndTime() {

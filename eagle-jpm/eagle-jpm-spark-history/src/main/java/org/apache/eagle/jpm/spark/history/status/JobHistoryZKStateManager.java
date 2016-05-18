@@ -19,12 +19,14 @@
 
 package org.apache.eagle.jpm.spark.history.status;
 
-import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
-import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.transaction.CuratorTransactionBridge;
+import org.apache.curator.framework.recipes.locks.InterProcessLock;
+import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
 import org.apache.curator.retry.RetryNTimes;
+import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
+import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +74,9 @@ public class JobHistoryZKStateManager {
     public List<String> loadApplications(int limit){
         String jobPath = zkRoot + "/jobs";
         List<String> apps = new ArrayList<>();
+        InterProcessLock lock = new InterProcessReadWriteLock(_curator,jobPath).writeLock();
         try{
+            lock.acquire();
             Iterator<String> iter =  _curator.getChildren().forPath(jobPath).iterator();
             while(iter.hasNext()) {
                 String appId = iter.next();
@@ -90,13 +94,22 @@ public class JobHistoryZKStateManager {
         }catch(Exception e){
             LOG.error("fail to read unprocessed jobs", e);
             throw new RuntimeException(e);
+        }finally {
+            try{
+                lock.release();
+            }catch(Exception e){
+                LOG.error("fail to release lock", e);
+            }
+
         }
     }
 
     public void resetApplications(){
         String jobPath = zkRoot + "/jobs";
         List<String> apps = new ArrayList<>();
+        InterProcessLock lock = new InterProcessReadWriteLock(_curator,jobPath).writeLock();
         try{
+            lock.acquire();
             Iterator<String> iter =  _curator.getChildren().forPath(jobPath).iterator();
             while(iter.hasNext()) {
                 String appId = iter.next();
@@ -116,6 +129,13 @@ public class JobHistoryZKStateManager {
         }catch(Exception e){
             LOG.error("fail to read unprocessed jobs", e);
             throw new RuntimeException(e);
+        }finally {
+            try{
+                lock.release();
+            }catch(Exception e){
+                LOG.error("fail to release lock", e);
+            }
+
         }
     }
 
@@ -206,19 +226,30 @@ public class JobHistoryZKStateManager {
     public void updateApplicationStatus(String appId, Enum<ZKStateConstant.AppStatus> status){
 
         String path = zkRoot + "/jobs/" + appId ;
+        InterProcessLock lock = new InterProcessReadWriteLock(_curator,zkRoot+"/jobs").readLock();
         try{
             if(_curator.checkExists().forPath(path) != null){
                 if(status.equals(ZKStateConstant.AppStatus.FINISHED)){
+                    lock.acquire();
                     _curator.delete().deletingChildrenIfNeeded().forPath(path);
                 }else{
                     _curator.setData().forPath(path, status.toString().getBytes("UTF-8"));
                 }
             }else{
                 String errorMsg = String.format("fail to update for application with path %s", path);
+                LOG.error(errorMsg);
             }
         }catch (Exception e){
             LOG.error("fail to update application status", e);
             throw new RuntimeException(e);
+        }finally{
+            try{
+                if(lock.isAcquiredInThisProcess())
+                    lock.release();
+            }catch (Exception e){
+                LOG.error("fail to release lock",e);
+            }
+
         }
 
     }

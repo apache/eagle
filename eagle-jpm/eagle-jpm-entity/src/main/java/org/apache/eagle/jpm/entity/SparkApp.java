@@ -96,6 +96,8 @@ public class SparkApp extends TaggedLogAPIEntity{
     private long execMemoryBytes;
     @Column("ae")
     private long driveMemoryBytes;
+    @Column("af")
+    private int completeTasks;
 
     public long getStartTime() {
         return startTime;
@@ -213,12 +215,14 @@ public class SparkApp extends TaggedLogAPIEntity{
         return driveMemoryBytes;
     }
 
+    public int getCompleteTasks(){ return completeTasks;}
+
     public JobConfig getConfig() {
         return config;
     }
     public void setStartTime(long startTime) {
         this.startTime = startTime;
-        valueChanged("endTime");
+        valueChanged("startTime");
     }
 
     public void setEndTime(long endTime) {
@@ -364,5 +368,10 @@ public class SparkApp extends TaggedLogAPIEntity{
     public void setDriveMemoryBytes(long driveMemoryBytes) {
         this.driveMemoryBytes = driveMemoryBytes;
         valueChanged("driveMemoryBytes");
+    }
+
+    public void setCompleteTasks(int completeTasks){
+        this.completeTasks = completeTasks;
+        valueChanged("completeTasks");
     }
 }

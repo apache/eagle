@@ -74,12 +74,6 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
     public void nextTuple() {
         LOG.info("Start to run tuple");
         try{
-            List<String> appIds = zkState.loadApplications(10);
-            for(String appId: appIds){
-                _collector.emit(new Values(appId), appId);
-                zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.SENT_FOR_PARSE);
-            }
-            LOG.info("{} apps sent.", appIds.size());
 
             long fetchTime = Calendar.getInstance().getTimeInMillis();
             if(fetchTime - this.lastFinishAppTime > 5 * 60 * 1000){
@@ -96,7 +90,16 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
                 zkState.updateLastUpdateTime(fetchTime);
             }
 
-           // this.takeRest(10);
+            List<String> appIds = zkState.loadApplications(10);
+            for(String appId: appIds){
+                _collector.emit(new Values(appId), appId);
+                zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.SENT_FOR_PARSE);
+            }
+            LOG.info("{} apps sent.", appIds.size());
+
+            if(appIds.isEmpty()){
+                this.takeRest(60);
+            }
         }catch (Exception e){
             LOG.error("Fail to run next tuple", e);
            // this.takeRest(10);
@@ -126,6 +129,8 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
         }
         failTimes ++;
         if(failTimes >= FAIL_MAX_TIMES){
+            this.failTimes.remove(appId);
+            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
             LOG.error(String.format("Application %s has failed for over %s times, drop it.", appId, FAIL_MAX_TIMES));
         }else{
             this.failTimes.put(appId, failTimes);

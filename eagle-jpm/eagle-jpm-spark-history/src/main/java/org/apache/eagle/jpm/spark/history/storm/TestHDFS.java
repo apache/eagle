@@ -20,6 +20,7 @@
 package org.apache.eagle.jpm.spark.history.storm;
 
 import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
+import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -40,7 +41,7 @@ public class TestHDFS {
         conf.set("hdfs.kerberos.principal", config.hdfsConfig.principal);
         conf.set("hdfs.keytab.file", config.hdfsConfig.keytab);
 
-        FileSystem hdfs = FileSystem.get(conf);
+        FileSystem hdfs = HDFSUtil.getFileSystem(conf);
         Path path = new Path("/logs/spark-events/local-1463002514438");
         boolean exists = hdfs.exists(path);
         LOG.info("File exists:{}", exists);

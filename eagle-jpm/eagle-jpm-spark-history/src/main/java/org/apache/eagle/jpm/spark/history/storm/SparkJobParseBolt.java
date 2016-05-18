@@ -30,7 +30,7 @@ import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.eagle.jpm.spark.history.crawl.SparkHistoryFileInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
-import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.SparkHistoryServerResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.model.SparkApplication;
@@ -97,7 +97,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
             if(attempts.isEmpty()){
                 LOG.info("application {} does not has logs on history server", appId);
             }else{
-                hdfs = FileSystem.get(this.hdfsConf);
+                hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
                 for (SparkApplicationAttempt attempt : attempts) {
                     Path attemptFile = new Path(this.config.hdfsConfig.baseDir + "/" + this.getAppAttemptLogName(appId, attempt.getAttemptId()));
                     JHFInputStreamReader reader = new SparkHistoryFileInputStreamReaderImpl(config.info.site , info);
@@ -107,6 +107,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
 
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
             LOG.info("Successfully parse application {}", appId);
+            _collector.ack(tuple);
         } catch (Exception e) {
             LOG.error("Fail to process application {}", appId, e);
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FAILED);
@@ -141,20 +142,20 @@ public class SparkJobParseBolt extends BaseRichBolt {
         try{
 
             SparkApplication app = null;
-            try {
-                List apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
-                if (apps != null) {
-                    app = (SparkApplication) apps.get(0);
-                    attempts = app.getAttempts();
-                }
-            } catch (Exception e) {
-                LOG.info("Fail to get application detail from history server for appId " + appId, e);
-            }
+//            try {
+//                List apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
+//                if (apps != null) {
+//                    app = (SparkApplication) apps.get(0);
+//                    attempts = app.getAttempts();
+//                }
+//            } catch (Exception e) {
+//                LOG.info("Fail to get application detail from history server for appId " + appId, e);
+//            }
 
 
             if (null == app) {
                 //history server may not have the info, just double check
-                hdfs = FileSystem.get(this.hdfsConf);
+                hdfs =HDFSUtil.getFileSystem(this.hdfsConf);
                 Integer attemptId = 1;
 
                 boolean exists = true;

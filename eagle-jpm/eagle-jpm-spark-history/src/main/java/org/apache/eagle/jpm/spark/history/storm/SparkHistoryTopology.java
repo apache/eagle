@@ -38,7 +38,7 @@ public class SparkHistoryTopology {
     public TopologyBuilder getBuilder(){
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("getJobs", new FinishedSparkJobSpout(config), 1);
-        builder.setBolt("parseJobs", new SparkJobParseBolt(config), 2).shuffleGrouping("getJobs");
+        builder.setBolt("parseJobs", new SparkJobParseBolt(config), 8).shuffleGrouping("getJobs");
         return builder;
     }
 
@@ -50,7 +50,7 @@ public class SparkHistoryTopology {
         Config conf = new Config();
         conf.setNumWorkers(crawlConfig.stormConfig.workerNo);
         conf.setMessageTimeoutSecs(crawlConfig.stormConfig.timeoutSec);
-        conf.setMaxSpoutPending(crawlConfig.stormConfig.spoutPending);
+        //conf.setMaxSpoutPending(crawlConfig.stormConfig.spoutPending);
         conf.put(Config.TOPOLOGY_DEBUG, true);
 
 
