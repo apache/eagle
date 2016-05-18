@@ -143,7 +143,10 @@ public class JHFSparkEventReader{
 
     private void handleExecutorAdd(JSONObject event)throws Exception{
         String executorID= (String)event.get("Executor ID");
-        this.initiateExecutor(executorID, JSONUtil.getLong(event,"Timestamp"));
+        SparkExecutor executor = this.initiateExecutor(executorID, JSONUtil.getLong(event,"Timestamp"));
+
+        JSONObject executorInfo = JSONUtil.getJSONObject(event, "Executor Info");
+        executor.setCores(JSONUtil.getInt(executorInfo, "Total Cores"));
 
     }
 

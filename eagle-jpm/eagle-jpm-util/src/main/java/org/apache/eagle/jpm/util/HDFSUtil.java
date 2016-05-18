@@ -42,6 +42,6 @@ public class HDFSUtil {
        kConfig.setBoolean("hadoop.security.authorization", true);
        kConfig.set("hadoop.security.authentication", "kerberos");
        UserGroupInformation.setConfiguration(kConfig);
-       UserGroupInformation.loginUserFromKeytab(kConfig.get("hdfs.kerberos.principal"), kConfig.get("hdfs.keytab.file"));
+       UserGroupInformation.loginUserFromKeytab(kConfig.get("hdfs.kerberos.principal"), kConfig.get("hdfs.re.file"));
      }
 }

@@ -70,6 +70,8 @@ public class SparkExecutor extends TaggedLogAPIEntity{
     private long execMemoryBytes;
     @Column("q")
     private long yarnMemoryBytes;
+    @Column("r")
+    private int cores;
 
     public String getHostPort() {
         return hostPort;
@@ -222,5 +224,14 @@ public class SparkExecutor extends TaggedLogAPIEntity{
     public void setYarnMemoryBytes(long yarnMemoryBytes) {
         this.yarnMemoryBytes = yarnMemoryBytes;
         this.valueChanged("yarnMemoryBytes");
+    }
+
+    public int getCores() {
+        return cores;
+    }
+
+    public void setCores(int cores) {
+        this.cores = cores;
+        valueChanged("cores");
     }
 }
