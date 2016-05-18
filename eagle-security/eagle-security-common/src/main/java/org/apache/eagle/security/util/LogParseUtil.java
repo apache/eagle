@@ -21,7 +21,7 @@ package org.apache.eagle.security.util;
 public class LogParseUtil {
 
     /**
-     * @param ugi UGI field of audit log
+     * @param newUgi UGI field of audit log
      * @return resultToMetrics user from UGI field
      * e.g.
      * 1)user@APD.xyz.com
@@ -29,14 +29,14 @@ public class LogParseUtil {
      * 3)hadoop (auth:KERBEROS)
      * 4)hadoop
      */
-    public static String parseUserFromUGI(String ugi) {
-        if(ugi == null) return null;
-        String newUgi = ugi.trim();
+    public static String parseUserFromUGI(String newUgi) {
+        if(newUgi == null) return null;
         int index = newUgi.indexOf("/");
-        if (index != -1) return newUgi.substring(0, index).trim();
+        if (index != -1) return newUgi.substring(0, index);
         index = newUgi.indexOf("@");
-        if (index != -1) return newUgi.substring(0, index).trim();
+        if (index != -1) return newUgi.substring(0, index);
         index = newUgi.indexOf("(");
-        return newUgi.substring(0, index).trim();
+        if (index != -1) return newUgi.substring(0, index).trim();
+        return newUgi.trim();
     }
 }
