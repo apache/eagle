@@ -38,7 +38,7 @@ public class OozieResourceSensitivityDataJoiner {
         LOG.info("Joining Resource with Sensitivity data ..");
         List<OozieResourceEntity> result = new ArrayList<>();
         for (CoordinatorJob eachJob : coordinatorJobs) {
-            OozieResourceEntity entity = new OozieResourceEntity(eachJob.getId(), eachJob.getAppName(), sensitivityMap.get(eachJob.getAppName()));
+            OozieResourceEntity entity = new OozieResourceEntity(eachJob.getId(), eachJob.getAppName(), sensitivityMap.get(eachJob.getId()));
             result.add(entity);
         }
         return result;

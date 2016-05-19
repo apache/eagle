@@ -47,10 +47,10 @@ public class TestOozieSensitivityMetadataDAOImpl {
         Map<String, Map<String, String>> allOozieSensitivityMap = oozieSensitivityMetadataDAO.getAllOozieSensitivityMap();
         Assert.assertEquals(1, allOozieSensitivityMap.size());
         Assert.assertTrue(allOozieSensitivityMap.containsKey("test"));
-        Assert.assertTrue(allOozieSensitivityMap.get("test").containsKey("co_pms_ods_adv_click_log"));
-        Assert.assertEquals("pms job", allOozieSensitivityMap.get("test").get("co_pms_ods_adv_click_log"));
-        Assert.assertTrue(allOozieSensitivityMap.get("test").containsKey("co_tandem_ods_adv_click_log"));
-        Assert.assertEquals("tandem job", allOozieSensitivityMap.get("test").get("co_tandem_ods_adv_click_log"));
+        Assert.assertTrue(allOozieSensitivityMap.get("test").containsKey("0007197-160509174709457-oozie-oozi-C"));
+        Assert.assertEquals("pms job", allOozieSensitivityMap.get("test").get("0007197-160509174709457-oozie-oozi-C"));
+        Assert.assertTrue(allOozieSensitivityMap.get("test").containsKey("0007189-160509174709457-oozie-oozi-C"));
+        Assert.assertEquals("tandem job", allOozieSensitivityMap.get("test").get("0007189-160509174709457-oozie-oozi-C"));
 
     }
 
@@ -64,10 +64,10 @@ public class TestOozieSensitivityMetadataDAOImpl {
         Assert.assertEquals(2, allOozieSensitivityMap.size());
         Assert.assertTrue(allOozieSensitivityMap.containsKey("test"));
         Assert.assertTrue(allOozieSensitivityMap.containsKey("test1"));
-        Assert.assertTrue(allOozieSensitivityMap.get("test1").containsKey("co_pms_ods_adv_click_log"));
-        Assert.assertEquals("pms job", allOozieSensitivityMap.get("test1").get("co_pms_ods_adv_click_log"));
-        Assert.assertTrue(allOozieSensitivityMap.get("test").containsKey("co_tandem_ods_adv_click_log"));
-        Assert.assertEquals("tandem job", allOozieSensitivityMap.get("test").get("co_tandem_ods_adv_click_log"));
+        Assert.assertTrue(allOozieSensitivityMap.get("test1").containsKey("0007197-160509174709457-oozie-oozi-C"));
+        Assert.assertEquals("pms job", allOozieSensitivityMap.get("test1").get("0007197-160509174709457-oozie-oozi-C"));
+        Assert.assertTrue(allOozieSensitivityMap.get("test").containsKey("0007189-160509174709457-oozie-oozi-C"));
+        Assert.assertEquals("tandem job", allOozieSensitivityMap.get("test").get("0007189-160509174709457-oozie-oozi-C"));
 
     }
 
@@ -79,10 +79,10 @@ public class TestOozieSensitivityMetadataDAOImpl {
         OozieSensitivityMetadataDAO oozieSensitivityMetadataDAO = new OozieSensitivityMetadataDAOImpl();
         Map<String, String> oozieSensitivityMap = oozieSensitivityMetadataDAO.getOozieSensitivityMap("test");
         Assert.assertEquals(2, oozieSensitivityMap.size());
-        Assert.assertTrue(oozieSensitivityMap.containsKey("co_pms_ods_adv_click_log"));
-        Assert.assertTrue(oozieSensitivityMap.containsKey("co_tandem_ods_adv_click_log"));
-        Assert.assertEquals("pms job", oozieSensitivityMap.get("co_pms_ods_adv_click_log"));
-        Assert.assertEquals("tandem job", oozieSensitivityMap.get("co_tandem_ods_adv_click_log"));
+        Assert.assertTrue(oozieSensitivityMap.containsKey("0007197-160509174709457-oozie-oozi-C"));
+        Assert.assertTrue(oozieSensitivityMap.containsKey("0007189-160509174709457-oozie-oozi-C"));
+        Assert.assertEquals("pms job", oozieSensitivityMap.get("0007197-160509174709457-oozie-oozi-C"));
+        Assert.assertEquals("tandem job", oozieSensitivityMap.get("0007189-160509174709457-oozie-oozi-C"));
 
     }
 
@@ -103,13 +103,13 @@ public class TestOozieSensitivityMetadataDAOImpl {
         OozieResourceSensitivityAPIEntity entity1 = new OozieResourceSensitivityAPIEntity();
         entity1.setTags(new HashMap<String, String>() {{
             put("site", sites[0]);
-            put("oozieResource", "co_tandem_ods_adv_click_log");
+            put("oozieResource", "0007189-160509174709457-oozie-oozi-C");
         }});
         entity1.setSensitivityType("tandem job");
         OozieResourceSensitivityAPIEntity entity2 = new OozieResourceSensitivityAPIEntity();
         entity2.setTags(new HashMap<String, String>() {{
             put("site", sites[1]);
-            put("oozieResource", "co_pms_ods_adv_click_log");
+            put("oozieResource", "0007197-160509174709457-oozie-oozi-C");
         }});
         entity2.setSensitivityType("pms job");
         entities.add(entity1);

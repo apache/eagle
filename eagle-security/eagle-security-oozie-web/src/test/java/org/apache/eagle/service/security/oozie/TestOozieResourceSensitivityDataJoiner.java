@@ -84,8 +84,8 @@ public class TestOozieResourceSensitivityDataJoiner {
         OozieSensitivityMetadataDAOImpl oozieSensitivityMetadataDAOMock = createMock(OozieSensitivityMetadataDAOImpl.class);
         expectNew(OozieSensitivityMetadataDAOImpl.class).andReturn(oozieSensitivityMetadataDAOMock);
         Map<String, String> oozieSensitivityMap = new HashMap<String, String>();
-        oozieSensitivityMap.put("co_pms_ods_adv_click_log", "pms job");
-        oozieSensitivityMap.put("co_tandem_ods_adv_click_log", "tandem job");
+        oozieSensitivityMap.put("0007197-160509174709457-oozie-oozi-C", "pms job");
+        oozieSensitivityMap.put("0007189-160509174709457-oozie-oozi-C", "tandem job");
         expect(oozieSensitivityMetadataDAOMock.getOozieSensitivityMap("test")).andReturn(oozieSensitivityMap);
         replay(oozieSensitivityMetadataDAOMock, OozieSensitivityMetadataDAOImpl.class);
     }
