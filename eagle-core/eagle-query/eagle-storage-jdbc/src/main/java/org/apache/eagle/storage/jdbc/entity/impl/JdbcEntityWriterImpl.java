@@ -37,6 +37,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.sql.Savepoint;
 
 /**
  * @since 3/27/15
@@ -63,11 +64,13 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
         if(LOG.isDebugEnabled()) LOG.debug("Writing "+entities.size()+" entities");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Connection connection = ConnectionManagerFactory.getInstance().getConnection();
-        // set auto commit false and commit by hands for 3x~5x better performance
-        connection.setAutoCommit(false);
+        Connection connection = null;
+        Savepoint insertDup = null;
 
         try {
+            connection = ConnectionManagerFactory.getInstance().getConnection();
+            // set auto commit false and commit by hands for 3x~5x better performance
+            connection.setAutoCommit(false);
             TorqueStatementPeerImpl<E> peer = connectionManager.getStatementExecutor(this.jdbcEntityDefinition.getJdbcTableName());
             for (E entity : entities) {
                 entity.setEncodedRowkey(peer.getPrimaryKeyBuilder().build(entity));
@@ -75,6 +78,8 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
 
                 ObjectKey key = null;
                 try {
+                    //save point , so that we can roll back just current entry, if required.
+                    insertDup = connection.setSavepoint("insertEntity");
                     // TODO: implement batch insert for better performance
                     key = peer.delegate().doInsert(columnValues,connection);
 
@@ -89,6 +94,7 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
                 } catch (ConstraintViolationException e){
                     //this message will be different in each DB type ...using duplicate keyword to catch for broader set of DBs. moreover we are already inside ConstraintViolationException exception, do we even need this check?
                     if(e.getMessage().toLowerCase().contains("duplicate")){
+                        connection.rollback(insertDup); // need to rollback current Insert entity, as it is duplicate record, need to update. Postgresql is strict in transaction handling(need rollback) as compared to MySql
                         String primaryKey = entity.getEncodedRowkey();
                         if(primaryKey==null) {
                             primaryKey = ConnectionManagerFactory.getInstance().getStatementExecutor().getPrimaryKeyBuilder().build(entity);
@@ -110,12 +116,14 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
             connection.commit();
         }catch (Exception ex) {
             LOG.error("Failed to write records, rolling back",ex);
-            connection.rollback();
+            if(connection!=null)
+                connection.rollback();
             throw ex;
         }finally {
             stopWatch.stop();
             if(LOG.isDebugEnabled()) LOG.debug("Closing connection");
-            connection.close();
+            if(connection!=null)
+                connection.close();
         }
 
         LOG.info(String.format("Wrote %s records in %s ms (table: %s)",keys.size(),stopWatch.getTime(),this.jdbcEntityDefinition.getJdbcTableName()));
