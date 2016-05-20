@@ -41,7 +41,7 @@ public class OozieResourceSensitivityPollingJob extends AbstractResourceSensitiv
         JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
         try {
             List<OozieResourceSensitivityAPIEntity>
-                    oozieResourceSensitivity = load(jobDataMap, "OozieResourceSensitivityAPIEntity");
+                    oozieResourceSensitivity = load(jobDataMap, "OozieResourceSensitivityService");
             if (oozieResourceSensitivity == null) {
                 LOG.warn("Oozie resource sensitivity information is empty");
                 return;
