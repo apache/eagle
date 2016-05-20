@@ -23,7 +23,7 @@ public class OozieMetadataAccessConfigDAOImpl implements OozieMetadataAccessConf
     @Override
     public OozieMetadataAccessConfig getConfig(String site) throws Exception{
         MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
-        Config config = repo.getConfig("oozieQueryLog", site);
+        Config config = repo.getConfig("oozieAuditLog", site);
         return OozieMetadataAccessConfig.config2Entity(config);
     }
 }
