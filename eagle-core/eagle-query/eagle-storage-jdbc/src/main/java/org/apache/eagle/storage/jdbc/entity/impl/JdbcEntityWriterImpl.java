@@ -66,7 +66,7 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
         stopWatch.start();
         Connection connection = null;
         Savepoint insertDup = null;
-
+        int i = 0 ;
         try {
             connection = ConnectionManagerFactory.getInstance().getConnection();
             // set auto commit false and commit by hands for 3x~5x better performance
@@ -79,7 +79,8 @@ public class JdbcEntityWriterImpl<E extends TaggedLogAPIEntity> implements JdbcE
                 ObjectKey key = null;
                 try {
                     //save point , so that we can roll back just current entry, if required.
-                    insertDup = connection.setSavepoint("insertEntity");
+                    i++ ;
+                    insertDup = connection.setSavepoint("insertEntity"+i);
                     // TODO: implement batch insert for better performance
                     key = peer.delegate().doInsert(columnValues,connection);
 
