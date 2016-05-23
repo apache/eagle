@@ -81,10 +81,6 @@ public class OozieAuditLogParser {
         sb.append(PREFIX_REGEX + OOZIEAUDIT_FLAG);
         sb.append(MESSAGE_SPLIT_FLAG);
         for (int i = 0; i < patterns.size(); i++) {
-          /*  sb.append("(");
-            sb.append(patterns.get(i) + "(" + COMMON_REGEX + ")");
-            sb.append(")");
-            sb.append(ALLOW_ALL_REGEX);*/
             sb.append("(");
             sb.append(patterns.get(i) + COMMON_REGEX);
             sb.append(")");
