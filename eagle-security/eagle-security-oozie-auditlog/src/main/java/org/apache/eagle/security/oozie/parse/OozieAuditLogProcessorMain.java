@@ -27,7 +27,7 @@ public class OozieAuditLogProcessorMain {
         StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
         env.fromSpout(new KafkaSourcedSpoutProvider()).withOutputFields(1).nameAs("kafkaMsgConsumer")
                 .flatMap(new OozieResourceSensitivityDataJoinExecutor())
-                .alertWithConsumer("oozieSecurityLogEventStream", "oozieSecurityLogAlertExecutor");
+                .alertWithConsumer("oozieSecurityLogEventStream", "oozieAuditLogAlertExecutor");
         env.execute();
     }
 }
