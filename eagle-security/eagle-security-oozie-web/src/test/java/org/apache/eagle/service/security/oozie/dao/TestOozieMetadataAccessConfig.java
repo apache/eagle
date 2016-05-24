@@ -25,9 +25,9 @@ import org.junit.Test;
 public class TestOozieMetadataAccessConfig {
     @Test
     public void testGetOozieConfig() throws Exception {
-        String oozieConfigStr = "web.accessType:\"oozie_api\",web.oozieUrl:\"http://localhost:11000/oozie\",web.filter:\"status=RUNNING\",web.authType:\"SIMPLE\"";
+        String oozieConfigStr = "classification.accessType:\"oozie_api\",classification.oozieUrl:\"http://localhost:11000/oozie\",classification.filter:\"status=RUNNING\",classification.authType:\"SIMPLE\"";
         Config config = ConfigFactory.parseString(oozieConfigStr);
-        config = config.getConfig(EagleConfigConstants.WEB_CONFIG);
+        config = config.getConfig(EagleConfigConstants.CLASSIFICATION_CONFIG);
         OozieMetadataAccessConfig oozieMetadataAccessConfig = OozieMetadataAccessConfig.config2Entity(config);
         System.out.print(oozieMetadataAccessConfig);
         Assert.assertEquals("oozie_api", oozieMetadataAccessConfig.getAccessType());

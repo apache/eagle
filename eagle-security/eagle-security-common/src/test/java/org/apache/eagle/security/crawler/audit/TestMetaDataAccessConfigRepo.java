@@ -61,11 +61,11 @@ public class TestMetaDataAccessConfigRepo {
             Assert.assertTrue(appConfig.getString("envContextConfig.mode").equals("cluster"));
         }
 
-        String oozieConfigStr = "web.accessType:\"oozie_api\",web.oozieUrl:\"http://localhost:11000/oozie\",web.filter:\"status=RUNNING\",web.authType:\"SIMPLE\"";
+        String oozieConfigStr = "classification.accessType:\"oozie_api\",classification.oozieUrl:\"http://localhost:11000/oozie\",classification.filter:\"status=RUNNING\",classification.authType:\"SIMPLE\"";
         config = ConfigFactory.parseString(oozieConfigStr);
         Config oozieConfig = null;
-        if(config.hasPath(EagleConfigConstants.WEB_CONFIG)) {
-            oozieConfig = config.getConfig(EagleConfigConstants.WEB_CONFIG);
+        if(config.hasPath(EagleConfigConstants.CLASSIFICATION_CONFIG)) {
+            oozieConfig = config.getConfig(EagleConfigConstants.CLASSIFICATION_CONFIG);
             Assert.assertTrue(oozieConfig.getString("accessType").equals("oozie_api"));
             Assert.assertTrue(oozieConfig.getString("oozieUrl").equals("http://localhost:11000/oozie"));
             Assert.assertTrue(oozieConfig.getString("filter").equals("status=RUNNING"));
