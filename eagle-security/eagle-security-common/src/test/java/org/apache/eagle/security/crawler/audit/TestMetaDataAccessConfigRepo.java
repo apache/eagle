@@ -61,8 +61,8 @@ public class TestMetaDataAccessConfigRepo {
             Assert.assertTrue(appConfig.getString("envContextConfig.mode").equals("cluster"));
         }
 
-        String oozieConfigStr = "classification.accessType:\"oozie_api\",classification.oozieUrl:\"http://localhost:11000/oozie\",classification.filter:\"status=RUNNING\",classification.authType:\"SIMPLE\"";
-        config = ConfigFactory.parseString(oozieConfigStr);
+        String oozieConfigStr = "classification.accessType=oozie_api\nclassification.oozieUrl=http://localhost:11000/oozie\nclassification.filter=status=RUNNING\nclassification.authType=SIMPLE";
+        config = ConfigFactory.parseString(oozieConfigStr,options);
         Config oozieConfig = null;
         if(config.hasPath(EagleConfigConstants.CLASSIFICATION_CONFIG)) {
             oozieConfig = config.getConfig(EagleConfigConstants.CLASSIFICATION_CONFIG);

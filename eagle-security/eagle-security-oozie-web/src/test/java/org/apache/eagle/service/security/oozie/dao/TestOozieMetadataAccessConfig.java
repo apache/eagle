@@ -18,6 +18,8 @@ package org.apache.eagle.service.security.oozie.dao;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigParseOptions;
+import com.typesafe.config.ConfigSyntax;
 import junit.framework.Assert;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.junit.Test;
@@ -25,8 +27,11 @@ import org.junit.Test;
 public class TestOozieMetadataAccessConfig {
     @Test
     public void testGetOozieConfig() throws Exception {
-        String oozieConfigStr = "classification.accessType:\"oozie_api\",classification.oozieUrl:\"http://localhost:11000/oozie\",classification.filter:\"status=RUNNING\",classification.authType:\"SIMPLE\"";
-        Config config = ConfigFactory.parseString(oozieConfigStr);
+        String oozieConfigStr = "classification.accessType=oozie_api\nclassification.oozieUrl=http://localhost:11000/oozie\nclassification.filter=status=RUNNING\nclassification.authType=SIMPLE";
+        ConfigParseOptions options = ConfigParseOptions.defaults()
+                .setSyntax(ConfigSyntax.PROPERTIES)
+                .setAllowMissing(false);
+        Config config = ConfigFactory.parseString(oozieConfigStr, options);
         config = config.getConfig(EagleConfigConstants.CLASSIFICATION_CONFIG);
         OozieMetadataAccessConfig oozieMetadataAccessConfig = OozieMetadataAccessConfig.config2Entity(config);
         System.out.print(oozieMetadataAccessConfig);
