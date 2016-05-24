@@ -145,6 +145,11 @@
 			<artifactId>eagle-security-hdfs-web</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.eagle</groupId>
+			<artifactId>eagle-security-maprfs-web</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!--
 		<dependency>
 			<groupId>org.apache.eagle</groupId>
