@@ -39,6 +39,7 @@
     <module>eagle-security-hive</module>
     <module>eagle-security-hive-web</module>
     <module>eagle-security-hdfs-web</module>
+    <module>eagle-security-maprfs-web</module>
     <module>eagle-security-hdfs-securitylog</module>
     <module>eagle-security-hbase-securitylog</module>
     <module>eagle-security-hbase-web</module>

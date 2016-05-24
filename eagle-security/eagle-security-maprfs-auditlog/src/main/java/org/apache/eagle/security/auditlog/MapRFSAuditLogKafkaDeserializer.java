@@ -17,8 +17,8 @@
 package org.apache.eagle.security.auditlog;
 
 import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
-import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
-import org.apache.eagle.security.hdfs.MAPRAuditLogParser;
+import org.apache.eagle.security.hdfs.MAPRFSAuditLogObject;
+import org.apache.eagle.security.hdfs.MAPRFSAuditLogParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-public class MapRAuditLogKafkaDeserializer implements SpoutKafkaMessageDeserializer {
-    private static Logger LOG = LoggerFactory.getLogger(MapRAuditLogKafkaDeserializer.class);
+public class MapRFSAuditLogKafkaDeserializer implements SpoutKafkaMessageDeserializer {
+    private static Logger LOG = LoggerFactory.getLogger(MapRFSAuditLogKafkaDeserializer.class);
     private Properties props;
 
-    public MapRAuditLogKafkaDeserializer(Properties props){
+    public MapRFSAuditLogKafkaDeserializer(Properties props){
         this.props = props;
     }
 
@@ -43,8 +43,8 @@ public class MapRAuditLogKafkaDeserializer implements SpoutKafkaMessageDeseriali
     public Object deserialize(byte[] arg0) {
         String logLine = new String(arg0);
 
-        MAPRAuditLogParser parser = new MAPRAuditLogParser();
-        HDFSAuditLogObject entity = null;
+        MAPRFSAuditLogParser parser = new MAPRFSAuditLogParser();
+        MAPRFSAuditLogObject entity = null;
         try{
             entity = parser.parse(logLine);
         }catch(Exception ex){
@@ -59,9 +59,10 @@ public class MapRAuditLogKafkaDeserializer implements SpoutKafkaMessageDeseriali
         map.put("dst", entity.dst);
         map.put("host", entity.host);
         map.put("timestamp", entity.timestamp);
-        map.put("allowed", entity.allowed);
+        map.put("status", entity.status);
         map.put("user", entity.user);
         map.put("cmd", entity.cmd);
+        map.put("volume", entity.volume);
 
         return map;
     }

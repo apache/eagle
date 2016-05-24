@@ -25,44 +25,43 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 
 
-public final class MAPRAuditLogParser {
-    private final static Logger LOG = LoggerFactory.getLogger(MAPRAuditLogParser.class);
+public final class MAPRFSAuditLogParser {
+    private final static Logger LOG = LoggerFactory.getLogger(MAPRFSAuditLogParser.class);
 
-    public MAPRAuditLogParser(){
+    public MAPRFSAuditLogParser(){
     }
 
-    public HDFSAuditLogObject parse(String log) throws JSONException, ParseException {
+    public MAPRFSAuditLogObject parse(String log) throws JSONException, ParseException {
         JSONObject jsonObject = new JSONObject(log);
         String timestamp = jsonObject.getJSONObject("timestamp").getString("$date");
         String cmd = jsonObject.getString("operation");
         String user = jsonObject.getString("uid");
         String ip = jsonObject.getString("ipAddress");
+        String status = jsonObject.getString("status");
+        String volumeID = jsonObject.getString("volumeId");
         String src;
         String dst;
-        try{
+        if(jsonObject.has("srcFid")){
             src = jsonObject.getString("srcFid");
-        } catch (JSONException e){
+        }else{
             src = "null";
         }
-        try{
+
+        if(jsonObject.has("dstFid")){
             dst = jsonObject.getString("dstFid");
-        }catch (JSONException e){
+        }else{
             dst = "null";
         }
 
-        String status = String.valueOf(jsonObject.getString("status"));
-        Boolean allowed = false;
-        if(status.equals("0"))  allowed = true;
-
-        HDFSAuditLogObject entity = new HDFSAuditLogObject();
+        MAPRFSAuditLogObject entity = new MAPRFSAuditLogObject();
         entity.user = user;
         entity.cmd = cmd;
         entity.src = src;
         entity.dst = dst;
         entity.host = ip;
-        entity.allowed =allowed;
+        entity.status = status;
+        entity.volume = volumeID;
         entity.timestamp = DateTimeUtil.maprhumanDateToMilliseconds(timestamp);
         return entity;
     }
-
 }
