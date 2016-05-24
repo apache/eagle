@@ -214,10 +214,23 @@ public class CompiledQuery {
         EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName(serviceName);
         if(ed.isTimeSeries()){
             // TODO check Time exists for timeseries or topology data
-            this.searchCondition.setStartTime(this.rawQuery.getStartTime());
-            this.searchCondition.setEndTime(this.rawQuery.getEndTime());
-            this.setStartTime(DateTimeUtil.humanDateToSeconds(this.getRawQuery().getStartTime()) * 1000);
-            this.setEndTime(DateTimeUtil.humanDateToSeconds(this.getRawQuery().getEndTime()) * 1000);
+            long endTimeMillis = System.currentTimeMillis();
+            long startTimeMills = endTimeMillis - 30 * DateTimeUtil.ONEDAY;
+            String endTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(endTimeMillis);
+            String startTime = DateTimeUtil.millisecondsToHumanDateWithSeconds(startTimeMills);
+
+            if(this.rawQuery.getStartTime() != null && this.rawQuery.getEndTime() != null) {
+                endTime = this.rawQuery.getEndTime();
+                startTime = this.rawQuery.getStartTime();
+                endTimeMillis = DateTimeUtil.humanDateToSeconds(endTime) * 1000;
+                startTimeMills = DateTimeUtil.humanDateToSeconds(startTime) * 1000;
+            } else {
+                LOG.warn("startTime or endTime is not given, use [currentSystemTime - 30 days, currentSystemTime]");
+            }
+            this.searchCondition.setStartTime(startTime);
+            this.searchCondition.setEndTime(endTime);
+            this.setStartTime(startTimeMills);
+            this.setEndTime(endTimeMillis);
         }else{
             this.searchCondition.setStartTime("0");
             this.searchCondition.setEndTime("1");

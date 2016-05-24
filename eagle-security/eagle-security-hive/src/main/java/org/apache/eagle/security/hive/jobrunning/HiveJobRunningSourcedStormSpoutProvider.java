@@ -17,6 +17,7 @@
 package org.apache.eagle.security.hive.jobrunning;
 
 import backtype.storm.topology.base.BaseRichSpout;
+import org.apache.eagle.job.DefaultJobPartitionerImpl;
 import org.apache.eagle.job.JobPartitioner;
 import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig;
 import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig.ControlConfig;
@@ -69,9 +70,11 @@ public class HiveJobRunningSourcedStormSpoutProvider {
 			controlConfig.partitionerCls = (Class<? extends JobPartitioner>)Class.forName(config.getString("dataSourceConfig.partitionerCls"));
 		}
 		catch(Exception ex){
-			LOG.error("failing find job id partitioner class " + config.getString("dataSourceConfig.partitionerCls"));
-			throw new IllegalStateException("jobId partitioner class does not exist " + config.getString("dataSourceConfig.partitionerCls"));
-		}
+			LOG.warn("failing find job id partitioner class " + config.getString("dataSourceConfig.partitionerCls"));
+			//throw new IllegalStateException("jobId partitioner class does not exist " + config.getString("dataSourceConfig.partitionerCls"));
+            controlConfig.partitionerCls = DefaultJobPartitionerImpl.class;
+
+        }
 		
 		JobRunningSpout spout = new JobRunningSpout(crawlConfig);
 		return spout;

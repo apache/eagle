@@ -93,7 +93,7 @@
             <artifactId>eagle-hadoop-metric</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+	    <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-gc</artifactId>
             <version>${project.version}</version>

@@ -36,7 +36,7 @@ public class AbstractResourceSensitivityPollingJob {
     protected <R extends TaggedLogAPIEntity> List<R> load(JobDataMap jobDataMap, String service) throws Exception {
         Map<String, Object> map = (Map<String, Object>) jobDataMap.get(EagleConfigConstants.EAGLE_SERVICE);
         String eagleServiceHost = (String) map.get(EagleConfigConstants.HOST);
-        Integer eagleServicePort = (Integer) map.get(EagleConfigConstants.PORT);
+        Integer eagleServicePort = Integer.parseInt(map.get(EagleConfigConstants.PORT).toString());
         String username = map.containsKey(EagleConfigConstants.USERNAME) ? (String) map.get(EagleConfigConstants.USERNAME) : null;
         String password = map.containsKey(EagleConfigConstants.PASSWORD) ? (String) map.get(EagleConfigConstants.PASSWORD) : null;
 
