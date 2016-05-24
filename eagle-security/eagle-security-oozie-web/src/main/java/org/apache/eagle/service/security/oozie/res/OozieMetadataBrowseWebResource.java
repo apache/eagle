@@ -37,7 +37,7 @@ public class OozieMetadataBrowseWebResource {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public OozieMetadataBrowseWebResponse getDatabases(@QueryParam("site") String site){
+    public OozieMetadataBrowseWebResponse getCoordJobs(@QueryParam("site") String site){
 
         OozieMetadataBrowseWebResponse response = new OozieMetadataBrowseWebResponse();
         List<CoordinatorJob> coordinators = null;
