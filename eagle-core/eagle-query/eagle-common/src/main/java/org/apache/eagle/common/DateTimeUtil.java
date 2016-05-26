@@ -100,6 +100,18 @@ public class DateTimeUtil {
 			return 0L;
 		}
 	}
+
+	//For mapr
+	//exp: 2015-06-06T10:44:22.800Z
+	public static long maprhumanDateToMilliseconds(String date) throws ParseException{
+		date = date.replace('T',' ');
+		date = date.replace('Z',' ');
+		date = date.replace('.',',');
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS ");
+		sdf.setTimeZone(CURRENT_TIME_ZONE);
+		Date d = sdf.parse(date);
+		return d.getTime();
+	}
 	/**
 	 * this could be accurate only when timezone is UTC
 	 * for the timezones other than UTC, there is possibly issue, for example
