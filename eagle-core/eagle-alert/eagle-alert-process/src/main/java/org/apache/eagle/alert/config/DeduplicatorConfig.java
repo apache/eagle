@@ -17,21 +17,26 @@
 package org.apache.eagle.alert.config;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class DeduplicatorConfig implements Serializable{
 	private static final long serialVersionUID = 1L;
+
+	private int alertDedupIntervalMin;
+	private List<String> fields;
+
 	public int getAlertDedupIntervalMin() {
 		return alertDedupIntervalMin;
 	}
+
 	public void setAlertDedupIntervalMin(int alertDedupIntervalMin) {
 		this.alertDedupIntervalMin = alertDedupIntervalMin;
 	}
-	public int getEmailDedupIntervalMin() {
-		return emailDedupIntervalMin;
+	public List<String> getFields() {
+		return fields;
 	}
-	public void setEmailDedupIntervalMin(int emailDedupIntervalMin) {
-		this.emailDedupIntervalMin = emailDedupIntervalMin;
+
+	public void setFields(List<String> fields) {
+		this.fields = fields;
 	}
-	private int alertDedupIntervalMin;
-	private int emailDedupIntervalMin;
 }
