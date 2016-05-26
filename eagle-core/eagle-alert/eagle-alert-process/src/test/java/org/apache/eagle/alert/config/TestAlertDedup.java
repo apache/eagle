@@ -25,10 +25,10 @@ public class TestAlertDedup {
 
 	@Test
 	public void test() throws Exception{
-		String alertDef = "{\"alertDedupIntervalMin\":\"720\",\"emailDedupIntervalMin\":\"1440\"}";
+		String alertDef = "{\"alertDedupIntervalMin\":\"10\",\"fields\":[\"key1\",\"key2\",\"key3\"]}";
 		DeduplicatorConfig dedupConfig = JsonSerDeserUtils.deserialize(alertDef, DeduplicatorConfig.class);
-		Assert.assertEquals(dedupConfig.getAlertDedupIntervalMin(), 720);
-		Assert.assertEquals(dedupConfig.getEmailDedupIntervalMin(), 1440);
+		Assert.assertEquals(dedupConfig.getAlertDedupIntervalMin(), 10);
+		Assert.assertEquals(dedupConfig.getFields().size(), 3);
 		
 		alertDef = "null";
 		dedupConfig = JsonSerDeserUtils.deserialize(alertDef, DeduplicatorConfig.class);
