@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.service.security.hive.dao;
+package org.apache.eagle.service.security.oozie.dao;
 
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.security.entity.OozieResourceSensitivityAPIEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
-import org.apache.eagle.security.entity.HiveResourceSensitivityAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,29 +27,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HiveSensitivityMetadataDAOImpl implements HiveSensitivityMetadataDAO{
-    private static Logger LOG = LoggerFactory.getLogger(HiveSensitivityMetadataDAOImpl.class);
+public class OozieSensitivityMetadataDAOImpl implements OozieSensitivityMetadataDAO{
+    private static Logger LOG = LoggerFactory.getLogger(OozieSensitivityMetadataDAOImpl.class);
 
     @Override
-    public Map<String, Map<String, String>> getAllHiveSensitivityMap(){
+    public Map<String, Map<String, String>> getAllOozieSensitivityMap(){
         GenericEntityServiceResource resource = new GenericEntityServiceResource();
         /* parameters are: query, startTime, endTime, pageSzie, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing,
         * parallel, metricName*/
-        GenericServiceAPIResponseEntity ret = resource.search("HiveResourceSensitivityService[]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
+        GenericServiceAPIResponseEntity ret = resource.search("OozieResourceSensitivityService[]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
                 0, null, false);
-        List<HiveResourceSensitivityAPIEntity> list = (List<HiveResourceSensitivityAPIEntity>) ret.getObj();
+        List<OozieResourceSensitivityAPIEntity> list = (List<OozieResourceSensitivityAPIEntity>) ret.getObj();
         if( list == null )
-        	return Collections.emptyMap();
+            return Collections.emptyMap();
         Map<String, Map<String, String>> res = new HashMap<String, Map<String, String>>();
-        
-        for(HiveResourceSensitivityAPIEntity entity : list){
+
+        for(OozieResourceSensitivityAPIEntity entity : list){
             String site = entity.getTags().get("site");
-            if(entity.getTags().containsKey("hiveResource")) {
+            if(entity.getTags().containsKey("oozieResource")) {
                 if(res.get(site) == null){
                     res.put(site, new HashMap<String, String>());
                 }
                 Map<String, String> resSensitivityMap = res.get(site);
-                resSensitivityMap.put(entity.getTags().get("hiveResource"), entity.getSensitivityType());
+                resSensitivityMap.put(entity.getTags().get("oozieResource"), entity.getSensitivityType());
             }
             else {
                 if(LOG.isDebugEnabled()) {
@@ -61,21 +61,21 @@ public class HiveSensitivityMetadataDAOImpl implements HiveSensitivityMetadataDA
     }
 
     @Override
-    public Map<String, String> getHiveSensitivityMap(String site){
+    public Map<String, String> getOozieSensitivityMap(String site){
         GenericEntityServiceResource resource = new GenericEntityServiceResource();
-        String queryFormat = "HiveResourceSensitivityService[@site=\"%s\"]{*}";
+        String queryFormat = "OozieResourceSensitivityService[@site=\"%s\"]{*}";
         GenericServiceAPIResponseEntity ret = resource.search(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
                 0, null, false);
-        List<HiveResourceSensitivityAPIEntity> list = (List<HiveResourceSensitivityAPIEntity>) ret.getObj();
+        List<OozieResourceSensitivityAPIEntity> list = (List<OozieResourceSensitivityAPIEntity>) ret.getObj();
         if( list == null )
-        	return Collections.emptyMap();
+            return Collections.emptyMap();
         Map<String, String> resSensitivityMap = new HashMap<String, String>();
-        for(HiveResourceSensitivityAPIEntity entity : list){
-            if(entity.getTags().containsKey("hiveResource")) {
-                resSensitivityMap.put(entity.getTags().get("hiveResource"), entity.getSensitivityType());
+        for(OozieResourceSensitivityAPIEntity entity : list){
+            if(entity.getTags().containsKey("oozieResource")) {
+                resSensitivityMap.put(entity.getTags().get("oozieResource"), entity.getSensitivityType());
             }
         }
         return resSensitivityMap;
     }
-    
+
 }
