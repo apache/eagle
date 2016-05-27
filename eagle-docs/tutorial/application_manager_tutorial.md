@@ -22,10 +22,8 @@ This tutorial will go through all parts of application manager and then give an 
 ### Design
 Application manager consists of a daemon scheduler and an execution module. The scheduler periodically loads user operations(start/stop) from database, and the execution module executes these operations. For more details, please refer to [here](https://cwiki.apache.org/confluence/display/EAG/Application+Management)
 
-### Manual
-
-#### Step 1: configure the scheduler
-The configuration file `eagle-scheduler.conf` defines scheduler parameters, topology execution platform settings and parts of topology settings. Here are some important ones:
+### Configurations
+The configuration file `eagle-scheduler.conf` defines scheduler parameters, execution platform settings and parts of default topology configuration.
 
 * **Scheduler properties**
 
@@ -45,23 +43,33 @@ The configuration file `eagle-scheduler.conf` defines scheduler parameters, topo
     
     Some default topology properties are defined here. It can be overridden.
    
-After the configuration is ready, start Eagle service `bin/eagle-service.sh start`. 
   
-#### Step 2: add topologies on UI
-1. First of all, go to admin page 
+#### Manual
+
+1. Editing eagle-scheduler.conf, and start Eagle service
+
+        # enable application manager         
+        appCommandLoaderEnabled=true
+        # provide jar path
+        envContextConfig.jarFile=/path-to-jar
+   
+    For more configurations, please back to **Configuration**. <br />
+    After the configuration is ready, start Eagle service `bin/eagle-service.sh start`. 
+   
+2. Go to admin page 
    ![admin-page](/images/appManager/admin-page.png)
    ![topology-monitor](/images/appManager/topology-monitor.png)
     
-2. Go to management page, and create a topology description. There are three required fields
+3. Go to management page, and create a topology description. There are three required fields
     * name: topology name
     * type: topology type [CLASS, DYNAMIC]
-    * execution entry: either the class which implement interface TopologyExecutable or eagle [DSL](https://github.com/apache/incubator-eagle/blob/master/eagle-assembly/src/main/conf/sandbox-hadoopjmx-pipeline.conf) based topology definition
+    * execution entry: either the class which implements interface TopologyExecutable or eagle [DSL](https://github.com/apache/incubator-eagle/blob/master/eagle-assembly/src/main/conf/sandbox-hadoopjmx-pipeline.conf) based topology definition
    ![topology-description](/images/appManager/topology-description.png)
    
-3. Back to monitoring page, and choose the site/application to deploy the topology 
+4. Back to monitoring page, and choose the site/application to deploy the topology 
    ![topology-execution](/images/appManager/topology-execution.png)
    
-4. Go to site page, and edit site->application and add some new configurations. Blow are some example configurations for [site=sandbox, applicatoin=hbaseSecurityLog]
+5. Go to site page, and edit site->application and add some new configurations. Blow are some example configurations for [site=sandbox, applicatoin=hbaseSecurityLog]
    `These configurations have a higher priority than those in eagle-scheduler.conf`
    
            classification.hbase.zookeeper.property.clientPort=2181
@@ -95,11 +103,11 @@ After the configuration is ready, start Eagle service `bin/eagle-service.sh star
    ![topology-configuration-1](/images/appManager/topology-configuration-1.png)
    ![topology-configuration-2](/images/appManager/topology-configuration-2.png)
    
-5. Go to monitoring page, and start topologies
+6. Go to monitoring page, and start topologies
    ![start-topology-1](/images/appManager/start-topology-1.png)
    ![start-topology-2](/images/appManager/start-topology-2.png)
    
-6. stop topologies on monitoring page
+7. stop topologies on monitoring page
    ![stop-topology-1](/images/appManager/stop-topology-1.png)
    ![stop-topology-2](/images/appManager/stop-topology-2.png)
    ![stop-topology-3](/images/appManager/stop-topology-3.png)
