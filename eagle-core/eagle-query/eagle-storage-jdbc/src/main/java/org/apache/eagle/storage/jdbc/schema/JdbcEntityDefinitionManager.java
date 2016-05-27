@@ -43,7 +43,6 @@ public class JdbcEntityDefinitionManager {
 
     public static JdbcEntityDefinition getJdbcEntityDefinition(EntityDefinition entityDefinition){
         checkInit();
-
         Class<? extends TaggedLogAPIEntity> entityClass = entityDefinition.getEntityClass();
         JdbcEntityDefinition jdbcEntityDefinition = sqlEntityDefinitionCache.get(entityClass);
         if(jdbcEntityDefinition == null){
@@ -150,7 +149,7 @@ public class JdbcEntityDefinitionManager {
     // Intially bind basic java types with SQL types
     //================================================
     static {
-        registerJdbcType(String.class, Types.LONGVARCHAR);
+        registerJdbcType(String.class, Types.VARCHAR);
         registerJdbcType(Integer.class, Types.INTEGER);
         registerJdbcType(Double.class, Types.DOUBLE);
         registerJdbcType(Float.class, Types.FLOAT);
