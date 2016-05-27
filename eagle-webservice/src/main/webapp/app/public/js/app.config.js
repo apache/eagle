@@ -43,7 +43,8 @@
 			DELETE_HOOK: {
 				FeatureDescService: 'rest/module/feature?feature=${feature}',
 				ApplicationDescService: 'rest/module/application?application=${application}',
-				SiteDescService: 'rest/module/site?site=${site}'
+				SiteDescService: 'rest/module/site?site=${site}',
+				TopologyDescriptionService: 'rest/module/topology?topology=${topology}'
 			},
 			UPDATE_HOOK: {
 				SiteDescService: 'rest/module/siteApplication'

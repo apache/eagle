@@ -247,7 +247,7 @@
 
 		$scope.deleteTopology = function (topology) {
 			UI.deleteConfirm(topology.tags.topology).then(null, null, function(holder) {
-				Entities.deleteEntities("TopologyDescriptionService", {topology: topology.tags.topology})._promise.then(function() {
+				Entities.delete("TopologyDescriptionService", {topology: topology.tags.topology})._promise.then(function() {
 					holder.closeFunc();
 					common.array.remove(topology, $scope.topologyList);
 				});
