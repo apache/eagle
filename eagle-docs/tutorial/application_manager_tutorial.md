@@ -15,37 +15,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-> Application manager aims to manage topology status on EAGLE UI. Users can easily start/start topologies remotely or locally without shell commands.
+> Application manager aims to manage topology status on EAGLE UI. Users can easily start/start topologies remotely or locally without any shell commands. At the same, it should be capable to sync the latest status of topologies on the execution platform (e.g., storm cluster). 
 
-This tutorial will go through all parts of appliaction manager and then give an example to use it. 
+This tutorial will go through all parts of application manager and then give an example to use it. 
 
 ### Design
-Briefly speaking, Application manager consists of a deamon scheduler and the application manager. The scheduler loads user operations(start/stop), and the applicaiton manager is responsible to execute these operations. For more details, please refer to [here](https://cwiki.apache.org/confluence/display/EAG/Application+Management)
+Application manager consists of a daemon scheduler and an execution module. The scheduler periodically loads user operations(start/stop) from database, and the execution module executes these operations. For more details, please refer to [here](https://cwiki.apache.org/confluence/display/EAG/Application+Management)
 
 ### Manual
 
 #### Step 1: configure the scheduler
 The configuration file `eagle-scheduler.conf` defines scheduler parameters, topology execution platform settings and parts of topology settings. Here are some important ones:
 
-* `envContextConfig.env`
+* **Scheduler properties**
 
-   application execution platform. Default value is storm
-   
-* `envContextConfig.url`
-   
-   execution platform http url. Default is "http://sandbox.hortonworks.com:8744"
-   
-* `envContextConfig.nimbusHost`
-  
-   Storm nimbus host. Default is "sandbox.hortonworks.com"
-   
-* `envContextConfig.nimbusThriftPort`
-   
-   Default is 6627
-   
-* `envContextConfig.jarFile`
+    **appCommandLoaderEnabled**: enable application manager. **TODO**: change it to true. <br />
+    **appCommandLoaderIntervalSecs**: defines the interval of the scheduler loads commands. Default value is 1 second.  <br />
+    **appHealthCheckIntervalSecs**: define the interval of health check, which tries to sync the topology execution status to Eagle. <br /><br />
 
-   Storm fat jar path. The only setting users must specify "/dir-to-jar/eagle-topology-0.3.0-incubating-assembly.jar"
+* **Execution platform properties**
+   
+    **envContextConfig.env**: application execution platform. Default value is storm.  <br />
+    **envContextConfig.url**: execution platform http url. Default is "http://sandbox.hortonworks.com:8744".  <br />
+    **envContextConfig.nimbusHost**: storm nimbus host. Default is "sandbox.hortonworks.com".  <br />
+    **envContextConfig.nimbusThriftPort**: default is 6627.  
+    **envContextConfig.jarFile**: storm fat jar path. **TODO**: change "/dir-to-jar/eagle-topology-0.3.0-incubating-assembly.jar" to your own jar path. <br /><br />
+
+* **Topology default properties**
+    
+    Some default topology properties are defined here. It can be overridden.
    
 After the configuration is ready, start Eagle service `bin/eagle-service.sh start`. 
   
