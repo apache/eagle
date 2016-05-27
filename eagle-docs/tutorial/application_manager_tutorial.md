@@ -41,7 +41,9 @@ The configuration file `eagle-scheduler.conf` defines scheduler parameters, exec
 
 * **Topology default properties**
     
-    Some default topology properties are defined here. It can be overridden.
+    Some default topology properties are defined here. 
+    
+Note: these configurations can be overridden in the topology configurations, which is shown below. The only difference is to add a prefix `.app`. For example, 'app.envContextConfig.jarFile' is to override 'envContextConfig.jarFile' in eagle-schedule.conf
    
   
 #### Manual
