@@ -20,7 +20,9 @@
 	'use strict';
 
 	var featureControllers = angular.module('featureControllers');
-	var feature = featureControllers.register("topology");
+	var feature = featureControllers.register("topology", {
+		global: true	// Global Feature needn't add to applications
+	});
 
 	// ==============================================================
 	// =                       Initialization                       =
