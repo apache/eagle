@@ -35,8 +35,6 @@ public class HiveMetadataResolver implements AttributeResolvable<GenericAttribut
 	private final static Logger LOG = LoggerFactory.getLogger(HiveMetadataResolver.class);
     private final static String HIVE_ATTRIBUTE_RESOLVE_FORMAT_HINT =
             "hive metadata resolve must be {\"site\":\"${site}\", \"query\"=\"/{db}/{table}/{column}\"}";
-    private HiveSensitivityMetadataDAOImpl dao = new HiveSensitivityMetadataDAOImpl();
-    private Map<String, Map<String, String>> maps = dao.getAllHiveSensitivityMap();
 
     @Override
     public List<String> resolve(GenericAttributeResolveRequest request) throws AttributeResolveException {
