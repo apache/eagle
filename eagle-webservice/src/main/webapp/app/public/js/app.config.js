@@ -44,7 +44,7 @@
 				FeatureDescService: 'rest/module/feature?feature=${feature}',
 				ApplicationDescService: 'rest/module/application?application=${application}',
 				SiteDescService: 'rest/module/site?site=${site}',
-				TopologyDescriptionService: 'rest/module/topology?topology=${topology}'
+				TopologyDescriptionService: 'rest/app/topology/${topology}'
 			},
 			UPDATE_HOOK: {
 				SiteDescService: 'rest/module/siteApplication'
