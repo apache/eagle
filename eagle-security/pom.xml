@@ -31,20 +31,18 @@
   <description>eagle security data activity monitoring project</description>
   <packaging>pom</packaging>
 
-    <modules>
-        <module>eagle-security-common</module>
-        <module>eagle-security-hdfs-auditlog</module>
-        <module>eagle-security-maprfs-auditlog</module>
-        <module>eagle-security-userprofile</module>
-        <module>eagle-security-hive</module>
-        <module>eagle-security-hive-web</module>
-        <module>eagle-security-hdfs-web</module>
-        <module>eagle-security-maprfs-web</module>
-        <module>eagle-security-hdfs-securitylog</module>
-        <module>eagle-security-hbase-securitylog</module>
-        <module>eagle-security-hbase-web</module>
-        <module>eagle-security-oozie-auditlog</module>
-        <module>eagle-security-oozie-web</module>
-        <module>eagle-metric-collection</module>
-    </modules>
+  <modules>
+    <module>eagle-security-common</module>
+	<module>eagle-security-hdfs-auditlog</module>
+    <module>eagle-security-maprfs-auditlog</module>
+    <module>eagle-security-userprofile</module>
+    <module>eagle-security-hive</module>
+    <module>eagle-security-hive-web</module>
+    <module>eagle-security-hdfs-web</module>
+    <module>eagle-security-maprfs-web</module>
+    <module>eagle-security-hdfs-securitylog</module>
+    <module>eagle-security-hbase-securitylog</module>
+    <module>eagle-security-hbase-web</module>
+	<module>eagle-metric-collection</module>
+  </modules>
 </project>
