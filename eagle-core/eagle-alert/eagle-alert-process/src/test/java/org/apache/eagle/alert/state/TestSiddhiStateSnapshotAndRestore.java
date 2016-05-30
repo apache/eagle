@@ -206,7 +206,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         return executionPlanRuntime;
     }
 
-    @Test
+    @Ignore
     public void testTimeSlideWindow() throws Exception{
         String tmpdir = System.getProperty("java.io.tmpdir");
         System.out.println("temporary directory: " + tmpdir);
