@@ -18,19 +18,18 @@ package org.apache.eagle.alert.dedup;
 
 import java.util.List;
 
+import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 
 /**
  * Dedup Eagle entities.
- *
- * @param <T> Eagle entity
  */
-public interface EntityDeduplicator<T extends TaggedLogAPIEntity> {
+public interface EntityDeduplicator {
 	
-	EntityDeduplicator<T> setDedupIntervalMin(long intervalMin);
+	EntityDeduplicator setDedupIntervalMin(long intervalMin);
 	
 	long getDedupIntervalMin();
 	
-	List<T> dedup(List<T> list);
+	List dedup(List<AlertAPIEntity> list);
 
 }

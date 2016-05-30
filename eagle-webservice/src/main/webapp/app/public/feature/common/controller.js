@@ -551,8 +551,10 @@
 							conditions: {},
 							notification: [],
 							dedupe: {
-								alertDedupIntervalMin: 10
+								alertDedupIntervalMin: 10,
+								fields: []
 							},
+							_dedupTags: {},
 							policy: {},
 							window: "externalTime",
 							group: "",
@@ -627,7 +629,11 @@
 
 						// === Revert inner data ===
 						// >> De-dupe
+						$scope.policy.__._dedupTags = {};
 						$scope.policy.__.dedupe = common.parseJSON($scope.policy.dedupeDef, {});
+						$.each($scope.policy.__.dedupe.fields || [], function (i, field) {
+							$scope.policy.__._dedupTags[field] = true;
+						});
 
 						// >> Notification
 						$scope.policy.__.notification = common.parseJSON($scope.policy.notificationDef, []);
@@ -953,6 +959,9 @@
 				$scope.lock = true;
 
 				// dedupeDef
+				$scope.policy.__.dedupe.fields = $.map($scope.policy.__._dedupTags, function (value, key) {
+					if(value) return key;
+				});
 				$scope.policy.dedupeDef = JSON.stringify($scope.policy.__.dedupe);
 
 				// notificationDef
@@ -961,7 +970,6 @@
 				$scope.policy.notificationDef = JSON.stringify($scope.policy.__.notification);
 
 				// policyDef
-				$scope.policy.__._dedupTags = $scope.policy.__._dedupTags || {};
 				$scope.policy.__.policy = {
 					expression: $scope.toQuery(),
 					type: "siddhiCEPEngine"
