@@ -46,7 +46,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 	protected DEDUP_TYPE dedupType;
 
 	private List<String> alertExecutorIdList;
-	private volatile CopyOnWriteHashMap<String, DefaultDeduplicator<AlertAPIEntity>> alertDedups;
+	private volatile CopyOnWriteHashMap<String, DefaultDeduplicator> alertDedups;
 	private PolicyDefinitionDAO<AlertDefinitionAPIEntity> dao;
 
 	public enum DEDUP_TYPE {
@@ -65,21 +65,17 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 		this.config = config;
 	}
 	
-	public DefaultDeduplicator<AlertAPIEntity> createAlertDedup(AlertDefinitionAPIEntity alertDef) {
+	public DefaultDeduplicator createAlertDedup(AlertDefinitionAPIEntity alertDef) {
 		DeduplicatorConfig dedupConfig = null;
 		try {
 			dedupConfig = JsonSerDeserUtils.deserialize(alertDef.getDedupeDef(), DeduplicatorConfig.class);
 		}
 		catch (Exception ex) {
-			LOG.warn("Initial dedupConfig error, " + ex.getMessage());
+			LOG.warn("Initial dedup Config error, " + ex.getMessage());
 		}
 
         if (dedupConfig != null) {
-			if (dedupType.equals(DEDUP_TYPE.ENTITY)) {
-				return new DefaultDeduplicator<>(dedupConfig.getAlertDedupIntervalMin());
-			} else if (dedupType.equals(DEDUP_TYPE.EMAIL)) {
-				return new DefaultDeduplicator<>(dedupConfig.getEmailDedupIntervalMin());
-			}
+			return new DefaultDeduplicator(dedupConfig.getAlertDedupIntervalMin(), dedupConfig.getFields());
 		}
 
 		return null;
@@ -97,7 +93,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
  			LOG.error("fail to initialize initialAlertDefs: ", ex);
 	        throw new IllegalStateException("fail to initialize initialAlertDefs: ", ex);
         }
-	    Map<String, DefaultDeduplicator<AlertAPIEntity>> tmpDeduplicators = new HashMap<String, DefaultDeduplicator<AlertAPIEntity>>();
+	    Map<String, DefaultDeduplicator> tmpDeduplicators = new HashMap<>();
         if(initialAlertDefs == null || initialAlertDefs.isEmpty()){
             LOG.warn("No alert definitions was found for site: "+site+", dataSource: "+dataSource);
         } else {
@@ -105,7 +101,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 			    if(initialAlertDefs.containsKey(alertExecutorId)){
                     for(AlertDefinitionAPIEntity alertDef : initialAlertDefs.get(alertExecutorId).values()){
                        try {
-                          DefaultDeduplicator<AlertAPIEntity> deduplicator = createAlertDedup(alertDef);
+                          DefaultDeduplicator deduplicator = createAlertDedup(alertDef);
                           if (deduplicator != null)
                               tmpDeduplicators.put(alertDef.getTags().get(Constants.POLICY_ID), deduplicator);
                           else LOG.warn("The dedup interval is not set, alertDef: " + alertDef);
@@ -133,7 +129,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
     public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, AlertAPIEntity>> outputCollector){
         String policyId = (String) input.get(0);
         AlertAPIEntity alertEntity = (AlertAPIEntity) input.get(1);
-        DefaultDeduplicator<AlertAPIEntity> dedup;
+        DefaultDeduplicator dedup;
         synchronized(alertDedups) {
             dedup = alertDedups.get(policyId);
         }
@@ -157,7 +153,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 		if(LOG.isDebugEnabled()) LOG.debug("Alert dedup config to be added : " + added);
 		for(AlertDefinitionAPIEntity alertDef : added.values()){
 			LOG.info("Alert dedup config really added " + alertDef);
-			DefaultDeduplicator<AlertAPIEntity> dedup = createAlertDedup(alertDef);
+			DefaultDeduplicator dedup = createAlertDedup(alertDef);
 			if (dedup != null) {
 				synchronized(alertDedups) {		
 					alertDedups.put(alertDef.getTags().get(Constants.POLICY_ID), dedup);
@@ -170,7 +166,7 @@ public abstract class AlertDeduplicationExecutorBase extends JavaStormStreamExec
 		LOG.info("Alert dedup config changed : " + changed);
 		for(AlertDefinitionAPIEntity alertDef : changed.values()){
 			LOG.info("Alert dedup config really changed " + alertDef);
-			DefaultDeduplicator<AlertAPIEntity> dedup = createAlertDedup(alertDef);
+			DefaultDeduplicator dedup = createAlertDedup(alertDef);
 			if (dedup != null) {
 				synchronized(alertDedups) {
 					alertDedups.put(alertDef.getTags().get(Constants.POLICY_ID), dedup);
