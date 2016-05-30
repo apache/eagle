@@ -22,6 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,7 +34,7 @@ public class EntityDedupKey {
     private static final Logger LOG = LoggerFactory.getLogger(EntityDedupKey.class);
 
     public EntityDedupKey(List<String> values, long timestamp) {
-        this.values = values;
+        this.values = new ArrayList<>(values);
         this.timestamp = timestamp;
         this.createdTime = System.currentTimeMillis();
     }
