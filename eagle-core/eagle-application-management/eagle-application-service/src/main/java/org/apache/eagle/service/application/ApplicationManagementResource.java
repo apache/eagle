@@ -21,6 +21,7 @@ package org.apache.eagle.service.application;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.application.dao.ApplicationManagerDAO;
 import org.apache.eagle.service.application.dao.ApplicationManagerDaoImpl;
 import org.apache.eagle.service.application.entity.TopologyExecutionStatus;
@@ -28,10 +29,7 @@ import org.apache.eagle.service.application.entity.TopologyOperationEntity;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,4 +96,14 @@ public class ApplicationManagementResource {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(inputStream, TypeFactory.defaultInstance().constructCollectionType(LinkedList.class, TopologyOperationEntity.class));
     }
+
+    @Path("topology")
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public GenericServiceAPIResponseEntity deleteTopology(@QueryParam("topology") String topology) {
+        return dao.deleteTopology(topology);
+    }
+
+
 }

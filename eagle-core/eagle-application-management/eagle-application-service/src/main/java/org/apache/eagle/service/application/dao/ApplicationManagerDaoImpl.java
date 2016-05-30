@@ -18,11 +18,9 @@
 
 package org.apache.eagle.service.application.dao;
 
-
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.application.entity.TopologyExecutionEntity;
-import org.apache.eagle.service.application.entity.TopologyExecutionStatus;
 import org.apache.eagle.service.application.entity.TopologyOperationEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.slf4j.Logger;
@@ -70,6 +68,22 @@ public class ApplicationManagerDaoImpl implements ApplicationManagerDAO {
             LOG.info("TopologyOperationEntity set is empty.");
         }
         GenericServiceAPIResponseEntity response = resource.updateEntities(entities, Constants.TOPOLOGY_OPERATION_SERVICE_ENDPOINT_NAME);
+        return response;
+    }
+
+    @Override
+    public GenericServiceAPIResponseEntity deleteTopology(String topology) {
+        String topologyQuery = Constants.TOPOLOGY_DESCRIPTION_SERVICE_ENDPOINT_NAME+ "[@topology=\"" + topology + "\"]{*}";
+        String executionQuery = Constants.TOPOLOGY_EXECUTION_SERVICE_ENDPOINT_NAME + "[@topology=\"" + topology + "\"]{*}";
+        int pageSize = Integer.MAX_VALUE;
+
+        GenericServiceAPIResponseEntity response = resource.deleteByQuery(topologyQuery, null, null, pageSize, null, false, false, 0L, 0, true, 0, null, false);
+        if(response.isSuccess()) {
+            response = resource.deleteByQuery(executionQuery, null, null, pageSize, null, false, false, 0L, 0, true, 0, null, false);
+        }
+        if(!response.isSuccess()) {
+            LOG.error(response.getException());
+        }
         return response;
     }
 

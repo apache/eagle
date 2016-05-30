@@ -166,7 +166,7 @@ class StormExecutionPlatform extends ExecutionPlatform {
         case None =>
           topologyExecution.setStatus(TopologyExecutionStatus.STOPPED)
           topologyExecution.setUrl("")
-          topologyExecution.setDescription(s"Fail to find topology: $name")
+          topologyExecution.setDescription("")
       }
     }
   }

@@ -29,4 +29,5 @@ public interface ApplicationManagerDAO {
     String loadTopologyExecutionStatus(String site, String application, String topology);
     int loadTopologyOperationsInRunning(String site, String application, String topology) throws Exception;
     GenericServiceAPIResponseEntity createOperation(List<TopologyOperationEntity> entities) throws Exception;
+    GenericServiceAPIResponseEntity deleteTopology(String topology);
 }
