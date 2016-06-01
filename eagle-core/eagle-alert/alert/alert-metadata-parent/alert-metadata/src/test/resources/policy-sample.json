@@ -1,0 +1,32 @@
+{
+  "name": "policy1",
+  "description": "test policy",
+  "inputStreams": [
+    "in-stream-1",
+    "in-stream-2"
+  ],
+  "outputStreams": [
+    "out-stream-1"
+  ],
+  "definition": {
+    "type": "siddhiCEPEngine",
+    "value": "select count(*) from in-stream-1"
+  },
+  "partitionSpec": [
+    {
+      "streamId": "in-stream-1",
+      "type": "GROUPBY",
+      "columns": [
+        "col-1",
+        "col-2"
+      ],
+      "sortSpec": {
+        "column": "col-1",
+        "windowPeriod": "60",
+        "order": "asc",
+        "windowMargin": 30000
+      }
+    }
+  ],
+  "parallelismHint": 2
+}

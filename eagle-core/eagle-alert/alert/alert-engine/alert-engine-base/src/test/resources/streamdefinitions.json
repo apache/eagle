@@ -1,0 +1,44 @@
+[
+{
+	"streamId": "perfmon_cpu_stream",
+	"dataSource" : "perfmon_datasource",
+	"description":"the data stream for perfmon cpu metrics",
+	"validate": false,
+	"timeseries":false,
+	"columns": [
+		{
+			"name": "host",
+			"type" : "string",
+			"defaultValue": "",
+			"required":true
+		},
+		{
+			"name": "timestamp",
+			"type" : "long",
+			"defaultValue": 0,
+			"required":true
+		},{
+			"name": "metric",
+			"type" : "string",
+			"defaultValue": "perfmon_cpu",
+			"required": true
+		},{
+			"name": "pool",
+			"type" : "string",
+			"defaultValue": "raptor_general",
+			"required":true
+		},{
+			"name": "value",
+			"type" : "double",
+			"defaultValue": 0.0,
+			"required":true
+		},
+		{
+			"name": "colo",
+			"type" : "string",
+			"defaultValue": "",
+			"required":true
+		}
+	]
+}
+]

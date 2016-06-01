@@ -1,0 +1,19 @@
+[
+{
+	"name":"test-stream-output",
+	"type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
+	"policyIds": [
+		"policy1", "policy2"
+	],
+	"properties": {
+	  "subject":"UMP Test Alert",
+	  "template":"",
+	  "sender": "sender@corp.com",
+	  "recipients": "receiver@corp.com",
+	  "smtp.server":"mailhost.com",
+	  "connection": "plaintext",
+	  "smtp.port": "25"
+	},
+	"dedupIntervalMin" : "PT0M"
+}
+]
