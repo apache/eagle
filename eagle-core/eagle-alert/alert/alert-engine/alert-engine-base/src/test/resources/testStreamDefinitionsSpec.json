@@ -1,0 +1,47 @@
+{
+  "testTopic5Stream": {
+    "streamId": "testTopic5Stream",
+    "dataSource": null,
+    "description": null,
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "value",
+        "type": "STRING",
+        "defaultValue": null,
+        "required": false
+      }
+    ]
+  },
+  "testTopic4Stream": {
+    "streamId": "testTopic4Stream",
+    "dataSource": null,
+    "description": null,
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "value",
+        "type": "STRING",
+        "defaultValue": null,
+        "required": false
+      }
+    ]
+  },
+  "testTopic3Stream": {
+    "streamId": "testTopic3Stream",
+    "dataSource": null,
+    "description": null,
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "value",
+        "type": "STRING",
+        "defaultValue": null,
+        "required": false
+      }
+    ]
+  }
+}

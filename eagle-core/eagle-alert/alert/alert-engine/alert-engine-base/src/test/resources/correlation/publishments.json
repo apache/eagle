@@ -1,0 +1,17 @@
+[
+{
+	"name":"log-stream-join-output",
+	"type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
+	"inputStreams": [
+		"log_stream_join_output"
+	],
+	"properties": {
+		"subject":"UMP Test Alert",
+        "template":"",
+	  "sender": "sender@corp.com",
+	  "recipients": "receiver@corp.com",
+	  "smtp.server":"mailhost.com"
+	},
+	"dedupIntervalMin" : "1"
+}
+]
