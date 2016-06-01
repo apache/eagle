@@ -52,6 +52,7 @@ public abstract class UserProfileMLAlgorithmEvaluator<M extends UserProfileModel
         this.config = config;
         this.mlDAO = this.getModelDAO();
         this.detector = getAnomalyDetector();
+        this.evalContext = context;
     }
 
     protected UserProfileAnomalyDetector<M> getAnomalyDetector(){ return this;}

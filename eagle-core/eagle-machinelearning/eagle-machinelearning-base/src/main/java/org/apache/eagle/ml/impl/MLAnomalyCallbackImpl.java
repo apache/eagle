@@ -71,7 +71,7 @@ public class MLAnomalyCallbackImpl implements MLAnomalyCallback {
         Map<String, String> tags = new HashMap<>();
         tags.put(EagleConfigConstants.SITE, site);
         tags.put(EagleConfigConstants.APPLICATION, applicatioin);
-        tags.put(Constants.SOURCE_STREAMS, (String)alertContext.evaluator.getAdditionalContext().get(Constants.SOURCE_STREAMS));
+        tags.put(Constants.SOURCE_STREAMS, mlAlertEvaluator.getAdditionalContext().get(Constants.SOURCE_STREAMS));
         tags.put(Constants.POLICY_ID, alertContext.policyId);
         tags.put(Constants.ALERT_SOURCE, source);
         tags.put(Constants.ALERT_EXECUTOR_ID, alertContext.alertExecutor.getExecutorId());
