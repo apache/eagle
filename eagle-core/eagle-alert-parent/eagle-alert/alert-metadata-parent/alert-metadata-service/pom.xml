@@ -16,7 +16,8 @@
 	<parent>
 		<groupId>org.apache.eagle</groupId>
 		<artifactId>alert-metadata-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.4.0-incubating-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>alert-metadata-service</artifactId>

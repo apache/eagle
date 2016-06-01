@@ -14,9 +14,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>io.sherlock</groupId>
-		<artifactId>alert-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<groupId>org.apache.eagle</groupId>
+		<artifactId>eagle-alert</artifactId>
+		<version>0.4.0-incubating-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>alert-coordinator</artifactId>
