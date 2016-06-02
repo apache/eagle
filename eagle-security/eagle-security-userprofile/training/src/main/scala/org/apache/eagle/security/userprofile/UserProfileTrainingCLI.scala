@@ -41,7 +41,7 @@ object UserProfileTrainingCLI{
     opt[Int]('p',"service-port") optional()  action {(x,c) => c.copy(servicePort = x)} text "Eagle service port, default: 9099"
     opt[String]('u',"service-username") optional() action {(x,c) => c.copy(username = x)} text "Eagle service authentication username, default: admin"
     opt[String]('w',"service-password") optional() action {(x,c) => c.copy(password = x)} text "Eagle service authentication password, default: secure"
-    opt[Map[String,String]]('k',"kafka-props") optional()  action { (x,c) => {c.copy(kafkaProps = ConfigurationConverter.getProperties(new MapConfiguration(JavaConversions.asJavaMap(x))))}} text "Kafka properties, for example: topic=sometopic,metadata.brokers.list=localhost:9200"
+    opt[Map[String,String]]('k',"kafka-props") optional()  action { (x,c) => {c.copy(kafkaProps = ConfigurationConverter.getProperties(new MapConfiguration(JavaConversions.mapAsJavaMap(x))))}} text "Kafka properties, for example: topic=sometopic,metadata.brokers.list=localhost:9200"
     opt[String]('r',"period") optional() action {(x,c) => c.copy(period = Period.parse(x))} text "Period window (https://en.wikipedia.org/wiki/ISO_8601#Durations), default: PT1M" // changing it to 1M interval
   }
 

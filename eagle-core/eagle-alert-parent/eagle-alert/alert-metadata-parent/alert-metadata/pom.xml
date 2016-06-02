@@ -15,25 +15,21 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>io.sherlock</groupId>
+		<groupId>org.apache.eagle</groupId>
 		<artifactId>alert-metadata-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.4.0-incubating-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
-
 	<artifactId>alert-metadata</artifactId>
 	<packaging>jar</packaging>
-
 	<dependencies>
-		<!-- Storm depends on org.ow2.asm:asm:4.0 -->
-		<!-- Jersey depends on asm:asm:3.0 -->
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>io.sherlock</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>alert-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
