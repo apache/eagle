@@ -30,6 +30,7 @@ import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.eagle.jpm.spark.history.crawl.SparkHistoryFileInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.SparkHistoryServerResourceFetcher;

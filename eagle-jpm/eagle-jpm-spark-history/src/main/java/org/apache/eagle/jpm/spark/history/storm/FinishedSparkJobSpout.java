@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -78,7 +79,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
             long fetchTime = Calendar.getInstance().getTimeInMillis();
             if(fetchTime - this.lastFinishAppTime > 5 * 60 * 1000){
                 List apps = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, new Long(lastFinishAppTime).toString());
-                List<AppInfo> appInfos = (List<AppInfo>)apps.get(0);
+                List<AppInfo> appInfos = (null != apps ? (List<AppInfo>)apps.get(0):new ArrayList<AppInfo>());
                 LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
                 for(AppInfo app: appInfos){
                     String appId = app.getId();
