@@ -18,7 +18,7 @@ echo $(dirname $0)
 
 #start topology
 echo "starting topology..."
-cd $(dirname $0)/../../alert-engine/alert-engine-base/
+cd $(dirname $0)/../../alert-engine/
 
 
 echo " as dev tests, tail -f test.log | grep AlertStreamEvent for alert stream....."

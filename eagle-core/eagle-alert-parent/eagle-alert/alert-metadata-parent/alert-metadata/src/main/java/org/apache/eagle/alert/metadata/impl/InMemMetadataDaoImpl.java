@@ -105,7 +105,8 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     public static <T> String getKey(T t) {
         if (t instanceof StreamDefinition) {
             return ((StreamDefinition) t).getStreamId();
-        } else if (t instanceof PublishmentType) {
+        }
+        if (t instanceof PublishmentType) {
             return ((PublishmentType) t).getType();
         }
 

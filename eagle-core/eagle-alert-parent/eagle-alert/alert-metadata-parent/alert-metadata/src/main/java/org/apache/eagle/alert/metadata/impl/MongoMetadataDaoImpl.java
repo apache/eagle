@@ -157,6 +157,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         BsonDocument filter = new BsonDocument();
         if (t instanceof StreamDefinition) {
             filter.append("streamId", new BsonString(InMemMetadataDaoImpl.getKey(t)));
+        } else if (t instanceof PublishmentType) {
+            filter.append("type", new BsonString(InMemMetadataDaoImpl.getKey(t)));
         } else {
             filter.append("name", new BsonString(InMemMetadataDaoImpl.getKey(t)));
         }

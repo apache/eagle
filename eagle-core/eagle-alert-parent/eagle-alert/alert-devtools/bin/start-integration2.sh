@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -20,7 +21,7 @@ export MAVEN_OPTS=-Xms256M -Xmx1024M
 
 #start topology
 echo "starting topology..."
-cd $(dirname $0)/../../alert-engine/alert-engine-base/
+cd $(dirname $0)/../../alert-engine/
 
 
 echo " as dev tests, tail -f test.log | grep AlertStreamEvent for alert stream....."
