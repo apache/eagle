@@ -32,7 +32,7 @@ public abstract class JavaUserProfileModeler<M,C extends UserProfileContext> imp
     public List<M> build(String site, String user, RealMatrix matrix) {
         java.util.List<M> models = generate(site, user, matrix);
         if (models != null) {
-            return JavaConversions.asScalaIterable(models).toList();
+            return JavaConversions.asScalaBuffer(models).toList();
         } else {
             return null;
         }

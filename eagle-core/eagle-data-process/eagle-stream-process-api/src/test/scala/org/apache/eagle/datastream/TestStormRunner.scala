@@ -61,7 +61,7 @@ object TestAlertAfterMap extends App{
   //env.execute
 }
 
-object StormRunnerWithoutSplitOrJoin extends Application{
+object StormRunnerWithoutSplitOrJoin extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
   env.fromSpout(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test"))
@@ -69,7 +69,7 @@ object StormRunnerWithoutSplitOrJoin extends Application{
 //  env.execute()
 }
 
-object StormRunnerWithSplit extends Application{
+object StormRunnerWithSplit extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
   val toBeSplit = env.fromSpout(TestSpout()).flatMap(EchoExecutor())
@@ -78,7 +78,7 @@ object StormRunnerWithSplit extends Application{
 //  env.execute()
 }
 
-object StormRunnerWithUnion extends Application{
+object StormRunnerWithUnion extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
   val tail1 = env.fromSpout(TestSpout()).flatMap(WordPrependExecutor("test"))
@@ -87,7 +87,7 @@ object StormRunnerWithUnion extends Application{
   env.execute()
 }
 
-object StormRunnerWithFilter extends Application{
+object StormRunnerWithFilter extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
   env.fromSpout(TestSpout()).flatMap(EchoExecutor()).flatMap(WordPrependExecutor("test")).
@@ -96,7 +96,7 @@ object StormRunnerWithFilter extends Application{
   //env.execute
 }
 
-object StormRunnerWithJavaExecutor extends Application{
+object StormRunnerWithJavaExecutor extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
   env.fromSpout(TestSpout()).flatMap(new JavaEchoExecutor()).flatMap(WordPrependExecutor("test")).
@@ -105,14 +105,14 @@ object StormRunnerWithJavaExecutor extends Application{
   //env.execute
 }
 
-object StormRunnerWithKeyValueSpout extends Application{
+object StormRunnerWithKeyValueSpout extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
   env.fromSpout(TestKeyValueSpout()).groupBy(1).flatMap(new GroupedEchoExecutor()).parallelism(2)
   //env.execute
 }
 
-object StormRunnerWithKeyValueSpoutRenameOutputFields extends Application{
+object StormRunnerWithKeyValueSpoutRenameOutputFields extends App{
   val config : Config = ConfigFactory.load;
   val env = ExecutionEnvironments.getStorm(config)
   env.fromSpout(TestKeyValueSpout()).withOutputFields(2).groupBy(0).flatMap(new GroupedEchoExecutor()).parallelism(2)

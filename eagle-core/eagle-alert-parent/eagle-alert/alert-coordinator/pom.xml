@@ -28,7 +28,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>io.sherlock</groupId>
+			<groupId>org.apache.eagle</groupId>
 			<artifactId>alert-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
