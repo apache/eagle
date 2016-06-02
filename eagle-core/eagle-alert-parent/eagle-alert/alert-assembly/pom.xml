@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.eagle</groupId>
         <artifactId>eagle-alert</artifactId>
-        <version>0.4.0-incubating-SNAPSHOT</version>
+        <version>0.5.0-incubating-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>alert-assembly</artifactId>
@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>alert-engine-base</artifactId>
+            <artifactId>alert-engine</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>alert-engine-base</artifactId>
+            <artifactId>alert-engine</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
         </dependency>
