@@ -65,13 +65,13 @@ public class SparkExecutor extends TaggedLogAPIEntity{
     @Column("n")
     private long startTime;
     @Column("o")
-    private long endTime;
+    private long endTime = 0;
     @Column("p")
     private long execMemoryBytes;
     @Column("q")
-    private long yarnMemoryBytes;
-    @Column("r")
     private int cores;
+    @Column("r")
+    private long memoryOverhead;
 
     public String getHostPort() {
         return hostPort;
@@ -217,15 +217,6 @@ public class SparkExecutor extends TaggedLogAPIEntity{
         this.valueChanged("execMemoryBytes");
     }
 
-    public long getYarnMemoryBytes() {
-        return yarnMemoryBytes;
-    }
-
-    public void setYarnMemoryBytes(long yarnMemoryBytes) {
-        this.yarnMemoryBytes = yarnMemoryBytes;
-        this.valueChanged("yarnMemoryBytes");
-    }
-
     public int getCores() {
         return cores;
     }
@@ -233,5 +224,14 @@ public class SparkExecutor extends TaggedLogAPIEntity{
     public void setCores(int cores) {
         this.cores = cores;
         valueChanged("cores");
+    }
+
+    public long getMemoryOverhead() {
+        return memoryOverhead;
+    }
+
+    public void setMemoryOverhead(long memoryOverhead) {
+        this.memoryOverhead = memoryOverhead;
+        valueChanged("memoryOverhead");
     }
 }

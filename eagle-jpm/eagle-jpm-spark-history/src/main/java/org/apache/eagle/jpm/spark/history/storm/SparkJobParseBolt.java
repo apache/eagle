@@ -95,7 +95,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
             List<SparkApplicationAttempt> attempts = this.getAttemptList(appId);
 
             if(attempts.isEmpty()){
-                LOG.info("application {} does not has logs on history server", appId);
+                LOG.info("Application:{}( Name:{}, user: {}, queue: {}) not found on history server.", appId, info.getName(), info.getUser(), info.getQueue());
             }else{
                 hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
                 for (SparkApplicationAttempt attempt : attempts) {
@@ -142,15 +142,15 @@ public class SparkJobParseBolt extends BaseRichBolt {
         try{
 
             SparkApplication app = null;
-//            try {
-//                List apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
-//                if (apps != null) {
-//                    app = (SparkApplication) apps.get(0);
-//                    attempts = app.getAttempts();
-//                }
-//            } catch (Exception e) {
-//                LOG.info("Fail to get application detail from history server for appId " + appId, e);
-//            }
+            try {
+                List apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
+                if (apps != null) {
+                    app = (SparkApplication) apps.get(0);
+                    attempts = app.getAttempts();
+                }
+            } catch (Exception e) {
+                LOG.info("Fail to get application detail from history server for appId " + appId, e);
+            }
 
 
             if (null == app) {

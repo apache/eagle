@@ -83,7 +83,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
                 for(AppInfo app: appInfos){
                     String appId = app.getId();
                     if(!zkState.hasApplication(appId)){
-                        zkState.addFinishedApplication(appId, app.getQueue(), app.getState(), app.getFinalStatus());
+                        zkState.addFinishedApplication(appId, app.getQueue(), app.getState(), app.getFinalStatus(), app.getUser(), app.getName());
                     }
                 }
                 this.lastFinishAppTime = fetchTime;

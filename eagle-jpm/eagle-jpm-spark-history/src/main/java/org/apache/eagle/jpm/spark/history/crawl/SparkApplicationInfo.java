@@ -27,6 +27,8 @@ public class SparkApplicationInfo {
     private String state;
     private String finalStatus;
     private String queue;
+    private String name;
+    private String user;
 
     public String getState() {
         return state;
@@ -50,5 +52,21 @@ public class SparkApplicationInfo {
 
     public void setQueue(String queue) {
         this.queue = queue;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }

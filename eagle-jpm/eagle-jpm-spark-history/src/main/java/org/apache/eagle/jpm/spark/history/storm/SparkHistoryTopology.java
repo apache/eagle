@@ -37,8 +37,8 @@ public class SparkHistoryTopology {
 
     public TopologyBuilder getBuilder(){
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("getJobs", new FinishedSparkJobSpout(config), 1);
-        builder.setBolt("parseJobs", new SparkJobParseBolt(config), 8).shuffleGrouping("getJobs");
+        builder.setSpout("getJobs", new FinishedSparkJobSpout(config), 1).setNumTasks(1);
+        builder.setBolt("parseJobs", new SparkJobParseBolt(config), 8).setNumTasks(8).shuffleGrouping("getJobs");
         return builder;
     }
 

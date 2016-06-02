@@ -149,6 +149,11 @@ public class JobHistoryZKStateManager {
                 info.setQueue(appStatus[0]);
                 info.setState(appStatus[1]);
                 info.setFinalStatus(appStatus[2]);
+                if(appStatus.length > 3){
+                    info.setUser(appStatus[3]);
+                    info.setName(appStatus[4]);
+                }
+
             }
             return info;
         }catch(Exception e){
@@ -185,7 +190,7 @@ public class JobHistoryZKStateManager {
         }
     }
 
-    public void addFinishedApplication(String appId, String queue, String yarnState, String yarnStatus){
+    public void addFinishedApplication(String appId, String queue, String yarnState, String yarnStatus, String user, String name){
         String path = zkRoot + "/jobs/" + appId;
 
 
@@ -194,8 +199,13 @@ public class JobHistoryZKStateManager {
                 _curator.delete().deletingChildrenIfNeeded().forPath(path);
             }
 
+            name = name.replace("/","_");
+            if(name.length() > 50){
+                name = name.substring(0, 50);
+            }
+
             CuratorTransactionBridge result =  _curator.inTransaction().create().withMode(CreateMode.PERSISTENT).forPath(path, ZKStateConstant.AppStatus.INIT.toString().getBytes("UTF-8"));
-            result = result.and().create().withMode(CreateMode.PERSISTENT).forPath(path + "/info", String.format("%s/%s/%s", queue, yarnState, yarnStatus).getBytes("UTF-8"));
+            result = result.and().create().withMode(CreateMode.PERSISTENT).forPath(path + "/info", String.format("%s/%s/%s/%s/%s", queue, yarnState, yarnStatus, user, name).getBytes("UTF-8"));
 
             result.and().commit();
         }catch (Exception e){
