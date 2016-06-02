@@ -22,7 +22,7 @@
 ### Install logstash-kafka plugin
 
 
-#### For Logstash 1.5.x
+#### For Logstash 1.5.x, 2.x
 
 
 logstash-kafka has been intergrated into [logstash-input-kafka][logstash-input-kafka] and [logstash-output-kafka][logstash-output-kafka], you can directly use it.
@@ -110,7 +110,11 @@ In logstash 1.4.x, the online version does not support specifying partition\_key
 
 
 ### Create logstash configuration file
-Go to the logstash root dir, and create a configure file
+
+Go to the logstash root dir, and create a configure file.
+The 2.0 release of Logstash includes a new version of the Kafka output plugin with significant configuration changes. For more details, please check the documentation pages for the [Logstash1.5](https://www.elastic.co/guide/en/logstash/1.5/plugins-outputs-kafka.html) and [Logstash2.0](https://www.elastic.co/guide/en/logstash/2.0/plugins-outputs-kafka.html) version of the kafka output plugin.
+
+#### For Logstash 1.4.X, 1.5.X
 
         input {
             file {
@@ -152,6 +156,48 @@ Go to the logstash root dir, and create a configure file
                 # stdout { codec => rubydebug }
             }
         }
+
+#### For Logstash 2.X
+
+		input {
+			file {
+				type => "hdp-nn-audit"
+				path => "/path/to/audit.log"
+				start_position => end
+				sincedb_path => "/var/log/logstash/"
+			}
+		}
+
+
+		filter{
+			if [type] == "hdp-nn-audit" {
+			  grok {
+				  match => ["message", "ugi=(?<user>([\w\d\-]+))@|ugi=(?<user>([\w\d\-]+))/[\w\d\-.]+@|ugi=(?<user>([\w\d.\-_]+))[\s(]+"]
+			  }
+			}
+		}
+
+		output {
+			 if [type] == "hdp-nn-audit" {
+				  kafka {
+					  codec => plain {
+						  format => "%{message}"
+					  }
+					  bootstrap_servers => "localhost:9092"
+					  topic_id => "hdfs_audit_log"
+					  acks => “0”
+					  timeout_ms => 10000
+					  retries => 3
+					  retry_backoff_ms => 100
+					  batch_size => 16384
+					  send_buffer_bytes => 131072
+					  client_id => "hdp-nn-audit"
+				  }
+				  # stdout { codec => rubydebug }
+			  }
+		}
+
+
 
 #### grok pattern testing
 We have 3 typical patterns for ugi field as follows

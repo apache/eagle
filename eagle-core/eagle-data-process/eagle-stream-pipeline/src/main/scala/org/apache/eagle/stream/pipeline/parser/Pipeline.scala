@@ -78,6 +78,12 @@ trait PipelineParser{
   }
 
   def parseString(config:String):Pipeline = parse(ConfigFactory.parseString(config))
+
+  def parseStringWithConfig(dataFlow:String, config: Config) = {
+    val pConfig = config.withFallback(ConfigFactory.parseString(dataFlow))
+    parse(pConfig)
+  }
+
   def parseResource(resource:String):Pipeline = {
     // TODO: Load environment, currently hard-code with storm
     if(resource.startsWith("/") || resource.startsWith("./")){
