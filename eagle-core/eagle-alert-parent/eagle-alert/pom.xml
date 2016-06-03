@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ~ Licensed to the Apache Software Foundation (ASF) under one or more 
+	~ contributor license agreements. See the NOTICE file distributed with ~ 
+	this work for additional information regarding copyright ownership. ~ The 
+	ASF licenses this file to You under the Apache License, Version 2.0 ~ (the 
+	"License"); you may not use this file except in compliance with ~ the License. 
+	You may obtain a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 
+	~ ~ Unless required by applicable law or agreed to in writing, software ~ 
+	distributed under the License is distributed on an "AS IS" BASIS, ~ WITHOUT 
+	WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. ~ See the 
+	License for the specific language governing permissions and ~ limitations 
+	under the License. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.apache.eagle</groupId>
+		<artifactId>eagle-alert-parent</artifactId>
+		<version>0.5.0-incubating-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>eagle-alert</artifactId>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>alert-common</module>
+		<module>alert-engine</module>
+		<module>alert-metadata-parent</module>
+		<module>alert-coordinator</module>
+		<module>alert-assembly</module>
+		<module>alert-devtools</module>
+	</modules>
+
+	<properties>
+		<!-- Runtime -->
+		<java.version>1.8</java.version>
+
+		<!-- Build -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven-compiler.version>2.0.2</maven-compiler.version>
+
+		<!-- Test -->
+		<junit.version>4.12</junit.version>
+
+		<!-- Utilities -->
+		<typesafe-config.version>1.2.1</typesafe-config.version>
+		<guava.version>19.0</guava.version>
+		<commons-lang3.version>3.3.2</commons-lang3.version>
+		<commons-collections.version>3.2.1</commons-collections.version>
+		<commons-lang.version>2.6</commons-lang.version>
+		<archaius.version>0.6.1</archaius.version>
+		<metrics.version>3.1.0</metrics.version>
+		<mapdb.version>3.0.0-M6</mapdb.version>
+
+		<!-- CEP -->
+		<siddhi.version>3.0.5</siddhi.version>
+
+		<!-- PUBLISH -->
+		<velocity.version>1.7</velocity.version>
+		<javax.mail.version>1.4</javax.mail.version>
+
+		<!-- JSON -->
+		<fastxml.version>2.4.5</fastxml.version>
+		<jackson.version>1.9.13</jackson.version>
+		<fasterxml-jackson.version>2.4.5</fasterxml-jackson.version>
+		<codehaus-jackson.version>1.9.13</codehaus-jackson.version>
+
+		<!-- Storm and Kafka -->
+		<storm.version>0.9.3</storm.version>
+		<storm-kafka.version>0.9.3.2.2.0.0-2041</storm-kafka.version>
+		<kafka-clients.version>0.8.2.0</kafka-clients.version>
+		<kafka.version>0.8.1.2.2.0.0-2041</kafka.version>
+		<kafka.artifact.id>kafka_2.10</kafka.artifact.id>
+		<zkclient.version>0.3</zkclient.version>
+		<slf4j-api.veresion>1.7.20</slf4j-api.veresion>
+		<slf4j-log4j12.veresion>1.7.20</slf4j-log4j12.veresion>
+		<logback.version>1.1.7</logback.version>
+
+		<!-- Web Service/Client -->
+		<jersey.version>1.19.1</jersey.version>
+		<!--<jersey-client.version>1.19.1</jersey-client.version>-->
+		<!--<jersey-server.version>1.19.1</jersey-server.version>-->
+		<!--<jersey-multipart.version>1.19.1</jersey-multipart.version>-->
+
+		<jetty.version>9.2.3.v20140905</jetty.version>
+		<tomcat-embed.version>7.0.55</tomcat-embed.version>
+		<swagger.version>1.5.8</swagger.version>
+		<curator-framework.version>2.8.0</curator-framework.version>
+		<mongodb.version>3.2.2</mongodb.version>
+		<mockito.version>1.10.19</mockito.version>
+		<joda.version>2.2</joda.version>
+		<metrics-elasticsearch-reporter.version>2.2.0</metrics-elasticsearch-reporter.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>Maven Central Repository</id>
+			<url>http://central.maven.org/maven2/</url>
+		</repository>
+		<repository>
+			<id>HDP Release Repository</id>
+			<url>http://repo.hortonworks.com/content/repositories/releases/</url>
+		</repository>
+		<repository>
+			<id>HDP Central Repository</id>
+			<url>http://repo.hortonworks.com/content/repositories/central/</url>
+		</repository>
+		<repository>
+			<id>WSO2 Public</id>
+			<url>http://maven.wso2.org/nexus/content/groups/wso2-public</url>
+		</repository>
+	</repositories>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${fastxml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${fastxml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>${javax.mail.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.velocity</groupId>
+				<artifactId>velocity</artifactId>
+				<version>${velocity.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mockito.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-framework</artifactId>
+				<version>${curator-framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-recipes</artifactId>
+				<version>${curator-framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${fasterxml-jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons-lang3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>${commons-collections.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>${commons-lang.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${fasterxml-jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.storm</groupId>
+				<artifactId>storm-kafka</artifactId>
+				<version>${storm-kafka.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>${slf4j-log4j12.veresion}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.storm</groupId>
+				<artifactId>storm-core</artifactId>
+				<version>${storm.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>log4j-over-slf4j</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.logging.log4j</groupId>
+						<artifactId>log4j-slf4j-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>ch.qos.logback</groupId>
+						<artifactId>logback-classic</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>${kafka.artifact.id}</artifactId>
+				<version>${kafka.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.sfl4j</groupId>
+						<artifactId>slf4j-log4j</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-jaxrs</artifactId>
+				<version>${codehaus-jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-xc</artifactId>
+				<version>${codehaus-jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-mapper-asl</artifactId>
+				<version>${codehaus-jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe</groupId>
+				<artifactId>config</artifactId>
+				<version>${typesafe-config.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.netflix.archaius</groupId>
+				<artifactId>archaius-core</artifactId>
+				<version>${archaius.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-core</artifactId>
+				<version>${metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-jvm</artifactId>
+				<version>${metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.siddhi</groupId>
+				<artifactId>siddhi-core</artifactId>
+				<version>${siddhi.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-simple</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.siddhi</groupId>
+				<artifactId>siddhi-query-api</artifactId>
+				<version>${siddhi.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.siddhi</groupId>
+				<artifactId>siddhi-query-compiler</artifactId>
+				<version>${siddhi.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.siddhi</groupId>
+				<artifactId>siddhi-extension-regex</artifactId>
+				<version>${siddhi.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.wso2.siddhi</groupId>
+				<artifactId>siddhi-extension-string</artifactId>
+				<version>${siddhi.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka-clients</artifactId>
+				<version>${kafka-clients.version}</version>
+				<!--<scope>test</scope> -->
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.101tec</groupId>
+				<artifactId>zkclient</artifactId>
+				<version>${zkclient.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-server</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-servlet</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey.contribs</groupId>
+				<artifactId>jersey-multipart</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.tomcat.embed</groupId>
+				<artifactId>tomcat-embed-core</artifactId>
+				<version>${tomcat-embed.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j-api.veresion}</version>
+			</dependency>
+			<!--<dependency>-->
+				<!--<groupId>ch.qos.logback</groupId>-->
+				<!--<artifactId>logback-classic</artifactId>-->
+				<!--<version>${logback.version}</version>-->
+			<!--</dependency>-->
+			<dependency>
+				<groupId>io.swagger</groupId>
+				<artifactId>swagger-jaxrs</artifactId>
+				<version>${swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mapdb</groupId>
+				<artifactId>mapdb</artifactId>
+				<version>${mapdb.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>${joda.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.elasticsearch</groupId>
+				<artifactId>metrics-elasticsearch-reporter</artifactId>
+				<version>${metrics-elasticsearch-reporter.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler.version}</version>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<encoding>UTF-8</encoding>
+						<maxmem>2048m</maxmem>
+						<fork>true</fork>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-maven-plugin</artifactId>
+					<version>${jetty.version}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

@@ -22,7 +22,7 @@ import java.util.Properties
 
 import joptsimple._
 import kafka.message._
-import kafka.producer.ConsoleProducer.{MessageReader, LineMessageReader}
+import kafka.tools.ConsoleProducer.{MessageReader, LineMessageReader}
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import kafka.serializer._
 import org.apache.commons.io.FileUtils
@@ -166,7 +166,7 @@ object ProducerTool {
     props.put("serializer.class", valueEncoderClass)
     props.put("send.buffer.bytes", socketBuffer.toString)
 
-    val reader = Class.forName(readerClass).newInstance().asInstanceOf[MessageReader[AnyRef, AnyRef]]
+    val reader = Class.forName(readerClass).newInstance().asInstanceOf[MessageReader]
 
     if (messageData.size()>0) {
       reader.init(new ByteArrayInputStream(messageData.get(0).getBytes(StandardCharsets.UTF_8)), cmdLineProps)
@@ -177,7 +177,7 @@ object ProducerTool {
     }
 
     try {
-      val producer = new Producer[AnyRef, AnyRef](new ProducerConfig(props))
+      val producer = new Producer[Array[Byte], Array[Byte]](new ProducerConfig(props))
 
       Runtime.getRuntime.addShutdownHook(new Thread() {
         override def run() {
@@ -185,7 +185,7 @@ object ProducerTool {
         }
       })
 
-      var message: KeyedMessage[AnyRef, AnyRef] = null
+      var message: KeyedMessage[Array[Byte], Array[Byte]] = null
       do {
         message = reader.readMessage()
         if (message != null)
