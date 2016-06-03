@@ -34,6 +34,7 @@
   <modules>
         <module>eagle-jpm-spark-running</module>
         <module>eagle-jpm-spark-history</module>
+        <module>eagle-jpm-mr-history</module>
          <module>eagle-jpm-entity</module>
         <module>eagle-jpm-util</module>
   </modules>
