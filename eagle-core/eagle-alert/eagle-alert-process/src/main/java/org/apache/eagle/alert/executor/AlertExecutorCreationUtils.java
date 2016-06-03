@@ -81,7 +81,7 @@ public class AlertExecutorCreationUtils {
             if(alertExecutorConfigs !=null && alertExecutorConfigs.containsKey(alertExecutorId)) {
                 Map<String, Object> alertExecutorConfig = (Map<String, Object>) alertExecutorConfigs.get(alertExecutorId).unwrapped();
                 int parts = 0;
-                if(alertExecutorConfig.containsKey("parallelism")) parts = (int) (alertExecutorConfig.get("parallelism"));
+                if(alertExecutorConfig.containsKey("parallelism")) parts = Integer.parseInt(alertExecutorConfig.get("parallelism").toString());
                 numPartitions = parts == 0 ? 1 : parts;
                 if(alertExecutorConfig.containsKey("partitioner")) partitionerCls = (String) alertExecutorConfig.get("partitioner");
             }

@@ -19,7 +19,7 @@ package org.apache.eagle.datastream.core
 
 import java.util.regex.Pattern
 
-import com.typesafe.config.{Config, ConfigObject, ConfigValue}
+import com.typesafe.config.{Config, ConfigObject}
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.slf4j.LoggerFactory
 
@@ -48,7 +48,7 @@ case class StreamParallelismConfigExpansion(config: Config) extends StreamDAGExp
     if(config.hasPath("envContextConfig.parallelismConfig")) {
       val parallelismConfig: ConfigObject = config.getObject("envContextConfig.parallelismConfig")
       parallelismConfig.asScala.toMap map {
-        case (name, value) => (Pattern.compile(name), value.asInstanceOf[ConfigValue].unwrapped().asInstanceOf[Int])
+        case (name, value) => (Pattern.compile(name), Integer.parseInt(value.unwrapped().toString))
       }
     }else{
       Map[Pattern,Int]()
