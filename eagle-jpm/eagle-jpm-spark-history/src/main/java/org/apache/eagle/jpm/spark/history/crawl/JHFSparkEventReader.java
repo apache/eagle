@@ -35,9 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-/**
- * Created by jnwang on 2016/4/27.
- */
 public class JHFSparkEventReader {
 
     public static final int FLUSH_LIMIT = 500;

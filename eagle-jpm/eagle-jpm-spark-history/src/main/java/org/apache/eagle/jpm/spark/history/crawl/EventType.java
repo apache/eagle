@@ -17,9 +17,6 @@
 
 package org.apache.eagle.jpm.spark.history.crawl;
 
-/**
- * Created by jnwang on 2016/4/27.
- */
 public enum EventType {
     SparkListenerBlockManagerAdded, SparkListenerEnvironmentUpdate, SparkListenerApplicationStart,
     SparkListenerExecutorAdded, SparkListenerJobStart,SparkListenerStageSubmitted, SparkListenerTaskStart,SparkListenerBlockManagerRemoved,

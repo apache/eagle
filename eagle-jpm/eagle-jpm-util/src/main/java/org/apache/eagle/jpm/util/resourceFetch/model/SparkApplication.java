@@ -24,9 +24,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.List;
 
-/**
- * Created by jnwang on 2016/5/4.
- */
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SparkApplication {

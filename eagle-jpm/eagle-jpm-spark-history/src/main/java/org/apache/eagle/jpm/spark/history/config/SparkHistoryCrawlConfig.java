@@ -25,9 +25,6 @@ import com.typesafe.config.ConfigFactory;
 
 import java.io.Serializable;
 
-/**
- * Created by jnwang on 2016/5/3.
- */
 public class SparkHistoryCrawlConfig implements Serializable{
     public ZKStateConfig zkStateConfig;
     public JobHistoryEndpointConfig jobHistoryConfig;

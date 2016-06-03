@@ -25,9 +25,6 @@ import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.IOException;
 
-/**
- * Created by jnwang on 2016/5/16.
- */
 public class HDFSUtil {
 
     public static FileSystem getFileSystem(Configuration conf) throws IOException {
@@ -36,7 +33,7 @@ public class HDFSUtil {
     }
 
     public static void login(Configuration kConfig) throws IOException {
-        if(kConfig.get("hdfs.kerberos.principal") == null){
+        if(kConfig.get("hdfs.kerberos.principal") == null || kConfig.get("hdfs.kerberos.principal").isEmpty()){
             return;
         }
        kConfig.setBoolean("hadoop.security.authorization", true);

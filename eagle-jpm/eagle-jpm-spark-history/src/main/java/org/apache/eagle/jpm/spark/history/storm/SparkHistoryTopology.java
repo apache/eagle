@@ -24,9 +24,6 @@ import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
 
-/**
- * Created by jnwang on 2016/5/6.
- */
 public class SparkHistoryTopology {
 
     private SparkHistoryCrawlConfig config;

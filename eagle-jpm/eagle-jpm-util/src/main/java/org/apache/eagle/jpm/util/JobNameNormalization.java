@@ -27,11 +27,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * please refer to https://wiki.vip.corp.ebay.com/display/DI/Job+name+normalization
- * @author yonzhang
- *
- */
 public class JobNameNormalization {
 	private static Logger logger = LoggerFactory.getLogger(JobNameNormalization.class);
 	private static JobNameNormalization instance = new JobNameNormalization();

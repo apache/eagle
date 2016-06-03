@@ -17,9 +17,6 @@
 
 package org.apache.eagle.jpm.util;
 
-/**
- * Created by jnwang on 2016/4/27.
- */
 public enum SparkJobTagName {
     SITE("site"),
     SPARK_APP_ID("sprkAppId"),

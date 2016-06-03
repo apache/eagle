@@ -20,9 +20,6 @@ package org.apache.eagle.jpm.util;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-/**
- * Created by jnwang on 2016/4/27.
- */
 public class JSONUtil {
 
     public static String getString(JSONObject obj, String field) {

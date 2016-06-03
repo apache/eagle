@@ -18,9 +18,6 @@ package org.apache.eagle.jpm.util.resourceFetch.ha;
 
 import java.io.IOException;
 
-/**
- * @since Aug 21, 2014
- */
 public interface HAURLSelector {
 	
 	boolean checkUrl(String url);

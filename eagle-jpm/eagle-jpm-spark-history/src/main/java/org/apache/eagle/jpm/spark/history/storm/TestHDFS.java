@@ -27,9 +27,6 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by jnwang on 2016/5/12.
- */
 public class TestHDFS {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestHDFS.class);

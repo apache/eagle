@@ -25,9 +25,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by jnwang on 2016/4/27.
- */
 public class SparkHistoryFileInputStreamReaderImpl implements JHFInputStreamReader {
 
     private String site;

@@ -22,10 +22,6 @@ import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.apache.eagle.jpm.util.Constants;
 
-/**
- * Created by jnwang on 2016/4/26.
- */
-
 @Table("eglesprk_tasks")
 @ColumnFamily("f")
 @Prefix("sprktask")

@@ -22,9 +22,6 @@ package org.apache.eagle.jpm.util.resourceFetch.model;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-/**
- * Created by jnwang on 2016/5/4.
- */
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SparkApplicationAttempt {

@@ -17,9 +17,6 @@
 
 package org.apache.eagle.jpm.util;
 
-/**
- * Created by jnwang on 2016/4/27.
- */
 public class Constants {
 
     public final static String SPARK_APP_SERVICE_ENDPOINT_NAME = "SparkAppService";

@@ -47,9 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by jnwang on 2016/5/6.
- */
 public class SparkJobParseBolt extends BaseRichBolt {
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkJobParseBolt.class);

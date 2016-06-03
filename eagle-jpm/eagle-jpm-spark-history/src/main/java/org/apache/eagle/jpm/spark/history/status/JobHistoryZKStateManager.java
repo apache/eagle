@@ -35,10 +35,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
-/**
- * Created by jnwang on 2016/5/3.
- */
 public class JobHistoryZKStateManager {
     public static final Logger LOG = LoggerFactory.getLogger(JobHistoryZKStateManager.class);
     private String zkRoot;

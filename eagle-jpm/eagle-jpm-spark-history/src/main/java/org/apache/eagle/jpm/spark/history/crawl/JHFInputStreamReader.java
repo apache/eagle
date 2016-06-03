@@ -19,9 +19,6 @@ package org.apache.eagle.jpm.spark.history.crawl;
 
 import java.io.InputStream;
 
-/**
- * Created by jnwang on 2016/4/28.
- */
 public interface JHFInputStreamReader {
     public void read(InputStream is) throws Exception;
 

@@ -21,9 +21,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * Created by jnwang on 2016/4/29.
- */
 public class JobConfig implements Serializable {
     private Map<String, String> config = new TreeMap<>();
 

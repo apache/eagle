@@ -17,9 +17,6 @@
 
 package org.apache.eagle.jpm.util;
 
-/**
- * Created by jnwang on 2016/4/28.
- */
 public class SparkEntityConstant {
 
     public enum SPARK_STAGE_STATUS{

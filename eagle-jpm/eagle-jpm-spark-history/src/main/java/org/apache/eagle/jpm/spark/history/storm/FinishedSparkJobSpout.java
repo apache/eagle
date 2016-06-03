@@ -41,9 +41,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
-/**
- * Created by jnwang on 2016/5/4.
- */
 public class FinishedSparkJobSpout extends BaseRichSpout {
 
     private static final Logger LOG = LoggerFactory.getLogger(FinishedSparkJobSpout.class);

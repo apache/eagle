@@ -27,9 +27,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-/**
- * Created by jnwang on 2016/4/27.
- */
 public class JHFSparkParser implements JHFParserBase {
 
     private static final Logger logger = LoggerFactory.getLogger(JHFSparkParser.class);

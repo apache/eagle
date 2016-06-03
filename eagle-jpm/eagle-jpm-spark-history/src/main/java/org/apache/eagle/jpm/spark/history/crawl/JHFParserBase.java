@@ -19,9 +19,6 @@ package org.apache.eagle.jpm.spark.history.crawl;
 
 import java.io.InputStream;
 
-/**
- * Created by jnwang on 2016/4/27.
- */
 public interface JHFParserBase {
     /**
      * this method will ensure to close the inputstream

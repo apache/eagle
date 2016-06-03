@@ -35,9 +35,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by jnwang on 2016/5/4.
- */
 public class SparkHistoryServerResourceFetcher implements ResourceFetcher{
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkHistoryServerResourceFetcher.class);

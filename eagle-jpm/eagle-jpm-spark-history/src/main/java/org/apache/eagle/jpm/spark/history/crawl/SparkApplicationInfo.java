@@ -19,9 +19,6 @@
 
 package org.apache.eagle.jpm.spark.history.crawl;
 
-/**
- * Created by jnwang on 2016/5/3.
- */
 public class SparkApplicationInfo {
 
     private String state;

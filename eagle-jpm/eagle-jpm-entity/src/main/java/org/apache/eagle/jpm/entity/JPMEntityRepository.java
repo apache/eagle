@@ -19,9 +19,6 @@ package org.apache.eagle.jpm.entity;
 
 import org.apache.eagle.log.entity.repo.EntityRepository;
 
-/**
- * Created by jnwang on 2016/4/26.
- */
 public class JPMEntityRepository extends EntityRepository {
     public JPMEntityRepository() {
         entitySet.add(SparkApp.class);

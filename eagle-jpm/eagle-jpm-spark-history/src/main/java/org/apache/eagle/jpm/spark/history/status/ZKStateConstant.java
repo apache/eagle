@@ -19,9 +19,6 @@
 
 package org.apache.eagle.jpm.spark.history.status;
 
-/**
- * Created by jnwang on 2016/5/3.
- */
 public class ZKStateConstant {
 
     public enum AppStatus{

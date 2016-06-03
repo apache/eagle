@@ -21,9 +21,6 @@ package org.apache.eagle.jpm.util.resourceFetch.url;
 
 import org.apache.eagle.jpm.util.Constants;
 
-/**
- * Created by jnwang on 2016/5/4.
- */
 public class SparkCompleteJobServiceURLBuilderImpl implements ServiceURLBuilder {
 
     public String build(String... parameters) {
