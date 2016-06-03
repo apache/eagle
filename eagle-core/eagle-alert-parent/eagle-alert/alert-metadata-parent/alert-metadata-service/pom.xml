@@ -21,7 +21,7 @@
 	</parent>
 
 	<artifactId>alert-metadata-service</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<dependencies>
 		<!-- Storm depends on org.ow2.asm:asm:4.0 -->

@@ -1056,6 +1056,7 @@
                                 <!-- README and test data with exact format -->
                                 <exclude>README*</exclude>
                                 <exclude>**/*.log</exclude>
+                                <exclude>**/*.out</exclude>
                                 <exclude>**/eagle.log*</exclude>
                                 <exclude>**/velocity.log*</exclude>
                                 <!-- all json files should be excluded -->
