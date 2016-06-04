@@ -316,7 +316,6 @@
 			<artifactId>spring-security-ldap</artifactId>
 			<version>${spring.framework.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -324,6 +323,17 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- Integrate next generation alert engine service -->
+		<dependency>
+			<groupId>org.apache.eagle</groupId>
+			<artifactId>alert-coordinator</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.eagle</groupId>
+			<artifactId>alert-metadata-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

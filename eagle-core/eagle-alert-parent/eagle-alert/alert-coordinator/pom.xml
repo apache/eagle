@@ -21,7 +21,7 @@
 	</parent>
 
 	<artifactId>alert-coordinator</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<name>alert-coordinator</name>
 	<url>http://maven.apache.org</url>
