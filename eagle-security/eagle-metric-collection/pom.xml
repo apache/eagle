@@ -91,6 +91,7 @@
           <version>${project.version}</version>
       </dependency>
       <dependency>
+          <!-- TODO: Clean explicit dependency version -->
           <groupId>com.hierynomus</groupId>
           <artifactId>sshj</artifactId>
           <version>0.13.0</version>
