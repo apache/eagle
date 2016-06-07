@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.hadoop.hive.ql.parse.ASTNode;
-import org.apache.hadoop.hive.ql.parse.ParseException;
+import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class TestParser {
     }
   }
 
-  public void printQueryAST(String query) throws ParseException {
+  public void printQueryAST(String query) throws RecognitionException {
     ASTNode root = parser.generateAST(query);
     printTree(root, 0);
   }
@@ -205,6 +205,32 @@ public class TestParser {
         String expectedOperation = "SELECT";
         String expectedInsertTable = "t1";
         Map<String, Set<String>> expectedTableColumn = null;
+        _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
+    }
+
+    @Test
+    public void testQueryWithKeyWords() throws Exception {
+        String query =  "SELECT id, user FROM db.table1";
+        String expectedOperation = "SELECT";
+        String expectedInsertTable = null;
+        Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
+        set.add("id");
+        set.add("user");
+        expectedTableColumn.put("db.table1", set);
+        _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
+    }
+
+    @Test
+    public void testInsertTableWithKeyWords() throws Exception {
+        String query =  "INSERT OVERWRITE TABLE table2 SELECT id, user FROM db.table1";
+        String expectedOperation = "SELECT";
+        String expectedInsertTable = "table2";
+        Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
+        set.add("id");
+        set.add("user");
+        expectedTableColumn.put("db.table1", set);
         _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
     }
 
