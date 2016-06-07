@@ -16,9 +16,8 @@
  */
 package org.apache.eagle.security.userprofile.model;
 
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.security.userprofile.UserProfileConstants;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.apache.eagle.security.userprofile.UserProfileConstants;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -66,7 +65,7 @@ public class UserActivityAggModelEntity extends TaggedLogAPIEntity{
         UserActivityAggModel model = new UserActivityAggModel(
                 entity.getTags().get(UserProfileConstants.USER_TAG),
                 new Array2DRowRealMatrix(entity.getCmdMatrix()),
-                scala.collection.JavaConversions.asScalaBuffer(entity.getCmdTypes()),
+                JavaConversions.<String>asScalaBuffer(entity.getCmdTypes()),
                 entity.getTags().get(UserProfileConstants.SITE_TAG),
                 entity.getTimestamp());
         return model;
@@ -74,7 +73,7 @@ public class UserActivityAggModelEntity extends TaggedLogAPIEntity{
 
     public static UserActivityAggModelEntity fromModel(final UserActivityAggModel model){
         UserActivityAggModelEntity entity = new UserActivityAggModelEntity();
-        entity.setCmdTypes(JavaConversions.asJavaList(model.cmdTypes()));
+        entity.setCmdTypes(JavaConversions.seqAsJavaList(model.cmdTypes()));
         entity.setCmdMatrix(model.matrix().getData());
         Map<String,String> tags = new HashMap<String,String>(){{
             put(UserProfileConstants.SITE_TAG,model.site());

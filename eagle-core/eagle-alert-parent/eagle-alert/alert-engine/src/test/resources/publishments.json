@@ -1,0 +1,29 @@
+[
+{
+	"name":"test-stream-output",
+	"type":"org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
+	"policyIds": [
+		"perfmon_cpu_host_check", "perfmon_cpu_pool_check"
+	],
+	"properties": {
+	  "subject":"UMP Test Alert",
+	  "template":"",
+	  "sender": "sender@corp.com",
+	  "recipients": "receiver@corp.com",
+	  "smtp.server":"mailhost.com",
+	  "connection": "plaintext",
+	  "smtp.port": "25"
+	},
+	"dedupIntervalMin" : "PT0M"
+},
+{
+  "type": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
+  "name":"kafka-testAlertStream",
+  "policyIds": ["perfmon_cpu_host_check"],
+  "dedupIntervalMin": "PT1M",
+  "properties":{
+    "kafka_broker":"sandbox.hortonworks.com:6667",
+    "topic":"test_kafka"
+  }
+}
+]

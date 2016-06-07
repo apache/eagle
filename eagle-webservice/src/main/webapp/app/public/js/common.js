@@ -147,6 +147,45 @@ common.format.date = function(val, type) {
 	}
 };
 
+// ===================== Property =====================
+common.properties = {};
+
+common.properties.parse = function (str, defaultValue) {
+	var regex = /\s*([\w\.]+)\s*=\s*(.*?)\s*([\r\n]+|$)/g;
+	var match, props = {};
+	var hasValue = false;
+	while((match = regex.exec(str)) !== null) {
+		props[match[1]] = match[2];
+		hasValue = true;
+	}
+	props = hasValue ? props : defaultValue;
+	props.getValueByPath = function (path) {
+		if(props[path] !== undefined) return props[path];
+		var subProps = {};
+		var prefixPath = path + ".";
+		$.each(props, function (key, value) {
+			if(typeof value === "string" && key.indexOf(prefixPath) === 0) {
+				subProps[key.replace(prefixPath, "")] = value;
+			}
+		});
+		return subProps;
+	};
+
+	return props;
+};
+
+common.properties.check = function (str) {
+	var pass = true;
+	var regex = /^\s*[\w\.]+\s*=(.*)$/;
+	$.each((str || "").trim().split(/[\r\n\s]+/g), function (i, line) {
+		if(!regex.test(line)) {
+			pass = false;
+			return false;
+		}
+	});
+	return pass;
+};
+
 // ====================== Array =======================
 common.array = {};
 
@@ -198,10 +237,16 @@ common.array.top = function(list, path, count) {
 	return !count ? _list : _list.slice(0, count);
 };
 
-common.array.find = function(val, list, path, findAll) {
+common.array.find = function(val, list, path, findAll, caseSensitive) {
 	path = path || "";
+	val = caseSensitive === false ? (val || "").toUpperCase() : val;
+
 	var _list = $.grep(list, function(unit) {
-		return val === common.getValueByPath(unit, path);
+		if(caseSensitive === false) {
+			return val === (common.getValueByPath(unit, path) || "").toUpperCase();
+		} else {
+			return val === common.getValueByPath(unit, path);
+		}
 	});
 	return findAll ? _list : (_list.length === 0 ? null : _list[0]);
 };

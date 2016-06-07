@@ -66,7 +66,5 @@ public final class EntityRepositoryScanner {
 			select().from("org.apache.eagle").returning(
 			allExtending(EntityRepository.class));
 		}
-
 	}
-
 }
