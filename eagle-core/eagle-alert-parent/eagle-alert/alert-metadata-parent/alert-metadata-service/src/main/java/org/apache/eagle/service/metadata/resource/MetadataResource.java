@@ -70,7 +70,7 @@ public class MetadataResource {
     }
 
     @Path("/import")
-    @GET
+    @POST
     public OpResult importModels(Models model) {
         return dao.importModels(model);
     }
