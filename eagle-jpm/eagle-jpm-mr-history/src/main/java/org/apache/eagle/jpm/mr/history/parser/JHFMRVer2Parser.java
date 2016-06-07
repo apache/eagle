@@ -62,7 +62,7 @@ public class JHFMRVer2Parser implements JHFParserBase {
              _reader.parseConfiguration();
              // don't need put to finally as it's a kind of flushing data
              _reader.close();
-            logger.error("reader used " + (System.currentTimeMillis() - start));
+            logger.error("reader used " + (System.currentTimeMillis() - start) + "ms");
         } catch (Exception ioe) {
             logger.error("Caught exception parsing history file after " + eventCtr + " events", ioe);
             throw ioe;
