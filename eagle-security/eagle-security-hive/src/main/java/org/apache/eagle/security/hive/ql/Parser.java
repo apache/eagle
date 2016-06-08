@@ -303,7 +303,7 @@ public class Parser {
         }
         break;
 
-      case HiveParser.TOK_FUNCTION:
+      case HiveParser.TOK_FUNCTION: case HiveParser.TOK_FUNCTIONDI:
         // Traverse children to get TOK_TABLE_OR_COL
         Set<String> tempSet = new HashSet<>();
         parseTokFunction(asn, tempSet);
@@ -337,14 +337,14 @@ public class Parser {
         String colRealName = convAliasToReal(columnAliasMap, ast.getChild(0).getText());
         set.add(colRealName);
         break;
-      case HiveParser.TOK_FUNCTION:
+      // Not only HiveParser.TOK_FUNCTION, but also HiveParser.KW_ADD, HiveParser.KW_WHEN ...
+      default:
         for (int i = 0; i < ast.getChildCount(); i++) {
           ASTNode n = (ASTNode)ast.getChild(i);
           if (n != null) {
             parseTokFunction(n, set);
           }
         }
-        break;
     }
   }
 
