@@ -24,13 +24,11 @@ import org.apache.eagle.security.userprofile.impl.UserProfileAnomalyEigenEvaluat
 import org.apache.eagle.security.userprofile.model.UserActivityAggModel;
 import org.apache.eagle.security.userprofile.model.UserCommandStatistics;
 import org.apache.eagle.security.userprofile.model.UserProfileEigenModel;
-import junit.framework.Assert;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.eagle.security.userprofile.impl.UserProfileAnomalyEigenEvaluator;
-import org.apache.eagle.security.userprofile.model.UserProfileEigenModel;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -23,9 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.query.aggregate.timeseries.TimeSeriesAggregator;
-import junit.framework.Assert;
-
 import org.apache.eagle.query.aggregate.AggregateFunctionType;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,22 +68,22 @@ public class TestTimeSeriesAggregator {
 			}
 			Map<List<String>, List<Double>> result = tsAgg.result();
 			Assert.assertEquals(result.size(), 6);
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "0")).get(0), (double)(entities[0].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "17")).get(0), (double)(entities[1].getNumHosts()+entities[2].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("cluster2", "35")).get(0), (double)(entities[3].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("cluster2", "53")).get(0), (double)(entities[4].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("cluster2", "58")).get(0), (double)(entities[5].getNumHosts()+entities[6].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "58")).get(0), (double)(entities[7].getNumHosts()));
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "0")).get(0), (double)(entities[0].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "17")).get(0), (double)(entities[1].getNumHosts()+entities[2].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster2", "35")).get(0), (double)(entities[3].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster2", "53")).get(0), (double)(entities[4].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster2", "58")).get(0), (double)(entities[5].getNumHosts()+entities[6].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "58")).get(0), (double)(entities[7].getNumHosts()), 0.001);
 			
 			Map<List<String>, List<double[]>> tsResult = tsAgg.getMetric();
 			Assert.assertEquals(tsResult.size(), 2);
 			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0).length, 60);
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[0], (double)(entities[0].getNumHosts()));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[17], (double)(entities[1].getNumHosts()+entities[2].getNumHosts()));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[35], (double)(entities[3].getNumHosts()));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[53], (double)(entities[4].getNumHosts()));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[58], (double)(entities[5].getNumHosts()+entities[6].getNumHosts()));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[58], (double)(entities[7].getNumHosts()));
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[0], (double)(entities[0].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[17], (double)(entities[1].getNumHosts()+entities[2].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[35], (double)(entities[3].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[53], (double)(entities[4].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[58], (double)(entities[5].getNumHosts()+entities[6].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[58], (double)(entities[7].getNumHosts()), 0.001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -98,20 +97,20 @@ public class TestTimeSeriesAggregator {
 			}
 			Map<List<String>, List<Double>> result = tsAgg.result();
 			Assert.assertEquals(result.size(), 5);
-			Assert.assertEquals(result.get(Arrays.asList("0")).get(0), (double)(entities[0].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("17")).get(0), (double)(entities[1].getNumHosts()+entities[2].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("35")).get(0), (double)(entities[3].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("53")).get(0), (double)(entities[4].getNumHosts()));
-			Assert.assertEquals(result.get(Arrays.asList("58")).get(0), (double)(entities[5].getNumHosts()+entities[6].getNumHosts()+entities[7].getNumHosts()));
+			Assert.assertEquals(result.get(Arrays.asList("0")).get(0), (double)(entities[0].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("17")).get(0), (double)(entities[1].getNumHosts()+entities[2].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("35")).get(0), (double)(entities[3].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("53")).get(0), (double)(entities[4].getNumHosts()), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("58")).get(0), (double)(entities[5].getNumHosts()+entities[6].getNumHosts()+entities[7].getNumHosts()), 0.001);
 			
 			Map<List<String>, List<double[]>> tsResult = tsAgg.getMetric();
 			Assert.assertEquals(tsResult.size(), 1);
 			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0).length, 60);
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[0], (double)(entities[0].getNumHosts()));
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[17], (double)(entities[1].getNumHosts()+entities[2].getNumHosts()));
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[35], (double)(entities[3].getNumHosts()));
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[53], (double)(entities[4].getNumHosts()));
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[58], (double)(entities[5].getNumHosts()+entities[6].getNumHosts()+entities[7].getNumHosts()));		
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[0], (double)(entities[0].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[17], (double)(entities[1].getNumHosts()+entities[2].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[35], (double)(entities[3].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[53], (double)(entities[4].getNumHosts()), 0.001);
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[58], (double)(entities[5].getNumHosts()+entities[6].getNumHosts()+entities[7].getNumHosts()), 0.001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -125,22 +124,22 @@ public class TestTimeSeriesAggregator {
 			}
 			Map<List<String>, List<Double>> result = tsAgg.result();
 			Assert.assertEquals(result.size(), 6);
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "0")).get(0), (double)(1));
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "17")).get(0), (double)(2));
-			Assert.assertEquals(result.get(Arrays.asList("cluster2", "35")).get(0), (double)(1));
-			Assert.assertEquals(result.get(Arrays.asList("cluster2", "53")).get(0), (double)(1));
-			Assert.assertEquals(result.get(Arrays.asList("cluster2", "58")).get(0), (double)(2));
-			Assert.assertEquals(result.get(Arrays.asList("cluster1", "58")).get(0), (double)(1));
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "0")).get(0), (double)(1), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "17")).get(0), (double)(2), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster2", "35")).get(0), (double)(1), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster2", "53")).get(0), (double)(1), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster2", "58")).get(0), (double)(2), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("cluster1", "58")).get(0), (double)(1), 0.001);
 			
 			Map<List<String>, List<double[]>> tsResult = tsAgg.getMetric();
 			Assert.assertEquals(tsResult.size(), 2);
 			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0).length, 60);
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[0], (double)(1));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[17], (double)(2));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[35], (double)(1));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[53], (double)(1));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[58], (double)(2));
-			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[58], (double)(1));
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[0], (double)(1), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[17], (double)(2), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[35], (double)(1), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[53], (double)(1), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster2")).get(0)[58], (double)(2), 0.001);
+			Assert.assertEquals(tsResult.get(Arrays.asList("cluster1")).get(0)[58], (double)(1), 0.001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -154,20 +153,20 @@ public class TestTimeSeriesAggregator {
 			}
 			Map<List<String>, List<Double>> result = tsAgg.result();
 			Assert.assertEquals(result.size(), 5);
-			Assert.assertEquals(result.get(Arrays.asList("0")).get(0), (double)(1));
-			Assert.assertEquals(result.get(Arrays.asList("17")).get(0), (double)(2));
-			Assert.assertEquals(result.get(Arrays.asList("35")).get(0), (double)(1));
-			Assert.assertEquals(result.get(Arrays.asList("53")).get(0), (double)(1));
-			Assert.assertEquals(result.get(Arrays.asList("58")).get(0), (double)(3));
+			Assert.assertEquals(result.get(Arrays.asList("0")).get(0), (double)(1), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("17")).get(0), (double)(2), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("35")).get(0), (double)(1), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("53")).get(0), (double)(1), 0.001);
+			Assert.assertEquals(result.get(Arrays.asList("58")).get(0), (double)(3), 0.001);
 			
 			Map<List<String>, List<double[]>> tsResult = tsAgg.getMetric();
 			Assert.assertEquals(tsResult.size(), 1);
 			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0).length, 60);
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[0], (double)(1));
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[17], (double)(2));
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[35], (double)(1));
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[53], (double)(1));
-			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[58], (double)(3));		
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[0], (double)(1), 0.001);
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[17], (double)(2), 0.001);
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[35], (double)(1), 0.001);
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[53], (double)(1), 0.001);
+			Assert.assertEquals(tsResult.get(new ArrayList<String>()).get(0)[58], (double)(3), 0.001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");

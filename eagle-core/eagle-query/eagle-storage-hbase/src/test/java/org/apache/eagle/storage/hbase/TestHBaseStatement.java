@@ -24,12 +24,9 @@ import java.util.List;
 import org.apache.eagle.log.entity.meta.EntityDefinition;
 import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
 import org.apache.eagle.storage.operation.CreateStatement;
-import junit.framework.Assert;
 
 import org.apache.eagle.storage.operation.QueryStatement;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import org.apache.eagle.service.hbase.TestHBaseBase;

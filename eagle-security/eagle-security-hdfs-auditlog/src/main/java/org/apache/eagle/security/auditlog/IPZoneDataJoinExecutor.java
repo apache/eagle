@@ -43,7 +43,7 @@ public class IPZoneDataJoinExecutor extends JavaStormStreamExecutor2<String, Map
 	public void init() {
 		// start IPZone data polling
 		try{
-			ExternalDataJoiner joiner = new ExternalDataJoiner(IPZonePollingJob.class, config);
+			ExternalDataJoiner joiner = new ExternalDataJoiner(IPZonePollingJob.class, config, "1");
 			joiner.start();
 		}catch(Exception ex){
 			LOG.error("Fail bring up quartz scheduler", ex);

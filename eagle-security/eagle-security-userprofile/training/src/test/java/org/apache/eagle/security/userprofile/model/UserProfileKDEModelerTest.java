@@ -17,10 +17,9 @@
 package org.apache.eagle.security.userprofile.model;
 
 import org.apache.eagle.security.userprofile.model.kde.UserProfileKDEModeler;
-import junit.framework.Assert;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.eagle.security.userprofile.model.kde.UserProfileKDEModeler;
+import org.junit.Assert;
 
 public class UserProfileKDEModelerTest {
 

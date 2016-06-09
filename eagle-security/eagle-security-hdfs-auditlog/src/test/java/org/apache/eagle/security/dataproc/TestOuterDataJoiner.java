@@ -18,7 +18,7 @@
 package eagle.security.dataproc;
 
 import eagle.security.util.ExternalDataJoiner;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;

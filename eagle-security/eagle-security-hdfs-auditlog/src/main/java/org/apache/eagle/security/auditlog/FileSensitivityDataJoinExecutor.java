@@ -46,7 +46,7 @@ public class FileSensitivityDataJoinExecutor extends JavaStormStreamExecutor2<St
 	public void init() {
 		// start IPZone data polling
 		try{
-			ExternalDataJoiner joiner = new ExternalDataJoiner(FileSensitivityPollingJob.class, config);
+			ExternalDataJoiner joiner = new ExternalDataJoiner(FileSensitivityPollingJob.class, config, "1");
 			joiner.start();
 		}catch(Exception ex){
 			LOG.error("Fail bring up quartz scheduler", ex);

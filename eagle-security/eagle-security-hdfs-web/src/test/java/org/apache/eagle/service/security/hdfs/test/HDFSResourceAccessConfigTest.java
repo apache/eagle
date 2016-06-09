@@ -17,7 +17,7 @@
 package org.apache.eagle.service.security.hdfs.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;

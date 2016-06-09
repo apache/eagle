@@ -32,7 +32,7 @@ import org.junit.Test;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * @since Dec 18, 2015

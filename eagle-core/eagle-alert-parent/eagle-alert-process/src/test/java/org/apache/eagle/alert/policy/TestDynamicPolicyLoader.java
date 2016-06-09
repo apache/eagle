@@ -25,14 +25,13 @@ import org.apache.eagle.policy.DynamicPolicyLoader;
 import org.apache.eagle.policy.PolicyLifecycleMethods;
 import org.apache.eagle.policy.dao.PolicyDefinitionDAO;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-
-import junit.framework.Assert;
 
 public class TestDynamicPolicyLoader {
 	private final static Logger LOG = LoggerFactory.getLogger(TestDynamicPolicyLoader.class);
