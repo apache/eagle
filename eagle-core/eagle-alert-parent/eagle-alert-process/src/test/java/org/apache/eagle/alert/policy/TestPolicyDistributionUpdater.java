@@ -21,7 +21,8 @@ package org.apache.eagle.alert.policy;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
+import org.apache.eagle.policy.siddhi.StreamMetadataManager;
+import org.junit.Assert;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
@@ -46,6 +47,7 @@ public class TestPolicyDistributionUpdater {
 
     @Test
     public void testPolicyDistributionReporter() throws Exception{
+        StreamMetadataManager.getInstance().reset();
         PolicyDefinitionDAO alertDao = new PolicyDefinitionEntityDAOImpl(new EagleServiceConnector(null, 1),
                 Constants.ALERT_DEFINITION_SERVICE_ENDPOINT_NAME) {
             @Override

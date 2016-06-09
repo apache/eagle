@@ -19,7 +19,6 @@
 
 package org.apache.eagle;
 
-import junit.framework.Assert;
 import org.apache.eagle.gc.model.GCPausedEvent;
 import org.apache.eagle.gc.parser.full.ConcurrentModeFailureParser;
 import org.apache.eagle.gc.parser.full.NormalFullGCParser;
@@ -27,6 +26,7 @@ import org.apache.eagle.gc.parser.full.ParaNewPromotionFailureParser;
 import org.apache.eagle.gc.parser.tenured.CMSInitialMarkParser;
 import org.apache.eagle.gc.parser.tenured.CMSRemarkParser;
 import org.apache.eagle.gc.parser.young.ParaNewParser;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestGCLogParser {

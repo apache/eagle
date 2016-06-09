@@ -16,8 +16,7 @@
  */
 package org.apache.eagle.common;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestByteUtil {
@@ -45,7 +44,7 @@ public class TestByteUtil {
 		byte[] bytes = ByteUtil.doubleToBytes(origValue);
 		checkNonZeros(bytes);
 		double value = ByteUtil.bytesToDouble(bytes);
-		Assert.assertEquals(origValue, value);
+		Assert.assertEquals(origValue, value, 0.0001);
 		bytes = new byte[16];
 		checkZeros(bytes);
 		ByteUtil.doubleToBytes(origValue, bytes, 4);
@@ -53,7 +52,7 @@ public class TestByteUtil {
 		checkZeros(bytes, 12, 16);
 		checkNonZeros(bytes, 4, 12);
 		value = ByteUtil.bytesToDouble(bytes, 4);
-		Assert.assertEquals(origValue, value);
+		Assert.assertEquals(origValue, value, 0.0001);
 	}
 	
 	@Test

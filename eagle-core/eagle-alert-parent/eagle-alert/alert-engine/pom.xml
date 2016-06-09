@@ -24,6 +24,12 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
+		<!-- need investigate why scala here can't be 2.11 -->
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.10.4</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.eagle</groupId>
 			<artifactId>alert-common</artifactId>

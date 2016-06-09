@@ -20,8 +20,8 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigParseOptions;
 import com.typesafe.config.ConfigSyntax;
-import junit.framework.Assert;
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestOozieMetadataAccessConfig {

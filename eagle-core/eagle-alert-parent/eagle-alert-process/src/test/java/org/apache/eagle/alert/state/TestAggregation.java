@@ -21,6 +21,7 @@ package org.apache.eagle.alert.state;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -28,7 +29,6 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
-import junit.framework.Assert;
 import org.wso2.siddhi.core.util.EventPrinter;
 
 public class TestAggregation {

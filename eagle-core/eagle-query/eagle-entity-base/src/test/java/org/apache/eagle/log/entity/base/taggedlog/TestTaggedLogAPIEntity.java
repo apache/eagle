@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.Column;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;

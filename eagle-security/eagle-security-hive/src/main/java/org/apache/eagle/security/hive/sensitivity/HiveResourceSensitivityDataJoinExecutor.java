@@ -48,7 +48,7 @@ public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExec
         // start hive resource data polling
         try {
             ExternalDataJoiner joiner = new ExternalDataJoiner(
-                    HiveResourceSensitivityPollingJob.class, config);
+                    HiveResourceSensitivityPollingJob.class, config, "1");
             joiner.start();
         } catch(Exception ex){
             LOG.error("Fail to bring up quartz scheduler.", ex);

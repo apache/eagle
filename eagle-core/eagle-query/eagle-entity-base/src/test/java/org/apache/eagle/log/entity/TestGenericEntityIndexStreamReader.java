@@ -26,6 +26,7 @@ import org.apache.eagle.log.entity.test.TestLogAPIEntity;
 import org.apache.eagle.query.parser.EagleQueryParser;
 import org.apache.eagle.service.hbase.TestHBaseBase;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;

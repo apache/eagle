@@ -18,9 +18,9 @@ package org.apache.eagle.query.aggregate.test;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.query.aggregate.BucketQuery;
-import junit.framework.Assert;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;

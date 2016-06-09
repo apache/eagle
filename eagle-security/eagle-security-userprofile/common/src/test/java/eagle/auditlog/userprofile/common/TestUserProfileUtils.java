@@ -18,9 +18,9 @@ package eagle.auditlog.userprofile.common;
 
 import org.apache.eagle.security.userprofile.UserProfileUtils;
 import org.apache.eagle.common.DateTimeUtil;
-import junit.framework.Assert;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.text.ParseException;

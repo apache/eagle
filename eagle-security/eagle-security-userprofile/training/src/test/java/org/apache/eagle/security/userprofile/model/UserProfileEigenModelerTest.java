@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.security.userprofile.model;
 
-import junit.framework.Assert;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.eagle.security.userprofile.model.eigen.UserProfileEigenModeler;
+import org.junit.Assert;
 import scala.collection.immutable.List;
 
 public class UserProfileEigenModelerTest {

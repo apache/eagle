@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl;
-import junit.framework.Assert;
 
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateClient;
 import org.apache.hadoop.hbase.client.HTableFactory;
@@ -33,7 +32,9 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DoubleWritable;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -224,9 +225,9 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 			Assert.assertTrue(result.size() > 0);
 			Assert.assertEquals("test4UT", new String(result.get(0).getKey().getValue().get(0).copyBytes()));
 			Assert.assertEquals("dc1", new String(result.get(0).getKey().getValue().get(1).copyBytes()));
-			Assert.assertEquals(2.0, result.get(0).getValue().get(0).get());
-			Assert.assertEquals(2.0, result.get(0).getValue().get(1).get());
-			Assert.assertEquals(2.0, result.get(0).getValue().get(2).get());
+			Assert.assertEquals(2.0, result.get(0).getValue().get(0).get(), 0.00001);
+			Assert.assertEquals(2.0, result.get(0).getValue().get(1).get(), 0.00001);
+			Assert.assertEquals(2.0, result.get(0).getValue().get(2).get(), 0.00001);
 			Assert.assertTrue(num <= result.get(0).getValue().get(3).get());
 			Assert.assertTrue(2.0 * num <= result.get(0).getValue().get(4).get());
 		} catch (Exception e) {

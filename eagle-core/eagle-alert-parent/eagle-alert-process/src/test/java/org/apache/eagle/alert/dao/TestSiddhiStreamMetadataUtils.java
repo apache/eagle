@@ -18,11 +18,11 @@ package org.apache.eagle.alert.dao;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
 import org.apache.eagle.alert.entity.AlertStreamSchemaEntity;
 import org.apache.eagle.policy.dao.AlertStreamSchemaDAO;
 import org.apache.eagle.policy.siddhi.SiddhiStreamMetadataUtils;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;

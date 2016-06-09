@@ -18,7 +18,6 @@ package org.apache.eagle.alert.cep;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
 import org.apache.eagle.alert.entity.AbstractPolicyDefinitionEntity;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
@@ -34,6 +33,7 @@ import org.apache.eagle.policy.siddhi.SiddhiPolicyDefinition;
 import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.apache.eagle.service.client.EagleServiceConnector;
+import org.junit.Assert;
 import org.junit.Test;
 import scala.Tuple2;
 

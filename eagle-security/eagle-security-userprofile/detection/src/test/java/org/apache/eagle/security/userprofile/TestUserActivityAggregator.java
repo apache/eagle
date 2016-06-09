@@ -26,13 +26,14 @@ import org.apache.eagle.security.userprofile.model.UserActivityAggModelEntity;
 import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import scala.Tuple2;
 
 import java.text.ParseException;
 import java.util.*;
 
-
+@Ignore
 public class TestUserActivityAggregator {
     private UserActivityAggregator aggregator_0;
     private UserActivityAggregator aggregator_1;
