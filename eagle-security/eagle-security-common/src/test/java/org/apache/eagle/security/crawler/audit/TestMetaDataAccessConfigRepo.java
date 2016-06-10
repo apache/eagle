@@ -20,11 +20,9 @@ package org.apache.eagle.security.crawler.audit;
 
 
 import com.typesafe.config.*;
-import junit.framework.Assert;
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Map;
 
 public class TestMetaDataAccessConfigRepo {
 

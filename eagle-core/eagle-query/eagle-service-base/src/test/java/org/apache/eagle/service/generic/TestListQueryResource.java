@@ -31,10 +31,7 @@ import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Scan;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.util.ArrayList;

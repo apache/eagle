@@ -49,7 +49,6 @@ import com.typesafe.config.ConfigFactory;
 public class Coordinator {
     private static final String COORDINATOR = "coordinator";
     /**
-     * {@link ZKMetadataChangeNotifyService}
      *  /alert/{topologyName}/spout
      *                  /router
      *                  /alert

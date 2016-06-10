@@ -21,7 +21,7 @@ package org.apache.eagle.security.crawler.audit;
 
 import org.apache.eagle.security.hdfs.HDFSAuditLogParser;
 import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestHDFSAuditLogParser {

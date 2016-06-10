@@ -19,7 +19,7 @@ package org.apache.eagle.log.expression;
  * 
  */
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class TestExpressionParser {
 		ExpressionParser parser = new ExpressionParser(exprStr);
 		Double value = parser.setVariable("mapProgress", 100.0)
 							 .eval();
-		Assert.assertEquals(value, 100.0);
+		Assert.assertEquals(value, 100.0, 0.001);
 		List<String> dependentFields = parser.getDependentFields();
 		Assert.assertEquals(dependentFields.size(), 1);
 		Assert.assertEquals(dependentFields.get(0), "mapProgress");
@@ -63,7 +63,7 @@ public class TestExpressionParser {
 							 .setVariable("endTime", 1415590100000.0)
 							 .setVariable("startTime", 1415590000000.0)
 							 .eval();
-		Assert.assertEquals(value, 0.0002);
+		Assert.assertEquals(value, 0.0002, 0.001);
 	}
 	
 	@Test
@@ -76,7 +76,7 @@ public class TestExpressionParser {
 							 .setVariable("d", 225.0)
 							 .setVariable("e", -125.0)
 							 .eval();
-		Assert.assertEquals(value, 2.0);
+		Assert.assertEquals(value, 2.0, 0.001);
 	}
 	
 	@Test
@@ -88,7 +88,7 @@ public class TestExpressionParser {
 							 .setVariable("c", -300.0)
 							 .setVariable("d", -300.0)
 							 .eval();
-		Assert.assertEquals(value, 600.0);
+		Assert.assertEquals(value, 600.0, 0.001);
 	}
 
 	@Test
@@ -100,7 +100,7 @@ public class TestExpressionParser {
 							 .setVariable("c", -300.0)
 							 .setVariable("d", -300.0)
 							 .eval();
-		Assert.assertEquals(value, 600.0);
+		Assert.assertEquals(value, 600.0, 0.001);
 	}
 
 	@Test
@@ -112,14 +112,14 @@ public class TestExpressionParser {
 				.setVariable("c", -300.0)
 				.setVariable("d", -300.0)
 				.eval();
-		Assert.assertEquals(value, 300.0);
+		Assert.assertEquals(value, 300.0, 0.001);
 
 		value = parser.setVariable("a", 200.0)
 				.setVariable("b", 200.0)
 				.setVariable("c", -300.0)
 				.setVariable("d", -300.0)
 				.eval();
-		Assert.assertEquals(value, 200.0);
+		Assert.assertEquals(value, 200.0, 0.001);
 	}
 
 	@Test
@@ -131,14 +131,14 @@ public class TestExpressionParser {
 				.setVariable("c", -300.0)
 				.setVariable("d", -300.0)
 				.eval();
-		Assert.assertEquals(value, 1.0);
+		Assert.assertEquals(value, 1.0, 0.001);
 
 		value = parser.setVariable("a", 100.0)
 				.setVariable("b", 200.0)
 				.setVariable("c", -300.0)
 				.setVariable("d", -300.0)
 				.eval();
-		Assert.assertEquals(value, 0.0);
+		Assert.assertEquals(value, 0.0, 0.001);
 
 		exprStr = "a < b";
 		parser = new ExpressionParser(exprStr);
@@ -217,14 +217,14 @@ public class TestExpressionParser {
 				.setVariable("c", -300.0)
 				.setVariable("d", -300.0)
 				.eval();
-		Assert.assertEquals(value, 1.0);
+		Assert.assertEquals(value, 1.0, 0.001);
 
 		value = parser.setVariable("a", 100.0)
 				.setVariable("b", 200.0)
 				.setVariable("c", -300.0)
 				.setVariable("d", -300.0)
 				.eval();
-		Assert.assertEquals(value, 0.0);
+		Assert.assertEquals(value, 0.0, 0.001);
 	}
 
 	@Test

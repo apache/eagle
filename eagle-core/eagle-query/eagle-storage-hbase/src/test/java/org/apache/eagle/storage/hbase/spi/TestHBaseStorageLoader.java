@@ -19,7 +19,7 @@ package org.apache.eagle.storage.hbase.spi;
 import org.apache.eagle.storage.DataStorageManager;
 import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
 import org.apache.eagle.storage.hbase.HBaseStorage;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

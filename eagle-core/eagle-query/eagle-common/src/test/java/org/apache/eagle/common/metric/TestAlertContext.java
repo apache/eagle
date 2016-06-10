@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.common.metric;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;

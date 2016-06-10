@@ -18,7 +18,7 @@ package org.apache.eagle.log.entity;
 
 import org.apache.eagle.log.entity.meta.DoubleSerDeser;
 import org.apache.eagle.common.ByteUtil;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.junit.Test;
 

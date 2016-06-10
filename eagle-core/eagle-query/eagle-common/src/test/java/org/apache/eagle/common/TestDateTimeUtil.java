@@ -19,8 +19,7 @@ package org.apache.eagle.common;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestDateTimeUtil {

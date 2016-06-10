@@ -45,7 +45,7 @@ public class OozieResourceSensitivityDataJoinExecutor extends JavaStormStreamExe
     public void init() {
         // start hive resource data polling
         try {
-            ExternalDataJoiner joiner = new ExternalDataJoiner(OozieResourceSensitivityPollingJob.class, config);
+            ExternalDataJoiner joiner = new ExternalDataJoiner(OozieResourceSensitivityPollingJob.class, config, "1");
             joiner.start();
         } catch (Exception ex) {
             LOG.error("Fail to bring up quartz scheduler.", ex);

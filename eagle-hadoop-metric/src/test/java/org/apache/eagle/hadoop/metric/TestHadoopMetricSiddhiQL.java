@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.hadoop.metric;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;

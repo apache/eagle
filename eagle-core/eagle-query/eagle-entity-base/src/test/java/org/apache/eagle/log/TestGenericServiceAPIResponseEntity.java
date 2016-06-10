@@ -17,7 +17,7 @@
 package org.apache.eagle.log;
 
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.junit.Before;

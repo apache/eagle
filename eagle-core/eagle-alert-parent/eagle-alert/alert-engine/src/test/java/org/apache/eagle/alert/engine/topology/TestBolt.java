@@ -22,6 +22,7 @@ package org.apache.eagle.alert.engine.topology;
 
 import java.util.Map;
 
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,11 @@ public class TestBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(TestBolt.class);
     private OutputCollector collector;
     private long count;
+
+    @Test
+    public void test(){
+
+    }
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;

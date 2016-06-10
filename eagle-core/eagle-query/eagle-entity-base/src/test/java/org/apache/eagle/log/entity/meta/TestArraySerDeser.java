@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.log.entity.meta;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 
@@ -44,7 +44,7 @@ public class TestArraySerDeser {
 		double[] targets = serDeser.deserialize(bytes);
 		Assert.assertEquals(doubles.length, targets.length);
 		for(int i=0; i<doubles.length; i++){
-			Assert.assertEquals(doubles[i], targets[i]);
+			Assert.assertEquals(doubles[i], targets[i], 0.0001);
 		}
 	}
 

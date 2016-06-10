@@ -19,12 +19,12 @@ package org.apache.eagle.notifications.testcases;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import org.apache.eagle.alert.entity.AlertDefinitionAPIEntity;
 import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.notification.plugin.AlertKafkaPlugin;
 import org.apache.eagle.policy.common.Constants;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 

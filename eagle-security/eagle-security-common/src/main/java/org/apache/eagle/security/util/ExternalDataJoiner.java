@@ -43,6 +43,7 @@ public class ExternalDataJoiner {
 	private Scheduler sched;
 	private JobDataMap jobDataMap;
 	private Class<? extends Job> jobCls;
+	private String id;
 	private final static String SCHEDULER_NAME = "OuterDataJoiner.scheduler";
 	
 	private static final String DATA_JOIN_POLL_INTERVALSEC = "dataJoinPollIntervalSec";
@@ -61,7 +62,8 @@ public class ExternalDataJoiner {
 		init(jobCls, prop);
 	}
 	
-	public ExternalDataJoiner(Class<? extends Job> jobCls, Config config) throws Exception{
+	public ExternalDataJoiner(Class<? extends Job> jobCls, Config config, String id) throws Exception{
+		this.id = id;
 		Map<String, Object> map = new HashMap<String, Object>();
         for(Map.Entry<String, ConfigValue> entry : config.getObject("eagleProps").entrySet()){
             map.put(entry.getKey(), entry.getValue().unwrapped());
@@ -78,7 +80,7 @@ public class ExternalDataJoiner {
 	
 	public void start(){
 		// for job
-		String group = String.format("%s.%s.%s", QUARTZ_GROUP_NAME, jobDataMap.getString(EagleConfigConstants.SITE), jobDataMap.getString(EagleConfigConstants.APPLICATION));
+		String group = String.format("%s.%s.%s.%s", QUARTZ_GROUP_NAME, jobDataMap.getString(EagleConfigConstants.SITE), jobDataMap.getString(EagleConfigConstants.APPLICATION), id);
 		JobDetail job = JobBuilder.newJob(jobCls)
 		     .withIdentity(jobCls.getName() + ".job", group)
 		     .usingJobData(jobDataMap)
@@ -88,7 +90,7 @@ public class ExternalDataJoiner {
 		Object interval = jobDataMap.get(DATA_JOIN_POLL_INTERVALSEC);
         int dataJoinPollIntervalSec = (interval == null ? defaultIntervalSeconds : Integer.parseInt(interval.toString()));
 		Trigger trigger = TriggerBuilder.newTrigger() 
-			  .withIdentity(jobCls.getName() + ".trigger", QUARTZ_GROUP_NAME) 
+			  .withIdentity(jobCls.getName() + ".trigger", group)
 		      .startNow() 
 		      .withSchedule(SimpleScheduleBuilder.simpleSchedule() 
 		          .withIntervalInSeconds(dataJoinPollIntervalSec)

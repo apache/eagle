@@ -27,7 +27,7 @@ import org.apache.eagle.query.aggregate.timeseries.PostHierarchicalAggregateSort
 import org.apache.eagle.query.aggregate.timeseries.HierarchicalAggregateEntity;
 import org.apache.eagle.query.aggregate.timeseries.HierarchicalAggregator;
 import org.apache.eagle.query.aggregate.AggregateFunctionType;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.eagle.query.aggregate.timeseries.SortOption;
 import org.codehaus.jackson.JsonFactory;
@@ -97,7 +97,7 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			HierarchicalAggregateEntity result = agg.result();
 			writeToJson("After aggregate", result);
 			Assert.assertEquals(result.getChildren().size(), 0);
-			Assert.assertEquals(result.getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()));
+			Assert.assertEquals(result.getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
 
 			// test sort by function1
 			SortOption so = new SortOption();
@@ -108,7 +108,7 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			writeToJson("After sort" ,result);
 			Assert.assertEquals(null, result.getChildren());
 			Assert.assertEquals(0, result.getSortedList().size());
-			Assert.assertEquals(result.getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()));
+			Assert.assertEquals(result.getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -131,8 +131,8 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			HierarchicalAggregateEntity result = agg.result();
 			writeToJson("After aggregate" ,result);
 			Assert.assertEquals(result.getChildren().size(), 2);
-			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()), 0.0001);
+			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
 			
 			// test sort by function 1
 			SortOption so = new SortOption();
@@ -147,12 +147,12 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			Assert.assertEquals(true, it.hasNext());
 			Map.Entry<String, HierarchicalAggregateEntity> entry = it.next();
 			Assert.assertEquals("cluster2", entry.getKey());
-			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()));
+			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
 			
 			Assert.assertEquals(true, it.hasNext());
 			entry = it.next();
 			Assert.assertEquals("cluster1", entry.getKey());
-			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()));
+			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()), 0.0001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -166,8 +166,8 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			HierarchicalAggregateEntity result = agg.result();
 			writeToJson("After aggregate" , result);
 			Assert.assertEquals(result.getChildren().size(), 2);
-			Assert.assertEquals(result.getChildren().get("dc1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("dc2").getValues().get(0), (double)(entities[2].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("dc1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
+			Assert.assertEquals(result.getChildren().get("dc2").getValues().get(0), (double)(entities[2].getNumHosts()), 0.0001);
 			
 			// test sort by function 1
 			SortOption so = new SortOption();
@@ -182,12 +182,12 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			Assert.assertEquals(true, it.hasNext());
 			Map.Entry<String, HierarchicalAggregateEntity> entry = it.next();
 			Assert.assertEquals("dc2", entry.getKey());
-			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[2].getNumHosts()));
+			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[2].getNumHosts()), 0.0001);
 			
 			Assert.assertEquals(true, it.hasNext());
 			entry = it.next();
 			Assert.assertEquals("dc1", entry.getKey());
-			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()));			
+			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -202,11 +202,11 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			writeToJson("After aggregate" , result);
 			Assert.assertEquals(result.getChildren().size(), 2);
 			Assert.assertEquals(2, result.getChildren().get("cluster1").getValues().size());
-			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(1), (double)(entities[0].getNumClusters()+entities[1].getNumClusters()+entities[2].getNumClusters()));
+			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()), 0.0001);
+			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(1), (double)(entities[0].getNumClusters()+entities[1].getNumClusters()+entities[2].getNumClusters()), 0.0001);
 			Assert.assertEquals(2, result.getChildren().get("cluster2").getValues().size());
-			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(1), (double)(entities[3].getNumClusters()+entities[4].getNumClusters()));
+			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
+			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(1), (double)(entities[3].getNumClusters()+entities[4].getNumClusters()), 0.0001);
 			
 			// test sort by function 2
 			SortOption so = new SortOption();
@@ -221,12 +221,12 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			Assert.assertEquals(true, it.hasNext());
 			Map.Entry<String, HierarchicalAggregateEntity> entry = it.next();
 			Assert.assertEquals("cluster1", entry.getKey());
-			Assert.assertEquals(entry.getValue().getValues().get(1), (double)(entities[0].getNumClusters()+entities[1].getNumClusters()+entities[2].getNumClusters()));
+			Assert.assertEquals(entry.getValue().getValues().get(1), (double)(entities[0].getNumClusters()+entities[1].getNumClusters()+entities[2].getNumClusters()), 0.0001);
 			
 			Assert.assertEquals(true, it.hasNext());
 			entry = it.next();
 			Assert.assertEquals("cluster2", entry.getKey());
-			Assert.assertEquals(entry.getValue().getValues().get(1), (double)(entities[3].getNumClusters()+entities[4].getNumClusters()));
+			Assert.assertEquals(entry.getValue().getValues().get(1), (double)(entities[3].getNumClusters()+entities[4].getNumClusters()), 0.0001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -250,15 +250,15 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			HierarchicalAggregateEntity result = agg.result();
 			writeToJson("After aggregate", result);
 			Assert.assertEquals(2, result.getChildren().size());
-			Assert.assertEquals(66.0, (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()));
+			Assert.assertEquals(66.0, (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()+entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
+			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()), 0.0001);
 			Assert.assertEquals(2, result.getChildren().get("cluster1").getChildren().size());
-			Assert.assertEquals(result.getChildren().get("cluster1").getChildren().get("dc1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("cluster1").getChildren().get("dc2").getValues().get(0), (double)(entities[2].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("cluster1").getChildren().get("dc1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()), 0.0001);
+			Assert.assertEquals(result.getChildren().get("cluster1").getChildren().get("dc2").getValues().get(0), (double)(entities[2].getNumHosts()), 0.0001);
 			
-			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
 			Assert.assertEquals(1, result.getChildren().get("cluster2").getChildren().size());
-			Assert.assertEquals(result.getChildren().get("cluster2").getChildren().get("dc1").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("cluster2").getChildren().get("dc1").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
 			
 			// test sort by function 2
 			SortOption so = new SortOption();
@@ -273,12 +273,12 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			Assert.assertEquals(true, it.hasNext());
 			Map.Entry<String, HierarchicalAggregateEntity> entry = it.next();
 			Assert.assertEquals("cluster2", entry.getKey());
-			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()));
+			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()), 0.0001);
 			
 			Assert.assertEquals(true, it.hasNext());
 			entry = it.next();
 			Assert.assertEquals("cluster1", entry.getKey());
-			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()));			
+			Assert.assertEquals(entry.getValue().getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()), 0.0001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -301,8 +301,8 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			HierarchicalAggregateEntity result = agg.result();
 			writeToJson("After aggregate", result);
 			Assert.assertEquals(result.getChildren().size(), 2);
-			Assert.assertEquals(result.getChildren().get("dc1").getValues().get(0), (double)(entities[1].getNumHosts()+entities[2].getNumHosts())+entities[4].getNumHosts());
-			Assert.assertEquals(result.getChildren().get("unassigned").getValues().get(0), (double)(entities[0].getNumHosts()+entities[3].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("dc1").getValues().get(0), (double)(entities[1].getNumHosts()+entities[2].getNumHosts())+entities[4].getNumHosts(), 0.0001);
+			Assert.assertEquals(result.getChildren().get("unassigned").getValues().get(0), (double)(entities[0].getNumHosts()+entities[3].getNumHosts()), 0.0001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
@@ -316,14 +316,13 @@ private final static Logger LOG = LoggerFactory.getLogger(TestHierarchicalAggreg
 			HierarchicalAggregateEntity result = agg.result();
 			writeToJson("After aggregate", result);
 			Assert.assertEquals(result.getChildren().size(), 2);
-			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("cluster1").getValues().get(0), (double)(entities[0].getNumHosts()+entities[1].getNumHosts()+entities[2].getNumHosts()), 0.0001);
 			Assert.assertEquals(2, result.getChildren().get("cluster1").getChildren().size());
-			Assert.assertEquals(result.getChildren().get("cluster1").getChildren().get("dc1").getValues().get(0), (double)(entities[1].getNumHosts()+entities[2].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("cluster1").getChildren().get("unassigned").getValues().get(0), (double)(entities[0].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("cluster1").getChildren().get("dc1").getValues().get(0), (double)(entities[1].getNumHosts()+entities[2].getNumHosts()), 0.0001);
+			Assert.assertEquals(result.getChildren().get("cluster1").getChildren().get("unassigned").getValues().get(0), (double)(entities[0].getNumHosts()), 0.0001);
 			
-			Assert.assertEquals(result.getChildren().get("cluster2").getValues().get(0), (double)(entities[3].getNumHosts()+entities[4].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("cluster2").getChildren().get("dc1").getValues().get(0), (double)(entities[4].getNumHosts()));
-			Assert.assertEquals(result.getChildren().get("cluster2").getChildren().get("unassigned").getValues().get(0), (double)(entities[3].getNumHosts()));
+			Assert.assertEquals(result.getChildren().get("cluster2").getChildren().get("dc1").getValues().get(0), (double)(entities[4].getNumHosts()), 0.0001);
+			Assert.assertEquals(result.getChildren().get("cluster2").getChildren().get("unassigned").getValues().get(0), (double)(entities[3].getNumHosts()), 0.0001);
 		}catch(Exception ex){
 			LOG.error("Can not aggregate", ex);
 			Assert.fail("Can not aggregate");
