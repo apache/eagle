@@ -27,3 +27,45 @@ limitations under the License.
 
 #### consume parsed hdfs authorization log
 /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --topic sandbox_hdfs_auth_log --zookeeper sandbox.hortonworks.com:2181
+
+
+#### run logstash in sandbox to fetch Hdfs authorization log
+
+##### step 1: create logstash config file: hdfs-authlog.conf
+
+~~~
+    input {
+        file {
+            type => "hdfs-auth"
+            path => "/var/log/hadoop/hdfs/SecurityAuth.audit"
+            start_position => end
+            sincedb_path => "/var/log/logstash/sincedb"
+        }
+    }
+
+    output {
+         if [type] == "hdfs-auth" {
+              kafka {
+                  codec => plain {
+                      format => "%{message}"
+                  }
+                  bootstrap_servers => "sandbox.hortonworks.com:6667"
+                  topic_id => "sandbox_hdfs_auth_log"
+                  acks => "0"
+                  timeout_ms => 10000
+                  retries => 3
+                  retry_backoff_ms => 100
+                  batch_size => 16384
+                  send_buffer_bytes => 131072
+                  client_id => "hdfs-auth"
+              }
+              # stdout { codec => rubydebug }
+          }
+    }
+
+~~~
+
+##### step 2: run logstash
+
+bin/logstash -f hdfs-authlog.conf
+
