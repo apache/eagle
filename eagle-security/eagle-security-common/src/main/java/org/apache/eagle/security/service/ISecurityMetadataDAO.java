@@ -18,8 +18,6 @@
 package org.apache.eagle.security.service;
 
 import java.util.Collection;
-import java.util.List;
-
 /**
  * Since 6/10/16.
  */
