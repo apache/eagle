@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.storage;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.URI;

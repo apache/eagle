@@ -19,7 +19,6 @@
 package org.apache.eagle.security.auditlog;
 
 import org.apache.eagle.common.DateTimeUtil;
-import junit.framework.Assert;
 import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -27,8 +26,6 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
-
-import java.lang.reflect.Field;
 
 public class TestSiddhiPattern {
     @Test

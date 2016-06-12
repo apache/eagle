@@ -18,7 +18,7 @@ package org.apache.eagle.datastream;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.eagle.dataproc.impl.aggregate.SimpleAggregateExecutor;
 import org.apache.eagle.dataproc.impl.aggregate.entity.AggregateEntity;
 import org.junit.Test;

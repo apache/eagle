@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.storage.jdbc;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.log.entity.meta.EntityDefinition;

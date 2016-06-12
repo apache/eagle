@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.eagle.common.config.EagleConfigFactory;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateClient;
 import org.apache.hadoop.hbase.client.HTableInterface;
@@ -30,6 +30,7 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DoubleWritable;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

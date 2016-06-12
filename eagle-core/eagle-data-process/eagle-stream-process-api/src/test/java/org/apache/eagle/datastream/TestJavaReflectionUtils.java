@@ -17,7 +17,7 @@
  */
 package org.apache.eagle.datastream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.eagle.datastream.utils.Reflections;
 import org.junit.Test;
 import scala.reflect.api.TypeTags;

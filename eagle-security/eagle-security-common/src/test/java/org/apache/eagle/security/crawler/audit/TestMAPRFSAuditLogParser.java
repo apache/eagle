@@ -16,10 +16,9 @@
  */
 package org.apache.eagle.security.crawler.audit;
 
-import junit.framework.Assert;
-import org.apache.eagle.security.hdfs.HDFSAuditLogParser;
 import org.apache.eagle.security.hdfs.MAPRFSAuditLogObject;
 import org.apache.eagle.security.hdfs.MAPRFSAuditLogParser;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

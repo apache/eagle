@@ -21,8 +21,8 @@ package org.apache.eagle.security.auditlog;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
 import org.apache.eagle.datastream.Collector;
+import org.junit.Assert;
 import org.junit.Test;
 import scala.Tuple2;
 

@@ -16,10 +16,7 @@
  */
 package org.apache.eagle.hadoop.metric;
 
-import junit.framework.Assert;
 import org.junit.Test;
-
-import java.util.Map;
 
 /**
  * Created on 1/19/16.

@@ -35,13 +35,12 @@
         <module>eagle-security-common</module>
         <module>eagle-security-hdfs-auditlog</module>
         <module>eagle-security-maprfs-auditlog</module>
-        <module>eagle-security-userprofile</module>
         <module>eagle-security-hive</module>
         <module>eagle-security-hive-web</module>
         <module>eagle-security-hdfs-web</module>
         <module>eagle-security-maprfs-web</module>
-        <module>eagle-security-hdfs-securitylog</module>
-        <module>eagle-security-hbase-securitylog</module>
+        <module>eagle-security-hdfs-authlog</module>
+        <module>eagle-security-hbase-auditlog</module>
         <module>eagle-security-hbase-web</module>
         <module>eagle-metric-collection</module>
         <module>eagle-security-oozie-auditlog</module>

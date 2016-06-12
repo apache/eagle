@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.query.parser.test;
 
-import junit.framework.Assert;
 import org.apache.eagle.query.parser.*;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -346,7 +346,7 @@ public class TestEagleQueryParser {
 		Assert.assertTrue(or.getANDExprList().size()==1);
 		Assert.assertEquals(1, or.getANDExprList().get(0).getAtomicExprList().size());
 		Assert.assertEquals("@field1", or.getANDExprList().get(0).getAtomicExprList().get(0).getKey());
-		Assert.assertEquals(-1.234, Double.parseDouble(or.getANDExprList().get(0).getAtomicExprList().get(0).getValue()));
+		Assert.assertEquals(-1.234, Double.parseDouble(or.getANDExprList().get(0).getAtomicExprList().get(0).getValue()), 0.0001);
 		Assert.assertEquals(">=", or.getANDExprList().get(0).getAtomicExprList().get(0).getOp().toString());
 		Assert.assertEquals(TokenType.NUMBER, or.getANDExprList().get(0).getAtomicExprList().get(0).getValueType());
 	}

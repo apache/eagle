@@ -75,6 +75,7 @@ public class CoordinatorTest {
     }
 
     @SuppressWarnings({ "resource", "unused" })
+    @Ignore
     @Test
     public void test_01() throws Exception {
         before();

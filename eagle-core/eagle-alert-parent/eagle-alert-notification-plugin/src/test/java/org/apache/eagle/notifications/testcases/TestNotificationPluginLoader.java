@@ -18,9 +18,9 @@ package org.apache.eagle.notifications.testcases;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
 import org.apache.eagle.notification.base.NotificationConstants;
 import org.apache.eagle.notification.plugin.NotificationPluginLoader;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
