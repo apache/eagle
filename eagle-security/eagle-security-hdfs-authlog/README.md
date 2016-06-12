@@ -17,34 +17,27 @@ limitations under the License.
 {% endcomment %}
 -->
 
-#### create topic in sandbox
+Follow below steps to get Hdfs authorization logs monitoring running
+
+### Step 1: logstash: fetch log file to Kafka
+#### 1.1 create topic for raw log
 /usr/hdp/2.2.4.2-2/kafka/bin/kafka-topics.sh --create --topic sandbox_hdfs_auth_log --partitions 2 --replication-factor 1 --zookeeper localhost:2181
-/usr/hdp/2.2.4.2-2/kafka/bin/kafka-topics.sh --create --topic sandbox_hdfs_auth_log_parsed --partitions 2 --replication-factor 1 --zookeeper localhost:2181
-
-#### produce a message
-/usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-producer.sh --topic sandbox_hdfs_auth_log --broker-list sandbox.hortonworks.com:6667
-
-
-#### consume parsed hdfs authorization log
+#### 1.2 consume raw log
 /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --topic sandbox_hdfs_auth_log --zookeeper sandbox.hortonworks.com:2181
-
-
-#### run logstash in sandbox to fetch Hdfs authorization log
-
-##### step 1: create logstash config file: hdfs-authlog.conf
-
+#### 1.3 create logstash config file: hdfs-authlog.conf
+download logstash 2.3.x
 ~~~
     input {
         file {
-            type => "hdfs-auth"
+            type => "hdfs-authlog"
             path => "/var/log/hadoop/hdfs/SecurityAuth.audit"
             start_position => end
-            sincedb_path => "/var/log/logstash/sincedb"
+            sincedb_path => "/var/log/logstash/hdfs-authlog-sincedb"
         }
     }
 
     output {
-         if [type] == "hdfs-auth" {
+         if [type] == "hdfs-authlog" {
               kafka {
                   codec => plain {
                       format => "%{message}"
@@ -57,15 +50,34 @@ limitations under the License.
                   retry_backoff_ms => 100
                   batch_size => 16384
                   send_buffer_bytes => 131072
-                  client_id => "hdfs-auth"
+                  client_id => "hdfs-authlog"
               }
               # stdout { codec => rubydebug }
           }
     }
 
 ~~~
+#### 1.4 run logstash
+     bin/logstash -f hdfs-authlog.conf
 
-##### step 2: run logstash
+### Step 2: hdfs-authlog topology: parse log and persist to Kafka
+#### 2.1 create topic for normalized log
+/usr/hdp/2.2.4.2-2/kafka/bin/kafka-topics.sh --create --topic sandbox_hdfs_auth_log_parsed --partitions 2 --replication-factor 1 --zookeeper localhost:2181
+#### 2.2 consume normalized log
+/usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --topic sandbox_hdfs_auth_log_parsed --zookeeper sandbox.hortonworks.com:2181
+#### 2.3 run eagle webservice
+find eagle-webservice project, run it
+#### 2.4 run eagle-security-hdfs-authlog topology
+find org.apache.eagle.security.securitylog.HdfsAuthLogMonitoringMain, run it
 
-bin/logstash -f hdfs-authlog.conf
+### Step 3: alert engine: consume parsed log
+#### 3.1 run alert engine
+find org.apache.eagle.alert.engine.UnitTopologyMain, run it
 
+
+### test to produce message
+##### produce raw log
+/usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-producer.sh --topic sandbox_hdfs_auth_log --broker-list sandbox.hortonworks.com:6667
+
+##### produce parsed log
+/usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-producer.sh --topic sandbox_hdfs_auth_log_parsed --broker-list sandbox.hortonworks.com:6667

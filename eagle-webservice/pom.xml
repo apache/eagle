@@ -210,19 +210,9 @@
 
 		<!-- eagle user profile common dependency -->
 		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-security-userprofile-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-machinelearning-base</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.eagle</groupId>

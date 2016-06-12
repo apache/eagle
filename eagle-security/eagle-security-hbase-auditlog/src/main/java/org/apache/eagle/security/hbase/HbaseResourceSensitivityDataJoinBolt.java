@@ -23,12 +23,14 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.security.util.ExternalDataJoiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import storm.kafka.bolt.mapper.FieldNameBasedTupleToKafkaMapper;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -60,42 +62,50 @@ public class HbaseResourceSensitivityDataJoinBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> event = (Map<String, Object>)input.getValue(0);
-        @SuppressWarnings("unchecked")
-        Map<String, HbaseResourceSensitivityAPIEntity> map =
-                (Map<String, HbaseResourceSensitivityAPIEntity>) ExternalDataCache
-                        .getInstance()
-                        .getJobResult(HbaseResourceSensitivityPollingJob.class);
-        LOG.info(">>>> event: " + event + " >>>> map: " + map);
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> event = (Map<String, Object>) input.getValue(0);
+            @SuppressWarnings("unchecked")
+            Map<String, HbaseResourceSensitivityAPIEntity> map =
+                    (Map<String, HbaseResourceSensitivityAPIEntity>) ExternalDataCache
+                            .getInstance()
+                            .getJobResult(HbaseResourceSensitivityPollingJob.class);
+            LOG.info(">>>> event: " + event + " >>>> map: " + map);
 
-        String resource = (String)event.get("scope");
+            String resource = (String) event.get("scope");
 
-        HbaseResourceSensitivityAPIEntity sensitivityEntity = null;
+            HbaseResourceSensitivityAPIEntity sensitivityEntity = null;
 
-        if (map != null && resource != "") {
-            for (String key : map.keySet()) {
-                Pattern pattern = Pattern.compile(key, Pattern.CASE_INSENSITIVE);
-                if(pattern.matcher(resource).find()) {
-                    sensitivityEntity = map.get(key);
-                    break;
+            if (map != null && resource != "") {
+                for (String key : map.keySet()) {
+                    Pattern pattern = Pattern.compile(key, Pattern.CASE_INSENSITIVE);
+                    if (pattern.matcher(resource).find()) {
+                        sensitivityEntity = map.get(key);
+                        break;
+                    }
                 }
             }
+            Map<String, Object> newEvent = new TreeMap<String, Object>(event);
+            newEvent.put("sensitivityType", sensitivityEntity == null ?
+                    "NA" : sensitivityEntity.getSensitivityType());
+            newEvent.put("scope", resource);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("After hbase resource sensitivity lookup: " + newEvent);
+            }
+            LOG.info("After hbase resource sensitivity lookup: " + newEvent);
+            // push to Kafka sink
+            ObjectMapper mapper = new ObjectMapper();
+            String msg = mapper.writeValueAsString(map);
+            collector.emit(Arrays.asList(newEvent.get("user"), msg));
+        }catch(Exception ex){
+            LOG.error("error joining data, ignore it", ex);
+        }finally {
+            collector.ack(input);
         }
-        Map<String, Object> newEvent = new TreeMap<String, Object>(event);
-        newEvent.put("sensitivityType", sensitivityEntity  == null ?
-                "NA" : sensitivityEntity.getSensitivityType());
-        newEvent.put("scope", resource);
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("After hbase resource sensitivity lookup: " + newEvent);
-        }
-        LOG.info("After hbase resource sensitivity lookup: " + newEvent);
-        collector.emit(Arrays.asList(newEvent.get("user"), newEvent));
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("f1"));
-
+        declarer.declare(new Fields(FieldNameBasedTupleToKafkaMapper.BOLT_KEY, FieldNameBasedTupleToKafkaMapper.BOLT_MESSAGE));
     }
 }
