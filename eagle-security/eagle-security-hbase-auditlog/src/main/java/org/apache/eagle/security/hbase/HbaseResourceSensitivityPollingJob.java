@@ -20,6 +20,9 @@ package org.apache.eagle.security.hbase;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
+import org.apache.eagle.security.service.HBaseSensitivityEntity;
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.security.util.AbstractResourceSensitivityPollingJob;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.quartz.Job;
@@ -29,6 +32,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -40,21 +44,9 @@ public class HbaseResourceSensitivityPollingJob extends AbstractResourceSensitiv
             throws JobExecutionException {
         JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
         try {
-            List<HbaseResourceSensitivityAPIEntity>
-            hbaseResourceSensitivity = load(jobDataMap, "HbaseResourceSensitivityService");
-            if(hbaseResourceSensitivity == null) {
-            	LOG.warn("Hbase resource sensitivity information is empty");
-            	return;
-            }
-            Map<String, HbaseResourceSensitivityAPIEntity> map = Maps.uniqueIndex(
-            		hbaseResourceSensitivity,
-            		new Function<HbaseResourceSensitivityAPIEntity, String>() {
-            			@Override
-            			public String apply(HbaseResourceSensitivityAPIEntity input) {
-            				return input.getTags().get("hbaseResource");
-            			}
-            		});
-            ExternalDataCache.getInstance().setJobResult(getClass(), map);
+            ISecurityMetadataDAO dao = MetadataDaoFactory.getInstance().getMetadataDao();
+            Collection<HBaseSensitivityEntity> sensitivityEntities = dao.listHBaseSensitivies();
+            ExternalDataCache.getInstance().setJobResult(getClass(), sensitivityEntities);
         } catch(Exception ex) {
         	LOG.error("Fail to load hbase resource sensitivity data", ex);
         }
