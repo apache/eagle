@@ -30,12 +30,14 @@ import org.apache.eagle.security.topo.TopologySubmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import storm.kafka.*;
+import storm.kafka.bolt.KafkaBolt;
 
 public class HbaseAuditLogMonitoringMain {
     private static Logger LOG = LoggerFactory.getLogger(HbaseAuditLogMonitoringMain.class);
     public final static String SPOUT_TASK_NUM = "topology.numOfSpoutTasks";
     public final static String PARSER_TASK_NUM = "topology.numOfParserTasks";
     public final static String JOIN_TASK_NUM = "topology.numOfJoinTasks";
+    public final static String SINK_TASK_NUM = "topology.numOfSinkTasks";
 
     public static void main(String[] args) throws Exception{
         System.setProperty("config.resource", "/application.conf");
@@ -49,6 +51,7 @@ public class HbaseAuditLogMonitoringMain {
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
         int numOfParserTasks = config.getInt(PARSER_TASK_NUM);
         int numOfJoinTasks = config.getInt(JOIN_TASK_NUM);
+        int numOfSinkTasks = config.getInt(SINK_TASK_NUM);
 
         builder.setSpout("ingest", spout, numOfSpoutTasks);
         BoltDeclarer boltDeclarer = builder.setBolt("parserBolt", bolt, numOfParserTasks);
@@ -57,6 +60,10 @@ public class HbaseAuditLogMonitoringMain {
         HbaseResourceSensitivityDataJoinBolt joinBolt = new HbaseResourceSensitivityDataJoinBolt(config);
         BoltDeclarer joinBoltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);
         joinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
+
+        KafkaBolt kafkaBolt = new KafkaBolt();
+        BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", kafkaBolt, numOfSinkTasks);
+        kafkaBoltDeclarer.shuffleGrouping("joinBolt");
 
         StormTopology topology = builder.createTopology();
 

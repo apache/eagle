@@ -25,18 +25,19 @@ Follow below steps to get Hdfs authorization logs monitoring running
 #### 1.2 consume raw log
 /usr/hdp/2.2.4.2-2/kafka/bin/kafka-console-consumer.sh --topic sandbox_hdfs_auth_log --zookeeper sandbox.hortonworks.com:2181
 #### 1.3 create logstash config file: hdfs-authlog.conf
+download logstash 2.3.x
 ~~~
     input {
         file {
-            type => "hdfs-auth"
+            type => "hdfs-authlog"
             path => "/var/log/hadoop/hdfs/SecurityAuth.audit"
             start_position => end
-            sincedb_path => "/var/log/logstash/sincedb"
+            sincedb_path => "/var/log/logstash/hdfs-authlog-sincedb"
         }
     }
 
     output {
-         if [type] == "hdfs-auth" {
+         if [type] == "hdfs-authlog" {
               kafka {
                   codec => plain {
                       format => "%{message}"
@@ -49,7 +50,7 @@ Follow below steps to get Hdfs authorization logs monitoring running
                   retry_backoff_ms => 100
                   batch_size => 16384
                   send_buffer_bytes => 131072
-                  client_id => "hdfs-auth"
+                  client_id => "hdfs-authlog"
               }
               # stdout { codec => rubydebug }
           }
