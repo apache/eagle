@@ -30,7 +30,10 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(JPAConstants.JPA_JOB_CONFIG_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
-
+@Indexes({
+        @Index(name="Index_1_jobId", columns = { "jobID" }, unique = true),
+        @Index(name="Index_2_normJobName", columns = { "normJobName" }, unique = false)
+})
 public class JobConfigurationAPIEntity extends JobBaseAPIEntity {
     
     @Column("a")

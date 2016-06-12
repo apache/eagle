@@ -19,7 +19,6 @@
 package org.apache.eagle.jpm.mr.history.common;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.dataproc.util.ConfigOptionParser;
 import org.apache.eagle.jpm.mr.history.storm.DefaultJobIdPartitioner;
 import org.apache.eagle.jpm.mr.history.storm.JobIdPartitioner;
@@ -30,6 +29,8 @@ import java.io.Serializable;
 
 public class JHFConfigManager implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(JHFConfigManager.class);
+
+    private static final String JOB_CONFIGURE_KEY_CONF_FILE = "JobConfigKeys.conf";
 
     public String getEnv() {
         return env;

@@ -384,8 +384,10 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             return true;
         for (Pattern p : m_filter.getJobConfKeyInclusionPatterns()) {
             Matcher m = p.matcher(key);
-            if (m.matches())
+            if (m.matches()) {
+                LOG.info("include key: " + p.toString());
                 return true;
+            }
         }
         return false;
     }

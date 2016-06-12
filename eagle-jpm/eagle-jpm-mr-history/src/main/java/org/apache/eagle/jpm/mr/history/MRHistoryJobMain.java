@@ -23,16 +23,35 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
+import org.apache.eagle.jpm.mr.history.common.JPAConstants;
+import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilterBuilder;
 import org.apache.eagle.jpm.mr.history.storm.HistoryJobProgressBolt;
 import org.apache.eagle.jpm.mr.history.storm.JobHistorySpout;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 public class MRHistoryJobMain {
     public static void main(String []args) {
         try {
-            //trigger init conf
+            //1. trigger init conf
             JHFConfigManager jhfConfigManager = JHFConfigManager.getInstance(args);
 
+            //2. init JobHistoryContentFilter
+            JobHistoryContentFilterBuilder builder = JobHistoryContentFilterBuilder.newBuilder().acceptJobFile().acceptJobConfFile();
+            List<String> confKeyPatterns = jhfConfigManager.getConfig().getStringList("MRConfigureKeys");
+            confKeyPatterns.add(JPAConstants.JobConfiguration.CASCADING_JOB);
+            confKeyPatterns.add(JPAConstants.JobConfiguration.HIVE_JOB);
+            confKeyPatterns.add(JPAConstants.JobConfiguration.PIG_JOB);
+            confKeyPatterns.add(JPAConstants.JobConfiguration.SCOOBI_JOB);
+
+            for (String key : confKeyPatterns) {
+                builder.includeJobKeyPatterns(Pattern.compile(key));
+            }
+            JobHistoryContentFilter filter = builder.build();
+
+            //3. init topology
             TopologyBuilder topologyBuilder = new TopologyBuilder();
             String topologyName = "mrHistoryJobTopology";
             String spoutName = "mrHistoryJobExecutor";
@@ -44,7 +63,7 @@ public class MRHistoryJobMain {
             }
             topologyBuilder.setSpout(
                     spoutName,
-                    new JobHistorySpout(JobHistoryContentFilterBuilder.newBuilder().acceptJobFile().acceptJobConfFile().build(), jhfConfigManager),
+                    new JobHistorySpout(filter, jhfConfigManager),
                     parallelism
             ).setNumTasks(tasks);
             topologyBuilder.setBolt(boltName, new HistoryJobProgressBolt(spoutName, jhfConfigManager), 1).setNumTasks(1).allGrouping(spoutName);

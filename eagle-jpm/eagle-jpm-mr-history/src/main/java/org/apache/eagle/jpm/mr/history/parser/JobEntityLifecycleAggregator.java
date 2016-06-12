@@ -20,7 +20,6 @@ package org.apache.eagle.jpm.mr.history.parser;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
 import org.apache.eagle.jpm.mr.history.common.JPAConstants;
 import org.apache.eagle.jpm.mr.history.entities.JobBaseAPIEntity;
 import org.apache.eagle.jpm.mr.history.entities.JobExecutionAPIEntity;
