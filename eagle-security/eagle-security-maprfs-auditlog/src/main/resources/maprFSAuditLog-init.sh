@@ -48,7 +48,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
         "alias":"MapRFSAuditLogMonitor",
         "groupName":"MapR",
         "features":["common","metadata", "classification"],
-	"config":"{\n\t\"view\": {\n\t\t\"prefix\": \"fileSensitivity\",\n\t\t\"service\": \"FileSensitivityService\",\n\t\t\"keys\": [\n\t\t\t\"filedir\",\n\t\t\t\"sensitivityType\"\n\t\t],\n\t\t\"type\": \"folder\",\n\t\t\"api\": \"hdfsResource\"\n\t}\n}"
+	"config":"{\n\t\"view\": {\n\t\t\"prefix\": \"fileSensitivity\",\n\t\t\"service\": \"FileSensitivityService\",\n\t\t\"keys\": [\n\t\t\t\"filedir\",\n\t\t\t\"sensitivityType\"\n\t\t],\n\t\t\"type\": \"folder\",\n\t\t\"api\": \"maprfsResource\"\n\t}\n}"
      }
   ]
   '
