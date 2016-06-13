@@ -42,9 +42,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class FinishedSparkJobSpout extends BaseRichSpout {
-
     private static final Logger LOG = LoggerFactory.getLogger(FinishedSparkJobSpout.class);
-    private SpoutOutputCollector _collector;
+    private SpoutOutputCollector collector;
     private JobHistoryZKStateManager zkState;
     private SparkHistoryCrawlConfig config;
     private ResourceFetcher rmFetch;
@@ -61,7 +60,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         rmFetch = new RMResourceFetcher(config.jobHistoryConfig.rms);
         this.failTimes = new HashMap<>();
-        this._collector = spoutOutputCollector;
+        this.collector = spoutOutputCollector;
         this.zkState = new JobHistoryZKStateManager(config);
         this.lastFinishAppTime = zkState.readLastFinishedTimestamp();
         zkState.resetApplications();
@@ -71,16 +70,15 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         LOG.info("Start to run tuple");
-        try{
-
+        try {
             long fetchTime = Calendar.getInstance().getTimeInMillis();
-            if(fetchTime - this.lastFinishAppTime > 5 * 60 * 1000){
+            if (fetchTime - this.lastFinishAppTime > 5 * 60 * 1000) {
                 List apps = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, new Long(lastFinishAppTime).toString());
                 List<AppInfo> appInfos = (null != apps ? (List<AppInfo>)apps.get(0):new ArrayList<AppInfo>());
                 LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
-                for(AppInfo app: appInfos){
+                for (AppInfo app: appInfos) {
                     String appId = app.getId();
-                    if(!zkState.hasApplication(appId)){
+                    if (!zkState.hasApplication(appId)) {
                         zkState.addFinishedApplication(appId, app.getQueue(), app.getState(), app.getFinalStatus(), app.getUser(), app.getName());
                     }
                 }
@@ -89,27 +87,27 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
             }
 
             List<String> appIds = zkState.loadApplications(10);
-            for(String appId: appIds){
-                _collector.emit(new Values(appId), appId);
+            for (String appId: appIds) {
+                collector.emit(new Values(appId), appId);
+                LOG.info("emit " + appId);
                 zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.SENT_FOR_PARSE);
             }
             LOG.info("{} apps sent.", appIds.size());
 
-            if(appIds.isEmpty()){
+            if (appIds.isEmpty()) {
                 this.takeRest(60);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error("Fail to run next tuple", e);
            // this.takeRest(10);
         }
 
     }
 
-    private void takeRest(int seconds){
+    private void takeRest(int seconds) {
         try {
             Thread.sleep(seconds * 1000);
-        }catch(InterruptedException e){
-
+        } catch(InterruptedException e) {
         }
     }
 
@@ -122,17 +120,17 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
     public void fail(Object msgId) {
         String appId = (String) msgId;
         int failTimes = 0;
-        if(this.failTimes.containsKey(appId)){
+        if (this.failTimes.containsKey(appId)) {
             failTimes = this.failTimes.get(appId);
         }
         failTimes ++;
-        if(failTimes >= FAIL_MAX_TIMES){
+        if (failTimes >= FAIL_MAX_TIMES) {
             this.failTimes.remove(appId);
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
             LOG.error(String.format("Application %s has failed for over %s times, drop it.", appId, FAIL_MAX_TIMES));
-        }else{
+        } else {
             this.failTimes.put(appId, failTimes);
-            _collector.emit(new Values(appId), appId);
+            collector.emit(new Values(appId), appId);
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.SENT_FOR_PARSE);
         }
     }
@@ -140,7 +138,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
     @Override
     public void ack(Object msgId) {
         String appId = (String) msgId;
-        if(this.failTimes.containsKey(appId)){
+        if (this.failTimes.containsKey(appId)) {
             this.failTimes.remove(appId);
         }
 

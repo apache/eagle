@@ -21,38 +21,61 @@ package org.apache.eagle.jpm.spark.history.storm;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
 
 public class SparkHistoryTopology {
 
-    private SparkHistoryCrawlConfig config;
+    private SparkHistoryCrawlConfig SHConfig;
 
     public SparkHistoryTopology(SparkHistoryCrawlConfig config){
-        this.config = config;
+        this.SHConfig = config;
     }
 
-    public TopologyBuilder getBuilder(){
+    public TopologyBuilder getBuilder() {
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("getJobs", new FinishedSparkJobSpout(config), 1).setNumTasks(1);
-        builder.setBolt("parseJobs", new SparkJobParseBolt(config), 8).setNumTasks(8).shuffleGrouping("getJobs");
+        String spoutName = "sparkHistoryJobSpout";
+        String boltName = "sparkHistoryJobBolt";
+        com.typesafe.config.Config config = this.SHConfig.getConfig();
+        builder.setSpout(spoutName,
+                new FinishedSparkJobSpout(SHConfig),
+                config.getInt("storm.parallelismConfig." + spoutName)
+        ).setNumTasks(config.getInt("storm.tasks." + spoutName));
+
+        builder.setBolt(boltName,
+                new SparkJobParseBolt(SHConfig),
+                config.getInt("storm.parallelismConfig." + boltName)
+        ).setNumTasks(config.getInt("storm.tasks." + boltName)).shuffleGrouping(spoutName);
         return builder;
     }
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
+        try {
+            SparkHistoryCrawlConfig crawlConfig = new SparkHistoryCrawlConfig();
 
-        SparkHistoryCrawlConfig crawlConfig = new SparkHistoryCrawlConfig();
-
-        Config conf = new Config();
-        conf.setNumWorkers(crawlConfig.stormConfig.workerNo);
-        conf.setMessageTimeoutSecs(crawlConfig.stormConfig.timeoutSec);
-        //conf.setMaxSpoutPending(crawlConfig.stormConfig.spoutPending);
-        conf.put(Config.TOPOLOGY_DEBUG, true);
+            Config conf = new Config();
+            conf.setNumWorkers(crawlConfig.stormConfig.workerNo);
+            conf.setMessageTimeoutSecs(crawlConfig.stormConfig.timeoutSec);
+            //conf.setMaxSpoutPending(crawlConfig.stormConfig.spoutPending);
+            conf.put(Config.TOPOLOGY_DEBUG, true);
 
 
-        LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology(crawlConfig.stormConfig.topologyName, conf, new SparkHistoryTopology(crawlConfig).getBuilder().createTopology());
-
+            if (crawlConfig.stormConfig.mode.equals("local")) {
+                LocalCluster cluster = new LocalCluster();
+                cluster.submitTopology(
+                        crawlConfig.stormConfig.topologyName,
+                        conf,
+                        new SparkHistoryTopology(crawlConfig).getBuilder().createTopology());
+            } else {
+                StormSubmitter.submitTopology(
+                        crawlConfig.stormConfig.topologyName,
+                        conf,
+                        new SparkHistoryTopology(crawlConfig).getBuilder().createTopology());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

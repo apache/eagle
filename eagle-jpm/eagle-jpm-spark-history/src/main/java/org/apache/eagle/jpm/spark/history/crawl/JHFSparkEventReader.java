@@ -366,8 +366,6 @@ public class JHFSparkEventReader {
     }
 
     public void clearReader() throws Exception {
-
-
         //clear tasks
         for (SparkTask task : tasks.values()) {
             logger.info("Task {} does not have result or no task metrics.", task.getTaskId());
@@ -681,7 +679,9 @@ public class JHFSparkEventReader {
     }
 
     private void doFlush(List entities) throws Exception {
+        logger.info("start flushing entities of total number " + entities.size());
         client.create(entities);
+        logger.info("finish flushing entities of total number " + entities.size());
 //        for(Object entity: entities){
 //            if(entity instanceof SparkApp){
 //                for (Field field : entity.getClass().getDeclaredFields()) {

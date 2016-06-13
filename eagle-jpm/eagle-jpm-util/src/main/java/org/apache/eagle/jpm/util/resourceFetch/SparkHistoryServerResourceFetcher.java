@@ -56,7 +56,6 @@ public class SparkHistoryServerResourceFetcher implements ResourceFetcher{
     }
 
     private List<Object> doFetchSparkApplicationDetail(String appId) throws Exception {
-        SparkApplication result = null;
         InputStream is = null;
         try {
             final String urlString = sparkDetailJobServiceURLBuilder.build(this.historyServerURL, appId);
@@ -64,11 +63,10 @@ public class SparkHistoryServerResourceFetcher implements ResourceFetcher{
             is = InputStreamUtils.getInputStream(urlString, auth, Constants.CompressionType.NONE);
             SparkApplication app = OBJ_MAPPER.readValue(is, SparkApplication.class);
             return Arrays.asList((Object)app);
-        }catch(FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             return null;
-        }
-        finally {
-            if (is != null) { try {is.close();} catch (Exception e){} }
+        } finally {
+            if (is != null) { try {is.close();} catch (Exception e) { } }
         }
     }
 

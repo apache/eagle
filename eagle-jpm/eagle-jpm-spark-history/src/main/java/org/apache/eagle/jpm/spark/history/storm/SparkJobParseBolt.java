@@ -51,12 +51,11 @@ public class SparkJobParseBolt extends BaseRichBolt {
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkJobParseBolt.class);
 
-    private OutputCollector _collector;
+    private OutputCollector collector;
     private ResourceFetcher historyServerFetcher;
     private SparkHistoryCrawlConfig config;
     private JobHistoryZKStateManager zkState;
     private Configuration hdfsConf;
-
 
     public SparkJobParseBolt(SparkHistoryCrawlConfig config) {
         this.config = config;
@@ -64,7 +63,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        this._collector = outputCollector;
+        this.collector = outputCollector;
         this.hdfsConf  = new Configuration();
         this.hdfsConf.set("fs.defaultFS", config.hdfsConfig.endpoint);
         this.hdfsConf.setBoolean("fs.hdfs.impl.disable.cache", true);
@@ -79,12 +78,10 @@ public class SparkJobParseBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
         String appId = tuple.getStringByField("appId");
         FileSystem hdfs = null;
-
         try {
-
-            if(!zkState.hasApplication(appId)){
+            if (!zkState.hasApplication(appId)) {
                 //may already be processed due to some reason
-                _collector.ack(tuple);
+                collector.ack(tuple);
                 return;
             }
 
@@ -92,9 +89,9 @@ public class SparkJobParseBolt extends BaseRichBolt {
             //first try to get attempts under the application
             List<SparkApplicationAttempt> attempts = this.getAttemptList(appId);
 
-            if(attempts.isEmpty()){
+            if (attempts.isEmpty()) {
                 LOG.info("Application:{}( Name:{}, user: {}, queue: {}) not found on history server.", appId, info.getName(), info.getUser(), info.getQueue());
-            }else{
+            } else {
                 hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
                 for (SparkApplicationAttempt attempt : attempts) {
                     Path attemptFile = new Path(this.config.hdfsConfig.baseDir + "/" + this.getAppAttemptLogName(appId, attempt.getAttemptId()));
@@ -105,23 +102,20 @@ public class SparkJobParseBolt extends BaseRichBolt {
 
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
             LOG.info("Successfully parse application {}", appId);
-            _collector.ack(tuple);
+            collector.ack(tuple);
         } catch (Exception e) {
             LOG.error("Fail to process application {}", appId, e);
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FAILED);
-            _collector.fail(tuple);
+            collector.fail(tuple);
         } finally {
-            if(null != hdfs){
-                try{
+            if (null != hdfs) {
+                try {
                     hdfs.close();
-                }catch(Exception e){
+                } catch (Exception e) {
                     LOG.error("Fail to close hdfs");
                 }
-
             }
         }
-
-
     }
 
     @Override
@@ -129,15 +123,14 @@ public class SparkJobParseBolt extends BaseRichBolt {
 
     }
 
-    private String getAppAttemptLogName(String appId, String attemptId){
+    private String getAppAttemptLogName(String appId, String attemptId) {
         return String.format("%s_%s", appId, attemptId);
     }
 
-    private List<SparkApplicationAttempt> getAttemptList(String appId) throws IOException{
-
+    private List<SparkApplicationAttempt> getAttemptList(String appId) throws IOException {
         FileSystem hdfs = null;
         List<SparkApplicationAttempt> attempts = new ArrayList<>();
-        try{
+        try {
 
             SparkApplication app = null;
             try {
@@ -147,36 +140,34 @@ public class SparkJobParseBolt extends BaseRichBolt {
                     attempts = app.getAttempts();
                 }
             } catch (Exception e) {
-                LOG.info("Fail to get application detail from history server for appId " + appId, e);
+                LOG.warn("Fail to get application detail from history server for appId " + appId, e);
             }
 
 
             if (null == app) {
                 //history server may not have the info, just double check
-                hdfs =HDFSUtil.getFileSystem(this.hdfsConf);
+                hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
                 Integer attemptId = 1;
 
                 boolean exists = true;
-                while(exists){
+                while (exists) {
                     Path attemptFile = new Path(this.config.hdfsConfig.baseDir + "/" + this.getAppAttemptLogName(appId, attemptId.toString()));
-                    if(hdfs.exists(attemptFile)){
+                    if (hdfs.exists(attemptFile)) {
                         SparkApplicationAttempt attempt = new SparkApplicationAttempt();
                         attempt.setAttemptId(attemptId.toString());
                         attempts.add(attempt);
                         attemptId++;
-                    }else{
+                    } else {
                         exists = false;
                     }
                 }
             }
             return attempts;
-        }finally {
-            if(null != hdfs){
+        } finally {
+            if (null != hdfs) {
                 hdfs.close();
             }
         }
-
-
     }
 
     @Override
@@ -184,6 +175,4 @@ public class SparkJobParseBolt extends BaseRichBolt {
         super.cleanup();
         zkState.close();
     }
-
-
 }

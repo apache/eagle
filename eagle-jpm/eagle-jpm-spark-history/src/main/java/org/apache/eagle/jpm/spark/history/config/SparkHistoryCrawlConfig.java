@@ -33,8 +33,13 @@ public class SparkHistoryCrawlConfig implements Serializable{
     public EagleInfo eagleInfo;
     public StormConfig stormConfig;
 
+    private Config config;
+    public Config getConfig() {
+        return config;
+    }
+
     public SparkHistoryCrawlConfig() {
-        Config config = ConfigFactory.load();
+        this.config = ConfigFactory.load();
 
         this.zkStateConfig = new ZKStateConfig();
         this.zkStateConfig.zkQuorum = config.getString("dataSourceConfig.zkQuorum");
@@ -64,13 +69,13 @@ public class SparkHistoryCrawlConfig implements Serializable{
         this.eagleInfo.port = config.getInt("eagleProps.eagle.service.port");
 
         this.stormConfig = new StormConfig();
+        this.stormConfig.mode = config.getString("storm.mode");
         this.stormConfig.topologyName = config.getString("storm.name");
         this.stormConfig.workerNo = config.getInt("storm.workerNo");
         this.stormConfig.timeoutSec = config.getInt("storm.messageTimeoutSec");
         this.stormConfig.spoutPending = config.getInt("storm.pendingSpout");
-
+        this.stormConfig.spoutCrawlInterval = config.getInt("storm.spoutCrawlInterval");
     }
-
 
     public static class ZKStateConfig implements Serializable {
         public String zkQuorum;
@@ -100,10 +105,12 @@ public class SparkHistoryCrawlConfig implements Serializable{
     }
 
     public static class StormConfig implements Serializable {
+        public String mode;
         public int workerNo;
         public int timeoutSec;
         public String topologyName;
         public int spoutPending;
+        public int spoutCrawlInterval;
     }
 
     public static class EagleInfo implements Serializable {
