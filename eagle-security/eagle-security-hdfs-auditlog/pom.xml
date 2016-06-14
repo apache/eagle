@@ -22,7 +22,7 @@
   <parent>
     <groupId>eagle</groupId>
     <artifactId>eagle-security-parent</artifactId>
-    <version>0.3.0-incubating</version>
+    <version>0.3.1-incubating</version>
   </parent>
   <artifactId>eagle-security-hdfs-auditlog</artifactId>
   <packaging>jar</packaging>
