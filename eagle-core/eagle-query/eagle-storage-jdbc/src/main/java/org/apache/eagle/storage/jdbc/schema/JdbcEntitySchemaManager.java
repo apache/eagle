@@ -155,7 +155,7 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
         tagColumn.setTypeCode(Types.VARCHAR);
         tagColumn.setJavaName(tagName);
 //        tagColumn.setScale(1024);
-        tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
+        tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_TAG_VARCHAR_SIZE));
         tagColumn.setDefaultValue(null);
         tagColumn.setDescription("eagle entity tag column for "+tagName);
         return tagColumn;
@@ -196,7 +196,7 @@ public class JdbcEntitySchemaManager implements IJdbcEntityDDLManager {
 //            Index index = new UniqueIndex();
             for (String tag : entityDefinition.getInternal().getTags()) {
                 Column tagColumn = createTagColumn(tag);
-                tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_VARCHAR_SIZE));
+//                tagColumn.setSize(String.valueOf(JdbcConstants.DEFAULT_TAG_VARCHAR_SIZE));
                 table.addColumn(tagColumn);
 //                IndexColumn indexColumn = new IndexColumn();
 //                indexColumn.setName(tag);
