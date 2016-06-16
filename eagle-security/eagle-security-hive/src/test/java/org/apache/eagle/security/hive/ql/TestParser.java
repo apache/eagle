@@ -235,6 +235,40 @@ public class TestParser {
     }
 
     @Test
+    public void testCountDistinct() throws Exception {
+        String query =  "SELECT count(distinct id) FROM db.table1";
+        String expectedOperation = "SELECT";
+        Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
+        set.add("id");
+        expectedTableColumn.put("db.table1", set);
+        _testParsingQuery(query, expectedOperation, null, expectedTableColumn);
+    }
+
+    @Test
+    public void testComplextQuery() throws Exception {
+        String query =  "SELECT id, \n" +
+                "  SUM(CASE WHEN(type=1 AND ds < '2016-05-12' AND category IN ('1', '2')) " +
+                "    THEN 1 ELSE 0 end) / COUNT(DISTINCT id) AS col1, \n" +
+                "  CASE WHEN SUM(CASE WHEN type=1 THEN 1 ELSE 0 END)=0 THEN 0 " +
+                "    ELSE SUM(CASE WHEN type=1 AND DATEDIFF('2016-05-21', ds)=1 " +
+                "    THEN 1 ELSE 0 END) * DATEDIFF('2016-05-21', '2016-04-21') / " +
+                "    SUM(CASE WHEN type=1 THEN 1 ELSE 0 END) END AS col2 \n" +
+                "FROM db.table1 \n" +
+                "WHERE ds < '2016-05-21' \n" +
+                "GROUP BY id";
+        String expectedOperation = "SELECT";
+        Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
+        set.add("id");
+        set.add("ds");
+        set.add("type");
+        set.add("category");
+        expectedTableColumn.put("db.table1", set);
+        _testParsingQuery(query, expectedOperation, null, expectedTableColumn);
+    }
+
+    @Test
     public void testCreateTable() throws Exception {
         String query = "CREATE TABLE page_view(viewTime INT, userid BIGINT,\n" +
                 "                page_url STRING, referrer_url STRING,\n" +
