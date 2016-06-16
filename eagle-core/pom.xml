@@ -21,7 +21,7 @@
     <parent>
 		<groupId>eagle</groupId>
 		<artifactId>eagle-parent</artifactId>
-        <version>0.3.0-incubating</version>
+        <version>0.3.1-incubating</version>
         <relativePath>../pom.xml</relativePath>
 	</parent>
 

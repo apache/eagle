@@ -30,6 +30,7 @@ import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.common.email.EagleMailClient;
 import com.netflix.config.ConcurrentMapConfiguration;
 import com.typesafe.config.ConfigObject;
+import com.typesafe.config.ConfigValue;
 
 public class AlertEmailSender implements Runnable {
 
@@ -45,12 +46,21 @@ public class AlertEmailSender implements Runnable {
     private final static Logger LOG = LoggerFactory.getLogger(AlertEmailSender.class);
     private final static int MAX_RETRY_COUNT = 3;
 
-    private static final String MAIL_HOST = "mail.host";
+    private static final String MAIL_AUTH = "mail.smtp.auth";
+    private static final String MAIL_HOST = "mail.smtp.host";
     private static final String MAIL_PORT = "mail.smtp.port";
+    private static final String MAIL_USER = "mail.user";
+    private static final String MAIL_PASSWORD = "mail.password";
+    private static final String MAIL_TLS_ENABLE = "mail.smtp.starttls.enable";
     private static final String MAIL_DEBUG = "mail.debug";
 
+    private static final String CONF_KEY_MAIL_AUTH = "mailSmtpAuth";
     private static final String CONF_KEY_MAIL_HOST = "mailHost";
     private static final String CONF_KEY_MAIL_PORT = "mailSmtpPort";
+    private static final String CONF_KEY_MAIL_USER = "mailSmtpUser";
+    private static final String CONF_KEY_MAIL_PASSWORD = "mailSmtpPassword";
+    private static final String CONF_KEY_MAIL_SSL_ENABLE = "mailSmtpSslEnable";
+    private static final String CONF_KEY_MAIL_TLS_ENABLE = "mailSmtpTlsEnable";
     private static final String CONF_KEY_MAIL_DEBUG = "mailDebug";
 
     private ConfigObject eagleProps;
@@ -78,7 +88,8 @@ public class AlertEmailSender implements Runnable {
         String tmp = ManagementFactory.getRuntimeMXBean().getName();
         this.origin = tmp.split("@")[1] + "(pid:" + tmp.split("@")[0] + ")";
         threadName = Thread.currentThread().getName();
-        LOG.info("Initialized "+threadName+": origin is : " + this.origin+", recipient of the email: " + this.recipents+", velocity TPL file: " + this.configFileName);
+        LOG.info("Initialized " + threadName + ": origin is : " + this.origin + ", recipient of the email: "
+                + this.recipents + ", velocity TPL file: " + this.configFileName);
     }
 
     public AlertEmailSender(AlertEmailContext alertEmail, ConfigObject eagleProps){
@@ -91,25 +102,49 @@ public class AlertEmailSender implements Runnable {
         int count = 0;
         boolean success = false;
         while(count++ < MAX_RETRY_COUNT && !success){
-            LOG.info("Sending email, tried: " + count+", max: "+MAX_RETRY_COUNT);
+            LOG.info("Sending email, tried: " + count + ", max: " + MAX_RETRY_COUNT);
             try {
                 final EagleMailClient client;
                 if (eagleProps != null) {
                     ConcurrentMapConfiguration con = new ConcurrentMapConfiguration();
                     con.addProperty(MAIL_HOST, eagleProps.get(CONF_KEY_MAIL_HOST).unwrapped());
                     con.addProperty(MAIL_PORT, eagleProps.get(CONF_KEY_MAIL_PORT).unwrapped());
-                    if (eagleProps.get(CONF_KEY_MAIL_DEBUG) != null) {
-                        con.addProperty(MAIL_DEBUG, eagleProps.get(CONF_KEY_MAIL_DEBUG).unwrapped());
+
+                    // Add authentication for email.
+                    ConfigValue authValue = eagleProps.get(CONF_KEY_MAIL_AUTH);
+                    if (authValue != null && Boolean.parseBoolean(String.valueOf(authValue.unwrapped()))) {
+                        con.addProperty(MAIL_AUTH, authValue.unwrapped());
+                        con.addProperty(MAIL_USER, eagleProps.get(CONF_KEY_MAIL_USER).unwrapped());
+                        con.addProperty(MAIL_PASSWORD, eagleProps.get(CONF_KEY_MAIL_PASSWORD).unwrapped());
+
+                        // Via SSL.
+                        ConfigValue sslValue = eagleProps.get(CONF_KEY_MAIL_SSL_ENABLE);
+                        if (sslValue != null && Boolean.parseBoolean(String.valueOf(sslValue.unwrapped()))) {
+                            con.addProperty("mail.smtp.socketFactory.port", "465");
+                            con.addProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+                        }
+
+                        // Via TLS.
+                        ConfigValue tlsValue = eagleProps.get(CONF_KEY_MAIL_TLS_ENABLE);
+                        if (tlsValue != null && Boolean.parseBoolean(String.valueOf(tlsValue.unwrapped()))) {
+                            con.addProperty(MAIL_TLS_ENABLE, tlsValue.unwrapped());
+                        }
                     }
+
+                    ConfigValue debugValue = eagleProps.get(CONF_KEY_MAIL_DEBUG);
+                    if (debugValue != null && Boolean.parseBoolean(String.valueOf(debugValue.unwrapped()))) {
+                        con.addProperty(MAIL_DEBUG, debugValue.unwrapped());
+                    }
+
                     client = new EagleMailClient(con);
-                }
-                else {
+                } else {
                     client = new EagleMailClient();
                 }
                 String env = "prod";
                 if (eagleProps != null && eagleProps.get("env") != null) {
                     env = (String) eagleProps.get("env").unwrapped();
                 }
+
                 LOG.info("Env is: " + env);
                 final VelocityContext context = new VelocityContext();
                 generateCommonContext(context);

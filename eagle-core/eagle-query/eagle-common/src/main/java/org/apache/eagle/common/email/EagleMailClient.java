@@ -58,7 +58,7 @@ public class EagleMailClient {
 	private static final String AUTH_CONFIG = "mail.smtp.auth";
 	private static final String DEBUG_CONFIG = "mail.debug";
 	private static final String USER_CONFIG = "mail.user";
-	private static final String PWD_CONFIG = "mail.pwd";
+	private static final String PASSWORD_CONFIG = "mail.password";
 
 	private VelocityEngine velocityEngine;
 	private Session session;
@@ -67,7 +67,7 @@ public class EagleMailClient {
 	public EagleMailClient() {
 		this(new ConcurrentMapConfiguration());
 	}
-	
+
 	public EagleMailClient(AbstractConfiguration configuration) {
 		try {
 			ConcurrentMapConfiguration con = (ConcurrentMapConfiguration)configuration;
@@ -81,13 +81,13 @@ public class EagleMailClient {
 			if(Boolean.parseBoolean(config.getProperty(AUTH_CONFIG))){
 				session = Session.getDefaultInstance(config, new Authenticator() {
 					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(config.getProperty(USER_CONFIG), config.getProperty(PWD_CONFIG));
+						return new PasswordAuthentication(config.getProperty(USER_CONFIG), config.getProperty(PASSWORD_CONFIG));
 					}
 				});
 			}
 			else session = Session.getDefaultInstance(config, new Authenticator() {});
-			final String debugMode =  config.getProperty(DEBUG_CONFIG, "false");
-			final boolean debug =  Boolean.parseBoolean(debugMode);
+			final String debugMode = config.getProperty(DEBUG_CONFIG, "false");
+			final boolean debug = Boolean.parseBoolean(debugMode);
 			session.setDebug(debug);
 		} catch (Exception e) {
             LOG.error("Failed connect to smtp server",e);
@@ -111,7 +111,9 @@ public class EagleMailClient {
 			//msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(DEFAULT_BCC_ADDRESS));
 			msg.setContent(content, "text/html;charset=utf-8");
 			LOG.info(String.format("Going to send mail: from[%s], to[%s], cc[%s], title[%s]", from, to, cc, title));
+
 			Transport.send(msg);
+
 			return true;
 		} catch (AddressException e) {
 			LOG.info("Send mail failed, got an AddressException: " + e.getMessage(), e);
@@ -123,7 +125,7 @@ public class EagleMailClient {
 	}
 
 	private boolean _send(String from,String to,String cc,String title,String content,List<MimeBodyPart> attachments){
-		MimeMessage  mail = new MimeMessage(session);
+		MimeMessage mail = new MimeMessage(session);
 		try {
 			mail.setFrom(new InternetAddress(from));
 			mail.setSubject(title);
@@ -135,13 +137,13 @@ public class EagleMailClient {
 				mail.setRecipients(Message.RecipientType.CC,
 						InternetAddress.parse(cc));
 			}
-			
+
 			//mail.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(DEFAULT_BCC_ADDRESS));
 
 			MimeBodyPart mimeBodyPart = new MimeBodyPart();
 			mimeBodyPart.setContent(content,"text/html;charset=utf-8");
 
-			Multipart  multipart = new MimeMultipart();
+			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(mimeBodyPart);
 
 			for(MimeBodyPart attachment:attachments){
@@ -151,7 +153,9 @@ public class EagleMailClient {
 			mail.setContent(multipart);
 //			mail.setContent(content, "text/html;charset=utf-8");
 			LOG.info(String.format("Going to send mail: from[%s], to[%s], cc[%s], title[%s]", from, to, cc, title));
+
 			Transport.send(mail);
+
 			return true;
 		} catch (AddressException e) {
 			LOG.info("Send mail failed, got an AddressException: " + e.getMessage(), e);
@@ -173,6 +177,7 @@ public class EagleMailClient {
 		try {
 			t = velocityEngine.getTemplate(BASE_PATH + templatePath);
 		} catch (ResourceNotFoundException ex) {
+
 		}
 		if (t == null) {
 			try {

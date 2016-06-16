@@ -73,20 +73,29 @@ public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionA
 		}
 
 		StringBuilder sb = new StringBuilder();
+		StringBuilder keysSb = new StringBuilder();
+		String prefix = "";
 		for (Entry<String, String> entry : context.getProperties().entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
-			sb.append(key + "=\"" + value + "\" ");			
+			sb.append(key).append("=\"").append(value).append("\" ");
+
+			keysSb.append(prefix).append(key);
+			prefix = ",";
 		}
+
+		String alertEventFields = keysSb.toString();
+		String alertEvent = sb.toString();
 		context.addAll(evaluator.getAdditionalContext());
 		String policyId = context.getProperty(Constants.POLICY_ID);
-		String alertMessage = "The Policy \"" + policyId + "\" has been detected with the below information: " + sb.toString() ;
+		String alertMessage = "The Policy \"" + policyId + "\" has been detected with the below information: " + alertEvent;
 		String site = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
 		String dataSource = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.DATA_SOURCE);
 		String host = config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
 		Integer port = config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
 
-		context.addProperty(Constants.ALERT_EVENT, sb.toString());
+		context.addProperty(Constants.ALERT_EVENT, alertEvent);
+		context.addProperty(Constants.ALERT_EVENT_FIELDS, alertEventFields);
 		context.addProperty(Constants.ALERT_MESSAGE, alertMessage);
 		context.addProperty(Constants.ALERT_TIMESTAMP_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds(System.currentTimeMillis()));
 		context.addProperty(EagleConfigConstants.DATA_SOURCE, dataSource);
@@ -104,6 +113,7 @@ public class SiddhiAlertAPIEntityRender implements ResultRender<AlertDefinitionA
 		context.addProperty(Constants.POLICY_DETAIL_URL, UrlBuilder.buiildPolicyDetailUrl(host, port, tags));
 		context.addProperty(Constants.ALERT_DETAIL_URL, UrlBuilder.buildAlertDetailUrl(host, port, entity));
 		entity.setAlertContext(context);
+
 		return entity;
 	}	
 }

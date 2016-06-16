@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+import org.apache.eagle.common.metric.AlertContext;
 import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.alert.entity.AlertAPIEntity;
 import com.typesafe.config.ConfigObject;
@@ -40,7 +41,8 @@ public class AlertEmailGenerator{
 
     private final static Logger LOG = LoggerFactory.getLogger(AlertEmailGenerator.class);
 
-    private final static long MAX_TIMEOUT_MS =60000;
+    private final static long MAX_TIMEOUT_MS = 60000;
+    private final static String EVENT_FIELDS_SPLITTER = ",";
 
     public boolean sendAlertEmail(AlertAPIEntity entity) {
         return sendAlertEmail(entity, recipients, null);
@@ -56,13 +58,16 @@ public class AlertEmailGenerator{
 
         AlertEmailComponent component = new AlertEmailComponent();
         component.setAlertContext(entity.getAlertContext());
+        AlertEmailComponent eventComponent = getEventComponent(entity.getAlertContext());
         List<AlertEmailComponent> components = new ArrayList<AlertEmailComponent>();
         components.add(component);
+        components.add(eventComponent);
         email.setComponents(components);
         if (entity.getAlertContext().getProperty(Constants.SUBJECT) != null) {
             email.setSubject(entity.getAlertContext().getProperty(Constants.SUBJECT));
+        } else {
+            email.setSubject(subject);
         }
-        else email.setSubject(subject);
         email.setVelocityTplFile(tplFile);
         email.setRecipients(recipients);
         email.setCc(cc);
@@ -74,7 +79,7 @@ public class AlertEmailGenerator{
 
         if(this.executorPool == null) throw new IllegalStateException("Invoking thread executor pool but it's is not set yet");
 
-        LOG.info("Sending email  in asynchronous to: "+recipients+", cc: "+cc);
+        LOG.info("Sending email in asynchronous to: " + recipients + ", cc: " + cc);
         Future future = this.executorPool.submit(thread);
         try {
             future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
@@ -132,5 +137,20 @@ public class AlertEmailGenerator{
 
     public void setExecutorPool(ThreadPoolExecutor executorPool) {
         this.executorPool = executorPool;
+    }
+
+    private AlertEmailComponent getEventComponent(AlertContext context) {
+        AlertContext eventFieldsContext = new AlertContext();
+        String eventFields = context.getProperty(Constants.ALERT_EVENT_FIELDS);
+        String[] fields = eventFields.split(EVENT_FIELDS_SPLITTER);
+
+        for (String key : fields) {
+            eventFieldsContext.addProperty(key, context.getProperty(key));
+        }
+
+        AlertEmailComponent component = new AlertEmailComponent();
+        component.setAlertContext(eventFieldsContext);
+
+        return component;
     }
 }

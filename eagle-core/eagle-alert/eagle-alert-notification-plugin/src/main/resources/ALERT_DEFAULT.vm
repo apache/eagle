@@ -113,19 +113,17 @@
 	</head>
 	<body>
 		#set ( $elem = $alertList[0] )
+		#set ( $eventFields = $alertList[1] )
 		#set ( $alertUrl = $elem["alertDetailUrl"] )
 		#set ( $policyUrl = $elem["policyDetailUrl"] )
-		<table class="body">
+		<table class="body" width="90%">
 			<tr>
 				<td align="center" valign="top" style="background: #999999; padding: 0 0 0 0;">
 					<!-- Eagle Header -->
-					<table width="580">
+					<table width="90%">
 						<tr>
 							<td style="padding: 0 0 0 0;" align="left" >
 								<p style="color:#FFFFFF;font-weight: bold; font-size: 24px">Eagle</p>
-							</td>
-							<td style="padding: 0 0 0 0;" align="right">
-								<p style="color:#FFFFFF;font-weight: bold;">DAM Alert</p>
 							</td>
 						</tr>
 					</table>
@@ -135,17 +133,17 @@
 			<tr>
 				<td align="center" valign="top">
 					<!-- Eagle Body -->
-					<table width="580">
+					<table width="90%">
 						<tr>
 							<!-- Title -->
 							<td align="center">
-								<h1>Malicious Data Operation Detected</h1>
+								<h1>$elem["dataSource"] Alert Detected</h1>
 							</td>
 						</tr>
 						<tr>
 							<!-- Time -->
 							<td>
-								<table width="580">
+								<table width="100%">
 									<tr>
 										<td>
 											<p><b>Detected Time: $elem["alertTimestamp"]</b></p>
@@ -168,16 +166,27 @@
 								</table>
 							</td>
 						</tr>
-						<tr>
-							<!-- Description -->
-							<td valign="top" style="background: #ECF8FF; border: 1px solid #b9e5ff; padding: 10px 10px 12px 10px;">
-								<p>$elem["alertMessage"]</p>
-							</td>
-						</tr>
+						<!-- Description -->
+                        <tr>
+                            <td>
+                                <table class="tableBordered" width="100%%">
+                                    #foreach ($key in $eventFields.keySet())
+                                    <tr>
+                                        <th>
+                                            <p>$key</p>
+                                        </th>
+                                        <td>
+                                            $eventFields.get($key)
+                                        </td>
+                                    </tr>
+                                    #end
+                                </table>
+                            </td>
+                        </tr>
 						<tr>
 							<!-- View Detail -->
 							<td align="center" style="padding: 10px 0 0 0;">
-								<table width="580">
+								<table width="100%">
 									<tr>
 										<td class="btn">
 											<a href="$alertUrl">View Alert Details on Eagle Web</a>
@@ -195,7 +204,7 @@
 						<tr>
 							<!-- Basic Information Content -->
 							<td>
-								<table class="tableBordered" width="580">
+								<table class="tableBordered" width="100%">
 									<tr>
 										<th>
 											<p>Site</p>
@@ -214,9 +223,6 @@
 									</tr>
 									<tr>
 										<th>
-											<p>Alert Type</p>
-										</th>
-										<th>
 											<p>Policy Name</p>
 										</th>
 										<th>
@@ -224,9 +230,6 @@
 										</th>
 									</tr>
 									<tr>
-										<td>
-											<p>DAM Alert</p>
-										</td>									
 										<td>
 											<p>$elem["policyId"]</p>
 										</td>
@@ -240,7 +243,7 @@
 						<tr>
 							<!-- View Detail -->
 							<td align="center" style="padding: 10px 0 0 0;">
-								<table width="580">
+								<table width="100%%">
 									<tr>
 										<td class="btn">
 											<a href="$policyUrl">View Policy Details on Eagle Web</a>
@@ -258,13 +261,13 @@
 						<tr>
 							<!-- Possible Root Causes Content -->
 							<td class="panel" valign="top" style="background: #F4F4F4; border: 1px solid #AAAAAA; padding: 10px 10px 12px 10px;">
-								<p> Malicious data operation found, please check.</p>
+								<p> $elem["dataSource"] alert found, please check.</p>
 							</td>
 						</tr>
 						<tr>
 							<!-- Copyright -->
 							<td align="center">
-								<p><a href="http://<Eagle-Host>/alerts/alertlist.html">Apache Eagle</a></p>
+								<p><a href="https://eagle.incubator.apache.org">Apache Eagle</a></p>
 							</td>
 						</tr>
 					</table>
