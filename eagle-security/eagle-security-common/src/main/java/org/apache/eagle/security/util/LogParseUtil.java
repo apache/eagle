@@ -21,7 +21,7 @@ package org.apache.eagle.security.util;
 public class LogParseUtil {
 
     /**
-     * @param ugi UGI field of audit log
+     * @param newUgi UGI field of audit log
      * @return resultToMetrics user from UGI field
      * e.g.
      * 1)user@APD.xyz.com
