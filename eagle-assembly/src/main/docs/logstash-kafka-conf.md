@@ -120,7 +120,7 @@ The 2.0 release of Logstash includes a new version of the Kafka output plugin wi
                 type => "hdp-nn-audit"
                 path => "/path/to/audit.log"
                 start_position => end
-                sincedb_path => "/var/log/logstash/"
+                sincedb_path => "/opt/logstash/sincedb.txt"
              }
         }
 
@@ -163,7 +163,7 @@ The 2.0 release of Logstash includes a new version of the Kafka output plugin wi
 				type => "hdp-nn-audit"
 				path => "/path/to/audit.log"
 				start_position => end
-				sincedb_path => "/var/log/logstash/"
+				sincedb_path => "/opt/logstash/sincedb.txt"
 			}
 		}
 
@@ -195,6 +195,21 @@ The 2.0 release of Logstash includes a new version of the Kafka output plugin wi
 				  # stdout { codec => rubydebug }
 			  }
 		}
+
+
+Notice:
+ `path => "/path/to/audit.log"` : 
+ Here `path` can be configured to be a single string or an array. For example:
+    `path => [ "var/msg/example.out", /var/message/*.out", "/var/log/*.log"]`
+    `path => "/var/log/hadoop/hdfs/hdfs-audit.log.*"`
+As you can see, we can apply regex pattern to match mutiple files.
+
+
+`sincedb_path => "/opt/logstash/sincedb.txt"`: 
+`sincedb_path` must be a file writable by logstash. This file will be used by Logstash to keep track of the current position in each file.
+
+
+
 
 #### grok pattern testing
 We have 3 typical patterns for ugi field as follows
