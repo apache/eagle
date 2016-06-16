@@ -28,7 +28,9 @@ public class JdbcConstants {
     public static final String ROW_KEY_COLUMN_NAME = "uuid";
 
     public static final int DEFAULT_TYPE_FOR_COMPLEX_TYPE = Types.BLOB;
-    public static final int DEFAULT_VARCHAR_SIZE =30000;
+    public static final int DEFAULT_TAG_VARCHAR_SIZE =1024;
+//    public static final int DEFAULT_VARCHAR_SIZE =30000;
+    public static final int DEFAULT_VARCHAR_SIZE =7168;
 
     // Eagle JDBC Storage Configuration
     public final static String EAGLE_DB_USERNAME = "eagle.service.storage-username";
