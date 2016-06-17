@@ -88,7 +88,8 @@ public class AlertEmailSender implements Runnable {
         String tmp = ManagementFactory.getRuntimeMXBean().getName();
         this.origin = tmp.split("@")[1] + "(pid:" + tmp.split("@")[0] + ")";
         threadName = Thread.currentThread().getName();
-        LOG.info("Initialized "+threadName+": origin is : " + this.origin+", recipient of the email: " + this.recipents+", velocity TPL file: " + this.configFileName);
+        LOG.info("Initialized "+threadName+": origin is : " + this.origin+", recipient of the email: "
+                + this.recipents+", velocity TPL file: " + this.configFileName);
     }
 
     public AlertEmailSender(AlertEmailContext alertEmail, ConfigObject eagleProps){
@@ -100,8 +101,8 @@ public class AlertEmailSender implements Runnable {
     public void run() {
         int count = 0;
         boolean success = false;
-        while(count++ < MAX_RETRY_COUNT && !success){
-            LOG.info("Sending email, tried: " + count+", max: "+ MAX_RETRY_COUNT);
+        while(count++ < MAX_RETRY_COUNT && !success) {
+            LOG.info("Sending email, tried: " + count + ", max: " + MAX_RETRY_COUNT);
             try {
                 final EagleMailClient client;
                 if (eagleProps != null) {
@@ -172,20 +173,21 @@ public class AlertEmailSender implements Runnable {
 
         if(success){
             sentSuccessfully = true;
-            LOG.info(String.format("Successfully send email, thread: %s",threadName));
+            LOG.info(String.format("Successfully send email, thread: %s", threadName));
         }else{
-            LOG.warn(String.format("Fail sending email after tries %s times, thread: %s",MAX_RETRY_COUNT,threadName));
+            LOG.warn(String.format("Fail sending email after tries %s times, thread: %s", MAX_RETRY_COUNT, threadName));
         }
     }
 
     private void generateCommonContext(VelocityContext context) {
-        context.put(Constants.ALERT_EMAIL_TIME_PROPERTY, DateTimeUtil.millisecondsToHumanDateWithSeconds( System.currentTimeMillis() ));
+        context.put(Constants.ALERT_EMAIL_TIME_PROPERTY,
+                DateTimeUtil.millisecondsToHumanDateWithSeconds(System.currentTimeMillis()));
         context.put(Constants.ALERT_EMAIL_COUNT_PROPERTY, alertContexts.size());
         context.put(Constants.ALERT_EMAIL_ALERTLIST_PROPERTY, alertContexts);
         context.put(Constants.ALERT_EMAIL_ORIGIN_PROPERTY, origin);
     }
 
-    public boolean sentSuccessfully(){
+    public boolean sentSuccessfully() {
         return this.sentSuccessfully;
     }
 }

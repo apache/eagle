@@ -53,6 +53,7 @@ public class Constants {
 	public static final String POLICY_ID = "policyId";
     public static final String SOURCE_STREAMS = "sourceStreams";
     public static final String ALERT_EVENT = "alertEvent";
+	public static final String ALERT_EVENT_FIELDS = "alertEventFields";
 	public static final String POLICY_DETAIL_URL = "policyDetailUrl";
 	public static final String ALERT_DETAIL_URL = "alertDetailUrl";
 
