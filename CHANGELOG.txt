@@ -1,4 +1,4 @@
-Release Notes - Eagle - Version 0.3.0
+Release Notes - Eagle - Version 0.3.1
 
 ** Highlights **  
     * Hadoop JMX metric monitoring.
@@ -75,7 +75,7 @@ Release Notes - Eagle - Version 0.3.0
     * [EAGLE-112] - Should support sum aggregation in front end for slide window function
     * [EAGLE-114] - Enable RAT check and fix missing license headers
     * [EAGLE-138] - Extend JMX Collector to support "hadoop.namenode.JournalTransaction"
-    * [EAGLE-143] - Create Eagle release 0.3.0
+    * [EAGLE-143] - Create Eagle release 0.3.1
     * [EAGLE-149] - Enable hadoop jmx metric cases
     * [EAGLE-152] - hadoop-metric monitoring automation script
     * [EAGLE-158] - Disable org.apache.eagle.datastream.EagleTuple
