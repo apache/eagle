@@ -115,8 +115,18 @@ public class InMemMetadataServiceClient implements IMetadataServiceClient {
     }
 
     @Override
+    public void addStreamingClusters(List<StreamingCluster> clusters) {
+        this.clusters.addAll(clusters);
+    }
+
+    @Override
     public void addTopology(Topology t) {
         topologies.add(t);
+    }
+
+    @Override
+    public void addTopologies(List<Topology> topologies) {
+        this.topologies.addAll(topologies);
     }
 
     @Override
@@ -125,8 +135,18 @@ public class InMemMetadataServiceClient implements IMetadataServiceClient {
     }
 
     @Override
+    public void addPolicies(List<PolicyDefinition> policies) {
+        this.policies.addAll(policies);
+    }
+
+    @Override
     public void addStreamDefinition(StreamDefinition streamDef) {
         definitions.add(streamDef);
+    }
+
+    @Override
+    public void addStreamDefinitions(List<StreamDefinition> streamDefs) {
+        this.definitions.addAll(streamDefs);
     }
 
     @Override
@@ -135,8 +155,18 @@ public class InMemMetadataServiceClient implements IMetadataServiceClient {
     }
 
     @Override
+    public void addDataSources(List<Kafka2TupleMetadata> k2ts) {
+        this.datasources.addAll(k2ts);
+    }
+
+    @Override
     public void addPublishment(Publishment pub) {
         publishmetns.add(pub);
+    }
+
+    @Override
+    public void addPublishments(List<Publishment> pubs) {
+        this.publishmetns.addAll(pubs);
     }
 
     @Override

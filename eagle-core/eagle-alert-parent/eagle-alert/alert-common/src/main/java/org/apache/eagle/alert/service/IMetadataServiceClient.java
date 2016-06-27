@@ -39,21 +39,27 @@ public interface IMetadataServiceClient extends Closeable, Serializable {
 
     // user metadta
     void addStreamingCluster(StreamingCluster cluster);
+    void addStreamingClusters(List<StreamingCluster> clusters);
     List<StreamingCluster> listClusters();
-    
+
     List<Topology> listTopologies();
     void addTopology(Topology t);
+    void addTopologies(List<Topology> topologies);
 
     void addPolicy(PolicyDefinition policy);
+    void addPolicies(List<PolicyDefinition> policies);
     List<PolicyDefinition> listPolicies();
 
     void addStreamDefinition(StreamDefinition streamDef);
+    void addStreamDefinitions(List<StreamDefinition> streamDefs);
     List<StreamDefinition> listStreams();
 
     void addDataSource(Kafka2TupleMetadata k2t);
+    void addDataSources(List<Kafka2TupleMetadata> k2ts);
     List<Kafka2TupleMetadata> listDataSources();
 
     void addPublishment(Publishment pub);
+    void addPublishments(List<Publishment> pubs);
     List<Publishment> listPublishment();
 
     // monitor metadata
@@ -62,8 +68,8 @@ public interface IMetadataServiceClient extends Closeable, Serializable {
     ScheduleState getVersionedSpec();
     ScheduleState getVersionedSpec(String version);
     void addScheduleState(ScheduleState state);
-    
+
     void clear();
-    
+
     // for topology mgmt
 }

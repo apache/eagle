@@ -93,8 +93,18 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
     }
 
     @Override
+    public void addStreamingClusters(List<StreamingCluster> clusters) {
+
+    }
+
+    @Override
     public void addTopology(Topology t) {
         
+    }
+
+    @Override
+    public void addTopologies(List<Topology> topologies) {
+
     }
 
     @Override
@@ -103,8 +113,18 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
     }
 
     @Override
+    public void addPolicies(List<PolicyDefinition> policies) {
+
+    }
+
+    @Override
     public void addStreamDefinition(StreamDefinition streamDef) {
         
+    }
+
+    @Override
+    public void addStreamDefinitions(List<StreamDefinition> streamDefs) {
+
     }
 
     @Override
@@ -113,8 +133,18 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
     }
 
     @Override
+    public void addDataSources(List<Kafka2TupleMetadata> k2ts) {
+
+    }
+
+    @Override
     public void addPublishment(Publishment pub) {
         
+    }
+
+    @Override
+    public void addPublishments(List<Publishment> pubs) {
+
     }
 
     @Override
