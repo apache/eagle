@@ -58,6 +58,14 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     private static final String METADATA_POLICIES_PATH = "/metadata/policies";
     private static final String METADATA_CLUSTERS_PATH = "/metadata/clusters";
     private static final String METADATA_TOPOLOGY_PATH = "/metadata/topologies";
+
+    private static final String METADATA_PUBLISHMENTS_BATCH_PATH = "/metadata/publishments/batch";
+    private static final String METADATA_DATASOURCES_BATCH_PATH = "/metadata/datasources/batch";
+    private static final String METADATA_STREAMS_BATCH_PATH = "/metadata/streams/batch";
+    private static final String METADATA_POLICIES_BATCH_PATH = "/metadata/policies/batch";
+    private static final String METADATA_CLUSTERS_BATCH_PATH = "/metadata/clusters/batch";
+    private static final String METADATA_TOPOLOGY_BATCH_PATH = "/metadata/topologies/batch";
+
     private static final String METADATA_CLEAR_PATH = "/metadata/clear";
 
     private static final String EAGLE_CORRELATION_CONTEXT = "metadataService.context";
@@ -197,9 +205,21 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     }
 
     @Override
+    public void addStreamingClusters(List<StreamingCluster> clusters) {
+        WebResource r = client.resource(basePath + METADATA_CLUSTERS_BATCH_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(clusters);
+    }
+
+    @Override
     public void addTopology(Topology t) {
         WebResource r = client.resource(basePath + METADATA_TOPOLOGY_PATH);
         r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(t);
+    }
+
+    @Override
+    public void addTopologies(List<Topology> topologies) {
+        WebResource r = client.resource(basePath + METADATA_TOPOLOGY_BATCH_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(topologies);
     }
 
     @Override
@@ -209,9 +229,21 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     }
 
     @Override
+    public void addPolicies(List<PolicyDefinition> policies) {
+        WebResource r = client.resource(basePath + METADATA_POLICIES_BATCH_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(policies);
+    }
+
+    @Override
     public void addStreamDefinition(StreamDefinition streamDef) {
         WebResource r = client.resource(basePath + METADATA_STREAMS_PATH);
         r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(streamDef);
+    }
+
+    @Override
+    public void addStreamDefinitions(List<StreamDefinition> streamDefs) {
+        WebResource r = client.resource(basePath + METADATA_STREAMS_BATCH_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(streamDefs);
     }
 
     @Override
@@ -221,9 +253,21 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     }
 
     @Override
+    public void addDataSources(List<Kafka2TupleMetadata> k2ts) {
+        WebResource r = client.resource(basePath + METADATA_DATASOURCES_BATCH_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(k2ts);
+    }
+
+    @Override
     public void addPublishment(Publishment pub) {
         WebResource r = client.resource(basePath + METADATA_PUBLISHMENTS_PATH);
         r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(pub);
+    }
+
+    @Override
+    public void addPublishments(List<Publishment> pubs) {
+        WebResource r = client.resource(basePath + METADATA_PUBLISHMENTS_BATCH_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(pubs);
     }
 
     @Override
