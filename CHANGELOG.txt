@@ -1,0 +1,114 @@
+
+Release Notes - Eagle - Version v0.4.0
+
+** Highlights **
+    * JBDC Metadata Storage Extension
+    * Topology management in remote mode including start/stop/status operations
+    * Auditlogparser for MapR's audit log
+    * Oozie auditlog integration for Oozie security monitoring
+    * Add applicaiton "maprFSAuditLog"
+    * Refactor bin/eagle-sandbox-starter.sh to make it easier to use
+
+** New Feature
+    * [EAGLE-169] - Dynamic security event correlation in Eagle
+    * [EAGLE-203] - Metrics feature support merge chart
+    * [EAGLE-225] - Create eagle bootstrap scripts for examples 
+    * [EAGLE-226] - Refactor Eagle scripts to avoid heavily depending on Hortonworks Sandbox
+    * [EAGLE-232] - Create local Kafka/Zookeeper/Storm runner tools for quickstart examples and add related scripts to start/top zk/kafka
+    * [EAGLE-238] - Support scheduling topology in local mode including start/stop/status operations
+    * [EAGLE-266] - Integrate MkDocs for eagle-docs: http://www.mkdocs.org/
+    * [EAGLE-271] - Topology management in remote mode including start/stop/status operations
+    * [EAGLE-272] - Support topology management in UI including creating topology and monitoring status
+    * [EAGLE-282] - Auditlogparser for MapR's audit log 
+    * [EAGLE-284] - Connect to MapR's CLDB service
+    * [EAGLE-298] - Oozie auditlog integration for Oozie security monitoring
+    * [EAGLE-307] - Add applicaiton "maprFSAuditLog" 
+
+** Improvement
+    * [EAGLE-103] - add comments to readme to tell users: currently, eagle is tested under jdk1.7.x, may have compile error with jdk1.8.x
+    * [EAGLE-182] - Replace Legacy "dataSource" field with "application" in UI request
+    * [EAGLE-185] - UI create cache after building
+    * [EAGLE-190] - JBDC Metadata Storage Extension
+    * [EAGLE-193] - UI metric dashboard support sortable
+    * [EAGLE-194] - UI show exception alert if service error
+    * [EAGLE-195] - policy metric display with interval of 5 min or customized interval
+    * [EAGLE-196] - eagle-topology.sh should have jar file path as parameter
+    * [EAGLE-201] - Change maven group name to org.apache.eagle instead of eagle
+    * [EAGLE-205] - Metric dashboard support multi metrics
+    * [EAGLE-207] - Management page add tips
+    * [EAGLE-208] - UI metric dashboard should support order & rename
+    * [EAGLE-216] - Added RM Policy and GC Policies in Resource
+    * [EAGLE-223] - Notification plugin to enable multiple instance of given alert plugin 
+    * [EAGLE-237] - Add development tools for quickly starting zookeeper, kafka and webservice without depending on sandbox
+    * [EAGLE-248] - Rename directories according industrial common sense
+    * [EAGLE-287] - Make EagleStore as the default notification method
+    * [EAGLE-288] - Need to add "Alert De-Dup Interval" setting in "PolicyObjectBase" 
+    * [EAGLE-295] - Add configuration value to enable application Manager
+    * [EAGLE-303] - Refactor message format in the email template.
+    * [EAGLE-305] - Add a config tip to the document for "Application Manager Tutorial" - setting "appCommandLoaderEnabled=true"
+    * [EAGLE-306] - add metadata for showing "Topology" tab in left-nav by default
+    * [EAGLE-315] - Add tutorial for mapr audit log monitoring
+    * [EAGLE-316] - Feature topology should not be added into an application
+    * [EAGLE-339] - Create HBase tables if not exists 
+    * [EAGLE-340] - refactor bin/eagle-sandbox-starter.sh to make it easier to use 
+
+** Bug
+    * [EAGLE-8] - In eagle-check-env.sh shell , Itbad way to check kafka installation
+    * [EAGLE-18] - Follow up with infra about website creation
+    * [EAGLE-157] - policy metric should be refreshed every minute
+    * [EAGLE-171] - Policy listing table is messed up by too long policy name.
+    * [EAGLE-172] - Scripting string is allowed to create policy rules.
+    * [EAGLE-173] - Mark/Un-mark a sensitivity type does not sync status mark in the table list.
+    * [EAGLE-176] - Metric dashboard UI keep api refresh after page switch
+    * [EAGLE-192] - Uncaught ReferenceError: damControllers is not defined (doc.js:7628)
+    * [EAGLE-200] - GC Log Monitoring  Not Working
+    * [EAGLE-210] - UI application group not display correctly
+    * [EAGLE-211] - Fix sometime unit test failing at TestSiddhiStateSnapshotAndRestore
+    * [EAGLE-212] - Fix AlertDataSourceEntity Bug in Hive web
+    * [EAGLE-213] - Updates fail for MySql  
+    * [EAGLE-214] - Policy edit page need auto switch application
+    * [EAGLE-217] - Fix unstable unit tests about state snapshot management
+    * [EAGLE-224] - Column not found to EAGLE_METRIC when using JDBC
+    * [EAGLE-227] - java.lang.NoClassDefFoundError: org/apache/commons/pool/impl/CursorableLinkedList$ListIter
+    * [EAGLE-228] - org.apache.eagle.notification.plugin.NotificationPluginManagerImpl - fail invoking plugin's onAlert, continue  java.lang.NullPointerException: null
+    * [EAGLE-229] - java.lang.IncompatibleClassChangeError: class net.sf.extcos.internal.JavaResourceAccessor$AnnotatedClassVisitor has interface org.objectweb.asm.ClassVisitor as super class
+    * [EAGLE-230] - Exception in persisting entitiesService side exception: org.codehaus.jackson.map.JsonMappingException: Conflicting setter definitions for property "alertContext"
+    * [EAGLE-235] - org.codehaus.jackson.map.JsonMappingException: Conflicting setter definitions for property "alertContext"
+    * [EAGLE-239] - Alert list and details are not correctly displayed
+    * [EAGLE-240] - java.lang.ArrayIndexOutOfBoundsException thrown by MetricKeyCodeDecoder
+    * [EAGLE-242] -  Import the notification plugin metadata when initializing
+    * [EAGLE-254] - HdfsAuditLog topology keeps alerting for one piece of log
+    * [EAGLE-258] - Automatically add apache-github and apache-git in pr tools
+    * [EAGLE-269] - Comparisons between 'LONG VARCHAR (UCS_BASIC)' and 'LONG VARCHAR (UCS_BASIC)' are not supported
+    * [EAGLE-270] - JDBC: Create table fail for some of the tables
+    * [EAGLE-273] -  Issue with creating MySql tables , only 14 were created out of 24, reason being varchar(30000) for multiple columns lead to exceeding the maximum row size of 65,535 bytes.
+    * [EAGLE-274] - 2016-04-15 15:50:20 b.s.d.worker [ERROR] Error on initialization of server mk-worker java.lang.RuntimeException: java.lang.ClassNotFoundException: org.slf4j.impl.Log4jLoggerAdapter
+    * [EAGLE-275] - Eagle email alert bug: $elem["dataSource"] Alert Detected
+    * [EAGLE-291] - JDBC: Update transactions fail in PostgreSQL
+    * [EAGLE-292] - Updated hbase policy failed: Data too long for column 'policyDef' when using mysql storage
+    * [EAGLE-294] - If a policy metadata field is not set, null attributes can not be able to add into input stream for SiddhiCEP 
+    * [EAGLE-297] - Email with authentication can not be validated and sent out.
+    * [EAGLE-300] - Disable spring debug log by default in webservice
+    * [EAGLE-301] - Tables omitted for using mysql
+    * [EAGLE-304] - Enable Advanced dedup configuration in policy definition 
+    * [EAGLE-308] - Consistency issue: deleting a topology doesn't delete existing topology-execution bound to it.
+    * [EAGLE-310] - already existing active topology status not displayed when a deleted topology+execution re-created with same name
+    * [EAGLE-311] - operations of items listed on topology-management monitoring page require buffering loading approaches
+    * [EAGLE-313] - normally stopped topology-execution shows error message in the description column
+    * [EAGLE-319] - java.sql.SQLSyntaxErrorException caught when querying from table topologyExecutionEntity
+    * [EAGLE-321] - java.lang.NoSuchMethodError: com.google.protobuf.LazyStringList.getUnmodifiableView
+    * [EAGLE-326] - typo found in eagle documentation
+    * [EAGLE-327] - java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Integer
+    * [EAGLE-330] - Hive ql.Parser can't parser a hive query sql with keywords
+    * [EAGLE-338] - fix topology-assembly build issue because of module name change
+    * [EAGLE-346] - ClassNotFoundException thrown out when topology is executing
+
+** Task
+    * [EAGLE-73] - Put docker steps to site tutorial
+    * [EAGLE-221] - Support cusomized notification type in policy editor
+    * [EAGLE-222] - Documentation for eagle alert plugin mechnism
+    * [EAGLE-280] - Update logstash-kafka-conf.md
+    * [EAGLE-309] - Add code formatter template
+
+** Sub-task
+    * [EAGLE-219] - Use PUT method for updating request when possible in front-end.
