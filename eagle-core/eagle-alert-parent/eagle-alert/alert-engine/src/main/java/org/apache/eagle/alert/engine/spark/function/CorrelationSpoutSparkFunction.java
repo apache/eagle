@@ -1,74 +1,87 @@
 package org.apache.eagle.alert.engine.spark.function;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionStrategy;
 import org.apache.eagle.alert.coordination.model.Tuple2StreamConverter;
-import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.coordinator.MetadataType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.apache.eagle.alert.engine.model.PartitionedEvent;
-import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.alert.engine.router.SpoutSpecListener;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.engine.serialization.Serializers;
-import org.apache.eagle.alert.engine.spark.broadcast.SpoutSpecData;
-import org.apache.eagle.alert.engine.spark.broadcast.StreamDefinitionData;
-import org.apache.eagle.alert.engine.spout.KafkaMessageIdWrapper;
-import org.apache.eagle.alert.utils.StreamIdConversion;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
+import scala.Tuple4;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, String>, Tuple2<String, String>>,SerializationMetadataProvider {
+public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, String>, Tuple2<Object, Object>>,SerializationMetadataProvider {
 
     private static final long serialVersionUID = -5281723341236671580L;
     private static final Logger LOG = LoggerFactory.getLogger(CorrelationSpoutSparkFunction.class);
 
     private String topologyId;
     private final Config config;
-    private JavaStreamingContext jssc,
+
     private String topic = "";
     private PartitionedEventSerializer serializer;
     private SpoutSpec spoutSpec;
-    private volatile Map<String, StreamDefinition> sds;
+    private Map<String, StreamDefinition> sds;
 
-    public CorrelationSpoutSparkFunction(String topic, JavaStreamingContext jssc, Config config) {
+    public CorrelationSpoutSparkFunction(String topic, String topologyId, Config config,SpoutSpec spoutSpec , Map<String, StreamDefinition> sds) {
 
-        this.jssc = jssc;
-        this.topologyId = jssc.sparkContext().appName();
+
+        this.topologyId = topologyId;
         this.config = config;
         this.topic = topic;
         this.serializer = Serializers.newPartitionedEventSerializer(this);
+        this.spoutSpec = spoutSpec;
+        this.sds = sds;
       /*  kafkaSpoutMetric = new KafkaSpoutMetric();
         context.registerMetric("kafkaSpout", kafkaSpoutMetric, 60);*/
     }
 
     @Override
-    public Tuple2<String, String> call(Tuple2<String, String> message) {
+    public Tuple2<Object, Object> call(Tuple2<String, String> message) {
 
+/**
+ * Convert incoming tuple to stream
+ * incoming tuple consists of 2 fields, topic and map of key/value
+ * output stream consists of 3 fields, stream name, timestamp, and map of key/value
+ */
         // cachedSpoutSpec get from broadcast var
-        SpoutSpec spoutSpec = SpoutSpecData.getInstance(new JavaSparkContext(message.context()), new SpoutSpec(topologyId, new HashMap<>(), new HashMap<>(), new HashMap<>())).getValue();
+
         List<StreamRepartitionMetadata> streamRepartitionMetadataList = spoutSpec.getStreamRepartitionMetadataMap().get(topic);
         Tuple2StreamConverter converter = new Tuple2StreamConverter(spoutSpec.getTuple2StreamMetadataMap().get(topic));
 
-        System.out.println(message._1);
-        System.out.println(message._2);
-        return message.copy("A", message._2);
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        };
+        Map<String, Object> value;
+        try {
+            value = mapper.readValue(message._2, typeRef);
+        } catch (IOException e) {
+            LOG.error("covert tuple value to map error");
+            return null;
+        }
+        List<Object> tuple = new ArrayList<Object>(2);
+        tuple.add(0, topic);
+        tuple.add(1, value);
+        List<Object> result = converter.convert(tuple);
+        /*Object topic = result.get(0);
+        Object streamName = result.get(1);
+        Object timestamp = result.get(2);
+        Object kv = result.get(3);*/
+        //key
+        return new Tuple2<>(topic, result);
     }
 
 
@@ -116,9 +129,9 @@ public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, St
         }
 
         StreamEvent event = convertToStreamEventByStreamDefinition((Long)convertedTuple.get(2), m, sds.get(streamId));
-        /*
+        /**
             phase 2: stream repartition
-        */
+        **/
         for(StreamRepartitionMetadata md : streamRepartitionMetadataList) {
             // one stream may have multiple group-by strategies, each strategy is for a specific group-by
             for(StreamRepartitionStrategy groupingStrategy : md.groupingStrategies){
@@ -198,16 +211,6 @@ public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, St
         return StreamEvent.Builder().timestamep(timestamp).attributes(m,sd).build();
     }
 
-    /**
-     * SpoutSpec may be changed, this class will respond to changes on tuple2StreamMetadataMap and streamRepartitionMetadataMap
-     * @param spoutSpec
-     * @param sds
-     */
-    @Override
-    public void update(SpoutSpec spoutSpec, Map<String, StreamDefinition> sds) {
-        this.streamRepartitionMetadataList = spoutSpec.getStreamRepartitionMetadataMap().get(topic);
-        this.converter = new Tuple2StreamConverter(spoutSpec.getTuple2StreamMetadataMap().get(topic));
-        this.sds = sds;
-    }
+
 
 }

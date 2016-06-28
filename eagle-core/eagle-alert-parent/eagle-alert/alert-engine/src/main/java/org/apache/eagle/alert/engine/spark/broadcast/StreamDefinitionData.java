@@ -16,6 +16,8 @@ public class StreamDefinitionData {
                     instance = jsc.broadcast(sds);
                 }
             }
+        }else{
+            instance = jsc.broadcast(sds);
         }
         return instance;
     }

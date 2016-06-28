@@ -14,6 +14,8 @@ public class SpoutSpecData {
                     instance = jsc.broadcast(meta);
                 }
             }
+        }else{
+            instance = jsc.broadcast(meta);
         }
         return instance;
     }
