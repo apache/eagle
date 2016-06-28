@@ -138,8 +138,8 @@
     <properties>
         <!-- General Properties -->
         <java.version>1.8</java.version>
-        <scala.version>2.11</scala.version>
-        <scala-lang.version>2.11.8</scala-lang.version>
+        <scala.version>2.10</scala.version>
+        <scala-lang.version>2.10.4</scala-lang.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -170,7 +170,7 @@
         <maprfs.version>5.0.0-mapr</maprfs.version>
         <mapr-hbase.version>0.98.9-mapr-1503</mapr-hbase.version>
 
-        <spark.core.version>1.4.0</spark.core.version>
+        <spark.core.version>1.6.1</spark.core.version>
 
         <!--  Client -->
         <kafka-client.version>0.9.0.0</kafka-client.version>
@@ -262,7 +262,7 @@
         <org.mortbay.jetty.version>6.1.26</org.mortbay.jetty.version>
 
         <!-- servlet  -->
-        <servlet-api.version>2.5</servlet-api.version>
+        <servlet-api.version>3.0.1</servlet-api.version>
 
         <!-- Alert Framework -->
         <velocity.version>1.7</velocity.version>

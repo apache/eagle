@@ -16,13 +16,14 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 
-public class StreamRepartitionStrategy {
+public class StreamRepartitionStrategy  implements Serializable {
     public StreamPartition partition ;
 
     public int numTotalParticipatingRouterBolts = 0;      // how many group-by bolts participate policy evaluation
