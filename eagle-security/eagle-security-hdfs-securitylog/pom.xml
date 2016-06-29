@@ -23,7 +23,7 @@
     <parent>
         <artifactId>eagle-security-parent</artifactId>
         <groupId>org.apache.eagle</groupId>
-        <version>0.4.0-incubating-SNAPSHOT</version>
+        <version>0.4.0-incubating</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
