@@ -79,7 +79,7 @@ public class KafkaProducerTest implements Serializable {
 
 
         Map<String, Object> map2 = new TreeMap<>();
-        map2.put("ip", "192.168.7.199");
+        map2.put("ip", "192.168.7.189");
         map2.put("jobid", "0000000-160427140648764-oozie-oozi-W");
         map2.put("operation", "end");
 

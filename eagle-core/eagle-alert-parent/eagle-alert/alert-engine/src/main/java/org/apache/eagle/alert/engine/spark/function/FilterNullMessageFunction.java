@@ -5,12 +5,10 @@ import scala.Tuple2;
 
 import java.util.List;
 
-public class FilterMessageFunction implements Function<List<Tuple2<Object, Object>>, Boolean> {
+public class FilterNullMessageFunction implements Function<Iterable<Tuple2<Integer, Object>>, Boolean> {
 
     @Override
-    public Boolean call(List<Tuple2<Object, Object>> tuple2s) throws Exception {
+    public Boolean call(Iterable<Tuple2<Integer, Object>> tuple2s) throws Exception {
         return tuple2s != null;
     }
-
-
 }

@@ -18,7 +18,7 @@ import scala.Tuple2;
 import java.io.IOException;
 import java.util.*;
 
-public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, String>, List<Tuple2<Object, Object>>>, SerializationMetadataProvider {
+public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, String>, Iterable<Tuple2<Integer, Object>>>, SerializationMetadataProvider {
 
     private static final long serialVersionUID = -5281723341236671580L;
     private static final Logger LOG = LoggerFactory.getLogger(CorrelationSpoutSparkFunction.class);
@@ -36,7 +36,7 @@ public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, St
     }
 
     @Override
-    public List<Tuple2<Object, Object>> call(Tuple2<String, String> message) {
+    public Iterable<Tuple2<Integer, Object>> call(Tuple2<String, String> message) {
 
 
         ObjectMapper mapper = new ObjectMapper();
@@ -79,7 +79,7 @@ public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, St
             LOG.warn("StreamDefinition {} is not found within {}, ignore this message", streamId, sds);
             return null;
         }
-        List<Tuple2<Object, Object>> outputTuple2s = new ArrayList<Tuple2<Object, Object>>(5);
+        List<Tuple2<Integer, Object>> outputTuple2s = new ArrayList<Tuple2<Integer, Object>>(5);
 
         Long timestamp = (Long) tupleContent.get(2);
         StreamEvent event = convertToStreamEventByStreamDefinition(timestamp, messageContent, sds.get(streamId));
@@ -97,15 +97,13 @@ public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, St
                 // filter out message
                 if (mod >= groupingStrategy.startSequence && mod < groupingStrategy.startSequence + numOfRouterBolts) {
                     PartitionedEvent pEvent = new PartitionedEvent(event, groupingStrategy.partition, hash);
-                    LOG.info(""+pEvent);
-                    outputTuple2s.add( new Tuple2<Object, Object>(topic,pEvent));
+                    outputTuple2s.add(new Tuple2<Integer, Object>(hash,pEvent));
                 }
             }
         }
         if (CollectionUtils.isEmpty(outputTuple2s)) {
             return null;
         }
-
         return outputTuple2s;
     }
 

@@ -164,7 +164,7 @@
               "streamId": "oozieStream",
               "type": "GROUPBY",
               "columns": [
-                "user"
+                "operation"
               ],
               "sortSpec": {
                 "windowPeriod": "PT10S",

@@ -43,5 +43,32 @@
         "required": false
       }
     ]
+  },
+  "oozieStream": {
+    "streamId": "oozieStream",
+    "dataSource": null,
+    "description": null,
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "ip",
+        "type": "STRING",
+        "defaultValue": null,
+        "required": false
+      },
+      {
+        "name": "jobid",
+        "type": "STRING",
+        "defaultValue": null,
+        "required": false
+      },
+      {
+        "name": "operation",
+        "type": "STRING",
+        "defaultValue": null,
+        "required": false
+      }
+    ]
   }
 }

@@ -35,7 +35,8 @@ public class StreamPartitioner extends Partitioner {
         } else {
             return code;
         }*/
-        return 0;
+        System.out.println("getPartition-----"+(Integer) key);
+        return (Integer) key;
     }
 
 }

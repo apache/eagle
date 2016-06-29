@@ -19,6 +19,7 @@
 package org.apache.eagle.alert.engine.runner;
 
 import com.typesafe.config.Config;
+import kafka.serializer.StringDecoder;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.coordinator.MetadataType;
@@ -27,8 +28,17 @@ import org.apache.eagle.alert.engine.router.SpoutSpecListener;
 import org.apache.eagle.alert.engine.spark.broadcast.SpoutSpecData;
 import org.apache.eagle.alert.engine.spark.broadcast.StreamDefinitionData;
 import org.apache.eagle.alert.engine.spark.function.CorrelationSpoutSparkFunction;
-import org.apache.eagle.alert.engine.spark.function.FilterMessageFunction;
+import org.apache.eagle.alert.engine.spark.function.FilterNullMessageFunction;
+import org.apache.eagle.alert.engine.spark.function.PairDataFunction;
+import org.apache.eagle.alert.engine.spark.function.TransFormFunction;
+import org.apache.spark.Partition;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFlatMapFunction;
+import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -36,11 +46,12 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
-public class UnitSparkTopologyRunner implements SpoutSpecListener {
+public class UnitSparkTopologyRunner implements SpoutSpecListener, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(UnitSparkTopologyRunner.class);
 
@@ -55,7 +66,7 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener {
     private final IMetadataChangeNotifyService metadataChangeNotifyService;
     private String topologyId;
     private final Config config;
-    private JavaStreamingContext jssc;
+    private transient JavaStreamingContext jssc;
     private SpoutSpec spoutSpec = null;
     private Map<String, StreamDefinition> sds = null;
 
@@ -112,11 +123,15 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener {
         JavaPairDStream<String, String> unifiedStream = jssc.union(kafkaStreams.get(0), kafkaStreams.subList(1, kafkaStreams.size()));*/
         Map<String, Integer> topicmap = new HashMap<>();
         topicmap.put("oozie", 1);
+        Set<String> topics = new HashSet<String>();
+        topics.add("oozie");
         String group = "test";
         String zkQuorum = config.getString("spout.kafkaBrokerZkQuorum");
         //final Broadcast<List<String>> blacklist  = JavaWordBlacklist.getInstance(jssc.sparkContext());
 
-        JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkQuorum, group, topicmap, StorageLevel.MEMORY_AND_DISK_SER_2());
+       JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkQuorum, group, topicmap, StorageLevel.MEMORY_AND_DISK_SER_2());
+
+       // KafkaUtils.createDirectStream(jssc,String.class,String.class, StringDecoder.class,StringDecoder.class,new HashMap<String, String>(),topics);
         while (spoutSpec == null || sds == null) {
             System.out.println("wait to load spoutSpec or sds");
         }
@@ -140,7 +155,37 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener {
         })*/
         int numOfRouter = config.getInt(ROUTER_TASK_NUM);
         String topic = "oozie";
-        messages.map(new CorrelationSpoutSparkFunction(numOfRouter,topic, spoutSpec,sds)).filter(new FilterMessageFunction()).print();
+        messages.map(new CorrelationSpoutSparkFunction(numOfRouter,topic, spoutSpec,sds))
+        .filter(new FilterNullMessageFunction())
+                .flatMapToPair(new PairDataFunction())
+               // .repartition(2)
+                .transformToPair(new TransFormFunction(numOfRouter))
+                .foreachRDD(new VoidFunction<JavaPairRDD<Integer, Object>>() {
+            @Override
+            public void call(JavaPairRDD<Integer, Object> integerObjectJavaPairRDD) throws Exception {
+                System.out.println("integerObjectJavaPairRDD.getNumPartitions()"+integerObjectJavaPairRDD.getNumPartitions());
+                List<Partition> ps = integerObjectJavaPairRDD.partitions();
+                for(Partition p:ps){
+                    System.out.println(p);
+                }
+                integerObjectJavaPairRDD.foreachPartition(new VoidFunction<Iterator<Tuple2<Integer, Object>>>() {
+
+                    @Override
+                    public void call(Iterator<Tuple2<Integer, Object>> v) throws Exception {
+                        int count =0;
+                        if(v.hasNext()){
+                            count++;
+                            Tuple2<Integer, Object> a = v.next();
+                            System.out.println(a._1());
+                            System.out.println(a._2());
+
+                        }
+                        System.out.println("__________________________"+count);
+                    }
+                });
+            }
+        });
+
         // jssc.union()
 
 
