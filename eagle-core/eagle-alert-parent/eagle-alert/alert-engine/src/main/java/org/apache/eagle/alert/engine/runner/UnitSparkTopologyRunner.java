@@ -27,11 +27,8 @@ import org.apache.eagle.alert.engine.router.SpoutSpecListener;
 import org.apache.eagle.alert.engine.spark.broadcast.SpoutSpecData;
 import org.apache.eagle.alert.engine.spark.broadcast.StreamDefinitionData;
 import org.apache.eagle.alert.engine.spark.function.CorrelationSpoutSparkFunction;
-import org.apache.eagle.alert.engine.spark.partition.StreamPartitioner;
+import org.apache.eagle.alert.engine.spark.function.FilterMessageFunction;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -39,7 +36,6 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +50,7 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener {
     public final static String SPARK_EXECUTOR_MEMORY = "topology.memory";
     public final static String SPARK_EXECUTOR_INSTANCES = "topology.spark.executor.num"; //no need to set if you open spark.dynamicAllocation.enabled  see https://spark.apache.org/docs/latest/job-scheduling.html#dynamic-resource-allocation
     public final static String LOCAL_MODE = "topology.localMode";
+    public final static String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
 
     private final IMetadataChangeNotifyService metadataChangeNotifyService;
     private String topologyId;
@@ -81,7 +78,7 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener {
         sparkConf.set("spark.executor.cores", sparkExecutorCores);
         sparkConf.set("spark.executor.memory", sparkExecutorMemory);
         this.jssc = new JavaStreamingContext(sparkConf, Durations.seconds(window));
-
+        // sc.setLocalProperty("spark.scheduler.pool", "pool1")
         // sparkConf.set("spark.streaming.receiver.writeAheadLog.enable", "true");
         this.metadataChangeNotifyService = metadataChangeNotifyService;
         this.metadataChangeNotifyService.registerListener(this);
@@ -141,13 +138,10 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener {
                 v1.pa
             }
         })*/
-        messages.updateStateByKey().map(new CorrelationSpoutSparkFunction("oozie", topologyId, config, spoutSpec ,sds)).transformToPair(new Function<JavaRDD<Tuple2<Object, Object>>, JavaPairRDD<Object, Object>>() {
-            @Override
-            public JavaPairRDD<Object, Object> call(JavaRDD<Tuple2<Object, Object>> v1) throws Exception {
-                return v1.repartition(10);
-            }
-        }).print();
-       // jssc.union()
+        int numOfRouter = config.getInt(ROUTER_TASK_NUM);
+        String topic = "oozie";
+        messages.map(new CorrelationSpoutSparkFunction(numOfRouter,topic, spoutSpec,sds)).filter(new FilterMessageFunction()).print();
+        // jssc.union()
 
 
     }

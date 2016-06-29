@@ -70,12 +70,20 @@ public class KafkaProducerTest implements Serializable {
 
         // send message
         //String logline = "2016-04-27 15:01:14,526  INFO oozieaudit:520 - IP [192.168.7.199], USER [tangjijun], GROUP [pms], APP [My_Workflow], JOBID [0000000-160427140648764-oozie-oozi-W], " + "OPERATION [start], PARAMETER [0000000-160427140648764-oozie-oozi-W], STATUS [SUCCESS], HTTPCODE [200], ERRORCODE [501], ERRORMESSAGE [no problem]";
-        Map<String, Object> map = new TreeMap<>();
-        map.put("ip", "192.168.7.199");
-        map.put("jobid", "0000000-160427140648764-oozie-oozi-W");
-        map.put("operation", "start");
+        Map<String, Object> map1 = new TreeMap<>();
+        map1.put("ip", "192.168.7.199");
+        map1.put("jobid", "0000000-160427140648764-oozie-oozi-W");
+        map1.put("operation", "start");
 
-        map.put("timestamp", DateTimeUtil.humanDateToMilliseconds("2016-04-27 15:01:14,526"));
+        map1.put("timestamp", DateTimeUtil.humanDateToMilliseconds("2016-04-27 15:01:14,526"));
+
+
+        Map<String, Object> map2 = new TreeMap<>();
+        map2.put("ip", "192.168.7.199");
+        map2.put("jobid", "0000000-160427140648764-oozie-oozi-W");
+        map2.put("operation", "end");
+
+        map2.put("timestamp", DateTimeUtil.humanDateToMilliseconds("2016-04-27 15:01:14,526"));
 
         System.out.println("-----------------" + zkServer.zookeeper().getClientPort());
         System.out.println(zkConnect);
@@ -90,11 +98,14 @@ public class KafkaProducerTest implements Serializable {
                 logline = "b";
             }*/
             ObjectMapper mapper = new ObjectMapper();
-            String msg = mapper.writeValueAsString(map);
-            KeyedMessage<Integer, byte[]> data = new KeyedMessage(topic,"tangjijun".getBytes(StandardCharsets.UTF_8), msg.getBytes(StandardCharsets.UTF_8));
+            String msg1 = mapper.writeValueAsString(map1);
+            String msg2 = mapper.writeValueAsString(map2);
+            KeyedMessage<Integer, byte[]> data1 = new KeyedMessage(topic,"tangjijun".getBytes(StandardCharsets.UTF_8), msg1.getBytes(StandardCharsets.UTF_8));
+            KeyedMessage<Integer, byte[]> data2 = new KeyedMessage(topic,"pms".getBytes(StandardCharsets.UTF_8), msg2.getBytes(StandardCharsets.UTF_8));
 
             List<KeyedMessage> messages = new ArrayList<KeyedMessage>();
-            messages.add(data);
+            messages.add(data1);
+            messages.add(data2);
             producer.send(scala.collection.JavaConversions.asScalaBuffer(messages));
             Thread.sleep(3000);
             System.out.println("-----------------");
