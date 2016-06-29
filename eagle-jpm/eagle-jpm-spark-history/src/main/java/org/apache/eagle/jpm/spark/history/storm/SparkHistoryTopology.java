@@ -59,7 +59,7 @@ public class SparkHistoryTopology {
             conf.setNumWorkers(crawlConfig.stormConfig.workerNo);
             conf.setMessageTimeoutSecs(crawlConfig.stormConfig.timeoutSec);
             //conf.setMaxSpoutPending(crawlConfig.stormConfig.spoutPending);
-            conf.put(Config.TOPOLOGY_DEBUG, true);
+            //conf.put(Config.TOPOLOGY_DEBUG, true);
 
 
             if (crawlConfig.stormConfig.mode.equals("local")) {

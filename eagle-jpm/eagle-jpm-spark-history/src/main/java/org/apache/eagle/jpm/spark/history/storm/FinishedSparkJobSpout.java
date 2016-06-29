@@ -72,7 +72,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
         LOG.info("Start to run tuple");
         try {
             long fetchTime = Calendar.getInstance().getTimeInMillis();
-            if (fetchTime - this.lastFinishAppTime > 5 * 60 * 1000) {
+            if (fetchTime - this.lastFinishAppTime > this.config.stormConfig.spoutCrawlInterval) {
                 List apps = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, new Long(lastFinishAppTime).toString());
                 List<AppInfo> appInfos = (null != apps ? (List<AppInfo>)apps.get(0):new ArrayList<AppInfo>());
                 LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
