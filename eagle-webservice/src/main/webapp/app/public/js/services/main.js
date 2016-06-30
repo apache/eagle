@@ -16,35 +16,8 @@
  * limitations under the License.
  */
 
-eagleComponents.directive('file', function($compile) {
+(function() {
 	'use strict';
 
-	return {
-		restrict : 'A',
-		scope: {
-			filepath: "=?filepath",
-		},
-		controller: function($scope, $element, $attrs) {
-			// Watch change(Only support clean the data)
-			if($attrs.filepath) {
-				$scope.$parent.$watch($attrs.filepath, function(value) {
-					if(!value) $element.val(value);
-				});
-			}
-
-			// Bind changed value
-			$element.on("change", function() {
-				var _path = $(this).val();
-				if($attrs.filepath) {
-					common.setValueByPath($scope.$parent, $attrs.filepath, _path);
-					$scope.$parent.$apply();
-				}
-			});
-
-			$scope.$on('$destroy',function(){
-				$element.off("change");
-			});
-		},
-		replace: false
-	};
-});
+	var eagleSrv = angular.module('eagle.service', []);
+})();

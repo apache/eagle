@@ -1,4 +1,3 @@
-@CHARSET "UTF-8";
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,31 +16,35 @@
  * limitations under the License.
  */
 
-.sidebar-mini.sidebar-collapse .main-header .logo > .logo-mini > img {
-	max-height: 30px;
-}
+eagleComponents.directive('file', function($compile) {
+	'use strict';
 
-.main-sidebar .customize-panel {
-	padding: 10px;
-}
+	return {
+		restrict : 'A',
+		scope: {
+			filepath: "=?filepath",
+		},
+		controller: function($scope, $element, $attrs) {
+			// Watch change(Only support clean the data)
+			if($attrs.filepath) {
+				$scope.$parent.$watch($attrs.filepath, function(value) {
+					if(!value) $element.val(value);
+				});
+			}
 
-.main-sidebar .customize-panel .btn-group,
-.main-sidebar .customize-panel .btn-group button,
-.main-sidebar .customize-panel .btn-group .dropdown-menu {
-	width: 100%;
-}
+			// Bind changed value
+			$element.on("change", function() {
+				var _path = $(this).val();
+				if($attrs.filepath) {
+					common.setValueByPath($scope.$parent, $attrs.filepath, _path);
+					$scope.$parent.$apply();
+				}
+			});
 
-.main-sidebar .customize-panel .btn-group button {
-	padding: 5px;
-	background: #374850;
-	border: none;
-}
-.main-sidebar .customize-panel .btn-group.open button{
-	background: #455b63;
-}
-
-.main-sidebar .customize-panel .btn-group button .caret {
-	position: absolute;
-	right: 10px;
-	top: 13px;
-}
+			$scope.$on('$destroy',function(){
+				$element.off("change");
+			});
+		},
+		replace: false
+	};
+});

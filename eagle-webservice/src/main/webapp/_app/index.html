@@ -59,20 +59,106 @@
 
 					<div class="navbar-custom-menu">
 						<ul class="nav navbar-nav">
-							<li>
-								<a class="btn btn-xs" data-toggle="dropdown" aria-expanded="false">
-									<i class="glyphicon glyphicon-question-sign"></i>
+							<!-- Admin error list -->
+							<li class="dropdown" ng-show="ServiceError.list.length">
+								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<i class="fa fa-exclamation-triangle" ng-class="{blink: ServiceError.hasUnread}"></i>
 								</a>
-
 								<ul class="dropdown-menu">
-									<li><a>How to start using eagle</a></li>
-									<li><a>How to register new site</a></li>
-									<li><a>How to install application</a></li>
-									<li><a>How to manage application</a></li>
-									<li><a>How to develop application</a></li>
+									<li ng-repeat="error in ServiceError.list">
+										<a ng-click="ServiceError.showError(error);">
+											<span class="fa" ng-class="{'fa-envelope': !error._read, 'fa-check': error._read}"></span>
+											{{error.title}}
+										</a>
+									</li>
+									<li role="separator" class="divider"></li>
+									<li>
+										<a ng-click="ServiceError.clearAll();">
+											<span class="fa fa-trash"></span>
+											Clear All
+										</a>
+									</li>
+								</ul>
+							</li>
+
+							<!-- Site -->
+							<li class="dropdown" ng-show="!PageConfig.hideSite && !PageConfig.lockSite">
+								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<i class="fa fa-server"></i>
+									{{Site.current().tags.site}}
+									<i class="fa fa-caret-down"></i>
+								</a>
+								<ul class="dropdown-menu">
+									<li ng-repeat="_site in Site.list" ng-if="_site.enabled">
+										<a ng-click="Site.current(_site);">
+											<span class="fa fa-database"></span> {{_site.tags.site}}
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li class="dropdown" ng-show="PageConfig.lockSite">
+								<a>
+									<i class="fa fa-server"></i>
+									{{Site.current().tags.site}}
+								</a>
+							</li>
+
+							<!-- User -->
+							<li class="dropdown user user-menu" ng-hide="PageConfig.hideUser">
+								<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+									<i class="fa fa-user"></i>
+									{{Auth.userProfile.username}}
+								</a>
+								<ul class="dropdown-menu">
+									<!-- User image -->
+									<li class="user-header">
+										<span class="img-circle">
+											<span class="fa fa-user" alt="User Image"></span>
+										</span>
+										<p>
+											{{Auth.userProfile.username}}
+											<small>
+												<span ng-repeat="role in Auth.userProfile.authorities">{{role.authority}} </span>
+											</small>
+										</p>
+									</li>
+									<!-- Menu Footer-->
+									<li class="user-footer">
+										<div class="pull-left" ng-if="Auth.isRole('ROLE_ADMIN')">
+											<a href="#/config/site" class="btn btn-default btn-flat">Management</a>
+										</div>
+										<div class="pull-right">
+											<a ng-click="logout();" class="btn btn-default btn-flat">Sign out</a>
+										</div>
+									</li>
 								</ul>
 							</li>
 						</ul>
+					</div>
+
+					<!-- Applications -->
+					<div ng-hide="PageConfig.hideApplication">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#moduleMenu">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="fa fa-map"></span>
+						</button>
+						<div class="collapse navbar-collapse" id="moduleMenu">
+							<ul class="nav navbar-nav">
+								<li ng-repeat="_grp in Site.current().applicationGroupList" ng-if="_grp.enabledList.length"
+									class="dropdown" ng-class="{active: Application.current().group === _grp.name}">
+									<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+										{{_grp.name}}
+									</a>
+									<ul class="dropdown-menu">
+										<li ng-repeat="_app in _grp.enabledList">
+											<a ng-click="Application.current(_app);">
+												<span class="fa fa-cubes"></span> {{_app.displayName}}
+											</a>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
 					</div>
 				</nav>
 			</header>
@@ -82,33 +168,15 @@
 			<aside class="main-sidebar" ng-hide="PageConfig.hideSidebar">
 				<!-- side bar: style can be found in sidebar.less -->
 				<section class="sidebar">
-					<div class="customize-panel">
-						<div uib-dropdown class="btn-group">
-							<button uib-dropdown-toggle class="btn btn-primary" ng-disabled="false">
-								[TODO:Site] <span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-								<li role="menuitem"><a href="#">Action</a></li>
-								<li role="menuitem"><a href="#">Another action</a></li>
-								<li role="menuitem"><a href="#">Something else here</a></li>
-							</ul>
-						</div>
-					</div>
 					<ul class="sidebar-menu">
-						<li ng-repeat="portal in Portal.list() track by $index" ng-class="{treeview: portal.list}">
-							<a>
-								<span class="fa fa-{{portal.icon || 'circle-o'}}"></span>
-								{{portal.name}}
-								<span class="fa fa-angle-left pull-right" ng-if="portal.list"></span>
+						<li class="header">
+							{{Application.current().group || 'Application'}} >
+							{{Application.current().displayName || 'Features'}}
+						</li>
+						<li ng-repeat="page in PageConfig.navConfig.pageList track by $index" ng-class="getNavClass(page)" ng-show="getNavVisible(page)">
+							<a href="{{page.url}}">
+								<i class="fa fa-{{page.icon}}"></i> <span>{{page.title}}</span> 
 							</a>
-							<ul class="treeview-menu" ng-if="portal.list">
-								<li ng-repeat="subPortal in portal.list track by $index">
-									<a>
-										<span class="fa fa-{{subPortal.icon || 'circle-o'}}"></span>
-										{{subPortal.name}}
-									</a>
-								</li>
-							</ul>
 						</li>
 					</ul>
 				</section>
@@ -179,37 +247,35 @@
 		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Service -->
-		<script src="public/js/services/main.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/services/pageSrv.js" type="text/javascript" charset="utf-8"></script>
-		<!--script src="public/js/srv/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/srv/main.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/applicationSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/authorizationSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/entitiesSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/siteSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/pageSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/wrapStateSrv.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/srv/uiSrv.js" type="text/javascript" charset="utf-8"></script-->
+		<script src="public/js/srv/uiSrv.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Misc -->
-		<!--script src="public/js/app.ui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/app.ui.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/app.time.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/app.config.js" type="text/javascript" charset="utf-8"></script>
 
-		<script src="public/js/common.js" type="text/javascript" charset="utf-8"></script-->
+		<script src="public/js/common.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Components -->
 		<script src="public/js/components/main.js" type="text/javascript" charset="utf-8"></script>
-		<!--script src="public/js/components/sortTable.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/sortTable.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/tabs.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/file.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/charts/line3d.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/components/nvd3.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/components/sortable.js" type="text/javascript" charset="utf-8"></script-->
+		<script src="public/js/components/sortable.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- Controllers -->
-		<script src="public/js/ctrls/main.js" type="text/javascript" charset="utf-8"></script>
-		<!--script src="public/js/ctrls/authController.js" type="text/javascript" charset="utf-8"></script>
-		<script src="public/js/ctrls/configurationController.js" type="text/javascript" charset="utf-8"></script-->
+		<script src="public/js/ctrl/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/authController.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrl/configurationController.js" type="text/javascript" charset="utf-8"></script>
 		<!-- endref -->
 	</body>
 </html>

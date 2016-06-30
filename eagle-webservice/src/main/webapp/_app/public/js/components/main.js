@@ -1,4 +1,3 @@
-@CHARSET "UTF-8";
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,31 +16,4 @@
  * limitations under the License.
  */
 
-.sidebar-mini.sidebar-collapse .main-header .logo > .logo-mini > img {
-	max-height: 30px;
-}
-
-.main-sidebar .customize-panel {
-	padding: 10px;
-}
-
-.main-sidebar .customize-panel .btn-group,
-.main-sidebar .customize-panel .btn-group button,
-.main-sidebar .customize-panel .btn-group .dropdown-menu {
-	width: 100%;
-}
-
-.main-sidebar .customize-panel .btn-group button {
-	padding: 5px;
-	background: #374850;
-	border: none;
-}
-.main-sidebar .customize-panel .btn-group.open button{
-	background: #455b63;
-}
-
-.main-sidebar .customize-panel .btn-group button .caret {
-	position: absolute;
-	right: 10px;
-	top: 13px;
-}
+var eagleComponents = angular.module('eagle.components', []);

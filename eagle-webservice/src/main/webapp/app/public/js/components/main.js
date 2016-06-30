@@ -16,4 +16,9 @@
  * limitations under the License.
  */
 
-var eagleComponents = angular.module('eagle.components', []);
+
+(function() {
+	'use strict';
+
+	var eagleComponents = angular.module('eagle.components', []);
+})();

@@ -17,31 +17,30 @@
  * limitations under the License.
  */
 
-.sidebar-mini.sidebar-collapse .main-header .logo > .logo-mini > img {
-	max-height: 30px;
-}
-
-.main-sidebar .customize-panel {
-	padding: 10px;
-}
-
-.main-sidebar .customize-panel .btn-group,
-.main-sidebar .customize-panel .btn-group button,
-.main-sidebar .customize-panel .btn-group .dropdown-menu {
-	width: 100%;
-}
-
-.main-sidebar .customize-panel .btn-group button {
-	padding: 5px;
-	background: #374850;
-	border: none;
-}
-.main-sidebar .customize-panel .btn-group.open button{
-	background: #455b63;
-}
-
-.main-sidebar .customize-panel .btn-group button .caret {
+[ui-view].ng-enter, [ui-view].ng-leave {
 	position: absolute;
-	right: 10px;
-	top: 13px;
+	left: 0;
+	right: 0;
+	-webkit-transition: all .5s ease-in-out;
+	-moz-transition: all .5s ease-in-out;
+	-o-transition: all .5s ease-in-out;
+	transition: all .3s ease-in-out;
+}
+
+[ui-view].ng-enter {
+	opacity: 0;
+}
+
+[ui-view].ng-enter-active {
+	opacity: 1;
+}
+
+[ui-view].ng-leave {
+	opacity: 1;
+	transform:translate3d(0, 0, 0);
+}
+
+[ui-view].ng-leave-active {
+	opacity: 0;
+	transform:translate3d(20%, 0, 0);
 }
