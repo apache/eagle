@@ -10,7 +10,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
-import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -18,7 +18,8 @@ import scala.Tuple2;
 import java.io.IOException;
 import java.util.*;
 
-public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, String>, Iterable<Tuple2<Integer, Object>>>, SerializationMetadataProvider {
+public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2<String,String>, Integer, Object>, SerializationMetadataProvider{
+       // Function<Tuple2<String, String>, Iterable<Tuple2<Integer, Object>>>, SerializationMetadataProvider
 
     private static final long serialVersionUID = -5281723341236671580L;
     private static final Logger LOG = LoggerFactory.getLogger(CorrelationSpoutSparkFunction.class);
@@ -97,7 +98,11 @@ public class CorrelationSpoutSparkFunction implements Function<Tuple2<String, St
                 // filter out message
                 if (mod >= groupingStrategy.startSequence && mod < groupingStrategy.startSequence + numOfRouterBolts) {
                     PartitionedEvent pEvent = new PartitionedEvent(event, groupingStrategy.partition, hash);
-                    outputTuple2s.add(new Tuple2<Integer, Object>(hash,pEvent));
+                    if(pEvent.getPartitionKey() == 101200){
+                        outputTuple2s.add(new Tuple2<Integer, Object>(1,pEvent));
+                    }else{
+                        outputTuple2s.add(new Tuple2<Integer, Object>(mod,pEvent));
+                    }
                 }
             }
         }
