@@ -77,9 +77,18 @@ public class SparkMockMetadataChangeNotifyService extends AbstractMetadataChange
             case ALERT_PUBLISH_BOLT:
                 notifyAlertPublishBolt();
                 break;
+            case ALL:
+                notifySpecListener();
+                break;
             default:
                 LOG.error("that is not possible man!");
         }
+    }
+
+    private void notifySpecListener() {
+        SpoutSpec newSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testSpoutSpec.json"), SpoutSpec.class);
+        RouterSpec boltSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testStreamRouterBoltSpec.json"), RouterSpec.class);
+        notifySpecListener(newSpec, boltSpec, sds);
     }
 
     private Map<String, StreamDefinition> defineStreamDefinitions() {

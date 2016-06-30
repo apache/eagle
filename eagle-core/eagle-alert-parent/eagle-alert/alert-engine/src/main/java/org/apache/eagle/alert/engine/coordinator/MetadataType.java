@@ -26,5 +26,6 @@ public enum MetadataType {
     SPOUT,
     STREAM_ROUTER_BOLT,
     ALERT_BOLT,
-    ALERT_PUBLISH_BOLT
+    ALERT_PUBLISH_BOLT,
+    ALL
 }

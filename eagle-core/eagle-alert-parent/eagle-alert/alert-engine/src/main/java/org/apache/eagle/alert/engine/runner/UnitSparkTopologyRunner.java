@@ -24,8 +24,7 @@ import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.coordinator.MetadataType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.router.SpoutSpecListener;
-import org.apache.eagle.alert.engine.router.StreamRouterBoltSpecListener;
+import org.apache.eagle.alert.engine.router.SpecListener;
 import org.apache.eagle.alert.engine.spark.broadcast.RouterSpecData;
 import org.apache.eagle.alert.engine.spark.broadcast.SpoutSpecData;
 import org.apache.eagle.alert.engine.spark.broadcast.StreamDefinitionData;
@@ -42,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.*;
 
-public class UnitSparkTopologyRunner implements SpoutSpecListener, StreamRouterBoltSpecListener, Serializable {
+public class UnitSparkTopologyRunner implements SpecListener, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(UnitSparkTopologyRunner.class);
 
@@ -85,8 +84,8 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener, StreamRouterB
         // sc.setLocalProperty("spark.scheduler.pool", "pool1")
         // sparkConf.set("spark.streaming.receiver.writeAheadLog.enable", "true");
         this.metadataChangeNotifyService = metadataChangeNotifyService;
-        this.metadataChangeNotifyService.registerListener((SpoutSpecListener)this);
-        this.metadataChangeNotifyService.init(config, MetadataType.SPOUT);
+        this.metadataChangeNotifyService.registerListener(this);
+        this.metadataChangeNotifyService.init(config, MetadataType.ALL);
        // this.metadataChangeNotifyService.registerListener((StreamRouterBoltSpecListener)this);
       //  this.metadataChangeNotifyService.init(config, MetadataType.STREAM_ROUTER_BOLT);
     }
@@ -127,7 +126,7 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener, StreamRouterB
        JavaPairDStream<String, String> messages = KafkaUtils.createStream(jssc, zkQuorum, group, topicmap, StorageLevel.MEMORY_AND_DISK_SER_2());
 
        // KafkaUtils.createDirectStream(jssc,String.class,String.class, StringDecoder.class,StringDecoder.class,new HashMap<String, String>(),topics);
-        while (spoutSpec == null || sds == null) {
+        while (spoutSpec == null || sds == null ||routerSpec ==null) {
             System.out.println("wait to load spoutSpec or sds");
         }
        /* messages.transformToPair(new Function<JavaPairRDD<String, String>, JavaPairRDD<String, String>>() {
@@ -191,8 +190,15 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener, StreamRouterB
 
     }
 
-
     @Override
+    public void onSpecChange(SpoutSpec spec, RouterSpec routerSpec, Map<String, StreamDefinition> sds) {
+        this.routerSpec = RouterSpecData.getInstance(jssc.sparkContext(), routerSpec).value();
+        this.spoutSpec = SpoutSpecData.getInstance(jssc.sparkContext(), spec).value();
+        this.sds = StreamDefinitionData.getInstance(jssc.sparkContext(), sds).value();
+    }
+
+
+   /* @Override
     public void onSpoutSpecChange(SpoutSpec spec, Map<String, StreamDefinition> sds) {
         LOG.info("new SpoutSpec metadata is updated " + spec);
         this.spoutSpec = SpoutSpecData.getInstance(jssc.sparkContext(), spec).value();
@@ -204,5 +210,7 @@ public class UnitSparkTopologyRunner implements SpoutSpecListener, StreamRouterB
         //reject sds
         LOG.info("new RouterSpec metadata is updated " + spec);
         this.routerSpec = RouterSpecData.getInstance(jssc.sparkContext(), spec).value();
-    }
+    }*/
+
+
 }

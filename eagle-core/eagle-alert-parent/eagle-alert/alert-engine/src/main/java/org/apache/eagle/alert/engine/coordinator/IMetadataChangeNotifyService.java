@@ -21,6 +21,7 @@ import java.io.Serializable;
 
 import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
+import org.apache.eagle.alert.engine.router.SpecListener;
 import org.apache.eagle.alert.engine.router.SpoutSpecListener;
 import org.apache.eagle.alert.engine.router.StreamRouterBoltSpecListener;
 
@@ -54,4 +55,6 @@ public interface IMetadataChangeNotifyService extends Closeable,Serializable {
     void registerListener(StreamRouterBoltSpecListener listener);
 
     void registerListener(AlertPublishSpecListener listener);
+
+    void registerListener(SpecListener listener);
 }

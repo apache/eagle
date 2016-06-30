@@ -17,10 +17,12 @@
 package org.apache.eagle.alert.coordination.model;
 
 
+import java.io.Serializable;
+
 /**
  * A slot is simply a bolt.
  */
-public class WorkSlot {
+public class WorkSlot implements Serializable {
     public String topologyName;
     public String boltId;
 

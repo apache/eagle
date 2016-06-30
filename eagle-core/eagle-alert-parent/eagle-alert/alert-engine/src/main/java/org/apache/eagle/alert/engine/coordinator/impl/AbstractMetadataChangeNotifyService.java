@@ -32,6 +32,7 @@ import org.apache.eagle.alert.engine.coordinator.MetadataType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
+import org.apache.eagle.alert.engine.router.SpecListener;
 import org.apache.eagle.alert.engine.router.SpoutSpecListener;
 import org.apache.eagle.alert.engine.router.StreamRouterBoltSpecListener;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ public abstract class AbstractMetadataChangeNotifyService implements IMetadataCh
     private final List<SpoutSpecListener> spoutSpecListeners = new ArrayList<>();
     private final List<AlertBoltSpecListener> alertBoltSpecListeners = new ArrayList<>();
     private final List<AlertPublishSpecListener> alertPublishSpecListeners = new ArrayList<>();
+    private final List<SpecListener> specListeners = new ArrayList<>();
     protected MetadataType type;
 
     /**
@@ -90,6 +92,12 @@ public abstract class AbstractMetadataChangeNotifyService implements IMetadataCh
             spoutSpecListeners.add(listener);
         }
     }
+    @Override
+    public void registerListener(SpecListener listener) {
+        synchronized (specListeners) {
+            specListeners.add(listener);
+        }
+    }
 
     protected void notifySpout(SpoutSpec spoutSpec, Map<String, StreamDefinition> sds) {
         spoutSpecListeners.forEach(s -> s.onSpoutSpecChange(spoutSpec, sds));
@@ -105,6 +113,11 @@ public abstract class AbstractMetadataChangeNotifyService implements IMetadataCh
 
     protected void notifyAlertPublishBolt(PublishSpec alertPublishSpec, Map<String, StreamDefinition> sds) {
         alertPublishSpecListeners.forEach(s -> s.onAlertPublishSpecChange(alertPublishSpec, sds));
+    }
+    protected void notifySpecListener(SpoutSpec spoutSpec,RouterSpec routerSpec,Map<String, StreamDefinition> sds) {
+        for (SpecListener specListener : specListeners){
+            specListener.onSpecChange(spoutSpec,routerSpec,sds);
+        }
     }
 
     public void close() throws IOException {

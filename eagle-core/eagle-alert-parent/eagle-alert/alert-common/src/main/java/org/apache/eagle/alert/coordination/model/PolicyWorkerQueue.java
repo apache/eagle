@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-public class PolicyWorkerQueue {
+public class PolicyWorkerQueue implements Serializable {
 
     private StreamPartition partition;
     private List<WorkSlot> workers;
