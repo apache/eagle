@@ -22,10 +22,26 @@
 	var eagleControllers = angular.module('eagleControllers');
 
 	// ======================================================================================
-	// =                                     Alert List                                     =
+	// =                                        Main                                        =
+	// ======================================================================================
+	eagleControllers.controller('alertCtrl', function ($scope, $wrapState, PageConfig) {
+		PageConfig.title = "Alert";
+		$scope.getState = function() {
+			return $wrapState.current.name;
+		};
+	});
+
+	// ======================================================================================
+	// =                                        List                                        =
 	// ======================================================================================
 	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig) {
-		PageConfig.title = "Alert";
 		PageConfig.subTitle = "Explore Alerts";
+	});
+
+	// ======================================================================================
+	// =                                       Policy                                       =
+	// ======================================================================================
+	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig) {
+		PageConfig.subTitle = "Manage Policies";
 	});
 }());

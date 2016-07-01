@@ -16,4 +16,14 @@
   limitations under the License.
   -->
 
-Yo!!!
+<div class="nav-tabs-custom">
+	<ul class="nav nav-tabs">
+		<li ng-class="{active: getState() === 'alert.list'}"><a href="#/alert/">Explore Triggered Alerts</a></li>
+		<li ng-class="{active: getState() === 'alert.policyList'}"><a href="#/alert/policyList">Manage Policies</a></li>
+		<li ng-class="{active: getState() === ''}"><a href="#/alert/create">Define Alert Policy</a></li>
+	</ul>
+	<div class="tab-content">
+		<div ui-view></div>
+	</div>
+</div>
+

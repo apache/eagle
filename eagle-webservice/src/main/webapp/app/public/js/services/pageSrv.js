@@ -49,7 +49,7 @@
 		]},
 		{name: "Alert", icon: "bell", list: [
 			{name: "Explore Alerts", path: "#/alert/"},
-			{name: "Manage Policies"},
+			{name: "Manage Policies", path: "#/alert/policyList"},
 			{name: "Define Policy"}
 		]}
 	];

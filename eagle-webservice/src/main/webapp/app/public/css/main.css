@@ -54,3 +54,8 @@
 #content {
 	position: relative;
 }
+
+.no-animate {
+	-webkit-transition: none !important;
+	transition: none !important;
+}
