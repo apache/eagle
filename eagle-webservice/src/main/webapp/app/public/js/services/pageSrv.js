@@ -25,19 +25,30 @@
 	// =                           Page                           =
 	// ============================================================
 	serviceModule.service('PageConfig', function() {
+		function PageConfig() {
+		}
+
+		PageConfig.reset = function () {
+			PageConfig.title = "";
+			PageConfig.subTitle = "";
+			PageConfig.navPath = [];
+			PageConfig.hideTitle = false;
+		};
+
+		return PageConfig;
 	});
 
 	// ============================================================
 	// =                          Portal                          =
 	// ============================================================
 	var defaultPortalList = [
-		{name: "Home", icon: "home"},
+		{name: "Home", icon: "home", path: "#/"},
 		{name: "Insight", icon: "heartbeat", list: [
 			{name: "Dashboards"},
 			{name: "Metrics"}
 		]},
 		{name: "Alert", icon: "bell", list: [
-			{name: "Explore Alerts"},
+			{name: "Explore Alerts", path: "#/alert/"},
 			{name: "Manage Policies"},
 			{name: "Define Policy"}
 		]}

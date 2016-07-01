@@ -25,10 +25,55 @@ var app = {};
 	/* App Module */
 	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'eagle.service']);
 
+	// GRUNT REPLACEMENT: eagleApp.buildTimestamp = TIMESTAMP
+	eagleApp._TRS = function() {
+		return eagleApp.buildTimestamp || Math.random();
+	};
+
+	// ======================================================================================
+	// =                                   Router config                                    =
+	// ======================================================================================
+	function routeResolve() {
+		return {};
+	}
+
+	eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
+		$urlRouterProvider.otherwise("/");
+		$stateProvider
+		// ================================== Home ==================================
+			.state('home', {
+				url: "/",
+				templateUrl: "partials/home.html?_=" + eagleApp._TRS(),
+				controller: "homeCtrl",
+				resolve: routeResolve()
+			})
+			.state('setup', {
+				url: "/setup",
+				templateUrl: "partials/setup.html?_=" + eagleApp._TRS(),
+				controller: "setupCtrl",
+				resolve: routeResolve()
+			})
+		// ================================= Alerts =================================
+			.state('alerts', {
+				url: "/alert/",
+				templateUrl: "partials/alert/list.html?_=" + eagleApp._TRS(),
+				controller: "alertListCtrl",
+				resolve: routeResolve()
+			});
+	});
+
 	// ======================================================================================
 	// =                                   Main Controller                                  =
 	// ======================================================================================
-	eagleApp.controller('MainCtrl', function ($scope, Portal) {
+	eagleApp.controller('MainCtrl', function ($scope, PageConfig, Portal) {
+		window._PageConfig = $scope.PageConfig = PageConfig;
 		window._Portal = $scope.Portal = Portal;
+
+		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
+			console.log("[Switch] current ->", current, currentParam);
+			console.log("[Switch] next ->", next, nextParam);
+			// Page initialization
+			PageConfig.reset();
+		});
 	});
 }());

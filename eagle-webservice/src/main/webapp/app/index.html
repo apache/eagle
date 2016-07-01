@@ -60,7 +60,7 @@
 					<div class="navbar-custom-menu">
 						<ul class="nav navbar-nav">
 							<li>
-								<a class="btn btn-xs" data-toggle="dropdown" aria-expanded="false">
+								<a data-toggle="dropdown" aria-expanded="false">
 									<i class="glyphicon glyphicon-question-sign"></i>
 								</a>
 
@@ -96,16 +96,16 @@
 					</div>
 					<ul class="sidebar-menu">
 						<li ng-repeat="portal in Portal.list() track by $index" ng-class="{treeview: portal.list}">
-							<a>
-								<span class="fa fa-{{portal.icon || 'circle-o'}}"></span>
-								{{portal.name}}
-								<span class="fa fa-angle-left pull-right" ng-if="portal.list"></span>
+							<a ng-href="{{portal.path}}">
+								<i class="fa fa-{{portal.icon || 'circle-o'}}"></i>
+								<span>{{portal.name}}</span>
+								<i class="fa fa-angle-left pull-right" ng-if="portal.list"></i>
 							</a>
 							<ul class="treeview-menu" ng-if="portal.list">
 								<li ng-repeat="subPortal in portal.list track by $index">
-									<a>
-										<span class="fa fa-{{subPortal.icon || 'circle-o'}}"></span>
-										{{subPortal.name}}
+									<a ng-href="{{subPortal.path}}">
+										<i class="fa fa-{{subPortal.icon || 'circle-o'}}"></i>
+										<span>{{subPortal.name}}</span>
 									</a>
 								</li>
 							</ul>
@@ -119,10 +119,10 @@
 			<!-- Right side column. Contains the navbar and content of the page -->
 			<div class="content-wrapper">
 				<!-- Content Header (Page header) -->
-				<section class="content-header" ng-hide="PageConfig.hideSidebar">
+				<section class="content-header" ng-hide="PageConfig.hideTitle">
 					<h1>
-						<span class="pageTitle">{{PageConfig.pageTitle}}</span>
-						<small class="pageSubTitle">{{PageConfig.pageSubTitle}}</small>
+						<span class="pageTitle">{{PageConfig.title}}</span>
+						<small class="pageSubTitle">{{PageConfig.subTitle}}</small>
 					</h1>
 
 
@@ -181,6 +181,7 @@
 		<!-- Service -->
 		<script src="public/js/services/main.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/services/pageSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/wrapStateSrv.js" type="text/javascript" charset="utf-8"></script>
 		<!--script src="public/js/srv/main.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/applicationSrv.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/srv/authorizationSrv.js" type="text/javascript" charset="utf-8"></script>
@@ -208,6 +209,8 @@
 
 		<!-- Controllers -->
 		<script src="public/js/ctrls/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/mainCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/alertCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<!--script src="public/js/ctrls/authController.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/configurationController.js" type="text/javascript" charset="utf-8"></script-->
 		<!-- endref -->
