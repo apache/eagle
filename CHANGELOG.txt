@@ -1,5 +1,5 @@
 
-Release Notes - Eagle - Version v0.4.0
+Release Notes - Apache Eagle v0.4.0 (incubating)
 
 ** Highlights **
     * JBDC Metadata Storage Extension
