@@ -53,11 +53,15 @@ The fastest way to get started with Eagle is to run with [docker](https://github
 As another alternative option, you could [install eagle package in sandbox](https://eagle.incubator.apache.org/docs/deployment-in-sandbox.html) manualy as well.
 
 ## Building Eagle (Supports JDK-1.7.x)
-Eagle is built using [Apache Maven](https://maven.apache.org/). NPM should be installed (On MAC OS try "brew install node"). To build Eagle, run:
+_**Note:**_
+
+1. Currently eagle is tested on **JDK-1.7.X**, currently (v0.4.0) not supporting JDK 1.8.
+2. **NPM** should be installed (On MAC OS try "brew install node"), this is a prerequisite.
+3. Eagle is built using [Apache Maven](https://maven.apache.org/). 
+
+To build Eagle, run:
 
     mvn -DskipTests clean package
-
-Note : Currently eagle is tested on JDK-1.7.X . Eagle does not support JDK 1.8.
 
 After successfully building, you will find eagle binary tarball under _eagle-assembly/target/_
 
