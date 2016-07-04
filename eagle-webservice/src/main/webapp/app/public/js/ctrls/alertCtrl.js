@@ -43,5 +43,13 @@
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig) {
 		PageConfig.subTitle = "Manage Policies";
+
+		$scope.testList = [];
+		for(var i = 0 ; i < 3 ; i += 1) {
+			$scope.testList.push("Item" + Math.random());
+		}
+
+		$scope.dddList = ["Good", "Tester"];
+		$scope.emptyList = [];
 	});
 }());

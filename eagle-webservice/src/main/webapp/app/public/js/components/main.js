@@ -20,5 +20,5 @@
 (function() {
 	'use strict';
 
-	var eagleComponents = angular.module('eagle.components', []);
+	angular.module('eagle.components', []);
 })();
