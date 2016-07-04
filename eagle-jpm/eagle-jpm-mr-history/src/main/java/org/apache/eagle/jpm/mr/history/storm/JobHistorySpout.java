@@ -72,8 +72,6 @@ import java.util.Map;
  * Note:
  * if one spout instance crashes and is brought up again, open() method would be invoked again, we need think of this scenario.
  *
- * @author yonzhang
- *
  */
 
 public class JobHistorySpout extends BaseRichSpout {
