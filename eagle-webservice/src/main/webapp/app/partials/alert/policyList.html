@@ -16,12 +16,34 @@
   limitations under the License.
   -->
 
-<div sort-table>
+<div sort-table="policyList">
 	<table class="table table-bordered">
-		<tbody>
-		<tr st-repeat="item in emptyList track by $index">
-			<td>{{item}}</td>
-		</tr>
+		<thead>
+			<tr>
+				<th sortpath="name" width="20%">Name</th>
+				<th sortpath="definition.type" width="50">Type</th>
+				<th>Description</th>
+				<th width="85">Action</th>
+			</tr>
+		</thead>
+		<tbody ts-repeat>
+			<tr>
+				<td>{{item.name}}</td>
+				<td class="text-center"><span class="label label-primary">{{item.definition.type}}</span></td>
+				<td>{{item.description}}</td>
+				<td class="text-center">
+					<div class="btn-group btn-group-xs">
+						<button class="btn btn-default"><span class="fa fa-play"></span></button>
+						<button class="btn btn-default"><span class="fa fa-pencil"></span></button>
+						<button class="btn btn-default"><span class="fa fa-trash"></span></button>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="4"><pre>{{item.definition.value}}</pre></td>
+			</tr>
 		</tbody>
 	</table>
 </div>
+
+{{policies}}

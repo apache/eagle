@@ -21,56 +21,76 @@
 
 	var eagleComponents = angular.module('eagle.components');
 
-	// =======================================================================================
-	// =                                       Wrapper                                       =
-	// =======================================================================================
 	eagleComponents.directive('sortTable', function($compile) {
 		'use strict';
 
 		return {
 			restrict: 'AE',
-			controller: function($scope, $element, $attrs) {
-				//console.log("Controller >>>", $scope, $element, $attrs);
-				//console.log($element.html());
-			},
-			/*compile: function ($element, $attrs, transclude) {
-				return {
-					pre: function preLink($scope, $element, $attrs, controller) {
-						console.log("Pre >>>", $scope, $element, $attrs, controller);
-						console.log($element.html());
-					},
-					post: function preLink($scope, $element, $attrs, controller) {
-						console.log("Post >>>", $scope, $element, $attrs, controller);
-						console.log($element.html());
-					}
-				}
-			}*/
-		};
-	});
-
-	// =======================================================================================
-	// =                                       Wrapper                                       =
-	// =======================================================================================
-	eagleComponents.directive('stRepeat', function($compile) {
-		'use strict';
-
-		return {
+			scope: true,
 			terminal: true,
-			//multiElement: true,
-			require: "^sortTable",
 			priority: 1001,
-			controller: function () {
-			},
-			compile: function ($element, $attrs, transclude) {
-				return {
-					pre: function($scope, $element, $attrs, controller) {
-						var repeatStr = $element.attr("st-repeat") || $element.attr("ng-repeat");
-						console.log(repeatStr);
-						$element.removeAttr("st-repeat");
-						$element.attr("ng-repeat", "item in dddList track by $index");
-						$compile($element)($scope);
+			controller: function($scope, $element, $attrs) {
+				// Initialization
+				$scope.pageNumber = 1;
+				$scope.pageSize = 10;
+				$scope.maxSize = 10;
+				$scope.search = "";
+
+				// Functions
+				$scope.doSort = function(path) {
+					if($scope.orderKey === path) {
+						$scope.orderKey = "-" + path;
+					} else {
+						$scope.orderKey = path;
 					}
 				};
+				$scope.checkSortClass = function(key) {
+					if($scope.orderKey === key) {
+						return "fa fa-sort-asc sort-mark";
+					} else if($scope.orderKey === "-" + key) {
+						return "fa fa-sort-desc sort-mark";
+					}
+					return "fa fa-sort sort-mark";
+				};
+			},
+			compile: function () {
+				return {
+					pre: function preLink($scope, $element, $attrs) {
+						// Search Box
+						var $search = $(
+							'<div class="search-box">' +
+							'<input type="search" class="form-control input-sm" placeholder="Search" ng-model="search" />' +
+							'<span class="fa fa-search" />' +
+							'</div>'
+						).prependTo($element);
+						$compile($search)($scope);
+
+						// Sort Column
+						$element.find("table [sortpath]").each(function () {
+							var $this = $(this);
+							var _sortpath = $this.attr("sortpath");
+							$this.attr("ng-click", "doSort('" + _sortpath + "')");
+							$this.prepend('<span ng-class="checkSortClass(\'' + _sortpath + '\')"></span>');
+							$compile($this)($scope);
+						});
+
+						// Repeat Items
+						var $tr = $element.find("table [ts-repeat], table > tbody > tr").filter(":first");
+						$tr.attr("ng-repeat", 'item in (filteredList = (' + $attrs.sortTable + ' | filter: search | orderBy: orderKey)).slice((pageNumber - 1) * pageSize, pageNumber * pageSize) track by $index');
+						$compile($tr)($scope);
+
+						// Page Navigation
+						var $navigation = $(
+							'<div class="navigation-bar clearfix">' +
+								'<span>' +
+									'show {{(pageNumber - 1) * pageSize + 1}} to {{pageNumber * pageSize}} of {{filteredList.length}} items' +
+								'</span>' +
+								'<uib-pagination total-items="filteredList.length" ng-model="pageNumber" boundary-links="true" items-per-page="pageSize" max-size="maxSize"></uib-pagination>' +
+							'</div>'
+						).appendTo($element);
+						$compile($navigation)($scope);
+					}
+				}
 			}
 		};
 	});

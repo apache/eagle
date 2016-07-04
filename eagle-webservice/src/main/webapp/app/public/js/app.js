@@ -80,10 +80,11 @@ var app = {};
 	// ======================================================================================
 	var STATE_NAME_MATCH = /^[^\.]*/;
 
-	eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal) {
+	eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity) {
+		window._WrapState = $scope.$wrapState = $wrapState;
 		window._PageConfig = $scope.PageConfig = PageConfig;
 		window._Portal = $scope.Portal = Portal;
-		window._WrapState = $scope.$wrapState = $wrapState;
+		window._Entity = $scope.Entity = Entity;
 
 		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
 			console.log("[Switch] current ->", current, currentParam);

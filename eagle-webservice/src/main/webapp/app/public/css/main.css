@@ -17,6 +17,9 @@
  * limitations under the License.
  */
 
+/* ========================================================================
+ * =                               Side Bar                               =
+ * ======================================================================== */
 .sidebar-mini.sidebar-collapse .main-header .logo > .logo-mini > img {
 	max-height: 30px;
 }
@@ -51,10 +54,43 @@
 	top: 13px;
 }
 
+/* ========================================================================
+ * =                                 Main                                 =
+ * ======================================================================== */
 #content {
 	position: relative;
 }
 
+/* ========================================================================
+ * =                                Table                                 =
+ * ======================================================================== */
+/*table.table tbody.info-wrapper {
+	border-top: 1px solid #f4f4f4;
+}*/
+
+table .info-wrapper .info-detail {
+	display: none;
+}
+
+table .info-wrapper:hover .info-detail {
+	display: table-row;
+}
+
+table.table pre {
+	white-space: pre-wrap;
+	margin: 0;
+}
+
+table.table pre.inline {
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+}
+
+/* ========================================================================
+ * =                                 Misc                                 =
+ * ======================================================================== */
 .no-animate {
 	-webkit-transition: none !important;
 	transition: none !important;

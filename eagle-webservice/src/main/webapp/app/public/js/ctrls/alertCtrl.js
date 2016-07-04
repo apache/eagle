@@ -41,15 +41,23 @@
 	// ======================================================================================
 	// =                                       Policy                                       =
 	// ======================================================================================
-	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig) {
+	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity) {
 		PageConfig.subTitle = "Manage Policies";
 
-		$scope.testList = [];
-		for(var i = 0 ; i < 3 ; i += 1) {
-			$scope.testList.push("Item" + Math.random());
-		}
+		$scope.policyList = Entity.queryMetadata("policies");
+		console.log($scope.policyList);
 
-		$scope.dddList = ["Good", "Tester"];
-		$scope.emptyList = [];
+		$scope.policyList1 = [
+			{definition: {
+				type: "111",
+				value: "assssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\n" +
+				"assssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\n" +
+				"assssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\n" +
+				"assssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\n" +
+				"assssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+			}},
+			{definition: {type: "222"}},
+			{definition: {type: "333"}},
+		];
 	});
 }());
