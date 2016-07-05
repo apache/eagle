@@ -12,6 +12,7 @@
 	  "recipients": "receiver@corp.com",
 	  "smtp.server":"mailhost.com"
 	},
-	"dedupIntervalMin" : "1"
+	"dedupIntervalMin" : "PT1M",
+	"serializer" : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
 }
 ]

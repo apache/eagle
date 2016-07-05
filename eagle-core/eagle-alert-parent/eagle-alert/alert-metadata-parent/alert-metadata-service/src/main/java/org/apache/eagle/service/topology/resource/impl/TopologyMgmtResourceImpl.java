@@ -28,7 +28,7 @@ import org.apache.eagle.alert.engine.UnitTopologyMain;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
-import org.apache.eagle.alert.metadata.resource.IMetadataDao;
+import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

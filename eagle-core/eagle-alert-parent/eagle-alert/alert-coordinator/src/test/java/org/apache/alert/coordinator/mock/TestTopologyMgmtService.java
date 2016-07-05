@@ -24,7 +24,6 @@ import org.apache.eagle.alert.coordinator.TopologyMgmtService;
 import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.GroupBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
-import org.junit.Test;
 
 public class TestTopologyMgmtService extends TopologyMgmtService {
 
@@ -32,10 +31,6 @@ public class TestTopologyMgmtService extends TopologyMgmtService {
     
     private int i = 0;
 
-    @Test
-    public void test(){
-
-    }
     @Override
     public TopologyMeta creatTopology() {
         TopologyMeta tm = new TopologyMeta();

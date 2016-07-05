@@ -181,4 +181,50 @@ public class CorrelationSpoutTest {
         }
         Assert.assertTrue(verified.get());
     }
+
+//    @Ignore
+//    @SuppressWarnings("rawtypes")
+//    @Test
+//    public void testSpout() {
+//        String topoId = "testMetadataInjection";
+//        final AtomicBoolean verified = new AtomicBoolean(false);
+//        Config config = ConfigFactory.load();
+//        CorrelationSpout spout = new CorrelationSpout(config, topoId, null, 1);
+//
+//        TopologyBuilder builder = new TopologyBuilder();
+//        // only one spout
+//        builder.setSpout("cc-spout", spout);
+//        builder.setBolt("recv-bolt", new RecvBolt()).globalGrouping("cc-spout");
+//
+//        StormTopology topology = builder.createTopology();
+//        LocalCluster cluster = new LocalCluster();
+//        cluster.submitTopology(topoId, new HashMap(), topology);
+//
+//        while (true) {
+//            try {
+//                Thread.sleep(1000);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+//    
+//    @SuppressWarnings("serial")
+//    private static class RecvBolt extends BaseRichBolt {
+//
+//        @Override
+//        public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+//        }
+//
+//        @Override
+//        public void execute(Tuple input) {
+//            
+//        }
+//
+//        @Override
+//        public void declareOutputFields(OutputFieldsDeclarer declarer) {
+//        }
+//        
+//    }
+
 }

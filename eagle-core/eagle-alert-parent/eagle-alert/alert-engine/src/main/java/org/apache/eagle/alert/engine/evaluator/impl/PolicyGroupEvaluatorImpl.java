@@ -90,7 +90,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
                     policyStreamHandler.getValue().send(partitionedEvent.getEvent());
                 } catch (Exception e) {
                     this.context.counter().scope("fail_count").incr();
-                    LOG.error("{} failed to handle {}",policyStreamHandler.getValue(), partitionedEvent.getEvent());
+                    LOG.error("{} failed to handle {}",policyStreamHandler.getValue(), partitionedEvent.getEvent(), e);
                 }
             }
         }

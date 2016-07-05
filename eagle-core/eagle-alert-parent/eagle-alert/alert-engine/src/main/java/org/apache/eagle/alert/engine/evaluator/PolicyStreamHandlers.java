@@ -20,13 +20,17 @@ import java.util.Map;
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyHandler;
+import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyHandler;
 
 public class PolicyStreamHandlers {
     public static final String SIDDHI_ENGINE ="siddhi";
+    public static final String NO_DATA_ALERT_ENGINE ="nodataalert";
 
     public static PolicyStreamHandler createHandler(String type, Map<String, StreamDefinition> sds){
         if(SIDDHI_ENGINE.equals(type)) {
             return new SiddhiPolicyHandler(sds);
+        }else if(NO_DATA_ALERT_ENGINE.equals(type)){
+            return new NoDataPolicyHandler(sds);
         }
         throw new IllegalArgumentException("Illegal policy stream handler type: "+type);
     }

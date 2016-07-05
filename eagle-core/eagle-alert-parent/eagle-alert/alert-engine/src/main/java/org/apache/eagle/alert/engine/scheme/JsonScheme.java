@@ -40,7 +40,8 @@ public class JsonScheme implements Scheme {
 
     private String topic;
 
-    public JsonScheme(String topic) {
+    @SuppressWarnings("rawtypes")
+    public JsonScheme(String topic, Map conf) {
         this.topic = topic;
     }
 

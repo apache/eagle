@@ -10,16 +10,13 @@
 	WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. ~ See the 
 	License for the specific language governing permissions and ~ limitations 
 	under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.apache.eagle</groupId>
-		<artifactId>eagle-alert-parent</artifactId>
-		<version>0.5.0-incubating-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
-	<artifactId>eagle-alert</artifactId>
+	<groupId>org.apache.eagle</groupId>
+	<artifactId>alert-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -29,18 +26,114 @@
 		<module>alert-coordinator</module>
 		<module>alert-assembly</module>
 		<module>alert-devtools</module>
+		<module>alert-service</module>
 	</modules>
+
+	<properties>
+		<!-- Runtime -->
+		<java.version>1.8</java.version>
+
+		<!-- Build -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven-compiler.version>2.0.2</maven-compiler.version>
+		<maven-apache-rat.version>0.11</maven-apache-rat.version>
+
+		<!-- Test -->
+		<junit.version>4.12</junit.version>
+
+		<!-- Utilities -->
+		<typesafe-config.version>1.2.1</typesafe-config.version>
+		<guava.version>19.0</guava.version>
+		<commons-lang3.version>3.3.2</commons-lang3.version>
+		<commons-collections.version>3.2.1</commons-collections.version>
+		<commons-lang.version>2.6</commons-lang.version>
+		<archaius.version>0.6.1</archaius.version>
+		<metrics.version>3.1.0</metrics.version>
+		<mapdb.version>3.0.0-M6</mapdb.version>
+
+		<!-- CEP -->
+		<siddhi.version>3.0.5</siddhi.version>
+
+		<!-- PUBLISH -->
+		<velocity.version>1.7</velocity.version>
+		<javax.mail.version>1.4</javax.mail.version>
+
+		<!-- JSON -->
+		<jackson.version>1.9.13</jackson.version>
+		<fasterxml-jackson.version>2.5.4</fasterxml-jackson.version>
+		<codehaus-jackson.version>1.9.13</codehaus-jackson.version>
+
+		<!-- Storm and Kafka -->
+		<storm.version>0.9.3</storm.version>
+		<storm-kafka.version>0.10.0</storm-kafka.version>
+		<kafka-clients.version>0.8.2.0</kafka-clients.version>
+		<kafka.version>0.10.0.0</kafka.version>
+		<kafka.artifact.id>kafka_2.11</kafka.artifact.id>
+		<zkclient.version>0.3</zkclient.version>
+		<slf4j-api.veresion>1.7.20</slf4j-api.veresion>
+		<slf4j-log4j12.veresion>1.7.20</slf4j-log4j12.veresion>
+		<logback.version>1.1.7</logback.version>
+
+		<!-- Web Service/Client -->
+		<jersey.version>1.19.1</jersey.version>
+		<!--<jersey-client.version>1.19.1</jersey-client.version> -->
+		<!--<jersey-server.version>1.19.1</jersey-server.version> -->
+		<!--<jersey-multipart.version>1.19.1</jersey-multipart.version> -->
+
+		<jetty.version>9.2.3.v20140905</jetty.version>
+		<tomcat-embed.version>7.0.55</tomcat-embed.version>
+		<swagger.version>1.5.8</swagger.version>
+		<curator-framework.version>2.8.0</curator-framework.version>
+		<mongodb.version>3.2.2</mongodb.version>
+		<mysql-connector-java.version>5.1.34</mysql-connector-java.version>
+        <ddlutils.version>1.0</ddlutils.version>
+		<mockito.version>1.10.19</mockito.version>
+		<joda.version>2.2</joda.version>
+		<metrics-elasticsearch-reporter.version>2.2.0</metrics-elasticsearch-reporter.version>
+
+		<curator.test.version>2.5.0</curator.test.version>
+		<common.cli.version>1.3.1</common.cli.version>
+		
+		<!-- internal storm-kafka library with fix based on official storm-kafka 0.10.0 release -->
+		<storm-kafka-client.version>0.10.0-SNAPSHOT</storm-kafka-client.version>
+		
+		<!-- dropwizard -->
+		<dropwizard.version>0.7.1</dropwizard.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>Maven Central Repository</id>
+			<url>http://central.maven.org/maven2/</url>
+		</repository>
+		<repository>
+			<id>HDP Release Repository</id>
+			<url>http://repo.hortonworks.com/content/repositories/releases/</url>
+		</repository>
+		<repository>
+			<id>HDP Central Repository</id>
+			<url>http://repo.hortonworks.com/content/repositories/central/</url>
+		</repository>
+		<repository>
+			<id>WSO2 Public</id>
+			<url>http://maven.wso2.org/nexus/content/groups/wso2-public</url>
+		</repository>
+		<repository>
+			<id>straas-nexus.snapshots</id>
+			<name>straas nexus</name>
+			<url>http://straas-nexus.vip.slc01.dev.ebayc3.com/content/repositories/snapshots</url>
+		</repository>
+		<repository>
+			<id>ebaycentral.releases</id>
+			<url>http://ebaycentral.corp.ebay.com/content/repositories/releases</url>
+		</repository>
+	</repositories>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>
-				<version>${fasterxml-jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
 				<version>${fasterxml-jackson.version}</version>
 			</dependency>
 			<dependency>
@@ -61,12 +154,17 @@
 			<dependency>
 				<groupId>org.apache.curator</groupId>
 				<artifactId>curator-framework</artifactId>
-				<version>${curator.version}</version>
+				<version>${curator-framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-test</artifactId>
+				<version>${curator.test.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.curator</groupId>
 				<artifactId>curator-recipes</artifactId>
-				<version>${curator.version}</version>
+				<version>${curator-framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
@@ -107,7 +205,7 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
-				<version>${slf4j-log4j12.version}</version>
+				<version>${slf4j-log4j12.veresion}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.storm</groupId>
@@ -140,11 +238,6 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-client</artifactId>
-				<version>${jersey.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-jaxrs</artifactId>
 				<version>${codehaus-jackson.version}</version>
@@ -162,7 +255,7 @@
 			<dependency>
 				<groupId>com.typesafe</groupId>
 				<artifactId>config</artifactId>
-				<version>${typesafe.config.version}</version>
+				<version>${typesafe-config.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.netflix.archaius</groupId>
@@ -227,9 +320,20 @@
 				<artifactId>zkclient</artifactId>
 				<version>${zkclient.version}</version>
 			</dependency>
+	
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.sun.jersey</groupId>
 				<artifactId>jersey-server</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-json</artifactId>
 				<version>${jersey.version}</version>
 			</dependency>
 			<dependency>
@@ -242,6 +346,7 @@
 				<artifactId>jersey-multipart</artifactId>
 				<version>${jersey.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.apache.tomcat.embed</groupId>
 				<artifactId>tomcat-embed-core</artifactId>
@@ -255,7 +360,7 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
+				<version>${slf4j-api.veresion}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.swagger</groupId>
@@ -277,12 +382,96 @@
 				<artifactId>metrics-elasticsearch-reporter</artifactId>
 				<version>${metrics-elasticsearch-reporter.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>${common.cli.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.ebay</groupId>
+				<artifactId>storm-kafka-client</artifactId>
+				<version>${storm-kafka-client.version}</version>
+			</dependency>
+			
+			<!-- dropwizard -->
+		    <dependency>
+		        <groupId>io.dropwizard</groupId>
+		        <artifactId>dropwizard-core</artifactId>
+		        <version>${dropwizard.version}</version>
+		        <exclusions>
+			        <exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+		        </exclusions>
+		    </dependency>
+		    <dependency>
+		        <groupId>io.dropwizard</groupId>
+		        <artifactId>dropwizard-jersey</artifactId>
+		        <version>${dropwizard.version}</version>
+		        <exclusions>
+			        <exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+		        </exclusions>
+		    </dependency>
+		    <dependency>
+				<groupId>io.swagger</groupId>
+				<artifactId>swagger-jersey-jaxrs</artifactId>
+				<version>${swagger.version}</version>
+				<scope>compile</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>*</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.rat</groupId>
+				<artifactId>apache-rat-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>header-check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<useDefaultExcludes>true</useDefaultExcludes>
+							<excludes>
+								<exclude>**/*.out</exclude>
+								<exclude>**/*.log</exclude>
+								<exclude>**/*.json</exclude>
+								<exclude>**/*.classpath</exclude>
+								<exclude>**/*.project</exclude>
+								<exclude>**/*.prefs</exclude>
+								<exclude>**/*.iml</exclude>
+								<exclude>**/MANIFEST.MF</exclude>
+								<exclude>**/dependency-reduced-pom.xml</exclude>
+                                                                <exclude>**/target/**</exclude>`
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.rat</groupId>
+					<artifactId>apache-rat-plugin</artifactId>
+					<version>${maven-apache-rat.version}</version>
+					<configuration>
+						<useDefaultExcludes>true</useDefaultExcludes>
+					</configuration>
+				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler.version}</version>

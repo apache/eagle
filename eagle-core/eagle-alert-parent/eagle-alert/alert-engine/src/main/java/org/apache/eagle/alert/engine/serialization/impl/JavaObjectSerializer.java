@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.alert.engine.serialization.impl;
 
-import org.apache.commons.lang3.SerializationUtils;
-import org.apache.eagle.alert.engine.serialization.Serializer;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
+
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.eagle.alert.engine.serialization.Serializer;
 
 public class JavaObjectSerializer implements Serializer<Object> {
     @Override

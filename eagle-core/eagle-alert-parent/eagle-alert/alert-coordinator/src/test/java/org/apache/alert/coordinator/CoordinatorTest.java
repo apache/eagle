@@ -31,8 +31,11 @@ import org.apache.eagle.alert.coordinator.Coordinator;
 import org.apache.eagle.alert.coordinator.ScheduleOption;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
+import org.apache.eagle.alert.utils.ZookeeperEmbedded;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -44,6 +47,21 @@ import com.typesafe.config.ConfigFactory;
  *
  */
 public class CoordinatorTest {
+
+    private static ZookeeperEmbedded zkEmbed;
+
+    @BeforeClass
+    public static void setup() throws Exception {
+
+        zkEmbed = new ZookeeperEmbedded(2181);
+        zkEmbed.start();
+
+    }
+
+    @AfterClass
+    public static void teardown() {
+        zkEmbed.shutdown();
+    }
 
     @SuppressWarnings({ "resource", "unused" })
     @Ignore
@@ -75,7 +93,6 @@ public class CoordinatorTest {
     }
 
     @SuppressWarnings({ "resource", "unused" })
-    @Ignore
     @Test
     public void test_01() throws Exception {
         before();
@@ -120,6 +137,11 @@ public class CoordinatorTest {
         System.setProperty("config.resource", "/test-application.conf");
         ConfigFactory.invalidateCaches();
         ConfigFactory.load().getConfig("coordinator");
+    }
+    
+    @Test
+    public void test_Schedule() {
+        Coordinator.startSchedule();
     }
 
 }

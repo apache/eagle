@@ -37,7 +37,7 @@ import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
-import org.apache.eagle.alert.metadata.resource.IMetadataDao;
+import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 
@@ -57,7 +57,7 @@ public class MetadataResource {
     public List<StreamingCluster> listClusters() {
         return dao.listClusters();
     }
-
+    
     @Path("/clear")
     @POST
     public OpResult clear() {

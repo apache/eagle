@@ -1,0 +1,20 @@
+[
+	{
+		"name":"test-stream-output",
+		"type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
+		"policyIds": [
+			"noDataAlertPolicy"
+		],
+		"properties": {
+			"subject":"UMP Test Alert",
+			"template":"",
+			"sender": "sender@corp.com",
+			"recipients": "yonzhang@ebay.com",
+			"smtp.server":"atom.corp.ebay.com",
+			"connection": "plaintext",
+			"smtp.port": "25"
+		},
+		"dedupIntervalMin" : "PT5M",
+		"serializer" : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
+	}
+]

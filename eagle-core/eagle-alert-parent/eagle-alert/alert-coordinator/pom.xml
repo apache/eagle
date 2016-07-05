@@ -15,9 +15,8 @@
 
 	<parent>
 		<groupId>org.apache.eagle</groupId>
-		<artifactId>eagle-alert</artifactId>
-		<version>0.5.0-incubating-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
+		<artifactId>alert-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>alert-coordinator</artifactId>

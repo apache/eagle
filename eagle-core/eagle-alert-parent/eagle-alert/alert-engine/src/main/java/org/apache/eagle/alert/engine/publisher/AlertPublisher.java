@@ -2,6 +2,7 @@ package org.apache.eagle.alert.engine.publisher;
 
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
@@ -24,7 +25,8 @@ import com.typesafe.config.Config;
  * limitations under the License.
  */
 public interface AlertPublisher extends AlertPublishListener, Serializable {
-    void init(Config config);
+    @SuppressWarnings("rawtypes")
+    void init(Config config, Map stormConfig);
     String getName();
     void nextEvent(AlertStreamEvent event);
     void close();
