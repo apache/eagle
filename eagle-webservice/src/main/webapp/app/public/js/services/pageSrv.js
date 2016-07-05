@@ -50,7 +50,7 @@
 		{name: "Alert", icon: "bell", list: [
 			{name: "Explore Alerts", path: "#/alert/"},
 			{name: "Manage Policies", path: "#/alert/policyList"},
-			{name: "Define Policy"}
+			{name: "Define Policy", path: "#/alert/policyCreate"}
 		]}
 	];
 	var adminPortalList = [

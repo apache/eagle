@@ -72,6 +72,12 @@ var app = {};
 				templateUrl: "partials/alert/policyList.html?_=" + eagleApp._TRS(),
 				controller: "policyListCtrl",
 				resolve: routeResolve()
+			})
+			.state('alert.policyCreate', {
+				url: "policyCreate",
+				templateUrl: "partials/alert/policyCreate.html?_=" + eagleApp._TRS(),
+				controller: "policyCreateCtrl",
+				resolve: routeResolve()
 			});
 	});
 

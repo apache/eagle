@@ -45,19 +45,9 @@
 		PageConfig.subTitle = "Manage Policies";
 
 		$scope.policyList = Entity.queryMetadata("policies");
-		console.log($scope.policyList);
+	});
 
-		$scope.policyList1 = [
-			{definition: {
-				type: "111",
-				value: "assssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\n" +
-				"assssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\n" +
-				"assssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\n" +
-				"assssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\n" +
-				"assssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-			}},
-			{definition: {type: "222"}},
-			{definition: {type: "333"}},
-		];
+	eagleControllers.controller('policyCreateCtrl', function ($scope, $wrapState, PageConfig, Entity) {
+		PageConfig.subTitle = "Define Alert Policy";
 	});
 }());
