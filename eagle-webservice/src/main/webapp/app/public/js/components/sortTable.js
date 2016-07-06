@@ -27,7 +27,7 @@
 		return {
 			restrict: 'AE',
 			scope: true,
-			terminal: true,
+			//terminal: true,
 			priority: 1001,
 			controller: function($scope, $element, $attrs) {
 				// Initialization
@@ -53,9 +53,13 @@
 					return "fa fa-sort sort-mark";
 				};
 			},
-			compile: function () {
+			compile: function ($element) {
+				var contents = $element.contents().remove();
+
 				return {
-					pre: function preLink($scope, $element, $attrs) {
+					post: function preLink($scope, $element, $attrs) {
+						$element.append(contents);
+
 						// Search Box
 						var $search = $(
 							'<div class="search-box">' +
@@ -82,10 +86,10 @@
 						// Page Navigation
 						var $navigation = $(
 							'<div class="navigation-bar clearfix">' +
-								'<span>' +
-									'show {{(pageNumber - 1) * pageSize + 1}} to {{pageNumber * pageSize}} of {{filteredList.length}} items' +
-								'</span>' +
-								'<uib-pagination total-items="filteredList.length" ng-model="pageNumber" boundary-links="true" items-per-page="pageSize" max-size="maxSize"></uib-pagination>' +
+							'<span>' +
+							'show {{(pageNumber - 1) * pageSize + 1}} to {{pageNumber * pageSize}} of {{filteredList.length}} items' +
+							'</span>' +
+							'<uib-pagination total-items="filteredList.length" ng-model="pageNumber" boundary-links="true" items-per-page="pageSize" max-size="maxSize"></uib-pagination>' +
 							'</div>'
 						).appendTo($element);
 						$compile($navigation)($scope);

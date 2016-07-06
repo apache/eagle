@@ -16,32 +16,48 @@
   limitations under the License.
   -->
 
-<div sort-table="policyList">
-	<table class="table table-bordered">
-		<thead>
-			<tr>
-				<th sortpath="name" width="20%">Name</th>
-				<th sortpath="definition.type" width="50">Type</th>
-				<th>Description</th>
-				<th width="85">Action</th>
-			</tr>
-		</thead>
-		<tbody ts-repeat>
-			<tr>
-				<td>{{item.name}}</td>
-				<td class="text-center"><span class="label label-primary">{{item.definition.type}}</span></td>
-				<td>{{item.description}}</td>
-				<td class="text-center">
-					<div class="btn-group btn-group-xs">
-						<button class="btn btn-default"><span class="fa fa-play"></span></button>
-						<button class="btn btn-default"><span class="fa fa-pencil"></span></button>
-						<button class="btn btn-default"><span class="fa fa-trash"></span></button>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="4"><pre>{{item.definition.value}}</pre></td>
-			</tr>
-		</tbody>
-	</table>
+<div class="box box-solid">
+	<div class="box-body">
+		<div sort-table="policyList" ng-show="policyList.length">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th sortpath="name" width="20%">Name</th>
+						<th sortpath="definition.type" width="70">Type</th>
+						<th>Description</th>
+						<th width="85">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<a ng-href="#/alert/policyEdit/{{item.name}}">{{item.name}}</a>
+						</td>
+						<td class="text-center"><span class="label label-primary">{{item.definition.type}}</span></td>
+						<td>{{item.description}}</td>
+						<td class="text-center">
+							<div class="btn-group btn-group-xs">
+								<button class="btn btn-default"><span class="fa fa-play"></span></button>
+								<button class="btn btn-default"><span class="fa fa-pencil"></span></button>
+								<button class="btn btn-danger" ng-click="deletePolicy(item)"><span class="fa fa-trash"></span></button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="callout callout-warning no-margin" ng-show="policyList._done && policyList.length === 0">
+			<h4>No Policy yet</h4>
+			<p>You have not create policy yet. Click <a href="#/alert/policyCreate">here</a> to create a new policy.</p>
+		</div>
+	</div>
+
+	<div class="overlay" ng-if="!policyList._done">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+
+	<div class="box-footer text-right">
+		<a href="#/alert/policyCreate" class="btn btn-primary">New Policy</a>
+	</div>
 </div>

@@ -75,8 +75,14 @@ var app = {};
 			})
 			.state('alert.policyCreate', {
 				url: "policyCreate",
-				templateUrl: "partials/alert/policyCreate.html?_=" + eagleApp._TRS(),
+				templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
 				controller: "policyCreateCtrl",
+				resolve: routeResolve()
+			})
+			.state('alert.policyEdit', {
+				url: "policyEdit/{name}",
+				templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
+				controller: "policyEditCtrl",
 				resolve: routeResolve()
 			});
 	});
@@ -86,11 +92,12 @@ var app = {};
 	// ======================================================================================
 	var STATE_NAME_MATCH = /^[^\.]*/;
 
-	eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity) {
+	eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, UI) {
 		window._WrapState = $scope.$wrapState = $wrapState;
 		window._PageConfig = $scope.PageConfig = PageConfig;
 		window._Portal = $scope.Portal = Portal;
 		window._Entity = $scope.Entity = Entity;
+		window._UI = $scope.UI = UI;
 
 		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
 			console.log("[Switch] current ->", current, currentParam);

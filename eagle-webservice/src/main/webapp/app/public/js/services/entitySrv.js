@@ -43,11 +43,27 @@
 
 		Entity.queryMetadata = function (url) {
 			var list = [];
-			list._promise = $http.get(_host + "/rest/metadata/" + url).then(function (res) {
-				var data = res.data;
-				Array.prototype.push.apply(list, data);
-			});
-			return list;
+
+			list._refresh = function () {
+				list._done = false;
+				list._promise = $http.get(_host + "/rest/metadata/" + url).then(function (res) {
+					var data = res.data;
+					list.splice(0);
+					Array.prototype.push.apply(list, data);
+					list._done = true;
+				});
+				return list;
+			};
+
+			return list._refresh();
+		};
+
+		Entity.deleteMetadata = function (url) {
+			return {
+				_promise: $http.delete(_host + "/rest/metadata/" + url).then(function (res) {
+					console.log(res);
+				})
+			};
 		};
 
 		return Entity;

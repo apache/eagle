@@ -20,9 +20,9 @@
 	<ul class="nav nav-tabs">
 		<li ng-class="{active: getState() === 'alert.list'}"><a href="#/alert/">Explore Triggered Alerts</a></li>
 		<li ng-class="{active: getState() === 'alert.policyList'}"><a href="#/alert/policyList">Manage Policies</a></li>
-		<li ng-class="{active: getState() === 'alert.policyCreate'}"><a href="#/alert/policyCreate">Define Alert Policy</a></li>
+		<li ng-class="{active: ['alert.policyCreate', 'alert.policyEdit'].indexOf(getState()) >= 0}"><a href="#/alert/policyCreate">Define Alert Policy</a></li>
 	</ul>
-	<div class="tab-content">
+	<div class="tab-content no-padding">
 		<div ui-view></div>
 	</div>
 </div>
