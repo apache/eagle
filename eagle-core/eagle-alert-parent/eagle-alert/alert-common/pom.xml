@@ -16,8 +16,8 @@
 
 	<parent>
 		<groupId>org.apache.eagle</groupId>
-		<artifactId>alert-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<artifactId>eagle-alert</artifactId>
+		<version>0.5.0-incubating-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>alert-common</artifactId>
