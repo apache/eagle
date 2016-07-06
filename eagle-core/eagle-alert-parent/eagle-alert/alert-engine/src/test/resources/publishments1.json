@@ -9,8 +9,8 @@
 	  "subject":"UMP Test Alert",
 	  "template":"",
 	  "sender": "sender@corp.com",
-	  "recipients": "liasu@ebay.com",
-	  "smtp.server":"atom.corp.ebay.com",
+	  "recipients": "services@corp.com",
+	  "smtp.server":"sender.mailhost.com",
 	  "connection": "plaintext",
 	  "smtp.port": "25"
 	},

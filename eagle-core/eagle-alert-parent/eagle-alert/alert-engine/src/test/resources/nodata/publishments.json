@@ -6,11 +6,11 @@
 			"noDataAlertPolicy"
 		],
 		"properties": {
-			"subject":"UMP Test Alert",
+			"subject":"Eagle Test Alert",
 			"template":"",
 			"sender": "sender@corp.com",
-			"recipients": "yonzhang@ebay.com",
-			"smtp.server":"atom.corp.ebay.com",
+			"recipients": "services@corp.com",
+			"smtp.server":"smtp.mailhost.com",
 			"connection": "plaintext",
 			"smtp.port": "25"
 		},

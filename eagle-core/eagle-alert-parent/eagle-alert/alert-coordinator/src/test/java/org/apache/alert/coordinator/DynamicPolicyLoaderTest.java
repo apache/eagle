@@ -19,8 +19,11 @@
 
 package org.apache.alert.coordinator;
 
+import org.junit.Ignore;
+
 /**
  * Since 4/28/16.
  */
+@Ignore
 public class DynamicPolicyLoaderTest {
 }

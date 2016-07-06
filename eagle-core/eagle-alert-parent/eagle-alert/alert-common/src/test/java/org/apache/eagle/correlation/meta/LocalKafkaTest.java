@@ -26,11 +26,13 @@ import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
+import org.junit.Ignore;
 
 /**
  * @since Jun 3, 2016
  *
  */
+@Ignore
 public class LocalKafkaTest {
 
     /**

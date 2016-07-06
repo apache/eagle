@@ -6,7 +6,7 @@
 		"log_stream_join_output"
 	],
 	"properties": {
-		"subject":"UMP Test Alert",
+		"subject":"Eagle Test Alert",
         "template":"",
 	  "sender": "sender@corp.com",
 	  "recipients": "receiver@corp.com",
