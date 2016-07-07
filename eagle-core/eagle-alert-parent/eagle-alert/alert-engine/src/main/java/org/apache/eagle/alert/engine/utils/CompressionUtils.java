@@ -16,11 +16,14 @@
  */
 package org.apache.eagle.alert.engine.utils;
 
-import com.google.common.io.ByteStreams;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import com.google.common.io.ByteStreams;
 
 
 public class CompressionUtils {

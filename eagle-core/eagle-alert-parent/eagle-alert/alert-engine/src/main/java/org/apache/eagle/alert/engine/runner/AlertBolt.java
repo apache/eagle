@@ -134,7 +134,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     public void onAlertBoltSpecChange(AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
         List<PolicyDefinition> newPolicies = spec.getBoltPoliciesMap().get(boltId);
         if(newPolicies == null) {
-            LOG.info("no policy with AlertBoltSpec {} for this bolt {}", spec, boltId);
+            LOG.info("no new policy with AlertBoltSpec {} for this bolt {}", spec, boltId);
             return;
         }
 

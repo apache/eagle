@@ -24,5 +24,7 @@ public class OpResult {
 
     public int code = 200;
     public String message = "";
-    
+
+    public static final int SUCCESS = 200;
+    public static final int FAILURE = 500;
 }

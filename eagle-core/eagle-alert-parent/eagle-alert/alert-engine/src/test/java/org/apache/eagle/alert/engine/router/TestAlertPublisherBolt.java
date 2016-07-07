@@ -18,10 +18,10 @@
 
 package org.apache.eagle.alert.engine.router;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.SimpleType;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
@@ -35,24 +35,25 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.SimpleType;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @Since 5/14/16.
  */
 public class TestAlertPublisherBolt {
 
+    @SuppressWarnings("rawtypes")
     @Ignore
     @Test
     public void test() {
         Config config = ConfigFactory.load("application-test.conf");
         AlertPublisher publisher = new AlertPublisherImpl("alertPublishBolt");
-        publisher.init(config);
+        publisher.init(config, new HashMap());
         PublishSpec spec = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishSpec.json"), PublishSpec.class);
         publisher.onPublishChange(spec.getPublishments(), null, null, null);
         AlertStreamEvent event = create("testAlertStream");
@@ -95,7 +96,7 @@ public class TestAlertPublisherBolt {
     @Test
     public void testAlertPublisher() throws Exception {
         AlertPublisher alertPublisher = new AlertPublisherImpl("alert-publisher-test");
-        List<Publishment> oldPubs = loadEntities("/publishments.json", Publishment.class);
+        List<Publishment> oldPubs = loadEntities("/publishments1.json", Publishment.class);
         List<Publishment> newPubs = loadEntities("/publishments2.json", Publishment.class);
         alertPublisher.onPublishChange(oldPubs, null, null, null);
         alertPublisher.onPublishChange(null, null, newPubs, oldPubs);

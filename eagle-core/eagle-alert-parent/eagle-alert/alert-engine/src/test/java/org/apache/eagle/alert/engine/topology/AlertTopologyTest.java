@@ -99,8 +99,8 @@ public class AlertTopologyTest implements Serializable{
         String topic = "testTopic3";
         int max = 1000;
         Properties configMap = new Properties();
-        configMap.put("bootstrap.servers", "sandbox.hortonworks.com:6667");
-        configMap.put("metadata.broker.list", "sandbox.hortonworks.com:6667");
+        configMap.put("bootstrap.servers", "localhost:6667");
+        configMap.put("metadata.broker.list", "localhost:6667");
         configMap.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         configMap.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         configMap.put("request.required.acks", "1");

@@ -18,7 +18,6 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +111,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
         Object streamId = convertedTuple.get(1);
 
         StreamDefinition sd = sds.get(streamId);
-        if(sd == null){
+        if (sd == null) {
             LOG.warn("StreamDefinition {} is not found within {}, ignore this message", streamId, sds);
             spout.ack(newMessageId);
             return null;
@@ -141,17 +140,17 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
                     }
                     // send message to StreamRouterBolt
                     PartitionedEvent pEvent = new PartitionedEvent(event, groupingStrategy.partition, hash);
-                    if(this.serializer == null){
-                         delegate.emit(sid, Collections.singletonList(pEvent), newMessageId);
-                    }else {
+                    if (this.serializer == null) {
+                        delegate.emit(sid, Collections.singletonList(pEvent), newMessageId);
+                    } else {
                         try {
                             delegate.emit(sid, Collections.singletonList(serializer.serialize(pEvent)), newMessageId);
-                        } catch (IOException e) {
-                            LOG.error("Failed to serialize {}", pEvent, e);
-                            throw new RuntimeException(e);
+                        } catch (Exception e) {
+                            LOG.error("Failed to serialize {}, this message would be ignored!", pEvent, e);
+                            spout.ack(newMessageId);
                         }
                     }
-                }else{
+                } else {
                     // ******* short-cut ack ********
                     // we should simply ack those messages which are not processed in this topology because KafkaSpout implementation requires _pending is empty
                     // before moving to next offsets.

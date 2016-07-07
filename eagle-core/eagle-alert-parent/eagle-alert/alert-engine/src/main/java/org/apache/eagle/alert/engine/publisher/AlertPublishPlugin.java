@@ -17,14 +17,14 @@
  */
 package org.apache.eagle.alert.engine.publisher;
 
+import java.io.Closeable;
+import java.util.Map;
+
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.impl.PublishStatus;
 
 import com.typesafe.config.Config;
-
-import java.io.Closeable;
-import java.util.Map;
 
 /**
  * Created on 2/10/16.
@@ -32,10 +32,14 @@ import java.util.Map;
  */
 public interface AlertPublishPlugin extends Closeable {
     /**
-     * for initialization
+     * 
+     * @param config
+     * @param publishment
+     * @param configProperties - storm config that would be useful for some implementation
      * @throws Exception
      */
-    void init(Config config, Publishment publishment) throws Exception;
+    @SuppressWarnings("rawtypes")
+    void init(Config config, Publishment publishment, Map configProperties) throws Exception;
 
     void update(String dedupIntervalMin, Map<String, String> pluginProperties);
 

@@ -18,7 +18,7 @@ package org.apache.eagle.alert.metadata.impl;
 
 import java.lang.reflect.Constructor;
 
-import org.apache.eagle.alert.metadata.resource.IMetadataDao;
+import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +31,9 @@ import com.typesafe.config.ConfigFactory;
  */
 public class MetadataDaoFactory {
 
-    private static final MetadataDaoFactory INSTANCE = new MetadataDaoFactory();
     private static final Logger LOG = LoggerFactory.getLogger(MetadataDaoFactory.class);
+
+    private static final MetadataDaoFactory INSTANCE = new MetadataDaoFactory();
 
     private IMetadataDao dao;
 
@@ -49,6 +50,7 @@ public class MetadataDaoFactory {
                 clz = Thread.currentThread().getContextClassLoader().loadClass(clsName);
                 if (IMetadataDao.class.isAssignableFrom(clz)) {
                     Constructor<?> cotr = clz.getConstructor(Config.class);
+                    LOG.info("metadada DAO loaded: " + clsName);
                     dao = (IMetadataDao) cotr.newInstance(datastoreConfig);
                 } else {
                     throw new Exception("metadataDao configuration need to be implementation of IMetadataDao! ");
