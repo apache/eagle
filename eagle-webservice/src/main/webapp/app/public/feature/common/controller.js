@@ -489,15 +489,16 @@
 						// >> Parse expression
 						$scope.policy.__.conditions = {};
 						var _condition = _policyUnit.expression.match(/from\s+(\w+)(\[(.*)])?(#window[^\)]*\))?\s+(select (\w+, )?(\w+)\((\w+)\) as [\w\d_]+ (group by (\w+) )?having ([\w\d_]+) ([<>=]+) ([^\s]+))?/);
-						var _cond_stream = _condition[1];
-						var _cond_query = _condition[3] || "";
-						var _cond_window = _condition[4];
-						var _cond_group = _condition[5];
-						var _cond_groupUnit = _condition.slice(7,14);
 
 						if(!_condition) {
 							$scope.policy.__.advanced = true;
 						} else {
+							var _cond_stream = _condition[1];
+							var _cond_query = _condition[3] || "";
+							var _cond_window = _condition[4];
+							var _cond_group = _condition[5];
+							var _cond_groupUnit = _condition.slice(7,14);
+
 							// > StreamName
 							var _streamName = _cond_stream;
 							var _cond = _cond_query;
