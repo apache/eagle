@@ -123,7 +123,6 @@
             <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
         </developer>
     </developers>
-
     <modules>
         <module>eagle-core</module>
         <module>eagle-webservice</module>
@@ -223,7 +222,8 @@
         <asm.version>5.0</asm.version>
 
         <!-- Streaming -->
-        <kafka.version>0.10.0.0</kafka.version>
+        <!--<kafka.version>0.10.0.0</kafka.version>-->
+        <kafka.version>0.8.2.2</kafka.version>
         <kafka-clients.version>0.8.2.0</kafka-clients.version>
         <kafka.artifact.id>kafka_2.11</kafka.artifact.id>
         <jgrapht.version>0.9.0</jgrapht.version>
@@ -298,11 +298,7 @@
 
         <!-- dropwizard -->
         <dropwizard.version>0.7.1</dropwizard.version>
-
     </properties>
-
-
-
 
     <dependencyManagement>
         <dependencies>

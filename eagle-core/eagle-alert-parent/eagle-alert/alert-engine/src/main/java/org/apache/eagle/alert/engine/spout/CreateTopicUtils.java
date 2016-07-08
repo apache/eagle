@@ -21,9 +21,7 @@ package org.apache.eagle.alert.engine.spout;
 import java.util.Properties;
 
 import kafka.admin.AdminUtils;
-import kafka.admin.RackAwareMode;
 import kafka.utils.ZKStringSerializer$;
-import kafka.utils.ZkUtils;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
@@ -42,13 +40,11 @@ public class CreateTopicUtils {
     public static void ensureTopicReady(String zkQuorum, String topic) {
         ZkConnection zkConnection = new ZkConnection(zkQuorum);
         ZkClient zkClient = new ZkClient(zkQuorum, 10000, 10000, ZKStringSerializer$.MODULE$);
-        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
-        if (!AdminUtils.topicExists(zkUtils, topic)) {
+//        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
+        if (!AdminUtils.topicExists(zkClient, topic)) {
             LOG.info("create topic " + topic + " with partitions " + partitions + ", and replicationFactor "
                     + replicationFactor);
-            AdminUtils.createTopic(zkUtils, topic, partitions, replicationFactor, new Properties(),
-                    RackAwareMode.Disabled$.MODULE$);
+            AdminUtils.createTopic(zkClient, topic, partitions, replicationFactor, new Properties());
         }
     }
-
 }
