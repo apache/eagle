@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 
+@SuppressWarnings("rawtypes")
 public class AlertPublisherImpl implements AlertPublisher {
     private static final long serialVersionUID = 4809983246198138865L;
     private final static Logger LOG = LoggerFactory.getLogger(AlertPublisherImpl.class);
@@ -40,14 +41,16 @@ public class AlertPublisherImpl implements AlertPublisher {
     private volatile Map<String, List<String>> policyPublishPluginMapping = new ConcurrentHashMap<>(1);
     private volatile Map<String, AlertPublishPlugin> publishPluginMapping = new ConcurrentHashMap<>(1);
     private Config config;
+    private Map conf;
 
     public AlertPublisherImpl(String name) {
         this.name = name;
     }
 
     @Override
-    public void init(Config config) {
+    public void init(Config config, Map conf) {
         this.config = config;
+        this.conf = conf;
     }
 
     @Override
@@ -84,6 +87,7 @@ public class AlertPublisherImpl implements AlertPublisher {
         publishPluginMapping.values().forEach(plugin -> plugin.close());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onPublishChange(List<Publishment> added,
                                 List<Publishment> removed,
@@ -100,7 +104,7 @@ public class AlertPublisherImpl implements AlertPublisher {
         }
 
         for (Publishment publishment : added) {
-            AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config);
+            AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
             if(plugin != null) {
                 publishPluginMapping.put(publishment.getName(), plugin);
                 onPolicyAdded(publishment.getPolicyIds(), publishment.getName());

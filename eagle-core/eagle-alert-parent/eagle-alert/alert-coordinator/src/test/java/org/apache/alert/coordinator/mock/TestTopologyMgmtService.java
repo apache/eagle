@@ -16,26 +16,23 @@
  */
 package org.apache.alert.coordinator.mock;
 
-import java.util.List;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.coordinator.TopologyMgmtService;
 import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.GroupBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
-import org.junit.Test;
+import org.junit.Ignore;
 
+import java.util.List;
+
+@Ignore
 public class TestTopologyMgmtService extends TopologyMgmtService {
 
     public static int BOLT_NUMBER = 5;
     
     private int i = 0;
 
-    @Test
-    public void test(){
-
-    }
     @Override
     public TopologyMeta creatTopology() {
         TopologyMeta tm = new TopologyMeta();

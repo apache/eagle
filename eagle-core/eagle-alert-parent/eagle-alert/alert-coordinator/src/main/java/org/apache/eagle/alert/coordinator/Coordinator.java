@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.eagle.alert.config.ConfigBusProducer;
 import org.apache.eagle.alert.config.ConfigValue;
@@ -29,6 +30,7 @@ import org.apache.eagle.alert.config.ZKConfig;
 import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordinator.provider.ScheduleContextBuilder;
+import org.apache.eagle.alert.coordinator.trigger.CoordinatorTrigger;
 import org.apache.eagle.alert.coordinator.trigger.DynamicPolicyLoader;
 import org.apache.eagle.alert.coordinator.trigger.PolicyChangeListener;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
@@ -47,8 +49,12 @@ import com.typesafe.config.ConfigFactory;
  *        pull policies and figure out if polices are changed
  */
 public class Coordinator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Coordinator.class);
+
     private static final String COORDINATOR = "coordinator";
     /**
+     * {@link ZKMetadataChangeNotifyService}
      *  /alert/{topologyName}/spout
      *                  /router
      *                  /alert
@@ -59,7 +65,6 @@ public class Coordinator {
     private static final String ZK_ALERT_CONFIG_ALERT = "{0}/alert";
     private static final String ZK_ALERT_CONFIG_PUBLISHER = "{0}/publisher";
 
-    private static final Logger LOG = LoggerFactory.getLogger(Coordinator.class);
 
     private final static String METADATA_SERVICE_HOST = "metadataService.host";
     private final static String METADATA_SERVICE_PORT = "metadataService.port";
@@ -71,7 +76,10 @@ public class Coordinator {
     private final ConfigBusProducer producer;
     private final IMetadataServiceClient client;
     private Config config;
-    
+
+    // FIXME : UGLY global state
+    private static final AtomicBoolean forcePeriodicallyBuild = new AtomicBoolean(true);
+
     public Coordinator() {
         config = ConfigFactory.load().getConfig(COORDINATOR);
         ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
@@ -85,7 +93,7 @@ public class Coordinator {
         this.client = client;
     }
 
-    public ScheduleState schedule(ScheduleOption option) {
+    public synchronized ScheduleState schedule(ScheduleOption option) {
         IScheduleContext context = new ScheduleContextBuilder(client).buildContext();
         TopologyMgmtService mgmtService = new TopologyMgmtService();
         IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
@@ -162,9 +170,9 @@ public class Coordinator {
         private Config config;
         private IMetadataServiceClient client;
 
-        public PolicyChangeHandler(Config config) {
+        public PolicyChangeHandler(Config config, IMetadataServiceClient client) {
             this.config = config;
-            this.client = new MetadataServiceClientImpl(config);
+            this.client = client;
         }
 
         @Override
@@ -173,22 +181,20 @@ public class Coordinator {
             LOG.info("policy changed ... ");
             LOG.info("allPolicies: " + allPolicies + ", addedPolicies: " + addedPolicies + ", removedPolicies: "
                     + removedPolicies + ", modifiedPolicies: " + modifiedPolicies);
+            
+            CoordinatorTrigger trigger = new CoordinatorTrigger(config, client);
+            trigger.run();
 
-            IScheduleContext context = new ScheduleContextBuilder(client).buildContext();
-            TopologyMgmtService mgmtService = new TopologyMgmtService();
-            IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
-
-            scheduler.init(context, mgmtService);
-
-            ScheduleState state = scheduler.schedule(new ScheduleOption());
-
-            ConfigBusProducer producer = new ConfigBusProducer(ZKConfigBuilder.getZKConfig(config));
-            postSchedule(client, state, producer);
-            producer.send("spout", new ConfigValue());
         }
     }
 
     public static void main(String[] args) throws Exception {
+        startSchedule();
+        
+        Thread.currentThread().join();
+    }
+
+    public static void startSchedule() {
         Config config = ConfigFactory.load().getConfig(COORDINATOR);
         // build dynamic policy loader
         String host = config.getString(METADATA_SERVICE_HOST);
@@ -196,16 +202,31 @@ public class Coordinator {
         String context = config.getString(METADATA_SERVICE_CONTEXT);
         IMetadataServiceClient client = new MetadataServiceClientImpl(host, port, context);
         DynamicPolicyLoader loader = new DynamicPolicyLoader(client);
-        loader.addPolicyChangeListener(new PolicyChangeHandler(config));
+        loader.addPolicyChangeListener(new PolicyChangeHandler(config, client));
 
         // schedule dynamic policy loader
         long initDelayMillis = config.getLong(DYNAMIC_POLICY_LOADER_INIT_MILLS);
         long delayMillis = config.getLong(DYNAMIC_POLICY_LOADER_DELAY_MILLS);
-        ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(2);
         scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
+        
+        // 
+        scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_DELAY,
+                CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_INTERVAL, TimeUnit.MILLISECONDS);
+        
         Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
         LOG.info("Eagle Coordinator started ...");
-        
-        Thread.currentThread().join();
+    }
+
+    public void enforcePeriodicallyBuild() {
+        forcePeriodicallyBuild.set(true);
+    }
+
+    public void disablePeriodicallyBuild() {
+        forcePeriodicallyBuild.set(false);
+    }
+
+    public static boolean isPeriodicallyForceBuildEnable() {
+        return forcePeriodicallyBuild.get();
     }
 }

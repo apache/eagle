@@ -24,19 +24,26 @@ import kafka.admin.AdminUtils;
 import kafka.utils.ZKStringSerializer$;
 
 import org.I0Itec.zkclient.ZkClient;
+import org.I0Itec.zkclient.ZkConnection;
 import org.slf4j.Logger;
 
 /**
  * normally this is used in unit test for convenience
  */
 public class CreateTopicUtils {
+
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(CreateTopicUtils.class);
+
     private static final int partitions = 2;
     private static final int replicationFactor = 1;
-    public static void ensureTopicReady(String zkQuorum, String topic){
+
+    public static void ensureTopicReady(String zkQuorum, String topic) {
+        ZkConnection zkConnection = new ZkConnection(zkQuorum);
         ZkClient zkClient = new ZkClient(zkQuorum, 10000, 10000, ZKStringSerializer$.MODULE$);
-        if(!AdminUtils.topicExists(zkClient, topic)) {
-            LOG.info("create topic " + topic + " with partitions " + partitions + ", and replicationFactor " + replicationFactor);
+//        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
+        if (!AdminUtils.topicExists(zkClient, topic)) {
+            LOG.info("create topic " + topic + " with partitions " + partitions + ", and replicationFactor "
+                    + replicationFactor);
             AdminUtils.createTopic(zkClient, topic, partitions, replicationFactor, new Properties());
         }
     }

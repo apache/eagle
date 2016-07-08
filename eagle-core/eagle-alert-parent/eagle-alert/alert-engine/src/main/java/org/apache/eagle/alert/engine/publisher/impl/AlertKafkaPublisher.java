@@ -26,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
-import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -36,30 +34,30 @@ import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 
-public class AlertKafkaPublisher implements AlertPublishPlugin {
+public class AlertKafkaPublisher extends AbstractPublishPlugin {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertKafkaPublisher.class);
-    private AlertDeduplicator deduplicator;
-    private PublishStatus status;
+    private static final long MAX_TIMEOUT_MS = 60000;
+
     @SuppressWarnings("rawtypes")
     private KafkaProducer producer;
     private String brokerList;
     private String topic;
 
-    private final static long MAX_TIMEOUT_MS =60000;
-
     @Override
-    public void init(Config config, Publishment publishment) throws Exception {
-        deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin());
+    @SuppressWarnings("rawtypes")
+    public void init(Config config, Publishment publishment, Map conf) throws Exception {
+        super.init(config, publishment, conf);
+
         if (publishment.getProperties() != null) {
             Map<String, String> kafkaConfig = new HashMap<>(publishment.getProperties());
             brokerList = kafkaConfig.get(PublishConstants.BROKER_LIST).trim();
-            producer = KafkaProducerManager.INSTANCE.getProducer(brokerList);
+            producer = KafkaProducerManager.INSTANCE.getProducer(brokerList, kafkaConfig);
             topic = kafkaConfig.get(PublishConstants.TOPIC).trim();
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void onAlert(AlertStreamEvent event) throws Exception {
         if (producer == null) {
@@ -72,7 +70,12 @@ public class AlertKafkaPublisher implements AlertPublishPlugin {
         }
         PublishStatus status = new PublishStatus();
         try {
-            Future<?> future = producer.send(createRecord(event, topic));
+            ProducerRecord record = createRecord(event, topic);
+            if (record == null) {
+                LOG.error(" Alert serialize return null, ignored message! ");
+                return;
+            }
+            Future<?> future = producer.send(record);
             future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             status.successful = true;
             status.errorMessage = "";
@@ -89,6 +92,7 @@ public class AlertKafkaPublisher implements AlertPublishPlugin {
         this.status = status;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void update(String dedupIntervalMin, Map<String, String> pluginProperties) {
         deduplicator.setDedupIntervalMin(dedupIntervalMin);
@@ -99,7 +103,7 @@ public class AlertKafkaPublisher implements AlertPublishPlugin {
             brokerList = newBrokerList;
             KafkaProducer newProducer = null;
             try {
-                newProducer = KafkaProducerManager.INSTANCE.getProducer(brokerList);
+                newProducer = KafkaProducerManager.INSTANCE.getProducer(brokerList, pluginProperties);
             } catch (Exception e) {
                 LOG.error("Create KafkaProducer failed with configurations: {}", pluginProperties);
             }
@@ -113,24 +117,22 @@ public class AlertKafkaPublisher implements AlertPublishPlugin {
         producer.close();
     }
 
-    /**
-     * To Create  KafkaProducer Record
-     * @param event
-     * @return ProducerRecord
-     * @throws Exception
-     */
-    private ProducerRecord<String, String> createRecord(AlertStreamEvent event, String topic) throws Exception {
-        ProducerRecord<String, String>  record  = new ProducerRecord<>(topic, event.toString());
-        return record;
+    private ProducerRecord<String, Object> createRecord(AlertStreamEvent event, String topic) throws Exception {
+        Object o = serialzeEvent(event);
+        if (o != null) {
+            ProducerRecord<String, Object> record = new ProducerRecord<>(topic, o);
+            return record;
+        } else {
+            return null;
+        }
+    }
+
+    private Object serialzeEvent(AlertStreamEvent event) {
+        return serializer.serialize(event);
     }
 
     @Override
-    public PublishStatus getStatus() {
-        return this.status;
-    }
-
-    @Override
-    public AlertStreamEvent dedup(AlertStreamEvent event) {
-        return this.deduplicator.dedup(event);
+    protected Logger getLogger() {
+        return LOG;
     }
 }

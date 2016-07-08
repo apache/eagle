@@ -53,13 +53,13 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     public AlertPublisherBolt(AlertPublisher alertPublisher, Config config, IMetadataChangeNotifyService coordinatorService){
         super(coordinatorService, config);
         this.alertPublisher = alertPublisher;
-        this.alertPublisher.init(config);
     }
 
     @Override
     public void internalPrepare(OutputCollector collector, IMetadataChangeNotifyService coordinatorService, Config config, TopologyContext context) {
         coordinatorService.registerListener(this);
         coordinatorService.init(config, MetadataType.ALERT_PUBLISH_BOLT);
+        this.alertPublisher.init(config, stormConf);
         streamContext = new StreamContextImpl(config,context.registerMetric("eagle.publisher",new MultiCountMetric(),60),context);
     }
 

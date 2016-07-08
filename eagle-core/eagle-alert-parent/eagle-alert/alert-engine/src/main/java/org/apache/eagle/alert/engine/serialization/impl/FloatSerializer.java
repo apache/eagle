@@ -1,10 +1,10 @@
 package org.apache.eagle.alert.engine.serialization.impl;
 
-import org.apache.eagle.alert.engine.serialization.Serializer;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import org.apache.eagle.alert.engine.serialization.Serializer;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more

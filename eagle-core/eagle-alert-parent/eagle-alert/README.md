@@ -35,18 +35,13 @@ The alert engine have three dependency module: Coordinator Service, Metadata Ser
 ####0. Dependencies
 > Alert engine need kafka as data source, ZK as coordination. Check alert-devtools/bin to start zk and kafka through start-zk-kafka.sh.
 
-####1. Start metadata service
-> For local dev, project alert-metadata-service packaging as a war, and enabled mvn jetty:run to run it. By default, metadata runs on localhost:8080
+####1. Start metadata service & coordinator service
+> For local dev, project alert-service packaging as a war, and enabled mvn jetty:run to run it. By default, metadata runs on localhost:8080/rest
 
-> For deployment, after mvn install, a war is avaialble in alert-metadata-service/target
+> For deployment, after mvn install, a war is avaialble in alert-service/target
 
-####2. Start coordiantor service
-> For local dev, project alert-coordinator packaing as a war, and enabled mvn jetty:run to run it. By default, it runs in localhost:9090, and have dependency on metadata. See application.conf for coordinator.
-
-> For deployment, find war in alert-coordinator/target after mvn install
-
-####3. Start engine runtime.
-> The engine are the topologies that runs in any storm (local or remote) with configuration to connect to the ZK and metadata service. The alert engine runtime main as in UnitTopologyMain.java. The started storm bolt should have the same name described in alert-metadata. Example of the configuration is /alert-engine-base/src/main/resources/application.conf 
+####2. Start engine runtime.
+> The engine are the topologies that runs in any storm (local or remote) with configuration to connect to the ZK and metadata service. The alert engine runtime main as in UnitTopologyMain.java. The started storm bolt should have the same name(and numbers config) described in alert-metadata. Example of the configuration is /alert-engine/src/main/resources/application.conf 
 
 See below detailed steps.
 
@@ -59,25 +54,15 @@ See below detailed steps.
   * tomcat
   * mongdb
 
-* Run Metadata service
-    1. copy alert-metadata/target/alert-metadata-0.0.1-SNAPSHOT.war into tomcat webapps/alertmetadata.war
-    2. check config under webapps/alertmetadata/WEB-INF/classes/application.conf
+* Run Metadata service & Coordinator service
+    1. copy alert-service/target/alert-service-0.0.1-SNAPSHOT.war into tomcat webapps/alert.war
+    2. check config under webapps/alert/WEB-INF/classes/application.conf
     ```json
     {
 	"datastore": {
 		"metadataDao": "org.apache.eagle.alert.metadata.impl.MongoMetadataDaoImpl",
 		"connection": "localhost:27017"
-	}
-     }
-    ```
-    
-    3. start tomcat
-    
-* Run Coordinator service
-    1. copy alert-coordinator/target/alert-coordinator-0.0.1-SNAPSHOT.war to tomcat webappes/coordinator.war
-    2. check config under webapps/coordinator/WEB-INF/classes/application.conf
-    ```json
-      {
+	},
 	"coordinator" : {
 		"policiesPerBolt" : 5,
 		"boltParallelism" : 5,
@@ -96,17 +81,18 @@ See below detailed steps.
 		"metadataService" : {
 			"host" : "localhost",
 			"port" : 8080,
-			"context" : "/alertmetadata/api"
+			"context" : "/alert/api"
 		},
 		"metadataDynamicCheck" : {
 			"initDelayMillis" : 1000,
 			"delayMillis" : 30000
 		}
 	}
-   }
-   ```
+     }
+    ```
+    
     3. start tomcat
-
+    
 * Run UnitTopologyMain
     1. copy alert-assembly/target/alert-engine-0.0.1-SNAPSHOT-alert-assembly.jar to somewhere close to your storm installation
     2. check config application.conf
@@ -145,15 +131,15 @@ See below detailed steps.
     "delayMillis" : 10000
   },
   "metadataService": {
-    "context" : "/alertmetadata/api",
     "host" : "localhost",
+    "context" : "/alert/rest",
     "port" : 8080
   },
   "coordinatorService": {
     "host": "localhost",
     "port": 8080,
-    "context" : "/coordinator/api"
-  }
+    "context" : "/alert/rest"
+  },
   "metric": {
     "sink": {
       "stdout": {}

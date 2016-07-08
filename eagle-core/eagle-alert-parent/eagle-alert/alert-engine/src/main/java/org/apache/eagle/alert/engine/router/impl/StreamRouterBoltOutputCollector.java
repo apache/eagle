@@ -57,7 +57,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
     private final static Logger LOG = LoggerFactory.getLogger(StreamRouterBoltOutputCollector.class);
     private final OutputCollector outputCollector;
     private final Object outputLock = new Object();
-    private final List<String> outputStreamIds;
+//    private final List<String> outputStreamIds;
     private final StreamContext streamContext;
     private final PartitionedEventSerializer serializer;
     private volatile Map<StreamPartition,StreamRouterSpec> routeSpecMap;
@@ -69,7 +69,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         this.outputCollector = outputCollector;
         this.routeSpecMap = new HashMap<>();
         this.routePartitionerMap = new HashMap<>();
-        this.outputStreamIds = outputStreamIds;
+//        this.outputStreamIds = outputStreamIds;
         this.streamContext = streamContext;
         this.serializer = serializer;
     }

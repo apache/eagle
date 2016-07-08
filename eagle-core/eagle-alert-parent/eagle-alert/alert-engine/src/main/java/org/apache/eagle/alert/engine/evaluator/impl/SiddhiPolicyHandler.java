@@ -76,7 +76,9 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
          */
         @Override
         public void receive(Event[] events) {
-            LOG.info("Generated {} alerts from policy '{}' in {}", events.length,context.getPolicyDefinition().getName(), context.getPolicyEvaluatorId());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Generated {} alerts from policy '{}' in {}", events.length,context.getPolicyDefinition().getName(), context.getPolicyEvaluatorId());
+            }
             for(Event e : events) {
                 AlertStreamEvent event = new AlertStreamEvent();
                 event.setTimestamp(e.getTimestamp());
@@ -131,6 +133,10 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
         if(inputHandler != null){
             context.getPolicyCounter().scope(String.format("%s.%s",this.context.getPolicyDefinition().getName(),"eval_count")).incr();
             inputHandler.send(event.getTimestamp(),event.getData());
+            
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("sent event to siddhi stream {} ", streamId);
+            }
         }else{
             context.getPolicyCounter().scope(String.format("%s.%s",this.context.getPolicyDefinition().getName(),"drop_count")).incr();
             LOG.warn("No input handler found for stream {}",streamId);

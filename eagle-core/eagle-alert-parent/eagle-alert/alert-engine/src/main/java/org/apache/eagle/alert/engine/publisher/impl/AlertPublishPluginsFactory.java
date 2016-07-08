@@ -18,6 +18,8 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
+import java.util.Map;
+
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.slf4j.Logger;
@@ -32,12 +34,13 @@ public class AlertPublishPluginsFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertPublishPluginsFactory.class);
 
-    public static AlertPublishPlugin createNotificationPlugin(Publishment publishment, Config config) {
+    @SuppressWarnings("rawtypes")
+    public static AlertPublishPlugin createNotificationPlugin(Publishment publishment, Config config, Map conf) {
         AlertPublishPlugin plugin = null;
         String publisherType = publishment.getType();
         try {
             plugin = (AlertPublishPlugin) Class.forName(publisherType).newInstance();
-            plugin.init(config, publishment);
+            plugin.init(config, publishment, conf);
         } catch (Exception ex) {
             LOG.error("Error in loading AlertPublisherPlugin class: ", ex);
             //throw new IllegalStateException(ex);

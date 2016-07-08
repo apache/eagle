@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
-import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.alert.engine.publisher.email.AlertEmailGenerator;
 import org.apache.eagle.alert.engine.publisher.email.AlertEmailGeneratorBuilder;
@@ -37,27 +35,28 @@ import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 
-public class AlertEmailPublisher implements AlertPublishPlugin {
+public class AlertEmailPublisher extends AbstractPublishPlugin {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertEmailPublisher.class);
-    private AlertEmailGenerator emailGenerator;
-    private AlertDeduplicator deduplicator;
-    private Map<String, String> emailConfig;
     private final static int DEFAULT_THREAD_POOL_CORE_SIZE = 4;
     private final static int DEFAULT_THREAD_POOL_MAX_SIZE = 8;
     private final static long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L; // 1 minute
+
+    private AlertEmailGenerator emailGenerator;
+    private Map<String, String> emailConfig;
+
     private transient ThreadPoolExecutor executorPool;
-    private PublishStatus status;
 
     @Override
-    public void init(Config config, Publishment publishment) throws Exception {
+    @SuppressWarnings("rawtypes")
+    public void init(Config config, Publishment publishment, Map conf) throws Exception {
+        super.init(config, publishment, conf);
         executorPool = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_CORE_SIZE, DEFAULT_THREAD_POOL_MAX_SIZE, DEFAULT_THREAD_POOL_SHRINK_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
         LOG.info(" Creating Email Generator... ");
         if (publishment.getProperties() != null) {
             emailConfig = new HashMap<>(publishment.getProperties());
             emailGenerator = createEmailGenerator(emailConfig);
         }
-        deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin());
     }
 
     @Override
@@ -84,7 +83,8 @@ public class AlertEmailPublisher implements AlertPublishPlugin {
 
     @Override
     public void update(String dedupIntervalMin, Map<String, String> pluginProperties) {
-        deduplicator.setDedupIntervalMin(dedupIntervalMin);
+        super.update(dedupIntervalMin, pluginProperties);
+
         if (pluginProperties != null && ! emailConfig.equals(pluginProperties)) {
             emailConfig = new HashMap<>(pluginProperties);
             emailGenerator = createEmailGenerator(pluginProperties);
@@ -94,16 +94,6 @@ public class AlertEmailPublisher implements AlertPublishPlugin {
     @Override
     public void close() {
         this.executorPool.shutdown();
-    }
-
-    @Override
-    public PublishStatus getStatus() {
-        return this.status;
-    }
-
-    @Override
-    public AlertStreamEvent dedup(AlertStreamEvent event) {
-        return deduplicator.dedup(event);
     }
 
     /**
@@ -147,5 +137,10 @@ public class AlertEmailPublisher implements AlertPublishPlugin {
         if(!(o instanceof AlertEmailPublisher))
             return false;
         return true;
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 }
