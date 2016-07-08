@@ -76,7 +76,7 @@
       "streamNameSelectorProp": {
         "userProvidedStreamName": "oozieStream"
       },
-      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.PlainStringStreamNameSelector",
       "timestampColumn": "timestamp",
       "timestampFormat": null
     }
@@ -167,7 +167,7 @@
                 "operation"
               ],
               "sortSpec": {
-                "windowPeriod": "PT10S",
+                "windowPeriod": "PT4S",
                 "windowMargin": 1000
               }
             },

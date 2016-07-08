@@ -68,6 +68,12 @@
         "type": "STRING",
         "defaultValue": null,
         "required": false
+      },
+      {
+        "name": "timestamp",
+        "type" : "LONG",
+        "defaultValue": 0,
+        "required":true
       }
     ]
   }

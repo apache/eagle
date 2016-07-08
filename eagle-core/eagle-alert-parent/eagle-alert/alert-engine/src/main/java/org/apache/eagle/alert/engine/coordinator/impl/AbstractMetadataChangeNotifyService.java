@@ -44,7 +44,7 @@ import com.typesafe.config.Config;
 /**
  * notify 3 components of metadata change Spout, StreamRouterBolt and AlertBolt
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings({"serial"})
 public abstract class AbstractMetadataChangeNotifyService implements IMetadataChangeNotifyService, Closeable,
         Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractMetadataChangeNotifyService.class);
@@ -92,6 +92,7 @@ public abstract class AbstractMetadataChangeNotifyService implements IMetadataCh
             spoutSpecListeners.add(listener);
         }
     }
+
     @Override
     public void registerListener(SpecListener listener) {
         synchronized (specListeners) {
@@ -114,9 +115,10 @@ public abstract class AbstractMetadataChangeNotifyService implements IMetadataCh
     protected void notifyAlertPublishBolt(PublishSpec alertPublishSpec, Map<String, StreamDefinition> sds) {
         alertPublishSpecListeners.forEach(s -> s.onAlertPublishSpecChange(alertPublishSpec, sds));
     }
-    protected void notifySpecListener(SpoutSpec spoutSpec,RouterSpec routerSpec,Map<String, StreamDefinition> sds) {
-        for (SpecListener specListener : specListeners){
-            specListener.onSpecChange(spoutSpec,routerSpec,sds);
+
+    protected void notifySpecListener(SpoutSpec spoutSpec, RouterSpec routerSpec, AlertBoltSpec alertBoltSpec, Map<String, StreamDefinition> sds) {
+        for (SpecListener specListener : specListeners) {
+            specListener.onSpecChange(spoutSpec, routerSpec, alertBoltSpec, sds);
         }
     }
 

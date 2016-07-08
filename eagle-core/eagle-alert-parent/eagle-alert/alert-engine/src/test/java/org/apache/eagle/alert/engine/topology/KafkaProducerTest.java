@@ -12,6 +12,7 @@ import kafka.server.KafkaServer;
 import kafka.utils.*;
 import kafka.zk.EmbeddedZookeeper;
 import org.I0Itec.zkclient.ZkClient;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.alert.engine.spark.function.CorrelationSpoutSparkFunction;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.spark.SparkConf;
@@ -67,7 +68,7 @@ public class KafkaProducerTest implements Serializable {
         ProducerConfig producerConfig = new ProducerConfig(properties);
         Producer producer = new Producer(producerConfig);
 
-
+        long starttime = DateTimeUtil.humanDateToMilliseconds("2016-07-07 17:40:14,526");
         // send message
         //String logline = "2016-04-27 15:01:14,526  INFO oozieaudit:520 - IP [192.168.7.199], USER [tangjijun], GROUP [pms], APP [My_Workflow], JOBID [0000000-160427140648764-oozie-oozi-W], " + "OPERATION [start], PARAMETER [0000000-160427140648764-oozie-oozi-W], STATUS [SUCCESS], HTTPCODE [200], ERRORCODE [501], ERRORMESSAGE [no problem]";
         Map<String, Object> map1 = new TreeMap<>();
@@ -75,7 +76,7 @@ public class KafkaProducerTest implements Serializable {
         map1.put("jobid", "0000000-160427140648764-oozie-oozi-W");
         map1.put("operation", "start");
 
-        map1.put("timestamp", DateTimeUtil.humanDateToMilliseconds("2016-04-27 15:01:14,526"));
+        map1.put("timestamp",starttime);
 
 
         Map<String, Object> map2 = new TreeMap<>();
@@ -83,7 +84,7 @@ public class KafkaProducerTest implements Serializable {
         map2.put("jobid", "0000000-160427140648764-oozie-oozi-W");
         map2.put("operation", "end");
 
-        map2.put("timestamp", DateTimeUtil.humanDateToMilliseconds("2016-04-27 15:01:14,526"));
+        map2.put("timestamp", starttime);
 
         System.out.println("-----------------" + zkServer.zookeeper().getClientPort());
         System.out.println(zkConnect);
@@ -108,7 +109,21 @@ public class KafkaProducerTest implements Serializable {
             messages.add(data2);
             producer.send(scala.collection.JavaConversions.asScalaBuffer(messages));
             Thread.sleep(3000);
-            System.out.println("-----------------");
+            map1.clear();
+            map2.clear();
+
+            map1.put("ip", "yyy.yyy.yyy.yyy");
+            map1.put("jobid", "140648764-oozie-oozi-W");
+            map1.put("operation", "start");
+            starttime = DateUtils.addSeconds(new Date(starttime),1).getTime();
+            map1.put("timestamp", starttime);
+
+            map2.put("ip", "xxx.xxx.xxx.xxx");
+            map2.put("jobid", "150648764-oozie-oozi-W");
+            map2.put("operation", "end");
+
+            map2.put("timestamp", starttime);
+            System.out.println("-----------------"+DateTimeUtil.millisecondsToHumanDateWithSeconds(starttime));
           //  count++;
         }
 

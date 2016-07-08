@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
+import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,6 @@ import java.io.IOException;
 import java.util.*;
 
 public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2<String,String>, Integer, Object>, SerializationMetadataProvider{
-       // Function<Tuple2<String, String>, Iterable<Tuple2<Integer, Object>>>, SerializationMetadataProvider
 
     private static final long serialVersionUID = -5281723341236671580L;
     private static final Logger LOG = LoggerFactory.getLogger(CorrelationSpoutSparkFunction.class);
@@ -98,11 +99,45 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
                 // filter out message
                 if (mod >= groupingStrategy.startSequence && mod < groupingStrategy.startSequence + numOfRouterBolts) {
                     PartitionedEvent pEvent = new PartitionedEvent(event, groupingStrategy.partition, hash);
-                    if(pEvent.getPartitionKey() == 101200){
+                    /* if(pEvent.getPartitionKey() == 101200){
+                        *//*LOG.info("EMIT");
+
+                        pEvent.getEvent().setTimestamp(1461740474526l);
+                        LOG.info(DateTimeUtil.millisecondsToHumanDateWithSeconds(1461740474526l));
                         outputTuple2s.add(new Tuple2<Integer, Object>(1,pEvent));
+
+                        pEvent.getEvent().setTimestamp(DateUtils.addSeconds(new Date(1461740474526l),1).getTime());
+                        LOG.info(DateTimeUtil.millisecondsToHumanDateWithSeconds(DateUtils.addSeconds(new Date(1461740474526l),1).getTime()));
+                        outputTuple2s.add(new Tuple2<Integer, Object>(1,pEvent));
+
+                        pEvent.getEvent().setTimestamp(DateUtils.addSeconds(new Date(1461740474526l),2).getTime());
+                        LOG.info(DateTimeUtil.millisecondsToHumanDateWithSeconds(DateUtils.addSeconds(new Date(1461740474526l),2).getTime()));
+                        outputTuple2s.add(new Tuple2<Integer, Object>(1,pEvent));*//*
+
+                       *//* pEvent.getEvent().setTimestamp(DateUtils.addSeconds(new Date(1461740474526l),3).getTime());
+                        LOG.info(DateTimeUtil.millisecondsToHumanDateWithSeconds(DateUtils.addSeconds(new Date(1461740474526l),3).getTime()));
+                        outputTuple2s.add(new Tuple2<Integer, Object>(1,pEvent));
+                        PartitionedEvent pEvent1 = new PartitionedEvent(pEvent.getEvent().copy(), groupingStrategy.partition, hash);;
+                        pEvent1.getEvent().setTimestamp(DateUtils.addSeconds(new Date(1461740474526l),1).getTime());
+                        LOG.info(DateTimeUtil.millisecondsToHumanDateWithSeconds(DateUtils.addSeconds(new Date(1461740474526l),1).getTime()));
+                        outputTuple2s.add(new Tuple2<Integer, Object>(1,pEvent1));*//*
+
+                      *//* PartitionedEvent pEvent2 = new PartitionedEvent(pEvent.getEvent().copy(), groupingStrategy.partition, hash);;
+                        pEvent2.getEvent().setTimestamp(DateUtils.addSeconds(new Date(1461740474526l),8).getTime());
+                        LOG.info(DateTimeUtil.millisecondsToHumanDateWithSeconds(DateUtils.addSeconds(new Date(1461740474526l),8).getTime()));
+                        outputTuple2s.add(new Tuple2<Integer, Object>(1,pEvent2));
+
+
+                        PartitionedEvent pEvent3 = new PartitionedEvent(pEvent.getEvent().copy(), groupingStrategy.partition, hash);;
+                        pEvent3.getEvent().setTimestamp(DateUtils.addSeconds(new Date(1461740474526l),18).getTime());
+                        LOG.info(DateTimeUtil.millisecondsToHumanDateWithSeconds(DateUtils.addSeconds(new Date(1461740474526l),18).getTime()));
+                        outputTuple2s.add(new Tuple2<Integer, Object>(1,pEvent3));*//*
                     }else{
-                        outputTuple2s.add(new Tuple2<Integer, Object>(mod,pEvent));
-                    }
+                      //  pEvent.getEvent().setTimestamp(DateUtils.addSeconds(new Date(1461740474526l),10).getTime());
+                        outputTuple2s.add(new Tuple2<Integer, Object>(0,pEvent));
+                        outputTuple2s.add(new Tuple2<Integer, Object>(0,pEvent));
+                    }*/
+                    outputTuple2s.add(new Tuple2<Integer, Object>(mod,pEvent));
                 }
             }
         }
@@ -119,11 +154,6 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
     }
 
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private StreamEvent convertToStreamEventByStreamDefinition(long timestamp, Map messageContent, StreamDefinition sd) {
-        return StreamEvent.Builder().timestamep(timestamp).attributes(messageContent, sd).build();
-    }
-
     @SuppressWarnings("rawtypes")
     private int getRoutingHashByGroupingStrategy(Map data, StreamRepartitionStrategy gs) {
         // calculate hash value for values from group-by fields
@@ -138,6 +168,11 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
         int hash = hashCodeBuilder.toHashCode();
         hash = Math.abs(hash);
         return hash;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private StreamEvent convertToStreamEventByStreamDefinition(long timestamp, Map messageContent, StreamDefinition sd) {
+        return StreamEvent.Builder().timestamep(timestamp).attributes(messageContent, sd).build();
     }
 
 }

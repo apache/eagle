@@ -88,7 +88,9 @@ public class SparkMockMetadataChangeNotifyService extends AbstractMetadataChange
     private void notifySpecListener() {
         SpoutSpec newSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testSpoutSpec.json"), SpoutSpec.class);
         RouterSpec boltSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testStreamRouterBoltSpec.json"), RouterSpec.class);
-        notifySpecListener(newSpec, boltSpec, sds);
+        AlertBoltSpec spec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testAlertBoltSpec.json"), AlertBoltSpec.class);
+
+        notifySpecListener(newSpec, boltSpec, spec, sds);
     }
 
     private Map<String, StreamDefinition> defineStreamDefinitions() {
