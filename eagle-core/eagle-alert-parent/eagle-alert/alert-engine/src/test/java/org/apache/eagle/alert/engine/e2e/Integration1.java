@@ -23,9 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import kafka.admin.AdminUtils;
-import kafka.admin.RackAwareMode;
 import kafka.utils.ZKStringSerializer$;
-import kafka.utils.ZkUtils;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
@@ -158,8 +156,8 @@ public class Integration1 {
         ZkClient zkClient = new ZkClient(zkconfig.zkQuorum, 10000, 10000, ZKStringSerializer$.MODULE$);
         Properties topicConfiguration = new Properties();
         ZkConnection zkConnection = new ZkConnection(zkconfig.zkQuorum);
-        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
-        AdminUtils.createTopic(zkUtils, topic, 1, 1, topicConfiguration, RackAwareMode.Disabled$.MODULE$);
+//        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
+        AdminUtils.createTopic(zkClient, topic, 1, 1, topicConfiguration);// RackAwareMode.Disabled$.MODULE$);
     }
 
     public static void proactive_schedule(Config config) throws Exception {
