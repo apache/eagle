@@ -116,9 +116,9 @@ public abstract class AbstractMetadataChangeNotifyService implements IMetadataCh
         alertPublishSpecListeners.forEach(s -> s.onAlertPublishSpecChange(alertPublishSpec, sds));
     }
 
-    protected void notifySpecListener(SpoutSpec spoutSpec, RouterSpec routerSpec, AlertBoltSpec alertBoltSpec, Map<String, StreamDefinition> sds) {
+    protected void notifySpecListener(SpoutSpec spoutSpec, RouterSpec routerSpec, AlertBoltSpec alertBoltSpec, PublishSpec publishSpec, Map<String, StreamDefinition> sds) {
         for (SpecListener specListener : specListeners) {
-            specListener.onSpecChange(spoutSpec, routerSpec, alertBoltSpec, sds);
+            specListener.onSpecChange(spoutSpec, routerSpec, alertBoltSpec, publishSpec, sds);
         }
     }
 

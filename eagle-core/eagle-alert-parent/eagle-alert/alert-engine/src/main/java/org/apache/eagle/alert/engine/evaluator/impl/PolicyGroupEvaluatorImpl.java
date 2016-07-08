@@ -66,15 +66,6 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
         return this.policyEvaluatorId;
     }
 
-    @Override
-    public void setName(String newName) {
-        if(this.policyEvaluatorId.equals(newName)){
-            return;
-        }
-        this.policyEvaluatorId = newName;
-        Thread.currentThread().setName(policyEvaluatorId);
-    }
-
     public void close() {
         for (PolicyStreamHandler handler : policyStreamHandlerMap.values()) {
             try {

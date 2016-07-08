@@ -134,12 +134,6 @@
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
 		</dependency>
-		<!--<dependency>
-			<groupId>com.holdenkarau</groupId>
-			<artifactId>spark-testing-base_${scala.version}</artifactId>
-			<version>1.6.1_0.3.3</version>
-			<scope>test</scope>
-		</dependency>-->
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-streaming_${scala.version}</artifactId>
@@ -173,13 +167,7 @@
 			<version>0.8.2.2</version>
 			<classifier>test</classifier>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_${scala.version}</artifactId>
-			<version>1.6.1</version>
-		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>

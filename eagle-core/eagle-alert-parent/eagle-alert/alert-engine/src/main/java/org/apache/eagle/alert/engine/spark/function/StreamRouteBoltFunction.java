@@ -1,3 +1,19 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.eagle.alert.engine.spark.function;
 
 import backtype.storm.metric.api.MultiCountMetric;
@@ -13,7 +29,6 @@ import org.apache.eagle.alert.engine.router.StreamRouter;
 import org.apache.eagle.alert.engine.router.impl.SparkStreamRouterBoltOutputCollector;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
-import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +65,6 @@ public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tup
         while (tuple2Iterator.hasNext()) {
             Tuple2<Integer, Object> tuple2 = tuple2Iterator.next();
             PartitionedEvent partitionedEvent = (PartitionedEvent) tuple2._2();
-            LOG.info(DateTimeUtil.millisecondsToHumanDateWithSeconds(partitionedEvent.getTimestamp()) + partitionedEvent);
             router.nextEvent(partitionedEvent);
         }
         cleanup(router);

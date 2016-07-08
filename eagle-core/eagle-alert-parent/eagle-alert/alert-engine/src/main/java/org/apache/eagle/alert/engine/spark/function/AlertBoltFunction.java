@@ -1,3 +1,19 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.eagle.alert.engine.spark.function;
 
 import backtype.storm.metric.api.MultiCountMetric;
@@ -10,7 +26,6 @@ import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorSpar
 import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
-import org.apache.eagle.alert.engine.router.StreamRoute;
 import org.apache.eagle.alert.engine.runner.MapComparator;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
@@ -30,33 +45,36 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
 
     private Map<String, StreamDefinition> sdf;
     private AlertBoltSpec spec;
+    private int numOfAlertBolts;
 
-
-    public AlertBoltFunction(String alertBoltNamePrefix, AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
+    public AlertBoltFunction(String alertBoltNamePrefix, AlertBoltSpec spec, Map<String, StreamDefinition> sds, int numOfAlertBolts) {
         this.alertBoltNamePrefix = alertBoltNamePrefix;
         this.sdf = sds;
         this.spec = spec;
+        this.numOfAlertBolts = numOfAlertBolts;
     }
 
     @Override
     public Iterable<Tuple2<String, AlertStreamEvent>> call(Iterator<Tuple2<Integer, Object>> tuple2Iterator) throws Exception {
-
         AlertBoltOutputCollectorSparkWrapper alertOutputCollector = new AlertBoltOutputCollectorSparkWrapper();
-        PolicyGroupEvaluator policyGroupEvaluator = new PolicyGroupEvaluatorImpl(alertBoltNamePrefix);
-        policyGroupEvaluator.init(new StreamContextImpl(null, new MultiCountMetric(), null), alertOutputCollector);
-        onAlertBoltSpecChange(policyGroupEvaluator, spec, sdf);
+        PolicyGroupEvaluatorImpl[] evaluators = new PolicyGroupEvaluatorImpl[numOfAlertBolts];
+        for (int i = 0; i < numOfAlertBolts; i++) {
+            evaluators[i] = new PolicyGroupEvaluatorImpl(alertBoltNamePrefix + i);
+            evaluators[i].init(new StreamContextImpl(null, new MultiCountMetric(), null), alertOutputCollector);
+            onAlertBoltSpecChange(evaluators[i], spec, sdf);
+        }
+
 
         while (tuple2Iterator.hasNext()) {
             Tuple2<Integer, Object> tuple2 = tuple2Iterator.next();
-            policyGroupEvaluator.setName(alertBoltNamePrefix + tuple2._1);
             PartitionedEvent event = (PartitionedEvent) tuple2._2;
-            LOG.info(tuple2._1 + "********************" + event);
-            policyGroupEvaluator.nextEvent(event);
+            evaluators[tuple2._1].nextEvent(event);
         }
 
-        cleanup(policyGroupEvaluator, alertOutputCollector);
+        cleanup(evaluators, alertOutputCollector);
         return alertOutputCollector.emitResult();
     }
+
 
     public void onAlertBoltSpecChange(PolicyGroupEvaluator policyGroupEvaluator, AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
 
@@ -83,8 +101,11 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
     }
 
 
-    public void cleanup(PolicyGroupEvaluator policyGroupEvaluator, AlertBoltOutputCollectorSparkWrapper alertOutputCollector) {
-        policyGroupEvaluator.close();
+    public void cleanup(PolicyGroupEvaluatorImpl[] policyGroupEvaluators, AlertBoltOutputCollectorSparkWrapper alertOutputCollector) {
+        for (int i = 0; i < numOfAlertBolts; i++) {
+            policyGroupEvaluators[i].close();
+        }
+
         alertOutputCollector.flush();
         alertOutputCollector.close();
     }

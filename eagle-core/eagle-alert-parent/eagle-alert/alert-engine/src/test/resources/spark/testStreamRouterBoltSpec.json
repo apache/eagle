@@ -135,7 +135,7 @@
       "targetQueue": [
         {
           "partition": {
-            "streamId": "testTopic5Stream",
+            "streamId": "oozieStream",
             "type": "GROUPBY",
             "columns": [
               "ip"

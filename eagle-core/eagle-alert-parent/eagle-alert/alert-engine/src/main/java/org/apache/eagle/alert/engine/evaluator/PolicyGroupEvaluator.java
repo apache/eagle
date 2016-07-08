@@ -41,7 +41,5 @@ public interface PolicyGroupEvaluator extends PolicyChangeListener, Serializable
 
     String getName();
 
-    void setName(String newName);
-
     void close();
 }
