@@ -41,7 +41,7 @@ public class HadoopYarnResourceUtils {
             is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
             o = OBJ_MAPPER.readValue(is, clazz);
         } catch (Exception e) {
-            throw new IllegalArgumentException(String.format("Fetch resource %s failed", urlString));
+            throw new IllegalArgumentException(String.format("Fetch resource %s failed", urlString), e);
         } finally {
             if (is != null) {
                 is.close();

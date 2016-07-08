@@ -20,15 +20,14 @@ package org.apache.eagle.hadoop.queue.storm;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import com.typesafe.config.Config;
-import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.hadoop.queue.crawler.ClusterMetricsCrawler;
 import org.apache.eagle.hadoop.queue.crawler.RunningAppsCrawler;
 import org.apache.eagle.hadoop.queue.crawler.SchedulerInfoCrawler;
 import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
 import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
 import org.apache.eagle.hadoop.queue.common.YarnURLSelectorImpl;
-import org.apache.eagle.jobrunning.common.JobConstants;
-import org.apache.eagle.jobrunning.ha.HAURLSelector;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.resourceFetch.ha.HAURLSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,8 @@ public class HadoopQueueRunningExtractor {
 
     private String site;
     private String urlBases;
-    private final HAURLSelector urlSelector;
+
+    private HAURLSelector urlSelector;
     private ExecutorService executorService;
     private SpoutOutputCollector collector;
 
@@ -56,7 +56,7 @@ public class HadoopQueueRunningExtractor {
             throw new IllegalArgumentException(site + ".baseurl is null");
         }
         String [] urls = urlBases.split(",");
-        urlSelector = new YarnURLSelectorImpl(urls, JobConstants.CompressionType.GZIP);
+        urlSelector = new YarnURLSelectorImpl(urls, Constants.CompressionType.GZIP);
         executorService = Executors.newFixedThreadPool(MAX_NUM_THREADS);
         this.collector = collector;
     }

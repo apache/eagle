@@ -48,7 +48,7 @@ public abstract class AbstractURLSelector implements HAURLSelector {
         try {
             is = InputStreamUtils.getInputStream(urlString, null, compressionType);
         } catch (Exception ex) {
-            LOG.info("get inputstream from url: " + urlString + " failed. ");
+            LOG.info("get input stream from url: " + urlString + " failed. ");
             return false;
         } finally {
             if (is != null) { try {	is.close(); } catch (IOException e) {/*Do nothing*/} }

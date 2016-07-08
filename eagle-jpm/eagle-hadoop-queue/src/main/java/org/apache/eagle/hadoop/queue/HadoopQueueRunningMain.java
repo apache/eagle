@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HadoopQueueRunningMain {
-    private static Logger LOG = LoggerFactory.getLogger(HadoopQueueRunningMain.class);
 
     public final static String PARSER_TASK_NUM = "topology.numOfParserTasks";
     public final static String TOTAL_WORKER_NUM = "topology.numOfTotalWorkers";
@@ -56,8 +55,7 @@ public class HadoopQueueRunningMain {
         String boltName = "parserBolt";
 
         builder.setSpout(spoutName, spout, 1);
-        BoltDeclarer boltDeclarer = builder.setBolt(boltName, bolt, numOfParserTasks);
-        boltDeclarer.shuffleGrouping(spoutName);
+        builder.setBolt(boltName, bolt, numOfParserTasks).shuffleGrouping(spoutName);
 
         StormTopology topology = builder.createTopology();
 

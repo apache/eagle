@@ -25,6 +25,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
+import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +34,18 @@ import java.util.Map;
 public class HadoopQueueRunningSpout extends BaseRichSpout {
 
     private final static Logger LOG = LoggerFactory.getLogger(HadoopQueueRunningSpout.class);
-    private final static int DEFAULT_WAIT_IN_SECONDS = 10;
+    private final static String FETCH_INTERVAL_CONF = "dataSourceConfig.FetchIntervalSec";
+    private final static String DEFAULT_FETCH_INTERVAL_SECONDS = "10";
+
+    private long fetchIntervalSec;
+    private long lastFetchTime = 0;
 
     private HadoopQueueRunningExtractor extractor;
     private Config config;
 
     public HadoopQueueRunningSpout(Config config) {
         this.config = config;
+        fetchIntervalSec = Long.parseLong(HadoopYarnResourceUtils.getConfigValue(config, FETCH_INTERVAL_CONF, DEFAULT_FETCH_INTERVAL_SECONDS));
     }
 
     @Override
@@ -55,14 +61,13 @@ public class HadoopQueueRunningSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         try {
-            extractor.crawl();
+            long fetchTime = System.currentTimeMillis();
+            if (fetchTime > this.fetchIntervalSec * 1000 + this.lastFetchTime) {
+                extractor.crawl();
+                lastFetchTime = fetchTime;
+            }
         } catch (Exception ex) {
             LOG.error("Fail crawling running queue resources and continue ...", ex);
-        }
-        try {
-            Thread.sleep(DEFAULT_WAIT_IN_SECONDS *1000);
-        } catch (InterruptedException e) {
-            LOG.warn("Sleep is interrupted");
         }
     }
 }

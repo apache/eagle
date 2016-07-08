@@ -34,7 +34,7 @@ import java.util.*;
 
 public class SchedulerInfoParseListener {
 
-    private Logger LOG = LoggerFactory.getLogger(SchedulerInfoParseListener.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SchedulerInfoParseListener.class);
     //private final static long AGGREGATE_INTERVAL = DateTimeUtil.ONEMINUTE;
     //private int MAX_CACHE_COUNT = 1000;
 

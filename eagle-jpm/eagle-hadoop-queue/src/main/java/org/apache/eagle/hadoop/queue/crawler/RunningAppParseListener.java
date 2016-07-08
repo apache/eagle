@@ -39,7 +39,7 @@ import java.util.*;
 
 public class RunningAppParseListener {
 
-	private Logger logger = LoggerFactory.getLogger(RunningAppParseListener.class);
+	private final static Logger logger = LoggerFactory.getLogger(RunningAppParseListener.class);
 	private final static long AGGREGATE_INTERVAL = DateTimeUtil.ONEMINUTE;
 
 	@SuppressWarnings("serial")
