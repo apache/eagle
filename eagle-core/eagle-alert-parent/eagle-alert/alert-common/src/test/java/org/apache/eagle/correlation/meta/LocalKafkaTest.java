@@ -16,17 +16,14 @@ package org.apache.eagle.correlation.meta;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import java.util.Properties;
-
 import kafka.admin.AdminUtils;
-import kafka.admin.RackAwareMode;
 import kafka.utils.ZKStringSerializer$;
-import kafka.utils.ZkUtils;
-
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
 import org.junit.Ignore;
+
+import java.util.Properties;
 
 /**
  * @since Jun 3, 2016
@@ -59,8 +56,8 @@ public class LocalKafkaTest {
         ZkClient zkClient = new ZkClient("localhost:2181", 10000, 10000, ZKStringSerializer$.MODULE$);
         Properties topicConfiguration = new Properties();
         ZkConnection zkConnection = new ZkConnection("localhost:2181");
-        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
-        AdminUtils.createTopic(zkUtils, topic, 1, 1, topicConfiguration, RackAwareMode.Disabled$.MODULE$);
+//        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
+        AdminUtils.createTopic(zkClient, topic, 1, 1, topicConfiguration);
     }
 
 }
