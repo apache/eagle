@@ -16,10 +16,10 @@
  *
  */
 
-package org.apache.eagle.jobrunning.ha;
+package org.apache.eagle.jpm.util.resourceFetch.ha;
 
-import org.apache.eagle.jobrunning.common.JobConstants;
-import org.apache.eagle.jobrunning.util.InputStreamUtils;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
 import org.apache.hadoop.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +33,12 @@ public abstract class AbstractURLSelector implements HAURLSelector {
     private volatile String selectedUrl;
 
     private volatile boolean reselectInProgress;
-    private final JobConstants.CompressionType compressionType;
+    private final Constants.CompressionType compressionType;
+
     private static final long MAX_RETRY_TIME = 3;
     private static final Logger LOG = LoggerFactory.getLogger(HAURLSelectorImpl.class);
 
-    public AbstractURLSelector(String[] urls, JobConstants.CompressionType compressionType) {
+    public AbstractURLSelector(String[] urls, Constants.CompressionType compressionType) {
         this.urls = urls;
         this.compressionType = compressionType;
     }
@@ -45,13 +46,11 @@ public abstract class AbstractURLSelector implements HAURLSelector {
     public boolean checkUrl(String urlString) {
         InputStream is = null;
         try {
-            is = InputStreamUtils.getInputStream(urlString, compressionType);
-        }
-        catch (Exception ex) {
+            is = InputStreamUtils.getInputStream(urlString, null, compressionType);
+        } catch (Exception ex) {
             LOG.info("get inputstream from url: " + urlString + " failed. ");
             return false;
-        }
-        finally {
+        } finally {
             if (is != null) { try {	is.close(); } catch (IOException e) {/*Do nothing*/} }
         }
         return true;

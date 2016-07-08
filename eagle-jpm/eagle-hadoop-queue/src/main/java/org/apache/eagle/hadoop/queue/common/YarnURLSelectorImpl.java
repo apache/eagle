@@ -18,12 +18,12 @@
 
 package org.apache.eagle.hadoop.queue.common;
 
-import org.apache.eagle.jobrunning.common.JobConstants;
-import org.apache.eagle.jobrunning.ha.AbstractURLSelector;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.resourceFetch.ha.AbstractURLSelector;
 
 public class YarnURLSelectorImpl extends AbstractURLSelector {
 
-    public YarnURLSelectorImpl(String[] urls, JobConstants.CompressionType compressionType) {
+    public YarnURLSelectorImpl(String[] urls, Constants.CompressionType compressionType) {
         super(urls, compressionType);
     }
 

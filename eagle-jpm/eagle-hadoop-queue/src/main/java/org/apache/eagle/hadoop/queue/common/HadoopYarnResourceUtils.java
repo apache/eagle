@@ -19,8 +19,8 @@
 package org.apache.eagle.hadoop.queue.common;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.jobrunning.common.JobConstants;
-import org.apache.eagle.jobrunning.util.InputStreamUtils;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -38,7 +38,7 @@ public class HadoopYarnResourceUtils {
         InputStream is = null;
         Object o = null;
         try {
-            is = InputStreamUtils.getInputStream(urlString, JobConstants.CompressionType.GZIP);
+            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
             o = OBJ_MAPPER.readValue(is, clazz);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Fetch resource %s failed", urlString));
