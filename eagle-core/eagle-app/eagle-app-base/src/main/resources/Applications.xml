@@ -1,0 +1,26 @@
+<applications>
+    <application>
+        <type>HDFS_AUDIT_APP</type>
+        <class>org.apache.eagle.app.base.example.ExampleApp</class>
+        <jar>target/apache-eagle-example-app.jar</jar>
+        <view>webapp/app/example</view>
+        <configurations>
+            <configuration>
+                <name>kafka.topic</name>
+                <value>hdfs_audit</value>
+                <description>Kafka Topic</description>
+            </configuration>
+            <configuration>
+                <name>zookeeper.server</name>
+                <value>localhost:2181</value>
+                <description></description>
+            </configuration>
+        </configurations>
+    </application>
+    <application>
+        <type>HIVE_SECURITY_APP</type>
+        <class>org.apache.eagle.app.base.example.ExampleApps</class>
+        <jar>target/apache-eagle-example-app.jar</jar>
+        <view>webapp/app/example2</view>
+    </application>
+</applications>
