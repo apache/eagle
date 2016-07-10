@@ -37,6 +37,8 @@ class JKafkaLog4jAppender extends AppenderSkeleton with Logging {
   var keyClass: String = null
   var keyer: Keyer = null
 
+  var securityProtocol: String = null
+
   var topicClass: String = null
   var topicPicker: TopicPicker = null
 
@@ -88,11 +90,19 @@ class JKafkaLog4jAppender extends AppenderSkeleton with Logging {
 
     if(keyPattern != null) props.put("keyPattern", keyPattern)
 
+
+
     if(compressionType != null) props.put(org.apache.kafka.clients.producer.ProducerConfig.COMPRESSION_TYPE_CONFIG, compressionType)
     if(requiredNumAcks != Int.MaxValue) props.put(org.apache.kafka.clients.producer.ProducerConfig.ACKS_CONFIG, requiredNumAcks.toString)
     if(retries > 0) props.put(org.apache.kafka.clients.producer.ProducerConfig.RETRIES_CONFIG, retries.toString)
     props.put(org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer")
     props.put(org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer")
+
+    if(securityProtocol != null) {
+      LogLog.debug("Use security protocol - "+securityProtocol)
+      props.put("security.protocol", securityProtocol)
+    }
+
     producer = new KafkaProducer[Array[Byte],Array[Byte]](props)
 
     if(keyClass != null){

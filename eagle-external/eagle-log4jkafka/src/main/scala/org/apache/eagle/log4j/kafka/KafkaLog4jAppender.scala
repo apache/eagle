@@ -34,6 +34,7 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
   var enqueueTimeout:String = null
   var queueSize:String = null
   var requiredNumAcks: Int = Int.MaxValue
+  var securityProtocol: String = null
 
   var keyClass: String = null
   var keyer: Keyer = null
@@ -100,6 +101,11 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
 
     props.put("serializer.class", serializerClass)
     props.put("batch.num.messages",batchSize.toString)
+
+    if(securityProtocol != null) {
+      props.put("security.protocol", securityProtocol)
+      LogLog.debug("Use security protocol - "+securityProtocol)
+    }
 
     //These have default values in ProducerConfig and AsyncProducerConfig. We don't care if they're not specified
     if(producerType != null) props.put("producer.type", producerType)
