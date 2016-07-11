@@ -16,15 +16,15 @@
  */
 package org.apache.eagle.alert.engine.serialization;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.impl.StreamEventSerializer;
 import org.apache.eagle.alert.engine.serialization.impl.StreamPartitionDigestSerializer;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 /**
  * TODO: Seams the complexity dosen't bring enough performance improve

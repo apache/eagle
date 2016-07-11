@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -36,7 +37,7 @@ import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
-import org.apache.eagle.alert.metadata.resource.IMetadataDao;
+import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 
@@ -64,7 +65,7 @@ public class MetadataResource {
     }
 
     @Path("/export")
-    @GET
+    @POST
     public Models export() {
         return dao.export();
     }
@@ -81,10 +82,30 @@ public class MetadataResource {
         return dao.addCluster(cluster);
     }
 
+    @Path("/clusters/batch")
+    @POST
+    public List<OpResult> addClusters(List<StreamingCluster> clusters) {
+        List<OpResult> results = new LinkedList<>();
+        for (StreamingCluster cluster: clusters) {
+            results.add(dao.addCluster(cluster));
+        }
+        return results;
+    }
+
     @Path("/clusters/{clusterId}")
     @DELETE
     public OpResult removeCluster(@PathParam("clusterId") String clusterId) {
         return dao.removeCluster(clusterId);
+    }
+
+    @Path("/clusters")
+    @DELETE
+    public List<OpResult> removeClusters(List<String> clusterIds) {
+        List<OpResult> results = new LinkedList<>();
+        for (String cluster: clusterIds) {
+            results.add(dao.removeCluster(cluster));
+        }
+        return results;
     }
 
     @Path("/streams")
@@ -99,10 +120,30 @@ public class MetadataResource {
         return dao.createStream(stream);
     }
 
+    @Path("/streams/batch")
+    @POST
+    public List<OpResult> addStreams(List<StreamDefinition> streams) {
+        List<OpResult> results = new LinkedList<>();
+        for (StreamDefinition stream: streams) {
+            results.add(dao.createStream(stream));
+        }
+        return results;
+    }
+
     @Path("/streams/{streamId}")
     @DELETE
     public OpResult removeStream(@PathParam("streamId") String streamId) {
         return dao.removeStream(streamId);
+    }
+
+    @Path("/streams")
+    @DELETE
+    public List<OpResult> removeStreams(List<String> streamIds) {
+        List<OpResult> results = new LinkedList<>();
+        for (String streamId: streamIds) {
+            results.add(dao.removeStream(streamId));
+        }
+        return results;
     }
 
     @Path("/datasources")
@@ -117,10 +158,30 @@ public class MetadataResource {
         return dao.addDataSource(dataSource);
     }
 
+    @Path("/datasources/batch")
+    @POST
+    public List<OpResult> addDataSources(List<Kafka2TupleMetadata> datasources) {
+        List<OpResult> results = new LinkedList<>();
+        for (Kafka2TupleMetadata ds: datasources) {
+            results.add(dao.addDataSource(ds));
+        }
+        return results;
+    }
+
     @Path("/datasources/{datasourceId}")
     @DELETE
     public OpResult removeDataSource(@PathParam("datasourceId") String datasourceId) {
         return dao.removeDataSource(datasourceId);
+    }
+
+    @Path("/datasources")
+    @DELETE
+    public List<OpResult> removeDataSources(List<String> datasourceIds) {
+        List<OpResult> results = new LinkedList<>();
+        for (String ds: datasourceIds) {
+            results.add(dao.removeDataSource(ds));
+        }
+        return results;
     }
 
     @Path("/policies")
@@ -135,10 +196,30 @@ public class MetadataResource {
         return dao.addPolicy(policy);
     }
 
+    @Path("/policies/batch")
+    @POST
+    public List<OpResult> addPolicies(List<PolicyDefinition> policies) {
+        List<OpResult> results = new LinkedList<>();
+        for (PolicyDefinition policy: policies) {
+            results.add(dao.addPolicy(policy));
+        }
+        return results;
+    }
+
     @Path("/policies/{policyId}")
     @DELETE
     public OpResult removePolicy(@PathParam("policyId") String policyId) {
         return dao.removePolicy(policyId);
+    }
+
+    @Path("/policies")
+    @DELETE
+    public List<OpResult> removePolicies(List<String> policies) {
+        List<OpResult> results = new LinkedList<>();
+        for (String policy: policies) {
+            results.add(dao.removePolicy(policy));
+        }
+        return results;
     }
 
     @Path("/publishments")
@@ -153,10 +234,30 @@ public class MetadataResource {
         return dao.addPublishment(publishment);
     }
 
+    @Path("/publishments/batch")
+    @POST
+    public List<OpResult> addPublishments(List<Publishment> publishments) {
+        List<OpResult> results = new LinkedList<>();
+        for (Publishment publishment: publishments) {
+            results.add(dao.addPublishment(publishment));
+        }
+        return results;
+    }
+
     @Path("/publishments/{pubId}")
     @DELETE
     public OpResult removePublishment(@PathParam("pubId") String pubId) {
         return dao.removePublishment(pubId);
+    }
+
+    @Path("/publishments")
+    @DELETE
+    public List<OpResult> removePublishments(List<String> pubIds) {
+        List<OpResult> results = new LinkedList<>();
+        for (String pub: pubIds) {
+            results.add(dao.removePublishment(pub));
+        }
+        return results;
     }
 
     @Path("/publishmentTypes")
@@ -171,10 +272,30 @@ public class MetadataResource {
         return dao.addPublishmentType(publishmentType);
     }
 
+    @Path("/publishmentTypes/batch")
+    @POST
+    public List<OpResult> addPublishmentTypes(List<PublishmentType> publishmentTypes) {
+        List<OpResult> results = new LinkedList<>();
+        for (PublishmentType pubType: publishmentTypes) {
+            results.add(dao.addPublishmentType(pubType));
+        }
+        return results;
+    }
+
     @Path("/publishmentTypes/{pubType}")
     @DELETE
     public OpResult removePublishmentType(@PathParam("pubType") String pubType) {
         return dao.removePublishmentType(pubType);
+    }
+
+    @Path("/publishmentTypes")
+    @DELETE
+    public List<OpResult> removePublishmentTypes(List<String> pubTypes) {
+        List<OpResult> results = new LinkedList<>();
+        for (String pubType: pubTypes) {
+            results.add(dao.removePublishmentType(pubType));
+        }
+        return results;
     }
 
     @Path("/schedulestates/{versionId}")
@@ -219,10 +340,30 @@ public class MetadataResource {
         return dao.addTopology(t);
     }
 
+    @Path("/topologies/batch")
+    @POST
+    public List<OpResult> addTopologies(List<Topology> topologies) {
+        List<OpResult> results = new LinkedList<>();
+        for (Topology t: topologies) {
+            results.add(dao.addTopology(t));
+        }
+        return results;
+    }
+
     @Path("/topologies/{topologyName}")
     @DELETE
     public OpResult removeTopology(@PathParam("topologyName") String topologyName) {
         return dao.removeTopology(topologyName);
+    }
+
+    @Path("/topologies")
+    @DELETE
+    public List<OpResult> removeTopologies(List<String> topologies) {
+        List<OpResult> results = new LinkedList<>();
+        for (String t: topologies) {
+            results.add(dao.removeTopology(t));
+        }
+        return results;
     }
 
 }

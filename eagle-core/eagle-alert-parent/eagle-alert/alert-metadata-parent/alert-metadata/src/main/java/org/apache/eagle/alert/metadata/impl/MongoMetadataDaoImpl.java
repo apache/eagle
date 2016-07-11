@@ -29,7 +29,8 @@ import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
-import org.apache.eagle.alert.metadata.resource.IMetadataDao;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.bson.BsonDocument;
@@ -66,7 +67,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     private final String connection;
     private final MongoClient client;
-    
+
     private MongoDatabase db;
     private MongoCollection<Document> cluster;
     private MongoCollection<Document> schema;
@@ -156,11 +157,11 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     private <T> OpResult addOrReplace(MongoCollection<Document> collection, T t) {
         BsonDocument filter = new BsonDocument();
         if (t instanceof StreamDefinition) {
-            filter.append("streamId", new BsonString(InMemMetadataDaoImpl.getKey(t)));
+            filter.append("streamId", new BsonString(MetadataUtils.getKey(t)));
         } else if (t instanceof PublishmentType) {
-            filter.append("type", new BsonString(InMemMetadataDaoImpl.getKey(t)));
+            filter.append("type", new BsonString(MetadataUtils.getKey(t)));
         } else {
-            filter.append("name", new BsonString(InMemMetadataDaoImpl.getKey(t)));
+            filter.append("name", new BsonString(MetadataUtils.getKey(t)));
         }
 
         String json = "";
@@ -379,4 +380,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         throw new UnsupportedOperationException("importModels not support!");
     }
 
+    @Override
+    public void close() throws IOException {
+        client.close();
+    }
 }

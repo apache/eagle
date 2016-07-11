@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.correlation.meta;
 
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 /**
@@ -24,7 +26,14 @@ import org.junit.Test;
 public class JsonTest {
 
     @Test
-    public void policyDefTest() {
-        // TODO
+    public void streamDefTest() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.readValue(JsonTest.class.getResourceAsStream("/streamDef.json"), StreamDefinition.class);
+
+        com.fasterxml.jackson.databind.ObjectMapper mapper2 = new com.fasterxml.jackson.databind.ObjectMapper();
+        mapper2.readValue(JsonTest.class.getResourceAsStream("/streamDef.json"), StreamDefinition.class);
+
     }
+
 }

@@ -18,9 +18,8 @@ package org.apache.eagle.alert.engine.coordinator;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 
-public class StreamColumn implements Serializable{
+public class StreamColumn implements Serializable {
     private static final long serialVersionUID = -5457861313624389106L;
     private String name;
     private Type type;
@@ -28,8 +27,9 @@ public class StreamColumn implements Serializable{
     private boolean required;
     private String description;
 
-    public String toString(){
-        return String.format("StreamColumn=name[%s], type=[%s], defaultValue=[%s], required=[%s]", name, type, defaultValue, required);
+    public String toString() {
+        return String.format("StreamColumn=name[%s], type=[%s], defaultValue=[%s], required=[%s]", name, type,
+                defaultValue, required);
     }
 
     public String getName() {
@@ -63,7 +63,7 @@ public class StreamColumn implements Serializable{
     public void setRequired(boolean required) {
         this.required = required;
     }
-    
+
     public String getDescription() {
         return description;
     }
@@ -72,13 +72,12 @@ public class StreamColumn implements Serializable{
         this.description = description;
     }
 
-
-    public enum Type implements Serializable{
+    public enum Type implements Serializable {
         STRING("string"), INT("int"), LONG("long"), FLOAT("float"), DOUBLE("double"), BOOL("bool"), OBJECT("object");
 
         private final String name;
 
-        Type(String name){
+        Type(String name) {
             this.name = name;
         }
 
@@ -87,10 +86,11 @@ public class StreamColumn implements Serializable{
             return name;
         }
 
-        @JsonCreator
+        @org.codehaus.jackson.annotate.JsonCreator
+        @com.fasterxml.jackson.annotation.JsonCreator
         public static Type getEnumFromValue(String value) {
             for (Type testEnum : values()) {
-                if (testEnum.name.equals(value)) {
+                if (testEnum.name.equalsIgnoreCase(value)) {
                     return testEnum;
                 }
             }
@@ -101,27 +101,31 @@ public class StreamColumn implements Serializable{
     public static class Builder {
         private StreamColumn column;
 
-        public Builder(){
+        public Builder() {
             column = new StreamColumn();
         }
-        public Builder name(String name){
+
+        public Builder name(String name) {
             column.setName(name);
             return this;
         }
-        public Builder type(Type type){
+
+        public Builder type(Type type) {
             column.setType(type);
             return this;
         }
-        public Builder defaultValue(Object defaultValue){
+
+        public Builder defaultValue(Object defaultValue) {
             column.setDefaultValue(defaultValue);
             return this;
         }
-        public Builder required(boolean required){
+
+        public Builder required(boolean required) {
             column.setRequired(required);
             return this;
         }
 
-        public StreamColumn build(){
+        public StreamColumn build() {
             return column;
         }
     }

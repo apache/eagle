@@ -40,6 +40,7 @@ public abstract class AbstractStreamBolt extends BaseRichBolt {
     private Config config;
     private List<String> outputStreamIds;
     protected OutputCollector collector;
+    protected Map stormConf;
 
     public AbstractStreamBolt(IMetadataChangeNotifyService changeNotifyService, Config config){
         this.changeNotifyService = changeNotifyService;
@@ -56,6 +57,7 @@ public abstract class AbstractStreamBolt extends BaseRichBolt {
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.stormConf = stormConf;
         Preconditions.checkNotNull(this.changeNotifyService, "IMetadataChangeNotifyService is not set yet");
         this.collector = collector;
         internalPrepare(collector,this.changeNotifyService,this.config,context);

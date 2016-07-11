@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-security-hdfs-securitylog</artifactId>
+            <artifactId>eagle-security-hdfs-authlog</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -45,17 +45,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-security-userprofile-detection</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-security-oozie-auditlog</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-security-hbase-securitylog</artifactId>
+            <artifactId>eagle-security-hbase-auditlog</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

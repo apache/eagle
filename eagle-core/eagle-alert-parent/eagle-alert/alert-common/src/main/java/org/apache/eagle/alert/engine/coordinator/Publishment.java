@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @since Apr 11, 2016
@@ -33,6 +33,8 @@ public class Publishment {
     private List<String> policyIds;
     private String dedupIntervalMin;
     private Map<String, String> properties;
+    // the class name to extend the IEventSerializer interface
+    private String serializer;
 
     public String getName() {
         return name;
@@ -40,6 +42,14 @@ public class Publishment {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSerializer() {
+        return serializer;
+    }
+
+    public void setSerializer(String serializer) {
+        this.serializer = serializer;
     }
 
     public String getType() {
@@ -78,24 +88,17 @@ public class Publishment {
     public boolean equals(Object obj) {
         if (obj instanceof Publishment) {
             Publishment p = (Publishment) obj;
-            return (Objects.equals(name, p.getName()) &&
-                    Objects.equals(type, p.getType()) &&
-                    Objects.equals(dedupIntervalMin, p.getDedupIntervalMin()) &&
-                    Objects.equals(policyIds, p.getPolicyIds()) &&
-                    properties.equals(p.getProperties()));
+            return (Objects.equals(name, p.getName()) && Objects.equals(type, p.getType())
+                    && Objects.equals(dedupIntervalMin, p.getDedupIntervalMin())
+                    && Objects.equals(policyIds, p.getPolicyIds()) && properties.equals(p.getProperties()));
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(type)
-                .append(dedupIntervalMin)
-                .append(policyIds)
-                .append(properties)
-                .build();
+        return new HashCodeBuilder().append(name).append(type).append(dedupIntervalMin).append(policyIds)
+                .append(properties).build();
     }
 
 }

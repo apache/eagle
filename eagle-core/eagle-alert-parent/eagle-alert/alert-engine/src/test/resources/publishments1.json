@@ -1,0 +1,20 @@
+[
+{
+	"name":"test-stream-output",
+	"type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
+	"policyIds": [
+		"perfmon_cpu_host_check", "perfmon_cpu_pool_check"
+	],
+	"properties": {
+	  "subject":"UMP Test Alert",
+	  "template":"",
+	  "sender": "sender@corp.com",
+	  "recipients": "services@corp.com",
+	  "smtp.server":"sender.mailhost.com",
+	  "connection": "plaintext",
+	  "smtp.port": "25"
+	},
+	"dedupIntervalMin" : "PT1M",
+	"serializer" : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
+}
+]

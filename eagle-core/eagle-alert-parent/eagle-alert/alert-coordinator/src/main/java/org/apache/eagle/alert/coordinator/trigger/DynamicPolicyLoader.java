@@ -21,12 +21,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Stopwatch;
 
 /**
  * Poll policy change and notify listeners
@@ -43,7 +46,7 @@ public class DynamicPolicyLoader implements Runnable{
         this.client = client;
     }
 
-    public synchronized void addPolicyChangeListener(PolicyChangeListener listener){
+    public synchronized void addPolicyChangeListener(PolicyChangeListener listener) {
         listeners.add(listener);
     }
 
@@ -56,6 +59,8 @@ public class DynamicPolicyLoader implements Runnable{
     public void run() {
         // we should catch every exception to avoid zombile thread
         try {
+            Stopwatch watch = Stopwatch.createStarted();
+            LOG.info("policies loader start.");
             List<PolicyDefinition> current = client.listPolicies();
             Map<String, PolicyDefinition> currPolicies = new HashMap<>();
             current.forEach(pe -> currPolicies.put(pe.getName(), pe));
@@ -88,6 +93,8 @@ public class DynamicPolicyLoader implements Runnable{
                 }
             }
 
+            watch.stop();
+            LOG.info("policies loader completed. used time milliseconds: {}", watch.elapsed(TimeUnit.MILLISECONDS));
             // reset cached policies
             cachedPolicies = currPolicies;
         } catch (Throwable t) {

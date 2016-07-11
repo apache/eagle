@@ -28,6 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import backtype.storm.utils.Utils;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 /**
  * @since May 9, 2016
  *
@@ -60,7 +63,8 @@ public class SampleClient1 {
         long base = System.currentTimeMillis();
         AtomicLong msgCount = new AtomicLong();
 
-        try (KafkaProducer<String, String> proceduer = createProceduer()) {
+        Config config = ConfigFactory.load();
+        try (KafkaProducer<String, String> proceduer = createProceduer(config)) {
             while (true) {
                 int hostIndex = 6;
                 for (int i = 0; i < hostIndex; i++) {
@@ -108,12 +112,10 @@ public class SampleClient1 {
         return Pair.of(base, JsonUtils.writeValueAsString(e));
     }
 
-    public static KafkaProducer<String, String> createProceduer() {
-
+    public static KafkaProducer<String, String> createProceduer(Config config) {
+        String servers = config.getString("kafkaProducer.bootstrapServers");
         Properties configMap = new Properties();
-        // String broker_list = zkconfig.zkQuorum;
-        // TODO: replace boot strap servers with new workable server
-        configMap.put("bootstrap.servers", "localhost:9092");
+        configMap.put("bootstrap.servers", servers);
         // configMap.put("metadata.broker.list", broker_list);
         configMap.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         configMap.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");

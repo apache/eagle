@@ -304,7 +304,12 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     protected KafkaSpoutWrapper createKafkaSpout(Map conf, TopologyContext context, SpoutOutputCollector collector, final String topic,
                                                  String schemeClsName, SpoutSpec spoutSpec, Map<String, StreamDefinition> sds) throws Exception{
         String kafkaBrokerZkQuorum = config.getString("spout.kafkaBrokerZkQuorum");
-        BrokerHosts hosts = new ZkHosts(kafkaBrokerZkQuorum);
+        BrokerHosts hosts = null;
+        if (config.hasPath("spout.kafkaBrokerZkBasePath")) {
+            hosts = new ZkHosts(kafkaBrokerZkQuorum, config.getString("spout.kafkaBrokerZkBasePath"));
+        } else {
+            hosts = new ZkHosts(kafkaBrokerZkQuorum);
+        }
         String transactionZkRoot = DEFAULT_STORM_KAFKA_TRANSACTION_ZK_ROOT;
         if(config.hasPath("spout.stormKafkaTransactionZkPath")) {
             transactionZkRoot = config.getString("spout.stormKafkaTransactionZkPath");
@@ -335,10 +340,14 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
             spoutConfig.startOffsetTime = config.getInt("spout.stormKafkaStartOffsetTime");
         }
 
-        spoutConfig.scheme = new SchemeAsMultiScheme(SchemeBuilder.buildFromClsName(schemeClsName, topic));
+        spoutConfig.scheme = new SchemeAsMultiScheme(SchemeBuilder.buildFromClsName(schemeClsName, topic, conf));
         KafkaSpoutWrapper wrapper = new KafkaSpoutWrapper(spoutConfig, kafkaSpoutMetric);
         SpoutOutputCollectorWrapper collectorWrapper = new SpoutOutputCollectorWrapper(this, collector, topic, spoutSpec, numOfRouterBolts, sds,this.serializer);
         wrapper.open(conf, context, collectorWrapper);
+        
+        if (LOG.isInfoEnabled()) {
+            LOG.info("create and open kafka wrapper: topic {}, scheme class{} ", topic, schemeClsName);
+        }
         return wrapper;
     }
 
