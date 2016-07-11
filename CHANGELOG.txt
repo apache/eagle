@@ -102,6 +102,8 @@ Release Notes - Apache Eagle 0.4.0 (incubating)
     * [EAGLE-330] - Hive ql.Parser can't parser a hive query sql with keywords
     * [EAGLE-338] - fix topology-assembly build issue because of module name change
     * [EAGLE-346] - ClassNotFoundException thrown out when topology is executing
+    * [EAGLE-355] - UI advanced policy expression can't parse
+    * [EAGLE-356] - Fix Authentication problem to query resource manager web service
 
 ** Task
     * [EAGLE-73] - Put docker steps to site tutorial
