@@ -14,4 +14,3 @@
 # limitations under the License.
 
 org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluatorServiceProviderImpl
-org.apache.eagle.ml.impl.MLPolicyEvaluatorServiceProviderImpl
