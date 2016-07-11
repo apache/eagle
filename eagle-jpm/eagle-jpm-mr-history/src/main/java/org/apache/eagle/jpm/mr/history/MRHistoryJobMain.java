@@ -37,10 +37,11 @@ public class MRHistoryJobMain {
         try {
             //1. trigger init conf
             JHFConfigManager jhfConfigManager = JHFConfigManager.getInstance(args);
+            com.typesafe.config.Config jhfAppConf = jhfConfigManager.getConfig();
 
             //2. init JobHistoryContentFilter
             JobHistoryContentFilterBuilder builder = JobHistoryContentFilterBuilder.newBuilder().acceptJobFile().acceptJobConfFile();
-            List<String> confKeyPatterns = jhfConfigManager.getConfig().getStringList("MRConfigureKeys");
+            List<String> confKeyPatterns = jhfAppConf.getStringList("MRConfigureKeys");
             confKeyPatterns.add(JPAConstants.JobConfiguration.CASCADING_JOB);
             confKeyPatterns.add(JPAConstants.JobConfiguration.HIVE_JOB);
             confKeyPatterns.add(JPAConstants.JobConfiguration.PIG_JOB);
@@ -53,11 +54,14 @@ public class MRHistoryJobMain {
 
             //3. init topology
             TopologyBuilder topologyBuilder = new TopologyBuilder();
-            String topologyName = "mrHistoryJobTopology";
+            String topologyName = jhfAppConf.getString("envContextConfig.topologyName");
+            if (topologyName == null) {
+                topologyName = "mrHistoryJobTopology";
+            }
             String spoutName = "mrHistoryJobExecutor";
             String boltName = "updateProcessTime";
-            int parallelism = jhfConfigManager.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
-            int tasks = jhfConfigManager.getConfig().getInt("envContextConfig.tasks." + spoutName);
+            int parallelism = jhfAppConf.getInt("envContextConfig.parallelismConfig." + spoutName);
+            int tasks = jhfAppConf.getInt("envContextConfig.tasks." + spoutName);
             if (parallelism > tasks) {
                 parallelism = tasks;
             }
@@ -68,8 +72,8 @@ public class MRHistoryJobMain {
             ).setNumTasks(tasks);
             topologyBuilder.setBolt(boltName, new HistoryJobProgressBolt(spoutName, jhfConfigManager), 1).setNumTasks(1).allGrouping(spoutName);
 
-            backtype.storm.Config config = new backtype.storm.Config();
-            config.setNumWorkers(jhfConfigManager.getConfig().getInt("envContextConfig.workers"));
+            Config config = new backtype.storm.Config();
+            config.setNumWorkers(jhfAppConf.getInt("envContextConfig.workers"));
             config.put(Config.TOPOLOGY_DEBUG, true);
             if (!jhfConfigManager.getEnv().equals("local")) {
                 //cluster mode
