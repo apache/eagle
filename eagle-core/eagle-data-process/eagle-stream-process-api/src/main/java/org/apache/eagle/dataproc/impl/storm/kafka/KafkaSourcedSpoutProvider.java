@@ -97,6 +97,10 @@ public class KafkaSourcedSpoutProvider implements StormSpoutProvider {
 		if (context.hasPath("forceFromStart")) {
 			spoutConfig.startOffsetTime = kafka.api.OffsetRequest.EarliestTime();
 		}
+
+		if(config.hasPath("securityProtocol")){
+			// spoutConfig.securityProtocol = config.getString("securityProtocol");
+		}
 		
 		spoutConfig.scheme = getStreamScheme(deserClsName, context);
         return new KafkaSpout(spoutConfig);
