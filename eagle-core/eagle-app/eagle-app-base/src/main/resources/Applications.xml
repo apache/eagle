@@ -1,8 +1,7 @@
 <applications>
     <application>
-        <type>HDFS_AUDIT_APP</type>
-        <class>org.apache.eagle.app.base.example.ExampleApp</class>
         <jar>target/apache-eagle-example-app.jar</jar>
+        <class>org.apache.eagle.app.base.example.ExampleAppContext</class>
         <view>webapp/app/example</view>
         <configurations>
             <configuration>
@@ -12,13 +11,13 @@
             </configuration>
             <configuration>
                 <name>zookeeper.server</name>
+                <displayName>Zookeeper Server</displayName>
                 <value>localhost:2181</value>
-                <description></description>
+                <description>Zookeeper Server address</description>
             </configuration>
         </configurations>
     </application>
     <application>
-        <type>HIVE_SECURITY_APP</type>
         <class>org.apache.eagle.app.base.example.ExampleApps</class>
         <jar>target/apache-eagle-example-app.jar</jar>
         <view>webapp/app/example2</view>

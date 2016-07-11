@@ -1,5 +1,3 @@
-package org.apache.eagle.app.base;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,23 +14,11 @@ package org.apache.eagle.app.base;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class Site {
-    private String name;
-    private String description;
+package org.apache.eagle.app.base.resource;
 
-    public String getName() {
-        return name;
-    }
+import javax.annotation.Resource;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+@Resource
+public class AppResource {
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

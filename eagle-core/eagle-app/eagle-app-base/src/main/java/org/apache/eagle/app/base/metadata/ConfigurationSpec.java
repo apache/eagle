@@ -1,4 +1,4 @@
-package org.apache.eagle.app.base;
+package org.apache.eagle.app.base.metadata;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -16,5 +16,41 @@ package org.apache.eagle.app.base;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class AppConfig {
+public class ConfigurationSpec {
+    private String name;
+    private String displayName;
+    private String value;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 }

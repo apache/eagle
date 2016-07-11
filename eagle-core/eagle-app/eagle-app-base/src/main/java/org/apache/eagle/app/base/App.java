@@ -16,33 +16,25 @@
  */
 package org.apache.eagle.app.base;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
+import org.apache.eagle.app.base.metadata.AppInstanceEntity;
 
 public interface App {
     /**
      *
-     * @param config
      */
-    void onInit(Config config);
+    void onStart(AppInstanceEntity appInstance);
 
     /**
      *
      */
-    void onStart();
+    void onStop(AppInstanceEntity appInstance);
 
     /**
      *
      */
-    void onStop();
+    void onInstall(AppInstanceEntity appInstance);
 
     /**
-     *
      */
-    void onInstall();
-
-    /**
-     *
-     * @param site
-     */
-    void onUninstall(Site site);
+    void onUninstall(AppInstanceEntity appInstance);
 }

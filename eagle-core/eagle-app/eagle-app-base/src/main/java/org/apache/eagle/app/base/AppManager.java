@@ -14,29 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.base.example;
+package org.apache.eagle.app.base;
 
-import org.apache.eagle.app.base.App;
 import org.apache.eagle.app.base.metadata.AppInstanceEntity;
+import org.apache.eagle.app.base.metadata.AppSpecEntity;
 
-public class ExampleApp implements App {
-    @Override
-    public void onStart(AppInstanceEntity appInstance) {
+import java.util.List;
 
-    }
+public interface AppManager {
+    /**
+     * Load applications
+     */
+    void load();
 
-    @Override
-    public void onStop(AppInstanceEntity appInstance) {
+    /**
+     * Reload applications
+     */
+    void reload();
 
-    }
+    /**
+     * Get all available applications
+     * @return
+     */
+    List<AppSpecEntity> getAvailableApps();
 
-    @Override
-    public void onInstall(AppInstanceEntity appInstance) {
+    /**
+     *
+     * @param instance
+     */
+    void startApp(AppInstanceEntity instance);
 
-    }
+    /**
+     *
+     * @param instance
+     */
+    void stopApp(AppInstanceEntity instance);
 
-    @Override
-    public void onUninstall(AppInstanceEntity appInstance) {
-        
-    }
+    /**
+     *
+     * @param instance
+     */
+    void installApp(AppInstanceEntity instance);
+
+    /**
+     *
+     * @param instance
+     */
+    void uninstallApp(AppInstanceEntity instance);
 }

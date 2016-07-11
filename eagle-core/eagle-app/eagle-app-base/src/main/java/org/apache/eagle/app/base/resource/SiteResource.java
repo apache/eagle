@@ -1,3 +1,7 @@
+package org.apache.eagle.app.base.resource;
+
+import javax.annotation.Resource;
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,35 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.base.example;
+@Resource
+public class SiteResource {
 
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
-import org.apache.eagle.app.base.App;
-import org.apache.eagle.app.base.Site;
-
-public class ExampleApp2 implements App {
-    @Override
-    public void onInit(Config config) {
-        
-    }
-
-    @Override
-    public void onStart() {
-
-    }
-
-    @Override
-    public void onStop() {
-
-    }
-
-    @Override
-    public void onInstall() {
-
-    }
-
-    @Override
-    public void onUninstall(Site site) {
-
-    }
 }
