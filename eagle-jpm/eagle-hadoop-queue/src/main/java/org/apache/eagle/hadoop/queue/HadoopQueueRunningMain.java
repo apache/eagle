@@ -28,6 +28,7 @@ import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.dataproc.util.ConfigOptionParser;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMetricPersistBolt;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueRunningSpout;
 import org.slf4j.Logger;
@@ -39,11 +40,18 @@ public class HadoopQueueRunningMain {
     public final static String TOTAL_WORKER_NUM = "topology.numOfTotalWorkers";
     public final static String TOPOLOGY_NAME = "topology.name";
     public final static String LOCAL_MODE = "topology.localMode";
+    private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueRunningMain.class);
 
     public static void main(String [] args) {
         //System.setProperty("config.resource", "/application.conf");
-        Config config = ConfigFactory.load();
-
+        //Config config = ConfigFactory.load();
+        Config config = null;
+        try {
+            LOG.info("Loading from configuration file");
+            config = new ConfigOptionParser().load(args);
+        } catch (Exception e) {
+            LOG.error("failed to load config");
+        }
         IRichSpout spout = new HadoopQueueRunningSpout(config);
         HadoopQueueMetricPersistBolt bolt = new HadoopQueueMetricPersistBolt(config);
         TopologyBuilder builder = new TopologyBuilder();

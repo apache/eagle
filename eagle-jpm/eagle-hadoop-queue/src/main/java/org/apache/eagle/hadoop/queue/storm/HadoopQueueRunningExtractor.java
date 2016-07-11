@@ -41,6 +41,7 @@ public class HadoopQueueRunningExtractor {
     private final static Logger LOGGER = LoggerFactory.getLogger(HadoopQueueRunningExtractor.class);
     private final static int MAX_NUM_THREADS = 10;
     private final static int MAX_WAIT_TIME = 10;
+    private final static String DEFAULT_SITE = "sandbox";
 
     private String site;
     private String urlBases;
@@ -50,7 +51,7 @@ public class HadoopQueueRunningExtractor {
     private SpoutOutputCollector collector;
 
     public HadoopQueueRunningExtractor(Config eagleConf, SpoutOutputCollector collector) {
-        site = HadoopYarnResourceUtils.getConfigValue(eagleConf, "eagleProps.site", "");
+        site = HadoopYarnResourceUtils.getConfigValue(eagleConf, "eagleProps.site", DEFAULT_SITE);
         urlBases = HadoopYarnResourceUtils.getConfigValue(eagleConf, "dataSourceConfig.RMEndPoints", "");
         if(urlBases == null){
             throw new IllegalArgumentException(site + ".baseurl is null");
