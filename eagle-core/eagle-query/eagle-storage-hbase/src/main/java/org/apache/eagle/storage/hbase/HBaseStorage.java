@@ -52,6 +52,7 @@ public class HBaseStorage extends DataStorageBase {
     
     @Override
     public void init() throws IOException {
+        HBaseEntitySchemaManager.getInstance().init();
         LOG.info("Initializing");
     }
 

@@ -139,6 +139,11 @@ public class EagleConfigFactory implements EagleConfig {
 	}
 
     @Override
+	public Configuration getHbaseConf() {
+		return hbaseConf;
+	}
+
+    @Override
 	public String getZKQuorum(){
 		return this.zkQuorum;
     }

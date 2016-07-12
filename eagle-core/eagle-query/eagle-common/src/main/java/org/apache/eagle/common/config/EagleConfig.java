@@ -17,6 +17,7 @@
 package org.apache.eagle.common.config;
 
 import com.typesafe.config.Config;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.HTableInterface;
 
 import java.util.TimeZone;
@@ -27,6 +28,8 @@ public interface EagleConfig {
     boolean isCoprocessorEnabled();
 
 	HTableInterface getHTable(String tableName);
+
+    Configuration getHbaseConf();
 
     String getStorageType();
 
