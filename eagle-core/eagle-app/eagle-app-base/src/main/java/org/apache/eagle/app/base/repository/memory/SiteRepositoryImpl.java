@@ -1,11 +1,10 @@
-package org.apache.eagle.app.base.resource;
+package org.apache.eagle.app.base.repository.memory;
 
 import org.apache.eagle.app.base.metadata.Site;
-import org.apache.eagle.app.base.persistence.PersistenceManager;
+import org.apache.eagle.app.base.persistence.annotation.Persistence;
+import org.apache.eagle.app.base.persistence.memory.Memory;
 import org.apache.eagle.app.base.repository.SiteRepository;
 
-import javax.annotation.Resource;
-import javax.ws.rs.Path;
 import java.util.List;
 
 /**
@@ -24,10 +23,20 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Resource
-public class SiteResource {
-    @Path("/v1/sites")
-    public List<Site> getAllSites(){
-        return PersistenceManager.getInstance().realize(SiteRepository.class).getAllSites();
+@Persistence(Memory.class)
+public class SiteRepositoryImpl implements SiteRepository {
+    @Override
+    public List<Site> getAllSites() {
+        return null;
+    }
+
+    @Override
+    public Site getSiteByName(String siteName) {
+        return null;
+    }
+
+    @Override
+    public Site getSiteByUUID(String uuid) {
+        return null;
     }
 }

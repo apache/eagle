@@ -1,3 +1,7 @@
+package org.apache.eagle.app.base.metadata;
+
+import jdk.nashorn.internal.ir.annotations.Immutable;
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,29 +18,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.base.metadata;
-
-import java.util.Properties;
-
-/**
- * Dynamically registered site
- */
-public class SiteEntity {
-    private String uuid;
-    private String site;
+@Immutable
+public class PropertySpec {
+    private String name;
+    private String displayName;
+    private String value;
     private String description;
-    private Properties properties;
-
-    private long createdTime;
-    private long modifiedTime;
-
-    public String getSite() {
-        return site;
-    }
-
-    public void setSite(String site) {
-        this.site = site;
-    }
+    private String type;
 
     public String getDescription() {
         return description;
@@ -46,35 +34,27 @@ public class SiteEntity {
         this.description = description;
     }
 
-    public Properties getProperties() {
-        return properties;
+    public String getValue() {
+        return value;
     }
 
-    public void setProperties(Properties properties) {
-        this.properties = properties;
+    public void setValue(String value) {
+        this.value = value;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getName() {
+        return name;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public long getCreatedTime() {
-        return createdTime;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setCreatedTime(long createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public long getModifiedTime() {
-        return modifiedTime;
-    }
-
-    public void setModifiedTime(long modifiedTime) {
-        this.modifiedTime = modifiedTime;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

@@ -1,13 +1,3 @@
-package org.apache.eagle.app.base.resource;
-
-import org.apache.eagle.app.base.metadata.Site;
-import org.apache.eagle.app.base.persistence.PersistenceManager;
-import org.apache.eagle.app.base.repository.SiteRepository;
-
-import javax.annotation.Resource;
-import javax.ws.rs.Path;
-import java.util.List;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,10 +14,15 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Resource
-public class SiteResource {
-    @Path("/v1/sites")
-    public List<Site> getAllSites(){
-        return PersistenceManager.getInstance().realize(SiteRepository.class).getAllSites();
+package org.apache.eagle.app.base.persistence.mongodb;
+
+import com.typesafe.config.Config;
+import org.apache.eagle.app.base.persistence.AbstractPersistence;
+
+public final class MongoDB extends AbstractPersistence {
+    public MongoDB(Config config) {
+        super(config);
     }
+
+
 }

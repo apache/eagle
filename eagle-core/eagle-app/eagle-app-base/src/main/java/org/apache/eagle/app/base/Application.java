@@ -14,29 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.base.example;
+package org.apache.eagle.app.base;
 
-import org.apache.eagle.app.base.App;
-import org.apache.eagle.app.base.metadata.AppInstanceEntity;
+import org.apache.eagle.app.base.metadata.ApplicationInstance;
 
-public class ExampleApp implements App {
-    @Override
-    public void onStart(AppInstanceEntity appInstance) {
+public interface Application {
+    void onInit();
 
-    }
+    /**
+     *
+     */
+    void onStart(ApplicationInstance applicationInstance);
 
-    @Override
-    public void onStop(AppInstanceEntity appInstance) {
+    /**
+     *
+     */
+    void onStop(ApplicationInstance applicationInstance);
 
-    }
+    /**
+     *
+     */
+    void onInstall(ApplicationInstance applicationInstance);
 
-    @Override
-    public void onInstall(AppInstanceEntity appInstance) {
-
-    }
-
-    @Override
-    public void onUninstall(AppInstanceEntity appInstance) {
-        
-    }
+    /**
+     */
+    void onUninstall(ApplicationInstance applicationInstance);
 }

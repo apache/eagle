@@ -1,13 +1,3 @@
-package org.apache.eagle.app.base.resource;
-
-import org.apache.eagle.app.base.metadata.Site;
-import org.apache.eagle.app.base.persistence.PersistenceManager;
-import org.apache.eagle.app.base.repository.SiteRepository;
-
-import javax.annotation.Resource;
-import javax.ws.rs.Path;
-import java.util.List;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,10 +14,28 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.app.base.resource;
+
+import org.apache.eagle.app.base.ApplicationManager;
+import org.apache.eagle.app.base.metadata.ApplicationSpec;
+
+import javax.annotation.Resource;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import java.util.List;
+
 @Resource
-public class SiteResource {
-    @Path("/v1/sites")
-    public List<Site> getAllSites(){
-        return PersistenceManager.getInstance().realize(SiteRepository.class).getAllSites();
+public class ApplicationResource {
+    @Path("/v1/apps")
+    @GET
+    public List<ApplicationSpec> getAvailableApplications(){
+        return ApplicationManager.getInstance().getAllApplications();
+    }
+
+    @Path("/v1/apps/{appType}")
+    @GET
+    public ApplicationSpec getApplication(@PathParam("appType") String appType){
+        return ApplicationManager.getInstance().getApplicationByType(appType);
     }
 }

@@ -14,11 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.base.resource;
+package org.apache.eagle.app.base.metadata;
 
-import javax.annotation.Resource;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 
-@Resource
-public class AppResource {
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
+@XmlRootElement(name = "applications")
+@Immutable
+public class ApplicationsConfig {
+    @XmlElement(name = "application")
+    private List<ApplicationSpec> applications;
+
+    public List<ApplicationSpec> getApplications() {
+        return applications;
+    }
 }

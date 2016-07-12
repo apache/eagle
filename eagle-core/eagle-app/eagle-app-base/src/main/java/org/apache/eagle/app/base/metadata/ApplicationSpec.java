@@ -20,36 +20,54 @@ import jdk.nashorn.internal.ir.annotations.Immutable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
-@XmlRootElement(name = "configuration")
+/**
+ * Static metadata provided by installed apps
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @Immutable
-public class ConfigurationSpec {
-    @XmlElement(name = "property")
-    private List<PropertySpec> properties;
+public class ApplicationSpec {
+    private String type;
+    private String name;
+    private String version;
+    private String description;
+    private String classname;
+    private String jarpath;
+    private String viewpath;
 
-    public List<PropertySpec> getProperties() {
-        return properties;
+    private ConfigurationSpec configuration;
+
+    public String getDescription() {
+        return description;
     }
 
-    public PropertySpec getProperty(String name){
-        for(PropertySpec propertySpec:properties){
-            if(propertySpec.getName().equals(name)){
-                return propertySpec;
-            }
-        }
-        return null;
+    public String getVersion() {
+        return version;
     }
 
-    public boolean hasProperty(String name){
-        for(PropertySpec propertySpec:properties){
-            if(propertySpec.getName().equals(name)){
-                return true;
-            }
-        }
-        return false;
+
+    public String getType() {
+        return type;
+    }
+
+    public ConfigurationSpec getConfiguration() {
+        return configuration;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public String getClassname() {
+        return classname;
+    }
+
+    public String getViewpath() {
+        return viewpath;
+    }
+
+    public String getJarpath() {
+        return jarpath;
     }
 }

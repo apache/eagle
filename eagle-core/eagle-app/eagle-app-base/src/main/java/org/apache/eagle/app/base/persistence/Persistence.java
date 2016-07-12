@@ -1,13 +1,3 @@
-package org.apache.eagle.app.base.resource;
-
-import org.apache.eagle.app.base.metadata.Site;
-import org.apache.eagle.app.base.persistence.PersistenceManager;
-import org.apache.eagle.app.base.repository.SiteRepository;
-
-import javax.annotation.Resource;
-import javax.ws.rs.Path;
-import java.util.List;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,10 +14,18 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Resource
-public class SiteResource {
-    @Path("/v1/sites")
-    public List<Site> getAllSites(){
-        return PersistenceManager.getInstance().realize(SiteRepository.class).getAllSites();
-    }
+package org.apache.eagle.app.base.persistence;
+
+public interface Persistence {
+    /**
+     *
+     * @param realization
+     */
+    <T extends Object> void register(T realization);
+
+    /**
+     * @param <T>
+     * @return
+     */
+    <T extends Object> T realize(Class<T> type);
 }

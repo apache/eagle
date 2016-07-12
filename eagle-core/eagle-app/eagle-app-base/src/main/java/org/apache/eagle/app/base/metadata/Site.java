@@ -19,16 +19,48 @@ package org.apache.eagle.app.base.metadata;
 import java.util.Properties;
 
 /**
- * Site app management entity
+ * Dynamically registered site
  */
-public class AppInstanceEntity {
+public class Site {
     private String uuid;
-    private SiteEntity site;
-    private AppSpecEntity app;
-    private Properties configurations;
+    private String site;
+    private String description;
+    private Properties properties;
 
     private long createdTime;
     private long modifiedTime;
+
+    public String getSite() {
+        return site;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public long getCreatedTime() {
         return createdTime;
@@ -44,37 +76,5 @@ public class AppInstanceEntity {
 
     public void setModifiedTime(long modifiedTime) {
         this.modifiedTime = modifiedTime;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public AppSpecEntity getApp() {
-        return app;
-    }
-
-    public void setApp(AppSpecEntity app) {
-        this.app = app;
-    }
-
-    public Properties getConfigurations() {
-        return configurations;
-    }
-
-    public void setConfigurations(Properties configurations) {
-        this.configurations = configurations;
-    }
-
-    public SiteEntity getSite() {
-        return site;
-    }
-
-    public void setSite(SiteEntity site) {
-        this.site = site;
     }
 }

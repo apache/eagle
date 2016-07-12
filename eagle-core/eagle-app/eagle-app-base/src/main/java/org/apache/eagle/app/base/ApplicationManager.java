@@ -16,49 +16,64 @@
  */
 package org.apache.eagle.app.base;
 
-import org.apache.eagle.app.base.metadata.AppInstanceEntity;
-import org.apache.eagle.app.base.metadata.AppSpecEntity;
+import org.apache.eagle.app.base.metadata.ApplicationInstance;
+import org.apache.eagle.app.base.metadata.ApplicationSpec;
+import org.apache.eagle.app.base.metadata.ApplicationsConfig;
 
 import java.util.List;
 
-public interface AppManager {
+public abstract class ApplicationManager {
     /**
      * Load applications
      */
-    void load();
+    public abstract void load();
 
     /**
      * Reload applications
      */
-    void reload();
+    public void reload(){
+        load();
+    }
 
     /**
      * Get all available applications
      * @return
      */
-    List<AppSpecEntity> getAvailableApps();
+    public abstract List<ApplicationSpec> getAllApplications();
 
     /**
      *
      * @param instance
      */
-    void startApp(AppInstanceEntity instance);
+    public abstract void startApp(ApplicationInstance instance);
 
     /**
      *
      * @param instance
      */
-    void stopApp(AppInstanceEntity instance);
+    public abstract void stopApp(ApplicationInstance instance);
 
     /**
      *
      * @param instance
      */
-    void installApp(AppInstanceEntity instance);
+    public abstract void installApp(ApplicationInstance instance);
 
     /**
      *
      * @param instance
      */
-    void uninstallApp(AppInstanceEntity instance);
+    public abstract void uninstallApp(ApplicationInstance instance);
+
+    private static ApplicationManager instance;
+
+    public static ApplicationManager getInstance(){
+        if(instance == null){
+            instance = new ApplicationManagerImpl();
+            instance.load();
+        }
+        return instance;
+    }
+
+    public abstract ApplicationSpec getApplicationByType(String appType);
 }

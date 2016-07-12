@@ -14,27 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.base;
+package org.apache.eagle.app.base.persistence;
 
-import org.apache.eagle.app.base.metadata.AppInstanceEntity;
+import org.junit.Assert;
+import org.junit.Test;
 
-public interface App {
-    /**
-     *
-     */
-    void onStart(AppInstanceEntity appInstance);
+public class PersistenceManagerTest {
+    @Test
+    public void testPersistenceManagerLoad(){
+        Assert.assertNotNull(PersistenceManager.getInstance().realize(ExistsRepository.class));
+        Assert.assertNull(PersistenceManager.getInstance().realize(NotExistsRepository.class));
+    }
 
-    /**
-     *
-     */
-    void onStop(AppInstanceEntity appInstance);
-
-    /**
-     *
-     */
-    void onInstall(AppInstanceEntity appInstance);
-
-    /**
-     */
-    void onUninstall(AppInstanceEntity appInstance);
+    @Test
+    public void testIsAssignableFrom(){
+        Assert.assertTrue(ExistsRepository.class.isAssignableFrom(ExistsRepositoryMemoryImpl.class));
+    }
 }
