@@ -39,7 +39,6 @@
         <module>eagle-policy</module>
         <module>eagle-alert-parent</module>
         <module>eagle-query</module>
-   		<module>eagle-machinelearning</module>
         <module>eagle-embed</module>
         <module>eagle-metric</module>
         <module>eagle-application-management</module>
