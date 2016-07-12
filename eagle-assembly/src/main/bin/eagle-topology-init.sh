@@ -183,7 +183,7 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
        "className": "org.apache.eagle.notification.plugin.AlertEmailPlugin",
        "description": "send alert to email",
        "enabled":true,
-       "fields": "[{\"name\":\"sender\"},{\"name\":\"recipients\"},{\"name\":\"subject\"}]"
+       "fields": [{"name":"sender"},{"name":"recipients"},{"name":"subject"}]
      },
      {
        "prefix": "alertNotifications",
@@ -193,7 +193,7 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
        "className": "org.apache.eagle.notification.plugin.AlertKafkaPlugin",
        "description": "send alert to kafka bus",
        "enabled":true,
-       "fields": "[{\"name\":\"kafka_broker\",\"value\":\"sandbox.hortonworks.com:6667\"},{\"name\":\"topic\"}]"
+       "fields": [{"name":"kafka_broker","value":"sandbox.hortonworks.com:6667"},{"name":"topic"}]
      },
      {
        "prefix": "alertNotifications",
