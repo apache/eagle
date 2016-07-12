@@ -137,8 +137,8 @@
     <properties>
         <!-- General Properties -->
         <java.version>1.8</java.version>
-        <scala.version>2.10</scala.version>
-        <scala-lang.version>2.10.4</scala-lang.version>
+        <scala.version>2.11</scala.version>
+        <scala-lang.version>2.11.8</scala-lang.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -197,7 +197,7 @@
         <!-- Serialization -->
         <gson.version>2.2.2</gson.version>
         <guava.version>19.0</guava.version>
-        <fasterxml-jackson.version>2.5.4</fasterxml-jackson.version>
+        <fasterxml-jackson.version>2.6.0</fasterxml-jackson.version>
         <codehaus-jackson.version>1.9.13</codehaus-jackson.version>
         <jsoup.version>1.7.3</jsoup.version>
         <io.netty.version>3.6.7.Final</io.netty.version>
@@ -263,7 +263,7 @@
         <org.mortbay.jetty.version>6.1.26</org.mortbay.jetty.version>
 
         <!-- servlet  -->
-        <servlet-api.version>3.0.1</servlet-api.version>
+        <servlet-api.version>2.5</servlet-api.version>
 
         <!-- Alert Framework -->
         <velocity.version>1.7</velocity.version>

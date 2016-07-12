@@ -29,7 +29,7 @@ public class StreamRepartitionStrategy  implements Serializable {
     public int numTotalParticipatingRouterBolts = 0;      // how many group-by bolts participate policy evaluation
     public int startSequence = 0;            // what is the sequence for the first bolt in this topology among all bolts
     public List<String> totalTargetBoltIds = new ArrayList<String>();
-    
+
     public int hashCode() {
         int hashcode = 1 * 31;
         hashcode += partition.hashCode();
@@ -38,7 +38,7 @@ public class StreamRepartitionStrategy  implements Serializable {
         }
         return hashcode;
     }
-    
+
     public boolean equals(Object obj) {
         if (!(obj instanceof StreamRepartitionStrategy)) {
             return false;

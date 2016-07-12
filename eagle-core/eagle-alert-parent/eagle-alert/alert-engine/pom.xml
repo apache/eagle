@@ -134,8 +134,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming_${scala.version}</artifactId>
-			<version>1.6.1</version>
+			<artifactId>spark-streaming-${kafka.artifact.id}</artifactId>
+			<version>${spark.core.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty.orbit</groupId>
@@ -144,26 +144,19 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-streaming_${scala.version}</artifactId>
+			<version>${spark.core.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-servlet</artifactId>
-			<version>${jersey.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
+			<artifactId>servlet-api</artifactId>
 			<version>${servlet-api.version}</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming-kafka_${scala.version}</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_${scala.version}</artifactId>
-			<version>0.8.2.2</version>
-			<classifier>test</classifier>
 		</dependency>
 	</dependencies>
 

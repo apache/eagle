@@ -49,6 +49,7 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
     public void call(Iterator<Tuple2<String, AlertStreamEvent>> tuple2Iterator) throws Exception {
 
         AlertPublisher alertPublisher = new AlertPublisherImpl(alertPublishBoltName);
+        alertPublisher.init(null,new HashMap<>());
         onAlertPublishSpecChange(alertPublisher, pubSpec, sds);
         while (tuple2Iterator.hasNext()) {
             Tuple2<String, AlertStreamEvent> tuple2 = tuple2Iterator.next();

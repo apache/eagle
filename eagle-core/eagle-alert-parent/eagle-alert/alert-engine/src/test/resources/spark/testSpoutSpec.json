@@ -99,7 +99,7 @@
                 "windowMargin": 1000
               }
             },
-            "numTotalParticipatingRouterBolts": 1,
+            "numTotalParticipatingRouterBolts": 4,
             "startSequence": 0,
             "totalTargetBoltIds": []
           }
@@ -123,7 +123,7 @@
                 "windowMargin": 1000
               }
             },
-            "numTotalParticipatingRouterBolts": 1,
+            "numTotalParticipatingRouterBolts": 4,
             "startSequence": 0,
             "totalTargetBoltIds": []
           }
@@ -147,7 +147,7 @@
                 "windowMargin": 1000
               }
             },
-            "numTotalParticipatingRouterBolts": 1,
+            "numTotalParticipatingRouterBolts": 4,
             "startSequence": 0,
             "totalTargetBoltIds": []
           }
@@ -171,7 +171,7 @@
                 "windowMargin": 1000
               }
             },
-            "numTotalParticipatingRouterBolts": 1,
+            "numTotalParticipatingRouterBolts": 4,
             "startSequence": 0,
             "totalTargetBoltIds": []
           }

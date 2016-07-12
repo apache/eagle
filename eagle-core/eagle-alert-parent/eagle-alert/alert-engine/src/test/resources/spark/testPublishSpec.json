@@ -16,17 +16,8 @@
 	  "smtp.server":"mailhost.com",
         "connection": "plaintext",
         "smtp.port": "25"
-      }
+      },
+      "serializer" : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
     }
-/*    {
-      "type": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
-      "name":"kafka-testAlertStream",
-      "policyIds": ["testPolicy"],
-      "dedupIntervalMin": "PT1M",
-      "properties":{
-        "kafka_broker":"sandbox.hortonworks.com:6667",
-        "topic":"test_kafka"
-      }
-    }*/
   ]
 }
