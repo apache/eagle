@@ -42,6 +42,6 @@
    		<module>eagle-machinelearning</module>
         <module>eagle-embed</module>
         <module>eagle-metric</module>
-        <module>eagle-application-management</module>
+        <module>eagle-metadata</module>
     </modules>
 </project>
