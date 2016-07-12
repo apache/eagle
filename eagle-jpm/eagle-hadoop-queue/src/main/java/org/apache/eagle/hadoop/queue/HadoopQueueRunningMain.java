@@ -40,6 +40,7 @@ public class HadoopQueueRunningMain {
     public final static String TOTAL_WORKER_NUM = "topology.numOfTotalWorkers";
     public final static String TOPOLOGY_NAME = "topology.name";
     public final static String LOCAL_MODE = "topology.localMode";
+
     private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueRunningMain.class);
 
     public static void main(String [] args) {
@@ -58,12 +59,13 @@ public class HadoopQueueRunningMain {
 
         int numOfParserTasks = config.getInt(PARSER_TASK_NUM);
         int numOfTotalWorkers = config.getInt(TOTAL_WORKER_NUM);
+        int numOfSpoutTasks = 1;
 
         String spoutName = "runningQueueSpout";
         String boltName = "parserBolt";
 
-        builder.setSpout(spoutName, spout, 1);
-        builder.setBolt(boltName, bolt, numOfParserTasks).shuffleGrouping(spoutName);
+        builder.setSpout(spoutName, spout, numOfSpoutTasks).setNumTasks(numOfSpoutTasks);
+        builder.setBolt(boltName, bolt, numOfParserTasks).setNumTasks(numOfParserTasks).shuffleGrouping(spoutName);
 
         StormTopology topology = builder.createTopology();
 
