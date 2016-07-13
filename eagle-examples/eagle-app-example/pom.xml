@@ -3,18 +3,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>eagle-metadata</artifactId>
+        <artifactId>eagle-examples</artifactId>
         <groupId>org.apache.eagle</groupId>
         <version>0.5.0-incubating-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>eagle-metadata-mysql</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-metadata-base</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+    <artifactId>eagle-app-example</artifactId>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/webapp/app</directory>
+                <targetPath>assets/</targetPath>
+            </resource>
+        </resources>
+    </build>
 </project>

@@ -16,14 +16,11 @@
  */
 package org.apache.eagle.metadata.model;
 
-import jdk.nashorn.internal.ir.annotations.Immutable;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @XmlRootElement(name = "applications")
-@Immutable
 public class ApplicationsConfig {
     @XmlElement(name = "application")
     private List<ApplicationSpec> applications;

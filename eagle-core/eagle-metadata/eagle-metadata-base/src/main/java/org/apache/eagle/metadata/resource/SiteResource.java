@@ -16,17 +16,17 @@
  */
 package org.apache.eagle.metadata.resource;
 
-import com.google.inject.Inject;
+import com.google.inject.servlet.RequestScoped;
 import org.apache.eagle.metadata.model.Site;
 import org.apache.eagle.metadata.service.SiteService;
 
-import javax.annotation.Resource;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Resource
+@Path("/sites")
+@RequestScoped
 public class SiteResource {
     private final SiteService siteRepository;
 
@@ -35,14 +35,15 @@ public class SiteResource {
         this.siteRepository = siteRepository;
     }
 
-    @Path("/v1/sites")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Site> getAllSites(){
         return siteRepository.getAllSites();
     }
 
-    @Path("/v1/sites/")
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Site createSite(Site site){
         return siteRepository.create(site);
     }

@@ -1,8 +1,3 @@
-package org.apache.eagle.metadata.store;
-
-import org.apache.eagle.metadata.service.SiteService;
-import org.apache.eagle.metadata.service.memory.SiteServiceMemoryImpl;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,10 +14,21 @@ import org.apache.eagle.metadata.service.memory.SiteServiceMemoryImpl;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.metadata.store;
+
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.impl.InMemMetadataDaoImpl;
+import org.apache.eagle.metadata.service.ApplicationService;
+import org.apache.eagle.metadata.service.SiteService;
+import org.apache.eagle.metadata.service.memory.ApplicationServiceMemoryImpl;
+import org.apache.eagle.metadata.service.memory.SiteServiceMemoryImpl;
+
 public class MemoryMetadataStore extends MetadataStore {
     @Override
     protected void configure() {
         super.configure();
         bind(SiteService.class).to(SiteServiceMemoryImpl.class);
+        bind(ApplicationService.class).to(ApplicationServiceMemoryImpl.class);
+        bind(IMetadataDao.class).to(InMemMetadataDaoImpl.class);
     }
 }

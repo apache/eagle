@@ -1,7 +1,3 @@
-package org.apache.eagle.metadata.store.mysql;
-
-import org.apache.eagle.metadata.store.MetadataStore;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,10 +14,18 @@ import org.apache.eagle.metadata.store.MetadataStore;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class MySQLMetadataStore extends MetadataStore{
-    @Override
-    protected void configure() {
-        super.configure();
+package org.apache.eagle.metadata.service.memory;
 
+import com.google.inject.Singleton;
+import org.apache.eagle.metadata.model.ApplicationInstance;
+import org.apache.eagle.metadata.service.ApplicationService;
+
+import java.util.List;
+
+@Singleton
+public class ApplicationServiceMemoryImpl implements ApplicationService {
+    @Override
+    public List<ApplicationInstance> getAllApplicationInstances() {
+        return null;
     }
 }

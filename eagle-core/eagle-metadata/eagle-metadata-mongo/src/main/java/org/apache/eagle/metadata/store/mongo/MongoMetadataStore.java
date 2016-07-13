@@ -1,7 +1,3 @@
-package org.apache.eagle.metadata.store.mongo;
-
-import org.apache.eagle.metadata.store.MetadataStore;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,10 +14,17 @@ import org.apache.eagle.metadata.store.MetadataStore;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.metadata.store.mongo;
+
+import com.google.inject.Singleton;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.impl.MongoMetadataDaoImpl;
+import org.apache.eagle.metadata.store.MetadataStore;
+
 public class MongoMetadataStore extends MetadataStore {
     @Override
     protected void configure() {
         super.configure();
-
+        bind(IMetadataDao.class).to(MongoMetadataDaoImpl.class).in(Singleton.class);
     }
 }

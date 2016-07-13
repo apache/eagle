@@ -17,34 +17,43 @@
 package org.apache.eagle.metadata.resource;
 
 
-import com.google.inject.Inject;
+import com.google.inject.servlet.RequestScoped;
 import org.apache.eagle.metadata.model.ApplicationSpec;
 import org.apache.eagle.metadata.service.ApplicationSpecService;
 
-import javax.annotation.Resource;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Resource
+@Path("/apps")
+@RequestScoped
 public class ApplicationResource {
     private final ApplicationSpecService applicationSpecService;
 
     @Inject
-    public ApplicationResource(ApplicationSpecService applicationSpecService){
+    public ApplicationResource( ApplicationSpecService applicationSpecService){
         this.applicationSpecService = applicationSpecService;
     }
 
-    @Path("/v1/apps")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<ApplicationSpec> getAvailableApplications(){
         return applicationSpecService.getAllApplicationSpecs();
     }
 
-    @Path("/v1/apps/{appType}")
+    @Path("/{appType}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public ApplicationSpec getApplication(@PathParam("appType") String appType){
         return applicationSpecService.getApplicationSpecByType(appType);
+    }
+
+    @Path("/install")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ApplicationSpec getApplication(){
+        return null;
     }
 }

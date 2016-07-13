@@ -17,30 +17,35 @@
 package org.apache.eagle.metadata.store;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.metadata.service.ApplicationSpecService;
 import org.apache.eagle.metadata.service.ApplicationSpecServiceProvider;
+import org.apache.eagle.metadata.service.ConfigServiceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class MetadataStore extends AbstractModule {
+    private final static Logger LOG = LoggerFactory.getLogger(MetadataStore.class);
     public static final String METADATA_STORE_CONFIG_KEY = "metadata.store";
 
     private static MetadataStore instance;
     public static MetadataStore getInstance(){
         if(instance == null) {
-            Config config = ConfigFactory.load();
-            if (config.hasPath(METADATA_STORE_CONFIG_KEY)) {
-                String metadataStoreClass = config.getString(METADATA_STORE_CONFIG_KEY);
-                try {
-                    instance = (MetadataStore) Class.forName(metadataStoreClass).newInstance();
-                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                    throw new RuntimeException(e.getMessage(), e.getCause());
+            try {
+                Config config = ConfigFactory.load();
+                String metadataStoreClass;
+                if (config.hasPath(METADATA_STORE_CONFIG_KEY)) {
+                    metadataStoreClass = config.getString(METADATA_STORE_CONFIG_KEY);
+                    LOG.info("Using {} = {}",METADATA_STORE_CONFIG_KEY,metadataStoreClass);
+                }else{
+                    metadataStoreClass = MemoryMetadataStore.class.getCanonicalName();
+                    LOG.info("{} is not set, using default {}",METADATA_STORE_CONFIG_KEY,metadataStoreClass);
                 }
-            } else {
-                throw new RuntimeException("No metadata store provided, metadata.store is null");
+                instance = (MetadataStore) Class.forName(metadataStoreClass).newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                throw new RuntimeException(e.getMessage(), e.getCause());
             }
         }
         return instance;
@@ -48,6 +53,7 @@ public abstract class MetadataStore extends AbstractModule {
 
     @Override
     protected void configure() {
+        bind(Config.class).toProvider(ConfigServiceProvider.class).in(Singleton.class);
         bind(ApplicationSpecService.class).toProvider(ApplicationSpecServiceProvider.class).in(Singleton.class);
     }
 }
