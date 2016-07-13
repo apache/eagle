@@ -23,6 +23,9 @@ import org.apache.eagle.policy.common.Constants;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import java.util.List;
+import java.util.Map;
+
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("alertNotifications")
@@ -65,15 +68,14 @@ public class AlertNotificationEntity extends TaggedLogAPIEntity {
     }
 
     @Column("d")
-    private String fields;
-    public String getFields() {
+    private List<Map<String, String>> fields;
+    public List<Map<String, String>> getFields() {
         return fields;
     }
 
-    public void setFields(String fields) {
+    public void setFields(List<Map<String, String>> fields) {
         this.fields = fields;
         valueChanged("fields");
     }
-
 
 }
