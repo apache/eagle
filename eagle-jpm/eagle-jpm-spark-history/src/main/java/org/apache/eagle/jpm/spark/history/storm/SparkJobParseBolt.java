@@ -134,9 +134,9 @@ public class SparkJobParseBolt extends BaseRichBolt {
 
             SparkApplication app = null;
             /*try {
-                List apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
+                List<SparkApplication> apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
                 if (apps != null) {
-                    app = (SparkApplication) apps.get(0);
+                    app = apps.get(0);
                     attempts = app.getAttempts();
                 }
             } catch (Exception e) {

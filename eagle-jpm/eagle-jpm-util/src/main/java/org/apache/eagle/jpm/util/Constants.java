@@ -34,6 +34,8 @@ public class Constants {
     public static final String V2_APPS_COMPLETED_URL = "ws/v1/cluster/apps?state=FINISHED";
 
     public static final String SPARK_APPS_URL ="api/v1/applications";
+    public static final String SPARK_EXECUTORS_URL = "executors";
+    public static final String SPARK_JOBS_URL = "jobs";
 
     public enum CompressionType {
         GZIP, NONE
@@ -41,9 +43,14 @@ public class Constants {
     public enum JobState {
         RUNNING, COMPLETED, ALL
     }
-
+    public enum AppState {
+        RUNNING, FINISHED, FAILED
+    }
+    public enum AppStatus {
+        SUCCEEDED, FAILED
+    }
     public enum ResourceType {
-         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL
+         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB
     }
 
 }

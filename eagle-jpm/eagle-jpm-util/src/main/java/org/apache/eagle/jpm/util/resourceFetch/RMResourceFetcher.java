@@ -38,7 +38,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-public class RMResourceFetcher implements ResourceFetcher{
+public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RMResourceFetcher.class);
 	private final HAURLSelector selector;
@@ -64,8 +64,8 @@ public class RMResourceFetcher implements ResourceFetcher{
 		}
 	}
 	
-	private List<Object> doFetchSparkFinishApplicationsList(String lastFinishTime) throws Exception {
-		List<AppInfo> result = null;
+	private List<AppInfo> doFetchSparkFinishApplicationsList(String lastFinishTime) throws Exception {
+		List<AppInfo> result;
 		InputStream is = null;
 		try {
 			checkUrl();
@@ -76,23 +76,48 @@ public class RMResourceFetcher implements ResourceFetcher{
 			if (appWrapper != null && appWrapper.getApps() != null
 					&& appWrapper.getApps().getApp() != null) {
 				result = appWrapper.getApps().getApp();
-				return Arrays.asList((Object)result);
+				return result;
 			}
 			return null;
-		}finally {
-			if (is != null) { try {is.close();} catch (Exception e){} }
+		} finally {
+			if (is != null) { try { is.close();} catch (Exception e) { } }
 		}
 	}
-	
 
+    private String getSparkRunningJobURL() {
+        return String.format("%s/%s?applicationTypes=SPARK&state=RUNNING&%s",
+                selector.getSelectedUrl(),
+                Constants.V2_APPS_URL,
+                Constants.ANONYMOUS_PARAMETER);
+    }
+
+    private List<AppInfo> doFetchSparkRunningApplicationsList() throws Exception {
+        List<AppInfo> result;
+        InputStream is = null;
+        try {
+            checkUrl();
+            final String urlString = getSparkRunningJobURL();
+            LOG.info("Going to call yarn api to fetch running spark job list: " + urlString);
+            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+            final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
+            if (appWrapper != null && appWrapper.getApps() != null && appWrapper.getApps().getApp() != null) {
+                result = appWrapper.getApps().getApp();
+                return result;
+            }
+            return null;
+        } finally {
+            if (is != null)  { try { is.close();} catch (Exception e) { } }
+        }
+    }
 	
-	public List<Object> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
+	public List<AppInfo> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
 		switch(resoureType) {
 			case COMPLETE_SPARK_JOB:
 				return doFetchSparkFinishApplicationsList((String)parameter[0]);
-
+			case RUNNING_SPARK_JOB:
+                return doFetchSparkRunningApplicationsList();
 			default:
-				throw new Exception("Not support ressourceType :" + resoureType);
+				throw new Exception("Not support resourceType :" + resoureType);
 		}
 	}
 }

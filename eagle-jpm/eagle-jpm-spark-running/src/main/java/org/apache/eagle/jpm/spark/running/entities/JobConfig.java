@@ -14,14 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.util.resourceFetch;
 
-import org.apache.eagle.jpm.util.Constants;
+package org.apache.eagle.jpm.spark.running.entities;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.HashMap;
 
-public interface ResourceFetcher<T> {
-    //continue to refactor later
-	List<T> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception;
-
+public class JobConfig extends HashMap<String, String> implements Serializable {
 }

@@ -14,14 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.util.resourceFetch;
 
-import org.apache.eagle.jpm.util.Constants;
+package org.apache.eagle.jpm.spark.running.entities;
 
-import java.util.List;
+import org.apache.eagle.log.entity.repo.EntityRepository;
 
-public interface ResourceFetcher<T> {
-    //continue to refactor later
-	List<T> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception;
-
+public class JPMEntityRepository extends EntityRepository {
+    public JPMEntityRepository() {
+        entitySet.add(SparkAppEntity.class);
+        entitySet.add(SparkJobEntity.class);
+        entitySet.add(SparkStageEntity.class);
+        entitySet.add(SparkTaskEntity.class);
+        entitySet.add(SparkExecutorEntity.class);
+    }
 }

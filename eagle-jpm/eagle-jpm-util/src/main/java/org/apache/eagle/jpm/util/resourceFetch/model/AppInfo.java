@@ -19,9 +19,11 @@ package org.apache.eagle.jpm.util.resourceFetch.model;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import java.io.Serializable;
+
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AppInfo {
+public class AppInfo implements Serializable {
 	String id;
 	String user;
 	String name;
