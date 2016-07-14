@@ -106,6 +106,39 @@ public class SparkAppEntity extends TaggedLogAPIEntity {
     private int driverCores;
     @Column("al")
     private AppInfo appInfo;
+    @Column("am")
+    private int activeStages;
+    @Column("an")
+    private int completeStages;
+    @Column("ba")
+    private int activeTasks;
+
+    public int getActiveTasks() {
+        return activeTasks;
+    }
+
+    public void setActiveTasks(int activeTasks) {
+        this.activeTasks = activeTasks;
+        valueChanged("activeTasks");
+    }
+
+    public int getCompleteStages() {
+        return completeStages;
+    }
+
+    public void setCompleteStages(int completeStages) {
+        this.completeStages = completeStages;
+        valueChanged("completeStages");
+    }
+
+    public int getActiveStages() {
+        return activeStages;
+    }
+
+    public void setActiveStages(int activeStages) {
+        this.activeStages = activeStages;
+        valueChanged("activeStages");
+    }
 
     public AppInfo getAppInfo() {
         return appInfo;

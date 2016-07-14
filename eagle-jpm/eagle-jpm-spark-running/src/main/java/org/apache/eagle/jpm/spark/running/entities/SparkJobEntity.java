@@ -59,6 +59,8 @@ public class SparkJobEntity extends TaggedLogAPIEntity {
     private int numSkippedStages = 0;
     @Column("m")
     private int numFailedStages = 0;
+    @Column("n")
+    private List<Integer> stages;
 
     public List<Integer> getStages() {
         return stages;
@@ -68,9 +70,6 @@ public class SparkJobEntity extends TaggedLogAPIEntity {
         this.stages = stages;
         this.valueChanged("stages");
     }
-
-    @Column("n")
-    private List<Integer> stages;
 
     public long getSubmissionTime() {
         return submissionTime;

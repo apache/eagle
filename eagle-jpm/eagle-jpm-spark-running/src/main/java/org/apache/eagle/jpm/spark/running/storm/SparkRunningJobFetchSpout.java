@@ -66,9 +66,10 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
         try {
             List<AppInfo> apps;
             Map<String, Map<String, SparkAppEntity>> sparkApps = null;
+            this.inited = true;
             if (!this.inited) {
                 sparkApps = recoverRunningApps();
-                LOG.info("recover {} spark yarn apps from eagle service", sparkApps.size());
+                LOG.info("recover {} spark yarn apps from zookeeper", sparkApps.size());
                 apps = new ArrayList<>();
                 for (String appId : sparkApps.keySet()) {
                     apps.add(sparkApps.get(appId).get(0).getAppInfo());

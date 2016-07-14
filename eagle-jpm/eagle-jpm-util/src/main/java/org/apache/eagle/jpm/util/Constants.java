@@ -36,6 +36,7 @@ public class Constants {
     public static final String SPARK_APPS_URL ="api/v1/applications";
     public static final String SPARK_EXECUTORS_URL = "executors";
     public static final String SPARK_JOBS_URL = "jobs";
+    public static final String SPARK_STAGES_URL = "stages";
 
     public enum CompressionType {
         GZIP, NONE
