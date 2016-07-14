@@ -42,7 +42,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
     private SparkRunningConfigManager.EndpointConfig endpointConfig;
     private SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig;
     private ExecutorService executorService;
-    private Map<String, SparkApplicationParser> runningSparkParsers = new HashMap<>();
+    private Map<String, SparkApplicationParser> runningSparkParsers;
 
     public SparkRunningJobParseBolt(SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                                     SparkRunningConfigManager.EndpointConfig endpointConfig,
@@ -50,6 +50,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;
         this.jobExtractorConfig = jobExtractorConfig;
+        this.runningSparkParsers = new HashMap<>();
     }
 
     @Override
@@ -59,8 +60,8 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        AppInfo appInfo = (AppInfo)tuple.getValue(0);
-        Map<String, SparkAppEntity> sparkApp = (Map<String, SparkAppEntity>)tuple.getValue(1);
+        AppInfo appInfo = (AppInfo)tuple.getValue(1);
+        Map<String, SparkAppEntity> sparkApp = (Map<String, SparkAppEntity>)tuple.getValue(2);
 
         LOG.info("get spark yarn application " + appInfo.getId());
         //read detailed SparkAppEntity if needed when recover
@@ -70,6 +71,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
         if (!runningSparkParsers.containsKey(appInfo.getId())) {
             applicationParser = new SparkApplicationParser(eagleServiceConfig, endpointConfig, jobExtractorConfig, appInfo, sparkApp);
             runningSparkParsers.put(appInfo.getId(), applicationParser);
+            LOG.info("create application parser for {}", appInfo.getId());
         } else {
             applicationParser = runningSparkParsers.get(appInfo.getId());
         }

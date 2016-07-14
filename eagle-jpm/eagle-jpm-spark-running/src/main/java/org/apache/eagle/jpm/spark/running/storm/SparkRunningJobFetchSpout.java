@@ -66,7 +66,6 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
         try {
             List<AppInfo> apps;
             Map<String, Map<String, SparkAppEntity>> sparkApps = null;
-            this.inited = true;
             if (!this.inited) {
                 sparkApps = recoverRunningApps();
                 LOG.info("recover {} spark yarn apps from zookeeper", sparkApps.size());
@@ -84,9 +83,9 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
                 LOG.info("emit spark yarn application " + apps.get(i).getId());
                 if (sparkApps != null) {
                     //emit (AppInfo, Map<String, SparkAppEntity>)
-                    collector.emit(new Values(apps.get(i), sparkApps.get(apps.get(i).getId())), apps.get(i).getId());
+                    collector.emit(new Values(apps.get(i).getId(), apps.get(i), sparkApps.get(apps.get(i).getId())));
                 } else {
-                    collector.emit(new Values(apps.get(i), null), apps.get(i).getId());
+                    collector.emit(new Values(apps.get(i).getId(), apps.get(i), null));
                 }
             }
         } catch (Exception e) {
@@ -100,8 +99,8 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
     }
 
     private Map<String, Map<String, SparkAppEntity>> recoverRunningApps() {
-        //we need read from zookeeper, path looks like /apps/spark/running/appId/
-        //content of path /apps/spark/running/appId is SparkAppEntity
+        //we need read from zookeeper, path looks like /apps/spark/running/yarnAppId/appId/
+        //content of path /apps/spark/running/yarnAppId/appId is SparkAppEntity(current attempt)
         //as we know, a yarn application may contains many spark applications
         //so, the returned results is a Map, key is yarn appId
         Map<String, Map<String, SparkAppEntity>> result = new HashMap<>();
@@ -111,7 +110,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("appInfo", "sparkAppEntity"));
+        outputFieldsDeclarer.declare(new Fields("appId", "appInfo", "sparkAppEntity"));
     }
 
     @Override

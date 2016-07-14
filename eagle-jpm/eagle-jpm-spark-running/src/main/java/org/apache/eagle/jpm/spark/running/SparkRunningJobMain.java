@@ -22,6 +22,7 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
 import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.jpm.spark.running.storm.SparkRunningJobFetchSpout;
 import org.apache.eagle.jpm.spark.running.storm.SparkRunningJobParseBolt;
@@ -60,7 +61,7 @@ public class SparkRunningJobMain {
                             sparkRunningConfigManager.getEagleServiceConfig(),
                             sparkRunningConfigManager.getEndpointConfig(),
                             sparkRunningConfigManager.getJobExtractorConfig()),
-                    parallelism).setNumTasks(tasks).shuffleGrouping(spoutName);
+                    parallelism).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
 
             backtype.storm.Config config = new backtype.storm.Config();
             config.setNumWorkers(sparkRunningConfigManager.getConfig().getInt("envContextConfig.workers"));

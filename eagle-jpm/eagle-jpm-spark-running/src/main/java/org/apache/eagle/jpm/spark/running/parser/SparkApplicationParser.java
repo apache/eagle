@@ -57,6 +57,7 @@ public class SparkApplicationParser implements Runnable {
 
     //<sparkAppId, SparkAppEntity>
     private Map<String, SparkAppEntity> sparkAppEntityMap;
+    private Map<String, JobConfig> sparkJobConfigs;
     private Map<Integer, Pair<Integer, Pair<Long, Long>>> stagesTime = new HashMap<>();
     private Configuration hdfsConf;
     private SparkRunningConfigManager.EndpointConfig endpointConfig;
@@ -76,6 +77,7 @@ public class SparkApplicationParser implements Runnable {
                                   SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig,
                                   AppInfo app, Map<String, SparkAppEntity> sparkApp) {
         this.app = app;
+        this.sparkJobConfigs = new HashMap<>();
         this.sparkAppEntityMap = sparkApp;
         if (this.sparkAppEntityMap == null) {
             this.sparkAppEntityMap = new HashMap<>();
@@ -132,6 +134,7 @@ public class SparkApplicationParser implements Runnable {
         attemptEntity.setYarnState(Constants.AppState.FINISHED.toString());
         attemptEntity.setYarnStatus(Constants.AppStatus.FAILED.toString());
         flush(attemptEntity);
+
         stagesTime.clear();
         LOG.info("spark application {} has been finished", sparkAppId);
     }
@@ -155,7 +158,6 @@ public class SparkApplicationParser implements Runnable {
         functions.add(fetchSparkJobs);
         functions.add(fetchSparkStagesAndTasks);
         for (String sparkAppId : sparkAppEntityMap.keySet()) {
-            SparkAppEntity sparkAppEntity = sparkAppEntityMap.get(sparkAppId);
             for (Function<String, Boolean> function : functions) {
                 int i = 0;
                 for (; i < MAX_RETRY_TIMES; i++) {
@@ -181,12 +183,15 @@ public class SparkApplicationParser implements Runnable {
             } catch (Exception e) {
                 LOG.warn("exception found when process application {}, {}", app.getId(), e);
                 e.printStackTrace();
+            } finally {
+                LOG.info("finish process yarn application " + app.getId());
             }
         }
     }
 
     private JobConfig getJobConfig(String sparkAppId, int attemptId) {
         //TODO
+        LOG.info("get job config for {}, attempt {}, appId, {}", sparkAppId, attemptId, app.getId());
         return new JobConfig();
     }
 
@@ -214,34 +219,39 @@ public class SparkApplicationParser implements Runnable {
             }
 
             currentAttempt = sparkApplication.getAttempts().size();
-            SparkAppEntity attemptEntity;
-            for (int j = 1; j <= currentAttempt; j++) {
-                if (!sparkAppEntityMap.containsKey(id) ||
-                        !sparkAppEntityMap.get(id).getTags().get(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString()).equals("" + j)) {
-                    //missing attempt
-                    attemptEntity = new SparkAppEntity();
-                    attemptEntity.setConfig(null);
-                    commonTags.put(SparkJobTagName.SPARK_APP_NAME.toString(), sparkApplication.getName());
-                    commonTags.put(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString(), "" + j);
-                    commonTags.put(SparkJobTagName.SPARK_APP_ID.toString(), id);
-                    attemptEntity.setTags(new HashMap<>(commonTags));
-                    attemptEntity.setAppInfo(app);
+            int lastSavedAttempt = 1;
+            if (sparkAppEntityMap.containsKey(id)) {
+                lastSavedAttempt = Integer.parseInt(sparkAppEntityMap.get(id).getTags().get(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString()));
+            }
+            for (int j = lastSavedAttempt; j <= currentAttempt; j++) {
+                SparkAppEntity attemptEntity = new SparkAppEntity();
+                commonTags.put(SparkJobTagName.SPARK_APP_NAME.toString(), sparkApplication.getName());
+                commonTags.put(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString(), "" + j);
+                commonTags.put(SparkJobTagName.SPARK_APP_ID.toString(), id);
+                attemptEntity.setTags(new HashMap<>(commonTags));
+                attemptEntity.setAppInfo(app);
 
-                    attemptEntity.setStartTime(dateTimeToLong(sparkApplication.getAttempts().get(j - 1).getStartTime()));
-                    attemptEntity.setTimestamp(attemptEntity.getStartTime());
-                    if (attemptEntity.getConfig() == null) {
-                        //read config from hdfs
-                        attemptEntity.setConfig(getJobConfig(id, j));
-                    }
-                } else {
-                    attemptEntity = sparkAppEntityMap.get(id);
+                attemptEntity.setStartTime(dateTimeToLong(sparkApplication.getAttempts().get(j - 1).getStartTime()));
+                attemptEntity.setTimestamp(attemptEntity.getStartTime());
+
+                if (sparkJobConfigs.containsKey(id) && j == currentAttempt) {
+                    attemptEntity.setConfig(sparkJobConfigs.get(id));
                 }
+
+                if (attemptEntity.getConfig() == null) {
+                    //read config from hdfs
+                    attemptEntity.setConfig(getJobConfig(id, j));
+                    if (j == currentAttempt) {
+                        sparkJobConfigs.put(id, attemptEntity.getConfig());
+                    }
+                }
+
                 if (j == currentAttempt) {
                     //current attempt
                     attemptEntity.setYarnState(app.getState());
                     attemptEntity.setYarnStatus(app.getFinalStatus());
                     sparkAppEntityMap.put(id, attemptEntity);
-                    //TODO, save to zookeeper if not exists
+                    //TODO, save to zookeeper(override)
                 } else {
                     attemptEntity.setYarnState(Constants.AppState.FAILED.toString());
                     attemptEntity.setYarnStatus(Constants.AppStatus.FAILED.toString());
