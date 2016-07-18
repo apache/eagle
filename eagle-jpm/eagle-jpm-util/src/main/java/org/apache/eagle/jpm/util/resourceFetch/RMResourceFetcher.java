@@ -85,10 +85,11 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 	}
 
     private String getSparkRunningJobURL() {
-        return String.format("%s/%s?applicationTypes=SPARK&state=RUNNING&%s",
-                selector.getSelectedUrl(),
-                Constants.V2_APPS_URL,
-                Constants.ANONYMOUS_PARAMETER);
+		StringBuilder sb = new StringBuilder();
+		sb.append(selector.getSelectedUrl()).append("/").append(Constants.V2_APPS_URL);
+		sb.append("?applicationTypes=SPARK&state=RUNNING&");
+		sb.append(Constants.ANONYMOUS_PARAMETER);
+		return sb.toString();
     }
 
     private List<AppInfo> doFetchSparkRunningApplicationsList() throws Exception {

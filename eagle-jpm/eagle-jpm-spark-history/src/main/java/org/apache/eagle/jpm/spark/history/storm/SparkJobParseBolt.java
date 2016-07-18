@@ -133,7 +133,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
         try {
 
             SparkApplication app = null;
-            /*try {
+            try {
                 List<SparkApplication> apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
                 if (apps != null) {
                     app = apps.get(0);
@@ -141,7 +141,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
                 }
             } catch (Exception e) {
                 LOG.warn("Fail to get application detail from history server for appId " + appId, e);
-            }*/
+            }
 
 
             if (null == app) {

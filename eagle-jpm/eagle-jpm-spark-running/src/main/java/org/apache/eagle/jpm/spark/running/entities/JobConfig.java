@@ -17,8 +17,14 @@
 
 package org.apache.eagle.jpm.spark.running.entities;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class JobConfig extends HashMap<String, String> implements Serializable {
+public class JobConfig implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(JobConfig.class);
+
+
 }
