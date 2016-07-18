@@ -16,7 +16,7 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.jobcounter;
+package org.apache.eagle.jpm.util.jobcounter;
 
 public class JobCounterException extends Exception {
 

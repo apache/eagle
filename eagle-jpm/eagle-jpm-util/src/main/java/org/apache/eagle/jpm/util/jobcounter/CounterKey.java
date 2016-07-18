@@ -16,17 +16,15 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.jobcounter;
+package org.apache.eagle.jpm.util.jobcounter;
 
 import java.util.List;
 
-public interface CounterGroupKey {
+public interface CounterKey {
 
-    String getName();
+    List<String> getNames();
     String getDescription();
     int getIndex();
-    int getCounterNumber();
-    List<CounterKey> listCounterKeys();
-    CounterKey getCounterKeyByName(String name);
-    CounterKey getCounterKeyByID(int index);
+    CounterGroupKey getGroupKey();
+    
 }

@@ -16,9 +16,8 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.entities;
+package org.apache.eagle.jpm.util.jobcounter;
 
-import org.apache.eagle.jpm.mr.history.jobcounter.*;
 import org.apache.eagle.log.entity.meta.EntitySerDeser;
 import org.apache.hadoop.hbase.util.Bytes;
 

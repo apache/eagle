@@ -16,7 +16,7 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.common;
+package org.apache.eagle.jpm.mr.history.entities;
 
 import java.util.Map;
 import java.util.TreeMap;

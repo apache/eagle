@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
@@ -109,13 +108,41 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
             if (is != null)  { try { is.close();} catch (Exception e) { } }
         }
     }
-	
+
+    private String getMRRunningJobURL() {
+        return String.format("%s/%s?applicationTypes=MAPREDUCE&state=RUNNING&%s",
+                selector.getSelectedUrl(),
+                Constants.V2_APPS_URL,
+                Constants.ANONYMOUS_PARAMETER);
+    }
+
+	private List<AppInfo> doFetchMRRunningApplicationsList() throws Exception {
+        List<AppInfo> result;
+        InputStream is = null;
+        try {
+            checkUrl();
+            final String urlString = getMRRunningJobURL();
+            LOG.info("Going to call yarn api to fetch running mr job list: " + urlString);
+            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+            final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
+            if (appWrapper != null && appWrapper.getApps() != null && appWrapper.getApps().getApp() != null) {
+                result = appWrapper.getApps().getApp();
+                return result;
+            }
+            return null;
+        } finally {
+            if (is != null)  { try { is.close();} catch (Exception e) { } }
+        }
+    }
+
 	public List<AppInfo> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
 		switch(resoureType) {
 			case COMPLETE_SPARK_JOB:
 				return doFetchSparkFinishApplicationsList((String)parameter[0]);
 			case RUNNING_SPARK_JOB:
                 return doFetchSparkRunningApplicationsList();
+            case RUNNING_MR_JOB:
+                return doFetchMRRunningApplicationsList();
 			default:
 				throw new Exception("Not support resourceType :" + resoureType);
 		}
