@@ -85,7 +85,7 @@ public class TestNoDataPolicyHandler {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
         def.setValue("PT1M,provided,1,host,host1,host2");
-        def.setType("string");
+        def.setType("nodataalert");
         pd.setDefinition(def);
         pd.setInputStreams(Arrays.asList(inputStream));
         pd.setOutputStreams(Arrays.asList(outputStream));
@@ -97,7 +97,7 @@ public class TestNoDataPolicyHandler {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
         def.setValue("PT1M,dynamic,1,host");
-        def.setType("string");
+        def.setType("nodataalert");
         pd.setDefinition(def);
         pd.setInputStreams(Arrays.asList(inputStream));
         pd.setOutputStreams(Arrays.asList(outputStream));

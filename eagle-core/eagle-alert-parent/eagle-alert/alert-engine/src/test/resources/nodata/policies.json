@@ -10,12 +10,13 @@
 		],
 		"definition": {
 			"type": "nodataalert",
-			"value": "PT1M,dynamic,1,host"
+			"value": "PT1M,dynamic,1,host",
 		},
 		"partitionSpec": [
 			{
 				"streamId": "noDataAlertStream",
-				"type": "GROUPBY"
+				"type": "GROUPBY",
+				"columns" : ["host"]
 			}
 		],
 		"parallelismHint": 2

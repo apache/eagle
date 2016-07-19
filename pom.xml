@@ -134,6 +134,7 @@
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
         <module>eagle-server</module>
+        <module>eagle-jpm</module>
     </modules>
     <properties>
         <!-- General Properties -->
