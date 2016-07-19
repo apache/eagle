@@ -91,6 +91,9 @@ Sandbox Starter
 		
 * check eagle UI <http://127.0.0.1:9099/eagle-service>
 
+If you get a 404 Error when trying to access the UI, add port 9099 to "Settings->Network->Advanced->Port Forwarding" in VirtualBox.
+(step 4 in "Setup Hadoop Environment" section in https://eagle.incubator.apache.org/docs/quick-start.html)
+
 * Take the following actions which will violate and obey the sample policy.
      * Violation Action: hdfs dfs -ls unknown
      * Violation Action: hdfs dfs -touchz /tmp/private
