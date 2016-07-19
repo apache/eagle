@@ -43,5 +43,7 @@
         <module>eagle-embed</module>
         <module>eagle-metric</module>
         <module>eagle-metadata</module>
+        <module>eagle-common</module>
+        <module>eagle-app</module>
     </modules>
 </project>

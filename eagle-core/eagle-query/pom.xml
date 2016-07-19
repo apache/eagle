@@ -31,7 +31,6 @@
 	<name>eagle-query-parent</name>
 
 	<modules>
-		<module>eagle-common</module>
 		<module>eagle-antlr</module>
 		<module>eagle-entity-base</module>
 		<module>eagle-audit-base</module>

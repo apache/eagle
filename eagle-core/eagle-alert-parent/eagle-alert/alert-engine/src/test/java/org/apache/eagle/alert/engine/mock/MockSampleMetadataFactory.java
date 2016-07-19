@@ -63,11 +63,6 @@ public class MockSampleMetadataFactory {
         streamColumns.add(new StreamColumn.Builder().name("flag").type(StreamColumn.Type.BOOL).build());
         streamColumns.add(new StreamColumn.Builder().name("timestamp").type(StreamColumn.Type.LONG).build());
         streamColumns.add(new StreamColumn.Builder().name("value").type(StreamColumn.Type.DOUBLE).build());
-//        streamColumns.add(new StreamColumn.Builder().name("value1").type(StreamColumn.Type.DOUBLE).build());
-//        streamColumns.add(new StreamColumn.Builder().name("value2").type(StreamColumn.Type.DOUBLE).build());
-//        streamColumns.add(new StreamColumn.Builder().name("value3").type(StreamColumn.Type.DOUBLE).build());
-//        streamColumns.add(new StreamColumn.Builder().name("value4").type(StreamColumn.Type.DOUBLE).build());
-//        streamColumns.add(new StreamColumn.Builder().name("value5").type(StreamColumn.Type.DOUBLE).build());
         sampleStreamDefinition.setColumns(streamColumns);
         return sampleStreamDefinition;
     }

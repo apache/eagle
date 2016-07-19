@@ -22,16 +22,17 @@
         <artifactId>eagle-core</artifactId>
         <groupId>org.apache.eagle</groupId>
         <version>0.5.0-incubating-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>eagle-app</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>eagle-app-parent</artifactId>
     <packaging>pom</packaging>
-    <description>Eagle Application Management</description>
+    <description>Eagle Applications</description>
 
     <modules>
+        <module>eagle-app-base</module>
         <module>eagle-stream-application-manager</module>
         <module>eagle-application-service</module>
-        <module>eagle-app-base</module>
     </modules>
 </project>

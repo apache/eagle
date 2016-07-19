@@ -19,12 +19,11 @@ package org.apache.eagle.metadata.store.mongo;
 import com.google.inject.Singleton;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MongoMetadataDaoImpl;
-import org.apache.eagle.metadata.store.MetadataStore;
+import org.apache.eagle.metadata.persistence.MetadataStore;
 
 public class MongoMetadataStore extends MetadataStore {
     @Override
     protected void configure() {
-        super.configure();
         bind(IMetadataDao.class).to(MongoMetadataDaoImpl.class).in(Singleton.class);
     }
 }

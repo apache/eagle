@@ -1,0 +1,110 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.eagle.app.manager;
+
+import java.io.Serializable;
+import java.util.Map;
+
+public class ApplicationOperations {
+    interface Operation extends Serializable {
+        //
+    }
+
+    public static class InstallOperation implements Operation{
+        private String siteId;
+        private String appType;
+        private Map<String,Object> configuration;
+
+        public String getSiteId() {
+           return siteId;
+       }
+        public void setSiteId(String siteId) {
+           this.siteId = siteId;
+       }
+        public String getAppType() {
+           return appType;
+       }
+        public void setAppType(String appType) {
+           this.appType = appType;
+       }
+
+        public Map<String, Object> getConfiguration() {
+            return configuration;
+        }
+
+        public void setConfiguration(Map<String, Object> configuration) {
+            this.configuration = configuration;
+        }
+    }
+
+    public static class UninstallOperation implements Operation{
+        private String uuid;
+        private String appId;
+        public String getUuid() {
+            return uuid;
+        }
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getAppId() {
+            return appId;
+        }
+
+        public void setAppId(String appId) {
+            this.appId = appId;
+        }
+    }
+
+    public static class StartOperation implements Operation{
+        private String uuid;
+        private String appId;
+        public String getUuid() {
+            return uuid;
+        }
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getAppId() {
+            return appId;
+        }
+
+        public void setAppId(String appId) {
+            this.appId = appId;
+        }
+    }
+
+    public static class StopOperation implements Operation{
+        private String uuid;
+        private String appId;
+        public String getUuid() {
+            return uuid;
+        }
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getAppId() {
+            return appId;
+        }
+
+        public void setAppId(String appId) {
+            this.appId = appId;
+        }
+    }
+}

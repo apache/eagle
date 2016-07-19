@@ -29,8 +29,8 @@
     <artifactId>eagle-metadata</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>eagle-metadata-base</module>
         <module>eagle-metadata-jdbc</module>
         <module>eagle-metadata-mongo</module>
+        <module>eagle-metadata-base</module>
     </modules>
 </project>

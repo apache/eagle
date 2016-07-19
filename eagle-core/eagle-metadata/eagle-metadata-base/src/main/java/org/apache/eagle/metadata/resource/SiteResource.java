@@ -17,34 +17,43 @@
 package org.apache.eagle.metadata.resource;
 
 import com.google.inject.servlet.RequestScoped;
-import org.apache.eagle.metadata.model.Site;
-import org.apache.eagle.metadata.service.SiteService;
+import org.apache.eagle.metadata.model.SiteEntity;
+import org.apache.eagle.metadata.service.SiteEntityService;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
+import java.util.Collection;
 
 @Path("/sites")
 @RequestScoped
 public class SiteResource {
-    private final SiteService siteRepository;
+    private final SiteEntityService siteEntityService;
 
     @Inject
-    public SiteResource(SiteService siteRepository){
-        this.siteRepository = siteRepository;
+    public SiteResource(SiteEntityService siteEntityService){
+        this.siteEntityService = siteEntityService;
     }
 
     @GET
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Site> getAllSites(){
-        return siteRepository.getAllSites();
+    public Collection<SiteEntity> getAllSites(){
+        return siteEntityService.findAll();
     }
 
     @POST
+    @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Site createSite(Site site){
-        return siteRepository.create(site);
+    public SiteEntity createSite(SiteEntity siteEntity){
+        return siteEntityService.create(siteEntity);
+    }
+
+    @GET
+    @Path("/{siteIdOrUUID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public SiteEntity getSiteByNameOrUUID(@PathParam("siteIdOrUUID") String siteIdOrUUID){
+        return siteEntityService.getBySiteIdOrUUID(siteIdOrUUID);
     }
 }

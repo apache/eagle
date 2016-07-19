@@ -190,6 +190,7 @@
         <commons-collections4.version>4.0</commons-collections4.version>
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-io.version>2.4</commons-io.version>
+        <guice.version>3.0</guice.version>
 
         <!-- Configuration -->
         <archaius.version>0.6.1</archaius.version>
@@ -384,6 +385,16 @@
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm-all</artifactId>
                 <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-servlet</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
             </dependency>
 
             <!-- Configuration -->
@@ -1110,7 +1121,7 @@
                                 <exclude>**/.classpath</exclude>
                                 <exclude>**/.settings/**</exclude>
                                 <exclude>**/.project</exclude>
-                                <exclude>**/.metadata/</exclude>
+                                <exclude>**/.descriptor/</exclude>
                                 <!-- Maven working directory -->
                                 <exclude>**/target/**</exclude>
                                 <!-- Patch files which can be lying around -->
