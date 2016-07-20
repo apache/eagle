@@ -18,9 +18,9 @@ package org.apache.eagle.app.resource;
 
 
 import com.google.inject.Inject;
-import org.apache.eagle.app.manager.ApplicationManagementService;
-import org.apache.eagle.app.manager.ApplicationOperations;
-import org.apache.eagle.app.manager.ApplicationProviderService;
+import org.apache.eagle.app.service.ApplicationManagementService;
+import org.apache.eagle.app.service.ApplicationOperations;
+import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;

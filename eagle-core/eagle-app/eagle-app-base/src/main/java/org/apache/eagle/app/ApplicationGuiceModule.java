@@ -18,10 +18,10 @@ package org.apache.eagle.app;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
-import org.apache.eagle.app.manager.ApplicationManagementService;
-import org.apache.eagle.app.manager.ApplicationManagementServiceImpl;
-import org.apache.eagle.app.manager.ApplicationProviderService;
-import org.apache.eagle.app.manager.ApplicationProviderServiceImpl;
+import org.apache.eagle.app.service.ApplicationManagementService;
+import org.apache.eagle.app.service.ApplicationManagementServiceImpl;
+import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.service.ApplicationProviderServiceImpl;
 import org.apache.eagle.metadata.service.ApplicationDescService;
 
 

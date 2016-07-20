@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app;
+package org.apache.eagle.app.spi;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 

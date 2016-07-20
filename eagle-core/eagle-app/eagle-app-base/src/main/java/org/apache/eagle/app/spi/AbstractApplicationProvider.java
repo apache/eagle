@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app;
+package org.apache.eagle.app.spi;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.config.ApplicationProviderDescConfig;
 import org.apache.eagle.app.sink.StreamSink;
@@ -29,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBException;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class AbstractApplicationProvider<T extends Application> implements ApplicationProvider<T> {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractApplicationProvider.class);

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.manager;
+package org.apache.eagle.app.service;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;

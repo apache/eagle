@@ -18,8 +18,7 @@ package org.apache.eagle.app.example;
 
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.app.AbstractApplicationProvider;
-import org.apache.eagle.metadata.model.ApplicationDesc;
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -23,7 +23,7 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import org.apache.eagle.metadata.model.ApplicationDesc;
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

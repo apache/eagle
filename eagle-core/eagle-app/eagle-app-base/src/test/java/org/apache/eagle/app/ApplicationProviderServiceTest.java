@@ -20,7 +20,8 @@ package org.apache.eagle.app;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
-import org.apache.eagle.app.manager.ApplicationProviderService;
+import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.common.module.CommonGuiceModule;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.junit.Test;
@@ -38,10 +39,8 @@ public class ApplicationProviderServiceTest {
         ApplicationProviderService providerManager = injector.getInstance(ApplicationProviderService.class);
         Collection<ApplicationDesc> applicationDescs = providerManager.getApplicationDescs();
         Collection<ApplicationProvider> applicationProviders = providerManager.getProviders();
-        Collection<ApplicationProviderConfig> providerConfigs = providerManager.getProviderConfigs();
 
         applicationDescs.forEach((d)-> LOGGER.debug(d.toString()));
         applicationProviders.forEach((d)-> LOGGER.debug(d.toString()));
-        providerConfigs.forEach((d)-> LOGGER.debug(d.toString()));
     }
 }

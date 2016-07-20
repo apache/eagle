@@ -16,7 +16,7 @@
  */
 package org.apache.eagle.app.example;
 
-import org.apache.eagle.app.AbstractApplicationProvider;
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
 public class ExampleApplicationProvider2 extends AbstractApplicationProvider<ExampleApplication> {
     public ExampleApplicationProvider2() {

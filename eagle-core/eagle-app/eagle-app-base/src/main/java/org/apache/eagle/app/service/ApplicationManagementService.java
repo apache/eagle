@@ -1,4 +1,3 @@
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,18 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.manager;
+package org.apache.eagle.app.service;
 
-import org.apache.eagle.app.Application;
-import org.apache.eagle.app.ApplicationProvider;
-import org.apache.eagle.app.config.ApplicationProviderConfig;
-import org.apache.eagle.metadata.service.ApplicationDescService;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 
-import java.util.Collection;
+public interface ApplicationManagementService {
+    /**
+     *
+     * @param operation
+     * @return
+     */
+    ApplicationEntity install(ApplicationOperations.InstallOperation operation);
 
-public interface ApplicationProviderService extends ApplicationDescService {
-    void reload();
-    Collection<ApplicationProviderConfig> getProviderConfigs();
-    Collection<ApplicationProvider> getProviders();
-    <T extends Application> ApplicationProvider<T> getApplicationProviderByType(String type);
+    /**
+     *
+     * @param operation
+     * @return
+     */
+    ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation);
+
+    /**
+     *
+     * @param operation
+     * @return
+     */
+    ApplicationEntity start(ApplicationOperations.StartOperation operation);
+
+    /**
+     *
+     * @param operation
+     * @return
+     */
+    ApplicationEntity stop(ApplicationOperations.StopOperation operation);
 }
