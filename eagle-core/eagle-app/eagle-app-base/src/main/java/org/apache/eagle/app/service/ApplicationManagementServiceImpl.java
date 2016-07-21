@@ -50,7 +50,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         this.applicationEntityService = applicationEntityService;
     }
 
-    public ApplicationEntity install(ApplicationOperations.InstallOperation operation) {
+    public ApplicationEntity install(AppOperations.InstallOperation operation) {
         Preconditions.checkNotNull(operation.getSiteId(),"siteId is null");
         Preconditions.checkNotNull(operation.getAppType(),"appType is null");
         SiteEntity siteEntity = siteEntityService.getBySiteId(operation.getSiteId());
@@ -68,7 +68,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         return applicationEntity;
     }
 
-    public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) {
+    public ApplicationEntity uninstall(AppOperations.UninstallOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
         // TODO: Check status, skip stop if already STOPPED
@@ -80,14 +80,14 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         return applicationEntityService.delete(applicationEntity);
     }
 
-    public ApplicationEntity start(ApplicationOperations.StartOperation operation) {
+    public ApplicationEntity start(AppOperations.StartOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
         application.start(new ApplicationContext(applicationEntity,this.config));
         return applicationEntity;
     }
 
-    public ApplicationEntity stop(ApplicationOperations.StopOperation operation) {
+    public ApplicationEntity stop(AppOperations.StopOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
         application.stop(new ApplicationContext(applicationEntity,this.config));

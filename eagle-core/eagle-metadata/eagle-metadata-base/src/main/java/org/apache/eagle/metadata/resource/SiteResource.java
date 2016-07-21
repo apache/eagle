@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.metadata.resource;
 
-import com.google.inject.servlet.RequestScoped;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.service.SiteEntityService;
 
@@ -26,7 +25,6 @@ import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 
 @Path("/sites")
-@RequestScoped
 public class SiteResource {
     private final SiteEntityService siteEntityService;
 

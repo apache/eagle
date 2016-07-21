@@ -14,36 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.service;
+package org.apache.eagle.app.test;
 
-import org.apache.eagle.metadata.model.ApplicationEntity;
+import com.google.inject.AbstractModule;
+import org.apache.eagle.app.ApplicationGuiceModule;
+import org.apache.eagle.common.module.CommonGuiceModule;
+import org.apache.eagle.metadata.persistence.MemoryMetadataStore;
 
-public interface ApplicationManagementService {
-    /**
-     *
-     * @param operation
-     * @return
-     */
-    ApplicationEntity install(AppOperations.InstallOperation operation);
-
-    /**
-     *
-     * @param operation
-     * @return
-     */
-    ApplicationEntity uninstall(AppOperations.UninstallOperation operation);
-
-    /**
-     *
-     * @param operation
-     * @return
-     */
-    ApplicationEntity start(AppOperations.StartOperation operation);
-
-    /**
-     *
-     * @param operation
-     * @return
-     */
-    ApplicationEntity stop(AppOperations.StopOperation operation);
+public class AppTestModule extends AbstractModule{
+    @Override
+    protected void configure() {
+        install(new CommonGuiceModule());
+        install(new ApplicationGuiceModule());
+        install(new MemoryMetadataStore());
+    }
 }

@@ -16,25 +16,51 @@
  */
 package org.apache.eagle.app.example;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import org.apache.eagle.app.ApplicationGuiceModule;
+import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
-import org.apache.eagle.common.module.CommonGuiceModule;
+import org.apache.eagle.app.service.AppOperations;
+import org.apache.eagle.app.test.AppTester;
+import org.apache.eagle.app.test.AppTestRunner;
 import org.apache.eagle.metadata.model.ApplicationDesc;
-import org.apache.eagle.metadata.persistence.MetadataStore;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.model.SiteEntity;
+import org.apache.eagle.metadata.resource.SiteResource;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Collection;
 
+@RunWith(AppTestRunner.class)
 public class ExampleApplicationTest {
-    private Injector injector = Guice.createInjector(new CommonGuiceModule(), new ApplicationGuiceModule(), MetadataStore.getInstance());
-    private ApplicationResource applicationResource = injector.getInstance(ApplicationResource.class);
+    @Inject private SiteResource siteResource;
+    @Inject private ApplicationResource applicationResource;
+    @Inject private AppTester tester;
 
     @Test
-    public void testApplicationDescs(){
+    public void testApplicationProviderLoading(){
         Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs();
         Assert.assertNotNull(applicationDescs);
+        Assert.assertEquals(2,applicationDescs.size());
+    }
+
+    @Test
+    public void testApplicationLifecycle() throws InterruptedException {
+        SiteEntity siteEntity = new SiteEntity();
+        siteEntity.setSiteId("test_site");
+        siteEntity.setSiteName("Test Site");
+        siteEntity.setDescription("Test Site for ExampleApplicationTest");
+        siteResource.createSite(siteEntity);
+        Assert.assertNotNull(siteEntity.getUuid());
+        ApplicationEntity applicationEntity = applicationResource.installApplication(new AppOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL));
+        Assert.assertNotNull(applicationEntity);
+        applicationResource.startApplication(new AppOperations.StartOperation(applicationEntity.getUuid()));
+        Thread.sleep(Long.MAX_VALUE);
+    }
+
+    @Test
+    public void testApplicationQuickRun(){
+        tester.run("EXAMPLE_APPLICATION");
+        tester.run(ExampleApplicationProvider.class);
     }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -13,37 +13,34 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ *
+ *
  */
-package org.apache.eagle.app.service;
 
-import org.apache.eagle.metadata.model.ApplicationEntity;
-
-public interface ApplicationManagementService {
-    /**
-     *
-     * @param operation
-     * @return
-     */
-    ApplicationEntity install(AppOperations.InstallOperation operation);
-
-    /**
-     *
-     * @param operation
-     * @return
-     */
-    ApplicationEntity uninstall(AppOperations.UninstallOperation operation);
-
-    /**
-     *
-     * @param operation
-     * @return
-     */
-    ApplicationEntity start(AppOperations.StartOperation operation);
-
-    /**
-     *
-     * @param operation
-     * @return
-     */
-    ApplicationEntity stop(AppOperations.StopOperation operation);
-}
+/**
+ * <h1>How to test application ?</h1>
+ *
+ * <h2>Option 1: Test with AppTestRunner</h2>
+ * <pre>
+ * @RunWith(AppTestRunner.class)
+ * public class ExampleApplicationTest {
+ *     @Inject
+ *     private ApplicationResource applicationResource;
+ * }
+ * </pre>
+ *
+ * <h2>Option 2: Manually create injector</h2>
+ * <pre>
+ * public class ExampleApplicationTest {
+ *     @Inject
+ *     private ApplicationResource applicationResource;
+ *
+ *     @Before
+ *     public void setUp(){
+ *         Guice.createInjector(new AppTestModule()).injector.injectMembers(this);
+ *     }
+ * }
+ * </pre>
+ */
+package org.apache.eagle.app.test;

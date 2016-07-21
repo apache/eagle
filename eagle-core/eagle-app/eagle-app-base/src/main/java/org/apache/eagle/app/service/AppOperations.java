@@ -21,7 +21,7 @@ import org.apache.eagle.metadata.model.ApplicationEntity;
 import java.io.Serializable;
 import java.util.Map;
 
-public class ApplicationOperations {
+public class AppOperations {
     interface Operation extends Serializable {
         //
     }
@@ -31,6 +31,23 @@ public class ApplicationOperations {
         private String appType;
         private ApplicationEntity.Mode mode = ApplicationEntity.Mode.LOCAL;
         private Map<String,Object> configuration;
+
+        public InstallOperation(){}
+        public InstallOperation(String siteId,String appType){
+            this.setSiteId(siteId);
+            this.setAppType(appType);
+        }
+        public InstallOperation(String siteId,String appType,ApplicationEntity.Mode mode){
+            this.setSiteId(siteId);
+            this.setAppType(appType);
+            this.setMode(mode);
+        }
+        public InstallOperation(String siteId,String appType,ApplicationEntity.Mode mode,Map<String,Object> configuration){
+            this.setSiteId(siteId);
+            this.setAppType(appType);
+            this.setMode(mode);
+            this.setConfiguration(configuration);
+        }
 
         public String getSiteId() {
            return siteId;
@@ -84,6 +101,13 @@ public class ApplicationOperations {
     public static class StartOperation implements Operation{
         private String uuid;
         private String appId;
+        public StartOperation(String uuid){
+            this.setUuid(uuid);
+        }
+        public StartOperation(String uuid,String appId){
+            this.setUuid(uuid);
+            this.setAppId(appId);
+        }
         public String getUuid() {
             return uuid;
         }
