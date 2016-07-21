@@ -26,12 +26,14 @@ import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.coordinator.resource.CoordinatorResource;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
 import org.apache.eagle.service.metadata.resource.MetadataResource;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.typesafe.config.ConfigFactory;
 
 /**
  * @since Jun 27, 2016
@@ -54,6 +56,13 @@ public class ServiceApp extends Application<AlertDropWizardConfiguration> {
 
     @Override
     public void run(AlertDropWizardConfiguration configuration, Environment environment) throws Exception {
+        if (StringUtils.isNotEmpty(configuration.getApplicationConfPath())) {
+            // setup config if given
+            System.setProperty("config.resource", configuration.getApplicationConfPath());
+            ConfigFactory.invalidateCaches();
+            ConfigFactory.load();
+        }
+
         environment.getApplicationContext().setContextPath("/rest");
         environment.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 

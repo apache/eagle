@@ -67,7 +67,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     private volatile Map<String, PolicyDefinition> cachedPolicies = new HashMap<>(); // for one streamGroup, there are multiple policies
 
     private StreamContext streamContext;
-    private volatile Map<String, StreamDefinition> sdf;
+    private volatile Map<String, StreamDefinition> sdf  = new HashMap<String, StreamDefinition>();
     private PartitionedEventSerializer serializer;
 
     public AlertBolt(String boltId, PolicyGroupEvaluator policyGroupEvaluator, Config config, IMetadataChangeNotifyService changeNotifyService){

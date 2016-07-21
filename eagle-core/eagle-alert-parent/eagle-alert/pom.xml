@@ -352,6 +352,7 @@
 								<exclude>**/*.project</exclude>
 								<exclude>**/*.prefs</exclude>
 								<exclude>**/*.iml</exclude>
+								<exclude>**/*.orig</exclude>
 								<exclude>**/MANIFEST.MF</exclude>
 								<exclude>**/dependency-reduced-pom.xml</exclude>
                                                                 <exclude>**/target/**</exclude>`

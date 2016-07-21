@@ -1,9 +1,9 @@
 [
 {
-	"name": "alertUnitTopology_1",
+	"name": "alertUnitTopology_2",
 	"numOfSpout":1,
-	"numOfAlertBolt": 10,
 	"numOfGroupBolt": 4,
+	"numOfAlertBolt": 10,
 	"spoutId": "alertEngineSpout",
 	"groupNodeIds" : [
 		"streamRouterBolt0",
