@@ -25,6 +25,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 
+import com.google.inject.Inject;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -64,7 +65,8 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     private SortedMap<String, ScheduleState> scheduleStates = new TreeMap<String, ScheduleState>();
     private List<PolicyAssignment> assignments = new ArrayList<PolicyAssignment>();
     private List<Topology> topologies = new ArrayList<Topology>();
-    
+
+    @Inject
     public InMemMetadataDaoImpl(Config config) {
     }
 

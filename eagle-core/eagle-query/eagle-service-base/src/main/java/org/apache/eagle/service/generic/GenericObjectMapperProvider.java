@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.service.generic;
 
+import com.google.inject.Singleton;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ser.FilterProvider;
@@ -27,6 +28,7 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
+@Singleton
 public class GenericObjectMapperProvider implements ContextResolver<ObjectMapper> {
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     @Override

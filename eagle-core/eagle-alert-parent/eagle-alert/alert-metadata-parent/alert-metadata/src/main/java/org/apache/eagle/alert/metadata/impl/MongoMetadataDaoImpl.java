@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.inject.Inject;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -80,6 +81,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     private MongoCollection<Document> assignments;
     private MongoCollection<Document> topologies;
 
+    @Inject
     public MongoMetadataDaoImpl(Config config) {
         this.connection = config.getString("connection");
         this.client = new MongoClient(new MongoClientURI(this.connection));
