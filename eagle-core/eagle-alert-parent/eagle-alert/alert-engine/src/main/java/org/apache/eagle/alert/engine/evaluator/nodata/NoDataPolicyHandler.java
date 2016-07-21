@@ -72,6 +72,26 @@ import org.slf4j.LoggerFactory;
  ],
  "parallelismHint": 2
  }
+     "name": "noDataAlertPolicy",
+     "description": "noDataAlertPolicy",
+     "inputStreams": [
+        "noDataAlertStream"
+     ],
+     "outputStreams": [
+        "noDataAlertStream_out"
+     ],
+     "definition": {
+        "type": "nodataalert",
+        "value": "PT1M,plain,1,host,host1,host2"   // or "value": "PT1M,dynamic,1,host"
+     },
+     "partitionSpec": [
+     {
+        "streamId": "noDataAlertStream",
+        "type": "GROUPBY"
+     }
+     ],
+     "parallelismHint": 2
+   }
  */
 public class NoDataPolicyHandler implements PolicyStreamHandler{
     private static final Logger LOG = LoggerFactory.getLogger(NoDataPolicyHandler.class);

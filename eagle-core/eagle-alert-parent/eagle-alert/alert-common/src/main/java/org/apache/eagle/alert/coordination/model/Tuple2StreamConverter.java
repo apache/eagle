@@ -67,8 +67,8 @@ public class Tuple2StreamConverter {
         Object timeObject = m.get(metadata.getTimestampColumn());
         long timestamp = 0L;
         if (timeObject == null) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("continue with current timestamp since no timestamp column specified! Metadata : ", metadata);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("continue with current timestamp since no timestamp column specified! Metadata : {} ", metadata);
             }
             timestamp = System.currentTimeMillis();
         } else if (timeObject instanceof Number) {
@@ -77,8 +77,8 @@ public class Tuple2StreamConverter {
             String timestampFieldValue = (String) m.get(metadata.getTimestampColumn());
             String dateFormat = metadata.getTimestampFormat();
             if (Strings.isNullOrEmpty(dateFormat)) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("continue with current timestamp becuase no data format sepcified! Metadata : ", metadata);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("continue with current timestamp becuase no data format sepcified! Metadata : {} ", metadata);
                 }
                 timestamp = System.currentTimeMillis();
             } else 

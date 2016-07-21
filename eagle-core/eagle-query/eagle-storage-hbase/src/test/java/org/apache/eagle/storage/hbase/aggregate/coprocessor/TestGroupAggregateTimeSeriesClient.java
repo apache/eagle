@@ -49,6 +49,7 @@ import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateClientImpl
 /**
  * @since : 11/10/14,2014
  */
+@Ignore
 public class TestGroupAggregateTimeSeriesClient extends TestHBaseBase {
 
 	private final static Logger LOG = LoggerFactory.getLogger(TestGroupAggregateTimeSeriesClient.class);
