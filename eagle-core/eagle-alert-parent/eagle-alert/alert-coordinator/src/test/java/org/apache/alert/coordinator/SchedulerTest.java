@@ -16,6 +16,7 @@
  */
 package org.apache.alert.coordinator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.alert.coordinator.mock.TestTopologyMgmtService;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
@@ -41,32 +43,42 @@ import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.coordinator.IScheduleContext;
 import org.apache.eagle.alert.coordinator.ScheduleOption;
-import org.apache.eagle.alert.coordinator.TopologyMgmtService;
 import org.apache.eagle.alert.coordinator.impl.GreedyPolicyScheduler;
+import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
+import org.apache.eagle.alert.coordinator.model.GroupBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 import org.apache.eagle.alert.coordinator.provider.InMemScheduleConext;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition.Definition;
+import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn.Type;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.SimpleType;
+import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 /**
+ * 
  * @since Apr 22, 2016
  *
  */
 public class SchedulerTest {
 
+    private static final String TOPO2 = "topo2";
+    private static final String TOPO1 = "topo1";
+    private static final int PARALELLISM = 5;
     private static final String STREAM2 = "stream2";
     private static final String JOIN_POLICY_1 = "join-policy-1";
     private static final String TEST_TOPIC = "test-topic";
@@ -83,12 +95,13 @@ public class SchedulerTest {
         ConfigFactory.invalidateCaches();
         System.setProperty("config.resource", "/application.conf");
     }
-    
+
     @Test
     public void test01_simple() throws Exception {
         GreedyPolicyScheduler ps = new GreedyPolicyScheduler();
-        IScheduleContext context = createScheduleContext();
-        ps.init(context, createMgmtService());
+        TestTopologyMgmtService mgmtService = createMgmtService();
+        IScheduleContext context = createScheduleContext(mgmtService);
+        ps.init(context, mgmtService);
         ps.schedule(new ScheduleOption());
 
         ScheduleState status = ps.getState();
@@ -97,7 +110,7 @@ public class SchedulerTest {
 
         LOG.info(mapper.writeValueAsString(spec));
         Assert.assertEquals(2, spec.size());
-        Assert.assertTrue(spec.containsKey("topo1"));
+        Assert.assertTrue(spec.containsKey(TOPO1));
         assertFirstPolicyScheduled(context, status);
     }
 
@@ -123,8 +136,8 @@ public class SchedulerTest {
                 Assert.assertEquals(1, streamMeta.groupingStrategies.size());
 
                 StreamRepartitionStrategy gs = streamMeta.groupingStrategies.iterator().next();
-                Assert.assertEquals(5, gs.numTotalParticipatingRouterBolts);
-                Assert.assertEquals(5, gs.totalTargetBoltIds.size());
+                Assert.assertEquals(TestTopologyMgmtService.ROUTER_BOLT_NUMBER, gs.numTotalParticipatingRouterBolts);
+                Assert.assertEquals(TestTopologyMgmtService.ROUTER_BOLT_NUMBER, gs.totalTargetBoltIds.size());
                 Assert.assertEquals(0, gs.startSequence);
 
                 Assert.assertTrue(context.getPolicyAssignments().containsKey(TEST_POLICY_1));
@@ -198,24 +211,23 @@ public class SchedulerTest {
         }
     }
 
-    private TopologyMgmtService createMgmtService() {
-        TestTopologyMgmtService.BOLT_NUMBER = 5;
-        TopologyMgmtService mgmtService = new TestTopologyMgmtService();
+    private TestTopologyMgmtService createMgmtService() {
+        TestTopologyMgmtService mgmtService = new TestTopologyMgmtService();
         return mgmtService;
     }
 
-    private InMemScheduleConext createScheduleContext() {
+    private InMemScheduleConext createScheduleContext(TestTopologyMgmtService mgmtService) {
         InMemScheduleConext context = new InMemScheduleConext();
         // topo
-        Pair<Topology, TopologyUsage> pair1 = TestTopologyMgmtService.createEmptyTopology("topo1");
-        Pair<Topology, TopologyUsage> pair2 = TestTopologyMgmtService.createEmptyTopology("topo2");
+        Pair<Topology, TopologyUsage> pair1 = mgmtService.createEmptyTopology(TOPO1);
+        Pair<Topology, TopologyUsage> pair2 = mgmtService.createEmptyTopology(TOPO2);
         context.addTopology(pair1.getLeft());
         context.addTopologyUsages(pair1.getRight());
         context.addTopology(pair2.getLeft());
         context.addTopologyUsages(pair2.getRight());
 
         // policy
-        createSamplePolicy(context, TEST_POLICY_1, STREAM1);
+        createSamplePolicy(context, TEST_POLICY_1, STREAM1, PARALELLISM);
 
         // data source
         Kafka2TupleMetadata ds = new Kafka2TupleMetadata();
@@ -269,9 +281,9 @@ public class SchedulerTest {
      */
     @Test
     public void test_schedule_add2() {
-        IScheduleContext context = createScheduleContext();
+        TestTopologyMgmtService mgmtService = createMgmtService();
+        IScheduleContext context = createScheduleContext(mgmtService);
         GreedyPolicyScheduler ps = new GreedyPolicyScheduler();
-        TopologyMgmtService mgmtService = new TopologyMgmtService();
         ps.init(context, mgmtService);
 
         ScheduleOption option = new ScheduleOption();
@@ -280,7 +292,7 @@ public class SchedulerTest {
         context = ps.getContext(); // context updated!
         assertFirstPolicyScheduled(context, status);
 
-        createSamplePolicy((InMemScheduleConext) context, TEST_POLICY_2, STREAM1);
+        createSamplePolicy((InMemScheduleConext) context, TEST_POLICY_2, STREAM1, PARALELLISM);
 
         ps.init(context, mgmtService); // reinit
         ps.schedule(option);
@@ -290,7 +302,7 @@ public class SchedulerTest {
         assertSecondPolicyCreated(context, status);
 
         // add one policy on different stream of the same topic
-        createSamplePolicy((InMemScheduleConext) context, TEST_POLICY_3, STREAM2);
+        createSamplePolicy((InMemScheduleConext) context, TEST_POLICY_3, STREAM2, PARALELLISM);
 
         ps.init(context, mgmtService); // re-init
         ps.schedule(option);
@@ -320,8 +332,8 @@ public class SchedulerTest {
                 Assert.assertEquals(1, streamMeta.groupingStrategies.size());
 
                 StreamRepartitionStrategy gs = streamMeta.groupingStrategies.iterator().next();
-                Assert.assertEquals(5, gs.numTotalParticipatingRouterBolts);
-                Assert.assertEquals(5, gs.totalTargetBoltIds.size());
+                Assert.assertEquals(TestTopologyMgmtService.ROUTER_BOLT_NUMBER, gs.numTotalParticipatingRouterBolts);
+                Assert.assertEquals(TestTopologyMgmtService.ROUTER_BOLT_NUMBER, gs.totalTargetBoltIds.size());
                 Assert.assertEquals(0, gs.startSequence);
 
                 PolicyAssignment pa1 = context.getPolicyAssignments().get(TEST_POLICY_1);
@@ -347,8 +359,8 @@ public class SchedulerTest {
                 Assert.assertEquals(1, streamMeta.groupingStrategies.size());
 
                 StreamRepartitionStrategy gs = streamMeta.groupingStrategies.iterator().next();
-                Assert.assertEquals(5, gs.numTotalParticipatingRouterBolts);
-                Assert.assertEquals(5, gs.totalTargetBoltIds.size());
+                Assert.assertEquals(TestTopologyMgmtService.ROUTER_BOLT_NUMBER, gs.numTotalParticipatingRouterBolts);
+                Assert.assertEquals(TestTopologyMgmtService.ROUTER_BOLT_NUMBER, gs.totalTargetBoltIds.size());
                 Assert.assertEquals(0, gs.startSequence);
 
                 // assert policy assignment for the three policies
@@ -362,7 +374,8 @@ public class SchedulerTest {
                 Assert.assertNotEquals(pa1.getQueueId(), pa3.getQueueId());
                 StreamWorkSlotQueue queue1 = getQueue(context, pa1.getQueueId()).getRight();
                 StreamWorkSlotQueue queue3 = getQueue(context, pa3.getQueueId()).getRight();
-                Assert.assertNotEquals(queue1.getWorkingSlots().get(0).getTopologyName(), queue3.getWorkingSlots().get(0).getTopologyName());
+                Assert.assertNotEquals(queue1.getWorkingSlots().get(0).getTopologyName(),
+                        queue3.getWorkingSlots().get(0).getTopologyName());
             }
         }
         // group spec
@@ -425,8 +438,8 @@ public class SchedulerTest {
                 Assert.assertEquals(1, streamMeta.groupingStrategies.size());
 
                 StreamRepartitionStrategy gs = streamMeta.groupingStrategies.iterator().next();
-                Assert.assertEquals(5, gs.numTotalParticipatingRouterBolts);
-                Assert.assertEquals(5, gs.totalTargetBoltIds.size());
+                Assert.assertEquals(TestTopologyMgmtService.ROUTER_BOLT_NUMBER, gs.numTotalParticipatingRouterBolts);
+                Assert.assertEquals(TestTopologyMgmtService.ROUTER_BOLT_NUMBER, gs.totalTargetBoltIds.size());
                 Assert.assertEquals(0, gs.startSequence);
 
                 // assert two policy on the same queue
@@ -492,7 +505,8 @@ public class SchedulerTest {
                 LOG.info("alert spec topology name {}", topo1);
                 for (List<String> definitions : alertSpec.getBoltPolicyIdsMap().values()) {
                     Assert.assertEquals(2, definitions.size());
-//                    List<String> names = Arrays.asList(definitions.stream().map((t) -> t.getName()).toArray(String[]::new));
+                    // List<String> names = Arrays.asList(definitions.stream().map((t) ->
+                    // t.getName()).toArray(String[]::new));
                     Assert.assertTrue(definitions.contains(TEST_POLICY_1));
                     Assert.assertTrue(definitions.contains(TEST_POLICY_2));
                 }
@@ -540,9 +554,9 @@ public class SchedulerTest {
         Assert.assertTrue(list.contains(gs2));
     }
 
-    private void createSamplePolicy(InMemScheduleConext context, String policyName, String stream) {
+    private void createSamplePolicy(InMemScheduleConext context, String policyName, String stream, int hint) {
         PolicyDefinition pd = new PolicyDefinition();
-        pd.setParallelismHint(5);
+        pd.setParallelismHint(hint);
         Definition def = new Definition();
         pd.setDefinition(def);
         pd.setName(policyName);
@@ -566,7 +580,12 @@ public class SchedulerTest {
 
     @Test
     public void test_schedule_updateParitition() {
-        // TODO
+        // This case design test is move to outter logic of ScheduleConetxtBuilder
+    }
+
+    @Test
+    public void test_schedule_updateDefinition() {
+        // This case design test is move to outter logic of ScheduleConetxtBuilder
     }
 
     @Test
@@ -577,9 +596,9 @@ public class SchedulerTest {
     @SuppressWarnings("unused")
     @Test
     public void test_schedule_multipleStream() throws Exception {
-        IScheduleContext context = createScheduleContext();
+        TestTopologyMgmtService mgmtService = new TestTopologyMgmtService();
+        IScheduleContext context = createScheduleContext(mgmtService);
         GreedyPolicyScheduler ps = new GreedyPolicyScheduler();
-        TopologyMgmtService mgmtService = new TopologyMgmtService();
 
         createJoinPolicy((InMemScheduleConext) context, JOIN_POLICY_1, Arrays.asList(STREAM1, STREAM2));
 
@@ -632,4 +651,96 @@ public class SchedulerTest {
         }
         context.addPoilcy(pd);
     }
+
+    @Test
+    public void testIrregularPolicyParallelismHint() {
+        Config config = ConfigFactory.load();
+        int defaultParallelism = config.getInt("coordinator.policyDefaultParallelism");
+        TestTopologyMgmtService mgmtService = new TestTopologyMgmtService(5, 12);
+        InMemScheduleConext context = createScheduleContext(mgmtService);
+        // recreate test poicy
+        context.getPolicies().clear();
+        // make the hint bigger than bolt number
+        int irregularParallelism = defaultParallelism + 2;
+        createSamplePolicy(context, "irregularPolicy", STREAM1, irregularParallelism);
+        GreedyPolicyScheduler ps = new GreedyPolicyScheduler();
+
+        ps.init(context, mgmtService);
+
+        ScheduleState scheduled = ps.schedule(new ScheduleOption());
+        Assert.assertEquals(2, scheduled.getSpoutSpecs().size());
+        Assert.assertEquals(2, scheduled.getGroupSpecs().size());
+        Assert.assertEquals(2, scheduled.getAlertSpecs().size());
+        // assertion
+        RouterSpec spec = scheduled.getGroupSpecs().get(TOPO1);
+        Assert.assertTrue(spec.getRouterSpecs().size() > 0); // must be allocated
+        for (StreamRouterSpec routerSpec : spec.getRouterSpecs()) {
+            Assert.assertEquals(1, routerSpec.getTargetQueue().size());
+            // irregularParallelism is prompted to 2 * defaultParallelism = 10
+            Assert.assertEquals(10, routerSpec.getTargetQueue().get(0).getWorkers().size());
+        }
+    }
+
+    @Test
+    public void testDataSources() throws Exception {
+        InMemScheduleConext context = loadContext("/multi/");
+        TestTopologyMgmtService mgmtService = new TestTopologyMgmtService(4, 10);
+
+        GreedyPolicyScheduler ps = new GreedyPolicyScheduler();
+        ps.init(context, mgmtService);
+
+        ScheduleState state = ps.schedule(new ScheduleOption());
+        Assert.assertNotNull(state);
+        Assert.assertEquals(2, state.getAssignments().size());
+        Assert.assertEquals(1, state.getAlertSpecs().size());
+        Assert.assertEquals(10, state.getAlertSpecs().get("alertUnitTopology_1").getBoltPolicyIdsMap().size());
+    }
+
+    private InMemScheduleConext loadContext(String base) throws Exception {
+        InMemScheduleConext context = new InMemScheduleConext();
+
+        List<Kafka2TupleMetadata> metadata = loadEntities(base + "datasources.json", Kafka2TupleMetadata.class);
+        for (Kafka2TupleMetadata k : metadata) {
+            context.addDataSource(k);
+        }
+
+        List<PolicyDefinition> policies = loadEntities(base + "policies.json", PolicyDefinition.class);
+        for (PolicyDefinition p : policies) {
+            context.addPoilcy(p);
+        }
+
+        List<Publishment> pubs = loadEntities(base + "publishments.json", Publishment.class);
+        for (Publishment pub : pubs) {
+            context.addPublishment(pub);
+        }
+
+        List<StreamDefinition> defs = loadEntities(base + "streamdefinitions.json", StreamDefinition.class);
+        for (StreamDefinition def : defs) {
+            context.addSchema(def);
+        }
+
+        List<Topology> topos = loadEntities(base + "topologies.json", Topology.class);
+        for (Topology t : topos) {
+            context.addTopology(t);
+            
+            TopologyUsage u = new TopologyUsage(t.getName());
+            for (String gnid : t.getGroupNodeIds()) {
+                u.getGroupUsages().put(gnid, new GroupBoltUsage(gnid));
+            }
+            for (String anid : t.getAlertBoltIds()) {
+                u.getAlertUsages().put(anid, new AlertBoltUsage(anid));
+            }
+            context.addTopologyUsages(u);
+        }
+
+        return context;
+    }
+
+    public static <T> List<T> loadEntities(String path, Class<T> tClz) throws Exception {
+        System.out.println(FileUtils.readFileToString(new File(SchedulerTest.class.getResource(path).getPath())));
+        JavaType type = CollectionType.construct(List.class, SimpleType.construct(tClz));
+        List<T> l = mapper.readValue(SchedulerTest.class.getResourceAsStream(path), type);
+        return l;
+    }
+
 }

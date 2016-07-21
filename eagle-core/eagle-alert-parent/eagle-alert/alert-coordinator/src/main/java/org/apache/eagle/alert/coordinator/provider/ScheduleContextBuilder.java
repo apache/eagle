@@ -92,9 +92,16 @@ public class ScheduleContextBuilder {
 
         // TODO: See ScheduleState comments on how to improve the storage
         ScheduleState state = client.getVersionedSpec();
-        assignments = listToMap(state == null ? new ArrayList<PolicyAssignment>() : cleanupDeprecatedAssignments(state.getAssignments()));
 
-        monitoredStreamMap = listToMap(state == null ? new ArrayList<MonitoredStream>() : cleanupDeprecatedStreamsAndAssignment(state.getMonitoredStreams()));
+        // detect policy update, remove the policy assignments.
+        // definition change : the assignment would NOT change, the runtime will do reload and check
+        // stream change : the assignment would NOT change, the runtime will do reload and check
+        // data source change : the assignment would NOT change, the runtime will do reload and check
+        // parallelism change : the policies' assignment would be dropped when it's bigger than assign queue, and expect
+        //      to be assigned in scheduler.
+        assignments = listToMap(state == null ? new ArrayList<PolicyAssignment>() : detectAssignmentsChange(state.getAssignments(), state));
+
+        monitoredStreamMap = listToMap(state == null ? new ArrayList<MonitoredStream>() : detectMonitoredStreams(state.getMonitoredStreams()));
 
         // build based on existing data
         usages = buildTopologyUsage();
@@ -119,7 +126,7 @@ public class ScheduleContextBuilder {
      * @param monitoredStreams
      * @return
      */
-    private List<MonitoredStream> cleanupDeprecatedStreamsAndAssignment(List<MonitoredStream> monitoredStreams) {
+    private List<MonitoredStream> detectMonitoredStreams(List<MonitoredStream> monitoredStreams) {
         List<MonitoredStream> result = new ArrayList<MonitoredStream>(monitoredStreams);
         
         // clear deprecated streams
@@ -193,14 +200,31 @@ public class ScheduleContextBuilder {
         }
     }
 
-    private List<PolicyAssignment> cleanupDeprecatedAssignments(List<PolicyAssignment> list) {
+    private List<PolicyAssignment> detectAssignmentsChange(List<PolicyAssignment> list, ScheduleState state) {
+        // FIXME: duplciated build map ?
+        Map<String, StreamWorkSlotQueue> queueMap = new HashMap<String, StreamWorkSlotQueue>();
+        for (MonitoredStream ms : state.getMonitoredStreams()) {
+            for (StreamWorkSlotQueue q : ms.getQueues()) {
+                queueMap.put(q.getQueueId(), q);
+            }
+        }
+
         List<PolicyAssignment> result = new ArrayList<PolicyAssignment>(list);
         Iterator<PolicyAssignment> paIt = result.iterator();
         while (paIt.hasNext()) {
             PolicyAssignment assignment = paIt.next();
+
             if (!policies.containsKey(assignment.getPolicyName())) {
                 LOG.info("Policy assignment {} 's policy not found, this assignment will be removed!", assignment);
                 paIt.remove();
+            } else {
+                StreamWorkSlotQueue queue = queueMap.get(assignment.getQueueId());
+                if (queue == null
+                        || policies.get(assignment.getPolicyName()).getParallelismHint() > queue.getQueueSize()) {
+                    // queue not found or policy has hint bigger than queue (possible a poilcy update)
+                    LOG.info("Policy assignment {} 's policy doesnt match queue: {}!", assignment, queue);
+                    paIt.remove();
+                }
             }
         }
         return result;

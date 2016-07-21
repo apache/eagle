@@ -145,4 +145,8 @@ public class InMemScheduleConext implements IScheduleContext {
         return publishments;
     }
 
+    public void addPublishment(Publishment pub) {
+        this.publishments.put(pub.getName(), pub);
+    }
+
 }

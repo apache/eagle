@@ -16,26 +16,28 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import backtype.storm.utils.Utils;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.eagle.alert.engine.UnitTopologyMain;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import backtype.storm.utils.Utils;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
- * Since 6/29/16.
+ * @since May 10, 2016
+ *
  */
-public class Integration5AbsenceAlert {
+public class Integration3 {
+
     private String[] args;
-
     private ExecutorService executors = Executors.newFixedThreadPool(5);
-
     private static KafkaEmbedded kafka;
 
     @BeforeClass
@@ -49,16 +51,37 @@ public class Integration5AbsenceAlert {
             kafka.shutdown();
         }
     }
+
+    /**
+     * Assumption:
+     * <p>
+     * start metadata service 8080 /rest
+     * 
+     * <pre>
+     * user@kafka-host:~$ $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic syslog_events
+     * </pre>
+     * <p>
+     * 
+     * @throws InterruptedException
+     */
     @Test
-    public void testTriggerAbsenceAlert() throws Exception{
-        System.setProperty("config.resource", "/absence/application-absence.conf");
+    public void testSeverity() throws Exception {
+        System.setProperty("config.resource", "/e2e/application-e2e.conf");
         ConfigFactory.invalidateCaches();
         Config config = ConfigFactory.load();
 
         System.out.println("loading metadatas...");
-        Integration1.loadMetadatas("/absence/", config);
+        Integration1.loadMetadatas("/e2e/", config);
         System.out.println("loading metadatas done!");
 
+        // send sample sherlock data
+        executors.submit(() -> {
+            try {
+                SampleClient3.main(args);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         executors.submit(() -> {
             try {
@@ -68,21 +91,6 @@ public class Integration5AbsenceAlert {
             }
         });
 
-        // wait 20 seconds for topology to bring up
-        try{
-            Thread.sleep(20000);
-        }catch(Exception ex){}
-
-        // send mock data
-        executors.submit(() -> {
-            try {
-                SampleClient5AbsenceAlert.main(args);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-
         Utils.sleep(1000 * 5l);
         while (true) {
             Integration1.proactive_schedule(config);
@@ -90,4 +98,10 @@ public class Integration5AbsenceAlert {
             Utils.sleep(1000 * 60l * 5);
         }
     }
+
+    @Test
+    public void testJson() throws Exception {
+        Integration1.checkAll("/e2e/");
+    }
+
 }
