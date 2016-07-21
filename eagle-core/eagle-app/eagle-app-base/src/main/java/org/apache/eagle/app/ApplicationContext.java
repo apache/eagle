@@ -98,7 +98,7 @@ public class ApplicationContext implements Serializable {
         if(streamSinkMap.containsKey(streamId)) {
             return streamSinkMap.get(streamId);
         } else {
-            throw new IllegalStateException("Stream ID: "+streamId+" is not declared in "+this.appEntity.getDescriptor().getProviderClass().getCanonicalName());
+            throw new IllegalStateException("Stream (ID: "+streamId+") was not declared in "+this.appEntity.getDescriptor().getProviderClass().getCanonicalName()+" before being called");
         }
     }
 

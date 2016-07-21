@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.example;
+package org.apache.eagle.app;
 
 import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
@@ -32,7 +32,7 @@ import org.junit.runner.RunWith;
 import java.util.Collection;
 
 @RunWith(AppUnitTestRunner.class)
-public class ExampleApplicationTest {
+public class TestApplicationTestSuite {
     @Inject private SiteResource siteResource;
     @Inject private ApplicationResource applicationResource;
     @Inject private AppSimulator simulator;
@@ -41,18 +41,9 @@ public class ExampleApplicationTest {
     public void testApplicationProviderLoading(){
         Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs();
         Assert.assertNotNull(applicationDescs);
-        Assert.assertEquals(2,applicationDescs.size());
+        Assert.assertEquals(1,applicationDescs.size());
     }
 
-    /**
-     * register site
-     * install app
-     * start app
-     * stop app
-     * uninstall app
-     *
-     * @throws InterruptedException
-     */
     @Test
     public void testApplicationLifecycle() throws InterruptedException {
         // Create local site
@@ -64,7 +55,7 @@ public class ExampleApplicationTest {
         Assert.assertNotNull(siteEntity.getUuid());
 
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new AppOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL));
+        ApplicationEntity applicationEntity = applicationResource.installApplication(new AppOperations.InstallOperation("test_site","TEST_APPLICATION", ApplicationEntity.Mode.LOCAL));
         // Start application
         applicationResource.startApplication(new AppOperations.StartOperation(applicationEntity.getUuid()));
         // Stop application
@@ -81,11 +72,11 @@ public class ExampleApplicationTest {
 
     @Test
     public void testApplicationQuickRunWithAppType(){
-        simulator.submit("EXAMPLE_APPLICATION");
+        simulator.submit("TEST_APPLICATION");
     }
 
     @Test
     public void testApplicationQuickRunWithAppProvider(){
-        simulator.submit(ExampleApplicationProvider.class);
+        simulator.submit(TestApplicationImpl.Provider.class);
     }
 }

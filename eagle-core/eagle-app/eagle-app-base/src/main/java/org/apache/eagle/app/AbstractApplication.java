@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -29,9 +29,31 @@ import org.slf4j.LoggerFactory;
 import scala.Int;
 import storm.trident.spout.RichSpoutBatchExecutor;
 
-public abstract class AbstractApplication implements Application {
+import java.io.Serializable;
+
+public abstract class AbstractApplication implements Application,Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractApplication.class);
-    private final static LocalCluster localCluster = new LocalCluster();
+    private static LocalCluster _localCluster;
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                if(_localCluster != null) {
+                    LOG.info("Shutting down local storm cluster instance");
+                    _localCluster.shutdown();
+                }
+            }
+        });
+    }
+
+    private static LocalCluster getLocalCluster(){
+        if(_localCluster == null){
+            _localCluster = new LocalCluster();
+        }
+
+        return _localCluster;
+    }
 
     @Override
     public void start(ApplicationContext context){
@@ -58,7 +80,7 @@ public abstract class AbstractApplication implements Application {
             }
         }else{
             LOG.info("Submitting as local mode");
-            localCluster.submitTopology(topologyName, conf, topology);
+            getLocalCluster().submitTopology(topologyName, conf, topology);
         }
     }
 
@@ -109,7 +131,7 @@ public abstract class AbstractApplication implements Application {
                 LOG.error("Failed to kill topology named {}, due to: {}",appId,e.getMessage(),e.getCause());
             }
         } else {
-            localCluster.killTopology(appId);
+            getLocalCluster().killTopology(appId);
         }
     }
 

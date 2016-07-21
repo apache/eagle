@@ -24,11 +24,13 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+@Ignore
 public class TestApplicationImpl extends AbstractApplication {
     private final static Logger LOG = LoggerFactory.getLogger(TestApplicationImpl.class);
     public class RandomEventSpout extends BaseRichSpout {

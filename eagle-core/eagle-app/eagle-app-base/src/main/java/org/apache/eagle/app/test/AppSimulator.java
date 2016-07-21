@@ -18,7 +18,34 @@ package org.apache.eagle.app.test;
 
 import org.apache.eagle.app.spi.ApplicationProvider;
 
-public interface AppTester {
-    void run(String appType);
-    void run(Class<? extends ApplicationProvider> appProviderClass);
+import java.util.Map;
+
+/**
+ * Application test simulator for developer to quickly run application without diving into application lifecycle
+ */
+public interface AppSimulator {
+    /**
+     *
+     * @param appType
+     */
+    void submit(String appType);
+    /**
+     *
+     * @param appType
+     * @param appConfig
+     */
+    void submit(String appType, Map<String,Object> appConfig);
+
+    /**
+     *
+     * @param appProviderClass
+     */
+    void submit(Class<? extends ApplicationProvider> appProviderClass);
+
+    /**
+     *
+     * @param appProviderClass
+     * @param appConfig
+     */
+    void submit(Class<? extends ApplicationProvider> appProviderClass, Map<String,Object> appConfig) throws Exception;
 }

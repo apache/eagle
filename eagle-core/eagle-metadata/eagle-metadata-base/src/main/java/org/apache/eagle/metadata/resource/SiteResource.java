@@ -20,11 +20,13 @@ import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.service.SiteEntityService;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 
 @Path("/sites")
+@Singleton
 public class SiteResource {
     private final SiteEntityService siteEntityService;
 

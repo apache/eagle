@@ -82,6 +82,14 @@ public class AppOperations {
     public static class UninstallOperation implements Operation{
         private String uuid;
         private String appId;
+        public UninstallOperation(String uuid){
+            this.setUuid(uuid);
+        }
+        public UninstallOperation(String uuid,String appId){
+            this.setUuid(uuid);
+            this.setAppId(appId);
+        }
+
         public String getUuid() {
             return uuid;
         }
@@ -127,6 +135,14 @@ public class AppOperations {
     public static class StopOperation implements Operation{
         private String uuid;
         private String appId;
+
+        public StopOperation(String uuid){
+            this.setUuid(uuid);
+        }
+        public StopOperation(String uuid,String appId){
+            this.setUuid(uuid);
+            this.setAppId(appId);
+        }
         public String getUuid() {
             return uuid;
         }

@@ -24,9 +24,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Define application provider programmatically
+ */
 public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleApplication> {
     @Override
-    protected void declare() {
+    protected void declareMetadata() {
         setType("EXAMPLE_APPLICATION");
         setName("Example Monitoring Application");
         setVersion("0.5.0-incubating");
@@ -41,7 +44,7 @@ public class ExampleApplicationProvider extends AbstractApplicationProvider<Exam
         sampleStreamDefinition.setStreamId(streamId);
         sampleStreamDefinition.setTimeseries(true);
         sampleStreamDefinition.setValidate(true);
-        sampleStreamDefinition.setDescription("Schema for "+streamId);
+        sampleStreamDefinition.setDescription("Auto generated sample Schema for "+streamId);
         List<StreamColumn> streamColumns = new ArrayList<>();
 
         streamColumns.add(new StreamColumn.Builder().name("name").type(StreamColumn.Type.STRING).build());

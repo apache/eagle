@@ -31,7 +31,12 @@ import java.util.Map;
 public class ApplicationEntity extends PersistenceEntity {
     private String appId;
     private SiteEntity site;
+
+    /**
+     * TODO: Think about keeping ApplicationDesc as a reference or deep clone into current instance
+     */
     private ApplicationDesc descriptor;
+
     private Map<String,Object> configuration = new HashMap<>();
     private Map<String,String> context = new HashMap<>();
     private Collection<StreamDesc> streams;

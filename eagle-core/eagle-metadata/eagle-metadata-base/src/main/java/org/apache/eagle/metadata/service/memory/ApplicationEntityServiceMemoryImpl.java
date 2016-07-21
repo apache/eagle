@@ -46,8 +46,8 @@ public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityServ
     public ApplicationEntity getByUUID(String uuid) {
         if(applicationEntityMap.containsKey(uuid)) {
             return applicationEntityMap.get(uuid);
-        }else{
-            throw new IllegalArgumentException("Application with UUID: "+uuid);
+        } else {
+            throw new IllegalArgumentException("Application (UUID: "+uuid+") is not found");
         }
     }
 

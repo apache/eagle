@@ -35,7 +35,24 @@
     <streams>
         <stream>
             <streamId>TEST_STREAM_1</streamId>
-            <description>Example output stream</description>
+            <description>Example output stream #1</description>
+            <validate>true</validate>
+            <timeseries>true</timeseries>
+            <columns>
+                <column>
+                    <name>metric</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>value</name>
+                    <type>double</type>
+                    <defaultValue>0.0</defaultValue>
+                </column>
+            </columns>
+        </stream>
+        <stream>
+            <streamId>TEST_STREAM_2</streamId>
+            <description>Example output stream #2</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>

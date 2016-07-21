@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AppTestRunner extends BlockJUnit4ClassRunner {
+public class AppUnitTestRunner extends BlockJUnit4ClassRunner {
     private final Injector injector;
-    public AppTestRunner(Class<?> klass) throws InitializationError {
+    public AppUnitTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
         injector = createInjectorFor(getModulesFor(klass));
     }
@@ -52,7 +52,7 @@ public class AppTestRunner extends BlockJUnit4ClassRunner {
         final List<Module> modules = new ArrayList<>();
 
         // Add default modules
-        modules.add(new AppTestModule());
+        modules.add(new AppTestGuiceModule());
 
         if(classes!= null) {
             for (final Class<?> module : Arrays.asList(classes)) {

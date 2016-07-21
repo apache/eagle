@@ -17,15 +17,17 @@
 package org.apache.eagle.app.test;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 import org.apache.eagle.app.ApplicationGuiceModule;
 import org.apache.eagle.common.module.CommonGuiceModule;
 import org.apache.eagle.metadata.persistence.MemoryMetadataStore;
 
-public class AppTestModule extends AbstractModule{
+public class AppTestGuiceModule extends AbstractModule{
     @Override
     protected void configure() {
         install(new CommonGuiceModule());
         install(new ApplicationGuiceModule());
         install(new MemoryMetadataStore());
+        bind(AppSimulator.class).to(AppSimulatorImpl.class).in(Singleton.class);
     }
 }

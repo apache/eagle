@@ -18,6 +18,9 @@ package org.apache.eagle.app.example;
 
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
+/**
+ * Define application provider with metadata.xml
+ */
 public class ExampleApplicationProvider2 extends AbstractApplicationProvider<ExampleApplication> {
     public ExampleApplicationProvider2() {
         super("ExampleApplicationMetadata.xml");

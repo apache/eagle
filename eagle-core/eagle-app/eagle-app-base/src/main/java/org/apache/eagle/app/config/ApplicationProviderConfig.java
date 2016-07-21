@@ -17,10 +17,21 @@
 
 package org.apache.eagle.app.config;
 
+import org.apache.eagle.app.spi.ApplicationProvider;
+
 public class ApplicationProviderConfig {
     private String jarPath;
     private String className;
 
+    public ApplicationProviderConfig(){}
+    public ApplicationProviderConfig(String jarPath, Class<? extends ApplicationProvider> className){
+        this.jarPath = jarPath;
+        this.className = className.getCanonicalName();
+    }
+    public ApplicationProviderConfig(String jarPath, String className){
+        this.jarPath = jarPath;
+        this.className = className;
+    }
     @Override
     public String toString() {
         return String.format("ApplicationProviderConfig[jarPath=%s,className=%s]",this.getJarPath(),this.getClassName());
