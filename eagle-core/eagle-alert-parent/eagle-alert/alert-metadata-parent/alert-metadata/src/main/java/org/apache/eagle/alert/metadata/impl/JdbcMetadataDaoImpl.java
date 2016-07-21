@@ -19,6 +19,7 @@ package org.apache.eagle.alert.metadata.impl;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
@@ -40,6 +41,7 @@ import org.apache.eagle.alert.metadata.resource.Models;
 public class JdbcMetadataDaoImpl implements IMetadataDao {
     private JdbcDatabaseHandler handler;
 
+    @Inject
     public JdbcMetadataDaoImpl(Config config) {
         handler = new JdbcDatabaseHandler(config);
     }
