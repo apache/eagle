@@ -16,9 +16,9 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.parser;
+package org.apache.eagle.jpm.util;
 
-public enum EagleJobTagName {
+public enum MRJobTagName {
     SITE("site"),
     RACK("rack"),
     HOSTNAME("hostname"),
@@ -37,7 +37,7 @@ public enum EagleJobTagName {
     JOB_TYPE("jobType");
 
     private String tagName; 
-    private EagleJobTagName(String tagName) {
+    private MRJobTagName(String tagName) {
         this.tagName = tagName;
     }
     

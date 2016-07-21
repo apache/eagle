@@ -42,6 +42,10 @@ public class Constants {
     public static final String SPARK_EXECUTORS_URL = "executors";
     public static final String SPARK_JOBS_URL = "jobs";
     public static final String SPARK_STAGES_URL = "stages";
+    public static final String MR_JOBS_URL = "ws/v1/mapreduce/jobs";
+    public static final String MR_JOB_COUNTERS_URL = "counters";
+    public static final String MR_TASKS_URL = "tasks";
+    public static final String MR_CONF_URL = "conf";
 
     public enum CompressionType {
         GZIP, NONE
@@ -63,11 +67,12 @@ public class Constants {
     public static final String JPA_JOB_CONFIG_SERVICE_NAME = "JobConfigService";
     public static final String JPA_JOB_EVENT_SERVICE_NAME = "JobEventService";
     public static final String JPA_JOB_EXECUTION_SERVICE_NAME = "JobExecutionService";
-
+    public static final String JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME = "RunningJobExecutionService";
     public static final String JPA_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "TaskAttemptExecutionService";
     public static final String JPA_TASK_FAILURE_COUNT_SERVICE_NAME = "TaskFailureCountService";
     public static final String JPA_TASK_ATTEMPT_COUNTER_SERVICE_NAME = "TaskAttemptCounterService";
     public static final String JPA_TASK_EXECUTION_SERVICE_NAME = "TaskExecutionService";
+    public static final String JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME = "RunningTaskExecutionService";
     public static final String JPA_JOB_PROCESS_TIME_STAMP_NAME = "JobProcessTimeStampService";
 
     public static final String JOB_TASK_TYPE_TAG = "taskType";
