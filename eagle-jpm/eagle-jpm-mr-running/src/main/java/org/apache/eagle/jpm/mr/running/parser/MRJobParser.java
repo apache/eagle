@@ -54,7 +54,6 @@ public class MRJobParser implements Runnable {
 
     private AppInfo app;
     private static final int MAX_RETRY_TIMES = 3;
-    private IEagleServiceClient client;
     private MRJobEntityCreationHandler mrJobEntityCreationHandler;
     //<jobId, JobExecutionAPIEntity>
     private Map<String, JobExecutionAPIEntity> mrJobEntityMap;
@@ -64,7 +63,6 @@ public class MRJobParser implements Runnable {
     private static final int CONNECTION_TIMEOUT = 10000;
     private static final int READ_TIMEOUT = 10000;
     private MRRunningConfigManager.EndpointConfig endpointConfig;
-    private MRRunningConfigManager.JobExtractorConfig jobExtractorConfig;
     private final Object lock = new Object();
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
     private Map<String, String> commonTags = new HashMap<>();
@@ -74,9 +72,9 @@ public class MRJobParser implements Runnable {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public MRJobParser(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
-                       MRRunningConfigManager.EndpointConfig endpointConfig,
+    public MRJobParser(MRRunningConfigManager.EndpointConfig endpointConfig,
                        MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
+                       MRJobEntityCreationHandler handler,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
                        RunningJobManager runningJobManager) {
         this.app = app;
@@ -86,14 +84,9 @@ public class MRJobParser implements Runnable {
             this.mrJobEntityMap = new HashMap<>();
         }
         this.mrJobConfigs = new HashMap<>();
-        this.client = new EagleServiceClientImpl(
-                eagleServiceConfig.eagleServiceHost,
-                eagleServiceConfig.eagleServicePort,
-                eagleServiceConfig.username,
-                eagleServiceConfig.password);
+
         this.endpointConfig = endpointConfig;
-        this.jobExtractorConfig = jobExtractorConfig;
-        this.mrJobEntityCreationHandler = new MRJobEntityCreationHandler(app.getId(), client);
+        this.mrJobEntityCreationHandler = handler;
 
         this.commonTags.put(MRJobTagName.SITE.toString(), jobExtractorConfig.site);
         this.commonTags.put(MRJobTagName.USER.toString(), app.getUser());

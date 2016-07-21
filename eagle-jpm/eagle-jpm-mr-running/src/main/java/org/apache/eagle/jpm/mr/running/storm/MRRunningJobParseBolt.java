@@ -26,9 +26,12 @@ import backtype.storm.tuple.Tuple;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
 import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.running.parser.MRJobEntityCreationHandler;
 import org.apache.eagle.jpm.mr.running.parser.MRJobParser;
 import org.apache.eagle.jpm.mr.running.recover.RunningJobManager;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
+import org.apache.eagle.service.client.IEagleServiceClient;
+import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
@@ -39,14 +42,14 @@ import java.util.concurrent.Executors;
 public class MRRunningJobParseBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(MRRunningJobParseBolt.class);
 
-    private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
     private MRRunningConfigManager.EndpointConfig endpointConfig;
     private MRRunningConfigManager.JobExtractorConfig jobExtractorConfig;
     private MRRunningConfigManager.ZKStateConfig zkStateConfig;
     private ExecutorService executorService;
     private Map<String, MRJobParser> runningMRParsers;
     private transient RunningJobManager runningJobManager;
-
+    private MRJobEntityCreationHandler mrJobEntityCreationHandler;
+    private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
     public MRRunningJobParseBolt(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                                  MRRunningConfigManager.EndpointConfig endpointConfig,
                                  MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
@@ -63,6 +66,13 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.executorService = Executors.newFixedThreadPool(jobExtractorConfig.parseJobThreadPoolSize);
         this.runningJobManager = new RunningJobManager(zkStateConfig);
+        this.mrJobEntityCreationHandler = new MRJobEntityCreationHandler(
+                new EagleServiceClientImpl(
+                    eagleServiceConfig.eagleServiceHost,
+                    eagleServiceConfig.eagleServicePort,
+                    eagleServiceConfig.username,
+                    eagleServiceConfig.password)
+        );
     }
 
     @Override
@@ -73,7 +83,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
         LOG.info("get mr yarn application " + appInfo.getId());
         MRJobParser applicationParser;
         if (!runningMRParsers.containsKey(appInfo.getId())) {
-            applicationParser = new MRJobParser(eagleServiceConfig, endpointConfig, jobExtractorConfig, appInfo, mrJobs, runningJobManager);
+            applicationParser = new MRJobParser(endpointConfig, jobExtractorConfig, mrJobEntityCreationHandler, appInfo, mrJobs, runningJobManager);
             runningMRParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
         } else {

@@ -84,7 +84,7 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
                     }
                 }
                 LOG.info("recover {} mr yarn apps from zookeeper", apps.size());
-                this.init = false;
+                this.init = true;
             } else {
                 apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
                 LOG.info("get {} apps from resource manager", apps.size());

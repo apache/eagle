@@ -74,11 +74,7 @@ public class MRRunningConfigManager implements Serializable {
     }
 
     public static class EndpointConfig implements Serializable {
-        public String nnEndpoint;
-        public String eventLog;
         public String[] rmUrls;
-        public String principal;
-        public String keyTab;
     }
 
     public Config getConfig() {
@@ -121,7 +117,7 @@ public class MRRunningConfigManager implements Serializable {
         // parse eagle service endpoint
         this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
         String port = config.getString("eagleProps.eagleService.port");
-        this.eagleServiceConfig.eagleServicePort = (port == null ? 8080 : Integer.parseInt(port));
+        this.eagleServiceConfig.eagleServicePort = Integer.parseInt(port);
         this.eagleServiceConfig.username = config.getString("eagleProps.eagleService.username");
         this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
 
@@ -132,9 +128,6 @@ public class MRRunningConfigManager implements Serializable {
         this.jobExtractorConfig.parseJobThreadPoolSize = config.getInt("jobExtractorConfig.parseJobThreadPoolSize");
 
         //parse data source config
-        this.endpointConfig.nnEndpoint = config.getString("dataSourceConfig.nnEndpoint");
-        this.endpointConfig.keyTab = config.getString("dataSourceConfig.keytab");
-        this.endpointConfig.principal = config.getString("dataSourceConfig.principal");
         this.endpointConfig.rmUrls = config.getStringList("dataSourceConfig.rmUrls").toArray(new String[0]);
 
         LOG.info("Successfully initialized MRRunningConfigManager");

@@ -33,6 +33,7 @@ public class MRJobEntityCreationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobEntityCreationHandler.class);
 
     class EntityFlushThread extends Thread {
+        private final Logger LOG = LoggerFactory.getLogger(EntityFlushThread.class);
         private Object entityLock = new Object();
         private Deque<List<TaggedLogAPIEntity>> listDeque = new LinkedList<>();
         public void enqueue(List<TaggedLogAPIEntity> entities) {
@@ -48,35 +49,32 @@ public class MRJobEntityCreationHandler {
                 synchronized (entityLock) {
                     if (!listDeque.isEmpty()) {
                         entities = listDeque.pollFirst();
-                    } else {
-                        Utils.sleep(1);
                     }
                 }
 
                 if (entities != null) {
                     try {
-                        LOG.info("start to flush mr job entities for app {}, size {}", appId, entities.size());
+                        LOG.info("start to flush mr job entities, size {}", entities.size());
                         client.create(entities);
-                        LOG.info("finish flushing mr job entities for app {}, size {}", appId, entities.size());
+                        LOG.info("finish flushing mr job entities, size {}", entities.size());
                         entities.clear();
                     } catch (Exception e) {
                         LOG.warn("exception found when flush entities, {}", e);
                         e.printStackTrace();
                     }
                 }
+                Utils.sleep(1);
             }
         }
     }
 
     private EntityFlushThread entityFlushThread;
     private List<TaggedLogAPIEntity> entities = new ArrayList<>();
-    private static final int MAX_ENTITIES_SIZE = 500;
+    private static final int MAX_ENTITIES_SIZE = 1000;
 
     private final Object lock = new Object();
-    private String appId;
     private IEagleServiceClient client;
-    public MRJobEntityCreationHandler(String appId, IEagleServiceClient client) {
-        this.appId = appId;
+    public MRJobEntityCreationHandler(IEagleServiceClient client) {
         this.client = client;
         this.entityFlushThread = new EntityFlushThread();
         this.entityFlushThread.start();
