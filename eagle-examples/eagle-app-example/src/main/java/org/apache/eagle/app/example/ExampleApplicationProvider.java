@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleApplication> {
     @Override
-    protected void declareMetadata() {
+    protected void configure() {
         setType("EXAMPLE_APPLICATION");
         setName("Example Monitoring Application");
         setVersion("0.5.0-incubating");

@@ -41,10 +41,10 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     public AbstractApplicationProvider(){
         applicationDesc = new ApplicationDesc();
         applicationDesc.setProviderClass(this.getClass());
-        declareMetadata();
+        configure();
     }
 
-    protected void declareMetadata(){
+    protected void configure (){
         // do nothing by default
     }
 
