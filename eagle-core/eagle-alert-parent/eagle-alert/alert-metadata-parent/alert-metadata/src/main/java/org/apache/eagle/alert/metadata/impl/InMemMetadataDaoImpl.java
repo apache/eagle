@@ -16,8 +16,7 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +34,8 @@ import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
-import org.apache.eagle.alert.metadata.resource.IMetadataDao;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
         Optional<T> scOp = clusters.stream().filter(new Predicate<T>() {
             @Override
             public boolean test(T t) {
-                if (getKey(t).equalsIgnoreCase(getKey(paramT))) {
+                if (MetadataUtils.getKey(t).equalsIgnoreCase(MetadataUtils.getKey(paramT))) {
                     return true;
                 }
                 return false;
@@ -102,32 +102,13 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
         return result;
     }
 
-    public static <T> String getKey(T t) {
-        if (t instanceof StreamDefinition) {
-            return ((StreamDefinition) t).getStreamId();
-        }
-        if (t instanceof PublishmentType) {
-            return ((PublishmentType) t).getType();
-        }
-
-        try {
-            Method m = t.getClass().getMethod("getName");
-            return (String) m.invoke(t);
-        } catch (NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException
-                | IllegalArgumentException e) {
-            LOG.error(" getName not found on given class :" + t.getClass().getName());
-        }
-        throw new RuntimeException(String.format("no getName() found on target class %s for matching", t.getClass()
-                .getName()));
-    }
-
     @SuppressWarnings("unchecked")
     private synchronized <T> OpResult remove(List<T> clusters, String id) {
         T[] matched = (T[]) clusters.stream().filter(new Predicate<T>() {
 
             @Override
             public boolean test(T t) {
-                if (getKey(t).equalsIgnoreCase(id)) {
+                if (MetadataUtils.getKey(t).equalsIgnoreCase(id)) {
                     return true;
                 }
                 return false;
@@ -230,7 +211,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public OpResult addScheduleState(ScheduleState state) {
+    public synchronized OpResult addScheduleState(ScheduleState state) {
         // FIXME : might concurrent issue
         String toRemove = null;
         if (scheduleStates.size() > maxScheduleState) {
@@ -248,7 +229,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
     }
 
     @Override
-    public ScheduleState getScheduleState() {
+    public synchronized ScheduleState getScheduleState() {
         if (scheduleStates.size() > 0) {
             return scheduleStates.get(scheduleStates.lastKey());
         }
@@ -286,6 +267,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult clear() {
+        LOG.info("clear models...");
         this.assignments.clear();
         this.clusters.clear();
         this.datasources.clear();
@@ -316,6 +298,7 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
 
     @Override
     public OpResult importModels(Models models) {
+        LOG.info("clear and import models...");
         clear();
         this.assignments.addAll(models.assignments);
         this.clusters.addAll(models.clusters);
@@ -331,4 +314,8 @@ public class InMemMetadataDaoImpl implements IMetadataDao {
         return result;
     }
 
+    @Override
+    public void close() throws IOException {
+
+    }
 }

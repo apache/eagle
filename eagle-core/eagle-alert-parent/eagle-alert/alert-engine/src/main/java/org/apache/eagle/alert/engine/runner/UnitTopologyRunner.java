@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
+import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
@@ -67,9 +68,15 @@ public class UnitTopologyRunner {
     public final static int DEFAULT_MESSAGE_TIMEOUT_SECS = 3600;
 
     private final IMetadataChangeNotifyService metadataChangeNotifyService;
+    private backtype.storm.Config givenStormConfig = null;
 
     public UnitTopologyRunner(IMetadataChangeNotifyService metadataChangeNotifyService){
         this.metadataChangeNotifyService = metadataChangeNotifyService;
+    }
+
+    public UnitTopologyRunner(ZKMetadataChangeNotifyService changeNotifyService, backtype.storm.Config stormConfig) {
+        this(changeNotifyService);
+        this.givenStormConfig = stormConfig;
     }
 
     public StormTopology buildTopology(String topologyId,
@@ -148,7 +155,7 @@ public class UnitTopologyRunner {
         return builder.createTopology();
     }
 
-    public void run(String topologyId,
+    private void run(String topologyId,
                     int numOfTotalWorkers,
                     int numOfSpoutTasks,
                     int numOfRouterBolts,
@@ -156,7 +163,8 @@ public class UnitTopologyRunner {
                     int numOfPublishTasks,
                     Config config,
                     boolean localMode) {
-        backtype.storm.Config stormConfig = new backtype.storm.Config();
+
+        backtype.storm.Config stormConfig = givenStormConfig == null ? new backtype.storm.Config() : givenStormConfig;
         // TODO: Configurable metric consumer instance number
 
         int messageTimeoutSecs = config.hasPath(MESSAGE_TIMEOUT_SECS)?config.getInt(MESSAGE_TIMEOUT_SECS) : DEFAULT_MESSAGE_TIMEOUT_SECS;
@@ -184,11 +192,6 @@ public class UnitTopologyRunner {
                 throw new IllegalStateException(ex);
             }
         }
-    }
-
-    public void run(Config config) {
-        String topologyId = config.getString("topology.name");
-        run(topologyId,config);
     }
 
     public void run(String topologyId,Config config) {

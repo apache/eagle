@@ -41,7 +41,8 @@ public class PlainStringScheme implements Scheme {
     private static final Logger LOG = LoggerFactory.getLogger(PlainStringScheme.class);
     private String topic;
 
-    public PlainStringScheme(String topic){
+    @SuppressWarnings("rawtypes")
+    public PlainStringScheme(String topic, Map conf){
         this.topic = topic;
     }
 

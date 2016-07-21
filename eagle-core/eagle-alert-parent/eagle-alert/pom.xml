@@ -10,7 +10,8 @@
 	WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. ~ See the 
 	License for the specific language governing permissions and ~ limitations 
 	under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -29,6 +30,7 @@
 		<module>alert-coordinator</module>
 		<module>alert-assembly</module>
 		<module>alert-devtools</module>
+		<module>alert-service</module>
 	</modules>
 
 	<dependencyManagement>
@@ -36,11 +38,6 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>
-				<version>${fasterxml-jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
 				<version>${fasterxml-jackson.version}</version>
 			</dependency>
 			<dependency>
@@ -62,6 +59,11 @@
 				<groupId>org.apache.curator</groupId>
 				<artifactId>curator-framework</artifactId>
 				<version>${curator.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-test</artifactId>
+				<version>${curator.test.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.curator</groupId>
@@ -138,11 +140,6 @@
 						<artifactId>slf4j-log4j</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.jersey</groupId>
-				<artifactId>jersey-client</artifactId>
-				<version>${jersey.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
@@ -227,9 +224,20 @@
 				<artifactId>zkclient</artifactId>
 				<version>${zkclient.version}</version>
 			</dependency>
+	
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.sun.jersey</groupId>
 				<artifactId>jersey-server</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-json</artifactId>
 				<version>${jersey.version}</version>
 			</dependency>
 			<dependency>
@@ -242,6 +250,7 @@
 				<artifactId>jersey-multipart</artifactId>
 				<version>${jersey.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.apache.tomcat.embed</groupId>
 				<artifactId>tomcat-embed-core</artifactId>
@@ -277,12 +286,91 @@
 				<artifactId>metrics-elasticsearch-reporter</artifactId>
 				<version>${metrics-elasticsearch-reporter.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>${common.cli.version}</version>
+			</dependency>
+
+			<!-- dropwizard -->
+		    <dependency>
+		        <groupId>io.dropwizard</groupId>
+		        <artifactId>dropwizard-core</artifactId>
+		        <version>${dropwizard.version}</version>
+		        <exclusions>
+			        <exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+		        </exclusions>
+		    </dependency>
+		    <dependency>
+		        <groupId>io.dropwizard</groupId>
+		        <artifactId>dropwizard-jersey</artifactId>
+		        <version>${dropwizard.version}</version>
+		        <exclusions>
+			        <exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+		        </exclusions>
+		    </dependency>
+		    <dependency>
+				<groupId>io.swagger</groupId>
+				<artifactId>swagger-jersey-jaxrs</artifactId>
+				<version>${swagger.version}</version>
+				<scope>compile</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>*</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.rat</groupId>
+				<artifactId>apache-rat-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>header-check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<useDefaultExcludes>true</useDefaultExcludes>
+							<excludes>
+								<exclude>**/*.out</exclude>
+								<exclude>**/*.log</exclude>
+								<exclude>**/*.json</exclude>
+								<exclude>**/*.classpath</exclude>
+								<exclude>**/*.project</exclude>
+								<exclude>**/*.prefs</exclude>
+								<exclude>**/*.iml</exclude>
+								<exclude>**/MANIFEST.MF</exclude>
+								<exclude>**/dependency-reduced-pom.xml</exclude>
+                                                                <exclude>**/target/**</exclude>`
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.rat</groupId>
+					<artifactId>apache-rat-plugin</artifactId>
+					<version>${maven-apache-rat.version}</version>
+					<configuration>
+						<useDefaultExcludes>true</useDefaultExcludes>
+					</configuration>
+				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler.version}</version>

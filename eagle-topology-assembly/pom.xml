@@ -28,6 +28,11 @@
     <url>http://maven.apache.org</url>
     <packaging>jar</packaging>
     <dependencies>
+        <!--<dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-hadoop-queue</artifactId>
+            <version>${project.version}</version>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-security-hdfs-auditlog</artifactId>

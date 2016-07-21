@@ -95,7 +95,7 @@ public class KafkaSourcedSpoutProvider implements StormSpoutProvider {
 		}		
 		// "forceFromStart" is for test usage, prod should not use this 
 		if (context.hasPath("forceFromStart")) {
-			spoutConfig.forceFromStart = context.getBoolean("forceFromStart");
+			spoutConfig.startOffsetTime = kafka.api.OffsetRequest.EarliestTime();
 		}
 		
 		spoutConfig.scheme = getStreamScheme(deserClsName, context);

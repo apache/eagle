@@ -26,6 +26,9 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import backtype.storm.utils.Utils;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 /**
  * @since May 10, 2016
  *
@@ -51,7 +54,6 @@ public class SampleClient2 {
         public String message;
         public String host;
     }
-    
 
     /**
      * @param args
@@ -60,8 +62,10 @@ public class SampleClient2 {
         AtomicLong base1 = new AtomicLong(System.currentTimeMillis());
         AtomicLong base2 = new AtomicLong(System.currentTimeMillis());
         AtomicLong count = new AtomicLong();
+        
+        Config config = ConfigFactory.load();
 
-        try (KafkaProducer<String, String> proceduer = SampleClient1.createProceduer()) {
+        try (KafkaProducer<String, String> proceduer = SampleClient1.createProceduer(config)) {
             while (true) {
                 nextUuid = String.format(instanceUuidTemp, UUID.randomUUID().toString());
                 nextReqId = String.format(reqIdTemp, UUID.randomUUID().toString());

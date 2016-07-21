@@ -25,6 +25,8 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 /**
  * Convert incoming tuple to stream
  * incoming tuple consists of 2 fields, topic and map of key/value
@@ -64,10 +66,23 @@ public class Tuple2StreamConverter {
 
         Object timeObject = m.get(metadata.getTimestampColumn());
         long timestamp = 0L;
-        if(timeObject instanceof Number){
+        if (timeObject == null) {
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("continue with current timestamp since no timestamp column specified! Metadata : ", metadata);
+            }
+            timestamp = System.currentTimeMillis();
+        } else if (timeObject instanceof Number) {
             timestamp = ((Number) timeObject).longValue();
-        }else{
+        } else {
             String timestampFieldValue = (String) m.get(metadata.getTimestampColumn());
+            String dateFormat = metadata.getTimestampFormat();
+            if (Strings.isNullOrEmpty(dateFormat)) {
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("continue with current timestamp becuase no data format sepcified! Metadata : ", metadata);
+                }
+                timestamp = System.currentTimeMillis();
+            } else 
+            
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat(metadata.getTimestampFormat());
                 timestamp = sdf.parse(timestampFieldValue).getTime();

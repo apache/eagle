@@ -17,11 +17,18 @@
 package org.apache.eagle.alert.engine.e2e;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
+import kafka.admin.AdminUtils;
+import kafka.utils.ZKStringSerializer$;
+
+import org.I0Itec.zkclient.ZkClient;
+import org.I0Itec.zkclient.ZkConnection;
+import org.apache.eagle.alert.config.ZKConfig;
+import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.UnitTopologyMain;
@@ -30,7 +37,10 @@ import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
+import org.apache.eagle.alert.utils.KafkaEmbedded;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -53,6 +63,7 @@ import com.typesafe.config.ConfigFactory;
  *
  */
 public class Integration1 {
+    private static final String SIMPLE_CONFIG = "/simple/application-integration.conf";
     private static final Logger LOG = LoggerFactory.getLogger(Integration1.class);
     private static final ObjectMapper om = new ObjectMapper();
 
@@ -61,16 +72,36 @@ public class Integration1 {
         inte.args = args;
         inte.test_simple_threshhold();
     }
-    
+
     private String[] args;
-    private ExecutorService executors = Executors.newFixedThreadPool(5);
+    private ExecutorService executors = Executors.newFixedThreadPool(5, new ThreadFactory() {
+        
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread();
+            t.setDaemon(true);
+            return t;
+        }
+    });
+    private static KafkaEmbedded kafka;
+
+    @BeforeClass
+    public static void setup() {
+//        kafka = new KafkaEmbedded(9092, 2181);
+//        makeSureTopic("perfmon_metrics");
+    }
+
+    @AfterClass
+    public static void end() {
+        if (kafka != null) {
+            kafka.shutdown();
+        }
+    }
 
     /**
      * Assumption:
      * <p>
-     * start metadata service 8080, better in docker
-     * <p>
-     * start coordinator service 9090, better in docker
+     * start metadata service 8080 /rest
      * <p>
      * datasources : perfmon_datasource
      * <p>
@@ -84,20 +115,29 @@ public class Integration1 {
      * 
      * @throws InterruptedException
      */
-    @Ignore
     @Test
     public void test_simple_threshhold() throws Exception {
-        System.setProperty("config.resource", "/application-integration.conf");
+        System.setProperty("config.resource", SIMPLE_CONFIG);
         ConfigFactory.invalidateCaches();
         Config config = ConfigFactory.load();
 
         System.out.println("loading metadatas...");
-        loadMetadatas("/", config);
+        loadMetadatas("/simple/", config);
         System.out.println("loading metadatas done!");
+
+        if (args == null) {
+            args = new String[] { "-f", "simple/application-integration.conf" };
+        }
 
         executors.submit(() -> SampleClient1.main(args));
 
-        executors.submit(() -> UnitTopologyMain.main(args));
+        executors.submit(() -> { 
+            try {
+                UnitTopologyMain.main(args);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         Utils.sleep(1000 * 5l);
         while (true) {
@@ -107,40 +147,20 @@ public class Integration1 {
         }
     }
 
-    /**
-     * Test only run expected when there is a missed config in the config file. mark as ignored
-     * @throws InterruptedException
-     * @throws ExecutionException
-     */
-    @Ignore
-    @Test(expected = ExecutionException.class)
-    public void test_typesafe_config() throws InterruptedException, ExecutionException {
-        System.setProperty("config.resource", "/application-integration.conf");
+    public static void makeSureTopic(String topic) {
+        System.setProperty("config.resource", SIMPLE_CONFIG);
         ConfigFactory.invalidateCaches();
-        Future<?> f = executors.submit(() -> {
-            UnitTopologyMain.main(null);
-        });
+        Config config = ConfigFactory.load();
+        ZKConfig zkconfig = ZKConfigBuilder.getZKConfig(config);
 
-        f.get();
+        ZkClient zkClient = new ZkClient(zkconfig.zkQuorum, 10000, 10000, ZKStringSerializer$.MODULE$);
+        Properties topicConfiguration = new Properties();
+        ZkConnection zkConnection = new ZkConnection(zkconfig.zkQuorum);
+//        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
+        AdminUtils.createTopic(zkClient, topic, 1, 1, topicConfiguration);// RackAwareMode.Disabled$.MODULE$);
     }
 
-//    @Test
-//    private void makeSureTopic() {
-//        System.setProperty("config.resource", "/application-integration.conf");
-//        ConfigFactory.invalidateCaches();
-//        Config config = ConfigFactory.load();
-//        ZKConfig zkconfig = ZKConfigBuilder.getZKConfig(config);
-//        
-//        CuratorFramework curator = CuratorFrameworkFactory.newClient(
-//                zkconfig.zkQuorum,
-//                zkconfig.zkSessionTimeoutMs,
-//                zkconfig.connectionTimeoutMs,
-//                new RetryNTimes(zkconfig.zkRetryTimes, zkconfig.zkRetryInterval)
-//        );
-//    }
-
     public static void proactive_schedule(Config config) throws Exception {
-
         try (CoordinatorClient cc = new CoordinatorClient(config)) {
             try {
                 String resp = cc.schedule();
@@ -205,7 +225,7 @@ public class Integration1 {
     public void testJson() throws Exception {
         {
             JavaType type = CollectionType.construct(List.class, SimpleType.construct(Topology.class));
-            List<Topology> l = om.readValue(Integration1.class.getResourceAsStream("/topologies.json"),
+            List<Topology> l = om.readValue(Integration1.class.getResourceAsStream("/simple/topologies.json"),
                     type);
             Topology t = (Topology) l.get(0);
 
@@ -216,16 +236,16 @@ public class Integration1 {
         {
             JavaType type = CollectionType.construct(List.class, SimpleType.construct(Publishment.class));
             // publishment
-            List<Publishment> l = om.readValue(Integration1.class.getResourceAsStream("/publishments.json"), type);
+            List<Publishment> l = om.readValue(Integration1.class.getResourceAsStream("/simple/publishments.json"), type);
             Publishment p = l.get(0);
             Assert.assertEquals("KAFKA", p.getType());
         }
         
-        checkAll("/");
+        checkAll("/simple/");
         checkAll("/correlation/");
     }
 
-    private void checkAll(String base) throws Exception {
+    public static void checkAll(String base) throws Exception {
         loadEntities(base + "datasources.json", Kafka2TupleMetadata.class);
         loadEntities(base + "policies.json", PolicyDefinition.class);
         loadEntities(base + "publishments.json", Publishment.class);

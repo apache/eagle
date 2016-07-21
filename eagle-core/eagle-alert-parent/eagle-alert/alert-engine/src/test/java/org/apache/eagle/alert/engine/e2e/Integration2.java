@@ -67,7 +67,12 @@ public class Integration2 {
         Config config = ConfigFactory.load();
         Integration1.loadMetadatas("/correlation/", config);
 
-        executors.submit(() -> UnitTopologyMain.main(args));
+        executors.submit(() -> {
+            try {
+                UnitTopologyMain.main(args);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }});
 
         executors.submit(() -> SampleClient2.main(args));
 

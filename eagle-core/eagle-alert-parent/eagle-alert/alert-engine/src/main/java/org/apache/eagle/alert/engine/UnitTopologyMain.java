@@ -19,6 +19,10 @@
 
 package org.apache.eagle.alert.engine;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
 import org.apache.eagle.alert.config.ZKConfig;
 import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
@@ -40,19 +44,43 @@ import com.typesafe.config.ConfigFactory;
  */
 public class UnitTopologyMain {
 
-    public static void main(String[] args) {
-        Config config = ConfigFactory.load();
-        ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
-        String topologyId = config.getString("topology.name");
-        ZKMetadataChangeNotifyService changeNotifyService = new ZKMetadataChangeNotifyService(zkConfig, topologyId);
+    public static void main(String[] args) throws Exception {
+        // command line parse
+        Options options = new Options();
+        options.addOption("c", true,
+                "config URL (valid file name) - defaults application.conf according to typesafe config default behavior.");
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
 
+        if (cmd.hasOption("c")) {
+            String fileName = cmd.getOptionValue("c", "application.conf");
+            System.setProperty("config.resource", fileName.startsWith("/") ? fileName : "/" + fileName);
+            ConfigFactory.invalidateCaches();
+        }
+        Config config = ConfigFactory.load();
+
+        // load config and start
+        String topologyId = config.getString("topology.name");
+        ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
         new UnitTopologyRunner(changeNotifyService).run(topologyId, config);
     }
-
-    public static StormTopology createTopology(Config config) {
-        ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
+    
+    public static void runTopology(Config config, backtype.storm.Config stormConfig) {
+        // load config and start
         String topologyId = config.getString("topology.name");
+        ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
+        new UnitTopologyRunner(changeNotifyService, stormConfig).run(topologyId, config);
+    }
+
+    private static ZKMetadataChangeNotifyService createZKNotifyService(Config config, String topologyId) {
+        ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
         ZKMetadataChangeNotifyService changeNotifyService = new ZKMetadataChangeNotifyService(zkConfig, topologyId);
+        return changeNotifyService;
+    }
+    
+    public static StormTopology createTopology(Config config) {
+        String topologyId = config.getString("topology.name");
+        ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
 
         return new UnitTopologyRunner(changeNotifyService).buildTopology(topologyId, config);
     }

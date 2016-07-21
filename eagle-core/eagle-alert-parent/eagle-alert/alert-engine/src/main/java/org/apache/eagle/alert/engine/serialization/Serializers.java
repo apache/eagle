@@ -16,11 +16,18 @@
  */
 package org.apache.eagle.alert.engine.serialization;
 
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
-import org.apache.eagle.alert.engine.serialization.impl.*;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.eagle.alert.engine.coordinator.StreamColumn;
+import org.apache.eagle.alert.engine.serialization.impl.BooleanSerializer;
+import org.apache.eagle.alert.engine.serialization.impl.DoubleSerializer;
+import org.apache.eagle.alert.engine.serialization.impl.FloatSerializer;
+import org.apache.eagle.alert.engine.serialization.impl.IntegerSerializer;
+import org.apache.eagle.alert.engine.serialization.impl.JavaObjectSerializer;
+import org.apache.eagle.alert.engine.serialization.impl.LongSerializer;
+import org.apache.eagle.alert.engine.serialization.impl.PartitionedEventSerializerImpl;
+import org.apache.eagle.alert.engine.serialization.impl.StringSerializer;
 
 public class Serializers {
     private final static Map<StreamColumn.Type,Serializer<?>> COLUMN_TYPE_SER_MAPPING = new HashMap<>();
@@ -32,6 +39,7 @@ public class Serializers {
         COLUMN_TYPE_SER_MAPPING.put(type,serializer);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> Serializer<T> getColumnSerializer(StreamColumn.Type type){
         if(COLUMN_TYPE_SER_MAPPING.containsKey(type)){
             return (Serializer<T>) COLUMN_TYPE_SER_MAPPING.get(type);

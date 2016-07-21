@@ -1,0 +1,24 @@
+[
+	{
+		"name": "noDataAlertPolicy",
+		"description": "noDataAlertPolicy",
+		"inputStreams": [
+			"noDataAlertStream"
+		],
+		"outputStreams": [
+			"noDataAlertStream_out"
+		],
+		"definition": {
+			"type": "nodataalert",
+			"value": "PT1M,dynamic,1,host",
+		},
+		"partitionSpec": [
+			{
+				"streamId": "noDataAlertStream",
+				"type": "GROUPBY",
+				"columns" : ["host"]
+			}
+		],
+		"parallelismHint": 2
+	}
+]

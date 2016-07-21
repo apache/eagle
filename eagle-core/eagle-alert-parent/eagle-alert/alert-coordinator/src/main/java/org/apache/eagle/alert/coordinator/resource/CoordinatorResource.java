@@ -54,6 +54,25 @@ public class CoordinatorResource {
         return JsonUtils.writeValueAsString(state);
     }
 
+    @POST
+    @Path("/enablePeriodicForceBuild")
+    public void enforcePeriodicallyBuild() {
+        alertCoordinator.enforcePeriodicallyBuild();
+    }
+
+    @POST
+    @Path("/disablePeriodicForceBuild")
+    public void disablePeriodicallyBuild() {
+        alertCoordinator.disablePeriodicallyBuild();
+    }
+    
+    @SuppressWarnings("static-access")
+    @GET
+    @Path("/periodicForceBuildState")
+    public boolean statPeriodicallyBuild() {
+        return alertCoordinator.isPeriodicallyForceBuildEnable();
+    }
+
     /**
      * Manually update the topology usages, for administration
      * 
