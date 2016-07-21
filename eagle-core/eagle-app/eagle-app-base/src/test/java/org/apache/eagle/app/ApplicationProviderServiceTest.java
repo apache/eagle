@@ -24,6 +24,7 @@ import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.common.module.CommonGuiceModule;
 import org.apache.eagle.metadata.model.ApplicationDesc;
+import org.apache.eagle.metadata.persistence.MemoryMetadataStore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ import java.util.Collection;
 
 public class ApplicationProviderServiceTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(ApplicationProviderServiceTest.class);
-    private Injector injector = Guice.createInjector(new CommonGuiceModule(),new ApplicationGuiceModule());
+    private Injector injector = Guice.createInjector(new CommonGuiceModule(),new ApplicationGuiceModule(), MemoryMetadataStore.getInstance());
 
     @Test
     public void testApplicationProviderManagerInit(){

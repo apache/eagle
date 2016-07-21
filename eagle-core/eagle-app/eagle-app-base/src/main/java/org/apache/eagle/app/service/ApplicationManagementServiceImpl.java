@@ -61,6 +61,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setDescriptor(appDesc);
         applicationEntity.setSite(siteEntity);
         applicationEntity.setConfiguration(operation.getConfiguration());
+        applicationEntity.setMode(operation.getMode());
         ApplicationContext applicationContext = new ApplicationContext(applicationEntity,config);
         applicationEntity.setStreams(applicationContext.getStreamSinkDescs());
         applicationEntityService.create(applicationEntity);

@@ -91,7 +91,6 @@
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-common</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>

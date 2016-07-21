@@ -28,10 +28,10 @@ public abstract class MetadataStore extends AbstractModule {
 
     private static MetadataStore instance;
     public static MetadataStore getInstance(){
+        String metadataStoreClass = null;
         if(instance == null) {
             try {
                 Config config = ConfigFactory.load();
-                String metadataStoreClass;
                 if (config.hasPath(METADATA_STORE_CONFIG_KEY)) {
                     metadataStoreClass = config.getString(METADATA_STORE_CONFIG_KEY);
                     LOG.info("Using {} = {}",METADATA_STORE_CONFIG_KEY,metadataStoreClass);
@@ -41,6 +41,7 @@ public abstract class MetadataStore extends AbstractModule {
                 }
                 instance = (MetadataStore) Class.forName(metadataStoreClass).newInstance();
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                LOG.error("Failed to instantiate {}",metadataStoreClass,e);
                 throw new RuntimeException(e.getMessage(), e.getCause());
             }
         }

@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.app.service;
 
+import org.apache.eagle.metadata.model.ApplicationEntity;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -27,6 +29,7 @@ public class ApplicationOperations {
     public static class InstallOperation implements Operation{
         private String siteId;
         private String appType;
+        private ApplicationEntity.Mode mode = ApplicationEntity.Mode.LOCAL;
         private Map<String,Object> configuration;
 
         public String getSiteId() {
@@ -48,6 +51,14 @@ public class ApplicationOperations {
 
         public void setConfiguration(Map<String, Object> configuration) {
             this.configuration = configuration;
+        }
+
+        public ApplicationEntity.Mode getMode() {
+            return mode;
+        }
+
+        public void setMode(ApplicationEntity.Mode mode) {
+            this.mode = mode;
         }
     }
 
