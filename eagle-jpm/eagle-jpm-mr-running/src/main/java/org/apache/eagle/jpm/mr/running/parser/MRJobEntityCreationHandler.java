@@ -18,9 +18,11 @@
 
 package org.apache.eagle.jpm.mr.running.parser;
 
+import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
 import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
+import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,10 +38,38 @@ public class MRJobEntityCreationHandler {
         private final Logger LOG = LoggerFactory.getLogger(EntityFlushThread.class);
         private Object entityLock = new Object();
         private Deque<List<TaggedLogAPIEntity>> listDeque = new LinkedList<>();
+        private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
+
+        public EntityFlushThread(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
+            this.eagleServiceConfig = eagleServiceConfig;
+        }
+
         public void enqueue(List<TaggedLogAPIEntity> entities) {
             synchronized (entityLock) {
                 listDeque.add(entities);
             }
+        }
+
+        public boolean flush(List<TaggedLogAPIEntity> entities) {
+            //need flush right now
+            try {
+                IEagleServiceClient client = new EagleServiceClientImpl(
+                        eagleServiceConfig.eagleServiceHost,
+                        eagleServiceConfig.eagleServicePort,
+                        eagleServiceConfig.username,
+                        eagleServiceConfig.password);
+
+                LOG.info("start to flush mr job entities, size {}", entities.size());
+                client.create(entities);
+                LOG.info("finish flushing mr job entities, size {}", entities.size());
+                entities.clear();
+            } catch (Exception e) {
+                LOG.warn("exception found when flush entities, {}", e);
+                e.printStackTrace();
+                return false;
+            }
+
+            return true;
         }
 
         @Override
@@ -53,15 +83,7 @@ public class MRJobEntityCreationHandler {
                 }
 
                 if (entities != null) {
-                    try {
-                        LOG.info("start to flush mr job entities, size {}", entities.size());
-                        client.create(entities);
-                        LOG.info("finish flushing mr job entities, size {}", entities.size());
-                        entities.clear();
-                    } catch (Exception e) {
-                        LOG.warn("exception found when flush entities, {}", e);
-                        e.printStackTrace();
-                    }
+                    flush(entities);
                 }
                 Utils.sleep(1);
             }
@@ -73,24 +95,28 @@ public class MRJobEntityCreationHandler {
     private static final int MAX_ENTITIES_SIZE = 1000;
 
     private final Object lock = new Object();
-    private IEagleServiceClient client;
-    public MRJobEntityCreationHandler(IEagleServiceClient client) {
-        this.client = client;
-        this.entityFlushThread = new EntityFlushThread();
+    public MRJobEntityCreationHandler(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
+        this.entityFlushThread = new EntityFlushThread(eagleServiceConfig);
         this.entityFlushThread.start();
     }
 
-    public void add(TaggedLogAPIEntity entity) {
+    public boolean add(TaggedLogAPIEntity entity) {
         synchronized (lock) {
             if (entity != null) {
                 entities.add(entity);
             }
 
+            if (entity == null) { //force to flush
+                return this.entityFlushThread.flush(entities);
+            }
+
             //flush in another thread
-            if (entities.size() >= MAX_ENTITIES_SIZE || entity == null) {
+            if (entities.size() >= MAX_ENTITIES_SIZE) {
                 this.entityFlushThread.enqueue(entities);
                 entities = new ArrayList<>();
             }
         }
+
+        return true;
     }
 }

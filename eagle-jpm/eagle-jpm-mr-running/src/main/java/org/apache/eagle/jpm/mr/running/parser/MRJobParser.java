@@ -31,8 +31,6 @@ import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
 import org.apache.eagle.jpm.util.resourceFetch.connection.URLConnectionUtils;
 import org.apache.eagle.jpm.util.resourceFetch.model.*;
 import org.apache.eagle.jpm.util.resourceFetch.model.JobCounters;
-import org.apache.eagle.service.client.IEagleServiceClient;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -52,6 +50,10 @@ import java.util.function.Function;
 public class MRJobParser implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobParser.class);
 
+    public enum ParserStatus {
+        RUNNING,
+        FINISHED
+    }
     private AppInfo app;
     private static final int MAX_RETRY_TIMES = 3;
     private MRJobEntityCreationHandler mrJobEntityCreationHandler;
@@ -67,7 +69,7 @@ public class MRJobParser implements Runnable {
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
     private Map<String, String> commonTags = new HashMap<>();
     private RunningJobManager runningJobManager;
-
+    private ParserStatus parserStatus;
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
@@ -92,6 +94,11 @@ public class MRJobParser implements Runnable {
         this.commonTags.put(MRJobTagName.USER.toString(), app.getUser());
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
+        this.parserStatus  = ParserStatus.RUNNING;
+    }
+
+    public ParserStatus status() {
+        return this.parserStatus;
     }
 
     private void finishMRJob(String mrJobId) {
@@ -312,6 +319,9 @@ public class MRJobParser implements Runnable {
             LOG.info("start to process yarn application " + app.getId());
             try {
                 fetchMRRunningInfo();
+                if (mrJobConfigs.size() == 0) {
+                    this.parserStatus = ParserStatus.FINISHED;
+                }
             } catch (Exception e) {
                 LOG.warn("exception found when process application {}, {}", app.getId(), e);
                 e.printStackTrace();
@@ -319,15 +329,17 @@ public class MRJobParser implements Runnable {
                 for (String jobId : mrJobEntityMap.keySet()) {
                     mrJobEntityCreationHandler.add(mrJobEntityMap.get(jobId));
                 }
-                mrJobEntityCreationHandler.add(null);//force flush
-                //delete from zk if needed
-                mrJobEntityMap.keySet()
-                        .stream()
-                        .filter(
-                                jobId -> mrJobEntityMap.get(jobId).getStatus().equals(Constants.AppState.FINISHED.toString()) ||
-                                        mrJobEntityMap.get(jobId).getStatus().equals(Constants.AppState.FAILED.toString()))
-                        .forEach(
-                                jobId -> this.runningJobManager.delete(app.getId(), jobId));
+                if (mrJobEntityCreationHandler.add(null)) { //force flush
+                    //we must flush entities before delete from zk in case of missing finish state of jobs
+                    //delete from zk if needed
+                    mrJobEntityMap.keySet()
+                            .stream()
+                            .filter(
+                                    jobId -> mrJobEntityMap.get(jobId).getStatus().equals(Constants.AppState.FINISHED.toString()) ||
+                                            mrJobEntityMap.get(jobId).getStatus().equals(Constants.AppState.FAILED.toString()))
+                            .forEach(
+                                    jobId -> this.runningJobManager.delete(app.getId(), jobId));
+                }
 
                 LOG.info("finish process yarn application " + app.getId());
             }

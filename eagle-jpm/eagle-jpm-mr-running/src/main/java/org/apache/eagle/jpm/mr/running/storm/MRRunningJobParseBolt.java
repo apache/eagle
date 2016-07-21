@@ -35,7 +35,9 @@ import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -57,7 +59,6 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;
         this.jobExtractorConfig = jobExtractorConfig;
-        //how to release parsers
         this.runningMRParsers = new HashMap<>();
         this.zkStateConfig = zkStateConfig;
     }
@@ -66,13 +67,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.executorService = Executors.newFixedThreadPool(jobExtractorConfig.parseJobThreadPoolSize);
         this.runningJobManager = new RunningJobManager(zkStateConfig);
-        this.mrJobEntityCreationHandler = new MRJobEntityCreationHandler(
-                new EagleServiceClientImpl(
-                    eagleServiceConfig.eagleServiceHost,
-                    eagleServiceConfig.eagleServicePort,
-                    eagleServiceConfig.username,
-                    eagleServiceConfig.password)
-        );
+        this.mrJobEntityCreationHandler = new MRJobEntityCreationHandler(eagleServiceConfig);
     }
 
     @Override
@@ -81,6 +76,12 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
         Map<String, JobExecutionAPIEntity> mrJobs = (Map<String, JobExecutionAPIEntity>)tuple.getValue(2);
 
         LOG.info("get mr yarn application " + appInfo.getId());
+
+        Set<String> runningParserIds = new HashSet<>(runningMRParsers.keySet());
+        runningParserIds.stream()
+                .filter(appId -> runningMRParsers.get(appId).status() == MRJobParser.ParserStatus.FINISHED)
+                .forEach(appId -> runningMRParsers.remove(appId));
+
         MRJobParser applicationParser;
         if (!runningMRParsers.containsKey(appInfo.getId())) {
             applicationParser = new MRJobParser(endpointConfig, jobExtractorConfig, mrJobEntityCreationHandler, appInfo, mrJobs, runningJobManager);
