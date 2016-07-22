@@ -103,4 +103,12 @@ public class Publishment implements Serializable {
                 .append(properties).build();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Publishment[name:").append(name).append(",type:").append(type).append(",policyId:")
+                .append(policyIds).append(",properties:").append(properties);
+        return sb.toString();
+    }
+
 }

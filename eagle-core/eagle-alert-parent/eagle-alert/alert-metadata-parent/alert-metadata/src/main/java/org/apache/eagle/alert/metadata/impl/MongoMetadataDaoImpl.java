@@ -44,6 +44,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.Function;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
@@ -81,7 +82,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     public MongoMetadataDaoImpl(Config config) {
         this.connection = config.getString("connection");
-        this.client = new MongoClient(connection);
+        this.client = new MongoClient(new MongoClientURI(this.connection));
         init();
     }
 

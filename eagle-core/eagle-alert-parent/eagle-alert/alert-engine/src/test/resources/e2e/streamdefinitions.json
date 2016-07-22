@@ -1,0 +1,76 @@
+[
+
+{
+	"streamId": "syslog_stream",
+	"dataSource" : "network_syslog_datasource",
+	"description":"the data stream for syslog events",
+	"validate": false,
+	"timeseries":false,
+	"columns": [
+		{
+			"name": "dims_facility",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required":true
+		},{
+			"name": "dims_severity",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required": true
+		},
+		{
+			"name": "dims_hostname",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required": true
+		},
+		{
+			"name": "dims_msgid",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required": true
+		},{
+			"name": "timestamp",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required":true
+		},{
+			"name": "conn",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required": true
+		},{
+			"name": "op",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required":true
+		},{
+			"name": "msgId",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required":true
+		},{
+			"name": "command",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required": true
+		},{
+			"name": "name",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required": true
+		},{
+			"name": "namespace",
+			"type" : "STRING",
+			"defaultValue": "",
+			"required": true
+		},{
+			"name": "epochMillis",
+			"type" : "LONG",
+			"defaultValue": 0,
+			"required": true
+		}
+	]
+}
+
+]

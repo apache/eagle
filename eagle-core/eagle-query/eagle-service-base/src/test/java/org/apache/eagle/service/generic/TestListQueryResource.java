@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Ignore
 public class TestListQueryResource extends TestHBaseBase {
 
 	HTableInterface table;

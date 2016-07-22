@@ -27,8 +27,8 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
-import org.apache.eagle.alert.metadata.impl.MongoMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.impl.MongoMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -92,7 +92,7 @@ public class MongoImplTest {
     private String TOPO_NAME = "topoName";
 
     @Test
-    public void test_apis() {
+    public void test_apis() throws Exception {
         // topology
         {
             OpResult result = dao.addTopology(new Topology(TOPO_NAME, 3, 5));
@@ -164,6 +164,28 @@ public class MongoImplTest {
             Assert.assertEquals(200, result.code);
             List<PublishmentType> assigns = dao.listPublishmentType();
             Assert.assertEquals(1, assigns.size());
+        }
+
+        // schedule state
+        {
+            ScheduleState state = new ScheduleState();
+            state.setVersion("001");
+            state.setScheduleTimeMillis(3000);
+            state.setCode(200);
+            OpResult result = dao.addScheduleState(state);
+            Assert.assertEquals(200, result.code);
+
+            Thread.sleep(1000);
+
+            state = new ScheduleState();
+            state.setScheduleTimeMillis(3000);
+            state.setVersion("002");
+            state.setCode(201);
+            result = dao.addScheduleState(state);
+            Assert.assertEquals(200, result.code);
+            
+            ScheduleState getState = dao.getScheduleState();
+            Assert.assertEquals(201, getState.getCode());
         }
     }
 

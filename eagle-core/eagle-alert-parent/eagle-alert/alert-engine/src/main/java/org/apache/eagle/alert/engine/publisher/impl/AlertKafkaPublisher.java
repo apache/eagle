@@ -79,7 +79,9 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             status.successful = true;
             status.errorMessage = "";
-            LOG.info("Successfully send message to Kafka: " + brokerList);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully send message to Kafka: " + brokerList);
+            }
         } catch (InterruptedException | ExecutionException e) {
             status.successful = false;
             status.errorMessage = String.format("Failed to send message to %s, due to:%s", brokerList, e);
