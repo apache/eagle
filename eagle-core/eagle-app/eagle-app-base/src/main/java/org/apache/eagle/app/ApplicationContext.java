@@ -30,7 +30,13 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Application Execution Context
+ * Application Wrapper Context Interface: org.apache.eagle.app.ApplicationContext
+ *
+ * <ul>
+ *     <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
+ *     <li>Application Processing Logic (Execution): org.apache.eagle.app.Application</li>
+ *     <li>Application Lifecycle Listener (Installation): org.apache.eagle.app.ApplicationLifecycleListener</li>
+ * </ul>
  */
 public class ApplicationContext implements Serializable, ApplicationLifecycleListener{
     private final Config envConfig;
