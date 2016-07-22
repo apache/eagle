@@ -21,10 +21,15 @@ import org.apache.eagle.metadata.model.ApplicationEntity;
 import java.io.Serializable;
 import java.util.Map;
 
-public class AppOperations {
+public final class ApplicationOperations {
     interface Operation extends Serializable {
-        //
+        String getType();
     }
+
+    private final static String INSTALL = "INSTALL";
+    private final static String UNINSTALL = "UNINSTALL";
+    private final static String START = "START";
+    private final static String STOP = "STOP";
 
     public static class InstallOperation implements Operation{
         private String siteId;
@@ -77,6 +82,11 @@ public class AppOperations {
         public void setMode(ApplicationEntity.Mode mode) {
             this.mode = mode;
         }
+
+        @Override
+        public String getType() {
+            return INSTALL;
+        }
     }
 
     public static class UninstallOperation implements Operation{
@@ -104,6 +114,11 @@ public class AppOperations {
         public void setAppId(String appId) {
             this.appId = appId;
         }
+
+        @Override
+        public String getType() {
+            return UNINSTALL;
+        }
     }
 
     public static class StartOperation implements Operation{
@@ -129,6 +144,11 @@ public class AppOperations {
 
         public void setAppId(String appId) {
             this.appId = appId;
+        }
+
+        @Override
+        public String getType() {
+            return START;
         }
     }
 
@@ -156,6 +176,11 @@ public class AppOperations {
 
         public void setAppId(String appId) {
             this.appId = appId;
+        }
+
+        @Override
+        public String getType() {
+            return STOP;
         }
     }
 }

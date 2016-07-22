@@ -18,7 +18,7 @@ package org.apache.eagle.app.example;
 
 import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
-import org.apache.eagle.app.service.AppOperations;
+import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.test.ApplicationSimulator;
 import org.apache.eagle.app.test.AppUnitTestRunner;
 import org.apache.eagle.metadata.model.ApplicationDesc;
@@ -64,13 +64,13 @@ public class ExampleApplicationTest {
         Assert.assertNotNull(siteEntity.getUuid());
 
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new AppOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL));
+        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL));
         // Start application
-        applicationResource.startApplication(new AppOperations.StartOperation(applicationEntity.getUuid()));
+        applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         // Stop application
-        applicationResource.stopApplication(new AppOperations.StopOperation(applicationEntity.getUuid()));
+        applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
         // Uninstall application
-        applicationResource.uninstallApplication(new AppOperations.UninstallOperation(applicationEntity.getUuid()));
+        applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         try {
             applicationResource.getApplicationEntityByUUID(applicationEntity.getUuid());
             Assert.fail("Application instance (UUID: "+applicationEntity.getUuid()+") should have been uninstalled");

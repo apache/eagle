@@ -20,7 +20,7 @@ import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.resource.ApplicationResource;
-import org.apache.eagle.app.service.AppOperations;
+import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.app.tools.DynamicJarPathFinder;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -55,9 +55,9 @@ public class AppSimulatorImpl extends ApplicationSimulator {
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new AppOperations.InstallOperation(siteEntity.getSiteId(),appType, ApplicationEntity.Mode.LOCAL));
+        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation(siteEntity.getSiteId(),appType, ApplicationEntity.Mode.LOCAL));
         // Start application
-        applicationResource.startApplication(new AppOperations.StartOperation(applicationEntity.getUuid()));
+        applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
     }
 
     private final static AtomicInteger incr = new AtomicInteger();

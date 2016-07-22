@@ -14,13 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.service;
+package org.apache.eagle.app.service.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.ApplicationContext;
+import org.apache.eagle.app.service.ApplicationOperations;
+import org.apache.eagle.app.service.ApplicationManagementService;
+import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
@@ -49,7 +52,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         this.applicationEntityService = applicationEntityService;
     }
 
-    public ApplicationEntity install(AppOperations.InstallOperation operation) {
+    public ApplicationEntity install(ApplicationOperations.InstallOperation operation) {
         Preconditions.checkNotNull(operation.getSiteId(),"siteId is null");
         Preconditions.checkNotNull(operation.getAppType(),"appType is null");
         SiteEntity siteEntity = siteEntityService.getBySiteId(operation.getSiteId());
@@ -68,7 +71,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         return applicationEntity;
     }
 
-    public ApplicationEntity uninstall(AppOperations.UninstallOperation operation) {
+    public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         ApplicationContext applicationContext = new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),config);
         // TODO: Check status, skip stop if already STOPPED
@@ -81,13 +84,13 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         return applicationEntityService.delete(applicationEntity);
     }
 
-    public ApplicationEntity start(AppOperations.StartOperation operation) {
+    public ApplicationEntity start(ApplicationOperations.StartOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),this.config).onAppStart();
         return applicationEntity;
     }
 
-    public ApplicationEntity stop(AppOperations.StopOperation operation) {
+    public ApplicationEntity stop(ApplicationOperations.StopOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),this.config).onAppStop();
         return applicationEntity;
