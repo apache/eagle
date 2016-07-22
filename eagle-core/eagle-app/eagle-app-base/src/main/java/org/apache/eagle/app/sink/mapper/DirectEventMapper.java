@@ -16,10 +16,4 @@
  */
 package org.apache.eagle.app.sink.mapper;
 
-import backtype.storm.tuple.Tuple;
-import org.apache.eagle.alert.engine.model.StreamEvent;
-
-import java.util.List;
-
-public interface DirectEventMapper extends StreamEventMapper {
-}
+public interface DirectEventMapper extends StreamEventMapper{}

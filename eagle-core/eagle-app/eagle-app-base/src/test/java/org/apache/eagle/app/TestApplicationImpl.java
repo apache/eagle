@@ -63,7 +63,7 @@ public class TestApplicationImpl extends AbstractApplication {
         }
     }
 
-    protected void buildTopology(TopologyBuilder builder, ApplicationContext context) {
+    protected void buildApp(TopologyBuilder builder, ApplicationContext context) {
         builder.setSpout("mockMetricSpout", new RandomEventSpout(), 4);
         builder.setBolt("sink_1",context.getFlattenStreamSink("TEST_STREAM_1")).fieldsGrouping("mockMetricSpout",new Fields("key"));
         builder.setBolt("sink_2",context.getFlattenStreamSink("TEST_STREAM_2")).fieldsGrouping("mockMetricSpout",new Fields("key"));

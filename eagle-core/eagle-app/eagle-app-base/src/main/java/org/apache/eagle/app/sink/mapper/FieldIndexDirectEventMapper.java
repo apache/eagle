@@ -22,18 +22,18 @@ import org.apache.eagle.alert.engine.model.StreamEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FieldNameEventMapper implements DirectEventMapper {
-    private final String[] fieldNames;
+public class FieldIndexDirectEventMapper implements DirectEventMapper {
+    private final int[] fieldIndexs;
 
-    public FieldNameEventMapper(String ... fieldNames){
-        this.fieldNames = fieldNames;
+    public FieldIndexDirectEventMapper(int ... fieldIndexs){
+        this.fieldIndexs = fieldIndexs;
     }
 
     @Override
     public List<StreamEvent> map(Tuple tuple) throws Exception {
-        List<StreamEvent> events = new ArrayList<>(fieldNames.length);
-        for(String fieldName:fieldNames){
-            events.add((StreamEvent) tuple.getValueByField(fieldName));
+        List<StreamEvent> events = new ArrayList<>(fieldIndexs.length);
+        for(int index:fieldIndexs){
+            events.add((StreamEvent) tuple.getValue(index));
         }
         return events;
     }

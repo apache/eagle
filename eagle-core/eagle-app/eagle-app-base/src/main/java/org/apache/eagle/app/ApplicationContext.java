@@ -107,7 +107,7 @@ public class ApplicationContext implements Serializable {
      * @return
      */
     public StreamSink getDirectStreamSink(String streamId, String ... fieldNames){
-        return getFlattenStreamSink(streamId,new FieldNameEventMapper(fieldNames));
+        return getFlattenStreamSink(streamId,new FieldNameDirectEventMapper(fieldNames));
     }
 
     /**
@@ -117,7 +117,7 @@ public class ApplicationContext implements Serializable {
      * @return
      */
     public StreamSink getDirectStreamSink(String streamId, int ... fieldIndexs){
-        return getFlattenStreamSink(streamId,new FieldIndexEventMapper(fieldIndexs));
+        return getFlattenStreamSink(streamId,new FieldIndexDirectEventMapper(fieldIndexs));
     }
 
     /**
