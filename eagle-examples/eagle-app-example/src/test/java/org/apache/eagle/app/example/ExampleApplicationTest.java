@@ -89,6 +89,12 @@ public class ExampleApplicationTest {
         simulator.submit(ExampleApplicationProvider.class);
     }
 
+    @Test
+    public void testApplicationQuickRunWithAppProvider2(){
+        simulator.submit(ExampleApplicationProvider2.class);
+    }
+
+
     /**
      * For DEBUG
      * @param args
