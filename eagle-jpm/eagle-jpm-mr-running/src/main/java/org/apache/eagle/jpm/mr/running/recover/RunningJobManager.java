@@ -196,10 +196,10 @@ public class RunningJobManager implements Serializable {
             //lock.acquire();
             if (curator.checkExists().forPath(path) != null) {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
-                LOG.info("delete job {} for yarn app {} ", jobId, yarnAppId);
+                LOG.info("delete job {} for yarn app {}, path {} ", jobId, yarnAppId, path);
             }
         } catch (Exception e) {
-            LOG.error("failed to delete job {} for yarn app {} ", jobId, yarnAppId);
+            LOG.error("failed to delete job {} for yarn app {}, path {}", jobId, yarnAppId, path);
             throw new RuntimeException(e);
         } finally {
             try {

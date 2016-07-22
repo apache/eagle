@@ -27,6 +27,7 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
+import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
 import org.apache.eagle.jpm.util.resourceFetch.connection.URLConnectionUtils;
 import org.apache.eagle.jpm.util.resourceFetch.model.*;
@@ -70,6 +71,7 @@ public class MRJobParser implements Runnable {
     private Map<String, String> commonTags = new HashMap<>();
     private RunningJobManager runningJobManager;
     private ParserStatus parserStatus;
+    private ResourceFetcher rmResourceFetcher;
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
@@ -95,6 +97,7 @@ public class MRJobParser implements Runnable {
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
         this.parserStatus  = ParserStatus.RUNNING;
+        this.rmResourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
     }
 
     public ParserStatus status() {
@@ -115,7 +118,7 @@ public class MRJobParser implements Runnable {
             } else if (i >= MAX_RETRY_TIMES - 1) {
                 //check whether the app has finished. if we test that we can connect rm, then we consider the jobs have finished
                 //if we get here either because of cannot connect rm or the jobs have finished
-                new RMResourceFetcher(endpointConfig.rmUrls).getResource(Constants.ResourceType.RUNNING_MR_JOB);
+                rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
                 mrJobEntityMap.keySet().forEach(this::finishMRJob);
             }
             Utils.sleep(5);
@@ -136,7 +139,7 @@ public class MRJobParser implements Runnable {
                 }
                 if (i >= MAX_RETRY_TIMES) {
                     //may caused by rm unreachable
-                    new RMResourceFetcher(endpointConfig.rmUrls).getResource(Constants.ResourceType.RUNNING_MR_JOB);
+                    rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
                     finishMRJob(jobId);
                     break;
                 }

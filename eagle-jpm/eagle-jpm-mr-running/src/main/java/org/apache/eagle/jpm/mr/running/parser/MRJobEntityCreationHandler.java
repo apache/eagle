@@ -38,17 +38,31 @@ public class MRJobEntityCreationHandler {
         private final Logger LOG = LoggerFactory.getLogger(EntityFlushThread.class);
         private Object entityLock = new Object();
         private Deque<List<TaggedLogAPIEntity>> listDeque = new LinkedList<>();
+        private List<TaggedLogAPIEntity> entities = new ArrayList<>();
         private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
 
         public EntityFlushThread(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
             this.eagleServiceConfig = eagleServiceConfig;
         }
 
-        public void enqueue(List<TaggedLogAPIEntity> entities) {
+        public boolean add(TaggedLogAPIEntity entity) {
             synchronized (entityLock) {
-                listDeque.add(entities);
+                if (entity != null) {
+                    entities.add(entity);
+                }
+
+                if (entity == null) { //force to flush
+                    return flush(entities);
+                }
+
+                if (entities.size() >= MAX_ENTITIES_SIZE) {
+                    listDeque.add(entities);
+                    entities = new ArrayList<>();
+                }
+                return true;
             }
         }
+
 
         public boolean flush(List<TaggedLogAPIEntity> entities) {
             //need flush right now
@@ -91,32 +105,14 @@ public class MRJobEntityCreationHandler {
     }
 
     private EntityFlushThread entityFlushThread;
-    private List<TaggedLogAPIEntity> entities = new ArrayList<>();
     private static final int MAX_ENTITIES_SIZE = 1000;
 
-    private final Object lock = new Object();
     public MRJobEntityCreationHandler(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
         this.entityFlushThread = new EntityFlushThread(eagleServiceConfig);
         this.entityFlushThread.start();
     }
 
     public boolean add(TaggedLogAPIEntity entity) {
-        synchronized (lock) {
-            if (entity != null) {
-                entities.add(entity);
-            }
-
-            if (entity == null) { //force to flush
-                return this.entityFlushThread.flush(entities);
-            }
-
-            //flush in another thread
-            if (entities.size() >= MAX_ENTITIES_SIZE) {
-                this.entityFlushThread.enqueue(entities);
-                entities = new ArrayList<>();
-            }
-        }
-
-        return true;
+        return this.entityFlushThread.add(entity);
     }
 }
