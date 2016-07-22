@@ -23,7 +23,7 @@ import org.apache.eagle.app.spi.AbstractApplicationProvider;
  */
 public class ExampleApplicationProvider2 extends AbstractApplicationProvider<ExampleApplication> {
     public ExampleApplicationProvider2() {
-        super("ExampleApplicationMetadata.xml");
+        super("/META-INF/apps/example/metadata.xml");
     }
 
     @Override

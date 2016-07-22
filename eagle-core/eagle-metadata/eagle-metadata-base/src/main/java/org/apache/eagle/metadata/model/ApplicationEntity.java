@@ -79,7 +79,7 @@ public class ApplicationEntity extends PersistenceEntity {
     public void ensureDefault() {
         super.ensureDefault();
         if(this.appId == null){
-            this.appId = String.format("EAGLE_APP_%s_%s",this.getSite().getSiteId(),this.getDescriptor().getType());
+            this.appId = String.format("EAGLE_APP[TYPE=%s,SITE=%s]",this.getDescriptor().getType(),this.getSite().getSiteId());
         }
         if(this.status == null){
             this.status = Status.INITIAILIZED;

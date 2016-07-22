@@ -28,45 +28,35 @@ import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @Ignore
 public class TestApplicationImpl extends AbstractApplication {
     private final static Logger LOG = LoggerFactory.getLogger(TestApplicationImpl.class);
-    public class RandomEventSpout extends BaseRichSpout {
-        SpoutOutputCollector _collector;
+    protected void buildApp(TopologyBuilder builder, ApplicationContext context) {
+        builder.setSpout("metric_spout", new RandomEventSpout(), 4);
+        builder.setBolt("sink_1",context.getFlattenStreamSink("SAMPLE_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",context.getFlattenStreamSink("SAMPLE_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));
+    }
 
-        @SuppressWarnings("rawtypes")
+    private class RandomEventSpout extends BaseRichSpout {
+        private SpoutOutputCollector _collector;
         @Override
-        public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
-            _collector = collector;
+        public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
+            _collector = spoutOutputCollector;
         }
 
         @Override
         public void nextTuple() {
-
+            _collector.emit(Arrays.asList("disk.usage",System.currentTimeMillis(),"host_1",56.7));
+            _collector.emit(Arrays.asList("cpu.usage",System.currentTimeMillis(),"host_2",99.8));
         }
 
         @Override
-        public void ack(Object id) {
-            //Ignored
+        public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+            outputFieldsDeclarer.declare(new Fields("metric","timestamp","source","value"));
         }
-
-        @Override
-        public void fail(Object id) {
-            _collector.emit(new Values(id), id);
-        }
-
-        @Override
-        public void declareOutputFields(OutputFieldsDeclarer declarer) {
-            declarer.declare(new Fields("key","event"));
-        }
-    }
-
-    protected void buildTopology(TopologyBuilder builder, ApplicationContext context) {
-        builder.setSpout("mockMetricSpout", new RandomEventSpout(), 4);
-        builder.setBolt("sink_1",context.getStreamSink("TEST_STREAM_1")).fieldsGrouping("mockMetricSpout",new Fields("key"));
-        builder.setBolt("sink_2",context.getStreamSink("TEST_STREAM_2")).fieldsGrouping("mockMetricSpout",new Fields("key"));
     }
 
     public static class Provider extends AbstractApplicationProvider<TestApplicationImpl> {

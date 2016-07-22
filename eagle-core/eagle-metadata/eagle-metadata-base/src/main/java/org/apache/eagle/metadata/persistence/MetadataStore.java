@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,6 +19,7 @@ package org.apache.eagle.metadata.persistence;
 import com.google.inject.AbstractModule;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ public abstract class MetadataStore extends AbstractModule {
     public static final String METADATA_STORE_CONFIG_KEY = "metadata.store";
 
     private static MetadataStore instance;
+
     public static MetadataStore getInstance(){
         String metadataStoreClass = null;
         if(instance == null) {

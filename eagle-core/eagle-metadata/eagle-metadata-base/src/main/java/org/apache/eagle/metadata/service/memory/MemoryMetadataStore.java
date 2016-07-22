@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metadata.persistence;
+package org.apache.eagle.metadata.service.memory;
 
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.InMemMetadataDaoImpl;
+import org.apache.eagle.metadata.persistence.MetadataStore;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.service.SiteEntityService;
-import org.apache.eagle.metadata.service.memory.ApplicationEntityServiceMemoryImpl;
-import org.apache.eagle.metadata.service.memory.SiteEntityEntityServiceMemoryImpl;
 
 public class MemoryMetadataStore extends MetadataStore {
     @Override

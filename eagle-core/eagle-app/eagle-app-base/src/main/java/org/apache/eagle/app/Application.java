@@ -17,7 +17,7 @@
 package org.apache.eagle.app;
 
 /**
- * Application Lifecycle Interface
+ * Application Execution Interface
  */
 public interface Application {
     /**

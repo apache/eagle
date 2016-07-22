@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import org.apache.eagle.app.ApplicationGuiceModule;
 import org.apache.eagle.common.module.CommonGuiceModule;
-import org.apache.eagle.metadata.persistence.MemoryMetadataStore;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
 
 public class AppTestGuiceModule extends AbstractModule{
     @Override
@@ -28,6 +28,6 @@ public class AppTestGuiceModule extends AbstractModule{
         install(new CommonGuiceModule());
         install(new ApplicationGuiceModule());
         install(new MemoryMetadataStore());
-        bind(AppSimulator.class).to(AppSimulatorImpl.class).in(Singleton.class);
+        bind(ApplicationSimulator.class).to(AppSimulatorImpl.class).in(Singleton.class);
     }
 }

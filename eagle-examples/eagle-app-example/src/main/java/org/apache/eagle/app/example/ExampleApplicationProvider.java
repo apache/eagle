@@ -47,9 +47,8 @@ public class ExampleApplicationProvider extends AbstractApplicationProvider<Exam
         sampleStreamDefinition.setDescription("Auto generated sample Schema for "+streamId);
         List<StreamColumn> streamColumns = new ArrayList<>();
 
-        streamColumns.add(new StreamColumn.Builder().name("name").type(StreamColumn.Type.STRING).build());
-        streamColumns.add(new StreamColumn.Builder().name("host").type(StreamColumn.Type.STRING).build());
-        streamColumns.add(new StreamColumn.Builder().name("flag").type(StreamColumn.Type.BOOL).build());
+        streamColumns.add(new StreamColumn.Builder().name("metric").type(StreamColumn.Type.STRING).build());
+        streamColumns.add(new StreamColumn.Builder().name("source").type(StreamColumn.Type.STRING).build());
         streamColumns.add(new StreamColumn.Builder().name("timestamp").type(StreamColumn.Type.LONG).build());
         streamColumns.add(new StreamColumn.Builder().name("value").type(StreamColumn.Type.DOUBLE).build());
         sampleStreamDefinition.setColumns(streamColumns);

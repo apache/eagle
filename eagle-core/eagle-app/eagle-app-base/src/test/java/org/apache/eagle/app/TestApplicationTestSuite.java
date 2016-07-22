@@ -18,8 +18,8 @@ package org.apache.eagle.app;
 
 import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
-import org.apache.eagle.app.service.AppOperations;
-import org.apache.eagle.app.test.AppSimulator;
+import org.apache.eagle.app.service.ApplicationOperations;
+import org.apache.eagle.app.test.ApplicationSimulator;
 import org.apache.eagle.app.test.AppUnitTestRunner;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -35,7 +35,7 @@ import java.util.Collection;
 public class TestApplicationTestSuite {
     @Inject private SiteResource siteResource;
     @Inject private ApplicationResource applicationResource;
-    @Inject private AppSimulator simulator;
+    @Inject private ApplicationSimulator simulator;
 
     @Test
     public void testApplicationProviderLoading(){
@@ -55,13 +55,13 @@ public class TestApplicationTestSuite {
         Assert.assertNotNull(siteEntity.getUuid());
 
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new AppOperations.InstallOperation("test_site","TEST_APPLICATION", ApplicationEntity.Mode.LOCAL));
+        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation("test_site","TEST_APPLICATION", ApplicationEntity.Mode.LOCAL));
         // Start application
-        applicationResource.startApplication(new AppOperations.StartOperation(applicationEntity.getUuid()));
+        applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         // Stop application
-        applicationResource.stopApplication(new AppOperations.StopOperation(applicationEntity.getUuid()));
+        applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
         // Uninstall application
-        applicationResource.uninstallApplication(new AppOperations.UninstallOperation(applicationEntity.getUuid()));
+        applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         try {
             applicationResource.getApplicationEntityByUUID(applicationEntity.getUuid());
             Assert.fail("Application instance (UUID: "+applicationEntity.getUuid()+") should have been uninstalled");

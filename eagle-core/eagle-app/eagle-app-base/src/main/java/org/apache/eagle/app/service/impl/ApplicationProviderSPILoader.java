@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.service.loader;
+package org.apache.eagle.app.service.impl;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.app.config.ApplicationProviderConfig;

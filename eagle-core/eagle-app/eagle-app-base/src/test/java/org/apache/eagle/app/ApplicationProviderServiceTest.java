@@ -19,12 +19,11 @@ package org.apache.eagle.app;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.common.module.CommonGuiceModule;
 import org.apache.eagle.metadata.model.ApplicationDesc;
-import org.apache.eagle.metadata.persistence.MemoryMetadataStore;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

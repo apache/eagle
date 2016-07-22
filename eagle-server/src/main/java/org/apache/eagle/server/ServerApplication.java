@@ -33,11 +33,12 @@ import org.apache.eagle.metadata.persistence.MetadataStore;
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 
-public class ServerApplication extends Application<ServerConfig> {
+class ServerApplication extends Application<ServerConfig> {
+    private GuiceBundle<ServerConfig> guiceBundle;
 
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
-        GuiceBundle<ServerConfig> guiceBundle = GuiceBundle.<ServerConfig>newBuilder()
+        guiceBundle = GuiceBundle.<ServerConfig>newBuilder()
                 .addModule(new CommonGuiceModule())
                 .addModule(MetadataStore.getInstance())
                 .addModule(new ApplicationGuiceModule())
@@ -63,11 +64,14 @@ public class ServerApplication extends Application<ServerConfig> {
 
         // Swagger resources
         environment.jersey().register(ApiListingResource.class);
+
         BeanConfig swaggerConfig = new BeanConfig();
         swaggerConfig.setTitle(ServerConfig.getServerName());
-        swaggerConfig.setVersion(ServerConfig.getServerName());
+        swaggerConfig.setVersion(ServerConfig.getServerVersion());
         swaggerConfig.setBasePath(ServerConfig.getApiBasePath());
         swaggerConfig.setResourcePackage(ServerConfig.getResourcePackage());
+        swaggerConfig.setLicense(ServerConfig.getLicense());
+        swaggerConfig.setLicenseUrl(ServerConfig.getLicenseUrl());
         swaggerConfig.setScan(true);
 
         // Simple CORS filter

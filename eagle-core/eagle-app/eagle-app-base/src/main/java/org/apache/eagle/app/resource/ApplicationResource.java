@@ -19,7 +19,7 @@ package org.apache.eagle.app.resource;
 
 import com.google.inject.Inject;
 import org.apache.eagle.app.service.ApplicationManagementService;
-import org.apache.eagle.app.service.AppOperations;
+import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -59,7 +59,7 @@ public class ApplicationResource {
         return providerService.getApplicationDescByType(type);
     }
 
-    @POST
+    @PUT
     @Path("/providers/reload")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<ApplicationDesc> reloadApplicationDescs(){
@@ -97,7 +97,7 @@ public class ApplicationResource {
     @Path("/install")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity installApplication(AppOperations.InstallOperation operation){
+    public ApplicationEntity installApplication(ApplicationOperations.InstallOperation operation){
         return applicationManagementService.install(operation);
     }
 
@@ -111,11 +111,11 @@ public class ApplicationResource {
      *
      * @param operation
      */
-    @POST
+    @DELETE
     @Path("/uninstall")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity uninstallApplication(AppOperations.UninstallOperation operation){
+    public ApplicationEntity uninstallApplication(ApplicationOperations.UninstallOperation operation){
         return applicationManagementService.uninstall(operation);
     }
 
@@ -132,7 +132,7 @@ public class ApplicationResource {
     @Path("/start")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity startApplication(AppOperations.StartOperation operation){
+    public ApplicationEntity startApplication(ApplicationOperations.StartOperation operation){
         return applicationManagementService.start(operation);
     }
 
@@ -149,7 +149,7 @@ public class ApplicationResource {
     @Path("/stop")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity stopApplication(AppOperations.StopOperation operation){
+    public ApplicationEntity stopApplication(ApplicationOperations.StopOperation operation){
         return applicationManagementService.stop(operation);
     }
 }

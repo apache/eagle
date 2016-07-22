@@ -61,7 +61,7 @@ public abstract class AbstractApplication implements Application,Serializable {
         String topologyName = context.getAppEntity().getAppId();
 
         TopologyBuilder builder = new TopologyBuilder();
-        buildTopology(builder,context);
+        buildApp(builder,context);
         StormTopology topology = builder.createTopology();
         Config conf = getClusterStormConfig(context);
         if(appEntity.getMode() == ApplicationEntity.Mode.CLUSTER){
@@ -117,7 +117,7 @@ public abstract class AbstractApplication implements Application,Serializable {
         return conf;
     }
 
-    protected abstract void buildTopology(TopologyBuilder builder, ApplicationContext context);
+    protected abstract void buildApp(TopologyBuilder builder, ApplicationContext context);
 
     @Override
     public void stop(ApplicationContext context) {

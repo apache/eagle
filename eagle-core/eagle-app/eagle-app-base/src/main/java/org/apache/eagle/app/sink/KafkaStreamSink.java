@@ -26,32 +26,27 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class KafkaStreamSink extends StreamSink {
+public class KafkaStreamSink extends AbstractStreamSink {
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
-    private final String topicId;
+    private String topicId;
 
-    public KafkaStreamSink(StreamDefinition streamDefinition, ApplicationContext applicationContext) {
-        super(streamDefinition, applicationContext);
-        this.topicId = String.format("EAGLE_%s_%s_%s",
-                applicationContext.getAppEntity().getSite().getSiteId(),
-                applicationContext.getAppEntity().getDescriptor().getType(),
+    @Override
+    public void init(StreamDefinition streamDefinition, ApplicationContext context) {
+        this.topicId = String.format("EAGLE_TOPIC_%s_%s_%s",
+                context.getAppEntity().getSite().getSiteId(),
+                context.getAppEntity().getDescriptor().getType(),
                 streamDefinition.getStreamId());
     }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context) {
         super.prepare(stormConf, context);
-        ensureTopic();
         // TODO: Create KafkaProducer
-    }
-
-    private void ensureTopic(){
-        LOGGER.info("TODO: ensure kafka topic {} created",this.topicId);
     }
 
     @Override
     protected void onEvent(StreamEvent streamEvent) {
-        LOGGER.info("TODO: producing {}",streamEvent);
+        LOGGER.info("TODO: producing {} to '{}'",streamEvent,topicId);
     }
 
     @Override
@@ -61,5 +56,23 @@ public class KafkaStreamSink extends StreamSink {
                 put("kafka.topic",KafkaStreamSink.this.topicId);
             }
         };
+    }
+
+    @Override
+    public void onAppInstall() {
+        ensureTopicCreated();
+    }
+
+    private void ensureTopicCreated(){
+        LOGGER.info("TODO: ensure kafka topic {} created",this.topicId);
+    }
+
+    private void ensureTopicDeleted(){
+        LOGGER.info("TODO: ensure kafka topic {} deleted",this.topicId);
+    }
+
+    @Override
+    public void onAppUninstall() {
+        ensureTopicDeleted();
     }
 }

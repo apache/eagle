@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.service;
+package org.apache.eagle.app.service.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
+import org.apache.eagle.app.service.ApplicationProviderLoader;
+import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.slf4j.Logger;

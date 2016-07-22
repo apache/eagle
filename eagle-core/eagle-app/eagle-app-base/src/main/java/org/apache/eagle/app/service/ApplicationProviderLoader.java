@@ -17,8 +17,8 @@
 package org.apache.eagle.app.service;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.app.service.loader.ApplicationProviderConfigLoader;
-import org.apache.eagle.app.service.loader.ApplicationProviderSPILoader;
+import org.apache.eagle.app.service.impl.ApplicationProviderConfigLoader;
+import org.apache.eagle.app.service.impl.ApplicationProviderSPILoader;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

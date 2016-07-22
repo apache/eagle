@@ -24,26 +24,26 @@ public interface ApplicationManagementService {
      * @param operation
      * @return
      */
-    ApplicationEntity install(AppOperations.InstallOperation operation);
+    ApplicationEntity install(ApplicationOperations.InstallOperation operation);
 
     /**
      *
      * @param operation
      * @return
      */
-    ApplicationEntity uninstall(AppOperations.UninstallOperation operation);
+    ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation);
 
     /**
      *
      * @param operation
      * @return
      */
-    ApplicationEntity start(AppOperations.StartOperation operation);
+    ApplicationEntity start(ApplicationOperations.StartOperation operation);
 
     /**
      *
      * @param operation
      * @return
      */
-    ApplicationEntity stop(AppOperations.StopOperation operation);
+    ApplicationEntity stop(ApplicationOperations.StopOperation operation);
 }
