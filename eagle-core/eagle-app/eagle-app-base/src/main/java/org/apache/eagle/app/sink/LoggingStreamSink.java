@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoggingStreamSink extends StreamSink {
+public class LoggingStreamSink extends AbstractStreamSink {
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
 
     @Override
@@ -41,5 +41,15 @@ public class LoggingStreamSink extends StreamSink {
     @Override
     public Map<String, Object> getSinkContext() {
         return new HashMap<>();
+    }
+
+    @Override
+    public void onAppInstall() {
+        LOGGER.info("Executing onAppInstall callback, do nothing");
+    }
+
+    @Override
+    public void onAppUninstall() {
+        LOGGER.info("Executing onAppUninstall callback, do nothing");
     }
 }

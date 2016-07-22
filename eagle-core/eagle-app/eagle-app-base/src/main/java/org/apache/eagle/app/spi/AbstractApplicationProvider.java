@@ -22,7 +22,7 @@ import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.config.ApplicationProviderDescConfig;
 import org.apache.eagle.app.sink.KafkaStreamSink;
-import org.apache.eagle.app.sink.StreamSink;
+import org.apache.eagle.app.sink.AbstractStreamSink;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationDocs;
 import org.apache.eagle.metadata.model.Configuration;
@@ -78,8 +78,8 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
                 envConfig.getString(APPLICATIONS_SINK_TYPE_PROPS_KEY) : DEFAULT_APPLICATIONS_SINK_TYPE;
         try {
             Class<?> sinkClass = Class.forName(sinkClassName);
-            if(!StreamSink.class.isAssignableFrom(sinkClass)){
-                throw new IllegalStateException(sinkClassName+ "is not assignable from "+StreamSink.class.getCanonicalName());
+            if(!AbstractStreamSink.class.isAssignableFrom(sinkClass)){
+                throw new IllegalStateException(sinkClassName+ "is not assignable from "+AbstractStreamSink.class.getCanonicalName());
             }
             applicationDesc.setSinkClass(sinkClass);
         } catch (ClassNotFoundException e) {

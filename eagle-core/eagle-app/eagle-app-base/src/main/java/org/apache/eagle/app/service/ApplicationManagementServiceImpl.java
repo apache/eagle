@@ -64,6 +64,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setMode(operation.getMode());
         ApplicationContext applicationContext = new ApplicationContext(applicationEntity,config);
         applicationEntity.setStreams(applicationContext.getStreamSinkDescs());
+        applicationContext.onAppInstall();
         applicationEntityService.create(applicationEntity);
         return applicationEntity;
     }
@@ -77,6 +78,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         }catch (Throwable throwable){
             LOGGER.error(throwable.getMessage(),throwable);
         }
+        new ApplicationContext(applicationEntity,config).onAppUninstall();
         return applicationEntityService.delete(applicationEntity);
     }
 

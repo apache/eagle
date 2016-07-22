@@ -14,22 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink;
+package org.apache.eagle.app;
 
-import backtype.storm.topology.base.BaseBasicBolt;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.app.ApplicationContext;
-import org.apache.eagle.app.ApplicationLifecycleListener;
-
-import java.util.Map;
-
-public abstract class StreamSink extends BaseBasicBolt implements ApplicationLifecycleListener {
+public interface ApplicationLifecycleListener {
     /**
-     * Should only initialize metadata in this method but must not open any resource like connection
-     *
-     * @param streamDefinition
-     * @param context
+     * on application installed
      */
-    public abstract void init(StreamDefinition streamDefinition, ApplicationContext context);
-    public abstract Map<String,Object> getSinkContext();
+    void onAppInstall();
+
+    /**
+     * on application uninstalled
+     */
+    void onAppUninstall();
 }

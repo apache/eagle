@@ -18,6 +18,7 @@ package org.apache.eagle.app;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.app.sink.AbstractStreamSink;
 import org.apache.eagle.app.sink.StreamSink;
 import org.apache.eagle.app.sink.mapper.*;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -26,26 +27,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Application Execution Context
  */
-public class ApplicationContext implements Serializable {
+public class ApplicationContext implements Serializable, ApplicationLifecycleListener{
     private final Config envConfig;
     private final ApplicationEntity appEntity;
     private final static Logger LOG = LoggerFactory.getLogger(ApplicationContext.class);
     private final Map<String, StreamDefinition> streamDefinitionMap;
     private final Map<String,StreamDesc> streamDescMap;
+    private final List<ApplicationLifecycleListener> applicationLifecycleListeners;
 
     public ApplicationContext(ApplicationEntity appEntity, Config envConfig){
         this.appEntity = appEntity;
         this.envConfig = envConfig;
         this.streamDefinitionMap = new HashMap<>();
         this.streamDescMap = new HashMap<>();
+        this.applicationLifecycleListeners = new LinkedList<>();
         doInit();
     }
 
@@ -64,6 +64,7 @@ public class ApplicationContext implements Serializable {
                     streamDesc.setStreamId(stream.getStreamId());
                     streamDescMap.put(streamDesc.getStreamId(),streamDesc);
                     streamDefinitionMap.put(streamDesc.getStreamId(),stream);
+                    applicationLifecycleListeners.add(streamSink);
                 } catch (InstantiationException | IllegalAccessException e) {
                     LOG.error("Failed to initialize instance "+sinkClass.getCanonicalName()+" for application: {}",this.getAppEntity());
                     throw new RuntimeException("Failed to initialize instance "+sinkClass.getCanonicalName()+" for application:"+this.getAppEntity(),e);
@@ -90,10 +91,10 @@ public class ApplicationContext implements Serializable {
         checkStreamExists(streamId);
         Class<?> sinkClass = appEntity.getDescriptor().getSinkClass();
         try {
-            StreamSink streamSink = (StreamSink) sinkClass.newInstance();
-            streamSink.setEventMapper(mapper);
-            streamSink.init(streamDefinitionMap.get(streamId),this);
-            return streamSink;
+            AbstractStreamSink abstractStreamSink = (AbstractStreamSink) sinkClass.newInstance();
+            abstractStreamSink.setEventMapper(mapper);
+            abstractStreamSink.init(streamDefinitionMap.get(streamId),this);
+            return abstractStreamSink;
         } catch (InstantiationException | IllegalAccessException e) {
             LOG.error("Failed to instantiate "+sinkClass,e);
             throw new IllegalStateException("Failed to instantiate "+sinkClass,e);
@@ -164,5 +165,29 @@ public class ApplicationContext implements Serializable {
 
     public Collection<StreamDesc> getStreamSinkDescs(){
         return streamDescMap.values();
+    }
+
+    @Override
+    public void onAppInstall() {
+        applicationLifecycleListeners.forEach((listener)->{
+            try {
+                listener.onAppInstall();
+            }catch (Throwable throwable){
+                LOG.error("Failed to install {}",listener.toString(),throwable);
+                throw throwable;
+            }
+        });
+    }
+
+    @Override
+    public void onAppUninstall() {
+        applicationLifecycleListeners.forEach((listener)->{
+            try {
+                listener.onAppUninstall();
+            }catch (Throwable throwable){
+                LOG.error("Failed to uninstall {}",listener.toString(),throwable);
+                throw throwable;
+            }
+        });
     }
 }
