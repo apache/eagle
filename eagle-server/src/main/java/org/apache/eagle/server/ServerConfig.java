@@ -20,33 +20,43 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dropwizard.Configuration;
 
-public class ServerConfig extends Configuration {
+class ServerConfig extends Configuration {
     private final static String SERVER_NAME = "Apache Eagle";
     private final static String SERVER_VERSION = "0.5.0-incubating";
     private final static String API_BASE_PATH = "/rest/*";
     private final static String CONTEXT_PATH="/";
     private final static String RESOURCE_PACKAGE = "org.apache.eagle";
+    private final static String LICENSE = "Apache License (Version 2.0)";
+    private final static String LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0";
 
     public Config getConfig(){
         return ConfigFactory.load();
     }
 
-    public static String getServerName(){
+    static String getServerName(){
         return SERVER_NAME;
     }
 
-    public static String getServerVersion(){
+    static String getServerVersion(){
         return SERVER_VERSION;
     }
 
-    public static String getApiBasePath(){
+    static String getApiBasePath(){
         return API_BASE_PATH;
     }
-    public static String getResourcePackage(){
+    static String getResourcePackage(){
         return RESOURCE_PACKAGE;
     }
 
-    public static String getContextPath(){
+    static String getContextPath(){
         return CONTEXT_PATH;
+    }
+
+    public static String getLicense(){
+        return LICENSE;
+    }
+
+    static String getLicenseUrl(){
+        return LICENSE_URL;
     }
 }

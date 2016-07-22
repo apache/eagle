@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AppSimulatorImpl implements AppSimulator {
+public class AppSimulatorImpl extends ApplicationSimulator {
     private final Config config;
     private final SiteResource siteResource;
     private final ApplicationResource applicationResource;

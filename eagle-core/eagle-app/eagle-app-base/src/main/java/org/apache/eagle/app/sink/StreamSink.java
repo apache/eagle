@@ -25,6 +25,7 @@ import backtype.storm.tuple.Tuple;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.app.ApplicationContext;
+import org.apache.eagle.app.sink.mapper.StreamEventMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +34,15 @@ import java.util.Map;
 
 public abstract class StreamSink extends BaseBasicBolt {
     private final static Logger LOG = LoggerFactory.getLogger(StreamSink.class);
-    public final static String KEY_FIELD = "KEY";
-    public final static String VALUE_FIELD = "VALUE";
+    private final static String KEY_FIELD = "KEY";
+    private final static String VALUE_FIELD = "VALUE";
+    private StreamEventMapper streamEventMapper;
 
-    public StreamSink(StreamDefinition streamDefinition,ApplicationContext applicationContext){
-        
+    public abstract void init(StreamDefinition streamDefinition, ApplicationContext context);
+
+    public StreamSink setEventMapper(StreamEventMapper streamEventMapper){
+        this.streamEventMapper = streamEventMapper;
+        return this;
     }
 
     @Override
@@ -47,27 +52,21 @@ public abstract class StreamSink extends BaseBasicBolt {
 
     @Override
     public void execute(Tuple input, BasicOutputCollector collector) {
-        List<Object> values = input.getValues();
-        Object inputValue;
-        if(values.size() == 1){
-            inputValue = values.get(0);
-        } else if(values.size() == 2){
-            inputValue = values.get(1);
-        } else{
-            collector.reportError(new IllegalStateException("Expect tuple in size of 1: <StreamEvent> or 2: <Object,StreamEvent>, but got "+values.size()+": "+values));
-            return;
-        }
-
-        if(inputValue instanceof StreamEvent){
-            try {
-                onEvent((StreamEvent) inputValue);
-            }catch (Exception e){
-                LOG.error("Failed to execute event {}",inputValue);
-                collector.reportError(e);
+        try {
+            List<StreamEvent> streamEvents = streamEventMapper.map(input);
+            if(streamEvents!=null) {
+                streamEvents.forEach((streamEvent -> {
+                    try {
+                        onEvent(streamEvent);
+                    } catch (Exception e) {
+                        LOG.error("Failed to execute event {}", streamEvent);
+                        collector.reportError(e);
+                    }
+                }));
             }
-        } else {
-            LOG.error("{} is not StreamEvent",inputValue);
-            collector.reportError(new IllegalStateException("Input tuple "+input+"is not type of StreamEvent"));
+        } catch (Exception e) {
+                LOG.error("Failed to execute event {}",input);
+                collector.reportError(e);
         }
     }
 

@@ -16,15 +16,41 @@
  */
 package org.apache.eagle.app.example;
 
+import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import org.apache.eagle.app.ApplicationContext;
 import org.apache.eagle.app.AbstractApplication;
+import org.apache.eagle.app.ApplicationContext;
+
+import java.util.Arrays;
+import java.util.Map;
 
 public class ExampleApplication extends AbstractApplication {
     protected void buildTopology(TopologyBuilder builder, ApplicationContext context) {
-        builder.setSpout("mockMetricSpout", new RandomEventSpout(), 4);
-        builder.setBolt("sink_1",context.getStreamSink("SAMPLE_STREAM_1")).fieldsGrouping("mockMetricSpout",new Fields("key"));
-        builder.setBolt("sink_2",context.getStreamSink("SAMPLE_STREAM_2")).fieldsGrouping("mockMetricSpout",new Fields("key"));
+        builder.setSpout("metric_spout", new RandomEventSpout(), 4);
+        builder.setBolt("sink_1",context.getFlattenStreamSink("SAMPLE_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",context.getFlattenStreamSink("SAMPLE_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));
+    }
+
+    private class RandomEventSpout extends BaseRichSpout {
+        private SpoutOutputCollector _collector;
+        @Override
+        public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
+            _collector = spoutOutputCollector;
+        }
+
+        @Override
+        public void nextTuple() {
+            _collector.emit(Arrays.asList("disk.usage",System.currentTimeMillis(),"host_1",56.7));
+            _collector.emit(Arrays.asList("cpu.usage",System.currentTimeMillis(),"host_2",99.8));
+        }
+
+        @Override
+        public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+            outputFieldsDeclarer.declare(new Fields("metric","timestamp","source","value"));
+        }
     }
 }

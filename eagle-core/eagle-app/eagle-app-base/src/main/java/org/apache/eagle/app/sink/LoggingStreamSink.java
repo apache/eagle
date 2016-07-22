@@ -27,8 +27,10 @@ import java.util.Map;
 
 public class LoggingStreamSink extends StreamSink {
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
-    public LoggingStreamSink(StreamDefinition streamDefinition, ApplicationContext applicationContext) {
-        super(streamDefinition, applicationContext);
+
+    @Override
+    public void init(StreamDefinition streamDefinition, ApplicationContext context) {
+        // do nothing
     }
 
     @Override

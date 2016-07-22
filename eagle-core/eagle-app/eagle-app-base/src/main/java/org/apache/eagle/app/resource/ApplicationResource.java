@@ -59,7 +59,7 @@ public class ApplicationResource {
         return providerService.getApplicationDescByType(type);
     }
 
-    @POST
+    @PUT
     @Path("/providers/reload")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<ApplicationDesc> reloadApplicationDescs(){
@@ -111,7 +111,7 @@ public class ApplicationResource {
      *
      * @param operation
      */
-    @POST
+    @DELETE
     @Path("/uninstall")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

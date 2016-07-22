@@ -24,6 +24,7 @@ import org.apache.eagle.metadata.persistence.MetadataStore;
 public class MongoMetadataStore extends MetadataStore {
     @Override
     protected void configure() {
+        super.configure();
         bind(IMetadataDao.class).to(MongoMetadataDaoImpl.class).in(Singleton.class);
     }
 }

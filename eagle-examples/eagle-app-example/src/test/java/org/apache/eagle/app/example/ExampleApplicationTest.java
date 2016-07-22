@@ -19,7 +19,7 @@ package org.apache.eagle.app.example;
 import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.AppOperations;
-import org.apache.eagle.app.test.AppSimulator;
+import org.apache.eagle.app.test.ApplicationSimulator;
 import org.apache.eagle.app.test.AppUnitTestRunner;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -35,7 +35,7 @@ import java.util.Collection;
 public class ExampleApplicationTest {
     @Inject private SiteResource siteResource;
     @Inject private ApplicationResource applicationResource;
-    @Inject private AppSimulator simulator;
+    @Inject private ApplicationSimulator simulator;
 
     @Test
     public void testApplicationProviderLoading(){
@@ -87,5 +87,13 @@ public class ExampleApplicationTest {
     @Test
     public void testApplicationQuickRunWithAppProvider(){
         simulator.submit(ExampleApplicationProvider.class);
+    }
+
+    /**
+     * For DEBUG
+     * @param args
+     */
+    public static void main(String[] args){
+        ApplicationSimulator.getInstance().submit(ExampleApplicationProvider.class);
     }
 }

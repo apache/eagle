@@ -16,36 +16,55 @@
  */
 package org.apache.eagle.app.test;
 
+import com.google.inject.Guice;
+import com.google.inject.Module;
 import org.apache.eagle.app.spi.ApplicationProvider;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Application test simulator for developer to quickly run application without diving into application lifecycle
  */
-public interface AppSimulator {
+public abstract class ApplicationSimulator {
     /**
      *
      * @param appType
      */
-    void submit(String appType);
+    public abstract void submit(String appType);
+
     /**
      *
      * @param appType
      * @param appConfig
      */
-    void submit(String appType, Map<String,Object> appConfig);
+    public abstract void submit(String appType, Map<String,Object> appConfig);
 
     /**
      *
      * @param appProviderClass
      */
-    void submit(Class<? extends ApplicationProvider> appProviderClass);
+    public abstract void submit(Class<? extends ApplicationProvider> appProviderClass);
 
     /**
      *
      * @param appProviderClass
      * @param appConfig
      */
-    void submit(Class<? extends ApplicationProvider> appProviderClass, Map<String,Object> appConfig) throws Exception;
+    public abstract void submit(Class<? extends ApplicationProvider> appProviderClass, Map<String,Object> appConfig) throws Exception;
+
+    public static ApplicationSimulator getInstance(){
+        return Guice.createInjector(new AppTestGuiceModule()).getInstance(ApplicationSimulator.class);
+    }
+
+    /**
+     * @param modules additional modules
+     * @return ApplicationSimulator instance
+     */
+    public static ApplicationSimulator getInstance(Module ... modules){
+        List<Module> contextModules = Arrays.asList(modules);
+        contextModules.add(new AppTestGuiceModule());
+        return Guice.createInjector(contextModules).getInstance(ApplicationSimulator.class);
+    }
 }

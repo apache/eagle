@@ -24,6 +24,7 @@ import org.apache.eagle.metadata.persistence.MetadataStore;
 public class MySQLMetadataStore extends MetadataStore{
     @Override
     protected void configure() {
+        super.configure();
         bind(IMetadataDao.class).to(JdbcMetadataDaoImpl.class).in(Singleton.class);
     }
 }
