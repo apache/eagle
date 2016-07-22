@@ -21,6 +21,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.sink.AbstractStreamSink;
 import org.apache.eagle.app.sink.StreamSink;
 import org.apache.eagle.app.sink.mapper.*;
+import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Application Wrapper Context Interface: org.apache.eagle.app.ApplicationContext
+ * Application Context Interface: org.apache.eagle.app.ApplicationContext
  *
  * <ul>
  *     <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
@@ -45,14 +46,29 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
     private final Map<String, StreamDefinition> streamDefinitionMap;
     private final Map<String,StreamDesc> streamDescMap;
     private final List<ApplicationLifecycleListener> applicationLifecycleListeners;
+    private final ApplicationProvider appProvider;
 
-    public ApplicationContext(ApplicationEntity appEntity, Config envConfig){
+    /**
+     * @param appEntity ApplicationEntity
+     * @param appProvider ApplicationProvider
+     * @param envConfig Config
+     */
+    public ApplicationContext(ApplicationEntity appEntity, ApplicationProvider appProvider, Config envConfig){
         this.appEntity = appEntity;
         this.envConfig = envConfig;
+        this.appProvider = appProvider;
         this.streamDefinitionMap = new HashMap<>();
         this.streamDescMap = new HashMap<>();
         this.applicationLifecycleListeners = new LinkedList<>();
         doInit();
+    }
+
+    public void registerListener(ApplicationLifecycleListener listener){
+        applicationLifecycleListeners.add(listener);
+    }
+
+    public List<ApplicationLifecycleListener> getListeners(){
+        return applicationLifecycleListeners;
     }
 
     private void doInit() {
@@ -70,7 +86,7 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
                     streamDesc.setStreamId(stream.getStreamId());
                     streamDescMap.put(streamDesc.getStreamId(),streamDesc);
                     streamDefinitionMap.put(streamDesc.getStreamId(),stream);
-                    applicationLifecycleListeners.add(streamSink);
+                    registerListener(streamSink);
                 } catch (InstantiationException | IllegalAccessException e) {
                     LOG.error("Failed to initialize instance "+sinkClass.getCanonicalName()+" for application: {}",this.getAppEntity());
                     throw new RuntimeException("Failed to initialize instance "+sinkClass.getCanonicalName()+" for application:"+this.getAppEntity(),e);
@@ -175,11 +191,11 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
 
     @Override
     public void onAppInstall() {
-        applicationLifecycleListeners.forEach((listener)->{
+        getListeners().forEach((listener)->{
             try {
                 listener.onAppInstall();
             }catch (Throwable throwable){
-                LOG.error("Failed to install {}",listener.toString(),throwable);
+                LOG.error("Failed to invoked onAppInstall of listener {}",listener.toString(),throwable);
                 throw throwable;
             }
         });
@@ -187,11 +203,37 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
 
     @Override
     public void onAppUninstall() {
-        applicationLifecycleListeners.forEach((listener)->{
+        getListeners().forEach((listener)->{
             try {
                 listener.onAppUninstall();
             }catch (Throwable throwable){
-                LOG.error("Failed to uninstall {}",listener.toString(),throwable);
+                LOG.error("Failed to invoked onAppUninstall of listener {}",listener.toString(),throwable);
+                throw throwable;
+            }
+        });
+    }
+
+    @Override
+    public void onAppStart() {
+        getListeners().forEach((listener)->{
+            try {
+                listener.onAppStart();
+            }catch (Throwable throwable){
+                LOG.error("Failed to invoked onAppStart of listener {}",listener.toString(),throwable);
+                throw throwable;
+            }
+        });
+        appProvider.getApplication().start(this);
+    }
+
+    @Override
+    public void onAppStop() {
+        appProvider.getApplication().stop(this);
+        getListeners().forEach((listener)->{
+            try {
+                listener.onAppStop();
+            }catch (Throwable throwable){
+                LOG.error("Failed to invoked onAppStop of listener {}",listener.toString(),throwable);
                 throw throwable;
             }
         });

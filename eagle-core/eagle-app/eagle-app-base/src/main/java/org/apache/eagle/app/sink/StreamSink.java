@@ -32,4 +32,14 @@ public abstract class StreamSink extends BaseBasicBolt implements ApplicationLif
      */
     public abstract void init(StreamDefinition streamDefinition, ApplicationContext context);
     public abstract Map<String,Object> getSinkContext();
+
+    @Override
+    public void onAppStart() {
+        // StreamSink by default will do nothing when application start
+    }
+
+    @Override
+    public void onAppStop() {
+        // StreamSink by default will do nothing when application start
+    }
 }

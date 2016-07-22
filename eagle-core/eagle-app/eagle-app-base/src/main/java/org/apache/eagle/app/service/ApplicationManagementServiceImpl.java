@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.Application;
 import org.apache.eagle.app.ApplicationContext;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -62,7 +61,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setSite(siteEntity);
         applicationEntity.setConfiguration(operation.getConfiguration());
         applicationEntity.setMode(operation.getMode());
-        ApplicationContext applicationContext = new ApplicationContext(applicationEntity,config);
+        ApplicationContext applicationContext = new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),config);
         applicationEntity.setStreams(applicationContext.getStreamSinkDescs());
         applicationContext.onAppInstall();
         applicationEntityService.create(applicationEntity);
@@ -71,28 +70,26 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 
     public ApplicationEntity uninstall(AppOperations.UninstallOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
+        ApplicationContext applicationContext = new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),config);
         // TODO: Check status, skip stop if already STOPPED
         try {
-            application.stop(new ApplicationContext(applicationEntity, this.config));
+            applicationContext.onAppStop();
         }catch (Throwable throwable){
             LOGGER.error(throwable.getMessage(),throwable);
         }
-        new ApplicationContext(applicationEntity,config).onAppUninstall();
+        applicationContext.onAppUninstall();
         return applicationEntityService.delete(applicationEntity);
     }
 
     public ApplicationEntity start(AppOperations.StartOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
-        application.start(new ApplicationContext(applicationEntity,this.config));
+        new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),this.config).onAppStart();
         return applicationEntity;
     }
 
     public ApplicationEntity stop(AppOperations.StopOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
-        application.stop(new ApplicationContext(applicationEntity,this.config));
+        new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),this.config).onAppStop();
         return applicationEntity;
     }
 }

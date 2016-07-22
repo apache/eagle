@@ -44,6 +44,10 @@
                     <type>string</type>
                 </column>
                 <column>
+                    <name>source</name>
+                    <type>string</type>
+                </column>
+                <column>
                     <name>value</name>
                     <type>double</type>
                     <defaultValue>0.0</defaultValue>
@@ -58,6 +62,10 @@
             <columns>
                 <column>
                     <name>metric</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>source</name>
                     <type>string</type>
                 </column>
                 <column>

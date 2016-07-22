@@ -26,4 +26,14 @@ public interface ApplicationLifecycleListener {
      * on application uninstalled
      */
     void onAppUninstall();
+
+    /**
+     *
+     */
+    void onAppStart();
+
+    /**
+     *
+     */
+    void onAppStop();
 }
