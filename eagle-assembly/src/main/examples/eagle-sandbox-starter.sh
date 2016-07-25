@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This script will start Eagle service with storage Derby,
+# and a sample application HiveQueryLog monitoring
+
 source $(dirname $0)/../bin/eagle-env.sh
 eagle_bin=$EAGLE_HOME/bin
 
@@ -28,41 +31,6 @@ $eagle_bin/eagle-check-env.sh
 [ $? != 0 ] && exit 1
 
 pid_dir=/var/run
-
-# Check HBase if it has been started
-hbase_master_pid=${pid_dir}/hbase/hbase-hbase-master.pid
-hbase_regionserver_pid=${pid_dir}/hbase/hbase-hbase-regionserver.pid
-echo "Checking if hbase is running ..."
-
-if [ -f $hbase_master_pid ] && \
-	ps aux | grep -v grep | grep $(cat $hbase_master_pid) > /dev/null
-then
-	echo "HBase Master is running as process `cat $hbase_master_pid`."
-else
-	echo "Error: HBase Master is not running. Please start it via Ambari."
-	exit 1
-fi
-
-if [ -f $hbase_regionserver_pid ] && \
-	ps aux | grep -v grep | grep $(cat $hbase_regionserver_pid) > /dev/null
-then
-	echo "HBase RegionServer is running as process `cat $hbase_regionserver_pid`."
-else
-	echo "Error: HBase RegionServer is not running. Please start it via Ambari."
-	exit 1
-fi
-
-# Check kafka if it has been started
-kafka_pid=$pid_dir/kafka/kafka.pid
-echo "Checking if kafka is running ..."
-
-if [ -f $kafka_pid ] && ps aux | grep -v grep | grep $(cat $kafka_pid) > /dev/null
-then
-	echo "Kafka is running as process `cat $kafka_pid`."
-else
-	echo "Error: Kafka is not running. Please start it via Ambari."
-	exit 1
-fi
 
 # Check storm if it has been started
 nimbus_pid=$pid_dir/storm/nimbus.pid
@@ -104,33 +72,14 @@ $eagle_bin/eagle-service.sh start
 ###################################################################
 
 echo "STEP [3/3]: start eagle topology"
-$eagle_bin/eagle-service-init.sh
-[ $? != 0 ] && exit 1
 
-echo "Creating kafka topics for eagle ... "
-KAFKA_HOME=/usr/hdp/current/kafka-broker
-EAGLE_ZOOKEEPER_QUORUM=localhost:2181
-topic=`${KAFKA_HOME}/bin/kafka-topics.sh --list --zookeeper $EAGLE_ZOOKEEPER_QUORUM --topic sandbox_hdfs_audit_log`
-if [ -z $topic ]; then
-	$KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper $EAGLE_ZOOKEEPER_QUORUM --replication-factor 1 --partitions 1 --topic sandbox_hdfs_audit_log
-fi
-
-if [ $? = 0 ]; then
-echo "==> Create kafka topic successfully for eagle"
-else
-echo "==> Failed, exiting"
-exit 1
-fi
 $eagle_bin/eagle-topology-init.sh
 [ $? != 0 ] && exit 1
 ${EAGLE_HOME}/examples/sample-sensitivity-resource-create.sh
 [ $? != 0 ] && exit 1
 ${EAGLE_HOME}/examples/sample-policy-create.sh
 [ $? != 0 ] && exit 1
-$eagle_bin/eagle-topology.sh --main org.apache.eagle.security.auditlog.HdfsAuditLogProcessorMain --config ${EAGLE_HOME}/conf/sandbox-hdfsAuditLog-application.conf start
-[ $? != 0 ] && exit 1
+
 $eagle_bin/eagle-topology.sh --main org.apache.eagle.security.hive.jobrunning.HiveJobRunningMonitoringMain --config ${EAGLE_HOME}/conf/sandbox-hiveQueryLog-application.conf start
-[ $? != 0 ] && exit 1
-$eagle_bin/eagle-topology.sh --main org.apache.eagle.security.userprofile.UserProfileDetectionMain --config ${EAGLE_HOME}/conf/sandbox-userprofile-topology.conf start
-[ $? != 0 ] && exit 1
+
 

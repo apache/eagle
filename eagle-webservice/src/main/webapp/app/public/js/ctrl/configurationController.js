@@ -111,7 +111,7 @@
 	});
 
 	// ======================== Application ========================
-	eagleControllers.controller('configApplicationCtrl', function ($scope, $timeout, PageConfig, Application, Entities, UI) {
+	eagleControllers.controller('configApplicationCtrl', function ($scope, $timeout, PageConfig, Application, Entities, Feature, UI) {
 		PageConfig.hideApplication = true;
 		PageConfig.hideSite = true;
 		$scope._pageLock = false;
@@ -132,6 +132,8 @@
 		$.each(Application.list, function(i, application) {
 			var _application = $scope.applications[application.tags.application] = $.extend({}, application, {features: application.features.slice()}, true);
 			_application.optionalFeatures = $.map(Application.featureList, function(feature) {
+				var featurePlugin = Feature.get(feature.tags.feature);
+				if(featurePlugin.config.global) return null;
 				if(!common.array.find(feature.tags.feature, _application.features)) {
 					return feature.tags.feature;
 				}
@@ -342,7 +344,11 @@
 			var _oriConfig = application.config;
 			UI.updateConfirm("Application", {config: _oriConfig}, [
 				{name: "Configuration", field: "config", type: "blob"}
-			]).then(null, null, function(holder) {
+			], function(entity) {
+				if(entity.config !== "" && !common.properties.check(entity.config)) {
+					return "Invalid Properties format";
+				}
+			}).then(null, null, function(holder) {
 				application.config = holder.entity.config;
 				holder.closeFunc();
 				if(_oriConfig !== application.config) $scope.changed = true;

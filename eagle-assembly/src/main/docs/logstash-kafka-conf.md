@@ -22,7 +22,7 @@
 ### Install logstash-kafka plugin
 
 
-#### For Logstash 1.5.x
+#### For Logstash 1.5.x, 2.x
 
 
 logstash-kafka has been intergrated into [logstash-input-kafka][logstash-input-kafka] and [logstash-output-kafka][logstash-output-kafka], you can directly use it.
@@ -32,7 +32,7 @@ logstash-kafka has been intergrated into [logstash-input-kafka][logstash-input-k
 
 #### For Logstash 1.4.x
 
-In logstash 1.4.x, the online version does not support specifying partition\_key for Kafka producer, and data will be produced into each partitions in turn. For eagle, we need to use the src in hdfs\_audit\_log as the partition key, so some hacking work have been done. If you have the same requirment, you can follow it. 
+In logstash 1.4.x, the online version does not support specifying partition\_key for Kafka producer, and data will be produced into each partitions in turn. For eagle, we need to use the src in hdfs\_audit\_log as the partition key, so some hacking work have been done. If you have the same requirment, you can follow it.
 
 1. Install logstash-kafka
 
@@ -51,13 +51,13 @@ In logstash 1.4.x, the online version does not support specifying partition\_key
 2. Hacking the kafka.rb
 
    We have added partition\_key\_format, which is used to specify the partition_key and supported by logstash 1.5.x, into  lib/logstash/outputs/kafka.rb. More details are shown [here](https://github.xyz.com/eagle/eagle/blob/master/eagle-assembly/src/main/docs/kafka.rb).
-       
+
           config :partition_key_format, :validate => :string, :default => nil
-        
+
           public
           def register
             LogStash::Logger.setup_log4j(@logger)
-        
+
             options = {
                 :broker_list => @broker_list,
                 :compression_codec => @compression_codec,
@@ -80,9 +80,9 @@ In logstash 1.4.x, the online version does not support specifying partition\_key
             }
             @producer = Kafka::Producer.new(options)
             @producer.connect
-        
+
             @logger.info('Registering kafka producer', :topic_id => @topic_id, :broker_list => @broker_list)
-        
+
             @codec.on_event do |data|
               begin
                 @producer.send_msg(@current_topic_id,@partition_key,data)
@@ -94,7 +94,7 @@ In logstash 1.4.x, the online version does not support specifying partition\_key
               end
             end
           end # def register
-        
+
           def receive(event)
             return unless output?(event)
             if event == LogStash::SHUTDOWN
@@ -111,13 +111,16 @@ In logstash 1.4.x, the online version does not support specifying partition\_key
 
 ### Create logstash configuration file
 Go to the logstash root dir, and create a configure file
+The 2.0 release of Logstash includes a new version of the Kafka output plugin with significant configuration changes. For more details, please check the documentation pages for the [Logstash1.5](https://www.elastic.co/guide/en/logstash/1.5/plugins-outputs-kafka.html) and [Logstash2.0](https://www.elastic.co/guide/en/logstash/2.0/plugins-outputs-kafka.html) version of the kafka output plugin.
+
+#### For Logstash 1.4.X, 1.5.X
 
         input {
             file {
                 type => "hdp-nn-audit"
                 path => "/path/to/audit.log"
                 start_position => end
-                sincedb_path => "/var/log/logstash/"
+                sincedb_path => "/opt/logstash/sincedb.txt"
              }
         }
 
@@ -152,6 +155,61 @@ Go to the logstash root dir, and create a configure file
                 # stdout { codec => rubydebug }
             }
         }
+
+#### For Logstash 2.X
+
+		input {
+			file {
+				type => "hdp-nn-audit"
+				path => "/path/to/audit.log"
+				start_position => end
+				sincedb_path => "/opt/logstash/sincedb.txt"
+			}
+		}
+
+
+		filter{
+			if [type] == "hdp-nn-audit" {
+			  grok {
+				  match => ["message", "ugi=(?<user>([\w\d\-]+))@|ugi=(?<user>([\w\d\-]+))/[\w\d\-.]+@|ugi=(?<user>([\w\d.\-_]+))[\s(]+"]
+			  }
+			}
+		}
+
+		output {
+			 if [type] == "hdp-nn-audit" {
+				  kafka {
+					  codec => plain {
+						  format => "%{message}"
+					  }
+					  bootstrap_servers => "localhost:9092"
+					  topic_id => "hdfs_audit_log"
+					  acks => “0”
+					  timeout_ms => 10000
+					  retries => 3
+					  retry_backoff_ms => 100
+					  batch_size => 16384
+					  send_buffer_bytes => 131072
+					  client_id => "hdp-nn-audit"
+				  }
+				  # stdout { codec => rubydebug }
+			  }
+		}
+
+
+Notice:
+ `path => "/path/to/audit.log"` : 
+ Here `path` can be configured to be a single string or an array. For example:
+    `path => [ "var/msg/example.out", /var/message/*.out", "/var/log/*.log"]`
+    `path => "/var/log/hadoop/hdfs/hdfs-audit.log.*"`
+As you can see, we can apply regex pattern to match mutiple files.
+
+
+`sincedb_path => "/opt/logstash/sincedb.txt"`: 
+`sincedb_path` must be a file writable by logstash. This file will be used by Logstash to keep track of the current position in each file.
+
+
+
 
 #### grok pattern testing
 We have 3 typical patterns for ugi field as follows

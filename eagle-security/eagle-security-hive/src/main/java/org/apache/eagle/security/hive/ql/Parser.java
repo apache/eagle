@@ -16,11 +16,19 @@
  */
 package org.apache.eagle.security.hive.ql;
 
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenRewriteStream;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.TreeAdaptor;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.ql.lib.Node;
+import org.apache.hadoop.hive.ql.parse.ASTErrorNode;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
-import org.apache.hadoop.hive.ql.parse.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +40,21 @@ import java.util.Set;
 
 public class Parser {
   private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
+
+  static final TreeAdaptor adaptor = new CommonTreeAdaptor() {
+    @Override
+    public Object create(Token payload) {
+      return new ASTNode(payload);
+    }
+    @Override
+    public Object dupNode(Object t) {
+      return create(((CommonTree)t).token);
+    }
+    @Override
+    public Object errorNode(TokenStream input, Token start, Token stop, RecognitionException e) {
+      return new ASTErrorNode(input, start, stop, e);
+    }
+  };
 
   private Set<String> tableSet;
   private Set<String> columnSet;
@@ -66,11 +89,26 @@ public class Parser {
    * Parse an Hive QL into an Abstract Syntax Tree(AST).
    * @param query
    * @return
-   * @throws ParseException
+   * @throws RecognitionException
    */
-  public ASTNode generateAST(String query) throws ParseException {
+  public ASTNode generateAST(String query) throws RecognitionException {
+    // https://issues.apache.org/jira/browse/HIVE-10731
+    // https://issues.apache.org/jira/browse/HIVE-6617
+    HiveConf hiveConf = new HiveConf();
+    hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_SUPPORT_SQL11_RESERVED_KEYWORDS, false);
+
     ParseDriver pd = new ParseDriver();
-    return pd.parse(query);
+    ParseDriver.ANTLRNoCaseStringStream antlrStream = pd.new ANTLRNoCaseStringStream(query);
+    ParseDriver.HiveLexerX lexer = pd.new HiveLexerX(antlrStream);
+    lexer.setHiveConf(hiveConf);
+    TokenRewriteStream tokens = new TokenRewriteStream(lexer);
+
+    HiveParser parser = new HiveParser(tokens);
+    parser.setHiveConf(hiveConf);
+    parser.setTreeAdaptor(adaptor);
+    HiveParser.statement_return r = parser.statement();
+
+    return (ASTNode)r.getTree();
   }
 
   private void parseQL(ASTNode ast) {
@@ -265,7 +303,7 @@ public class Parser {
         }
         break;
 
-      case HiveParser.TOK_FUNCTION:
+      case HiveParser.TOK_FUNCTION: case HiveParser.TOK_FUNCTIONDI:
         // Traverse children to get TOK_TABLE_OR_COL
         Set<String> tempSet = new HashSet<>();
         parseTokFunction(asn, tempSet);
@@ -299,14 +337,14 @@ public class Parser {
         String colRealName = convAliasToReal(columnAliasMap, ast.getChild(0).getText());
         set.add(colRealName);
         break;
-      case HiveParser.TOK_FUNCTION:
+      // Not only HiveParser.TOK_FUNCTION, but also HiveParser.KW_ADD, HiveParser.KW_WHEN ...
+      default:
         for (int i = 0; i < ast.getChildCount(); i++) {
           ASTNode n = (ASTNode)ast.getChild(i);
           if (n != null) {
             parseTokFunction(n, set);
           }
         }
-        break;
     }
   }
 

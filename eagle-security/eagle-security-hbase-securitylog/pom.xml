@@ -24,7 +24,7 @@
     <parent>
         <artifactId>eagle-security-parent</artifactId>
         <groupId>org.apache.eagle</groupId>
-        <version>0.3.0-incubating</version>
+        <version>0.4.0-incubating</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -34,6 +34,11 @@
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-security-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-stream-application-manager</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

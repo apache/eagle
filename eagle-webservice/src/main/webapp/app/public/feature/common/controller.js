@@ -551,8 +551,10 @@
 							conditions: {},
 							notification: [],
 							dedupe: {
-								alertDedupIntervalMin: 10
+								alertDedupIntervalMin: 10,
+								fields: []
 							},
+							_dedupTags: {},
 							policy: {},
 							window: "externalTime",
 							group: "",
@@ -627,7 +629,11 @@
 
 						// === Revert inner data ===
 						// >> De-dupe
+						$scope.policy.__._dedupTags = {};
 						$scope.policy.__.dedupe = common.parseJSON($scope.policy.dedupeDef, {});
+						$.each($scope.policy.__.dedupe.fields || [], function (i, field) {
+							$scope.policy.__._dedupTags[field] = true;
+						});
 
 						// >> Notification
 						$scope.policy.__.notification = common.parseJSON($scope.policy.notificationDef, []);
@@ -638,15 +644,17 @@
 						// >> Parse expression
 						$scope.policy.__.conditions = {};
 						var _condition = _policyUnit.expression.match(/from\s+(\w+)(\[(.*)])?(#window[^\)]*\))?\s+(select (\w+, )?(\w+)\((\w+)\) as [\w\d_]+ (group by (\w+) )?having ([\w\d_]+) ([<>=]+) ([^\s]+))?/);
-						var _cond_stream = _condition[1];
-						var _cond_query = _condition[3] || "";
-						var _cond_window = _condition[4];
-						var _cond_group = _condition[5];
-						var _cond_groupUnit = _condition.slice(7,14);
+						var _cond_stream, _cond_query, _cond_window, _cond_group, _cond_groupUnit;
 
 						if(!_condition) {
 							$scope.policy.__.advanced = true;
 						} else {
+							_cond_stream = _condition[1];
+							_cond_query = _condition[3] || "";
+							_cond_window = _condition[4];
+							_cond_group = _condition[5];
+							_cond_groupUnit = _condition.slice(7,14);
+
 							// > StreamName
 							var _streamName = _cond_stream;
 							var _cond = _cond_query;
@@ -953,6 +961,9 @@
 				$scope.lock = true;
 
 				// dedupeDef
+				$scope.policy.__.dedupe.fields = $.map($scope.policy.__._dedupTags, function (value, key) {
+					if(value) return key;
+				});
 				$scope.policy.dedupeDef = JSON.stringify($scope.policy.__.dedupe);
 
 				// notificationDef
@@ -961,7 +972,6 @@
 				$scope.policy.notificationDef = JSON.stringify($scope.policy.__.notification);
 
 				// policyDef
-				$scope.policy.__._dedupTags = $scope.policy.__._dedupTags || {};
 				$scope.policy.__.policy = {
 					expression: $scope.toQuery(),
 					type: "siddhiCEPEngine"

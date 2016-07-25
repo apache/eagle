@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.hadoop.hive.ql.parse.ASTNode;
-import org.apache.hadoop.hive.ql.parse.ParseException;
+import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class TestParser {
     }
   }
 
-  public void printQueryAST(String query) throws ParseException {
+  public void printQueryAST(String query) throws RecognitionException {
     ASTNode root = parser.generateAST(query);
     printTree(root, 0);
   }
@@ -206,6 +206,66 @@ public class TestParser {
         String expectedInsertTable = "t1";
         Map<String, Set<String>> expectedTableColumn = null;
         _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
+    }
+
+    @Test
+    public void testQueryWithKeyWords() throws Exception {
+        String query =  "SELECT id, user FROM db.table1";
+        String expectedOperation = "SELECT";
+        String expectedInsertTable = null;
+        Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
+        set.add("id");
+        set.add("user");
+        expectedTableColumn.put("db.table1", set);
+        _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
+    }
+
+    @Test
+    public void testInsertTableWithKeyWords() throws Exception {
+        String query =  "INSERT OVERWRITE TABLE table2 SELECT id, user FROM db.table1";
+        String expectedOperation = "SELECT";
+        String expectedInsertTable = "table2";
+        Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
+        set.add("id");
+        set.add("user");
+        expectedTableColumn.put("db.table1", set);
+        _testParsingQuery(query, expectedOperation, expectedInsertTable, expectedTableColumn);
+    }
+
+    @Test
+    public void testCountDistinct() throws Exception {
+        String query =  "SELECT count(distinct id) FROM db.table1";
+        String expectedOperation = "SELECT";
+        Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
+        set.add("id");
+        expectedTableColumn.put("db.table1", set);
+        _testParsingQuery(query, expectedOperation, null, expectedTableColumn);
+    }
+
+    @Test
+    public void testComplextQuery() throws Exception {
+        String query =  "SELECT id, \n" +
+                "  SUM(CASE WHEN(type=1 AND ds < '2016-05-12' AND category IN ('1', '2')) " +
+                "    THEN 1 ELSE 0 end) / COUNT(DISTINCT id) AS col1, \n" +
+                "  CASE WHEN SUM(CASE WHEN type=1 THEN 1 ELSE 0 END)=0 THEN 0 " +
+                "    ELSE SUM(CASE WHEN type=1 AND DATEDIFF('2016-05-21', ds)=1 " +
+                "    THEN 1 ELSE 0 END) * DATEDIFF('2016-05-21', '2016-04-21') / " +
+                "    SUM(CASE WHEN type=1 THEN 1 ELSE 0 END) END AS col2 \n" +
+                "FROM db.table1 \n" +
+                "WHERE ds < '2016-05-21' \n" +
+                "GROUP BY id";
+        String expectedOperation = "SELECT";
+        Map<String, Set<String>> expectedTableColumn = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
+        set.add("id");
+        set.add("ds");
+        set.add("type");
+        set.add("category");
+        expectedTableColumn.put("db.table1", set);
+        _testParsingQuery(query, expectedOperation, null, expectedTableColumn);
     }
 
     @Test
