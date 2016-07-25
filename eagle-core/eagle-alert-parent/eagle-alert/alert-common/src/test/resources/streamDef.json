@@ -18,12 +18,12 @@
 			"required":true
 		},{
 			"name": "metric",
-			"type" : "float",
+			"type" : "string",
 			"defaultValue": "perfmon_cpu",
 			"required": true
 		},{
 			"name": "pool",
-			"type" : "int",
+			"type" : "string",
 			"defaultValue": "raptor_general",
 			"required":true
 		},{
@@ -35,7 +35,7 @@
 		{
 			"name": "colo",
 			"type" : "bool",
-			"defaultValue": "",
+			"defaultValue": true,
 			"required":true
 		}
 	]
