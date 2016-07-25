@@ -21,9 +21,9 @@
 
 	<parent>
 		<groupId>org.apache.eagle</groupId>
-		<artifactId>eagle-query-parent</artifactId>
+		<artifactId>eagle-core</artifactId>
 		<version>0.5.0-incubating-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>eagle-common</artifactId>
