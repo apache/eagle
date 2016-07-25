@@ -18,11 +18,11 @@
 cd $(dirname $0)/..
 
 echo "Starting zookeeper"
-bin/zookeeper-server-start.sh -daemon conf/zookeeper-server.properties
+bin/zookeeper-server-start.sh -daemon /usr/apache-eagle/incubator-eagle/eagle-core/eagle-alert-parent/eagle-alert/alert-devtools/conf/zookeeper-server.properties
 sleep 1
 bin/zookeeper-server-status.sh
 
 echo "Starting kafka"
-bin/kafka-server-start.sh -daemon conf/kafka-server.properties
+bin/kafka-server-start.sh -daemon /usr/apache-eagle/incubator-eagle/eagle-core/eagle-alert-parent/eagle-alert/alert-devtools/conf/kafka-server.properties
 sleep 1
 bin/kafka-server-status.sh

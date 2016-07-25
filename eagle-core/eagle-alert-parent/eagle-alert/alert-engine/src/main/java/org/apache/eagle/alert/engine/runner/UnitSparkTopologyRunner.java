@@ -18,15 +18,7 @@ package org.apache.eagle.alert.engine.runner;
 
 import com.typesafe.config.Config;
 import kafka.serializer.StringDecoder;
-import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
-import org.apache.eagle.alert.coordination.model.PublishSpec;
-import org.apache.eagle.alert.coordination.model.RouterSpec;
-import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.coordinator.MetadataType;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.router.SpecListener;
-import org.apache.eagle.alert.engine.spark.broadcast.*;
 import org.apache.eagle.alert.engine.spark.function.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Durations;
@@ -38,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class UnitSparkTopologyRunner implements SpecListener {
+public class UnitSparkTopologyRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(UnitSparkTopologyRunner.class);
 
@@ -58,17 +50,13 @@ public class UnitSparkTopologyRunner implements SpecListener {
     public final static String CHECKPOINT_DIRECTORY = "topology.checkpointDirectory";
 
 
-    private final IMetadataChangeNotifyService metadataChangeNotifyService;
+    //  private final IMetadataChangeNotifyService metadataChangeNotifyService;
+    private final Object lock = new Object();
     private String topologyId;
     private final Config config;
     private JavaStreamingContext jssc;
-    private SpoutSpec spoutSpec = null;
-    private RouterSpec routerSpec = null;
-    private AlertBoltSpec alertBoltSpec = null;
-    private PublishSpec publishSpec = null;
-    private Map<String, StreamDefinition> sds = null;
 
-    public UnitSparkTopologyRunner(IMetadataChangeNotifyService metadataChangeNotifyService, Config config) {
+    public UnitSparkTopologyRunner(IMetadataChangeNotifyService metadataChangeNotifyService, Config config) throws InterruptedException {
 
         this.topologyId = config.getString("topology.name");
         this.config = config;
@@ -83,19 +71,19 @@ public class UnitSparkTopologyRunner implements SpecListener {
         }
         String sparkExecutorCores = config.getString(SPARK_EXECUTOR_CORES);
         String sparkExecutorMemory = config.getString(SPARK_EXECUTOR_MEMORY);
-       // String checkpointDir = config.getString(CHECKPOINT_DIRECTORY);
+        // String checkpointDir = config.getString(CHECKPOINT_DIRECTORY);
         sparkConf.set("spark.executor.cores", sparkExecutorCores);
         sparkConf.set("spark.executor.memory", sparkExecutorMemory);
 
         this.jssc = new JavaStreamingContext(sparkConf, Durations.seconds(window));
-       // this.jssc.checkpoint(checkpointDir);
-        this.metadataChangeNotifyService = metadataChangeNotifyService;
+        // this.jssc.checkpoint(checkpointDir);
+        /*this.metadataChangeNotifyService = metadataChangeNotifyService;
         this.metadataChangeNotifyService.registerListener(this);
-        this.metadataChangeNotifyService.init(config, MetadataType.ALL);
+        this.metadataChangeNotifyService.init(config, MetadataType.ALL);*/
+
     }
 
     public void run() {
-
         buildTopology(jssc, config);
         jssc.start();
         jssc.awaitTermination();
@@ -107,7 +95,7 @@ public class UnitSparkTopologyRunner implements SpecListener {
         String zkQuorum = config.getString("spout.kafkaBrokerZkQuorum");
         Map<String, String> kafkaParams = new HashMap<>();
         kafkaParams.put("metadata.broker.list", zkQuorum);
-        kafkaParams.put("auto.offset.reset", "largest");
+        kafkaParams.put("auto.offset.reset", "largest");//smallest|largest 重头消费|最新消费
 
 
         String topic = config.getString(CONSUMER_KAFKA_TOPIC);
@@ -118,28 +106,15 @@ public class UnitSparkTopologyRunner implements SpecListener {
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
 
-        while (spoutSpec == null || sds == null || routerSpec == null || alertBoltSpec == null || publishSpec == null) {
-            System.out.println("wait to load meta");
-        }
 
         JavaPairDStream<String, String> messages = KafkaUtils.createDirectStream(jssc, String.class, String.class, StringDecoder.class, StringDecoder.class, kafkaParams, topics);
 
         messages.window(Durations.seconds(windowDurations), Durations.seconds(windowDurations))
-                .flatMapToPair(new CorrelationSpoutSparkFunction(numOfRouter, topic, spoutSpec, sds))
+                .flatMapToPair(new CorrelationSpoutSparkFunction(numOfRouter, topic, config))
                 .transformToPair(new ChangePartitionTo(numOfRouter))
-                .mapPartitionsToPair(new StreamRouteBoltFunction(routerSpec, sds, "streamBolt"))
-                .transformToPair(new ChangePartitionTo(numOfAlertBolts)).mapPartitionsToPair(new AlertBoltFunction(alertBoltNamePrefix, alertBoltSpec, sds, numOfAlertBolts))
-                .repartition(numOfPublishTasks).foreachRDD(new Publisher(publishSpec, sds, alertPublishBoltName));
-
-
+                .mapPartitionsToPair(new StreamRouteBoltFunction(config, "streamBolt"))
+                .transformToPair(new ChangePartitionTo(numOfAlertBolts)).mapPartitionsToPair(new AlertBoltFunction(alertBoltNamePrefix, config, numOfAlertBolts))
+                .repartition(numOfPublishTasks).foreachRDD(new Publisher(config, alertPublishBoltName));
     }
 
-    @Override
-    public void onSpecChange(SpoutSpec spec, RouterSpec routerSpec, AlertBoltSpec alertBoltSpec, PublishSpec publishSpec, Map<String, StreamDefinition> sds) {
-        this.sds = StreamDefinitionData.getInstance(jssc.sparkContext(), sds).value();
-        this.routerSpec = RouterSpecData.getInstance(jssc.sparkContext(), routerSpec).value();
-        this.spoutSpec = SpoutSpecData.getInstance(jssc.sparkContext(), spec).value();
-        this.alertBoltSpec = AlertBoltSpecData.getInstance(jssc.sparkContext(), alertBoltSpec).value();
-        this.publishSpec = PublishSpecData.getInstance(jssc.sparkContext(), publishSpec).value();
-    }
 }

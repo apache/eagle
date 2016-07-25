@@ -63,7 +63,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         executionPlanRuntime.start();
         return executionPlanRuntime;
     }
-
+    @Ignore
     @Test
     public void testSimpleSiddhiQuery() throws Exception{
         String tmpdir = System.getProperty("java.io.tmpdir");
@@ -205,7 +205,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         executionPlanRuntime.start();
         return executionPlanRuntime;
     }
-
+    @Ignore
     @Test
     public void testTimeSlideWindow() throws Exception{
         String tmpdir = System.getProperty("java.io.tmpdir");
@@ -262,7 +262,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         executionPlanRuntime.start();
         return executionPlanRuntime;
     }
-
+    @Ignore
     @Test
     public void testExternalTimeSlideWindowWithGroupby() throws Exception{
         String tmpdir = System.getProperty("java.io.tmpdir");
@@ -317,7 +317,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         });
         return executionPlanRuntime;
     }
-
+    @Ignore
     @Test
     public void testExternalTimeSlideWindowWithGroupby_2() throws Exception{
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -367,7 +367,7 @@ public class TestSiddhiStateSnapshotAndRestore {
         executionPlanRuntime.start();
         return executionPlanRuntime;
     }
-
+    @Ignore
     @Test
     public void testInternalTimeSlideWindowWithGroupby() throws Exception{
         String tmpdir = System.getProperty("java.io.tmpdir");

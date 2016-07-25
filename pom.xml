@@ -133,7 +133,6 @@
         <module>eagle-examples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
-        <module>eagle-jpm</module>
     </modules>
     <properties>
         <!-- General Properties -->
@@ -197,7 +196,7 @@
 
         <!-- Serialization -->
         <gson.version>2.2.2</gson.version>
-        <guava.version>19.0</guava.version>
+        <guava.version>16.0</guava.version>
         <fasterxml-jackson.version>2.6.0</fasterxml-jackson.version>
         <codehaus-jackson.version>1.9.13</codehaus-jackson.version>
         <jsoup.version>1.7.3</jsoup.version>

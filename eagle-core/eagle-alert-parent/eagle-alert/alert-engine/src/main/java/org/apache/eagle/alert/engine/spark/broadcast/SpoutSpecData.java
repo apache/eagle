@@ -21,7 +21,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 
 public class SpoutSpecData {
-    private static volatile Broadcast<SpoutSpec> instance = null;
+    private static Broadcast<SpoutSpec> instance = null;
 
     public static Broadcast<SpoutSpec> getInstance(JavaSparkContext jsc, final SpoutSpec meta) {
         if (instance == null) {

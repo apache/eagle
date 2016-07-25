@@ -33,6 +33,7 @@ import org.apache.eagle.alert.resource.SimpleCORSFiler;
 import org.apache.eagle.service.metadata.resource.MetadataResource;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.eagle.service.metadata.resource.SpecMetadataResource;
 import com.typesafe.config.ConfigFactory;
 
 /**
@@ -71,6 +72,9 @@ public class ServiceApp extends Application<AlertDropWizardConfiguration> {
 
         CoordinatorResource coorResource = new CoordinatorResource();
         environment.jersey().register(coorResource);
+
+        SpecMetadataResource specResource = new SpecMetadataResource();
+        environment.jersey().register(specResource);
 
         // swagger resources
         environment.jersey().register(new ApiListingResource());

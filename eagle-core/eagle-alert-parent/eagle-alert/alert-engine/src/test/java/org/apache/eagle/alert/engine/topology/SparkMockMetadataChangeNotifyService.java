@@ -19,6 +19,9 @@ package org.apache.eagle.alert.engine.topology;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
@@ -28,6 +31,9 @@ import org.apache.eagle.alert.engine.coordinator.MetadataType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.impl.AbstractMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.utils.MetadataSerDeser;
+import org.apache.eagle.alert.service.IMetadataServiceClient;
+import org.apache.eagle.alert.service.MetadataServiceClientImpl;
+import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +43,7 @@ import com.typesafe.config.Config;
 
 @SuppressWarnings({"serial"})
 public class SparkMockMetadataChangeNotifyService extends AbstractMetadataChangeNotifyService implements Runnable {
-    private final static Logger LOG = LoggerFactory.getLogger(MockMetadataChangeNotifyService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SparkMockMetadataChangeNotifyService.class);
     @SuppressWarnings("unused")
     private static final String[] topics = new String[]{"testTopic3", "testTopic4", "testTopic5"};
     public static final String SPARK = "/spark";
@@ -46,6 +52,7 @@ public class SparkMockMetadataChangeNotifyService extends AbstractMetadataChange
     @SuppressWarnings("unused")
     private String spoutId;
     private Map<String, StreamDefinition> sds;
+    private transient SpecMetadataServiceClientImpl client;
 
     public SparkMockMetadataChangeNotifyService(String topologyName, String spoutId) {
         this.topologyName = topologyName;
@@ -55,6 +62,7 @@ public class SparkMockMetadataChangeNotifyService extends AbstractMetadataChange
     @Override
     public void init(Config config, MetadataType type) {
         super.init(config, type);
+        this.client = new SpecMetadataServiceClientImpl(config);
         this.sds = defineStreamDefinitions();
         new Thread(this).start();
     }
@@ -75,6 +83,7 @@ public class SparkMockMetadataChangeNotifyService extends AbstractMetadataChange
                 notifyAlertPublishBolt();
                 break;
             case ALL:
+                LOG.info("load metadata");
                 notifySpecListener();
                 break;
             default:
@@ -82,19 +91,23 @@ public class SparkMockMetadataChangeNotifyService extends AbstractMetadataChange
         }
     }
 
-    private void notifySpecListener() {
-        SpoutSpec newSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testSpoutSpec.json"), SpoutSpec.class);
+    private  void notifySpecListener() {
+
+      /*  SpoutSpec newSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testSpoutSpec.json"), SpoutSpec.class);
         RouterSpec routerSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testStreamRouterBoltSpec.json"), RouterSpec.class);
         AlertBoltSpec alertBoltSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testAlertBoltSpec.json"), AlertBoltSpec.class);
-        PublishSpec publishSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testPublishSpec.json"), PublishSpec.class);
+        PublishSpec publishSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testPublishSpec.json"), PublishSpec.class);*/
+
+
+        SpoutSpec newSpec = client.getSpoutSpec();
+        RouterSpec routerSpec = client.getRouterSpec();
+        AlertBoltSpec alertBoltSpec = client.getAlertBoltSpec();
+        PublishSpec publishSpec = client.getPublishSpec();
         notifySpecListener(newSpec, routerSpec, alertBoltSpec, publishSpec, sds);
     }
 
     private Map<String, StreamDefinition> defineStreamDefinitions() {
-        Map<String, StreamDefinition> sds = MetadataSerDeser.deserialize(getClass().getResourceAsStream(SPARK + "/testStreamDefinitionsSpec.json"),
-                new TypeReference<Map<String, StreamDefinition>>() {
-                });
-        return sds;
+        return client.getSds();
     }
 
     private void notifySpout(List<String> plainStringTopics, List<String> jsonStringTopics) {

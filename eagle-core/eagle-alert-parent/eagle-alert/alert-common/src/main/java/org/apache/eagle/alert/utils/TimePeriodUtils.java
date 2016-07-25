@@ -16,10 +16,14 @@
  */
 package org.apache.eagle.alert.utils;
 
+import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
 
 import scala.Int;
+
+import java.util.Date;
 
 public class TimePeriodUtils {
     /**
@@ -58,5 +62,11 @@ public class TimePeriodUtils {
 
     public static int getMillisecondsOfPeriod(Period period){
         return getSecondsOfPeriod(period) * 1000;
+    }
+
+    public static void main(String[] args) {
+        long time = DateUtils.addSeconds(new Date(1467884607526l),0).getTime();
+        System.out.println(DateTimeUtil.millisecondsToHumanDateWithSeconds(time));
+        System.out.println(DateTimeUtil.millisecondsToHumanDateWithSeconds(formatMillisecondsByPeriod(time,Period.parse("PT1S"))));
     }
 }

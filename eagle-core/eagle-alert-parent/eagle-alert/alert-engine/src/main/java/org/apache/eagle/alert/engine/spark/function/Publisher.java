@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.spark.function;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -30,6 +31,7 @@ public class Publisher implements VoidFunction<JavaPairRDD<String, AlertStreamEv
     private PublishSpec publishSpec;
     private Map<String, StreamDefinition> sds;
     private String alertPublishBoltName;
+    private Config config;
 
     public Publisher(PublishSpec publishSpec, Map<String, StreamDefinition> sds, String alertPublishBoltName) {
         this.publishSpec = publishSpec;
@@ -37,8 +39,13 @@ public class Publisher implements VoidFunction<JavaPairRDD<String, AlertStreamEv
         this.alertPublishBoltName = alertPublishBoltName;
     }
 
+    public Publisher(Config config, String alertPublishBoltName) {
+        this.config = config;
+        this.alertPublishBoltName = alertPublishBoltName;
+    }
+
     @Override
     public void call(JavaPairRDD<String, AlertStreamEvent> rdd) throws Exception {
-        rdd.foreachPartition(new AlertPublisherBoltFunction(publishSpec, sds, alertPublishBoltName));
+        rdd.foreachPartition(new AlertPublisherBoltFunction(config, alertPublishBoltName));
     }
 }

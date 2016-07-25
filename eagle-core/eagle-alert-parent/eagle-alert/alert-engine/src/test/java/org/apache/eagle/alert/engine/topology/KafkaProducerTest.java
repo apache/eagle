@@ -8,12 +8,17 @@ import kafka.utils.ZKStringSerializer$;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.curator.RetryPolicy;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -27,8 +32,6 @@ import java.util.TreeMap;
 public class KafkaProducerTest implements Serializable {
 
     String topic = "oozie";
-    String key = "tjj";
-
     @Test
     public void producerTestOozie() throws InterruptedException, JsonProcessingException, ParseException {
 
@@ -63,8 +66,8 @@ public class KafkaProducerTest implements Serializable {
             try {
                 String msg = mapper.writeValueAsString(map1);
                 String msg2 = mapper.writeValueAsString(map2);
-                ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(topic, key, msg);
-                ProducerRecord<String, String> producerRecord2 = new ProducerRecord<String, String>(topic, key, msg2);
+                ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(topic, "tangjijun", msg);
+                ProducerRecord<String, String> producerRecord2 = new ProducerRecord<String, String>(topic, "pms", msg2);
                 System.out.println(msg);
                 System.out.println(msg2);
                 producer.send(producerRecord);
@@ -99,8 +102,24 @@ public class KafkaProducerTest implements Serializable {
         ZkClient zkClient = new ZkClient("localhost:2181", 10000, 10000, ZKStringSerializer$.MODULE$);
         Properties topicConfiguration = new Properties();
         ZkConnection zkConnection = new ZkConnection("localhost:2181");
+      //  zkConnection.create()
 //        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
         AdminUtils.createTopic(zkClient, topic, 3, 1, topicConfiguration);
+    }
+    @Test
+    public void listZk() throws Exception {
+        String zkhost="localhost:2181";//zk的host
+        RetryPolicy rp=new ExponentialBackoffRetry(1000, 3);//重试机制
+        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder().connectString(zkhost)
+                .connectionTimeoutMs(5000)
+                .sessionTimeoutMs(5000)
+                .retryPolicy(rp);
+        builder.namespace("tjj");
+        CuratorFramework zclient = builder.build();
+        zclient.start();
+        zclient.newNamespaceAwareEnsurePath("/tjj");
+        System.out.print(zclient.checkExists().forPath("/alert"));
+
     }
 
 }

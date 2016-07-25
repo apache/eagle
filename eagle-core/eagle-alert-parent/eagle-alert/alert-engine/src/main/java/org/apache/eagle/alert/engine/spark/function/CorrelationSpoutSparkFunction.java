@@ -18,6 +18,7 @@ package org.apache.eagle.alert.engine.spark.function;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.coordination.model.*;
@@ -26,7 +27,10 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
+import org.apache.eagle.alert.engine.spark.broadcast.SpoutSpecData;
+import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -43,6 +47,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
     private String topic = "";
     private SpoutSpec spoutSpec;
     private Map<String, StreamDefinition> sds;
+    private Config config;
 
     public CorrelationSpoutSparkFunction(int numOfRouter, String topic, SpoutSpec spoutSpec, Map<String, StreamDefinition> sds) {
         this.topic = topic;
@@ -51,9 +56,18 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
         this.numOfRouterBolts = numOfRouter;
     }
 
+    public CorrelationSpoutSparkFunction(int numOfRouter, String topic, Config config) {
+        this.topic = topic;
+        this.numOfRouterBolts = numOfRouter;
+        this.config = config;
+    }
+
     @Override
     public Iterable<Tuple2<Integer, Object>> call(Tuple2<String, String> message) {
 
+        SpecMetadataServiceClientImpl client = new SpecMetadataServiceClientImpl(config);
+        sds = client.getSds();
+        spoutSpec = client.getSpoutSpec();
 
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {

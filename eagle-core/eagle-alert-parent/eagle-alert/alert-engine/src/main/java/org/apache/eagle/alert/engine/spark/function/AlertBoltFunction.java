@@ -28,10 +28,12 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.runner.MapComparator;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
+import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
+import com.typesafe.config.Config;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,6 +48,7 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
     private Map<String, StreamDefinition> sdf;
     private AlertBoltSpec spec;
     private int numOfAlertBolts;
+    private Config config;
 
     public AlertBoltFunction(String alertBoltNamePrefix, AlertBoltSpec spec, Map<String, StreamDefinition> sds, int numOfAlertBolts) {
         this.alertBoltNamePrefix = alertBoltNamePrefix;
@@ -54,8 +57,18 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
         this.numOfAlertBolts = numOfAlertBolts;
     }
 
+    public AlertBoltFunction(String alertBoltNamePrefix, Config config, int numOfAlertBolts) {
+        this.alertBoltNamePrefix = alertBoltNamePrefix;
+        this.numOfAlertBolts = numOfAlertBolts;
+        this.config = config;
+
+    }
+
     @Override
     public Iterable<Tuple2<String, AlertStreamEvent>> call(Iterator<Tuple2<Integer, Object>> tuple2Iterator) throws Exception {
+        SpecMetadataServiceClientImpl client = new SpecMetadataServiceClientImpl(config);
+        this.spec = client.getAlertBoltSpec();
+        this.sdf = client.getSds();
         AlertBoltOutputCollectorSparkWrapper alertOutputCollector = new AlertBoltOutputCollectorSparkWrapper();
         PolicyGroupEvaluatorImpl[] evaluators = new PolicyGroupEvaluatorImpl[numOfAlertBolts];
         for (int i = 0; i < numOfAlertBolts; i++) {
@@ -63,7 +76,6 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
             evaluators[i].init(new StreamContextImpl(null, new MultiCountMetric(), null), alertOutputCollector);
             onAlertBoltSpecChange(evaluators[i], spec, sdf);
         }
-
 
         while (tuple2Iterator.hasNext()) {
             Tuple2<Integer, Object> tuple2 = tuple2Iterator.next();

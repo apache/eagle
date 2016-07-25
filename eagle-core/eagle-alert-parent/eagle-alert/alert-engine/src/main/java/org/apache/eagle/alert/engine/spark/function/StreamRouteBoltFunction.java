@@ -17,6 +17,7 @@
 package org.apache.eagle.alert.engine.spark.function;
 
 import backtype.storm.metric.api.MultiCountMetric;
+import com.typesafe.config.Config;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
@@ -29,6 +30,7 @@ import org.apache.eagle.alert.engine.router.StreamRouter;
 import org.apache.eagle.alert.engine.router.impl.SparkStreamRouterBoltOutputCollector;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
+import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,7 @@ public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tup
     private Map<String, StreamDefinition> sdf = new HashMap<>();
     private RouterSpec routerSpec;
     private String name;
+    private Config config;
 
     public StreamRouteBoltFunction(RouterSpec routerSpec, Map<String, StreamDefinition> sds,String name) {
         this.routerSpec = routerSpec;
@@ -55,8 +58,17 @@ public class StreamRouteBoltFunction implements PairFlatMapFunction<Iterator<Tup
         this.name = name;
     }
 
+    public StreamRouteBoltFunction(Config config ,String name) {
+        this.name = name;
+        this.config = config;
+    }
+
     @Override
     public Iterable<Tuple2<Integer, Object>> call(Iterator<Tuple2<Integer, Object>> tuple2Iterator) throws Exception {
+
+        SpecMetadataServiceClientImpl client = new SpecMetadataServiceClientImpl(config);
+        this.sdf = client.getSds();
+        this.routerSpec = client.getRouterSpec();
         SparkStreamRouterBoltOutputCollector routeCollector = new SparkStreamRouterBoltOutputCollector(name);
         StreamRouter router = new StreamRouterImpl(name);
         router.prepare(new StreamContextImpl(null, new MultiCountMetric(), null), routeCollector);

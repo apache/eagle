@@ -24,13 +24,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestUnitSparkTopologyMain {
-    @Ignore
     @Test
-    public void testTopologyRun() {
+    public void testTopologyRun() throws InterruptedException {
         testTopologyRun("/spark/application-spark.conf");
     }
 
-    public void testTopologyRun(String configResourceName) {
+    public void testTopologyRun(String configResourceName) throws InterruptedException {
         ConfigFactory.invalidateCaches();
         System.setProperty("config.resource", configResourceName);
         System.out.print("Set config.resource = " + configResourceName);
@@ -41,7 +40,7 @@ public class TestUnitSparkTopologyMain {
         new UnitSparkTopologyRunner(changeNotifyService,config).run();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         if (args.length > 0) {
             new TestUnitSparkTopologyMain().testTopologyRun(args[0]);
         } else {

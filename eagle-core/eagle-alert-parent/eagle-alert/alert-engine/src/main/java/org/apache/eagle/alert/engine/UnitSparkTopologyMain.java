@@ -24,7 +24,7 @@ import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyServ
 import org.apache.eagle.alert.engine.runner.UnitSparkTopologyRunner;
 
 public class UnitSparkTopologyMain {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Config config = ConfigFactory.load();
         ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
         String topologyId = config.getString("topology.name");

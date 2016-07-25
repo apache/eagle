@@ -20,8 +20,12 @@ import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 public class AlertBoltSpecData {
-    private static volatile Broadcast<AlertBoltSpec> instance = null;
+    private static Broadcast<AlertBoltSpec> instance = null;
 
     public static Broadcast<AlertBoltSpec> getInstance(JavaSparkContext jsc, final AlertBoltSpec meta) {
         if (instance == null) {
@@ -34,5 +38,6 @@ public class AlertBoltSpecData {
             instance = jsc.broadcast(meta);
         }
         return instance;
+
     }
 }

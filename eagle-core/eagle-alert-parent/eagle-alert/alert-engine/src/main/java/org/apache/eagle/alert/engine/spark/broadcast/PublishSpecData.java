@@ -22,7 +22,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 
 public class PublishSpecData {
-    private static volatile Broadcast<PublishSpec> instance = null;
+    private static Broadcast<PublishSpec> instance = null;
 
     public static Broadcast<PublishSpec> getInstance(JavaSparkContext jsc, final PublishSpec meta) {
         if (instance == null) {

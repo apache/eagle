@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.spark.function;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -23,6 +24,7 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
 import org.apache.eagle.alert.engine.runner.MapComparator;
+import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,7 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
     private PublishSpec pubSpec;
     private Map<String, StreamDefinition> sds;
     private String alertPublishBoltName = "alertPublishBolt";
+    private Config config;
 
     public AlertPublisherBoltFunction(PublishSpec pubSpec, Map<String, StreamDefinition> sds, String alertPublishBoltName) {
         this.pubSpec = pubSpec;
@@ -45,11 +48,19 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
         this.alertPublishBoltName = alertPublishBoltName;
     }
 
+    public AlertPublisherBoltFunction(Config config, String alertPublishBoltName) {
+        this.alertPublishBoltName = alertPublishBoltName;
+        this.config = config;
+    }
+
     @Override
     public void call(Iterator<Tuple2<String, AlertStreamEvent>> tuple2Iterator) throws Exception {
 
         AlertPublisher alertPublisher = new AlertPublisherImpl(alertPublishBoltName);
         alertPublisher.init(null,new HashMap<>());
+        SpecMetadataServiceClientImpl client = new SpecMetadataServiceClientImpl(config);
+        pubSpec = client.getPublishSpec();
+        sds = client.getSds();
         onAlertPublishSpecChange(alertPublisher, pubSpec, sds);
         while (tuple2Iterator.hasNext()) {
             Tuple2<String, AlertStreamEvent> tuple2 = tuple2Iterator.next();

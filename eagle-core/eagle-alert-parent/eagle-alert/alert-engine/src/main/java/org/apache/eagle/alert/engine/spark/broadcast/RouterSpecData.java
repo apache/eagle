@@ -23,7 +23,7 @@ import org.apache.spark.broadcast.Broadcast;
 
 public class RouterSpecData {
 
-    private static volatile Broadcast<RouterSpec> instance = null;
+    private static Broadcast<RouterSpec> instance = null;
 
     public static Broadcast<RouterSpec> getInstance(JavaSparkContext jsc, final RouterSpec meta) {
         if (instance == null) {
