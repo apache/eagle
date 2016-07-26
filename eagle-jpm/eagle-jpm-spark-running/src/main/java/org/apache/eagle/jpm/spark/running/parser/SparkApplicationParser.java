@@ -19,22 +19,26 @@
 package org.apache.eagle.jpm.spark.running.parser;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.jpm.spark.running.entities.*;
+import org.apache.eagle.jpm.entity.JobConfig;
+import org.apache.eagle.jpm.spark.crawl.JHFParserBase;
+import org.apache.eagle.jpm.spark.crawl.JHFSparkEventReader;
+import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
 import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
-import org.apache.eagle.jpm.spark.running.entities.JobConfig;
+import org.apache.eagle.jpm.spark.running.entities.*;
 import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.SparkJobTagName;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
 import org.apache.eagle.jpm.util.resourceFetch.model.*;
-import org.apache.eagle.jpm.util.resourceFetch.model.SparkExecutor;
-import org.apache.eagle.jpm.util.resourceFetch.model.SparkJob;
-import org.apache.eagle.jpm.util.resourceFetch.model.SparkStage;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +47,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.codehaus.jackson.map.ObjectMapper;
 import java.util.function.Function;
 
 public class SparkApplicationParser implements Runnable {
@@ -51,6 +54,7 @@ public class SparkApplicationParser implements Runnable {
 
     private List<TaggedLogAPIEntity> entities = new ArrayList<>();
     private AppInfo app;
+    private SparkApplicationInfo sparkAppInfo;
     private static final int MAX_ENTITIES_SIZE = 500;
     private static final int MAX_RETRY_TIMES = 3;
     private IEagleServiceClient client;
@@ -77,6 +81,7 @@ public class SparkApplicationParser implements Runnable {
                                   SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig,
                                   AppInfo app, Map<String, SparkAppEntity> sparkApp) {
         this.app = app;
+        this.sparkAppInfo = getSparkAppInfo(app);
         this.sparkJobConfigs = new HashMap<>();
         this.sparkAppEntityMap = sparkApp;
         if (this.sparkAppEntityMap == null) {
@@ -100,6 +105,17 @@ public class SparkApplicationParser implements Runnable {
         this.commonTags.put(SparkJobTagName.SPARK_QUEUE.toString(), app.getQueue());
     }
 
+    private SparkApplicationInfo getSparkAppInfo(AppInfo app) {
+        SparkApplicationInfo appInfo = new SparkApplicationInfo();
+        appInfo.setName(app.getName());
+        appInfo.setUser(app.getUser());
+        appInfo.setFinalStatus(app.getFinalStatus());
+        appInfo.setQueue(app.getQueue());
+        appInfo.setState(app.getState());
+
+        return appInfo;
+    }
+
     private void flush(TaggedLogAPIEntity entity) {
         if (entity != null) entities.add(entity);
         try {
@@ -120,13 +136,14 @@ public class SparkApplicationParser implements Runnable {
             try {
                 is.close();
             } catch (Exception e) {
+                LOG.error("Error when closing input stream.");
             }
         }
     }
 
     private long dateTimeToLong(String date) {
         //TODO
-        return 0l;
+        return 0L;
     }
 
     private void finishSparkApp(String sparkAppId) {
@@ -191,8 +208,55 @@ public class SparkApplicationParser implements Runnable {
 
     private JobConfig getJobConfig(String sparkAppId, int attemptId) {
         //TODO
-        LOG.info("get job config for {}, attempt {}, appId, {}", sparkAppId, attemptId, app.getId());
-        return new JobConfig();
+        LOG.info("Get job config for sparkAppId {}, attempt {}, appId {}", sparkAppId, attemptId, app.getId());
+        FileSystem hdfs = null;
+        JobConfig jobConfig = null;
+        try {
+            hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
+            String attemptIdFormatted = String.format("%06d", attemptId);
+            // remove "application_"
+            String sparkAppIdNum = sparkAppId.substring(12);
+            String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+            String appAttemptLogName = this.getAppAttemptLogName(sparkAppId, attemptIdString);
+
+            String eventLogDir = this.endpointConfig.eventLog;
+            Path attemptFile = getFilePath(eventLogDir, appAttemptLogName);
+            LOG.info("Attempt File path: " + attemptFile.toString());
+
+            String site = this.jobExtractorConfig.site;
+            SparkApplicationInfo info = this.sparkAppInfo;
+            Map<String, String> baseTags = new HashMap<>();
+            baseTags.put(SparkJobTagName.SITE.toString(), site);
+            baseTags.put(SparkJobTagName.SPARK_QUEUE.toString(), app.getQueue());
+            JHFSparkEventReader sparkEventReader = new JHFSparkEventReader(baseTags, info);
+            JHFParserBase parser = new JHFSparkRunningJobParser(sparkEventReader);
+            parser.parse(hdfs.open(attemptFile));
+
+            jobConfig = sparkEventReader.getApp().getConfig();
+        } catch (Exception e) {
+            LOG.error("Fail to process application {}", sparkAppId, e);
+        } finally {
+            if (null != hdfs) {
+                try {
+                    hdfs.close();
+                } catch (Exception e) {
+                    LOG.error("Fail to close hdfs");
+                }
+            }
+        }
+        return jobConfig;
+    }
+
+    private String getAppAttemptLogName(String appId, String attemptId) {
+        if (attemptId.equals("0")) {
+            return appId;
+        }
+        return appId + "_" + attemptId;
+    }
+
+    private Path getFilePath(String eventLogDir, String appAttemptLogName) {
+        String attemptLogDir = eventLogDir + "/" + appAttemptLogName + ".inprogress";
+        return new Path(attemptLogDir);
     }
 
     private boolean fetchSparkApps() {
@@ -210,6 +274,8 @@ public class SparkApplicationParser implements Runnable {
         } finally {
             closeInputStream(is);
         }
+        LOG.info("Successfully fetched spark application.");
+
         for (SparkApplication sparkApplication : sparkApplications) {
             String id = sparkApplication.getId();
             if (id.contains(" ")) {

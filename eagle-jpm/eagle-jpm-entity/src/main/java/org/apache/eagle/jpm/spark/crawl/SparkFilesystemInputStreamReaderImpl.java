@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.history.crawl;
+package org.apache.eagle.jpm.spark.crawl;
 
 import org.apache.eagle.jpm.util.SparkJobTagName;
 
@@ -25,13 +25,13 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SparkHistoryFileInputStreamReaderImpl implements JHFInputStreamReader {
+public class SparkFilesystemInputStreamReaderImpl implements JHFInputStreamReader {
 
     private String site;
     private SparkApplicationInfo app;
 
 
-    public SparkHistoryFileInputStreamReaderImpl(String site, SparkApplicationInfo app){
+    public SparkFilesystemInputStreamReaderImpl(String site, SparkApplicationInfo app){
         this.site = site;
         this.app = app;
     }
@@ -46,7 +46,7 @@ public class SparkHistoryFileInputStreamReaderImpl implements JHFInputStreamRead
     }
 
     public static void main(String[] args) throws Exception{
-        SparkHistoryFileInputStreamReaderImpl impl = new SparkHistoryFileInputStreamReaderImpl("apollo-phx", new SparkApplicationInfo());
+        SparkFilesystemInputStreamReaderImpl impl = new SparkFilesystemInputStreamReaderImpl("apollo-phx", new SparkApplicationInfo());
         impl.read(new FileInputStream(new File("E:\\eagle\\application_1459803563374_535667_1")));
     }
 

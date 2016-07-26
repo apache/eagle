@@ -25,12 +25,11 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
-import org.apache.eagle.jpm.spark.history.crawl.JHFInputStreamReader;
-import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
-import org.apache.eagle.jpm.spark.history.crawl.SparkHistoryFileInputStreamReaderImpl;
+import org.apache.eagle.jpm.spark.crawl.JHFInputStreamReader;
+import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
+import org.apache.eagle.jpm.spark.crawl.SparkFilesystemInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
-import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.SparkHistoryServerResourceFetcher;
@@ -94,8 +93,9 @@ public class SparkJobParseBolt extends BaseRichBolt {
             } else {
                 hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
                 for (SparkApplicationAttempt attempt : attempts) {
-                    Path attemptFile = new Path(this.config.hdfsConfig.baseDir + "/" + this.getAppAttemptLogName(appId, attempt.getAttemptId()));
-                    JHFInputStreamReader reader = new SparkHistoryFileInputStreamReaderImpl(config.info.site , info);
+                    String appAttemptLogName = this.getAppAttemptLogName(appId, attempt.getAttemptId());
+                    Path attemptFile = getFilePath(appAttemptLogName);
+                    JHFInputStreamReader reader = new SparkFilesystemInputStreamReaderImpl(config.info.site, info);
                     reader.read(hdfs.open(attemptFile));
                 }
             }
@@ -124,7 +124,15 @@ public class SparkJobParseBolt extends BaseRichBolt {
     }
 
     private String getAppAttemptLogName(String appId, String attemptId) {
-        return String.format("%s_%s", appId, attemptId);
+        if (attemptId.equals("0")) {
+            return appId;
+        }
+        return appId + "_" + attemptId;
+    }
+
+    private Path getFilePath(String appAttemptLogName) {
+        String attemptLogDir = this.config.hdfsConfig.baseDir + "/" + appAttemptLogName;
+        return new Path(attemptLogDir);
     }
 
     private List<SparkApplicationAttempt> getAttemptList(String appId) throws IOException {
@@ -133,33 +141,38 @@ public class SparkJobParseBolt extends BaseRichBolt {
         try {
 
             SparkApplication app = null;
-            try {
-                List<SparkApplication> apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
+            /*try {
+                List apps = this.historyServerFetcher.getResource(Constants.ResourceType.SPARK_JOB_DETAIL, appId);
                 if (apps != null) {
-                    app = apps.get(0);
+                    app = (SparkApplication) apps.get(0);
                     attempts = app.getAttempts();
                 }
             } catch (Exception e) {
                 LOG.warn("Fail to get application detail from history server for appId " + appId, e);
-            }
+            }*/
 
 
             if (null == app) {
-                //history server may not have the info, just double check
+                // history server may not have the info, just double check.
+                // TODO: if attemptId is not "1, 2, 3,...", we should change the logic.
+                // attemptId might be: "appId_000001"
                 hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
-                Integer attemptId = 1;
+                int attemptId = 0;
 
                 boolean exists = true;
                 while (exists) {
-                    Path attemptFile = new Path(this.config.hdfsConfig.baseDir + "/" + this.getAppAttemptLogName(appId, attemptId.toString()));
+                    String attemptIdString = Integer.toString(attemptId);
+                    String appAttemptLogName = this.getAppAttemptLogName(appId, attemptIdString);
+                    LOG.info("Attempt ID: {}, App Attempt Log: {}", attemptIdString, appAttemptLogName);
+                    Path attemptFile = getFilePath(appAttemptLogName);
                     if (hdfs.exists(attemptFile)) {
                         SparkApplicationAttempt attempt = new SparkApplicationAttempt();
-                        attempt.setAttemptId(attemptId.toString());
+                        attempt.setAttemptId(attemptIdString);
                         attempts.add(attempt);
-                        attemptId++;
-                    } else {
+                    } else if (attemptId > 0) {
                         exists = false;
                     }
+                    attemptId++;
                 }
             }
             return attempts;

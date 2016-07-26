@@ -63,6 +63,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         LOG.info("Start to fetch spark running jobs");
+        int appsNum = 0;
         try {
             List<AppInfo> apps;
             Map<String, Map<String, SparkAppEntity>> sparkApps = null;
@@ -76,10 +77,14 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
                 this.inited = true;
             } else {
                 apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_SPARK_JOB);
-                LOG.info("get {} apps from resource manager", apps.size());
+                appsNum = (apps == null ? 0 : apps.size());
+                if (apps == null) {
+                    LOG.info("No app is running.");
+                }
+                LOG.info("=== get {} apps from resource manager ===", appsNum);
             }
 
-            for (int i = 0; i < apps.size(); i++) {
+            for (int i = 0; i < appsNum; i++) {
                 LOG.info("emit spark yarn application " + apps.get(i).getId());
                 if (sparkApps != null) {
                     //emit (AppInfo, Map<String, SparkAppEntity>)

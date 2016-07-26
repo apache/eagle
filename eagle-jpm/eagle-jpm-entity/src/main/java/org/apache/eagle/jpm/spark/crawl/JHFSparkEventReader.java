@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.history.crawl;
+package org.apache.eagle.jpm.spark.crawl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -69,8 +69,13 @@ public class JHFSparkEventReader {
         this.initiateClient();
     }
 
+    public SparkApp getApp() {
+        return this.app;
+    }
+
     public void read(JSONObject eventObj) throws Exception {
         String eventType = (String) eventObj.get("Event");
+        logger.info("Event type: " + eventType);
         if (eventType.equalsIgnoreCase(EventType.SparkListenerApplicationStart.toString())) {
             handleAppStarted(eventObj);
         } else if (eventType.equalsIgnoreCase(EventType.SparkListenerEnvironmentUpdate.toString())) {
@@ -110,7 +115,7 @@ public class JHFSparkEventReader {
 
         List<String> jobConfs = conf.getStringList("basic.jobConf.additional.info");
         String[] props = {"spark.yarn.app.id", "spark.executor.memory", "spark.driver.host", "spark.driver.port",
-                "spark.driver.memory", "ebay.job.name", "spark.scheduler.pool", "spark.executor.cores", "spark.yarn.am.memory",
+                "spark.driver.memory", "spark.scheduler.pool", "spark.executor.cores", "spark.yarn.am.memory",
                 "spark.yarn.am.cores", "spark.yarn.executor.memoryOverhead", "spark.yarn.driver.memoryOverhead", "spark.yarn.am.memoryOverhead", "spark.master"};
         jobConfs.addAll(Arrays.asList(props));
         for (String prop : jobConfs) {
@@ -134,7 +139,6 @@ public class JHFSparkEventReader {
             } else {
                 return conf.getString("spark.defaultVal." + configName);
             }
-
         }
     }
 
@@ -248,6 +252,7 @@ public class JHFSparkEventReader {
         tasks.remove(taskId);
         this.flushEntities(task, false);
     }
+
 
     private SparkTask initializeTask(JSONObject event) {
         SparkTask task = new SparkTask();
@@ -680,7 +685,7 @@ public class JHFSparkEventReader {
 
     private void doFlush(List entities) throws Exception {
         logger.info("start flushing entities of total number " + entities.size());
-        client.create(entities);
+//        client.create(entities);
         logger.info("finish flushing entities of total number " + entities.size());
 //        for(Object entity: entities){
 //            if(entity instanceof SparkApp){

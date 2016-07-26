@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.history.crawl;
+package org.apache.eagle.jpm.spark.crawl;
 
 
 import org.json.simple.JSONObject;
@@ -40,21 +40,22 @@ public class JHFSparkParser implements JHFParserBase {
     @Override
     public void parse(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        try{
+        try {
             String line = null;
 
             JSONParser parser = new JSONParser();
             while((line = reader.readLine()) != null){
                 try{
                     JSONObject eventObj = (JSONObject) parser.parse(line);
+                    String eventType = (String) eventObj.get("Event");
+                    logger.info("Event type: " + eventType);
                     this.eventReader.read(eventObj);
                 }catch(Exception e){
-                    logger.error(String.format("Fail to parse %s.", line), e);
+                    logger.error(String.format("Invalid json string. Fail to parse %s.", line), e);
                 }
             }
             this.eventReader.clearReader();
-
-        }finally {
+        } finally {
             if(reader != null){
                 reader.close();
             }

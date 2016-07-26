@@ -17,6 +17,7 @@
 
 package org.apache.eagle.jpm.spark.running.entities;
 
+import org.apache.eagle.jpm.entity.JobConfig;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
