@@ -36,8 +36,8 @@ public class TestApplicationImpl extends AbstractApplication {
     private final static Logger LOG = LoggerFactory.getLogger(TestApplicationImpl.class);
     protected void buildApp(TopologyBuilder builder, ApplicationContext context) {
         builder.setSpout("metric_spout", new RandomEventSpout(), 4);
-        builder.setBolt("sink_1",context.getFlattenStreamSink("SAMPLE_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
-        builder.setBolt("sink_2",context.getFlattenStreamSink("SAMPLE_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_1",context.getFlattenStreamSink("TEST_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",context.getFlattenStreamSink("TEST_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));
     }
 
     private class RandomEventSpout extends BaseRichSpout {
