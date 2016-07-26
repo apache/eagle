@@ -70,7 +70,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
             value = mapper.readValue(message._2, typeRef);
         } catch (IOException e) {
             LOG.error("covert tuple value to map error");
-            return null;
+            return  Collections.emptyIterator();
         }
         List<Object> tuple = new ArrayList<Object>(2);
         String topic = message._1;
@@ -84,7 +84,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
         if (metadata == null) {
             LOG.error(
                     "tuple2StreamMetadata is null spout collector for topic {} see monitored metadata invalid, is this data source removed! ", topic);
-            return null;
+            return  Collections.emptyIterator();
         }
         Tuple2StreamConverter converter = new Tuple2StreamConverter(metadata);
         List<Object> tupleContent = converter.convert(tuple);
@@ -93,7 +93,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
         if (streamRepartitionMetadataList == null) {
             LOG.error(
                     "streamRepartitionMetadataList is nullspout collector for topic {} see monitored metadata invalid, is this data source removed! ", topic);
-            return null;
+            return  Collections.emptyIterator();
         }
         Map<String, Object> messageContent = (Map<String, Object>) tupleContent.get(3);
         Object streamId = tupleContent.get(1);
@@ -101,7 +101,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
         StreamDefinition sd = sds.get(streamId);
         if (sd == null) {
             LOG.warn("StreamDefinition {} is not found within {}, ignore this message", streamId, sds);
-            return null;
+            return  Collections.emptyIterator();
         }
         List<Tuple2<Integer, PartitionedEvent>> outputTuple2s = new ArrayList<Tuple2<Integer, PartitionedEvent>>(5);
 
@@ -126,7 +126,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
             }
         }
         if (CollectionUtils.isEmpty(outputTuple2s)) {
-            return null;
+            return  Collections.emptyIterator();
         }
         return outputTuple2s.iterator();
     }
