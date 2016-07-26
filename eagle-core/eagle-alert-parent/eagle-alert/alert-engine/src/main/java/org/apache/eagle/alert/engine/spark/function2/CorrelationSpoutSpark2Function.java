@@ -1,20 +1,4 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.apache.eagle.alert.engine.spark.function;
+package org.apache.eagle.alert.engine.spark.function2;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,10 +11,9 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
-import org.apache.eagle.alert.engine.spark.broadcast.SpoutSpecData;
+import org.apache.eagle.alert.engine.spark.function.CorrelationSpoutSparkFunction;
 import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
-import org.apache.spark.api.java.function.PairFlatMapFunction;
-import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -38,42 +21,55 @@ import scala.Tuple2;
 import java.io.IOException;
 import java.util.*;
 
-public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2<String, String>, Integer, PartitionedEvent>, SerializationMetadataProvider {
+public class CorrelationSpoutSpark2Function implements FlatMapFunction<String, Tuple2<Integer, PartitionedEvent>>, SerializationMetadataProvider {
+
 
     private static final long serialVersionUID = -5281723341236671580L;
     private static final Logger LOG = LoggerFactory.getLogger(CorrelationSpoutSparkFunction.class);
 
     private int numOfRouterBolts;
-  //  private String topic = "";
+    //  private String topic = "";
     private SpoutSpec spoutSpec;
     private Map<String, StreamDefinition> sds;
     private Config config;
 
+    public CorrelationSpoutSpark2Function(int numOfRouter, SpoutSpec spoutSpec, Map<String, StreamDefinition> sds) {
+        this.spoutSpec = spoutSpec;
+        this.sds = sds;
+        this.numOfRouterBolts = numOfRouter;
+    }
 
-    public CorrelationSpoutSparkFunction(int numOfRouter, Config config) {
+    public CorrelationSpoutSpark2Function(int numOfRouter, Config config) {
         this.numOfRouterBolts = numOfRouter;
         this.config = config;
     }
 
     @Override
-    public Iterator<Tuple2<Integer, PartitionedEvent>> call(Tuple2<String, String> message) {
+    public Iterator<Tuple2<Integer, PartitionedEvent>> call(String message) {
+
+        if (message == null) {
+            return null;
+        }
 
         SpecMetadataServiceClientImpl client = new SpecMetadataServiceClientImpl(config);
         sds = client.getSds();
         spoutSpec = client.getSpoutSpec();
-
+        String[] topicAndContent = message.split(" ");
+        if (topicAndContent.length < 2) {
+            return null;
+        }
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
         };
         Map<String, Object> value;
         try {
-            value = mapper.readValue(message._2, typeRef);
+            value = mapper.readValue(topicAndContent[1], typeRef);
         } catch (IOException e) {
             LOG.error("covert tuple value to map error");
             return null;
         }
         List<Object> tuple = new ArrayList<Object>(2);
-        String topic = message._1;
+        String topic = topicAndContent[0];
         tuple.add(0, topic);
         tuple.add(1, value);
          /*Object topic = tupleContent.get(0);
@@ -121,6 +117,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
                 // filter out message
                 if (mod >= groupingStrategy.startSequence && mod < groupingStrategy.startSequence + numOfRouterBolts) {
                     PartitionedEvent pEvent = new PartitionedEvent(event, groupingStrategy.partition, hash);
+                    LOG.info(mod+"--------"+pEvent);
                     outputTuple2s.add(new Tuple2<Integer, PartitionedEvent>(mod, pEvent));
                 }
             }

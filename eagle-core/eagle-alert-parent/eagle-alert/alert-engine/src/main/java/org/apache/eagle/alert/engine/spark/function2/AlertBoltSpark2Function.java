@@ -1,22 +1,7 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.apache.eagle.alert.engine.spark.function;
+package org.apache.eagle.alert.engine.spark.function2;
 
 import backtype.storm.metric.api.MultiCountMetric;
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
@@ -28,20 +13,22 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.runner.MapComparator;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
+import org.apache.eagle.alert.engine.spark.function.AlertBoltFunction;
 import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
-import org.apache.spark.api.java.function.PairFlatMapFunction;
+import org.apache.spark.api.java.function.MapPartitionsFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-import com.typesafe.config.Config;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<Integer, PartitionedEvent>>, String, AlertStreamEvent>, SerializationMetadataProvider {
-    private final static Logger LOG = LoggerFactory.getLogger(AlertBoltFunction.class);
+public class AlertBoltSpark2Function implements MapPartitionsFunction<Tuple2<Integer, PartitionedEvent>, Tuple2<String, AlertStreamEvent>>, SerializationMetadataProvider {
+
+
+    private final static Logger LOG = LoggerFactory.getLogger(AlertBoltSpark2Function.class);
 
     private String alertBoltNamePrefix;
 
@@ -50,14 +37,8 @@ public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<In
     private int numOfAlertBolts;
     private Config config;
 
-    public AlertBoltFunction(String alertBoltNamePrefix, AlertBoltSpec spec, Map<String, StreamDefinition> sds, int numOfAlertBolts) {
-        this.alertBoltNamePrefix = alertBoltNamePrefix;
-        this.sdf = sds;
-        this.spec = spec;
-        this.numOfAlertBolts = numOfAlertBolts;
-    }
 
-    public AlertBoltFunction(String alertBoltNamePrefix, Config config, int numOfAlertBolts) {
+    public AlertBoltSpark2Function(String alertBoltNamePrefix, Config config, int numOfAlertBolts) {
         this.alertBoltNamePrefix = alertBoltNamePrefix;
         this.numOfAlertBolts = numOfAlertBolts;
         this.config = config;

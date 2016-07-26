@@ -160,7 +160,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming-${kafka.artifact.id}</artifactId>
+			<artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
 			<version>${spark.core.version}</version>
 			<exclusions>
 				<exclusion>

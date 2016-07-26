@@ -48,6 +48,7 @@ public class UnitSparkTopologyRunner {
     public final static String CONSUMER_KAFKA_TOPIC = "topology.topics";
     public final static String WINDOW_DURATIONS = "topology.windowDurations";
     public final static String CHECKPOINT_DIRECTORY = "topology.checkpointDirectory";
+    public final static String TOPOLOGY_MASTER = "topology.master";
 
 
     //  private final IMetadataChangeNotifyService metadataChangeNotifyService;
@@ -68,6 +69,8 @@ public class UnitSparkTopologyRunner {
         if (localMode) {
             LOG.info("Submitting as local mode");
             sparkConf.setMaster("local[*]");
+        }else{
+            sparkConf.setMaster(config.getString(TOPOLOGY_MASTER));
         }
         String sparkExecutorCores = config.getString(SPARK_EXECUTOR_CORES);
         String sparkExecutorMemory = config.getString(SPARK_EXECUTOR_MEMORY);
@@ -83,7 +86,7 @@ public class UnitSparkTopologyRunner {
 
     }
 
-    public void run() {
+    public void run() throws InterruptedException {
         buildTopology(jssc, config);
         jssc.start();
         jssc.awaitTermination();
@@ -110,7 +113,7 @@ public class UnitSparkTopologyRunner {
         JavaPairDStream<String, String> messages = KafkaUtils.createDirectStream(jssc, String.class, String.class, StringDecoder.class, StringDecoder.class, kafkaParams, topics);
 
         messages.window(Durations.seconds(windowDurations), Durations.seconds(windowDurations))
-                .flatMapToPair(new CorrelationSpoutSparkFunction(numOfRouter, topic, config))
+                .flatMapToPair(new CorrelationSpoutSparkFunction(numOfRouter,config))
                 .transformToPair(new ChangePartitionTo(numOfRouter))
                 .mapPartitionsToPair(new StreamRouteBoltFunction(config, "streamBolt"))
                 .transformToPair(new ChangePartitionTo(numOfAlertBolts)).mapPartitionsToPair(new AlertBoltFunction(alertBoltNamePrefix, config, numOfAlertBolts))

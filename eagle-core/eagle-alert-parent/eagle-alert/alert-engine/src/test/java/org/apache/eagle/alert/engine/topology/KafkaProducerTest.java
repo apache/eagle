@@ -66,8 +66,8 @@ public class KafkaProducerTest implements Serializable {
             try {
                 String msg = mapper.writeValueAsString(map1);
                 String msg2 = mapper.writeValueAsString(map2);
-                ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(topic, "tangjijun", msg);
-                ProducerRecord<String, String> producerRecord2 = new ProducerRecord<String, String>(topic, "pms", msg2);
+                ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(topic, "oozie", msg);
+                ProducerRecord<String, String> producerRecord2 = new ProducerRecord<String, String>(topic, "oozie", msg2);
                 System.out.println(msg);
                 System.out.println(msg2);
                 producer.send(producerRecord);

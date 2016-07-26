@@ -38,7 +38,7 @@ import java.util.*;
 
 public class SparkStreamRouterBoltOutputCollector implements PartitionedEventCollector, Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(SparkStreamRouterBoltOutputCollector.class);
-    private final List<Tuple2<Integer, Object>> outputCollector;
+    private final List<Tuple2<Integer, PartitionedEvent>> outputCollector;
     private volatile Map<StreamPartition, StreamRouterSpec> routeSpecMap;
     private volatile Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap;
     // private final String outputLock = new String("LOCK");
@@ -46,16 +46,16 @@ public class SparkStreamRouterBoltOutputCollector implements PartitionedEventCol
 
     public SparkStreamRouterBoltOutputCollector(String sourceId) {
         this.sourceId = sourceId;
-        this.outputCollector = new LinkedList<Tuple2<Integer, Object>>();
+        this.outputCollector = new LinkedList<Tuple2<Integer, PartitionedEvent>>();
         this.routeSpecMap = new HashMap<>();
         this.routePartitionerMap = new HashMap<>();
     }
 
-    public List<Tuple2<Integer, Object>> emitResult() {
+    public List<Tuple2<Integer, PartitionedEvent>> emitResult() {
         if (outputCollector.isEmpty()) {
             return Collections.emptyList();
         }
-        List<Tuple2<Integer, Object>> result = new LinkedList<>();
+        List<Tuple2<Integer, PartitionedEvent>> result = new LinkedList<>();
         result.addAll(outputCollector);
         outputCollector.clear();
         return result;
@@ -95,7 +95,7 @@ public class SparkStreamRouterBoltOutputCollector implements PartitionedEventCol
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Emitted to partition {} with message {}", partitionIndex, emittedEvent);
                         }
-                        outputCollector.add(new Tuple2<Integer, Object>(partitionIndex, event));
+                        outputCollector.add(new Tuple2<Integer, PartitionedEvent>(partitionIndex, event));
                     } catch (RuntimeException ex) {
                         LOG.error("Failed to emit to partition {} with {}", partitionIndex, newEvent, ex);
                         throw ex;

@@ -1,4 +1,3 @@
-/*
 package org.apache.eagle.alert.engine.topology;
 
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -48,4 +47,4 @@ public class WordCount implements Serializable {
         query.awaitTermination();
     }
 
-}*/
+}

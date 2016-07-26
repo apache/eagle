@@ -16,11 +16,12 @@
  */
 package org.apache.eagle.alert.engine.spark.function;
 
+import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.spark.partition.StreamRoutePartitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
 
-public class ChangePartitionTo implements Function<JavaPairRDD<Integer, Object>, JavaPairRDD<Integer, Object>> {
+public class ChangePartitionTo implements Function<JavaPairRDD<Integer, PartitionedEvent>, JavaPairRDD<Integer, PartitionedEvent>> {
     private int numParts;// can be dynamic set like executor in storm
 
     public ChangePartitionTo(int numParts) {
@@ -28,7 +29,7 @@ public class ChangePartitionTo implements Function<JavaPairRDD<Integer, Object>,
     }
 
     @Override
-    public JavaPairRDD<Integer, Object> call(JavaPairRDD<Integer, Object> rdd) throws Exception {
+    public JavaPairRDD<Integer, PartitionedEvent> call(JavaPairRDD<Integer, PartitionedEvent> rdd) throws Exception {
         return rdd.partitionBy(new StreamRoutePartitioner(numParts));
     }
 }
