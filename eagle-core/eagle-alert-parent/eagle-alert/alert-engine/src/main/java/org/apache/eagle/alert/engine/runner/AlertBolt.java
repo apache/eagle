@@ -16,20 +16,19 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import backtype.storm.metric.api.MultiCountMetric;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.StreamContextImpl;
-import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.coordinator.MetadataType;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.evaluator.PolicyGroupEvaluator;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorWrapper;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
@@ -41,14 +40,10 @@ import org.apache.eagle.alert.utils.AlertConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.metric.api.MultiCountMetric;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-
-import com.typesafe.config.Config;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Since 5/1/16.
@@ -69,6 +64,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     private StreamContext streamContext;
     private volatile Map<String, StreamDefinition> sdf  = new HashMap<String, StreamDefinition>();
     private PartitionedEventSerializer serializer;
+    private volatile String specVersion = "Not Initialized";
 
     public AlertBolt(String boltId, PolicyGroupEvaluator policyGroupEvaluator, Config config, IMetadataChangeNotifyService changeNotifyService){
         super(changeNotifyService, config);
@@ -80,8 +76,10 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         // byte[] in higher priority
         if(object instanceof byte[]) {
             return serializer.deserialize((byte[]) object);
-        } else {
+        } else if (object instanceof PartitionedEvent){
             return (PartitionedEvent) object;
+        } else {
+            throw new IllegalStateException(String.format("Unsupported event class '%s', expect byte array or PartitionedEvent!", object == null ? null : object.getClass().getCanonicalName()));
         }
     }
 
@@ -94,8 +92,8 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                 this.collector.ack(input);
             }
             this.streamContext.counter().scope("ack_count").incr();
-        }catch (Exception ex) {
-            LOG.error(ex.getMessage(),ex);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
             synchronized (outputLock) {
                 this.streamContext.counter().scope("fail_count").incr();
                 this.collector.fail(input);
@@ -131,7 +129,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     }
 
     @Override
-    public void onAlertBoltSpecChange(AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
+    public synchronized void onAlertBoltSpecChange(AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
         List<PolicyDefinition> newPolicies = spec.getBoltPoliciesMap().get(boltId);
         if(newPolicies == null) {
             LOG.info("no new policy with AlertBoltSpec {} for this bolt {}", spec, boltId);
@@ -148,10 +146,19 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         // switch
         cachedPolicies = newPoliciesMap;
         sdf = sds;
+        specVersion = spec.getVersion();
     }
 
     @Override
-    public StreamDefinition getStreamDefinition(String streamId) {
-        return sdf.get(streamId);
+    public StreamDefinition getStreamDefinition(String streamId) throws StreamDefinitionNotFoundException {
+        if (sdf.containsKey(streamId)) {
+            return sdf.get(streamId);
+        } else {
+            throw new StreamDefinitionNotFoundException(streamId, specVersion);
+        }
+    }
+
+    public String getBoltId() {
+        return boltId;
     }
 }
