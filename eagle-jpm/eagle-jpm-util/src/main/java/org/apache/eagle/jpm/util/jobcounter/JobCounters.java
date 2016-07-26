@@ -16,17 +16,32 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.jobcounter;
+package org.apache.eagle.jpm.util.jobcounter;
 
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-public interface CounterGroupKey {
 
-    String getName();
-    String getDescription();
-    int getIndex();
-    int getCounterNumber();
-    List<CounterKey> listCounterKeys();
-    CounterKey getCounterKeyByName(String name);
-    CounterKey getCounterKeyByID(int index);
+public final class JobCounters {
+    
+    private Map<String, Map<String, Long>> counters = new TreeMap<>();
+
+    public Map<String, Map<String, Long>> getCounters() {
+        return counters;
+    }
+
+    public void setCounters(Map<String, Map<String, Long>> counters) {
+        this.counters = counters;
+    }
+    
+    public String toString(){
+        return counters.toString();
+    }
+
+    public void clear() {
+        for (Map.Entry<String, Map<String, Long>> entry : counters.entrySet()) {
+            entry.getValue().clear();
+        }
+        counters.clear();
+    }
 }

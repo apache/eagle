@@ -16,7 +16,7 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.jobcounter;
+package org.apache.eagle.jpm.util.jobcounter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

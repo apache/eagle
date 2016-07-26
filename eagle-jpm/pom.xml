@@ -37,6 +37,7 @@
         <module>eagle-jpm-mr-history</module>
          <module>eagle-jpm-entity</module>
         <module>eagle-jpm-util</module>
+      <module>eagle-jpm-mr-running</module>
   </modules>
 
     <dependencies>

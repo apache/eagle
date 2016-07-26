@@ -16,33 +16,15 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.parser;
+package org.apache.eagle.jpm.util.jobcounter;
 
-public enum EagleJobTagName {
-    SITE("site"),
-    RACK("rack"),
-    HOSTNAME("hostname"),
-    JOB_NAME("jobName"),
-    NORM_JOB_NAME("normJobName"),
-    JOB_ID("jobID"),
-    TASK_ID("taskID"),
-    TASK_ATTEMPT_ID("taskAttemptID"),
-    JOB_STATUS("jobStatus"),
-    USER("user"),
-    TASK_TYPE("taskType"),
-    TASK_EXEC_TYPE("taskExecType"),
-    ERROR_CATEGORY("errorCategory"),
-    JOB_QUEUE("queue"),
-    RULE_TYPE("ruleType"),
-    JOB_TYPE("jobType");
+import java.util.List;
 
-    private String tagName; 
-    private EagleJobTagName(String tagName) {
-        this.tagName = tagName;
-    }
+public interface CounterKey {
+
+    List<String> getNames();
+    String getDescription();
+    int getIndex();
+    CounterGroupKey getGroupKey();
     
-    public String toString() {
-
-        return this.tagName;
-    }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,23 +16,33 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.common;
+package org.apache.eagle.jpm.util;
 
-import java.util.Map;
-import java.util.TreeMap;
+public enum MRJobTagName {
+    SITE("site"),
+    RACK("rack"),
+    HOSTNAME("hostname"),
+    JOB_NAME("jobName"),
+    NORM_JOB_NAME("normJobName"),
+    JOB_ID("jobID"),
+    TASK_ID("taskID"),
+    TASK_ATTEMPT_ID("taskAttemptID"),
+    JOB_STATUS("jobStatus"),
+    USER("user"),
+    TASK_TYPE("taskType"),
+    TASK_EXEC_TYPE("taskExecType"),
+    ERROR_CATEGORY("errorCategory"),
+    JOB_QUEUE("queue"),
+    RULE_TYPE("ruleType"),
+    JOB_TYPE("jobType");
 
-public final class JobConfig {
-    private Map<String, String> config = new TreeMap<>();
-
-    public Map<String, String> getConfig() {
-        return config;
-    }
-
-    public void setConfig(Map<String, String> config) {
-        this.config = config;
+    private String tagName; 
+    private MRJobTagName(String tagName) {
+        this.tagName = tagName;
     }
     
-    public String toString(){
-        return config.toString();
+    public String toString() {
+
+        return this.tagName;
     }
 }
