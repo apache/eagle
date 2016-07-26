@@ -1,0 +1,182 @@
+{
+  "version": null,
+  "topologyId": "testTopology",
+  "kafka2TupleMetadataMap": {
+    "testTopic5": {
+      "type": null,
+      "name": "testTopic5",
+      "properties": null,
+      "topic": "testTopic5",
+      "schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
+      "codec": null
+    },
+    "testTopic3": {
+      "type": null,
+      "name": "testTopic3",
+      "properties": null,
+      "topic": "testTopic3",
+      "schemeCls": "org.apache.eagle.alert.engine.scheme.PlainStringScheme",
+      "codec": null
+    },
+    "testTopic4": {
+      "type": null,
+      "name": "testTopic4",
+      "properties": null,
+      "topic": "testTopic4",
+      "schemeCls": "org.apache.eagle.alert.engine.scheme.PlainStringScheme",
+      "codec": null
+    },
+    "oozie": {
+      "type": null,
+      "name": "oozie",
+      "properties": null,
+      "topic": "oozie",
+      "schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
+      "codec": null
+    }
+  },
+  "tuple2StreamMetadataMap": {
+    "testTopic5": {
+      "activeStreamNames": [
+        "testTopic5Stream"
+      ],
+      "streamNameSelectorProp": {
+        "userProvidedStreamName": "testTopic5Stream"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": null
+    },
+    "testTopic3": {
+      "activeStreamNames": [
+        "testTopic3Stream"
+      ],
+      "streamNameSelectorProp": {
+        "userProvidedStreamName": "testTopic3Stream"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.PlainStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": null
+    },
+    "testTopic4": {
+      "activeStreamNames": [
+        "testTopic4Stream"
+      ],
+      "streamNameSelectorProp": {
+        "userProvidedStreamName": "testTopic4Stream"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.PlainStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": null
+    },
+    "oozie": {
+      "activeStreamNames": [
+        "oozieStream"
+      ],
+      "streamNameSelectorProp": {
+        "userProvidedStreamName": "oozieStream"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.PlainStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": null
+    }
+  },
+  "streamRepartitionMetadataMap": {
+    "testTopic5": [
+      {
+        "topicName": "testTopic5",
+        "streamId": "defaultStringStream",
+        "groupingStrategies": [
+          {
+            "partition": {
+              "streamId": "testTopic5Stream",
+              "type": "GROUPBY",
+              "columns": [
+                "value"
+              ],
+              "sortSpec": {
+                "windowPeriod": "PT10S",
+                "windowMargin": 1000
+              }
+            },
+            "numTotalParticipatingRouterBolts": 4,
+            "startSequence": 0,
+            "totalTargetBoltIds": []
+          }
+        ]
+      }
+    ],
+    "testTopic3": [
+      {
+        "topicName": "testTopic3",
+        "streamId": "defaultStringStream",
+        "groupingStrategies": [
+          {
+            "partition": {
+              "streamId": "testTopic3Stream",
+              "type": "GROUPBY",
+              "columns": [
+                "value"
+              ],
+              "sortSpec": {
+                "windowPeriod": "PT10S",
+                "windowMargin": 1000
+              }
+            },
+            "numTotalParticipatingRouterBolts": 4,
+            "startSequence": 0,
+            "totalTargetBoltIds": []
+          }
+        ]
+      }
+    ],
+    "testTopic4": [
+      {
+        "topicName": "testTopic4",
+        "streamId": "defaultStringStream",
+        "groupingStrategies": [
+          {
+            "partition": {
+              "streamId": "testTopic4Stream",
+              "type": "GROUPBY",
+              "columns": [
+                "value"
+              ],
+              "sortSpec": {
+                "windowPeriod": "PT10S",
+                "windowMargin": 1000
+              }
+            },
+            "numTotalParticipatingRouterBolts": 4,
+            "startSequence": 0,
+            "totalTargetBoltIds": []
+          }
+        ]
+      }
+    ],
+    "oozie": [
+      {
+        "topicName": "oozie",
+        "streamId": "defaultStringStream",
+        "groupingStrategies": [
+          {
+            "partition": {
+              "streamId": "oozieStream",
+              "type": "GROUPBY",
+              "columns": [
+                "operation"
+              ],
+              "sortSpec": {
+                "windowPeriod": "PT4S",
+                "windowMargin": 1000
+              }
+            },
+            "numTotalParticipatingRouterBolts": 4,
+            "startSequence": 0,
+            "totalTargetBoltIds": []
+          }
+        ]
+      }
+    ]
+  }
+}

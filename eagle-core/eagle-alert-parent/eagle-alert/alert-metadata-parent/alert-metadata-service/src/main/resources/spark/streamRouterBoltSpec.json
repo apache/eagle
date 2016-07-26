@@ -1,0 +1,162 @@
+{
+  "version": null,
+  "topologyName": "testTopology",
+  "routerSpecs": [
+    {
+      "streamId": "testTopic3Stream",
+      "partition": {
+        "streamId": "testTopic3Stream",
+        "type": "GROUPBY",
+        "columns": [
+          "value"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT10S",
+          "windowMargin": 1000
+        }
+      },
+      "targetQueue": [
+        {
+          "partition": {
+            "streamId": "testTopic3Stream",
+            "type": "GROUPBY",
+            "columns": [
+              "value"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT10S",
+              "windowMargin": 1000
+            }
+          },
+          "workers": [
+            {
+              "topologyName": "testTopology",
+              "boltId": "alertBolt0"
+            },
+            {
+              "topologyName": "testTopology",
+              "boltId": "alertBolt1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "streamId": "testTopic4Stream",
+      "partition": {
+        "streamId": "testTopic4Stream",
+        "type": "GROUPBY",
+        "columns": [
+          "value"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT10S",
+          "windowMargin": 1000
+        }
+      },
+      "targetQueue": [
+        {
+          "partition": {
+            "streamId": "testTopic4Stream",
+            "type": "GROUPBY",
+            "columns": [
+              "value"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT10S",
+              "windowMargin": 1000
+            }
+          },
+          "workers": [
+            {
+              "topologyName": "testTopology",
+              "boltId": "alertBolt0"
+            },
+            {
+              "topologyName": "testTopology",
+              "boltId": "alertBolt1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "streamId": "testTopic5Stream",
+      "partition": {
+        "streamId": "testTopic5Stream",
+        "type": "GROUPBY",
+        "columns": [
+          "value"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT10S",
+          "windowMargin": 1000
+        }
+      },
+      "targetQueue": [
+        {
+          "partition": {
+            "streamId": "testTopic5Stream",
+            "type": "GROUPBY",
+            "columns": [
+              "value"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT10S",
+              "windowMargin": 1000
+            }
+          },
+          "workers": [
+            {
+              "topologyName": "testTopology",
+              "boltId": "alertBolt0"
+            },
+            {
+              "topologyName": "testTopology",
+              "boltId": "alertBolt1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "streamId": "oozieStream",
+      "partition": {
+        "streamId": "oozieStream",
+        "type": "GROUPBY",
+        "columns": [
+          "operation"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT4S",
+          "windowMargin": 1000
+        }
+      },
+      "targetQueue": [
+        {
+          "partition": {
+            "streamId": "oozieStream",
+            "type": "GROUPBY",
+            "columns": [
+              "ip"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT4S",
+              "windowMargin": 1000
+            }
+          },
+          "workers": [
+            {
+              "topologyName": "testTopology",
+              "boltId": "alertBolt0"
+            },
+            {
+              "topologyName": "testTopology",
+              "boltId": "alertBolt1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

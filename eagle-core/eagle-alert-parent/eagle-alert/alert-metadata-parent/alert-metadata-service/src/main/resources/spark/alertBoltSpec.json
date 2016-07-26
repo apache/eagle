@@ -1,0 +1,150 @@
+{
+  "version": "version1",
+  "topologyName": "testTopology",
+  "boltPoliciesMap": {
+    "alertBolt0": [
+      {
+        "name": "policy1",
+        "description": null,
+        "inputStreams": [
+          "testTopic3Stream"
+        ],
+        "outputStreams": [
+          "testAlertStream"
+        ],
+        "definition": {
+          "type": "siddhi",
+          "value": "from testTopic3Stream[value=='xyz'] select value insert into testAlertStream;"
+        },
+        "partitionSpec": [
+          {
+            "streamId": "testTopic3Stream",
+            "type": "GROUPBY",
+            "columns": [
+              "value"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT10S",
+              "windowMargin": 1000
+            }
+          }
+        ],
+        "parallelismHint": 0
+      },
+      {
+        "name": "policy2",
+        "description": null,
+        "inputStreams": [
+          "testTopic4Stream"
+        ],
+        "outputStreams": [
+          "testAlertStream"
+        ],
+        "definition": {
+          "type": "siddhi",
+          "value": "from testTopic4Stream[value=='xyz'] select value insert into testAlertStream;"
+        },
+        "partitionSpec": [
+          {
+            "streamId": "testTopic4Stream",
+            "type": "GROUPBY",
+            "columns": [
+              "value"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT10S",
+              "windowMargin": 1000
+            }
+          }
+        ],
+        "parallelismHint": 0
+      },
+      {
+        "name": "policy3",
+        "description": null,
+        "inputStreams": [
+          "testTopic5Stream"
+        ],
+        "outputStreams": [
+          "testAlertStream"
+        ],
+        "definition": {
+          "type": "siddhi",
+          "value": "from testTopic5Stream[value=='xyz'] select value insert into testAlertStream;"
+        },
+        "partitionSpec": [
+          {
+            "streamId": "testTopic5Stream",
+            "type": "GROUPBY",
+            "columns": [
+              "value"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT10S",
+              "windowMargin": 1000
+            }
+          }
+        ],
+        "parallelismHint": 0
+      },
+      {
+        "name": "policy4",
+        "description": null,
+        "inputStreams": [
+          "oozieStream"
+        ],
+        "outputStreams": [
+          "testAlertStream"
+        ],
+        "definition": {
+          "type": "siddhi",
+          "value": " from oozieStream#window.externalTime(timestamp, 4 sec)  select ip, jobid , operation, count(1) as visitCount insert into testAlertStream;  "
+        },
+        "partitionSpec": [
+          {
+            "streamId": "oozieStream",
+            "type": "GROUPBY",
+            "columns": [
+              "operation"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT4S",
+              "windowMargin": 1000
+            }
+          }
+        ],
+        "parallelismHint": 0
+      }
+    ],
+    "alertBolt1": [
+      {
+        "name": "policy4",
+        "description": null,
+        "inputStreams": [
+          "oozieStream"
+        ],
+        "outputStreams": [
+          "testAlertStream"
+        ],
+        "definition": {
+          "type": "siddhi",
+          "value": " from oozieStream#window.externalTime(timestamp, 2 sec)  select ip, jobid , operation, count(1) as visitCount insert into testAlertStream;  "
+        },
+        "partitionSpec": [
+          {
+            "streamId": "oozieStream",
+            "type": "GROUPBY",
+            "columns": [
+              "operation"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT4S",
+              "windowMargin": 1000
+            }
+          }
+        ],
+        "parallelismHint": 0
+      }
+    ]
+  }
+}
