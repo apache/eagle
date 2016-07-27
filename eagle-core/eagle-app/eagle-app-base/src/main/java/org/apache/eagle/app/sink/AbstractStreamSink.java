@@ -23,19 +23,20 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.app.sink.mapper.StreamEventMapper;
+import org.apache.eagle.metadata.model.StreamSinkDesc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractStreamSink extends StreamSink {
+public abstract class AbstractStreamSink<K extends StreamSinkDesc> extends StreamSink<K> {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractStreamSink.class);
     private final static String KEY_FIELD = "KEY";
     private final static String VALUE_FIELD = "VALUE";
     private StreamEventMapper streamEventMapper;
 
-    public AbstractStreamSink setEventMapper(StreamEventMapper streamEventMapper){
+    public AbstractStreamSink<K> setEventMapper(StreamEventMapper streamEventMapper){
         this.streamEventMapper = streamEventMapper;
         return this;
     }

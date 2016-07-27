@@ -94,7 +94,6 @@ public class ExampleApplicationTest {
         simulator.submit(ExampleApplicationProvider2.class);
     }
 
-
     /**
      * For DEBUG
      * @param args

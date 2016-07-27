@@ -18,7 +18,6 @@ package org.apache.eagle.app;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.app.sink.AbstractStreamSink;
 import org.apache.eagle.app.sink.StreamSink;
 import org.apache.eagle.app.sink.mapper.*;
 import org.apache.eagle.app.spi.ApplicationProvider;
@@ -77,12 +76,10 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
         if(null != outputStreams){
             outputStreams.forEach((stream) -> {
                 try {
-                    StreamSink streamSink = (StreamSink) sinkClass.newInstance();
-                    streamSink.init(stream,this);
                     StreamDesc streamDesc = new StreamDesc();
-                    streamDesc.setStreamSchema(stream);
-                    streamDesc.setSinkContext(streamSink.getSinkContext());
-                    streamDesc.setSinkType(sinkClass);
+                    StreamSink streamSink = (StreamSink) sinkClass.newInstance();
+                    streamDesc.setSink(streamSink.init(stream,this));
+                    streamDesc.setSchema(stream);
                     streamDesc.setStreamId(stream.getStreamId());
                     streamDescMap.put(streamDesc.getStreamId(),streamDesc);
                     streamDefinitionMap.put(streamDesc.getStreamId(),stream);
@@ -113,7 +110,7 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
         checkStreamExists(streamId);
         Class<?> sinkClass = appEntity.getDescriptor().getSinkClass();
         try {
-            AbstractStreamSink abstractStreamSink = (AbstractStreamSink) sinkClass.newInstance();
+            StreamSink abstractStreamSink = (StreamSink) sinkClass.newInstance();
             abstractStreamSink.setEventMapper(mapper);
             abstractStreamSink.init(streamDefinitionMap.get(streamId),this);
             return abstractStreamSink;
