@@ -56,7 +56,7 @@ public class TestApplicationTestSuite {
         Assert.assertNotNull(siteEntity.getUuid());
 
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation("test_site","TEST_APPLICATION", ApplicationEntity.Mode.LOCAL));
+        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation("test_site","TEST_APPLICATION", ApplicationEntity.Mode.LOCAL)).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         // Stop application

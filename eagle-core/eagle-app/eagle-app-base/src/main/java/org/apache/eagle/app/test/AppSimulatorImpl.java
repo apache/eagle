@@ -55,7 +55,7 @@ public class AppSimulatorImpl extends ApplicationSimulator {
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation(siteEntity.getSiteId(),appType, ApplicationEntity.Mode.LOCAL));
+        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation(siteEntity.getSiteId(),appType, ApplicationEntity.Mode.LOCAL)).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
     }
