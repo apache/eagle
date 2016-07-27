@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
-public class RESTResponse<T>{
+public class RESTResponse_<T>{
     private boolean success = false;
     private String message;
     private String exception;
@@ -61,23 +61,23 @@ public class RESTResponse<T>{
     }
 
     public static <E> RestResponseBuilder<E> of(E data){
-        return RESTResponse.<E>builder().data(data);
+        return RESTResponse_.<E>builder().data(data);
     }
 
     public static <E> RestResponseBuilder<E> of(Consumer<RestResponseBuilder<E>> func){
-        return RESTResponse.<E>builder().of(func);
+        return RESTResponse_.<E>builder().of(func);
     }
 
     public static <E> RestResponseBuilder<E> of(Supplier<E> func){
-        return RESTResponse.<E>builder().of(func);
+        return RESTResponse_.<E>builder().of(func);
     }
 
     public static <E> RestResponseBuilder<E> async(UnhandledSupplier<E,Exception> func) {
-        return RESTResponse.<E>builder().async(func);
+        return RESTResponse_.<E>builder().async(func);
     }
 
     public static <E> RestResponseBuilder<E> async(UnhandledConsumer<RestResponseBuilder<E>, Exception> func){
-        return RESTResponse.<E>builder().async(func);
+        return RESTResponse_.<E>builder().async(func);
     }
 
     public String getException() {
@@ -94,7 +94,7 @@ public class RESTResponse<T>{
 
 
     public static class RestResponseBuilder<E>{
-        private RESTResponse current = new RESTResponse();
+        private RESTResponse_ current = new RESTResponse_();
         private Response.Status status = Response.Status.OK;
 
         public RestResponseBuilder<E> success(boolean success){
@@ -197,7 +197,7 @@ public class RESTResponse<T>{
             return this;
         }
 
-        public RESTResponse<E> get(){
+        public RESTResponse_<E> get(){
             return current;
         }
 
