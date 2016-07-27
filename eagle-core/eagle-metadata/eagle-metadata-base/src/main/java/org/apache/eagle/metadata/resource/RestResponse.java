@@ -16,24 +16,21 @@
  */
 package org.apache.eagle.metadata.resource;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.time.StopWatch;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class RestResponse<T>{
-    private Long timestamp;
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+public class RESTResponse<T>{
     private boolean success = false;
     private String message;
     private String exception;
     private T data;
-    private Long time;
 
     public T getData() {
         return data;
@@ -64,27 +61,23 @@ public class RestResponse<T>{
     }
 
     public static <E> RestResponseBuilder<E> of(E data){
-        return RestResponse.<E>builder().data(data);
+        return RESTResponse.<E>builder().data(data);
     }
 
     public static <E> RestResponseBuilder<E> of(Consumer<RestResponseBuilder<E>> func){
-        return RestResponse.<E>builder().of(func);
+        return RESTResponse.<E>builder().of(func);
     }
 
     public static <E> RestResponseBuilder<E> of(Supplier<E> func){
-        return RestResponse.<E>builder().of(func);
+        return RESTResponse.<E>builder().of(func);
     }
 
     public static <E> RestResponseBuilder<E> async(UnhandledSupplier<E,Exception> func) {
-        return RestResponse.<E>builder().async(func);
+        return RESTResponse.<E>builder().async(func);
     }
 
     public static <E> RestResponseBuilder<E> async(UnhandledConsumer<RestResponseBuilder<E>, Exception> func){
-        return RestResponse.<E>builder().async(func);
-    }
-
-    public static <E> RestResponseBuilder<E> verbose(boolean verbose) {
-        return RestResponse.<E>builder().verbose(verbose);
+        return RESTResponse.<E>builder().async(func);
     }
 
     public String getException() {
@@ -99,33 +92,18 @@ public class RestResponse<T>{
         this.exception = exception;
     }
 
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public Long getTime() {
-        return time;
-    }
-
-    public void setTime(Long time) {
-        this.time = time;
-    }
 
     public static class RestResponseBuilder<E>{
-        RestResponse<E> current;
-        Response.Status status = Response.Status.OK;
-        boolean verbose = true;
-
-        public RestResponseBuilder(){
-            current = new RestResponse<>();
-        }
+        private RESTResponse current = new RESTResponse();
+        private Response.Status status = Response.Status.OK;
 
         public RestResponseBuilder<E> success(boolean success){
             this.current.setSuccess(success);
+            return this;
+        }
+
+        public RestResponseBuilder<E> status(Response.Status status){
+            this.status = status;
             return this;
         }
 
@@ -139,54 +117,28 @@ public class RestResponse<T>{
             return this;
         }
 
-        public RestResponseBuilder<E> status(Response.Status status){
-            this.status = status;
-            return this;
-        }
         public RestResponseBuilder<E> exception(Throwable exception){
             this.current.setThrowable(exception);
             return this;
         }
 
-        public RestResponseBuilder<E> type(Class<?> clazz){
-            return this;
-        }
-
-        public RestResponseBuilder<E> spend(Long spendMillis){
-            this.current.setTime(spendMillis);
-            return this;
-        }
-
-        public RestResponseBuilder<E> verbose(boolean verbose){
-            this.verbose = verbose;
-            return this;
-        }
-
         public RestResponseBuilder<E> of(Consumer<RestResponseBuilder<E>> func){
-            StopWatch stopWatch = new StopWatch();
             try {
-                stopWatch.start();
                 this.success(true).status(Response.Status.OK);
                 func.accept(this);
             } catch (Exception ex){
                 this.success(false).data(null).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage());
-            } finally {
-                stopWatch.stop();
-                this.spend(stopWatch.getTime());
+                raiseWebAppException(ex);
             }
             return this;
         }
 
         public RestResponseBuilder<E>  of(Supplier<E> func){
-            StopWatch stopWatch = new StopWatch();
             try {
-                stopWatch.start();
                 this.success(true).status(Response.Status.OK).data(func.get());
             } catch (Throwable ex){
                 this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage());
-            } finally {
-                stopWatch.stop();
-                this.spend(stopWatch.getTime());
+                raiseWebAppException(ex);
             }
             return this;
         }
@@ -197,6 +149,7 @@ public class RestResponse<T>{
                     this.status(Response.Status.OK).success(true).data(func.get());
                 } catch (Throwable e) {
                     this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(e.getMessage()).exception(e);
+                    raiseWebAppException(e);
                 }
             });
             runAsync(future);
@@ -204,9 +157,7 @@ public class RestResponse<T>{
         }
 
         private void runAsync(CompletableFuture future){
-            StopWatch stopWatch = new StopWatch();
             try {
-                stopWatch.start();
                 future.get();
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
@@ -214,10 +165,12 @@ public class RestResponse<T>{
                 this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage()).exception(ex);
             } catch (Throwable ex) {
                 this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage()).exception(ex);
-            } finally {
-                stopWatch.stop();
-                this.spend(stopWatch.getTime());
+                raiseWebAppException(ex);
             }
+        }
+
+        private void raiseWebAppException(Throwable ex){
+            throw new WebApplicationException(ex,Response.status(this.status).entity(this.current).build());
         }
 
         public RestResponseBuilder<E> async(UnhandledConsumer<RestResponseBuilder<E>, Exception> func){
@@ -227,6 +180,7 @@ public class RestResponse<T>{
                     this.success(true);
                 } catch (Throwable ex) {
                     this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage()).exception(ex);
+                    raiseWebAppException(ex);
                 }
             });
             runAsync(future);
@@ -238,16 +192,13 @@ public class RestResponse<T>{
                 func.accept(this);
             } catch (Throwable ex) {
                 this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage()).exception(ex);
+                raiseWebAppException(ex);
             }
             return this;
         }
 
-        public Response get(){
-            this.current.setTimestamp(System.currentTimeMillis());
-            if(!this.verbose){
-                this.current.setException(null);
-            }
-            return Response.status(this.status).entity(this.current).build();
+        public RESTResponse<E> get(){
+            return current;
         }
 
         public RestResponseBuilder<E> status(boolean success, Response.Status status) {
