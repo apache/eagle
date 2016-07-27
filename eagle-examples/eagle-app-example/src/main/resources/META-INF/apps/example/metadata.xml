@@ -17,7 +17,7 @@
   -->
 
 <application>
-    <type>EXAMPLE_APPLICATION_2</type>
+    <type>EXAMPLE_APPLICATION</type>
     <name>Example Monitoring Application</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.app.example.ExampleApplication</appClass>
