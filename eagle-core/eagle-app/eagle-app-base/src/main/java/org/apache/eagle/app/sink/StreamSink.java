@@ -20,18 +20,19 @@ import backtype.storm.topology.base.BaseBasicBolt;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.ApplicationContext;
 import org.apache.eagle.app.ApplicationLifecycleListener;
+import org.apache.eagle.app.sink.mapper.StreamEventMapper;
+import org.apache.eagle.metadata.model.StreamSinkDesc;
 
-import java.util.Map;
-
-public abstract class StreamSink extends BaseBasicBolt implements ApplicationLifecycleListener {
+public abstract class StreamSink<T extends StreamSinkDesc> extends BaseBasicBolt implements ApplicationLifecycleListener {
     /**
      * Should only initialize metadata in this method but must not open any resource like connection
      *
      * @param streamDefinition
      * @param context
      */
-    public abstract void init(StreamDefinition streamDefinition, ApplicationContext context);
-    public abstract Map<String,Object> getSinkContext();
+    public abstract T init(StreamDefinition streamDefinition, ApplicationContext context);
+
+    public abstract StreamSink<T> setEventMapper(StreamEventMapper streamEventMapper);
 
     @Override
     public void onAppStart() {
