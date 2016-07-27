@@ -23,6 +23,7 @@ import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.resource.RESTResponse;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 import javax.ws.rs.*;
@@ -62,9 +63,12 @@ public class ApplicationResource {
     @PUT
     @Path("/providers/reload")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ApplicationDesc> reloadApplicationDescs(){
-        providerService.reload();
-        return providerService.getApplicationDescs();
+    public RESTResponse<Collection<ApplicationDesc>> reloadApplicationDescs(){
+        return RESTResponse.<Collection<ApplicationDesc>>async((builder)-> {
+            providerService.reload();
+            builder.message("Successfully reload application providers");
+            builder.data(providerService.getApplicationDescs());
+        }).get();
     }
 
     @GET
@@ -97,8 +101,12 @@ public class ApplicationResource {
     @Path("/install")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity installApplication(ApplicationOperations.InstallOperation operation){
-        return applicationManagementService.install(operation);
+    public RESTResponse<ApplicationEntity> installApplication(ApplicationOperations.InstallOperation operation){
+        return RESTResponse.<ApplicationEntity>async((builder)-> {
+            ApplicationEntity entity = applicationManagementService.install(operation);
+            builder.message("Successfully installed application "+operation.getAppType()+" onto site "+operation.getSiteId());
+            builder.data(entity);
+        }).get();
     }
 
     /**
@@ -115,8 +123,11 @@ public class ApplicationResource {
     @Path("/uninstall")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity uninstallApplication(ApplicationOperations.UninstallOperation operation){
-        return applicationManagementService.uninstall(operation);
+    public RESTResponse<Void> uninstallApplication(ApplicationOperations.UninstallOperation operation){
+        return RESTResponse.<Void>async((builder)-> {
+            ApplicationEntity entity = applicationManagementService.uninstall(operation);
+            builder.success(true).message("Successfully uninstalled application "+entity.getUuid());
+        }).get();
     }
 
     /**
@@ -132,8 +143,11 @@ public class ApplicationResource {
     @Path("/start")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity startApplication(ApplicationOperations.StartOperation operation){
-        return applicationManagementService.start(operation);
+    public RESTResponse<Void> startApplication(ApplicationOperations.StartOperation operation){
+        return RESTResponse.<Void>async((builder)-> {
+            ApplicationEntity entity = applicationManagementService.start(operation);
+            builder.success(true).message("Successfully started application "+entity.getUuid());
+        }).get();
     }
 
     /**
@@ -149,7 +163,10 @@ public class ApplicationResource {
     @Path("/stop")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity stopApplication(ApplicationOperations.StopOperation operation){
-        return applicationManagementService.stop(operation);
+    public RESTResponse<Void> stopApplication(ApplicationOperations.StopOperation operation){
+        return RESTResponse.<Void>async((builder)-> {
+            ApplicationEntity entity = applicationManagementService.stop(operation);
+            builder.success(true).message("Successfully stopped application "+entity.getUuid());
+        }).get();
     }
 }

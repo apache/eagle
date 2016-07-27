@@ -25,6 +25,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 
+import static org.apache.eagle.metadata.resource.RESTResponse.async;
+
 @Path("/sites")
 @Singleton
 public class SiteResource {
@@ -46,8 +48,12 @@ public class SiteResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public SiteEntity createSite(SiteEntity siteEntity){
-        return siteEntityService.create(siteEntity);
+    public RESTResponse<SiteEntity> createSite(SiteEntity siteEntity){
+        return RESTResponse.<SiteEntity>async((builder)-> {
+            SiteEntity entity = siteEntityService.create(siteEntity);
+            builder.message("Successfully created site (siteId:"+entity.getSiteId()+", uuid: "+entity.getUuid()+")");
+            builder.data(entity);
+        }).get();
     }
 
     @GET
