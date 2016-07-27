@@ -48,7 +48,7 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
         this.alertPublishBoltName = alertPublishBoltName;
     }
 
-    public AlertPublisherBoltFunction(Config config, String alertPublishBoltName) {
+    protected AlertPublisherBoltFunction(Config config, String alertPublishBoltName) {
         this.alertPublishBoltName = alertPublishBoltName;
         this.config = config;
     }
@@ -66,12 +66,12 @@ public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<
             Tuple2<String, AlertStreamEvent> tuple2 = tuple2Iterator.next();
             AlertStreamEvent alertEvent = tuple2._2;
             LOG.info("AlertPublisherBoltFunction "+alertEvent);
-            alertPublisher.nextEvent((alertEvent));
+            alertPublisher.nextEvent(alertEvent);
         }
 
     }
 
-    public void onAlertPublishSpecChange(AlertPublisher alertPublisher, PublishSpec pubSpec, Map<String, StreamDefinition> sds) {
+    private void onAlertPublishSpecChange(AlertPublisher alertPublisher, PublishSpec pubSpec, Map<String, StreamDefinition> sds) {
         if (pubSpec == null) return;
 
         List<Publishment> newPublishments = pubSpec.getPublishments();
