@@ -98,17 +98,19 @@ public class JdbcDatabaseHandler {
             LOG.info("update {} entities", status);
             connection.commit();
         } catch (SQLException e) {
-            //e.printStackTrace();
+            LOG.error(e.getMessage(),e.getCause());
             if(e.getMessage().toLowerCase().contains("duplicate")){
+                LOG.info("Detected duplicated entity");
                 try {
                     connection.rollback(savepoint);
                     update(tb, key, value);
                 } catch (SQLException e1) {
                     //e1.printStackTrace();
-                    LOG.warn("Rollback failed");
+                    LOG.warn("Rollback failed",e1);
                 }
             }
         } catch (JsonProcessingException e) {
+            LOG.error("Got JsonProcessingException: {}",e.getMessage(),e.getCause());
             result.code = OpResult.FAILURE;
             result.message = e.getMessage();
         } finally {
@@ -116,7 +118,7 @@ public class JdbcDatabaseHandler {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    LOG.error("Failed to close statement: {}",e.getMessage(),e.getCause());
                 }
             }
         }

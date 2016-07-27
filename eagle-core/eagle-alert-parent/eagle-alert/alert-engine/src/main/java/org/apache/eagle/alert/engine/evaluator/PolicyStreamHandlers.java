@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.alert.engine.evaluator;
 
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.absence.AbsencePolicyHandler;
-import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyHandler;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyHandler;
+import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyHandler;
+
+import java.util.Map;
 
 public class PolicyStreamHandlers {
     public static final String SIDDHI_ENGINE ="siddhi";

@@ -67,11 +67,8 @@ public class ServiceApp extends Application<AlertDropWizardConfiguration> {
         environment.getApplicationContext().setContextPath("/rest");
         environment.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-        MetadataResource resource = new MetadataResource();
-        environment.jersey().register(resource);
-
-        CoordinatorResource coorResource = new CoordinatorResource();
-        environment.jersey().register(coorResource);
+        environment.jersey().register(MetadataResource.class);
+        environment.jersey().register(CoordinatorResource.class);
 
         SpecMetadataResource specResource = new SpecMetadataResource();
         environment.jersey().register(specResource);

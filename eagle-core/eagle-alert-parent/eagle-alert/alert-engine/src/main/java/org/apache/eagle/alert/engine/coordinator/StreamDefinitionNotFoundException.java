@@ -1,5 +1,7 @@
 package org.apache.eagle.alert.engine.coordinator;
 
+import java.io.IOException;
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,10 +18,17 @@ package org.apache.eagle.alert.engine.coordinator;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class StreamDefinitionNotFoundException extends Exception {
+public class StreamDefinitionNotFoundException extends IOException {
     private static final long serialVersionUID = 6027811718016485808L;
 
-    public StreamDefinitionNotFoundException(String streamId){
-        super("Stream definition not found: "+streamId);
+    public StreamDefinitionNotFoundException() {
+    }
+
+    public StreamDefinitionNotFoundException(String streamId) {
+        super("Stream definition not found: " + streamId);
+    }
+
+    public StreamDefinitionNotFoundException(String streamName, String specVersion) {
+        super(String.format("Stream '%s' not found! Current spec version '%s'. Possibly metadata not loaded or metadata mismatch between upstream and alert bolts yet!", streamName, specVersion));
     }
 }
