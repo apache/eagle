@@ -17,8 +17,8 @@ package org.apache.eagle.alert.utils;
  * limitations under the License.
  */
 public class StreamIdConversion {
-    private final static String STREAM_ID_TEMPLATE = "stream_%s_to_%s";
-    private final static String STREAM_ID_NUM_TEMPLATE = "stream_%s";
+    public final static String STREAM_ID_TEMPLATE = "stream_%s_to_%s";
+    public final static String STREAM_ID_NUM_TEMPLATE = "stream_%s";
     public static String generateStreamIdBetween(String sourceId, String targetId){
         return String.format(STREAM_ID_TEMPLATE,sourceId,targetId);
     }
