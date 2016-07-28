@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class StreamDefinition implements Serializable{
     private boolean validate;
     private boolean timeseries;
 
-    private List<StreamColumn> columns = new ArrayList<StreamColumn>();
+    private List<StreamColumn> columns = new ArrayList<>();
 
     public String toString(){
         return String.format("StreamDefinition[streamId=%s, dataSource=%s, description=%s, validate=%s, timeseries=%s, columns=%s",
@@ -78,6 +79,8 @@ public class StreamDefinition implements Serializable{
         this.timeseries = timeseries;
     }
 
+    @XmlElementWrapper(name="columns")
+    @XmlElement(name = "column")
     public List<StreamColumn> getColumns() {
         return columns;
     }

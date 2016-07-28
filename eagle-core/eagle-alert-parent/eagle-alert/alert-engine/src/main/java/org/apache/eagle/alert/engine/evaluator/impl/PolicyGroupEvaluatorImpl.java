@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
@@ -31,6 +27,10 @@ import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandlers;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     private static final long serialVersionUID = -5499413193675985288L;
@@ -141,7 +141,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
                 PolicyHandlerContext context = new PolicyHandlerContext();
                 context.setPolicyCounter(this.context.counter());
                 context.setPolicyDefinition(policy);
-                context.setParentEvaluator(this);
+                context.setPolicyEvaluator(this);
                 context.setPolicyEvaluatorId(policyEvaluatorId);
                 handler.prepare(collector, context);
                 handlers.put(policy.getName(), handler);

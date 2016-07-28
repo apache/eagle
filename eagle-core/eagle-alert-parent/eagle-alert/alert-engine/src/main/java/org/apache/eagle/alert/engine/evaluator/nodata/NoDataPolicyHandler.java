@@ -72,6 +72,26 @@ import org.slf4j.LoggerFactory;
  ],
  "parallelismHint": 2
  }
+     "name": "noDataAlertPolicy",
+     "description": "noDataAlertPolicy",
+     "inputStreams": [
+        "noDataAlertStream"
+     ],
+     "outputStreams": [
+        "noDataAlertStream_out"
+     ],
+     "definition": {
+        "type": "nodataalert",
+        "value": "PT1M,plain,1,host,host1,host2"   // or "value": "PT1M,dynamic,1,host"
+     },
+     "partitionSpec": [
+     {
+        "streamId": "noDataAlertStream",
+        "type": "GROUPBY"
+     }
+     ],
+     "parallelismHint": 2
+   }
  */
 public class NoDataPolicyHandler implements PolicyStreamHandler{
     private static final Logger LOG = LoggerFactory.getLogger(NoDataPolicyHandler.class);
@@ -171,8 +191,8 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
         event.setData(triggerEvent);
         event.setStreamId(policyDef.getOutputStreams().get(0));
         event.setPolicy(context.getPolicyDefinition());
-        if (this.context.getParentEvaluator() != null) {
-            event.setCreatedBy(context.getParentEvaluator().getName());
+        if (this.context.getPolicyEvaluator() != null) {
+            event.setCreatedBy(context.getPolicyEvaluator().getName());
         }
         event.setCreatedTime(System.currentTimeMillis());
         event.setSchema(sd);

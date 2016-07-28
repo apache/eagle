@@ -23,7 +23,6 @@ import org.apache.eagle.alert.engine.UnitTopologyMain;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutorService;
@@ -50,7 +49,7 @@ public class Integration5AbsenceAlert {
             kafka.shutdown();
         }
     }
-    @Test @Ignore
+    @Test
     public void testTriggerAbsenceAlert() throws Exception{
         System.setProperty("config.resource", "/absence/application-absence.conf");
         ConfigFactory.invalidateCaches();

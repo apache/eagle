@@ -1,17 +1,17 @@
 [
-  {
-    "name": "absenceAlertDataSource",
-    "type": "KAFKA",
-    "properties": {},
-    "topic": "absenceAlertTopic",
-    "schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
-    "codec": {
-      "streamNameSelectorProp": {
-        "userProvidedStreamName": "noDataAlertStream"
-      },
-      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
-      "timestampColumn": "timestamp",
-      "timestampFormat": ""
-    }
-  }
+	{
+		"name": "absenceAlertDataSource",
+		"type": "KAFKA",
+		"properties": {},
+		"topic": "absenceAlertTopic",
+		"schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
+		"codec": {
+			"streamNameSelectorProp": {
+				"userProvidedStreamName": "noDataAlertStream"
+			},
+			"streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+			"timestampColumn": "timestamp",
+			"timestampFormat": ""
+		}
+	}
 ]

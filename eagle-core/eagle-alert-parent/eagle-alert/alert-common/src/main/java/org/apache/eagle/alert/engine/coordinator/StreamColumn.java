@@ -16,7 +16,14 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 
 
 public class StreamColumn implements Serializable {
@@ -40,6 +47,7 @@ public class StreamColumn implements Serializable {
         this.name = name;
     }
 
+    @XmlJavaTypeAdapter(StreamColumnTypeAdapter.class)
     public Type getType() {
         return type;
     }
@@ -48,12 +56,43 @@ public class StreamColumn implements Serializable {
         this.type = type;
     }
 
+    @XmlJavaTypeAdapter(value = DefaultValueAdapter.class)
     public Object getDefaultValue() {
         return defaultValue;
     }
 
+    private void ensureDefaultValueType() {
+        if(this.getDefaultValue()!=null && (this.getDefaultValue() instanceof String) && this.getType() != Type.STRING){
+            switch (this.getType()) {
+                case INT:
+                    this.setDefaultValue(Integer.valueOf((String) this.getDefaultValue()));
+                    break;
+                case LONG:
+                    this.setDefaultValue(Long.valueOf((String) this.getDefaultValue()));
+                    break;
+                case FLOAT:
+                    this.setDefaultValue(Float.valueOf((String) this.getDefaultValue()));
+                    break;
+                case DOUBLE:
+                    this.setDefaultValue(Double.valueOf((String) this.getDefaultValue()));
+                    break;
+                case BOOL:
+                    this.setDefaultValue(Double.valueOf((String) this.getDefaultValue()));
+                    break;
+                case OBJECT:
+                    try {
+                        this.setDefaultValue(new ObjectMapper().readValue((String) this.getDefaultValue(),HashMap.class));
+                    } catch (IOException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                    break;
+            }
+        }
+    }
+
     public void setDefaultValue(Object defaultValue) {
         this.defaultValue = defaultValue;
+        ensureDefaultValueType();
     }
 
     public boolean isRequired() {
@@ -95,6 +134,31 @@ public class StreamColumn implements Serializable {
                 }
             }
             throw new IllegalArgumentException();
+        }
+    }
+
+    public static class StreamColumnTypeAdapter extends XmlAdapter<String,Type>{
+
+        @Override
+        public Type unmarshal(String v) throws Exception {
+            return Type.getEnumFromValue(v);
+        }
+
+        @Override
+        public String marshal(Type v) throws Exception {
+            return v.name;
+        }
+    }
+
+    public static class DefaultValueAdapter extends XmlAdapter<String,Object>{
+        @Override
+        public Object unmarshal(String v) throws Exception {
+            return v;
+        }
+
+        @Override
+        public String marshal(Object v) throws Exception {
+            return v.toString();
         }
     }
 

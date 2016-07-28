@@ -16,22 +16,22 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import backtype.storm.metric.api.MultiCountMetric;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.StreamContextImpl;
-import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.coordinator.MetadataType;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.evaluator.PolicyGroupEvaluator;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorWrapper;
+import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
@@ -41,14 +41,10 @@ import org.apache.eagle.alert.utils.AlertConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.metric.api.MultiCountMetric;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-
-import com.typesafe.config.Config;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Since 5/1/16.
@@ -66,23 +62,12 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     // mapping from policy name to PolicyDefinition
     private volatile Map<String, PolicyDefinition> cachedPolicies = new HashMap<>(); // for one streamGroup, there are multiple policies
 
-    private StreamContext streamContext;
-    private volatile Map<String, StreamDefinition> sdf;
-    private PartitionedEventSerializer serializer;
 
-    public AlertBolt(String boltId, PolicyGroupEvaluator policyGroupEvaluator, Config config, IMetadataChangeNotifyService changeNotifyService){
-        super(changeNotifyService, config);
+    public AlertBolt(String boltId, Config config, IMetadataChangeNotifyService changeNotifyService){
+        super(boltId, changeNotifyService, config);
         this.boltId = boltId;
-        this.policyGroupEvaluator = policyGroupEvaluator;
-    }
-
-    PartitionedEvent deserialize(Object object) throws IOException {
-        // byte[] in higher priority
-        if(object instanceof byte[]) {
-            return serializer.deserialize((byte[]) object);
-        } else {
-            return (PartitionedEvent) object;
-        }
+        this.policyGroupEvaluator = new PolicyGroupEvaluatorImpl(boltId + "-evaluator_stage1"); // use bolt id as evaluatorId.
+        // TODO next stage evaluator
     }
 
     @Override
@@ -94,8 +79,8 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                 this.collector.ack(input);
             }
             this.streamContext.counter().scope("ack_count").incr();
-        }catch (Exception ex) {
-            LOG.error(ex.getMessage(),ex);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
             synchronized (outputLock) {
                 this.streamContext.counter().scope("fail_count").incr();
                 this.collector.fail(input);
@@ -110,7 +95,6 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         // instantiate output lock object
         outputLock = new Object();
         streamContext = new StreamContextImpl(config,context.registerMetric("eagle.evaluator",new MultiCountMetric(),60),context);
-        serializer = Serializers.newPartitionedEventSerializer(this);
         alertOutputCollector = new AlertBoltOutputCollectorWrapper(collector, outputLock,streamContext);
         policyGroupEvaluator.init(streamContext, alertOutputCollector);
         metadataChangeNotifyService.registerListener(this);
@@ -131,7 +115,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     }
 
     @Override
-    public void onAlertBoltSpecChange(AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
+    public synchronized void onAlertBoltSpecChange(AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
         List<PolicyDefinition> newPolicies = spec.getBoltPoliciesMap().get(boltId);
         if(newPolicies == null) {
             LOG.info("no new policy with AlertBoltSpec {} for this bolt {}", spec, boltId);
@@ -148,10 +132,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         // switch
         cachedPolicies = newPoliciesMap;
         sdf = sds;
+        specVersion = spec.getVersion();
     }
 
-    @Override
-    public StreamDefinition getStreamDefinition(String streamId) {
-        return sdf.get(streamId);
-    }
 }

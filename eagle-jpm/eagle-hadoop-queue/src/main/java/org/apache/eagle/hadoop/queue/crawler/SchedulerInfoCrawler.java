@@ -42,7 +42,7 @@ public class SchedulerInfoCrawler implements Runnable {
 	@Override
 	public void run() {
 		try {
-			//https://apollo-phx-rm-2.vip.ebay.com:50030/ws/v1/cluster/scheduler?anonymous=true
+			//https://some.server.address:50030/ws/v1/cluster/scheduler?anonymous=true
 			logger.info("Start to crawl cluster scheduler queues from " + this.urlString);
 			SchedulerWrapper schedulerWrapper = (SchedulerWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(urlString, SchedulerWrapper.class);
 			if (schedulerWrapper == null || schedulerWrapper.getScheduler() == null) {

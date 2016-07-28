@@ -17,14 +17,14 @@
 			"defaultValue": 0,
 			"required":true
 		},{
-			"name": "metric",
+			"name": "floatField",
 			"type" : "float",
-			"defaultValue": "perfmon_cpu",
+			"defaultValue": "1.2",
 			"required": true
 		},{
-			"name": "pool",
+			"name": "intField",
 			"type" : "int",
-			"defaultValue": "raptor_general",
+			"defaultValue": "3",
 			"required":true
 		},{
 			"name": "value",
@@ -33,9 +33,9 @@
 			"required":true
 		},
 		{
-			"name": "colo",
+			"name": "boolField",
 			"type" : "bool",
-			"defaultValue": "",
+			"defaultValue": true,
 			"required":true
 		}
 	]
