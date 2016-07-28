@@ -47,7 +47,7 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     protected void configure (){
         // do nothing by default
     }
-Å
+
     protected AbstractApplicationProvider(String applicationDescConfig) {
         this();
         ApplicationProviderDescConfig descWrapperConfig = ApplicationProviderDescConfig.loadFromXML(applicationDescConfig);
