@@ -95,7 +95,7 @@ Note: these configurations can be overridden in the topology configurations, whi
            app.eagleProps.site=sandbox
            app.eagleProps.application=hbaseSecurityLog
            app.eagleProps.dataJoinPollIntervalSec=30
-           app.eagleProps.mailHost=atom.corp.ebay.com
+           app.eagleProps.mailHost=some.mail.server
            app.eagleProps.mailSmtpPort=25
            app.eagleProps.mailDebug=true
            app.eagleProps.eagleService.host=localhost
