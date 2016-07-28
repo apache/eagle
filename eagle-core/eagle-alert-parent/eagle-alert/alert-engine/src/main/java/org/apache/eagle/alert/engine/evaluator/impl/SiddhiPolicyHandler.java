@@ -85,8 +85,8 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
                 event.setData(e.getData());
                 event.setStreamId(outputStream);
                 event.setPolicy(context.getPolicyDefinition());
-                if (this.context.getParentEvaluator() != null) {
-                    event.setCreatedBy(context.getParentEvaluator().getName());
+                if (this.context.getPolicyEvaluator() != null) {
+                    event.setCreatedBy(context.getPolicyEvaluator().getName());
                 }
                 event.setCreatedTime(System.currentTimeMillis());
                 event.setSchema(definition);

@@ -16,43 +16,27 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
-import org.apache.eagle.alert.coordination.model.RouterSpec;
-import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
-import org.apache.eagle.alert.engine.StreamContext;
-import org.apache.eagle.alert.engine.StreamContextImpl;
-import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.coordinator.MetadataType;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
-import org.apache.eagle.alert.engine.model.PartitionedEvent;
-import org.apache.eagle.alert.engine.router.StreamRouter;
-import org.apache.eagle.alert.engine.router.StreamRouterBoltSpecListener;
-import org.apache.eagle.alert.engine.router.impl.StreamRouterBoltOutputCollector;
-import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
-import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
-import org.apache.eagle.alert.engine.serialization.Serializers;
-import org.apache.eagle.alert.utils.AlertConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
-
 import com.typesafe.config.Config;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
+import org.apache.eagle.alert.coordination.model.RouterSpec;
+import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
+import org.apache.eagle.alert.engine.StreamContextImpl;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.router.StreamRouter;
+import org.apache.eagle.alert.engine.router.StreamRouterBoltSpecListener;
+import org.apache.eagle.alert.engine.router.impl.StreamRouterBoltOutputCollector;
+import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
+import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
+import org.apache.eagle.alert.utils.AlertConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouterBoltSpecListener, SerializationMetadataProvider{
     private final static Logger LOG = LoggerFactory.getLogger(StreamRouterBolt.class);
@@ -63,33 +47,20 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
     private volatile Map<StreamPartition, StreamSortSpec> cachedSSS = new HashMap<>();
     // mapping from StreamPartition(streamId, groupbyspec) to StreamRouterSpec
     private volatile Map<StreamPartition, StreamRouterSpec> cachedSRS = new HashMap<>();
-    private volatile Map<String,StreamDefinition> sdf = new HashMap<>();
-    private PartitionedEventSerializer serializer;
 
-    public StreamRouterBolt(StreamRouter router, Config config, IMetadataChangeNotifyService changeNotifyService) {
-        super(changeNotifyService, config);
-        this.router = router;
+    public StreamRouterBolt(String boltId, Config config, IMetadataChangeNotifyService changeNotifyService) {
+        super(boltId, changeNotifyService, config);
+        this.router = new StreamRouterImpl(boltId + "-router");
     }
 
-    private StreamContext streamContext;
 
     @Override
     public void internalPrepare(OutputCollector collector, IMetadataChangeNotifyService changeNotifyService, Config config, TopologyContext context) {
         streamContext = new StreamContextImpl(config,context.registerMetric("eagle.router",new MultiCountMetric(),60),context);
-        serializer= Serializers.newPartitionedEventSerializer(this);
-        routeCollector = new StreamRouterBoltOutputCollector(this.router.getName(),collector,this.getOutputStreamIds(),streamContext,serializer);
+        routeCollector = new StreamRouterBoltOutputCollector(getBoltId(),collector,this.getOutputStreamIds(),streamContext,serializer);
         router.prepare(streamContext, routeCollector);
         changeNotifyService.registerListener(this);
         changeNotifyService.init(config, MetadataType.STREAM_ROUTER_BOLT);
-    }
-
-    PartitionedEvent deserialize(Object object) throws IOException {
-        // byte[] in higher priority
-        if(object instanceof byte[]) {
-            return serializer.deserialize((byte[]) object);
-        } else {
-            return (PartitionedEvent) object;
-        }
     }
 
     @Override
@@ -184,6 +155,7 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
         // switch cache
         cachedSRS = newSRS;
         sdf = sds;
+        specVersion = spec.getVersion();
     }
 
     /**
@@ -206,8 +178,8 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
         }
     }
 
-    @Override
-    public StreamDefinition getStreamDefinition(String streamId) {
-        return this.sdf.get(streamId);
+    public StreamRouter getStreamRouter() {
+        return router;
     }
+
 }
