@@ -40,8 +40,8 @@ public class SiteResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<SiteEntity> getAllSites(){
-        return siteEntityService.findAll();
+    public RESTResponse<Collection<SiteEntity>> getAllSites(){
+        return RESTResponse.async(siteEntityService::findAll).get();
     }
 
     @POST
@@ -59,7 +59,7 @@ public class SiteResource {
     @GET
     @Path("/{siteIdOrUUID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public SiteEntity getSiteByNameOrUUID(@PathParam("siteIdOrUUID") String siteIdOrUUID){
-        return siteEntityService.getBySiteIdOrUUID(siteIdOrUUID);
+    public RESTResponse<SiteEntity> getSiteByNameOrUUID(@PathParam("siteIdOrUUID") String siteIdOrUUID){
+        return RESTResponse.async(()->siteEntityService.getBySiteIdOrUUID(siteIdOrUUID)).get();
     }
 }

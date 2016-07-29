@@ -49,15 +49,15 @@ public class ApplicationResource {
     @GET
     @Path("/providers")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ApplicationDesc> getApplicationDescs(){
-        return providerService.getApplicationDescs();
+    public RESTResponse<Collection<ApplicationDesc>> getApplicationDescs(){
+        return RESTResponse.async(providerService::getApplicationDescs).get();
     }
 
     @GET
     @Path("/providers/{type}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationDesc getApplicationDescs(@PathParam("type") String type){
-        return providerService.getApplicationDescByType(type);
+    public RESTResponse<ApplicationDesc> getApplicationDescByType(@PathParam("type") String type){
+        return RESTResponse.async(()->providerService.getApplicationDescByType(type)).get();
     }
 
     @PUT
@@ -74,19 +74,21 @@ public class ApplicationResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ApplicationEntity> getApplicationEntities(@QueryParam("siteId") String siteId){
-        if(siteId == null) {
-            return entityService.findAll();
-        } else {
-            return entityService.findBySiteId(siteId);
-        }
+    public RESTResponse<Collection<ApplicationEntity>> getApplicationEntities(@QueryParam("siteId") String siteId){
+        return RESTResponse.async(()-> {
+            if (siteId == null) {
+                return entityService.findAll();
+            } else {
+                return entityService.findBySiteId(siteId);
+            }
+        }).get();
     }
 
     @GET
     @Path("/{appUuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity getApplicationEntityByUUID(@PathParam("appUuid") String appUuid){
-        return entityService.getByUUID(appUuid);
+    public RESTResponse<ApplicationEntity> getApplicationEntityByUUID(@PathParam("appUuid") String appUuid){
+        return RESTResponse.async(()->entityService.getByUUID(appUuid)).get();
     }
 
     /**
