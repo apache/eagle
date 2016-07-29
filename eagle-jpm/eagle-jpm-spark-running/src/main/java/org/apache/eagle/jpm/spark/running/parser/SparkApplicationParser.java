@@ -43,6 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -142,8 +144,21 @@ public class SparkApplicationParser implements Runnable {
     }
 
     private long dateTimeToLong(String date) {
-        //TODO
-        return 0L;
+        // date is like: 2016-07-29T19:35:40.715GMT
+        long timestamp = 0L;
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSzzz");
+            Date parsedDate = dateFormat.parse(date);
+            timestamp = parsedDate.getTime();
+        } catch(ParseException e) {
+            e.printStackTrace();
+        }
+        
+        if (timestamp == 0L) {
+            LOG.error("Not able to parse date: " + date);
+        }
+
+        return timestamp;
     }
 
     private void finishSparkApp(String sparkAppId) {
