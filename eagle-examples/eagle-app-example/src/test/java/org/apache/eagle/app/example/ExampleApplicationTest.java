@@ -39,7 +39,7 @@ public class ExampleApplicationTest {
 
     @Test
     public void testApplicationProviderLoading(){
-        Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs();
+        Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs().getData();
         Assert.assertNotNull(applicationDescs);
         Assert.assertEquals(2,applicationDescs.size());
     }
