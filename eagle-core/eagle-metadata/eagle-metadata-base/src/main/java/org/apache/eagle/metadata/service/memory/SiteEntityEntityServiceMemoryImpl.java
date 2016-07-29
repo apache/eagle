@@ -16,49 +16,71 @@
  */
 package org.apache.eagle.metadata.service.memory;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Singleton;
+import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.service.SiteEntityService;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Singleton
 public class SiteEntityEntityServiceMemoryImpl implements SiteEntityService {
-    private Map<String,SiteEntity> nameSiteMap = new HashMap<>();
+    private Map<String,SiteEntity> siteId2EntityMap = new HashMap<>();
 
     @Override
     public Collection<SiteEntity> findAll() {
-        return nameSiteMap.values();
+        return siteId2EntityMap.values();
     }
 
     @Override
-    public SiteEntity getByUUID(String uuid) {
-        return nameSiteMap.values().stream().filter((site) -> uuid.equals(site.getUuid())).findAny().get();
+    public SiteEntity getByUUID(String uuid) throws EntityNotFoundException {
+        Optional<SiteEntity> entityOptional = siteId2EntityMap.values().stream().filter((site) -> uuid.equals(site.getUuid())).findAny();
+        if(entityOptional.isPresent()){
+            return entityOptional.get();
+        }else{
+            throw new EntityNotFoundException("Site with UUID: "+uuid+" not found");
+        }
     }
 
     @Override
     public SiteEntity create(SiteEntity entity) {
-        if(getBySiteId(entity.getSiteId()) != null){
-            throw new IllegalArgumentException("Duplicated site: "+entity);
+        Preconditions.checkNotNull(entity.getSiteId(),"SiteId is null: "+entity.getSiteId());
+        if(siteId2EntityMap.containsKey(entity.getSiteId())){
+            throw new IllegalArgumentException("Duplicated siteId: "+entity.getSiteId());
         }
         entity.ensureDefault();
-        nameSiteMap.put(entity.getSiteId(),entity);
+        siteId2EntityMap.put(entity.getSiteId(),entity);
         return entity;
     }
 
     @Override
-    public SiteEntity getBySiteId(String siteName) {
-        return nameSiteMap.get(siteName);
+    public SiteEntity getBySiteId(String siteId) throws EntityNotFoundException {
+        if(!siteId2EntityMap.containsKey(siteId)){
+            throw new EntityNotFoundException("Site with siteId: "+siteId+" not exists");
+        }
+        return siteId2EntityMap.get(siteId);
+    }
+
+
+    @Override
+    public SiteEntity deleteBySiteId(String siteId) throws EntityNotFoundException {
+        return siteId2EntityMap.remove(getBySiteId(siteId).getSiteId());
     }
 
     @Override
-    public SiteEntity getBySiteIdOrUUID(String siteNameOrUUID) {
-        if(nameSiteMap.containsKey(siteNameOrUUID)){
-            return nameSiteMap.get(siteNameOrUUID);
-        } else {
-            return getByUUID(siteNameOrUUID);
+    public SiteEntity update(SiteEntity siteEntity) throws EntityNotFoundException {
+        if(siteEntity.getSiteId() == null && siteEntity.getUuid() == null){
+            throw new IllegalArgumentException("siteId and UUID are both null, don't know how to update");
         }
+        SiteEntity oldEntity = (siteEntity.getSiteId()!=null)? getBySiteId(siteEntity.getSiteId()) : getByUUID(siteEntity.getUuid());
+        siteEntity.setUuid(oldEntity.getUuid());
+        siteEntity.setCreatedTime(oldEntity.getCreatedTime());
+        siteEntity.ensureDefault();
+        siteId2EntityMap.put(siteEntity.getSiteId(),siteEntity);
+        return siteEntity;
     }
 }

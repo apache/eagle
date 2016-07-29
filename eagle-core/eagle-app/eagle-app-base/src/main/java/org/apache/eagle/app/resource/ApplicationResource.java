@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -49,44 +49,46 @@ public class ApplicationResource {
     @GET
     @Path("/providers")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ApplicationDesc> getApplicationDescs(){
-        return providerService.getApplicationDescs();
+    public RESTResponse<Collection<ApplicationDesc>> getApplicationDescs(){
+        return RESTResponse.async(providerService::getApplicationDescs).get();
     }
 
     @GET
     @Path("/providers/{type}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationDesc getApplicationDescs(@PathParam("type") String type){
-        return providerService.getApplicationDescByType(type);
+    public RESTResponse<ApplicationDesc> getApplicationDescByType(@PathParam("type") String type){
+        return RESTResponse.async(()->providerService.getApplicationDescByType(type)).get();
     }
 
     @PUT
     @Path("/providers/reload")
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Collection<ApplicationDesc>> reloadApplicationDescs(){
-        return RESTResponse.<Collection<ApplicationDesc>>async((builder)-> {
+        return RESTResponse.<Collection<ApplicationDesc>>async((response)-> {
             providerService.reload();
-            builder.message("Successfully reload application providers");
-            builder.data(providerService.getApplicationDescs());
+            response.message("Successfully reload application providers");
+            response.data(providerService.getApplicationDescs());
         }).get();
     }
 
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ApplicationEntity> getApplicationEntities(@QueryParam("siteId") String siteId){
-        if(siteId == null) {
-            return entityService.findAll();
-        } else {
-            return entityService.findBySiteId(siteId);
-        }
+    public RESTResponse<Collection<ApplicationEntity>> getApplicationEntities(@QueryParam("siteId") String siteId){
+        return RESTResponse.async(()-> {
+            if (siteId == null) {
+                return entityService.findAll();
+            } else {
+                return entityService.findBySiteId(siteId);
+            }
+        }).get();
     }
 
     @GET
     @Path("/{appUuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity getApplicationEntityByUUID(@PathParam("appUuid") String appUuid){
-        return entityService.getByUUID(appUuid);
+    public RESTResponse<ApplicationEntity> getApplicationEntityByUUID(@PathParam("appUuid") String appUuid){
+        return RESTResponse.async(()->entityService.getByUUID(appUuid)).get();
     }
 
     /**
@@ -102,10 +104,10 @@ public class ApplicationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<ApplicationEntity> installApplication(ApplicationOperations.InstallOperation operation){
-        return RESTResponse.<ApplicationEntity>async((builder)-> {
+        return RESTResponse.<ApplicationEntity>async((response)-> {
             ApplicationEntity entity = applicationManagementService.install(operation);
-            builder.message("Successfully installed application "+operation.getAppType()+" onto site "+operation.getSiteId());
-            builder.data(entity);
+            response.message("Successfully installed application "+operation.getAppType()+" onto site "+operation.getSiteId());
+            response.data(entity);
         }).get();
     }
 
@@ -124,9 +126,9 @@ public class ApplicationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> uninstallApplication(ApplicationOperations.UninstallOperation operation){
-        return RESTResponse.<Void>async((builder)-> {
+        return RESTResponse.<Void>async((response)-> {
             ApplicationEntity entity = applicationManagementService.uninstall(operation);
-            builder.success(true).message("Successfully uninstalled application "+entity.getUuid());
+            response.success(true).message("Successfully uninstalled application "+entity.getUuid());
         }).get();
     }
 
@@ -144,9 +146,9 @@ public class ApplicationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> startApplication(ApplicationOperations.StartOperation operation){
-        return RESTResponse.<Void>async((builder)-> {
+        return RESTResponse.<Void>async((response)-> {
             ApplicationEntity entity = applicationManagementService.start(operation);
-            builder.success(true).message("Successfully started application "+entity.getUuid());
+            response.success(true).message("Successfully started application "+entity.getUuid());
         }).get();
     }
 
@@ -164,9 +166,9 @@ public class ApplicationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<Void> stopApplication(ApplicationOperations.StopOperation operation){
-        return RESTResponse.<Void>async((builder)-> {
+        return RESTResponse.<Void>async((response)-> {
             ApplicationEntity entity = applicationManagementService.stop(operation);
-            builder.success(true).message("Successfully stopped application "+entity.getUuid());
+            response.success(true).message("Successfully stopped application "+entity.getUuid());
         }).get();
     }
 }
