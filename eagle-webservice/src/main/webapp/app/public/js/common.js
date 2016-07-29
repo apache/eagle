@@ -176,7 +176,7 @@ common.properties.parse = function (str, defaultValue) {
 
 common.properties.check = function (str) {
 	var pass = true;
-	var regex = /^\s*[\w\.]+\s*=(.*)$/;
+	var regex = /^\s*[\w\.-]+\s*=(.*)$/;
 	$.each((str || "").trim().split(/[\r\n\s]+/g), function (i, line) {
 		if(!regex.test(line)) {
 			pass = false;
