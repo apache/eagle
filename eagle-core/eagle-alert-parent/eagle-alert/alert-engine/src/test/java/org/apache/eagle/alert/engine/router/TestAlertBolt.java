@@ -167,7 +167,7 @@ public class TestAlertBolt {
         Config config = ConfigFactory.load();
         PolicyGroupEvaluator policyGroupEvaluator = new PolicyGroupEvaluatorImpl("testPolicyGroupEvaluatorImpl");
         TestStreamRouterBolt.MockChangeService mockChangeService = new TestStreamRouterBolt.MockChangeService();
-        AlertBolt bolt = new AlertBolt("alertBolt1", policyGroupEvaluator, config, mockChangeService);
+        AlertBolt bolt = new AlertBolt("alertBolt1", config, mockChangeService);
         Map stormConf = new HashMap<>();
         TopologyContext topologyContext = mock(TopologyContext.class);
         when(topologyContext.registerMetric(any(String.class), any(MultiCountMetric.class), any(int.class))).thenReturn(new MultiCountMetric());

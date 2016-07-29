@@ -110,7 +110,7 @@ public class JHFSparkEventReader {
 
         List<String> jobConfs = conf.getStringList("basic.jobConf.additional.info");
         String[] props = {"spark.yarn.app.id", "spark.executor.memory", "spark.driver.host", "spark.driver.port",
-                "spark.driver.memory", "ebay.job.name", "spark.scheduler.pool", "spark.executor.cores", "spark.yarn.am.memory",
+                "spark.driver.memory", "spark.scheduler.pool", "spark.executor.cores", "spark.yarn.am.memory",
                 "spark.yarn.am.cores", "spark.yarn.executor.memoryOverhead", "spark.yarn.driver.memoryOverhead", "spark.yarn.am.memoryOverhead", "spark.master"};
         jobConfs.addAll(Arrays.asList(props));
         for (String prop : jobConfs) {
@@ -158,7 +158,9 @@ public class JHFSparkEventReader {
             entity.getTags().put(SparkJobTagName.SPARK_APP_ID.toString(), JSONUtil.getString(event, "App ID"));
             entity.getTags().put(SparkJobTagName.SPARK_APP_NAME.toString(), JSONUtil.getString(event, "App Name"));
             entity.getTags().put(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString(), JSONUtil.getString(event, "App Attempt ID"));
-            entity.getTags().put(SparkJobTagName.SPARK_APP_NORM_NAME.toString(), this.getNormalizedName(JSONUtil.getString(event, "App Name"), this.app.getConfig().getConfig().get("ebay.job.name")));
+            // the second argument of getNormalizeName() is changed to null because the original code contains sensitive text
+            // original second argument looks like: this.app.getConfig().getConfig().get("xxx"), "xxx" is the sensitive text
+            entity.getTags().put(SparkJobTagName.SPARK_APP_NORM_NAME.toString(), this.getNormalizedName(JSONUtil.getString(event, "App Name"), null));
             entity.getTags().put(SparkJobTagName.SPARK_USER.toString(), JSONUtil.getString(event, "User"));
         }
 

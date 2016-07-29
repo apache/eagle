@@ -85,7 +85,7 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
         String rack = null;
         // we get rack/hostname based on task's status
         if (values.get(Keys.TASK_STATUS).equals(EagleTaskStatus.SUCCESS.name())) {
-            // in CDH4.1.4, the hostname has the format of /default/rack128/phxdpehdc10dn0338.stratus.phx.ebay.com
+            // in CDH4.1.4, the hostname has the format of /default/rack128/some.server.address
             // if not specified, the hostname has the format  of /default-rack/<hostname>
             String decoratedHostname = values.get(Keys.HOSTNAME);
             String[] tmp = decoratedHostname.split("/");

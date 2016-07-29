@@ -16,25 +16,10 @@
  */
 package org.apache.eagle.metadata.model;
 
-import java.util.Map;
+import java.io.Serializable;
 
-public class StreamSinkDesc {
-    private Class<?> sinkType;
-    private Map<String,Object> sinkContext;
-
-    public Class<?> getSinkType() {
-        return sinkType;
-    }
-
-    public void setSinkType(Class<?> sinkType) {
-        this.sinkType = sinkType;
-    }
-
-    public Map<String, Object> getSinkContext() {
-        return sinkContext;
-    }
-
-    public void setSinkContext(Map<String, Object> sinkContext) {
-        this.sinkContext = sinkContext;
-    }
+public interface StreamSinkDesc extends Serializable {
+    String getType();
+    Class<?> getSinkClass();
+    Class<? extends StreamSinkDesc> getDescClass();
 }

@@ -18,13 +18,10 @@ package org.apache.eagle.metadata.model;
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
-import java.util.Map;
-
 public class StreamDesc {
     private String streamId;
-    private StreamDefinition streamSchema;
-    private Class<?> sinkType;
-    private Map<String,Object> sinkContext;
+    private StreamDefinition schema;
+    private StreamSinkDesc sink;
 
     public String getStreamId() {
         return streamId;
@@ -34,27 +31,19 @@ public class StreamDesc {
         this.streamId = streamId;
     }
 
-    public StreamDefinition getStreamSchema() {
-        return streamSchema;
+    public StreamDefinition getSchema() {
+        return schema;
     }
 
-    public void setStreamSchema(StreamDefinition streamSchema) {
-        this.streamSchema = streamSchema;
+    public void setSchema(StreamDefinition streamSchema) {
+        this.schema = streamSchema;
     }
 
-    public Class<?> getSinkType() {
-        return sinkType;
+    public StreamSinkDesc getSink() {
+        return sink;
     }
 
-    public void setSinkType(Class<?> sinkType) {
-        this.sinkType = sinkType;
-    }
-
-    public Map<String, Object> getSinkContext() {
-        return sinkContext;
-    }
-
-    public void setSinkContext(Map<String, Object> sinkContext) {
-        this.sinkContext = sinkContext;
+    public void setSink(StreamSinkDesc sinkDesc) {
+        this.sink = sinkDesc;
     }
 }

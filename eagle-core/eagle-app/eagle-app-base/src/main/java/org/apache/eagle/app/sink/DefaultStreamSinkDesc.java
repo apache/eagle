@@ -14,20 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.example;
+package org.apache.eagle.app.sink;
 
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.metadata.model.StreamSinkDesc;
 
-/**
- * Define application provider programmatically
- */
-public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleApplication> {
-    public ExampleApplicationProvider() {
-        super("/META-INF/apps/example/metadata.xml");
+public class DefaultStreamSinkDesc implements StreamSinkDesc {
+    private final Class<?> streamPersistClass;
+    private final static String NONE_STORAGE_TYPE = "NONE";
+
+    public DefaultStreamSinkDesc(Class<?> streamPersistClass){
+        this.streamPersistClass = streamPersistClass;
     }
 
     @Override
-    public ExampleApplication getApplication() {
-        return new ExampleApplication();
+    public String getType() {
+        return NONE_STORAGE_TYPE;
+    }
+
+    public Class<?> getSinkClass() {
+        return streamPersistClass;
+    }
+
+    @Override
+    public Class<? extends StreamSinkDesc> getDescClass() {
+        return DefaultStreamSinkDesc.class;
     }
 }

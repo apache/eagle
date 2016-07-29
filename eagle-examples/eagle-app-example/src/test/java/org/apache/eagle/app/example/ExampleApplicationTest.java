@@ -64,7 +64,7 @@ public class ExampleApplicationTest {
         Assert.assertNotNull(siteEntity.getUuid());
 
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL));
+        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL)).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         // Stop application
@@ -93,7 +93,6 @@ public class ExampleApplicationTest {
     public void testApplicationQuickRunWithAppProvider2(){
         simulator.submit(ExampleApplicationProvider2.class);
     }
-
 
     /**
      * For DEBUG

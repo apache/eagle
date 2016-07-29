@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,20 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.example;
+package org.apache.eagle.app.sink;
 
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.metadata.model.StreamSinkDesc;
 
-/**
- * Define application provider programmatically
- */
-public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleApplication> {
-    public ExampleApplicationProvider() {
-        super("/META-INF/apps/example/metadata.xml");
+public class KafkaStreamSinkDesc implements StreamSinkDesc {
+    private String topicId;
+
+    public String getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(String topicId) {
+        this.topicId = topicId;
     }
 
     @Override
-    public ExampleApplication getApplication() {
-        return new ExampleApplication();
+    public String getType() {
+        return "KAFKA";
+    }
+
+    @Override
+    public Class<?> getSinkClass() {
+        return KafkaStreamSink.class;
+    }
+
+    @Override
+    public Class<? extends StreamSinkDesc> getDescClass() {
+        return KafkaStreamSinkDesc.class;
     }
 }

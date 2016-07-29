@@ -191,8 +191,8 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
         event.setData(triggerEvent);
         event.setStreamId(policyDef.getOutputStreams().get(0));
         event.setPolicy(context.getPolicyDefinition());
-        if (this.context.getParentEvaluator() != null) {
-            event.setCreatedBy(context.getParentEvaluator().getName());
+        if (this.context.getPolicyEvaluator() != null) {
+            event.setCreatedBy(context.getPolicyEvaluator().getName());
         }
         event.setCreatedTime(System.currentTimeMillis());
         event.setSchema(sd);

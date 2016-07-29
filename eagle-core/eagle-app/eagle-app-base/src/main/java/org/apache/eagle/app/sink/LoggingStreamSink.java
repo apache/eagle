@@ -22,25 +22,12 @@ import org.apache.eagle.app.ApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class LoggingStreamSink extends AbstractStreamSink {
+public class LoggingStreamSink extends AbstractStreamSink<DefaultStreamSinkDesc> {
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
-
-    @Override
-    public void init(StreamDefinition streamDefinition, ApplicationContext context) {
-        // do nothing
-    }
 
     @Override
     protected void onEvent(StreamEvent streamEvent) {
         LOGGER.info("Receiving {}",streamEvent);
-    }
-
-    @Override
-    public Map<String, Object> getSinkContext() {
-        return new HashMap<>();
     }
 
     @Override
@@ -51,5 +38,10 @@ public class LoggingStreamSink extends AbstractStreamSink {
     @Override
     public void onAppUninstall() {
         LOGGER.info("Executing onAppUninstall callback, do nothing");
+    }
+
+    @Override
+    public DefaultStreamSinkDesc init(StreamDefinition streamDefinition, ApplicationContext context) {
+        return new DefaultStreamSinkDesc(LoggingStreamSink.class);
     }
 }

@@ -23,19 +23,20 @@ import org.apache.eagle.app.ApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class KafkaStreamSink extends AbstractStreamSink {
+public class KafkaStreamSink extends AbstractStreamSink<KafkaStreamSinkDesc> {
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
     private String topicId;
 
     @Override
-    public void init(StreamDefinition streamDefinition, ApplicationContext context) {
-        this.topicId = String.format("EAGLE_TOPIC_%s_%s_%s",
+    public KafkaStreamSinkDesc init(StreamDefinition streamDefinition, ApplicationContext context) {
+        this.topicId = String.format("EAGLE.%s.%s",
                 context.getAppEntity().getSite().getSiteId(),
-                context.getAppEntity().getDescriptor().getType(),
-                streamDefinition.getStreamId());
+                streamDefinition.getStreamId()).toLowerCase();
+        KafkaStreamSinkDesc desc = new KafkaStreamSinkDesc();
+        desc.setTopicId(topicId);
+        return desc;
     }
 
     @Override
@@ -49,14 +50,14 @@ public class KafkaStreamSink extends AbstractStreamSink {
         LOGGER.info("TODO: producing {} to '{}'",streamEvent,topicId);
     }
 
-    @Override
-    public Map<String, Object> getSinkContext() {
-        return new HashMap<String,Object>(){
-            {
-                put("kafka.topic",KafkaStreamSink.this.topicId);
-            }
-        };
-    }
+//    @Override
+//    public Map<String, Object> getSink() {
+//        return new HashMap<String,Object>(){
+//            {
+//                put("kafka.topic",KafkaStreamSink.this.topicId);
+//            }
+//        };
+//    }
 
     @Override
     public void onAppInstall() {
