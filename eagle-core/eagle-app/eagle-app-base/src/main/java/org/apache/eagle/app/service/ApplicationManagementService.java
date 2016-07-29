@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app.service;
 
+import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 
 public interface ApplicationManagementService {
@@ -24,7 +25,7 @@ public interface ApplicationManagementService {
      * @param operation
      * @return
      */
-    ApplicationEntity install(ApplicationOperations.InstallOperation operation);
+    ApplicationEntity install(ApplicationOperations.InstallOperation operation) throws EntityNotFoundException;
 
     /**
      *
