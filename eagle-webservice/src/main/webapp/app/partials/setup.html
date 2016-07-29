@@ -28,11 +28,19 @@
 	</div>
 	<div class="box-body">
 		<div class="form-group">
-			<label>Site Name</label>
-			<input class="form-control" placeholder="A site is a cluster/service which you want to monitor, use 'sandbox' by default " value="sandbox">
+			<label>* Site Id</label>
+			<input class="form-control" placeholder="Site id should be unique" ng-model="siteId">
+		</div>
+		<div class="form-group">
+			<label>Display Name</label>
+			<input class="form-control" placeholder="Site display name in UI" ng-model="siteName">
+		</div>
+		<div class="form-group">
+			<label>Description</label>
+			<textarea class="form-control" placeholder="Description about current site" ng-model="description" rows="5"></textarea>
 		</div>
 	</div>
 	<div class="box-footer text-right">
-		<button class="btn btn-primary">Next</button>
+		<button class="btn btn-primary" ng-click="createSite()" ng-disabled="site === ''">Next</button>
 	</div>
 </div>

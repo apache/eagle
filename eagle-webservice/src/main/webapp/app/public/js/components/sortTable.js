@@ -22,8 +22,6 @@
 	var eagleComponents = angular.module('eagle.components');
 
 	eagleComponents.directive('sortTable', function($compile) {
-		'use strict';
-
 		return {
 			restrict: 'AE',
 			scope: true,
@@ -94,7 +92,7 @@
 						).appendTo($element);
 						$compile($navigation)($scope);
 					}
-				}
+				};
 			}
 		};
 	});

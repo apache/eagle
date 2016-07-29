@@ -81,11 +81,12 @@
 	function connectPolicyEditController(entity, args) {
 		var newArgs = [entity];
 		args = Array.prototype.push.apply(newArgs, args);
-		policyEditController.apply(this, newArgs);
+		/* jshint validthis: true */
+		policyEditController.apply(this, args);
 	}
 	function policyEditController(policy, $scope, $wrapState, PageConfig, Entity) {
 		$scope.policy = policy;
-	};
+	}
 
 	eagleControllers.controller('policyCreateCtrl', function ($scope, $wrapState, PageConfig, Entity) {
 		PageConfig.subTitle = "Define Alert Policy";

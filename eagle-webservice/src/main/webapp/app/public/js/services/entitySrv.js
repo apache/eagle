@@ -41,12 +41,12 @@
 			return _host;
 		};
 
-		Entity.queryMetadata = function (url) {
+		Entity.query = function (url) {
 			var list = [];
 
 			list._refresh = function () {
 				list._done = false;
-				list._promise = $http.get(_host + "/rest/metadata/" + url).then(function (res) {
+				list._promise = $http.get(_host + "/rest/" + url).then(function (res) {
 					var data = res.data;
 					list.splice(0);
 					Array.prototype.push.apply(list, data);
@@ -56,6 +56,27 @@
 			};
 
 			return list._refresh();
+		};
+
+		Entity.update = function (url, entity) {
+			var _list = [];
+			$http({
+				method: 'POST',
+				url: _host + "/rest/" + url,
+				headers: {
+					"Content-Type": "application/json"
+				},
+				data: entity
+			}).then(function (data) {
+				_list.push.apply(_list, data);
+			});
+
+			return _list;
+		};
+
+		// TODO: metadata will be removed
+		Entity.queryMetadata = function (url) {
+			return Entity.query('metadata/' +  url);
 		};
 
 		Entity.deleteMetadata = function (url) {

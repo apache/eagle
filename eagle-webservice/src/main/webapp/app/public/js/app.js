@@ -33,8 +33,25 @@ var app = {};
 	// ======================================================================================
 	// =                                   Router config                                    =
 	// ======================================================================================
-	function routeResolve() {
-		return {};
+	function routeResolve(config) {
+		var resolve = {};
+
+		config = $.extend({
+			auth: true,
+			site: true
+		}, config);
+
+		if(config.auth) {
+			// TODO: need auth module
+		}
+
+		if(config.site) {
+			resolve.Site = function (Site) {
+				return Site.getPromise();
+			}
+		}
+
+		return resolve;
 	}
 
 	eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
@@ -51,7 +68,7 @@ var app = {};
 				url: "/setup",
 				templateUrl: "partials/setup.html?_=" + eagleApp._TRS(),
 				controller: "setupCtrl",
-				resolve: routeResolve()
+				resolve: routeResolve({ site: false })
 			})
 		// ================================= Alerts =================================
 			.state('alert', {

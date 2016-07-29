@@ -39,7 +39,17 @@
 	// ======================================================================================
 	// =                                       Set Up                                       =
 	// ======================================================================================
-	eagleControllers.controller('setupCtrl', function ($scope, PageConfig) {
+	eagleControllers.controller('setupCtrl', function ($scope, PageConfig, Entity) {
 		PageConfig.hideTitle = true;
+
+		$scope.siteId = "sandbox";
+		$scope.siteName = "Sandbox";
+		$scope.description = "";
+
+		$scope.createSite = function () {
+			Entity.update("sites", {
+
+			});
+		};
 	});
 }());
