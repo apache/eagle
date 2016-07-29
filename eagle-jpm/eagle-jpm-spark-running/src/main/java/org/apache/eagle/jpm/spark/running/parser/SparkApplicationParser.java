@@ -228,10 +228,17 @@ public class SparkApplicationParser implements Runnable {
         JobConfig jobConfig = null;
         try {
             hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
-            String attemptIdFormatted = String.format("%06d", attemptId);
-            // remove "application_"
-            String sparkAppIdNum = sparkAppId.substring(12);
-            String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+            // // For Yarn version >= 2.7,
+            // // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
+            // String attemptIdFormatted = String.format("%06d", attemptId);
+            // // remove "application_" to get the number part of appID.
+            // String sparkAppIdNum = sparkAppId.substring(12);
+            // String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+
+            // For Yarn version 2.4.x
+            // log name: application_1464382345557_269065_1
+            String attemptIdString = Integer.toString(attemptId);
+
             String appAttemptLogName = this.getAppAttemptLogName(sparkAppId, attemptIdString);
 
             String eventLogDir = this.endpointConfig.eventLog;
