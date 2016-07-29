@@ -36,9 +36,10 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class JHFSparkEventReader {
+    private static final Logger LOG = LoggerFactory.getLogger(JHFSparkEventReader.class);
 
     public static final int FLUSH_LIMIT = 500;
-    private static final Logger logger = LoggerFactory.getLogger(JHFSparkEventReader.class);
+    private long firstTaskLaunchTime;
 
     private Map<String, SparkExecutor> executors;
     private SparkApp app;
@@ -75,7 +76,7 @@ public class JHFSparkEventReader {
 
     public void read(JSONObject eventObj) throws Exception {
         String eventType = (String) eventObj.get("Event");
-        logger.info("Event type: " + eventType);
+        LOG.info("Event type: " + eventType);
         if (eventType.equalsIgnoreCase(EventType.SparkListenerApplicationStart.toString())) {
             handleAppStarted(eventObj);
         } else if (eventType.equalsIgnoreCase(EventType.SparkListenerEnvironmentUpdate.toString())) {
@@ -103,7 +104,7 @@ public class JHFSparkEventReader {
         } else if (eventType.equalsIgnoreCase(EventType.SparkListenerBlockManagerRemoved.toString())) {
             //nothing to do now
         } else {
-            logger.info("Not registered event type:" + eventType);
+            LOG.info("Not registered event type:" + eventType);
         }
 
     }
@@ -161,7 +162,11 @@ public class JHFSparkEventReader {
         for (TaggedLogAPIEntity entity : entities) {
             entity.getTags().put(SparkJobTagName.SPARK_APP_ID.toString(), JSONUtil.getString(event, "App ID"));
             entity.getTags().put(SparkJobTagName.SPARK_APP_NAME.toString(), JSONUtil.getString(event, "App Name"));
-            entity.getTags().put(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString(), JSONUtil.getString(event, "App Attempt ID"));
+            // In yarn-client mode, attemptId is not available in the log, so we set attemptId = 0.
+            String attemptId = isClientMode(this.app.getConfig()) ? "0" : JSONUtil.getString(event, "App Attempt ID");
+            LOG.info("attemptId = {}.", attemptId);           
+            entity.getTags().put(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString(), attemptId);
+
             entity.getTags().put(SparkJobTagName.SPARK_APP_NORM_NAME.toString(), this.getNormalizedName(JSONUtil.getString(event, "App Name"), this.app.getConfig().getConfig().get("ebay.job.name")));
             entity.getTags().put(SparkJobTagName.SPARK_USER.toString(), JSONUtil.getString(event, "User"));
         }
@@ -263,10 +268,16 @@ public class JHFSparkEventReader {
         task.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), JSONUtil.getLong(event, "Stage Attempt ID").toString());
 
         JSONObject taskInfo = JSONUtil.getJSONObject(event, "Task Info");
-        task.setTaskId(JSONUtil.getInt(taskInfo, "Task ID"));
+        int taskId = JSONUtil.getInt(taskInfo, "Task ID");
+        task.setTaskId(taskId);
+
         task.getTags().put(SparkJobTagName.SPARK_TASK_INDEX.toString(), JSONUtil.getInt(taskInfo, "Index").toString());
         task.getTags().put(SparkJobTagName.SPARK_TASK_ATTEMPT_ID.toString(), JSONUtil.getInt(taskInfo, "Attempt").toString());
-        task.setLaunchTime(JSONUtil.getLong(taskInfo, "Launch Time"));
+        long launchTime = JSONUtil.getLong(taskInfo, "Launch Time");
+        if (taskId == 0) {
+            this.setFirstTaskLaunchTime(launchTime);
+        }
+        task.setLaunchTime(launchTime);
         task.setExecutorId(JSONUtil.getString(taskInfo, "Executor ID"));
         task.setHost(JSONUtil.getString(taskInfo, "Host"));
         task.setTaskLocality(JSONUtil.getString(taskInfo, "Locality"));
@@ -275,6 +286,15 @@ public class JHFSparkEventReader {
         tasks.put(task.getTaskId(), task);
         return task;
     }
+
+    private void setFirstTaskLaunchTime(long launchTime) {
+        this.firstTaskLaunchTime = launchTime;
+    }
+
+    private long getFirstTaskLaunchTime() {
+        return this.firstTaskLaunchTime;
+    }
+
 
     private void handleJobStart(JSONObject event) {
         SparkJob job = new SparkJob();
@@ -301,9 +321,7 @@ public class JHFSparkEventReader {
             String stageName = JSONUtil.getString(stageInfo, "Stage Name");
             int numTasks = JSONUtil.getInt(stageInfo, "Number of Tasks");
             this.initiateStage(jobId, stageId, stageAttemptId, stageName, numTasks);
-
         }
-
     }
 
     private void handleStageSubmit(JSONObject event) {
@@ -334,7 +352,13 @@ public class JHFSparkEventReader {
         Integer stageAttemptId = JSONUtil.getInt(stageInfo, "Stage Attempt ID");
         String key = this.generateStageKey(stageId.toString(), stageAttemptId.toString());
         SparkStage stage = stages.get(key);
-        stage.setSubmitTime(JSONUtil.getLong(stageInfo, "Submission Time"));
+
+        // If "Submission Time" is not available, use the "Launch Time" of "Task ID" = 0.
+        Long submissionTime = JSONUtil.getLong(stageInfo, "Submission Time");
+        if (submissionTime == null) {
+            submissionTime = this.getFirstTaskLaunchTime();
+        }
+        stage.setSubmitTime(submissionTime);
         stage.setCompleteTime(JSONUtil.getLong(stageInfo, "Completion Time"));
 
         if (stageInfo.containsKey("Failure Reason")) {
@@ -362,7 +386,6 @@ public class JHFSparkEventReader {
         } else {
             job.setStatus(SparkEntityConstant.SPARK_JOB_STATUS.FAILED.toString());
         }
-
     }
 
     private void handleAppEnd(JSONObject event) {
@@ -373,7 +396,7 @@ public class JHFSparkEventReader {
     public void clearReader() throws Exception {
         //clear tasks
         for (SparkTask task : tasks.values()) {
-            logger.info("Task {} does not have result or no task metrics.", task.getTaskId());
+            LOG.info("Task {} does not have result or no task metrics.", task.getTaskId());
             task.setFailed(true);
             aggregateToStage(task);
             aggregateToExecutor(task);
@@ -665,7 +688,7 @@ public class JHFSparkEventReader {
                 this.doFlush(this.createEntities);
                 this.createEntities.clear();
             } catch (Exception e) {
-                logger.error("Fail to flush entities", e);
+                LOG.error("Fail to flush entities", e);
             }
 
         }
@@ -684,9 +707,9 @@ public class JHFSparkEventReader {
     }
 
     private void doFlush(List entities) throws Exception {
-        logger.info("start flushing entities of total number " + entities.size());
+        LOG.info("start flushing entities of total number " + entities.size());
 //        client.create(entities);
-        logger.info("finish flushing entities of total number " + entities.size());
+        LOG.info("finish flushing entities of total number " + entities.size());
 //        for(Object entity: entities){
 //            if(entity instanceof SparkApp){
 //                for (Field field : entity.getClass().getDeclaredFields()) {

@@ -126,7 +126,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
         if (this.failTimes.containsKey(appId)) {
             failTimes = this.failTimes.get(appId);
         }
-        failTimes ++;
+        failTimes++;
         if (failTimes >= FAIL_MAX_TIMES) {
             this.failTimes.remove(appId);
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
