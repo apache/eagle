@@ -25,8 +25,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 
-import static org.apache.eagle.metadata.resource.RESTResponse.async;
-
 @Path("/sites")
 @Singleton
 public class SiteResource {
@@ -57,9 +55,27 @@ public class SiteResource {
     }
 
     @GET
-    @Path("/{siteIdOrUUID}")
+    @Path("/{siteId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public RESTResponse<SiteEntity> getSiteByNameOrUUID(@PathParam("siteIdOrUUID") String siteIdOrUUID){
-        return RESTResponse.async(()->siteEntityService.getBySiteIdOrUUID(siteIdOrUUID)).get();
+    public RESTResponse<SiteEntity> getSiteBySiteId(@PathParam("siteId") String siteId){
+        return RESTResponse.async(()->siteEntityService.getBySiteId(siteId)).get();
+    }
+
+    @DELETE
+    @Path("/{siteId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<SiteEntity> deleteSiteBySiteId(@PathParam("siteId") String siteId){
+        return RESTResponse.async(()->siteEntityService.deleteBySiteId(siteId)).get();
+    }
+
+    @PUT
+    @Path("/{siteId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public RESTResponse<SiteEntity> updateSite(@PathParam("siteId") String siteId,SiteEntity siteEntity){
+        return RESTResponse.async(()-> {
+            siteEntity.setSiteId(siteId);
+            return siteEntityService.update(siteEntity);
+        }).get();
     }
 }

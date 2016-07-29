@@ -18,6 +18,7 @@ package org.apache.eagle.server;
 
 import io.dropwizard.jersey.errors.LoggingExceptionMapper;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.eagle.metadata.resource.RESTResponse;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -32,31 +33,6 @@ public class RESTExceptionMapper extends LoggingExceptionMapper<Throwable> {
         }
         final long id = ThreadLocalRandom.current().nextLong();
         logException(id, throwable);
-       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionResponseEntity(throwable)).type(MediaType.APPLICATION_JSON_TYPE).build();
-    }
-
-    public static class ExceptionResponseEntity {
-        public ExceptionResponseEntity(Throwable throwable){
-            this.setMessage(ExceptionUtils.getMessage(throwable));
-            this.setException(ExceptionUtils.getStackTrace(throwable));
-        }
-        private String message;
-        private String exception;
-
-        public String getException() {
-            return exception;
-        }
-
-        public void setException(String exception) {
-            this.exception = exception;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
+       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RESTResponse<>(throwable)).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 }
