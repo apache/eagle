@@ -47,6 +47,8 @@ public class Constants {
     public static final String MR_TASKS_URL = "tasks";
     public static final String MR_CONF_URL = "conf";
 
+    public static final String YARN_API_CLUSTER_INFO = "ws/v1/cluster/info";
+
     public enum CompressionType {
         GZIP, NONE
     }
@@ -60,7 +62,7 @@ public class Constants {
         SUCCEEDED, FAILED
     }
     public enum ResourceType {
-         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB
+         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB, CLUSTER_INFO
     }
 
     //MR

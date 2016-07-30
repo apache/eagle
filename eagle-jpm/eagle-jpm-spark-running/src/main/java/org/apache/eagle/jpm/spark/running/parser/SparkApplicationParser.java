@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,14 @@ public class SparkApplicationParser implements Runnable {
         appInfo.setState(app.getState());
 
         return appInfo;
+    }
+
+    public String getResourceManagerVersion() throws Exception{
+        ClusterInfo clusterInfo = new RMResourceFetcher(endpointConfig.rmUrls).getClusterInfo();
+        if (clusterInfo != null) {
+            return clusterInfo.getResourceManagerVersion();
+        }
+        return null;
     }
 
     private void flush(TaggedLogAPIEntity entity) {
@@ -222,7 +231,8 @@ public class SparkApplicationParser implements Runnable {
     }
 
     private JobConfig getJobConfig(String sparkAppId, int attemptId) {
-        //TODO
+        //TODO: getResourceManagerVersion() and compare version to make attempt id.
+        
         LOG.info("Get job config for sparkAppId {}, attempt {}, appId {}", sparkAppId, attemptId, app.getId());
         FileSystem hdfs = null;
         JobConfig jobConfig = null;

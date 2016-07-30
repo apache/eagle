@@ -25,9 +25,12 @@ import org.apache.eagle.jpm.util.resourceFetch.ha.HAURLSelector;
 import org.apache.eagle.jpm.util.resourceFetch.ha.HAURLSelectorImpl;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppsWrapper;
+import org.apache.eagle.jpm.util.resourceFetch.model.ClusterInfo;
+import org.apache.eagle.jpm.util.resourceFetch.model.ClusterInfoWrapper;
 import org.apache.eagle.jpm.util.resourceFetch.url.JobListServiceURLBuilderImpl;
 import org.apache.eagle.jpm.util.resourceFetch.url.ServiceURLBuilder;
 import org.apache.eagle.jpm.util.resourceFetch.url.SparkCompleteJobServiceURLBuilderImpl;
+import org.apache.hadoop.mapreduce.Cluster;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -137,6 +140,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     }
 
 	public List<AppInfo> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
+		getClusterInfo();
 		switch(resoureType) {
 			case COMPLETE_SPARK_JOB:
 				return doFetchSparkFinishApplicationsList((String)parameter[0]);
@@ -146,6 +150,29 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 return doFetchMRRunningApplicationsList();
 			default:
 				throw new Exception("Not support resourceType :" + resoureType);
+		}
+	}
+
+	private String getClusterInfoURL() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(selector.getSelectedUrl()).append("/").append(Constants.YARN_API_CLUSTER_INFO);
+		return sb.toString();
+	}
+
+	public ClusterInfo getClusterInfo() throws Exception {
+		InputStream is = null;
+		try {
+			checkUrl();
+			final String urlString = getClusterInfoURL();
+			LOG.info("Calling yarn api to fetch cluster info: " + urlString);
+			is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+			final ClusterInfoWrapper clusterInfoWrapper = OBJ_MAPPER.readValue(is, ClusterInfoWrapper.class);
+			if (clusterInfoWrapper != null && clusterInfoWrapper.getClusterInfo() != null) {
+				return clusterInfoWrapper.getClusterInfo();
+			}
+			return null;
+		} finally {
+			if (is != null)  { try { is.close();} catch (Exception e) { } }
 		}
 	}
 }
