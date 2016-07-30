@@ -24,10 +24,10 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+import org.apache.eagle.jpm.spark.crawl.JHFInputStreamReader;
+import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
+import org.apache.eagle.jpm.spark.crawl.SparkFilesystemInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
-import org.apache.eagle.jpm.spark.history.crawl.JHFInputStreamReader;
-import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
-import org.apache.eagle.jpm.spark.history.crawl.SparkHistoryFileInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
 import org.apache.eagle.jpm.util.HDFSUtil;
@@ -41,11 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SparkJobParseBolt extends BaseRichBolt {
 
@@ -103,7 +99,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
                     LOG.info("Attempt log name: " + attemptLogName + extension);
 
                     Path attemptFile = getFilePath(attemptLogName, extension);
-                    JHFInputStreamReader reader = new SparkHistoryFileInputStreamReaderImpl(config.info.site, info);
+                    JHFInputStreamReader reader = new SparkFilesystemInputStreamReaderImpl(config.info.site, info);
                     reader.read(hdfs.open(attemptFile));
                 }
             }
@@ -161,6 +157,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
         if (null == app) {
             // history server may not have the info, just double check.
             // TODO: if attemptId is not "1, 2, 3,...", we should change the logic.
+            // Use getResourceManagerVersion() to compare YARN/RM versions.
             // attemptId might be: "appId_000001"
             int attemptId = 0;
 

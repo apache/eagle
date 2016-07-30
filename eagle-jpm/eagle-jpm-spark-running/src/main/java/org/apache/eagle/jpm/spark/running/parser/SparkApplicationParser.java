@@ -232,7 +232,7 @@ public class SparkApplicationParser implements Runnable {
 
     private JobConfig getJobConfig(String sparkAppId, int attemptId) {
         //TODO: getResourceManagerVersion() and compare version to make attempt id.
-        
+
         LOG.info("Get job config for sparkAppId {}, attempt {}, appId {}", sparkAppId, attemptId, app.getId());
         FileSystem hdfs = null;
         JobConfig jobConfig = null;
