@@ -53,10 +53,11 @@ public class MRJobParser implements Runnable {
 
     public enum ParserStatus {
         RUNNING,
-        FINISHED
+        FINISHED,
+        APP_FINISHED
     }
     private AppInfo app;
-    private static final int MAX_RETRY_TIMES = 3;
+    private static final int MAX_RETRY_TIMES = 2;
     private MRJobEntityCreationHandler mrJobEntityCreationHandler;
     //<jobId, JobExecutionAPIEntity>
     private Map<String, JobExecutionAPIEntity> mrJobEntityMap;
@@ -65,22 +66,23 @@ public class MRJobParser implements Runnable {
     private static final String XML_FORMAT = "application/xml";
     private static final int CONNECTION_TIMEOUT = 10000;
     private static final int READ_TIMEOUT = 10000;
-    private MRRunningConfigManager.EndpointConfig endpointConfig;
     private final Object lock = new Object();
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
     private Map<String, String> commonTags = new HashMap<>();
     private RunningJobManager runningJobManager;
     private ParserStatus parserStatus;
     private ResourceFetcher rmResourceFetcher;
+    private boolean first;
+    private Set<String> finishedTaskIds;
+
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public MRJobParser(MRRunningConfigManager.EndpointConfig endpointConfig,
-                       MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                       MRJobEntityCreationHandler handler,
+    public MRJobParser(MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
+                       MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
-                       RunningJobManager runningJobManager) {
+                       RunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher) {
         this.app = app;
         this.mrJobEntityMap = new HashMap<>();
         this.mrJobEntityMap = mrJobMap;
@@ -89,25 +91,33 @@ public class MRJobParser implements Runnable {
         }
         this.mrJobConfigs = new HashMap<>();
 
-        this.endpointConfig = endpointConfig;
-        this.mrJobEntityCreationHandler = handler;
+        this.mrJobEntityCreationHandler = new MRJobEntityCreationHandler(eagleServiceConfig);
 
         this.commonTags.put(MRJobTagName.SITE.toString(), jobExtractorConfig.site);
         this.commonTags.put(MRJobTagName.USER.toString(), app.getUser());
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
-        this.parserStatus  = ParserStatus.RUNNING;
-        this.rmResourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
+        this.parserStatus  = ParserStatus.FINISHED;
+        this.rmResourceFetcher = rmResourceFetcher;
+        this.first = true;
+        this.finishedTaskIds = new HashSet<>();
     }
 
     public ParserStatus status() {
         return this.parserStatus;
     }
 
+    public void setStatus(ParserStatus status) {
+        this.parserStatus = status;
+    }
+
     private void finishMRJob(String mrJobId) {
         JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(mrJobId);
         jobExecutionAPIEntity.setStatus(Constants.AppState.FINISHED.toString());
         mrJobConfigs.remove(mrJobId);
+        if (mrJobConfigs.size() == 0) {
+            this.parserStatus = ParserStatus.APP_FINISHED;
+        }
         LOG.info("mr job {} has been finished", mrJobId);
     }
 
@@ -120,14 +130,18 @@ public class MRJobParser implements Runnable {
                 //if we get here either because of cannot connect rm or the jobs have finished
                 rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
                 mrJobEntityMap.keySet().forEach(this::finishMRJob);
+                return;
             }
-            Utils.sleep(5);
         }
 
         List<Function<String, Boolean>> functions = new ArrayList<>();
-        functions.add(fetchJobCounters);
-        functions.add(fetchJobConfig);
-        functions.add(fetchTasks);
+        if (!this.first) { //do not fetch these info below for the first time
+            functions.add(fetchJobConfig);
+            functions.add(fetchTasks);
+            functions.add(fetchJobCounters);
+        }
+
+        this.first = false;
         for (String jobId : mrJobEntityMap.keySet()) {
             for (Function<String, Boolean> function : functions) {
                 int i = 0;
@@ -135,7 +149,6 @@ public class MRJobParser implements Runnable {
                     if (function.apply(jobId)) {
                         break;
                     }
-                    Utils.sleep(5);
                 }
                 if (i >= MAX_RETRY_TIMES) {
                     //may caused by rm unreachable
@@ -199,7 +212,10 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setSuccessfulMapAttempts(mrJob.getSuccessfulMapAttempts());
             jobExecutionAPIEntity.setAppInfo(app);
             runningJobManager.update(app.getId(), id, jobExecutionAPIEntity);
+            mrJobEntityCreationHandler.add(jobExecutionAPIEntity);
         }
+
+        mrJobEntityCreationHandler.flush();
         return true;
     }
 
@@ -259,6 +275,9 @@ public class MRJobParser implements Runnable {
         }
 
         for (MRTask task : tasks) {
+            if (this.finishedTaskIds.contains(task.getId())) {
+                continue;
+            }
             TaskExecutionAPIEntity taskExecutionAPIEntity = new TaskExecutionAPIEntity();
             taskExecutionAPIEntity.setTags(new HashMap<>(mrJobEntityMap.get(jobId).getTags()));
             taskExecutionAPIEntity.getTags().put(MRJobTagName.TASK_TYPE.toString(), task.getType());
@@ -273,6 +292,10 @@ public class MRJobParser implements Runnable {
             taskExecutionAPIEntity.setSuccessfulAttempt(task.getSuccessfulAttempt());
             taskExecutionAPIEntity.setStatusDesc(task.getStatus());
             mrJobEntityCreationHandler.add(taskExecutionAPIEntity);
+
+            if (task.getState().equals(Constants.AppStatus.SUCCEEDED.toString())) {
+                this.finishedTaskIds.add(task.getId());
+            }
         }
         return true;
     };
@@ -319,12 +342,14 @@ public class MRJobParser implements Runnable {
     @Override
     public void run() {
         synchronized (this.lock) {
+            if (this.parserStatus == ParserStatus.APP_FINISHED) {
+                return;
+            }
+
+            this.parserStatus = ParserStatus.RUNNING;
             LOG.info("start to process yarn application " + app.getId());
             try {
                 fetchMRRunningInfo();
-                if (mrJobConfigs.size() == 0) {
-                    this.parserStatus = ParserStatus.FINISHED;
-                }
             } catch (Exception e) {
                 LOG.warn("exception found when process application {}, {}", app.getId(), e);
                 e.printStackTrace();
@@ -332,7 +357,7 @@ public class MRJobParser implements Runnable {
                 for (String jobId : mrJobEntityMap.keySet()) {
                     mrJobEntityCreationHandler.add(mrJobEntityMap.get(jobId));
                 }
-                if (mrJobEntityCreationHandler.add(null)) { //force flush
+                if (mrJobEntityCreationHandler.flush()) { //force flush
                     //we must flush entities before delete from zk in case of missing finish state of jobs
                     //delete from zk if needed
                     mrJobEntityMap.keySet()
@@ -345,6 +370,9 @@ public class MRJobParser implements Runnable {
                 }
 
                 LOG.info("finish process yarn application " + app.getId());
+            }
+            if (this.parserStatus == ParserStatus.RUNNING) {
+                this.parserStatus = ParserStatus.FINISHED;
             }
         }
     }

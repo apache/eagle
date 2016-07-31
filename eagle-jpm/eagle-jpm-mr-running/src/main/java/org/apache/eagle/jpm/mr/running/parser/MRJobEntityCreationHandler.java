@@ -34,85 +34,45 @@ import java.util.List;
 public class MRJobEntityCreationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobEntityCreationHandler.class);
 
-    class EntityFlushThread extends Thread {
-        private final Logger LOG = LoggerFactory.getLogger(EntityFlushThread.class);
-        private Object entityLock = new Object();
-        private Deque<List<TaggedLogAPIEntity>> listDeque = new LinkedList<>();
-        private List<TaggedLogAPIEntity> entities = new ArrayList<>();
-        private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
-
-        public EntityFlushThread(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
-            this.eagleServiceConfig = eagleServiceConfig;
-        }
-
-        public boolean add(TaggedLogAPIEntity entity) {
-            synchronized (entityLock) {
-                if (entity != null) {
-                    entities.add(entity);
-                }
-
-                if (entity == null) { //force to flush
-                    return flush(entities);
-                }
-
-                if (entities.size() >= MAX_ENTITIES_SIZE) {
-                    listDeque.add(entities);
-                    entities = new ArrayList<>();
-                }
-                return true;
-            }
-        }
-
-
-        public boolean flush(List<TaggedLogAPIEntity> entities) {
-            //need flush right now
-            try {
-                IEagleServiceClient client = new EagleServiceClientImpl(
-                        eagleServiceConfig.eagleServiceHost,
-                        eagleServiceConfig.eagleServicePort,
-                        eagleServiceConfig.username,
-                        eagleServiceConfig.password);
-
-                LOG.info("start to flush mr job entities, size {}", entities.size());
-                client.create(entities);
-                LOG.info("finish flushing mr job entities, size {}", entities.size());
-                entities.clear();
-            } catch (Exception e) {
-                LOG.warn("exception found when flush entities, {}", e);
-                e.printStackTrace();
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                List<TaggedLogAPIEntity> entities = null;
-                synchronized (entityLock) {
-                    if (!listDeque.isEmpty()) {
-                        entities = listDeque.pollFirst();
-                    }
-                }
-
-                if (entities != null) {
-                    flush(entities);
-                }
-                Utils.sleep(1);
-            }
-        }
-    }
-
-    private EntityFlushThread entityFlushThread;
-    private static final int MAX_ENTITIES_SIZE = 1000;
+    private List<TaggedLogAPIEntity> entities = new ArrayList<>();
+    private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
 
     public MRJobEntityCreationHandler(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
-        this.entityFlushThread = new EntityFlushThread(eagleServiceConfig);
-        this.entityFlushThread.start();
+        this.eagleServiceConfig = eagleServiceConfig;
     }
 
-    public boolean add(TaggedLogAPIEntity entity) {
-        return this.entityFlushThread.add(entity);
+    public void add(TaggedLogAPIEntity entity) {
+        entities.add(entity);
+        if (entities.size() >= eagleServiceConfig.maxFlushNum) {
+            this.flush();
+        }
+    }
+
+    public boolean flush() {
+        //need flush right now
+        IEagleServiceClient client = new EagleServiceClientImpl(
+                eagleServiceConfig.eagleServiceHost,
+                eagleServiceConfig.eagleServicePort,
+                eagleServiceConfig.username,
+                eagleServiceConfig.password);
+        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
+        try {
+            LOG.info("start to flush mr job entities, size {}", entities.size());
+            client.create(entities);
+            LOG.info("finish flushing mr job entities, size {}", entities.size());
+            entities.clear();
+        } catch (Exception e) {
+            LOG.warn("exception found when flush entities, {}", e);
+            e.printStackTrace();
+            return false;
+        } finally {
+            client.getJerseyClient().destroy();
+            try {
+                client.close();
+            } catch (Exception e) {
+            }
+        }
+
+        return true;
     }
 }

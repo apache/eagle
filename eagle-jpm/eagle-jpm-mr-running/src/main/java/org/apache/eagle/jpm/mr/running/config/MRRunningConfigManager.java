@@ -62,13 +62,14 @@ public class MRRunningConfigManager implements Serializable {
     public static class EagleServiceConfig implements Serializable {
         public String eagleServiceHost;
         public int eagleServicePort;
+        public int readTimeoutSeconds;
+        public int maxFlushNum;
         public String username;
         public String password;
     }
 
     public static class JobExtractorConfig implements Serializable {
         public String site;
-        public int readTimeoutSeconds;
         public int fetchRunningJobInterval;
         public int parseJobThreadPoolSize;
     }
@@ -120,10 +121,10 @@ public class MRRunningConfigManager implements Serializable {
         this.eagleServiceConfig.eagleServicePort = Integer.parseInt(port);
         this.eagleServiceConfig.username = config.getString("eagleProps.eagleService.username");
         this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
-
+        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("eagleProps.eagleService.readTimeOutSeconds");
+        this.eagleServiceConfig.maxFlushNum = config.getInt("eagleProps.eagleService.maxFlushNum");
         //parse job extractor
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
-        this.jobExtractorConfig.readTimeoutSeconds = config.getInt("jobExtractorConfig.readTimeOutSeconds");
         this.jobExtractorConfig.fetchRunningJobInterval = config.getInt("jobExtractorConfig.fetchRunningJobInterval");
         this.jobExtractorConfig.parseJobThreadPoolSize = config.getInt("jobExtractorConfig.parseJobThreadPoolSize");
 

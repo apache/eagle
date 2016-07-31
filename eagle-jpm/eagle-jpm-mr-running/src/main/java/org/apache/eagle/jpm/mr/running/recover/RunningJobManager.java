@@ -69,10 +69,10 @@ public class RunningJobManager implements Serializable {
         Map<String, JobExecutionAPIEntity> result = new HashMap<>();
         String path = this.zkRoot + "/" + yarnAppId;
         List<String> jobIds = curator.getChildren().forPath(path);
-        if (jobIds.size() == 0) {
+        /*if (jobIds.size() == 0) {
             LOG.info("delete empty path {}", path);
             delete(yarnAppId);
-        }
+        }*/
 
         for (String jobId : jobIds) {
             String jobPath = path + "/" + jobId;
@@ -177,13 +177,11 @@ public class RunningJobManager implements Serializable {
 
         } catch (Exception e) {
             LOG.error("failed to update job {} for yarn app {} ", jobId, yarnAppId);
-            throw new RuntimeException(e);
         } finally {
             try {
                 //lock.release();
             } catch (Exception e) {
                 LOG.error("fail releasing lock", e);
-                throw new RuntimeException(e);
             }
         }
         return true;
@@ -197,16 +195,18 @@ public class RunningJobManager implements Serializable {
             if (curator.checkExists().forPath(path) != null) {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
                 LOG.info("delete job {} for yarn app {}, path {} ", jobId, yarnAppId, path);
+                if (curator.getChildren().forPath(path).size() == 0) {
+                    delete(yarnAppId);
+                }
             }
         } catch (Exception e) {
             LOG.error("failed to delete job {} for yarn app {}, path {}", jobId, yarnAppId, path);
-            throw new RuntimeException(e);
         } finally {
             try {
                 //lock.release();
             } catch (Exception e) {
                 LOG.error("fail releasing lock", e);
-                throw new RuntimeException(e);
+
             }
         }
     }
@@ -217,18 +217,16 @@ public class RunningJobManager implements Serializable {
         try {
             //lock.acquire();
             if (curator.checkExists().forPath(path) != null) {
-                curator.delete().deletingChildrenIfNeeded().forPath(path);
+                curator.delete().forPath(path);
                 LOG.info("delete yarn app {}, path {} ", yarnAppId, path);
             }
         } catch (Exception e) {
             LOG.error("failed to delete yarn app {}, path {} ", yarnAppId, path);
-            throw new RuntimeException(e);
         } finally {
             try {
                 //lock.release();
             } catch (Exception e) {
                 LOG.error("fail releasing lock", e);
-                throw new RuntimeException(e);
             }
         }
     }

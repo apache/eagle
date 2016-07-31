@@ -18,11 +18,12 @@
 
 package org.apache.eagle.jpm.util.jobcounter;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 
 
-public final class JobCounters {
+public final class JobCounters implements Serializable {
     
     private Map<String, Map<String, Long>> counters = new TreeMap<>();
 

@@ -29,6 +29,9 @@ import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.parser.MRJobEntityCreationHandler;
 import org.apache.eagle.jpm.mr.running.parser.MRJobParser;
 import org.apache.eagle.jpm.mr.running.recover.RunningJobManager;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
+import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -50,8 +53,8 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     private ExecutorService executorService;
     private Map<String, MRJobParser> runningMRParsers;
     private transient RunningJobManager runningJobManager;
-    private MRJobEntityCreationHandler mrJobEntityCreationHandler;
     private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
+    private ResourceFetcher resourceFetcher;
     public MRRunningJobParseBolt(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                                  MRRunningConfigManager.EndpointConfig endpointConfig,
                                  MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
@@ -66,8 +69,9 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.executorService = Executors.newFixedThreadPool(jobExtractorConfig.parseJobThreadPoolSize);
+
         this.runningJobManager = new RunningJobManager(zkStateConfig);
-        this.mrJobEntityCreationHandler = new MRJobEntityCreationHandler(eagleServiceConfig);
+        this.resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
     }
 
     @Override
@@ -77,21 +81,29 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
 
         LOG.info("get mr yarn application " + appInfo.getId());
 
-        Set<String> runningParserIds = new HashSet<>(runningMRParsers.keySet());
-        runningParserIds.stream()
-                .filter(appId -> runningMRParsers.get(appId).status() == MRJobParser.ParserStatus.FINISHED)
-                .forEach(appId -> runningMRParsers.remove(appId));
-
         MRJobParser applicationParser;
         if (!runningMRParsers.containsKey(appInfo.getId())) {
-            applicationParser = new MRJobParser(endpointConfig, jobExtractorConfig, mrJobEntityCreationHandler, appInfo, mrJobs, runningJobManager);
+            applicationParser = new MRJobParser(jobExtractorConfig, eagleServiceConfig,
+                    appInfo, mrJobs, runningJobManager, this.resourceFetcher);
             runningMRParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
         } else {
             applicationParser = runningMRParsers.get(appInfo.getId());
         }
 
-        executorService.execute(applicationParser);
+        Set<String> runningParserIds = new HashSet<>(runningMRParsers.keySet());
+        runningParserIds.stream()
+                .filter(appId -> runningMRParsers.get(appId).status() == MRJobParser.ParserStatus.APP_FINISHED)
+                .forEach(appId -> {
+                    runningMRParsers.remove(appId);
+                    LOG.info("remove parser {}", appId);
+                });
+
+        if (appInfo.getState().equals(Constants.AppState.FINISHED.toString()) ||
+                applicationParser.status() == MRJobParser.ParserStatus.FINISHED) {
+            applicationParser.setStatus(MRJobParser.ParserStatus.RUNNING);
+            executorService.execute(applicationParser);
+        }
     }
 
     @Override

@@ -108,9 +108,12 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
                                     mrApps = new HashMap<>();
                                 }
                                 mrApps.put(appId, result);
-                                apps.add(result.get(result.keySet().iterator().next()).getAppInfo());
+                                AppInfo appInfo = result.get(result.keySet().iterator().next()).getAppInfo();
+                                appInfo.setState(Constants.AppState.FINISHED.toString());
+                                apps.add(appInfo);
                             }
                         } catch (KeeperException.NoNodeException e) {
+                            LOG.warn("{}", e);
                             LOG.warn("yarn app {} has finished", appId);
                         }
                     }
