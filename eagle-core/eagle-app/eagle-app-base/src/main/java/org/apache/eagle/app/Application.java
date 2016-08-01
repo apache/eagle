@@ -16,25 +16,48 @@
  */
 package org.apache.eagle.app;
 
+import com.typesafe.config.Config;
+import org.apache.eagle.app.environment.Environment;
+
 /**
  * Application Execution Interface
+ *
+ * @param <Proc>
+ * @param <Conf>
+ * @param <Env>
  */
-public interface Application {
+public interface Application<Proc,Conf extends ApplicationConfig,Env extends Environment> {
     /**
      *
-     * @param context
+     * @param config
+     * @return
      */
-    void start(ApplicationContext context);
+    Proc execute(Conf config, Env env);
 
     /**
      *
-     * @param context
+     * @param config
+     * @return
      */
-    void stop(ApplicationContext context);
+    Proc execute(Config config, Env env);
 
-    /**
-     * 
-     * @param context
-     */
-    void status(ApplicationContext context);
+    void run(String[] args);
+
+//    /**
+//     *
+//     * @param context
+//     */
+//    void start(ApplicationContext context);
+//
+//    /**
+//     *
+//     * @param context
+//     */
+//    void stop(ApplicationContext context);
+//
+//    /**
+//     *
+//     * @param context
+//     */
+//    void status(ApplicationContext context);
 }

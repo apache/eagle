@@ -30,7 +30,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Application Context Interface: org.apache.eagle.app.ApplicationContext
+ * Managed Application Interface: org.apache.eagle.app.ApplicationContext
  *
  * <ul>
  *     <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
@@ -42,24 +42,24 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
     private final Config envConfig;
     private final ApplicationEntity appEntity;
     private final static Logger LOG = LoggerFactory.getLogger(ApplicationContext.class);
-    private final Map<String, StreamDefinition> streamDefinitionMap;
-    private final Map<String,StreamDesc> streamDescMap;
+//    private final Map<String, StreamDefinition> streamDefinitionMap;
+//    private final Map<String,StreamDesc> streamDescMap;
     private final List<ApplicationLifecycleListener> applicationLifecycleListeners;
-    private final ApplicationProvider appProvider;
+    private final Application application;
 
     /**
      * @param appEntity ApplicationEntity
-     * @param appProvider ApplicationProvider
+     * @param application Application
      * @param envConfig Config
      */
-    public ApplicationContext(ApplicationEntity appEntity, ApplicationProvider appProvider, Config envConfig){
+    public ApplicationContext(Application application,ApplicationEntity appEntity, Config envConfig){
         this.appEntity = appEntity;
         this.envConfig = envConfig;
-        this.appProvider = appProvider;
-        this.streamDefinitionMap = new HashMap<>();
-        this.streamDescMap = new HashMap<>();
+        this.application = application;
+//        this.streamDefinitionMap = new HashMap<>();
+//        this.streamDescMap = new HashMap<>();
         this.applicationLifecycleListeners = new LinkedList<>();
-        doInit();
+//        doInit();
     }
 
     public void registerListener(ApplicationLifecycleListener listener){
@@ -70,27 +70,27 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
         return applicationLifecycleListeners;
     }
 
-    private void doInit() {
-        Class<?> sinkClass = appEntity.getDescriptor().getSinkClass();
-        List<StreamDefinition> outputStreams = appEntity.getDescriptor().getStreams();
-        if(null != outputStreams){
-            outputStreams.forEach((stream) -> {
-                try {
-                    StreamDesc streamDesc = new StreamDesc();
-                    StreamSink streamSink = (StreamSink) sinkClass.newInstance();
-                    streamDesc.setSink(streamSink.init(stream,this));
-                    streamDesc.setSchema(stream);
-                    streamDesc.setStreamId(stream.getStreamId());
-                    streamDescMap.put(streamDesc.getStreamId(),streamDesc);
-                    streamDefinitionMap.put(streamDesc.getStreamId(),stream);
-                    registerListener(streamSink);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    LOG.error("Failed to initialize instance "+sinkClass.getCanonicalName()+" for application: {}",this.getAppEntity());
-                    throw new RuntimeException("Failed to initialize instance "+sinkClass.getCanonicalName()+" for application:"+this.getAppEntity(),e);
-                }
-            });
-        }
-    }
+//    private void doInit() {
+//        Class<?> sinkClass = appEntity.getDescriptor().getSinkClass();
+//        List<StreamDefinition> outputStreams = appEntity.getDescriptor().getStreams();
+//        if(null != outputStreams){
+//            outputStreams.forEach((stream) -> {
+//                try {
+//                    StreamDesc streamDesc = new StreamDesc();
+//                    StreamSink streamSink = (StreamSink) sinkClass.newInstance();
+//                    streamDesc.setSink(streamSink.init(stream,this));
+//                    streamDesc.setSchema(stream);
+//                    streamDesc.setStreamId(stream.getStreamId());
+//                    streamDescMap.put(streamDesc.getStreamId(),streamDesc);
+//                    streamDefinitionMap.put(streamDesc.getStreamId(),stream);
+//                    registerListener(streamSink);
+//                } catch (InstantiationException | IllegalAccessException e) {
+//                    LOG.error("Failed to initialize instance "+sinkClass.getCanonicalName()+" for application: {}",this.appEntity);
+//                    throw new RuntimeException("Failed to initialize instance "+sinkClass.getCanonicalName()+" for application:"+this.appEntity,e);
+//                }
+//            });
+//        }
+//    }
 
     public ApplicationEntity getAppEntity() {
         return appEntity;
@@ -100,91 +100,91 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
         return envConfig;
     }
 
-    /**
-     * Make sure streamId is declared in Application Providers
-     *
-     * @param streamId
-     * @return
-     */
-    public StreamSink getFlattenStreamSink(String streamId, StreamEventMapper mapper){
-        checkStreamExists(streamId);
-        Class<?> sinkClass = appEntity.getDescriptor().getSinkClass();
-        try {
-            StreamSink abstractStreamSink = (StreamSink) sinkClass.newInstance();
-            abstractStreamSink.setEventMapper(mapper);
-            abstractStreamSink.init(streamDefinitionMap.get(streamId),this);
-            return abstractStreamSink;
-        } catch (InstantiationException | IllegalAccessException e) {
-            LOG.error("Failed to instantiate "+sinkClass,e);
-            throw new IllegalStateException("Failed to instantiate "+sinkClass,e);
-        }
-    }
+//    /**
+//     * Make sure streamId is declared in Application Providers
+//     *
+//     * @param streamId
+//     * @return
+//     */
+//    public StreamSink getFlattenStreamSink(String streamId, StreamEventMapper mapper){
+//        checkStreamExists(streamId);
+//        Class<?> sinkClass = appEntity.getDescriptor().getSinkClass();
+//        try {
+//            StreamSink abstractStreamSink = (StreamSink) sinkClass.newInstance();
+//            abstractStreamSink.setEventMapper(mapper);
+//            abstractStreamSink.init(streamDefinitionMap.get(streamId),this);
+//            return abstractStreamSink;
+//        } catch (InstantiationException | IllegalAccessException e) {
+//            LOG.error("Failed to instantiate "+sinkClass,e);
+//            throw new IllegalStateException("Failed to instantiate "+sinkClass,e);
+//        }
+//    }
+//
+//    /**
+//     * Make sure streamId is declared in Application Providers
+//     *
+//     * @param streamId
+//     * @return
+//     */
+//    public StreamSink getDirectStreamSink(String streamId, String ... fieldNames){
+//        return getFlattenStreamSink(streamId,new FieldNameDirectEventMapper(fieldNames));
+//    }
+//
+//    /**
+//     * Make sure streamId is declared in Application Providers
+//     *
+//     * @param streamId
+//     * @return
+//     */
+//    public StreamSink getDirectStreamSink(String streamId, int ... fieldIndexs){
+//        return getFlattenStreamSink(streamId,new FieldIndexDirectEventMapper(fieldIndexs));
+//    }
+//
+//    /**
+//     * Make sure streamId is declared in Application Providers
+//     *
+//     * @param streamId
+//     * @return
+//     */
+//    public StreamSink getFlattenStreamSink(String streamId, TimestampSelector timestampSelector){
+//        checkStreamExists(streamId);
+//        return getFlattenStreamSink(streamId,new FlattenEventMapper(streamDefinitionMap.get(streamId),timestampSelector));
+//    }
+//
+//    /**
+//     * Make sure streamId is declared in Application Providers
+//     *
+//     * @param streamId
+//     * @return
+//     */
+//    public StreamSink getFlattenStreamSink(String streamId, String timestampField){
+//        checkStreamExists(streamId);
+//        return getFlattenStreamSink(streamId,new FlattenEventMapper(streamDefinitionMap.get(streamId),timestampField));
+//    }
+//
+//    /**
+//     * Make sure streamId is declared in Application Providers
+//     *
+//     * @param streamId
+//     * @return
+//     */
+//    public StreamSink getFlattenStreamSink(String streamId){
+//        checkStreamExists(streamId);
+//        return getFlattenStreamSink(streamId,new FlattenEventMapper(streamDefinitionMap.get(streamId)));
+//    }
+//
+//    private void checkStreamExists(String streamId){
+//        if(! streamDefinitionMap.containsKey(streamId)){
+//            LOG.error("Stream [streamId = "+streamId+"] is not defined in "
+//                    + appEntity.getDescriptor().getProviderClass().getCanonicalName());
+//            throw new IllegalStateException("Stream [streamId = "+streamId+"] is not defined in "
+//                    + appEntity.getDescriptor().getProviderClass().getCanonicalName());
+//        }
+//    }
 
-    /**
-     * Make sure streamId is declared in Application Providers
-     *
-     * @param streamId
-     * @return
-     */
-    public StreamSink getDirectStreamSink(String streamId, String ... fieldNames){
-        return getFlattenStreamSink(streamId,new FieldNameDirectEventMapper(fieldNames));
-    }
-
-    /**
-     * Make sure streamId is declared in Application Providers
-     *
-     * @param streamId
-     * @return
-     */
-    public StreamSink getDirectStreamSink(String streamId, int ... fieldIndexs){
-        return getFlattenStreamSink(streamId,new FieldIndexDirectEventMapper(fieldIndexs));
-    }
-
-    /**
-     * Make sure streamId is declared in Application Providers
-     *
-     * @param streamId
-     * @return
-     */
-    public StreamSink getFlattenStreamSink(String streamId, TimestampSelector timestampSelector){
-        checkStreamExists(streamId);
-        return getFlattenStreamSink(streamId,new FlattenEventMapper(streamDefinitionMap.get(streamId),timestampSelector));
-    }
-
-    /**
-     * Make sure streamId is declared in Application Providers
-     *
-     * @param streamId
-     * @return
-     */
-    public StreamSink getFlattenStreamSink(String streamId, String timestampField){
-        checkStreamExists(streamId);
-        return getFlattenStreamSink(streamId,new FlattenEventMapper(streamDefinitionMap.get(streamId),timestampField));
-    }
-
-    /**
-     * Make sure streamId is declared in Application Providers
-     *
-     * @param streamId
-     * @return
-     */
-    public StreamSink getFlattenStreamSink(String streamId){
-        checkStreamExists(streamId);
-        return getFlattenStreamSink(streamId,new FlattenEventMapper(streamDefinitionMap.get(streamId)));
-    }
-
-    private void checkStreamExists(String streamId){
-        if(! streamDefinitionMap.containsKey(streamId)){
-            LOG.error("Stream [streamId = "+streamId+"] is not defined in "
-                    + appEntity.getDescriptor().getProviderClass().getCanonicalName());
-            throw new IllegalStateException("Stream [streamId = "+streamId+"] is not defined in "
-                    + appEntity.getDescriptor().getProviderClass().getCanonicalName());
-        }
-    }
-
-    public Collection<StreamDesc> getStreamSinkDescs(){
-        return streamDescMap.values();
-    }
+//    public Collection<StreamDesc> getStreamSinkDescs(){
+//        return streamDescMap.values();
+//    }
 
     @Override
     public void onAppInstall() {
@@ -220,12 +220,12 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
                 throw throwable;
             }
         });
-        appProvider.getApplication().start(this);
+//        appProvider.getApplication().start(this);
     }
 
     @Override
     public void onAppStop() {
-        appProvider.getApplication().stop(this);
+//        appProvider.getApplication().stop(this);
         getListeners().forEach((listener)->{
             try {
                 listener.onAppStop();
@@ -234,5 +234,14 @@ public class ApplicationContext implements Serializable, ApplicationLifecycleLis
                 throw throwable;
             }
         });
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public Config getFinalConfig() {
+        // Merge AppConfig with EnvConfig;
+        throw new RuntimeException("Not implemented yet");
     }
 }

@@ -18,6 +18,6 @@
 <providers>
     <provider>
         <jarPath>target/apache-eagle-example-app.jar</jarPath>
-        <className>org.apache.eagle.app.TestApplicationImpl$Provider</className>
+        <className>org.apache.eagle.app.TestStormAppImpl$Provider</className>
     </provider>
 </providers>

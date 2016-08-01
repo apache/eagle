@@ -65,8 +65,8 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setSite(siteEntity);
         applicationEntity.setConfiguration(operation.getConfiguration());
         applicationEntity.setMode(operation.getMode());
-        ApplicationContext applicationContext = new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),config);
-        applicationEntity.setStreams(applicationContext.getStreamSinkDescs());
+        ApplicationContext applicationContext = new ApplicationContext(applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),applicationEntity,config);
+//        TODO: applicationEntity.setStreams(applicationContext.getStreamSinkDescs());
         applicationContext.onAppInstall();
         applicationEntityService.create(applicationEntity);
         return applicationEntity;
@@ -74,7 +74,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 
     public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        ApplicationContext applicationContext = new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),config);
+        ApplicationContext applicationContext = new ApplicationContext(applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),applicationEntity,config);
         // TODO: Check status, skip stop if already STOPPED
         try {
             applicationContext.onAppStop();
@@ -87,13 +87,15 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 
     public ApplicationEntity start(ApplicationOperations.StartOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),this.config).onAppStart();
+        ApplicationContext applicationContext = new ApplicationContext(applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),applicationEntity,config);
+        applicationContext.onAppStart();
         return applicationEntity;
     }
 
     public ApplicationEntity stop(ApplicationOperations.StopOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        new ApplicationContext(applicationEntity,applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()),this.config).onAppStop();
+        ApplicationContext applicationContext = new ApplicationContext(applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),applicationEntity,config);
+        applicationContext.onAppStop();
         return applicationEntity;
     }
 }

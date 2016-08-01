@@ -19,6 +19,7 @@ package org.apache.eagle.metadata.model;
 import java.io.Serializable;
 
 public interface StreamSinkDesc extends Serializable {
+    String getStreamId();
     String getType();
     Class<?> getSinkClass();
     Class<? extends StreamSinkDesc> getDescClass();
