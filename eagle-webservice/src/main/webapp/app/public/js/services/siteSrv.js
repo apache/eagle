@@ -31,9 +31,15 @@
 			var list = Site.list = Entity.query('sites');
 			list._promise.then(function () {
 				$.each(list, function (i, site) {
-					var applications = common.array.find(site.siteId, Application.list, 'siteId', true);
-					applications = $.map(applications, function (app) {
-						return Application.providers[app.appType];
+					var applications = common.array.find(site.siteId, Application.list, 'site.siteId', true);
+					$.each(applications, function (i, app) {
+						app.descriptor = app.descriptor || {};
+						var oriApp = Application.providers[app.descriptor.type];
+						Object.defineProperty(app, 'origin', {
+							get: function () {
+								return oriApp;
+							}
+						});
 					});
 
 					Object.defineProperties(site, {

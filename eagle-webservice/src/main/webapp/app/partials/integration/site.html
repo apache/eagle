@@ -23,24 +23,27 @@
 				<th>App</th>
 				<th>Version</th>
 				<th>Description</th>
-				<th>Status</th>
+				<th width="10">Status</th>
 				<th>Quick Links</th>
-				<th width="180">Actions</th>
+				<th width="200">Actions</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="app in applicationList track by $index">
-				<td><a ng-click="showAppDetail(app)">{{app.name}}</a></td>
-				<td>{{app.version}}</td>
-				<td>TODO: check status</td>
+				<td><a ng-click="showAppDetail(app)">{{app.origin.name}}</a></td>
+				<td>{{app.origin.version}}</td>
 				<td>{{app.description}}</td>
+				<td class="text-center">
+					<span class="label label-{{getAppStatusClass(app)}}" ng-if="app.installed">{{app.status}}</span>
+					<span class="label label-default" ng-if="!app.installed">UNINSTALLED</span>
+				</td>
 				<td>TODO: ui link</td>
 				<td class="text-center">
 					<div class="btn-group btn-group-xs" ng-if="app.installed">
 						<button class="btn btn-default btn-sm">Monitor</button>
 						<button class="btn btn-default btn-sm">Start</button>
 						<button class="btn btn-default btn-sm">Stop</button>
-						<button class="btn btn-default btn-sm">Uninstall</button>
+						<button class="btn btn-default btn-sm" ng-click="uninstallApp(app)">Uninstall</button>
 					</div>
 					<div class="btn-group btn-group-xs" ng-if="!app.installed">
 						<button class="btn btn-primary btn-sm" ng-click="installApp(app)">Install Application</button>
@@ -51,6 +54,9 @@
 	</table>
 </div>
 
+
+
+<!-- Modal: Application information -->
 <div class="modal fade" role="dialog" id="appMDL">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">

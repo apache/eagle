@@ -29,6 +29,10 @@
 	serviceModule.service('Entity', function($http, $q) {
 		function Entity() {}
 
+		function withThen(list) {
+			list._then = list._promise.then.bind(list._promise);
+		}
+
 		// Dev usage. Set rest api source
 		Entity._host = function (host) {
 			console.warn("This function only used for development usage.");
@@ -53,7 +57,7 @@
 					list._done = true;
 					return list;
 				});
-				//list.then = list._promise.then;
+				withThen(list);
 				return list;
 			};
 
@@ -75,7 +79,7 @@
 			}, function (res) {
 				return $q.reject(res.data);
 			});
-			list.then = list._promise.then;
+			withThen(list);
 			return list;
 		};
 

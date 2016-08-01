@@ -56,10 +56,22 @@
 		}
 
 		// Map applications
-		$scope.uninstalledApplicationList = common.array.minus(Application.providerList, $scope.site.applicationList, "type", "appType");
-		$scope.applicationList = $.map($scope.site.applicationList, function (i, app) {
+		var uninstalledApplicationList = common.array.minus(Application.providerList, $scope.site.applicationList, "type", "descriptor.type");
+		$scope.applicationList = $.map($scope.site.applicationList, function (app) {
 			app.installed = true;
-		}).concat($scope.uninstalledApplicationList);
+			return app;
+		}).concat($.map(uninstalledApplicationList, function (oriApp) {
+			return { origin: oriApp };
+		}));
+
+		// Application status class
+		$scope.getAppStatusClass = function (application) {
+			switch((application.status || "").toUpperCase()) {
+				case "INITIALIZED":
+					return "success";
+			}
+			return "info";
+		};
 
 		// Application detail
 		$scope.showAppDetail = function (application) {
@@ -84,17 +96,25 @@
 
 			UI.fieldConfirm({
 				title: "Install '" + application.type + "'"
-			}, null, fields).then(null, null, function (holder) {
+			}, null, fields)(function (entity, closeFunc) {
 				Entity.create("apps/install", {
 					siteId: $scope.site.siteId,
 					appType: application.type,
-					configuration: holder.entity
-				}).then(function () {
+					configuration: entity
+				})._then(function () {
 					$wrapState.reload();
-					holder.closeFunc();
+					closeFunc();
 				});
 			});
 		};
+
+		// Uninstall application
+		$scope.uninstallApp = function (application) {
+			UI.deleteConfirm(application.descriptor.name + " - " + application.site.siteId)
+			(function (entity, closeFunc) {
+				
+			});
+		}
 	});
 
 	// ======================================================================================

@@ -54,7 +54,7 @@
 				siteId: $scope.siteId,
 				siteName: $scope.siteName,
 				description: $scope.description
-			}).then(function () {
+			})._then(function () {
 				Site.reload();
 				$wrapState.go('home');
 			}, function (res) {
