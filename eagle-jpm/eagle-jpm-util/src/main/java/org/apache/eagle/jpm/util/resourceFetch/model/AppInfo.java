@@ -24,6 +24,8 @@ import java.io.Serializable;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AppInfo implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	String id;
 	String user;
 	String name;

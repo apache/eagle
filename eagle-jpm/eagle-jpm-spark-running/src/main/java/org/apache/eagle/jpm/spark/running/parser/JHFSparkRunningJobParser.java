@@ -18,9 +18,11 @@ import java.io.InputStreamReader;
  */
 public class JHFSparkRunningJobParser implements JHFParserBase {
 
-    private static final Logger logger = LoggerFactory.getLogger(JHFSparkParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JHFSparkParser.class);
 
-    JHFSparkEventReader eventReader;
+    private boolean isValidJson;
+
+    private JHFSparkEventReader eventReader;
 
     public JHFSparkRunningJobParser(JHFSparkEventReader reader) {
         this.eventReader = reader;
@@ -28,41 +30,38 @@ public class JHFSparkRunningJobParser implements JHFParserBase {
 
     @Override
     public void parse(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        try {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             String line = null;
             boolean stopReadline = false;
             while ((line = reader.readLine()) != null && !stopReadline) {
                 try {
-                    boolean isValid = true;
-                    JSONObject eventObj = parseAndValidateJSON(line, isValid);
+                    isValidJson = true;
+                    JSONObject eventObj = parseAndValidateJSON(line);
 
-                    if (isValid) {
+                    if (isValidJson) {
                         String eventType = (String) eventObj.get("Event");
-                        logger.info("Event type: " + eventType);
+                        LOG.info("Event type: " + eventType);
                         this.eventReader.read(eventObj);
                         if (eventType.equals("SparkListenerEnvironmentUpdate")) {
                             stopReadline = true;
                         }
                     }
                 } catch (Exception e) {
-                    logger.error(String.format("Fail to parse %s.", line), e);
+                    LOG.error(String.format("Fail to parse %s.", line), e);
                 }
             }
             this.eventReader.clearReader();
-        } finally {
-            reader.close();
         }
     }
 
-    private JSONObject parseAndValidateJSON(String line, boolean isValid) {
+    private JSONObject parseAndValidateJSON(String line) {
         JSONObject eventObj = null;
         JSONParser parser = new JSONParser();
         try {
             eventObj = (JSONObject) parser.parse(line);
         } catch (ParseException ex) {
-            isValid = false;
-            logger.error(String.format("Invalid json string. Fail to parse %s.", line), ex);
+            isValidJson = false;
+            LOG.error(String.format("Invalid json string. Fail to parse %s.", line), ex);
         }
         return eventObj;
     }
