@@ -39,16 +39,31 @@
 	// ======================================================================================
 	// =                                       Set Up                                       =
 	// ======================================================================================
-	eagleControllers.controller('setupCtrl', function ($scope, PageConfig, Entity) {
+	eagleControllers.controller('setupCtrl', function ($wrapState, $scope, PageConfig, Entity, Site) {
 		PageConfig.hideTitle = true;
 
+		$scope.lock = false;
 		$scope.siteId = "sandbox";
 		$scope.siteName = "Sandbox";
 		$scope.description = "";
 
 		$scope.createSite = function () {
-			Entity.update("sites", {
+			$scope.lock = true;
 
+			Entity.create("sites", {
+				siteId: $scope.siteId,
+				siteName: $scope.siteName,
+				description: $scope.description
+			}).then(function () {
+				Site.reload();
+				$wrapState.go('home');
+			}, function (res) {
+				$.dialog({
+					title: "OPS!",
+					content: res.message
+				});
+			}).finally(function () {
+				$scope.lock = false;
 			});
 		};
 	});

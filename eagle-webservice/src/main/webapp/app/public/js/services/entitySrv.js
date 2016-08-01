@@ -26,7 +26,7 @@
 		_host = localStorage.getItem("host") || "";
 	}
 
-	serviceModule.service('Entity', function($http) {
+	serviceModule.service('Entity', function($http, $q) {
 		function Entity() {}
 
 		// Dev usage. Set rest api source
@@ -49,29 +49,34 @@
 				list._promise = $http.get(_host + "/rest/" + url).then(function (res) {
 					var data = res.data;
 					list.splice(0);
-					Array.prototype.push.apply(list, data);
+					Array.prototype.push.apply(list, data.data);
 					list._done = true;
+					return list;
 				});
+				//list.then = list._promise.then;
 				return list;
 			};
 
 			return list._refresh();
 		};
 
-		Entity.update = function (url, entity) {
-			var _list = [];
-			$http({
+		Entity.create = function (url, entity) {
+			var list = [];
+			list._promise = $http({
 				method: 'POST',
 				url: _host + "/rest/" + url,
 				headers: {
 					"Content-Type": "application/json"
 				},
 				data: entity
-			}).then(function (data) {
-				_list.push.apply(_list, data);
+			}).then(function (res) {
+				list.push.apply(list, res.data);
+				return res.data;
+			}, function (res) {
+				return $q.reject(res.data);
 			});
-
-			return _list;
+			list.then = list._promise.then;
+			return list;
 		};
 
 		// TODO: metadata will be removed

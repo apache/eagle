@@ -35,21 +35,29 @@ var app = {};
 	// ======================================================================================
 	function routeResolve(config) {
 		var resolve = {};
+		if(config === false) return resolve;
 
 		config = $.extend({
 			auth: true,
-			site: true
+			site: true,
+			application: true
 		}, config);
 
 		if(config.auth) {
 			// TODO: need auth module
 		}
 
-		if(config.site) {
+		//if(config.site) {
 			resolve.Site = function (Site) {
-				return Site.getPromise();
-			}
-		}
+				return Site.getPromise(config);
+			};
+		//}
+
+		//if(config.application) {
+			resolve.Application = function (Application) {
+				return Application.getPromise();
+			};
+		//}
 
 		return resolve;
 	}
@@ -68,7 +76,7 @@ var app = {};
 				url: "/setup",
 				templateUrl: "partials/setup.html?_=" + eagleApp._TRS(),
 				controller: "setupCtrl",
-				resolve: routeResolve({ site: false })
+				resolve: routeResolve({ site: false, application: false })
 			})
 		// ================================= Alerts =================================
 			.state('alert', {
@@ -76,7 +84,7 @@ var app = {};
 				url: "/alert/",
 				templateUrl: "partials/alert/main.html?_=" + eagleApp._TRS(),
 				controller: "alertCtrl",
-				resolve: routeResolve()
+				resolve: routeResolve(false)
 			})
 			.state('alert.list', {
 				url: "",
@@ -101,6 +109,32 @@ var app = {};
 				templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
 				controller: "policyEditCtrl",
 				resolve: routeResolve()
+			})
+		// =============================== Integration ==============================
+			.state('integration', {
+				abstract: true,
+				url: "/integration/",
+				templateUrl: "partials/integration/main.html?_=" + eagleApp._TRS(),
+				controller: "integrationCtrl",
+				resolve: routeResolve(false)
+			})
+			.state('integration.siteList', {
+				url: "siteList",
+				templateUrl: "partials/integration/siteList.html?_=" + eagleApp._TRS(),
+				controller: "integrationSiteListCtrl",
+				resolve: routeResolve({ application: false })
+			})
+			.state('integration.site', {
+				url: "site/:id",
+				templateUrl: "partials/integration/site.html?_=" + eagleApp._TRS(),
+				controller: "integrationSiteCtrl",
+				resolve: routeResolve({ application: false })
+			})
+			.state('integration.application', {
+				url: "application",
+				templateUrl: "partials/integration/application.html?_=" + eagleApp._TRS(),
+				controller: "integrationApplicationCtrl",
+				resolve: routeResolve({ application: false })
 			});
 	});
 
@@ -109,11 +143,13 @@ var app = {};
 	// ======================================================================================
 	var STATE_NAME_MATCH = /^[^\.]*/;
 
-	eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, UI) {
+	eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, Site, Application, UI) {
 		window._WrapState = $scope.$wrapState = $wrapState;
 		window._PageConfig = $scope.PageConfig = PageConfig;
 		window._Portal = $scope.Portal = Portal;
 		window._Entity = $scope.Entity = Entity;
+		window._Site = $scope.Site = Site;
+		window._Application = $scope.Application = Application;
 		window._UI = $scope.UI = UI;
 
 		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {

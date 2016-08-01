@@ -21,18 +21,57 @@
 
 	var serviceModule = angular.module('eagle.service');
 
-	serviceModule.service('Site', function($wrapState, Entity) {
+	serviceModule.service('Site', function($q, $wrapState, Entity, Application) {
 		var Site = {};
 
-		Site.getPromise = function () {
+		Site.list = [];
+
+		// Load sites
+		Site.reload = function () {
 			var list = Site.list = Entity.query('sites');
-			return list._promise.then(function() {
-				if(list.length === 0) {
-					$wrapState.go("setup", 1);
+			list._promise.then(function () {
+				$.each(list, function (i, site) {
+					var applications = common.array.find(site.siteId, Application.list, 'siteId', true);
+					applications = $.map(applications, function (app) {
+						return Application.providers[app.appType];
+					});
+
+					Object.defineProperties(site, {
+						applicationList: {
+							get: function () {
+								return applications;
+							}
+						}
+					});
+				});
+			});
+		};
+
+		// Find Site
+		Site.find = function (siteId) {
+			return common.array.find(siteId, Site.list, 'siteId');
+		};
+
+		Site.getPromise = function (config) {
+			return $q.all([Site.list._promise, Application.getPromise()]).then(function(dataList) {
+				// Site check
+				if(config.site !== false && Site.list.length === 0) {
+					$wrapState.go('setup', 1);
+					return $q.reject(Site);
 				}
+
+				// Application check
+				if(config.application !== false && Application.list.length === 0) {
+					$wrapState.go('integration.site', {id: Site.list[0].siteId}, 1);
+					return $q.reject(Site);
+				}
+
 				return Site;
 			});
 		};
+
+		// Initialization
+		Site.reload();
 
 		return Site;
 	});

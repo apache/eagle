@@ -55,8 +55,8 @@
 	];
 	var adminPortalList = [
 		{name: "Integration", icon: "puzzle-piece", list: [
-			{name: "Sites"},
-			{name: "Apps"},
+			{name: "Sites", path: "#/integration/siteList"},
+			{name: "Apps", path: "#/integration/application"},
 			{name: "Streams"}
 		]}
 	];

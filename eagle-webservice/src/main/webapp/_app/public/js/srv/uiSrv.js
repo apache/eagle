@@ -19,6 +19,13 @@
 (function() {
 	'use strict';
 
+	/**
+	 * Check function to check fields pass or not
+	 * @callback checkFieldFunction
+	 * @param {{}} entity
+	 * @return {string}
+     */
+
 	var serviceModule = angular.module('eagle.service');
 
 	// ===========================================================
@@ -125,14 +132,14 @@
 
 		/***
 		 * Create a customize field confirm modal.
-		 * @param config		Configuration object
-		 * 			@param config.title			Title of dialog box
-		 * 			@param config.size				"large". Set dialog size
-		 * 			@param config.confirm			Boolean. Display or not confirm button
-		 * 			@param config.confirmDesc		Confirm button display description
-		 * @param entity		bind entity
-		 * @param fieldList	Array. Format: {name, field, type(optional: select, blob), rows(optional: number), description(optional), optional(optional), readonly(optional), valueList(optional)}
-		 * @param checkFunc	Check logic function. Return string will prevent access
+		 * @param {object} config					- Configuration object
+		 * @param {string=} config.title				- Title of dialog box
+		 * @param {string=} config.size				- "large". Set dialog size
+		 * @param {boolean=} config.confirm			- Display or not confirm button
+		 * @param {string=} config.confirmDesc		- Confirm button display description
+		 * @param {object} entity					- bind entity
+		 * @param {{name:string, field:string,type:('select'|'blob'),rows:number,description:string,optional:boolean,readonly:boolean,valueList:Array}[]} fieldList - Display fields
+		 * @param {checkFieldFunction=} checkFunc	- Check logic function. Return string will prevent access
 		 */
 		UI.fieldConfirm = function(config, entity, fieldList, checkFunc) {
 			return _fieldDialog("field", config, entity, fieldList, checkFunc);

@@ -33,8 +33,123 @@
 		return retFunc;
 	}
 
+	/**
+	 * Check function to check fields pass or not
+	 * @callback checkFieldFunction
+	 * @param {{}} entity
+	 * @return {string}
+	 */
+
 	serviceModule.service('UI', function($rootScope, $q, $compile) {
 		function UI() {}
+
+		function _bindShortcut($dialog) {
+			$dialog.on("keydown", function (event) {
+				if(event.which === 13) {
+					if(!$(":focus").is("textarea")) {
+						$dialog.find(".confirmBtn:enabled").click();
+					}
+				}
+			});
+		}
+
+		function _fieldDialog(create, name, entity, fieldList, checkFunc) {
+			var _deferred, $mdl, $scope;
+
+			var _entity = entity || {};
+
+			_deferred = $q.defer();
+			$scope = $rootScope.$new(true);
+			$scope.name = name;
+			$scope.entity = _entity;
+			$scope.fieldList = fieldList;
+			$scope.checkFunc = checkFunc;
+			$scope.lock = false;
+			$scope.create = create;
+
+			$scope.config = typeof name === "object" ? name : {};
+
+			// Init
+			if(!entity) {
+				$.each(fieldList, function (i, field) {
+					if(field.defaultValue) {
+						_entity[field.field] = field.defaultValue;
+					}
+				});
+			}
+
+			// Modal
+			$mdl = $(TMPL_FIELDS).appendTo('body');
+			$compile($mdl)($scope);
+			$mdl.modal();
+
+			$mdl.on("hide.bs.modal", function() {
+				_deferred.reject();
+			});
+			$mdl.on("hidden.bs.modal", function() {
+				_deferred.resolve({
+					entity: _entity
+				});
+				$mdl.remove();
+			});
+
+			// Function
+			$scope.getFieldDescription = function (field) {
+				if(typeof field.description === "function") {
+					return field.description($scope.entity);
+				}
+				return field.description || ((field.name || field.field) + '...');
+			};
+
+			$scope.emptyFieldList = function() {
+				return $.map(fieldList, function(field) {
+					if(!field.optional && !_entity[field.field]) {
+						return field.field;
+					}
+				});
+			};
+
+			$scope.confirm = function() {
+				$scope.lock = true;
+				_deferred.notify({
+					entity: _entity,
+					closeFunc: function() {
+						$mdl.modal('hide');
+					},
+					unlock: function() {
+						$scope.lock = false;
+					}
+				});
+			};
+
+			_bindShortcut($mdl);
+
+			return _deferred.promise;
+		}
+
+		/***
+		 * Create a customize field confirm modal.
+		 * @param {object} config						- Configuration object
+		 * @param {string} config.title						- Title of dialog box
+		 * @param {string=} config.size						- "large". Set dialog size
+		 * @param {boolean=} config.confirm					- Display or not confirm button
+		 * @param {string=} config.confirmDesc				- Confirm button display description
+		 * @param {object} entity						- bind entity
+		 * @param {Object[]} fieldList					- Display fields
+		 * @param {string} fieldList[].field				- Mapping entity field
+		 * @param {string=} fieldList[].name				- Field display name
+		 * @param {*=} fieldList[].defaultValue				- Field default value. Only will be set if entity object is undefined
+		 * @param {string=} fieldList[].type				- Field types: 'select', 'blob'
+		 * @param {number=} fieldList[].rows				- Display as textarea if rows is set
+		 * @param {string=} fieldList[].description			- Display as placeholder
+		 * @param {boolean=} fieldList[].optional			- Optional field will not block the confirm
+		 * @param {boolean=} fieldList[].readonly			- Read Only can not be updated
+		 * @param {string[]=} fieldList[].valueList			- For select type usage
+		 * @param {checkFieldFunction=} checkFunc	- Check logic function. Return string will prevent access
+		 */
+		UI.fieldConfirm = function(config, entity, fieldList, checkFunc) {
+			return _fieldDialog("field", config, entity, fieldList, checkFunc);
+		};
 
 		UI.deleteConfirm = function (name) {
 			var _deferred, $mdl, $scope;

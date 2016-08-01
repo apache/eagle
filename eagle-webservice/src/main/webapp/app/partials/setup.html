@@ -16,7 +16,7 @@
   limitations under the License.
   -->
 
-<h2>Welcome to using Apache Eagle!</h2>
+<h2>Welcome for using Apache Eagle!</h2>
 <p class="lead">
 	As the first installation, please create a <code>SITE</code>.
 	(A site is a cluster/service which you want to monitor, as a quick start, you could use <code>sandbox</code> by default)
@@ -41,6 +41,6 @@
 		</div>
 	</div>
 	<div class="box-footer text-right">
-		<button class="btn btn-primary" ng-click="createSite()" ng-disabled="site === ''">Next</button>
+		<button class="btn btn-primary" ng-click="createSite()" ng-disabled="site === '' || lock">Next</button>
 	</div>
 </div>
