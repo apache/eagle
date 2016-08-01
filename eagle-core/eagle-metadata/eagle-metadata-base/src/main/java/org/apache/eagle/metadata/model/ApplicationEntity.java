@@ -41,7 +41,7 @@ public class ApplicationEntity extends PersistenceEntity {
     private Map<String,String> context = new HashMap<>();
     private Collection<StreamDesc> streams;
     private Mode mode = Mode.CLUSTER;
-    private Status status = Status.INITIAILIZED;
+    private Status status = Status.INITIALIZED;
 
     public SiteEntity getSite() {
         return site;
@@ -82,7 +82,7 @@ public class ApplicationEntity extends PersistenceEntity {
             this.appId = String.format("EAGLE_APP[TYPE=%s,SITE=%s]",this.getDescriptor().getType(),this.getSite().getSiteId());
         }
         if(this.status == null){
-            this.status = Status.INITIAILIZED;
+            this.status = Status.INITIALIZED;
         }
     }
 
@@ -119,10 +119,10 @@ public class ApplicationEntity extends PersistenceEntity {
     }
 
     public static enum Status{
-        INITIAILIZED("INITIAILIZED"),
+        INITIALIZED("INITIALIZED"),
         STARTING("STARTING"),
         RUNNING("RUNNING"),
-        STOPPPING("STOPPPING"),
+        STOPPING("STOPPING"),
         STOPPED("STOPPED");
 
         private final String status;
