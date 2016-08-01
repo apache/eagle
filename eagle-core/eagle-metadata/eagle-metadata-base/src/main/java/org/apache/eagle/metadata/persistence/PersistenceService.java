@@ -16,10 +16,12 @@
  */
 package org.apache.eagle.metadata.persistence;
 
+import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
+
 import java.util.Collection;
 
 public interface PersistenceService<T extends PersistenceEntity> {
     Collection<T> findAll();
-    T getByUUID(String uuid);
+    T getByUUID(String uuid) throws EntityNotFoundException;
     T create(T entity);
 }

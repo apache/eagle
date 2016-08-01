@@ -24,6 +24,7 @@ import org.apache.eagle.app.ApplicationContext;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
@@ -52,7 +53,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         this.applicationEntityService = applicationEntityService;
     }
 
-    public ApplicationEntity install(ApplicationOperations.InstallOperation operation) {
+    public ApplicationEntity install(ApplicationOperations.InstallOperation operation) throws EntityNotFoundException {
         Preconditions.checkNotNull(operation.getSiteId(),"siteId is null");
         Preconditions.checkNotNull(operation.getAppType(),"appType is null");
         SiteEntity siteEntity = siteEntityService.getBySiteId(operation.getSiteId());

@@ -22,6 +22,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -31,6 +32,17 @@ public class RESTResponse<T>{
     private String message;
     private String exception;
     private T data;
+
+    public RESTResponse(){}
+
+    public RESTResponse(Throwable throwable){
+        if(throwable.getMessage() == null || throwable.getMessage().isEmpty()) {
+            this.setMessage(throwable.getMessage());
+        }else{
+            this.setMessage(ExceptionUtils.getMessage(throwable));
+        }
+        this.setException(ExceptionUtils.getStackTrace(throwable));
+    }
 
     public T getData() {
         return data;
@@ -96,6 +108,7 @@ public class RESTResponse<T>{
     public static class RestResponseBuilder<E>{
         private RESTResponse current = new RESTResponse();
         private Response.Status status = Response.Status.OK;
+        private CompletableFuture future = null;
 
         public RestResponseBuilder<E> success(boolean success){
             this.current.setSuccess(success);
@@ -119,6 +132,13 @@ public class RESTResponse<T>{
 
         public RestResponseBuilder<E> exception(Throwable exception){
             this.current.setThrowable(exception);
+            if(this.current.getMessage() == null){
+                if(exception.getMessage() ==null || exception.getMessage().isEmpty()){
+                    this.current.setMessage(ExceptionUtils.getMessage(exception));
+                }else{
+                    this.current.setMessage(exception.getMessage());
+                }
+            }
             return this;
         }
 
@@ -127,7 +147,7 @@ public class RESTResponse<T>{
                 this.success(true).status(Response.Status.OK);
                 func.accept(this);
             } catch (Exception ex){
-                this.success(false).data(null).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage());
+                this.success(false).data(null).status(Response.Status.BAD_REQUEST).exception(ex);
                 raiseWebAppException(ex);
             }
             return this;
@@ -137,7 +157,7 @@ public class RESTResponse<T>{
             try {
                 this.success(true).status(Response.Status.OK).data(func.get());
             } catch (Throwable ex){
-                this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage());
+                this.success(false).status(Response.Status.BAD_REQUEST).exception(ex);
                 raiseWebAppException(ex);
             }
             return this;
@@ -148,7 +168,7 @@ public class RESTResponse<T>{
                 try {
                     this.status(Response.Status.OK).success(true).data(func.get());
                 } catch (Throwable e) {
-                    this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(e.getMessage()).exception(e);
+                    this.success(false).status(Response.Status.BAD_REQUEST).exception(e);
                     raiseWebAppException(e);
                 }
             });
@@ -162,9 +182,10 @@ public class RESTResponse<T>{
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 future.cancel(true);
-                this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage()).exception(ex);
-            } catch (Throwable ex) {
-                this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage()).exception(ex);
+                this.success(false).status(Response.Status.BAD_REQUEST).exception(ex.getCause());
+                raiseWebAppException(ex);
+            } catch (ExecutionException ex) {
+                this.success(false).status(Response.Status.BAD_REQUEST).exception(ex.getCause());
                 raiseWebAppException(ex);
             }
         }
@@ -179,7 +200,7 @@ public class RESTResponse<T>{
                     func.accept(this);
                     this.success(true);
                 } catch (Throwable ex) {
-                    this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage()).exception(ex);
+                    this.success(false).status(Response.Status.BAD_REQUEST).exception(ex);
                     raiseWebAppException(ex);
                 }
             });
@@ -191,7 +212,7 @@ public class RESTResponse<T>{
             try {
                 func.accept(this);
             } catch (Throwable ex) {
-                this.success(false).status(Response.Status.INTERNAL_SERVER_ERROR).message(ex.getMessage()).exception(ex);
+                this.success(false).status(Response.Status.BAD_REQUEST).exception(ex);
                 raiseWebAppException(ex);
             }
             return this;
