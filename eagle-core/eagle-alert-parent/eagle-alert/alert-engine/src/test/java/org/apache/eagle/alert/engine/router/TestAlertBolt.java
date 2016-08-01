@@ -43,6 +43,7 @@ import org.apache.eagle.alert.engine.serialization.impl.PartitionedEventSerializ
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -174,7 +175,7 @@ public class TestAlertBolt {
         bolt.prepare(stormConf, topologyContext, collector);
         return bolt;
     }
-
+    @Ignore
     @Test
     public void testMetadataMismatch() throws Exception {
         AtomicInteger failedCount = new AtomicInteger();

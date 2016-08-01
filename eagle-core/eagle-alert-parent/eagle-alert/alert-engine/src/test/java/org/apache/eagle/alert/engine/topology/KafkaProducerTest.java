@@ -48,6 +48,7 @@ import java.util.TreeMap;
 public class KafkaProducerTest implements Serializable {
 
     String topic = "oozie";
+    @Ignore
     @Test
     public void producerTestOozie() throws InterruptedException, JsonProcessingException, ParseException {
 
@@ -122,6 +123,7 @@ public class KafkaProducerTest implements Serializable {
 //        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
         AdminUtils.createTopic(zkClient, topic, 3, 1, topicConfiguration);
     }
+    @Ignore
     @Test
     public void listZk() throws Exception {
         String zkhost="localhost:2181";//zk的host

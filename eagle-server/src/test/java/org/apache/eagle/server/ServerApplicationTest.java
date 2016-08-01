@@ -16,9 +16,11 @@
  */
 package org.apache.eagle.server;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ServerApplicationTest {
+    @Ignore
     @Test
     public void testServerMain() throws Exception {
         ServerMain.main(new String[]{"server"});

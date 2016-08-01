@@ -3,6 +3,7 @@ package org.apache.eagle.alert.engine.topology;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.streaming.StreamingQuery;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class WordCount implements Serializable {
+    @Ignore
     @Test
     public void testTopologyRun() {
 

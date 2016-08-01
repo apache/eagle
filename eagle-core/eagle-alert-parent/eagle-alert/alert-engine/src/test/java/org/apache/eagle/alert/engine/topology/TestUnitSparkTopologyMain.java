@@ -21,14 +21,17 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.runner.UnitSparkTopologyRunner;
 import org.apache.eagle.alert.engine.runner.UnitSpark2TopologyRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestUnitSparkTopologyMain {
+
+    @Ignore
     @Test
     public void testTopologyRun() throws InterruptedException {
         testTopologyRun("/spark/application-spark.conf");
     }
-
+    @Ignore
     @Test
     public void testTopologyRun2() throws InterruptedException {
         testTopologyRun2("/spark/application-spark.conf");
