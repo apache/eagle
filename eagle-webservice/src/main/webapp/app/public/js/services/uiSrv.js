@@ -148,7 +148,7 @@
 		 * @param {checkFieldFunction=} checkFunc	- Check logic function. Return string will prevent access
 		 */
 		UI.fieldConfirm = function(config, entity, fieldList, checkFunc) {
-			return _fieldDialog("field", config, entity, fieldList, checkFunc);
+			return wrapPromise(_fieldDialog("field", config, entity, fieldList, checkFunc));
 		};
 
 		UI.deleteConfirm = function (name) {

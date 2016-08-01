@@ -26,32 +26,45 @@
 
 		Site.list = [];
 
+		// Link with application
+		function linkApplications(siteList, ApplicationList) {
+			$.each(siteList, function (i, site) {
+				var applications = common.array.find(site.siteId, ApplicationList, 'site.siteId', true);
+
+				$.each(applications, function (i, app) {
+					app.descriptor = app.descriptor || {};
+					var oriApp = Application.providers[app.descriptor.type];
+					Object.defineProperty(app, 'origin', {
+						configurable: true,
+						get: function () {
+							return oriApp;
+						}
+					});
+				});
+
+				Object.defineProperties(site, {
+					applicationList: {
+						configurable: true,
+						get: function () {
+							return applications;
+						}
+					}
+				});
+			});
+		}
+
 		// Load sites
 		Site.reload = function () {
 			var list = Site.list = Entity.query('sites');
 			list._promise.then(function () {
-				$.each(list, function (i, site) {
-					var applications = common.array.find(site.siteId, Application.list, 'site.siteId', true);
-					$.each(applications, function (i, app) {
-						app.descriptor = app.descriptor || {};
-						var oriApp = Application.providers[app.descriptor.type];
-						Object.defineProperty(app, 'origin', {
-							get: function () {
-								return oriApp;
-							}
-						});
-					});
-
-					Object.defineProperties(site, {
-						applicationList: {
-							get: function () {
-								return applications;
-							}
-						}
-					});
-				});
+				linkApplications(list, Application.list);
 			});
+			return Site;
 		};
+
+		Application.onReload(function (Application) {
+			linkApplications(Site.list, Application.list);
+		});
 
 		// Find Site
 		Site.find = function (siteId) {
@@ -59,7 +72,7 @@
 		};
 
 		Site.getPromise = function (config) {
-			return $q.all([Site.list._promise, Application.getPromise()]).then(function(dataList) {
+			return $q.all([Site.list._promise, Application.getPromise()]).then(function() {
 				// Site check
 				if(config.site !== false && Site.list.length === 0) {
 					$wrapState.go('setup', 1);

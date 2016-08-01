@@ -56,21 +56,33 @@
 		}
 
 		// Map applications
-		var uninstalledApplicationList = common.array.minus(Application.providerList, $scope.site.applicationList, "type", "descriptor.type");
-		$scope.applicationList = $.map($scope.site.applicationList, function (app) {
-			app.installed = true;
-			return app;
-		}).concat($.map(uninstalledApplicationList, function (oriApp) {
-			return { origin: oriApp };
-		}));
+		function mapApplications() {
+			var uninstalledApplicationList = common.array.minus(Application.providerList, $scope.site.applicationList, "type", "descriptor.type");
+			$scope.applicationList = $.map($scope.site.applicationList, function (app) {
+				app.installed = true;
+				return app;
+			}).concat($.map(uninstalledApplicationList, function (oriApp) {
+				return { origin: oriApp };
+			}));
+		}
+		mapApplications();
+
 
 		// Application status class
 		$scope.getAppStatusClass = function (application) {
 			switch((application.status || "").toUpperCase()) {
 				case "INITIALIZED":
+					return "primary";
+				case "STARTING":
+					return "warning";
+				case "RUNNING":
 					return "success";
+				case "STOPPING":
+					return "warning";
+				case "STOPPED":
+					return "danger";
 			}
-			return "info";
+			return "default";
 		};
 
 		// Application detail
@@ -84,6 +96,7 @@
 
 		// Install application
 		$scope.installApp = function (application) {
+			application = application.origin;
 			var fields = common.getValueByPath(application, "configuration.properties", []);
 			fields = $.map(fields, function (prop) {
 				return {
@@ -102,7 +115,7 @@
 					appType: application.type,
 					configuration: entity
 				})._then(function () {
-					$wrapState.reload();
+					Application.reload().getPromise().then(mapApplications);
 					closeFunc();
 				});
 			});
@@ -112,7 +125,10 @@
 		$scope.uninstallApp = function (application) {
 			UI.deleteConfirm(application.descriptor.name + " - " + application.site.siteId)
 			(function (entity, closeFunc) {
-				
+				Entity.delete("apps/uninstall", application.uuid)._then(function () {
+					Application.reload().getPromise().then(mapApplications);
+					closeFunc();
+				});
 			});
 		}
 	});

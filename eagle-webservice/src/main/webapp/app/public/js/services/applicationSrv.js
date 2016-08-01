@@ -23,12 +23,23 @@
 
 	serviceModule.service('Application', function($wrapState, Entity) {
 		var Application = {};
+		var reloadListenerList = [];
 
 		Application.list = [];
 
 		// Load applications
 		Application.reload = function () {
 			Application.list = Entity.query('apps');
+			Application.list._then(function () {
+				$.each(reloadListenerList, function (i, listener) {
+					listener(Application);
+				});
+			});
+			return Application;
+		};
+
+		Application.onReload = function (func) {
+			reloadListenerList.push(func);
 		};
 
 		// Load providers

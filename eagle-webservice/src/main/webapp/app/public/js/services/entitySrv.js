@@ -29,6 +29,21 @@
 	serviceModule.service('Entity', function($http, $q) {
 		function Entity() {}
 
+		function wrapList(list, promise) {
+			list._done = false;
+			list._promise = promise;
+			promise.then(function (res) {
+				var data = res.data;
+				list.splice(0);
+				Array.prototype.push.apply(list, data.data);
+				list._done = true;
+
+				return list;
+			});
+			withThen(list);
+			return list;
+		}
+
 		function withThen(list) {
 			list._then = list._promise.then.bind(list._promise);
 		}
@@ -47,18 +62,8 @@
 
 		Entity.query = function (url) {
 			var list = [];
-
 			list._refresh = function () {
-				list._done = false;
-				list._promise = $http.get(_host + "/rest/" + url).then(function (res) {
-					var data = res.data;
-					list.splice(0);
-					Array.prototype.push.apply(list, data.data);
-					list._done = true;
-					return list;
-				});
-				withThen(list);
-				return list;
+				return wrapList(list, $http.get(_host + "/rest/" + url));
 			};
 
 			return list._refresh();
@@ -66,21 +71,26 @@
 
 		Entity.create = function (url, entity) {
 			var list = [];
-			list._promise = $http({
+			return wrapList(list, $http({
 				method: 'POST',
 				url: _host + "/rest/" + url,
 				headers: {
 					"Content-Type": "application/json"
 				},
 				data: entity
-			}).then(function (res) {
-				list.push.apply(list, res.data);
-				return res.data;
-			}, function (res) {
-				return $q.reject(res.data);
-			});
-			withThen(list);
-			return list;
+			}));
+		};
+
+		Entity.delete = function (url, uuid) {
+			var list = [];
+			return wrapList(list, $http({
+				method: 'DELETE',
+				url: _host + "/rest/" + url,
+				headers: {
+					"Content-Type": "application/json"
+				},
+				data: {uuid: uuid}
+			}));
 		};
 
 		// TODO: metadata will be removed
