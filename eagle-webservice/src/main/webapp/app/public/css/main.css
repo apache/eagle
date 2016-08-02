@@ -76,6 +76,10 @@ table .info-wrapper:hover .info-detail {
 	display: table-row;
 }
 
+table ul {
+	padding: 0 0 0 20px;
+}
+
 table.table pre {
 	white-space: pre-wrap;
 	margin: 0;
@@ -88,9 +92,6 @@ table.table pre.inline {
 	background: transparent;
 }
 
-table.table ul {
-	padding: 0 0 0 20px;
-}
 
 /* ========================================================================
  * =                                Modal                                 =
