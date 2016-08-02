@@ -536,7 +536,7 @@ public class SparkApplicationParser implements Runnable {
                 LOG.info("fetch spark stage from {}", stageURL);
                 stage = OBJ_MAPPER.readValue(is, SparkStage[].class)[0];
             } catch (Exception e) {
-                LOG.warn("fetch spark job from {} failed, {}", stageURL, e);
+                LOG.warn("fetch spark stage from {} failed, {}", stageURL, e);
                 e.printStackTrace();
                 return false;
             } finally {
@@ -569,6 +569,7 @@ public class SparkApplicationParser implements Runnable {
             stageEntity.setName(stage.getName());
             stageEntity.setSchedulingPool(stage.getSchedulingPool());
             stageEntity.setSubmitTime(stagesTime.get(stage.getStageId()).getRight().getLeft());
+            stageEntity.setTimestamp(stageEntity.getSubmitTime());
             stageEntity.setCompleteTime(stagesTime.get(stage.getStageId()).getRight().getRight());
             stageEntity.setNumTasks(stage.getTasks() == null ? 0 : stage.getTasks().size());
             fetchTasksFromStage(stageEntity, stage);
@@ -611,6 +612,7 @@ public class SparkApplicationParser implements Runnable {
             taskEntity.setHost(task.getHost());
             taskEntity.setTaskLocality(task.getTaskLocality());
             taskEntity.setSpeculative(task.isSpeculative());
+            taskEntity.setTimestamp(stageEntity.getTimestamp());
 
             SparkTaskMetrics taskMetrics = task.getTaskMetrics();
             taskEntity.setExecutorDeserializeTime(taskMetrics == null ? 0 : taskMetrics.getExecutorDeserializeTime());
