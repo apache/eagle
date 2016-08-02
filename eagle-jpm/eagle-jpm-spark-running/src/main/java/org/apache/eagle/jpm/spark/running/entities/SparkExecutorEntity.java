@@ -25,7 +25,7 @@ import org.apache.eagle.jpm.util.Constants;
 @Table("eagleSparkRunningExecutors")
 @ColumnFamily("f")
 @Prefix("sparkExecutor")
-@Service(Constants.SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME)
+@Service(Constants.RUNNING_SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(true)
 @Tags({"site","sparkAppId", "sparkAppAttemptId", "sparkAppName", "executorId","user", "queue"})

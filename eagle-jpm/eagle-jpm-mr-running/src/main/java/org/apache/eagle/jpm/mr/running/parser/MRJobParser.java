@@ -74,7 +74,7 @@ public class MRJobParser implements Runnable {
     private ResourceFetcher rmResourceFetcher;
     private boolean first;
     private Set<String> finishedTaskIds;
-
+    private List<String> configKeys;
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
@@ -82,7 +82,8 @@ public class MRJobParser implements Runnable {
     public MRJobParser(MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
                        MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
-                       RunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher) {
+                       RunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
+                       List<String> configKeys) {
         this.app = app;
         this.mrJobEntityMap = new HashMap<>();
         this.mrJobEntityMap = mrJobMap;
@@ -101,6 +102,7 @@ public class MRJobParser implements Runnable {
         this.rmResourceFetcher = rmResourceFetcher;
         this.first = true;
         this.finishedTaskIds = new HashSet<>();
+        this.configKeys = configKeys;
     }
 
     public ParserStatus status() {
@@ -325,7 +327,9 @@ public class MRJobParser implements Runnable {
                 Node property = propertyList.item(i);
                 String key = property.getChildNodes().item(0).getTextContent();
                 String value = property.getChildNodes().item(1).getTextContent();
-                config.put(key, value);
+                if (this.configKeys.contains(key)) {
+                    config.put(key, value);
+                }
             }
             mrJobEntityMap.get(jobId).setJobConfig(config);
             mrJobConfigs.put(jobId, config);

@@ -37,10 +37,8 @@ import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -55,15 +53,18 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     private transient RunningJobManager runningJobManager;
     private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
     private ResourceFetcher resourceFetcher;
+    private List<String> configKeys;
     public MRRunningJobParseBolt(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                                  MRRunningConfigManager.EndpointConfig endpointConfig,
                                  MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                                 MRRunningConfigManager.ZKStateConfig zkStateConfig) {
+                                 MRRunningConfigManager.ZKStateConfig zkStateConfig,
+                                 List<String> configKeys) {
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;
         this.jobExtractorConfig = jobExtractorConfig;
         this.runningMRParsers = new HashMap<>();
         this.zkStateConfig = zkStateConfig;
+        this.configKeys = configKeys;
     }
 
     @Override
@@ -84,7 +85,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
         MRJobParser applicationParser;
         if (!runningMRParsers.containsKey(appInfo.getId())) {
             applicationParser = new MRJobParser(jobExtractorConfig, eagleServiceConfig,
-                    appInfo, mrJobs, runningJobManager, this.resourceFetcher);
+                    appInfo, mrJobs, runningJobManager, this.resourceFetcher, configKeys);
             runningMRParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
         } else {

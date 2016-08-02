@@ -99,6 +99,7 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
 
     public void setJobConfig(JobConfig jobConfig) {
         this.jobConfig = jobConfig;
+        valueChanged("jobConfig");
     }
 
     public JobCounters getJobCounters() {
@@ -332,6 +333,6 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
 
     public void setAppInfo(AppInfo appInfo) {
         this.appInfo = appInfo;
-        valueChanged("successfulMapAttempts");
+        valueChanged("appInfo");
     }
 }

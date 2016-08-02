@@ -26,6 +26,10 @@ import backtype.storm.tuple.Fields;
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobFetchSpout;
 import org.apache.eagle.jpm.mr.running.storm.MRRunningJobParseBolt;
+import org.apache.eagle.jpm.util.Constants;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class MRRunningJobMain {
     public static void main(String[] args) {
@@ -33,6 +37,12 @@ public class MRRunningJobMain {
         try {
             //1. trigger init conf
             MRRunningConfigManager mrRunningConfigManager = MRRunningConfigManager.getInstance(args);
+
+            List<String> confKeyKeys = mrRunningConfigManager.getConfig().getStringList("MRConfigureKeys");
+            confKeyKeys.add(Constants.JobConfiguration.CASCADING_JOB);
+            confKeyKeys.add(Constants.JobConfiguration.HIVE_JOB);
+            confKeyKeys.add(Constants.JobConfiguration.PIG_JOB);
+            confKeyKeys.add(Constants.JobConfiguration.SCOOBI_JOB);
 
             //2. init topology
             TopologyBuilder topologyBuilder = new TopologyBuilder();
@@ -63,7 +73,8 @@ public class MRRunningJobMain {
                             mrRunningConfigManager.getEagleServiceConfig(),
                             mrRunningConfigManager.getEndpointConfig(),
                             mrRunningConfigManager.getJobExtractorConfig(),
-                            mrRunningConfigManager.getZkStateConfig()),
+                            mrRunningConfigManager.getZkStateConfig(),
+                            confKeyKeys),
                     parallelism).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
 
             backtype.storm.Config config = new backtype.storm.Config();

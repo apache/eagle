@@ -26,27 +26,36 @@ import backtype.storm.tuple.Tuple;
 import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
 import org.apache.eagle.jpm.spark.running.parser.SparkApplicationParser;
+import org.apache.eagle.jpm.spark.running.recover.RunningJobManager;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
+import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 public class SparkRunningJobParseBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(SparkRunningJobParseBolt.class);
 
+    private SparkRunningConfigManager.ZKStateConfig zkStateConfig;
     private SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig;
     private SparkRunningConfigManager.EndpointConfig endpointConfig;
     private SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig;
     private ExecutorService executorService;
     private Map<String, SparkApplicationParser> runningSparkParsers;
-
-    public SparkRunningJobParseBolt(SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig,
+    private ResourceFetcher resourceFetcher;
+    public SparkRunningJobParseBolt(SparkRunningConfigManager.ZKStateConfig zkStateConfig,
+                                    SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                                     SparkRunningConfigManager.EndpointConfig endpointConfig,
                                     SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig) {
+        this.zkStateConfig = zkStateConfig;
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;
         this.jobExtractorConfig = jobExtractorConfig;
@@ -56,6 +65,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.executorService = Executors.newFixedThreadPool(jobExtractorConfig.parseThreadPoolSize);
+        this.resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
     }
 
     @Override
@@ -64,19 +74,29 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
         Map<String, SparkAppEntity> sparkApp = (Map<String, SparkAppEntity>)tuple.getValue(2);
 
         LOG.info("get spark yarn application " + appInfo.getId());
-        //read detailed SparkAppEntity if needed when recover
-        //TODO
 
         SparkApplicationParser applicationParser;
         if (!runningSparkParsers.containsKey(appInfo.getId())) {
-            applicationParser = new SparkApplicationParser(eagleServiceConfig, endpointConfig, jobExtractorConfig, appInfo, sparkApp);
+            applicationParser = new SparkApplicationParser(eagleServiceConfig, endpointConfig, jobExtractorConfig, appInfo, sparkApp, new RunningJobManager(zkStateConfig), resourceFetcher);
             runningSparkParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
         } else {
             applicationParser = runningSparkParsers.get(appInfo.getId());
         }
 
-        executorService.execute(applicationParser);
+        Set<String> runningParserIds = new HashSet<>(runningSparkParsers.keySet());
+        runningParserIds.stream()
+                .filter(appId -> runningSparkParsers.get(appId).status() == SparkApplicationParser.ParserStatus.APP_FINISHED)
+                .forEach(appId -> {
+                    runningSparkParsers.remove(appId);
+                    LOG.info("remove parser {}", appId);
+                });
+
+        if (appInfo.getState().equals(Constants.AppState.FINISHED.toString()) ||
+                applicationParser.status() == SparkApplicationParser.ParserStatus.FINISHED) {
+            applicationParser.setStatus(SparkApplicationParser.ParserStatus.RUNNING);
+            executorService.execute(applicationParser);
+        }
     }
 
     @Override

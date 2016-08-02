@@ -16,10 +16,9 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.running.parser;
+package org.apache.eagle.jpm.spark.running.parser;
 
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
-import org.apache.eagle.jpm.util.Utils;
+import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -27,17 +26,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 
-public class MRJobEntityCreationHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(MRJobEntityCreationHandler.class);
+public class SparkAppEntityCreationHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(SparkAppEntityCreationHandler.class);
 
     private List<TaggedLogAPIEntity> entities = new ArrayList<>();
-    private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
+    private SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig;
 
-    public MRJobEntityCreationHandler(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
+    public SparkAppEntityCreationHandler(SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
         this.eagleServiceConfig = eagleServiceConfig;
     }
 
@@ -60,9 +57,9 @@ public class MRJobEntityCreationHandler {
                 eagleServiceConfig.password);
         client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         try {
-            LOG.info("start to flush mr job entities, size {}", entities.size());
+            LOG.info("start to flush spark app entities, size {}", entities.size());
             client.create(entities);
-            LOG.info("finish flushing mr job entities, size {}", entities.size());
+            LOG.info("finish flushing spark app entities, size {}", entities.size());
             entities.clear();
         } catch (Exception e) {
             LOG.warn("exception found when flush entities, {}", e);

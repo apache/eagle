@@ -101,7 +101,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
             checkUrl();
             final String urlString = getSparkRunningJobURL();
             LOG.info("Going to call yarn api to fetch running spark job list: " + urlString);
-            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.NONE);
             final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
             if (appWrapper != null && appWrapper.getApps() != null && appWrapper.getApps().getApp() != null) {
                 result = appWrapper.getApps().getApp();
@@ -140,7 +140,6 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     }
 
 	public List<AppInfo> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
-		getClusterInfo();
 		switch(resoureType) {
 			case COMPLETE_SPARK_JOB:
 				return doFetchSparkFinishApplicationsList((String)parameter[0]);
@@ -155,7 +154,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 
 	private String getClusterInfoURL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(selector.getSelectedUrl()).append("/").append(Constants.YARN_API_CLUSTER_INFO);
+		sb.append(selector.getSelectedUrl()).append("/").append(Constants.YARN_API_CLUSTER_INFO).append("?" + Constants.ANONYMOUS_PARAMETER);
 		return sb.toString();
 	}
 

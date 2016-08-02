@@ -29,7 +29,11 @@ public class Constants {
     public final static String SPARK_STAGE_SERVICE_ENDPOINT_NAME = "SparkStageService";
     public final static String SPARK_TASK_SERVICE_ENDPOINT_NAME = "SparkTaskService";
     public final static String SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "SparkExecutorService";
-
+    public final static String RUNNING_SPARK_APP_SERVICE_ENDPOINT_NAME = "RunningSparkAppService";
+    public final static String RUNNING_SPARK_JOB_SERVICE_ENDPOINT_NAME = "RunningSparkJobService";
+    public final static String RUNNING_SPARK_STAGE_SERVICE_ENDPOINT_NAME = "RunningSparkStageService";
+    public final static String RUNNING_SPARK_TASK_SERVICE_ENDPOINT_NAME = "RunningSparkTaskService";
+    public final static String RUNNING_SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "RunningSparkExecutorService";
     public static final String APPLICATION_PREFIX = "application";
     public static final String JOB_PREFIX = "job";
     public static final String V2_APPS_URL = "ws/v1/cluster/apps";
@@ -37,6 +41,17 @@ public class Constants {
 
     public static final String V2_APPS_RUNNING_URL = "ws/v1/cluster/apps?state=RUNNING";
     public static final String V2_APPS_COMPLETED_URL = "ws/v1/cluster/apps?state=FINISHED";
+
+    public static final String SPARK_MASTER_KEY = "spark.master";
+    public static final String SPARK_EXECUTOR_MEMORY_KEY = "spark.executor.memory";
+    public static final String SPARK_DRIVER_MEMORY_KEY = "spark.driver.memory";
+    public static final String SPARK_YARN_AM_MEMORY_KEY = "spark.yarn.am.memory";
+    public static final String SPARK_EXECUTOR_CORES_KEY = "spark.executor.cores";
+    public static final String SPARK_DRIVER_CORES_KEY = "spark.driver.cores";
+    public static final String SPARK_YARN_AM_CORES_KEY = "spark.yarn.am.cores";
+    public static final String SPARK_YARN_EXECUTOR_MEMORY_OVERHEAD_KEY = "spark.yarn.executor.memoryOverhead";
+    public static final String SPARK_YARN_DRIVER_MEMORY_OVERHEAD_KEY = "spark.yarn.driver.memoryOverhead";
+    public static final String SPARK_YARN_am_MEMORY_OVERHEAD_KEY = "spark.yarn.am.memoryOverhead";
 
     public static final String SPARK_APPS_URL ="api/v1/applications";
     public static final String SPARK_EXECUTORS_URL = "executors";
@@ -54,6 +69,9 @@ public class Constants {
     }
     public enum JobState {
         RUNNING, COMPLETED, ALL
+    }
+    public enum StageState {
+        ACTIVE, COMPLETE, PENDING
     }
     public enum AppState {
         RUNNING, FINISHED, FAILED

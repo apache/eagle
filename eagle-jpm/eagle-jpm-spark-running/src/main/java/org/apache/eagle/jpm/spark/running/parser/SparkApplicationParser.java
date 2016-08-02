@@ -19,61 +19,60 @@
 package org.apache.eagle.jpm.spark.running.parser;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.jpm.entity.JobConfig;
-import org.apache.eagle.jpm.spark.crawl.JHFParserBase;
-import org.apache.eagle.jpm.spark.crawl.JHFSparkEventReader;
-import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
+import org.apache.eagle.jpm.spark.crawl.EventType;
 import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.jpm.spark.running.entities.*;
+import org.apache.eagle.jpm.spark.running.recover.RunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.SparkJobTagName;
-import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
+import org.apache.eagle.jpm.util.Utils;
+import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
 import org.apache.eagle.jpm.util.resourceFetch.model.*;
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.service.client.IEagleServiceClient;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStreamReader;
+import java.util.*;
 import java.util.function.Function;
 
 public class SparkApplicationParser implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(SparkApplicationParser.class);
 
-    private List<TaggedLogAPIEntity> entities = new ArrayList<>();
-    private AppInfo app;
-    private SparkApplicationInfo sparkAppInfo;
-    private static final int MAX_ENTITIES_SIZE = 500;
-    private static final int MAX_RETRY_TIMES = 3;
-    private IEagleServiceClient client;
+    public enum ParserStatus {
+        RUNNING,
+        FINISHED,
+        APP_FINISHED
+    }
 
+    private AppInfo app;
+    private static final int MAX_RETRY_TIMES = 2;
+    private SparkAppEntityCreationHandler sparkAppEntityCreationHandler;
     //<sparkAppId, SparkAppEntity>
     private Map<String, SparkAppEntity> sparkAppEntityMap;
     private Map<String, JobConfig> sparkJobConfigs;
-    private Map<Integer, Pair<Integer, Pair<Long, Long>>> stagesTime = new HashMap<>();
+    private Map<Integer, Pair<Integer, Pair<Long, Long>>> stagesTime;
+    private Set<Integer> completeStages;
     private Configuration hdfsConf;
     private SparkRunningConfigManager.EndpointConfig endpointConfig;
-    private SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig;
     private final Object lock = new Object();
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
     private Map<String, String> commonTags = new HashMap<>();
-
-    private int currentAttempt = 1;
+    private RunningJobManager runningJobManager;
+    private ParserStatus parserStatus;
+    private ResourceFetcher rmResourceFetcher;
+    private int currentAttempt;
+    private boolean first;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -82,21 +81,21 @@ public class SparkApplicationParser implements Runnable {
     public SparkApplicationParser(SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                                   SparkRunningConfigManager.EndpointConfig endpointConfig,
                                   SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                                  AppInfo app, Map<String, SparkAppEntity> sparkApp) {
+                                  AppInfo app, Map<String, SparkAppEntity> sparkApp,
+                                  RunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher) {
+        this.sparkAppEntityCreationHandler = new SparkAppEntityCreationHandler(eagleServiceConfig);
+        this.endpointConfig = endpointConfig;
         this.app = app;
-        this.sparkAppInfo = getSparkAppInfo(app);
         this.sparkJobConfigs = new HashMap<>();
+        this.stagesTime = new HashMap<>();
+        this.completeStages = new HashSet<>();
         this.sparkAppEntityMap = sparkApp;
         if (this.sparkAppEntityMap == null) {
             this.sparkAppEntityMap = new HashMap<>();
         }
-        this.client = new EagleServiceClientImpl(
-                eagleServiceConfig.eagleServiceHost,
-                eagleServiceConfig.eagleServicePort,
-                eagleServiceConfig.username,
-                eagleServiceConfig.password);
-        this.endpointConfig = endpointConfig;
-        this.jobExtractorConfig = jobExtractorConfig;
+        this.rmResourceFetcher = rmResourceFetcher;
+        this.currentAttempt = 1;
+        this.first = true;
         this.hdfsConf  = new Configuration();
         this.hdfsConf.set("fs.defaultFS", endpointConfig.nnEndpoint);
         this.hdfsConf.setBoolean("fs.hdfs.impl.disable.cache", true);
@@ -106,76 +105,26 @@ public class SparkApplicationParser implements Runnable {
         this.commonTags.put(SparkJobTagName.SITE.toString(), jobExtractorConfig.site);
         this.commonTags.put(SparkJobTagName.SPARK_USER.toString(), app.getUser());
         this.commonTags.put(SparkJobTagName.SPARK_QUEUE.toString(), app.getQueue());
+        this.parserStatus  = ParserStatus.FINISHED;
+        this.runningJobManager = runningJobManager;
     }
 
-    private SparkApplicationInfo getSparkAppInfo(AppInfo app) {
-        SparkApplicationInfo appInfo = new SparkApplicationInfo();
-        appInfo.setName(app.getName());
-        appInfo.setUser(app.getUser());
-        appInfo.setFinalStatus(app.getFinalStatus());
-        appInfo.setQueue(app.getQueue());
-        appInfo.setState(app.getState());
-
-        return appInfo;
+    public ParserStatus status() {
+        return this.parserStatus;
     }
 
-    public String getResourceManagerVersion() throws Exception{
-        ClusterInfo clusterInfo = new RMResourceFetcher(endpointConfig.rmUrls).getClusterInfo();
-        if (clusterInfo != null) {
-            return clusterInfo.getResourceManagerVersion();
-        }
-        return null;
-    }
-
-    private void flush(TaggedLogAPIEntity entity) {
-        if (entity != null) entities.add(entity);
-        try {
-            if (entities.size() >= MAX_ENTITIES_SIZE) {
-                LOG.info("start to flush spark entities for application {}, size {}", app.getId(), entities.size());
-                //client.create(entities);
-                LOG.info("finish flushing spark entities for application {}, size {}", app.getId(), entities.size());
-                entities.clear();
-            }
-        } catch (Exception e) {
-            LOG.warn("exception found when flush entities {}", e);
-            e.printStackTrace();
-        }
-    }
-
-    private void closeInputStream(InputStream is) {
-        if (is != null) {
-            try {
-                is.close();
-            } catch (Exception e) {
-                LOG.error("Error when closing input stream.");
-            }
-        }
-    }
-
-    private long dateTimeToLong(String date) {
-        // date is like: 2016-07-29T19:35:40.715GMT
-        long timestamp = 0L;
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSzzz");
-            Date parsedDate = dateFormat.parse(date);
-            timestamp = parsedDate.getTime();
-        } catch(ParseException e) {
-            e.printStackTrace();
-        }
-        
-        if (timestamp == 0L) {
-            LOG.error("Not able to parse date: " + date);
-        }
-
-        return timestamp;
+    public void setStatus(ParserStatus status) {
+        this.parserStatus = status;
     }
 
     private void finishSparkApp(String sparkAppId) {
         SparkAppEntity attemptEntity = sparkAppEntityMap.get(sparkAppId);
         attemptEntity.setYarnState(Constants.AppState.FINISHED.toString());
         attemptEntity.setYarnStatus(Constants.AppStatus.FAILED.toString());
-        flush(attemptEntity);
-
+        sparkJobConfigs.remove(sparkAppId);
+        if (sparkJobConfigs.size() == 0) {
+            this.parserStatus = ParserStatus.APP_FINISHED;
+        }
         stagesTime.clear();
         LOG.info("spark application {} has been finished", sparkAppId);
     }
@@ -187,17 +136,20 @@ public class SparkApplicationParser implements Runnable {
             } else if (i == MAX_RETRY_TIMES - 1) {
                 //check whether the app has finished. if we test that we can connect rm, then we consider the app has finished
                 //if we get here either because of cannot connect rm or the app has finished
-                new RMResourceFetcher(endpointConfig.rmUrls).getResource(Constants.ResourceType.RUNNING_SPARK_JOB);
-                for (String sparkAppId : sparkAppEntityMap.keySet()) {
-                    finishSparkApp(sparkAppId);
-                }
+                rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_SPARK_JOB);
+                sparkAppEntityMap.keySet().forEach(this::finishSparkApp);
+                return;
             }
         }
 
         List<Function<String, Boolean>> functions = new ArrayList<>();
         functions.add(fetchSparkExecutors);
         functions.add(fetchSparkJobs);
-        functions.add(fetchSparkStagesAndTasks);
+        if (!first) {
+            functions.add(fetchSparkStagesAndTasks);
+        }
+
+        this.first = false;
         for (String sparkAppId : sparkAppEntityMap.keySet()) {
             for (Function<String, Boolean> function : functions) {
                 int i = 0;
@@ -207,6 +159,8 @@ public class SparkApplicationParser implements Runnable {
                     }
                 }
                 if (i >= MAX_RETRY_TIMES) {
+                    //may caused by rm unreachable
+                    rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_SPARK_JOB);
                     finishSparkApp(sparkAppId);
                     break;
                 }
@@ -217,16 +171,70 @@ public class SparkApplicationParser implements Runnable {
     @Override
     public void run() {
         synchronized (this.lock) {
+            if (this.parserStatus == ParserStatus.APP_FINISHED) {
+                return;
+            }
+
             LOG.info("start to process yarn application " + app.getId());
             try {
                 fetchSparkRunningInfo();
-                flush(null);
             } catch (Exception e) {
                 LOG.warn("exception found when process application {}, {}", app.getId(), e);
                 e.printStackTrace();
             } finally {
+                for (String jobId : sparkAppEntityMap.keySet()) {
+                    sparkAppEntityCreationHandler.add(sparkAppEntityMap.get(jobId));
+                }
+                if (sparkAppEntityCreationHandler.flush()) { //force flush
+                    //we must flush entities before delete from zk in case of missing finish state of jobs
+                    //delete from zk if needed
+                    sparkAppEntityMap.keySet()
+                            .stream()
+                            .filter(
+                                    jobId -> sparkAppEntityMap.get(jobId).getYarnState().equals(Constants.AppState.FINISHED.toString()) ||
+                                            sparkAppEntityMap.get(jobId).getYarnState().equals(Constants.AppState.FAILED.toString()))
+                            .forEach(
+                                    jobId -> this.runningJobManager.delete(app.getId(), jobId));
+                }
+
                 LOG.info("finish process yarn application " + app.getId());
             }
+
+            if (this.parserStatus == ParserStatus.RUNNING) {
+                this.parserStatus = ParserStatus.FINISHED;
+            }
+        }
+    }
+
+    private JobConfig parseJobConfig(InputStream is) throws Exception {
+        JobConfig jobConfig = new JobConfig();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        try {
+            String line;
+            boolean stop = false;
+            while ((line = reader.readLine()) != null && !stop) {
+                try {
+                    JSONParser parser = new JSONParser();
+                    JSONObject eventObj = (JSONObject)parser.parse(line);
+
+                    if (eventObj != null) {
+                        String eventType = (String) eventObj.get("Event");
+                        LOG.info("Event type: " + eventType);
+                        if (eventType.equalsIgnoreCase(EventType.SparkListenerEnvironmentUpdate.toString())) {
+                            stop = true;
+                            JSONObject sparkProps = (JSONObject)eventObj.get("Spark Properties");
+                            for (Object key : sparkProps.keySet()) {
+                                jobConfig.put((String)key, (String)sparkProps.get(key));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.error(String.format("Fail to parse %s.", line), e);
+                }
+            }
+            reader.close();
+        } finally {
+            return jobConfig;
         }
     }
 
@@ -249,22 +257,21 @@ public class SparkApplicationParser implements Runnable {
             // log name: application_1464382345557_269065_1
             String attemptIdString = Integer.toString(attemptId);
 
-            String appAttemptLogName = this.getAppAttemptLogName(sparkAppId, attemptIdString);
-
+            //test appId_attemptId.inprogress/appId_attemptId/appId.inprogress/appId
             String eventLogDir = this.endpointConfig.eventLog;
-            Path attemptFile = getFilePath(eventLogDir, appAttemptLogName);
+            Path attemptFile = new Path(eventLogDir + "/" + sparkAppId + "_" + attemptIdString + ".inprogress");
+            if (!hdfs.exists(attemptFile)) {
+                attemptFile = new Path(eventLogDir + "/" + sparkAppId + "_" + attemptIdString);
+                if (!hdfs.exists(attemptFile)) {
+                    attemptFile = new Path(eventLogDir + "/" + sparkAppId + ".inprogress");
+                    if (!hdfs.exists(attemptFile)) {
+                        attemptFile = new Path(eventLogDir + "/" + sparkAppId);
+                    }
+                }
+            }
+
             LOG.info("Attempt File path: " + attemptFile.toString());
-
-            String site = this.jobExtractorConfig.site;
-            SparkApplicationInfo info = this.sparkAppInfo;
-            Map<String, String> baseTags = new HashMap<>();
-            baseTags.put(SparkJobTagName.SITE.toString(), site);
-            baseTags.put(SparkJobTagName.SPARK_QUEUE.toString(), app.getQueue());
-            JHFSparkEventReader sparkEventReader = new JHFSparkEventReader(baseTags, info);
-            JHFParserBase parser = new JHFSparkRunningJobParser(sparkEventReader);
-            parser.parse(hdfs.open(attemptFile));
-
-            jobConfig = sparkEventReader.getApp().getConfig();
+            jobConfig = parseJobConfig(hdfs.open(attemptFile));
         } catch (Exception e) {
             LOG.error("Fail to process application {}", sparkAppId, e);
         } finally {
@@ -279,16 +286,13 @@ public class SparkApplicationParser implements Runnable {
         return jobConfig;
     }
 
-    private String getAppAttemptLogName(String appId, String attemptId) {
-        if (attemptId.equals("0")) {
-            return appId;
+    private boolean isClientMode(JobConfig jobConfig) {
+        if (jobConfig.containsKey(Constants.SPARK_MASTER_KEY) &&
+                jobConfig.get(Constants.SPARK_MASTER_KEY).equalsIgnoreCase("yarn-client")) {
+            return true;
+        } else {
+            return false;
         }
-        return appId + "_" + attemptId;
-    }
-
-    private Path getFilePath(String eventLogDir, String appAttemptLogName) {
-        String attemptLogDir = eventLogDir + "/" + appAttemptLogName + ".inprogress";
-        return new Path(attemptLogDir);
     }
 
     private boolean fetchSparkApps() {
@@ -304,13 +308,12 @@ public class SparkApplicationParser implements Runnable {
             e.printStackTrace();
             return false;
         } finally {
-            closeInputStream(is);
+            Utils.closeInputStream(is);
         }
-        LOG.info("Successfully fetched spark application.");
 
         for (SparkApplication sparkApplication : sparkApplications) {
             String id = sparkApplication.getId();
-            if (id.contains(" ")) {
+            if (id.contains(" ") || !id.startsWith("app")) {
                 //spark version < 1.6.0 and id contains white space, need research again later
                 LOG.warn("skip spark application {}", id);
                 continue;
@@ -329,7 +332,7 @@ public class SparkApplicationParser implements Runnable {
                 attemptEntity.setTags(new HashMap<>(commonTags));
                 attemptEntity.setAppInfo(app);
 
-                attemptEntity.setStartTime(dateTimeToLong(sparkApplication.getAttempts().get(j - 1).getStartTime()));
+                attemptEntity.setStartTime(Utils.dateTimeToLong(sparkApplication.getAttempts().get(j - 1).getStartTime()));
                 attemptEntity.setTimestamp(attemptEntity.getStartTime());
 
                 if (sparkJobConfigs.containsKey(id) && j == currentAttempt) {
@@ -337,11 +340,25 @@ public class SparkApplicationParser implements Runnable {
                 }
 
                 if (attemptEntity.getConfig() == null) {
-                    //read config from hdfs
                     attemptEntity.setConfig(getJobConfig(id, j));
                     if (j == currentAttempt) {
                         sparkJobConfigs.put(id, attemptEntity.getConfig());
                     }
+                }
+
+                try {
+                    JobConfig jobConfig = attemptEntity.getConfig();
+                    attemptEntity.setExecMemoryBytes(Utils.parseMemory(jobConfig.get(Constants.SPARK_EXECUTOR_MEMORY_KEY)));
+                    attemptEntity.setDriveMemoryBytes(isClientMode(jobConfig) ?
+                            Utils.parseMemory(jobConfig.get(Constants.SPARK_YARN_AM_MEMORY_KEY)) :
+                            Utils.parseMemory(jobConfig.get(Constants.SPARK_DRIVER_MEMORY_KEY)));
+                    attemptEntity.setExecutorCores(Integer.parseInt(jobConfig.get(Constants.SPARK_EXECUTOR_CORES_KEY)));
+                    attemptEntity.setDriverCores(isClientMode(jobConfig) ?
+                            Integer.parseInt(jobConfig.get(Constants.SPARK_YARN_AM_CORES_KEY)) :
+                            Integer.parseInt(jobConfig.get(Constants.SPARK_DRIVER_CORES_KEY)));
+                } catch (Exception e) {
+                    LOG.warn("add config failed, {}", e);
+                    e.printStackTrace();
                 }
 
                 if (j == currentAttempt) {
@@ -349,14 +366,16 @@ public class SparkApplicationParser implements Runnable {
                     attemptEntity.setYarnState(app.getState());
                     attemptEntity.setYarnStatus(app.getFinalStatus());
                     sparkAppEntityMap.put(id, attemptEntity);
-                    //TODO, save to zookeeper(override)
+                    this.runningJobManager.update(app.getId(), id, attemptEntity);
                 } else {
-                    attemptEntity.setYarnState(Constants.AppState.FAILED.toString());
+                    attemptEntity.setYarnState(Constants.AppState.FINISHED.toString());
                     attemptEntity.setYarnStatus(Constants.AppStatus.FAILED.toString());
-                    flush(attemptEntity);
                 }
+                sparkAppEntityCreationHandler.add(attemptEntity);
             }
         }
+
+        sparkAppEntityCreationHandler.flush();
         return true;
     }
 
@@ -375,7 +394,7 @@ public class SparkApplicationParser implements Runnable {
             e.printStackTrace();
             return false;
         } finally {
-            closeInputStream(is);
+            Utils.closeInputStream(is);
         }
         sparkAppEntity.setExecutors(sparkExecutors.length);
 
@@ -399,10 +418,16 @@ public class SparkApplicationParser implements Runnable {
 
             entity.setTimestamp(sparkAppEntity.getTimestamp());
             entity.setStartTime(sparkAppEntity.getStartTime());
-            entity.setExecMemoryBytes(sparkAppEntity.getExecMemoryBytes());
-            entity.setCores(sparkAppEntity.getExecutorCores());
-            entity.setMemoryOverhead(sparkAppEntity.getExecutorMemoryOverhead());
-            flush(entity);
+            if (executor.getId().equalsIgnoreCase("driver")) {
+                entity.setExecMemoryBytes(sparkAppEntity.getDriveMemoryBytes());
+                entity.setCores(sparkAppEntity.getDriverCores());
+                entity.setMemoryOverhead(sparkAppEntity.getDriverMemoryOverhead());
+            } else {
+                entity.setExecMemoryBytes(sparkAppEntity.getExecMemoryBytes());
+                entity.setCores(sparkAppEntity.getExecutorCores());
+                entity.setMemoryOverhead(sparkAppEntity.getExecutorMemoryOverhead());
+            }
+            sparkAppEntityCreationHandler.add(entity);
         }
         return true;
     };
@@ -422,7 +447,7 @@ public class SparkApplicationParser implements Runnable {
             e.printStackTrace();
             return false;
         } finally {
-            closeInputStream(is);
+            Utils.closeInputStream(is);
         }
 
         sparkAppEntity.setNumJobs(sparkJobs.length);
@@ -430,9 +455,9 @@ public class SparkApplicationParser implements Runnable {
             SparkJobEntity entity = new SparkJobEntity();
             entity.setTags(new HashMap<>(commonTags));
             entity.getTags().put(SparkJobTagName.SPARK_JOB_ID.toString(), sparkJob.getJobId() + "");
-            entity.setSubmissionTime(dateTimeToLong(sparkJob.getSubmissionTime()));
+            entity.setSubmissionTime(Utils.dateTimeToLong(sparkJob.getSubmissionTime()));
             if (sparkJob.getCompletionTime() != null) {
-                entity.setCompletionTime(dateTimeToLong(sparkJob.getCompletionTime()));
+                entity.setCompletionTime(Utils.dateTimeToLong(sparkJob.getCompletionTime()));
             }
             entity.setNumStages(sparkJob.getStageIds().size());
             entity.setStatus(sparkJob.getStatus());
@@ -462,7 +487,7 @@ public class SparkApplicationParser implements Runnable {
             for (Integer stageId : sparkJob.getStageIds()) {
                 stagesTime.put(stageId, Pair.of(sparkJob.getJobId(), Pair.of(entity.getSubmissionTime(), entity.getCompletionTime())));
             }
-            flush(entity);
+            sparkAppEntityCreationHandler.add(entity);
         }
         return true;
     };
@@ -477,11 +502,11 @@ public class SparkApplicationParser implements Runnable {
             LOG.info("fetch spark stage from {}", stageURL);
             sparkStages = OBJ_MAPPER.readValue(is, SparkStage[].class);
         } catch (Exception e) {
-            LOG.warn("fetch spark job from {} failed, {}", stageURL, e);
+            LOG.warn("fetch spark stage from {} failed, {}", stageURL, e);
             e.printStackTrace();
             return false;
         } finally {
-            closeInputStream(is);
+            Utils.closeInputStream(is);
         }
 
         for (SparkStage sparkStage : sparkStages) {
@@ -498,7 +523,11 @@ public class SparkApplicationParser implements Runnable {
                 e.printStackTrace();
                 return false;
             } finally {
-                closeInputStream(is);
+                Utils.closeInputStream(is);
+            }
+
+            if (this.completeStages.contains(stage.getStageId())) {
+                return true;
             }
             SparkStageEntity stageEntity = new SparkStageEntity();
             stageEntity.setTags(new HashMap<>(commonTags));
@@ -525,8 +554,12 @@ public class SparkApplicationParser implements Runnable {
             stageEntity.setSubmitTime(stagesTime.get(stage.getStageId()).getRight().getLeft());
             stageEntity.setCompleteTime(stagesTime.get(stage.getStageId()).getRight().getRight());
             stageEntity.setNumTasks(stage.getTasks() == null ? 0 : stage.getTasks().size());
-            fetchTasksFromStage(sparkAppEntity, stageEntity, stage);
-            flush(stageEntity);
+            fetchTasksFromStage(stageEntity, stage);
+            sparkAppEntityCreationHandler.add(stageEntity);
+            if (stage.getStatus().equals(Constants.StageState.COMPLETE.toString())) {
+                this.completeStages.add(stage.getStageId());
+                LOG.info("stage {} of spark {} has finished", stage.getStageId(), sparkAppId);
+            }
 
             sparkAppEntity.setInputBytes(sparkAppEntity.getInputBytes() + stageEntity.getInputBytes());
             sparkAppEntity.setInputRecords(sparkAppEntity.getInputBytes() + stageEntity.getInputRecords());
@@ -548,7 +581,7 @@ public class SparkApplicationParser implements Runnable {
         return true;
     };
 
-    private void fetchTasksFromStage(SparkAppEntity sparkAppEntity, SparkStageEntity stageEntity, SparkStage stage) {
+    private void fetchTasksFromStage(SparkStageEntity stageEntity, SparkStage stage) {
         Map<String, SparkTask> tasks = stage.getTasks();
         for (String key : tasks.keySet()) {
             SparkTask task = tasks.get(key);
@@ -557,7 +590,7 @@ public class SparkApplicationParser implements Runnable {
             taskEntity.getTags().put(SparkJobTagName.SPARK_TASK_ATTEMPT_ID.toString(), task.getAttempt() + "");
             taskEntity.getTags().put(SparkJobTagName.SPARK_TASK_INDEX.toString(), task.getIndex() + "");
             taskEntity.setTaskId(task.getTaskId());
-            taskEntity.setLaunchTime(dateTimeToLong(task.getLaunchTime()));
+            taskEntity.setLaunchTime(Utils.dateTimeToLong(task.getLaunchTime()));
             taskEntity.setHost(task.getHost());
             taskEntity.setTaskLocality(task.getTaskLocality());
             taskEntity.setSpeculative(task.isSpeculative());
@@ -598,6 +631,8 @@ public class SparkApplicationParser implements Runnable {
             stageEntity.setResultSize(stageEntity.getResultSize() + taskEntity.getResultSize());
             stageEntity.setJvmGcTime(stageEntity.getJvmGcTime() + taskEntity.getJvmGcTime());
             stageEntity.setResultSerializationTime(stageEntity.getResultSerializationTime() + taskEntity.getResultSerializationTime());
+
+            this.sparkAppEntityCreationHandler.add(taskEntity);
         }
     }
 }

@@ -26,65 +26,105 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
+import org.apache.eagle.jpm.spark.running.recover.RunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
+import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SparkRunningJobFetchSpout extends BaseRichSpout {
     private static final Logger LOG = LoggerFactory.getLogger(SparkRunningJobFetchSpout.class);
 
+    private SparkRunningConfigManager.ZKStateConfig zkStateConfig;
     private SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig;
     private SparkRunningConfigManager.EndpointConfig endpointConfig;
     private ResourceFetcher resourceFetcher;
     private SpoutOutputCollector collector;
-    private boolean inited;
+    private boolean init;
+    private transient RunningJobManager runningJobManager;
+    private Set<String> runningYarnApps;
 
     public SparkRunningJobFetchSpout(SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                                     SparkRunningConfigManager.EndpointConfig endpointConfig) {
+                                     SparkRunningConfigManager.EndpointConfig endpointConfig,
+                                     SparkRunningConfigManager.ZKStateConfig zkStateConfig) {
         this.jobExtractorConfig = jobExtractorConfig;
         this.endpointConfig = endpointConfig;
-        this.inited = false;
+        this.zkStateConfig = zkStateConfig;
+        this.init = false;
+        this.runningYarnApps = new HashSet<>();
     }
 
     @Override
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
         collector = spoutOutputCollector;
+        this.runningJobManager = new RunningJobManager(zkStateConfig);
     }
 
     @Override
     public void nextTuple() {
         LOG.info("Start to fetch spark running jobs");
-        int appsNum = 0;
         try {
-            List<AppInfo> apps;
             Map<String, Map<String, SparkAppEntity>> sparkApps = null;
-            if (!this.inited) {
+            List<AppInfo> apps;
+            if (!this.init) {
                 sparkApps = recoverRunningApps();
-                LOG.info("recover {} spark yarn apps from zookeeper", sparkApps.size());
+
                 apps = new ArrayList<>();
                 for (String appId : sparkApps.keySet()) {
-                    apps.add(sparkApps.get(appId).get(0).getAppInfo());
+                    Map<String, SparkAppEntity> jobs = sparkApps.get(appId);
+                    if (jobs.size() > 0) {
+                        Set<String> jobIds = jobs.keySet();
+                        apps.add(jobs.get(jobIds.iterator().next()).getAppInfo());
+                        this.runningYarnApps.add(appId);
+                    }
                 }
-                this.inited = true;
+                LOG.info("recover {} spark yarn apps from zookeeper", apps.size());
+                this.init = true;
             } else {
                 apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_SPARK_JOB);
-                appsNum = (apps == null ? 0 : apps.size());
-                if (apps == null) {
-                    LOG.info("No app is running.");
+                LOG.info("get {} apps from resource manager", apps.size());
+                Set<String> running = new HashSet<>();
+                Iterator<String> appIdIterator = this.runningYarnApps.iterator();
+                while (appIdIterator.hasNext()) {
+                    String appId = appIdIterator.next();
+                    boolean hasFinished = true;
+                    for (AppInfo appInfo : apps) {
+                        if (appId.equals(appInfo.getId())) {
+                            hasFinished = false;
+                        }
+                        running.add(appInfo.getId());
+                    }
+
+                    if (hasFinished) {
+                        try {
+                            Map<String, SparkAppEntity> result = this.runningJobManager.recoverYarnApp(appId);
+                            if (result.size() > 0) {
+                                if (sparkApps == null) {
+                                    sparkApps = new HashMap<>();
+                                }
+                                sparkApps.put(appId, result);
+                                AppInfo appInfo = result.get(result.keySet().iterator().next()).getAppInfo();
+                                appInfo.setState(Constants.AppState.FINISHED.toString());
+                                apps.add(appInfo);
+                            }
+                        } catch (KeeperException.NoNodeException e) {
+                            LOG.warn("{}", e);
+                            LOG.warn("yarn app {} has finished", appId);
+                        }
+                    }
                 }
-                LOG.info("=== get {} apps from resource manager ===", appsNum);
+
+                this.runningYarnApps = running;
+                LOG.info("get {} total apps(contains finished)", apps.size());
             }
 
-            for (int i = 0; i < appsNum; i++) {
+            for (int i = 0; i < apps.size(); i++) {
                 LOG.info("emit spark yarn application " + apps.get(i).getId());
                 if (sparkApps != null) {
                     //emit (AppInfo, Map<String, SparkAppEntity>)
@@ -108,8 +148,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
         //content of path /apps/spark/running/yarnAppId/appId is SparkAppEntity(current attempt)
         //as we know, a yarn application may contains many spark applications
         //so, the returned results is a Map, key is yarn appId
-        Map<String, Map<String, SparkAppEntity>> result = new HashMap<>();
-        //TODO
+        Map<String, Map<String, SparkAppEntity>> result = this.runningJobManager.recover();
         return result;
     }
 

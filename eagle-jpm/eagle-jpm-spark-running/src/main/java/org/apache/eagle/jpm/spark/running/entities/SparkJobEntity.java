@@ -27,7 +27,7 @@ import java.util.List;
 @Table("eagleSparkRunningJobs")
 @ColumnFamily("f")
 @Prefix("sparkJob")
-@Service(Constants.SPARK_JOB_SERVICE_ENDPOINT_NAME)
+@Service(Constants.RUNNING_SPARK_JOB_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(true)
 @Tags({"site","sparkAppId", "sparkAppAttemptId", "sparkAppName", "jobId","user", "queue"})

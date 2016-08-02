@@ -33,6 +33,9 @@ public class SparkRunningConfigManager implements Serializable {
     }
     private String env;
 
+    public ZKStateConfig getZkStateConfig() { return zkStateConfig; }
+    private ZKStateConfig zkStateConfig;
+
     public EagleServiceConfig getEagleServiceConfig() {
         return eagleServiceConfig;
     }
@@ -48,16 +51,26 @@ public class SparkRunningConfigManager implements Serializable {
     }
     private EndpointConfig endpointConfig;
 
+    public static class ZKStateConfig implements Serializable {
+        public String zkQuorum;
+        public String zkRoot;
+        public int zkSessionTimeoutMs;
+        public int zkRetryTimes;
+        public int zkRetryInterval;
+        public String zkPort;
+    }
+
     public static class EagleServiceConfig implements Serializable {
         public String eagleServiceHost;
         public int eagleServicePort;
+        public int readTimeoutSeconds;
+        public int maxFlushNum;
         public String username;
         public String password;
     }
 
     public static class JobExtractorConfig implements Serializable {
         public String site;
-        public int readTimeoutSeconds;
         public int fetchRunningJobInterval;
         public int parseThreadPoolSize;
     }
@@ -81,6 +94,7 @@ public class SparkRunningConfigManager implements Serializable {
         this.eagleServiceConfig = new EagleServiceConfig();
         this.jobExtractorConfig = new JobExtractorConfig();
         this.endpointConfig = new EndpointConfig();
+        this.zkStateConfig = new ZKStateConfig();
     }
 
     public static SparkRunningConfigManager getInstance(String[] args) {
@@ -98,16 +112,24 @@ public class SparkRunningConfigManager implements Serializable {
 
         this.env = config.getString("envContextConfig.env");
 
+        this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");
+        this.zkStateConfig.zkPort = config.getString("zookeeperConfig.zkPort");
+        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeperConfig.zkSessionTimeoutMs");
+        this.zkStateConfig.zkRetryTimes = config.getInt("zookeeperConfig.zkRetryTimes");
+        this.zkStateConfig.zkRetryInterval = config.getInt("zookeeperConfig.zkRetryInterval");
+        this.zkStateConfig.zkRoot = config.getString("zookeeperConfig.zkRoot");
+
         // parse eagle service endpoint
         this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
         String port = config.getString("eagleProps.eagleService.port");
         this.eagleServiceConfig.eagleServicePort = (port == null ? 8080 : Integer.parseInt(port));
         this.eagleServiceConfig.username = config.getString("eagleProps.eagleService.username");
         this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
+        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("eagleProps.eagleService.readTimeOutSeconds");
+        this.eagleServiceConfig.maxFlushNum = config.getInt("eagleProps.eagleService.maxFlushNum");
 
         //parse job extractor
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
-        this.jobExtractorConfig.readTimeoutSeconds = config.getInt("jobExtractorConfig.readTimeOutSeconds");
         this.jobExtractorConfig.fetchRunningJobInterval = config.getInt("jobExtractorConfig.fetchRunningJobInterval");
         this.jobExtractorConfig.parseThreadPoolSize = config.getInt("jobExtractorConfig.parseThreadPoolSize");
 

@@ -47,7 +47,8 @@ public class SparkRunningJobMain {
                     spoutName,
                     new SparkRunningJobFetchSpout(
                             sparkRunningConfigManager.getJobExtractorConfig(),
-                            sparkRunningConfigManager.getEndpointConfig()),
+                            sparkRunningConfigManager.getEndpointConfig(),
+                            sparkRunningConfigManager.getZkStateConfig()),
                     parallelism
             ).setNumTasks(tasks);
 
@@ -58,6 +59,7 @@ public class SparkRunningJobMain {
             }
             topologyBuilder.setBolt(boltName,
                     new SparkRunningJobParseBolt(
+                            sparkRunningConfigManager.getZkStateConfig(),
                             sparkRunningConfigManager.getEagleServiceConfig(),
                             sparkRunningConfigManager.getEndpointConfig(),
                             sparkRunningConfigManager.getJobExtractorConfig()),

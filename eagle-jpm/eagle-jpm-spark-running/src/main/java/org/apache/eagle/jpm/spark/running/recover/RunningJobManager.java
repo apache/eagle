@@ -16,13 +16,13 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.running.recover;
+package org.apache.eagle.jpm.spark.running.recover;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
-import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
+import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
+import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.apache.zookeeper.CreateMode;
 import org.codehaus.jettison.json.JSONException;
@@ -40,7 +40,7 @@ public class RunningJobManager implements Serializable {
     private final static String ENTITY_TAGS_KEY = "entityTags";
     private final static String APP_INFO_KEY = "appInfo";
 
-    private CuratorFramework newCurator(MRRunningConfigManager.ZKStateConfig config) throws Exception {
+    private CuratorFramework newCurator(SparkRunningConfigManager.ZKStateConfig config) throws Exception {
         return CuratorFrameworkFactory.newClient(
                 config.zkQuorum,
                 config.zkSessionTimeoutMs,
@@ -49,7 +49,7 @@ public class RunningJobManager implements Serializable {
         );
     }
 
-    public RunningJobManager(MRRunningConfigManager.ZKStateConfig config) {
+    public RunningJobManager(SparkRunningConfigManager.ZKStateConfig config) {
         this.zkRoot = config.zkRoot;
 
         try {
@@ -65,8 +65,8 @@ public class RunningJobManager implements Serializable {
         }
     }
 
-    public Map<String, JobExecutionAPIEntity> recoverYarnApp(String yarnAppId) throws Exception {
-        Map<String, JobExecutionAPIEntity> result = new HashMap<>();
+    public Map<String, SparkAppEntity> recoverYarnApp(String yarnAppId) throws Exception {
+        Map<String, SparkAppEntity> result = new HashMap<>();
         String path = this.zkRoot + "/" + yarnAppId;
         List<String> jobIds = curator.getChildren().forPath(path);
         /*if (jobIds.size() == 0) {
@@ -86,8 +86,8 @@ public class RunningJobManager implements Serializable {
             JSONObject object = new JSONObject(fields);
             Map<String, Map<String, String>> parseResult = parse(object);
             Map<String, String> tags = parseResult.get(ENTITY_TAGS_KEY);
-            JobExecutionAPIEntity jobExecutionAPIEntity = new JobExecutionAPIEntity();
-            jobExecutionAPIEntity.setTags(tags);
+            SparkAppEntity sparkAppEntity = new SparkAppEntity();
+            sparkAppEntity.setTags(tags);
 
             Map<String, String> appInfoMap = parseResult.get(APP_INFO_KEY);
             AppInfo appInfo = new AppInfo();
@@ -109,20 +109,20 @@ public class RunningJobManager implements Serializable {
             appInfo.setAmContainerLogs(appInfoMap.get("amContainerLogs"));
             appInfo.setAmHostHttpAddress(appInfoMap.get("amHostHttpAddress"));
 
-            jobExecutionAPIEntity.setAppInfo(appInfo);
-            jobExecutionAPIEntity.setTimestamp(appInfo.getStartedTime());
-            result.put(jobId, jobExecutionAPIEntity);
+            sparkAppEntity.setAppInfo(appInfo);
+            sparkAppEntity.setTimestamp(appInfo.getStartedTime());
+            result.put(jobId, sparkAppEntity);
         }
         return result;
     }
 
-    public Map<String, Map<String, JobExecutionAPIEntity>> recover() {
-        //we need read from zookeeper, path looks like /apps/mr/running/yarnAppId/jobId/
-        //content of path /apps/mr/running/yarnAppId/jobId is JobExecutionAPIEntity
+    public Map<String, Map<String, SparkAppEntity>> recover() {
+        //we need read from zookeeper, path looks like /apps/spark/running/yarnAppId/jobId/
+        //content of path /apps/spark/running/yarnAppId/jobId is SparkAppEntity
         //as we know, a yarn application may contains many mr jobs
         //so, the returned results is a Map-Map
-        //<yarnAppId, <jobId, JobExecutionAPIEntity>>
-        Map<String, Map<String, JobExecutionAPIEntity>> result = new HashMap<>();
+        //<yarnAppId, <jobId, SparkAppEntity>>
+        Map<String, Map<String, SparkAppEntity>> result = new HashMap<>();
         try {
             List<String> yarnAppIds = curator.getChildren().forPath(this.zkRoot);
             for (String yarnAppId : yarnAppIds) {
@@ -139,7 +139,7 @@ public class RunningJobManager implements Serializable {
         return result;
     }
 
-    public boolean update(String yarnAppId, String jobId, JobExecutionAPIEntity entity) {
+    public boolean update(String yarnAppId, String jobId, SparkAppEntity entity) {
         String path = this.zkRoot + "/" + yarnAppId + "/" + jobId;
         //InterProcessMutex lock = new InterProcessMutex(curator, path);
         Map<String, String> fields = new HashMap<>();
@@ -195,18 +195,17 @@ public class RunningJobManager implements Serializable {
             if (curator.checkExists().forPath(path) != null) {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
                 LOG.info("delete job {} for yarn app {}, path {} ", jobId, yarnAppId, path);
-                if (curator.getChildren().forPath(path).size() == 0) {
-                    delete(yarnAppId);
-                }
             }
         } catch (Exception e) {
             LOG.error("failed to delete job {} for yarn app {}, path {}, {}", jobId, yarnAppId, path, e);
         } finally {
             try {
                 //lock.release();
+                if (curator.getChildren().forPath(path).size() == 0) {
+                    delete(yarnAppId);
+                }
             } catch (Exception e) {
                 LOG.error("fail releasing lock", e);
-
             }
         }
     }
@@ -245,7 +244,7 @@ public class RunningJobManager implements Serializable {
             Iterator<String> keyItemItr = jsonObject.keys();
             while (keyItemItr.hasNext()) {
                 String itemKey = keyItemItr.next();
-                items.put(itemKey, (String)jsonObject.get(itemKey));
+                items.put(itemKey, jsonObject.get(itemKey) == JSONObject.NULL ? null : (String) jsonObject.get(itemKey));
             }
         }
         return result;

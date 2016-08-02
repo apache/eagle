@@ -17,7 +17,6 @@
 
 package org.apache.eagle.jpm.spark.running.entities;
 
-import org.apache.eagle.jpm.entity.JobConfig;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
@@ -27,7 +26,7 @@ import org.apache.eagle.jpm.util.Constants;
 @Table("eagleSparkRunningApps")
 @ColumnFamily("f")
 @Prefix("sparkApp")
-@Service(Constants.SPARK_APP_SERVICE_ENDPOINT_NAME)
+@Service(Constants.RUNNING_SPARK_APP_SERVICE_ENDPOINT_NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @TimeSeries(true)
 @Tags({"site","sparkAppId", "sparkAppAttemptId", "sparkAppName", "user", "queue"})
