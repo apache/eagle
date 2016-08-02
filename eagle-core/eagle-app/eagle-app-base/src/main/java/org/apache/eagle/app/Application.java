@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,48 +16,71 @@
  */
 package org.apache.eagle.app;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.Environment;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Application Execution Interface
+ *
+ * <h1>Design Principle</h1>
+ * <ul>
+ *  <li>Easy to develop and extend </li>
+ *  <li>Easy to test and run locally</li>
+ *  <li>Easy to manage lifecycle through framework</li>
+ * </ul>
  *
  * @param <Proc>
  * @param <Conf>
  * @param <Env>
  */
-public interface Application<Proc,Conf extends ApplicationConfig,Env extends Environment> {
-    /**
-     *
-     * @param config
-     * @return
-     */
-    Proc execute(Conf config, Env env);
+public interface Application <
+    Conf extends ApplicationConfig, //  Application Configuration
+    Env extends Environment,        // Application Environment
+    Proc                            // Application Process
+> extends ApplicationTool, Serializable {
 
     /**
+     * Execute with type-safe configuration
      *
-     * @param config
+     * Developer-oriented interface
+     *
+     * @param config application configuration
+     * @param environment execution environment
+     * @return execution process
+     */
+    Proc execute(Conf config, Env environment);
+
+    /**
+     * Execute with raw map-based configuration
+     *
+     * Management service oriented interface
+     *
+     * @param config application configuration
+     * @param environment  execution environment
+     * @return execution process
+     */
+    Proc execute(Map<String,Object> config, Env environment);
+
+    /**
+     * Execute with environment based configuration
+     *
+     * Light-weight Runner (dry-run/test purpose) oriented interface
+     *
+     * @param environment  execution environment
+     * @return execution process
+     */
+    Proc execute(Env environment);
+
+    /**
+     * @return application configuration POJO class
+     */
+    Class<Conf> getConfigClass();
+
+    /**
+     *
      * @return
      */
-    Proc execute(Config config, Env env);
-
-    void run(String[] args);
-
-//    /**
-//     *
-//     * @param context
-//     */
-//    void start(ApplicationContext context);
-//
-//    /**
-//     *
-//     * @param context
-//     */
-//    void stop(ApplicationContext context);
-//
-//    /**
-//     *
-//     * @param context
-//     */
-//    void status(ApplicationContext context);
+    Class<? extends Env> getEnvironmentClass();
 }

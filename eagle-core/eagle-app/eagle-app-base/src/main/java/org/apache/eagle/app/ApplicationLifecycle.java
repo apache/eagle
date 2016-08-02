@@ -14,23 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment;
+package org.apache.eagle.app;
 
-import org.apache.eagle.app.ApplicationContext;
+public interface ApplicationLifecycle {
+    /**
+     * on application installed
+     */
+    void onInstall();
 
-public class SparkExecutionRuntime implements ExecutionRuntime {
-    @Override
-    public void start(ApplicationContext context) {
+    /**
+     * on application uninstalled
+     */
+    void onUninstall();
 
-    }
+    /**
+     *
+     */
+    void onStart();
 
-    @Override
-    public void stop(ApplicationContext context) {
-
-    }
-
-    @Override
-    public void status(ApplicationContext context) {
-
-    }
+    /**
+     *
+     */
+    void onStop();
 }

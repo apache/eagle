@@ -18,29 +18,29 @@ package org.apache.eagle.app.sink;
 
 import backtype.storm.topology.base.BaseBasicBolt;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.app.ApplicationContext;
-import org.apache.eagle.app.ApplicationLifecycleListener;
+import org.apache.eagle.app.ApplicationContainer;
+import org.apache.eagle.app.ApplicationLifecycle;
 import org.apache.eagle.app.sink.mapper.StreamEventMapper;
 import org.apache.eagle.metadata.model.StreamSinkDesc;
 
-public abstract class StreamSink<T extends StreamSinkDesc> extends BaseBasicBolt implements ApplicationLifecycleListener {
+public abstract class StreamSinkBolt<T extends StreamSinkDesc> extends BaseBasicBolt implements ApplicationLifecycle {
     /**
      * Should only initialize metadata in this method but must not open any resource like connection
      *
      * @param streamDefinition
      * @param context
      */
-    public abstract T init(StreamDefinition streamDefinition, ApplicationContext context);
+    public abstract T init(StreamDefinition streamDefinition, ApplicationContainer context);
 
-    public abstract StreamSink<T> setEventMapper(StreamEventMapper streamEventMapper);
+    public abstract StreamSinkBolt<T> setEventMapper(StreamEventMapper streamEventMapper);
 
     @Override
-    public void onAppStart() {
-        // StreamSink by default will do nothing when application start
+    public void onStart() {
+        // StreamSinkBolt by default will do nothing when application start
     }
 
     @Override
-    public void onAppStop() {
-        // StreamSink by default will do nothing when application start
+    public void onStop() {
+        // StreamSinkBolt by default will do nothing when application start
     }
 }

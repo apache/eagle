@@ -16,12 +16,8 @@
  */
 package org.apache.eagle.app.environment;
 
-import org.apache.eagle.app.sink.StreamSink;
-import org.apache.eagle.metadata.model.StreamSinkDesc;
+import com.google.inject.Provider;
 
-/**
- * Storm Execution Environment Context
- */
-public class StormEnvironment implements Environment {
-
+public interface ExecutionRuntimeProvider<T extends Environment> extends Provider<ExecutionRuntime<T>>{
+    ExecutionRuntime<T> get();
 }

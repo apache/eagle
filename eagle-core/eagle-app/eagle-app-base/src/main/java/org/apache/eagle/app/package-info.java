@@ -20,10 +20,10 @@
  * <h1>Application Management Framework Interfaces</h1>
  *
  * <ul>
- *     <li>Application Context (Runtime): org.apache.eagle.app.ApplicationContext</li>
+ *     <li>Application Context (Runtime): org.apache.eagle.app.ApplicationContainer</li>
  *     <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
  *     <li>Application Processing Logic (Execution): org.apache.eagle.app.Application</li>
- *     <li>Application Lifecycle Listener (Callback): org.apache.eagle.app.ApplicationLifecycleListener</li>
+ *     <li>Application Lifecycle Listener (Callback): org.apache.eagle.app.ApplicationLifecycle</li>
  * </ul>
  */
 package org.apache.eagle.app;

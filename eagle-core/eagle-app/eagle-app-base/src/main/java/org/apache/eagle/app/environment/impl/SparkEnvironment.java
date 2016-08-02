@@ -14,12 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metadata.model;
+package org.apache.eagle.app.environment.impl;
 
-import java.io.Serializable;
+import com.typesafe.config.Config;
+import org.apache.eagle.app.environment.AbstractEnvironment;
 
-public interface StreamSinkDesc extends Serializable {
-    String getType();
-    Class<?> getSinkClass();
-    Class<? extends StreamSinkDesc> getDescClass();
+/**
+ * Storm Execution Environment Context
+ */
+public class SparkEnvironment extends AbstractEnvironment {
+    private final Config config;
+
+    public SparkEnvironment(Config config){
+        this.config  = config;
+    }
+
+    @Override
+    public Config getConfig() {
+        return config;
+    }
 }

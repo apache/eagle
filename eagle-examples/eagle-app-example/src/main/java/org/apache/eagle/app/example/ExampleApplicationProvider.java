@@ -21,13 +21,13 @@ import org.apache.eagle.app.spi.AbstractApplicationProvider;
 /**
  * Define application provider programmatically
  */
-public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleStormApp> {
+public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleStormApplication> {
     public ExampleApplicationProvider() {
         super("/META-INF/apps/example/metadata.xml");
     }
 
     @Override
-    public ExampleStormApp getApplication() {
-        return new ExampleStormApp();
+    public ExampleStormApplication getApplication() {
+        return new ExampleStormApplication();
     }
 }

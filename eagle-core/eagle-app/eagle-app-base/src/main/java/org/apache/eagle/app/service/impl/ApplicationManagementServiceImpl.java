@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.ApplicationContext;
+import org.apache.eagle.app.ApplicationContainer;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationProviderService;
@@ -65,37 +65,45 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setSite(siteEntity);
         applicationEntity.setConfiguration(operation.getConfiguration());
         applicationEntity.setMode(operation.getMode());
-        ApplicationContext applicationContext = new ApplicationContext(applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),applicationEntity,config);
-//        TODO: applicationEntity.setStreams(applicationContext.getStreamSinkDescs());
-        applicationContext.onAppInstall();
+        ApplicationContainer applicationContainer = new ApplicationContainer(
+                applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
+                applicationEntity,config);
+//        TODO: applicationEntity.setStreams(applicationContainer.getStreamSinkDescs());
+        applicationContainer.onInstall();
         applicationEntityService.create(applicationEntity);
         return applicationEntity;
     }
 
     public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        ApplicationContext applicationContext = new ApplicationContext(applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),applicationEntity,config);
+        ApplicationContainer applicationContainer = new ApplicationContainer(
+                applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
+                applicationEntity,config);
         // TODO: Check status, skip stop if already STOPPED
         try {
-            applicationContext.onAppStop();
+            applicationContainer.onStop();
         }catch (Throwable throwable){
             LOGGER.error(throwable.getMessage(),throwable);
         }
-        applicationContext.onAppUninstall();
+        applicationContainer.onUninstall();
         return applicationEntityService.delete(applicationEntity);
     }
 
     public ApplicationEntity start(ApplicationOperations.StartOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        ApplicationContext applicationContext = new ApplicationContext(applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),applicationEntity,config);
-        applicationContext.onAppStart();
+        ApplicationContainer applicationContainer = new ApplicationContainer(
+                applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
+                applicationEntity,config);
+        applicationContainer.onStart();
         return applicationEntity;
     }
 
     public ApplicationEntity stop(ApplicationOperations.StopOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
-        ApplicationContext applicationContext = new ApplicationContext(applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),applicationEntity,config);
-        applicationContext.onAppStop();
+        ApplicationContainer applicationContainer = new ApplicationContainer(
+                applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
+                applicationEntity,config);
+        applicationContainer.onStop();
         return applicationEntity;
     }
 }

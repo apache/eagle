@@ -20,7 +20,7 @@ import com.typesafe.config.Config;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.service.ApplicationProviderLoader;
 import org.apache.eagle.app.spi.ApplicationProvider;
-import org.apache.eagle.app.tools.DynamicJarPathFinder;
+import org.apache.eagle.app.utils.DynamicJarPathFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

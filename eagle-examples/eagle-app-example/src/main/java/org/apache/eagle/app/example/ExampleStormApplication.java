@@ -16,23 +16,40 @@
  */
 package org.apache.eagle.app.example;
 
+import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import org.apache.eagle.app.StormApp;
-import org.apache.eagle.app.ApplicationContext;
+import org.apache.eagle.app.ApplicationConfig;
+import org.apache.eagle.app.StormApplication;
+import org.apache.eagle.app.environment.impl.StormEnvironment;
 
 import java.util.Arrays;
 import java.util.Map;
 
-public class ExampleStormApp extends StormApp {
-    protected void buildApp(TopologyBuilder builder, ApplicationContext context) {
-        builder.setSpout("metric_spout", new RandomEventSpout(), 4);
-        builder.setBolt("sink_1",context.getFlattenStreamSink("SAMPLE_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
-        builder.setBolt("sink_2",context.getFlattenStreamSink("SAMPLE_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));
+public class ExampleStormApplication extends StormApplication<ExampleStormApplication.ExampleStormApplicationConfig> {
+    @Override
+    public StormTopology execute(ExampleStormApplicationConfig config, StormEnvironment environment) {
+        TopologyBuilder builder = new TopologyBuilder();
+        builder.setSpout("metric_spout", new RandomEventSpout(), config.getSpoutNum());
+        builder.setBolt("sink_1",environment.getStreamSink("SAMPLE_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",environment.getStreamSink("SAMPLE_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));
+        return builder.createTopology();
+    }
+
+    public static class ExampleStormApplicationConfig extends ApplicationConfig {
+        private int spoutNum;
+
+        public int getSpoutNum() {
+            return spoutNum;
+        }
+
+        public void setSpoutNum(int spoutNum) {
+            this.spoutNum = spoutNum;
+        }
     }
 
     private class RandomEventSpout extends BaseRichSpout {

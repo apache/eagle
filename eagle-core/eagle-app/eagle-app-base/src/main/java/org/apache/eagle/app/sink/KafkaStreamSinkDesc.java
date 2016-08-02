@@ -36,7 +36,7 @@ public class KafkaStreamSinkDesc implements StreamSinkDesc {
 
     @Override
     public Class<?> getSinkClass() {
-        return KafkaStreamSink.class;
+        return KafkaStreamSinkBolt.class;
     }
 
     @Override

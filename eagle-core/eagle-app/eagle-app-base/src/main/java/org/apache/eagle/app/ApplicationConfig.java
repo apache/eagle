@@ -16,8 +16,36 @@
  */
 package org.apache.eagle.app;
 
-import com.typesafe.config.Config;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 
-public interface ApplicationConfig {
-    void load(Config config);
+import java.io.Serializable;
+
+public class ApplicationConfig implements Serializable {
+    private ApplicationEntity.Mode mode;
+    private String appId;
+    private String jarPath;
+
+    public ApplicationEntity.Mode getMode() {
+        return mode;
+    }
+
+    public void setMode(ApplicationEntity.Mode mode) {
+        this.mode = mode;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getJarPath() {
+        return jarPath;
+    }
+
+    public void setJarPath(String jarPath) {
+        this.jarPath = jarPath;
+    }
 }

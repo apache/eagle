@@ -33,7 +33,7 @@ import java.util.Map;
 //@Ignore
 //public class TestStormAppImpl extends StormApp {
 //    private final static Logger LOG = LoggerFactory.getLogger(TestStormAppImpl.class);
-//    protected void buildApp(TopologyBuilder builder, ApplicationContext context) {
+//    protected void buildApp(TopologyBuilder builder, ApplicationContainer context) {
 //        builder.setSpout("metric_spout", new RandomEventSpout(), 4);
 //        builder.setBolt("sink_1",context.getFlattenStreamSink("TEST_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
 //        builder.setBolt("sink_2",context.getFlattenStreamSink("TEST_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));

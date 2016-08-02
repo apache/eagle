@@ -46,16 +46,16 @@ import java.io.Serializable;
 //    }
 //
 //    @Override
-//    public void start(ApplicationContext context){
-//        ApplicationEntity appEntity = context.getAppEntity();
-//        String topologyName = context.getAppEntity().getAppId();
+//    public void start(ApplicationContainer context){
+//        ApplicationEntity appEntity = context.getMetadata();
+//        String topologyName = context.getMetadata().getAppId();
 //
 //        TopologyBuilder builder = new TopologyBuilder();
 //        buildApp(builder,context);
 //        StormTopology topology = builder.createTopology();
 //        Config conf = getClusterStormConfig(context);
 //        if(appEntity.getMode() == ApplicationEntity.Mode.CLUSTER){
-//            String jarFile = context.getAppEntity().getDescriptor().getJarPath();
+//            String jarFile = context.getMetadata().getDescriptor().getJarPath();
 //            synchronized (StormApp.class) {
 //                System.setProperty("storm.jar", jarFile);
 //                LOG.info("Submitting as cluster mode");
@@ -79,7 +79,7 @@ import java.io.Serializable;
 //    private final static Integer STORM_NIMBUS_THRIFT_DEFAULT = 6627;
 //    private final static String STORM_NIMBUS_THRIFT_CONF_PATH = "application.storm.nimbusThriftPort";
 //
-//    private static Config getClusterStormConfig(ApplicationContext context){
+//    private static Config getClusterStormConfig(ApplicationContainer context){
 //        Config conf = new Config();
 //        conf.put(RichSpoutBatchExecutor.MAX_BATCH_SIZE_CONF, Int.box(64 * 1024));
 //        conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, Int.box(8));
@@ -107,11 +107,11 @@ import java.io.Serializable;
 //        return conf;
 //    }
 //
-//    protected abstract void buildApp(TopologyBuilder builder, ApplicationContext context);
+//    protected abstract void buildApp(TopologyBuilder builder, ApplicationContainer context);
 //
 //    @Override
-//    public void stop(ApplicationContext context) {
-//        ApplicationEntity appEntity = context.getAppEntity();
+//    public void stop(ApplicationContainer context) {
+//        ApplicationEntity appEntity = context.getMetadata();
 //        String appId = appEntity.getAppId();
 //        if(appEntity.getMode() == ApplicationEntity.Mode.CLUSTER){
 //            Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getClusterStormConfig(context)).getClient();
@@ -126,7 +126,7 @@ import java.io.Serializable;
 //    }
 //
 //    @Override
-//    public void status(ApplicationContext context) {
+//    public void status(ApplicationContainer context) {
 //        // TODO: Not implemented yet!
 //        throw new RuntimeException("TODO: Not implemented yet!");
 //    }

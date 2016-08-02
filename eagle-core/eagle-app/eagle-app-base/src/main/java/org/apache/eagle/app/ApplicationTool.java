@@ -14,12 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metadata.model;
+package org.apache.eagle.app;
 
-import java.io.Serializable;
+import com.typesafe.config.Config;
 
-public interface StreamSinkDesc extends Serializable {
-    String getType();
-    Class<?> getSinkClass();
-    Class<? extends StreamSinkDesc> getDescClass();
+public interface ApplicationTool<Conf extends ApplicationConfig> {
+    /**
+     * Run application through CLI
+     *
+     * @param args application arguments
+     */
+    void run(String[] args);
+
+    void run(Config config);
 }

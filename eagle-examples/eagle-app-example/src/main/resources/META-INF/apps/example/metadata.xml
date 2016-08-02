@@ -20,7 +20,7 @@
     <type>EXAMPLE_APPLICATION</type>
     <name>Example Monitoring Application</name>
     <version>0.5.0-incubating</version>
-    <appClass>org.apache.eagle.app.example.ExampleStormApp</appClass>
+    <appClass>org.apache.eagle.app.example.ExampleStormApplication</appClass>
     <viewPath>/apps/example</viewPath>
     <configuration>
         <property>

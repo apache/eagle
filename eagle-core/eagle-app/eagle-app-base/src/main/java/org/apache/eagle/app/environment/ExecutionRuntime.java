@@ -16,13 +16,18 @@
  */
 package org.apache.eagle.app.environment;
 
-import org.apache.eagle.app.ApplicationContext;
+import org.apache.eagle.app.Application;
+import org.apache.eagle.app.ApplicationConfig;
 
 /**
  * Execution Runtime Adapter
  */
-public interface ExecutionRuntime {
-    void start(ApplicationContext context);
-    void stop(ApplicationContext context);
-    void status(ApplicationContext context);
+public interface ExecutionRuntime<Env extends Environment> {
+    void prepare(Env environment);
+
+    void start(Application executor, ApplicationConfig config);
+
+    void stop(Application executor, ApplicationConfig config);
+
+    void status(Application executor, ApplicationConfig config);
 }

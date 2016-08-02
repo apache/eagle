@@ -30,13 +30,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractStreamSink<K extends StreamSinkDesc> extends StreamSink<K> {
-    private final static Logger LOG = LoggerFactory.getLogger(AbstractStreamSink.class);
+public abstract class AbstractStreamSinkBolt<K extends StreamSinkDesc> extends StreamSinkBolt<K> {
+    private final static Logger LOG = LoggerFactory.getLogger(AbstractStreamSinkBolt.class);
     private final static String KEY_FIELD = "KEY";
     private final static String VALUE_FIELD = "VALUE";
     private StreamEventMapper streamEventMapper;
 
-    public AbstractStreamSink<K> setEventMapper(StreamEventMapper streamEventMapper){
+    public AbstractStreamSinkBolt<K> setEventMapper(StreamEventMapper streamEventMapper){
         this.streamEventMapper = streamEventMapper;
         return this;
     }

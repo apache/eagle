@@ -14,26 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app;
+package org.apache.eagle.app.environment;
 
-public interface ApplicationLifecycleListener {
-    /**
-     * on application installed
-     */
-    void onAppInstall();
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-    /**
-     * on application uninstalled
-     */
-    void onAppUninstall();
-
-    /**
-     *
-     */
-    void onAppStart();
-
-    /**
-     *
-     */
-    void onAppStop();
+public abstract class AbstractEnvironment implements Environment {
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(this.getClass())
+                .append(this.getConfig()).build();
+    }
 }

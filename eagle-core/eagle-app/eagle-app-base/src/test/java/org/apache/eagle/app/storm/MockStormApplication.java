@@ -23,29 +23,41 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import com.typesafe.config.Config;
 import org.apache.eagle.app.ApplicationConfig;
 import org.apache.eagle.app.StormApplication;
-import org.apache.eagle.app.environment.StormEnvironment;
+import org.apache.eagle.app.environment.impl.StormEnvironment;
 
 import java.util.Arrays;
 import java.util.Map;
 
-public class TestStormApplication extends StormApplication<TestStormApplication.TestStormApplicationConfig> {
+public class MockStormApplication extends StormApplication<MockStormApplication.MockStormApplicationConfig> {
+    private MockStormApplicationConfig appConfig;
+
     @Override
-    public StormTopology execute(TestStormApplicationConfig config, StormEnvironment environment) {
+    public StormTopology execute(MockStormApplicationConfig config, StormEnvironment environment) {
+        this.setAppConfig(config);
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("metric_spout", new RandomEventSpout(), config.getSpoutNum());
+        builder.setBolt("sink_1",environment.getStreamSink("TEST_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",environment.getStreamSink("TEST_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));
         return builder.createTopology();
     }
 
-    public static class TestStormApplicationConfig implements ApplicationConfig {
-        private int spoutNum;
+    public MockStormApplicationConfig getAppConfig() {
+        return appConfig;
+    }
 
-        @Override
-        public void load(Config config) {
-            this.spoutNum = config.getInt("application.spout.num");
-        }
+    private void setAppConfig(MockStormApplicationConfig appConfig) {
+        this.appConfig = appConfig;
+    }
+
+    /**
+     * TODO: Load configuration from name space in application className
+     * Application Configuration
+     */
+    static class MockStormApplicationConfig extends ApplicationConfig {
+        private int spoutNum;
+        private boolean loaded = false;
 
         public int getSpoutNum() {
             return spoutNum;
@@ -53,6 +65,14 @@ public class TestStormApplication extends StormApplication<TestStormApplication.
 
         public void setSpoutNum(int spoutNum) {
             this.spoutNum = spoutNum;
+        }
+
+        public boolean isLoaded() {
+            return loaded;
+        }
+
+        public void setLoaded(boolean loaded) {
+            this.loaded = loaded;
         }
     }
 

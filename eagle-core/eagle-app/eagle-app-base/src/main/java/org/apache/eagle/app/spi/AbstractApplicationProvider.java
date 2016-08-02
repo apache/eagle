@@ -21,8 +21,8 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.config.ApplicationProviderDescConfig;
-import org.apache.eagle.app.sink.KafkaStreamSink;
-import org.apache.eagle.app.sink.StreamSink;
+import org.apache.eagle.app.sink.KafkaStreamSinkBolt;
+import org.apache.eagle.app.sink.StreamSinkBolt;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationDocs;
 import org.apache.eagle.metadata.model.Configuration;
@@ -35,7 +35,7 @@ import java.util.List;
 public abstract class AbstractApplicationProvider<T extends Application> implements ApplicationProvider<T> {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractApplicationProvider.class);
     private final static String APPLICATIONS_SINK_TYPE_PROPS_KEY = "application.sink.type";
-    private final static String DEFAULT_APPLICATIONS_SINK_TYPE = KafkaStreamSink.class.getCanonicalName();
+    private final static String DEFAULT_APPLICATIONS_SINK_TYPE = KafkaStreamSinkBolt.class.getCanonicalName();
     private final ApplicationDesc applicationDesc;
 
     public AbstractApplicationProvider(){
@@ -78,8 +78,8 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
                 envConfig.getString(APPLICATIONS_SINK_TYPE_PROPS_KEY) : DEFAULT_APPLICATIONS_SINK_TYPE;
         try {
             Class<?> sinkClass = Class.forName(sinkClassName);
-            if(!StreamSink.class.isAssignableFrom(sinkClass)){
-                throw new IllegalStateException(sinkClassName+ "is not assignable from "+StreamSink.class.getCanonicalName());
+            if(!StreamSinkBolt.class.isAssignableFrom(sinkClass)){
+                throw new IllegalStateException(sinkClassName+ "is not assignable from "+StreamSinkBolt.class.getCanonicalName());
             }
             applicationDesc.setSinkClass(sinkClass);
         } catch (ClassNotFoundException e) {

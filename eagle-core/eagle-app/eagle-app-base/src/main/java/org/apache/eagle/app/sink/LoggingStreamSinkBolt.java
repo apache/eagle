@@ -18,12 +18,12 @@ package org.apache.eagle.app.sink;
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.app.ApplicationContext;
+import org.apache.eagle.app.ApplicationContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoggingStreamSink extends AbstractStreamSink<DefaultStreamSinkDesc> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
+public class LoggingStreamSinkBolt extends AbstractStreamSinkBolt<DefaultStreamSinkDesc> {
+    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSinkBolt.class);
 
     @Override
     protected void onEvent(StreamEvent streamEvent) {
@@ -31,17 +31,17 @@ public class LoggingStreamSink extends AbstractStreamSink<DefaultStreamSinkDesc>
     }
 
     @Override
-    public void onAppInstall() {
-        LOGGER.info("Executing onAppInstall callback, do nothing");
+    public void onInstall() {
+        LOGGER.info("Executing onInstall callback, do nothing");
     }
 
     @Override
-    public void onAppUninstall() {
-        LOGGER.info("Executing onAppUninstall callback, do nothing");
+    public void onUninstall() {
+        LOGGER.info("Executing onUninstall callback, do nothing");
     }
 
     @Override
-    public DefaultStreamSinkDesc init(StreamDefinition streamDefinition, ApplicationContext context) {
-        return new DefaultStreamSinkDesc(LoggingStreamSink.class);
+    public DefaultStreamSinkDesc init(StreamDefinition streamDefinition, ApplicationContainer context) {
+        return new DefaultStreamSinkDesc(LoggingStreamSinkBolt.class);
     }
 }

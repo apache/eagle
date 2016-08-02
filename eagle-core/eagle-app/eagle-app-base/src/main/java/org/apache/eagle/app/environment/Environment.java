@@ -16,9 +16,15 @@
  */
 package org.apache.eagle.app.environment;
 
+import com.typesafe.config.Config;
+
+import java.io.Serializable;
+
 /**
  * Execution Environment Context
  */
-public interface Environment {
+public interface Environment extends Serializable{
+    Config getConfig();
+
 
 }
