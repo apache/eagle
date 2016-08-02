@@ -24,6 +24,8 @@ import java.io.Serializable;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClusterInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private long startedOn;
     private String state;
