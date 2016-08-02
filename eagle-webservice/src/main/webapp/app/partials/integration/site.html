@@ -17,32 +17,39 @@
   -->
 
 <div class="box-body">
-	<table class="table table-bordered">
+	<p class="text-danger" ng-if="site.applicationList.length === 0">
+		<span class="fa fa-exclamation-triangle"></span> Site must install at least one application to start up.
+	</p>
+	<p class="text-warning" ng-if="site.applicationList.length !== 0 && getStartedAppCount() === 0">
+		<span class="fa fa-exclamation-triangle"></span> No application started.
+	</p>
+
+	<table class="table table-bordered table-hover">
 		<thead>
 			<tr>
 				<th>App</th>
+				<th width="10">Status</th>
 				<th>Version</th>
 				<th>Description</th>
-				<th width="10">Status</th>
 				<th>Quick Links</th>
-				<th width="200">Actions</th>
+				<th width="150">Actions</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="app in applicationList track by $index">
 				<td><a ng-click="showAppDetail(app)">{{app.origin.name}}</a></td>
-				<td>{{app.origin.version}}</td>
-				<td>{{app.description}}</td>
 				<td class="text-center">
 					<span class="label label-{{getAppStatusClass(app)}}" ng-if="app.installed">{{app.status}}</span>
 					<span class="label label-default" ng-if="!app.installed">UNINSTALLED</span>
 				</td>
+				<td>{{app.origin.version}}</td>
+				<td>{{app.description}}</td>
 				<td>TODO: ui link</td>
 				<td class="text-center">
 					<div class="btn-group btn-group-xs" ng-if="app.installed">
-						<button class="btn btn-default btn-sm">Monitor</button>
-						<button class="btn btn-default btn-sm">Start</button>
-						<button class="btn btn-default btn-sm">Stop</button>
+						<!--button class="btn btn-default btn-sm">Monitor</button-->
+						<button class="btn btn-default btn-sm" ng-click="startApp(app)">Start</button>
+						<button class="btn btn-default btn-sm" ng-click="stopApp(app)">Stop</button>
 						<button class="btn btn-default btn-sm" ng-click="uninstallApp(app)">Uninstall</button>
 					</div>
 					<div class="btn-group btn-group-xs" ng-if="!app.installed">
@@ -73,10 +80,10 @@
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" data-id="install">
-						<div ng-bind-html="installHTML"></div>
+						<pre ng-bind-html="installHTML"></pre>
 					</div>
 					<div class="tab-pane" data-id="uninstall">
-						<div ng-bind-html="uninstallHTML"></div>
+						<pre ng-bind-html="uninstallHTML"></pre>
 					</div>
 				</div>
 			</div>

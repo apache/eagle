@@ -17,13 +17,13 @@
   -->
 
 <div class="box-body">
-	<table class="table table-bordered">
+	<table class="table table-bordered table-hover">
 		<thead>
 		<tr>
 			<th>Site</th>
 			<th>Description</th>
 			<th>Enabled Apps</th>
-			<th>Actions</th>
+			<th width="95">Actions</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -35,9 +35,26 @@
 					</a>
 				</td>
 				<td>{{site.description}}</td>
-				<td></td>
-				<td></td>
+				<td>
+					<span class="text-muted" ng-if="site.applicationList.length === 0">(Nothing installed...)</span>
+					<ul class="list-inline no-margin">
+						<li ng-repeat="app in site.applicationList track by $index">
+							<span class="label label-primary">
+								{{app.descriptor.name}}
+							</span>
+						</li>
+					</ul>
+				</td>
+				<td class="text-center">
+					<div class="btn-group btn-group-xs">
+						<a class="btn btn-default btn-sm" ui-sref="integration.site({id: site.siteId})">Edit</a>
+						<button class="btn btn-default btn-sm" ng-click="deleteSite(site)">Delete</button>
+					</div>
+				</td>
 			</tr>
 		</tbody>
 	</table>
+</div>
+<div class="box-footer text-right">
+	<button class="btn btn-primary" ng-click="newSite()">New Site</button>
 </div>

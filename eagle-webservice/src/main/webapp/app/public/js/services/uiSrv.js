@@ -129,6 +129,26 @@
 
 		/***
 		 * Create a customize field confirm modal.
+		 * @param {string} name							- Create entity name
+		 * @param {object} entity						- Bind entity
+		 * @param {Object[]} fieldList					- Display fields
+		 * @param {string} fieldList[].field				- Mapping entity field
+		 * @param {string=} fieldList[].name				- Field display name
+		 * @param {*=} fieldList[].defaultValue				- Field default value. Only will be set if entity object is undefined
+		 * @param {string=} fieldList[].type				- Field types: 'select', 'blob'
+		 * @param {number=} fieldList[].rows				- Display as textarea if rows is set
+		 * @param {string=} fieldList[].description			- Display as placeholder
+		 * @param {boolean=} fieldList[].optional			- Optional field will not block the confirm
+		 * @param {boolean=} fieldList[].readonly			- Read Only can not be updated
+		 * @param {string[]=} fieldList[].valueList			- For select type usage
+		 * @param {checkFieldFunction=} checkFunc	- Check logic function. Return string will prevent access
+		 */
+		UI.createConfirm = function(name, entity, fieldList, checkFunc) {
+			return wrapPromise(_fieldDialog(true, name, entity, fieldList, checkFunc));
+		};
+
+		/***
+		 * Create a customize field confirm modal.
 		 * @param {object} config						- Configuration object
 		 * @param {string} config.title						- Title of dialog box
 		 * @param {string=} config.size						- "large". Set dialog size

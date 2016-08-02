@@ -69,7 +69,7 @@
 			return list._refresh();
 		};
 
-		Entity.create = function (url, entity) {
+		Entity.create = Entity.post = function (url, entity) {
 			var list = [];
 			return wrapList(list, $http({
 				method: 'POST',

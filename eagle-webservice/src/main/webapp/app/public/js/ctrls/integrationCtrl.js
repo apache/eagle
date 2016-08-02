@@ -34,9 +34,32 @@
 	// ======================================================================================
 	// =                                        Site                                        =
 	// ======================================================================================
-	eagleControllers.controller('integrationSiteListCtrl', function ($scope, $wrapState, PageConfig) {
+	eagleControllers.controller('integrationSiteListCtrl', function ($scope, $wrapState, PageConfig, UI, Entity, Site) {
 		PageConfig.title = "Integration";
 		PageConfig.subTitle = "Site";
+
+		$scope.deleteSite = function (site) {
+			UI.deleteConfirm(site.siteId)
+			(function (entity, closeFunc, unlock) {
+				Entity.delete("sites", site.uuid)._then(function () {
+					Site.reload();
+					closeFunc();
+				}, unlock);
+			});
+		};
+
+		$scope.newSite = function () {
+			UI.createConfirm("Site", {}, [
+				{field: "siteId", name: "Site Id"},
+				{field: "siteName", name: "Display Name"},
+				{field: "description", name: "Description", type: "blob", rows: 5}
+			])(function (entity, closeFunc, unlock) {
+				Entity.create("sites", entity)._then(function () {
+					Site.reload();
+					closeFunc();
+				}, unlock);
+			});
+		};
 	});
 
 	eagleControllers.controller('integrationSiteCtrl', function ($sce, $scope, $wrapState, PageConfig, Entity, UI, Site, Application) {
@@ -67,6 +90,10 @@
 		}
 		mapApplications();
 
+		// Application refresh
+		function refreshApplications() {
+			Application.reload().getPromise().then(mapApplications);
+		}
 
 		// Application status class
 		$scope.getAppStatusClass = function (application) {
@@ -85,8 +112,16 @@
 			return "default";
 		};
 
+		// Get started application count
+		$scope.getStartedAppCount = function () {
+			return $.grep($scope.site.applicationList, function (app) {
+				return $.inArray((app.status || "").toUpperCase(), ["STARTING", "RUNNING"]) >= 0;
+			}).length;
+		};
+
 		// Application detail
 		$scope.showAppDetail = function (application) {
+			application = application.origin;
 			var docs = application.docs || {install: "", uninstall: ""};
 			$scope.application = application;
 			$scope.installHTML = $sce.trustAsHtml(docs.install);
@@ -109,28 +144,42 @@
 
 			UI.fieldConfirm({
 				title: "Install '" + application.type + "'"
-			}, null, fields)(function (entity, closeFunc) {
+			}, null, fields)(function (entity, closeFunc, unlock) {
 				Entity.create("apps/install", {
 					siteId: $scope.site.siteId,
 					appType: application.type,
 					configuration: entity
 				})._then(function () {
-					Application.reload().getPromise().then(mapApplications);
+					refreshApplications();
 					closeFunc();
-				});
+				}, unlock);
 			});
 		};
 
 		// Uninstall application
 		$scope.uninstallApp = function (application) {
 			UI.deleteConfirm(application.descriptor.name + " - " + application.site.siteId)
-			(function (entity, closeFunc) {
+			(function (entity, closeFunc, unlock) {
 				Entity.delete("apps/uninstall", application.uuid)._then(function () {
-					Application.reload().getPromise().then(mapApplications);
+					refreshApplications();
 					closeFunc();
-				});
+				}, unlock);
 			});
-		}
+		};
+
+		// Start application
+		$scope.startApp = function (application) {
+			Entity.post("apps/start", { uuid: application.uuid })._then(function () {
+				refreshApplications();
+			});
+		};
+
+		// Stop application
+		$scope.stopApp = function (application) {
+			Entity.post("apps/stop", { uuid: application.uuid })._then(function () {
+				refreshApplications();
+			});
+		};
 	});
 
 	// ======================================================================================
