@@ -208,23 +208,22 @@ public class SparkApplicationParser implements Runnable {
 
     private JobConfig parseJobConfig(InputStream is) throws Exception {
         JobConfig jobConfig = new JobConfig();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        try {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             String line;
             boolean stop = false;
             while ((line = reader.readLine()) != null && !stop) {
                 try {
                     JSONParser parser = new JSONParser();
-                    JSONObject eventObj = (JSONObject)parser.parse(line);
+                    JSONObject eventObj = (JSONObject) parser.parse(line);
 
                     if (eventObj != null) {
                         String eventType = (String) eventObj.get("Event");
                         LOG.info("Event type: " + eventType);
                         if (eventType.equalsIgnoreCase(EventType.SparkListenerEnvironmentUpdate.toString())) {
                             stop = true;
-                            JSONObject sparkProps = (JSONObject)eventObj.get("Spark Properties");
+                            JSONObject sparkProps = (JSONObject) eventObj.get("Spark Properties");
                             for (Object key : sparkProps.keySet()) {
-                                jobConfig.put((String)key, (String)sparkProps.get(key));
+                                jobConfig.put((String) key, (String) sparkProps.get(key));
                             }
                         }
                     }
@@ -232,8 +231,7 @@ public class SparkApplicationParser implements Runnable {
                     LOG.error(String.format("Fail to parse %s.", line), e);
                 }
             }
-            reader.close();
-        } finally {
+            
             return jobConfig;
         }
     }
@@ -242,10 +240,9 @@ public class SparkApplicationParser implements Runnable {
         //TODO: getResourceManagerVersion() and compare version to make attempt id.
 
         LOG.info("Get job config for sparkAppId {}, attempt {}, appId {}", sparkAppId, attemptId, app.getId());
-        FileSystem hdfs = null;
         JobConfig jobConfig = null;
-        try {
-            hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
+
+        try (FileSystem hdfs = HDFSUtil.getFileSystem(this.hdfsConf)) {
             // // For Yarn version >= 2.7,
             // // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
             // String attemptIdFormatted = String.format("%06d", attemptId);
@@ -274,25 +271,14 @@ public class SparkApplicationParser implements Runnable {
             jobConfig = parseJobConfig(hdfs.open(attemptFile));
         } catch (Exception e) {
             LOG.error("Fail to process application {}", sparkAppId, e);
-        } finally {
-            if (null != hdfs) {
-                try {
-                    hdfs.close();
-                } catch (Exception e) {
-                    LOG.error("Fail to close hdfs");
-                }
-            }
         }
+
         return jobConfig;
     }
 
     private boolean isClientMode(JobConfig jobConfig) {
-        if (jobConfig.containsKey(Constants.SPARK_MASTER_KEY) &&
-                jobConfig.get(Constants.SPARK_MASTER_KEY).equalsIgnoreCase("yarn-client")) {
-            return true;
-        } else {
-            return false;
-        }
+        return jobConfig.containsKey(Constants.SPARK_MASTER_KEY) &&
+               jobConfig.get(Constants.SPARK_MASTER_KEY).equalsIgnoreCase("yarn-client");
     }
 
     private boolean fetchSparkApps() {

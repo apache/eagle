@@ -88,7 +88,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
                 this.init = true;
             } else {
                 apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_SPARK_JOB);
-                LOG.info("get {} apps from resource manager", apps.size());
+                LOG.info("get {} apps from resource manager", apps == null ? 0 : apps.size());
                 Set<String> running = new HashSet<>();
                 Iterator<String> appIdIterator = this.runningYarnApps.iterator();
                 while (appIdIterator.hasNext()) {
