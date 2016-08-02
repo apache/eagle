@@ -60,13 +60,39 @@
 		]}
 	];
 
-	serviceModule.service('Portal', function() {
-		var portalList = defaultPortalList.concat(adminPortalList);
+	serviceModule.service('Portal', function($wrapState, Site) {
+		var Portal = {};
 
-		function Portal() {}
-		Portal.list = function () {
-			return portalList;
+		var backHome = {name: "Back home", icon: "arrow-left", path: "#/"};
+		var mainList = [];
+
+		Portal.refresh = function () {
+			// TODO: check admin
+			mainList = defaultPortalList.concat(adminPortalList);
+
+			var siteList = $.map(Site.list, function (site) {
+				return {
+					name: site.siteName,
+					path: "#/site/" + site.siteId
+				};
+			});
+
+			mainList.push({
+				name: "Sites", icon: "server", list: siteList});
 		};
+
+		Object.defineProperty(Portal, 'list', {
+			get: function () {
+				var isSite = /^site/.test($wrapState.state.current.name || "");
+				return isSite ? [backHome] : mainList;
+			}
+		});
+
+
+		// Initialization
+		Site.onReload(Portal.refresh);
+
+		Portal.refresh();
 
 		return Portal;
 	});

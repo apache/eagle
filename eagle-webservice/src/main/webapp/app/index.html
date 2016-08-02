@@ -87,20 +87,8 @@
 			<aside class="main-sidebar" ng-hide="PageConfig.hideSidebar">
 				<!-- side bar: style can be found in sidebar.less -->
 				<section class="sidebar">
-					<div class="customize-panel">
-						<div uib-dropdown class="btn-group">
-							<button uib-dropdown-toggle class="btn btn-primary" ng-disabled="false">
-								[TODO:Site] <span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-								<li role="menuitem"><a href="#">Action</a></li>
-								<li role="menuitem"><a href="#">Another action</a></li>
-								<li role="menuitem"><a href="#">Something else here</a></li>
-							</ul>
-						</div>
-					</div>
 					<ul class="sidebar-menu">
-						<li ng-repeat="portal in Portal.list() track by $index" ng-class="{treeview: portal.list}">
+						<li ng-repeat="portal in Portal.list track by $index" ng-class="{treeview: portal.list}">
 							<a ng-href="{{portal.path}}">
 								<i class="fa fa-{{portal.icon || 'circle-o'}}"></i>
 								<span>{{portal.name}}</span>
@@ -223,6 +211,7 @@
 		<script src="public/js/ctrls/mainCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/alertCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/integrationCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/siteCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<!--script src="public/js/ctrls/authController.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/configurationController.js" type="text/javascript" charset="utf-8"></script-->
 		<!-- endref -->

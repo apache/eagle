@@ -23,6 +23,7 @@
 
 	serviceModule.service('Site', function($q, $wrapState, Entity, Application) {
 		var Site = {};
+		var reloadListenerList = [];
 
 		Site.list = [];
 
@@ -58,13 +59,16 @@
 			var list = Site.list = Entity.query('sites');
 			list._promise.then(function () {
 				linkApplications(list, Application.list);
+				$.each(reloadListenerList, function (i, listener) {
+					listener(Site);
+				});
 			});
 			return Site;
 		};
 
-		Application.onReload(function (Application) {
-			linkApplications(Site.list, Application.list);
-		});
+		Site.onReload = function (func) {
+			reloadListenerList.push(func);
+		};
 
 		// Find Site
 		Site.find = function (siteId) {
@@ -90,6 +94,10 @@
 		};
 
 		// Initialization
+		Application.onReload(function (Application) {
+			linkApplications(Site.list, Application.list);
+		});
+
 		Site.reload();
 
 		return Site;

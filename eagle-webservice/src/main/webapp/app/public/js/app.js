@@ -135,7 +135,15 @@ var app = {};
 				templateUrl: "partials/integration/streamList.html?_=" + eagleApp._TRS(),
 				controller: "integrationStreamListCtrl",
 				resolve: routeResolve()
-			});
+			})
+		// ================================== Site ==================================
+			.state('site', {
+				url: "/site/:id",
+				templateUrl: "partials/site/home.html?_=" + eagleApp._TRS(),
+				controller: "siteCtrl",
+				resolve: routeResolve()
+			})
+		;
 	});
 
 	// ======================================================================================
