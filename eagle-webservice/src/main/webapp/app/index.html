@@ -107,7 +107,7 @@
 								<i class="fa fa-angle-left pull-right" ng-if="portal.list"></i>
 							</a>
 							<ul class="treeview-menu" ng-if="portal.list">
-								<li ng-repeat="subPortal in portal.list track by $index">
+								<li ng-repeat="subPortal in portal.list track by $index" ng-class="{active: getNavClass(subPortal)}">
 									<a ng-href="{{subPortal.path}}">
 										<i class="fa fa-{{subPortal.icon || 'circle-o'}}"></i>
 										<span>{{subPortal.name}}</span>

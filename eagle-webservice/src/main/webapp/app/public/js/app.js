@@ -141,7 +141,7 @@ var app = {};
 	// ======================================================================================
 	// =                                   Main Controller                                  =
 	// ======================================================================================
-	var STATE_NAME_MATCH = /^[^\.]*/;
+	var STATE_NAME_MATCH = /^[^.]*/;
 
 	eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, Site, Application, UI) {
 		window._WrapState = $scope.$wrapState = $wrapState;
@@ -152,6 +152,7 @@ var app = {};
 		window._Application = $scope.Application = Application;
 		window._UI = $scope.UI = UI;
 
+		// ============================== Route Update ==============================
 		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
 			console.log("[Switch] current ->", current, currentParam);
 			console.log("[Switch] next ->", next, nextParam);
@@ -161,5 +162,17 @@ var app = {};
 				PageConfig.reset();
 			}
 		});
+
+		// ================================ Function ================================
+		// Get side bar navigation item class
+		$scope.getNavClass = function (portal) {
+			var path = (portal.path || "").replace(/^#/, '');
+
+			if ($wrapState.path() === path) {
+				return "active";
+			} else {
+				return "";
+			}
+		};
 	});
 }());

@@ -101,6 +101,13 @@
 				get: function() {
 					return $.extend({}, $location.search(), $stateParams);
 				}
+			},
+
+			// Parameter
+			state: {
+				get: function() {
+					return $state;
+				}
 			}
 		});
 
