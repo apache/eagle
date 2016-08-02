@@ -303,6 +303,10 @@ public class SparkApplicationParser implements Runnable {
             is = InputStreamUtils.getInputStream(appURL, null, Constants.CompressionType.NONE);
             LOG.info("fetch spark application from {}", appURL);
             sparkApplications = OBJ_MAPPER.readValue(is, SparkApplication[].class);
+        } catch (java.net.ConnectException e) {
+            LOG.warn("fetch spark application from {} failed, {}", appURL, e);
+            e.printStackTrace();
+            return true;
         } catch (Exception e) {
             LOG.warn("fetch spark application from {} failed, {}", appURL, e);
             e.printStackTrace();
@@ -349,12 +353,13 @@ public class SparkApplicationParser implements Runnable {
                 try {
                     JobConfig jobConfig = attemptEntity.getConfig();
                     attemptEntity.setExecMemoryBytes(Utils.parseMemory(jobConfig.get(Constants.SPARK_EXECUTOR_MEMORY_KEY)));
+
                     attemptEntity.setDriveMemoryBytes(isClientMode(jobConfig) ?
-                            Utils.parseMemory(jobConfig.get(Constants.SPARK_YARN_AM_MEMORY_KEY)) :
+                            0 :
                             Utils.parseMemory(jobConfig.get(Constants.SPARK_DRIVER_MEMORY_KEY)));
                     attemptEntity.setExecutorCores(Integer.parseInt(jobConfig.get(Constants.SPARK_EXECUTOR_CORES_KEY)));
                     attemptEntity.setDriverCores(isClientMode(jobConfig) ?
-                            Integer.parseInt(jobConfig.get(Constants.SPARK_YARN_AM_CORES_KEY)) :
+                            0 :
                             Integer.parseInt(jobConfig.get(Constants.SPARK_DRIVER_CORES_KEY)));
                 } catch (Exception e) {
                     LOG.warn("add config failed, {}", e);
@@ -389,6 +394,10 @@ public class SparkApplicationParser implements Runnable {
             is = InputStreamUtils.getInputStream(executorURL, null, Constants.CompressionType.NONE);
             LOG.info("fetch spark executor from {}", executorURL);
             sparkExecutors = OBJ_MAPPER.readValue(is, SparkExecutor[].class);
+        } catch (java.net.ConnectException e) {
+            LOG.warn("fetch spark application from {} failed, {}", executorURL, e);
+            e.printStackTrace();
+            return true;
         } catch (Exception e) {
             LOG.warn("fetch spark executor from {} failed, {}", executorURL, e);
             e.printStackTrace();
@@ -442,6 +451,10 @@ public class SparkApplicationParser implements Runnable {
             is = InputStreamUtils.getInputStream(jobURL, null, Constants.CompressionType.NONE);
             LOG.info("fetch spark job from {}", jobURL);
             sparkJobs = OBJ_MAPPER.readValue(is, SparkJob[].class);
+        } catch (java.net.ConnectException e) {
+            LOG.warn("fetch spark application from {} failed, {}", jobURL, e);
+            e.printStackTrace();
+            return true;
         } catch (Exception e) {
             LOG.warn("fetch spark job from {} failed, {}", jobURL, e);
             e.printStackTrace();
@@ -501,6 +514,10 @@ public class SparkApplicationParser implements Runnable {
             is = InputStreamUtils.getInputStream(stageURL, null, Constants.CompressionType.NONE);
             LOG.info("fetch spark stage from {}", stageURL);
             sparkStages = OBJ_MAPPER.readValue(is, SparkStage[].class);
+        } catch (java.net.ConnectException e) {
+            LOG.warn("fetch spark application from {} failed, {}", stageURL, e);
+            e.printStackTrace();
+            return true;
         } catch (Exception e) {
             LOG.warn("fetch spark stage from {} failed, {}", stageURL, e);
             e.printStackTrace();

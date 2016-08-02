@@ -102,58 +102,42 @@
           <version>${project.version}</version>
       </dependency>
       <dependency>
-          <groupId>com.ebay.hadoop</groupId>
-          <artifactId>hadoop-ebay</artifactId>
-          <version>2.4.1-EBAY-11</version>
-      </dependency>
-      <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-hdfs-nfs</artifactId>
-          <version>2.4.1-EBAY-22</version>
+          <version>${hadoop.version}</version>
       </dependency>
 
       <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-common</artifactId>
-          <version>2.4.1-EBAY-22</version>
+          <version>${hadoop.version}</version>
       </dependency>
       <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-annotations</artifactId>
-          <version>2.4.1-EBAY-22</version>
+          <version>${hadoop.version}</version>
       </dependency>
       <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-hdfs</artifactId>
-          <version>2.4.1-EBAY-22</version>
+          <version>${hadoop.version}</version>
       </dependency>
       <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-auth</artifactId>
-          <version>2.4.1-EBAY-22</version>
+          <version>${hadoop.version}</version>
       </dependency>
       <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-mapreduce-client-app</artifactId>
-          <version>2.4.1-EBAY-22</version>
+          <version>${hadoop.version}</version>
       </dependency>
       <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-mapreduce-client-core</artifactId>
-          <version>2.4.1-EBAY-22</version>
+          <version>${hadoop.version}</version>
       </dependency>
   </dependencies>
-    <repositories>
-        <repository>
-            <id>hadoop</id>
-            <name>Ebay hadoop</name>
-            <url>http://nxrepository.corp.ebay.com/nexus/content/repositories/hadoop.releases/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-        </repository>
-    </repositories>
   <build>
       <resources>
           <resource>
