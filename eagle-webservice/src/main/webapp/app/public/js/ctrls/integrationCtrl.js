@@ -183,9 +183,21 @@
 	});
 
 	// ======================================================================================
-	// =                                     Application                                    =
+	// =                                       Stream                                       =
 	// ======================================================================================
-	eagleControllers.controller('integrationApplicationCtrl', function ($scope, $wrapState, PageConfig) {
-		PageConfig.title = "Todo Application!!!";
+	eagleControllers.controller('integrationStreamListCtrl', function ($scope, $wrapState, PageConfig, Application) {
+		PageConfig.title = "Integration";
+		PageConfig.subTitle = "Streams";
+
+		$scope.streamList = $.map(Application.list, function (app) {
+			return (app.streams || []).map(function (stream) {
+				return {
+					streamId: stream.streamId,
+					appType: app.descriptor.type,
+					siteId: app.site.siteId,
+					schema: stream.schema
+				};
+			});
+		});
 	});
 }());

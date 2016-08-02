@@ -130,11 +130,11 @@ var app = {};
 				controller: "integrationSiteCtrl",
 				resolve: routeResolve({ application: false })
 			})
-			.state('integration.application', {
-				url: "application",
-				templateUrl: "partials/integration/application.html?_=" + eagleApp._TRS(),
-				controller: "integrationApplicationCtrl",
-				resolve: routeResolve({ application: false })
+			.state('integration.streamList', {
+				url: "streamList",
+				templateUrl: "partials/integration/streamList.html?_=" + eagleApp._TRS(),
+				controller: "integrationStreamListCtrl",
+				resolve: routeResolve()
 			});
 	});
 
