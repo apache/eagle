@@ -164,7 +164,7 @@ public class JHFSparkEventReader {
             entity.getTags().put(SparkJobTagName.SPARK_APP_ID.toString(), JSONUtil.getString(event, "App ID"));
             entity.getTags().put(SparkJobTagName.SPARK_APP_NAME.toString(), JSONUtil.getString(event, "App Name"));
             // In yarn-client mode, attemptId is not available in the log, so we set attemptId = 0.
-            String attemptId = isClientMode(this.app.getConfig()) ? "0" : JSONUtil.getString(event, "App Attempt ID");
+            String attemptId = isClientMode(this.app.getConfig()) ? "1" : JSONUtil.getString(event, "App Attempt ID");
             entity.getTags().put(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString(), attemptId);
 
             entity.getTags().put(SparkJobTagName.SPARK_APP_NORM_NAME.toString(), this.getNormalizedName(JSONUtil.getString(event, "App Name"), this.app.getConfig().getConfig().get("ebay.job.name")));
