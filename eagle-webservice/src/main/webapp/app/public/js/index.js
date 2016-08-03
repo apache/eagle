@@ -35,13 +35,13 @@
 	};
 
 	var _lastRegisterApp = null;
-	var register = window.register = function (appName) {
+	var _providers = {};
+	window.register = function (appName) {
 		_lastRegisterApp = appName;
 	};
-	register.providers = {};
 
 	$(function () {
-		console.info("Eagle Web Start...");
+		console.info("[Eagle] Application initialization...");
 
 		// Load providers
 		$.get(_host + "/rest/apps/providers").then(function (res) {
@@ -49,21 +49,40 @@
 			 * @param {{}} oriApp					application provider
 			 * @param {string} oriApp.viewPath		path of application interface
 			 */
-			$.each(res.data || [], function (i, oriApp) {
+			var promiseList = $.map(res.data || [], function (oriApp) {
+				var promise = $.Deferred();
 				var url = oriApp.viewPath;
-				register.providers[oriApp.type] = "";
+				_providers[oriApp.type] = null;
 
 				if(url) {
 					url = url.replace(/^[\\\/]/, "").replace(/[\\\/]$/, "");
 
-					console.log("Getting", oriApp.type, url);
-					$.getScript(url + "/index.js", function () {
-						register.providers[oriApp.type] = _lastRegisterApp;
+					$.getScript(url + "/index.js").then(function () {
+						var appName = _lastRegisterApp || oriApp.type;
+
+						try {
+							angular.module(appName);
+							_providers[oriApp.type] = appName;
+						} catch(err) {
+							console.error("Application module not exist:", oriApp.type);
+						}
+
 						_lastRegisterApp = null;
+					}, function () {
+						console.error("Load application failed:", oriApp.type);
+					}).always(function () {
+						promise.resolve();
 					});
 				} else {
-					console.error("Path not config:", oriApp);
+					console.error("Path not config:", oriApp.type);
+					promise.resolve();
 				}
+
+				return promise;
+			});
+
+			$.when.apply($, promiseList).always(function () {
+				$(document).trigger("APPLICATION_READY", _providers);
 			});
 		});
 	});

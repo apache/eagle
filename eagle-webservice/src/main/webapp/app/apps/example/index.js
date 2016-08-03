@@ -17,9 +17,10 @@
  */
 
 (function () {
-
 	var exampleApp = angular.module('exampleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
 
-	//
+	/**
+	 * When application module name is not same as provider type, you should call `register` function to register module
+	 */
 	register('exampleApp');
 })();

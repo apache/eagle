@@ -18,169 +18,185 @@
 
 var app = {};
 
-
 (function() {
 	'use strict';
 
-	/* App Module */
-	var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'eagle.service']);
+	$(document).on("APPLICATION_READY", function (event, providers) {
+		console.info("[Eagle] Angular bootstrap...");
 
-	// GRUNT REPLACEMENT: eagleApp.buildTimestamp = TIMESTAMP
-	eagleApp._TRS = function() {
-		return eagleApp.buildTimestamp || Math.random();
-	};
+		// ======================================================================================
+		// =                                   Initialization                                   =
+		// ======================================================================================
+		var appList = $.map(providers, function (value) {
+			return value;
+		});
+		var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'eagle.service'].concat(appList));
 
-	// ======================================================================================
-	// =                                   Router config                                    =
-	// ======================================================================================
-	function routeResolve(config) {
-		var resolve = {};
-		if(config === false) return resolve;
+		// GRUNT REPLACEMENT: eagleApp.buildTimestamp = TIMESTAMP
+		eagleApp._TRS = function() {
+			return eagleApp.buildTimestamp || Math.random();
+		};
 
-		config = $.extend({
-			auth: true,
-			site: true,
-			application: true
-		}, config);
+		// ======================================================================================
+		// =                                   Router config                                    =
+		// ======================================================================================
+		function routeResolve(config) {
+			var resolve = {};
+			if(config === false) return resolve;
 
-		if(config.auth) {
-			// TODO: need auth module
-		}
+			config = $.extend({
+				auth: true,
+				site: true,
+				application: true
+			}, config);
 
-		//if(config.site) {
+			if(config.auth) {
+				// TODO: need auth module
+			}
+
+			//if(config.site) {
 			resolve.Site = function (Site) {
 				return Site.getPromise(config);
 			};
-		//}
+			//}
 
-		//if(config.application) {
+			//if(config.application) {
 			resolve.Application = function (Application) {
 				return Application.getPromise();
 			};
-		//}
+			//}
 
-		return resolve;
-	}
+			return resolve;
+		}
 
-	eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
-		$urlRouterProvider.otherwise("/");
-		$stateProvider
-		// ================================== Home ==================================
-			.state('home', {
-				url: "/",
-				templateUrl: "partials/home.html?_=" + eagleApp._TRS(),
-				controller: "homeCtrl",
-				resolve: routeResolve()
-			})
-			.state('setup', {
-				url: "/setup",
-				templateUrl: "partials/setup.html?_=" + eagleApp._TRS(),
-				controller: "setupCtrl",
-				resolve: routeResolve({ site: false, application: false })
-			})
-		// ================================= Alerts =================================
-			.state('alert', {
-				abstract: true,
-				url: "/alert/",
-				templateUrl: "partials/alert/main.html?_=" + eagleApp._TRS(),
-				controller: "alertCtrl",
-				resolve: routeResolve(false)
-			})
-			.state('alert.list', {
-				url: "",
-				templateUrl: "partials/alert/list.html?_=" + eagleApp._TRS(),
-				controller: "alertListCtrl",
-				resolve: routeResolve()
-			})
-			.state('alert.policyList', {
-				url: "policyList",
-				templateUrl: "partials/alert/policyList.html?_=" + eagleApp._TRS(),
-				controller: "policyListCtrl",
-				resolve: routeResolve()
-			})
-			.state('alert.policyCreate', {
-				url: "policyCreate",
-				templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
-				controller: "policyCreateCtrl",
-				resolve: routeResolve()
-			})
-			.state('alert.policyEdit', {
-				url: "policyEdit/{name}",
-				templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
-				controller: "policyEditCtrl",
-				resolve: routeResolve()
-			})
-		// =============================== Integration ==============================
-			.state('integration', {
-				abstract: true,
-				url: "/integration/",
-				templateUrl: "partials/integration/main.html?_=" + eagleApp._TRS(),
-				controller: "integrationCtrl",
-				resolve: routeResolve(false)
-			})
-			.state('integration.siteList', {
-				url: "siteList",
-				templateUrl: "partials/integration/siteList.html?_=" + eagleApp._TRS(),
-				controller: "integrationSiteListCtrl",
-				resolve: routeResolve({ application: false })
-			})
-			.state('integration.site', {
-				url: "site/:id",
-				templateUrl: "partials/integration/site.html?_=" + eagleApp._TRS(),
-				controller: "integrationSiteCtrl",
-				resolve: routeResolve({ application: false })
-			})
-			.state('integration.streamList', {
-				url: "streamList",
-				templateUrl: "partials/integration/streamList.html?_=" + eagleApp._TRS(),
-				controller: "integrationStreamListCtrl",
-				resolve: routeResolve()
-			})
-		// ================================== Site ==================================
-			.state('site', {
-				url: "/site/:id",
-				templateUrl: "partials/site/home.html?_=" + eagleApp._TRS(),
-				controller: "siteCtrl",
-				resolve: routeResolve()
-			})
-		;
-	});
-
-	// ======================================================================================
-	// =                                   Main Controller                                  =
-	// ======================================================================================
-	var STATE_NAME_MATCH = /^[^.]*/;
-
-	eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, Site, Application, UI) {
-		window._WrapState = $scope.$wrapState = $wrapState;
-		window._PageConfig = $scope.PageConfig = PageConfig;
-		window._Portal = $scope.Portal = Portal;
-		window._Entity = $scope.Entity = Entity;
-		window._Site = $scope.Site = Site;
-		window._Application = $scope.Application = Application;
-		window._UI = $scope.UI = UI;
-
-		// ============================== Route Update ==============================
-		$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
-			console.log("[Switch] current ->", current, currentParam);
-			console.log("[Switch] next ->", next, nextParam);
-
-			// Page initialization
-			if(current.name.match(STATE_NAME_MATCH)[0] !== next.name.match(STATE_NAME_MATCH)[0]) {
-				PageConfig.reset();
-			}
+		eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
+			$urlRouterProvider.otherwise("/");
+			$stateProvider
+			// ================================== Home ==================================
+				.state('home', {
+					url: "/",
+					templateUrl: "partials/home.html?_=" + eagleApp._TRS(),
+					controller: "homeCtrl",
+					resolve: routeResolve()
+				})
+				.state('setup', {
+					url: "/setup",
+					templateUrl: "partials/setup.html?_=" + eagleApp._TRS(),
+					controller: "setupCtrl",
+					resolve: routeResolve({ site: false, application: false })
+				})
+				// ================================= Alerts =================================
+				.state('alert', {
+					abstract: true,
+					url: "/alert/",
+					templateUrl: "partials/alert/main.html?_=" + eagleApp._TRS(),
+					controller: "alertCtrl",
+					resolve: routeResolve(false)
+				})
+				.state('alert.list', {
+					url: "",
+					templateUrl: "partials/alert/list.html?_=" + eagleApp._TRS(),
+					controller: "alertListCtrl",
+					resolve: routeResolve()
+				})
+				.state('alert.policyList', {
+					url: "policyList",
+					templateUrl: "partials/alert/policyList.html?_=" + eagleApp._TRS(),
+					controller: "policyListCtrl",
+					resolve: routeResolve()
+				})
+				.state('alert.policyCreate', {
+					url: "policyCreate",
+					templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
+					controller: "policyCreateCtrl",
+					resolve: routeResolve()
+				})
+				.state('alert.policyEdit', {
+					url: "policyEdit/{name}",
+					templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
+					controller: "policyEditCtrl",
+					resolve: routeResolve()
+				})
+				// =============================== Integration ==============================
+				.state('integration', {
+					abstract: true,
+					url: "/integration/",
+					templateUrl: "partials/integration/main.html?_=" + eagleApp._TRS(),
+					controller: "integrationCtrl",
+					resolve: routeResolve(false)
+				})
+				.state('integration.siteList', {
+					url: "siteList",
+					templateUrl: "partials/integration/siteList.html?_=" + eagleApp._TRS(),
+					controller: "integrationSiteListCtrl",
+					resolve: routeResolve({ application: false })
+				})
+				.state('integration.site', {
+					url: "site/:id",
+					templateUrl: "partials/integration/site.html?_=" + eagleApp._TRS(),
+					controller: "integrationSiteCtrl",
+					resolve: routeResolve({ application: false })
+				})
+				.state('integration.streamList', {
+					url: "streamList",
+					templateUrl: "partials/integration/streamList.html?_=" + eagleApp._TRS(),
+					controller: "integrationStreamListCtrl",
+					resolve: routeResolve()
+				})
+				// ================================== Site ==================================
+				.state('site', {
+					url: "/site/:id",
+					templateUrl: "partials/site/home.html?_=" + eagleApp._TRS(),
+					controller: "siteCtrl",
+					resolve: routeResolve()
+				})
+			;
 		});
 
-		// ================================ Function ================================
-		// Get side bar navigation item class
-		$scope.getNavClass = function (portal) {
-			var path = (portal.path || "").replace(/^#/, '');
+		// ======================================================================================
+		// =                                   Main Controller                                  =
+		// ======================================================================================
+		var STATE_NAME_MATCH = /^[^.]*/;
 
-			if ($wrapState.path() === path) {
-				return "active";
-			} else {
-				return "";
-			}
-		};
+		eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, Site, Application, UI) {
+			window._WrapState = $scope.$wrapState = $wrapState;
+			window._PageConfig = $scope.PageConfig = PageConfig;
+			window._Portal = $scope.Portal = Portal;
+			window._Entity = $scope.Entity = Entity;
+			window._Site = $scope.Site = Site;
+			window._Application = $scope.Application = Application;
+			window._UI = $scope.UI = UI;
+
+			// ============================== Route Update ==============================
+			$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
+				console.log("[Switch] current ->", current, currentParam);
+				console.log("[Switch] next ->", next, nextParam);
+
+				// Page initialization
+				if(current.name.match(STATE_NAME_MATCH)[0] !== next.name.match(STATE_NAME_MATCH)[0]) {
+					PageConfig.reset();
+				}
+			});
+
+			// ================================ Function ================================
+			// Get side bar navigation item class
+			$scope.getNavClass = function (portal) {
+				var path = (portal.path || "").replace(/^#/, '');
+
+				if ($wrapState.path() === path) {
+					return "active";
+				} else {
+					return "";
+				}
+			};
+		});
+
+		// ======================================================================================
+		// =                                      Bootstrap                                     =
+		// ======================================================================================
+		angular.element(document).ready(function() {
+			console.info("[Eagle] UI start...");
+			angular.bootstrap(document, ['eagleApp']);
+		});
 	});
-}());
+})();
