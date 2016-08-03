@@ -28,7 +28,7 @@ public class SpecMetadataServiceClientImpl implements IMetadataServiceClient {
     private static final Logger LOG = LoggerFactory.getLogger(SpecMetadataServiceClientImpl.class);
 
 
-    private static final String METADATA_SPOUT_PATH = "/specmetadata/spoutspec";
+    private static final String METADATA_SPOUT_PATH = "/specmetadata/spoutSpec";
     private static final String METADATA_ROUTER_PATH = "/specmetadata/routerSpec";
     private static final String METADATA_ALERTBOLT_PATH = "/specmetadata/alertBoltSpec";
     private static final String METADATA_PUBLISH_PATH = "/specmetadata/publishSpec";
