@@ -21,7 +21,7 @@
 
 	var serviceModule = angular.module('eagle.service');
 
-	serviceModule.service('Application', function($wrapState, Entity) {
+	serviceModule.service('Application', function($q, $wrapState, Entity) {
 		var Application = {};
 		var reloadListenerList = [];
 
@@ -46,8 +46,8 @@
 		Application.providers = {};
 		Application.providerList = Entity.query('apps/providers');
 		Application.providerList._promise.then(function () {
-			$.each(Application.providerList, function (i, app) {
-				Application.providers[app.type] = app;
+			$.each(Application.providerList, function (i, oriApp) {
+				Application.providers[oriApp.type] = oriApp;
 			});
 		});
 
