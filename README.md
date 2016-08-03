@@ -23,7 +23,7 @@ limitations under the License.
 
 ## Overview
 
-Apache Eagle is an open source analytics solution for identifying security and performance issues instantly on big data platforms e.g. Hadoop, Spark, NoSQL etc. It analyzes data activities, yarn applications, jmx metrics, and daemon logs etc., provides state-of-the-art alert engine to identify security breach, performance issues and shows insights.
+Apache Eagle is an open source analytics solution for identifying security and performance issues instantly on big data platforms e.g. Apache Hadoop, Apache Spark, NoSQL etc. It analyzes data activities, yarn applications, jmx metrics, and daemon logs etc., provides state-of-the-art alert engine to identify security breach, performance issues and shows insights.
 
 For more details, please visit [https://eagle.incubator.apache.org](https://eagle.incubator.apache.org)
 
