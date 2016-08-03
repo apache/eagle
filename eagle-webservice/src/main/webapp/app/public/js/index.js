@@ -19,6 +19,9 @@
 (function () {
 	"use strict";
 
+	// ======================================================================================
+	// =                                        Host                                        =
+	// ======================================================================================
 	var _host = "";
 	if(localStorage) {
 		_host = localStorage.getItem("host") || "";
@@ -34,14 +37,95 @@
 		return _host;
 	};
 
-	var _lastRegisterApp = null;
-	var _providers = {};
-	window.register = function (appName) {
-		_lastRegisterApp = appName;
+	// ======================================================================================
+	// =                                      Register                                      =
+	// ======================================================================================
+	var _moduleStateId = 0;
+
+	function Module(dependencies) {
+		this.dependencies = dependencies;
+		this.queueList = [];
+		this.routeList = [];
+		return this;
+	}
+
+	// GRUNT REPLACEMENT: Module.buildTimestamp = TIMESTAMP
+	window._TRS = function() {
+		return Module.buildTimestamp || Math.random();
 	};
 
+	Module.prototype.service = function () {
+		this.queueList.push({type: "service", args: arguments});
+	};
+	Module.prototype.directive = function () {
+		this.queueList.push({type: "directive", args: arguments});
+	};
+	Module.prototype.controller = function () {
+		this.queueList.push({type: "controller", args: arguments});
+	};
+
+	/**
+	 * Set application route
+	 * @param {{}|string=} state				Config state. More info please check angular ui router
+	 * @param {{}} config						Route config
+	 * @param {string} config.url				Root url. start with '/'
+	 * @param {string} config.templateUrl		Template url. Relative path of application `viewPath`
+	 * @param {string} config.controller		Set page controller
+	 */
+	Module.prototype.route = function (state, config) {
+		if(arguments.length === 1) {
+			config = state;
+			state = "_APPLICATION_STATE_" + _moduleStateId++;
+		}
+
+		if(!config.url) throw "Url not defined!";
+
+		this.routeList.push({
+			state: state,
+			config: config
+		});
+	};
+	Module.prototype.create = function (moduleName, path) {
+		var module = angular.module(moduleName, this.dependencies);
+		$.each(this.queueList, function (i, item) {
+			var type = item.type;
+			var args = Array.prototype.slice.apply(item.args);
+			if(type === "controller") {
+				args[0] = moduleName + "_" + args[0];
+			}
+			module[type].apply(module, args);
+		});
+
+		return $.map(this.routeList, function (route) {
+			var config = route.config = $.extend({}, route.config);
+
+			// Parse template url
+			var parser = document.createElement('a');
+			parser.href = path + "/" + config.templateUrl;
+			parser.search = parser.search ? parser.search + "&_=" + window._TRS() : "?_=" + window._TRS();
+			config.templateUrl = parser.href;
+
+			if(typeof config.controller === "string") {
+				config.controller = moduleName + "_" + config.controller;
+			}
+
+			return route;
+		});
+	};
+
+	var _registerAppList = [];
+	var _lastRegisterApp = null;
+	window.register = function (dependencies) {
+		_lastRegisterApp = new Module(dependencies);
+		return _lastRegisterApp;
+	};
+
+	// ======================================================================================
+	// =                                        Main                                        =
+	// ======================================================================================
 	$(function () {
 		console.info("[Eagle] Application initialization...");
+		var routeList = [];
 
 		// Load providers
 		$.get(_host + "/rest/apps/providers").then(function (res) {
@@ -52,25 +136,23 @@
 			var promiseList = $.map(res.data || [], function (oriApp) {
 				var promise = $.Deferred();
 				var url = oriApp.viewPath;
-				_providers[oriApp.type] = null;
 
 				if(url) {
 					url = url.replace(/^[\\\/]/, "").replace(/[\\\/]$/, "");
 
 					$.getScript(url + "/index.js").then(function () {
-						var appName = _lastRegisterApp || oriApp.type;
-
-						try {
-							angular.module(appName);
-							_providers[oriApp.type] = appName;
-						} catch(err) {
-							console.error("Application module not exist:", oriApp.type);
+						var appRouteList = [];
+						if(_lastRegisterApp) {
+							appRouteList = _lastRegisterApp.create(oriApp.type, url);
+							routeList = routeList.concat(appRouteList);
+							_registerAppList.push(oriApp.type);
+						} else {
+							console.error("Application not register:", oriApp.type);
 						}
-
-						_lastRegisterApp = null;
 					}, function () {
 						console.error("Load application failed:", oriApp.type);
 					}).always(function () {
+						_lastRegisterApp = null;
 						promise.resolve();
 					});
 				} else {
@@ -82,7 +164,10 @@
 			});
 
 			$.when.apply($, promiseList).always(function () {
-				$(document).trigger("APPLICATION_READY", _providers);
+				$(document).trigger("APPLICATION_READY", {
+					appList: _registerAppList,
+					routeList: routeList
+				});
 			});
 		});
 	});

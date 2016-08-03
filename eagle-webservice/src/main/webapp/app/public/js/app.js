@@ -21,16 +21,13 @@ var app = {};
 (function() {
 	'use strict';
 
-	$(document).on("APPLICATION_READY", function (event, providers) {
+	$(document).on("APPLICATION_READY", function (event, register) {
 		console.info("[Eagle] Angular bootstrap...");
 
 		// ======================================================================================
 		// =                                   Initialization                                   =
 		// ======================================================================================
-		var appList = $.map(providers, function (value) {
-			return value;
-		});
-		var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'eagle.service'].concat(appList));
+		var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'eagle.service'].concat(register.appList));
 
 		// GRUNT REPLACEMENT: eagleApp.buildTimestamp = TIMESTAMP
 		eagleApp._TRS = function() {
@@ -151,6 +148,11 @@ var app = {};
 					resolve: routeResolve()
 				})
 			;
+
+			// =========================== Application States ===========================
+			$.each(register.routeList, function (i, route) {
+				$stateProvider.state(route.state, route.config);
+			});
 		});
 
 		// ======================================================================================
@@ -172,8 +174,11 @@ var app = {};
 				console.log("[Switch] current ->", current, currentParam);
 				console.log("[Switch] next ->", next, nextParam);
 
+				var currentName = (current || {}).name || "";
+				var nextName = (next || {}).name || "";
+
 				// Page initialization
-				if(current.name.match(STATE_NAME_MATCH)[0] !== next.name.match(STATE_NAME_MATCH)[0]) {
+				if(currentName.match(STATE_NAME_MATCH)[0] !== nextName.match(STATE_NAME_MATCH)[0]) {
 					PageConfig.reset();
 				}
 			});
@@ -194,8 +199,10 @@ var app = {};
 		// ======================================================================================
 		// =                                      Bootstrap                                     =
 		// ======================================================================================
+		//noinspection JSCheckFunctionSignatures
 		angular.element(document).ready(function() {
 			console.info("[Eagle] UI start...");
+			//noinspection JSCheckFunctionSignatures
 			angular.bootstrap(document, ['eagleApp']);
 		});
 	});

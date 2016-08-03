@@ -17,10 +17,24 @@
  */
 
 (function () {
-	var exampleApp = angular.module('exampleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
-
 	/**
-	 * When application module name is not same as provider type, you should call `register` function to register module
+	 * `register` is global function that for application to set up 'controller', 'service', 'directive', 'route' in Eagle
 	 */
-	register('exampleApp');
+	var exampleApp = register(['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
+
+	exampleApp.route({
+		url: "/test",
+		templateUrl: "test.html",
+		controller: "testCtrl"
+	});
+
+	exampleApp.route("testState", {
+		url: "/test/123",
+		templateUrl: "test.html",
+		controller: "testCtrl"
+	});
+
+	exampleApp.controller('testCtrl', function ($scope) {
+		$scope.aaa = 123123123;
+	});
 })();
