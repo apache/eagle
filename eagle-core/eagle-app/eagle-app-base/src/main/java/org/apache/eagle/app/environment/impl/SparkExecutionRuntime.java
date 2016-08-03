@@ -17,35 +17,39 @@
 package org.apache.eagle.app.environment.impl;
 
 import org.apache.eagle.app.Application;
-import org.apache.eagle.app.ApplicationConfig;
+import org.apache.eagle.app.Configuration;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
 
-public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment> {
+public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,Object> {
     @Override
     public void prepare(SparkEnvironment environment) {
-
+        throw new RuntimeException("Not implemented yet");
     }
 
     @Override
-    public void start(Application executor, ApplicationConfig config) {
+    public SparkEnvironment environment() {
+        throw new RuntimeException("Not implemented yet");
+    }
+
+    @Override
+    public void start(Application executor, Configuration config) {
 
         throw new RuntimeException("Not implemented yet");
     }
 
     @Override
-    public void stop(Application executor, ApplicationConfig config) {
+    public void stop(Application executor, Configuration config) {
 
         throw new RuntimeException("Not implemented yet");
     }
 
     @Override
-    public void status(Application executor, ApplicationConfig config) {
-
+    public void status(Application executor, Configuration config) {
         throw new RuntimeException("Not implemented yet");
     }
 
-    public static class Provider implements ExecutionRuntimeProvider<SparkEnvironment> {
+    public static class Provider implements ExecutionRuntimeProvider<SparkEnvironment,Object> {
         @Override
         public SparkExecutionRuntime get() {
             return new SparkExecutionRuntime();

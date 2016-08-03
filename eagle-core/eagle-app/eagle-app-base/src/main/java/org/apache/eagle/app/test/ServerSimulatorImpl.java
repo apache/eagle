@@ -32,25 +32,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AppSimulatorImpl extends ApplicationSimulator {
+public class ServerSimulatorImpl extends ServerSimulator {
     private final Config config;
     private final SiteResource siteResource;
     private final ApplicationResource applicationResource;
 
     @Inject
-    public AppSimulatorImpl(Config config, SiteResource siteResource,ApplicationResource applicationResource){
+    public ServerSimulatorImpl(Config config, SiteResource siteResource, ApplicationResource applicationResource){
         this.config = config;
         this.siteResource = siteResource;
         this.applicationResource = applicationResource;
     }
 
     @Override
-    public void submit(String appType) {
-        submit(appType, new HashMap<>());
+    public void start(String appType) {
+        start(appType, new HashMap<>());
     }
 
     @Override
-    public void submit(String appType, Map<String, Object> appConfig) {
+    public void start(String appType, Map<String, Object> appConfig) {
         SiteEntity siteEntity = getUniqueSite();
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
@@ -72,16 +72,16 @@ public class AppSimulatorImpl extends ApplicationSimulator {
     }
 
     @Override
-    public void submit(Class<? extends ApplicationProvider> appProviderClass) {
-        submit(appProviderClass, new HashMap<>());
+    public void start(Class<? extends ApplicationProvider> appProviderClass) {
+        start(appProviderClass, new HashMap<>());
     }
 
     @Override
-    public void submit(Class<? extends ApplicationProvider> appProviderClass, Map<String, Object> appConfig) {
+    public void start(Class<? extends ApplicationProvider> appProviderClass, Map<String, Object> appConfig) {
         try {
             ApplicationProvider applicationProvider = appProviderClass.newInstance();
             applicationProvider.prepare(new ApplicationProviderConfig(DynamicJarPathFinder.findPath(appProviderClass),appProviderClass),config);
-            submit(applicationProvider.getApplicationDesc().getType(),appConfig);
+            start(applicationProvider.getApplicationDesc().getType(),appConfig);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalStateException(e.getMessage(),e);
         }

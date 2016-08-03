@@ -21,9 +21,9 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.*;
 import backtype.storm.utils.NimbusClient;
+import com.google.common.base.Preconditions;
 import org.apache.eagle.app.Application;
-import org.apache.eagle.app.ApplicationConfig;
-import org.apache.eagle.app.environment.Environment;
+import org.apache.eagle.app.Configuration;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
 import org.apache.eagle.app.utils.DynamicJarPathFinder;
@@ -32,7 +32,7 @@ import org.apache.thrift7.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment> {
+public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,StormTopology> {
     private final static Logger LOG = LoggerFactory.getLogger(StormExecutionRuntime.class);
     private static LocalCluster _localCluster;
 
@@ -54,7 +54,6 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment>
         if(_localCluster == null){
             _localCluster = new LocalCluster();
         }
-
         return _localCluster;
     }
 
@@ -64,16 +63,23 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment>
     }
 
     @Override
-    public void start(Application executor, ApplicationConfig config){
+    public StormEnvironment environment() {
+        return this.environment;
+    }
+
+    @Override
+    public <Conf extends Configuration> void start(Application<Conf, StormEnvironment, StormTopology> executor, Conf config){
         String topologyName = config.getAppId();
-        StormTopology topology = (StormTopology) executor.execute(config, (Environment) environment);
+        Preconditions.checkNotNull(topologyName,"[appId] is required by null for "+executor.getClass().getCanonicalName());
+        StormTopology topology = executor.execute(config, environment);
+        LOG.info("Starting {} ({})",topologyName,executor.getClass().getCanonicalName());
         Config conf = this.environment.getStormConfig();
         if(config.getMode() == ApplicationEntity.Mode.CLUSTER){
             if(config.getJarPath() == null) config.setJarPath(DynamicJarPathFinder.findPath(executor.getClass()));
             String jarFile = config.getJarPath();
             synchronized (StormExecutionRuntime.class) {
                 System.setProperty("storm.jar", jarFile);
-                LOG.info("Submitting as cluster mode");
+                LOG.info("Submitting as cluster mode ...");
                 try {
                     StormSubmitter.submitTopologyWithProgressBar(topologyName, conf, topology);
                 } catch (AlreadyAliveException | InvalidTopologyException e) {
@@ -84,13 +90,14 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment>
                 }
             }
         } else {
-            LOG.info("Submitting as local mode");
+            LOG.info("Submitting as local mode ...");
             getLocalCluster().submitTopology(topologyName, conf, topology);
+            LOG.info("Submitted");
         }
     }
 
     @Override
-    public void stop(Application executor, ApplicationConfig config) {
+    public <Conf extends Configuration> void stop(Application<Conf,StormEnvironment, StormTopology> executor, Conf config) {
         String appId = config.getAppId();
         if(config.getMode() == ApplicationEntity.Mode.CLUSTER){
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(this.environment.getStormConfig()).getClient();
@@ -100,17 +107,19 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment>
                 LOG.error("Failed to kill topology named {}, due to: {}",appId,e.getMessage(),e.getCause());
             }
         } else {
-            getLocalCluster().killTopology(appId);
+            KillOptions killOptions = new KillOptions();
+            killOptions.set_wait_secs(0);
+            getLocalCluster().killTopologyWithOpts(appId,killOptions);
         }
     }
 
     @Override
-    public void status(Application executor, ApplicationConfig config) {
+    public <Conf extends Configuration> void status(Application<Conf,StormEnvironment, StormTopology> executor, Conf config) {
         // TODO: Not implemented yet!
         throw new RuntimeException("TODO: Not implemented yet!");
     }
 
-    public static class Provider implements ExecutionRuntimeProvider<StormEnvironment> {
+    public static class Provider implements ExecutionRuntimeProvider<StormEnvironment,StormTopology> {
         @Override
         public StormExecutionRuntime get() {
             return new StormExecutionRuntime();

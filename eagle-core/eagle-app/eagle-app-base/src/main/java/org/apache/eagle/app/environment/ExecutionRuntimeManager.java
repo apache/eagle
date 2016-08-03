@@ -16,11 +16,14 @@
  */
 package org.apache.eagle.app.environment;
 
+import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.impl.SparkEnvironment;
 import org.apache.eagle.app.environment.impl.SparkExecutionRuntime;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.environment.impl.StormExecutionRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -34,6 +37,8 @@ import java.util.Map;
  */
 public class ExecutionRuntimeManager {
     private final static ExecutionRuntimeManager INSTANCE = new ExecutionRuntimeManager();
+    private final static Logger LOGGER = LoggerFactory.getLogger(ExecutionRuntimeManager.class);
+
     static {
         getInstance().register(StormEnvironment.class,new StormExecutionRuntime.Provider());
         getInstance().register(SparkEnvironment.class,new SparkExecutionRuntime.Provider());
@@ -51,17 +56,20 @@ public class ExecutionRuntimeManager {
         return INSTANCE;
     }
 
-    public <E extends Environment> ExecutionRuntime getRuntime(E environment) {
+    public <E extends Environment,P> ExecutionRuntime getRuntime(E environment) {
+        Preconditions.checkNotNull(environment,"Failed to create execution runtime as environment is null");
         if(executionRuntimeCache.containsKey(environment.getClass()))
             return executionRuntimeCache.get(environment.getClass());
 
         if(executionRuntimeProviders.containsKey(environment.getClass())){
-            ExecutionRuntime<E> runtime = ((ExecutionRuntimeProvider<E>)executionRuntimeProviders.get(environment.getClass())).get();
+            ExecutionRuntime<E,P> runtime = ((ExecutionRuntimeProvider<E,P>)executionRuntimeProviders.get(environment.getClass())).get();
             runtime.prepare(environment);
             executionRuntimeCache.put(environment,runtime);
+            LOGGER.info("Created new execution runtime {} for environment: {}",runtime,environment);
             return runtime;
         } else {
-            throw new IllegalStateException("No matched execution runtime found for environment"+environment);
+            LOGGER.error("No matched execution runtime found for environment: "+environment);
+            throw new IllegalStateException("No matched execution runtime found for environment: "+environment);
         }
     }
 
@@ -70,7 +78,8 @@ public class ExecutionRuntimeManager {
             E environment = environmentClass.getConstructor(Config.class).newInstance(config);
             return getRuntime(environment);
         } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException(e.getMessage(),e);
+            LOGGER.error("Failed to create environment instance of type: "+environmentClass,e);
+            throw new RuntimeException("Failed to create environment instance of type: "+environmentClass,e);
         }
     }
 

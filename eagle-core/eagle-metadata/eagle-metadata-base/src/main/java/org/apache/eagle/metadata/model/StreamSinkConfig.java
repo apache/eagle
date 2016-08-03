@@ -14,20 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink.mapper;
-
-import backtype.storm.tuple.Tuple;
-import org.apache.eagle.alert.engine.model.StreamEvent;
+package org.apache.eagle.metadata.model;
 
 import java.io.Serializable;
-import java.util.List;
 
-@FunctionalInterface
-public interface StreamEventMapper extends Serializable{
-    /**
-     * @param tuple
-     * @return
-     * @throws Exception
-     */
-    List<StreamEvent> map(Tuple tuple) throws Exception;
+public interface StreamSinkConfig extends Serializable {
+    String getType();
+    Class<?> getSinkType();
+    Class<? extends StreamSinkConfig> getConfigType();
 }

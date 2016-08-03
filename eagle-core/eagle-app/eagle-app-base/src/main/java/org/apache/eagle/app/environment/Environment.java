@@ -17,6 +17,7 @@
 package org.apache.eagle.app.environment;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.app.sink.StreamSinkProvider;
 
 import java.io.Serializable;
 
@@ -24,7 +25,6 @@ import java.io.Serializable;
  * Execution Environment Context
  */
 public interface Environment extends Serializable{
-    Config getConfig();
-
-
+    Config config();
+    StreamSinkProvider streamSink();
 }

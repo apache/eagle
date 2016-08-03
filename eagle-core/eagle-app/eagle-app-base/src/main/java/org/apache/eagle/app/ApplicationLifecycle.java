@@ -20,20 +20,20 @@ public interface ApplicationLifecycle {
     /**
      * on application installed
      */
-    void onInstall();
+    default void onInstall(){}
 
     /**
      * on application uninstalled
      */
-    void onUninstall();
+    default void onUninstall(){}
 
     /**
      *
      */
-    void onStart();
+    default void onStart(){}
 
     /**
      *
      */
-    void onStop();
+    default void onStop(){}
 }

@@ -18,13 +18,13 @@ package org.apache.eagle.app.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.ApplicationConfig;
+import org.apache.eagle.app.Configuration;
 
 import java.util.Map;
 
 public class ApplicationConfigHelper {
     private static final ObjectMapper mapper = new ObjectMapper();
-    public static <Conf extends ApplicationConfig> Conf convertFrom(Map<String,Object> configMap, Class<Conf> confClass){
+    public static <Conf extends Configuration> Conf convertFrom(Map<String,Object> configMap, Class<Conf> confClass){
         return mapper.convertValue(configMap,confClass);
     }
 
@@ -42,7 +42,7 @@ public class ApplicationConfigHelper {
             if(unwrappedConfig.containsKey(namespace)){
                 return (Map<String,Object>) unwrappedConfig.get(namespace);
             }else {
-                return null;
+                throw new IllegalArgumentException("Failed to load app config as config key: '"+namespace+"' was not found in: "+config);
             }
         }
     }

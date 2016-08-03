@@ -79,7 +79,7 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath:/applicationContainer.xml
+            classpath:/applicationContext.xml
             classpath:/eagleSecurity.xml
         </param-value>
     </context-param>

@@ -19,37 +19,46 @@ package org.apache.eagle.app.sink;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.app.sink.mapper.StreamEventMapper;
-import org.apache.eagle.metadata.model.StreamSinkDesc;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractStreamSinkBolt<K extends StreamSinkDesc> extends StreamSinkBolt<K> {
-    private final static Logger LOG = LoggerFactory.getLogger(AbstractStreamSinkBolt.class);
+public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseBasicBolt implements StreamSink<K> {
+    private final static Logger LOG = LoggerFactory.getLogger(StormStreamSink.class);
     private final static String KEY_FIELD = "KEY";
-    private final static String VALUE_FIELD = "VALUE";
-    private StreamEventMapper streamEventMapper;
+    final static String VALUE_FIELD = "VALUE";
+    private StreamEventMapper streamEventMapper = null;
+    private String streamId;
 
-    public AbstractStreamSinkBolt<K> setEventMapper(StreamEventMapper streamEventMapper){
-        this.streamEventMapper = streamEventMapper;
+    @Override
+    public void init(String streamId, K config) {
+        this.streamId = streamId;
+        this.streamEventMapper = new FlattenEventMapper(streamId);
+    }
+
+    public StormStreamSink<K> setEventMapper(StreamEventMapper eventMapper){
+        this.streamEventMapper = eventMapper;
         return this;
     }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context) {
         super.prepare(stormConf, context);
+        Preconditions.checkNotNull(this.streamEventMapper);
     }
 
     @Override
     public void execute(Tuple input, BasicOutputCollector collector) {
         try {
-            List<StreamEvent> streamEvents = streamEventMapper.map(input);
+            List<StreamEvent> streamEvents = this.streamEventMapper.map(input);
             if(streamEvents!=null) {
                 streamEvents.forEach((streamEvent -> {
                     try {
@@ -71,5 +80,9 @@ public abstract class AbstractStreamSinkBolt<K extends StreamSinkDesc> extends S
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields(KEY_FIELD,VALUE_FIELD));
+    }
+
+    public String getStreamId() {
+        return streamId;
     }
 }

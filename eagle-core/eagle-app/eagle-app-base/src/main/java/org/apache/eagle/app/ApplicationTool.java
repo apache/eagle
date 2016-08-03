@@ -17,14 +17,44 @@
 package org.apache.eagle.app;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.commons.cli.ParseException;
+import org.apache.eagle.common.config.ConfigOptionParser;
 
-public interface ApplicationTool<Conf extends ApplicationConfig> {
+public interface ApplicationTool<Conf extends Configuration> {
     /**
      * Run application through CLI
      *
      * @param args application arguments
      */
-    void run(String[] args);
+    default void run(String[] args){
+        try {
+            run(new ConfigOptionParser().load(args));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 
+    /**
+     *
+     * @param config
+     */
     void run(Config config);
+
+    /**
+     * @param appConf
+     */
+    void run(Conf appConf, Config envConfig);
+
+    /**
+     * @param appConf
+     */
+    default void run(Conf appConf){
+        run(appConf, ConfigFactory.load());
+    }
+
+    default void run(){
+        run(ConfigFactory.load());
+    }
 }

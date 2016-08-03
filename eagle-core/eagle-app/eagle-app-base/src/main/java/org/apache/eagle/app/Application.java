@@ -36,11 +36,10 @@ import java.util.Map;
  * @param <Env>
  */
 public interface Application <
-    Conf extends ApplicationConfig, //  Application Configuration
+    Conf extends Configuration,     //  Application Configuration
     Env extends Environment,        // Application Environment
     Proc                            // Application Process
-> extends ApplicationTool, Serializable {
-
+> extends Serializable {
     /**
      * Execute with type-safe configuration
      *
@@ -74,13 +73,12 @@ public interface Application <
     Proc execute(Env environment);
 
     /**
-     * @return application configuration POJO class
+     * @return application configuration type (POJO class)
      */
-    Class<Conf> getConfigClass();
+    Class<Conf> getConfigType();
 
     /**
-     *
-     * @return
+     * @return application environment type
      */
-    Class<? extends Env> getEnvironmentClass();
+    Class<? extends Env> getEnvironmentType();
 }

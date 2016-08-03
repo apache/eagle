@@ -20,8 +20,9 @@ import org.apache.eagle.metadata.model.ApplicationEntity;
 
 import java.io.Serializable;
 
-public class ApplicationConfig implements Serializable {
+public class Configuration implements Serializable {
     private ApplicationEntity.Mode mode;
+    private String siteId;
     private String appId;
     private String jarPath;
 
@@ -47,5 +48,13 @@ public class ApplicationConfig implements Serializable {
 
     public void setJarPath(String jarPath) {
         this.jarPath = jarPath;
+    }
+
+    public String getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
     }
 }

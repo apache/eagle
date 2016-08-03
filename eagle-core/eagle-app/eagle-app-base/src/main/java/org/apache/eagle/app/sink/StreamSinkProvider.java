@@ -14,40 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment;
+package org.apache.eagle.app.sink;
 
-import org.apache.eagle.app.Application;
 import org.apache.eagle.app.Configuration;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
 
-/**
- * Execution Runtime Adapter
- */
-public interface ExecutionRuntime<Env extends Environment, Proc> {
+import java.lang.reflect.ParameterizedType;
+
+public interface StreamSinkProvider<S extends StreamSink<D>,D extends StreamSinkConfig>{
     /**
-     * @param environment
+     * @param streamId
+     * @param appConfig
+     * @return
      */
-    void prepare(Env environment);
+    D getSinkConfig(String streamId, Configuration appConfig);
+    S getSink();
 
-    Env environment();
+    default S getSink(String streamId, Configuration appConfig){
+        S s = getSink();
+        s.init(streamId,getSinkConfig(streamId,appConfig));
+        return s;
+    }
 
-    /**
-     * @param executor
-     * @param config
-     * @param <Conf>
-     */
-    <Conf extends Configuration> void start(Application<Conf,Env, Proc> executor, Conf config);
+    default Class<? extends S> getSinkType(){
+        return (Class<S>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
 
-    /**
-     * @param executor
-     * @param config
-     * @param <Conf>
-     */
-    <Conf extends Configuration> void stop(Application<Conf,Env, Proc> executor, Conf config);
-
-    /**
-     * @param executor
-     * @param config
-     * @param <Conf>
-     */
-    <Conf extends Configuration> void status(Application<Conf,Env, Proc> executor, Conf config);
+    default Class<? extends D> getSinkConfigType(){
+        return (Class<D>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+    }
 }

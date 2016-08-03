@@ -23,33 +23,20 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import org.apache.eagle.app.ApplicationConfig;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 
 import java.util.Arrays;
 import java.util.Map;
 
-public class ExampleStormApplication extends StormApplication<ExampleStormApplication.ExampleStormApplicationConfig> {
+public class ExampleStormApplication extends StormApplication<ExampleStormConfig> {
     @Override
-    public StormTopology execute(ExampleStormApplicationConfig config, StormEnvironment environment) {
+    public StormTopology execute(ExampleStormConfig config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("metric_spout", new RandomEventSpout(), config.getSpoutNum());
-        builder.setBolt("sink_1",environment.getStreamSink("SAMPLE_STREAM_1")).fieldsGrouping("metric_spout",new Fields("metric"));
-        builder.setBolt("sink_2",environment.getStreamSink("SAMPLE_STREAM_2")).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_1",environment.getFlattenStreamSink("SAMPLE_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",environment.getFlattenStreamSink("SAMPLE_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         return builder.createTopology();
-    }
-
-    public static class ExampleStormApplicationConfig extends ApplicationConfig {
-        private int spoutNum;
-
-        public int getSpoutNum() {
-            return spoutNum;
-        }
-
-        public void setSpoutNum(int spoutNum) {
-            this.spoutNum = spoutNum;
-        }
     }
 
     private class RandomEventSpout extends BaseRichSpout {

@@ -18,12 +18,12 @@ package org.apache.eagle.app.sink;
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.app.ApplicationContainer;
+import org.apache.eagle.app.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoggingStreamSinkBolt extends AbstractStreamSinkBolt<DefaultStreamSinkDesc> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSinkBolt.class);
+public class LoggingStreamSink extends StormStreamSink<DefaultStreamSinkConfig> {
+    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
 
     @Override
     protected void onEvent(StreamEvent streamEvent) {
@@ -40,8 +40,16 @@ public class LoggingStreamSinkBolt extends AbstractStreamSinkBolt<DefaultStreamS
         LOGGER.info("Executing onUninstall callback, do nothing");
     }
 
-    @Override
-    public DefaultStreamSinkDesc init(StreamDefinition streamDefinition, ApplicationContainer context) {
-        return new DefaultStreamSinkDesc(LoggingStreamSinkBolt.class);
+
+    public static class Provider implements StreamSinkProvider<LoggingStreamSink,DefaultStreamSinkConfig> {
+        @Override
+        public DefaultStreamSinkConfig getSinkConfig(String streamId, Configuration appConfig) {
+            return new DefaultStreamSinkConfig(LoggingStreamSink.class);
+        }
+
+        @Override
+        public LoggingStreamSink getSink() {
+            return new LoggingStreamSink();
+        }
     }
 }

@@ -14,19 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app;
+package org.apache.eagle.app.service;
 
+import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
+import org.apache.eagle.app.Application;
+import org.apache.eagle.app.ApplicationLifecycle;
+import org.apache.eagle.app.Configuration;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.utils.ApplicationConfigHelper;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.model.StreamDesc;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- * Managed Application Interface: org.apache.eagle.app.ApplicationContainer
+ * Managed Application Interface: org.apache.eagle.app.service.ApplicationContext
  *
  * <ul>
  *     <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
@@ -34,8 +44,8 @@ import java.util.Map;
  *     <li>Application Lifecycle Listener (Installation): org.apache.eagle.app.ApplicationLifecycle</li>
  * </ul>
  */
-public class ApplicationContainer implements Serializable, ApplicationLifecycle {
-    private final ApplicationConfig config;
+public class ApplicationContext implements Serializable, ApplicationLifecycle {
+    private final Configuration config;
     private final Application application;
     private final ExecutionRuntime runtime;
     private final ApplicationEntity metadata;
@@ -44,19 +54,32 @@ public class ApplicationContainer implements Serializable, ApplicationLifecycle 
      * @param metadata ApplicationEntity
      * @param application Application
      */
-    public ApplicationContainer(Application application, ApplicationEntity metadata, Config config){
+    public ApplicationContext(Application application, ApplicationEntity metadata, Config config){
+        Preconditions.checkNotNull(application,"Application is null");
+        Preconditions.checkNotNull(metadata,"ApplicationEntity is null");
         this.application = application;
         this.metadata = metadata;
-        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentClass(),config);
+        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(),config);
         Map<String,Object> applicationConfig = metadata.getConfiguration();
-        this.config = ApplicationConfigHelper.convertFrom(applicationConfig,application.getConfigClass());
+        if(applicationConfig == null) {
+            applicationConfig = Collections.emptyMap();
+        }
+        this.config = ApplicationConfigHelper.convertFrom(applicationConfig,application.getConfigType());
         this.config.setMode(metadata.getMode());
         this.config.setAppId(metadata.getAppId());
     }
 
     @Override
     public void onInstall() {
-        //
+        List<StreamDesc> streamDescCollection = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
+            StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(streamDefinition.getStreamId(),this.config);
+            StreamDesc streamDesc = new StreamDesc();
+            streamDesc.setSchema(streamDefinition);
+            streamDesc.setSink(streamSinkConfig);
+            streamDesc.setStreamId(streamDefinition.getStreamId());
+            return streamDesc;
+        })).collect(Collectors.toList());
+        metadata.setStreams(streamDescCollection);
     }
 
     @Override

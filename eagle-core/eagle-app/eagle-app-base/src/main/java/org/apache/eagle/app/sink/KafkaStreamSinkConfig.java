@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,27 +16,31 @@
  */
 package org.apache.eagle.app.sink;
 
-import org.apache.eagle.metadata.model.StreamSinkDesc;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
 
-public class DefaultStreamSinkDesc implements StreamSinkDesc {
-    private final Class<?> streamPersistClass;
-    private final static String NONE_STORAGE_TYPE = "NONE";
+public class KafkaStreamSinkConfig implements StreamSinkConfig {
+    private String topicId;
 
-    public DefaultStreamSinkDesc(Class<?> streamPersistClass){
-        this.streamPersistClass = streamPersistClass;
+    public String getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(String topicId) {
+        this.topicId = topicId;
     }
 
     @Override
     public String getType() {
-        return NONE_STORAGE_TYPE;
-    }
-
-    public Class<?> getSinkClass() {
-        return streamPersistClass;
+        return "KAFKA";
     }
 
     @Override
-    public Class<? extends StreamSinkDesc> getDescClass() {
-        return DefaultStreamSinkDesc.class;
+    public Class<?> getSinkType() {
+        return KafkaStreamSink.class;
+    }
+
+    @Override
+    public Class<? extends StreamSinkConfig> getConfigType() {
+        return KafkaStreamSinkConfig.class;
     }
 }

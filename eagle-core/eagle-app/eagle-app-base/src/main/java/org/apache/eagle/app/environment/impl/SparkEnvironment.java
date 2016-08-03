@@ -23,14 +23,7 @@ import org.apache.eagle.app.environment.AbstractEnvironment;
  * Storm Execution Environment Context
  */
 public class SparkEnvironment extends AbstractEnvironment {
-    private final Config config;
-
     public SparkEnvironment(Config config){
-        this.config  = config;
-    }
-
-    @Override
-    public Config getConfig() {
-        return config;
+        super(config);
     }
 }

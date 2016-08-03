@@ -27,44 +27,44 @@ import java.util.Map;
 /**
  * Application test simulator for developer to quickly run application without diving into application lifecycle
  */
-public abstract class ApplicationSimulator {
+public abstract class ServerSimulator {
     /**
      *
      * @param appType
      */
-    public abstract void submit(String appType);
+    public abstract void start(String appType);
 
     /**
      *
      * @param appType
      * @param appConfig
      */
-    public abstract void submit(String appType, Map<String,Object> appConfig);
+    public abstract void start(String appType, Map<String,Object> appConfig);
 
     /**
      *
      * @param appProviderClass
      */
-    public abstract void submit(Class<? extends ApplicationProvider> appProviderClass);
+    public abstract void start(Class<? extends ApplicationProvider> appProviderClass);
 
     /**
      *
      * @param appProviderClass
      * @param appConfig
      */
-    public abstract void submit(Class<? extends ApplicationProvider> appProviderClass, Map<String,Object> appConfig) throws Exception;
+    public abstract void start(Class<? extends ApplicationProvider> appProviderClass, Map<String,Object> appConfig) throws Exception;
 
-    public static ApplicationSimulator getInstance(){
-        return Guice.createInjector(new AppTestGuiceModule()).getInstance(ApplicationSimulator.class);
+    public static ServerSimulator getInstance(){
+        return Guice.createInjector(new AppTestGuiceModule()).getInstance(ServerSimulator.class);
     }
 
     /**
      * @param modules additional modules
-     * @return ApplicationSimulator instance
+     * @return ServerSimulator instance
      */
-    public static ApplicationSimulator getInstance(Module ... modules){
+    public static ServerSimulator getInstance(Module ... modules){
         List<Module> contextModules = Arrays.asList(modules);
         contextModules.add(new AppTestGuiceModule());
-        return Guice.createInjector(contextModules).getInstance(ApplicationSimulator.class);
+        return Guice.createInjector(contextModules).getInstance(ServerSimulator.class);
     }
 }

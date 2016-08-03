@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.sink.mapper;
+package org.apache.eagle.app.sink;
 
-public interface DirectEventMapper extends StreamEventMapper{}
+import org.apache.eagle.app.ApplicationLifecycle;
+import org.apache.eagle.metadata.model.StreamSinkConfig;
+
+public interface StreamSink<T extends StreamSinkConfig> extends ApplicationLifecycle {
+    void init(String streamId,T config);
+}
