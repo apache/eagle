@@ -34,10 +34,10 @@
 		return _host;
 	};
 
+	var _lastRegisterApp = null;
 	var register = window.register = function (appName) {
-		console.log("Register:", appName);
+		_lastRegisterApp = appName;
 	};
-
 	register.providers = {};
 
 	$(function () {
@@ -58,7 +58,8 @@
 
 					console.log("Getting", oriApp.type, url);
 					$.getScript(url + "/index.js", function () {
-						console.log("success!", oriApp.type);
+						register.providers[oriApp.type] = _lastRegisterApp;
+						_lastRegisterApp = null;
 					});
 				} else {
 					console.error("Path not config:", oriApp);
