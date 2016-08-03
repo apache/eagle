@@ -98,7 +98,7 @@ public class UnitSparkTopologyRunner {
         String zkQuorum = config.getString("spout.kafkaBrokerZkQuorum");
         Map<String, String> kafkaParams = new HashMap<>();
         kafkaParams.put("metadata.broker.list", zkQuorum);
-        kafkaParams.put("auto.offset.reset", "largest");//smallest|largest 重头消费|最新消费
+        kafkaParams.put("auto.offset.reset", "smallest");//smallest|largest 重头消费|最新消费
 
 
         String topic = config.getString(CONSUMER_KAFKA_TOPIC);
@@ -116,7 +116,8 @@ public class UnitSparkTopologyRunner {
                 .flatMapToPair(new CorrelationSpoutSparkFunction(numOfRouter,config))
                 .transformToPair(new ChangePartitionTo(numOfRouter))
                 .mapPartitionsToPair(new StreamRouteBoltFunction(config, "streamBolt"))
-                .transformToPair(new ChangePartitionTo(numOfAlertBolts)).mapPartitionsToPair(new AlertBoltFunction(alertBoltNamePrefix, config, numOfAlertBolts))
+                .transformToPair(new ChangePartitionTo(numOfAlertBolts))
+                .mapPartitionsToPair(new AlertBoltFunction(alertBoltNamePrefix, config, numOfAlertBolts))
                 .repartition(numOfPublishTasks).foreachRDD(new Publisher(config, alertPublishBoltName));
     }
 
