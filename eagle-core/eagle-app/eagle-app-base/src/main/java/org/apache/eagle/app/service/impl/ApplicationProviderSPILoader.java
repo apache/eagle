@@ -68,17 +68,17 @@ public class ApplicationProviderSPILoader extends ApplicationProviderLoader{
         } else {
             LOG.info("Loading application providers from context class loader");
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            loadProviderFromClassLoader(classLoader,(applicationProviderConfig) -> DynamicJarPathFinder.findPath(applicationProviderConfig.getClass()));
+            loadProviderFromClassLoader(classLoader,(applicationProvider) -> DynamicJarPathFinder.findPath(applicationProvider.getClass()));
         }
     }
 
-    private void loadProviderFromClassLoader(ClassLoader jarFileClassLoader, Function<ApplicationProviderConfig,String> jarFileSupplier){
+    private void loadProviderFromClassLoader(ClassLoader jarFileClassLoader, Function<ApplicationProvider,String> jarFileSupplier){
         ServiceLoader<ApplicationProvider> serviceLoader = ServiceLoader.load(ApplicationProvider.class, jarFileClassLoader);
         for (ApplicationProvider applicationProvider : serviceLoader) {
             try {
                 ApplicationProviderConfig providerConfig = new ApplicationProviderConfig();
                 providerConfig.setClassName(applicationProvider.getClass().getCanonicalName());
-                providerConfig.setJarPath(jarFileSupplier.apply(providerConfig));
+                providerConfig.setJarPath(jarFileSupplier.apply(applicationProvider));
                 applicationProvider.prepare(providerConfig, getConfig());
                 registerProvider(applicationProvider);
             }catch (Throwable ex){
