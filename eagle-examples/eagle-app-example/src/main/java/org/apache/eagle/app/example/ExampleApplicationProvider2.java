@@ -34,7 +34,7 @@ public class ExampleApplicationProvider2 extends AbstractApplicationProvider<Exa
         setName("Example Monitoring Application 2");
         setVersion("0.5.0-incubating");
         setAppClass(ExampleStormApplication.class);
-        setViewPath("/apps/example");
+        setViewPath("/apps/example2");
         setAppConfig("ExampleApplicationConf.xml");
         setStreams(Arrays.asList(createSampleStreamDefinition("SAMPLE_STREAM_1"), createSampleStreamDefinition("SAMPLE_STREAM_2")));
     }

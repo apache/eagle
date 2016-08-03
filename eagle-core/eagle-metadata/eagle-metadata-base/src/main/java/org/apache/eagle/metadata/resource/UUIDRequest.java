@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,15 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metadata.service;
+package org.apache.eagle.metadata.resource;
 
-import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
-import org.apache.eagle.metadata.model.SiteEntity;
-import org.apache.eagle.metadata.persistence.PersistenceService;
 
-public interface SiteEntityService extends PersistenceService<SiteEntity>{
-    SiteEntity getBySiteId(String siteId) throws EntityNotFoundException;
-    SiteEntity deleteBySiteId(String siteId) throws EntityNotFoundException;
-    SiteEntity deleteByUUID(String uuid) throws EntityNotFoundException;
-    SiteEntity update(SiteEntity siteEntity) throws EntityNotFoundException;
+import java.io.Serializable;
+
+public class UUIDRequest implements Serializable{
+    private String uuid;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 }

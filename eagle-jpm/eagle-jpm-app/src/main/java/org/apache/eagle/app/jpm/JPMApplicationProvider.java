@@ -14,15 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metadata.service;
+package org.apache.eagle.app.jpm;
 
-import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
-import org.apache.eagle.metadata.model.SiteEntity;
-import org.apache.eagle.metadata.persistence.PersistenceService;
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
-public interface SiteEntityService extends PersistenceService<SiteEntity>{
-    SiteEntity getBySiteId(String siteId) throws EntityNotFoundException;
-    SiteEntity deleteBySiteId(String siteId) throws EntityNotFoundException;
-    SiteEntity deleteByUUID(String uuid) throws EntityNotFoundException;
-    SiteEntity update(SiteEntity siteEntity) throws EntityNotFoundException;
+/**
+ * Define application provider programmatically
+ */
+public class JPMApplicationProvider extends AbstractApplicationProvider<JPMApplication> {
+    public JPMApplicationProvider() {
+        super("/META-INF/apps/jpm/metadata.xml");
+    }
+
+    @Override
+    public JPMApplication getApplication() {
+        return new JPMApplication();
+    }
 }
