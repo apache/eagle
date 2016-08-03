@@ -58,8 +58,8 @@ public class ExecutionRuntimeManager {
 
     public <E extends Environment,P> ExecutionRuntime getRuntime(E environment) {
         Preconditions.checkNotNull(environment,"Failed to create execution runtime as environment is null");
-        if(executionRuntimeCache.containsKey(environment.getClass()))
-            return executionRuntimeCache.get(environment.getClass());
+        if(executionRuntimeCache.containsKey(environment))
+            return executionRuntimeCache.get(environment);
 
         if(executionRuntimeProviders.containsKey(environment.getClass())){
             ExecutionRuntime<E,P> runtime = ((ExecutionRuntimeProvider<E,P>)executionRuntimeProviders.get(environment.getClass())).get();
