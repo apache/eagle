@@ -38,6 +38,7 @@
         <module>eagle-jpm-entity</module>
         <module>eagle-hadoop-queue</module>
         <module>eagle-jpm-util</module>
+        <module>eagle-jpm-app</module>
   </modules>
 
     <dependencies>
