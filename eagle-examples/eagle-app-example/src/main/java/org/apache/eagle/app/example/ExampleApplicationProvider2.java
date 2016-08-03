@@ -27,13 +27,13 @@ import java.util.List;
 /**
  * Define application provider with metadata.xml
  */
-public class ExampleApplicationProvider2 extends AbstractApplicationProvider<ExampleApplication> {
+public class ExampleApplicationProvider2 extends AbstractApplicationProvider<ExampleStormApplication> {
     @Override
     protected void configure() {
         setType("EXAMPLE_APPLICATION_2");
         setName("Example Monitoring Application 2");
         setVersion("0.5.0-incubating");
-        setAppClass(ExampleApplication.class);
+        setAppClass(ExampleStormApplication.class);
         setViewPath("/apps/example2");
         setAppConfig("ExampleApplicationConf.xml");
         setStreams(Arrays.asList(createSampleStreamDefinition("SAMPLE_STREAM_1"), createSampleStreamDefinition("SAMPLE_STREAM_2")));
@@ -56,7 +56,7 @@ public class ExampleApplicationProvider2 extends AbstractApplicationProvider<Exa
     }
 
     @Override
-    public ExampleApplication getApplication() {
-        return new ExampleApplication();
+    public ExampleStormApplication getApplication() {
+        return new ExampleStormApplication();
     }
 }

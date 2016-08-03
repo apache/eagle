@@ -21,7 +21,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 public class StreamDesc {
     private String streamId;
     private StreamDefinition schema;
-    private StreamSinkDesc sink;
+    private StreamSinkConfig sink;
 
     public String getStreamId() {
         return streamId;
@@ -39,11 +39,11 @@ public class StreamDesc {
         this.schema = streamSchema;
     }
 
-    public StreamSinkDesc getSink() {
+    public StreamSinkConfig getSink() {
         return sink;
     }
 
-    public void setSink(StreamSinkDesc sinkDesc) {
+    public void setSink(StreamSinkConfig sinkDesc) {
         this.sink = sinkDesc;
     }
 }

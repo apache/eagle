@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,7 +17,20 @@
 package org.apache.eagle.server;
 
 public class ServerMain {
-    public static void main(String[] args) throws Exception {
-        new ServerApplication().run(args);
+    public static void main(String[] args) {
+        System.out.println(
+            "Welcome to Apache Eagle (Incubating)\n"+
+            "---------------"
+        );
+        System.out.println(
+            "Starting Eagle Server ..."
+        );
+        try {
+            new ServerApplication().run(args);
+        } catch (Exception e) {
+            System.err.println("Got exception: "+e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

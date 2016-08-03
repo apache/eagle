@@ -21,6 +21,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,7 +40,7 @@ public class ApplicationEntity extends PersistenceEntity {
 
     private Map<String,Object> configuration = new HashMap<>();
     private Map<String,String> context = new HashMap<>();
-    private Collection<StreamDesc> streams;
+    private List<StreamDesc> streams;
     private Mode mode = Mode.CLUSTER;
     private Status status = Status.INITIALIZED;
 
@@ -110,11 +111,11 @@ public class ApplicationEntity extends PersistenceEntity {
         this.status = status;
     }
 
-    public Collection<StreamDesc> getStreams() {
+    public List<StreamDesc> getStreams() {
         return streams;
     }
 
-    public void setStreams(Collection<StreamDesc> streams) {
+    public void setStreams(List<StreamDesc> streams) {
         this.streams = streams;
     }
 

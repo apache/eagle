@@ -35,7 +35,7 @@ public class ApplicationDesc implements Serializable {
     private Class<?> providerClass;
     private Configuration configuration;
     private List<StreamDefinition> streams;
-    private Class<?> sinkClass;
+//    private Class<?> sinkClass;
     private ApplicationDocs docs;
 
     public String getDescription() {
@@ -115,13 +115,13 @@ public class ApplicationDesc implements Serializable {
         this.configuration = configuration;
     }
 
-    public Class<?> getSinkClass() {
-        return sinkClass;
-    }
-
-    public void setSinkClass(Class<?> sinkClass) {
-        this.sinkClass = sinkClass;
-    }
+//    public Class<?> getSinkType() {
+//        return sinkClass;
+//    }
+//
+//    public void setSinkClass(Class<?> sinkClass) {
+//        this.sinkClass = sinkClass;
+//    }
 
     public List<StreamDefinition> getStreams() {
         return streams;

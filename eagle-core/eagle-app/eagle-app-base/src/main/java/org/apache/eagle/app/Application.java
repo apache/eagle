@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,25 +16,69 @@
  */
 package org.apache.eagle.app;
 
+import org.apache.eagle.app.environment.Environment;
+
+import java.io.Serializable;
+import java.util.Map;
+
 /**
  * Application Execution Interface
+ *
+ * <h1>Design Principle</h1>
+ * <ul>
+ *  <li>Easy to develop and extend </li>
+ *  <li>Easy to test and run locally</li>
+ *  <li>Easy to manage lifecycle through framework</li>
+ * </ul>
+ *
+ * @param <Proc>
+ * @param <Conf>
+ * @param <Env>
  */
-public interface Application {
+public interface Application <
+    Conf extends Configuration,     //  Application Configuration
+    Env extends Environment,        // Application Environment
+    Proc                            // Application Process
+> extends Serializable {
     /**
+     * Execute with type-safe configuration
      *
-     * @param context
+     * Developer-oriented interface
+     *
+     * @param config application configuration
+     * @param environment execution environment
+     * @return execution process
      */
-    void start(ApplicationContext context);
+    Proc execute(Conf config, Env environment);
 
     /**
+     * Execute with raw map-based configuration
      *
-     * @param context
+     * Management service oriented interface
+     *
+     * @param config application configuration
+     * @param environment  execution environment
+     * @return execution process
      */
-    void stop(ApplicationContext context);
+    Proc execute(Map<String,Object> config, Env environment);
 
     /**
-     * 
-     * @param context
+     * Execute with environment based configuration
+     *
+     * Light-weight Runner (dry-run/test purpose) oriented interface
+     *
+     * @param environment  execution environment
+     * @return execution process
      */
-    void status(ApplicationContext context);
+    Proc execute(Env environment);
+
+    /**
+     * @return application configuration type (POJO class)
+     */
+    Class<Conf> getConfigType();
+
+    /**
+     * @return application environment type
+     */
+    Class<? extends Env> getEnvironmentType();
 }

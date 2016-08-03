@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,26 +17,21 @@
 package org.apache.eagle.app.sink;
 
 import backtype.storm.task.TopologyContext;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.app.ApplicationContext;
+import org.apache.eagle.app.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class KafkaStreamSink extends AbstractStreamSink<KafkaStreamSinkDesc> {
+public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
     private String topicId;
 
     @Override
-    public KafkaStreamSinkDesc init(StreamDefinition streamDefinition, ApplicationContext context) {
-        this.topicId = String.format("EAGLE.%s.%s",
-                context.getAppEntity().getSite().getSiteId(),
-                streamDefinition.getStreamId()).toLowerCase();
-        KafkaStreamSinkDesc desc = new KafkaStreamSinkDesc();
-        desc.setTopicId(topicId);
-        return desc;
+    public void init(String streamId, KafkaStreamSinkConfig config) {
+        super.init(streamId, config);
+        this.topicId = config.getTopicId();
     }
 
     @Override
@@ -50,17 +45,8 @@ public class KafkaStreamSink extends AbstractStreamSink<KafkaStreamSinkDesc> {
         LOGGER.info("TODO: producing {} to '{}'",streamEvent,topicId);
     }
 
-//    @Override
-//    public Map<String, Object> getSink() {
-//        return new HashMap<String,Object>(){
-//            {
-//                put("kafka.topic",KafkaStreamSink.this.topicId);
-//            }
-//        };
-//    }
-
     @Override
-    public void onAppInstall() {
+    public void onInstall() {
         ensureTopicCreated();
     }
 
@@ -73,7 +59,24 @@ public class KafkaStreamSink extends AbstractStreamSink<KafkaStreamSinkDesc> {
     }
 
     @Override
-    public void onAppUninstall() {
+    public void onUninstall() {
         ensureTopicDeleted();
+    }
+
+    public static class Provider implements StreamSinkProvider<KafkaStreamSink,KafkaStreamSinkConfig> {
+        @Override
+        public KafkaStreamSinkConfig getSinkConfig(String streamId, Configuration appConfig) {
+            String topicId = String.format("EAGLE.%s.%s",
+                    appConfig.getSiteId(),
+                    streamId).toLowerCase();
+            KafkaStreamSinkConfig desc = new KafkaStreamSinkConfig();
+            desc.setTopicId(topicId);
+            return desc;
+        }
+
+        @Override
+        public KafkaStreamSink getSink() {
+            return new KafkaStreamSink();
+        }
     }
 }

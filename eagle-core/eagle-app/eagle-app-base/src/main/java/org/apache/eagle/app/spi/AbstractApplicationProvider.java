@@ -34,8 +34,6 @@ import java.util.List;
 
 public abstract class AbstractApplicationProvider<T extends Application> implements ApplicationProvider<T> {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractApplicationProvider.class);
-    private final static String APPLICATIONS_SINK_TYPE_PROPS_KEY = "application.sink.type";
-    private final static String DEFAULT_APPLICATIONS_SINK_TYPE = KafkaStreamSink.class.getCanonicalName();
     private final ApplicationDesc applicationDesc;
 
     public AbstractApplicationProvider(){
@@ -74,17 +72,17 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     @Override
     public void prepare(ApplicationProviderConfig providerConfig, Config envConfig) {
         this.applicationDesc.setJarPath(providerConfig.getJarPath());
-        String sinkClassName = envConfig.hasPath(APPLICATIONS_SINK_TYPE_PROPS_KEY) ?
-                envConfig.getString(APPLICATIONS_SINK_TYPE_PROPS_KEY) : DEFAULT_APPLICATIONS_SINK_TYPE;
-        try {
-            Class<?> sinkClass = Class.forName(sinkClassName);
-            if(!StreamSink.class.isAssignableFrom(sinkClass)){
-                throw new IllegalStateException(sinkClassName+ "is not assignable from "+StreamSink.class.getCanonicalName());
-            }
-            applicationDesc.setSinkClass(sinkClass);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(e.getMessage(),e.getCause());
-        }
+//        String sinkClassName = envConfig.hasPath(APPLICATIONS_SINK_TYPE_PROPS_KEY) ?
+//                envConfig.getString(APPLICATIONS_SINK_TYPE_PROPS_KEY) : DEFAULT_APPLICATIONS_SINK_TYPE;
+//        try {
+//            Class<?> sinkClass = Class.forName(sinkClassName);
+//            if(!StreamSink.class.isAssignableFrom(sinkClass)){
+//                throw new IllegalStateException(sinkClassName+ "is not assignable from "+StreamSink.class.getCanonicalName());
+//            }
+//            applicationDesc.setSinkClass(sinkClass);
+//        } catch (ClassNotFoundException e) {
+//            throw new IllegalStateException(e.getMessage(),e.getCause());
+//        }
     }
 
     protected void setVersion(String version) {
