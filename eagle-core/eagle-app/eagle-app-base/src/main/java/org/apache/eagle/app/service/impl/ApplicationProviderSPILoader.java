@@ -44,7 +44,6 @@ public class ApplicationProviderSPILoader extends ApplicationProviderLoader{
         }
 
         LOG.info("Using {}: {}",APPLICATIONS_DIR_PROPS_KEY,this.appProviderExtDir);
-
     }
 
     @Override
