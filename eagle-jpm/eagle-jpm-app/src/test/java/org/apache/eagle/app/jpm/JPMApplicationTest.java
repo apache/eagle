@@ -20,7 +20,6 @@ import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.test.AppUnitTestRunner;
-import org.apache.eagle.app.test.ApplicationSimulator;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;

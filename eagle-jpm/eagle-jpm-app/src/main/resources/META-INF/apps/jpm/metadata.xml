@@ -17,7 +17,7 @@
   -->
 
 <application>
-    <type>JPM</type>
+    <type>JPM_APP</type>
     <name>Job Performance Monitoring Application</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.app.jpm.JPMApplication</appClass>
