@@ -22,4 +22,5 @@ package org.apache.eagle.common.agg;
 public class Agg {
     String field;
     String function;
+    String alias;
 }

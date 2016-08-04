@@ -16,12 +16,16 @@
  */
 package org.apache.eagle.common.agg;
 
+import java.util.List;
+
 /**
  * Since 8/3/16.
  */
-public class TimeBatchAggSpec {
-    long batchSize;
-    long offset;
+public class TimeBatchWindowSpec {
     Groupby groupby;
-    Agg agg;
+    List<Agg> aggs;
+    String filter;
+    String timestampColumn;
+    String windowDuration;
+    long start;
 }
