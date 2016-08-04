@@ -49,7 +49,10 @@
 		this.dependencies = dependencies;
 		this.queueList = [];
 		this.routeList = [];
-		this.requireList = [];
+
+		this.requireRest = 0;
+		this.requireDeferred = null;
+
 		return this;
 	}
 
@@ -96,6 +99,12 @@
 
 	Module.prototype.require = function (scriptURL) {
 		var _this = this;
+
+		_this.requireRest += 1;
+		if(!_this.requireDeferred) {
+			_this.requireDeferred = $.Deferred();
+		}
+
 		setTimeout(function () {
 			$.getScript(_this.baseURL + "/" + scriptURL).then(function () {
 				if(_hookRequireFunc) {
@@ -105,36 +114,62 @@
 				}
 			}).always(function () {
 				_hookRequireFunc = null;
+				_this.requireRest -= 1;
+				_this.requireCheck();
 			});
 		}, 0);
 	};
 
-	Module.prototype.create = function (moduleName, path) {
+	Module.prototype.requireCheck = function () {
+		if(this.requireRest === 0) {
+			this.requireDeferred.resolve();
+		}
+	};
+
+	/**
+	 * Get module instance. Will init angular module.
+	 * @param {string} moduleName	angular module name
+	 */
+	Module.prototype.getInstance = function (moduleName) {
+		var _this = this;
+		var deferred = $.Deferred();
 		var module = angular.module(moduleName, this.dependencies);
-		$.each(this.queueList, function (i, item) {
-			var type = item.type;
-			var args = Array.prototype.slice.apply(item.args);
-			if(type === "controller") {
-				args[0] = moduleName + "_" + args[0];
-			}
-			module[type].apply(module, args);
+
+		// Required list
+		$.when(this.requireDeferred).always(function () {
+			// Fill module props
+			$.each(_this.queueList, function (i, item) {
+				var type = item.type;
+				var args = Array.prototype.slice.apply(item.args);
+				if (type === "controller") {
+					args[0] = moduleName + "_" + args[0];
+				}
+				module[type].apply(module, args);
+			});
+
+			// Render routes
+			var routeList = $.map(_this.routeList, function (route) {
+				var config = route.config = $.extend({}, route.config);
+
+				// Parse template url
+				var parser = document.createElement('a');
+				parser.href = _this.baseURL + "/" + config.templateUrl;
+				parser.search = parser.search ? parser.search + "&_=" + window._TRS() : "?_=" + window._TRS();
+				config.templateUrl = parser.href;
+
+				if (typeof config.controller === "string") {
+					config.controller = moduleName + "_" + config.controller;
+				}
+
+				return route;
+			});
+
+			deferred.resolve({
+				routeList: routeList
+			});
 		});
 
-		return $.map(this.routeList, function (route) {
-			var config = route.config = $.extend({}, route.config);
-
-			// Parse template url
-			var parser = document.createElement('a');
-			parser.href = path + "/" + config.templateUrl;
-			parser.search = parser.search ? parser.search + "&_=" + window._TRS() : "?_=" + window._TRS();
-			config.templateUrl = parser.href;
-
-			if(typeof config.controller === "string") {
-				config.controller = moduleName + "_" + config.controller;
-			}
-
-			return route;
-		});
+		return deferred;
 	};
 
 	window.register = function (dependencies) {
@@ -162,38 +197,39 @@
 			 * @param {string} oriApp.viewPath		path of application interface
 			 */
 			var promiseList = $.map(res.data || [], function (oriApp) {
-				var promise = $.Deferred();
+				var deferred = $.Deferred();
 				var url = oriApp.viewPath;
 
 				if(url) {
 					url = url.replace(/^[\\\/]/, "").replace(/[\\\/]$/, "");
 
 					$.getScript(url + "/index.js").then(function () {
-						var appRouteList = [];
 						if(_lastRegisterApp) {
-							appRouteList = _lastRegisterApp.create(oriApp.type, url);
 							_lastRegisterApp.baseURL = url;
-							routeList = routeList.concat(appRouteList);
+							_lastRegisterApp.getInstance(oriApp.type).then(function (module) {
+								routeList = routeList.concat(module.routeList);
+								deferred.resolve();
+							});
 							_registerAppList.push(oriApp.type);
 						} else {
 							console.error("Application not register:", oriApp.type);
+							deferred.reject();
 						}
 					}, function () {
 						console.error("Load application failed:", oriApp.type);
+						deferred.reject();
 					}).always(function () {
 						_lastRegisterApp = null;
-						promise.resolve();
 					});
 				} else {
 					console.error("Path not config:", oriApp.type);
-					promise.resolve();
+					deferred.reject();
 				}
 
-				return promise;
+				return deferred;
 			});
 
-			common.deferred.all(promiseList);
-			$.when.apply($, promiseList).always(function () {
+			common.deferred.all(promiseList).always(function () {
 				$(document).trigger("APPLICATION_READY", {
 					appList: _registerAppList,
 					routeList: routeList

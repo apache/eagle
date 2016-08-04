@@ -176,12 +176,17 @@
 		}
 
 		$.each(deferredList, function (i, deferred) {
-			deferred.then(function (data) {
-				successList[i] = data;
-				hasFailure = true;
-			}, function (data) {
-				failureList[i] = data;
-			}).always(doCheck);
+			if(deferred && deferred.then) {
+				deferred.then(function (data) {
+					successList[i] = data;
+					hasFailure = true;
+				}, function (data) {
+					failureList[i] = data;
+				}).always(doCheck);
+			} else {
+				successList[i] = deferred;
+				doCheck();
+			}
 		});
 
 		return deferred;

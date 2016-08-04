@@ -29,4 +29,5 @@
 	});
 
 	jpmApp.require("ctrl/listCtrl.js");
+	jpmApp.require("ctrl/detailCtrl.js");
 })();
