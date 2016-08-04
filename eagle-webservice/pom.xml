@@ -17,7 +17,7 @@
 	<parent>
 		<groupId>org.apache.eagle</groupId>
 		<artifactId>eagle-parent</artifactId>
-		<version>0.4.0-incubating</version>
+		<version>0.4.1-incubating-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>eagle-webservice</artifactId>
