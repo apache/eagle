@@ -93,11 +93,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-metadata-base</artifactId>
-            <version>0.5.0-incubating-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>compile</scope>

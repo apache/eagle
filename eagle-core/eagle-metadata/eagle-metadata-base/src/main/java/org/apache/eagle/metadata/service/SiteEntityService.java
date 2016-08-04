@@ -23,5 +23,6 @@ import org.apache.eagle.metadata.persistence.PersistenceService;
 public interface SiteEntityService extends PersistenceService<SiteEntity>{
     SiteEntity getBySiteId(String siteId) throws EntityNotFoundException;
     SiteEntity deleteBySiteId(String siteId) throws EntityNotFoundException;
+    SiteEntity deleteByUUID(String uuid) throws EntityNotFoundException;
     SiteEntity update(SiteEntity siteEntity) throws EntityNotFoundException;
 }

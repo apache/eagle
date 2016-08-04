@@ -72,6 +72,11 @@ public class SiteEntityEntityServiceMemoryImpl implements SiteEntityService {
     }
 
     @Override
+    public SiteEntity deleteByUUID(String uuid) throws EntityNotFoundException {
+        return siteId2EntityMap.remove(getByUUID(uuid).getSiteId());
+    }
+
+    @Override
     public SiteEntity update(SiteEntity siteEntity) throws EntityNotFoundException {
         if(siteEntity.getSiteId() == null && siteEntity.getUuid() == null){
             throw new IllegalArgumentException("siteId and UUID are both null, don't know how to update");

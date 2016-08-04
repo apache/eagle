@@ -28,6 +28,6 @@ public class AppTestGuiceModule extends AbstractModule{
         install(new CommonGuiceModule());
         install(new ApplicationGuiceModule());
         install(new MemoryMetadataStore());
-        bind(ApplicationSimulator.class).to(AppSimulatorImpl.class).in(Singleton.class);
+        bind(ServerSimulator.class).to(ServerSimulatorImpl.class).in(Singleton.class);
     }
 }

@@ -56,7 +56,11 @@ public abstract class ApplicationProviderLoader {
     }
 
     public ApplicationProvider<?> getApplicationProviderByType(String type) {
-        return providers.get(type);
+        if(providers.containsKey(type)) {
+            return providers.get(type);
+        }else{
+            throw new IllegalArgumentException("Unknown Application Type: "+type);
+        }
     }
 
     public void reset(){
