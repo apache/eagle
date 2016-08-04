@@ -20,7 +20,7 @@
     <type>TEST_APPLICATION</type>
     <name>Test Monitoring Application</name>
     <version>0.5.0-incubating</version>
-    <appClass>org.apache.eagle.app.TestStormAppImpl</appClass>
+    <appClass>org.apache.eagle.app.TestStormApplication</appClass>
     <viewPath>/apps/example</viewPath>
     <configuration>
         <property>

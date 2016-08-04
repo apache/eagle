@@ -71,6 +71,6 @@ public class MockStormApplicationTest {
         appConfig.setLoaded(true);
         appConfig.setSpoutNum(4);
         new MockStormApplication().run(appConfig);
-        Thread.sleep(Long.MAX_VALUE);
+//        Thread.sleep(Long.MAX_VALUE);
     }
 }
