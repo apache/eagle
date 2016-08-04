@@ -72,17 +72,6 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     @Override
     public void prepare(ApplicationProviderConfig providerConfig, Config envConfig) {
         this.applicationDesc.setJarPath(providerConfig.getJarPath());
-//        String sinkClassName = envConfig.hasPath(APPLICATIONS_SINK_TYPE_PROPS_KEY) ?
-//                envConfig.getString(APPLICATIONS_SINK_TYPE_PROPS_KEY) : DEFAULT_APPLICATIONS_SINK_TYPE;
-//        try {
-//            Class<?> sinkClass = Class.forName(sinkClassName);
-//            if(!StreamSink.class.isAssignableFrom(sinkClass)){
-//                throw new IllegalStateException(sinkClassName+ "is not assignable from "+StreamSink.class.getCanonicalName());
-//            }
-//            applicationDesc.setSinkClass(sinkClass);
-//        } catch (ClassNotFoundException e) {
-//            throw new IllegalStateException(e.getMessage(),e.getCause());
-//        }
     }
 
     protected void setVersion(String version) {
