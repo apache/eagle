@@ -42,6 +42,7 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
 import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.eagle.alert.utils.StreamIdConversion;
 import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Test;
@@ -77,9 +78,8 @@ public class TestStreamRouterBolt {
     @Test
     public void testRouterWithSortAndRouteSpec() throws Exception{
         Config config = ConfigFactory.load();
-        StreamRouterImpl routerImpl = new StreamRouterImpl("testStreamRouterImpl");
         MockChangeService mockChangeService = new MockChangeService();
-        StreamRouterBolt bolt = new StreamRouterBolt(routerImpl, config, mockChangeService);
+        StreamRouterBolt routerBolt = new StreamRouterBolt("routerBolt1", config, mockChangeService);
 
         final Map<String,List<PartitionedEvent>> streamCollected = new HashMap<>();
         final List<PartitionedEvent> orderCollected = new ArrayList<>();
@@ -90,7 +90,7 @@ public class TestStreamRouterBolt {
             public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
                 PartitionedEvent event;
                 try {
-                    event = bolt.deserialize(tuple.get(0));
+                    event = routerBolt.deserialize(tuple.get(0));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -120,7 +120,7 @@ public class TestStreamRouterBolt {
         Map stormConf = new HashMap<>();
         TopologyContext topologyContext = mock(TopologyContext.class);
         when(topologyContext.registerMetric(any(String.class), any(MultiCountMetric.class), any(int.class))).thenReturn(new MultiCountMetric());
-        bolt.prepare(stormConf, topologyContext, collector);
+        routerBolt.prepare(stormConf, topologyContext, collector);
 
         String streamId = "cpuUsageStream";
         // StreamPartition, groupby col1 for stream cpuUsageStream
@@ -147,6 +147,7 @@ public class TestStreamRouterBolt {
         queue.setWorkers(Arrays.asList(new WorkSlot("testTopology","alertBolt1"), new WorkSlot("testTopology","alertBolt2")));
         routerSpec.setTargetQueue(Collections.singletonList(queue));
         boltSpec.addRouterSpec(routerSpec);
+        boltSpec.setVersion("version1");
 
         // construct StreamDefinition
         StreamDefinition schema = new StreamDefinition();
@@ -158,8 +159,8 @@ public class TestStreamRouterBolt {
         Map<String, StreamDefinition> sds = new HashMap<>();
         sds.put(schema.getStreamId(), schema);
 
-        bolt.declareOutputStreams(Arrays.asList("alertBolt1", "alertBolt2"));
-        bolt.onStreamRouteBoltSpecChange(boltSpec, sds);
+        routerBolt.declareOutputStreams(Arrays.asList("alertBolt1", "alertBolt2"));
+        routerBolt.onStreamRouteBoltSpecChange(boltSpec, sds);
         GeneralTopologyContext context = mock(GeneralTopologyContext.class);
         int taskId = 1;
         when(context.getComponentId(taskId)).thenReturn("comp1");
@@ -185,7 +186,7 @@ public class TestStreamRouterBolt {
         pEvent.setEvent(event);
         pEvent.setPartition(sp);
         Tuple input = new TupleImpl(context, Collections.singletonList(pEvent), taskId, "default");
-        bolt.execute(input);
+        routerBolt.execute(input);
 
         // construct another event with "value2"
         event = new StreamEvent();
@@ -197,7 +198,7 @@ public class TestStreamRouterBolt {
         pEvent.setPartition(sp);
         pEvent.setEvent(event);
         input = new TupleImpl(context, Collections.singletonList(pEvent), taskId, "default");
-        bolt.execute(input);
+        routerBolt.execute(input);
 
         // construct another event with "value3"
         event = new StreamEvent();
@@ -209,7 +210,7 @@ public class TestStreamRouterBolt {
         pEvent.setPartition(sp);
         pEvent.setEvent(event);
         input = new TupleImpl(context, Collections.singletonList(pEvent), taskId, "default");
-        bolt.execute(input);
+        routerBolt.execute(input);
 
         // construct another event with "value4"
         event = new StreamEvent();
@@ -221,7 +222,7 @@ public class TestStreamRouterBolt {
         pEvent.setPartition(sp);
         pEvent.setEvent(event);
         input = new TupleImpl(context, Collections.singletonList(pEvent), taskId, "default");
-        bolt.execute(input);
+        routerBolt.execute(input);
 
         // construct another event with "value5", which will be thrown because two late
         event = new StreamEvent();
@@ -233,18 +234,20 @@ public class TestStreamRouterBolt {
         pEvent.setPartition(sp);
         pEvent.setEvent(event);
         input = new TupleImpl(context, Collections.singletonList(pEvent), taskId, "default");
-        bolt.execute(input);
+        routerBolt.execute(input);
 
         Assert.assertEquals("Should finally collect two streams",2,streamCollected.size());
-        Assert.assertTrue("Should collect stream stream_testStreamRouterImpl_to_alertBolt1",streamCollected.keySet().contains("stream_testStreamRouterImpl_to_alertBolt1"));
-        Assert.assertTrue("Should collect stream stream_testStreamRouterImpl_to_alertBolt2",streamCollected.keySet().contains("stream_testStreamRouterImpl_to_alertBolt2"));
+        Assert.assertTrue("Should collect stream stream_routerBolt_to_alertBolt1",streamCollected.keySet().contains(
+                String.format(StreamIdConversion.generateStreamIdBetween(routerBolt.getBoltId(), "alertBolt1"))));
+        Assert.assertTrue("Should collect stream stream_routerBolt_to_alertBolt2",streamCollected.keySet().contains(
+                String.format(StreamIdConversion.generateStreamIdBetween(routerBolt.getBoltId(), "alertBolt2"))));
 
         Assert.assertEquals("Should finally collect 3 events",3,orderCollected.size());
         Assert.assertArrayEquals("Should sort 3 events in ASC order",new String[]{"value2","value1","value3"},orderCollected.stream().map((d)->d.getData()[0]).toArray());
 
         // The first 3 events are ticked automatically by window
 
-        bolt.cleanup();
+        routerBolt.cleanup();
 
         // Close will flush all events in memory, so will receive the last event which is still in memory as window is not expired according to clock
         // The 5th event will be thrown because too late and out of margin

@@ -16,18 +16,47 @@
  */
 package org.apache.eagle.app.example;
 
+import org.apache.eagle.alert.engine.coordinator.StreamColumn;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Define application provider with metadata.xml
  */
-public class ExampleApplicationProvider2 extends AbstractApplicationProvider<ExampleApplication> {
-    public ExampleApplicationProvider2() {
-        super("/META-INF/apps/example/metadata.xml");
+public class ExampleApplicationProvider2 extends AbstractApplicationProvider<ExampleStormApplication> {
+    @Override
+    protected void configure() {
+        setType("EXAMPLE_APPLICATION_2");
+        setName("Example Monitoring Application 2");
+        setVersion("0.5.0-incubating");
+        setAppClass(ExampleStormApplication.class);
+        setViewPath("/apps/example2");
+        setAppConfig("ExampleApplicationConf.xml");
+        setStreams(Arrays.asList(createSampleStreamDefinition("SAMPLE_STREAM_1"), createSampleStreamDefinition("SAMPLE_STREAM_2")));
+    }
+
+    private static StreamDefinition createSampleStreamDefinition(String streamId){
+        StreamDefinition sampleStreamDefinition = new StreamDefinition();
+        sampleStreamDefinition.setStreamId(streamId);
+        sampleStreamDefinition.setTimeseries(true);
+        sampleStreamDefinition.setValidate(true);
+        sampleStreamDefinition.setDescription("Auto generated sample Schema for "+streamId);
+        List<StreamColumn> streamColumns = new ArrayList<>();
+
+        streamColumns.add(new StreamColumn.Builder().name("metric").type(StreamColumn.Type.STRING).build());
+        streamColumns.add(new StreamColumn.Builder().name("source").type(StreamColumn.Type.STRING).build());
+        streamColumns.add(new StreamColumn.Builder().name("timestamp").type(StreamColumn.Type.LONG).build());
+        streamColumns.add(new StreamColumn.Builder().name("value").type(StreamColumn.Type.DOUBLE).build());
+        sampleStreamDefinition.setColumns(streamColumns);
+        return sampleStreamDefinition;
     }
 
     @Override
-    public ExampleApplication getApplication() {
-        return new ExampleApplication();
+    public ExampleStormApplication getApplication() {
+        return new ExampleStormApplication();
     }
 }

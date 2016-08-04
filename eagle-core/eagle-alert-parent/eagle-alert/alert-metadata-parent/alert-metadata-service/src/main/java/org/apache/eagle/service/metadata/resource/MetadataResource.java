@@ -54,6 +54,10 @@ public class MetadataResource {
 //    private IMetadataDao dao = MetadataDaoFactory.getInstance().getMetadataDao();
     private final IMetadataDao dao;
 
+    public MetadataResource(){
+        this.dao = MetadataDaoFactory.getInstance().getMetadataDao();;
+    }
+
     @Inject
     public MetadataResource(IMetadataDao dao){
         this.dao = dao;

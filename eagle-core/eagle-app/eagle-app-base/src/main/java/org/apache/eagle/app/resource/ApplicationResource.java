@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -23,6 +23,7 @@ import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.resource.RESTResponse;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 import javax.ws.rs.*;
@@ -48,41 +49,45 @@ public class ApplicationResource {
     @GET
     @Path("/providers")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ApplicationDesc> getApplicationDescs(){
-        return providerService.getApplicationDescs();
+    public RESTResponse<Collection<ApplicationDesc>> getApplicationDescs(){
+        return RESTResponse.async(providerService::getApplicationDescs).get();
     }
 
     @GET
     @Path("/providers/{type}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationDesc getApplicationDescs(@PathParam("type") String type){
-        return providerService.getApplicationDescByType(type);
+    public RESTResponse<ApplicationDesc> getApplicationDescByType(@PathParam("type") String type){
+        return RESTResponse.async(()->providerService.getApplicationDescByType(type)).get();
     }
 
     @PUT
     @Path("/providers/reload")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ApplicationDesc> reloadApplicationDescs(){
-        providerService.reload();
-        return providerService.getApplicationDescs();
+    public RESTResponse<Collection<ApplicationDesc>> reloadApplicationDescs(){
+        return RESTResponse.<Collection<ApplicationDesc>>async((response)-> {
+            providerService.reload();
+            response.message("Successfully reload application providers");
+            response.data(providerService.getApplicationDescs());
+        }).get();
     }
 
     @GET
-    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ApplicationEntity> getApplicationEntities(@QueryParam("siteId") String siteId){
-        if(siteId == null) {
-            return entityService.findAll();
-        } else {
-            return entityService.findBySiteId(siteId);
-        }
+    public RESTResponse<Collection<ApplicationEntity>> getApplicationEntities(@QueryParam("siteId") String siteId){
+        return RESTResponse.async(()-> {
+            if (siteId == null) {
+                return entityService.findAll();
+            } else {
+                return entityService.findBySiteId(siteId);
+            }
+        }).get();
     }
 
     @GET
     @Path("/{appUuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity getApplicationEntityByUUID(@PathParam("appUuid") String appUuid){
-        return entityService.getByUUID(appUuid);
+    public RESTResponse<ApplicationEntity> getApplicationEntityByUUID(@PathParam("appUuid") String appUuid){
+        return RESTResponse.async(()->entityService.getByUUID(appUuid)).get();
     }
 
     /**
@@ -97,8 +102,12 @@ public class ApplicationResource {
     @Path("/install")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity installApplication(ApplicationOperations.InstallOperation operation){
-        return applicationManagementService.install(operation);
+    public RESTResponse<ApplicationEntity> installApplication(ApplicationOperations.InstallOperation operation){
+        return RESTResponse.<ApplicationEntity>async((response)-> {
+            ApplicationEntity entity = applicationManagementService.install(operation);
+            response.message("Successfully installed application "+operation.getAppType()+" onto site "+operation.getSiteId());
+            response.data(entity);
+        }).get();
     }
 
     /**
@@ -115,8 +124,11 @@ public class ApplicationResource {
     @Path("/uninstall")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity uninstallApplication(ApplicationOperations.UninstallOperation operation){
-        return applicationManagementService.uninstall(operation);
+    public RESTResponse<Void> uninstallApplication(ApplicationOperations.UninstallOperation operation){
+        return RESTResponse.<Void>async((response)-> {
+            ApplicationEntity entity = applicationManagementService.uninstall(operation);
+            response.success(true).message("Successfully uninstalled application "+entity.getUuid());
+        }).get();
     }
 
     /**
@@ -132,8 +144,11 @@ public class ApplicationResource {
     @Path("/start")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity startApplication(ApplicationOperations.StartOperation operation){
-        return applicationManagementService.start(operation);
+    public RESTResponse<Void> startApplication(ApplicationOperations.StartOperation operation){
+        return RESTResponse.<Void>async((response)-> {
+            ApplicationEntity entity = applicationManagementService.start(operation);
+            response.success(true).message("Successfully started application "+entity.getUuid());
+        }).get();
     }
 
     /**
@@ -149,7 +164,10 @@ public class ApplicationResource {
     @Path("/stop")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApplicationEntity stopApplication(ApplicationOperations.StopOperation operation){
-        return applicationManagementService.stop(operation);
+    public RESTResponse<Void> stopApplication(ApplicationOperations.StopOperation operation){
+        return RESTResponse.<Void>async((response)-> {
+            ApplicationEntity entity = applicationManagementService.stop(operation);
+            response.success(true).message("Successfully stopped application "+entity.getUuid());
+        }).get();
     }
 }

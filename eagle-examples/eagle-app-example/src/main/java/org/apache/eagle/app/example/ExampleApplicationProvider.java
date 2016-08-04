@@ -16,47 +16,18 @@
  */
 package org.apache.eagle.app.example;
 
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Define application provider programmatically
  */
-public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleApplication> {
-    @Override
-    protected void configure() {
-        setType("EXAMPLE_APPLICATION");
-        setName("Example Monitoring Application");
-        setVersion("0.5.0-incubating");
-        setAppClass(ExampleApplication.class);
-        setViewPath("/apps/example");
-        setAppConfig("ExampleApplicationConf.xml");
-        setStreams(Arrays.asList(createSampleStreamDefinition("SAMPLE_STREAM_1"), createSampleStreamDefinition("SAMPLE_STREAM_2")));
-    }
-
-    private static StreamDefinition createSampleStreamDefinition(String streamId){
-        StreamDefinition sampleStreamDefinition = new StreamDefinition();
-        sampleStreamDefinition.setStreamId(streamId);
-        sampleStreamDefinition.setTimeseries(true);
-        sampleStreamDefinition.setValidate(true);
-        sampleStreamDefinition.setDescription("Auto generated sample Schema for "+streamId);
-        List<StreamColumn> streamColumns = new ArrayList<>();
-
-        streamColumns.add(new StreamColumn.Builder().name("metric").type(StreamColumn.Type.STRING).build());
-        streamColumns.add(new StreamColumn.Builder().name("source").type(StreamColumn.Type.STRING).build());
-        streamColumns.add(new StreamColumn.Builder().name("timestamp").type(StreamColumn.Type.LONG).build());
-        streamColumns.add(new StreamColumn.Builder().name("value").type(StreamColumn.Type.DOUBLE).build());
-        sampleStreamDefinition.setColumns(streamColumns);
-        return sampleStreamDefinition;
+public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleStormApplication> {
+    public ExampleApplicationProvider() {
+        super("/META-INF/apps/example/metadata.xml");
     }
 
     @Override
-    public ExampleApplication getApplication() {
-        return new ExampleApplication();
+    public ExampleStormApplication getApplication() {
+        return new ExampleStormApplication();
     }
 }

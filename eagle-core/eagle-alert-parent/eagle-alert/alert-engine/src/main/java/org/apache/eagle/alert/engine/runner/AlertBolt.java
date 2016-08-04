@@ -31,6 +31,7 @@ import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.evaluator.PolicyGroupEvaluator;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorWrapper;
+import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
@@ -61,26 +62,12 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     // mapping from policy name to PolicyDefinition
     private volatile Map<String, PolicyDefinition> cachedPolicies = new HashMap<>(); // for one streamGroup, there are multiple policies
 
-    private StreamContext streamContext;
-    private volatile Map<String, StreamDefinition> sdf  = new HashMap<String, StreamDefinition>();
-    private PartitionedEventSerializer serializer;
-    private volatile String specVersion = "Not Initialized";
 
-    public AlertBolt(String boltId, PolicyGroupEvaluator policyGroupEvaluator, Config config, IMetadataChangeNotifyService changeNotifyService){
-        super(changeNotifyService, config);
+    public AlertBolt(String boltId, Config config, IMetadataChangeNotifyService changeNotifyService){
+        super(boltId, changeNotifyService, config);
         this.boltId = boltId;
-        this.policyGroupEvaluator = policyGroupEvaluator;
-    }
-
-    PartitionedEvent deserialize(Object object) throws IOException {
-        // byte[] in higher priority
-        if(object instanceof byte[]) {
-            return serializer.deserialize((byte[]) object);
-        } else if (object instanceof PartitionedEvent){
-            return (PartitionedEvent) object;
-        } else {
-            throw new IllegalStateException(String.format("Unsupported event class '%s', expect byte array or PartitionedEvent!", object == null ? null : object.getClass().getCanonicalName()));
-        }
+        this.policyGroupEvaluator = new PolicyGroupEvaluatorImpl(boltId + "-evaluator_stage1"); // use bolt id as evaluatorId.
+        // TODO next stage evaluator
     }
 
     @Override
@@ -108,7 +95,6 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         // instantiate output lock object
         outputLock = new Object();
         streamContext = new StreamContextImpl(config,context.registerMetric("eagle.evaluator",new MultiCountMetric(),60),context);
-        serializer = Serializers.newPartitionedEventSerializer(this);
         alertOutputCollector = new AlertBoltOutputCollectorWrapper(collector, outputLock,streamContext);
         policyGroupEvaluator.init(streamContext, alertOutputCollector);
         metadataChangeNotifyService.registerListener(this);
@@ -149,16 +135,4 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         specVersion = spec.getVersion();
     }
 
-    @Override
-    public StreamDefinition getStreamDefinition(String streamId) throws StreamDefinitionNotFoundException {
-        if (sdf.containsKey(streamId)) {
-            return sdf.get(streamId);
-        } else {
-            throw new StreamDefinitionNotFoundException(streamId, specVersion);
-        }
-    }
-
-    public String getBoltId() {
-        return boltId;
-    }
 }

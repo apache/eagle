@@ -19,20 +19,6 @@
 
 package org.apache.eagle.alert.engine.runner;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
-import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
-import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
-import org.apache.eagle.alert.engine.spout.CorrelationSpout;
-import org.apache.eagle.alert.utils.AlertConstants;
-import org.apache.eagle.alert.utils.StreamIdConversion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.StormTopology;
@@ -40,9 +26,18 @@ import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigRenderOptions;
+import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
+import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
+import org.apache.eagle.alert.engine.spout.CorrelationSpout;
+import org.apache.eagle.alert.utils.AlertConstants;
+import org.apache.eagle.alert.utils.StreamIdConversion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * By default
@@ -86,11 +81,8 @@ public class UnitTopologyRunner {
                               int numOfPublishTasks,
                               Config config) {
 
-        StreamRouterImpl[] routers = new StreamRouterImpl[numOfRouterBolts];
         StreamRouterBolt[] routerBolts = new StreamRouterBolt[numOfRouterBolts];
-        PolicyGroupEvaluatorImpl[] evaluators = new PolicyGroupEvaluatorImpl[numOfAlertBolts];
         AlertBolt[] alertBolts = new AlertBolt[numOfAlertBolts];
-        AlertPublisherImpl publisher;
         AlertPublisherBolt publisherBolt;
 
         TopologyBuilder builder = new TopologyBuilder();
@@ -102,19 +94,16 @@ public class UnitTopologyRunner {
 
         // construct StreamRouterBolt objects
         for(int i=0; i<numOfRouterBolts; i++){
-            routers[i] = new StreamRouterImpl(streamRouterBoltNamePrefix + i);
-            routerBolts[i] = new StreamRouterBolt(routers[i], config, getMetadataChangeNotifyService());
+            routerBolts[i] = new StreamRouterBolt(streamRouterBoltNamePrefix + i, config, getMetadataChangeNotifyService());
         }
 
         // construct AlertBolt objects
         for(int i=0; i<numOfAlertBolts; i++){
-            evaluators[i] = new PolicyGroupEvaluatorImpl(alertBoltNamePrefix + i);
-            alertBolts[i] = new AlertBolt(alertBoltNamePrefix+i, evaluators[i], config, getMetadataChangeNotifyService());
+            alertBolts[i] = new AlertBolt(alertBoltNamePrefix+i, config, getMetadataChangeNotifyService());
         }
 
         // construct AlertPublishBolt object
-        publisher = new AlertPublisherImpl(alertPublishBoltName);
-        publisherBolt = new AlertPublisherBolt(publisher, config, getMetadataChangeNotifyService());
+        publisherBolt = new AlertPublisherBolt(alertPublishBoltName, config, getMetadataChangeNotifyService());
 
         // connect spout and router bolt, also define output streams for downstreaming alert bolt
         for(int i=0; i<numOfRouterBolts; i++){
