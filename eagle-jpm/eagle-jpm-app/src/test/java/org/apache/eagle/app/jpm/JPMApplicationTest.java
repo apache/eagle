@@ -31,7 +31,8 @@ import org.junit.runner.RunWith;
 public class JPMApplicationTest {
     @Inject
     private SiteResource siteResource;
-    @Inject private ApplicationResource applicationResource;
+    @Inject
+    private ApplicationResource applicationResource;
 
     /**
      * register site
