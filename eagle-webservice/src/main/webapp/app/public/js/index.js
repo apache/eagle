@@ -41,11 +41,15 @@
 	// =                                      Register                                      =
 	// ======================================================================================
 	var _moduleStateId = 0;
+	var _registerAppList = [];
+	var _lastRegisterApp = null;
+	var _hookRequireFunc = null;
 
 	function Module(dependencies) {
 		this.dependencies = dependencies;
 		this.queueList = [];
 		this.routeList = [];
+		this.requireList = [];
 		return this;
 	}
 
@@ -56,12 +60,15 @@
 
 	Module.prototype.service = function () {
 		this.queueList.push({type: "service", args: arguments});
+		return this;
 	};
 	Module.prototype.directive = function () {
 		this.queueList.push({type: "directive", args: arguments});
+		return this;
 	};
 	Module.prototype.controller = function () {
 		this.queueList.push({type: "controller", args: arguments});
+		return this;
 	};
 
 	/**
@@ -84,7 +91,24 @@
 			state: state,
 			config: config
 		});
+		return this;
 	};
+
+	Module.prototype.require = function (scriptURL) {
+		var _this = this;
+		setTimeout(function () {
+			$.getScript(_this.baseURL + "/" + scriptURL).then(function () {
+				if(_hookRequireFunc) {
+					_hookRequireFunc(_this);
+				} else {
+					console.error("Hook function not set!", _this);
+				}
+			}).always(function () {
+				_hookRequireFunc = null;
+			});
+		}, 0);
+	};
+
 	Module.prototype.create = function (moduleName, path) {
 		var module = angular.module(moduleName, this.dependencies);
 		$.each(this.queueList, function (i, item) {
@@ -113,10 +137,14 @@
 		});
 	};
 
-	var _registerAppList = [];
-	var _lastRegisterApp = null;
 	window.register = function (dependencies) {
-		_lastRegisterApp = new Module(dependencies);
+		if($.isArray(dependencies)) {
+			_lastRegisterApp = new Module(dependencies);
+		} else if(typeof dependencies === "function") {
+			_hookRequireFunc = function (module) {
+				dependencies(module);
+			};
+		}
 		return _lastRegisterApp;
 	};
 
@@ -144,6 +172,7 @@
 						var appRouteList = [];
 						if(_lastRegisterApp) {
 							appRouteList = _lastRegisterApp.create(oriApp.type, url);
+							_lastRegisterApp.baseURL = url;
 							routeList = routeList.concat(appRouteList);
 							_registerAppList.push(oriApp.type);
 						} else {
@@ -163,6 +192,7 @@
 				return promise;
 			});
 
+			common.deferred.all(promiseList);
 			$.when.apply($, promiseList).always(function () {
 				$(document).trigger("APPLICATION_READY", {
 					appList: _registerAppList,

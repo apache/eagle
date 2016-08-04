@@ -153,4 +153,37 @@
 		});
 		return list;
 	};
+
+	// =========================== Deferred ===========================
+	common.deferred = {};
+
+
+	common.deferred.all = function (deferredList) {
+		var deferred = $.Deferred();
+		var successList = [];
+		var failureList = [];
+		var hasFailure = false;
+		var rest = deferredList.length;
+		function doCheck() {
+			rest -= 1;
+			if(rest === 0) {
+				if(hasFailure) {
+					deferred.reject(failureList);
+				} else {
+					deferred.resolve(successList);
+				}
+			}
+		}
+
+		$.each(deferredList, function (i, deferred) {
+			deferred.then(function (data) {
+				successList[i] = data;
+				hasFailure = true;
+			}, function (data) {
+				failureList[i] = data;
+			}).always(doCheck);
+		});
+
+		return deferred;
+	};
 })();
