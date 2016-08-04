@@ -130,6 +130,20 @@
 			});
 			return _list;
 		}
+		function _get(url) {
+			var _list = [];
+			_list._promise = $http({
+				method: 'GET',
+				url: url,
+				headers: {
+					"Content-Type": "text/plain"
+				}
+			}).success(function(data) {
+				// console.log(data);
+				_list.push.apply(_list, data.obj);
+			});
+			return _list;
+		}
 		function ParseCondition(condition) {
 			var _this = this;
 			_this.condition = "";
@@ -157,6 +171,12 @@
 		pkg = {
 			_query: _query,
 			_post: _post,
+
+			maprfsNameToID: function(serviceName, value, site) {
+				//var _url = "../rest/maprIDResolver/fNameResolver?fName="+name;
+				var _url = app.getMapRNameResolverURL(serviceName, value, site);
+				return _get(_url);
+			},
 
 			updateEntity: function(serviceName, entities, config) {
 				var _url;
