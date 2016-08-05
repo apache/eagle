@@ -15,18 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.mr.running.entities;
+package org.apache.eagle.jpm.util.resourceFetch.model;
 
-import org.apache.eagle.jpm.util.jobcounter.JobCounters;
-import org.apache.eagle.jpm.util.jobcounter.JobCountersSerDeser;
-import org.apache.eagle.log.entity.repo.EntityRepository;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-public class JPMEntityRepository extends EntityRepository {
-    public JPMEntityRepository() {
-        entitySet.add(JobExecutionAPIEntity.class);
-        entitySet.add(TaskExecutionAPIEntity.class);
-        entitySet.add(TaskAttemptExecutionAPIEntity.class);
-
-        serDeserMap.put(JobCounters.class, new JobCountersSerDeser());
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TaskCountersWrapper {
+    public TaskCounters getJobTaskCounters() {
+        return jobTaskCounters;
     }
+
+    public void setJobTaskCounters(TaskCounters jobTaskCounters) {
+        this.jobTaskCounters = jobTaskCounters;
+    }
+
+    private TaskCounters jobTaskCounters;
 }

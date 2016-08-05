@@ -60,6 +60,7 @@ public class Constants {
     public static final String MR_JOBS_URL = "ws/v1/mapreduce/jobs";
     public static final String MR_JOB_COUNTERS_URL = "counters";
     public static final String MR_TASKS_URL = "tasks";
+    public static final String MR_TASK_ATTEMPTS_URL = "attempts";
     public static final String MR_CONF_URL = "conf";
 
     public static final String YARN_API_CLUSTER_INFO = "ws/v1/cluster/info";
@@ -68,16 +69,19 @@ public class Constants {
         GZIP, NONE
     }
     public enum JobState {
-        RUNNING, COMPLETED, ALL
+        NEW, INITED, RUNNING, SUCCEEDED, FAILED, KILL_WAIT, KILLED, ERROR, FINISHED, ALL
+    }
+    public enum TaskState {
+        NEW, SCHEDULED, RUNNING, SUCCEEDED, FAILED, KILL_WAIT, KILLED
     }
     public enum StageState {
         ACTIVE, COMPLETE, PENDING
     }
     public enum AppState {
-        RUNNING, FINISHED, FAILED
+        NEW, NEW_SAVING, SUBMITTED, ACCEPTED, RUNNING, FINISHED, FAILED, KILLED
     }
     public enum AppStatus {
-        SUCCEEDED, FAILED
+        UNDEFINED, SUCCEEDED, FAILED, KILLED
     }
     public enum ResourceType {
          COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB, CLUSTER_INFO
@@ -93,6 +97,7 @@ public class Constants {
     public static final String JPA_TASK_ATTEMPT_COUNTER_SERVICE_NAME = "TaskAttemptCounterService";
     public static final String JPA_TASK_EXECUTION_SERVICE_NAME = "TaskExecutionService";
     public static final String JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME = "RunningTaskExecutionService";
+    public static final String JPA_RUNNING_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "RunningTaskAttemptExecutionService";
     public static final String JPA_JOB_PROCESS_TIME_STAMP_NAME = "JobProcessTimeStampService";
 
     public static final String JOB_TASK_TYPE_TAG = "taskType";

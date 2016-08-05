@@ -26,23 +26,26 @@ import java.io.Serializable;
 public class AppInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	String id;
-	String user;
-	String name;
-	String queue;
-	String state;
-	String finalStatus;
-	double progress;
-	String trackingUI;
-	String trackingUrl;
-	String diagnostics;
-	String clusterId;
-	String applicationType;
-	long startedTime;
-	long finishedTime;
-	long elapsedTime;
-	String amContainerLogs;
-	String amHostHttpAddress;
+	private String id;
+	private String user;
+    private String name;
+    private String queue;
+    private String state;
+    private String finalStatus;
+    private double progress;
+    private String trackingUI;
+    private String trackingUrl;
+    private String diagnostics;
+    private String clusterId;
+    private String applicationType;
+    private long startedTime;
+    private long finishedTime;
+    private long elapsedTime;
+    private String amContainerLogs;
+    private String amHostHttpAddress;
+    private long allocatedMB;
+    private int allocatedVCores;
+    private int runningContainers;
 	
 	public String getId() {
 		return id;
@@ -146,5 +149,29 @@ public class AppInfo implements Serializable {
 	public void setAmHostHttpAddress(String amHostHttpAddress) {
 		this.amHostHttpAddress = amHostHttpAddress;
 	}
+
+    public long getAllocatedMB() {
+        return allocatedMB;
+    }
+
+    public void setAllocatedMB(long allocatedMB) {
+        this.allocatedMB = allocatedMB;
+    }
+
+    public int getAllocatedVCores() {
+        return allocatedVCores;
+    }
+
+    public void setAllocatedVCores(int allocatedVCores) {
+        this.allocatedVCores = allocatedVCores;
+    }
+
+    public int getRunningContainers() {
+        return runningContainers;
+    }
+
+    public void setRunningContainers(int runningContainers) {
+        this.runningContainers = runningContainers;
+    }
 
 }

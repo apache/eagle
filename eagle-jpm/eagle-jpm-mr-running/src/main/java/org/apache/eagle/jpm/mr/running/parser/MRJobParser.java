@@ -18,15 +18,16 @@
 
 package org.apache.eagle.jpm.mr.running.parser;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
 import org.apache.eagle.jpm.mr.running.entities.JobConfig;
 import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.running.entities.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.entities.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.recover.RunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.Utils;
-import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
 import org.apache.eagle.jpm.util.resourceFetch.connection.URLConnectionUtils;
@@ -75,6 +76,7 @@ public class MRJobParser implements Runnable {
     private boolean first;
     private Set<String> finishedTaskIds;
     private List<String> configKeys;
+    private MRRunningConfigManager.JobExtractorConfig jobExtractorConfig;
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
@@ -84,6 +86,7 @@ public class MRJobParser implements Runnable {
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
                        RunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
                        List<String> configKeys) {
+        this.jobExtractorConfig = jobExtractorConfig;
         this.app = app;
         this.mrJobEntityMap = new HashMap<>();
         this.mrJobEntityMap = mrJobMap;
@@ -137,8 +140,8 @@ public class MRJobParser implements Runnable {
         }
 
         List<Function<String, Boolean>> functions = new ArrayList<>();
+        functions.add(fetchJobConfig);
         if (!this.first) { //do not fetch these info below for the first time
-            functions.add(fetchJobConfig);
             functions.add(fetchTasks);
             functions.add(fetchJobCounters);
         }
@@ -214,10 +217,8 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setSuccessfulMapAttempts(mrJob.getSuccessfulMapAttempts());
             jobExecutionAPIEntity.setAppInfo(app);
             runningJobManager.update(app.getId(), id, jobExecutionAPIEntity);
-            mrJobEntityCreationHandler.add(jobExecutionAPIEntity);
         }
 
-        mrJobEntityCreationHandler.flush();
         return true;
     }
 
@@ -248,7 +249,7 @@ public class MRJobParser implements Runnable {
 
             Map<String, Long> counterValues = groups.get(jobCounterGroup.getCounterGroupName());
             List<JobCounterItem> items = jobCounterGroup.getCounter();
-            if (items == null) return true;
+            if (items == null) continue;
             for (JobCounterItem item : items) {
                 counterValues.put(item.getName(), item.getTotalCounterValue());
                 //counterValues.put(item.getName() + "_MAP", item.getMapCounterValue());
@@ -260,6 +261,118 @@ public class MRJobParser implements Runnable {
         jobExecutionAPIEntity.setJobCounters(jobCounter);
         return true;
     };
+
+    private Function<Pair<String, String>, org.apache.eagle.jpm.util.jobcounter.JobCounters> fetchTaskCounters = jobAndTaskId -> {
+        org.apache.eagle.jpm.util.jobcounter.JobCounters jobCounter = new org.apache.eagle.jpm.util.jobcounter.JobCounters();
+        String jobId = jobAndTaskId.getLeft();
+        String taskId = jobAndTaskId.getRight();
+        String taskCounterURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_TASKS_URL + "/" + taskId + "/" + Constants.MR_JOB_COUNTERS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
+        InputStream is = null;
+        TaskCounters taskCounters = null;
+        try {
+            is = InputStreamUtils.getInputStream(taskCounterURL, null, Constants.CompressionType.NONE);
+            LOG.info("fetch mr task counters from {}", taskCounterURL);
+            taskCounters = OBJ_MAPPER.readValue(is, TaskCountersWrapper.class).getJobTaskCounters();
+        } catch (Exception e) {
+            LOG.warn("fetch mr task counters from {} failed, {}", taskCounterURL, e);
+            return null;
+        } finally {
+            Utils.closeInputStream(is);
+        }
+
+        if (taskCounters.getTaskCounterGroup() == null) return jobCounter;
+        Map<String, Map<String, Long>> groups = new HashMap<>();
+
+        for (TaskCounterGroup taskCounterGroup : taskCounters.getTaskCounterGroup()) {
+            if (!groups.containsKey(taskCounterGroup.getCounterGroupName())) {
+                groups.put(taskCounterGroup.getCounterGroupName(), new HashMap<>());
+            }
+
+            Map<String, Long> counterValues = groups.get(taskCounterGroup.getCounterGroupName());
+            List<TaskCounterItem> items = taskCounterGroup.getCounter();
+            if (items == null) continue;
+            for (TaskCounterItem item : items) {
+                counterValues.put(item.getName(), item.getValue());
+            }
+        }
+
+        jobCounter.setCounters(groups);
+
+        return jobCounter;
+    };
+
+    private Function<Pair<String, String>, TaskAttemptExecutionAPIEntity> fetchTaskAttempt = jobAndTaskId -> {
+        String jobId = jobAndTaskId.getLeft();
+        String taskId = jobAndTaskId.getRight();
+        String taskAttemptURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_TASKS_URL + "/" + taskId + "/" + Constants.MR_TASK_ATTEMPTS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
+        InputStream is = null;
+        List<MRTaskAttempt> taskAttempts = null;
+        try {
+            is = InputStreamUtils.getInputStream(taskAttemptURL, null, Constants.CompressionType.GZIP);
+            LOG.info("fetch mr task attempt from {}", taskAttemptURL);
+            taskAttempts = OBJ_MAPPER.readValue(is, MRTaskAttemptWrapper.class).getTaskAttempts().getTaskAttempt();
+        } catch (Exception e) {
+            LOG.warn("fetch mr task attempt from {} failed, {}", taskAttemptURL, e);
+            return null;
+        } finally {
+            Utils.closeInputStream(is);
+        }
+        Comparator<MRTaskAttempt> byStartTime = (e1, e2) -> -1 * Long.compare(e1.getStartTime(), e2.getStartTime());
+        Iterator<MRTaskAttempt> taskAttemptIterator = taskAttempts.stream().sorted(byStartTime).iterator();
+        while (taskAttemptIterator.hasNext()) {
+            MRTaskAttempt mrTaskAttempt = taskAttemptIterator.next();
+            TaskAttemptExecutionAPIEntity taskAttemptExecutionAPIEntity = new TaskAttemptExecutionAPIEntity();
+            taskAttemptExecutionAPIEntity.setTags(new HashMap<>(mrJobEntityMap.get(jobId).getTags()));
+            taskAttemptExecutionAPIEntity.getTags().put(MRJobTagName.TASK_TYPE.toString(), mrTaskAttempt.getType());
+            taskAttemptExecutionAPIEntity.getTags().put(MRJobTagName.TASK_ID.toString(), taskId);
+            taskAttemptExecutionAPIEntity.getTags().put(MRJobTagName.RACK.toString(), mrTaskAttempt.getRack());
+            String nodeHttpAddress = mrTaskAttempt.getNodeHttpAddress();
+            String host = nodeHttpAddress.substring(0, nodeHttpAddress.indexOf(':'));
+            taskAttemptExecutionAPIEntity.getTags().put(MRJobTagName.HOSTNAME.toString(), host);
+
+            taskAttemptExecutionAPIEntity.setTimestamp(mrTaskAttempt.getStartTime());
+            taskAttemptExecutionAPIEntity.setStartTime(mrTaskAttempt.getStartTime());
+            taskAttemptExecutionAPIEntity.setFinishTime(mrTaskAttempt.getFinishTime());
+            taskAttemptExecutionAPIEntity.setElapsedTime(mrTaskAttempt.getElapsedTime());
+            taskAttemptExecutionAPIEntity.setProgress(mrTaskAttempt.getProgress());
+            taskAttemptExecutionAPIEntity.setId(mrTaskAttempt.getId());
+            taskAttemptExecutionAPIEntity.setStatus(mrTaskAttempt.getState());
+            taskAttemptExecutionAPIEntity.setDiagnostics(mrTaskAttempt.getDiagnostics());
+            taskAttemptExecutionAPIEntity.setType(mrTaskAttempt.getType());
+            taskAttemptExecutionAPIEntity.setAssignedContainerId(mrTaskAttempt.getAssignedContainerId());
+            this.mrJobEntityCreationHandler.add(taskAttemptExecutionAPIEntity);
+            return taskAttemptExecutionAPIEntity;
+        }
+        return null;
+    };
+
+    private Set<String> calcFetchCounterAndAttemptTaskId(List<MRTask> tasks) {
+        Set<String> needFetchAttemptTasks = new HashSet<>();
+        //1, sort by elapsedTime
+        Comparator<MRTask> byElapsedTimeIncrease = (e1, e2) -> Long.compare(e1.getElapsedTime(), e2.getElapsedTime());
+        Comparator<MRTask> byElapsedTimeDecrease = (e1, e2) -> -1 * Long.compare(e1.getElapsedTime(), e2.getElapsedTime());
+        //2, fetch bottom n
+        Iterator<MRTask> taskIteratorIncrease = tasks.stream().sorted(byElapsedTimeIncrease).iterator();
+        int i = 0;
+        while (taskIteratorIncrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
+            MRTask mrTask = taskIteratorIncrease.next();
+            if (mrTask.getElapsedTime() > 0) {
+                i++;
+                needFetchAttemptTasks.add(mrTask.getId());
+            }
+        }
+        //3, fetch top n
+        Iterator<MRTask> taskIteratorDecrease = tasks.stream().sorted(byElapsedTimeDecrease).iterator();
+        i = 0;
+        while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
+            MRTask mrTask = taskIteratorDecrease.next();
+            if (mrTask.getElapsedTime() > 0) {
+                i++;
+                needFetchAttemptTasks.add(mrTask.getId());
+            }
+        }
+        return needFetchAttemptTasks;
+    }
 
     private Function<String, Boolean> fetchTasks = jobId -> {
         String taskURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_TASKS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
@@ -276,6 +389,7 @@ public class MRJobParser implements Runnable {
             Utils.closeInputStream(is);
         }
 
+        Set<String> needFetchAttemptTasks = calcFetchCounterAndAttemptTaskId(tasks);
         for (MRTask task : tasks) {
             if (this.finishedTaskIds.contains(task.getId())) {
                 continue;
@@ -293,9 +407,25 @@ public class MRJobParser implements Runnable {
             taskExecutionAPIEntity.setStatus(task.getState());
             taskExecutionAPIEntity.setSuccessfulAttempt(task.getSuccessfulAttempt());
             taskExecutionAPIEntity.setStatusDesc(task.getStatus());
+
+            if (needFetchAttemptTasks.contains(task.getId())) {
+                taskExecutionAPIEntity.setJobCounters(fetchTaskCounters.apply(Pair.of(jobId, task.getId())));
+                if (taskExecutionAPIEntity.getJobCounters() == null) {
+                    return false;
+                }
+
+                TaskAttemptExecutionAPIEntity taskAttemptExecutionAPIEntity = fetchTaskAttempt.apply(Pair.of(jobId, task.getId()));
+                if (taskAttemptExecutionAPIEntity != null) {
+                    taskExecutionAPIEntity.setHost(taskAttemptExecutionAPIEntity.getTags().get(MRJobTagName.HOSTNAME.toString()));
+                }
+            }
+
             mrJobEntityCreationHandler.add(taskExecutionAPIEntity);
 
-            if (task.getState().equals(Constants.AppStatus.SUCCEEDED.toString())) {
+            if (!(task.getState().equals(Constants.TaskState.NEW.toString()) ||
+                    task.getState().equals(Constants.TaskState.SCHEDULED.toString()) ||
+                    task.getState().equals(Constants.TaskState.RUNNING.toString()))) {
+                LOG.info("mr job {} task {} has finished", jobId, task.getId());
                 this.finishedTaskIds.add(task.getId());
             }
         }
@@ -330,9 +460,15 @@ public class MRJobParser implements Runnable {
                 if (this.configKeys.contains(key)) {
                     config.put(key, value);
                 }
+
+                if (!this.configKeys.isEmpty() && key.equals(this.configKeys.get(0))) {
+                    mrJobEntityMap.get(jobId).getTags().put(MRJobTagName.NORM_JOB_NAME.toString(), value);
+                }
             }
             mrJobEntityMap.get(jobId).setJobConfig(config);
             mrJobConfigs.put(jobId, config);
+
+            mrJobEntityCreationHandler.add(mrJobEntityMap.get(jobId));
         } catch (Exception e) {
             LOG.warn("fetch job conf from {} failed, {}", confURL, e);
             return false;

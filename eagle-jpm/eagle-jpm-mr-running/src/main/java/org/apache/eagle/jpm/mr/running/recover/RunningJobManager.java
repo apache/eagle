@@ -79,8 +79,8 @@ public class RunningJobManager implements Serializable {
             LOG.info("recover path {}", jobPath);
             String fields = new String(curator.getData().forPath(jobPath), "UTF-8");
             if (fields.length() == 0) {
-                LOG.info("delete empty path {}", jobPath);
-                delete(yarnAppId, jobId);
+                //LOG.info("delete empty path {}", jobPath);
+                //delete(yarnAppId, jobId);
                 continue;
             }
             JSONObject object = new JSONObject(fields);
@@ -108,6 +108,9 @@ public class RunningJobManager implements Serializable {
             appInfo.setElapsedTime(Long.parseLong(appInfoMap.get("elapsedTime")));
             appInfo.setAmContainerLogs(appInfoMap.get("amContainerLogs"));
             appInfo.setAmHostHttpAddress(appInfoMap.get("amHostHttpAddress"));
+            appInfo.setAllocatedMB(Long.parseLong(appInfoMap.get("allocatedMB")));
+            appInfo.setAllocatedVCores(Integer.parseInt(appInfoMap.get("allocatedVCores")));
+            appInfo.setRunningContainers(Integer.parseInt(appInfoMap.get("runningContainers")));
 
             jobExecutionAPIEntity.setAppInfo(appInfo);
             jobExecutionAPIEntity.setTimestamp(appInfo.getStartedTime());
@@ -161,6 +164,9 @@ public class RunningJobManager implements Serializable {
         appInfo.put("elapsedTime", entity.getAppInfo().getElapsedTime() + "");
         appInfo.put("amContainerLogs", entity.getAppInfo().getAmContainerLogs());
         appInfo.put("amHostHttpAddress", entity.getAppInfo().getAmHostHttpAddress());
+        appInfo.put("allocatedMB", entity.getAppInfo().getAllocatedMB() + "");
+        appInfo.put("allocatedVCores", entity.getAppInfo().getAllocatedVCores() + "");
+        appInfo.put("runningContainers", entity.getAppInfo().getRunningContainers() + "");
 
         fields.put(ENTITY_TAGS_KEY, (new JSONObject(entity.getTags())).toString());
         fields.put(APP_INFO_KEY, (new JSONObject(appInfo)).toString());

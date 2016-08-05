@@ -72,6 +72,7 @@ public class MRRunningConfigManager implements Serializable {
         public String site;
         public int fetchRunningJobInterval;
         public int parseJobThreadPoolSize;
+        public int topAndBottomTaskByElapsedTime;
     }
 
     public static class EndpointConfig implements Serializable {
@@ -127,6 +128,7 @@ public class MRRunningConfigManager implements Serializable {
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
         this.jobExtractorConfig.fetchRunningJobInterval = config.getInt("jobExtractorConfig.fetchRunningJobInterval");
         this.jobExtractorConfig.parseJobThreadPoolSize = config.getInt("jobExtractorConfig.parseJobThreadPoolSize");
+        this.jobExtractorConfig.topAndBottomTaskByElapsedTime = config.getInt("jobExtractorConfig.topAndBottomTaskByElapsedTime");
 
         //parse data source config
         this.endpointConfig.rmUrls = config.getStringList("dataSourceConfig.rmUrls").toArray(new String[0]);

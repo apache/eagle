@@ -38,11 +38,12 @@ public class MRRunningJobMain {
             //1. trigger init conf
             MRRunningConfigManager mrRunningConfigManager = MRRunningConfigManager.getInstance(args);
 
-            List<String> confKeyKeys = mrRunningConfigManager.getConfig().getStringList("MRConfigureKeys");
+            List<String> confKeyKeys = mrRunningConfigManager.getConfig().getStringList("MRConfigureKeys.jobConfigKey");
             confKeyKeys.add(Constants.JobConfiguration.CASCADING_JOB);
             confKeyKeys.add(Constants.JobConfiguration.HIVE_JOB);
             confKeyKeys.add(Constants.JobConfiguration.PIG_JOB);
             confKeyKeys.add(Constants.JobConfiguration.SCOOBI_JOB);
+            confKeyKeys.add(0, mrRunningConfigManager.getConfig().getString("MRConfigureKeys.jobNameKey"));
 
             //2. init topology
             TopologyBuilder topologyBuilder = new TopologyBuilder();

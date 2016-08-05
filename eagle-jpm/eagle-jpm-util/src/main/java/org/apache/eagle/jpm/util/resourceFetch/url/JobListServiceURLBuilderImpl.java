@@ -34,7 +34,7 @@ public class JobListServiceURLBuilderImpl implements ServiceURLBuilder {
 
 		if (jobState.equals(Constants.JobState.RUNNING.name())) {
 			restApi = Constants.V2_APPS_RUNNING_URL;
-		} else if (jobState.equals(Constants.JobState.COMPLETED.name())) {
+		} else if (jobState.equals(Constants.JobState.FINISHED.name())) {
 			restApi = Constants.V2_APPS_COMPLETED_URL;
 		} else if (jobState.equals(Constants.JobState.ALL.name())) {
 			restApi = Constants.V2_APPS_URL;

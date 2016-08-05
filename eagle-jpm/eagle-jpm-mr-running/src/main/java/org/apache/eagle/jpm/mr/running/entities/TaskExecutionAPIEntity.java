@@ -48,6 +48,10 @@ public class TaskExecutionAPIEntity extends TaggedLogAPIEntity {
     private String successfulAttempt;
     @Column("g")
     private String statusDesc;
+    @Column("h")
+    private JobCounters jobCounters;
+    @Column("i")
+    private String host;
 
     public long getStartTime() {
         return startTime;
@@ -110,5 +114,23 @@ public class TaskExecutionAPIEntity extends TaggedLogAPIEntity {
     public void setStatusDesc(String statusDesc) {
         this.statusDesc = statusDesc;
         valueChanged("statusDesc");
+    }
+
+    public JobCounters getJobCounters() {
+        return jobCounters;
+    }
+
+    public void setJobCounters(JobCounters jobCounters) {
+        this.jobCounters = jobCounters;
+        valueChanged("jobCounters");
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+        valueChanged("host");
     }
 }
