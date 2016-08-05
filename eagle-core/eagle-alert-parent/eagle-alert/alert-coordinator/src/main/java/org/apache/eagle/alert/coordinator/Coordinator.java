@@ -75,6 +75,11 @@ public class Coordinator {
     private final static String METADATA_SERVICE_CONTEXT = "metadataService.context";
     private final static String DYNAMIC_POLICY_LOADER_INIT_MILLS = "metadataDynamicCheck.initDelayMillis";
     private final static String DYNAMIC_POLICY_LOADER_DELAY_MILLS = "metadataDynamicCheck.delayMillis";
+    
+    private final static String GREEDY_SCHEDULER_ZK_PATH = "/alert/greedy/leader";
+    private final static String POLICY_SCHEDULER_ZK_PATH = "/alert/policy/leader";
+    private final static int ACQUIRE_LOCK_WAIT_INTERVAL_MS = 2000;
+    private final static int ACQUIRE_LOCK_MAX_RETRIES_TIMES = 90; //about 9 minutes
 
     private volatile ScheduleState currentState = null;
     private final ConfigBusProducer producer;
@@ -98,28 +103,47 @@ public class Coordinator {
     }
 
     public synchronized ScheduleState schedule(ScheduleOption option) {
-        Stopwatch watch = Stopwatch.createStarted();
-        IScheduleContext context = new ScheduleContextBuilder(client).buildContext();
-        TopologyMgmtService mgmtService = new TopologyMgmtService();
-        IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
-
-        scheduler.init(context, mgmtService);
-        ScheduleState state = scheduler.schedule(option);
-
-        long scheduleTime = watch.elapsed(TimeUnit.MILLISECONDS);
-        state.setScheduleTimeMillis((int) scheduleTime);// hardcode to integer
-        watch.reset();
-        watch.start();
-
-        // persist & notify
-        postSchedule(client, state, producer);
-
-        watch.stop();
-        long postTime = watch.elapsed(TimeUnit.MILLISECONDS);
-        LOG.info("Schedule result, schedule time {} ms, post schedule time {} ms !", scheduleTime, postTime);
-
-        currentState = state;
-        return state;
+    	ExclusiveExecutor.Runnable exclusiveRunnable = new ExclusiveExecutor.Runnable() {
+			@Override
+			public void run() throws Exception {
+				//do nothing
+			}
+    	};
+    	ExclusiveExecutor.execute(GREEDY_SCHEDULER_ZK_PATH, exclusiveRunnable);
+    	int waitMaxTimes = 0;
+    	while (waitMaxTimes < ACQUIRE_LOCK_MAX_RETRIES_TIMES) { //about 3 minutes waiting
+    		if (!exclusiveRunnable.isCompleted()) {
+    			waitMaxTimes ++;
+    			try {
+					Thread.sleep(ACQUIRE_LOCK_WAIT_INTERVAL_MS);
+				} catch (InterruptedException e) {}
+    			continue;
+    		}
+    		
+    		Stopwatch watch = Stopwatch.createStarted();
+	        IScheduleContext context = new ScheduleContextBuilder(client).buildContext();
+	        TopologyMgmtService mgmtService = new TopologyMgmtService();
+	        IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
+	
+	        scheduler.init(context, mgmtService);
+	        ScheduleState state = scheduler.schedule(option);
+	
+	        long scheduleTime = watch.elapsed(TimeUnit.MILLISECONDS);
+	        state.setScheduleTimeMillis((int) scheduleTime);// hardcode to integer
+	        watch.reset();
+	        watch.start();
+	
+	        // persist & notify
+	        postSchedule(client, state, producer);
+	
+	        watch.stop();
+	        long postTime = watch.elapsed(TimeUnit.MILLISECONDS);
+	        LOG.info("Schedule result, schedule time {} ms, post schedule time {} ms !", scheduleTime, postTime);
+	
+	        currentState = state;
+	        return state;
+    	}
+    	throw new LockWebApplicationException("Acquire greedy scheduler lock failed, please retry later");
     }
 
     public static void postSchedule(IMetadataServiceClient client, ScheduleState state, ConfigBusProducer producer) {
@@ -209,34 +233,45 @@ public class Coordinator {
     }
 
     public static void startSchedule() {
-        Config config = ConfigFactory.load().getConfig(COORDINATOR);
-        // build dynamic policy loader
-        String host = config.getString(METADATA_SERVICE_HOST);
-        int port = config.getInt(METADATA_SERVICE_PORT);
-        String context = config.getString(METADATA_SERVICE_CONTEXT);
-        IMetadataServiceClient client = new MetadataServiceClientImpl(host, port, context);
-        DynamicPolicyLoader loader = new DynamicPolicyLoader(client);
-        loader.addPolicyChangeListener(new PolicyChangeHandler(config, client));
+    	ExclusiveExecutor.execute(POLICY_SCHEDULER_ZK_PATH, new ExclusiveExecutor.Runnable() {
+			
+			@Override
+			public void run() throws Exception {
+				Config config = ConfigFactory.load().getConfig(COORDINATOR);
+		        // build dynamic policy loader
+		        String host = config.getString(METADATA_SERVICE_HOST);
+		        int port = config.getInt(METADATA_SERVICE_PORT);
+		        String context = config.getString(METADATA_SERVICE_CONTEXT);
+		        IMetadataServiceClient client = new MetadataServiceClientImpl(host, port, context);
+		        DynamicPolicyLoader loader = new DynamicPolicyLoader(client);
+		        loader.addPolicyChangeListener(new PolicyChangeHandler(config, client));
 
-        // schedule dynamic policy loader
-        long initDelayMillis = config.getLong(DYNAMIC_POLICY_LOADER_INIT_MILLS);
-        long delayMillis = config.getLong(DYNAMIC_POLICY_LOADER_DELAY_MILLS);
-        ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(2, new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread t = new Thread();
-                t.setDaemon(true);
-                return t;
-            }
-        });
-        scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
+		        // schedule dynamic policy loader
+		        long initDelayMillis = config.getLong(DYNAMIC_POLICY_LOADER_INIT_MILLS);
+		        long delayMillis = config.getLong(DYNAMIC_POLICY_LOADER_DELAY_MILLS);
+		        ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(2, new ThreadFactory() {
+		            @Override
+		            public Thread newThread(Runnable r) {
+		                Thread t = new Thread();
+		                t.setDaemon(true);
+		                return t;
+		            }
+		        });
+		        scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
+		        
+		        // 
+		        scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_DELAY,
+		                CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_INTERVAL, TimeUnit.MILLISECONDS);
+		        
+		        Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
+		        LOG.info("Eagle Coordinator started ...");
+                
+                Thread.currentThread().join();
+			}
+			
+		});
+    	
         
-        // 
-        scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_DELAY,
-                CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_INTERVAL, TimeUnit.MILLISECONDS);
-        
-        Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
-        LOG.info("Eagle Coordinator started ...");
     }
 
     public void enforcePeriodicallyBuild() {
