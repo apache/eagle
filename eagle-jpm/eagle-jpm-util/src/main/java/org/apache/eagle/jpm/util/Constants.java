@@ -150,4 +150,13 @@ public class Constants {
         RACK_LOCAL_MAPS,
         TOTAL_LAUNCHED_MAPS
     }
+
+    public static final String metricFormat = "%s.%s";
+    public static final String ALLOCATED_MB = "allocatedmb";
+    public static final String ALLOCATED_VCORES = "allocatedvcores";
+    public static final String RUNNING_CONTAINERS = "runningcontainers";
+    public static final String TASK_EXECUTION_TIME = "taskduration";
+    public static final String JOB_LEVEL = "job";
+    public static final String TASK_LEVEL = "task";
+
 }
