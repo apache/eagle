@@ -19,8 +19,13 @@
 package org.apache.eagle.jpm.mr.running.parser;
 
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
+import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.running.entities.TaskExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.running.parser.metrics.JobExecutionMetricsCreationListener;
+import org.apache.eagle.jpm.mr.running.parser.metrics.TaskExecutionMetricsCreationListener;
 import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
@@ -36,13 +41,25 @@ public class MRJobEntityCreationHandler {
 
     private List<TaggedLogAPIEntity> entities = new ArrayList<>();
     private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
+    private JobExecutionMetricsCreationListener jobMetricsListener;
+    private TaskExecutionMetricsCreationListener taskMetricsListener;
 
     public MRJobEntityCreationHandler(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
         this.eagleServiceConfig = eagleServiceConfig;
+        jobMetricsListener = new JobExecutionMetricsCreationListener();
+        taskMetricsListener = new TaskExecutionMetricsCreationListener();
     }
 
     public void add(TaggedLogAPIEntity entity) {
         entities.add(entity);
+        List<GenericMetricEntity> metricEntities;
+        if (entity instanceof TaskExecutionAPIEntity) {
+            metricEntities = taskMetricsListener.generateMetrics((TaskExecutionAPIEntity) entity);
+            entities.addAll(metricEntities);
+        } else if (entity instanceof JobExecutionAPIEntity) {
+            metricEntities = jobMetricsListener.generateMetrics((JobExecutionAPIEntity) entity);
+            entities.addAll(metricEntities);
+        }
         if (entities.size() >= eagleServiceConfig.maxFlushNum) {
             this.flush();
         }
