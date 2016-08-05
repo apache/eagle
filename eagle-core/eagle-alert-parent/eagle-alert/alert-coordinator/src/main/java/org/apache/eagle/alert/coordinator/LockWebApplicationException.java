@@ -16,31 +16,19 @@
  */
 package org.apache.eagle.alert.coordinator;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class LockWebApplicationException extends WebApplicationException {
 
-/**
- * @since Jun 16, 2016
- *
- */
-public class CoordinatorListener implements ServletContextListener {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(CoordinatorListener.class);
-    
-    public CoordinatorListener() {
-    }
-    
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-    	LOG.info("start coordinator background tasks..");
-        Coordinator.startSchedule();
-    }
-    
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-    }
+	private static final long serialVersionUID = 3441072187262776401L;
+
+	public LockWebApplicationException() {
+		super(Response.Status.INTERNAL_SERVER_ERROR);
+	}
+
+	public LockWebApplicationException(String message) {
+		super(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(message).type("text/plain").build());
+	}
 
 }
