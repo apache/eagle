@@ -25,10 +25,12 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.junit.Ignore;
 
 import java.util.Arrays;
 import java.util.Map;
 
+@Ignore
 public class TestStormApplication extends StormApplication<TestStormApplication.TestStormAppConfig>{
     @Override
     public StormTopology execute(TestStormAppConfig config, StormEnvironment environment) {
