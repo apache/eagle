@@ -56,27 +56,31 @@
 			<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th>Job</th>
-						<th>Status</th>
-						<th>User</th>
-						<th>Queue</th>
-						<th>Submission Time</th>
-						<th>Execution Time</th>
-						<th>Duration</th>
-						<th>Map Tasks</th>
-						<th>Reduce Tasks</th>
-						<th>Allocated Containers</th>
+						<th sortpath="tags.jobID">Job</th>
+						<th sortpath="currentState">Status</th>
+						<th sortpath="tags.user">User</th>
+						<th sortpath="tags.queue">Queue</th>
+						<th sortpath="submissionTime">Submission Time</th>
+						<th sortpath="startTime">Execution Time</th>
+						<th sortpath="duration">Duration</th>
+						<th sortpath="numTotalMaps">Map Tasks</th>
+						<th sortpath="numTotalReduces">Reduce Tasks</th>
+						<th sortpath="runningContainers">Allocated Containers</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr ng-repeat="item in jobList">
 						<td>{{item.tags.jobID}}</td>
-						<td>{{item.currentState}}</td>
+						<td class="text-center">
+							<span class="label label-{{getStateClass(item.currentState)}}">
+								{{item.currentState}}
+							</span>
+						</td>
 						<td>{{item.tags.user}}</td>
 						<td>{{item.tags.queue}}</td>
 						<td>{{Time.format(item.submissionTime)}}</td>
 						<td>{{Time.format(item.startTime)}}</td>
-						<td>{{Time.diff(item.startTime, item.endTime)}}</td>
+						<td>{{Time.diffStr(item.duration)}}</td>
 						<td>{{item.numTotalMaps}}</td>
 						<td>{{item.numTotalReduces}}</td>
 						<td>{{item.runningContainers || "-"}}</td>

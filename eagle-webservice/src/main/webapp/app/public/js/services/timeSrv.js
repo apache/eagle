@@ -20,9 +20,9 @@
 	'use strict';
 
 	var UNITS = [
-		["days", "days", "day"],
-		["hours", "hrs", "hr"],
-		["minutes", "mins", "min"],
+		["days", "day", "day"],
+		["hours", "hr", "hr"],
+		["minutes", "min", "min"],
 		["seconds", "s", "s"],
 	];
 
@@ -55,11 +55,20 @@
 		Time.diff = function (from, to) {
 			from = Time(from);
 			to = Time(to);
-			if(!from || !to) return null;
+			if (!from || !to) return null;
+			return to.diff(from);
+		}
+
+		Time.diffStr = function (from, to) {
+			var diff = from;
+			if(arguments.length === 2) {
+				diff = Time.diff(from, to);
+			}
+			if(diff === null) return "-";
 
 			var match = false;
 			var rows = [];
-			var duration = moment.duration(to.diff(from));
+			var duration = moment.duration(diff);
 			var rest = 3;
 
 			$.each(UNITS, function (i, unit) {
@@ -74,7 +83,7 @@
 				}
 			});
 
-			return rows.join(" ");
+			return rows.join(", ");
 		};
 
 		return Time;

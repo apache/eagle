@@ -100,7 +100,7 @@
 		 * @return {[]}
 		 */
 		Entity.merge = function (oriList, tgtList) {
-			if(!oriList) return tgtList;
+			oriList = oriList || [];
 
 			var list = [].concat(oriList);
 			list._done = tgtList._done;
@@ -113,7 +113,9 @@
 				list._done = true;
 			});
 
-			return withThen(list);
+			list = withThen(list);
+
+			return list;
 		};
 
 		// TODO: metadata will be removed

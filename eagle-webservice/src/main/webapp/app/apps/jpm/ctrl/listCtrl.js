@@ -49,8 +49,32 @@
 					"numTotalReduces",
 					"runningContainers"
 				]));
+				$scope.jobList._then(function () {
+					$.each($scope.jobList, function (i, job) {
+						job.duration = Time.diff(job.startTime, job.endTime);
+					});
+				});
 			};
 			$scope.refreshList();
+
+			$scope.getStateClass = function (state) {
+				switch ((state || "").toUpperCase()) {
+				case "NEW":
+				case "NEW_SAVING":
+				case "SUBMITTED":
+				case "ACCEPTED":
+					return "warning";
+				case "RUNNING":
+					return "info";
+				case "SUCCESS":
+					return "success";
+				case "FINISHED":
+					return "primary";
+				case "FAILED":
+					return "danger";
+				}
+				return "default";
+			};
 
 			// Time component
 			$element.on("change.jpm", "#startTime", function () {
@@ -71,12 +95,6 @@
 				$("#startTime").val(startTime.format(Time.FORMAT));
 				$("#endTime").val(endTime.format(Time.FORMAT));
 			}, 0);
-
-
-
-
-			console.log(">>>", Time.diff(startTime, endTime.clone().add(1234567, "ms")));
-
 
 			// Clean up
 			$scope.$on('$destroy', function() {
