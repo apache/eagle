@@ -303,7 +303,7 @@
         <!-- dropwizard -->
         <dropwizard.version>0.7.1</dropwizard.version>
         <!-- checkstyle -->
-        <checkstyle.path>build/checkstyle/</checkstyle.path>
+        <checkstyle.path>eagle-dev/checkstyle/</checkstyle.path>
     </properties>
 
     <dependencyManagement>
