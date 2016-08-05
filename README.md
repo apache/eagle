@@ -17,7 +17,7 @@ limitations under the License.
 {% endcomment %}
 -->
 
-# Apache Eagle
+# Apache Eagle (Incubating)
 
 >  Secure Hadoop Data in Real Time
 
