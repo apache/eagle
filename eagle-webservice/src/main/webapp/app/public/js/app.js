@@ -160,7 +160,7 @@ var app = {};
 		// ======================================================================================
 		var STATE_NAME_MATCH = /^[^.]*/;
 
-		eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, Site, Application, UI) {
+		eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, Site, Application, UI, Time) {
 			window._WrapState = $scope.$wrapState = $wrapState;
 			window._PageConfig = $scope.PageConfig = PageConfig;
 			window._Portal = $scope.Portal = Portal;
@@ -168,6 +168,7 @@ var app = {};
 			window._Site = $scope.Site = Site;
 			window._Application = $scope.Application = Application;
 			window._UI = $scope.UI = UI;
+			window._Time = $scope.Time = Time;
 
 			// ============================== Route Update ==============================
 			$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
@@ -194,6 +195,11 @@ var app = {};
 					return "";
 				}
 			};
+
+			// ================================== Init ==================================
+			$.each(register.portalList, function (i, config) {
+				Portal.register(config.portal, config.isSite);
+			});
 		});
 
 		// ======================================================================================

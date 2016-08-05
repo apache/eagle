@@ -49,6 +49,7 @@
 		this.dependencies = dependencies;
 		this.queueList = [];
 		this.routeList = [];
+		this.portalList = [];
 
 		this.requireRest = 0;
 		this.requireDeferred = null;
@@ -72,6 +73,19 @@
 	Module.prototype.controller = function () {
 		this.queueList.push({type: "controller", args: arguments});
 		return this;
+	};
+
+	/**
+	 * Add portal into side navigation bar.
+	 * @param {{}} portal				Config portal content
+	 * @param {string} portal.name		Display name
+	 * @param {string} portal.icon		Display icon. Use 'FontAwesome'
+	 * @param {string=} portal.path		Route path
+	 * @param {[]=} portal.list			Sub portal
+	 * @param {boolean} isSite			true will show in site page or will shown in main page
+	 */
+	Module.prototype.portal = function (portal, isSite) {
+		this.portalList.push({portal: portal, isSite: isSite});
 	};
 
 	/**
@@ -151,6 +165,11 @@
 			var routeList = $.map(_this.routeList, function (route) {
 				var config = route.config = $.extend({}, route.config);
 
+				// Parse url
+				if(config.site) {
+					config.url = "/site/:siteId/" + config.url.replace(/^[\\\/]/, "");
+				}
+
 				// Parse template url
 				var parser = document.createElement('a');
 				parser.href = _this.baseURL + "/" + config.templateUrl;
@@ -164,7 +183,14 @@
 				return route;
 			});
 
+			// Portal update
+			$.each(_this.portalList, function (i, config) {
+				config.portal.application = moduleName;
+			});
+
 			deferred.resolve({
+				application: moduleName,
+				portalList: _this.portalList,
 				routeList: routeList
 			});
 		});
@@ -188,7 +214,6 @@
 	// ======================================================================================
 	$(function () {
 		console.info("[Eagle] Application initialization...");
-		var routeList = [];
 
 		// Load providers
 		$.get(_host + "/rest/apps/providers").then(function (res) {
@@ -205,34 +230,41 @@
 
 					$.getScript(url + "/index.js").then(function () {
 						if(_lastRegisterApp) {
+							_registerAppList.push(oriApp.type);
 							_lastRegisterApp.baseURL = url;
 							_lastRegisterApp.getInstance(oriApp.type).then(function (module) {
-								routeList = routeList.concat(module.routeList);
-								deferred.resolve();
+								deferred.resolve(module);
 							});
-							_registerAppList.push(oriApp.type);
 						} else {
 							console.error("Application not register:", oriApp.type);
-							deferred.reject();
+							deferred.resolve();
 						}
 					}, function () {
 						console.error("Load application failed:", oriApp.type);
-						deferred.reject();
+						deferred.resolve();
 					}).always(function () {
 						_lastRegisterApp = null;
 					});
 				} else {
 					console.error("Path not config:", oriApp.type);
-					deferred.reject();
+					deferred.resolve();
 				}
 
 				return deferred;
 			});
 
-			common.deferred.all(promiseList).always(function () {
+			common.deferred.all(promiseList).then(function (moduleList) {
+				var routeList = $.map(moduleList, function (module) {
+					return module && module.routeList;
+				});
+				var portalList = $.map(moduleList, function (module) {
+					return module && module.portalList;
+				});
+
 				$(document).trigger("APPLICATION_READY", {
 					appList: _registerAppList,
-					routeList: routeList
+					routeList: routeList,
+					portalList: portalList
 				});
 			});
 		});

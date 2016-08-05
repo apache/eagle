@@ -17,9 +17,71 @@
  */
 
 (function () {
+	function verifyTime(str, format) {
+		var date = moment(str);
+		if(str === date.format(format)) {
+			return date;
+		}
+	}
+
 	/**
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
+		jpmApp.controller("listCtrl", function ($element, $scope, PageConfig, Time, Entity, JPM) {
+			PageConfig.title = "Job Performance Monitoring";
+			PageConfig.subTitle = "list";
+
+			// Initialization
+			var endTime = Time();
+			var startTime = endTime.clone().subtract(1, "day");
+
+			$scope.refreshList = function () {
+				$scope.jobList = Entity.merge($scope.jobList, JPM.list("apollo", startTime, endTime, [
+					"jobID",
+					"currentState",
+					"user",
+					"queue",
+					"submissionTime",
+					"startTime",
+					"endTime",
+					"numTotalMaps",
+					"numTotalReduces",
+					"runningContainers"
+				]));
+			};
+			$scope.refreshList();
+
+			// Time component
+			$element.on("change.jpm", "#startTime", function () {
+				var time = verifyTime($(this).val(), Time.FORMAT);
+				if(time) {
+					startTime = time;
+					$scope.refreshList();
+				}
+			});
+			$element.on("change.jpm", "#endTime", function () {
+				var time = verifyTime($(this).val(), Time.FORMAT);
+				if(time) {
+					endTime = time;
+					$scope.refreshList();
+				}
+			});
+			setTimeout(function () {
+				$("#startTime").val(startTime.format(Time.FORMAT));
+				$("#endTime").val(endTime.format(Time.FORMAT));
+			}, 0);
+
+
+
+
+			console.log(">>>", Time.diff(startTime, endTime.clone().add(1234567, "ms")));
+
+
+			// Clean up
+			$scope.$on('$destroy', function() {
+				$element.off("change.jpm");
+			});
+		});
 	});
 })();

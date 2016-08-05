@@ -94,8 +94,8 @@
 		};
 
 		// Initialization
-		Application.onReload(function (Application) {
-			linkApplications(Site.list, Application.list);
+		Application.onReload(function () {
+			Site.reload();
 		});
 
 		Site.reload();

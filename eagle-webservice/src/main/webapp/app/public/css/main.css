@@ -146,7 +146,11 @@ table.table pre.inline {
 /* ========================================================================
  * =                                 Misc                                 =
  * ======================================================================== */
-.no-animate {
+.ng-hide.ng-hide-animate.no-animate {
 	-webkit-transition: none !important;
 	transition: none !important;
+}
+
+.ng-hide.ng-hide-animate.no-animate {
+	display: none;
 }

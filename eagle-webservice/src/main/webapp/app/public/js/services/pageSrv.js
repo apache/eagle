@@ -63,28 +63,52 @@
 	serviceModule.service('Portal', function($wrapState, Site) {
 		var Portal = {};
 
+		var mainPortalList = [];
+		var sitePortalList = [];
+		var connectedMainPortalList = [];
+		var sitePortals = {};
+
 		var backHome = {name: "Back home", icon: "arrow-left", path: "#/"};
-		var mainList = [];
+
+		Portal.register = function (portal, isSite) {
+			(isSite ? sitePortalList : mainPortalList).push(portal);
+		};
 
 		Portal.refresh = function () {
 			// TODO: check admin
-			mainList = defaultPortalList.concat(adminPortalList);
 
+			// Main level
+			connectedMainPortalList = defaultPortalList.concat(adminPortalList);
 			var siteList = $.map(Site.list, function (site) {
 				return {
 					name: site.siteName,
 					path: "#/site/" + site.siteId
 				};
 			});
+			connectedMainPortalList.push({name: "Sites", icon: "server", list: siteList});
 
-			mainList.push({
-				name: "Sites", icon: "server", list: siteList});
+			// Site level
+			sitePortals = {};
+			$.each(Site.list, function (i, site) {
+				sitePortals[site.siteId] = [backHome].concat($.map(sitePortalList, function (portal) {
+					var hasApp = !!common.array.find(portal.application, site.applicationList, "descriptor.type");
+					if(hasApp) {
+						return $.extend({}, portal, {
+							path: "#/site/" + site.siteId + "/" + portal.path.replace(/^[\\\/]/, "")
+						});
+					}
+				}));
+			});
 		};
 
 		Object.defineProperty(Portal, 'list', {
 			get: function () {
-				var isSite = /^site/.test($wrapState.state.current.name || "");
-				return isSite ? [backHome] : mainList;
+				var match = $wrapState.path().match(/^\/site\/([^\/]*)/);
+				if(match && match[1]) {
+					return sitePortals[match[1]];
+				} else {
+					return connectedMainPortalList;
+				}
 			}
 		});
 

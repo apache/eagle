@@ -179,9 +179,9 @@
 			if(deferred && deferred.then) {
 				deferred.then(function (data) {
 					successList[i] = data;
-					hasFailure = true;
 				}, function (data) {
 					failureList[i] = data;
+					hasFailure = true;
 				}).always(doCheck);
 			} else {
 				successList[i] = deferred;

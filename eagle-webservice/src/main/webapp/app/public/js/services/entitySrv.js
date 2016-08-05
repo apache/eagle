@@ -40,12 +40,12 @@
 
 				return list;
 			});
-			withThen(list);
-			return list;
+			return withThen(list);
 		}
 
 		function withThen(list) {
 			list._then = list._promise.then.bind(list._promise);
+			return list;
 		}
 
 		// Dev usage. Set rest api source
@@ -91,6 +91,29 @@
 				},
 				data: {uuid: uuid}
 			}));
+		};
+
+		/**
+		 * Merge 2 array into one. Will return origin list before target list is ready. Then fill with target list.
+		 * @param oriList
+		 * @param tgtList
+		 * @return {[]}
+		 */
+		Entity.merge = function (oriList, tgtList) {
+			if(!oriList) return tgtList;
+
+			var list = [].concat(oriList);
+			list._done = tgtList._done;
+			list._refresh = tgtList._refresh;
+			list._promise = tgtList._promise;
+
+			list._promise.then(function () {
+				list.splice(0);
+				Array.prototype.push.apply(list, tgtList);
+				list._done = true;
+			});
+
+			return withThen(list);
 		};
 
 		// TODO: metadata will be removed

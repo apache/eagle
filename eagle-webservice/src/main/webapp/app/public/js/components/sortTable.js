@@ -64,7 +64,7 @@
 							'<input type="search" class="form-control input-sm" placeholder="Search" ng-model="search" />' +
 							'<span class="fa fa-search" />' +
 							'</div>'
-						).prependTo($element);
+						).insertBefore($element.find("table"));
 						$compile($search)($scope);
 
 						// Sort Column

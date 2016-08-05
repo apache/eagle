@@ -23,9 +23,84 @@
 	var jpmApp = register(['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
 
 	jpmApp.route({
-		url: "/jpm",
+		url: "/jpm/list",
+		site: true,
 		templateUrl: "partials/job/list.html",
-		controller: "testCtrl"
+		controller: "listCtrl"
+	});
+
+	jpmApp.portal({name: "JPM", icon: "home", path: "jpm/list"}, true);
+
+	jpmApp.service("JPM", function ($http, Time) {
+		// TODO: mock auth
+		$http.defaults.withCredentials = true;
+		var _hash = btoa('eagle:secret');
+
+		// TODO: timestamp support
+		var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=JobExecutionService[@site="${site}"]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		//var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=RunningJobExecutionService[@site="${site}"]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+
+		var JPM = {};
+
+		/**
+		 * @typedef {{}} Job						Job entity
+		 * @property {{}} tags						unique job key
+		 * @property {string} tags.jobID			Job Id
+		 * @property {string} tags.user				Submit user
+		 * @property {string} tags.queue			Queue
+		 * @property {string} currentState			Job state
+		 * @property {string} submissionTime		Submission time
+		 * @property {string} startTime				Start time
+		 * @property {string} endTime				End time
+		 * @property {string} numTotalMaps			Maps count
+		 * @property {string} numTotalReduces		Reduce count
+		 * @property {string} runningContainers		Running container count
+		 */
+
+		/**
+		 * Fetch job list
+		 * @param site
+		 * @param startTime
+		 * @param endTime
+		 * @return {Job[]}
+		 */
+		JPM.list = function (site, startTime, endTime, fields, limit) {
+			var _list = [];
+
+			var url = common.template(QUERY_LIST, {
+				site: site,
+				startTime: moment(startTime).format(Time.FORMAT),
+				endTime: moment(endTime).format(Time.FORMAT),
+				fields: fields ? $.map(fields, function (field) {
+					return "@" + field;
+				}).join(",") : "*",
+				limit: limit || 10000
+			});
+
+			_list._done = false;
+			_list._promise = $http({
+				url: url,
+				method: "GET",
+				headers: {
+					'Authorization': "Basic " + _hash
+				}
+			});
+			/**
+			 * @param {{}} res
+			 * @param {{}} res.data
+			 * @param {Array} res.data.obj
+			 */
+			_list._promise.then(function (res) {
+				_list._done = true;
+				_list.splice(0);
+				Array.prototype.push.apply(_list, res.data.obj);
+				return _list
+			});
+
+			return _list;
+		};
+
+		return JPM;
 	});
 
 	jpmApp.require("ctrl/listCtrl.js");

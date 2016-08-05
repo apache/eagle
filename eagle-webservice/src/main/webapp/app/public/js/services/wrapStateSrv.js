@@ -45,8 +45,7 @@
 
 			if(_targetState !== state || priority) {
 				if($state.current && $state.current.name === state && angular.equals($state.params, param)) {
-					console.log($state);
-					console.log("[Wrap State] Go reload.");
+					console.log("[Wrap State] Go reload.", $state);
 					$state.reload();
 				} else {
 					console.log("[Wrap State] Go:", state, param, priority);

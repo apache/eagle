@@ -16,4 +16,73 @@
   limitations under the License.
   -->
 
-asd
+<style>
+	.datePickerGroup {
+		float: right;
+	}
+
+	.datePickerGroup > input {
+		width: 150px;
+		display: inline-block;
+		float: left;
+	}
+	.datePickerGroup > .addon {
+		float: left;
+		display: inline-block;
+		border-top: 1px solid #d2d6de;
+		border-bottom: 1px solid #d2d6de;
+		padding: 6px;
+		height: 34px;
+		background: #f4f4f4;
+	}
+</style>
+
+
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Job List
+			<span ng-hide="jobList._done" class="fa fa-refresh fa-spin no-animate"></span>
+		</h3>
+	</div>
+	<div class="box-body">
+		<div sort-table="jobList">
+			<div class="datePickerGroup clearfix">
+				<input id="startTime" type="text" class="form-control" data-toggle="datepicker" />
+				<span class="addon">To</span>
+				<input id="endTime" type="text" class="form-control" data-toggle="datepicker" data-position="right" />
+			</div>
+
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Job</th>
+						<th>Status</th>
+						<th>User</th>
+						<th>Queue</th>
+						<th>Submission Time</th>
+						<th>Execution Time</th>
+						<th>Duration</th>
+						<th>Map Tasks</th>
+						<th>Reduce Tasks</th>
+						<th>Allocated Containers</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in jobList">
+						<td>{{item.tags.jobID}}</td>
+						<td>{{item.currentState}}</td>
+						<td>{{item.tags.user}}</td>
+						<td>{{item.tags.queue}}</td>
+						<td>{{Time.format(item.submissionTime)}}</td>
+						<td>{{Time.format(item.startTime)}}</td>
+						<td>{{Time.diff(item.startTime, item.endTime)}}</td>
+						<td>{{item.numTotalMaps}}</td>
+						<td>{{item.numTotalReduces}}</td>
+						<td>{{item.runningContainers || "-"}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
