@@ -40,17 +40,17 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
 
     private StormEnvironment environment;
 
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                if(_localCluster != null) {
-                    LOG.info("Shutting down local storm cluster instance");
-                    _localCluster.shutdown();
-                }
-            }
-        });
-    }
+//    static {
+//        Runtime.getRuntime().addShutdownHook(new Thread(){
+//            @Override
+//            public void run() {
+//                if(_localCluster != null) {
+//                    LOG.info("Shutting down local storm cluster instance");
+//                    _localCluster.shutdown();
+//                }
+//            }
+//        });
+//    }
 
     private static LocalCluster getLocalCluster(){
         if(_localCluster == null){

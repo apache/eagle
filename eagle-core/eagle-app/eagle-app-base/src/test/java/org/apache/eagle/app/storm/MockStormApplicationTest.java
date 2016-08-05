@@ -52,7 +52,7 @@ public class MockStormApplicationTest {
         MockStormApplication mockStormApplication = new MockStormApplication();
         mockStormApplication.execute(new StormEnvironment(ConfigFactory.load()));
         Assert.assertTrue(mockStormApplication.getAppConfig().isLoaded());
-        Assert.assertEquals(1234,mockStormApplication.getAppConfig().getSpoutNum());
+        Assert.assertEquals(3,mockStormApplication.getAppConfig().getSpoutNum());
         Assert.assertEquals(ApplicationEntity.Mode.LOCAL,mockStormApplication.getAppConfig().getMode());
     }
 
@@ -71,6 +71,5 @@ public class MockStormApplicationTest {
         appConfig.setLoaded(true);
         appConfig.setSpoutNum(4);
         new MockStormApplication().run(appConfig);
-//        Thread.sleep(Long.MAX_VALUE);
     }
 }
