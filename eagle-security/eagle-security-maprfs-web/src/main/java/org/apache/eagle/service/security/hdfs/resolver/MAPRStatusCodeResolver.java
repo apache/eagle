@@ -25,9 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -45,11 +43,29 @@ public class MAPRStatusCodeResolver implements AttributeResolvable<GenericAttrib
             "EADDRINUSE","EADDRNOTAVAIL","ENETDOWN","ENETUNREACH","ENETRESET","ECONNABORTED","ECONNRESET","ENOBUFS","EISCONN","ENOTCONN",
             "ESHUTDOWN","ETOOMANYREFS","ETIMEDOUT","ECONNREFUSED","EHOSTDOWN","EHOSTUNREACH","EALREADY","EINPROGRESS","ESTALE","EUCLEAN","ENOTNAM",
             "ENAVAIL","EISNAM","EREMOTEIO","EDQUOT","ENOMEDIUM","EMEDIUMTYPE","ECANCELED","ENOKEY","EKEYEXPIRED","EKEYREVOKED","EKEYREJECTED"};
+    private Map<String, String> statusCodeMap = new HashMap<String, String>();
 
     private final static String MAPRFS_STATUS_CODE_RESOLVE_FORMAT_HINT = String.format("Status code must be in {%s}", StringUtils.join(statusCodes, ","));
 
     private final static List<String> statusList = Arrays.asList(statusCodes);
 
+    public MAPRStatusCodeResolver () {
+        //construct hashmap for status code query
+        for(int i = 0; i < statusCodes.length; i++){
+            statusCodeMap.put(statusCodes[i],String.valueOf(i));
+        }
+    }
+
+    //conver human readable status code to id
+    public String getStatusCodeID(String code){
+        String id = "STATUS CODE ID NOT FOUND";
+        if(statusCodeMap.containsKey(code)) {
+            id = statusCodeMap.get(code);
+        }
+        return id;
+    }
+
+    @Override
     public List<String> resolve(GenericAttributeResolveRequest request) throws AttributeResolveException {
         String query = request.getQuery().trim();
         List<String> res = new ArrayList<>();

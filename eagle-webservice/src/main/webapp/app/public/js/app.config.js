@@ -40,6 +40,8 @@
 			userProfile: 'rest/authentication',
 			logout: 'logout',
 
+			maprNameResolver: '../rest/maprNameResolver',
+
 			DELETE_HOOK: {
 				FeatureDescService: 'rest/module/feature?feature=${feature}',
 				ApplicationDescService: 'rest/module/application?application=${application}',
@@ -61,6 +63,23 @@
 		var _url = app.packageURL(_path);
 		if(kvs !== undefined) {
 			_url = common.template(_url, kvs);
+		}
+		return _url;
+	};
+
+	app.getMapRNameResolverURL = function(name,value, site) {
+		var key = "maprNameResolver";
+		var _path = app.config.urls[key];
+		if(!_path) throw "URL:'" + name + "' not exist!";
+		var _url = _path;
+		if(name == "fNameResolver") {
+			_url +=  "/" + name + "?fName=" + value + "&site=" + site;
+		} else if(name == "sNameResolver") {
+			_url +=  "/" + name + "?sName=" + value + "&site=" + site;
+		} else if (name == "vNameResolver") {
+			_url += "/" + name + "?vName=" + value + "&site=" + site;
+		} else{
+			throw "resolver:'" + name + "' not exist!";
 		}
 		return _url;
 	};
