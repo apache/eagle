@@ -274,7 +274,7 @@
         <javax.mail.version>1.4</javax.mail.version>
         <extcos4.version>0.4b</extcos4.version>
         <extcos3.version>0.3b</extcos3.version>
-        <siddhi.version>3.0.5</siddhi.version>
+        <siddhi.version>3.1.1</siddhi.version>
 
         <!-- Testing -->
         <junit.version>4.12</junit.version>
