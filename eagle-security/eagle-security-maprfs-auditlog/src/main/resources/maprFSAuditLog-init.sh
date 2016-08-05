@@ -32,7 +32,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
            "application":"maprFSAuditLog"
         },
         "enabled": true,
-        "config": "classification.fs.defaultFS=hdfs://mapr1.da.dg:7222\nclassification.mapr.webhttps=https://mapr1.da.dg:8443\nclassification.mapr.username=mapr\nclassification.mapr.password=mapr"
+        "config": "classification.fs.defaultFS=hdfs://sandbox.mapr.com:7222\nclassification.mapr.webhttps=https://sandbox.mapr.com:8443\nclassification.mapr.username=username\nclassification.mapr.password=password"
      }
   ]
   '

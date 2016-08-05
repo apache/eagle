@@ -17,19 +17,15 @@
 
 
 import org.apache.eagle.service.security.hdfs.rest.MapRNameResolver;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class MapRNameResolverTest {
-
-    public static void main(String[] args){
+    @Test
+    public void testResolver () {
         MapRNameResolver resolver = new MapRNameResolver();
-        String name = "/test05";
-        String id = "";
-        try{
-            //id = resolver.getFid(name);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println("name to Id: " + id);
+        Assert.assertEquals("2049.2692.136572", resolver.getFid("/test0","mapr"));
+        Assert.assertEquals("0", resolver.getSid("success", "mapr"));
+        Assert.assertEquals("mapr.cluster.root","186635570");
     }
-
 }
