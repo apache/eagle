@@ -55,7 +55,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
         this.jobExtractorConfig = jobExtractorConfig;
         this.endpointConfig = endpointConfig;
         this.zkStateConfig = zkStateConfig;
-        this.init = false;
+        this.init = !(zkStateConfig.recoverEnabled);
         this.runningYarnApps = new HashSet<>();
     }
 
@@ -94,43 +94,47 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
                 while (appIdIterator.hasNext()) {
                     String appId = appIdIterator.next();
                     boolean hasFinished = true;
-                    for (AppInfo appInfo : apps) {
-                        if (appId.equals(appInfo.getId())) {
-                            hasFinished = false;
-                        }
-                        running.add(appInfo.getId());
-                    }
-
-                    if (hasFinished) {
-                        try {
-                            Map<String, SparkAppEntity> result = this.runningJobManager.recoverYarnApp(appId);
-                            if (result.size() > 0) {
-                                if (sparkApps == null) {
-                                    sparkApps = new HashMap<>();
-                                }
-                                sparkApps.put(appId, result);
-                                AppInfo appInfo = result.get(result.keySet().iterator().next()).getAppInfo();
-                                appInfo.setState(Constants.AppState.FINISHED.toString());
-                                apps.add(appInfo);
+                    if (apps != null) {
+                        for (AppInfo appInfo : apps) {
+                            if (appId.equals(appInfo.getId())) {
+                                hasFinished = false;
                             }
-                        } catch (KeeperException.NoNodeException e) {
-                            LOG.warn("{}", e);
-                            LOG.warn("yarn app {} has finished", appId);
+                            running.add(appInfo.getId());
+                        }
+
+                        if (hasFinished) {
+                            try {
+                                Map<String, SparkAppEntity> result = this.runningJobManager.recoverYarnApp(appId);
+                                if (result.size() > 0) {
+                                    if (sparkApps == null) {
+                                        sparkApps = new HashMap<>();
+                                    }
+                                    sparkApps.put(appId, result);
+                                    AppInfo appInfo = result.get(result.keySet().iterator().next()).getAppInfo();
+                                    appInfo.setState(Constants.AppState.FINISHED.toString());
+                                    apps.add(appInfo);
+                                }
+                            } catch (KeeperException.NoNodeException e) {
+                                LOG.warn("{}", e);
+                                LOG.warn("yarn app {} has finished", appId);
+                            }
                         }
                     }
                 }
 
                 this.runningYarnApps = running;
-                LOG.info("get {} total apps(contains finished)", apps.size());
+                LOG.info("get {} total apps(contains finished)", apps == null ? 0 : apps.size());
             }
 
-            for (int i = 0; i < apps.size(); i++) {
-                LOG.info("emit spark yarn application " + apps.get(i).getId());
-                if (sparkApps != null) {
-                    //emit (AppInfo, Map<String, SparkAppEntity>)
-                    collector.emit(new Values(apps.get(i).getId(), apps.get(i), sparkApps.get(apps.get(i).getId())));
-                } else {
-                    collector.emit(new Values(apps.get(i).getId(), apps.get(i), null));
+            if (apps != null) {
+                for (AppInfo app : apps) {
+                    LOG.info("emit spark yarn application " + app.getId());
+                    if (sparkApps != null) {
+                        //emit (AppInfo, Map<String, SparkAppEntity>)
+                        collector.emit(new Values(app.getId(), app, sparkApps.get(app.getId())));
+                    } else {
+                        collector.emit(new Values(app.getId(), app, null));
+                    }
                 }
             }
         } catch (Exception e) {

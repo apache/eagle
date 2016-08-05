@@ -243,12 +243,12 @@ public class SparkApplicationParser implements Runnable {
         JobConfig jobConfig = null;
 
         try (FileSystem hdfs = HDFSUtil.getFileSystem(this.hdfsConf)) {
-            // // For Yarn version >= 2.7,
-            // // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
-            // String attemptIdFormatted = String.format("%06d", attemptId);
-            // // remove "application_" to get the number part of appID.
-            // String sparkAppIdNum = sparkAppId.substring(12);
-            // String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+//             // For Yarn version >= 2.7,
+//             // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
+//             String attemptIdFormatted = String.format("%06d", attemptId);
+//             // remove "application_" to get the number part of appID.
+//             String sparkAppIdNum = sparkAppId.substring(12);
+//             String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
 
             // For Yarn version 2.4.x
             // log name: application_1464382345557_269065_1
@@ -344,9 +344,13 @@ public class SparkApplicationParser implements Runnable {
                             0 :
                             Utils.parseMemory(jobConfig.get(Constants.SPARK_DRIVER_MEMORY_KEY)));
                     attemptEntity.setExecutorCores(Integer.parseInt(jobConfig.get(Constants.SPARK_EXECUTOR_CORES_KEY)));
-                    attemptEntity.setDriverCores(isClientMode(jobConfig) ?
-                            0 :
-                            Integer.parseInt(jobConfig.get(Constants.SPARK_DRIVER_CORES_KEY)));
+                    // spark.driver.cores may not be set.
+                    String driverCoresStr = jobConfig.get(Constants.SPARK_DRIVER_CORES_KEY);
+                    int driverCores = 0;
+                    if (driverCoresStr != null && !isClientMode(jobConfig)) {
+                        driverCores = Integer.parseInt(driverCoresStr);
+                    }
+                    attemptEntity.setDriverCores(driverCores);
                 } catch (Exception e) {
                     LOG.warn("add config failed, {}", e);
                     e.printStackTrace();

@@ -50,13 +50,14 @@ public class SparkAppEntityCreationHandler {
         if (entities.size() == 0) {
             return true;
         }
-        IEagleServiceClient client = new EagleServiceClientImpl(
+
+
+        try (IEagleServiceClient client = new EagleServiceClientImpl(
                 eagleServiceConfig.eagleServiceHost,
                 eagleServiceConfig.eagleServicePort,
                 eagleServiceConfig.username,
-                eagleServiceConfig.password);
-        client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
-        try {
+                eagleServiceConfig.password)) {
+            client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
             LOG.info("start to flush spark app entities, size {}", entities.size());
             client.create(entities);
             LOG.info("finish flushing spark app entities, size {}", entities.size());
@@ -65,12 +66,6 @@ public class SparkAppEntityCreationHandler {
             LOG.warn("exception found when flush entities, {}", e);
             e.printStackTrace();
             return false;
-        } finally {
-            client.getJerseyClient().destroy();
-            try {
-                client.close();
-            } catch (Exception e) {
-            }
         }
 
         return true;
