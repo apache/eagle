@@ -41,12 +41,12 @@ import org.wso2.siddhi.core.stream.output.StreamCallback;
 public class TestExternalBatchWindow {
 
     private static SiddhiManager siddhiManager;
-    
+
     @BeforeClass
     public static void beforeClass() {
         siddhiManager = new SiddhiManager();
     }
-    
+
     @AfterClass
     public static void afterClass() {
         siddhiManager.shutdown();
@@ -75,7 +75,7 @@ public class TestExternalBatchWindow {
         for (int i = 0; i < length; i++) {
             input.send(new Object[] { 15, now + i * 1000 });
         }
-        
+
         Thread.sleep(1000);
         Assert.assertFalse("Event happens inner external time batch window, should not have event recieved in callback!", recieved.get());
 
@@ -83,9 +83,9 @@ public class TestExternalBatchWindow {
     }
 
     private ExecutionPlanRuntime simpleQueryRuntime() {
-        String query = "define stream jmxMetric(cpu int, timestamp long); " 
+        String query = "define stream jmxMetric(cpu int, timestamp long); "
                 + "@info(name='query')"
-                + "from jmxMetric#window.eagle:externalTimeBatch(timestamp, 10 sec) " 
+                + "from jmxMetric#window.externalTimeBatch(timestamp, 10 sec) "
                 + "select avg(cpu) as avgCpu, count(1) as count insert into tmp;";
 
         return siddhiManager.createExecutionPlanRuntime(query);
@@ -108,7 +108,7 @@ public class TestExternalBatchWindow {
     public void test05ExternalJoin() {
         // TODO
     }
-    
+
     @Test
     public void test06EdgeCase() throws Exception {
         // every 10 sec
@@ -141,7 +141,7 @@ public class TestExternalBatchWindow {
         for (int i = 0; i < length; i++) {
             input.send(new Object[] { 15, now + i * 10 });
         }
-        
+
         // second round
         // if the trigger event mix with the last window, we should see the avgValue is not expected
         for (int i = 0; i < length; i++) {
@@ -149,11 +149,11 @@ public class TestExternalBatchWindow {
         }
         // to trigger second round
         input.send(new Object[] { 10000, now + 10 * 10000 });
-        
+
 //        latch.await();// for debug
 
         Thread.sleep(1000);
-        
+
         Assert.assertEquals(2, recCount.get());
     }
 
@@ -162,11 +162,11 @@ public class TestExternalBatchWindow {
         String defaultStream = "define stream LoginEvents (myTime long, ip string, phone string,price int);";
 
         String query = " @info(name='pull76') "
-                + " from LoginEvents#window.eagle:externalTimeBatch(myTime, 5 sec)  "
+                + " from LoginEvents#window.externalTimeBatch(myTime, 5 sec)  "
                 + " select myTime, phone, ip, price, count(ip) as cntip , "
                 + " min(myTime) as mintime, max(myTime) as maxtime "
                 + " insert into events ;";
-        
+
         ExecutionPlanRuntime runtime = siddhiManager.createExecutionPlanRuntime(defaultStream + query);
 
         InputHandler inputHandler = runtime.getInputHandler("LoginEvents");
@@ -194,10 +194,10 @@ public class TestExternalBatchWindow {
                 }
             }
         });
-        
-        
+
+
         runtime.start();
-        
+
         long start = System.currentTimeMillis();
         Calendar c = Calendar.getInstance();
         c.add(Calendar.HOUR, 1);
@@ -214,12 +214,12 @@ public class TestExternalBatchWindow {
         Thread.sleep(1000);
         runtime.shutdown();
     }
-    
+
     @Test
     public void test01DownSampling() throws Exception {
         String stream = "define stream jmxMetric(cpu int, memory int, bytesIn long, bytesOut long, timestamp long);";
-        String query = "@info(name = 'downSample') " 
-                + "from jmxMetric#window.eagle:externalTimeBatch(timestamp, 10 sec) "
+        String query = "@info(name = 'downSample') "
+                + "from jmxMetric#window.externalTimeBatch(timestamp, 10 sec) "
                 + "select "
                 + "avg(cpu) as avgCpu, max(cpu) as maxCpu, min(cpu) as minCpu, "
                 + " '|' as s, "
@@ -227,7 +227,7 @@ public class TestExternalBatchWindow {
                 + " '|' as s1, "
                 + " avg(bytesIn) as avgBytesIn, max(bytesIn) as maxBytesIn, min(bytesIn) as minBytesIn, "
                 + " '|' as s2, "
-                + " avg(bytesOut) as avgBytesOut, max(bytesOut) as maxBytesOut, min(bytesOut) as minBytesOut, " 
+                + " avg(bytesOut) as avgBytesOut, max(bytesOut) as maxBytesOut, min(bytesOut) as minBytesOut, "
                 + " '|' as s3, "
                 + " timestamp as timeWindowEnds, "
                 + " '|' as s4, "

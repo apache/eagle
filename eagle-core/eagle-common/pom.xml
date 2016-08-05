@@ -32,6 +32,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.wso2.siddhi</groupId>
+			<artifactId>siddhi-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 		</dependency>
