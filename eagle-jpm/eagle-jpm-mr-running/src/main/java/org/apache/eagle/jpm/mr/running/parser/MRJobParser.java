@@ -216,6 +216,9 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setKilledMapAttempts(mrJob.getKilledMapAttempts());
             jobExecutionAPIEntity.setSuccessfulMapAttempts(mrJob.getSuccessfulMapAttempts());
             jobExecutionAPIEntity.setAppInfo(app);
+            jobExecutionAPIEntity.setAllocatedMB(app.getAllocatedMB());
+            jobExecutionAPIEntity.setAllocatedVCores(app.getAllocatedVCores());
+            jobExecutionAPIEntity.setRunningContainers(app.getRunningContainers());
             runningJobManager.update(app.getId(), id, jobExecutionAPIEntity);
         }
 
@@ -243,22 +246,35 @@ public class MRJobParser implements Runnable {
         Map<String, Map<String, Long>> groups = new HashMap<>();
 
         for (JobCounterGroup jobCounterGroup : jobCounters.getCounterGroup()) {
-            if (!groups.containsKey(jobCounterGroup.getCounterGroupName())) {
-                groups.put(jobCounterGroup.getCounterGroupName(), new HashMap<>());
+            String counterGroupName = jobCounterGroup.getCounterGroupName();
+            if (!groups.containsKey(counterGroupName)) {
+                groups.put(counterGroupName, new HashMap<>());
             }
 
-            Map<String, Long> counterValues = groups.get(jobCounterGroup.getCounterGroupName());
+            Map<String, Long> counterValues = groups.get(counterGroupName);
             List<JobCounterItem> items = jobCounterGroup.getCounter();
             if (items == null) continue;
             for (JobCounterItem item : items) {
-                counterValues.put(item.getName(), item.getTotalCounterValue());
-                //counterValues.put(item.getName() + "_MAP", item.getMapCounterValue());
-                //counterValues.put(item.getName() + "_REDUCE", item.getReduceCounterValue());
+                String key = item.getName();
+                counterValues.put(key, item.getTotalCounterValue());
+                if (counterGroupName.equals(Constants.JOB_COUNTER)) {
+                    if (key.equals(Constants.JobCounter.DATA_LOCAL_MAPS.toString())) {
+                        jobExecutionAPIEntity.setDataLocalMaps((int)item.getTotalCounterValue());
+                    } else if (key.equals(Constants.JobCounter.RACK_LOCAL_MAPS.toString())) {
+                        jobExecutionAPIEntity.setRackLocalMaps((int)item.getTotalCounterValue());
+                    } else if (key.equals(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString())) {
+                        jobExecutionAPIEntity.setTotalLaunchedMaps((int)item.getTotalCounterValue());
+                    }
+                }
             }
         }
 
         jobCounter.setCounters(groups);
         jobExecutionAPIEntity.setJobCounters(jobCounter);
+        if (jobExecutionAPIEntity.getTotalLaunchedMaps() > 0) {
+            jobExecutionAPIEntity.setDataLocalMapsPercentage(jobExecutionAPIEntity.getDataLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
+            jobExecutionAPIEntity.setRackLocalMapsPercentage(jobExecutionAPIEntity.getRackLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
+        }
         return true;
     };
 
@@ -422,10 +438,11 @@ public class MRJobParser implements Runnable {
 
             mrJobEntityCreationHandler.add(taskExecutionAPIEntity);
 
-            if (!(task.getState().equals(Constants.TaskState.NEW.toString()) ||
-                    task.getState().equals(Constants.TaskState.SCHEDULED.toString()) ||
-                    task.getState().equals(Constants.TaskState.RUNNING.toString()))) {
-                LOG.info("mr job {} task {} has finished", jobId, task.getId());
+            if (task.getState().equals(Constants.TaskState.SUCCEEDED.toString()) ||
+                    task.getState().equals(Constants.TaskState.FAILED.toString()) ||
+                    task.getState().equals(Constants.TaskState.KILLED.toString()) ||
+                    task.getState().equals(Constants.TaskState.KILL_WAIT.toString())) {
+                //LOG.info("mr job {} task {} has finished", jobId, task.getId());
                 this.finishedTaskIds.add(task.getId());
             }
         }

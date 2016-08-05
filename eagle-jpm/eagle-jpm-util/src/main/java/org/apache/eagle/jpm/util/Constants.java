@@ -133,6 +133,7 @@ public class Constants {
 
     public static final String FILE_SYSTEM_COUNTER = "org.apache.hadoop.mapreduce.FileSystemCounter";
     public static final String TASK_COUNTER = "org.apache.hadoop.mapreduce.TaskCounter";
+    public static final String JOB_COUNTER = "org.apache.hadoop.mapreduce.JobCounter";
 
     public static final String MAP_TASK_ATTEMPT_COUNTER = "MapTaskAttemptCounter";
     public static final String REDUCE_TASK_ATTEMPT_COUNTER = "ReduceTaskAttemptCounter";
@@ -144,17 +145,9 @@ public class Constants {
         TASK_ATTEMPT_DURATION,
     }
 
-
-
-    private static final String DEFAULT_JOB_CONF_NORM_JOBNAME_KEY = "eagle.job.name";
-    private static final String EAGLE_NORM_JOBNAME_CONF_KEY = "eagle.job.normalizedfieldname";
-
-    public static String JOB_CONF_NORM_JOBNAME_KEY = null;
-
-    static {
-        if (JOB_CONF_NORM_JOBNAME_KEY == null) {
-            JOB_CONF_NORM_JOBNAME_KEY = DEFAULT_JOB_CONF_NORM_JOBNAME_KEY;
-        }
-        LOG.info("Loaded " + EAGLE_NORM_JOBNAME_CONF_KEY + " : " + JOB_CONF_NORM_JOBNAME_KEY);
+    public enum JobCounter {
+        DATA_LOCAL_MAPS,
+        RACK_LOCAL_MAPS,
+        TOTAL_LAUNCHED_MAPS
     }
 }

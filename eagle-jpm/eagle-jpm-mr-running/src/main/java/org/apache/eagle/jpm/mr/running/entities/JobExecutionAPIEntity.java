@@ -92,6 +92,22 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     private JobCounters jobCounters;
     @Column("aa")
     private JobConfig jobConfig;
+    @Column("ab")
+    private long allocatedMB;
+    @Column("ac")
+    private int allocatedVCores;
+    @Column("ad")
+    private int runningContainers;
+    @Column("ae")
+    private int dataLocalMaps;
+    @Column("af")
+    private double dataLocalMapsPercentage;
+    @Column("ag")
+    private int rackLocalMaps;
+    @Column("ah")
+    private double rackLocalMapsPercentage;
+    @Column("ai")
+    private int totalLaunchedMaps;
 
     public JobConfig getJobConfig() {
         return jobConfig;
@@ -334,5 +350,77 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     public void setAppInfo(AppInfo appInfo) {
         this.appInfo = appInfo;
         valueChanged("appInfo");
+    }
+
+    public long getAllocatedMB() {
+        return allocatedMB;
+    }
+
+    public void setAllocatedMB(long allocatedMB) {
+        this.allocatedMB = allocatedMB;
+        valueChanged("allocatedMB");
+    }
+
+    public int getAllocatedVCores() {
+        return allocatedVCores;
+    }
+
+    public void setAllocatedVCores(int allocatedVCores) {
+        this.allocatedVCores = allocatedVCores;
+        valueChanged("allocatedVCores");
+    }
+
+    public int getRunningContainers() {
+        return runningContainers;
+    }
+
+    public void setRunningContainers(int runningContainers) {
+        this.runningContainers = runningContainers;
+        valueChanged("runningContainers");
+    }
+
+    public int getDataLocalMaps() {
+        return dataLocalMaps;
+    }
+
+    public void setDataLocalMaps(int dataLocalMaps) {
+        this.dataLocalMaps = dataLocalMaps;
+        valueChanged("dataLocalMaps");
+    }
+
+    public double getDataLocalMapsPercentage() {
+        return dataLocalMapsPercentage;
+    }
+
+    public void setDataLocalMapsPercentage(double dataLocalMapsPercentage) {
+        this.dataLocalMapsPercentage = dataLocalMapsPercentage;
+        valueChanged("dataLocalMapsPercentage");
+    }
+
+    public int getRackLocalMaps() {
+        return rackLocalMaps;
+    }
+
+    public void setRackLocalMaps(int rackLocalMaps) {
+        this.rackLocalMaps = rackLocalMaps;
+        valueChanged("rackLocalMaps");
+    }
+
+    public double getRackLocalMapsPercentage() {
+        return rackLocalMapsPercentage;
+    }
+
+    public void setRackLocalMapsPercentage(double rackLocalMapsPercentage) {
+        this.rackLocalMapsPercentage = rackLocalMapsPercentage;
+        valueChanged("rackLocalMapsPercentage");
+    }
+
+    public int getTotalLaunchedMaps() {
+        return totalLaunchedMaps;
+    }
+
+    public void setTotalLaunchedMaps(int totalLaunchedMaps) {
+        this.totalLaunchedMaps = totalLaunchedMaps;
+        valueChanged("totalLaunchedMaps");
     }
 }

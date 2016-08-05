@@ -224,7 +224,27 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
            m_jobExecutionEntity.setNumTotalMaps(m_numTotalMaps);
            m_jobExecutionEntity.setNumTotalReduces(m_numTotalReduces);
            if (values.get(Keys.COUNTERS) != null || totalCounters != null) {
-               m_jobExecutionEntity.setJobCounters(parseCounters(totalCounters));
+               JobCounters jobCounters = parseCounters(totalCounters);
+               m_jobExecutionEntity.setJobCounters(jobCounters);
+               if (jobCounters.getCounters().containsKey(Constants.JOB_COUNTER)) {
+                   Map<String, Long> counters = jobCounters.getCounters().get(Constants.JOB_COUNTER);
+                   if (counters.containsKey(Constants.JobCounter.DATA_LOCAL_MAPS.toString())) {
+                       m_jobExecutionEntity.setDataLocalMaps(counters.get(Constants.JobCounter.DATA_LOCAL_MAPS.toString()).intValue());
+                   }
+
+                   if (counters.containsKey(Constants.JobCounter.RACK_LOCAL_MAPS.toString())) {
+                       m_jobExecutionEntity.setRackLocalMaps(counters.get(Constants.JobCounter.RACK_LOCAL_MAPS.toString()).intValue());
+                   }
+
+                   if (counters.containsKey(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString())) {
+                       m_jobExecutionEntity.setTotalLaunchedMaps(counters.get(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString()).intValue());
+                   }
+               }
+
+               if (m_jobExecutionEntity.getTotalLaunchedMaps() > 0) {
+                   m_jobExecutionEntity.setDataLocalMapsPercentage(m_jobExecutionEntity.getDataLocalMaps() * 1.0 / m_jobExecutionEntity.getTotalLaunchedMaps());
+                   m_jobExecutionEntity.setRackLocalMapsPercentage(m_jobExecutionEntity.getRackLocalMaps() * 1.0 / m_jobExecutionEntity.getTotalLaunchedMaps());
+               }
            }
            entityCreated(m_jobExecutionEntity);
        }
