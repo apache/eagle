@@ -20,13 +20,14 @@ import org.apache.eagle.storage.DataStorageManager;
 import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
 import org.apache.eagle.storage.hbase.HBaseStorage;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @since 3/20/15
  */
 public class TestHBaseStorageLoader {
-    @Test
+    @Test @Ignore("TODO: Add back after refactoring hbase related unit test cases")
     public void testHBaseStorageLoader() {
         try {
             assert DataStorageManager.getDataStorageByEagleConfig() instanceof HBaseStorage;
