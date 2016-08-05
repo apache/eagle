@@ -50,6 +50,9 @@ public class ExampleStormApplication extends StormApplication<ExampleStormConfig
         public void nextTuple() {
             _collector.emit(Arrays.asList("disk.usage",System.currentTimeMillis(),"host_1",56.7));
             _collector.emit(Arrays.asList("cpu.usage",System.currentTimeMillis(),"host_2",99.8));
+            try{
+                Thread.sleep(5000);
+            }catch (Exception ex){}
         }
 
         @Override

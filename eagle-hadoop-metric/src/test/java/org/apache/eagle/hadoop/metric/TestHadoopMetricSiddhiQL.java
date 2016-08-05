@@ -117,7 +117,7 @@ public class TestHadoopMetricSiddhiQL {
         latch.await(10, TimeUnit.SECONDS);
         Thread.sleep(3000);
 
-        System.out.println(count.get());
+        System.out.println("callback count=" + count.get());
         if (eventHappenCount >= 0) {
             Assert.assertEquals(eventHappenCount, count.get());
         } else {
@@ -310,4 +310,45 @@ public class TestHadoopMetricSiddhiQL {
         return events;
     }
 
+    @Test
+    public void testNoActiveNamenodeFor3Times() throws Exception {
+        String sql = " define stream s (host string, timestamp long, metric string, component string, site string, value double); " +
+                " @info(name='query') " +
+                " from s[metric == \"hadoop.namenode.hastate.active.count\"]#window.length(3) select  metric, host, value, timestamp, component, site, avg(convert(value, \"long\")) as avgValue, count() as cnt having avgValue==0 and cnt==3  insert into tmp;";
+//        " from s[metric == \"hadoop.namenode.hastate.active.count\"]#window.length(3) select  metric, host, value, timestamp, component, site, min(convert(value, \"long\")) as minValue, max(convert(value, \"long\")) as maxValue, count() as cnt having minValue==0 and maxValue==0 and cnt==3  insert into tmp;";
+
+        System.out.println(sql);
+
+        testQL(sql, generateMBEvents_times_0(1), 0);
+        testQL(sql, generateMBEvents_times_0(2), 0);
+        testQL(sql, generateMBEvents_times_0(3), 1);
+    }
+
+    private List<Event> generateMBEvents_times_0(int times_0) {
+        List<Event> events = new LinkedList<>();
+
+        long base1 = System.currentTimeMillis();
+        double[] values = new double[3];
+        if(times_0 == 1){
+            values[0] = 1.0;
+            values[1] = 0.0;
+            values[2] = 1.0;
+        }else if(times_0 == 2){
+            values[0] = 1.0;
+            values[1] = 0.0;
+            values[2] = 0.0;
+        }else if(times_0 == 3){
+            values[0] = 0.0;
+            values[1] = 0.0;
+            values[2] = 0.0;
+        }
+        for(int i=0; i<3; i++) {
+            // master / slave in sync
+            base1 = base1 + 1000;
+            Event e = new Event();
+            e.setData(new Object[]{"a", base1, "hadoop.namenode.hastate.active.count", "namenode", "sandbox", values[i]});
+            events.add(e);
+        }
+        return events;
+    }
 }
