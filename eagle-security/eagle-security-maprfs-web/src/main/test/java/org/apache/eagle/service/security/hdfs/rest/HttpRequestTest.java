@@ -16,18 +16,15 @@
  */
 package org.apache.eagle.service.security.hdfs.rest;
 
-import org.apache.eagle.service.security.hdfs.resolver.MAPRFSVolumeResolver;
 import org.json.JSONObject;
-
-import java.util.List;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class HttpRequestTest {
-    public static void main(String args[]) throws Exception {
-        String restUrl = "https://mapr1.da.dg:8443/rest/volume/list";
-        JSONObject res = HttpRequest.executeGet(restUrl,"mapr", "mapr");
-        MAPRFSVolumeResolver resolver = new MAPRFSVolumeResolver();
-        List<String> ans = resolver.extractVolumeList(res);
-        for(String i : ans) System.out.println(i);
+    @Test
+    public void TestExecuteGet() throws Exception {
+        String restUrl = "https://sandbox.mapr.com:8443/rest/volume/list";
+        JSONObject res = HttpRequest.executeGet(restUrl,"username", "password");
+        Assert.assertEquals("OK",res.getString("status"));
     }
-
 }
