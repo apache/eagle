@@ -58,6 +58,10 @@
                     <groupId>com.sun.jersey</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -132,6 +136,11 @@
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-jpm-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-hbase-auditlog</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

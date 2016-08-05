@@ -36,11 +36,12 @@ public class MetadataDaoFactory {
 
     private MetadataDaoFactory() {
         Config config = ConfigFactory.load();
-        Config datastoreConfig = config.getConfig("datastore");
-        if (datastoreConfig == null) {
+
+        if (!config.hasPath("datastore") || config.getConfig("datastore") == null) {
             LOG.warn("datastore is not configured, use in-memory store !!!");
-            dao = new InMemMetadataDaoImpl(datastoreConfig);
+            dao = new InMemMetadataDaoImpl(config.getConfig("datastore"));
         } else {
+            Config datastoreConfig = config.getConfig("datastore");
             String clsName = datastoreConfig.getString("metadataDao");
             Class<?> clz;
             try {

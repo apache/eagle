@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app.sink;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.app.Configuration;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 
@@ -24,15 +25,15 @@ import java.lang.reflect.ParameterizedType;
 public interface StreamSinkProvider<S extends StreamSink<D>,D extends StreamSinkConfig>{
     /**
      * @param streamId
-     * @param appConfig
+     * @param config
      * @return
      */
-    D getSinkConfig(String streamId, Configuration appConfig);
+    D getSinkConfig(String streamId, Config config);
     S getSink();
 
-    default S getSink(String streamId, Configuration appConfig){
+    default S getSink(String streamId, Config config){
         S s = getSink();
-        s.init(streamId,getSinkConfig(streamId,appConfig));
+        s.init(streamId,getSinkConfig(streamId,config));
         return s;
     }
 

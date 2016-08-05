@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
 import org.apache.eagle.security.service.HBaseSensitivityEntity;
 import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.InMemMetadataDaoImpl;
 import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.security.util.AbstractResourceSensitivityPollingJob;
 import org.apache.eagle.security.util.ExternalDataCache;
@@ -44,7 +45,7 @@ public class HbaseResourceSensitivityPollingJob extends AbstractResourceSensitiv
             throws JobExecutionException {
         JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
         try {
-            ISecurityMetadataDAO dao = MetadataDaoFactory.getInstance().getMetadataDao();
+            ISecurityMetadataDAO dao = new InMemMetadataDaoImpl(null);
             Collection<HBaseSensitivityEntity> sensitivityEntities = dao.listHBaseSensitivies();
             ExternalDataCache.getInstance().setJobResult(getClass(), sensitivityEntities);
         } catch(Exception ex) {

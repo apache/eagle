@@ -17,6 +17,7 @@
 package org.apache.eagle.app.sink;
 
 import backtype.storm.task.TopologyContext;
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.app.Configuration;
 import org.slf4j.Logger;
@@ -65,9 +66,9 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
 
     public static class Provider implements StreamSinkProvider<KafkaStreamSink,KafkaStreamSinkConfig> {
         @Override
-        public KafkaStreamSinkConfig getSinkConfig(String streamId, Configuration appConfig) {
+        public KafkaStreamSinkConfig getSinkConfig(String streamId, Config config) {
             String topicId = String.format("EAGLE.%s.%s",
-                    appConfig.getSiteId(),
+                    config.getString("siteId"),
                     streamId).toLowerCase();
             KafkaStreamSinkConfig desc = new KafkaStreamSinkConfig();
             desc.setTopicId(topicId);

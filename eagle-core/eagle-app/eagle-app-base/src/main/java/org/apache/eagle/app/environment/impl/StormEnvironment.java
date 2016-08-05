@@ -36,7 +36,7 @@ public class StormEnvironment extends AbstractEnvironment {
         super(envConfig);
     }
 
-    public StormStreamSink getFlattenStreamSink(String streamId,Configuration appConfig) {
-        return ((StormStreamSink) streamSink().getSink(streamId,appConfig)).setEventMapper(new FlattenEventMapper(streamId));
+    public StormStreamSink getFlattenStreamSink(String streamId, Config config) {
+        return ((StormStreamSink) streamSink().getSink(streamId,config)).setEventMapper(new FlattenEventMapper(streamId));
     }
 }
