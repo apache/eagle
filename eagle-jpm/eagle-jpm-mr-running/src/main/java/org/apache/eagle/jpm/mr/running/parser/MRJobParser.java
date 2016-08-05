@@ -141,9 +141,9 @@ public class MRJobParser implements Runnable {
 
         List<Function<String, Boolean>> functions = new ArrayList<>();
         functions.add(fetchJobConfig);
+        functions.add(fetchJobCounters);
         if (!this.first) { //do not fetch these info below for the first time
             functions.add(fetchTasks);
-            functions.add(fetchJobCounters);
         }
 
         this.first = false;

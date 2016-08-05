@@ -63,13 +63,13 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     private int rackLocalMaps;
     @Column("n")
     private double rackLocalMapsPercentage;
-    @Column("h")
+    @Column("o")
     private int totalLaunchedMaps;
-    @Column("i")
+    @Column("p")
     private long submissionTime;
-    @Column("j")
+    @Column("q")
     private long lastMapDuration;
-    @Column("k")
+    @Column("r")
     private long lastReduceDuration;
 
     public String getCurrentState() {
