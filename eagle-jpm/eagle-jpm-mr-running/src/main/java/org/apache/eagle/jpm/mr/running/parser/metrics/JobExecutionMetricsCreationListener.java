@@ -41,7 +41,7 @@ public class JobExecutionMetricsCreationListener extends AbstractMetricsCreation
             if (jobCounters != null && jobCounters.getCounters() != null) {
                 for (Map<String, Long> metricGroup : jobCounters.getCounters().values()) {
                     for (Map.Entry<String, Long> entry : metricGroup.entrySet()) {
-                        String metricName = buildMetricName(entry.getKey().toLowerCase());
+                        String metricName = entry.getKey().toLowerCase();
                         metrics.add(metricWrapper(currentTime, metricName, entry.getValue(), tags));
                     }
                 }
