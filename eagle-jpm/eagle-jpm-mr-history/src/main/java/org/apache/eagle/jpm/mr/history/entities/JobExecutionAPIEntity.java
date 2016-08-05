@@ -65,6 +65,12 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     private double rackLocalMapsPercentage;
     @Column("h")
     private int totalLaunchedMaps;
+    @Column("i")
+    private long submissionTime;
+    @Column("j")
+    private long lastMapDuration;
+    @Column("k")
+    private long lastReduceDuration;
 
     public String getCurrentState() {
         return currentState;
@@ -183,5 +189,32 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     public void setTotalLaunchedMaps(int totalLaunchedMaps) {
         this.totalLaunchedMaps = totalLaunchedMaps;
         valueChanged("totalLaunchedMaps");
+    }
+
+    public long getSubmissionTime() {
+        return submissionTime;
+    }
+
+    public void setSubmissionTime(long submissionTime) {
+        this.submissionTime = submissionTime;
+        valueChanged("submissionTime");
+    }
+
+    public long getLastMapDuration() {
+        return lastMapDuration;
+    }
+
+    public void setLastMapDuration(long lastMapDuration) {
+        this.lastMapDuration = lastMapDuration;
+        valueChanged("lastMapDuration");
+    }
+
+    public long getLastReduceDuration() {
+        return lastReduceDuration;
+    }
+
+    public void setLastReduceDuration(long lastReduceDuration) {
+        this.lastReduceDuration = lastReduceDuration;
+        valueChanged("lastReduceDuration");
     }
 }

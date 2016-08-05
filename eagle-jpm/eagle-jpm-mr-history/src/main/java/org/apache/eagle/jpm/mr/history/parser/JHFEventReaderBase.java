@@ -211,6 +211,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
            m_jobExecutionEntity.setStartTime(m_jobLaunchEventEntity.getTimestamp());
            m_jobExecutionEntity.setEndTime(m_jobFinishEventEntity.getTimestamp());
            m_jobExecutionEntity.setTimestamp(m_jobLaunchEventEntity.getTimestamp());
+           m_jobExecutionEntity.setSubmissionTime(m_jobSubmitEventEntity.getTimestamp());
            if (values.get(Keys.FAILED_MAPS) != null) {
                // for Artemis
                m_jobExecutionEntity.setNumFailedMaps(Integer.valueOf(values.get(Keys.FAILED_MAPS)));
@@ -310,6 +311,13 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             entity.setTaskStatus(values.get(Keys.TASK_STATUS));
             if (values.get(Keys.COUNTERS) != null || counters != null) {
                 entity.setJobCounters(parseCounters(counters));
+            }
+            long duration = entity.getEndTime() - m_jobSubmitEventEntity.getTimestamp();
+            if (taskType.equals(Constants.TaskType.MAP.toString()) && duration > m_jobExecutionEntity.getLastMapDuration()) {
+                m_jobExecutionEntity.setLastMapDuration(duration);
+            }
+            if (taskType.equals(Constants.TaskType.REDUCE.toString()) && duration > m_jobExecutionEntity.getLastReduceDuration()) {
+                m_jobExecutionEntity.setLastReduceDuration(duration);
             }
             entityCreated(entity);
             //_taskStartTime.remove(taskID); // clean this taskID

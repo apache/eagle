@@ -108,6 +108,8 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     private double rackLocalMapsPercentage;
     @Column("ai")
     private int totalLaunchedMaps;
+    @Column("aj")
+    private long submissionTime;
 
     public JobConfig getJobConfig() {
         return jobConfig;
@@ -422,5 +424,14 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     public void setTotalLaunchedMaps(int totalLaunchedMaps) {
         this.totalLaunchedMaps = totalLaunchedMaps;
         valueChanged("totalLaunchedMaps");
+    }
+
+    public long getSubmissionTime() {
+        return submissionTime;
+    }
+
+    public void setSubmissionTime(long submissionTime) {
+        this.submissionTime = submissionTime;
+        valueChanged("submissionTime");
     }
 }
