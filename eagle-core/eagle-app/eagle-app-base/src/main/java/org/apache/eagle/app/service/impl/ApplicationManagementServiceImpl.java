@@ -82,7 +82,9 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         for(Property p : propertyList){
             appConfig.put(p.getName(), p.getValue());
         }
-        appConfig.putAll(operation.getConfiguration());
+        if(operation.getConfiguration() != null) {
+            appConfig.putAll(operation.getConfiguration());
+        }
         appConfig.put("siteId", operation.getSiteId());
         appConfig.put("mode", operation.getMode().name());
         appConfig.put("appId", operation.getAppType());

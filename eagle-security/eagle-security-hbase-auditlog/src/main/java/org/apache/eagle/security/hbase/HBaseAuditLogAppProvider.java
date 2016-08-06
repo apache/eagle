@@ -26,7 +26,7 @@ import org.apache.eagle.app.spi.AbstractApplicationProvider;
  */
 public class HBaseAuditLogAppProvider extends AbstractApplicationProvider<HBaseAuditLogApplication> {
     public HBaseAuditLogAppProvider() {
-        super("/META-INF//metadata.xml");
+        super("/META-INF/metadata.xml");
     }
 
     @Override
