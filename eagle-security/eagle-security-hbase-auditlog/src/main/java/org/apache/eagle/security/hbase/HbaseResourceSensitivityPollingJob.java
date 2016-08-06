@@ -20,6 +20,7 @@ package org.apache.eagle.security.hbase;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
+import org.apache.eagle.security.entity.OozieResourceSensitivityAPIEntity;
 import org.apache.eagle.security.service.HBaseSensitivityEntity;
 import org.apache.eagle.security.service.ISecurityMetadataDAO;
 import org.apache.eagle.security.service.InMemMetadataDaoImpl;
@@ -47,7 +48,15 @@ public class HbaseResourceSensitivityPollingJob extends AbstractResourceSensitiv
         try {
             ISecurityMetadataDAO dao = new InMemMetadataDaoImpl(null);
             Collection<HBaseSensitivityEntity> sensitivityEntities = dao.listHBaseSensitivies();
-            ExternalDataCache.getInstance().setJobResult(getClass(), sensitivityEntities);
+            Map<String, HBaseSensitivityEntity> map = Maps.uniqueIndex(
+                    sensitivityEntities,
+                    new Function<HBaseSensitivityEntity, String>() {
+                        @Override
+                        public String apply(HBaseSensitivityEntity input) {
+                            return input.getHbaseResource();
+                        }
+                    });
+            ExternalDataCache.getInstance().setJobResult(getClass(), map);
         } catch(Exception ex) {
         	LOG.error("Fail to load hbase resource sensitivity data", ex);
         }

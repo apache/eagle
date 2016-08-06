@@ -94,9 +94,7 @@ public class HbaseResourceSensitivityDataJoinBolt extends BaseRichBolt {
             }
             LOG.info("After hbase resource sensitivity lookup: " + newEvent);
             // push to Kafka sink
-            ObjectMapper mapper = new ObjectMapper();
-            String msg = mapper.writeValueAsString(map);
-            collector.emit(Arrays.asList(newEvent.get("user"), msg));
+            collector.emit(Arrays.asList(newEvent.get("user"), newEvent));
         }catch(Exception ex){
             LOG.error("error joining data, ignore it", ex);
         }finally {

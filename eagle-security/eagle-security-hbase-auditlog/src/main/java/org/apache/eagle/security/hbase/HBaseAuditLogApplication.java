@@ -25,6 +25,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.app.sink.StormStreamSink;
 import org.apache.eagle.security.topo.NewKafkaSourcedSpoutProvider;
 import storm.kafka.StringScheme;
 import storm.kafka.bolt.KafkaBolt;
@@ -63,9 +64,9 @@ public class HBaseAuditLogApplication extends StormApplication<HBaseAuditLogAppC
         BoltDeclarer joinBoltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);
         joinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
 
-//        KafkaBolt kafkaBolt = new KafkaBolt();
-//        BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", kafkaBolt, numOfSinkTasks);
-//        kafkaBoltDeclarer.shuffleGrouping("joinBolt");
+        StormStreamSink sinkBolt = environment.getFlattenStreamSink("hbase_audit_log_stream",config);
+        BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", sinkBolt, numOfSinkTasks);
+        kafkaBoltDeclarer.shuffleGrouping("joinBolt");
         return builder.createTopology();
     }
 
