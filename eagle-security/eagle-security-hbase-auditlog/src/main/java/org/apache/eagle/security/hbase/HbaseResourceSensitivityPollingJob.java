@@ -19,12 +19,8 @@ package org.apache.eagle.security.hbase;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
-import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
-import org.apache.eagle.security.entity.OozieResourceSensitivityAPIEntity;
-import org.apache.eagle.security.service.HBaseSensitivityEntity;
-import org.apache.eagle.security.service.ISecurityMetadataDAO;
-import org.apache.eagle.security.service.InMemMetadataDaoImpl;
-import org.apache.eagle.security.service.MetadataDaoFactory;
+import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.security.service.*;
 import org.apache.eagle.security.util.AbstractResourceSensitivityPollingJob;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.quartz.Job;
@@ -35,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 public class HbaseResourceSensitivityPollingJob extends AbstractResourceSensitivityPollingJob implements Job {
@@ -46,8 +41,7 @@ public class HbaseResourceSensitivityPollingJob extends AbstractResourceSensitiv
             throws JobExecutionException {
         JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
         try {
-            ISecurityMetadataDAO dao = new InMemMetadataDaoImpl(null);
-            Collection<HBaseSensitivityEntity> sensitivityEntities = dao.listHBaseSensitivies();
+            Collection<HBaseSensitivityEntity> sensitivityEntities = load(jobDataMap);
             Map<String, HBaseSensitivityEntity> map = Maps.uniqueIndex(
                     sensitivityEntities,
                     new Function<HBaseSensitivityEntity, String>() {
@@ -62,4 +56,18 @@ public class HbaseResourceSensitivityPollingJob extends AbstractResourceSensitiv
         }
     }
 
+    private Collection<HBaseSensitivityEntity> load(JobDataMap jobDataMap) throws Exception {
+        Map<String, Object> map = (Map<String,Object>)jobDataMap.get(EagleConfigConstants.EAGLE_SERVICE);
+        String eagleServiceHost = (String)map.get(EagleConfigConstants.HOST);
+        Integer eagleServicePort = Integer.parseInt(map.get(EagleConfigConstants.PORT).toString());
+        String username = map.containsKey(EagleConfigConstants.USERNAME) ? (String)map.get(EagleConfigConstants.USERNAME) : null;
+        String password = map.containsKey(EagleConfigConstants.PASSWORD) ? (String)map.get(EagleConfigConstants.PASSWORD) : null;
+
+        // load from eagle database
+        LOG.info("Load hbase resource sensitivity information from eagle service "
+                + eagleServiceHost + ":" + eagleServicePort);
+
+        IMetadataServiceClient client = new MetadataServiceClientImpl(eagleServiceHost, eagleServicePort, "/rest");
+        return client.listHBaseSensitivies();
+    }
 }

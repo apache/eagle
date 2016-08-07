@@ -17,7 +17,6 @@
 package org.apache.eagle.security.service;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,42 +27,45 @@ import java.lang.reflect.Constructor;
  *
  */
 public class MetadataDaoFactory {
-
-    private static final MetadataDaoFactory INSTANCE = new MetadataDaoFactory();
     private static final Logger LOG = LoggerFactory.getLogger(MetadataDaoFactory.class);
 
+    private static MetadataDaoFactory instance = new MetadataDaoFactory();
     private ISecurityMetadataDAO dao;
+    private volatile boolean initialized = false;
 
-    private MetadataDaoFactory() {
-        Config config = ConfigFactory.load();
-
-        if (!config.hasPath("datastore") || config.getConfig("datastore") == null) {
-            LOG.warn("datastore is not configured, use in-memory store !!!");
-            dao = new InMemMetadataDaoImpl(config.getConfig("datastore"));
+    public synchronized void init(Config config) {
+        if(initialized)
+            return;
+        if (!config.hasPath("metadata.store") || config.getString("metadata.store") == null) {
+            LOG.warn("metadata store is not configured, use in-memory store !!!");
+            dao = new InMemMetadataDaoImpl();
         } else {
-            Config datastoreConfig = config.getConfig("datastore");
-            String clsName = datastoreConfig.getString("metadataDao");
+            String clsName = config.getString("metadata.store");
             Class<?> clz;
             try {
                 clz = Thread.currentThread().getContextClassLoader().loadClass(clsName);
                 if (ISecurityMetadataDAO.class.isAssignableFrom(clz)) {
-                    Constructor<?> cotr = clz.getConstructor(Config.class);
-                    dao = (ISecurityMetadataDAO) cotr.newInstance(datastoreConfig);
+                    Constructor<?> cotr = clz.getConstructor();
+                    dao = (ISecurityMetadataDAO) cotr.newInstance();
                 } else {
                     throw new Exception("metadataDao configuration need to be implementation of IMetadataDao! ");
                 }
             } catch (Exception e) {
                 LOG.error("error when initialize the dao, fall back to in memory mode!", e);
-                dao = new InMemMetadataDaoImpl(datastoreConfig);
+                dao = new InMemMetadataDaoImpl();
             }
         }
+        initialized = true;
     }
 
-    public static MetadataDaoFactory getInstance() {
-        return INSTANCE;
+    public static MetadataDaoFactory getInstance(){
+        return instance;
     }
 
     public ISecurityMetadataDAO getMetadataDao() {
-        return dao;
+        if(!initialized)
+            throw new IllegalStateException("Web app has not been installed");
+        else
+            return dao;
     }
 }

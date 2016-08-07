@@ -34,4 +34,9 @@ public interface ApplicationProvider<T extends Application> {
      * @return application instance
      */
     T getApplication();
+
+    /**
+     * set configuration for web resource when application onInstall is invoked
+     */
+    void installWebConfig(Config config);
 }

@@ -28,7 +28,6 @@ import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
 import org.apache.eagle.security.topo.NewKafkaSourcedSpoutProvider;
 import storm.kafka.StringScheme;
-import storm.kafka.bolt.KafkaBolt;
 
 /**
  * Since 7/27/16.
@@ -66,7 +65,7 @@ public class HBaseAuditLogApplication extends StormApplication<HBaseAuditLogAppC
 
         StormStreamSink sinkBolt = environment.getFlattenStreamSink("hbase_audit_log_stream",config);
         BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", sinkBolt, numOfSinkTasks);
-        kafkaBoltDeclarer.shuffleGrouping("joinBolt");
+        kafkaBoltDeclarer.fieldsGrouping("joinBolt", new Fields("user"));
         return builder.createTopology();
     }
 

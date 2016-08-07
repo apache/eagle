@@ -17,27 +17,16 @@
  *
  */
 
-package org.apache.eagle.security.hbase;
+package org.apache.eagle.security.service;
 
-import com.typesafe.config.Config;
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
-import org.apache.eagle.security.service.MetadataDaoFactory;
+import java.io.Closeable;
+import java.io.Serializable;
+import java.util.Collection;
 
 /**
- * Since 8/5/16.
+ * service stub to get metadata from remote metadata service
  */
-public class HBaseAuditLogAppProvider extends AbstractApplicationProvider<HBaseAuditLogApplication> {
-    public HBaseAuditLogAppProvider() {
-        super("/META-INF/metadata.xml");
-    }
-
-    @Override
-    public HBaseAuditLogApplication getApplication() {
-        return new HBaseAuditLogApplication();
-    }
-
-    @Override
-    public void installWebConfig(Config config){
-        MetadataDaoFactory.getInstance().init(config);
-    }
+public interface IMetadataServiceClient extends Closeable, Serializable {
+    Collection<HBaseSensitivityEntity> listHBaseSensitivies();
+    OpResult addHBaseSensitivity(Collection<HBaseSensitivityEntity> h);
 }

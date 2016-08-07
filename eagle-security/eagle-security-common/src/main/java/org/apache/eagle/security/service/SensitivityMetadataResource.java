@@ -16,12 +16,30 @@
  */
 package org.apache.eagle.security.service;
 
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
+import java.util.Collection;
 
 /**
  * Since 6/10/16.
  */
 @Path("/metadata/sensitivity")
 public class SensitivityMetadataResource {
+    public SensitivityMetadataResource(){
+    }
 
+    @Path("/hbase")
+    @GET
+    @Produces("application/json")
+    public Collection<HBaseSensitivityEntity> getHBaseSensitivites(){
+        ISecurityMetadataDAO dao = MetadataDaoFactory.getInstance().getMetadataDao();
+        return dao.listHBaseSensitivies();
+    }
+
+    @Path("/hbase")
+    @POST
+    @Consumes("application/json")
+    public void addHBaseSensitivities(Collection<HBaseSensitivityEntity> list){
+        ISecurityMetadataDAO dao = MetadataDaoFactory.getInstance().getMetadataDao();
+        dao.addHBaseSensitivity(list);
+    }
 }

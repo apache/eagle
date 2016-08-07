@@ -1,0 +1,7 @@
+./kafka-topics.sh --topic sandbox_hbase_audit_log --zookeeper localhost:2181 --create --replication-factor 1 --partitions 2
+
+./kafka-topics.sh --topic sandbox_hbase_audit_log_parsed --zookeeper localhost:2181 --create --replication-factor 1 --partitions 2
+
+./kafka-console-producer.sh --topic sandbox_hbase_audit_log --broker-list sandbox.hortonworks.com:6667
+
+./kafka-console-consumer.sh --topic sandbox_hbase_audit_log_parsed --zookeeper sandbox.hortonworks.com:2181 --from-beginning

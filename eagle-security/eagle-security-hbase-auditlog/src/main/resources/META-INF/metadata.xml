@@ -175,6 +175,12 @@
             <value>kafka.serializer.StringEncoder</value>
             <description>serializer class Kafka message key</description>
         </property>
+        <property>
+            <name>metadata.store</name>
+            <displayName>metadata.store</displayName>
+            <value>org.apache.eagle.security.service.InMemMetadataDaoImpl</value>
+            <description>implementation class for metadata store</description>
+        </property>
     </configuration>
     <streams>
         <stream>
