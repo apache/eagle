@@ -99,8 +99,6 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationContext.onInstall();
         applicationEntityService.create(applicationEntity);
 
-        // initialize web config
-        provider.installWebConfig(ConfigFactory.parseMap(appConfig));
         return applicationEntity;
     }
 

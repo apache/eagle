@@ -128,8 +128,4 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     public ApplicationDesc getApplicationDesc() {
         return applicationDesc;
     }
-
-    @Override
-    public void installWebConfig(Config config){
-    }
 }

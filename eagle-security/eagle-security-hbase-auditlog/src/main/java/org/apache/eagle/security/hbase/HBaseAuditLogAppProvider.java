@@ -35,9 +35,4 @@ public class HBaseAuditLogAppProvider extends AbstractApplicationProvider<HBaseA
     public HBaseAuditLogApplication getApplication() {
         return new HBaseAuditLogApplication();
     }
-
-    @Override
-    public void installWebConfig(Config config){
-        MetadataDaoFactory.getInstance().init(config);
-    }
 }

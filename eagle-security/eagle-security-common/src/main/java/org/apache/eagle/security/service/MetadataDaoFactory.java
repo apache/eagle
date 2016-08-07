@@ -29,21 +29,15 @@ import java.lang.reflect.Constructor;
 public class MetadataDaoFactory {
     private static final Logger LOG = LoggerFactory.getLogger(MetadataDaoFactory.class);
 
-    private static MetadataDaoFactory instance = new MetadataDaoFactory();
-    private ISecurityMetadataDAO dao;
-    private volatile boolean initialized = false;
-
-    public synchronized void init(Config config) {
-        if(initialized)
-            return;
-        if (!config.hasPath("metadata.store") || config.getString("metadata.store") == null) {
+    public static ISecurityMetadataDAO getMetadataDAO(String storeCls) {
+        ISecurityMetadataDAO dao = null;
+        if (storeCls == null) {
             LOG.warn("metadata store is not configured, use in-memory store !!!");
             dao = new InMemMetadataDaoImpl();
         } else {
-            String clsName = config.getString("metadata.store");
             Class<?> clz;
             try {
-                clz = Thread.currentThread().getContextClassLoader().loadClass(clsName);
+                clz = Thread.currentThread().getContextClassLoader().loadClass(storeCls);
                 if (ISecurityMetadataDAO.class.isAssignableFrom(clz)) {
                     Constructor<?> cotr = clz.getConstructor();
                     dao = (ISecurityMetadataDAO) cotr.newInstance();
@@ -55,17 +49,6 @@ public class MetadataDaoFactory {
                 dao = new InMemMetadataDaoImpl();
             }
         }
-        initialized = true;
-    }
-
-    public static MetadataDaoFactory getInstance(){
-        return instance;
-    }
-
-    public ISecurityMetadataDAO getMetadataDao() {
-        if(!initialized)
-            throw new IllegalStateException("Web app has not been installed");
-        else
-            return dao;
+        return dao;
     }
 }
