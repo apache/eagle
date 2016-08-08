@@ -24,7 +24,7 @@ import org.apache.eagle.jpm.mr.running.entities.JobConfig;
 import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.entities.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.entities.TaskExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.running.recover.RunningJobManager;
+import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.Utils;
@@ -70,7 +70,7 @@ public class MRJobParser implements Runnable {
     private final Object lock = new Object();
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
     private Map<String, String> commonTags = new HashMap<>();
-    private RunningJobManager runningJobManager;
+    private MRRunningJobManager runningJobManager;
     private ParserStatus parserStatus;
     private ResourceFetcher rmResourceFetcher;
     private boolean first;
@@ -84,7 +84,7 @@ public class MRJobParser implements Runnable {
     public MRJobParser(MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
                        MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
-                       RunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
+                       MRRunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
                        List<String> configKeys) {
         this.jobExtractorConfig = jobExtractorConfig;
         this.app = app;
@@ -424,7 +424,7 @@ public class MRJobParser implements Runnable {
 
         Set<String> needFetchAttemptTasks = calcFetchCounterAndAttemptTaskId(tasks);
         for (MRTask task : tasks) {
-            if (this.finishedTaskIds.contains(task.getId())) {
+            if (this.finishedTaskIds.contains(task.getId()) && !needFetchAttemptTasks.contains(task.getId())) {
                 continue;
             }
             TaskExecutionAPIEntity taskExecutionAPIEntity = new TaskExecutionAPIEntity();

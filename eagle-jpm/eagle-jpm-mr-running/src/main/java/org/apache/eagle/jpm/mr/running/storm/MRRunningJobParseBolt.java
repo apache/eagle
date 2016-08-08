@@ -23,18 +23,14 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
 import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.running.parser.MRJobEntityCreationHandler;
 import org.apache.eagle.jpm.mr.running.parser.MRJobParser;
-import org.apache.eagle.jpm.mr.running.recover.RunningJobManager;
+import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
-import org.apache.eagle.service.client.IEagleServiceClient;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +46,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     private MRRunningConfigManager.ZKStateConfig zkStateConfig;
     private ExecutorService executorService;
     private Map<String, MRJobParser> runningMRParsers;
-    private transient RunningJobManager runningJobManager;
+    private transient MRRunningJobManager runningJobManager;
     private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
     private ResourceFetcher resourceFetcher;
     private List<String> configKeys;
@@ -71,7 +67,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.executorService = Executors.newFixedThreadPool(jobExtractorConfig.parseJobThreadPoolSize);
 
-        this.runningJobManager = new RunningJobManager(zkStateConfig);
+        this.runningJobManager = new MRRunningJobManager(zkStateConfig);
         this.resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
     }
 

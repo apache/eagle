@@ -26,7 +26,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
-import org.apache.eagle.jpm.spark.running.recover.RunningJobManager;
+import org.apache.eagle.jpm.spark.running.recover.SparkRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
@@ -46,7 +46,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
     private ResourceFetcher resourceFetcher;
     private SpoutOutputCollector collector;
     private boolean init;
-    private transient RunningJobManager runningJobManager;
+    private transient SparkRunningJobManager sparkRunningJobManager;
     private Set<String> runningYarnApps;
 
     public SparkRunningJobFetchSpout(SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig,
@@ -63,7 +63,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
         collector = spoutOutputCollector;
-        this.runningJobManager = new RunningJobManager(zkStateConfig);
+        this.sparkRunningJobManager = new SparkRunningJobManager(zkStateConfig);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
 
                         if (hasFinished) {
                             try {
-                                Map<String, SparkAppEntity> result = this.runningJobManager.recoverYarnApp(appId);
+                                Map<String, SparkAppEntity> result = this.sparkRunningJobManager.recoverYarnApp(appId);
                                 if (result.size() > 0) {
                                     if (sparkApps == null) {
                                         sparkApps = new HashMap<>();
@@ -152,7 +152,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
         //content of path /apps/spark/running/yarnAppId/appId is SparkAppEntity(current attempt)
         //as we know, a yarn application may contains many spark applications
         //so, the returned results is a Map, key is yarn appId
-        Map<String, Map<String, SparkAppEntity>> result = this.runningJobManager.recover();
+        Map<String, Map<String, SparkAppEntity>> result = this.sparkRunningJobManager.recover();
         return result;
     }
 

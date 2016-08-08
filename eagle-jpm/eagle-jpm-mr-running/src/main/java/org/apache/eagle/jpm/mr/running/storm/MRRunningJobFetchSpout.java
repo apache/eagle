@@ -26,7 +26,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
 import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.running.recover.RunningJobManager;
+import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
@@ -46,7 +46,7 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
     private ResourceFetcher resourceFetcher;
     private SpoutOutputCollector collector;
     private boolean init;
-    private transient RunningJobManager runningJobManager;
+    private transient MRRunningJobManager runningJobManager;
     private Set<String> runningYarnApps;
     public MRRunningJobFetchSpout(MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
                                   MRRunningConfigManager.EndpointConfig endpointConfig,
@@ -62,7 +62,7 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
         collector = spoutOutputCollector;
-        this.runningJobManager = new RunningJobManager(zkStateConfig);
+        this.runningJobManager = new MRRunningJobManager(zkStateConfig);
     }
 
     @Override
