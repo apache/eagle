@@ -22,6 +22,7 @@ import org.apache.eagle.jpm.mr.history.entities.JobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.entities.*;
 import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.jpm.mr.history.parser.JHFMRVer1Parser.Keys;
@@ -57,10 +58,10 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     // hostname to rack mapping
     protected Map<String, String> m_host2RackMapping;
 
-    protected String m_jobID;
+    protected String m_jobId;
     protected String m_jobName;
     protected String m_jobType;
-    protected String m_normJobName;
+    protected String m_jobDefId;
     protected String m_user;
     protected String m_queueName;
     protected Long m_jobLauchTime;
@@ -122,7 +123,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     public void close() throws IOException {
         // check if this job history file is complete
         if (m_jobExecutionEntity.getEndTime() == 0L) {
-            throw new IOException(new JHFWriteNotCompletedException(m_jobID));
+            throw new IOException(new JHFWriteNotCompletedException(m_jobId));
         }
         try {
             flush();
@@ -143,7 +144,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
        * @param id
        */
     private void setJobID(String id) {
-        this.m_jobID = id;
+        this.m_jobId = id;
     }
 
     private void setJobType(String jobType) {
@@ -153,10 +154,10 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     protected void handleJob(EventType eventType, Map<Keys, String> values, Object totalCounters) throws Exception {
        String id = values.get(Keys.JOBID);
 
-       if (m_jobID == null) {
+       if (m_jobId == null) {
            setJobID(id);
-       } else if (!m_jobID.equals(id)) {
-           String msg = "Current job ID '" + id + "' does not match previously stored value '" + m_jobID + "'";
+       } else if (!m_jobId.equals(id)) {
+           String msg = "Current job ID '" + id + "' does not match previously stored value '" + m_jobId + "'";
            LOG.error(msg);
            throw new ImportException(msg);
        }
@@ -166,25 +167,36 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
            m_user = values.get(Keys.USER);
            m_queueName = values.get(Keys.JOB_QUEUE);
            m_jobName = values.get(Keys.JOBNAME);
-           m_normJobName = m_jobName;
+           m_jobDefId = m_jobName;
 
-           LOG.info("NormJobName of " + id + ": " + m_normJobName);
+           // If given job name then use it as norm job name, otherwise use eagle JobNameNormalization rule to generate.
+           String jobDefId = null;
+           if(configuration != null ) jobDefId = configuration.get(Constants.JOB_DEFINITION_ID_KEY);
+
+           if(jobDefId == null) {
+               m_jobDefId = JobNameNormalization.getInstance().normalize(m_jobName);
+           } else {
+               LOG.debug("Got normJobName from job configuration for " + id + ": " + jobDefId);
+               m_jobDefId = jobDefId;
+           }
+
+           LOG.info("NormJobName of " + id + ": " + m_jobDefId);
 
            m_jobSubmitEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-           m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobID);
+           m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
            m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), EagleJobStatus.SUBMITTED.name());
            m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-           m_jobSubmitEventEntity.getTags().put(MRJobTagName.NORM_JOB_NAME.toString(), m_normJobName);
+           m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(),this.m_jobType);
            entityCreated(m_jobSubmitEventEntity);
        } else if(values.get(Keys.LAUNCH_TIME) != null) {  // job launched
            m_jobLaunchEventEntity.setTimestamp(Long.valueOf(values.get(Keys.LAUNCH_TIME)));
            m_jobLauchTime = m_jobLaunchEventEntity.getTimestamp();
            m_jobLaunchEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-           m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobID);
+           m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
            m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), EagleJobStatus.LAUNCHED.name());
            m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-           m_jobLaunchEventEntity.getTags().put(MRJobTagName.NORM_JOB_NAME.toString(), m_normJobName);
+           m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
            m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(),this.m_jobType);
            m_numTotalMaps = Integer.valueOf(values.get(Keys.TOTAL_MAPS));
            m_numTotalReduces = Integer.valueOf(values.get(Keys.TOTAL_REDUCES));
@@ -192,18 +204,18 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
        } else if(values.get(Keys.FINISH_TIME) != null) {  // job finished
            m_jobFinishEventEntity.setTimestamp(Long.valueOf(values.get(Keys.FINISH_TIME)));
            m_jobFinishEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-           m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobID);
+           m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
            m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), values.get(Keys.JOB_STATUS));
            m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-           m_jobFinishEventEntity.getTags().put(MRJobTagName.NORM_JOB_NAME.toString(), m_normJobName);
+           m_jobFinishEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
            m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(),this.m_jobType);
            entityCreated(m_jobFinishEventEntity);
 
            // populate jobExecutionEntity entity
            m_jobExecutionEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-           m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobID);
+           m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-           m_jobExecutionEntity.getTags().put(MRJobTagName.NORM_JOB_NAME.toString(), m_normJobName);
+           m_jobExecutionEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_QUEUE.toString(), m_queueName);
            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(),this.m_jobType);
 
@@ -286,9 +298,9 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             put(MRJobTagName.TASK_TYPE.toString(), taskType);
             put(MRJobTagName.USER.toString(), m_user);
             //put(MRJobTagName.JOB_NAME.toString(), _jobName);
-            put(MRJobTagName.NORM_JOB_NAME.toString(), m_normJobName);
+            put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
             put(MRJobTagName.JOB_TYPE.toString(), m_jobType);
-            put(MRJobTagName.JOB_ID.toString(), m_jobID);
+            put(MRJobTagName.JOB_ID.toString(), m_jobId);
             put(MRJobTagName.TASK_ID.toString(), taskID);
         }};
         taskBaseTags.putAll(m_baseTags);
@@ -375,16 +387,16 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             JobConfigurationAPIEntity jobConfigurationEntity = new JobConfigurationAPIEntity();
             jobConfigurationEntity.setTags(new HashMap<>(m_baseTags));
             jobConfigurationEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-            jobConfigurationEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobID);
+            jobConfigurationEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
             jobConfigurationEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-            jobConfigurationEntity.getTags().put(MRJobTagName.NORM_JOB_NAME.toString(), m_normJobName);
+            jobConfigurationEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
             jobConfigurationEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(), m_jobType);
             jobConfigurationEntity.setTimestamp(m_jobLaunchEventEntity.getTimestamp());
 
             JobConfig jobConfig = new JobConfig();
             jobConfig.setConfig(prop);
             jobConfigurationEntity.setJobConfig(jobConfig);
-            jobConfigurationEntity.setConfigJobName(m_normJobName);
+            jobConfigurationEntity.setConfigJobName(m_jobDefId);
             entityCreated(jobConfigurationEntity);
         }
     }

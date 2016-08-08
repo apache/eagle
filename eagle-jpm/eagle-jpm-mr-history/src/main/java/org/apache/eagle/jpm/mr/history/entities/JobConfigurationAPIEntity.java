@@ -30,8 +30,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-        @Index(name="Index_1_jobId", columns = { "jobID" }, unique = true),
-        @Index(name="Index_2_normJobName", columns = { "normJobName" }, unique = false)
+        @Index(name="Index_1_jobId", columns = { "jobId" }, unique = true),
+        @Index(name="Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
 })
 public class JobConfigurationAPIEntity extends JobBaseAPIEntity {
     

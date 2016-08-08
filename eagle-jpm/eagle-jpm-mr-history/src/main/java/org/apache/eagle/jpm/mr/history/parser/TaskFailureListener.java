@@ -82,7 +82,7 @@ public class TaskFailureListener implements HistoryJobEntityCreationListener {
     	Map<String, String> tags = new HashMap<>();
     	failureTask.setTags(tags);
     	tags.put(MRJobTagName.SITE.toString(), e.getTags().get(MRJobTagName.SITE.toString()));
-    	tags.put(MRJobTagName.NORM_JOB_NAME.toString(), e.getTags().get(MRJobTagName.NORM_JOB_NAME.toString()));
+    	tags.put(MRJobTagName.JOD_DEF_ID.toString(), e.getTags().get(MRJobTagName.JOD_DEF_ID.toString()));
     	tags.put(MRJobTagName.RACK.toString(), e.getTags().get(MRJobTagName.RACK.toString()));
     	tags.put(MRJobTagName.HOSTNAME.toString(), e.getTags().get(MRJobTagName.HOSTNAME.toString()));
     	tags.put(MRJobTagName.JOB_ID.toString(), e.getTags().get(MRJobTagName.JOB_ID.toString()));

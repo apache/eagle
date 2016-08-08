@@ -190,7 +190,7 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setTags(new HashMap<>(commonTags));
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_ID.toString(), id);
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), mrJob.getName());
-            jobExecutionAPIEntity.getTags().put(MRJobTagName.NORM_JOB_NAME.toString(), mrJob.getName());
+            jobExecutionAPIEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), mrJob.getName());
             jobExecutionAPIEntity.setTimestamp(app.getStartedTime());
             jobExecutionAPIEntity.setSubmissionTime(app.getStartedTime());
             jobExecutionAPIEntity.setStartTime(mrJob.getStartTime());
@@ -496,7 +496,7 @@ public class MRJobParser implements Runnable {
                 }
 
                 if (!this.configKeys.isEmpty() && key.equals(this.configKeys.get(0))) {
-                    mrJobEntityMap.get(jobId).getTags().put(MRJobTagName.NORM_JOB_NAME.toString(), value);
+                    mrJobEntityMap.get(jobId).getTags().put(MRJobTagName.JOD_DEF_ID.toString(), value);
                 }
             }
             mrJobEntityMap.get(jobId).setJobConfig(config);

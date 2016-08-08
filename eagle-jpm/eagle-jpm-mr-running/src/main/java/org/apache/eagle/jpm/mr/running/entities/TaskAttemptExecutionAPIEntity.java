@@ -31,7 +31,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 
-@Tags({"site", "jobId", "JobName", "jobNormalName", "jobType", "taskType", "taskId", "user", "queue", "host", "rack"})
+@Tags({"site", "jobId", "JobName", "jobDefId", "jobType", "taskType", "taskId", "user", "queue", "host", "rack"})
 public class TaskAttemptExecutionAPIEntity extends TaggedLogAPIEntity {
     @Column("a")
     private long startTime;
