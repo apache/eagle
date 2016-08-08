@@ -43,26 +43,11 @@
 		var JPM = {};
 
 		/**
-		 * @typedef {{}} Job						Job entity
-		 * @property {{}} tags						unique job key
-		 * @property {string} tags.jobID			Job Id
-		 * @property {string} tags.user				Submit user
-		 * @property {string} tags.queue			Queue
-		 * @property {string} currentState			Job state
-		 * @property {string} submissionTime		Submission time
-		 * @property {string} startTime				Start time
-		 * @property {string} endTime				End time
-		 * @property {string} numTotalMaps			Maps count
-		 * @property {string} numTotalReduces		Reduce count
-		 * @property {string} runningContainers		Running container count
-		 */
-
-		/**
 		 * Fetch job list
 		 * @param site
 		 * @param startTime
 		 * @param endTime
-		 * @return {Job[]}
+		 * @return {[]}
 		 */
 		JPM.list = function (site, startTime, endTime, fields, limit) {
 			var _list = [];

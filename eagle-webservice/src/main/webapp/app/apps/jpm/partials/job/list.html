@@ -56,7 +56,7 @@
 			<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th sortpath="tags.jobID">Job</th>
+						<th sortpath="tags.jobId">Job</th>
 						<th sortpath="currentState">Status</th>
 						<th sortpath="tags.user">User</th>
 						<th sortpath="tags.queue">Queue</th>
@@ -70,7 +70,7 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="item in jobList">
-						<td>{{item.tags.jobID}}</td>
+						<td>{{item.tags.jobId}}</td>
 						<td class="text-center">
 							<span class="label label-{{getStateClass(item.currentState)}}">
 								{{item.currentState}}

@@ -37,8 +37,27 @@
 			var startTime = endTime.clone().subtract(1, "day");
 
 			$scope.refreshList = function () {
+				/**
+				 * @namespace
+				 * @property {[]} jobList
+				 * @property {{}} jobList.tags						unique job key
+				 * @property {string} jobList.tags.jobId			Job Id
+				 * @property {string} jobList.tags.user				Submit user
+				 * @property {string} jobList.tags.queue			Queue
+				 * @property {string} jobList.currentState			Job state
+				 * @property {string} jobList.submissionTime		Submission time
+				 * @property {string} jobList.startTime				Start time
+				 * @property {string} jobList.endTime				End time
+				 * @property {string} jobList.numTotalMaps			Maps count
+				 * @property {string} jobList.numTotalReduces		Reduce count
+				 * @property {string} jobList.runningContainers		Running container count
+				 */
+
 				$scope.jobList = Entity.merge($scope.jobList, JPM.list("apollo", startTime, endTime, [
-					"jobID",
+					"jobId",
+					"jobDefId",
+					"jobName",
+					"jobExecId",
 					"currentState",
 					"user",
 					"queue",
@@ -48,7 +67,7 @@
 					"numTotalMaps",
 					"numTotalReduces",
 					"runningContainers"
-				]));
+				], 100000));
 				$scope.jobList._then(function () {
 					$.each($scope.jobList, function (i, job) {
 						job.duration = Time.diff(job.startTime, job.endTime);
