@@ -368,8 +368,10 @@ public class MRJobParser implements Runnable {
         //1, sort by elapsedTime
         Comparator<MRTask> byElapsedTimeIncrease = (e1, e2) -> Long.compare(e1.getElapsedTime(), e2.getElapsedTime());
         Comparator<MRTask> byElapsedTimeDecrease = (e1, e2) -> -1 * Long.compare(e1.getElapsedTime(), e2.getElapsedTime());
-        //2, fetch bottom n
-        Iterator<MRTask> taskIteratorIncrease = tasks.stream().sorted(byElapsedTimeIncrease).iterator();
+        //2, get finished bottom n
+        Iterator<MRTask> taskIteratorIncrease = tasks.stream()
+                .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
+                .sorted(byElapsedTimeIncrease).iterator();
         int i = 0;
         while (taskIteratorIncrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
             MRTask mrTask = taskIteratorIncrease.next();
@@ -378,8 +380,22 @@ public class MRJobParser implements Runnable {
                 needFetchAttemptTasks.add(mrTask.getId());
             }
         }
-        //3, fetch top n
-        Iterator<MRTask> taskIteratorDecrease = tasks.stream().sorted(byElapsedTimeDecrease).iterator();
+        //3, fetch finished top n
+        Iterator<MRTask> taskIteratorDecrease = tasks.stream()
+                .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
+                .sorted(byElapsedTimeDecrease).iterator();
+        i = 0;
+        while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
+            MRTask mrTask = taskIteratorDecrease.next();
+            if (mrTask.getElapsedTime() > 0) {
+                i++;
+                needFetchAttemptTasks.add(mrTask.getId());
+            }
+        }
+        //4, fetch running top n
+        taskIteratorDecrease = tasks.stream()
+                .filter(task -> task.getState().equals(Constants.TaskState.RUNNING.toString()))
+                .sorted(byElapsedTimeDecrease).iterator();
         i = 0;
         while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
             MRTask mrTask = taskIteratorDecrease.next();
