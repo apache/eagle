@@ -48,14 +48,15 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
 
     protected AbstractApplicationProvider(String applicationDescConfig) {
         this();
-        ApplicationProviderDescConfig descWrapperConfig = ApplicationProviderDescConfig.loadFromXML(applicationDescConfig);
+        ApplicationProviderDescConfig descWrapperConfig = ApplicationProviderDescConfig.loadFromXML(this, applicationDescConfig);
         setType(descWrapperConfig.getType());
         setVersion(descWrapperConfig.getVersion());
         setName(descWrapperConfig.getName());
         setDocs(descWrapperConfig.getDocs());
         try {
             if (descWrapperConfig.getAppClass() != null) {
-                setAppClass((Class<T>) Class.forName(descWrapperConfig.getAppClass()));
+//                setAppClass((Class<T>) Class.forName(descWrapperConfig.getAppClass()));
+                setAppClass((Class<T>) Class.forName(descWrapperConfig.getAppClass(), true, this.getClass().getClassLoader()));
                 if (!Application.class.isAssignableFrom(applicationDesc.getAppClass())) {
                     throw new IllegalStateException(descWrapperConfig.getAppClass() + " is not sub-class of " + Application.class.getCanonicalName());
                 }

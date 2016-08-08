@@ -44,13 +44,13 @@ public class ApplicationProviderServiceImpl implements ApplicationProviderServic
 
     @Inject
     public ApplicationProviderServiceImpl(Config config){
-        LOG.info("Initializing {}",this.getClass().getCanonicalName());
+        LOG.warn("Initializing {}",this.getClass().getCanonicalName());
         this.config = config;
         String appProviderLoaderClass = this.config.hasPath(APP_PROVIDER_LOADER_CLASS_KEY)?
                 this.config.getString(APP_PROVIDER_LOADER_CLASS_KEY):ApplicationProviderLoader.getDefaultAppProviderLoader();
-        LOG.info("Initializing {} = {}",APP_PROVIDER_LOADER_CLASS_KEY,appProviderLoaderClass);
+        LOG.warn("Initializing {} = {}",APP_PROVIDER_LOADER_CLASS_KEY,appProviderLoaderClass);
         appProviderLoader = initializeAppProviderLoader(appProviderLoaderClass);
-        LOG.info("Initialized {}",appProviderLoader);
+        LOG.warn("Initialized {}",appProviderLoader);
         reload();
     }
 
@@ -65,9 +65,9 @@ public class ApplicationProviderServiceImpl implements ApplicationProviderServic
 
     public synchronized void reload(){
         appProviderLoader.reset();
-        LOG.info("Loading application providers ...");
+        LOG.warn("Loading application providers ...");
         appProviderLoader.load();
-        LOG.info("Loaded {} application providers",appProviderLoader.getProviders().size());
+        LOG.warn("Loaded {} application providers",appProviderLoader.getProviders().size());
     }
 
     public Collection<ApplicationProvider> getProviders(){
