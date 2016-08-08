@@ -54,7 +54,8 @@ public class GenericServiceAPIResponseEntityDeserializer extends JsonDeserialize
                 else if(SUCCESS_FIELD.equals(field.getKey()) && field.getValue() != null){
                     entity.setSuccess(field.getValue().getValueAsBoolean(false));
                 }else if(EXCEPTION_FIELD.equals(field.getKey()) && field.getValue() != null){
-                    entity.setException(field.getValue().getTextValue());
+//                    entity.setException(field.getValue().getTextValue());
+                    entity.setException(new Exception(field.getValue().getTextValue()));
                 }else if(TYPE_FIELD.endsWith(field.getKey())  && field.getValue() != null){
                     try {
                         entity.setType(Class.forName(field.getValue().getTextValue()));

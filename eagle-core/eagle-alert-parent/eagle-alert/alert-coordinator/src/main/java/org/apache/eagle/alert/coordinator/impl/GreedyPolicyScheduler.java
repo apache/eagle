@@ -137,6 +137,7 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
                 expectParal = policyDefaultParallelism;
             }
             // how to handle expand of an policy in a smooth transition manner
+            // TODO policy fix
             PolicyAssignment assignment = context.getPolicyAssignments().get(def.getName());
             if (assignment != null) {
                 LOG.info("policy {} already allocated", def.getName());
@@ -297,7 +298,7 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
      * @return
      */
     private int getQueueSize(int hint) {
-        return initialQueueSize;
+        return initialQueueSize * ((hint + initialQueueSize - 1) / initialQueueSize);
     }
 
     private boolean isQueueAvailable(StreamWorkSlotQueue queue, PolicyDefinition def) {

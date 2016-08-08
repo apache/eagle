@@ -104,6 +104,10 @@ public class AlertPublisherImpl implements AlertPublisher {
         }
 
         for (Publishment publishment : added) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(publishment.toString());
+            }
+
             AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
             if(plugin != null) {
                 publishPluginMapping.put(publishment.getName(), plugin);

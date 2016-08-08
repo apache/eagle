@@ -16,52 +16,77 @@
  */
 package org.apache.alert.coordinator.mock;
 
+import java.util.List;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.coordinator.TopologyMgmtService;
 import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.GroupBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
-import org.junit.Ignore;
 
-import java.util.List;
-
-@Ignore
+@org.junit.Ignore
 public class TestTopologyMgmtService extends TopologyMgmtService {
 
-    public static int BOLT_NUMBER = 5;
-    
+    public static final int ROUTER_BOLT_NUMBER = 6;
+    public static final int BOLT_NUMBER = 7;
+
+    private int boltNumber;
+    private int routerNumber;
     private int i = 0;
+    private String namePrefix = "Topology";
+    
+    // a config used to check if createTopology is enabled. FIXME: another class of mgmt service might be better
+    private boolean enableCreateTopology = false;
+
+    public TestTopologyMgmtService() {
+        boltNumber = BOLT_NUMBER;// default behaivor
+        this.routerNumber = ROUTER_BOLT_NUMBER;
+    }
+
+    public TestTopologyMgmtService(int routerNumber, int boltNumber) {
+        this.routerNumber = routerNumber;
+        this.boltNumber = boltNumber;
+    }
+
+    public TestTopologyMgmtService(int routerNumber, int boltNumber, String prefix, boolean enable) {
+        this.routerNumber = routerNumber;
+        this.boltNumber = boltNumber;
+        this.namePrefix = prefix;
+        this.enableCreateTopology = enable;
+    }
 
     @Override
     public TopologyMeta creatTopology() {
-        TopologyMeta tm = new TopologyMeta();
-        tm.topologyId = "Topoloy" + (i++);
-        tm.clusterId = "default-cluster";
-        tm.nimbusHost = "localhost";
-        tm.nimbusPort = "3000";
-        Pair<Topology, TopologyUsage> pair = TestTopologyMgmtService.createEmptyTopology(tm.topologyId);
-        tm.topology = pair.getLeft();
-        tm.usage = pair.getRight();
-        
-        return tm;
+        if (enableCreateTopology) {
+            TopologyMeta tm = new TopologyMeta();
+            tm.topologyId = namePrefix + (i++);
+            tm.clusterId = "default-cluster";
+            tm.nimbusHost = "localhost";
+            tm.nimbusPort = "3000";
+            Pair<Topology, TopologyUsage> pair = createEmptyTopology(tm.topologyId);
+            tm.topology = pair.getLeft();
+            tm.usage = pair.getRight();
+            return tm;
+        } else {
+            throw new UnsupportedOperationException("not supported yet!");
+        }
     }
 
     @Override
     public List<TopologyMeta> listTopologies() {
-        // TODO Auto-generated method stub
         return super.listTopologies();
     }
 
-    public static Pair<Topology, TopologyUsage> createEmptyTopology(String topoName) {
-        Topology t = new Topology(topoName, TestTopologyMgmtService.BOLT_NUMBER, TestTopologyMgmtService.BOLT_NUMBER);
+    public Pair<Topology, TopologyUsage> createEmptyTopology(String topoName) {
+        Topology t = new Topology(topoName, routerNumber, boltNumber);
         for (int i = 0; i < t.getNumOfGroupBolt(); i++) {
             t.getGroupNodeIds().add(t.getName() + "-grp-" + i);
         }
         for (int i = 0; i < t.getNumOfAlertBolt(); i++) {
             t.getAlertBoltIds().add(t.getName() + "-alert-" + i);
         }
-    
+
         TopologyUsage u = new TopologyUsage(topoName);
         for (String gnid : t.getGroupNodeIds()) {
             u.getGroupUsages().put(gnid, new GroupBoltUsage(gnid));
@@ -69,7 +94,7 @@ public class TestTopologyMgmtService extends TopologyMgmtService {
         for (String anid : t.getAlertBoltIds()) {
             u.getAlertUsages().put(anid, new AlertBoltUsage(anid));
         }
-    
+
         return Pair.of(t, u);
     }
 }

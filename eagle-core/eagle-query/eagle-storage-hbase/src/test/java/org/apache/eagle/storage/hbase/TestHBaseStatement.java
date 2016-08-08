@@ -40,6 +40,7 @@ import org.apache.eagle.common.DateTimeUtil;
 /**
  * @since 3/23/15
  */
+@Ignore
 public class TestHBaseStatement extends TestHBaseBase {
 
     EntityDefinition entityDefinition;

@@ -163,11 +163,12 @@ public class JHFSparkEventReader {
         for (TaggedLogAPIEntity entity : entities) {
             entity.getTags().put(SparkJobTagName.SPARK_APP_ID.toString(), JSONUtil.getString(event, "App ID"));
             entity.getTags().put(SparkJobTagName.SPARK_APP_NAME.toString(), JSONUtil.getString(event, "App Name"));
-            // In yarn-client mode, attemptId is not available in the log, so we set attemptId = 0.
+            // In yarn-client mode, attemptId is not available in the log, so we set attemptId = 1.
             String attemptId = isClientMode(this.app.getConfig()) ? "1" : JSONUtil.getString(event, "App Attempt ID");
             entity.getTags().put(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString(), attemptId);
-
-            entity.getTags().put(SparkJobTagName.SPARK_APP_NORM_NAME.toString(), this.getNormalizedName(JSONUtil.getString(event, "App Name"), this.app.getConfig().getConfig().get("ebay.job.name")));
+            // the second argument of getNormalizeName() is changed to null because the original code contains sensitive text
+            // original second argument looks like: this.app.getConfig().getConfig().get("xxx"), "xxx" is the sensitive text
+            entity.getTags().put(SparkJobTagName.SPARK_APP_NORM_NAME.toString(), this.getNormalizedName(JSONUtil.getString(event, "App Name"), null));
             entity.getTags().put(SparkJobTagName.SPARK_USER.toString(), JSONUtil.getString(event, "User"));
 
             entity.setTimestamp(appStartTime);

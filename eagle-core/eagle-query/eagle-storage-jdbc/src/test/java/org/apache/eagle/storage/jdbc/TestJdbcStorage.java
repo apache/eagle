@@ -27,6 +27,7 @@ import org.apache.eagle.storage.operation.CompiledQuery;
 import org.apache.eagle.storage.operation.RawQuery;
 import org.apache.eagle.storage.result.ModifyResult;
 import org.apache.eagle.storage.result.QueryResult;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -204,7 +205,7 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
      *
      * @throws IOException
      */
-//    @Test
+    @Test @Ignore("Ignore performance auto testing")
     public void testWriterPerformance() throws IOException {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -240,11 +241,4 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
         instance.setTimestamp(System.currentTimeMillis());
         return instance;
     }
-
-
-    @Test
-    public void testInitSuccessfully() {
-
-    }
-
 }

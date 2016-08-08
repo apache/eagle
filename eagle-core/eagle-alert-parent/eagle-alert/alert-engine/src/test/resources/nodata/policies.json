@@ -15,7 +15,8 @@
 		"partitionSpec": [
 			{
 				"streamId": "noDataAlertStream",
-				"type": "GROUPBY"
+				"type": "GROUPBY",
+				"columns" : ["host"]
 			}
 		],
 		"parallelismHint": 2

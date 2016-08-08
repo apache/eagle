@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.security.service;
 
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,7 +28,7 @@ import java.util.*;
 /**
  * In memory service for simple service start. Make all service API as
  * synchronized.
- * 
+ *
  * @since Apr 11, 2016
  *
  */
@@ -37,7 +38,8 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
 
     private Map<Pair<String, String>, HBaseSensitivityEntity> hBaseSensitivityEntities = new HashMap<>();
 
-    public InMemMetadataDaoImpl(Config config) {
+    @Inject
+    public InMemMetadataDaoImpl() {
     }
 
     @Override

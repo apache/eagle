@@ -87,8 +87,7 @@ public class TestAlertPublisherBolt {
         comparator.compare();
         Assert.assertTrue(comparator.getModified().size() == 1);
 
-        AlertPublisher alertPublisher = new AlertPublisherImpl("alert-publisher-test");
-        AlertPublisherBolt publisherBolt = new AlertPublisherBolt(alertPublisher, null, null);
+        AlertPublisherBolt publisherBolt = new AlertPublisherBolt("alert-publisher-test", null, null);
         publisherBolt.onAlertPublishSpecChange(spec1, null);
         publisherBolt.onAlertPublishSpecChange(spec2, null);
     }

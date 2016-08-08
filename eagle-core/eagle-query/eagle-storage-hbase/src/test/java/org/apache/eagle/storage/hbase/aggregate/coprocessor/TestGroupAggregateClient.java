@@ -53,6 +53,7 @@ import org.apache.eagle.service.hbase.TestHBaseBase;
 /**
  * @since : 10/30/14,2014
  */
+@Ignore
 public class TestGroupAggregateClient extends TestHBaseBase {
 	HTableInterface table;
 	long startTime;

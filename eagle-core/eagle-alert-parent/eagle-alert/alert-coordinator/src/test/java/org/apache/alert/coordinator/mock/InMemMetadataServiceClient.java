@@ -18,6 +18,7 @@ package org.apache.alert.coordinator.mock;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -35,6 +36,9 @@ import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 
 /**
+ * According to metadata servic client semantic, change to the interface returned value should not direclty change the
+ * states.
+ * 
  * @since May 5, 2016
  *
  */
@@ -57,37 +61,41 @@ public class InMemMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public List<StreamingCluster> listClusters() {
-        return clusters;
+        return Collections.unmodifiableList(clusters);
     }
 
     @Override
     public List<Topology> listTopologies() {
-        return topologies;
+        return Collections.unmodifiableList(topologies);
     }
 
     @Override
     public List<PolicyDefinition> listPolicies() {
-        return policies;
+        return Collections.unmodifiableList(policies);
+    }
+    
+    public void removePolicy(int idx) {
+        policies.remove(idx);
     }
 
     @Override
     public List<StreamDefinition> listStreams() {
-        return definitions;
+        return Collections.unmodifiableList(definitions);
     }
 
     @Override
     public List<Kafka2TupleMetadata> listDataSources() {
-        return datasources;
+        return Collections.unmodifiableList(datasources);
     }
 
     @Override
     public List<Publishment> listPublishment() {
-        return publishmetns;
+        return Collections.unmodifiableList(publishmetns);
     }
 
     @Override
     public List<SpoutSpec> listSpoutMetadata() {
-        return spoutSpecs;
+        return Collections.unmodifiableList(spoutSpecs);
     }
 
     @Override

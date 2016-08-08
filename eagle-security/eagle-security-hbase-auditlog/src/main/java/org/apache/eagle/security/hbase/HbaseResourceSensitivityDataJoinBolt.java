@@ -23,14 +23,12 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import org.apache.eagle.security.entity.HbaseResourceSensitivityAPIEntity;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.security.util.ExternalDataJoiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import storm.kafka.bolt.mapper.FieldNameBasedTupleToKafkaMapper;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -94,9 +92,7 @@ public class HbaseResourceSensitivityDataJoinBolt extends BaseRichBolt {
             }
             LOG.info("After hbase resource sensitivity lookup: " + newEvent);
             // push to Kafka sink
-            ObjectMapper mapper = new ObjectMapper();
-            String msg = mapper.writeValueAsString(map);
-            collector.emit(Arrays.asList(newEvent.get("user"), msg));
+            collector.emit(Arrays.asList(newEvent.get("user"), newEvent));
         }catch(Exception ex){
             LOG.error("error joining data, ignore it", ex);
         }finally {
@@ -106,6 +102,6 @@ public class HbaseResourceSensitivityDataJoinBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(FieldNameBasedTupleToKafkaMapper.BOLT_KEY, FieldNameBasedTupleToKafkaMapper.BOLT_MESSAGE));
+        declarer.declare(new Fields("user", "message"));
     }
 }

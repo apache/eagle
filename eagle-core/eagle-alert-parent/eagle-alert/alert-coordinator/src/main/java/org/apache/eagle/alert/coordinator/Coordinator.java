@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -39,14 +40,17 @@ import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 /**
- * @since Mar 24, 2016 Coordinator is a standalone java application, which
- *        listens to policy changes and use schedule algorithm to distribute
- *        policies 1) reacting to shutdown events 2) start non-daemon thread to
- *        pull policies and figure out if polices are changed
+ * TODO: To simply avoid concurrent call of schdule, make the schedule as synchronized. This is not safe when multiple
+ * instance, consider a distributed lock for prevent multiple schedule happen concurrently.
+ * 
+ * @since Mar 24, 2016 Coordinator is a standalone java application, which listens to policy changes and use schedule
+ *        algorithm to distribute policies 1) reacting to shutdown events 2) start non-daemon thread to pull policies
+ *        and figure out if polices are changed
  */
 public class Coordinator {
 
@@ -94,6 +98,7 @@ public class Coordinator {
     }
 
     public synchronized ScheduleState schedule(ScheduleOption option) {
+        Stopwatch watch = Stopwatch.createStarted();
         IScheduleContext context = new ScheduleContextBuilder(client).buildContext();
         TopologyMgmtService mgmtService = new TopologyMgmtService();
         IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
@@ -101,8 +106,17 @@ public class Coordinator {
         scheduler.init(context, mgmtService);
         ScheduleState state = scheduler.schedule(option);
 
+        long scheduleTime = watch.elapsed(TimeUnit.MILLISECONDS);
+        state.setScheduleTimeMillis((int) scheduleTime);// hardcode to integer
+        watch.reset();
+        watch.start();
+
         // persist & notify
         postSchedule(client, state, producer);
+
+        watch.stop();
+        long postTime = watch.elapsed(TimeUnit.MILLISECONDS);
+        LOG.info("Schedule result, schedule time {} ms, post schedule time {} ms !", scheduleTime, postTime);
 
         currentState = state;
         return state;
@@ -207,7 +221,14 @@ public class Coordinator {
         // schedule dynamic policy loader
         long initDelayMillis = config.getLong(DYNAMIC_POLICY_LOADER_INIT_MILLS);
         long delayMillis = config.getLong(DYNAMIC_POLICY_LOADER_DELAY_MILLS);
-        ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(2);
+        ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(2, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread();
+                t.setDaemon(true);
+                return t;
+            }
+        });
         scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
         
         // 

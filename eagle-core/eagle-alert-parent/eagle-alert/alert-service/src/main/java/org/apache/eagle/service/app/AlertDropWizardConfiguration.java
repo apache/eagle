@@ -18,10 +18,23 @@ package org.apache.eagle.service.app;
 
 import io.dropwizard.Configuration;
 
+import javax.validation.Valid;
+
 /**
  * @since Jun 27, 2016
  *
  */
 public class AlertDropWizardConfiguration extends Configuration {
+
+    @Valid
+    private String applicationConfPath;
+
+    public String getApplicationConfPath() {
+        return applicationConfPath;
+    }
+
+    public void setApplicationConfPath(String applicationConfPath) {
+        this.applicationConfPath = applicationConfPath;
+    }
 
 }

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.eagle.alert.engine.evaluator.impl.DistinctValuesInTimeWindow;
+import org.apache.eagle.alert.engine.evaluator.nodata.DistinctValuesInTimeWindow;
 import org.junit.Test;
 
 /**

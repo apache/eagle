@@ -58,18 +58,18 @@ public class WorkSlotStrategyTest {
         StreamGroup group = new StreamGroup();
         group.addStreamPartition(partition);
 
-        TestTopologyMgmtService.BOLT_NUMBER = 3;
-        TestTopologyMgmtService mgmtService = new TestTopologyMgmtService();
 
-        SameTopologySlotStrategy strategy = new SameTopologySlotStrategy(context, group, mgmtService);
         {
+            TestTopologyMgmtService mgmtService = new TestTopologyMgmtService(3, 3, "prefix-time1", true);
+            SameTopologySlotStrategy strategy = new SameTopologySlotStrategy(context, group, mgmtService);
             List<WorkSlot> slots = strategy.reserveWorkSlots(5, false, new HashMap<String, Object>());
             Assert.assertEquals(0, slots.size());
             Assert.assertEquals(1, context.getTopologies().size());
         }
 
-        TestTopologyMgmtService.BOLT_NUMBER = 5;
         {
+            TestTopologyMgmtService mgmtService = new TestTopologyMgmtService(5, 5, "prefix-time2", true);
+            SameTopologySlotStrategy strategy = new SameTopologySlotStrategy(context, group, mgmtService);
             List<WorkSlot> slots = strategy.reserveWorkSlots(5, false, new HashMap<String, Object>());
             Assert.assertEquals(5, slots.size());
             LOG.info(slots.get(0).getTopologyName());
@@ -110,8 +110,7 @@ public class WorkSlotStrategyTest {
 
         MonitoredStream ms1 = new MonitoredStream(sg);
 
-        TestTopologyMgmtService.BOLT_NUMBER = 5;
-        TestTopologyMgmtService mgmtService = new TestTopologyMgmtService();
+        TestTopologyMgmtService mgmtService = new TestTopologyMgmtService(5, 5, "prefix-3", true);
 
         String topo1 = null;
         String bolt1 = null;
@@ -145,7 +144,6 @@ public class WorkSlotStrategyTest {
         sg2.addStreamPartition(partition2);
         MonitoredStream ms2 = new MonitoredStream(sg2);
         queue = wrb.createQueue(ms2, false, 5, new HashMap<String, Object>());
-        TestTopologyMgmtService.BOLT_NUMBER = 5;
         {
             Assert.assertEquals(5, queue.getWorkingSlots().size());
             Assert.assertEquals(2, context.getTopologies().size());

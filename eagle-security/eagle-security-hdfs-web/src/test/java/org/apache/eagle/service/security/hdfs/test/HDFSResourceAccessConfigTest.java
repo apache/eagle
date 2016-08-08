@@ -26,15 +26,15 @@ public class HDFSResourceAccessConfigTest {
 
 	@Test
 	public void testHDFSResourceAccessConfig() throws Exception {
-		String configStr = "{\"fs.defaultFS\":\"hdfs://sandbox-nn-ha\",\"dfs.nameservices\":\"sandbox-nn-ha\",\"dfs.ha.namenodes.sandbox-nn-ha\":\"nn1,nn2\",\"dfs.namenode.rpc-address.sandbox-nn-ha.nn1\":\"sandbox-nn.vip.ebay.com:8020\",\"dfs.namenode.rpc-address.sandbox-nn-ha.nn2\":\"sandbox-nn-2.vip.ebay.com:8020\",\"dfs.client.failover.proxy.provider.sandbox-nn-ha\":\"org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider\",\"hadoop.security.authentication\":\"kerberos\",\"dfs.namenode.kerberos.principal\":\"hadoop/_HOST@EXAMPLE.COM\"}";
+		String configStr = "{\"fs.defaultFS\":\"hdfs://sandbox-nn-ha\",\"dfs.nameservices\":\"sandbox-nn-ha\",\"dfs.ha.namenodes.sandbox-nn-ha\":\"nn1,nn2\",\"dfs.namenode.rpc-address.sandbox-nn-ha.nn1\":\"sandbox-nn.some.server.com:8020\",\"dfs.namenode.rpc-address.sandbox-nn-ha.nn2\":\"sandbox-nn-2.some.server.com:8020\",\"dfs.client.failover.proxy.provider.sandbox-nn-ha\":\"org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider\",\"hadoop.security.authentication\":\"kerberos\",\"dfs.namenode.kerberos.principal\":\"hadoop/_HOST@EXAMPLE.COM\"}";
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, String> configMap = mapper.readValue(configStr, Map.class);
 		Map<String, String> result = new HashMap<>();
 		result.put("fs.defaultFS" , "hdfs://sandbox-nn-ha");
 		result.put("dfs.nameservices", "sandbox-nn-ha");
 		result.put("dfs.ha.namenodes.sandbox-nn-ha", "nn1,nn2");
-		result.put("dfs.namenode.rpc-address.sandbox-nn-ha.nn1", "sandbox-nn.vip.ebay.com:8020");
-		result.put("dfs.namenode.rpc-address.sandbox-nn-ha.nn2", "sandbox-nn-2.vip.ebay.com:8020");
+		result.put("dfs.namenode.rpc-address.sandbox-nn-ha.nn1", "sandbox-nn.some.server.com:8020");
+		result.put("dfs.namenode.rpc-address.sandbox-nn-ha.nn2", "sandbox-nn-2.some.server.com:8020");
 		result.put("dfs.client.failover.proxy.provider.sandbox-nn-ha","org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
 		result.put("hadoop.security.authentication", "kerberos");
 		result.put("dfs.namenode.kerberos.principal", "hadoop/_HOST@EXAMPLE.COM");

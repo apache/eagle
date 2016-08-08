@@ -29,7 +29,6 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.PolicyHandlerContext;
 import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
-import org.apache.eagle.alert.engine.evaluator.impl.DistinctValuesInTimeWindow;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
@@ -50,6 +49,49 @@ import org.slf4j.LoggerFactory;
  * fixed fields and dynamic fields
  * fixed fields are leading fields : windowPeriod, type, numOfFields, f1_name, f2_name
  * dynamic fields depend on wisb type.
+ *
+ * policy would be like:
+ * {
+ "name": "noDataAlertPolicy",
+ "description": "noDataAlertPolicy",
+ "inputStreams": [
+ "noDataAlertStream"
+ ],
+ "outputStreams": [
+ "noDataAlertStream_out"
+ ],
+ "definition": {
+ "type": "nodataalert",
+ "value": "PT1M,plain,1,host,host1,host2"   // or "value": "PT1M,dynamic,1,host"
+ },
+ "partitionSpec": [
+ {
+ "streamId": "noDataAlertStream",
+ "type": "GROUPBY"
+ }
+ ],
+ "parallelismHint": 2
+ }
+     "name": "noDataAlertPolicy",
+     "description": "noDataAlertPolicy",
+     "inputStreams": [
+        "noDataAlertStream"
+     ],
+     "outputStreams": [
+        "noDataAlertStream_out"
+     ],
+     "definition": {
+        "type": "nodataalert",
+        "value": "PT1M,plain,1,host,host1,host2"   // or "value": "PT1M,dynamic,1,host"
+     },
+     "partitionSpec": [
+     {
+        "streamId": "noDataAlertStream",
+        "type": "GROUPBY"
+     }
+     ],
+     "parallelismHint": 2
+   }
  */
 public class NoDataPolicyHandler implements PolicyStreamHandler{
     private static final Logger LOG = LoggerFactory.getLogger(NoDataPolicyHandler.class);
@@ -61,10 +103,10 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
     private volatile List<Integer> wisbFieldIndices = new ArrayList<>();
     // reuse PolicyDefinition.defintion.value field to store full set of values separated by comma
     private volatile PolicyDefinition policyDef;
-    private volatile DistinctValuesInTimeWindow distinctWindow;
     private volatile Collector<AlertStreamEvent> collector;
     private volatile PolicyHandlerContext context;
     private volatile NoDataWisbType wisbType;
+    private volatile DistinctValuesInTimeWindow distinctWindow;
 
     public NoDataPolicyHandler(Map<String, StreamDefinition> sds){
         this.sds = sds;
@@ -149,8 +191,8 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
         event.setData(triggerEvent);
         event.setStreamId(policyDef.getOutputStreams().get(0));
         event.setPolicy(context.getPolicyDefinition());
-        if (this.context.getParentEvaluator() != null) {
-            event.setCreatedBy(context.getParentEvaluator().getName());
+        if (this.context.getPolicyEvaluator() != null) {
+            event.setCreatedBy(context.getPolicyEvaluator().getName());
         }
         event.setCreatedTime(System.currentTimeMillis());
         event.setSchema(sd);

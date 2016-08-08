@@ -27,6 +27,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import com.google.inject.Inject;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -36,8 +37,8 @@ import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
-import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 
@@ -50,7 +51,17 @@ import org.apache.eagle.alert.metadata.resource.OpResult;
 @Consumes("application/json")
 public class MetadataResource {
 
-    private IMetadataDao dao = MetadataDaoFactory.getInstance().getMetadataDao();
+//    private IMetadataDao dao = MetadataDaoFactory.getInstance().getMetadataDao();
+    private final IMetadataDao dao;
+
+    public MetadataResource(){
+        this.dao = MetadataDaoFactory.getInstance().getMetadataDao();;
+    }
+
+    @Inject
+    public MetadataResource(IMetadataDao dao){
+        this.dao = dao;
+    }
 
     @Path("/clusters")
     @GET
