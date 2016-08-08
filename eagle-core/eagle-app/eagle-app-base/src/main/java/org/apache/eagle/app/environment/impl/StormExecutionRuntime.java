@@ -102,15 +102,18 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     @Override
-    public <Conf extends Configuration> void start(Application<Conf, StormEnvironment, StormTopology> executor, Conf config){
-        String topologyName = config.getAppId();
+    public <Conf extends Configuration> void start(Application<Conf, StormEnvironment, StormTopology> executor, com.typesafe.config.Config config){
+        String topologyName = config.getString("appId");
         Preconditions.checkNotNull(topologyName,"[appId] is required by null for "+executor.getClass().getCanonicalName());
         StormTopology topology = executor.execute(config, environment);
         LOG.info("Starting {} ({})",topologyName,executor.getClass().getCanonicalName());
         Config conf = getStormConfig();
-        if(config.getMode() == ApplicationEntity.Mode.CLUSTER){
-            if(config.getJarPath() == null) config.setJarPath(DynamicJarPathFinder.findPath(executor.getClass()));
-            String jarFile = config.getJarPath();
+        if(config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()){
+//            if(config.getString("jarPath") == null) config.setJarPath(DynamicJarPathFinder.findPath(executor.getClass()));
+            String jarFile = config.getString("jarPath");
+            if(jarFile == null){
+                jarFile = DynamicJarPathFinder.findPath(executor.getClass());
+            }
             synchronized (StormExecutionRuntime.class) {
                 System.setProperty("storm.jar", jarFile);
                 LOG.info("Submitting as cluster mode ...");
@@ -131,9 +134,9 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     @Override
-    public <Conf extends Configuration> void stop(Application<Conf,StormEnvironment, StormTopology> executor, Conf config) {
-        String appId = config.getAppId();
-        if(config.getMode() == ApplicationEntity.Mode.CLUSTER){
+    public <Conf extends Configuration> void stop(Application<Conf,StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
+        String appId = config.getString("appId");
+        if(config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()){
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig()).getClient();
             try {
                 stormClient.killTopology(appId);
@@ -148,7 +151,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     @Override
-    public <Conf extends Configuration> void status(Application<Conf,StormEnvironment, StormTopology> executor, Conf config) {
+    public <Conf extends Configuration> void status(Application<Conf,StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         // TODO: Not implemented yet!
         throw new RuntimeException("TODO: Not implemented yet!");
     }

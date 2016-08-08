@@ -439,7 +439,7 @@ public class GenericEntityServiceResource {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("data storage is null");
             }
-            
+
             QueryResult<?> result = queryStatement.execute(dataStorage);
             if(result.isSuccess()){
                 meta.put(FIRST_TIMESTAMP, result.getFirstTimestamp());
@@ -543,7 +543,7 @@ public class GenericEntityServiceResource {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("Data storage is null");
             }
-            
+
             DeleteStatement deleteStatement = new DeleteStatement(rawQuery);
             ModifyResult<String> deleteResult = deleteStatement.execute(dataStorage);
             if(deleteResult.isSuccess()){

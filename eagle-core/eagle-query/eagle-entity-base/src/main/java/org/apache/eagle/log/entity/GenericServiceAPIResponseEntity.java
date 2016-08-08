@@ -111,11 +111,11 @@ public class GenericServiceAPIResponseEntity<T>{
 	public String getException() {
 		return exception;
 	}
-	public void setException(String exception) {
-		this.exception = exception;
-	}
+//	public void setException(String exception) {
+//		this.exception = exception;
+//	}
 
-    public void setException(Exception exception){
-        if(exception!=null) this.exception = EagleExceptionWrapper.wrap(exception);
+    public void setException(Exception exceptionObj){
+        if(exception!=null) this.exception = EagleExceptionWrapper.wrap(exceptionObj);
     }
 }

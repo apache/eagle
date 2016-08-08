@@ -23,6 +23,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.Configuration;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
@@ -35,20 +36,16 @@ public class MockStormApplication extends StormApplication<MockStormApplication.
 
     @Override
     public StormTopology execute(MockStormConfiguration config, StormEnvironment environment) {
-        this.setAppConfig(config);
+        return null;
+    }
+
+    @Override
+    public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("metric_spout", new RandomEventSpout(), config.getSpoutNum());
+        builder.setSpout("metric_spout", new RandomEventSpout(), config.getInt("spoutNum"));
         builder.setBolt("sink_1",environment.getFlattenStreamSink("TEST_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         builder.setBolt("sink_2",environment.getFlattenStreamSink("TEST_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         return builder.createTopology();
-    }
-
-    public MockStormConfiguration getAppConfig() {
-        return appConfig;
-    }
-
-    private void setAppConfig(MockStormConfiguration appConfig) {
-        this.appConfig = appConfig;
     }
 
     /**

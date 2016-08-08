@@ -54,8 +54,11 @@ public class ServerSimulatorImpl extends ServerSimulator {
         SiteEntity siteEntity = getUniqueSite();
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation(siteEntity.getSiteId(),appType, ApplicationEntity.Mode.LOCAL);
+        installOperation.setConfiguration(appConfig);
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation(siteEntity.getSiteId(),appType, ApplicationEntity.Mode.LOCAL)).getData();
+        ApplicationEntity applicationEntity =
+                applicationResource.installApplication(installOperation).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
     }

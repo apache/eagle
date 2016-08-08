@@ -56,8 +56,6 @@ public class NewKafkaSourcedSpoutProvider implements StormSpoutProvider {
         String groupId = context.getString("consumerGroupId");
         // Kafka fetch size
         int fetchSize = context.getInt("fetchSize");
-        // Kafka deserializer class
-        String deserClsName = context.getString("deserializerClass");
         // Kafka broker zk connection
         String zkConnString = context.getString("zkConnection");
         // transaction zkRoot

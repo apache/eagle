@@ -32,6 +32,10 @@ abstract class AbstractApplication<Conf extends Configuration,Env extends Enviro
         return execute(ApplicationConfigHelper.convertFrom(config, getConfigType()),env);
     }
 
+    @Override
+    public Proc execute(Config config, Env environment){
+        return null;
+    }
     /**
      *  Map application configuration from environment
      *
@@ -44,12 +48,13 @@ abstract class AbstractApplication<Conf extends Configuration,Env extends Enviro
 
     @Override
     public void run(Config config) {
-        ExecutionRuntimeManager.getInstance().getRuntime(getEnvironmentType(),config).start(this,loadAppConfigFromEnv(config));
+//        ExecutionRuntimeManager.getInstance().getRuntime(getEnvironmentType(),config).start(this,loadAppConfigFromEnv(config));
+        ExecutionRuntimeManager.getInstance().getRuntime(getEnvironmentType(),config).start(this,config);
     }
 
     @Override
     public void run(Configuration conf, Config config) {
-        ExecutionRuntimeManager.getInstance().getRuntime(getEnvironmentType(), config).start(this,conf);
+//        ExecutionRuntimeManager.getInstance().getRuntime(getEnvironmentType(), config).start(this,conf);
     }
 
     @Override

@@ -16,27 +16,35 @@
  */
 package org.apache.eagle.security.hbase;
 
+import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.app.StormApplication;
+import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.app.sink.StormStreamSink;
 import org.apache.eagle.security.topo.NewKafkaSourcedSpoutProvider;
 import storm.kafka.StringScheme;
-import storm.kafka.bolt.KafkaBolt;
 
 /**
  * Since 7/27/16.
  */
-public class HBaseAuditLogApplication{
+public class HBaseAuditLogApplication extends StormApplication<HBaseAuditLogAppConf> {
     public final static String SPOUT_TASK_NUM = "topology.numOfSpoutTasks";
     public final static String PARSER_TASK_NUM = "topology.numOfParserTasks";
     public final static String JOIN_TASK_NUM = "topology.numOfJoinTasks";
     public final static String SINK_TASK_NUM = "topology.numOfSinkTasks";
-    protected void buildApp(TopologyBuilder builder) {
-        System.setProperty("config.resource", "/application.conf");
-        Config config = ConfigFactory.load();
+    @Override
+    public StormTopology execute(HBaseAuditLogAppConf config1, StormEnvironment environment) {
+        return null;
+    }
+
+    @Override
+    public StormTopology execute(Config config, StormEnvironment environment) {
+        TopologyBuilder builder = new TopologyBuilder();
         NewKafkaSourcedSpoutProvider provider = new NewKafkaSourcedSpoutProvider();
         IRichSpout spout = provider.getSpout(config);
 
@@ -55,8 +63,15 @@ public class HBaseAuditLogApplication{
         BoltDeclarer joinBoltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);
         joinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
 
-        KafkaBolt kafkaBolt = new KafkaBolt();
-        BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", kafkaBolt, numOfSinkTasks);
-        kafkaBoltDeclarer.shuffleGrouping("joinBolt");
+        StormStreamSink sinkBolt = environment.getFlattenStreamSink("hbase_audit_log_stream",config);
+        BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", sinkBolt, numOfSinkTasks);
+        kafkaBoltDeclarer.fieldsGrouping("joinBolt", new Fields("user"));
+        return builder.createTopology();
+    }
+
+    public static void main(String[] args){
+        Config config = ConfigFactory.load();
+        HBaseAuditLogApplication app = new HBaseAuditLogApplication();
+        app.run(config);
     }
 }

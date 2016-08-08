@@ -49,7 +49,7 @@ public class AttributeResolveResource {
             response.setObj(result);
         } catch (Exception e) {
             response.setSuccess(false);
-            response.setException(EagleExceptionWrapper.wrap(e));
+            response.setException(e);
             return response;
         }
         return response;
@@ -73,7 +73,7 @@ public class AttributeResolveResource {
             response.setObj(result);
         } catch (Exception e) {
             response.setSuccess(false);
-            response.setException(EagleExceptionWrapper.wrap(e));
+            response.setException(e);
             return response;
         }
         return response;

@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app.sink;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.app.Configuration;
@@ -43,7 +44,7 @@ public class LoggingStreamSink extends StormStreamSink<DefaultStreamSinkConfig> 
 
     public static class Provider implements StreamSinkProvider<LoggingStreamSink,DefaultStreamSinkConfig> {
         @Override
-        public DefaultStreamSinkConfig getSinkConfig(String streamId, Configuration appConfig) {
+        public DefaultStreamSinkConfig getSinkConfig(String streamId, Config config) {
             return new DefaultStreamSinkConfig(LoggingStreamSink.class);
         }
 

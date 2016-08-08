@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.Environment;
 
 import java.io.Serializable;
@@ -61,6 +62,14 @@ public interface Application <
      * @return execution process
      */
     Proc execute(Map<String,Object> config, Env environment);
+
+    /**
+     * Execute with type-safe configuration
+     * @param config
+     * @param environment
+     * @return
+     */
+    Proc execute(Config config, Env environment);
 
     /**
      * Execute with environment based configuration

@@ -18,6 +18,7 @@ package org.apache.eagle.app.service;
 
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.ApplicationLifecycle;
 import org.apache.eagle.app.Configuration;
@@ -45,7 +46,7 @@ import java.util.stream.Collectors;
  * </ul>
  */
 public class ApplicationContext implements Serializable, ApplicationLifecycle {
-    private final Configuration config;
+    private final Config config;
     private final Application application;
     private final ExecutionRuntime runtime;
     private final ApplicationEntity metadata;
@@ -54,19 +55,17 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
      * @param metadata ApplicationEntity
      * @param application Application
      */
-    public ApplicationContext(Application application, ApplicationEntity metadata, Config config){
+    public ApplicationContext(Application application, ApplicationEntity metadata, Config config1){
         Preconditions.checkNotNull(application,"Application is null");
         Preconditions.checkNotNull(metadata,"ApplicationEntity is null");
         this.application = application;
         this.metadata = metadata;
-        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(),config);
+        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(),config1);
         Map<String,Object> applicationConfig = metadata.getConfiguration();
         if(applicationConfig == null) {
             applicationConfig = Collections.emptyMap();
         }
-        this.config = ApplicationConfigHelper.convertFrom(applicationConfig,application.getConfigType());
-        this.config.setMode(metadata.getMode());
-        this.config.setAppId(metadata.getAppId());
+        this.config = ConfigFactory.parseMap(applicationConfig);
     }
 
     @Override

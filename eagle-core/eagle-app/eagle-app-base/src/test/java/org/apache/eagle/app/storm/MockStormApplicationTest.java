@@ -33,30 +33,6 @@ public class MockStormApplicationTest {
     }
 
     @Test
-    public void testGetConfigFromMap(){
-        MockStormApplication mockStormApplication = new MockStormApplication();
-        mockStormApplication.execute(new HashMap<String,Object>(){
-            {
-                put("spoutNum",1234);
-                put("loaded",true);
-                put("mode", ApplicationEntity.Mode.CLUSTER);
-            }
-        },new StormEnvironment(ConfigFactory.load()));
-        Assert.assertTrue(mockStormApplication.getAppConfig().isLoaded());
-        Assert.assertEquals(1234,mockStormApplication.getAppConfig().getSpoutNum());
-        Assert.assertEquals(ApplicationEntity.Mode.CLUSTER,mockStormApplication.getAppConfig().getMode());
-    }
-
-    @Test
-    public void testGetConfigFromEnvironmentConfigFile(){
-        MockStormApplication mockStormApplication = new MockStormApplication();
-        mockStormApplication.execute(new StormEnvironment(ConfigFactory.load()));
-        Assert.assertTrue(mockStormApplication.getAppConfig().isLoaded());
-        Assert.assertEquals(3,mockStormApplication.getAppConfig().getSpoutNum());
-        Assert.assertEquals(ApplicationEntity.Mode.LOCAL,mockStormApplication.getAppConfig().getMode());
-    }
-
-    @Test
     public void testRunApplicationWithSysConfig(){
         new MockStormApplication().run();
     }
