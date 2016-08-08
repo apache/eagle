@@ -14,4 +14,4 @@
 # limitations under the License.
 
 org.apache.eagle.app.example.ExampleApplicationProvider
-org.apache.eagle.app.example.ExampleApplicationProvider2
+##org.apache.eagle.app.example.ExampleApplicationProvider2
