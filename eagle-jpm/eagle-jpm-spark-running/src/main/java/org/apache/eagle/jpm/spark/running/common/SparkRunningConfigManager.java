@@ -119,7 +119,7 @@ public class SparkRunningConfigManager implements Serializable {
         this.zkStateConfig.zkRetryTimes = config.getInt("zookeeperConfig.zkRetryTimes");
         this.zkStateConfig.zkRetryInterval = config.getInt("zookeeperConfig.zkRetryInterval");
         this.zkStateConfig.zkRoot = config.getString("zookeeperConfig.zkRoot");
-        this.zkStateConfig.recoverEnabled = config.getBoolean("zookeeperConfig.recoverEnable");
+        this.zkStateConfig.recoverEnabled = config.getBoolean("zookeeperConfig.recoverEnabled");
 
         // parse eagle service endpoint
         this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
