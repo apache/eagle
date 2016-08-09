@@ -12,18 +12,35 @@
        "https":false
      }
    },
-   "input": {
-    "component": "namenode",
-    "port": "50070",
-    "https": false
-   },
+   "inputs": [
+      {
+        "component": "namenode",
+        "host": "127.0.0.1",
+        "port": "50070",
+        "https": false,
+        "kafka_topic": "nn_jmx_metric_sandbox"
+      },
+      {
+        "component": "resourcemanager",
+        "host": "127.0.0.1",
+        "port": "8088",
+        "https": false,
+        "kafka_topic": "rm_jmx_metric_sandbox"
+      },
+      {
+        "component": "datanode",
+        "host": "127.0.0.1",
+        "port": "50075",
+        "https": false,
+        "kafka_topic": "dn_jmx_metric_sandbox"
+      }
+   ],
    "filter": {
     "monitoring.group.selected": ["hadoop", "java.lang"]
    },
    "output": {
      "kafka": {
-       "topic": "nn_jmx_metric_sandbox",
-       "brokerList": ["sandbox.hortonworks.com:6667"]
+       "brokerList": ["localhost:9092"]
      }
    }
 }
