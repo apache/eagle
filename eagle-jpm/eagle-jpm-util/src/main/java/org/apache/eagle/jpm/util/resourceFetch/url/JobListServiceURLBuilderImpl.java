@@ -21,17 +21,32 @@ import org.apache.eagle.jpm.util.Constants;
 public class JobListServiceURLBuilderImpl implements ServiceURLBuilder {
 	
 	public String build(String ... parameters) {
-		// {rmUrl}/ws/v1/cluster/apps?state=RUNNING 
+		/**
+		 * {rmUrl}/ws/v1/cluster/apps?state=RUNNING
+		 * We need to remove tailing slashes to avoid "url//ws/v1"
+		 * because it would not be found and would be redirected to
+		 * history server ui.
+		 */
+		String rmUrl = URLUtil.removeTrailingSlash(parameters[0]);
+
+		String restApi = null;
 		String jobState = parameters[1];
+
 		if (jobState.equals(Constants.JobState.RUNNING.name())) {
-			return parameters[0] + "/" + Constants.V2_APPS_RUNNING_URL + "&" + Constants.ANONYMOUS_PARAMETER;
+			restApi = Constants.V2_APPS_RUNNING_URL;
+		} else if (jobState.equals(Constants.JobState.FINISHED.name())) {
+			restApi = Constants.V2_APPS_COMPLETED_URL;
+		} else if (jobState.equals(Constants.JobState.ALL.name())) {
+			restApi = Constants.V2_APPS_URL;
 		}
-		else if (jobState.equals(Constants.JobState.COMPLETED.name())) {
-			return parameters[0] + "/" + Constants.V2_APPS_COMPLETED_URL + "&" + Constants.ANONYMOUS_PARAMETER;
+		if (restApi == null) {
+			return null;
 		}
-		else if (jobState.equals(Constants.JobState.ALL.name())) {
-			return parameters[0]  + "/" + Constants.V2_APPS_URL + "&" + Constants.ANONYMOUS_PARAMETER;
-		}
-		return null;
+		// "/ws/v1/cluster/apps?state=RUNNING"
+		StringBuilder sb = new StringBuilder();
+		sb.append(rmUrl).append("/").append(restApi);
+		sb.append("&").append(Constants.ANONYMOUS_PARAMETER);
+
+		return sb.toString();
 	}
 }

@@ -147,7 +147,11 @@ public class Integration1 {
 
         ZkClient zkClient = new ZkClient(zkconfig.zkQuorum, 10000, 10000, ZKStringSerializer$.MODULE$);
         Properties topicConfiguration = new Properties();
+//        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
+        AdminUtils.createTopic(zkClient, topic, 1, 1, topicConfiguration);// RackAwareMode.Disabled$.MODULE$);
+
         AdminUtils.createTopic(zkClient, topic, 1, 1, topicConfiguration);
+
     }
 
     public static void proactive_schedule(Config config) throws Exception {

@@ -22,7 +22,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AppsWrapper {
-	
+	private static final long serialVersionUID = 1L;
+
 	private Applications apps;
 
 	public Applications getApps() {

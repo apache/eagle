@@ -23,8 +23,12 @@ import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.eagle.jobrunning.common.JobConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InputStreamUtils {
+	private static final Logger LOG = LoggerFactory.getLogger(InputStreamUtils.class);
+
 
 	private static final int CONNECTION_TIMEOUT = 10 * 1000;
 	private static final int READ_TIMEOUT = 5 * 60 * 1000;
@@ -47,6 +51,7 @@ public class InputStreamUtils {
 	
 	public static InputStream getInputStream(String urlString, JobConstants.CompressionType compressionType, int timeout) throws Exception {
 		final URL url = URLConnectionUtils.getUrl(urlString);
+		LOG.info("Open connection. compression type:" + compressionType + "; URL: " + url.toString());
 		if (compressionType.equals(JobConstants.CompressionType.GZIP)) {
 			return openGZIPInputStream(url, timeout);
 		}

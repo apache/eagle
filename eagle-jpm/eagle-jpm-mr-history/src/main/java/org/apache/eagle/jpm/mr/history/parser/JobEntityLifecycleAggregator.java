@@ -20,11 +20,11 @@ package org.apache.eagle.jpm.mr.history.parser;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.eagle.jpm.mr.history.common.JPAConstants;
 import org.apache.eagle.jpm.mr.history.entities.JobBaseAPIEntity;
 import org.apache.eagle.jpm.mr.history.entities.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.history.entities.TaskAttemptExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.history.jobcounter.JobCounters;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,16 +83,16 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
 
             Map<String,Long> mapTaskAttemptCounter = this.m_mapTaskAttemptCounterAgg.result();
             if (mapTaskAttemptCounter == null) mapTaskAttemptCounter = new HashMap<>();
-            mapTaskAttemptCounter.put(JPAConstants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.m_mapAttemptDuration);
-            counters.put(JPAConstants.MAP_TASK_ATTEMPT_COUNTER,mapTaskAttemptCounter);
+            mapTaskAttemptCounter.put(Constants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.m_mapAttemptDuration);
+            counters.put(Constants.MAP_TASK_ATTEMPT_COUNTER,mapTaskAttemptCounter);
 
             Map<String,Long> reduceTaskAttemptCounter = this.m_reduceTaskAttemptCounterAgg.result();
             if (reduceTaskAttemptCounter == null) reduceTaskAttemptCounter = new HashMap<>();
-            reduceTaskAttemptCounter.put(JPAConstants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.m_reduceAttemptDuration);
-            counters.put(JPAConstants.REDUCE_TASK_ATTEMPT_COUNTER,reduceTaskAttemptCounter);
+            reduceTaskAttemptCounter.put(Constants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.m_reduceAttemptDuration);
+            counters.put(Constants.REDUCE_TASK_ATTEMPT_COUNTER,reduceTaskAttemptCounter);
 
-            counters.put(JPAConstants.MAP_TASK_ATTEMPT_FILE_SYSTEM_COUNTER, this.m_mapFileSystemCounterAgg.result());
-            counters.put(JPAConstants.REDUCE_TASK_ATTEMPT_FILE_SYSTEM_COUNTER,this.m_reduceFileSystemTaskCounterAgg.result());
+            counters.put(Constants.MAP_TASK_ATTEMPT_FILE_SYSTEM_COUNTER, this.m_mapFileSystemCounterAgg.result());
+            counters.put(Constants.REDUCE_TASK_ATTEMPT_FILE_SYSTEM_COUNTER,this.m_reduceFileSystemTaskCounterAgg.result());
 
             jobCounters.setCounters(counters);
 
@@ -105,18 +105,18 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
 
     private void taskAttemptEntityCreated(TaskAttemptExecutionAPIEntity entity) {
         JobCounters jobCounters = entity.getJobCounters();
-        String taskType = entity.getTags().get(JPAConstants.JOB_TASK_TYPE_TAG);
+        String taskType = entity.getTags().get(Constants.JOB_TASK_TYPE_TAG);
 
         if (taskType != null && jobCounters != null && jobCounters.getCounters() != null) {
-            if (JPAConstants.TaskType.MAP.toString().equals(taskType.toUpperCase())) {
+            if (Constants.TaskType.MAP.toString().equals(taskType.toUpperCase())) {
                 m_mapAttemptDuration += entity.getDuration();
-                this.m_mapTaskAttemptCounterAgg.accumulate(jobCounters.getCounters().get(JPAConstants.TASK_COUNTER));
-                this.m_mapFileSystemCounterAgg.accumulate(jobCounters.getCounters().get(JPAConstants.FILE_SYSTEM_COUNTER));
+                this.m_mapTaskAttemptCounterAgg.accumulate(jobCounters.getCounters().get(Constants.TASK_COUNTER));
+                this.m_mapFileSystemCounterAgg.accumulate(jobCounters.getCounters().get(Constants.FILE_SYSTEM_COUNTER));
                 return;
-            } else if (JPAConstants.TaskType.REDUCE.toString().equals(taskType.toUpperCase())) {
+            } else if (Constants.TaskType.REDUCE.toString().equals(taskType.toUpperCase())) {
                 m_reduceAttemptDuration += entity.getDuration();
-                this.m_reduceTaskAttemptCounterAgg.accumulate(jobCounters.getCounters().get(JPAConstants.TASK_COUNTER));
-                this.m_reduceFileSystemTaskCounterAgg.accumulate(jobCounters.getCounters().get(JPAConstants.FILE_SYSTEM_COUNTER));
+                this.m_reduceTaskAttemptCounterAgg.accumulate(jobCounters.getCounters().get(Constants.TASK_COUNTER));
+                this.m_reduceFileSystemTaskCounterAgg.accumulate(jobCounters.getCounters().get(Constants.FILE_SYSTEM_COUNTER));
                 return;
             }
         }
