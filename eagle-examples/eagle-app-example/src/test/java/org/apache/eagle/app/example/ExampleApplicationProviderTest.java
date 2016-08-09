@@ -44,7 +44,7 @@ public class ExampleApplicationProviderTest {
     public void testApplicationProviderLoading(){
         Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs().getData();
         Assert.assertNotNull(applicationDescs);
-        Assert.assertEquals(2,applicationDescs.size());
+        Assert.assertEquals(1,applicationDescs.size());
     }
 
     /**
