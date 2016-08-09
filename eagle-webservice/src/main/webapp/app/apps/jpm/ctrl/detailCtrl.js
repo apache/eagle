@@ -21,5 +21,30 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
+		jpmApp.controller("detailCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
+			PageConfig.title = "Job";
+			$scope.getStateClass = JPM.getStateClass;
+
+			$scope.site = $wrapState.param.siteId;
+			$scope.jobId = $wrapState.param.jobId;
+
+			JPM.list({
+				jobId: $scope.jobId,
+				site: $scope.site
+			})._promise.then(function (res) {
+				$scope.job = common.getValueByPath(res, "data.obj.0");
+				PageConfig.subTitle = $scope.jobId;
+				console.log(">>>", $scope.job);
+
+				if(!$scope.job) {
+					$.dialog({
+						title: "OPS!",
+						content: "Job not found!"
+					}, function () {
+						$wrapState.go("jpmList", {siteId: $scope.site});
+					});
+				}
+			});
+		});
 	});
 })();

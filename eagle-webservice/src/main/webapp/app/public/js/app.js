@@ -169,6 +169,7 @@ var app = {};
 			window._Application = $scope.Application = Application;
 			window._UI = $scope.UI = UI;
 			window._Time = $scope.Time = Time;
+			$scope.common = common;
 
 			// ============================== Route Update ==============================
 			$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {

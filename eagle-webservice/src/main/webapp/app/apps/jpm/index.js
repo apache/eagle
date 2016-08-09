@@ -22,23 +22,27 @@
 	 */
 	var jpmApp = register(['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
 
-	jpmApp.route({
+	jpmApp.route("jpmList", {
 		url: "/jpm/list",
 		site: true,
 		templateUrl: "partials/job/list.html",
 		controller: "listCtrl"
+	}).route("jpmDetail", {
+		url: "/jpm/detail/:jobId",
+		site: true,
+		templateUrl: "partials/job/detail.html",
+		controller: "detailCtrl"
 	});
 
 	jpmApp.portal({name: "JPM", icon: "home", path: "jpm/list"}, true);
 
 	jpmApp.service("JPM", function ($http, Time) {
 		// TODO: mock auth
-		$http.defaults.withCredentials = true;
 		var _hash = btoa('eagle:secret');
 
 		// TODO: timestamp support
-		var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=JobExecutionService[@site="${site}"]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		//var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=RunningJobExecutionService[@site="${site}"]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=JobExecutionService[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		//var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=RunningJobExecutionService[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 
 		var JPM = {};
 
@@ -49,11 +53,13 @@
 		 * @param endTime
 		 * @return {[]}
 		 */
-		JPM.list = function (site, startTime, endTime, fields, limit) {
+		JPM.list = function (condition, startTime, endTime, fields, limit) {
 			var _list = [];
 
 			var url = common.template(QUERY_LIST, {
-				site: site,
+				condition: $.map(condition, function (value, key) {
+					return "@" + key + '="' + value + '"'
+				}).join(" AND "),
 				startTime: moment(startTime).format(Time.FORMAT),
 				endTime: moment(endTime).format(Time.FORMAT),
 				fields: fields ? $.map(fields, function (field) {
@@ -62,6 +68,7 @@
 				limit: limit || 10000
 			});
 
+			$http.defaults.withCredentials = true;
 			_list._done = false;
 			_list._promise = $http({
 				url: url,
@@ -70,6 +77,8 @@
 					'Authorization': "Basic " + _hash
 				}
 			});
+			$http.defaults.withCredentials = false;
+
 			/**
 			 * @param {{}} res
 			 * @param {{}} res.data
@@ -83,6 +92,25 @@
 			});
 
 			return _list;
+		};
+
+		JPM.getStateClass = function (state) {
+			switch ((state || "").toUpperCase()) {
+				case "NEW":
+				case "NEW_SAVING":
+				case "SUBMITTED":
+				case "ACCEPTED":
+					return "warning";
+				case "RUNNING":
+					return "info";
+				case "SUCCESS":
+					return "success";
+				case "FINISHED":
+					return "primary";
+				case "FAILED":
+					return "danger";
+			}
+			return "default";
 		};
 
 		return JPM;

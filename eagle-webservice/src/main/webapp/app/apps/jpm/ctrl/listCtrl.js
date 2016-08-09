@@ -28,13 +28,16 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
-		jpmApp.controller("listCtrl", function ($element, $scope, PageConfig, Time, Entity, JPM) {
+		jpmApp.controller("listCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
 			PageConfig.title = "Job Performance Monitoring";
 			PageConfig.subTitle = "list";
+			$scope.getStateClass = JPM.getStateClass;
 
 			// Initialization
 			var endTime = Time();
-			var startTime = endTime.clone().subtract(1, "day");
+			var startTime = endTime.clone().subtract(6, "hour");
+
+			$scope.site = $wrapState.param.siteId;
 
 			$scope.refreshList = function () {
 				/**
@@ -53,7 +56,7 @@
 				 * @property {string} jobList.runningContainers		Running container count
 				 */
 
-				$scope.jobList = Entity.merge($scope.jobList, JPM.list("apollo", startTime, endTime, [
+				$scope.jobList = Entity.merge($scope.jobList, JPM.list({site: $scope.site}, startTime, endTime, [
 					"jobId",
 					"jobDefId",
 					"jobName",
@@ -75,25 +78,6 @@
 				});
 			};
 			$scope.refreshList();
-
-			$scope.getStateClass = function (state) {
-				switch ((state || "").toUpperCase()) {
-				case "NEW":
-				case "NEW_SAVING":
-				case "SUBMITTED":
-				case "ACCEPTED":
-					return "warning";
-				case "RUNNING":
-					return "info";
-				case "SUCCESS":
-					return "success";
-				case "FINISHED":
-					return "primary";
-				case "FAILED":
-					return "danger";
-				}
-				return "default";
-			};
 
 			// Time component
 			$element.on("change.jpm", "#startTime", function () {

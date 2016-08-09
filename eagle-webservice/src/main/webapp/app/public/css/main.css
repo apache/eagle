@@ -66,6 +66,21 @@ a {
 }
 
 /* ========================================================================
+ * =                                 Grid                                 =
+ * ======================================================================== */
+.row {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	flex-wrap: wrap;
+}
+.row > [class*='col-'] {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ========================================================================
  * =                                Table                                 =
  * ======================================================================== */
 table .info-wrapper .info-detail {
@@ -92,6 +107,13 @@ table.table pre.inline {
 	background: transparent;
 }
 
+/* ========================================================================
+ * =                                 Box                                  =
+ * ======================================================================== */
+.box .box-title .label {
+	font-size: 12px;
+	padding: 1px 7px;
+}
 
 /* ========================================================================
  * =                                Modal                                 =
@@ -153,4 +175,8 @@ table.table pre.inline {
 
 .ng-hide.ng-hide-animate.no-animate {
 	display: none;
+}
+
+.text-break {
+	word-break:break-all;
 }

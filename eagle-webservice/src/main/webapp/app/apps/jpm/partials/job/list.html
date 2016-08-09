@@ -70,7 +70,9 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="item in jobList">
-						<td>{{item.tags.jobId}}</td>
+						<td>
+							<a ui-sref="jpmDetail({siteId: site, jobId: item.tags.jobId})">{{item.tags.jobId}}</a>
+						</td>
 						<td class="text-center">
 							<span class="label label-{{getStateClass(item.currentState)}}">
 								{{item.currentState}}

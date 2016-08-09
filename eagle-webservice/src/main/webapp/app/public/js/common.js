@@ -34,7 +34,9 @@
 		if(unit === null || unit === undefined) throw "Unit or path can't be empty!";
 		if(path === "" || path === null || path === undefined) return unit;
 
-		path = path.replace(/\[(\d+)\]/g, ".$1").replace(/^\./, "").split(/\./);
+		if(typeof path === "string") {
+			path = path.replace(/\[(\d+)\]/g, ".$1").replace(/^\./, "").split(/\./);
+		}
 		$.each(path, function(i, path) {
 			unit = unit[path];
 			if(unit === null || unit === undefined) {
@@ -190,5 +192,14 @@
 		});
 
 		return deferred;
+	};
+
+	// ============================ Number ============================
+	common.number = {};
+
+	common.number.toFixed = function (num, fixed) {
+		if(num === undefined || num === null || isNaN(num)) return "-";
+		num = Number(num);
+		return num.toFixed(fixed || 0);
 	};
 })();
