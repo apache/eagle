@@ -35,6 +35,18 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
   var queueSize:String = null
   var requiredNumAcks: Int = Int.MaxValue
 
+  // Security Configuration
+  // security.protocol
+  var securityProtocol: String = null
+  // java.security.krb5.conf
+  var securityKrb5Conf: String = null
+  // java.security.auth.login.config
+  var securityAuthLoginConfig:String = null
+  // javax.security.auth.useSubjectCredsOnly
+  var securityAuthUseSubjectCredsOnly:String = null
+  // sun.security.krb5.debug
+  var securityKrb5Debug:String = null
+
   var keyClass: String = null
   var keyer: Keyer = null
 
@@ -84,6 +96,21 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
   def getBatchSize:Int = batchSize
   def setBatchSize(batchSize:Int) { this.batchSize = batchSize };
 
+  def getSecurityProtocol:String = securityProtocol
+  def setSecurityProtocol(securityProtocol:String) = this.securityProtocol = securityProtocol
+
+  def getSecurityKrb5Conf:String = securityKrb5Conf
+  def setSecurityKrb5Conf(securityKrb5Conf:String) = this.securityKrb5Conf = securityKrb5Conf
+
+  def getSecurityAuthLoginConfig:String = securityAuthLoginConfig
+  def setSecurityAuthLoginConfig(securityAuthLoginConfig:String) = this.securityAuthLoginConfig = securityAuthLoginConfig
+
+  def getSecurityAuthUseSubjectCredsOnly:String = securityAuthUseSubjectCredsOnly
+  def setSecurityAuthUseSubjectCredsOnly(securityAuthUseSubjectCredsOnly:String) = this.securityAuthUseSubjectCredsOnly = securityAuthUseSubjectCredsOnly
+
+  def getSecurityKrb5Debug:String = securityKrb5Debug
+  def setSecurityKrb5Debug(securityKrb5Debug:String) = this.securityKrb5Debug = securityKrb5Debug
+
   override def activateOptions() {
     // check for config parameter validity
     val props = new Properties()
@@ -100,6 +127,27 @@ class KafkaLog4jAppender extends AppenderSkeleton with Logging {
 
     props.put("serializer.class", serializerClass)
     props.put("batch.num.messages",batchSize.toString)
+
+    if(securityProtocol != null) {
+      props.put("security.protocol", securityProtocol)
+      LogLog.debug("Use security protocol - "+securityProtocol)
+      if(securityKrb5Conf != null){
+        System.setProperty("java.security.krb5.conf", securityKrb5Conf)
+        LogLog.debug("Use securityKrb5Conf (java.security.krb5.conf) - "+securityKrb5Conf)
+      }
+      if(securityAuthLoginConfig != null){
+        System.setProperty("java.security.auth.login.config", securityAuthLoginConfig)
+        LogLog.debug("Use securityAuthLoginConfig (java.security.auth.login.config) - "+securityAuthLoginConfig)
+      }
+      if(securityAuthUseSubjectCredsOnly != null){
+        System.setProperty("javax.security.auth.useSubjectCredsOnly", securityAuthUseSubjectCredsOnly)
+        LogLog.debug("Use securityAuthUseSubjectCredsOnly (javax.security.auth.useSubjectCredsOnly) - "+securityAuthUseSubjectCredsOnly)
+      }
+      if(securityKrb5Debug != null){
+        System.setProperty("sun.security.krb5.debug",securityKrb5Debug)
+        LogLog.debug("Use securityKrb5Debug (sun.security.krb5.debug) - "+securityKrb5Debug)
+      }
+    }
 
     //These have default values in ProducerConfig and AsyncProducerConfig. We don't care if they're not specified
     if(producerType != null) props.put("producer.type", producerType)
