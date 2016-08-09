@@ -44,7 +44,7 @@ public class ExampleApplicationProviderTest {
     public void testApplicationProviderLoading(){
         Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs().getData();
         Assert.assertNotNull(applicationDescs);
-        Assert.assertEquals(2,applicationDescs.size());
+        Assert.assertEquals(1,applicationDescs.size());
     }
 
     /**
@@ -94,12 +94,6 @@ public class ExampleApplicationProviderTest {
     @Test
     public void testApplicationQuickRunWithAppProvider() throws Exception{
         simulator.start(ExampleApplicationProvider.class, getConf());
-    }
-
-    @Ignore
-    @Test
-    public void testApplicationQuickRunWithAppProvider2() throws Exception{
-        simulator.start(ExampleApplicationProvider2.class, getConf());
     }
 
     private Map<String, Object> getConf(){

@@ -127,11 +127,11 @@
             <artifactId>eagle-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.eagle</groupId>-->
-            <!--<artifactId>eagle-app-example</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-app-example</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!--<dependency>-->
             <!--<groupId>org.apache.eagle</groupId>-->
             <!--<artifactId>eagle-jpm-app</artifactId>-->

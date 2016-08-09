@@ -94,7 +94,7 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
     public void testWrite() throws IOException {
         List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
         int i= 0;
-        while( i++ < 1000){
+        while( i++ < 5){
             TestTimeSeriesAPIEntity entity = newInstance();
 
             entityList.add(entity);
@@ -108,13 +108,13 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
         // record insert init time
         long startTime = System.currentTimeMillis();
         // Write 1000 entities
-        List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
+        List<TestTimeSeriesAPIEntity> entityList = new ArrayList<>();
         int i= 0;
-        while( i++ < 1000){
+        while( i++ < 5){
             entityList.add(newInstance());
         }
         ModifyResult<String> result = storage.create(entityList, entityDefinition);
-        Assert.assertTrue(result.getSize() >= 1000);
+        Assert.assertTrue(result.getSize() >= 5);
         // record insertion finish time
         long endTime = System.currentTimeMillis();
 
@@ -126,21 +126,20 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
         rawQuery.setPageSize(10000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         QueryResult queryResult = storage.query(query, entityDefinition);
-        Assert.assertTrue(queryResult.getSize() >= 1000);
+        Assert.assertTrue(queryResult.getSize() >= 5);
     }
 
     @Test
     public void testWriteAndAggregation() throws IOException, QueryCompileException {
         // record insert init time
         long startTime = System.currentTimeMillis();
-        // Write 1000 entities
-        List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
+        List<TestTimeSeriesAPIEntity> entityList = new ArrayList<>();
         int i= 0;
-        while( i++ < 1000){
+        while( i++ < 5){
             entityList.add(newInstance());
         }
         ModifyResult<String> result = storage.create(entityList, entityDefinition);
-        Assert.assertTrue(result.getSize() >= 1000);
+        Assert.assertTrue(result.getSize() >= 5);
         // record insertion finish time
         long endTime = System.currentTimeMillis();
 
@@ -160,13 +159,13 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
         // record insert init time
         long startTime = System.currentTimeMillis();
         // Write 1000 entities
-        List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
+        List<TestTimeSeriesAPIEntity> entityList = new ArrayList<>();
         int i= 0;
-        while( i++ < 1000){
+        while( i++ < 5){
             entityList.add(newInstance());
         }
         ModifyResult<String> result = storage.create(entityList, entityDefinition);
-        Assert.assertTrue(result.getSize() >= 1000);
+        Assert.assertTrue(result.getSize() >= 5);
         // record insertion finish time
         long endTime = System.currentTimeMillis();
 
@@ -178,23 +177,23 @@ public class TestJdbcStorage extends JdbcStorageTestBase {
         rawQuery.setPageSize(1000000);
         CompiledQuery query = new CompiledQuery(rawQuery);
         ModifyResult<String> queryResult = storage.delete(query, entityDefinition);
-        Assert.assertTrue(queryResult.getSize() >= 1000);
+        Assert.assertTrue(queryResult.getSize() >= 5);
     }
 
     @Test
     public void testWriteAndUpdate() throws IOException, QueryCompileException {
-        // Write 1000 entities
-        List<TestTimeSeriesAPIEntity> entityList = new ArrayList<TestTimeSeriesAPIEntity>();
+        // Write 5 entities
+        List<TestTimeSeriesAPIEntity> entityList = new ArrayList<>();
         int i= 0;
-        while( i++ < 1000){
+        while( i++ < 5){
             entityList.add(newInstance());
         }
         ModifyResult<String> result = storage.create(entityList, entityDefinition);
-        Assert.assertTrue(result.getSize() >= 1000);
+        Assert.assertTrue(result.getSize() >= 5);
 
         // record insertion finish time
         ModifyResult<String> queryResult = storage.update(entityList, entityDefinition);
-        Assert.assertTrue(queryResult.getSize() >= 1000);
+        Assert.assertTrue(queryResult.getSize() >= 5);
     }
 
     /**

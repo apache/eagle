@@ -27,7 +27,7 @@ import java.io.InputStream;
 public class ApplicationProviderDescConfigTest {
     @Test
     public void testApplicationDescWrapperConfigLoadFromXML(){
-        ApplicationProviderDescConfig config = ApplicationProviderDescConfig.loadFromXML(null, "TestApplicationMetadata.xml");
+        ApplicationProviderDescConfig config = ApplicationProviderDescConfig.loadFromXML(ApplicationProviderDescConfigTest.class, "TestApplicationMetadata.xml");
         Assert.assertNotNull(config);
     }
 
