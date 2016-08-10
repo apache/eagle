@@ -168,7 +168,7 @@
 
         <mapr-hive.version>1.2.0-mapr-1510</mapr-hive.version>
         <mapr-hadoop.version>2.7.0-mapr-1506</mapr-hadoop.version>
-        <maprfs.version>5.0.0-mapr</maprfs.version>
+        <maprfs.version>5.1.0-mapr</maprfs.version>
         <mapr-hbase.version>0.98.9-mapr-1503</mapr-hbase.version>
 
         <spark.core.version>1.4.0</spark.core.version>
@@ -192,6 +192,7 @@
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-io.version>2.4</commons-io.version>
         <guice.version>3.0</guice.version>
+        <httpclient.version>4.5.2</httpclient.version>
 
         <!-- Configuration -->
         <archaius.version>0.6.1</archaius.version>
@@ -233,7 +234,7 @@
         <storm-kafka.version>0.10.0</storm-kafka.version>
         <storm.version>0.9.3</storm.version>
 
-        <mapr-kafka.version>0.8.1.1</mapr-kafka.version>
+        <mapr-kafka.version>0.9.0.0-mapr-1607</mapr-kafka.version>
         <mapr-kafka-clients.version>0.8.3-mapr-1509</mapr-kafka-clients.version>
         <mapr-storm-kafka.version>0.9.3</mapr-storm-kafka.version>
         <mapr-storm.version>0.9.3-mapr-1509</mapr-storm.version>
@@ -398,6 +399,16 @@
                 <artifactId>guice</artifactId>
                 <version>${guice.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.mapr.hadoop</groupId>
+                <artifactId>maprfs</artifactId>
+                <version>${maprfs.version}</version>
+             </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
 
             <!-- Configuration -->
             <dependency>
@@ -539,6 +550,11 @@
                 <groupId>org.jgrapht</groupId>
                 <artifactId>jgrapht-core</artifactId>
                 <version>${jgrapht.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.version}</artifactId>
+                <version>${kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
@@ -974,11 +990,6 @@
                         <version>${mapr-hbase.version}</version>
                     </dependency>
                     <dependency>
-                        <groupId>com.mapr.hadoop</groupId>
-                        <artifactId>maprfs</artifactId>
-                        <version>${maprfs.version}</version>
-                    </dependency>
-                    <dependency>
                         <groupId>org.apache.hadoop</groupId>
                         <artifactId>hadoop-client</artifactId>
                         <version>${mapr-hadoop.version}</version>
@@ -1009,11 +1020,6 @@
                         <version>${mapr-hive.version}</version>
                     </dependency>
 
-                    <dependency>
-                        <groupId>org.apache.kafka</groupId>
-                        <artifactId>kafka_${scala.version}</artifactId>
-                        <version>${mapr-kafka.version}</version>
-                    </dependency>
                     <dependency>
                         <groupId>org.apache.storm</groupId>
                         <artifactId>storm-kafka</artifactId>
@@ -1207,6 +1213,12 @@
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
             </releases>
+        </repository>
+        <repository>
+            <id>mapr-releases</id>
+            <url>http://repository.mapr.com/maven/</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
         </repository>
         <repository>
             <id>siddhi cep engine</id>
