@@ -21,7 +21,7 @@ import com.typesafe.config.ConfigFactory;
 import org.apache.commons.cli.ParseException;
 import org.apache.eagle.common.config.ConfigOptionParser;
 
-public interface ApplicationTool<Conf extends Configuration> {
+public interface ApplicationTool {
     /**
      * Run application through CLI
      *
@@ -41,18 +41,6 @@ public interface ApplicationTool<Conf extends Configuration> {
      * @param config
      */
     void run(Config config);
-
-    /**
-     * @param appConf
-     */
-    void run(Conf appConf, Config envConfig);
-
-    /**
-     * @param appConf
-     */
-    default void run(Conf appConf){
-        run(appConf, ConfigFactory.load());
-    }
 
     default void run(){
         run(ConfigFactory.load());

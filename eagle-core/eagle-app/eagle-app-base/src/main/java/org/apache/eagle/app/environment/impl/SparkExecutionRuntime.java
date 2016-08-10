@@ -18,7 +18,6 @@ package org.apache.eagle.app.environment.impl;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
-import org.apache.eagle.app.Configuration;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
 
@@ -35,13 +34,11 @@ public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,
 
     @Override
     public void start(Application executor, Config config) {
-
         throw new RuntimeException("Not implemented yet");
     }
 
     @Override
     public void stop(Application executor, Config config) {
-
         throw new RuntimeException("Not implemented yet");
     }
 

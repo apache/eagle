@@ -19,9 +19,7 @@
 
 package org.apache.eagle.security.hbase;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
-import org.apache.eagle.security.service.MetadataDaoFactory;
 
 /**
  * Since 8/5/16.

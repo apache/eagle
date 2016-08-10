@@ -21,16 +21,13 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.ApplicationLifecycle;
-import org.apache.eagle.app.Configuration;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
-import org.apache.eagle.app.utils.ApplicationConfigHelper;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +62,7 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
         if(applicationConfig == null) {
             applicationConfig = Collections.emptyMap();
         }
+        // TODO: Merge application config with environment config
         this.config = ConfigFactory.parseMap(applicationConfig);
     }
 

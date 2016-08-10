@@ -32,15 +32,11 @@ import storm.kafka.StringScheme;
 /**
  * Since 7/27/16.
  */
-public class HBaseAuditLogApplication extends StormApplication<HBaseAuditLogAppConf> {
+public class HBaseAuditLogApplication extends StormApplication {
     public final static String SPOUT_TASK_NUM = "topology.numOfSpoutTasks";
     public final static String PARSER_TASK_NUM = "topology.numOfParserTasks";
     public final static String JOIN_TASK_NUM = "topology.numOfJoinTasks";
     public final static String SINK_TASK_NUM = "topology.numOfSinkTasks";
-    @Override
-    public StormTopology execute(HBaseAuditLogAppConf config1, StormEnvironment environment) {
-        return null;
-    }
 
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
@@ -63,7 +59,7 @@ public class HBaseAuditLogApplication extends StormApplication<HBaseAuditLogAppC
         BoltDeclarer joinBoltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);
         joinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
 
-        StormStreamSink sinkBolt = environment.getFlattenStreamSink("hbase_audit_log_stream",config);
+        StormStreamSink sinkBolt = environment.getStreamSink("hbase_audit_log_stream",config);
         BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", sinkBolt, numOfSinkTasks);
         kafkaBoltDeclarer.fieldsGrouping("joinBolt", new Fields("user"));
         return builder.createTopology();

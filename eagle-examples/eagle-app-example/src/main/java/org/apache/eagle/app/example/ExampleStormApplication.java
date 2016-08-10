@@ -31,18 +31,13 @@ import org.apache.eagle.app.environment.impl.StormEnvironment;
 import java.util.Arrays;
 import java.util.Map;
 
-public class ExampleStormApplication extends StormApplication<ExampleStormConfig> {
-    @Override
-    public StormTopology execute(ExampleStormConfig config, StormEnvironment environment) {
-        return null;
-    }
-
+public class ExampleStormApplication extends StormApplication{
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("metric_spout", new RandomEventSpout(), config.getInt("spoutNum"));
-        builder.setBolt("sink_1",environment.getFlattenStreamSink("SAMPLE_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
-        builder.setBolt("sink_2",environment.getFlattenStreamSink("SAMPLE_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_1",environment.getStreamSink("SAMPLE_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",environment.getStreamSink("SAMPLE_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         return builder.createTopology();
     }
 

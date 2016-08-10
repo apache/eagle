@@ -111,12 +111,12 @@ public class ApplicationProviderDescConfig {
 
     private final static Logger LOG = LoggerFactory.getLogger(ApplicationProviderDescConfig.class);
 
-    public static ApplicationProviderDescConfig loadFromXML(AbstractApplicationProvider provider, String configXmlFile){
+    public static ApplicationProviderDescConfig loadFromXML(Class<?> classLoader, String configXmlFile){
         try {
             JAXBContext jc = JAXBContext.newInstance(ApplicationProviderDescConfig.class);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
 //            InputStream is = ApplicationProviderDescConfig.class.getResourceAsStream(configXmlFile);
-            InputStream is = provider.getClass().getResourceAsStream(configXmlFile);
+            InputStream is = classLoader.getResourceAsStream(configXmlFile);
             if(is == null){
                 is = ApplicationProviderDescConfig.class.getResourceAsStream("/"+configXmlFile);
             }

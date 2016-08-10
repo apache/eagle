@@ -96,12 +96,6 @@ public class ExampleApplicationProviderTest {
         simulator.start(ExampleApplicationProvider.class, getConf());
     }
 
-    @Ignore
-    @Test
-    public void testApplicationQuickRunWithAppProvider2() throws Exception{
-        simulator.start(ExampleApplicationProvider2.class, getConf());
-    }
-
     private Map<String, Object> getConf(){
         Map<String, Object> conf = new HashMap<>();
         conf.put("dataSinkConfig.topic", "testTopic");
