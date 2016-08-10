@@ -65,7 +65,6 @@ public class SiteEntityEntityServiceMemoryImpl implements SiteEntityService {
         return siteId2EntityMap.get(siteId);
     }
 
-
     @Override
     public SiteEntity deleteBySiteId(String siteId) throws EntityNotFoundException {
         return siteId2EntityMap.remove(getBySiteId(siteId).getSiteId());

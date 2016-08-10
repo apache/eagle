@@ -17,7 +17,6 @@
 package org.apache.eagle.app.sink;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.app.Configuration;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 
 import java.lang.reflect.ParameterizedType;

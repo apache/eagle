@@ -64,7 +64,7 @@ build
 .settings
 .externalToolBuilders
 classes
-# bin
+bin
 
 # Temporary files
 logs/
