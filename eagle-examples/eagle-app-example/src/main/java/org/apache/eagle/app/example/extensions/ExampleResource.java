@@ -19,6 +19,7 @@ package org.apache.eagle.app.example.extensions;
 
 import com.google.inject.Inject;
 import com.typesafe.config.Config;
+import org.apache.eagle.common.module.ModuleScope;
 
 import javax.ws.rs.Path;
 import java.util.List;
@@ -29,14 +30,16 @@ import javax.ws.rs.core.MediaType;
 @Path("/example")
 public class ExampleResource {
     @Inject
-    private ExampleService exampleService;
+    private ExampleEntityService exampleEntityService;
+    @Inject
+    private ExampleCommonService commonService;
     @Inject
     private Config config;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<ExampleEntity> getEntities(){
-        return exampleService.getEntities();
+        return exampleEntityService.getEntities();
     }
 
     @GET
@@ -44,5 +47,12 @@ public class ExampleResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Config getConfig(){
         return config;
+    }
+
+    @GET
+    @Path("/common")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Class<? extends ModuleScope> getCommonServiceScope(){
+        return commonService.getScope();
     }
 }

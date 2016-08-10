@@ -23,6 +23,7 @@ import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.test.ServerSimulator;
 import org.apache.eagle.app.test.AppUnitTestRunner;
+import org.apache.eagle.common.module.GlobalScope;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
@@ -56,6 +57,7 @@ public class ExampleApplicationProviderTest {
         List<ExampleEntity> entities = exampleResource.getEntities();
         Assert.assertNotNull(entities);
         Assert.assertEquals(1,entities.size());
+        Assert.assertEquals(GlobalScope.class,exampleResource.getCommonServiceScope());
     }
 
     /**

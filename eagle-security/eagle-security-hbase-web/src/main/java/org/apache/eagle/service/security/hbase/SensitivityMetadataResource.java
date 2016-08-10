@@ -20,16 +20,12 @@ package org.apache.eagle.service.security.hbase;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.typesafe.config.Config;
-import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.security.service.HBaseSensitivityEntity;
 import org.apache.eagle.security.service.ISecurityMetadataDAO;
-import org.apache.eagle.security.service.MetadataDaoFactory;
 
 import javax.ws.rs.*;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Since 6/10/16.
@@ -39,10 +35,11 @@ import java.util.Iterator;
 public class SensitivityMetadataResource {
     private ApplicationEntityService entityService;
     private ISecurityMetadataDAO dao;
+
     @Inject
-    public SensitivityMetadataResource(ApplicationEntityService entityService, Config eagleServerConfig){
+    public SensitivityMetadataResource(ApplicationEntityService entityService, ISecurityMetadataDAO metadataDAO){
         this.entityService = entityService;
-        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
+        this.dao = metadataDAO;
     }
 
     @Path("/hbase")

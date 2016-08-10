@@ -14,25 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.common.module;
+package org.apache.eagle.app.example.extensions;
 
-import com.google.inject.Module;
-
+import java.util.Collections;
 import java.util.List;
 
-/**
- * @see ModuleRegistry
- */
-public interface ModuleScope {
-    /**
-     * @param registry ModuleRegistry
-     * @return
-     */
-    default List<Module> getModules(ModuleRegistry registry){
-        return registry.getModules(this.getClass());
-    }
+public class ExampleEntityServiceMemoryImpl implements ExampleEntityService {
 
-    default String getName(){
-        return getClass().getName();
+    @Override
+    public List<ExampleEntity> getEntities() {
+        ExampleEntity entity = new ExampleEntity();
+        entity.setMessage("Message from "+ExampleEntityServiceMemoryImpl.class.getCanonicalName());
+        return Collections.singletonList(entity);
     }
 }

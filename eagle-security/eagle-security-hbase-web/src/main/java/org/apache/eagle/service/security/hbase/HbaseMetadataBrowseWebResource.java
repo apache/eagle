@@ -26,7 +26,6 @@ import org.apache.eagle.security.entity.HbaseResourceEntity;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.security.service.HBaseSensitivityEntity;
 import org.apache.eagle.security.service.ISecurityMetadataDAO;
-import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
 import org.apache.eagle.service.security.hbase.dao.HbaseMetadataDAOImpl;
 import org.apache.hadoop.conf.Configuration;
@@ -48,10 +47,9 @@ public class HbaseMetadataBrowseWebResource {
     private ISecurityMetadataDAO dao;
 
     @Inject
-    public HbaseMetadataBrowseWebResource(ApplicationEntityService entityService, Config eagleServerConfig){
+    public HbaseMetadataBrowseWebResource(ApplicationEntityService entityService, ISecurityMetadataDAO metadataDAO){
         this.entityService = entityService;
-        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
-
+        this.dao = metadataDAO;
     }
 
     private Map<String, Map<String, String>> getAllSensitivities(){

@@ -19,6 +19,7 @@
 
 package org.apache.eagle.security.service;
 
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
     private final String INSERT_STATEMENT = "INSERT INTO hbase_sensitivity_entity (site, hbase_resource, sensitivity_type) VALUES (?, ?, ?)";
 
     // get connection url from config
+    @Inject
     public JDBCSecurityMetadataDAO(Config config){
         this.config = config;
     }

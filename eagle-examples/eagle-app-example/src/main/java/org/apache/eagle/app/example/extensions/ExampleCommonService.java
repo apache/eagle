@@ -16,15 +16,8 @@
  */
 package org.apache.eagle.app.example.extensions;
 
-import java.util.Collections;
-import java.util.List;
+import org.apache.eagle.common.module.ModuleScope;
 
-public class ExampleServiceMemoryImpl implements ExampleService {
-
-    @Override
-    public List<ExampleEntity> getEntities() {
-        ExampleEntity entity = new ExampleEntity();
-        entity.setMessage("Message from "+ExampleServiceMemoryImpl.class.getCanonicalName());
-        return Collections.singletonList(entity);
-    }
+public interface ExampleCommonService {
+    Class<? extends ModuleScope> getScope();
 }

@@ -16,8 +16,12 @@
  */
 package org.apache.eagle.app.example.extensions;
 
-import java.util.List;
+import org.apache.eagle.common.module.GlobalScope;
+import org.apache.eagle.common.module.ModuleScope;
 
-public interface ExampleService {
-    List<ExampleEntity> getEntities();
+public class ExampleCommonServiceImpl implements ExampleCommonService{
+    @Override
+    public Class<? extends ModuleScope> getScope() {
+        return GlobalScope.class;
+    }
 }
