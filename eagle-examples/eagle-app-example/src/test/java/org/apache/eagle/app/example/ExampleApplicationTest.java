@@ -19,20 +19,8 @@ package org.apache.eagle.app.example;
 import org.junit.Test;
 
 public class ExampleApplicationTest {
-    @Test
-    public void testRunWithAppTool(){
-        new ExampleStormApplication().run(new ExampleStormConfig("unittest_app_topology"));
-    }
-
     /**
      * Should load application from application.conf:
-     * {
-     *     org.apache.eagle.app.example.ExampleStormApplication{
-     *          appId: VALUE,
-     *          mode: LOCAL,
-     *          {Attribute}:{Value}
-     *     }
-     * }
      */
     @Test
     public void testRunWithAppToolFromEnvConfig(){

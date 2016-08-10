@@ -16,20 +16,15 @@
  */
 package org.apache.eagle.app.sink;
 
+import backtype.storm.topology.BasicOutputCollector;
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.app.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 public class LoggingStreamSink extends StormStreamSink<DefaultStreamSinkConfig> {
     private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
-
-    @Override
-    protected void onEvent(StreamEvent streamEvent) {
-        LOGGER.info("Receiving {}",streamEvent);
-    }
 
     @Override
     public void onInstall() {
@@ -41,6 +36,10 @@ public class LoggingStreamSink extends StormStreamSink<DefaultStreamSinkConfig> 
         LOGGER.info("Executing onUninstall callback, do nothing");
     }
 
+    @Override
+    protected void execute(Object key, Map event, BasicOutputCollector collector) {
+        LOGGER.info("Receiving {}",event);
+    }
 
     public static class Provider implements StreamSinkProvider<LoggingStreamSink,DefaultStreamSinkConfig> {
         @Override

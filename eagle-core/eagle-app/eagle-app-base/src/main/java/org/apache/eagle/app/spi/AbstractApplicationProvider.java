@@ -36,19 +36,22 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     private final static Logger LOG = LoggerFactory.getLogger(AbstractApplicationProvider.class);
     private final ApplicationDesc applicationDesc;
 
-    public AbstractApplicationProvider(){
-        applicationDesc = new ApplicationDesc();
-        applicationDesc.setProviderClass(this.getClass());
-        configure();
-    }
-
-    protected void configure (){
-        // do nothing by default
-    }
+//    Disable programmable ApplicationProvider approach
+//
+//    public AbstractApplicationProvider(){
+//        applicationDesc = new ApplicationDesc();
+//        applicationDesc.setProviderClass(this.getClass());
+//        configure();
+//    }
+//
+//    protected void configure (){
+//        // do nothing by default
+//    }
 
     protected AbstractApplicationProvider(String applicationDescConfig) {
-        this();
-        ApplicationProviderDescConfig descWrapperConfig = ApplicationProviderDescConfig.loadFromXML(this, applicationDescConfig);
+        applicationDesc = new ApplicationDesc();
+        applicationDesc.setProviderClass(this.getClass());
+        ApplicationProviderDescConfig descWrapperConfig = ApplicationProviderDescConfig.loadFromXML(this.getClass(), applicationDescConfig);
         setType(descWrapperConfig.getType());
         setVersion(descWrapperConfig.getVersion());
         setName(descWrapperConfig.getName());
