@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# EAGLE_SERVICE_HOST, default is `hostname -f`
+# EAGLE_SERVICE_HOST, default is `hostname -f` 
 export EAGLE_SERVICE_HOST=localhost
 # EAGLE_SERVICE_PORT, default is 9099
 export EAGLE_SERVICE_PORT=9099
