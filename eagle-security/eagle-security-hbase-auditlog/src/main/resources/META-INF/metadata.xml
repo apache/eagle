@@ -34,7 +34,7 @@
         <property>
             <name>dataSourceConfig.zkConnection</name>
             <displayName>dataSourceConfig.zkConnection</displayName>
-            <value>localhost</value>
+            <value>server.eagle.apache.org</value>
             <description>zk connection</description>
         </property>
         <property>
@@ -52,7 +52,7 @@
         <property>
             <name>dataSourceConfig.transactionZKServers</name>
             <displayName>dataSourceConfig.transactionZKServers</displayName>
-            <value>localhost</value>
+            <value>server.eagle.apache.org</value>
             <description>zookeeper server for offset transaction</description>
         </property>
         <property>
@@ -180,6 +180,24 @@
             <displayName>metadata.store</displayName>
             <value>org.apache.eagle.security.service.InMemMetadataDaoImpl</value>
             <description>implementation class for metadata store</description>
+        </property>
+        <property>
+            <name>hbase.zookeeper.quorum</name>
+            <displayName>hbase.zookeeper.quorum</displayName>
+            <value>server.eagle.apache.org</value>
+            <description>hbase zookeeper endpoint host</description>
+        </property>
+        <property>
+            <name>hbase.zookeeper.property.clientPort</name>
+            <displayName>hbase.zookeeper.property.clientPort</displayName>
+            <value>2181</value>
+            <description>hbase zookeeper endpoint port</description>
+        </property>
+        <property>
+            <name>zookeeper.znode.parent</name>
+            <displayName>zookeeper.znode.parent</displayName>
+            <value>/hbase-unsecure</value>
+            <description>zookeeper znode parent for hbase</description>
         </property>
     </configuration>
     <streams>

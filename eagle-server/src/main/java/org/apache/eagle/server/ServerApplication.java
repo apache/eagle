@@ -16,8 +16,10 @@
  */
 package org.apache.eagle.server;
 
+import com.google.inject.Binding;
 import com.hubspot.dropwizard.guice.GuiceBundle;
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.typesafe.config.Config;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
@@ -28,9 +30,14 @@ import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
 import org.apache.eagle.app.ApplicationGuiceModule;
 import org.apache.eagle.common.module.CommonGuiceModule;
+import org.apache.eagle.common.module.ConfigServiceProvider;
 import org.apache.eagle.metadata.persistence.MetadataStore;
 
 import javax.servlet.DispatcherType;
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.EnumSet;
 
 class ServerApplication extends Application<ServerConfig> {
@@ -59,6 +66,18 @@ class ServerApplication extends Application<ServerConfig> {
         environment.jersey().register(RESTExceptionMapper.class);
         environment.jersey().setUrlPattern(ServerConfig.getApiBasePath());
 
+        Binding<Config> b = guiceBundle.getInjector().getBinding(Config.class);
+        Config conf = b.getProvider().get();
+        if(conf.hasPath("application.provider.dir")) {
+            File loc = new File(conf.getString("application.provider.dir"));
+            File[] jarFiles = loc.listFiles(file -> file.getPath().toLowerCase().endsWith(".jar"));
+            URL[] urls = new URL[jarFiles.length];
+            for (int i = 0; i < jarFiles.length; i++) {
+                urls[i] = jarFiles[i].toURI().toURL();
+            }
+            URLClassLoader jarFileClassLoader = new URLClassLoader(urls);
+            Thread.currentThread().setContextClassLoader(jarFileClassLoader);
+        }
         // Automatically scan all REST resources
         new PackagesResourceConfig(ServerConfig.getResourcePackage()).getClasses().forEach(environment.jersey()::register);
 

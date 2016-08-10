@@ -18,6 +18,7 @@ package org.apache.eagle.app.config;
 
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
 import org.apache.eagle.metadata.model.ApplicationDocs;
 import org.apache.eagle.metadata.model.Configuration;
 import org.slf4j.Logger;
@@ -110,11 +111,12 @@ public class ApplicationProviderDescConfig {
 
     private final static Logger LOG = LoggerFactory.getLogger(ApplicationProviderDescConfig.class);
 
-    public static ApplicationProviderDescConfig loadFromXML(String configXmlFile){
+    public static ApplicationProviderDescConfig loadFromXML(Class<?> classLoader, String configXmlFile){
         try {
             JAXBContext jc = JAXBContext.newInstance(ApplicationProviderDescConfig.class);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
-            InputStream is = ApplicationProviderDescConfig.class.getResourceAsStream(configXmlFile);
+//            InputStream is = ApplicationProviderDescConfig.class.getResourceAsStream(configXmlFile);
+            InputStream is = classLoader.getResourceAsStream(configXmlFile);
             if(is == null){
                 is = ApplicationProviderDescConfig.class.getResourceAsStream("/"+configXmlFile);
             }

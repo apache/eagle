@@ -21,16 +21,13 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.ApplicationLifecycle;
-import org.apache.eagle.app.Configuration;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
-import org.apache.eagle.app.utils.ApplicationConfigHelper;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -55,17 +52,17 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
      * @param metadata ApplicationEntity
      * @param application Application
      */
-    public ApplicationContext(Application application, ApplicationEntity metadata, Config config1){
+    public ApplicationContext(Application application, ApplicationEntity metadata, Config envConfig){
         Preconditions.checkNotNull(application,"Application is null");
         Preconditions.checkNotNull(metadata,"ApplicationEntity is null");
         this.application = application;
         this.metadata = metadata;
-        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(),config1);
+        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(),envConfig);
         Map<String,Object> applicationConfig = metadata.getConfiguration();
         if(applicationConfig == null) {
             applicationConfig = Collections.emptyMap();
         }
-        this.config = ConfigFactory.parseMap(applicationConfig);
+        this.config = ConfigFactory.parseMap(applicationConfig).withFallback(envConfig);
     }
 
     @Override

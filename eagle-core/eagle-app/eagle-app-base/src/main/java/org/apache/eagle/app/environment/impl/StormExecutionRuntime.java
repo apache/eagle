@@ -23,7 +23,6 @@ import backtype.storm.generated.*;
 import backtype.storm.utils.NimbusClient;
 import com.google.common.base.Preconditions;
 import org.apache.eagle.app.Application;
-import org.apache.eagle.app.Configuration;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
 import org.apache.eagle.app.utils.DynamicJarPathFinder;
@@ -39,18 +38,6 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     private static LocalCluster _localCluster;
 
     private StormEnvironment environment;
-
-//    static {
-//        Runtime.getRuntime().addShutdownHook(new Thread(){
-//            @Override
-//            public void run() {
-//                if(_localCluster != null) {
-//                    LOG.info("Shutting down local storm cluster instance");
-//                    _localCluster.shutdown();
-//                }
-//            }
-//        });
-//    }
 
     private static LocalCluster getLocalCluster(){
         if(_localCluster == null){
@@ -102,7 +89,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     @Override
-    public <Conf extends Configuration> void start(Application<Conf, StormEnvironment, StormTopology> executor, com.typesafe.config.Config config){
+    public void start(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config){
         String topologyName = config.getString("appId");
         Preconditions.checkNotNull(topologyName,"[appId] is required by null for "+executor.getClass().getCanonicalName());
         StormTopology topology = executor.execute(config, environment);
@@ -134,7 +121,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     @Override
-    public <Conf extends Configuration> void stop(Application<Conf,StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
+    public void stop(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         String appId = config.getString("appId");
         if(config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()){
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig()).getClient();
@@ -151,7 +138,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     @Override
-    public <Conf extends Configuration> void status(Application<Conf,StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
+    public void status(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         // TODO: Not implemented yet!
         throw new RuntimeException("TODO: Not implemented yet!");
     }

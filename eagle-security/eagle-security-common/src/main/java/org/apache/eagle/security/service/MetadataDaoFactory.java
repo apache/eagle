@@ -20,8 +20,6 @@ import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-
 /**
  * @since Apr 12, 2016
  *
@@ -29,25 +27,14 @@ import java.lang.reflect.Constructor;
 public class MetadataDaoFactory {
     private static final Logger LOG = LoggerFactory.getLogger(MetadataDaoFactory.class);
 
-    public static ISecurityMetadataDAO getMetadataDAO(String storeCls) {
+    public static ISecurityMetadataDAO getMetadataDAO(Config eagleServerConfig) {
+        String storeCls = eagleServerConfig.getString("metadata.store");
+
         ISecurityMetadataDAO dao = null;
-        if (storeCls == null) {
-            LOG.warn("metadata store is not configured, use in-memory store !!!");
+        if (!storeCls.equalsIgnoreCase("org.apache.eagle.metadata.service.memory.MemoryMetadataStore")) {
             dao = new InMemMetadataDaoImpl();
         } else {
-            Class<?> clz;
-            try {
-                clz = Thread.currentThread().getContextClassLoader().loadClass(storeCls);
-                if (ISecurityMetadataDAO.class.isAssignableFrom(clz)) {
-                    Constructor<?> cotr = clz.getConstructor();
-                    dao = (ISecurityMetadataDAO) cotr.newInstance();
-                } else {
-                    throw new Exception("metadataDao configuration need to be implementation of IMetadataDao! ");
-                }
-            } catch (Exception e) {
-                LOG.error("error when initialize the dao, fall back to in memory mode!", e);
-                dao = new InMemMetadataDaoImpl();
-            }
+            dao = new JDBCSecurityMetadataDAO(eagleServerConfig);
         }
         return dao;
     }

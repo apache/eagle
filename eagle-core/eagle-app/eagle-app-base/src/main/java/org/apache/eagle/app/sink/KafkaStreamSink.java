@@ -56,19 +56,12 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     }
 
     @Override
-    protected void onEvent(StreamEvent streamEvent) {
-    }
-
-    @Override
-    public void execute(Tuple input, BasicOutputCollector collector) {
-        LOG.info("TODO: producing {} to '{}'", input, topicId);
-
+    protected void execute(Object key, Map event,BasicOutputCollector collector) {
         try {
-            Map m = (Map) input.getValue(1);
-            String output = new ObjectMapper().writeValueAsString(m);
-            producer.send(new KeyedMessage(this.topicId, m.get("user"), output));
+            String output = new ObjectMapper().writeValueAsString(event);
+            producer.send(new KeyedMessage(this.topicId, event.get("user"), output));
         }catch(Exception ex){
-            LOG.error("", ex);
+            LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
         }
     }
