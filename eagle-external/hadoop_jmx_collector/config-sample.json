@@ -15,21 +15,21 @@
    "inputs": [
       {
         "component": "namenode",
-        "host": "127.0.0.1",
+        "host": "server.eagle.apache.org",
         "port": "50070",
         "https": false,
         "kafka_topic": "nn_jmx_metric_sandbox"
       },
       {
         "component": "resourcemanager",
-        "host": "127.0.0.1",
+        "host": "server.eagle.apache.org",
         "port": "8088",
         "https": false,
         "kafka_topic": "rm_jmx_metric_sandbox"
       },
       {
         "component": "datanode",
-        "host": "127.0.0.1",
+        "host": "server.eagle.apache.org",
         "port": "50075",
         "https": false,
         "kafka_topic": "dn_jmx_metric_sandbox"
