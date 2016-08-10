@@ -26,6 +26,7 @@ import org.apache.eagle.jpm.mr.running.entities.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.entities.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
@@ -118,7 +119,7 @@ public class MRJobParser implements Runnable {
 
     private void finishMRJob(String mrJobId) {
         JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(mrJobId);
-        jobExecutionAPIEntity.setStatus(Constants.AppState.FINISHED.toString());
+        jobExecutionAPIEntity.setCurrentState(Constants.AppState.FINISHED.toString());
         mrJobConfigs.remove(mrJobId);
         if (mrJobConfigs.size() == 0) {
             this.parserStatus = ParserStatus.APP_FINISHED;
@@ -186,19 +187,20 @@ public class MRJobParser implements Runnable {
                 mrJobEntityMap.put(id, new JobExecutionAPIEntity());
             }
 
+            String jobDefId = JobNameNormalization.getInstance().normalize(mrJob.getName());
             JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(id);
             jobExecutionAPIEntity.setTags(new HashMap<>(commonTags));
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_ID.toString(), id);
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), mrJob.getName());
-            jobExecutionAPIEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), mrJob.getName());
+            jobExecutionAPIEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), jobDefId);
             jobExecutionAPIEntity.setTimestamp(app.getStartedTime());
             jobExecutionAPIEntity.setSubmissionTime(app.getStartedTime());
             jobExecutionAPIEntity.setStartTime(mrJob.getStartTime());
-            jobExecutionAPIEntity.setElapsedTime(mrJob.getElapsedTime());
-            jobExecutionAPIEntity.setStatus(mrJob.getState());
-            jobExecutionAPIEntity.setMapsTotal(mrJob.getMapsTotal());
+            jobExecutionAPIEntity.setDurationTime(mrJob.getElapsedTime());
+            jobExecutionAPIEntity.setCurrentState(mrJob.getState());
+            jobExecutionAPIEntity.setNumTotalMaps(mrJob.getMapsTotal());
             jobExecutionAPIEntity.setMapsCompleted(mrJob.getMapsCompleted());
-            jobExecutionAPIEntity.setReducesTotal(mrJob.getReducesTotal());
+            jobExecutionAPIEntity.setNumTotalReduces(mrJob.getReducesTotal());
             jobExecutionAPIEntity.setReducesCompleted(mrJob.getReducesCompleted());
             jobExecutionAPIEntity.setMapProgress(mrJob.getMapProgress());
             jobExecutionAPIEntity.setReduceProgress(mrJob.getReduceProgress());
@@ -220,7 +222,6 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setAllocatedMB(app.getAllocatedMB());
             jobExecutionAPIEntity.setAllocatedVCores(app.getAllocatedVCores());
             jobExecutionAPIEntity.setRunningContainers(app.getRunningContainers());
-            runningJobManager.update(app.getId(), id, jobExecutionAPIEntity);
         }
 
         return true;
@@ -503,6 +504,7 @@ public class MRJobParser implements Runnable {
             mrJobConfigs.put(jobId, config);
 
             mrJobEntityCreationHandler.add(mrJobEntityMap.get(jobId));
+            runningJobManager.update(app.getId(), jobId, mrJobEntityMap.get(jobId));
         } catch (Exception e) {
             LOG.warn("fetch job conf from {} failed, {}", confURL, e);
             return false;
@@ -537,8 +539,8 @@ public class MRJobParser implements Runnable {
                     mrJobEntityMap.keySet()
                             .stream()
                             .filter(
-                                    jobId -> mrJobEntityMap.get(jobId).getStatus().equals(Constants.AppState.FINISHED.toString()) ||
-                                            mrJobEntityMap.get(jobId).getStatus().equals(Constants.AppState.FAILED.toString()))
+                                    jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString()) ||
+                                            mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
                             .forEach(
                                     jobId -> this.runningJobManager.delete(app.getId(), jobId));
                 }

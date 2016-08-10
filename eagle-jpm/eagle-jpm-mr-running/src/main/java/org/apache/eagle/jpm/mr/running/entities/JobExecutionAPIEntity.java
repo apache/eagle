@@ -43,15 +43,15 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     @Column("b")
     private long endTime;
     @Column("c")
-    private long elapsedTime;
+    private long durationTime;
     @Column("d")
-    private String status;
+    private String currentState;
     @Column("e")
-    private int mapsTotal;
+    private int numTotalMaps;
     @Column("f")
     private int mapsCompleted;
     @Column("g")
-    private int reducesTotal;
+    private int numTotalReduces;
     @Column("h")
     private int reducesCompleted;
     @Column("i")
@@ -147,31 +147,31 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
         valueChanged("endTime");
     }
 
-    public long getElapsedTime() {
-        return elapsedTime;
+    public long getDurationTime() {
+        return durationTime;
     }
 
-    public void setElapsedTime(long elapsedTime) {
-        this.elapsedTime = elapsedTime;
-        valueChanged("elapsedTime");
+    public void setDurationTime(long durationTime) {
+        this.durationTime = durationTime;
+        valueChanged("durationTime");
     }
 
-    public String getStatus() {
-        return status;
+    public String getCurrentState() {
+        return currentState;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-        valueChanged("status");
+    public void setCurrentState(String currentState) {
+        this.currentState = currentState;
+        valueChanged("currentState");
     }
 
-    public int getMapsTotal() {
-        return mapsTotal;
+    public int getNumTotalMaps() {
+        return numTotalMaps;
     }
 
-    public void setMapsTotal(int mapsTotal) {
-        this.mapsTotal = mapsTotal;
-        valueChanged("mapsTotal");
+    public void setNumTotalMaps(int numTotalMaps) {
+        this.numTotalMaps = numTotalMaps;
+        valueChanged("numTotalMaps");
     }
 
     public int getMapsCompleted() {
@@ -183,13 +183,13 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
         valueChanged("mapsCompleted");
     }
 
-    public int getReducesTotal() {
-        return reducesTotal;
+    public int getNumTotalReduces() {
+        return numTotalReduces;
     }
 
-    public void setReducesTotal(int reducesTotal) {
-        this.reducesTotal = reducesTotal;
-        valueChanged("reducesTotal");
+    public void setNumTotalReduces(int numTotalReduces) {
+        this.numTotalReduces = numTotalReduces;
+        valueChanged("numTotalReduces");
     }
 
     public int getReducesCompleted() {

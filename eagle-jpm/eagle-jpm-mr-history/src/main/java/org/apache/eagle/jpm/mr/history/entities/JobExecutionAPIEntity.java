@@ -71,6 +71,16 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     private long lastMapDuration;
     @Column("r")
     private long lastReduceDuration;
+    @Column("s")
+    private long durationTime;
+
+    public long getDurationTime() {
+        return durationTime;
+    }
+    public void setDurationTime(long durationTime) {
+        this.durationTime = durationTime;
+        valueChanged("durationTime");
+    }
 
     public String getCurrentState() {
         return currentState;

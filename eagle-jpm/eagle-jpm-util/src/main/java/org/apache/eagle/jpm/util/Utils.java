@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.util;
 
-import jline.internal.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +82,7 @@ public class Utils {
             int executorPB = Integer.parseInt(memory.substring(0, memory.length() - 1));
             return 1024l * 1024 * 1024 * 1024 * 1024 * executorPB;
         }
-        Log.info("Cannot parse memory info " +  memory);
+        LOG.info("Cannot parse memory info " +  memory);
         return 0l;
     }
 }

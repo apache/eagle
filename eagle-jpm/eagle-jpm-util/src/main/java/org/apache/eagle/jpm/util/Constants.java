@@ -159,6 +159,4 @@ public class Constants {
     public static final String JOB_LEVEL = "job";
     public static final String TASK_LEVEL = "task";
 
-    public static final String JOB_DEFINITION_ID_KEY = "jobDefId";
-
 }
