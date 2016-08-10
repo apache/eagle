@@ -25,7 +25,6 @@ import backtype.storm.topology.TopologyBuilder;
 import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilterBuilder;
-import org.apache.eagle.jpm.mr.history.storm.HistoryJobProgressBolt;
 import org.apache.eagle.jpm.mr.history.storm.JobHistorySpout;
 import org.apache.eagle.jpm.util.Constants;
 
@@ -59,7 +58,6 @@ public class MRHistoryJobMain {
                 topologyName = jhfAppConf.getString("envContextConfig.topologyName");
             }
             String spoutName = "mrHistoryJobExecutor";
-            String boltName = "updateProcessTime";
             int parallelism = jhfAppConf.getInt("envContextConfig.parallelismConfig." + spoutName);
             int tasks = jhfAppConf.getInt("envContextConfig.tasks." + spoutName);
             if (parallelism > tasks) {
@@ -70,7 +68,6 @@ public class MRHistoryJobMain {
                     new JobHistorySpout(filter, jhfConfigManager),
                     parallelism
             ).setNumTasks(tasks);
-            topologyBuilder.setBolt(boltName, new HistoryJobProgressBolt(spoutName, jhfConfigManager), 1).setNumTasks(1).allGrouping(spoutName);
 
             Config config = new backtype.storm.Config();
             config.setNumWorkers(jhfAppConf.getInt("envContextConfig.workers"));
