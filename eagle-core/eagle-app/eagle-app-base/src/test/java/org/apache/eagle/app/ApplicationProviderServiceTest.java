@@ -19,6 +19,7 @@ package org.apache.eagle.app;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.apache.eagle.app.module.ApplicationGuiceModule;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.common.module.CommonGuiceModule;
@@ -32,7 +33,7 @@ import java.util.Collection;
 
 public class ApplicationProviderServiceTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(ApplicationProviderServiceTest.class);
-    private Injector injector = Guice.createInjector(new CommonGuiceModule(),new ApplicationGuiceModule(), MemoryMetadataStore.getInstance());
+    private Injector injector = Guice.createInjector(new CommonGuiceModule(),new ApplicationGuiceModule(), new MemoryMetadataStore());
 
     @Test
     public void testApplicationProviderManagerInit(){
