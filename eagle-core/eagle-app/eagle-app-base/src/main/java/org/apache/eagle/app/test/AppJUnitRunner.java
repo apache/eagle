@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AppUnitTestRunner extends BlockJUnit4ClassRunner {
+public class AppJUnitRunner extends BlockJUnit4ClassRunner {
     private final Injector injector;
-    public AppUnitTestRunner(Class<?> klass) throws InitializationError {
+    public AppJUnitRunner(Class<?> klass) throws InitializationError {
         super(klass);
         injector = createInjectorFor(getModulesFor(klass));
     }
