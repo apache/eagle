@@ -26,7 +26,7 @@ import backtype.storm.tuple.Tuple;
 import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
 import org.apache.eagle.jpm.spark.running.parser.SparkApplicationParser;
-import org.apache.eagle.jpm.spark.running.recover.RunningJobManager;
+import org.apache.eagle.jpm.spark.running.recover.SparkRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
@@ -77,7 +77,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
 
         SparkApplicationParser applicationParser;
         if (!runningSparkParsers.containsKey(appInfo.getId())) {
-            applicationParser = new SparkApplicationParser(eagleServiceConfig, endpointConfig, jobExtractorConfig, appInfo, sparkApp, new RunningJobManager(zkStateConfig), resourceFetcher);
+            applicationParser = new SparkApplicationParser(eagleServiceConfig, endpointConfig, jobExtractorConfig, appInfo, sparkApp, new SparkRunningJobManager(zkStateConfig), resourceFetcher);
             runningSparkParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());
         } else {

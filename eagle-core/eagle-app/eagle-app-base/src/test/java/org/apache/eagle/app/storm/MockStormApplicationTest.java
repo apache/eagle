@@ -16,36 +16,19 @@
  */
 package org.apache.eagle.app.storm;
 
-import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.app.utils.DynamicJarPathFinder;
-import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.HashMap;
 
 public class MockStormApplicationTest {
     @Test
     public void testGetConfigClass(){
         MockStormApplication mockStormApplication = new MockStormApplication();
-        Assert.assertEquals(MockStormApplication.MockStormConfiguration.class,mockStormApplication.getConfigType());
+        Assert.assertEquals(StormEnvironment.class,mockStormApplication.getEnvironmentType());
     }
 
     @Test
     public void testRunApplicationWithSysConfig(){
         new MockStormApplication().run();
-    }
-
-    @Test
-    public void testRunApplicationWithAppConfig() throws InterruptedException {
-        MockStormApplication.MockStormConfiguration appConfig = new MockStormApplication.MockStormConfiguration();
-        appConfig.setJarPath(DynamicJarPathFinder.findPath(MockStormApplication.class));
-        appConfig.setSiteId("test_site");
-        appConfig.setAppId("test_application_storm_topology");
-        appConfig.setMode(ApplicationEntity.Mode.LOCAL);
-        appConfig.setLoaded(true);
-        appConfig.setSpoutNum(4);
-        new MockStormApplication().run(appConfig);
     }
 }

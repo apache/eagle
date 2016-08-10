@@ -22,7 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.spark.crawl.EventType;
 import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.jpm.spark.running.entities.*;
-import org.apache.eagle.jpm.spark.running.recover.RunningJobManager;
+import org.apache.eagle.jpm.spark.running.recover.SparkRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.SparkJobTagName;
@@ -68,7 +68,7 @@ public class SparkApplicationParser implements Runnable {
     private final Object lock = new Object();
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
     private Map<String, String> commonTags = new HashMap<>();
-    private RunningJobManager runningJobManager;
+    private SparkRunningJobManager sparkRunningJobManager;
     private ParserStatus parserStatus;
     private ResourceFetcher rmResourceFetcher;
     private int currentAttempt;
@@ -82,7 +82,7 @@ public class SparkApplicationParser implements Runnable {
                                   SparkRunningConfigManager.EndpointConfig endpointConfig,
                                   SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig,
                                   AppInfo app, Map<String, SparkAppEntity> sparkApp,
-                                  RunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher) {
+                                  SparkRunningJobManager sparkRunningJobManager, ResourceFetcher rmResourceFetcher) {
         this.sparkAppEntityCreationHandler = new SparkAppEntityCreationHandler(eagleServiceConfig);
         this.endpointConfig = endpointConfig;
         this.app = app;
@@ -106,7 +106,7 @@ public class SparkApplicationParser implements Runnable {
         this.commonTags.put(SparkJobTagName.SPARK_USER.toString(), app.getUser());
         this.commonTags.put(SparkJobTagName.SPARK_QUEUE.toString(), app.getQueue());
         this.parserStatus  = ParserStatus.FINISHED;
-        this.runningJobManager = runningJobManager;
+        this.sparkRunningJobManager = sparkRunningJobManager;
     }
 
     public ParserStatus status() {
@@ -194,7 +194,7 @@ public class SparkApplicationParser implements Runnable {
                                     jobId -> sparkAppEntityMap.get(jobId).getYarnState().equals(Constants.AppState.FINISHED.toString()) ||
                                             sparkAppEntityMap.get(jobId).getYarnState().equals(Constants.AppState.FAILED.toString()))
                             .forEach(
-                                    jobId -> this.runningJobManager.delete(app.getId(), jobId));
+                                    jobId -> this.sparkRunningJobManager.delete(app.getId(), jobId));
                 }
 
                 LOG.info("finish process yarn application " + app.getId());
@@ -361,7 +361,7 @@ public class SparkApplicationParser implements Runnable {
                     attemptEntity.setYarnState(app.getState());
                     attemptEntity.setYarnStatus(app.getFinalStatus());
                     sparkAppEntityMap.put(id, attemptEntity);
-                    this.runningJobManager.update(app.getId(), id, attemptEntity);
+                    this.sparkRunningJobManager.update(app.getId(), id, attemptEntity);
                 } else {
                     attemptEntity.setYarnState(Constants.AppState.FINISHED.toString());
                     attemptEntity.setYarnStatus(Constants.AppStatus.FAILED.toString());

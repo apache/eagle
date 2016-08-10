@@ -32,31 +32,14 @@ import java.util.Arrays;
 import java.util.Map;
 
 @Ignore
-public class TestStormApplication extends StormApplication<TestStormApplication.TestStormAppConfig>{
-    @Override
-    public StormTopology execute(TestStormAppConfig config, StormEnvironment environment){
-        return null;
-    }
-
+public class TestStormApplication extends StormApplication{
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("metric_spout", new RandomEventSpout(), config.getInt("spoutNum"));
-        builder.setBolt("sink_1",environment.getFlattenStreamSink("TEST_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
-        builder.setBolt("sink_2",environment.getFlattenStreamSink("TEST_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_1",environment.getStreamSink("TEST_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",environment.getStreamSink("TEST_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         return builder.createTopology();
-    }
-
-    public final static class TestStormAppConfig extends Configuration{
-        private int spoutNum = 1;
-
-        public int getSpoutNum() {
-            return spoutNum;
-        }
-
-        public void setSpoutNum(int spoutNum) {
-            this.spoutNum = spoutNum;
-        }
     }
 
     private class RandomEventSpout extends BaseRichSpout {

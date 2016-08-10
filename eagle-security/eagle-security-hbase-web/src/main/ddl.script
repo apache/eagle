@@ -13,5 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-org.apache.eagle.app.example.ExampleApplicationProvider
-##org.apache.eagle.app.example.ExampleApplicationProvider2
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'  with grant option;
+flush privileges;
+
+create database eagle;
+use eagle;
+create table hbase_sensitivity_entity (site varchar(20), hbase_resource varchar(100), sensitivity_type varchar(20), primary key (site, hbase_resource));

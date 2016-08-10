@@ -16,13 +16,12 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.running.recover;
+package org.apache.eagle.jpm.util.jobrecover;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
-import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.apache.zookeeper.CreateMode;
 import org.codehaus.jettison.json.JSONException;
@@ -40,20 +39,20 @@ public class RunningJobManager implements Serializable {
     private final static String ENTITY_TAGS_KEY = "entityTags";
     private final static String APP_INFO_KEY = "appInfo";
 
-    private CuratorFramework newCurator(MRRunningConfigManager.ZKStateConfig config) throws Exception {
+    private CuratorFramework newCurator(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval) throws Exception {
         return CuratorFrameworkFactory.newClient(
-                config.zkQuorum,
-                config.zkSessionTimeoutMs,
+                zkQuorum,
+                zkSessionTimeoutMs,
                 15000,
-                new RetryNTimes(config.zkRetryTimes, config.zkRetryInterval)
+                new RetryNTimes(zkRetryTimes, zkRetryInterval)
         );
     }
 
-    public RunningJobManager(MRRunningConfigManager.ZKStateConfig config) {
-        this.zkRoot = config.zkRoot;
+    public RunningJobManager(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval, String zkRoot) {
+        this.zkRoot = zkRoot;
 
         try {
-            curator = newCurator(config);
+            curator = newCurator(zkQuorum, zkSessionTimeoutMs, zkRetryTimes, zkRetryInterval);
             curator.start();
             if (curator.checkExists().forPath(this.zkRoot) == null) {
                 curator.create()
@@ -65,8 +64,8 @@ public class RunningJobManager implements Serializable {
         }
     }
 
-    public Map<String, JobExecutionAPIEntity> recoverYarnApp(String yarnAppId) throws Exception {
-        Map<String, JobExecutionAPIEntity> result = new HashMap<>();
+    public Map<String, Pair<Map<String, String>, AppInfo>> recoverYarnApp(String yarnAppId) throws Exception {
+        Map<String, Pair<Map<String, String>, AppInfo>> result = new HashMap<>();
         String path = this.zkRoot + "/" + yarnAppId;
         List<String> jobIds = curator.getChildren().forPath(path);
         /*if (jobIds.size() == 0) {
@@ -86,8 +85,6 @@ public class RunningJobManager implements Serializable {
             JSONObject object = new JSONObject(fields);
             Map<String, Map<String, String>> parseResult = parse(object);
             Map<String, String> tags = parseResult.get(ENTITY_TAGS_KEY);
-            JobExecutionAPIEntity jobExecutionAPIEntity = new JobExecutionAPIEntity();
-            jobExecutionAPIEntity.setTags(tags);
 
             Map<String, String> appInfoMap = parseResult.get(APP_INFO_KEY);
             AppInfo appInfo = new AppInfo();
@@ -112,20 +109,19 @@ public class RunningJobManager implements Serializable {
             appInfo.setAllocatedVCores(Integer.parseInt(appInfoMap.get("allocatedVCores")));
             appInfo.setRunningContainers(Integer.parseInt(appInfoMap.get("runningContainers")));
 
-            jobExecutionAPIEntity.setAppInfo(appInfo);
-            jobExecutionAPIEntity.setTimestamp(appInfo.getStartedTime());
-            result.put(jobId, jobExecutionAPIEntity);
+            result.put(jobId, Pair.of(tags, appInfo));
         }
         return result;
     }
 
-    public Map<String, Map<String, JobExecutionAPIEntity>> recover() {
-        //we need read from zookeeper, path looks like /apps/mr/running/yarnAppId/jobId/
-        //content of path /apps/mr/running/yarnAppId/jobId is JobExecutionAPIEntity
-        //as we know, a yarn application may contains many mr jobs
+    public Map<String, Map<String, Pair<Map<String, String>, AppInfo>>> recover() {
+        //we need read from zookeeper, path looks like /apps/x/running/yarnAppId/jobId/
+        //content of path /apps/x/running/yarnAppId/jobId is Pair<Map<String, String>, AppInfo>
+        //Pair is entity tags and AppInfo
+        //as we know, a yarn application may contains many mr jobs or spark applications
         //so, the returned results is a Map-Map
-        //<yarnAppId, <jobId, JobExecutionAPIEntity>>
-        Map<String, Map<String, JobExecutionAPIEntity>> result = new HashMap<>();
+        //<yarnAppId, <jobId, Pair<<Map<String, String>, AppInfo>>>
+        Map<String, Map<String, Pair<Map<String, String>, AppInfo>>> result = new HashMap<>();
         try {
             List<String> yarnAppIds = curator.getChildren().forPath(this.zkRoot);
             for (String yarnAppId : yarnAppIds) {
@@ -142,33 +138,33 @@ public class RunningJobManager implements Serializable {
         return result;
     }
 
-    public boolean update(String yarnAppId, String jobId, JobExecutionAPIEntity entity) {
+    public boolean update(String yarnAppId, String jobId, Map<String, String> tags, AppInfo app) {
         String path = this.zkRoot + "/" + yarnAppId + "/" + jobId;
         //InterProcessMutex lock = new InterProcessMutex(curator, path);
         Map<String, String> fields = new HashMap<>();
         Map<String, String> appInfo = new HashMap<>();
-        appInfo.put("id", entity.getAppInfo().getId());
-        appInfo.put("user", entity.getAppInfo().getUser());
-        appInfo.put("name", entity.getAppInfo().getName());
-        appInfo.put("queue", entity.getAppInfo().getQueue());
-        appInfo.put("state", entity.getAppInfo().getState());
-        appInfo.put("finalStatus", entity.getAppInfo().getFinalStatus());
-        appInfo.put("progress", entity.getAppInfo().getProgress() + "");
-        appInfo.put("trackingUI", entity.getAppInfo().getTrackingUI());
-        appInfo.put("diagnostics", entity.getAppInfo().getDiagnostics());
-        appInfo.put("trackingUrl", entity.getAppInfo().getTrackingUrl());
-        appInfo.put("clusterId", entity.getAppInfo().getClusterId());
-        appInfo.put("applicationType", entity.getAppInfo().getApplicationType());
-        appInfo.put("startedTime", entity.getAppInfo().getStartedTime() + "");
-        appInfo.put("finishedTime", entity.getAppInfo().getFinishedTime() + "");
-        appInfo.put("elapsedTime", entity.getAppInfo().getElapsedTime() + "");
-        appInfo.put("amContainerLogs", entity.getAppInfo().getAmContainerLogs());
-        appInfo.put("amHostHttpAddress", entity.getAppInfo().getAmHostHttpAddress());
-        appInfo.put("allocatedMB", entity.getAppInfo().getAllocatedMB() + "");
-        appInfo.put("allocatedVCores", entity.getAppInfo().getAllocatedVCores() + "");
-        appInfo.put("runningContainers", entity.getAppInfo().getRunningContainers() + "");
+        appInfo.put("id", app.getId());
+        appInfo.put("user", app.getUser());
+        appInfo.put("name", app.getName());
+        appInfo.put("queue", app.getQueue());
+        appInfo.put("state", app.getState());
+        appInfo.put("finalStatus", app.getFinalStatus());
+        appInfo.put("progress", app.getProgress() + "");
+        appInfo.put("trackingUI", app.getTrackingUI());
+        appInfo.put("diagnostics", app.getDiagnostics());
+        appInfo.put("trackingUrl", app.getTrackingUrl());
+        appInfo.put("clusterId", app.getClusterId());
+        appInfo.put("applicationType", app.getApplicationType());
+        appInfo.put("startedTime", app.getStartedTime() + "");
+        appInfo.put("finishedTime", app.getFinishedTime() + "");
+        appInfo.put("elapsedTime", app.getElapsedTime() + "");
+        appInfo.put("amContainerLogs", app.getAmContainerLogs());
+        appInfo.put("amHostHttpAddress", app.getAmHostHttpAddress());
+        appInfo.put("allocatedMB", app.getAllocatedMB() + "");
+        appInfo.put("allocatedVCores", app.getAllocatedVCores() + "");
+        appInfo.put("runningContainers", app.getRunningContainers() + "");
 
-        fields.put(ENTITY_TAGS_KEY, (new JSONObject(entity.getTags())).toString());
+        fields.put(ENTITY_TAGS_KEY, (new JSONObject(tags)).toString());
         fields.put(APP_INFO_KEY, (new JSONObject(appInfo)).toString());
         try {
             //lock.acquire();

@@ -18,6 +18,8 @@ package org.apache.eagle.metadata.resource;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -28,6 +30,7 @@ import java.util.function.Supplier;
 
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public class RESTResponse<T>{
+    private final static Logger LOGGER = LoggerFactory.getLogger(RESTResponse.class);
     private boolean success = false;
     private String message;
     private String exception;
@@ -147,6 +150,7 @@ public class RESTResponse<T>{
                 this.success(true).status(Response.Status.OK);
                 func.accept(this);
             } catch (Exception ex){
+                LOGGER.error("Exception: " +ex.getMessage(),ex);
                 this.success(false).data(null).status(Response.Status.BAD_REQUEST).exception(ex);
                 raiseWebAppException(ex);
             }
@@ -157,6 +161,7 @@ public class RESTResponse<T>{
             try {
                 this.success(true).status(Response.Status.OK).data(func.get());
             } catch (Throwable ex){
+                LOGGER.error("Exception: " +ex.getMessage(),ex);
                 this.success(false).status(Response.Status.BAD_REQUEST).exception(ex);
                 raiseWebAppException(ex);
             }
@@ -168,6 +173,7 @@ public class RESTResponse<T>{
                 try {
                     this.status(Response.Status.OK).success(true).data(func.get());
                 } catch (Throwable e) {
+                    LOGGER.error("Exception: " +e.getMessage(),e);
                     this.success(false).status(Response.Status.BAD_REQUEST).exception(e);
                     raiseWebAppException(e);
                 }
@@ -180,11 +186,13 @@ public class RESTResponse<T>{
             try {
                 future.get();
             } catch (InterruptedException ex) {
+                LOGGER.error("InterruptedException: "+ex.getMessage(),ex);
                 Thread.currentThread().interrupt();
                 future.cancel(true);
                 this.success(false).status(Response.Status.BAD_REQUEST).exception(ex.getCause());
                 raiseWebAppException(ex);
             } catch (ExecutionException ex) {
+                LOGGER.error("ExecutionException: "+ex.getMessage(),ex);
                 this.success(false).status(Response.Status.BAD_REQUEST).exception(ex.getCause());
                 raiseWebAppException(ex);
             }
@@ -200,6 +208,7 @@ public class RESTResponse<T>{
                     func.accept(this);
                     this.success(true);
                 } catch (Throwable ex) {
+                    LOGGER.error("Exception: " +ex.getMessage(),ex);
                     this.success(false).status(Response.Status.BAD_REQUEST).exception(ex);
                     raiseWebAppException(ex);
                 }
@@ -212,6 +221,7 @@ public class RESTResponse<T>{
             try {
                 func.accept(this);
             } catch (Throwable ex) {
+                LOGGER.error("Exception: " +ex.getMessage(),ex);
                 this.success(false).status(Response.Status.BAD_REQUEST).exception(ex);
                 raiseWebAppException(ex);
             }
