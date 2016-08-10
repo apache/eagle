@@ -18,8 +18,8 @@
 
 package org.apache.eagle.jpm.mr.history.entities;
 
-import org.apache.eagle.jpm.mr.history.common.JobConfig;
-import org.apache.eagle.jpm.mr.history.jobcounter.JobCounters;
+import org.apache.eagle.jpm.util.jobcounter.JobCounters;
+import org.apache.eagle.jpm.util.jobcounter.JobCountersSerDeser;
 import org.apache.eagle.log.entity.repo.EntityRepository;
 
 public class JPAEntityRepository extends EntityRepository {

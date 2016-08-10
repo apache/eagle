@@ -18,8 +18,8 @@
 
 package org.apache.eagle.jpm.mr.history.entities;
 
-import org.apache.eagle.jpm.mr.history.common.JPAConstants;
-import org.apache.eagle.jpm.mr.history.jobcounter.JobCounters;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -27,12 +27,12 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Table("eaglejpa")
 @ColumnFamily("f")
 @Prefix("jexec")
-@Service(JPAConstants.JPA_JOB_EXECUTION_SERVICE_NAME)
+@Service(Constants.JPA_JOB_EXECUTION_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-    @Index(name="Index_1_jobId", columns = { "jobID" }, unique = true),
-    @Index(name="Index_2_normJobName", columns = { "normJobName" }, unique = false)
+    @Index(name="Index_1_jobId", columns = { "jobId" }, unique = true),
+    @Index(name="Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
     })
 public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     @Column("a")
@@ -55,6 +55,22 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     private int numFinishedReduces;
     @Column("j")
     private JobCounters jobCounters;
+    @Column("k")
+    private int dataLocalMaps;
+    @Column("l")
+    private double dataLocalMapsPercentage;
+    @Column("m")
+    private int rackLocalMaps;
+    @Column("n")
+    private double rackLocalMapsPercentage;
+    @Column("o")
+    private int totalLaunchedMaps;
+    @Column("p")
+    private long submissionTime;
+    @Column("q")
+    private long lastMapDuration;
+    @Column("r")
+    private long lastReduceDuration;
 
     public String getCurrentState() {
         return currentState;
@@ -128,5 +144,77 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     public void setJobCounters(JobCounters jobCounters) {
         this.jobCounters = jobCounters;
         _pcs.firePropertyChange("jobCounters", null, null);
+    }
+
+    public int getDataLocalMaps() {
+        return dataLocalMaps;
+    }
+
+    public void setDataLocalMaps(int dataLocalMaps) {
+        this.dataLocalMaps = dataLocalMaps;
+        valueChanged("dataLocalMaps");
+    }
+
+    public double getDataLocalMapsPercentage() {
+        return dataLocalMapsPercentage;
+    }
+
+    public void setDataLocalMapsPercentage(double dataLocalMapsPercentage) {
+        this.dataLocalMapsPercentage = dataLocalMapsPercentage;
+        valueChanged("dataLocalMapsPercentage");
+    }
+
+    public int getRackLocalMaps() {
+        return rackLocalMaps;
+    }
+
+    public void setRackLocalMaps(int rackLocalMaps) {
+        this.rackLocalMaps = rackLocalMaps;
+        valueChanged("rackLocalMaps");
+    }
+
+    public double getRackLocalMapsPercentage() {
+        return rackLocalMapsPercentage;
+    }
+
+    public void setRackLocalMapsPercentage(double rackLocalMapsPercentage) {
+        this.rackLocalMapsPercentage = rackLocalMapsPercentage;
+        valueChanged("rackLocalMapsPercentage");
+    }
+
+    public int getTotalLaunchedMaps() {
+        return totalLaunchedMaps;
+    }
+
+    public void setTotalLaunchedMaps(int totalLaunchedMaps) {
+        this.totalLaunchedMaps = totalLaunchedMaps;
+        valueChanged("totalLaunchedMaps");
+    }
+
+    public long getSubmissionTime() {
+        return submissionTime;
+    }
+
+    public void setSubmissionTime(long submissionTime) {
+        this.submissionTime = submissionTime;
+        valueChanged("submissionTime");
+    }
+
+    public long getLastMapDuration() {
+        return lastMapDuration;
+    }
+
+    public void setLastMapDuration(long lastMapDuration) {
+        this.lastMapDuration = lastMapDuration;
+        valueChanged("lastMapDuration");
+    }
+
+    public long getLastReduceDuration() {
+        return lastReduceDuration;
+    }
+
+    public void setLastReduceDuration(long lastReduceDuration) {
+        this.lastReduceDuration = lastReduceDuration;
+        valueChanged("lastReduceDuration");
     }
 }

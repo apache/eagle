@@ -17,14 +17,23 @@
 
 package org.apache.eagle.jpm.util;
 
-public class Constants {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class Constants {
+    private final static Logger LOG = LoggerFactory.getLogger(Constants.class);
+
+    //SPARK
     public final static String SPARK_APP_SERVICE_ENDPOINT_NAME = "SparkAppService";
     public final static String SPARK_JOB_SERVICE_ENDPOINT_NAME = "SparkJobService";
     public final static String SPARK_STAGE_SERVICE_ENDPOINT_NAME = "SparkStageService";
     public final static String SPARK_TASK_SERVICE_ENDPOINT_NAME = "SparkTaskService";
     public final static String SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "SparkExecutorService";
-
+    public final static String RUNNING_SPARK_APP_SERVICE_ENDPOINT_NAME = "RunningSparkAppService";
+    public final static String RUNNING_SPARK_JOB_SERVICE_ENDPOINT_NAME = "RunningSparkJobService";
+    public final static String RUNNING_SPARK_STAGE_SERVICE_ENDPOINT_NAME = "RunningSparkStageService";
+    public final static String RUNNING_SPARK_TASK_SERVICE_ENDPOINT_NAME = "RunningSparkTaskService";
+    public final static String RUNNING_SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "RunningSparkExecutorService";
     public static final String APPLICATION_PREFIX = "application";
     public static final String JOB_PREFIX = "job";
     public static final String V2_APPS_URL = "ws/v1/cluster/apps";
@@ -33,17 +42,123 @@ public class Constants {
     public static final String V2_APPS_RUNNING_URL = "ws/v1/cluster/apps?state=RUNNING";
     public static final String V2_APPS_COMPLETED_URL = "ws/v1/cluster/apps?state=FINISHED";
 
+    public static final String SPARK_MASTER_KEY = "spark.master";
+    public static final String SPARK_EXECUTOR_MEMORY_KEY = "spark.executor.memory";
+    public static final String SPARK_DRIVER_MEMORY_KEY = "spark.driver.memory";
+    public static final String SPARK_YARN_AM_MEMORY_KEY = "spark.yarn.am.memory";
+    public static final String SPARK_EXECUTOR_CORES_KEY = "spark.executor.cores";
+    public static final String SPARK_DRIVER_CORES_KEY = "spark.driver.cores";
+    public static final String SPARK_YARN_AM_CORES_KEY = "spark.yarn.am.cores";
+    public static final String SPARK_YARN_EXECUTOR_MEMORY_OVERHEAD_KEY = "spark.yarn.executor.memoryOverhead";
+    public static final String SPARK_YARN_DRIVER_MEMORY_OVERHEAD_KEY = "spark.yarn.driver.memoryOverhead";
+    public static final String SPARK_YARN_am_MEMORY_OVERHEAD_KEY = "spark.yarn.am.memoryOverhead";
+
     public static final String SPARK_APPS_URL ="api/v1/applications";
+    public static final String SPARK_EXECUTORS_URL = "executors";
+    public static final String SPARK_JOBS_URL = "jobs";
+    public static final String SPARK_STAGES_URL = "stages";
+    public static final String MR_JOBS_URL = "ws/v1/mapreduce/jobs";
+    public static final String MR_JOB_COUNTERS_URL = "counters";
+    public static final String MR_TASKS_URL = "tasks";
+    public static final String MR_TASK_ATTEMPTS_URL = "attempts";
+    public static final String MR_CONF_URL = "conf";
+
+    public static final String YARN_API_CLUSTER_INFO = "ws/v1/cluster/info";
 
     public enum CompressionType {
         GZIP, NONE
     }
     public enum JobState {
-        RUNNING, COMPLETED, ALL
+        NEW, INITED, RUNNING, SUCCEEDED, FAILED, KILL_WAIT, KILLED, ERROR, FINISHED, ALL
+    }
+    public enum TaskState {
+        NEW, SCHEDULED, RUNNING, SUCCEEDED, FAILED, KILL_WAIT, KILLED
+    }
+    public enum StageState {
+        ACTIVE, COMPLETE, PENDING
+    }
+    public enum AppState {
+        NEW, NEW_SAVING, SUBMITTED, ACCEPTED, RUNNING, FINISHED, FAILED, KILLED
+    }
+    public enum AppStatus {
+        UNDEFINED, SUCCEEDED, FAILED, KILLED
+    }
+    public enum ResourceType {
+         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB, CLUSTER_INFO
     }
 
-    public enum ResourceType {
-         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL
+    //MR
+    public static final String JPA_JOB_CONFIG_SERVICE_NAME = "JobConfigService";
+    public static final String JPA_JOB_EVENT_SERVICE_NAME = "JobEventService";
+    public static final String JPA_JOB_EXECUTION_SERVICE_NAME = "JobExecutionService";
+    public static final String JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME = "RunningJobExecutionService";
+    public static final String JPA_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "TaskAttemptExecutionService";
+    public static final String JPA_TASK_FAILURE_COUNT_SERVICE_NAME = "TaskFailureCountService";
+    public static final String JPA_TASK_ATTEMPT_COUNTER_SERVICE_NAME = "TaskAttemptCounterService";
+    public static final String JPA_TASK_EXECUTION_SERVICE_NAME = "TaskExecutionService";
+    public static final String JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME = "RunningTaskExecutionService";
+    public static final String JPA_RUNNING_TASK_ATTEMPT_EXECUTION_SERVICE_NAME = "RunningTaskAttemptExecutionService";
+    public static final String JPA_JOB_PROCESS_TIME_STAMP_NAME = "JobProcessTimeStampService";
+
+    public static final String JOB_TASK_TYPE_TAG = "taskType";
+
+    public static class JobConfiguration {
+        // job type
+        public static final String SCOOBI_JOB = "scoobi.mode";
+        public static final String HIVE_JOB = "hive.query.string";
+        public static final String PIG_JOB = "pig.script";
+        public static final String CASCADING_JOB = "cascading.app.name";
     }
+
+    /**
+     * MR task types
+     */
+    public enum TaskType {
+        SETUP, MAP, REDUCE, CLEANUP
+    }
+
+    public enum JobType {
+        CASCADING("CASCADING"),HIVE("HIVE"),PIG("PIG"),SCOOBI("SCOOBI"),
+        NOTAVALIABLE("N/A")
+        ;
+        private String value;
+        JobType(String value){
+            this.value = value;
+        }
+        @Override
+        public String toString() {
+            return this.value;
+        }
+    }
+
+    public static final String FILE_SYSTEM_COUNTER = "org.apache.hadoop.mapreduce.FileSystemCounter";
+    public static final String TASK_COUNTER = "org.apache.hadoop.mapreduce.TaskCounter";
+    public static final String JOB_COUNTER = "org.apache.hadoop.mapreduce.JobCounter";
+
+    public static final String MAP_TASK_ATTEMPT_COUNTER = "MapTaskAttemptCounter";
+    public static final String REDUCE_TASK_ATTEMPT_COUNTER = "ReduceTaskAttemptCounter";
+
+    public static final String MAP_TASK_ATTEMPT_FILE_SYSTEM_COUNTER = "MapTaskAttemptFileSystemCounter";
+    public static final String REDUCE_TASK_ATTEMPT_FILE_SYSTEM_COUNTER = "ReduceTaskAttemptFileSystemCounter";
+
+    public enum TaskAttemptCounter {
+        TASK_ATTEMPT_DURATION,
+    }
+
+    public enum JobCounter {
+        DATA_LOCAL_MAPS,
+        RACK_LOCAL_MAPS,
+        TOTAL_LAUNCHED_MAPS
+    }
+
+    public static final String metricFormat = "%s.%s";
+    public static final String ALLOCATED_MB = "allocatedmb";
+    public static final String ALLOCATED_VCORES = "allocatedvcores";
+    public static final String RUNNING_CONTAINERS = "runningcontainers";
+    public static final String TASK_EXECUTION_TIME = "taskduration";
+    public static final String JOB_LEVEL = "job";
+    public static final String TASK_LEVEL = "task";
+
+    public static final String JOB_DEFINITION_ID_KEY = "jobDefId";
 
 }

@@ -38,14 +38,11 @@ import java.util.Iterator;
 @Singleton
 public class SensitivityMetadataResource {
     private ApplicationEntityService entityService;
-    private Config config;
     private ISecurityMetadataDAO dao;
     @Inject
     public SensitivityMetadataResource(ApplicationEntityService entityService, Config eagleServerConfig){
         this.entityService = entityService;
-        this.config = eagleServerConfig;
-        String metadataStoreCls = eagleServerConfig.getString("metadata.store");
-        dao = MetadataDaoFactory.getMetadataDAO(metadataStoreCls);
+        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
     }
 
     @Path("/hbase")

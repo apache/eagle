@@ -35,7 +35,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-public class SparkHistoryServerResourceFetcher implements ResourceFetcher{
+public class SparkHistoryServerResourceFetcher implements ResourceFetcher<SparkApplication> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkHistoryServerResourceFetcher.class);
 
@@ -55,14 +55,14 @@ public class SparkHistoryServerResourceFetcher implements ResourceFetcher{
         this.auth = "Basic " + new String(new Base64().encode(String.format("%s:%s", userName, pwd).getBytes()));;
     }
 
-    private List<Object> doFetchSparkApplicationDetail(String appId) throws Exception {
+    private List<SparkApplication> doFetchSparkApplicationDetail(String appId) throws Exception {
         InputStream is = null;
         try {
             final String urlString = sparkDetailJobServiceURLBuilder.build(this.historyServerURL, appId);
             LOG.info("Going to call spark history server api to fetch spark job: " + urlString);
             is = InputStreamUtils.getInputStream(urlString, auth, Constants.CompressionType.NONE);
             SparkApplication app = OBJ_MAPPER.readValue(is, SparkApplication.class);
-            return Arrays.asList((Object)app);
+            return Arrays.asList(app);
         } catch (FileNotFoundException e) {
             return null;
         } finally {
@@ -70,7 +70,7 @@ public class SparkHistoryServerResourceFetcher implements ResourceFetcher{
         }
     }
 
-    public List<Object> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
+    public List<SparkApplication> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
         switch(resoureType) {
             case SPARK_JOB_DETAIL:
                 return doFetchSparkApplicationDetail((String)parameter[0]);

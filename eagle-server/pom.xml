@@ -71,12 +71,10 @@
         <dependency>
             <groupId>com.hubspot.dropwizard</groupId>
             <artifactId>dropwizard-guice</artifactId>
-            <version>0.7.0.2</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-assets</artifactId>
-            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
@@ -128,25 +126,29 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-app-example</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.eagle</groupId>-->
-            <!--<artifactId>eagle-jpm-app</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.eagle</groupId>-->
-            <!--<artifactId>eagle-security-hbase-auditlog</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.eagle</groupId>-->
-            <!--<artifactId>eagle-security-hbase-web</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-jpm-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-hbase-auditlog</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-hbase-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
