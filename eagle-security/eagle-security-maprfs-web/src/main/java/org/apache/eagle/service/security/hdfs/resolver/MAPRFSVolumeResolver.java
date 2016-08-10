@@ -86,7 +86,7 @@ public class MAPRFSVolumeResolver implements AttributeResolvable<GenericAttribut
 
 
     public List<String> extractVolumeList(JSONObject response){
-        // rest url:  https://192.168.6.148:8443/rest/volume/list
+        // rest url:  https://sandbox.map.com:8443/rest/volume/list
         List<String> result = new ArrayList<>();
         JSONArray list = (JSONArray) response.get("data");
         for(int i = 0; i< list.length();i++ ){
