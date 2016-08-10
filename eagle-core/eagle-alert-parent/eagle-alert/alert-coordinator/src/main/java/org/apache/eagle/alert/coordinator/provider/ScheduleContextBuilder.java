@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
@@ -38,6 +39,7 @@ import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.GroupBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition.PolicyStatus;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
@@ -86,10 +88,12 @@ public class ScheduleContextBuilder {
     public IScheduleContext buildContext() {
         topologies = listToMap(client.listTopologies());
         kafkaSources = listToMap(client.listDataSources());
-        policies = listToMap(client.listPolicies());
+        // filter out disabled policies
+        policies = listToMap(client.listPolicies().stream().filter(
+        		(t) -> t.getPolicyStatus() != PolicyStatus.disabled).collect(Collectors.toList()));
         publishments = listToMap(client.listPublishment());
         streamDefinitions = listToMap(client.listStreams());
-
+        
         // TODO: See ScheduleState comments on how to improve the storage
         ScheduleState state = client.getVersionedSpec();
 

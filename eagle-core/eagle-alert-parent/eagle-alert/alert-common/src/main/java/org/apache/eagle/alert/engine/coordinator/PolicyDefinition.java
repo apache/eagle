@@ -36,6 +36,7 @@ public class PolicyDefinition implements Serializable{
     private List<String> outputStreams = new ArrayList<String>();
 
     private Definition definition;
+    private PolicyStatus policyStatus = PolicyStatus.enabled;
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
@@ -103,7 +104,15 @@ public class PolicyDefinition implements Serializable{
         this.parallelismHint = parallelism;
     }
 
-    @Override
+    public PolicyStatus getPolicyStatus() {
+		return policyStatus;
+	}
+
+	public void setPolicyStatus(PolicyStatus policyStatus) {
+		this.policyStatus = policyStatus;
+	}
+
+	@Override
     public int hashCode() {
         return new HashCodeBuilder().
                 append(name).
@@ -190,6 +199,10 @@ public class PolicyDefinition implements Serializable{
         public String toString() {
             return String.format("{type=\"%s\",value=\"%s\"",type,value);
         }
+    }
+    
+    public static enum PolicyStatus {
+    	enabled, disabled
     }
 
     @Override
