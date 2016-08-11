@@ -71,15 +71,18 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationEntity applicationEntity = new ApplicationEntity();
         applicationEntity.setDescriptor(appDesc);
         applicationEntity.setSite(siteEntity);
+        applicationEntity.setMode(operation.getMode());
+        applicationEntity.ensureDefault();
 
         /**
          *  calculate application config based on
          *   1) default values in metadata.xml
-         *   2) user's config value
-         *   3) some metadata, for example siteId, mode, appId
+         *   2) user's config value override default configurations
+         *   3) some metadata, for example siteId, mode, appId in ApplicationContext
          */
         Map<String, Object> appConfig = new HashMap<>();
         ApplicationProvider provider = applicationProviderService.getApplicationProviderByType(operation.getAppType());
+
         List<Property> propertyList = provider.getApplicationDesc().getConfiguration().getProperties();
         for(Property p : propertyList){
             appConfig.put(p.getName(), p.getValue());
@@ -87,19 +90,12 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         if(operation.getConfiguration() != null) {
             appConfig.putAll(operation.getConfiguration());
         }
-        appConfig.put("siteId", operation.getSiteId());
-        appConfig.put("mode", operation.getMode().name());
-        appConfig.put("appId", operation.getAppType());
-
         applicationEntity.setConfiguration(appConfig);
-        applicationEntity.setMode(operation.getMode());
         ApplicationContext applicationContext = new ApplicationContext(
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
                 applicationEntity,config);
         applicationContext.onInstall();
-        applicationEntityService.create(applicationEntity);
-
-        return applicationEntity;
+        return applicationEntityService.create(applicationEntity);
     }
 
     @Override

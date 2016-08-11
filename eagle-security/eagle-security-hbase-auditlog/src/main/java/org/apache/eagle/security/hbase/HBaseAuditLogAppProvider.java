@@ -19,18 +19,43 @@
 
 package org.apache.eagle.security.hbase;
 
+import com.google.inject.AbstractModule;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.common.module.ModuleRegistry;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
+import org.apache.eagle.metadata.store.mysql.MySQLMetadataStore;
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.InMemMetadataDaoImpl;
+import org.apache.eagle.security.service.JDBCSecurityMetadataDAO;
 
 /**
  * Since 8/5/16.
  */
 public class HBaseAuditLogAppProvider extends AbstractApplicationProvider<HBaseAuditLogApplication> {
-    public HBaseAuditLogAppProvider() {
-        super("/META-INF/metadata.xml");
+    @Override
+    protected String getMetadata() {
+        return "/META-INF/metadata.xml";
     }
 
     @Override
     public HBaseAuditLogApplication getApplication() {
         return new HBaseAuditLogApplication();
+    }
+
+    @Override
+    public void register(ModuleRegistry registry) {
+        registry.register(MemoryMetadataStore.class, new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(ISecurityMetadataDAO.class).to(InMemMetadataDaoImpl.class);
+            }
+        });
+
+        registry.register(MySQLMetadataStore.class, new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(ISecurityMetadataDAO.class).to(JDBCSecurityMetadataDAO.class);
+            }
+        });
     }
 }

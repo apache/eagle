@@ -19,11 +19,12 @@ package org.apache.eagle.app.jpm;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
 /**
- * Define application provider programmatically
+ * Define application provider pragmatically
  */
 public class JPMApplicationProvider extends AbstractApplicationProvider<JPMApplication> {
-    public JPMApplicationProvider() {
-        super("/META-INF/apps/jpm/metadata.xml");
+    @Override
+    protected String getMetadata() {
+        return "/META-INF/apps/jpm/metadata.xml";
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.apache.eagle.app.test;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.apache.eagle.app.module.ApplicationExtensionLoader;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
@@ -26,9 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AppUnitTestRunner extends BlockJUnit4ClassRunner {
+public class AppJUnitRunner extends BlockJUnit4ClassRunner {
     private final Injector injector;
-    public AppUnitTestRunner(Class<?> klass) throws InitializationError {
+    public AppJUnitRunner(Class<?> klass) throws InitializationError {
         super(klass);
         injector = createInjectorFor(getModulesFor(klass));
     }
@@ -51,8 +52,10 @@ public class AppUnitTestRunner extends BlockJUnit4ClassRunner {
             throws InitializationError {
         final List<Module> modules = new ArrayList<>();
 
+        AppTestGuiceModule testGuiceModule = new AppTestGuiceModule();
+
         // Add default modules
-        modules.add(new AppTestGuiceModule());
+        modules.add(testGuiceModule);
 
         if(classes!= null) {
             for (final Class<?> module : Arrays.asList(classes)) {

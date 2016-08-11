@@ -18,13 +18,11 @@ package org.apache.eagle.app.sink;
 
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
-import backtype.storm.tuple.Tuple;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
-import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +75,13 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
 
     private void ensureTopicDeleted(){
         LOG.info("TODO: ensure kafka topic {} deleted",this.topicId);
+    }
+
+    @Override
+    public void cleanup() {
+        if(this.producer != null){
+            this.producer.close();
+        }
     }
 
     @Override
