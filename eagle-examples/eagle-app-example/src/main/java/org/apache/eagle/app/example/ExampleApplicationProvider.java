@@ -33,10 +33,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleStormApplication> {
     private final static Logger LOGGER = LoggerFactory.getLogger(ExampleApplicationProvider.class);
-    @Override
-    protected String getMetadata() {
-        return "/META-INF/apps/example/metadata.xml";
-    }
 
     @Override
     public ExampleStormApplication getApplication() {
