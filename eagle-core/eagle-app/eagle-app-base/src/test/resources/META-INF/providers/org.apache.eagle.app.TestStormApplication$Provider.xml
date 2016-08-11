@@ -78,34 +78,34 @@
     </streams>
     <docs>
         <install>
-# Step 1: Create source kafka topic named "${site}_example_source_topic"
+            # Step 1: Create source kafka topic named "${site}_example_source_topic"
 
-./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
+            ./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
 
-# Step 2: Set up data collector to flow data into kafka topic in
+            # Step 2: Set up data collector to flow data into kafka topic in
 
-./bin/logstash -f log_collector.conf
+            ./bin/logstash -f log_collector.conf
 
-## `log_collector.conf` sample as following:
+            ## `log_collector.conf` sample as following:
 
-input {
+            input {
 
-}
-filter {
+            }
+            filter {
 
-}
-output{
+            }
+            output{
 
-}
+            }
 
-# Step 3: start application
+            # Step 3: start application
 
-# Step 4: monitor with featured portal or alert with policies
+            # Step 4: monitor with featured portal or alert with policies
         </install>
         <uninstall>
-# Step 1: stop and uninstall application
-# Step 2: delete kafka topic named "${site}_example_source_topic"
-# Step 3: stop logstash
+            # Step 1: stop and uninstall application
+            # Step 2: delete kafka topic named "${site}_example_source_topic"
+            # Step 3: stop logstash
         </uninstall>
     </docs>
 </application>

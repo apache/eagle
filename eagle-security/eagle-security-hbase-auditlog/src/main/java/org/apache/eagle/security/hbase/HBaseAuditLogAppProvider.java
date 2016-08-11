@@ -33,11 +33,6 @@ import org.apache.eagle.security.service.JDBCSecurityMetadataDAO;
  */
 public class HBaseAuditLogAppProvider extends AbstractApplicationProvider<HBaseAuditLogApplication> {
     @Override
-    protected String getMetadata() {
-        return "/META-INF/metadata.xml";
-    }
-
-    @Override
     public HBaseAuditLogApplication getApplication() {
         return new HBaseAuditLogApplication();
     }

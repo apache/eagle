@@ -23,11 +23,6 @@ import org.apache.eagle.app.spi.AbstractApplicationProvider;
  */
 public class JPMApplicationProvider extends AbstractApplicationProvider<JPMApplication> {
     @Override
-    protected String getMetadata() {
-        return "/META-INF/apps/jpm/metadata.xml";
-    }
-
-    @Override
     public JPMApplication getApplication() {
         return new JPMApplication();
     }
