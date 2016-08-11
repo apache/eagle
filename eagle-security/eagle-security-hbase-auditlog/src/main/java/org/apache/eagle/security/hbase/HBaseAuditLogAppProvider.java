@@ -23,7 +23,7 @@ import com.google.inject.AbstractModule;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
-import org.apache.eagle.metadata.store.mysql.MySQLMetadataStore;
+import org.apache.eagle.metadata.store.jdbc.JDBCMetadataStore;
 import org.apache.eagle.security.service.ISecurityMetadataDAO;
 import org.apache.eagle.security.service.InMemMetadataDaoImpl;
 import org.apache.eagle.security.service.JDBCSecurityMetadataDAO;
@@ -46,7 +46,7 @@ public class HBaseAuditLogAppProvider extends AbstractApplicationProvider<HBaseA
             }
         });
 
-        registry.register(MySQLMetadataStore.class, new AbstractModule() {
+        registry.register(JDBCMetadataStore.class, new AbstractModule() {
             @Override
             protected void configure() {
                 bind(ISecurityMetadataDAO.class).to(JDBCSecurityMetadataDAO.class);

@@ -1,4 +1,6 @@
-package org.apache.eagle.metadata.resource;
+package org.apache.eagle.common.function;
+
+import java.sql.SQLException;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -17,6 +19,13 @@ package org.apache.eagle.metadata.resource;
  * limitations under the License.
  */
 @FunctionalInterface
-public interface UnhandledConsumer<T, E extends Exception> {
-    void accept(T o) throws E;
+public interface ThrowableFunction<T, R, E extends Throwable> {
+
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param t the function argument
+     * @return the function result
+     */
+    R apply(T t) throws E;
 }

@@ -1,6 +1,4 @@
-package org.apache.eagle.metadata.resource;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,14 +14,26 @@ package org.apache.eagle.metadata.resource;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@FunctionalInterface
-public interface UncheckedFunction<T, R> {
+package org.apache.eagle.common.module;
 
+import com.google.inject.AbstractModule;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Defines the Guice Modules in use in the test class.
+ *
+ * @version $Id$
+ */
+@Inherited
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Modules {
     /**
-     * Applies this function to the given argument.
-     *
-     * @param t the function argument
-     * @return the function result
+     * The Guice Modules classes needed by the class under test.
      */
-    R apply(T t) throws Exception;
+    Class<? extends AbstractModule>[] value();
 }

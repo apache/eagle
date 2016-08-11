@@ -1,4 +1,4 @@
-package org.apache.eagle.metadata.resource;
+package org.apache.eagle.common.function;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -15,15 +15,8 @@ package org.apache.eagle.metadata.resource;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @see java.util.function.Supplier
  */
 @FunctionalInterface
-public interface UnhandledSupplier<T, E extends Exception> {
-    /**
-     * Gets a result.
-     *
-     * @return a result
-     */
-    T get() throws E;
+public interface ThrowableConsumer<T, E extends Throwable> {
+    void accept(T o) throws E;
 }

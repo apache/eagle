@@ -20,13 +20,16 @@
 package org.apache.eagle.security.service;
 
 import com.google.inject.Inject;
-import com.typesafe.config.Config;
+import org.apache.eagle.metadata.store.jdbc.JDBCMetadataQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.ArrayList;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Since 8/8/16.
@@ -34,51 +37,47 @@ import java.util.Collection;
 public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
     private static final Logger LOG = LoggerFactory.getLogger(JDBCSecurityMetadataDAO.class);
 
-    private Config config;
     /**
      * composite primary key: site and hbase_resource
      */
+    private final String TABLE_DDL_STATEMENT = "create table if not exists hbase_sensitivity_entity (site varchar(20), hbase_resource varchar(100), sensitivity_type varchar(20), primary key (site, hbase_resource));";
     private final String QUERY_ALL_STATEMENT = "SELECT site, hbase_resource, sensitivity_type FROM hbase_sensitivity_entity";
     private final String INSERT_STATEMENT = "INSERT INTO hbase_sensitivity_entity (site, hbase_resource, sensitivity_type) VALUES (?, ?, ?)";
 
-    // get connection url from config
+    private DataSource dataSource;
+    private JDBCMetadataQueryService queryService;
+
+    /**
+     * Inject datasource
+     *
+     * @param dataSource
+     */
     @Inject
-    public JDBCSecurityMetadataDAO(Config config){
-        this.config = config;
+    public JDBCSecurityMetadataDAO(DataSource dataSource, JDBCMetadataQueryService queryService) {
+        this.dataSource = dataSource;
+        this.queryService = queryService;
+        try {
+            queryService.execute(TABLE_DDL_STATEMENT);
+        } catch (SQLException e) {
+            LOG.error("Unable to create table hbase_sensitivity_entity",e);
+            throw new IllegalStateException("Unable to create table hbase_sensitivity_entity",e);
+        }
     }
 
     @Override
     public Collection<HBaseSensitivityEntity> listHBaseSensitivies() {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        Collection<HBaseSensitivityEntity> ret = new ArrayList<>();
-        ResultSet rs = null;
         try {
-            connection = getJdbcConnection();
-            statement = connection.prepareStatement(QUERY_ALL_STATEMENT);
-            rs = statement.executeQuery();
-            while (rs.next()) {
+            return queryService.query(QUERY_ALL_STATEMENT,(rs -> {
                 HBaseSensitivityEntity entity = new HBaseSensitivityEntity();
                 entity.setSite(rs.getString(1));
                 entity.setHbaseResource(rs.getString(2));
                 entity.setSensitivityType(rs.getString(3));
-                ret.add(entity);
-            }
-        }catch(Exception e) {
-            LOG.error("error in querying hbase_sensitivity_entity table", e);
-        }finally{
-            try{
-                if(rs != null)
-                    rs.close();
-                if(statement != null)
-                    statement.close();
-                if(connection != null)
-                    connection.close();
-            }catch(Exception ex){
-                LOG.error("error in closing database resources", ex);
-            }
+                return entity;
+            }));
+        } catch (SQLException e) {
+            LOG.error("Error in querying all from hbase_sensitivity_entity table", e);
         }
-        return ret;
+        return Collections.emptyList();
     }
 
     @Override
@@ -86,7 +85,7 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
         Connection connection = null;
         PreparedStatement statement = null;
         try{
-            connection = getJdbcConnection();
+            connection = dataSource.getConnection();
             statement = connection.prepareStatement(INSERT_STATEMENT);
             connection.setAutoCommit(false);
             for(HBaseSensitivityEntity entity : h){
@@ -110,17 +109,5 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
             }
         }
         return null;
-    }
-
-    private Connection getJdbcConnection() throws Exception {
-        Connection connection = null;
-        String conn = config.getString("connection");
-        try {
-            connection = DriverManager.getConnection(conn, "root", "");
-        } catch (Exception e) {
-            LOG.error("error get connection for {}", conn, e);
-            throw e;
-        }
-        return connection;
     }
 }
