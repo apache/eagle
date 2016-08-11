@@ -70,7 +70,7 @@ public class Integration1 {
         
         @Override
         public Thread newThread(Runnable r) {
-            Thread t = new Thread();
+            Thread t = new Thread(r);
             t.setDaemon(true);
             return t;
         }
@@ -118,7 +118,7 @@ public class Integration1 {
         System.out.println("loading metadatas done!");
 
         if (args == null) {
-            args = new String[] { "-f", "simple/application-integration.conf" };
+            args = new String[] { "-c", "simple/application-integration.conf" };
         }
 
         executors.submit(() -> SampleClient1.main(args));

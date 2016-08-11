@@ -1,18 +1,17 @@
 package org.apache.eagle.alert.metric;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.JvmAttributeGaugeSet;
+import com.codahale.metrics.MetricRegistry;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.metric.sink.KafkaSink;
 import org.apache.eagle.alert.metric.source.JVMMetricSource;
 import org.apache.eagle.alert.metric.source.MetricSource;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.JvmAttributeGaugeSet;
-import com.codahale.metrics.MetricRegistry;
-import com.typesafe.config.ConfigFactory;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -51,6 +50,34 @@ public class MetricSystemTest {
         system.stop();
     }
 
+    @Test @Ignore
+    public void testMetaConflict(){
+        MetricSystem system = MetricSystem.load(ConfigFactory.load());
+        system.register(new MetaConflictMetricSource());
+        system.start();
+        system.report();
+        system.stop();
+    }
+
+    private class MetaConflictMetricSource implements MetricSource {
+        private MetricRegistry registry = new MetricRegistry();
+
+        public MetaConflictMetricSource(){
+            registry.register("meta.conflict", (Gauge<String>) () -> "meta conflict happening!");
+        }
+
+        @Override
+        public String name() {
+            return "metaConflict";
+        }
+
+        @Override
+        public MetricRegistry registry() {
+            return registry;
+        }
+    }
+
+
     private class SampleMetricSource implements MetricSource {
         private MetricRegistry registry = new MetricRegistry();
 
@@ -58,11 +85,11 @@ public class MetricSystemTest {
             registry.register("sample.long", (Gauge<Long>) System::currentTimeMillis);
             registry.register("sample.map", (Gauge<Map<String, Object>>) () -> new HashMap<String, Object>(){
                 private static final long serialVersionUID = 3948508906655117683L;
-            {
-                put("int",1234);
-                put("str","text");
-                put("bool",true);
-            }});
+                {
+                    put("int",1234);
+                    put("str","text");
+                    put("bool",true);
+                }});
         }
 
         @Override
