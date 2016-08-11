@@ -67,11 +67,6 @@ public class TestStormApplication extends StormApplication{
 
     public final static class Provider extends AbstractApplicationProvider<TestStormApplication> {
         @Override
-        protected String getMetadata() {
-            return "TestApplicationMetadata.xml";
-        }
-
-        @Override
         public TestStormApplication getApplication() {
             return new TestStormApplication();
         }
