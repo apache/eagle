@@ -25,7 +25,7 @@ eagle_bin=$EAGLE_HOME/bin
 
 ## AlertDataSource: data sources bound to sites
 
-echo "Begin to initialize HBase tables ..."
+echo "Begin to initialize metadata for eagle topologies ..."
 
 echo ""
 echo "Importing sample site ..."
