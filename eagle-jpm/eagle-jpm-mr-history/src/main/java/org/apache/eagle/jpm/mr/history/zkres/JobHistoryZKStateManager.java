@@ -38,6 +38,8 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public static final String ZNODE_LOCK_FOR_ENSURE_JOB_PARTITIONS = "lockForEnsureJobPartitions";
     public static final String ZNODE_FORCE_START_FROM = "forceStartFrom";
     public static final String ZNODE_PARTITIONS = "partitions";
+    public static final String ZNODE_JOBS = "jobs";
+    public static final String ZNODE_TIMESTAMPS = "timeStamps";
 
     public static final int BACKOFF_DAYS = 0;
 
@@ -201,7 +203,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
 
     @Override
     public String readProcessedDate(int partitionId) {
-        String path = zkRoot + "/partitions/" + partitionId;
+        String path = zkRoot + "/" + ZNODE_PARTITIONS + "/" + partitionId;
         try {
             if (_curator.checkExists().forPath(path) != null) {
                 return new String(_curator.getData().forPath(path), "UTF-8");
@@ -216,7 +218,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
 
     @Override
     public void updateProcessedDate(int partitionId, String date) {
-        String path = zkRoot + "/partitions/" + partitionId;
+        String path = zkRoot + "/" + ZNODE_PARTITIONS + "/" + partitionId;
         try {
             if (_curator.checkExists().forPath(path) == null) {
                 _curator.create()
@@ -234,7 +236,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
 
     @Override
     public void addProcessedJob(String date, String jobId) {
-        String path = zkRoot + "/jobs/" + date + "/" + jobId;
+        String path = zkRoot + "/" + ZNODE_JOBS + "/" + date + "/" + jobId;
         try {
             if (_curator.checkExists().forPath(path) == null) {
                 _curator.create()
@@ -254,7 +256,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public void truncateProcessedJob(String date) {
         LOG.info("trying to truncate all data for day " + date);
         // we need lock before we do truncate
-        String path = zkRoot + "/jobs/" + date;
+        String path = zkRoot + "/" + ZNODE_JOBS + "/" + date;
         InterProcessMutex lock = new InterProcessMutex(_curator, path);
         try {
             lock.acquire();
@@ -277,7 +279,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
 
     @Override
     public List<String> readProcessedJobs(String date) {
-        String path = zkRoot + "/jobs/" + date;
+        String path = zkRoot + "/" + ZNODE_JOBS + "/" + date;
         try {
             if (_curator.checkExists().forPath(path) != null) {
                 return _curator.getChildren().forPath(path);
@@ -300,6 +302,43 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         } catch (Exception ex) {
             LOG.error("fail truncating verything", ex);
             throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public long readProcessedTimeStamp(int partitionId) {
+        String path = zkRoot + "/" + ZNODE_PARTITIONS + "/" + partitionId + "/" + ZNODE_TIMESTAMPS;
+        try {
+            if (_curator.checkExists().forPath(path) == null) {
+                _curator.create()
+                        .creatingParentsIfNeeded()
+                        .withMode(CreateMode.PERSISTENT)
+                        .forPath(path);
+                return 0l;
+            } else {
+                return Long.parseLong(new String(_curator.getData().forPath(path), "UTF-8"));
+            }
+        } catch (Exception e) {
+            LOG.error("fail to read timeStamp for partition " + partitionId, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void updateProcessedTimeStamp(int partitionId, long timeStamp) {
+        String path = zkRoot + "/" + ZNODE_PARTITIONS + "/" + partitionId + "/" + ZNODE_TIMESTAMPS;
+        try {
+            if (_curator.checkExists().forPath(path) == null) {
+                _curator.create()
+                        .creatingParentsIfNeeded()
+                        .withMode(CreateMode.PERSISTENT)
+                        .forPath(path);
+            }
+
+            _curator.setData().forPath(path, (timeStamp + "").getBytes("UTF-8"));
+        } catch (Exception e) {
+            LOG.error("fail to update timeStamp for partition " + partitionId, e);
+            throw new RuntimeException(e);
         }
     }
 }

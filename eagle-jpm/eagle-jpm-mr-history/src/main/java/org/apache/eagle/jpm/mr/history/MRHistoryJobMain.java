@@ -23,11 +23,10 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
-import org.apache.eagle.jpm.mr.history.common.JPAConstants;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilterBuilder;
-import org.apache.eagle.jpm.mr.history.storm.HistoryJobProgressBolt;
 import org.apache.eagle.jpm.mr.history.storm.JobHistorySpout;
+import org.apache.eagle.jpm.util.Constants;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -37,14 +36,15 @@ public class MRHistoryJobMain {
         try {
             //1. trigger init conf
             JHFConfigManager jhfConfigManager = JHFConfigManager.getInstance(args);
+            com.typesafe.config.Config jhfAppConf = jhfConfigManager.getConfig();
 
             //2. init JobHistoryContentFilter
             JobHistoryContentFilterBuilder builder = JobHistoryContentFilterBuilder.newBuilder().acceptJobFile().acceptJobConfFile();
-            List<String> confKeyPatterns = jhfConfigManager.getConfig().getStringList("MRConfigureKeys");
-            confKeyPatterns.add(JPAConstants.JobConfiguration.CASCADING_JOB);
-            confKeyPatterns.add(JPAConstants.JobConfiguration.HIVE_JOB);
-            confKeyPatterns.add(JPAConstants.JobConfiguration.PIG_JOB);
-            confKeyPatterns.add(JPAConstants.JobConfiguration.SCOOBI_JOB);
+            List<String> confKeyPatterns = jhfAppConf.getStringList("MRConfigureKeys");
+            confKeyPatterns.add(Constants.JobConfiguration.CASCADING_JOB);
+            confKeyPatterns.add(Constants.JobConfiguration.HIVE_JOB);
+            confKeyPatterns.add(Constants.JobConfiguration.PIG_JOB);
+            confKeyPatterns.add(Constants.JobConfiguration.SCOOBI_JOB);
 
             for (String key : confKeyPatterns) {
                 builder.includeJobKeyPatterns(Pattern.compile(key));
@@ -54,10 +54,12 @@ public class MRHistoryJobMain {
             //3. init topology
             TopologyBuilder topologyBuilder = new TopologyBuilder();
             String topologyName = "mrHistoryJobTopology";
+            if (jhfAppConf.hasPath("envContextConfig.topologyName")) {
+                topologyName = jhfAppConf.getString("envContextConfig.topologyName");
+            }
             String spoutName = "mrHistoryJobExecutor";
-            String boltName = "updateProcessTime";
-            int parallelism = jhfConfigManager.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
-            int tasks = jhfConfigManager.getConfig().getInt("envContextConfig.tasks." + spoutName);
+            int parallelism = jhfAppConf.getInt("envContextConfig.parallelismConfig." + spoutName);
+            int tasks = jhfAppConf.getInt("envContextConfig.tasks." + spoutName);
             if (parallelism > tasks) {
                 parallelism = tasks;
             }
@@ -66,10 +68,9 @@ public class MRHistoryJobMain {
                     new JobHistorySpout(filter, jhfConfigManager),
                     parallelism
             ).setNumTasks(tasks);
-            topologyBuilder.setBolt(boltName, new HistoryJobProgressBolt(spoutName, jhfConfigManager), 1).setNumTasks(1).allGrouping(spoutName);
 
-            backtype.storm.Config config = new backtype.storm.Config();
-            config.setNumWorkers(jhfConfigManager.getConfig().getInt("envContextConfig.workers"));
+            Config config = new backtype.storm.Config();
+            config.setNumWorkers(jhfAppConf.getInt("envContextConfig.workers"));
             config.put(Config.TOPOLOGY_DEBUG, true);
             if (!jhfConfigManager.getEnv().equals("local")) {
                 //cluster mode

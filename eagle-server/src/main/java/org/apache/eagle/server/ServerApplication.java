@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.server;
 
-import com.hubspot.dropwizard.guice.GuiceBundle;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -26,25 +25,15 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
-import org.apache.eagle.app.ApplicationGuiceModule;
-import org.apache.eagle.common.module.CommonGuiceModule;
-import org.apache.eagle.metadata.persistence.MetadataStore;
+import org.apache.eagle.server.module.GuideBundleLoader;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 
 class ServerApplication extends Application<ServerConfig> {
-    private GuiceBundle<ServerConfig> guiceBundle;
-
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
-        guiceBundle = GuiceBundle.<ServerConfig>newBuilder()
-                .addModule(new CommonGuiceModule())
-                .addModule(MetadataStore.getInstance())
-                .addModule(new ApplicationGuiceModule())
-                .setConfigClass(ServerConfig.class)
-                .build();
-        bootstrap.addBundle(guiceBundle);
+        bootstrap.addBundle(GuideBundleLoader.load());
         bootstrap.addBundle(new AssetsBundle("/assets","/","index.html","/"));
     }
 

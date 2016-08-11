@@ -25,9 +25,12 @@ import org.apache.eagle.jpm.util.resourceFetch.ha.HAURLSelector;
 import org.apache.eagle.jpm.util.resourceFetch.ha.HAURLSelectorImpl;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppsWrapper;
+import org.apache.eagle.jpm.util.resourceFetch.model.ClusterInfo;
+import org.apache.eagle.jpm.util.resourceFetch.model.ClusterInfoWrapper;
 import org.apache.eagle.jpm.util.resourceFetch.url.JobListServiceURLBuilderImpl;
 import org.apache.eagle.jpm.util.resourceFetch.url.ServiceURLBuilder;
 import org.apache.eagle.jpm.util.resourceFetch.url.SparkCompleteJobServiceURLBuilderImpl;
+import org.apache.hadoop.mapreduce.Cluster;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -35,10 +38,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
-public class RMResourceFetcher implements ResourceFetcher{
+public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RMResourceFetcher.class);
 	private final HAURLSelector selector;
@@ -64,8 +66,8 @@ public class RMResourceFetcher implements ResourceFetcher{
 		}
 	}
 	
-	private List<Object> doFetchSparkFinishApplicationsList(String lastFinishTime) throws Exception {
-		List<AppInfo> result = null;
+	private List<AppInfo> doFetchSparkFinishApplicationsList(String lastFinishTime) throws Exception {
+		List<AppInfo> result;
 		InputStream is = null;
 		try {
 			checkUrl();
@@ -76,23 +78,100 @@ public class RMResourceFetcher implements ResourceFetcher{
 			if (appWrapper != null && appWrapper.getApps() != null
 					&& appWrapper.getApps().getApp() != null) {
 				result = appWrapper.getApps().getApp();
-				return Arrays.asList((Object)result);
+				return result;
 			}
 			return null;
-		}finally {
-			if (is != null) { try {is.close();} catch (Exception e){} }
+		} finally {
+			if (is != null) { try { is.close();} catch (Exception e) { } }
 		}
 	}
-	
 
-	
-	public List<Object> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
+    private String getSparkRunningJobURL() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(selector.getSelectedUrl()).append("/").append(Constants.V2_APPS_URL);
+		sb.append("?applicationTypes=SPARK&state=RUNNING&");
+		sb.append(Constants.ANONYMOUS_PARAMETER);
+		return sb.toString();
+    }
+
+    private List<AppInfo> doFetchSparkRunningApplicationsList() throws Exception {
+        List<AppInfo> result;
+        InputStream is = null;
+        try {
+            checkUrl();
+            final String urlString = getSparkRunningJobURL();
+            LOG.info("Going to call yarn api to fetch running spark job list: " + urlString);
+            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.NONE);
+            final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
+            if (appWrapper != null && appWrapper.getApps() != null && appWrapper.getApps().getApp() != null) {
+                result = appWrapper.getApps().getApp();
+                return result;
+            }
+            return null;
+        } finally {
+            if (is != null)  { try { is.close();} catch (Exception e) { } }
+        }
+    }
+
+    private String getMRRunningJobURL() {
+        return String.format("%s/%s?applicationTypes=MAPREDUCE&state=RUNNING&%s",
+                selector.getSelectedUrl(),
+                Constants.V2_APPS_URL,
+                Constants.ANONYMOUS_PARAMETER);
+    }
+
+	private List<AppInfo> doFetchMRRunningApplicationsList() throws Exception {
+        List<AppInfo> result;
+        InputStream is = null;
+        try {
+            checkUrl();
+            final String urlString = getMRRunningJobURL();
+            LOG.info("Going to call yarn api to fetch running mr job list: " + urlString);
+            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+            final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
+            if (appWrapper != null && appWrapper.getApps() != null && appWrapper.getApps().getApp() != null) {
+                result = appWrapper.getApps().getApp();
+                return result;
+            }
+            return null;
+        } finally {
+            if (is != null)  { try { is.close();} catch (Exception e) { } }
+        }
+    }
+
+	public List<AppInfo> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
 		switch(resoureType) {
 			case COMPLETE_SPARK_JOB:
 				return doFetchSparkFinishApplicationsList((String)parameter[0]);
-
+			case RUNNING_SPARK_JOB:
+                return doFetchSparkRunningApplicationsList();
+            case RUNNING_MR_JOB:
+                return doFetchMRRunningApplicationsList();
 			default:
-				throw new Exception("Not support ressourceType :" + resoureType);
+				throw new Exception("Not support resourceType :" + resoureType);
+		}
+	}
+
+	private String getClusterInfoURL() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(selector.getSelectedUrl()).append("/").append(Constants.YARN_API_CLUSTER_INFO).append("?" + Constants.ANONYMOUS_PARAMETER);
+		return sb.toString();
+	}
+
+	public ClusterInfo getClusterInfo() throws Exception {
+		InputStream is = null;
+		try {
+			checkUrl();
+			final String urlString = getClusterInfoURL();
+			LOG.info("Calling yarn api to fetch cluster info: " + urlString);
+			is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+			final ClusterInfoWrapper clusterInfoWrapper = OBJ_MAPPER.readValue(is, ClusterInfoWrapper.class);
+			if (clusterInfoWrapper != null && clusterInfoWrapper.getClusterInfo() != null) {
+				return clusterInfoWrapper.getClusterInfo();
+			}
+			return null;
+		} finally {
+			if (is != null)  { try { is.close();} catch (Exception e) { } }
 		}
 	}
 }

@@ -29,7 +29,7 @@ public class HDFSUtil {
 
     public static FileSystem getFileSystem(Configuration conf) throws IOException {
         HDFSUtil.login(conf);
-       return FileSystem.get(conf);
+        return FileSystem.get(conf);
     }
 
     public static void login(Configuration kConfig) throws IOException {

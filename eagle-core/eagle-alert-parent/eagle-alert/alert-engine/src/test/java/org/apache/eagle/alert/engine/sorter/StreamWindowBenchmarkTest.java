@@ -37,7 +37,7 @@ import com.codahale.metrics.ScheduledReporter;
 import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 
-@Ignore
+@Ignore("Ignore automatic heavy benchmark test")
 public class StreamWindowBenchmarkTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(StreamWindowBenchmarkTest.class);
     public void sendDESCOrderedEventsToWindow(StreamWindow window, StreamWindowRepository.StorageType storageType, int num) {

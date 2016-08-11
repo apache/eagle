@@ -19,7 +19,7 @@ package org.apache.eagle.app.jpm;
 import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
-import org.apache.eagle.app.test.AppUnitTestRunner;
+import org.apache.eagle.app.test.AppJUnitRunner;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
@@ -27,7 +27,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(AppUnitTestRunner.class)
+import java.util.HashMap;
+import java.util.Map;
+
+@RunWith(AppJUnitRunner.class)
 public class JPMApplicationTest {
     @Inject
     private SiteResource siteResource;
@@ -53,8 +56,11 @@ public class JPMApplicationTest {
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
 
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site","JPM_APP", ApplicationEntity.Mode.LOCAL);
+        installOperation.setConfiguration(getConf());
+
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation("test_site","JPM_APP", ApplicationEntity.Mode.LOCAL)).getData();
+        ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         // Stop application
@@ -67,5 +73,16 @@ public class JPMApplicationTest {
         } catch (Exception ex){
             // Expected exception
         }
+    }
+
+    private Map<String, Object> getConf(){
+        Map<String, Object> conf = new HashMap<>();
+        conf.put("dataSinkConfig.topic", "testTopic");
+        conf.put("dataSinkConfig.brokerList", "broker");
+        conf.put("dataSinkConfig.serializerClass", "serializerClass");
+        conf.put("dataSinkConfig.keySerializerClass", "keySerializerClass");
+        conf.put("spoutNum", 2);
+        conf.put("mode", "LOCAL");
+        return conf;
     }
 }

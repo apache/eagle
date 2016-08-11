@@ -47,13 +47,12 @@ public class HAURLSelectorImpl implements HAURLSelector {
 	public boolean checkUrl(String urlString) {
 		InputStream is = null;
 		try {
+			LOG.info("Getting input stream from url: " + urlString);
 			is = InputStreamUtils.getInputStream(urlString, compressionType);
-		}
-		catch (Exception ex) {
-			LOG.info("get inputstream from url: " + urlString + " failed. ");
+		} catch (Exception ex) {
+			LOG.error("Failed to get input stream from url: " + urlString);
 			return false;
-		}
-		finally {
+		} finally {
 			if (is != null) { try {	is.close(); } catch (IOException e) {/*Do nothing*/} }
 		}
 		return true;

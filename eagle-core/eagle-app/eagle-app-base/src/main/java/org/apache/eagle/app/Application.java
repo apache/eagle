@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.app;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.Environment;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Application Execution Interface
@@ -32,52 +32,24 @@ import java.util.Map;
  * </ul>
  *
  * @param <Proc>
- * @param <Conf>
  * @param <Env>
  */
 public interface Application <
-    Conf extends Configuration,     //  Application Configuration
     Env extends Environment,        // Application Environment
     Proc                            // Application Process
 > extends Serializable {
     /**
-     * Execute with type-safe configuration
-     *
-     * Developer-oriented interface
+     * Execute with application configuration
      *
      * @param config application configuration
      * @param environment execution environment
      * @return execution process
      */
-    Proc execute(Conf config, Env environment);
+    Proc execute(Config config, Env environment);
 
     /**
-     * Execute with raw map-based configuration
+     * Execution Environment type
      *
-     * Management service oriented interface
-     *
-     * @param config application configuration
-     * @param environment  execution environment
-     * @return execution process
-     */
-    Proc execute(Map<String,Object> config, Env environment);
-
-    /**
-     * Execute with environment based configuration
-     *
-     * Light-weight Runner (dry-run/test purpose) oriented interface
-     *
-     * @param environment  execution environment
-     * @return execution process
-     */
-    Proc execute(Env environment);
-
-    /**
-     * @return application configuration type (POJO class)
-     */
-    Class<Conf> getConfigType();
-
-    /**
      * @return application environment type
      */
     Class<? extends Env> getEnvironmentType();

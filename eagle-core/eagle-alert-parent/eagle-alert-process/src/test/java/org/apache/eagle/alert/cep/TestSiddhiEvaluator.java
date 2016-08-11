@@ -34,16 +34,15 @@ import org.apache.eagle.policy.siddhi.SiddhiPolicyEvaluator;
 import org.apache.eagle.policy.siddhi.StreamMetadataManager;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import scala.Tuple2;
 
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 public class TestSiddhiEvaluator {
-
-	int alertCount = 0;
-
-	public AlertStreamSchemaEntity createStreamMetaEntity(String attrName, String type) {
+	private AlertStreamSchemaEntity createStreamMetaEntity(String attrName, String type) {
 		AlertStreamSchemaEntity entity = new AlertStreamSchemaEntity();
 		Map<String, String> tags = new HashMap<String, String>();
 		tags.put("application", "hdfsAuditLog");
@@ -54,9 +53,17 @@ public class TestSiddhiEvaluator {
 		return entity;
 	}
 
+	private int alertCount;
+	private Semaphore semaphore;
+	@Before
+	public void before(){
+		alertCount = 0;
+		semaphore = new Semaphore(0);
+	}
+
 	@Test
 	public void test() throws Exception{
-        Config config = ConfigFactory.load("unittest.conf");
+		Config config = ConfigFactory.load("unittest.conf");
 		AlertStreamSchemaDAO streamDao = new AlertStreamSchemaDAOImpl(null, null) {
 			@Override
 			public List<AlertStreamSchemaEntity> findAlertStreamSchemaByApplication(String dataSource) throws Exception {
@@ -108,7 +115,7 @@ public class TestSiddhiEvaluator {
 		AlertExecutor alertExecutor = new AlertExecutor("alertExecutorId", null, 3, 1, alertDao, new String[]{"hdfsAuditLogEventStream"}) {
 			@Override
 			protected Map<String, String> getDimensions(String policyId) {
-				return new HashMap<String, String>();
+				return new HashMap<>();
 			}
 		};
 		alertExecutor.prepareConfig(config);
@@ -118,18 +125,15 @@ public class TestSiddhiEvaluator {
 		context.alertExecutor = alertExecutor;
 		context.policyId = "testPolicy";
 		context.resultRender = new SiddhiAlertAPIEntityRender();
-		context.outputCollector = new Collector<Tuple2<String, AlertAPIEntity>> () {
-			@Override
-			public void collect(Tuple2<String, AlertAPIEntity> stringAlertAPIEntityTuple2) {
-				alertCount++;
-			}
+		context.outputCollector = (Collector<Tuple2<String, AlertAPIEntity>>) (stringAlertAPIEntityTuple2) -> {
+			alertCount++;
+			semaphore.release();
 		};
-
 		SiddhiPolicyEvaluator<AlertDefinitionAPIEntity, AlertAPIEntity> evaluator =
 				new SiddhiPolicyEvaluator<>(config, context, policyDef, new String[]{"hdfsAuditLogEventStream"}, false);
-
 		evaluator.evaluate(new ValuesArray(context.outputCollector, "hdfsAuditLogEventStream", data1));
 		Thread.sleep(2 * 1000);
+		semaphore.acquire();
 		Assert.assertEquals(alertCount, 1);
 	}
 }

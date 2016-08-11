@@ -224,7 +224,7 @@ public class Coordinator {
         ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(2, new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
-                Thread t = new Thread();
+                Thread t = new Thread(r);
                 t.setDaemon(true);
                 return t;
             }

@@ -23,57 +23,21 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import org.apache.eagle.app.Configuration;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 
 import java.util.Arrays;
 import java.util.Map;
 
-public class MockStormApplication extends StormApplication<MockStormApplication.MockStormConfiguration> {
-    private MockStormConfiguration appConfig;
-
+public class MockStormApplication extends StormApplication {
     @Override
-    public StormTopology execute(MockStormConfiguration config, StormEnvironment environment) {
-        this.setAppConfig(config);
+    public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("metric_spout", new RandomEventSpout(), config.getSpoutNum());
-        builder.setBolt("sink_1",environment.getFlattenStreamSink("TEST_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
-        builder.setBolt("sink_2",environment.getFlattenStreamSink("TEST_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setSpout("metric_spout", new RandomEventSpout(), config.getInt("spoutNum"));
+        builder.setBolt("sink_1",environment.getStreamSink("TEST_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",environment.getStreamSink("TEST_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         return builder.createTopology();
-    }
-
-    public MockStormConfiguration getAppConfig() {
-        return appConfig;
-    }
-
-    private void setAppConfig(MockStormConfiguration appConfig) {
-        this.appConfig = appConfig;
-    }
-
-    /**
-     * TODO: Load configuration from name space in application className
-     * Application Configuration
-     */
-    static class MockStormConfiguration extends Configuration {
-        private int spoutNum = 1;
-        private boolean loaded = false;
-
-        public int getSpoutNum() {
-            return spoutNum;
-        }
-
-        public void setSpoutNum(int spoutNum) {
-            this.spoutNum = spoutNum;
-        }
-
-        public boolean isLoaded() {
-            return loaded;
-        }
-
-        public void setLoaded(boolean loaded) {
-            this.loaded = loaded;
-        }
     }
 
     private class RandomEventSpout extends BaseRichSpout {
@@ -88,7 +52,6 @@ public class MockStormApplication extends StormApplication<MockStormApplication.
             _collector.emit(Arrays.asList("disk.usage",System.currentTimeMillis(),"host_1",56.7));
             _collector.emit(Arrays.asList("cpu.usage",System.currentTimeMillis(),"host_2",99.8));
         }
-
         @Override
         public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
             outputFieldsDeclarer.declare(new Fields("metric","timestamp","source","value"));

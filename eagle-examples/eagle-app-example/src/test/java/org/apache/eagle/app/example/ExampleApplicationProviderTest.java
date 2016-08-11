@@ -17,10 +17,13 @@
 package org.apache.eagle.app.example;
 
 import com.google.inject.Inject;
+import org.apache.eagle.app.example.extensions.ExampleEntity;
+import org.apache.eagle.app.example.extensions.ExampleResource;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.test.ServerSimulator;
-import org.apache.eagle.app.test.AppUnitTestRunner;
+import org.apache.eagle.app.test.AppJUnitRunner;
+import org.apache.eagle.common.module.GlobalScope;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
@@ -30,18 +33,30 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@RunWith(AppUnitTestRunner.class)
+@RunWith(AppJUnitRunner.class)
 public class ExampleApplicationProviderTest {
     @Inject private SiteResource siteResource;
     @Inject private ApplicationResource applicationResource;
     @Inject private ServerSimulator simulator;
+    @Inject private ExampleResource exampleResource;
 
     @Test
     public void testApplicationProviderLoading(){
         Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs().getData();
         Assert.assertNotNull(applicationDescs);
-        Assert.assertEquals(2,applicationDescs.size());
+        Assert.assertEquals(1,applicationDescs.size());
+    }
+
+    @Test
+    public void testApplicationExtensions(){
+        List<ExampleEntity> entities = exampleResource.getEntities();
+        Assert.assertNotNull(entities);
+        Assert.assertEquals(1,entities.size());
+        Assert.assertEquals(GlobalScope.class,exampleResource.getCommonServiceScope());
     }
 
     /**
@@ -63,8 +78,10 @@ public class ExampleApplicationProviderTest {
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
 
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL);
+        installOperation.setConfiguration(getConf());
         // Install application
-        ApplicationEntity applicationEntity = applicationResource.installApplication(new ApplicationOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL)).getData();
+        ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         // Stop application
@@ -81,16 +98,22 @@ public class ExampleApplicationProviderTest {
 
     @Test
     public void testApplicationQuickRunWithAppType(){
-        simulator.start("EXAMPLE_APPLICATION");
+        simulator.start("EXAMPLE_APPLICATION", getConf());
     }
 
     @Test
-    public void testApplicationQuickRunWithAppProvider(){
-        simulator.start(ExampleApplicationProvider.class);
+    public void testApplicationQuickRunWithAppProvider() throws Exception{
+        simulator.start(ExampleApplicationProvider.class, getConf());
     }
 
-    @Test
-    public void testApplicationQuickRunWithAppProvider2(){
-        simulator.start(ExampleApplicationProvider2.class);
+    private Map<String, Object> getConf(){
+        Map<String, Object> conf = new HashMap<>();
+        conf.put("dataSinkConfig.topic", "testTopic");
+        conf.put("dataSinkConfig.brokerList", "broker");
+        conf.put("dataSinkConfig.serializerClass", "serializerClass");
+        conf.put("dataSinkConfig.keySerializerClass", "keySerializerClass");
+        conf.put("spoutNum", 2);
+        conf.put("mode", "LOCAL");
+        return conf;
     }
 }

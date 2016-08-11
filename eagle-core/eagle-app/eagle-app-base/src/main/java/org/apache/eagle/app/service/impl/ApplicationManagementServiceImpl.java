@@ -20,18 +20,25 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.service.ApplicationContext;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.model.Property;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.service.SiteEntityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class ApplicationManagementServiceImpl implements ApplicationManagementService {
@@ -53,6 +60,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         this.applicationEntityService = applicationEntityService;
     }
 
+    @Override
     public ApplicationEntity install(ApplicationOperations.InstallOperation operation) throws EntityNotFoundException {
         Preconditions.checkNotNull(operation.getSiteId(),"siteId is null");
         Preconditions.checkNotNull(operation.getAppType(),"appType is null");
@@ -63,16 +71,34 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationEntity applicationEntity = new ApplicationEntity();
         applicationEntity.setDescriptor(appDesc);
         applicationEntity.setSite(siteEntity);
-        applicationEntity.setConfiguration(operation.getConfiguration());
         applicationEntity.setMode(operation.getMode());
+        applicationEntity.ensureDefault();
+
+        /**
+         *  calculate application config based on
+         *   1) default values in metadata.xml
+         *   2) user's config value override default configurations
+         *   3) some metadata, for example siteId, mode, appId in ApplicationContext
+         */
+        Map<String, Object> appConfig = new HashMap<>();
+        ApplicationProvider provider = applicationProviderService.getApplicationProviderByType(operation.getAppType());
+
+        List<Property> propertyList = provider.getApplicationDesc().getConfiguration().getProperties();
+        for(Property p : propertyList){
+            appConfig.put(p.getName(), p.getValue());
+        }
+        if(operation.getConfiguration() != null) {
+            appConfig.putAll(operation.getConfiguration());
+        }
+        applicationEntity.setConfiguration(appConfig);
         ApplicationContext applicationContext = new ApplicationContext(
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
                 applicationEntity,config);
         applicationContext.onInstall();
-        applicationEntityService.create(applicationEntity);
-        return applicationEntity;
+        return applicationEntityService.create(applicationEntity);
     }
 
+    @Override
     public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         ApplicationContext applicationContext = new ApplicationContext(
@@ -88,6 +114,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         return applicationEntityService.delete(applicationEntity);
     }
 
+    @Override
     public ApplicationEntity start(ApplicationOperations.StartOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         ApplicationContext applicationContext = new ApplicationContext(
@@ -97,6 +124,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         return applicationEntity;
     }
 
+    @Override
     public ApplicationEntity stop(ApplicationOperations.StopOperation operation) {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         ApplicationContext applicationContext = new ApplicationContext(

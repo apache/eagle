@@ -18,32 +18,31 @@ package org.apache.eagle.app.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.Configuration;
 
 import java.util.Map;
 
-public class ApplicationConfigHelper {
-    private static final ObjectMapper mapper = new ObjectMapper();
-    public static <Conf extends Configuration> Conf convertFrom(Map<String,Object> configMap, Class<Conf> confClass){
-        return mapper.convertValue(configMap,confClass);
-    }
-
-    /**
-     *  Map application configuration from environment
-     *
-     * @param config
-     * @return
-     */
-    public static Map<String,Object> unwrapFrom(Config config, String namespace){
-        if(config.hasPath(namespace)) {
-            return config.getConfig(namespace).root().unwrapped();
-        }else{
-            Map<String,Object> unwrappedConfig = config.root().unwrapped();
-            if(unwrappedConfig.containsKey(namespace)){
-                return (Map<String,Object>) unwrappedConfig.get(namespace);
-            }else {
-                throw new IllegalArgumentException("Failed to load app config as config key: '"+namespace+"' was not found in: "+config);
-            }
-        }
-    }
-}
+//public class ApplicationConfigHelper {
+//    private static final ObjectMapper mapper = new ObjectMapper();
+//    public static <Conf extends Configuration> Conf convertFrom(Map<String,Object> configMap, Class<Conf> confClass){
+//        return mapper.convertValue(configMap,confClass);
+//    }
+//
+//    /**
+//     *  Map application configuration from environment
+//     *
+//     * @param config
+//     * @return
+//     */
+//    public static Map<String,Object> unwrapFrom(Config config, String namespace){
+//        if(config.hasPath(namespace)) {
+//            return config.getConfig(namespace).root().unwrapped();
+//        }else{
+//            Map<String,Object> unwrappedConfig = config.root().unwrapped();
+//            if(unwrappedConfig.containsKey(namespace)){
+//                return (Map<String,Object>) unwrappedConfig.get(namespace);
+//            }else {
+//                throw new IllegalArgumentException("Failed to load app config as config key: '"+namespace+"' was not found in: "+config);
+//            }
+//        }
+//    }
+//}

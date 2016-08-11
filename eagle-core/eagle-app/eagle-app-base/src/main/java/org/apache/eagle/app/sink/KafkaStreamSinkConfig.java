@@ -20,6 +20,9 @@ import org.apache.eagle.metadata.model.StreamSinkConfig;
 
 public class KafkaStreamSinkConfig implements StreamSinkConfig {
     private String topicId;
+    private String brokerList;
+    private String serializerClass;
+    private String keySerializerClass;
 
     public String getTopicId() {
         return topicId;
@@ -27,6 +30,30 @@ public class KafkaStreamSinkConfig implements StreamSinkConfig {
 
     public void setTopicId(String topicId) {
         this.topicId = topicId;
+    }
+
+    public String getBrokerList() {
+        return brokerList;
+    }
+
+    public void setBrokerList(String brokerList) {
+        this.brokerList = brokerList;
+    }
+
+    public String getSerializerClass() {
+        return serializerClass;
+    }
+
+    public void setSerializerClass(String serializerClass) {
+        this.serializerClass = serializerClass;
+    }
+
+    public String getKeySerializerClass() {
+        return keySerializerClass;
+    }
+
+    public void setKeySerializerClass(String keySerializerClass) {
+        this.keySerializerClass = keySerializerClass;
     }
 
     @Override

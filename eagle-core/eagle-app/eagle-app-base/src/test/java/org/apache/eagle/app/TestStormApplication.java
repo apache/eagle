@@ -23,32 +23,27 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
+import org.junit.Ignore;
 
 import java.util.Arrays;
 import java.util.Map;
 
-public class TestStormApplication extends StormApplication<TestStormApplication.TestStormAppConfig>{
+@Ignore
+public class TestStormApplication extends StormApplication{
     @Override
-    public StormTopology execute(TestStormAppConfig config, StormEnvironment environment) {
+    public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("metric_spout", new RandomEventSpout(), config.getSpoutNum());
-        builder.setBolt("sink_1",environment.getFlattenStreamSink("TEST_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
-        builder.setBolt("sink_2",environment.getFlattenStreamSink("TEST_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setSpout("metric_spout", new RandomEventSpout(), config.getInt("spoutNum"));
+        builder.setBolt("sink_1",environment.getStreamSink("TEST_STREAM_1",config)).fieldsGrouping("metric_spout",new Fields("metric"));
+        builder.setBolt("sink_2",environment.getStreamSink("TEST_STREAM_2",config)).fieldsGrouping("metric_spout",new Fields("metric"));
         return builder.createTopology();
-    }
-
-    public final static class TestStormAppConfig extends Configuration{
-        private int spoutNum = 1;
-
-        public int getSpoutNum() {
-            return spoutNum;
-        }
-
-        public void setSpoutNum(int spoutNum) {
-            this.spoutNum = spoutNum;
-        }
     }
 
     private class RandomEventSpout extends BaseRichSpout {
@@ -71,12 +66,41 @@ public class TestStormApplication extends StormApplication<TestStormApplication.
     }
 
     public final static class Provider extends AbstractApplicationProvider<TestStormApplication> {
-        public Provider(){
-            super("TestApplicationMetadata.xml");
+        @Override
+        protected String getMetadata() {
+            return "TestApplicationMetadata.xml";
         }
+
         @Override
         public TestStormApplication getApplication() {
             return new TestStormApplication();
+        }
+
+        @Override
+        public void register(ModuleRegistry registry) {
+            registry.register(MemoryMetadataStore.class, new AbstractModule() {
+                @Override
+                protected void configure() {
+                    bind(ExtendedDao.class).to(ExtendedDaoImpl.class);
+                }
+            });
+        }
+    }
+
+    private interface ExtendedDao{
+        Class<? extends ExtendedDao> getType();
+    }
+
+    private class ExtendedDaoImpl implements ExtendedDao {
+        private final Config config;
+
+        @Inject
+        public ExtendedDaoImpl(Config config){
+            this.config = config;
+        }
+        @Override
+        public Class<? extends ExtendedDao> getType() {
+            return ExtendedDaoImpl.class;
         }
     }
 }

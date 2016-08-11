@@ -21,7 +21,6 @@ package org.apache.eagle.service.application;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.policy.common.Constants;
 import org.apache.eagle.service.application.dao.ApplicationManagerDAO;
 import org.apache.eagle.service.application.dao.ApplicationManagerDaoImpl;
 import org.apache.eagle.service.application.entity.TopologyExecutionStatus;

@@ -18,8 +18,8 @@
 
 package org.apache.eagle.jpm.mr.history.entities;
 
-import org.apache.eagle.jpm.mr.history.common.JPAConstants;
-import org.apache.eagle.jpm.mr.history.jobcounter.JobCounters;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -27,7 +27,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Table("eaglejpa_task")
 @ColumnFamily("f")
 @Prefix("taexec")
-@Service(JPAConstants.JPA_TASK_ATTEMPT_EXECUTION_SERVICE_NAME)
+@Service(Constants.JPA_TASK_ATTEMPT_EXECUTION_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
