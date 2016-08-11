@@ -83,3 +83,4 @@ application-local.conf
 **/*.pyc
 
 site/
+**/*.db

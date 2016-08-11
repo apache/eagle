@@ -1,4 +1,6 @@
-/*
+package org.apache.eagle.common.function;
+
+/**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,26 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.test;
-
-import com.google.inject.AbstractModule;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- * Defines the Guice Modules in use in the test class.
- *
- * @version $Id$
- */
-@Inherited
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Modules {
-    /**
-     * The Guice Modules classes needed by the class under test.
-     */
-    Class<? extends AbstractModule>[] value();
+@FunctionalInterface
+public interface ThrowableConsumer2<T1,T2, E extends Throwable> {
+    void accept(T1 o1,T2 o2) throws E;
 }
