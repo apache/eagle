@@ -14,8 +14,7 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache</groupId>
@@ -125,17 +124,18 @@
     </developers>
     <modules>
         <module>eagle-core</module>
-        <module>eagle-webservice</module>
+        <!--<module>eagle-webservice</module>-->
         <module>eagle-security</module>
         <module>eagle-external</module>
-        <module>eagle-assembly</module>
+        <!--<module>eagle-assembly</module>-->
         <module>eagle-topology-assembly</module>
         <module>eagle-examples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
         <module>eagle-server</module>
         <module>eagle-jpm</module>
-    </modules>
+        <module>eagle-server-assembly</module>
+  </modules>
     <properties>
         <!-- General Properties -->
         <java.version>1.8</java.version>
@@ -169,7 +169,7 @@
 
         <mapr-hive.version>1.2.0-mapr-1510</mapr-hive.version>
         <mapr-hadoop.version>2.7.0-mapr-1506</mapr-hadoop.version>
-        <maprfs.version>5.0.0-mapr</maprfs.version>
+        <maprfs.version>5.1.0-mapr</maprfs.version>
         <mapr-hbase.version>0.98.9-mapr-1503</mapr-hbase.version>
 
         <spark.core.version>1.4.0</spark.core.version>
@@ -193,6 +193,7 @@
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-io.version>2.4</commons-io.version>
         <guice.version>3.0</guice.version>
+        <httpclient.version>4.5.2</httpclient.version>
 
         <!-- Configuration -->
         <archaius.version>0.6.1</archaius.version>
@@ -234,7 +235,7 @@
         <storm-kafka.version>0.10.0</storm-kafka.version>
         <storm.version>0.9.3</storm.version>
 
-        <mapr-kafka.version>0.8.1.1</mapr-kafka.version>
+        <mapr-kafka.version>0.9.0.0-mapr-1607</mapr-kafka.version>
         <mapr-kafka-clients.version>0.8.3-mapr-1509</mapr-kafka-clients.version>
         <mapr-storm-kafka.version>0.9.3</mapr-storm-kafka.version>
         <mapr-storm.version>0.9.3-mapr-1509</mapr-storm.version>
@@ -274,7 +275,7 @@
         <javax.mail.version>1.4</javax.mail.version>
         <extcos4.version>0.4b</extcos4.version>
         <extcos3.version>0.3b</extcos3.version>
-        <siddhi.version>3.0.5</siddhi.version>
+        <siddhi.version>3.1.1</siddhi.version>
 
         <!-- Testing -->
         <junit.version>4.12</junit.version>
@@ -302,6 +303,7 @@
 
         <!-- dropwizard -->
         <dropwizard.version>0.7.1</dropwizard.version>
+        <dropwizard-guice.version>0.7.0.2</dropwizard-guice.version>
         <!-- checkstyle -->
         <checkstyle.path>eagle-dev/checkstyle/</checkstyle.path>
     </properties>
@@ -399,6 +401,16 @@
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mapr.hadoop</groupId>
+                <artifactId>maprfs</artifactId>
+                <version>${maprfs.version}</version>
+             </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
             </dependency>
 
             <!-- Configuration -->
@@ -541,6 +553,11 @@
                 <groupId>org.jgrapht</groupId>
                 <artifactId>jgrapht-core</artifactId>
                 <version>${jgrapht.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.version}</artifactId>
+                <version>${kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
@@ -823,6 +840,16 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-assets</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hubspot.dropwizard</groupId>
+                <artifactId>dropwizard-guice</artifactId>
+                <version>${dropwizard-guice.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-jersey-jaxrs</artifactId>
                 <version>${swagger.version}</version>
@@ -943,7 +970,7 @@
         <profile>
             <id>mapr</id>
             <!--<activation>-->
-            <!--<activeByDefault>true</activeByDefault>-->
+                <!--<activeByDefault>true</activeByDefault>-->
             <!--</activation>-->
             <repositories>
                 <repository>
@@ -964,11 +991,6 @@
                         <groupId>org.apache.hbase</groupId>
                         <artifactId>hbase-client</artifactId>
                         <version>${mapr-hbase.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.mapr.hadoop</groupId>
-                        <artifactId>maprfs</artifactId>
-                        <version>${maprfs.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.apache.hadoop</groupId>
@@ -1001,11 +1023,6 @@
                         <version>${mapr-hive.version}</version>
                     </dependency>
 
-                    <dependency>
-                        <groupId>org.apache.kafka</groupId>
-                        <artifactId>kafka_${scala.version}</artifactId>
-                        <version>${mapr-kafka.version}</version>
-                    </dependency>
                     <dependency>
                         <groupId>org.apache.storm</groupId>
                         <artifactId>storm-kafka</artifactId>
@@ -1201,7 +1218,7 @@
 
                                 <!-- TODO: fix it -->
                                 <exclude>**/webapp/**</exclude>
-
+                                <exclude>**/*.pid</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -1225,6 +1242,12 @@
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
             </releases>
+        </repository>
+        <repository>
+            <id>mapr-releases</id>
+            <url>http://repository.mapr.com/maven/</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
         </repository>
         <repository>
             <id>siddhi cep engine</id>
