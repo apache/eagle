@@ -165,7 +165,7 @@ public class TestAlertBolt {
     }
 
     @NotNull
-    private AlertBolt createAlertBolt(OutputCollector collector) {
+    public static AlertBolt createAlertBolt(OutputCollector collector) {
         Config config = ConfigFactory.load();
         PolicyGroupEvaluator policyGroupEvaluator = new PolicyGroupEvaluatorImpl("testPolicyGroupEvaluatorImpl");
         TestStreamRouterBolt.MockChangeService mockChangeService = new TestStreamRouterBolt.MockChangeService();
@@ -244,10 +244,10 @@ public class TestAlertBolt {
             PolicyDefinition def = new PolicyDefinition();
             def.setName("policy-definition");
             def.setInputStreams(Arrays.asList(streamId));
-
+            def.setOutputStreams(Arrays.asList("output"));
             PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
             definition.setType(PolicyStreamHandlers.NO_DATA_ALERT_ENGINE);
-            definition.setValue("PT0M,plain,1,host,host1");
+            definition.setValue("PT0M,provided,1,host,host1");
             def.setDefinition(definition);
 
             boltSpecs.getBoltPoliciesMap().put(bolt.getBoltId(), Arrays.asList(def));
@@ -341,5 +341,6 @@ public class TestAlertBolt {
         sp.setType(StreamPartition.Type.GROUPBY);
         return sp;
     }
+
 
 }

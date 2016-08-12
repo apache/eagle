@@ -1,0 +1,28 @@
+[
+  {
+    "type": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
+    "name": "kafka-testAlertStream",
+    "policyIds": [
+      "state_check_latency"
+    ],
+    "dedupIntervalMin": "PT1M",
+    "properties": {
+      "kafka_broker": "localhost:9092",
+      "topic": "latency_state_kafka1"
+    },
+    "serializer": "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
+  },
+  {
+    "type": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
+    "name": "kafka-testAlertStream_state",
+    "policyIds": [
+      "state_check_latency"
+    ],
+    "dedupIntervalMin": "PT1M",
+    "properties": {
+      "kafka_broker": "localhost:9092",
+      "topic": "latency_state_kafka2"
+    },
+    "serializer": "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
+  }
+]

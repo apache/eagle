@@ -1,0 +1,38 @@
+[
+  {
+    "name": "state_check_latency",
+    "definition": {
+      "type": "siddhi",
+      "value": "from perfmon_latency_stream#window.time(5 min) select host, timestamp, metric, pool, value, colo, convert(avg(value)/1000, 'int') as latencyState group by host insert into perfmon_latency_check_output;",
+      "inputStreams": [
+        "perfmon_latency_stream"
+      ],
+      "outputStreams": [
+        "perfmon_latency_check_output"
+      ]
+    },
+    "stateDefinition": {
+      "type": "siddhi",
+      "value": "from every a = perfmon_latency_check_output -> b = perfmon_latency_check_output[host == a.host and timestamp > a.timestamp] within 5 min select a.latencyState as fromState, b.latencyState as toState, b.timestamp as happenTime insert into perfmon_latency_check_output2",
+      "value1": "from every a = perfmon_latency_check_output[latencyState >= 1] -> b = perfmon_latency_check_output[host == a.host and latencyState != a.latencyState and timestamp > a.timestamp] within 5 min select a.latencyState as fromState, b.latencyState as toState, b.timestamp as happenTime insert into perfmon_latency_check_output2",
+      "inputStreams": [
+        "perfmon_latency_check_output"
+      ],
+      "outputStreams": [
+        "perfmon_latency_check_output2"
+      ]
+    },
+    "partitionSpec": [
+      {
+        "streamId": "perfmon_latency_stream",
+        "type": "GROUPBY",
+        "columns": [
+          "host"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT0M"
+        }
+      }
+    ]
+  }
+]

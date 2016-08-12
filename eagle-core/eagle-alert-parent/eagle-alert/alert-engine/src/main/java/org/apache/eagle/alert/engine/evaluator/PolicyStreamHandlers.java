@@ -19,23 +19,34 @@ package org.apache.eagle.alert.engine.evaluator;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.absence.AbsencePolicyHandler;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyHandler;
+import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyStateHandler;
 import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyHandler;
 
 import java.util.Map;
 
+/**
+ * TODO/FIXME: to support multiple stage definition in single policy. The methods in this class is not good to understand now.(Hard code of 0/1).
+ */
 public class PolicyStreamHandlers {
-    public static final String SIDDHI_ENGINE ="siddhi";
-    public static final String NO_DATA_ALERT_ENGINE ="nodataalert";
-    public static final String ABSENCE_ALERT_ENGINE ="absencealert";
+    public static final String SIDDHI_ENGINE = "siddhi";
+    public static final String NO_DATA_ALERT_ENGINE = "nodataalert";
+    public static final String ABSENCE_ALERT_ENGINE = "absencealert";
 
-    public static PolicyStreamHandler createHandler(String type, Map<String, StreamDefinition> sds){
-        if(SIDDHI_ENGINE.equals(type)) {
-            return new SiddhiPolicyHandler(sds);
-        }else if(NO_DATA_ALERT_ENGINE.equals(type)){
+    public static PolicyStreamHandler createHandler(String type, Map<String, StreamDefinition> sds) {
+        if (SIDDHI_ENGINE.equals(type)) {
+            return new SiddhiPolicyHandler(sds, 0);// // FIXME: 8/2/16 
+        } else if (NO_DATA_ALERT_ENGINE.equals(type)) {
             return new NoDataPolicyHandler(sds);
-        }else if(ABSENCE_ALERT_ENGINE.equals(type)){
+        } else if (ABSENCE_ALERT_ENGINE.equals(type)) {
             return new AbsencePolicyHandler(sds);
         }
         throw new IllegalArgumentException("Illegal policy stream handler type " + type);
+    }
+
+    public static PolicyStreamHandler createStateHandler(String type, Map<String, StreamDefinition> sds) {
+        if (SIDDHI_ENGINE.equals(type)) {
+            return new SiddhiPolicyStateHandler(sds, 1); //// FIXME: 8/2/16
+        }
+        throw new IllegalArgumentException("Illegal policy state handler type " + type);
     }
 }

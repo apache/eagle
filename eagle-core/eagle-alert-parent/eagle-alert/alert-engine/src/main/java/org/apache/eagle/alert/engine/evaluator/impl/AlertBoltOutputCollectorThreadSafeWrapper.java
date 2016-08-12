@@ -48,37 +48,39 @@ public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCol
     private final AutoAlertFlusher flusher;
     private final static int MAX_ALERT_DELAY_SECS = 10;
 
-    public AlertBoltOutputCollectorThreadSafeWrapper(OutputCollector outputCollector){
+    public AlertBoltOutputCollectorThreadSafeWrapper(OutputCollector outputCollector) {
         this.delegate = outputCollector;
         this.queue = new LinkedBlockingQueue<>();
         this.flusher = new AutoAlertFlusher(this);
-        this.flusher.setName(Thread.currentThread().getName()+"-alertFlusher");
+        this.flusher.setName(Thread.currentThread().getName() + "-alertFlusher");
         this.flusher.start();
     }
 
-    private static class AutoAlertFlusher extends Thread{
+    private static class AutoAlertFlusher extends Thread {
         private final AlertBoltOutputCollectorThreadSafeWrapper collector;
         private boolean stopped = false;
         private final static Logger LOG = LoggerFactory.getLogger(AutoAlertFlusher.class);
 
-        private AutoAlertFlusher(AlertBoltOutputCollectorThreadSafeWrapper collector){
+        private AutoAlertFlusher(AlertBoltOutputCollectorThreadSafeWrapper collector) {
             this.collector = collector;
         }
 
         @Override
         public void run() {
             LOG.info("Starting");
-            while(!this.stopped){
-                if(System.currentTimeMillis() - collector.lastFlushTime.get() >= MAX_ALERT_DELAY_SECS * 1000L){
+            while (!this.stopped) {
+                if (System.currentTimeMillis() - collector.lastFlushTime.get() >= MAX_ALERT_DELAY_SECS * 1000L) {
                     this.collector.flush();
                 }
                 try {
                     Thread.sleep(5000);
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             }
             LOG.info("Stopped");
         }
-        public void shutdown(){
+
+        public void shutdown() {
             LOG.info("Stopping");
             this.stopped = true;
         }
