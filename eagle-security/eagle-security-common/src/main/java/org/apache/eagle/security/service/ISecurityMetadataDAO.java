@@ -25,4 +25,8 @@ import java.util.Collection;
 public interface ISecurityMetadataDAO {
     Collection<HBaseSensitivityEntity> listHBaseSensitivies();
     OpResult addHBaseSensitivity(Collection<HBaseSensitivityEntity> h);
+    Collection<HdfsSensitivityEntity> listHdfsSensitivities();
+    OpResult addHdfsSensitivity(Collection<HdfsSensitivityEntity> h);
+    Collection<IPZoneEntity> listIPZones();
+    OpResult addIPZone(Collection<IPZoneEntity> h);
 }

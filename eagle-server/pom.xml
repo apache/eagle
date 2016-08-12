@@ -145,6 +145,18 @@
             <artifactId>eagle-security-hbase-web</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- hdfs audit log monitoring -->
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-hdfs-auditlog</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-hdfs-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>

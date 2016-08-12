@@ -54,6 +54,11 @@
   			<groupId>org.wso2.siddhi</groupId>
   			<artifactId>siddhi-extension-string</artifactId>
   		</dependency>
+		<dependency>
+			<groupId>org.apache.eagle</groupId>
+			<artifactId>eagle-metadata-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
 

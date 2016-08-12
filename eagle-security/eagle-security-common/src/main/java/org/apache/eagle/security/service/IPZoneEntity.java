@@ -14,28 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.security.service;
 
-package org.apache.eagle.service.security.hbase.resolver;
+/**
+ * Since 8/10/16.
+ */
+public class IPZoneEntity {
+    String iphost;
+    String securityZone;
 
-
-import com.typesafe.config.Config;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
-import org.apache.eagle.security.resolver.AbstractCommandResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-
-
-public class HbaseActionResolver extends AbstractCommandResolver {
-    public HbaseActionResolver(ApplicationEntityService entityService, Config eagleServerConfig){
-        
+    public String getIphost() {
+        return iphost;
     }
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseActionResolver.class);
-    private final String [] cmdStrs = {"ADMIN", "READ", "WRITE", "CREATE", "EXECUTE"};
 
-    @Override
-    public void init() {
-        this.setCommands(Arrays.asList(cmdStrs));
+    public void setIphost(String iphost) {
+        this.iphost = iphost;
+    }
+
+    public String getSecurityZone() {
+        return securityZone;
+    }
+
+    public void setSecurityZone(String securityZone) {
+        this.securityZone = securityZone;
     }
 }

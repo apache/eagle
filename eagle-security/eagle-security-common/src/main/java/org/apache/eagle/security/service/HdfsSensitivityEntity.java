@@ -14,28 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.security.service;
 
-package org.apache.eagle.service.security.hbase.resolver;
+/**
+ * Since 8/10/16.
+ */
+public class HdfsSensitivityEntity {
+    String site;
+    String filedir;
+    String sensitivityType;
 
-
-import com.typesafe.config.Config;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
-import org.apache.eagle.security.resolver.AbstractCommandResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-
-
-public class HbaseActionResolver extends AbstractCommandResolver {
-    public HbaseActionResolver(ApplicationEntityService entityService, Config eagleServerConfig){
-        
+    public String getSite() {
+        return site;
     }
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseActionResolver.class);
-    private final String [] cmdStrs = {"ADMIN", "READ", "WRITE", "CREATE", "EXECUTE"};
 
-    @Override
-    public void init() {
-        this.setCommands(Arrays.asList(cmdStrs));
+    public void setSite(String site) {
+        this.site = site;
+    }
+
+    public String getFiledir() {
+        return filedir;
+    }
+
+    public void setFiledir(String filedir) {
+        this.filedir = filedir;
+    }
+
+    public String getSensitivityType() {
+        return sensitivityType;
+    }
+
+    public void setSensitivityType(String sensitivityType) {
+        this.sensitivityType = sensitivityType;
     }
 }

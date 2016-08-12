@@ -26,6 +26,7 @@ import org.apache.eagle.security.entity.HbaseResourceEntity;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.security.service.HBaseSensitivityEntity;
 import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
 import org.apache.eagle.service.security.hbase.dao.HbaseMetadataDAOImpl;
 import org.apache.hadoop.conf.Configuration;
@@ -40,16 +41,15 @@ import java.util.regex.Pattern;
 @Path("/hbaseResource")
 public class HbaseMetadataBrowseWebResource {
     private static Logger LOG = LoggerFactory.getLogger(HbaseMetadataBrowseWebResource.class);
-    private MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
     final public static String HBASE_APPLICATION = "HBaseAuditLogApplication";
 
     private ApplicationEntityService entityService;
     private ISecurityMetadataDAO dao;
 
     @Inject
-    public HbaseMetadataBrowseWebResource(ApplicationEntityService entityService, ISecurityMetadataDAO metadataDAO){
+    public HbaseMetadataBrowseWebResource(ApplicationEntityService entityService, Config eagleServerConfig){
         this.entityService = entityService;
-        this.dao = metadataDAO;
+        this.dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
     }
 
     private Map<String, Map<String, String>> getAllSensitivities(){
@@ -147,8 +147,8 @@ public class HbaseMetadataBrowseWebResource {
         List<String> columns = null;
         List<HbaseResourceEntity> values = new ArrayList<>();
         try {
-            Config config = repo.getConfig(HBASE_APPLICATION, site);
-            Configuration conf = repo.convert(config);
+            Map<String, Object> config = getAppConfig(site, HBASE_APPLICATION);
+            Configuration conf = convert(config);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
             String tableName = String.format("%s:%s", namespace, table);
             columns = dao.getColumnFamilies(tableName);

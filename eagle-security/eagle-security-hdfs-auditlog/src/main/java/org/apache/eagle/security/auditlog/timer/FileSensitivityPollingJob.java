@@ -16,10 +16,14 @@
  */
 package org.apache.eagle.security.auditlog.timer;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.security.service.HdfsSensitivityEntity;
+import org.apache.eagle.security.service.IMetadataServiceClient;
+import org.apache.eagle.security.service.MetadataServiceClientImpl;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.security.entity.FileSensitivityAPIEntity;
 import org.quartz.Job;
@@ -29,9 +33,6 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.service.client.IEagleServiceClient;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
@@ -43,15 +44,15 @@ public class FileSensitivityPollingJob implements Job{
 			throws JobExecutionException {
 		JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
 		try{
-			List<FileSensitivityAPIEntity> ipZones = load(jobDataMap);
-			if(ipZones == null){
+			Collection<HdfsSensitivityEntity> sensitivityAPIEntities = load(jobDataMap);
+			if(sensitivityAPIEntities == null){
 				LOG.warn("File sensitivity information is empty");
 				return;
 			}
-			Map<String, FileSensitivityAPIEntity> map = Maps.uniqueIndex(ipZones, new Function<FileSensitivityAPIEntity, String>(){
+			Map<String, HdfsSensitivityEntity> map = Maps.uniqueIndex(sensitivityAPIEntities, new Function<HdfsSensitivityEntity, String>(){
 				@Override
-				public String apply(FileSensitivityAPIEntity input) {
-					return input.getTags().get("filedir");
+				public String apply(HdfsSensitivityEntity input) {
+					return input.getFiledir();
 				}
 			});
 			ExternalDataCache.getInstance().setJobResult(getClass(), map);
@@ -60,7 +61,7 @@ public class FileSensitivityPollingJob implements Job{
 		}
 	}
 
-	private List<FileSensitivityAPIEntity> load(JobDataMap jobDataMap) throws Exception{
+	private Collection<HdfsSensitivityEntity> load(JobDataMap jobDataMap) throws Exception{
 		Map<String, Object> map = (Map<String,Object>)jobDataMap.get(EagleConfigConstants.EAGLE_SERVICE);
 		String eagleServiceHost = (String)map.get(EagleConfigConstants.HOST);
 		Integer eagleServicePort = Integer.parseInt(map.get(EagleConfigConstants.PORT).toString());
@@ -68,15 +69,7 @@ public class FileSensitivityPollingJob implements Job{
 		String password = map.containsKey(EagleConfigConstants.PASSWORD) ? (String)map.get(EagleConfigConstants.PASSWORD) : null;
 		// load from eagle database
 		LOG.info("Load file sensitivity information from eagle service " + eagleServiceHost + ":" + eagleServicePort);
-		IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
-		String query = "FileSensitivityService[]{*}";
-		GenericServiceAPIResponseEntity<FileSensitivityAPIEntity> response = client.search()
-			.pageSize(Integer.MAX_VALUE)
-			.query(query)
-			.send();
-		client.close();
-		if(response.getException() != null)
-			throw new IllegalStateException(response.getException());
-		return response.getObj();
+		IMetadataServiceClient client = new MetadataServiceClientImpl(eagleServiceHost, eagleServicePort, "/rest");
+		return client.listHdfsSensitivities();
 	}
 }
