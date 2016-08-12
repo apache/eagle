@@ -52,7 +52,7 @@ public class AppJUnitRunner extends BlockJUnit4ClassRunner {
             throws InitializationError {
         final List<Module> modules = new ArrayList<>();
 
-        AppTestGuiceModule testGuiceModule = new AppTestGuiceModule();
+        ApplicationTestGuiceModule testGuiceModule = new ApplicationTestGuiceModule();
 
         // Add default modules
         modules.add(testGuiceModule);

@@ -99,20 +99,23 @@ public class SparkRunningConfigManager implements Serializable {
     }
 
     public static SparkRunningConfigManager getInstance(String[] args) {
-        manager.init(args);
-        return manager;
-    }
-
-    private void init(String[] args) {
         try {
             LOG.info("Loading from configuration file");
-            this.config = new ConfigOptionParser().load(args);
+            manager.init(new ConfigOptionParser().load(args));
         } catch (Exception e) {
             LOG.error("failed to load config");
         }
+        return manager;
+    }
 
+    public static SparkRunningConfigManager getInstance(Config config) {
+        manager.init(config);
+        return manager;
+    }
+
+    private void init(Config config){
+        this.config = config;
         this.env = config.getString("envContextConfig.env");
-
         this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");
         this.zkStateConfig.zkPort = config.getString("zookeeperConfig.zkPort");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeperConfig.zkSessionTimeoutMs");

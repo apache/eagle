@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * Application test simulator for developer to quickly run application without diving into application lifecycle
  */
-public abstract class ServerSimulator {
+public abstract class ApplicationSimulator {
     /**
      *
      * @param appType
@@ -54,17 +54,17 @@ public abstract class ServerSimulator {
      */
     public abstract void start(Class<? extends ApplicationProvider> appProviderClass, Map<String,Object> appConfig) throws Exception;
 
-    public static ServerSimulator getInstance(){
-        return Guice.createInjector(new AppTestGuiceModule()).getInstance(ServerSimulator.class);
+    public static ApplicationSimulator getInstance(){
+        return Guice.createInjector(new ApplicationTestGuiceModule()).getInstance(ApplicationSimulator.class);
     }
 
     /**
      * @param modules additional modules
-     * @return ServerSimulator instance
+     * @return ApplicationSimulator instance
      */
-    public static ServerSimulator getInstance(Module ... modules){
+    public static ApplicationSimulator getInstance(Module ... modules){
         List<Module> contextModules = Arrays.asList(modules);
-        contextModules.add(new AppTestGuiceModule());
-        return Guice.createInjector(contextModules).getInstance(ServerSimulator.class);
+        contextModules.add(new ApplicationTestGuiceModule());
+        return Guice.createInjector(contextModules).getInstance(ApplicationSimulator.class);
     }
 }
