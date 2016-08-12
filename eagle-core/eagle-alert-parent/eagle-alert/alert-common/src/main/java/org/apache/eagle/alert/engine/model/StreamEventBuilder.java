@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.alert.engine.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class StreamEventBuilder{
     private final static Logger LOG = LoggerFactory.getLogger(StreamEventBuilder.class);
@@ -71,6 +71,11 @@ public class StreamEventBuilder{
 
     public StreamEventBuilder timestamep(long timestamp){
         instance.setTimestamp(timestamp);
+        return this;
+    }
+
+    public StreamEventBuilder metaVersion(String metaVersion){
+        instance.setMetaVersion(metaVersion);
         return this;
     }
 

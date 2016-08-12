@@ -16,16 +16,16 @@
  */
 package org.apache.eagle.alert.engine.model;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.utils.DateTimeUtil;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.utils.DateTimeUtil;
 
 /**
  * @since Apr 5, 2016
@@ -37,6 +37,7 @@ public class StreamEvent implements Serializable {
     private String streamId;
     private Object[] data;
     private long timestamp;
+    private String metaVersion;
 
     public StreamEvent(){}
 
@@ -44,6 +45,13 @@ public class StreamEvent implements Serializable {
         this.setStreamId(streamId);
         this.setTimestamp(timestamp);
         this.setData(data);
+    }
+
+    public StreamEvent(String streamId,long timestamp,Object[] data,String metaVersion){
+        this.setStreamId(streamId);
+        this.setTimestamp(timestamp);
+        this.setData(data);
+        this.setMetaVersion(metaVersion);
     }
 
     public String getStreamId() {
@@ -70,9 +78,17 @@ public class StreamEvent implements Serializable {
         this.timestamp = timestamp;
     }
 
+    public String getMetaVersion() {
+        return metaVersion;
+    }
+
+    public void setMetaVersion(String metaVersion) {
+        this.metaVersion = metaVersion;
+    }
+
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(streamId).append(timestamp).append(data).build();
+        return new HashCodeBuilder().append(streamId).append(timestamp).append(data).append(metaVersion).build();
     }
 
     @Override
@@ -97,7 +113,7 @@ public class StreamEvent implements Serializable {
                 }
             }
         }
-        return String.format("StreamEvent[stream=%S,timestamp=%s,data=[%s]]",this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()), StringUtils.join(dataStrings,","));
+        return String.format("StreamEvent[stream=%S,timestamp=%s,data=[%s],metaVersion=%s]",this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()), StringUtils.join(dataStrings,","), this.getMetaVersion());
     }
 
     public static StreamEventBuilder Builder(){
@@ -112,6 +128,7 @@ public class StreamEvent implements Serializable {
         newEvent.setTimestamp(this.getTimestamp());
         newEvent.setData(this.getData());
         newEvent.setStreamId(this.getStreamId());
+        newEvent.setMetaVersion(this.getMetaVersion());
         return newEvent;
     }
 
@@ -119,6 +136,7 @@ public class StreamEvent implements Serializable {
         this.setTimestamp(event.getTimestamp());
         this.setData(event.getData());
         this.setStreamId(event.getStreamId());
+        this.setMetaVersion(event.getMetaVersion());
     }
 
     /**

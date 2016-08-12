@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import backtype.storm.metric.api.MultiCountMetric;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import com.google.common.base.Preconditions;
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.StreamContext;
-import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
@@ -35,19 +35,20 @@ import org.apache.eagle.alert.utils.AlertConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-
-import com.google.common.base.Preconditions;
-import com.typesafe.config.Config;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"rawtypes", "serial"})
 public abstract class AbstractStreamBolt extends BaseRichBolt implements SerializationMetadataProvider {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractStreamBolt.class);
     private IMetadataChangeNotifyService changeNotifyService;
+
+    public Config getConfig() {
+        return config;
+    }
+
     private Config config;
     private List<String> outputStreamIds;
     protected OutputCollector collector;
@@ -57,6 +58,7 @@ public abstract class AbstractStreamBolt extends BaseRichBolt implements Seriali
     protected PartitionedEventSerializer serializer;
     protected volatile Map<String, StreamDefinition> sdf  = new HashMap<String, StreamDefinition>();
     protected volatile String specVersion = "Not Initialized";
+    protected volatile boolean specVersionOutofdate = false;
     protected StreamContext streamContext;
 
     public AbstractStreamBolt(String boltId, IMetadataChangeNotifyService changeNotifyService, Config config) {

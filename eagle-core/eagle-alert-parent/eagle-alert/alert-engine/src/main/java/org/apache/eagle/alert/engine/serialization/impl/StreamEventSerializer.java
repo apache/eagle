@@ -16,17 +16,17 @@
  */
 package org.apache.eagle.alert.engine.serialization.impl;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.BitSet;
-
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.engine.serialization.Serializer;
 import org.apache.eagle.alert.engine.serialization.Serializers;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.BitSet;
 
 /**
  * @see StreamEvent
@@ -55,7 +55,12 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
 
     @Override
     public void serialize(StreamEvent event, DataOutput dataOutput) throws IOException {
-        dataOutput.writeUTF(event.getStreamId());
+        // Bryant: here "metaVersion/streamId" writes to dataOutputUTF
+        String metaVersion = event.getMetaVersion();
+        String streamId = event.getStreamId();
+        String metaVersion_streamId = String.format("%s/%s", metaVersion, streamId);
+
+        dataOutput.writeUTF(metaVersion_streamId);
         dataOutput.writeLong(event.getTimestamp());
         if(event.getData() == null || event.getData().length == 0){
             dataOutput.writeInt(0);
@@ -82,7 +87,12 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
     @Override
     public StreamEvent deserialize(DataInput dataInput) throws IOException {
         StreamEvent event = new StreamEvent();
-        event.setStreamId(dataInput.readUTF());
+        String metaVersion_streamId = dataInput.readUTF();
+        String streamId = metaVersion_streamId.split("/")[1];
+        String metaVersion = metaVersion_streamId.split("/")[0];
+        event.setStreamId(streamId);
+        event.setMetaVersion(metaVersion);
+
         StreamDefinition definition = serializationMetadataProvider.getStreamDefinition(event.getStreamId());
         event.setTimestamp(dataInput.readLong());
         int isNullBytesLen = dataInput.readInt();

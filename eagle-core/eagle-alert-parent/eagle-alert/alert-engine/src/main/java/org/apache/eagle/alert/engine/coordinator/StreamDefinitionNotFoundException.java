@@ -31,4 +31,8 @@ public class StreamDefinitionNotFoundException extends IOException {
     public StreamDefinitionNotFoundException(String streamName, String specVersion) {
         super(String.format("Stream '%s' not found! Current spec version '%s'. Possibly metadata not loaded or metadata mismatch between upstream and alert bolts yet!", streamName, specVersion));
     }
+
+    public StreamDefinitionNotFoundException(String streamName, String streamMetaVersion, String specVersion) {
+        super(String.format("Stream '%s' has meta version '%s' which is different from current spec version '%s'.", streamName, streamMetaVersion, specVersion));
+    }
 }
