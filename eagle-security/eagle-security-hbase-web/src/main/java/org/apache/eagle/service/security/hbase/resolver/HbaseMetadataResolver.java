@@ -18,9 +18,9 @@
 
 package org.apache.eagle.service.security.hbase.resolver;
 
-
 import com.typesafe.config.Config;
-import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
@@ -32,10 +32,29 @@ import org.apache.hadoop.conf.Configuration;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
 public class HbaseMetadataResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
+    private ApplicationEntityService entityService;
+    public HbaseMetadataResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+        this.entityService = entityService;
+    }
+
+    private Map<String, Object> getAppConfig(String site, String appType){
+        ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
+        return entity.getConfiguration();
+    }
+
+    private Configuration convert(Map<String, Object> originalConfig) throws Exception {
+        Configuration config = new Configuration();
+        for (Map.Entry<String, Object> entry : originalConfig.entrySet()) {
+            config.set(entry.getKey().toString(), entry.getValue().toString());
+        }
+        return config;
+    }
+
     @Override
     public List<String> resolve(GenericAttributeResolveRequest request) throws AttributeResolveException {
         String query = request.getQuery().trim();
@@ -43,9 +62,8 @@ public class HbaseMetadataResolver implements AttributeResolvable<GenericAttribu
         String[] subResources = query.split(":");
 
         try {
-            MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
-            Config config = repo.getConfig(HbaseMetadataBrowseWebResource.HBASE_APPLICATION, site);
-            Configuration conf = repo.convert(config);
+            Map<String, Object> config = getAppConfig(site, HbaseMetadataBrowseWebResource.HBASE_APPLICATION);
+            Configuration conf = convert(config);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
 
             switch (subResources.length) {

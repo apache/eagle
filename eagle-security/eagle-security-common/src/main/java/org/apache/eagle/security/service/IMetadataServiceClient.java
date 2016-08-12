@@ -27,6 +27,10 @@ import java.util.Collection;
  * service stub to get metadata from remote metadata service
  */
 public interface IMetadataServiceClient extends Closeable, Serializable {
-    Collection<HBaseSensitivityEntity> listHBaseSensitivies();
+    Collection<HBaseSensitivityEntity> listHBaseSensitivities();
     OpResult addHBaseSensitivity(Collection<HBaseSensitivityEntity> h);
+    Collection<HdfsSensitivityEntity> listHdfsSensitivities();
+    OpResult addHdfsSensitivity(Collection<HdfsSensitivityEntity> h);
+    Collection<IPZoneEntity> listIPZones();
+    OpResult addIPZone(Collection<IPZoneEntity> h);
 }

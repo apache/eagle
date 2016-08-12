@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.service.security.hdfs.resolver;
 
+import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
@@ -33,6 +35,10 @@ import java.util.regex.Pattern;
 public class HDFSCommandResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
     private final static Logger LOG = LoggerFactory.getLogger(HDFSCommandResolver.class);
 
+    public HDFSCommandResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+
+    }
+    
     private final static String [] cmdStrs = {"open", "create", "append", "delete", "listfileinfo", "rename",
             "mkdirs", "listStatus", "setReplication", "setOwner", "setPermission", "setTimes", "setXAttr", "removeXAttr", "getXAttrs",
             "contentSummary", "createEncryptionZone", "checkAccess"};

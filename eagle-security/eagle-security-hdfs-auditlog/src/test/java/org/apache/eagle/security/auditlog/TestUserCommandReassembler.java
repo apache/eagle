@@ -22,6 +22,8 @@ package org.apache.eagle.security.auditlog;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
+import org.apache.eagle.security.hdfs.HDFSAuditLogParser;
 import org.junit.Assert;
 import org.junit.Test;
 import scala.Tuple2;
@@ -32,9 +34,18 @@ import java.util.*;
  * Created by yonzhang on 11/24/15.
  */
 public class TestUserCommandReassembler {
-    private Map<String, Object> parseEvent(String log){
-        HdfsAuditLogKafkaDeserializer deserializer = new HdfsAuditLogKafkaDeserializer(null);
-        return (Map<String, Object>)deserializer.deserialize(log.getBytes());
+    private Map parseEvent(String log) throws Exception{
+        HDFSAuditLogParser deserializer = new HDFSAuditLogParser();
+        HDFSAuditLogObject entity = deserializer.parse(log);
+        Map<String, Object> map = new TreeMap<String, Object>();
+        map.put("src", entity.src);
+        map.put("dst", entity.dst);
+        map.put("host", entity.host);
+        map.put("timestamp", entity.timestamp);
+        map.put("allowed", entity.allowed);
+        map.put("user", entity.user);
+        map.put("cmd", entity.cmd);
+        return map;
     }
 
     /**

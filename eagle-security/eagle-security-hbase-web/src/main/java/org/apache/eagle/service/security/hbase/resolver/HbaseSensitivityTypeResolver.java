@@ -17,22 +17,42 @@
 
 package org.apache.eagle.service.security.hbase.resolver;
 
+import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.security.resolver.AbstractSensitivityTypeResolver;
-import org.apache.eagle.service.security.hbase.HbaseSensitivityResourceService;
+import org.apache.eagle.security.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HbaseSensitivityTypeResolver extends AbstractSensitivityTypeResolver {
     private final static Logger LOG = LoggerFactory.getLogger(HbaseSensitivityTypeResolver.class);
+    private ISecurityMetadataDAO dao;
+
+    public HbaseSensitivityTypeResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+        // todo I know this is ugly, but push abstraction to later
+        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
+    }
 
     @Override
     public void init() {
-        HbaseSensitivityResourceService dao = new HbaseSensitivityResourceService();
-        Map<String, Map<String, String>> maps = dao.getAllHbaseSensitivityMap();
+        Map<String, Map<String, String>> maps = getAllSensitivities();
         this.setSensitivityMaps(maps);
     }
 
+    private Map<String, Map<String, String>> getAllSensitivities(){
+        Map<String, Map<String, String>> all = new HashMap<>();
+        Collection<HBaseSensitivityEntity> entities = dao.listHBaseSensitivies();
+        for(HBaseSensitivityEntity entity : entities){
+            if(!all.containsKey(entity.getSite())){
+                all.put(entity.getSite(), new HashMap<>());
+            }
+            all.get(entity.getSite()).put(entity.getHbaseResource(), entity.getSensitivityType());
+        }
+        return all;
+    }
 }
 

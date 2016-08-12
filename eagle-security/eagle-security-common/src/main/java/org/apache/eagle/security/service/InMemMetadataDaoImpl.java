@@ -37,6 +37,9 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
     private static final Logger LOG = LoggerFactory.getLogger(InMemMetadataDaoImpl.class);
 
     private Map<Pair<String, String>, HBaseSensitivityEntity> hBaseSensitivityEntities = new HashMap<>();
+    private Map<Pair<String, String>, HdfsSensitivityEntity> hdfsSensitivityEntities = new HashMap<>();
+    private Map<String, IPZoneEntity> ipZones = new HashMap<>();
+
 
     @Inject
     public InMemMetadataDaoImpl() {
@@ -52,6 +55,33 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
         for (HBaseSensitivityEntity e : h) {
             Pair p = new ImmutablePair<>(e.getSite(), e.getHbaseResource());
             hBaseSensitivityEntities.put(p, e);
+        }
+        return new OpResult();
+    }
+
+    @Override
+    public Collection<HdfsSensitivityEntity> listHdfsSensitivities() {
+        return hdfsSensitivityEntities.values();
+    }
+
+    @Override
+    public OpResult addHdfsSensitivity(Collection<HdfsSensitivityEntity> h) {
+        for(HdfsSensitivityEntity e : h){
+            Pair p = new ImmutablePair<>(e.getSite(), e.getFiledir());
+            hdfsSensitivityEntities.put(p, e);
+        }
+        return new OpResult();
+    }
+
+    @Override
+    public Collection<IPZoneEntity> listIPZones() {
+        return ipZones.values();
+    }
+
+    @Override
+    public OpResult addIPZone(Collection<IPZoneEntity> h) {
+        for(IPZoneEntity e : h){
+            ipZones.put(e.getIphost(), e);
         }
         return new OpResult();
     }

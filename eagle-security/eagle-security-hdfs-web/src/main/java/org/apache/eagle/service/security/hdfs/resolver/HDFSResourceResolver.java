@@ -18,16 +18,19 @@ package org.apache.eagle.service.security.hdfs.resolver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
 
+import org.apache.eagle.service.security.hdfs.rest.HDFSResourceWebResource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
@@ -45,6 +48,12 @@ import org.apache.eagle.service.security.hdfs.HDFSResourceConstants;
  */
 public class HDFSResourceResolver  implements AttributeResolvable<GenericAttributeResolveRequest,String> {
 	private final static Logger LOG = LoggerFactory.getLogger(HDFSResourceResolver.class);
+	private ApplicationEntityService entityService;
+
+	public HDFSResourceResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+		this.entityService = entityService;
+	}
+
 	/**
 	 * HDFS Resource Resolve API
 	 *
@@ -54,10 +63,9 @@ public class HDFSResourceResolver  implements AttributeResolvable<GenericAttribu
 	public List<String> resolve(GenericAttributeResolveRequest request)
 			throws AttributeResolveException {
 		List<String> result = new ArrayList<>();
-		MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
 		try {
-			Config config = repo.getConfig(HDFSResourceConstants.HDFS_APPLICATION, request.getSite().trim());
-			Configuration conf = repo.convert(config);
+			Map<String, Object> config = getAppConfig(request.getSite(), HDFSResourceWebResource.HDFS_APPLICATION);
+			Configuration conf = convert(config);
 			HDFSFileSystem fileSystem = new HDFSFileSystem(conf);
 			String query = request.getQuery().trim();
 			List<FileStatus> fileStatuses = null;
@@ -84,6 +92,19 @@ public class HDFSResourceResolver  implements AttributeResolvable<GenericAttribu
 			LOG.error(" Exception in HDFS Resource Resolver ", e);
 			throw new AttributeResolveException(e);
 		}
+	}
+
+	private Map<String, Object> getAppConfig(String site, String appType){
+		ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
+		return entity.getConfiguration();
+	}
+
+	private Configuration convert(Map<String, Object> originalConfig) throws Exception {
+		Configuration config = new Configuration();
+		for (Map.Entry<String, Object> entry : originalConfig.entrySet()) {
+			config.set(entry.getKey().toString(), entry.getValue().toString());
+		}
+		return config;
 	}
 
 	/**

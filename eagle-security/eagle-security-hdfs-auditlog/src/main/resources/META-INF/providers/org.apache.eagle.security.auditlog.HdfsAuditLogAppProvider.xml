@@ -1,34 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
   ~ /*
-  ~  * Licensed to the Apache Software Foundation (ASF) under one or more
-  ~  * contributor license agreements.  See the NOTICE file distributed with
-  ~  * this work for additional information regarding copyright ownership.
-  ~  * The ASF licenses this file to You under the Apache License, Version 2.0
-  ~  * (the "License"); you may not use this file except in compliance with
-  ~  * the License.  You may obtain a copy of the License at
-  ~  * <p/>
-  ~  * http://www.apache.org/licenses/LICENSE-2.0
-  ~  * <p/>
-  ~  * Unless required by applicable law or agreed to in writing, software
-  ~  * distributed under the License is distributed on an "AS IS" BASIS,
-  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~  * See the License for the specific language governing permissions and
-  ~  * limitations under the License.
+  ~  *
+  ~  *  * Licensed to the Apache Software Foundation (ASF) under one or more
+  ~  *  * contributor license agreements.  See the NOTICE file distributed with
+  ~  *  * this work for additional information regarding copyright ownership.
+  ~  *  * The ASF licenses this file to You under the Apache License, Version 2.0
+  ~  *  * (the "License"); you may not use this file except in compliance with
+  ~  *  * the License.  You may obtain a copy of the License at
+  ~  *  * <p/>
+  ~  *  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *  * <p/>
+  ~  *  * Unless required by applicable law or agreed to in writing, software
+  ~  *  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  *  * See the License for the specific language governing permissions and
+  ~  *  * limitations under the License.
+  ~  *
   ~  */
   -->
 
 <application>
-    <type>HbaseAuditLogApplication</type>
-    <name>Hbase Audit Log Monitoring Application</name>
+    <type>HdfsAuditLogApplication</type>
+    <name>Hdfs Audit Log Monitoring Application</name>
     <version>0.5.0-incubating</version>
-    <appClass>org.apache.eagle.security.hbase.HBaseAuditLogApplication</appClass>
+    <appClass>org.apache.eagle.security.auditlog.HdfsAuditLogApplication</appClass>
     <viewPath>/apps/example</viewPath>
     <configuration>
         <property>
             <name>dataSourceConfig.topic</name>
             <displayName>dataSourceConfig.topic</displayName>
-            <value>hbase_audit_log</value>
+            <value>hdfs_audit_log</value>
             <description>data source topic</description>
         </property>
         <property>
@@ -70,7 +72,7 @@
         <property>
             <name>dataSourceConfig.consumerGroupId</name>
             <displayName>dataSourceConfig.consumerGroupId</displayName>
-            <value>eagle.hbaseaudit.consumer</value>
+            <value>eagle.hdfsaudit.consumer</value>
             <description>kafka consumer group Id</description>
         </property>
         <property>
@@ -154,7 +156,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>dataSinkConfig.topic</displayName>
-            <value>hbase_audit_log_parsed</value>
+            <value>hdfs_audit_log_parsed</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
@@ -176,30 +178,18 @@
             <description>serializer class Kafka message key</description>
         </property>
 
-        <!-- properties for attribute resolver-->
+        <!-- properties for hdfs file system access and attribute resolver-->
         <property>
-            <name>hbase.zookeeper.quorum</name>
-            <displayName>hbase.zookeeper.quorum</displayName>
-            <value>server.eagle.apache.org</value>
-            <description>hbase zookeeper endpoint host</description>
-        </property>
-        <property>
-            <name>hbase.zookeeper.property.clientPort</name>
-            <displayName>hbase.zookeeper.property.clientPort</displayName>
-            <value>2181</value>
-            <description>hbase zookeeper endpoint port</description>
-        </property>
-        <property>
-            <name>zookeeper.znode.parent</name>
-            <displayName>zookeeper.znode.parent</displayName>
-            <value>/hbase-unsecure</value>
-            <description>zookeeper znode parent for hbase</description>
+            <name>fs.defaultFS</name>
+            <displayName>fs.defaultFS</displayName>
+            <value>hdfs://server.eagle.apache.org:8020</value>
+            <description>hdfs endpoint</description>
         </property>
     </configuration>
     <streams>
         <stream>
-            <streamId>hbase_audit_log_stream</streamId>
-            <description>Hbase Audit Log Stream</description>
+            <streamId>hdfs_audit_log_stream</streamId>
+            <description>Hdfs Audit Log Stream</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>
@@ -224,34 +214,34 @@
     </streams>
     <docs>
         <install>
-            # Step 1: Create source kafka topic named "${site}_example_source_topic"
+# Step 1: Create source kafka topic named "${site}_example_source_topic"
 
-            ./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
+./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
 
-            # Step 2: Set up data collector to flow data into kafka topic in
+# Step 2: Set up data collector to flow data into kafka topic in
 
-            ./bin/logstash -f log_collector.conf
+./bin/logstash -f log_collector.conf
 
-            ## `log_collector.conf` sample as following:
+## `log_collector.conf` sample as following:
 
-            input {
+input {
 
-            }
-            filter {
+}
+filter {
 
-            }
-            output{
+}
+output{
 
-            }
+}
 
-            # Step 3: start application
+# Step 3: start application
 
-            # Step 4: monitor with featured portal or alert with policies
+# Step 4: monitor with featured portal or alert with policies
         </install>
         <uninstall>
-            # Step 1: stop and uninstall application
-            # Step 2: delete kafka topic named "${site}_example_source_topic"
-            # Step 3: stop logstash
+# Step 1: stop and uninstall application
+# Step 2: delete kafka topic named "${site}_example_source_topic"
+# Step 3: stop logstash
         </uninstall>
     </docs>
 </application>

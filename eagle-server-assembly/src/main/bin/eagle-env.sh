@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -13,5 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export JAVA_HOME=$(/usr/libexec/java_home -v 1.7)
-mvn -X exec:java -Dexec.mainClass="eagle.security.auditlog.HdfsAuditLogProcessorMain"
+# set EAGLE_HOME
+export EAGLE_HOME=$(dirname $0)/..
+
+# EAGLE_SERVICE_HOST, default is `hostname -f`
+export EAGLE_SERVICE_HOST=localhost
+
+# EAGLE_SERVICE_PORT, default is 9099
+export EAGLE_SERVICE_PORT=9099
+
+# EAGLE_SERVICE_USER
+export EAGLE_SERVICE_USER=admin
+
+# EAGLE_SERVICE_PASSWORD
+export EAGLE_SERVICE_PASSWD=secret
+
+export EAGLE_CLASSPATH=$EAGLE_HOME/conf
+
+# Add eagle shared library jars
+for file in `ls $EAGLE_HOME/lib`; do
+	EAGLE_CLASSPATH=$EAGLE_CLASSPATH:$EAGLE_HOME/lib/$file
+done

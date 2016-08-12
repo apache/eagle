@@ -16,9 +16,11 @@
  */
 package org.apache.eagle.service.alert.resolver;
 
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.service.common.EagleExceptionWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 
 import javax.ws.rs.*;
 import java.io.InputStream;
@@ -29,6 +31,15 @@ import java.util.List;
  */
 @Path("/stream")
 public class AttributeResolveResource {
+    private ApplicationEntityService entityService;
+    private Config eagleServerConfig;
+
+    @Inject
+    public AttributeResolveResource(ApplicationEntityService entityService, Config eagleServerConfig){
+        this.entityService = entityService;
+        this.eagleServerConfig = eagleServerConfig;
+    }
+
     @POST
     @Path("attributeresolve")
     @Consumes({"application/json"})
@@ -38,7 +49,7 @@ public class AttributeResolveResource {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
         try {
             if(resolver == null) throw new AttributeResolveException("resolver is null");
-            AttributeResolvable resolvable = AttributeResolverFactory.getAttributeResolver(resolver);
+            AttributeResolvable resolvable = AttributeResolverFactory.getAttributeResolver(resolver, entityService, eagleServerConfig);
             ObjectMapper objectMapper = new ObjectMapper();
             Class<?> resolveRequestClass = resolvable.getRequestClass();
             if(resolveRequestClass == null) throw new AttributeResolveException("Request class is null for resolver "+resolver);
@@ -63,7 +74,7 @@ public class AttributeResolveResource {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
         try {
             if(resolver == null) throw new AttributeResolveException("resolver is null");
-            AttributeResolvable resolvable = AttributeResolverFactory.getAttributeResolver(resolver);
+            AttributeResolvable resolvable = AttributeResolverFactory.getAttributeResolver(resolver, entityService, eagleServerConfig);
             Class<?> resolveRequestClass = resolvable.getRequestClass();
             if(resolveRequestClass == null) throw new AttributeResolveException("Request class is null for resolver "+resolver);
             GenericAttributeResolveRequest resolveRequest = new GenericAttributeResolveRequest(query,site);
