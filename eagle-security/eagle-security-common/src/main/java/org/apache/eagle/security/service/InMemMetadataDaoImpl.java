@@ -39,14 +39,14 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
     private Map<Pair<String, String>, HBaseSensitivityEntity> hBaseSensitivityEntities = new HashMap<>();
     private Map<Pair<String, String>, HdfsSensitivityEntity> hdfsSensitivityEntities = new HashMap<>();
     private Map<String, IPZoneEntity> ipZones = new HashMap<>();
-
+    private Map<Pair<String, String>, HiveSensitivityEntity> hiveSensitivityEntities = new HashMap<>();
 
     @Inject
     public InMemMetadataDaoImpl() {
     }
 
     @Override
-    public synchronized Collection<HBaseSensitivityEntity> listHBaseSensitivies() {
+    public synchronized Collection<HBaseSensitivityEntity> listHBaseSensitivities() {
         return hBaseSensitivityEntities.values();
     }
 
@@ -82,6 +82,20 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
     public OpResult addIPZone(Collection<IPZoneEntity> h) {
         for(IPZoneEntity e : h){
             ipZones.put(e.getIphost(), e);
+        }
+        return new OpResult();
+    }
+
+    @Override
+    public synchronized Collection<HiveSensitivityEntity> listHiveSensitivities() {
+        return hiveSensitivityEntities.values();
+    }
+
+    @Override
+    public synchronized OpResult addHiveSensitivity(Collection<HiveSensitivityEntity> h) {
+        for (HiveSensitivityEntity e : h) {
+            Pair p = new ImmutablePair<>(e.getSite(), e.getHiveResource());
+            hiveSensitivityEntities.put(p, e);
         }
         return new OpResult();
     }

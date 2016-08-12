@@ -54,7 +54,7 @@ public class HbaseMetadataBrowseWebResource {
 
     private Map<String, Map<String, String>> getAllSensitivities(){
         Map<String, Map<String, String>> all = new HashMap<>();
-        Collection<HBaseSensitivityEntity> entities = dao.listHBaseSensitivies();
+        Collection<HBaseSensitivityEntity> entities = dao.listHBaseSensitivities();
         for(HBaseSensitivityEntity entity : entities){
             if(!all.containsKey(entity.getSite())){
                 all.put(entity.getSite(), new HashMap<>());

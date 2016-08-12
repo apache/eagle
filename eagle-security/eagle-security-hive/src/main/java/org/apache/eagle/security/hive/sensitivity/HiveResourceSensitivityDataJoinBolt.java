@@ -16,9 +16,16 @@
  */
 package org.apache.eagle.security.hive.sensitivity;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import org.apache.eagle.jobrunning.storm.JobRunningContentFilterImpl;
 import org.apache.eagle.security.entity.HiveResourceSensitivityAPIEntity;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.security.util.ExternalDataJoiner;
@@ -33,22 +40,21 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExecutor2<String, Map> {
-    private final static Logger LOG = LoggerFactory.getLogger(
-            HiveResourceSensitivityDataJoinExecutor.class);
+public class HiveResourceSensitivityDataJoinBolt extends BaseRichBolt {
+    private final static Logger LOG = LoggerFactory.getLogger(HiveResourceSensitivityDataJoinBolt.class);
+    private OutputCollector collector;
     private Config config;
-    
-    @Override
-    public void prepareConfig(Config config) {
-        this.config = config;       
-    }
 
+    public HiveResourceSensitivityDataJoinBolt(Config config){
+        this.config = config;
+    }
     @Override
-    public void init() {
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
         // start hive resource data polling
         try {
             ExternalDataJoiner joiner = new ExternalDataJoiner(
-                    HiveResourceSensitivityPollingJob.class, config, "1");
+                    HiveResourceSensitivityPollingJob.class, config, context.getThisComponentId() + "." + context.getThisTaskIndex());
             joiner.start();
         } catch(Exception ex){
             LOG.error("Fail to bring up quartz scheduler.", ex);
@@ -57,10 +63,9 @@ public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExec
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
-        String user = (String)input.get(0);
-        Map<String, Object> event = (Map<String, Object>)input.get(1);
+    public void execute(Tuple input) {
+        String user = input.getString(0);
+        Map<String, Object> event = (Map<String, Object>)input.getValue(1);
         Map<String, HiveResourceSensitivityAPIEntity> map =
                 (Map<String, HiveResourceSensitivityAPIEntity>) ExternalDataCache
                         .getInstance()
@@ -92,9 +97,13 @@ public class HiveResourceSensitivityDataJoinExecutor extends JavaStormStreamExec
                 LOG.debug("After hive resource sensitivity lookup: " + newEvent);
             }
             LOG.info("After hive resource sensitivity lookup: " + newEvent);
-            outputCollector.collect(new Tuple2(
-                    user,
-                    newEvent));
+            collector.emit(Arrays.asList(user, newEvent));
+            collector.ack(input);
         }
+    }
+
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields("user", "message"));
     }
 }

@@ -16,6 +16,14 @@
  */
 package org.apache.eagle.service.security.hive.res;
 
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
+import org.apache.eagle.security.service.HiveSensitivityEntity;
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
 import org.apache.eagle.security.entity.HiveResourceEntity;
 import org.apache.eagle.service.security.hive.dao.*;
@@ -30,8 +38,16 @@ import java.util.regex.Pattern;
 @Path("/hiveResource")
 public class HiveMetadataBrowseWebResource {
     private static Logger LOG = LoggerFactory.getLogger(HiveMetadataBrowseWebResource.class);
-    private HiveSensitivityMetadataDAOImpl dao = new HiveSensitivityMetadataDAOImpl();
-    private Map<String, Map<String, String>> maps = dao.getAllHiveSensitivityMap();
+
+    final public static String HIVE_APPLICATION = "HiveQueryMonitoringApplication";
+    private ApplicationEntityService entityService;
+    private ISecurityMetadataDAO dao;
+
+    @Inject
+    public HiveMetadataBrowseWebResource(ApplicationEntityService entityService, Config eagleServerConfig){
+        this.entityService = entityService;
+        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
+    }
 
     @Path("/databases")
     @GET
@@ -43,8 +59,10 @@ public class HiveMetadataBrowseWebResource {
         List<String> databases = null;
         List<HiveResourceEntity> values = new ArrayList<>();
         try {
-            HiveMetadataAccessConfig config = new HiveMetadataAccessConfigDAOImpl().getConfig(site);
-            HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(config);
+            Map<String, Object> config = getAppConfig(site, HIVE_APPLICATION);
+            Config typesafeConfig  = ConfigFactory.parseMap(config);
+            HiveMetadataAccessConfig hiveConfig = HiveMetadataAccessConfig.config2Entity(typesafeConfig);
+            HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(hiveConfig);
             databases = dao.getDatabases();
         } catch(Exception ex){
             LOG.error("fail getting databases", ex);
@@ -74,8 +92,10 @@ public class HiveMetadataBrowseWebResource {
         List<String> tables = null;
         List<HiveResourceEntity> values = new ArrayList<>();
         try {
-            HiveMetadataAccessConfig config = new HiveMetadataAccessConfigDAOImpl().getConfig(site);
-            HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(config);
+            Map<String, Object> config = getAppConfig(site, HIVE_APPLICATION);
+            Config typesafeConfig  = ConfigFactory.parseMap(config);
+            HiveMetadataAccessConfig hiveConfig = HiveMetadataAccessConfig.config2Entity(typesafeConfig);
+            HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(hiveConfig);
             tables = dao.getTables(database);
         }catch(Exception ex){
             LOG.error("fail getting databases", ex);
@@ -104,8 +124,10 @@ public class HiveMetadataBrowseWebResource {
         List<String> columns = null;
         List<HiveResourceEntity> values = new ArrayList<>();
         try {
-            HiveMetadataAccessConfig config = new HiveMetadataAccessConfigDAOImpl().getConfig(site);
-            HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(config);
+            Map<String, Object> config = getAppConfig(site, HIVE_APPLICATION);
+            Config typesafeConfig  = ConfigFactory.parseMap(config);
+            HiveMetadataAccessConfig hiveConfig = HiveMetadataAccessConfig.config2Entity(typesafeConfig);
+            HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(hiveConfig);
             columns = dao.getColumns(database, table);
         }catch(Exception ex){
             LOG.error("fail getting databases", ex);
@@ -125,6 +147,7 @@ public class HiveMetadataBrowseWebResource {
     }
 
     String checkSensitivity(String site, String resource, Set<String> childSensitiveTypes) {
+        Map<String, Map<String, String>> maps = getAllSensitivities();
         String sensitiveType = null;
         if (maps != null && maps.get(site) != null) {
             Map<String, String> map = maps.get(site);
@@ -142,4 +165,20 @@ public class HiveMetadataBrowseWebResource {
         return sensitiveType;
     }
 
+    private Map<String, Map<String, String>> getAllSensitivities(){
+        Map<String, Map<String, String>> all = new HashMap<>();
+        Collection<HiveSensitivityEntity> entities = dao.listHiveSensitivities();
+        for(HiveSensitivityEntity entity : entities){
+            if(!all.containsKey(entity.getSite())){
+                all.put(entity.getSite(), new HashMap<>());
+            }
+            all.get(entity.getSite()).put(entity.getHiveResource(), entity.getSensitivityType());
+        }
+        return all;
+    }
+
+    private Map<String, Object> getAppConfig(String site, String appType){
+        ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
+        return entity.getConfiguration();
+    }
 }

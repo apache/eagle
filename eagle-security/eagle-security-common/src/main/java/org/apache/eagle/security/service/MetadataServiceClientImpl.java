@@ -46,6 +46,9 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     private static final String METADATA_LIST_HDFS_SENSITIVITY_PATH = "/metadata/security/hdfsSensitivity";
     private static final String METADATA_ADD_HDFS_SENSITIVITY_PATH = "/metadata/security/hdfsSensitivity";
 
+    private static final String METADATA_LIST_HIVE_SENSITIVITY_PATH = "/metadata/security/hiveSensitivity";
+    private static final String METADATA_ADD_HIVE_SENSITIVITY_PATH = "/metadata/security/hiveSensitivity";
+
     private static final String METADATA_LIST_IPZONE_PATH = "/metadata/security/ipzone";
     private static final String METADATA_ADD_IPZONE_PATH = "/metadata/security/ipzone";
 
@@ -138,6 +141,19 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     @Override
     public OpResult addIPZone(Collection<IPZoneEntity> h){
         WebResource r = client.resource(basePath + METADATA_ADD_IPZONE_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(h);
+        return new OpResult();
+    }
+
+    @Override
+    public Collection<HiveSensitivityEntity> listHiveSensitivities() {
+        return list(METADATA_LIST_HIVE_SENSITIVITY_PATH, new GenericType<List<HiveSensitivityEntity>>() {
+        });
+    }
+
+    @Override
+    public OpResult addHiveSensitivity(Collection<HiveSensitivityEntity> h) {
+        WebResource r = client.resource(basePath + METADATA_ADD_HIVE_SENSITIVITY_PATH);
         r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(h);
         return new OpResult();
     }

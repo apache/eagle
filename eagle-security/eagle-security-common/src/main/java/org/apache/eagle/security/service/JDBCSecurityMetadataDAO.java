@@ -114,7 +114,7 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
     }
 
     @Override
-    public Collection<HBaseSensitivityEntity> listHBaseSensitivies() {
+    public Collection<HBaseSensitivityEntity> listHBaseSensitivities() {
         return listEntities(HBASE_QUERY_ALL_STATEMENT, rs -> {
             try {
                 HBaseSensitivityEntity entity = new HBaseSensitivityEntity();
@@ -189,6 +189,34 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
             try {
                 statement.setString(1, e.getIphost());
                 statement.setString(2, e.getSecurityZone());
+            }catch(Exception ex){
+                throw new IllegalStateException(ex);
+            }
+            return statement;
+        });
+    }
+
+    @Override
+    public Collection<HiveSensitivityEntity> listHiveSensitivities() {
+        return listEntities(HIVE_QUERY_ALL_STATEMENT, rs -> {
+            try {
+                HiveSensitivityEntity entity = new HiveSensitivityEntity();
+                entity.setSite(rs.getString(1));
+                entity.setHiveResource(rs.getString(2));
+                entity.setSensitivityType(rs.getString(3));
+                return entity;
+            }catch(Exception ex){ throw new IllegalStateException(ex);}
+        });
+    }
+
+    @Override
+    public OpResult addHiveSensitivity(Collection<HiveSensitivityEntity> h) {
+        return addEntities(HIVE_INSERT_STATEMENT, h, (entity, statement) -> {
+            HiveSensitivityEntity e = (HiveSensitivityEntity)entity;
+            try {
+                statement.setString(1, e.getSite());
+                statement.setString(2, e.getHiveResource());
+                statement.setString(3, e.getSensitivityType());
             }catch(Exception ex){
                 throw new IllegalStateException(ex);
             }

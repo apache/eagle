@@ -12,10 +12,5 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-server:
-  applicationConnectors:
-    - type: http
-      port: 9090
-  adminConnectors:
-    - type: http
-      port: 9091
+
+org.apache.eagle.security.hive.jobrunning.HiveQueryMonitoringAppProvider

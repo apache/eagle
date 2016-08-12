@@ -16,35 +16,35 @@
  */
 package org.apache.eagle.security.hive.jobrunning;
 
-import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import org.apache.eagle.jobrunning.common.JobConstants;
 import org.apache.eagle.jobrunning.common.JobConstants.ResourceType;
 import org.apache.eagle.jobrunning.storm.JobRunningContentFilter;
 import org.apache.eagle.jobrunning.storm.JobRunningContentFilterImpl;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class JobConfigurationAdaptorExecutor extends JavaStormStreamExecutor2<String, Map> {
-	private static final long serialVersionUID = 1L;	
-	private static final Logger LOG = LoggerFactory.getLogger(JobConfigurationAdaptorExecutor.class);
+public class JobFilterBolt extends BaseRichBolt {
+	private static final Logger LOG = LoggerFactory.getLogger(JobFilterBolt.class);
+    private OutputCollector collector;
 	private JobRunningContentFilter filter;
-	
-	@Override
-	public void prepareConfig(Config config) {
-	}
 
-	@Override
-	public void init() {
-		filter = new JobRunningContentFilterImpl();
-	}
-	
+    @Override
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
+        filter = new JobRunningContentFilterImpl();
+    }
+
 	private Map<String, Object> convertMap(Map<String, String> configs) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		for (Entry<String, String> config : configs.entrySet()) {
@@ -54,12 +54,12 @@ public class JobConfigurationAdaptorExecutor extends JavaStormStreamExecutor2<St
 	}
 
     @Override
-    public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
-		String user = (String)input.get(0);
-        String jobId = (String)input.get(1);
-        ResourceType type = (ResourceType)input.get(2);
+    public void execute(Tuple input) {
+		String user = input.getString(0);
+        String jobId = input.getString(1);
+        ResourceType type = (ResourceType)input.getValue(2);
         if (type.equals(ResourceType.JOB_CONFIGURATION)) {
-            Map<String, String> configs = (Map<String, String>)input.get(3);
+            Map<String, String> configs = (Map<String, String>)input.getValue(3);
             if (filter.acceptJobConf(configs)) {
                 if(LOG.isDebugEnabled()) {
                     LOG.debug("Got a hive job, jobID: " + jobId + ", query: " + configs.get(JobConstants.HIVE_QUERY_STRING));
@@ -68,11 +68,17 @@ public class JobConfigurationAdaptorExecutor extends JavaStormStreamExecutor2<St
                 }
 
                 Map<String, Object> map = convertMap(configs);
-                outputCollector.collect(new Tuple2(user, map));
+                collector.emit(Arrays.asList(user, map));
             }
             else {
                 LOG.info("skip non hive job, jobId: " + jobId);
             }
         }
+        collector.ack(input);
+    }
+
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields("user", "message"));
     }
 }

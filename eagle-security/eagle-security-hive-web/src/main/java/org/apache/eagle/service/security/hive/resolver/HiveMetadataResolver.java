@@ -22,11 +22,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
 import org.apache.eagle.service.security.hive.dao.*;
+import org.apache.eagle.service.security.hive.res.HiveMetadataBrowseWebResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +41,12 @@ public class HiveMetadataResolver implements AttributeResolvable<GenericAttribut
     private final static String HIVE_ATTRIBUTE_RESOLVE_FORMAT_HINT =
             "hive metadata resolve must be {\"site\":\"${site}\", \"query\"=\"/{db}/{table}/{column}\"}";
 
+    private ApplicationEntityService entityService;
+
+    public HiveMetadataResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+        this.entityService = entityService;
+    }
+
     @Override
     public List<String> resolve(GenericAttributeResolveRequest request) throws AttributeResolveException {
         // query should be formatted as "/{db}/{table}/{column}" with "/" as leading character
@@ -44,8 +55,10 @@ public class HiveMetadataResolver implements AttributeResolvable<GenericAttribut
         String prefix = null;
 
         try {
-            HiveMetadataAccessConfig config = new HiveMetadataAccessConfigDAOImpl().getConfig(request.getSite());
-            HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(config);
+            Map<String, Object> config = getAppConfig(request.getSite(), HiveMetadataBrowseWebResource.HIVE_APPLICATION);
+            Config typesafeConfig  = ConfigFactory.parseMap(config);
+            HiveMetadataAccessConfig hiveConfig = HiveMetadataAccessConfig.config2Entity(typesafeConfig);
+            HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(hiveConfig);
             if (subResources.length == 0) { // query all databases with "/"
                 return filterAndCombineAttribue("/", dao.getDatabases(), null);
             }else if(subResources.length == 2){ // query all tables given a database
@@ -108,5 +121,10 @@ public class HiveMetadataResolver implements AttributeResolvable<GenericAttribut
     @Override
     public Class<GenericAttributeResolveRequest> getRequestClass() {
         return GenericAttributeResolveRequest.class;
+    }
+
+    private Map<String, Object> getAppConfig(String site, String appType){
+        ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
+        return entity.getConfiguration();
     }
 }
