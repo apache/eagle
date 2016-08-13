@@ -16,11 +16,15 @@
  */
 package org.apache.eagle.service.security.hive.resolver;
 
+import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
+import org.apache.eagle.security.service.HiveSensitivityEntity;
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
-import org.apache.eagle.service.security.hive.dao.HiveSensitivityMetadataDAOImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,17 +33,20 @@ import java.util.regex.Pattern;
 
 public class HiveSensitivityTypeResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
     private final static Logger LOG = LoggerFactory.getLogger(HiveSensitivityTypeResolver.class);
-    private HiveSensitivityMetadataDAOImpl dao = new HiveSensitivityMetadataDAOImpl();
-    private Map<String, Map<String, String>> maps = dao.getAllHiveSensitivityMap();
+    private ISecurityMetadataDAO dao;
+    private ApplicationEntityService entityService;
 
-
+    public HiveSensitivityTypeResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+        this.entityService = entityService;
+        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
+    }
     private final static String SENSITIVETYPE_ATTRIBUTE_RESOLVE_FORMAT_HINT = "Sensitive type should be composed of a-z, A-Z, 0-9 or -";
 
     public List<String> resolve(GenericAttributeResolveRequest request) throws AttributeResolveException {
         String query = request.getQuery().trim();
         String site = request.getSite().trim();
         List<String> res = new ArrayList<>();
-        Map<String, String> map = maps.get(site);
+        Map<String, String> map = getAllSensitivities().get(site);
 
         if(map == null) {
             return res;
@@ -69,5 +76,17 @@ public class HiveSensitivityTypeResolver implements AttributeResolvable<GenericA
     @Override
     public Class<GenericAttributeResolveRequest> getRequestClass() {
         return GenericAttributeResolveRequest.class;
+    }
+
+    private Map<String, Map<String, String>> getAllSensitivities(){
+        Map<String, Map<String, String>> all = new HashMap<>();
+        Collection<HiveSensitivityEntity> entities = dao.listHiveSensitivities();
+        for(HiveSensitivityEntity entity : entities){
+            if(!all.containsKey(entity.getSite())){
+                all.put(entity.getSite(), new HashMap<>());
+            }
+            all.get(entity.getSite()).put(entity.getHiveResource(), entity.getSensitivityType());
+        }
+        return all;
     }
 }

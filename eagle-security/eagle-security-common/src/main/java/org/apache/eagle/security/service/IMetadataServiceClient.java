@@ -33,4 +33,6 @@ public interface IMetadataServiceClient extends Closeable, Serializable {
     OpResult addHdfsSensitivity(Collection<HdfsSensitivityEntity> h);
     Collection<IPZoneEntity> listIPZones();
     OpResult addIPZone(Collection<IPZoneEntity> h);
+    Collection<HiveSensitivityEntity> listHiveSensitivities();
+    OpResult addHiveSensitivity(Collection<HiveSensitivityEntity> h);
 }

@@ -16,15 +16,18 @@
  */
 package org.apache.eagle.security.hive.jobrunning;
 
-import com.typesafe.config.Config;
-import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.JavaStormStreamExecutor2;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import org.apache.eagle.security.hive.ql.HiveQLParserContent;
 import org.apache.eagle.security.hive.ql.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -33,24 +36,17 @@ import java.util.TreeMap;
 /**
  * parse hive query log
  */
-public class HiveQueryParserExecutor extends JavaStormStreamExecutor2<String, Map> {
-	private static final long serialVersionUID = -5878930561335302957L;
-	private static final Logger LOG = LoggerFactory.getLogger(HiveQueryParserExecutor.class);
-
-	private Config config;
+public class HiveQueryParserBolt extends BaseRichBolt {
+	private static final Logger LOG = LoggerFactory.getLogger(HiveQueryParserBolt.class);
+    private OutputCollector collector;
 
     @Override
-	public void prepareConfig(Config config) {
-		this.config = config;
-	}
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
+    }
 
     @Override
-	public void init(){
-
-	}
-
-    @Override
-    public void flatMap(java.util.List<Object> input, Collector<Tuple2<String, Map>> outputCollector){
+    public void execute(Tuple input) {
         /**
          * hiveQueryLog includes the following key value pair
          * "hive.current.database" -> <database name>
@@ -58,9 +54,9 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor2<String, Ma
          * "mapreduce.job.user.name" -> <user name>
          * TODO we need hive job start and end time
          */
-        String user = (String)input.get(0);
+        String user = input.getString(0);
         @SuppressWarnings("unchecked")
-        Map<String, Object> hiveQueryLog = (Map<String, Object>)input.get(1);
+        Map<String, Object> hiveQueryLog = (Map<String, Object>)input.getValue(1);
         //if(LOG.isDebugEnabled()) LOG.debug("Receive hive query log: " + hiveQueryLog);
 
         String query = null;
@@ -149,6 +145,12 @@ public class HiveQueryParserExecutor extends JavaStormStreamExecutor2<String, Ma
         event.put("resource", resources.toString());
         LOG.info("HiveQL Parser event stream. " + event);
 
-        outputCollector.collect(new Tuple2(user, event));
+        collector.emit(Arrays.asList(user, event));
+        collector.ack(input);
+    }
+
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields("user", "message"));
     }
 }

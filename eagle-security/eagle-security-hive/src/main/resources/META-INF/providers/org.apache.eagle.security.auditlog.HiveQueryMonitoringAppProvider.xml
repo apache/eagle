@@ -15,85 +15,60 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <application>
-    <type>HbaseAuditLogApplication</type>
-    <name>Hbase Audit Log Monitoring Application</name>
+    <type>HiveQueryMonitoringApplication</type>
+    <name>Hdfs Audit Log Monitoring Application</name>
     <version>0.5.0-incubating</version>
-    <appClass>org.apache.eagle.security.hbase.HBaseAuditLogApplication</appClass>
+    <appClass>org.apache.eagle.security.auditlog.HdfsAuditLogApplication</appClass>
     <viewPath>/apps/example</viewPath>
     <configuration>
         <property>
-            <name>dataSourceConfig.topic</name>
-            <displayName>dataSourceConfig.topic</displayName>
-            <value>hbase_audit_log</value>
-            <description>data source topic</description>
+            <name>dataSourceConfig.zkQuorum</name>
+            <displayName>dataSourceConfig.zkQuorum</displayName>
+            <value>server.eagle.apache.org:2181</value>
+            <description>zookeeper quorum for storing hive job processing status</description>
         </property>
         <property>
-            <name>dataSourceConfig.zkConnection</name>
-            <displayName>dataSourceConfig.zkConnection</displayName>
-            <value>server.eagle.apache.org</value>
-            <description>zk connection</description>
+            <name>dataSourceConfig.zkRoot</name>
+            <displayName>dataSourceConfig.zkRoot</displayName>
+            <value>/jobrunning</value>
+            <description>zookeeper znode path for storing hive job processing status</description>
         </property>
         <property>
-            <name>dataSourceConfig.zkConnectionTimeoutMS</name>
-            <displayName>dataSourceConfig.zkConnectionTimeoutMS</displayName>
+            <name>dataSourceConfig.zkSessionTimeoutMs</name>
+            <displayName>dataSourceConfig.zkSessionTimeoutMs</displayName>
             <value>15000</value>
             <description>zk connection timeout in milliseconds</description>
         </property>
         <property>
-            <name>dataSourceConfig.fetchSize</name>
-            <displayName>dataSourceConfig.fetchSize</displayName>
-            <value>1048586</value>
-            <description>kafka fetch size</description>
+            <name>dataSourceConfig.zkRetryTimes</name>
+            <displayName>dataSourceConfig.zkRetryTimes</displayName>
+            <value>3</value>
+            <description>retry times when zookeeper fails</description>
         </property>
         <property>
-            <name>dataSourceConfig.transactionZKServers</name>
-            <displayName>dataSourceConfig.transactionZKServers</displayName>
-            <value>server.eagle.apache.org</value>
-            <description>zookeeper server for offset transaction</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.transactionZKPort</name>
-            <displayName>dataSourceConfig.transactionZKPort</displayName>
-            <value>2181</value>
-            <description>zookeeper server port for offset transaction</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.transactionZKRoot</name>
-            <displayName>dataSourceConfig.transactionZKRoot</displayName>
-            <value>/consumers</value>
-            <description>offset transaction root</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.consumerGroupId</name>
-            <displayName>dataSourceConfig.consumerGroupId</displayName>
-            <value>eagle.hbaseaudit.consumer</value>
-            <description>kafka consumer group Id</description>
-        </property>
-        <property>
-            <name>dataSourceConfig.transactionStateUpdateMS</name>
-            <displayName>dataSourceConfig.transactionStateUpdateMS</displayName>
+            <name>dataSourceConfig.zkRetryInterval</name>
+            <displayName>dataSourceConfig.zkRetryInterval</displayName>
             <value>2000</value>
-            <description>zk upate</description>
+            <description>interval for retrying when zookeeper fails</description>
         </property>
         <property>
-            <name>dataSourceConfig.schemeCls</name>
-            <displayName>dataSourceConfig.schemeCls</displayName>
-            <value>storm.kafka.StringScheme</value>
-            <description>scheme class</description>
+            <name>dataSourceConfig.RMEndPoints</name>
+            <displayName>dataSourceConfig.RMEndPoints</displayName>
+            <value>http://server.eagle.apache.org:8088/</value>
+            <description>resource manager endpoint</description>
         </property>
         <property>
-            <name>dataSourceConfig.transactionZKPort</name>
-            <displayName>dataSourceConfig.transactionZKPort</displayName>
-            <value>2181</value>
-            <description>zookeeper server port for offset transaction</description>
+            <name>dataSourceConfig.HSEndPoint</name>
+            <displayName>dataSourceConfig.HSEndPoint</displayName>
+            <value>http://server.eagle.apache.org:19888/</value>
+            <description>history server endpoint</description>
         </property>
         <property>
-            <name>dataSourceConfig.transactionZKPort</name>
-            <displayName>dataSourceConfig.transactionZKPort</displayName>
-            <value>2181</value>
-            <description>zookeeper server port for offset transaction</description>
+            <name>dataSourceConfig.partitionerCls</name>
+            <displayName>dataSourceConfig.partitionerCls</displayName>
+            <value>org.apache.eagle.job.DefaultJobPartitionerImpl</value>
+            <description>partition class for job</description>
         </property>
         <property>
             <name>topology.numOfSpoutTasks</name>
@@ -152,13 +127,13 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>dataSinkConfig.topic</displayName>
-            <value>hbase_audit_log_parsed</value>
+            <value>hive_query_parsed</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
             <name>dataSinkConfig.brokerList</name>
             <displayName>dataSinkConfig.brokerList</displayName>
-            <value>sandbox.hortonworks.com:6667</value>
+            <value>server.eagle.apache.org:6667</value>
             <description>kafka broker list</description>
         </property>
         <property>
@@ -174,30 +149,18 @@
             <description>serializer class Kafka message key</description>
         </property>
 
-        <!-- properties for attribute resolver-->
+        <!-- properties for hdfs file system access and attribute resolver-->
         <property>
-            <name>hbase.zookeeper.quorum</name>
-            <displayName>hbase.zookeeper.quorum</displayName>
-            <value>server.eagle.apache.org</value>
-            <description>hbase zookeeper endpoint host</description>
-        </property>
-        <property>
-            <name>hbase.zookeeper.property.clientPort</name>
-            <displayName>hbase.zookeeper.property.clientPort</displayName>
-            <value>2181</value>
-            <description>hbase zookeeper endpoint port</description>
-        </property>
-        <property>
-            <name>zookeeper.znode.parent</name>
-            <displayName>zookeeper.znode.parent</displayName>
-            <value>/hbase-unsecure</value>
-            <description>zookeeper znode parent for hbase</description>
+            <name>fs.defaultFS</name>
+            <displayName>fs.defaultFS</displayName>
+            <value>hdfs://server.eagle.apache.org:8020</value>
+            <description>hdfs endpoint</description>
         </property>
     </configuration>
     <streams>
         <stream>
-            <streamId>hbase_audit_log_stream</streamId>
-            <description>Hbase Audit Log Stream</description>
+            <streamId>hdfs_audit_log_stream</streamId>
+            <description>Hdfs Audit Log Stream</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>
@@ -222,34 +185,34 @@
     </streams>
     <docs>
         <install>
-            # Step 1: Create source kafka topic named "${site}_example_source_topic"
+# Step 1: Create source kafka topic named "${site}_example_source_topic"
 
-            ./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
+./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
 
-            # Step 2: Set up data collector to flow data into kafka topic in
+# Step 2: Set up data collector to flow data into kafka topic in
 
-            ./bin/logstash -f log_collector.conf
+./bin/logstash -f log_collector.conf
 
-            ## `log_collector.conf` sample as following:
+## `log_collector.conf` sample as following:
 
-            input {
+input {
 
-            }
-            filter {
+}
+filter {
 
-            }
-            output{
+}
+output{
 
-            }
+}
 
-            # Step 3: start application
+# Step 3: start application
 
-            # Step 4: monitor with featured portal or alert with policies
+# Step 4: monitor with featured portal or alert with policies
         </install>
         <uninstall>
-            # Step 1: stop and uninstall application
-            # Step 2: delete kafka topic named "${site}_example_source_topic"
-            # Step 3: stop logstash
+# Step 1: stop and uninstall application
+# Step 2: delete kafka topic named "${site}_example_source_topic"
+# Step 3: stop logstash
         </uninstall>
     </docs>
 </application>

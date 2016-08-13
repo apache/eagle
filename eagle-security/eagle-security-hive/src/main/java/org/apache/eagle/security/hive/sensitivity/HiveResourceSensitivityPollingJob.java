@@ -20,6 +20,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.security.service.HiveSensitivityEntity;
+import org.apache.eagle.security.service.IMetadataServiceClient;
+import org.apache.eagle.security.service.MetadataServiceClientImpl;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -31,6 +34,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -43,18 +47,18 @@ public class HiveResourceSensitivityPollingJob implements Job {
             throws JobExecutionException {
         JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
         try {
-            List<HiveResourceSensitivityAPIEntity>
+            Collection<HiveSensitivityEntity>
             hiveResourceSensitivity = load(jobDataMap);
             if(hiveResourceSensitivity == null) {
             	LOG.warn("Hive resource sensitivity information is empty");
             	return;
             }
-            Map<String, HiveResourceSensitivityAPIEntity> map = Maps.uniqueIndex(
+            Map<String, HiveSensitivityEntity> map = Maps.uniqueIndex(
             		hiveResourceSensitivity,
-            		new Function<HiveResourceSensitivityAPIEntity, String>() {
+            		new Function<HiveSensitivityEntity, String>() {
             			@Override
-            			public String apply(HiveResourceSensitivityAPIEntity input) {
-            				return input.getTags().get("hiveResource");
+            			public String apply(HiveSensitivityEntity input) {
+            				return input.getHiveResource();
             			}
             		});
             ExternalDataCache.getInstance().setJobResult(getClass(), map);
@@ -63,7 +67,7 @@ public class HiveResourceSensitivityPollingJob implements Job {
         }
     }
 
-    private List<HiveResourceSensitivityAPIEntity> load(JobDataMap jobDataMap) throws Exception {
+    private Collection<HiveSensitivityEntity> load(JobDataMap jobDataMap) throws Exception {
         Map<String, Object> map = (Map<String,Object>)jobDataMap.get(EagleConfigConstants.EAGLE_SERVICE);
         String eagleServiceHost = (String)map.get(EagleConfigConstants.HOST);
         Integer eagleServicePort = Integer.parseInt(map.get(EagleConfigConstants.PORT).toString());
@@ -74,13 +78,7 @@ public class HiveResourceSensitivityPollingJob implements Job {
         LOG.info("Load hive resource sensitivity information from eagle service "
             + eagleServiceHost + ":" + eagleServicePort);
 
-        IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
-        String query = "HiveResourceSensitivityService[]{*}";
-        GenericServiceAPIResponseEntity<HiveResourceSensitivityAPIEntity> response =
-                client.search().pageSize(Integer.MAX_VALUE).query(query).send();
-        client.close();
-        if (response.getException() != null)
-            throw new IllegalStateException(response.getException());
-        return response.getObj();
+        IMetadataServiceClient client = new MetadataServiceClientImpl(eagleServiceHost, eagleServicePort, "/rest");
+        return client.listHiveSensitivities();
     }
 }

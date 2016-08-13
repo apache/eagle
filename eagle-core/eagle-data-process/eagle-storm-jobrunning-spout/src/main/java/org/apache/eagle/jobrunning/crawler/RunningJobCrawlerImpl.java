@@ -231,10 +231,14 @@ public class RunningJobCrawlerImpl implements RunningJobCrawler{
 				if (controlConfig.jobInfoEnabled) {
 					addIntoProcessingQueueAndList(completedJobSet, queueOfCompleteJobInfo, ResourceType.JOB_COMPLETE_INFO);
 				}
-				Thread.sleep(20 * 1000);
 			} catch (Throwable t) {
 				LOG.error("Got a throwable in fetching job completed list :", t);
-			}						
+			}
+			try {
+				Thread.sleep(10 * 1000);
+			}catch(Exception ex){
+
+			}
 		}
 	}
 	

@@ -42,7 +42,7 @@ public class SecurityExternalMetadataResource {
     @GET
     @Produces("application/json")
     public Collection<HBaseSensitivityEntity> getHBaseSensitivites(@QueryParam("site") String site){
-        return dao.listHBaseSensitivies();
+        return dao.listHBaseSensitivities();
     }
 
     @Path("/hbaseSensitivity")
