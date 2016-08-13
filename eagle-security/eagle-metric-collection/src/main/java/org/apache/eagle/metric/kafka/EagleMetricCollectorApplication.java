@@ -16,13 +16,18 @@
  */
 package org.apache.eagle.metric.kafka;
 
+import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SchemeAsMultiScheme;
+import backtype.storm.topology.BoltDeclarer;
+import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
+import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.app.StormApplication;
+import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutProvider;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSourcedSpoutScheme;
-import org.apache.eagle.datastream.ExecutionEnvironments;
-import org.apache.eagle.datastream.storm.StormExecutionEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import storm.kafka.BrokerHosts;
@@ -35,13 +40,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class EagleMetricCollectorMain {
+/**
+ * Since 8/12/16.
+ */
+public class EagleMetricCollectorApplication extends StormApplication{
+    private static final Logger LOG = LoggerFactory.getLogger(EagleMetricCollectorApplication.class);
 
-    private static final Logger LOG = LoggerFactory.getLogger(EagleMetricCollectorMain.class);
+    public final static String SPOUT_TASK_NUM = "topology.numOfSpoutTasks";
+    public final static String DISTRIBUTION_TASK_NUM = "topology.numOfDistributionTasks";
 
-    public static void main(String[] args) throws Exception {
-        StormExecutionEnvironment env = ExecutionEnvironments.getStorm(args);
-        Config config = env.getConfig();
+    @Override
+    public StormTopology execute(Config config, StormEnvironment environment) {
         String deserClsName = config.getString("dataSourceConfig.deserializerClass");
         final KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, config) {
             @Override
@@ -52,7 +61,6 @@ public class EagleMetricCollectorMain {
                 return Arrays.asList(map.get("user"), map.get("timestamp"));
             }
         };
-
 
         // TODO: Refactored the anonymous in to independen class file, avoiding too complex logic in main method
         KafkaSourcedSpoutProvider kafkaMessageSpoutProvider = new KafkaSourcedSpoutProvider() {
@@ -114,9 +122,27 @@ public class EagleMetricCollectorMain {
             }
         };
 
-        env.fromSpout(new KafkaOffsetSourceSpoutProvider()).withOutputFields(0).nameAs("kafkaLogLagChecker");
-        env.fromSpout(kafkaMessageSpoutProvider).withOutputFields(2).nameAs("kafkaMessageFetcher").groupBy(Arrays.asList(0))
-                .flatMap(new KafkaMessageDistributionExecutor());
-        env.execute();
+        TopologyBuilder builder = new TopologyBuilder();
+        BaseRichSpout spout1 = new KafkaOffsetSourceSpoutProvider().getSpout(config);
+        BaseRichSpout spout2 = kafkaMessageSpoutProvider.getSpout(config);
+
+        int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
+        int numOfDistributionTasks = config.getInt(DISTRIBUTION_TASK_NUM);
+
+        builder.setSpout("kafkaLogLagChecker", spout1, numOfSpoutTasks);
+        builder.setSpout("kafkaMessageFetcher", spout2, numOfSpoutTasks);
+
+        KafkaMessageDistributionBolt bolt = new KafkaMessageDistributionBolt(config);
+        BoltDeclarer bolteclarer = builder.setBolt("distributionBolt", bolt, numOfDistributionTasks);
+        bolteclarer.fieldsGrouping("kafkaLogLagChecker", new Fields("f1"));
+        bolteclarer.fieldsGrouping("kafkaLogLagChecker", new Fields("f1"));
+        return builder.createTopology();
+    }
+
+
+    public static void main(String[] args){
+        Config config = ConfigFactory.load();
+        EagleMetricCollectorApplication app = new EagleMetricCollectorApplication();
+        app.run(config);
     }
 }
