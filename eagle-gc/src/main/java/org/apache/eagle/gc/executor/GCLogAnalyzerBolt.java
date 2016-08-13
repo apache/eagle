@@ -19,6 +19,12 @@
 
 package org.apache.eagle.gc.executor;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
 import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.datastream.JavaStormStreamExecutor2;
@@ -30,30 +36,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class GCLogAnalysorExecutor extends JavaStormStreamExecutor2<String, Map> {
-
-    public final static Logger LOG = LoggerFactory.getLogger(GCLogAnalysorExecutor.class);
-
-    private Config config;
-
+public class GCLogAnalyzerBolt extends BaseRichBolt {
+    public final static Logger LOG = LoggerFactory.getLogger(GCLogAnalyzerBolt.class);
+    private OutputCollector collector;
     private long previousLogTime;
 
     @Override
-    public void prepareConfig(Config config) {
-        this.config = config;
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
     }
 
     @Override
-    public void init() {
-
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields("f1", "f2"));
     }
 
+
+
     @Override
-    public void flatMap(List<Object> input, Collector<Tuple2<String, Map>> collector) {
-        String log = (String)input.get(0);
+    public void execute(Tuple input) {
+        String log = input.getString(0);
         GCStreamBuilder builder = new GCStreamBuilder();
         try {
             GCPausedEvent pauseEvent = builder.build(log);
@@ -62,7 +68,7 @@ public class GCLogAnalysorExecutor extends JavaStormStreamExecutor2<String, Map>
                 pauseEvent.setTimestamp(previousLogTime);
             }
             previousLogTime = pauseEvent.getTimestamp();
-            collector.collect(new Tuple2("GCLog", pauseEvent.toMap()));
+            collector.emit(Arrays.asList("GCLog", pauseEvent.toMap()));
         }
         catch (IgnoredLogFormatException ex1) {
             //DO nothing
@@ -72,6 +78,8 @@ public class GCLogAnalysorExecutor extends JavaStormStreamExecutor2<String, Map>
         }
         catch (Exception ex3) {
             LOG.error("Got an exception when parsing log: ", ex3);
+        }finally {
+            collector.ack(input);
         }
     }
 }

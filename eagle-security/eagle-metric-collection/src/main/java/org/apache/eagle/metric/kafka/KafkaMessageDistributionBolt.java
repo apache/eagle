@@ -19,6 +19,11 @@
 
 package org.apache.eagle.metric.kafka;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Tuple;
 import com.codahale.metrics.MetricRegistry;
 import com.typesafe.config.Config;
 import org.apache.commons.lang.time.DateUtils;
@@ -34,23 +39,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class KafkaMessageDistributionExecutor extends JavaStormStreamExecutor1<String> {
-
+public class KafkaMessageDistributionBolt extends BaseRichBolt {
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaMessageDistributionBolt.class);
+    private static final long DEFAULT_METRIC_GRANULARITY = 60 * 1000;
     private Config config;
     private Map<String, String> baseMetricDimension;
     private MetricRegistry registry;
     private EagleMetricListener listener;
     private long granularity;
-    private static final long DEFAULT_METRIC_GRANULARITY = 60 * 1000;
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaMessageDistributionExecutor.class);
+    private OutputCollector collector;
 
-    @Override
-    public void prepareConfig(Config config) {
+    public KafkaMessageDistributionBolt(Config config){
         this.config = config;
     }
 
     @Override
-    public void init() {
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         String site = config.getString("dataSourceConfig.site");
         String topic = config.getString("dataSourceConfig.topic");
         this.baseMetricDimension = new HashMap<>();
@@ -80,10 +84,15 @@ public class KafkaMessageDistributionExecutor extends JavaStormStreamExecutor1<S
     }
 
     @Override
-    public void flatMap(List<Object> input, Collector<Tuple1<String>> collector) {
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+
+    }
+
+    @Override
+    public void execute(Tuple input) {
         try {
-            String user = (String) input.get(0);
-            Long timestamp = (Long) input.get(1);
+            String user = input.getString(0);
+            Long timestamp = input.getLong(1);
             String metricKey = generateMetricKey(user);
             if (registry.getMetrics().get(metricKey) == null) {
                 EagleCounterMetric metric = new EagleCounterMetric(timestamp, metricKey, 1.0, granularity);
@@ -98,6 +107,8 @@ public class KafkaMessageDistributionExecutor extends JavaStormStreamExecutor1<S
         }
         catch (Exception ex) {
             LOG.error("Got an exception, ex: ", ex);
+        }finally {
+            collector.ack(input);
         }
     }
 }

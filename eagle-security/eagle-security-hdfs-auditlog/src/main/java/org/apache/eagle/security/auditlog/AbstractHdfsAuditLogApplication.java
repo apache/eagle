@@ -26,7 +26,6 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
@@ -39,7 +38,7 @@ import org.apache.eagle.partition.PartitionStrategy;
 import org.apache.eagle.partition.PartitionStrategyImpl;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
 import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
-import org.apache.eagle.security.topo.NewKafkaSourcedSpoutProvider;
+import org.apache.eagle.dataproc.impl.storm.kafka.NewKafkaSourcedSpoutProvider;
 import storm.kafka.StringScheme;
 
 /**
