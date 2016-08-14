@@ -30,7 +30,7 @@ import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
-import org.apache.eagle.dataproc.impl.storm.kafka.NewKafkaSourcedSpoutProvider;
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
 import org.apache.eagle.gc.executor.GCLogAnalyzerBolt;
 import org.apache.eagle.gc.executor.GCMetricGeneratorBolt;
 import storm.kafka.StringScheme;
@@ -47,7 +47,7 @@ public class GCLogApplication extends StormApplication{
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
-        NewKafkaSourcedSpoutProvider provider = new NewKafkaSourcedSpoutProvider();
+        KafkaSpoutProvider provider = new KafkaSpoutProvider();
         IRichSpout spout = provider.getSpout(config);
 
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);

@@ -38,7 +38,7 @@ import org.apache.eagle.partition.PartitionStrategy;
 import org.apache.eagle.partition.PartitionStrategyImpl;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
 import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
-import org.apache.eagle.dataproc.impl.storm.kafka.NewKafkaSourcedSpoutProvider;
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
 import storm.kafka.StringScheme;
 
 /**
@@ -54,7 +54,7 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
-        NewKafkaSourcedSpoutProvider provider = new NewKafkaSourcedSpoutProvider();
+        KafkaSpoutProvider provider = new KafkaSpoutProvider();
         IRichSpout spout = provider.getSpout(config);
 
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);

@@ -26,7 +26,7 @@ import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
-import org.apache.eagle.dataproc.impl.storm.kafka.NewKafkaSourcedSpoutProvider;
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
 
 /**
  * Since 7/27/16.
@@ -40,7 +40,7 @@ public class HBaseAuditLogApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
-        NewKafkaSourcedSpoutProvider provider = new NewKafkaSourcedSpoutProvider();
+        KafkaSpoutProvider provider = new KafkaSpoutProvider();
         IRichSpout spout = provider.getSpout(config);
 
         HBaseAuditLogParserBolt bolt = new HBaseAuditLogParserBolt();

@@ -28,7 +28,7 @@ import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
 import org.apache.eagle.security.oozie.parse.sensitivity.OozieResourceSensitivityDataJoinBolt;
-import org.apache.eagle.dataproc.impl.storm.kafka.NewKafkaSourcedSpoutProvider;
+import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
 
 /**
  * Since 8/12/16.
@@ -42,7 +42,7 @@ public class OozieAuditLogApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
-        NewKafkaSourcedSpoutProvider provider = new NewKafkaSourcedSpoutProvider();
+        KafkaSpoutProvider provider = new KafkaSpoutProvider();
         IRichSpout spout = provider.getSpout(config);
 
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
