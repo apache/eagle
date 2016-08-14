@@ -38,14 +38,14 @@ import java.util.Arrays;
 /**
  * Since 6/8/16.
  */
-public class NewKafkaSourcedSpoutProvider implements StormSpoutProvider {
-    private final static Logger LOG = LoggerFactory.getLogger(NewKafkaSourcedSpoutProvider.class);
+public class KafkaSpoutProvider implements StormSpoutProvider {
+    private final static Logger LOG = LoggerFactory.getLogger(KafkaSpoutProvider.class);
 
     private String configPrefix = "dataSourceConfig";
 
-    public NewKafkaSourcedSpoutProvider(){}
+    public KafkaSpoutProvider(){}
 
-    public NewKafkaSourcedSpoutProvider(String prefix){
+    public KafkaSpoutProvider(String prefix){
         this.configPrefix = prefix;
     }
 

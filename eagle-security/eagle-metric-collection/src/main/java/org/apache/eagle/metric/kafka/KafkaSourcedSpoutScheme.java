@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.dataproc.impl.storm.kafka;
+package org.apache.eagle.metric.kafka;
 
 import backtype.storm.spout.Scheme;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
+import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
 import org.apache.eagle.datastream.utils.NameConstants;
 
 import java.lang.reflect.Constructor;
