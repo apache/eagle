@@ -77,11 +77,6 @@
       </dependency>
       <dependency>
           <groupId>org.apache.eagle</groupId>
-          <artifactId>eagle-alert-process</artifactId>
-          <version>${project.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-stream-process-base</artifactId>
           <version>${project.version}</version>
       </dependency>

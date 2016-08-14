@@ -34,11 +34,6 @@
 	  	  <artifactId>eagle-storm-jobrunning-spout</artifactId>
           <version>${project.version}</version>
 	   </dependency>
-      <dependency>
-          <groupId>org.apache.eagle</groupId>
-          <artifactId>eagle-stream-application-manager</artifactId>
-          <version>${project.version}</version>
-      </dependency>
 	   <dependency>
 	      <groupId>org.apache.curator</groupId>
 	  	  <artifactId>curator-framework</artifactId>

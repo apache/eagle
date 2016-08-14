@@ -28,15 +28,11 @@ import com.codahale.metrics.MetricRegistry;
 import com.typesafe.config.Config;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
-import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.JavaStormStreamExecutor1;
 import org.apache.eagle.metric.reportor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple1;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class KafkaMessageDistributionBolt extends BaseRichBolt {

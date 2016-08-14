@@ -173,16 +173,6 @@ abstract class StreamProducer[+T <: Any] extends StreamInfo with StreamProtocol[
     ret
   }
 
-  /**
-   * alert is always sink of data flow
-   */
-  def alertWithConsumer(upStreamNames: util.List[String], alertExecutorId : String) = {
-    alert(upStreamNames.asScala, alertExecutorId,consume = true)
-  }
-
-  def alertWithoutConsumer(upStreamNames: util.List[String], alertExecutorId : String) = {
-    alert(upStreamNames.asScala, alertExecutorId, consume = false)
-  }
 
   override def alert(upStreamNames: Seq[String], alertExecutorId : String, consume: Boolean=true, strategy : PartitionStrategy=null):AlertStreamProducer = {
     val ret = AlertStreamProducer(upStreamNames, alertExecutorId, consume, strategy)

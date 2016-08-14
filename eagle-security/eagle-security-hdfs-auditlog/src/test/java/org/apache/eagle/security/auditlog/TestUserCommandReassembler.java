@@ -19,14 +19,14 @@
 
 package org.apache.eagle.security.auditlog;
 
+import backtype.storm.task.IOutputCollector;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.datastream.Collector;
 import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
 import org.apache.eagle.security.hdfs.HDFSAuditLogParser;
-import org.junit.Assert;
 import org.junit.Test;
-import scala.Tuple2;
 
 import java.util.*;
 
@@ -62,13 +62,32 @@ public class TestUserCommandReassembler {
         assembler.prepareConfig(config);
         assembler.init();
 
-        Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             @Override
-            public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");Assert.assertEquals("user:appendToFile", cmd);
-                System.out.println("assert passed!!!");
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                return null;
             }
-        };
+
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+
+            }
+
+            @Override
+            public void ack(Tuple input) {
+
+            }
+
+            @Override
+            public void fail(Tuple input) {
+
+            }
+
+            @Override
+            public void reportError(Throwable error) {
+
+            }
+        });
         assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);
@@ -91,14 +110,32 @@ public class TestUserCommandReassembler {
         assembler.prepareConfig(config);
         assembler.init();
 
-        Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             @Override
-            public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");
-                Assert.assertEquals("user:read", cmd);
-                System.out.println("assert passed!!!");
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                return null;
             }
-        };
+
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+
+            }
+
+            @Override
+            public void ack(Tuple input) {
+
+            }
+
+            @Override
+            public void fail(Tuple input) {
+
+            }
+
+            @Override
+            public void reportError(Throwable error) {
+
+            }
+        });
         assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
@@ -128,15 +165,32 @@ public class TestUserCommandReassembler {
         assembler.prepareConfig(config);
         assembler.init();
 
-        Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             @Override
-            public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");
-                Assert.assertEquals("user:copyFromLocal", cmd);
-                //Assert.assertEquals("user:appendToFile", cmd);
-                System.out.println("assert passed!!!");
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                return null;
             }
-        };
+
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+
+            }
+
+            @Override
+            public void ack(Tuple input) {
+
+            }
+
+            @Override
+            public void fail(Tuple input) {
+
+            }
+
+            @Override
+            public void reportError(Throwable error) {
+
+            }
+        });
         assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);

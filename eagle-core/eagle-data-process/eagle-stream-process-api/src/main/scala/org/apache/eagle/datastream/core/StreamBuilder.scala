@@ -18,17 +18,17 @@ package org.apache.eagle.datastream.core
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.eagle.dataproc.util.ConfigOptionParser
-import org.apache.eagle.datastream.ExecutionEnvironments
-import org.apache.eagle.datastream.utils.GraphPrinter
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 
+import scala.reflect
 import scala.reflect.runtime.universe._
 
 trait StreamContextBuilder extends StreamSourceBuilder {
   def config:Configuration
   /**
    * Business logic DAG
-   * @return
+    *
+    * @return
    */
   def dag:DirectedAcyclicGraph[StreamProducer[Any], StreamConnector[Any,Any]]
   /**
@@ -48,31 +48,23 @@ class StreamContext(private val conf:Config) extends StreamContextBuilder{
   private val _config:Configuration = Configuration(conf)
   override def dag = _dag
   override def config = _config
-  override def build: StreamDAG = {
-    implicit val i_conf = _config.get
-    StreamNameExpansion()
-    GraphPrinter.print(dag,message="Before expanded DAG ")
-    StreamAggregateExpansion()
-    StreamAlertExpansion()
-    StreamUnionExpansion()
-    StreamGroupbyExpansion()
-    StreamParallelismConfigExpansion()
-    StreamNameExpansion()
-    GraphPrinter.print(dag,message="After expanded DAG ")
-    GraphPrinter.printDotDigraph(dag)
-    StreamDAGTransformer.transform(dag)
+
+  def build:StreamDAG = {
+    null
   }
+
 
   override def submit(env: ExecutionEnvironment): Unit = {
     env.submit(this)
   }
 
-  override def submit(clazz: Class[ExecutionEnvironment]): Unit = {
-    ExecutionEnvironments.get(clazz,conf).submit(this)
+  def submit[E<:ExecutionEnvironment](implicit typeTag:TypeTag[E]):Unit = {
+
   }
 
-  override def submit[E <: ExecutionEnvironment](implicit typeTag: TypeTag[E]): Unit = {
-    ExecutionEnvironments.getWithConfig[E](conf).submit(this)
+
+  override def submit(clazz: Class[ExecutionEnvironment]): Unit = {
+
   }
 }
 

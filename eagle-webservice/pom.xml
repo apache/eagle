@@ -190,12 +190,6 @@
 			<artifactId>eagle-security-maprfs-web</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!--
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-stream-application-manager</artifactId>
-			<version>${project.version}</version>
-		</dependency> -->
 		<dependency>
 			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-topology-assembly</artifactId>
@@ -213,17 +207,6 @@
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-alert-base</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.storm</groupId>
-					<artifactId>storm-core</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.eagle</groupId>

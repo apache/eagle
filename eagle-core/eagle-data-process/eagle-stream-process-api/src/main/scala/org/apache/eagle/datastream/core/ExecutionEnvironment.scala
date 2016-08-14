@@ -22,7 +22,7 @@ import com.typesafe.config.Config
 
 trait StreamContextAdapter{
   def submit(context:StreamContext):Unit = {
-    execute(context.build)
+    execute(null)
   }
   def execute(dag: StreamDAG)
 }

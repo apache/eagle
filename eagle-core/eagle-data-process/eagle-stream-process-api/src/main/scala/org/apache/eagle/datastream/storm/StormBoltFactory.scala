@@ -20,7 +20,6 @@ package org.apache.eagle.datastream.storm
 
 import backtype.storm.topology.base.BaseRichBolt
 import com.typesafe.config.Config
-import org.apache.eagle.dataproc.impl.persist.PersistExecutor
 import org.apache.eagle.datastream._
 import org.apache.eagle.datastream.core._
 
@@ -54,9 +53,7 @@ object StormBoltFactory {
         ForeachBoltWrapper(foreach.fn)
       }
       case persist : PersistProducer[Any] => {
-        val persisExecutor = new PersistExecutor(persist.executorId, persist.storageType.toString)
-        persisExecutor.prepareConfig(config)
-        JavaStormBoltWrapper(persisExecutor.asInstanceOf[JavaStormStreamExecutor[AnyRef]])
+        JavaStormBoltWrapper(null)
       }
       case _ => throw new UnsupportedOperationException(s"Unsupported producer: ${producer.toString}")
     }

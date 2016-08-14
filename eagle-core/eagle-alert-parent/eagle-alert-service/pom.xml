@@ -31,16 +31,6 @@
 	<name>eagle-alert-service</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-alert-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-alert-process</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	  	<dependency>
   			<groupId>org.apache.eagle</groupId>
   			<artifactId>eagle-service-base</artifactId>
@@ -57,6 +47,11 @@
 		<dependency>
 			<groupId>org.apache.eagle</groupId>
 			<artifactId>eagle-metadata-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.eagle</groupId>
+			<artifactId>eagle-stream-process-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
