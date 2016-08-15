@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
@@ -49,15 +50,20 @@ public class TestSerDeserPer {
         data = new Object[]{sb.toString()};
     }
 
+    private String getTmpPath() {
+        return System.getProperty("java.io.tmpdir");
+    }
+
     @Test
     public void testSerDeserPerf() throws Exception{
         Kryo kryo = new Kryo();
-        Output output = new Output(new FileOutputStream("/tmp/file.bin"));
+        String outputPath = FilenameUtils.concat(getTmpPath(), "file.bin");
+        Output output = new Output(new FileOutputStream(outputPath));
         for(int i=0; i<1000; i++){
             kryo.writeObject(output, constructPE());
         }
         output.close();
-        Input input = new Input(new FileInputStream("/tmp/file.bin"));
+        Input input = new Input(new FileInputStream(outputPath));
         PartitionedEvent someObject = kryo.readObject(input, PartitionedEvent.class);
         input.close();
         Assert.assertTrue(someObject.getData().length == 1);
@@ -88,12 +94,13 @@ public class TestSerDeserPer {
     @Test
     public void testSerDeserPerf2() throws Exception{
         Kryo kryo = new Kryo();
-        Output output = new Output(new FileOutputStream("/tmp/file2.bin"));
+        String outputPath = FilenameUtils.concat(getTmpPath(), "file2.bin");
+        Output output = new Output(new FileOutputStream(outputPath));
         for(int i=0; i<1000; i++){
             kryo.writeObject(output, constructNewPE());
         }
         output.close();
-        Input input = new Input(new FileInputStream("/tmp/file2.bin"));
+        Input input = new Input(new FileInputStream(outputPath));
         NewPartitionedEvent someObject = kryo.readObject(input, NewPartitionedEvent.class);
         input.close();
         Assert.assertTrue(someObject.getData().length == 1);
@@ -119,12 +126,13 @@ public class TestSerDeserPer {
     @Test
     public void testSerDeserPerf3() throws Exception{
         Kryo kryo = new Kryo();
-        Output output = new Output(new FileOutputStream("/tmp/file3.bin"));
+        String outputPath = FilenameUtils.concat(getTmpPath(), "file3.bin");
+        Output output = new Output(new FileOutputStream(outputPath));
         for(int i=0; i<1000; i++){
             kryo.writeObject(output, constructNewPE2());
         }
         output.close();
-        Input input = new Input(new FileInputStream("/tmp/file3.bin"));
+        Input input = new Input(new FileInputStream(outputPath));
         NewPartitionedEvent2 someObject = kryo.readObject(input, NewPartitionedEvent2.class);
         input.close();
         Assert.assertTrue(someObject.getData().length == 1);
