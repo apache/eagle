@@ -65,14 +65,12 @@ public class EmbeddedHbase {
 	    	util = new HBaseTestingUtility();
 	        Configuration conf= util.getConfiguration();
 	        conf.setInt("test.hbase.zookeeper.property.clientPort", port);
-	        conf.set("zookeeper.znode.parent", znode);
 	        conf.setInt("hbase.zookeeper.property.maxClientCnxns", 200);
-			conf.set("hbase.master.ipc.address", "localhost");
 	        conf.setInt("hbase.master.info.port", -1);//avoid port clobbering
 	        // start mini hbase cluster
 	        hBaseCluster = util.startMiniCluster();
 	        Configuration config = hBaseCluster.getConf();
-	        
+
 	        config.set("zookeeper.session.timeout", "120000");
 	        config.set("hbase.zookeeper.property.tickTime", "6000");
 	        config.set(HConstants.HBASE_CLIENT_PAUSE, "3000");
