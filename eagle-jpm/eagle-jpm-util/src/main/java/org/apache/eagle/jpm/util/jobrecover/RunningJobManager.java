@@ -38,6 +38,7 @@ public class RunningJobManager implements Serializable {
     private CuratorFramework curator;
     private final static String ENTITY_TAGS_KEY = "entityTags";
     private final static String APP_INFO_KEY = "appInfo";
+    private final static String ZNODE_LAST_FINISH_TIME = "lastFinishTime";
 
     private CuratorFramework newCurator(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval) throws Exception {
         return CuratorFrameworkFactory.newClient(
@@ -251,5 +252,31 @@ public class RunningJobManager implements Serializable {
             }
         }
         return result;
+    }
+
+    public Long recoverLastFinishedTime(int partitionId) {
+        String path = this.zkRoot + "/" + partitionId + "/" + ZNODE_LAST_FINISH_TIME;
+        try {
+            return Long.valueOf(new String(curator.getData().forPath(path)));
+        } catch (Exception e) {
+            LOG.error("failed to recover last finish time {}", e);
+        }
+
+        return 0l;
+    }
+
+    public void updateLastFinishTime(int partitionId, Long lastFinishTime) {
+        String path = this.zkRoot + "/" + partitionId + "/" + ZNODE_LAST_FINISH_TIME;
+        try {
+            if (curator.checkExists().forPath(path) == null) {
+                curator.create()
+                        .creatingParentsIfNeeded()
+                        .withMode(CreateMode.PERSISTENT)
+                        .forPath(path);
+            }
+            curator.setData().forPath(path, lastFinishTime.toString().getBytes("UTF-8"));
+        } catch (Exception e) {
+            LOG.error("failed to update last finish time {}", e);
+        }
     }
 }

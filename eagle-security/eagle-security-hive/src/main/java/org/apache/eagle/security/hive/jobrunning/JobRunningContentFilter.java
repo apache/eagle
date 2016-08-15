@@ -14,15 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jobrunning.crawler;
+package org.apache.eagle.security.hive.jobrunning;
 
-import org.apache.eagle.jobrunning.common.JobConstants.ResourceType;
+import java.io.Serializable;
+import java.util.Map;
 
-public interface RunningJobCrawler {
-	
-	public void crawl() throws Exception;
-	
-	public void addIntoProcessingList(ResourceType type, JobContext context);
-	
-	public void removeFromProcessingList(ResourceType type, JobContext context);
+/**
+ * define what content in job running stream should be streamed
+ */
+public interface JobRunningContentFilter extends Serializable {
+	boolean acceptJobConf(Map<String, String> config);
 }

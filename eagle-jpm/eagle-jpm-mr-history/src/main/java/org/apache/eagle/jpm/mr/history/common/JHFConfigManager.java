@@ -20,8 +20,8 @@ package org.apache.eagle.jpm.mr.history.common;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.util.ConfigOptionParser;
-import org.apache.eagle.jpm.mr.history.storm.DefaultJobIdPartitioner;
-import org.apache.eagle.jpm.mr.history.storm.JobIdPartitioner;
+import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
+import org.apache.eagle.jpm.util.JobIdPartitioner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,7 +157,7 @@ public class JHFConfigManager implements Serializable {
             this.controlConfig.partitionerCls = (Class<? extends JobIdPartitioner>) Class.forName(config.getString("dataSourceConfig.partitionerCls"));
             assert this.controlConfig.partitionerCls != null;
         } catch (Exception e) {
-            LOG.warn("can not initialize partitioner class, use org.apache.eagle.jpm.mr.history.storm.DefaultJobIdPartitioner", e);
+            LOG.warn("can not initialize partitioner class, use org.apache.eagle.jpm.util.DefaultJobIdPartitioner", e);
             this.controlConfig.partitionerCls = DefaultJobIdPartitioner.class;
         } finally {
             LOG.info("Loaded partitioner class: {}",this.controlConfig.partitionerCls);

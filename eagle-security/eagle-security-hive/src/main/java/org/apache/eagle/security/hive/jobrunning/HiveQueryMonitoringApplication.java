@@ -56,7 +56,7 @@ public class HiveQueryMonitoringApplication extends StormApplication {
         builder.setSpout("ingest", spout, numOfSpoutTasks);
         JobFilterBolt bolt = new JobFilterBolt();
         BoltDeclarer boltDeclarer = builder.setBolt("filterBolt", bolt, numOfFilterTasks);
-        boltDeclarer.fieldsGrouping("ingest", new Fields("f1"));
+        boltDeclarer.fieldsGrouping("ingest", new Fields("jobId"));
 
         HiveQueryParserBolt parserBolt = new HiveQueryParserBolt();
         BoltDeclarer parserBoltDeclarer = builder.setBolt("parserBolt", parserBolt, numOfParserTasks);

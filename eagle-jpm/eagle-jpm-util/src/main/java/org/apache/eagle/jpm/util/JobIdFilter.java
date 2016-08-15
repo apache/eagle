@@ -16,13 +16,8 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.storm;
+package org.apache.eagle.jpm.util;
 
-public class DefaultJobIdPartitioner implements JobIdPartitioner {
-    @Override
-    public int partition(int numTotalParts, String jobId) {
-        int hash = jobId.hashCode();
-        hash = Math.abs(hash);
-        return hash % numTotalParts;
-    }
+public interface JobIdFilter {
+    boolean accept(String jobId);
 }
