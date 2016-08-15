@@ -1,0 +1,19 @@
+[
+  {
+    "name": "hadoop_jmx_datasource",
+    "type": "KAFKA",
+    "properties": {
+    },
+    "topic": "hadoop_jmx_metrics",
+    "schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
+    "codec": {
+      "streamNameSelectorProp": {
+        "userProvidedStreamName" : "hadoopJmxMetricEventStream",
+        "streamNameFormat":"%s"
+      },
+      "streamNameSelectorCls":"org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": ""
+    }
+  }
+]
