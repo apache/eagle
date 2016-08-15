@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  * @since Apr 25, 2016
  * This meta-data controls how tuple streamId is repartitioned
  */
-public class StreamRepartitionMetadata {
+public class StreamRepartitionMetadata  implements Serializable {
     private String topicName;
     private String streamId;
     /**
