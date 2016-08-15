@@ -73,6 +73,7 @@ public class SparkApplicationParser implements Runnable {
     private ResourceFetcher rmResourceFetcher;
     private int currentAttempt;
     private boolean first;
+    private String rmVersion;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -107,6 +108,8 @@ public class SparkApplicationParser implements Runnable {
         this.commonTags.put(SparkJobTagName.SPARK_QUEUE.toString(), app.getQueue());
         this.parserStatus  = ParserStatus.FINISHED;
         this.sparkRunningJobManager = sparkRunningJobManager;
+
+        this.rmVersion = getResourceManagerVersion();
     }
 
     public ParserStatus status() {
@@ -236,6 +239,14 @@ public class SparkApplicationParser implements Runnable {
         }
     }
 
+    public String getResourceManagerVersion() throws Exception {
+        ClusterInfo clusterInfo = rmResourceFetcher.getClusterInfo();
+        if (clusterInfo != null) {
+            return clusterInfo.getResourceManagerVersion();
+        }
+        return null;
+    }
+
     private JobConfig getJobConfig(String sparkAppId, int attemptId) {
         //TODO: getResourceManagerVersion() and compare version to make attempt id.
 
@@ -243,16 +254,19 @@ public class SparkApplicationParser implements Runnable {
         JobConfig jobConfig = null;
 
         try (FileSystem hdfs = HDFSUtil.getFileSystem(this.hdfsConf)) {
-//             // For Yarn version >= 2.7,
-//             // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
-//             String attemptIdFormatted = String.format("%06d", attemptId);
-//             // remove "application_" to get the number part of appID.
-//             String sparkAppIdNum = sparkAppId.substring(12);
-//             String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
-
             // For Yarn version 2.4.x
             // log name: application_1464382345557_269065_1
             String attemptIdString = Integer.toString(attemptId);
+
+            // For Yarn version >= 2.7,
+            // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
+            if (rmVersion != null && Utils.compareVersion(rmVersion, "2.7") >= 0) {
+                String attemptIdFormatted = String.format("%06d", attemptId);
+
+                // remove "application_" to get the number part of appID.
+                String sparkAppIdNum = sparkAppId.substring(12);
+                attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+            }
 
             //test appId_attemptId.inprogress/appId_attemptId/appId.inprogress/appId
             String eventLogDir = this.endpointConfig.eventLog;

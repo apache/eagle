@@ -84,6 +84,51 @@ public class Utils {
             return 1024l * 1024 * 1024 * 1024 * 1024 * executorPB;
         }
         Log.info("Cannot parse memory info " +  memory);
-        return 0l;
+        return 0L;
+    }
+
+    /**
+     * Compare two version numbers version1 and version2.
+     * If version1 > version2 return 1, if version1 < version2 return -1, otherwise return 0.
+     * 0.1 < 1.2 < 1.23
+     *
+     * @param version1
+     * @param version2
+     */
+    public static int compareVersion(String version1, String version2) {
+        // Split
+        String[] v1 = version1.split("\\.");
+        String[] v2 = version2.split("\\.");
+
+        int i = 0;
+        // Compare corresonding numbers.
+        for (; i < v1.length && i < v2.length; i++) {
+            int val1 = Integer.parseInt(v1[i]);
+            int val2 = Integer.parseInt(v2[i]);
+            if (val1 < val2) {
+                return -1;
+            }
+            if (val1 > val2) {
+                return 1;
+            }
+        }
+
+        if (v2.length > v1.length) {
+            for (; i < v2.length; i++) {
+                int val = Integer.parseInt(v2[i]);
+                if (val != 0) {
+                    return -1;
+                }
+            }
+        } else if (v1.length > v2.length) {
+            for (; i < v1.length; i++) {
+                int val = Integer.parseInt(v1[i]);
+                if (val != 0) {
+                    return 1;
+                }
+            }
+        }
+
+        return 0;
     }
 }

@@ -46,6 +46,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 	private final HAURLSelector selector;
 	private final ServiceURLBuilder jobListServiceURLBuilder;
 	private final ServiceURLBuilder sparkCompleteJobServiceURLBuilder;
+	private ClusterInfo clusterInfo;
 	
 	private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	
@@ -153,12 +154,14 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 	}
 
 	private String getClusterInfoURL() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(selector.getSelectedUrl()).append("/").append(Constants.YARN_API_CLUSTER_INFO).append("?" + Constants.ANONYMOUS_PARAMETER);
-		return sb.toString();
+		return selector.getSelectedUrl() + "/" + Constants.YARN_API_CLUSTER_INFO + "?" + Constants.ANONYMOUS_PARAMETER;
 	}
 
 	public ClusterInfo getClusterInfo() throws Exception {
+		if (this.clusterInfo != null) {
+            return this.clusterInfo;
+        }
+
 		InputStream is = null;
 		try {
 			checkUrl();
@@ -167,9 +170,9 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 			is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
 			final ClusterInfoWrapper clusterInfoWrapper = OBJ_MAPPER.readValue(is, ClusterInfoWrapper.class);
 			if (clusterInfoWrapper != null && clusterInfoWrapper.getClusterInfo() != null) {
-				return clusterInfoWrapper.getClusterInfo();
+				this.clusterInfo = clusterInfoWrapper.getClusterInfo();
 			}
-			return null;
+			return this.clusterInfo;
 		} finally {
 			if (is != null)  { try { is.close();} catch (Exception e) { } }
 		}
