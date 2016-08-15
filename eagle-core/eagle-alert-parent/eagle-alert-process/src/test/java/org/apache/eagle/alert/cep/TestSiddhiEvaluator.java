@@ -129,7 +129,7 @@ public class TestSiddhiEvaluator {
 				new SiddhiPolicyEvaluator<>(config, context, policyDef, new String[]{"hdfsAuditLogEventStream"}, false);
 
 		evaluator.evaluate(new ValuesArray(context.outputCollector, "hdfsAuditLogEventStream", data1));
-		Thread.sleep(2 * 1000);
+		Thread.sleep(3 * 1000);
 		Assert.assertEquals(alertCount, 1);
 	}
 }
