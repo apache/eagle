@@ -151,7 +151,7 @@ public class Constants {
         TOTAL_LAUNCHED_MAPS
     }
 
-    public static final String metricFormat = "%s.%s";
+    public static final String hadoopMetricFormat = "hadoop.%s.%s";
     public static final String ALLOCATED_MB = "allocatedmb";
     public static final String ALLOCATED_VCORES = "allocatedvcores";
     public static final String RUNNING_CONTAINERS = "runningcontainers";

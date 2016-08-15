@@ -40,6 +40,6 @@ public class TaskExecutionMetricsCreationListener extends AbstractMetricsCreatio
 
     @Override
     public String buildMetricName(String field) {
-        return String.format(Constants.metricFormat, Constants.TASK_LEVEL, field);
+        return String.format(Constants.hadoopMetricFormat, Constants.TASK_LEVEL, field);
     }
 }
