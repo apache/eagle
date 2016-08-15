@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -32,7 +33,7 @@ import java.util.Set;
  *        All other messages which are not one of activeStreamNames will be
  *        filtered out
  */
-public class Tuple2StreamMetadata {
+public class Tuple2StreamMetadata  implements Serializable {
     /**
      * only messages belonging to activeStreamNames will be kept while
      * transforming tuple into stream

@@ -22,7 +22,7 @@ limitations under the License.
 * [Apache Maven](https://maven.apache.org/)
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
-## Documentation
+## Alert engine base on Storm Documentation
 
 
 ## Build
@@ -151,5 +151,80 @@ See below detailed steps.
   3. start storm
      storm jar alert-engine-0.0.1-SNAPSHOT-alert-assembly.jar org.apache.eagle.alert.engine.UnitTopologyMain
 
+## Support
+
+
+## Prerequisites
+
+* [Apache Maven](https://maven.apache.org/)
+* [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+
+## Alert engine base on Spark Streaming Documentation
+
+
+## Build
+
+    mvn install
+    
+## Setup
+The alert engine have two dependency module: Metadata Service, and engine runtime(spark streaming).
+
+####0. Dependencies
+> Alert engine need kafka as data source.
+
+#### 1. Start metadata service
+> For deployment, after mvn install, a war is avaialble in alert-service/target.
+
+####2. Start engine runtime.
+> The engine are the topologies that runs in any spark streaming (local or remote) with configuration to connect to the metadata service. The alert engine runtime main as in UnitSparkTopologyMain.java. Example of the configuration is /alert-engine/src/test/resources/application-spark.conf 
+
+See below detailed steps.
+
+
+## Run
+* pre-requisites
+  * spark streaming
+  * kafka
+  * tomcat
+
+* Run Metadata service
+    1. copy alert-service/target/alert-service-{version}-SNAPSHOT.war into tomcat webapps/alert.war
+    2. check config under webapps/alert/WEB-INF/lib/alert-metadata-service-0.5.0-incubating-SNAPSHOT.jar/spark.You can also find the config in /alert-metadata-service/src/main/resources/spark.You can add or remove topic in spoutSpec.json without restart spark streaming context.
+    3. start tomcat
+    
+* Run UnitSparkTopologyMain
+    1. copy alert-assembly/target/alert-engine-{version}-SNAPSHOT-alert-assembly.jar to somewhere close to your spark installation
+    2. check config application-spark.conf
+   ```json
+{
+  "topology" : {
+    "name" : "alertUnitSparkTopology_3",
+    "batchDuration" : 4,
+    "windowDurations" : 20,
+    "slideDurations"  :20,
+    "core" : 1,
+    "memory" : 1G,
+    "localMode" : "true",
+    "numOfRouterBolts" : 4,
+    "numOfAlertBolts"  : 2,
+    "numOfPublishTasks": 10
+  },
+  "spout" : {
+    "kafkaBrokerZkQuorum": "localhost:9092",
+  },
+  "metadataService": {
+    "context" : "/alert/rest",
+    "host" : "localhost",
+    "port" : 8080
+  },
+  "zkConfig" : {
+    "zkQuorum" : "localhost:2181",
+  }
+}
+```
+ 
+  3. start spark streaming
+    spark-submit  --class org.apache.eagle.alert.engine.UnitSparkTopologyMain eagle-topology-{version}-incubating-SNAPSHOT-assembly.jar
+    
 ## Support
 

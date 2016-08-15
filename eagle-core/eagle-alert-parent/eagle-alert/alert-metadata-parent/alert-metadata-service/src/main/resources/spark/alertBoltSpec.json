@@ -1,0 +1,66 @@
+{
+  "version": "version1",
+  "topologyName": "testTopology",
+  "boltPoliciesMap": {
+    "alertBolt0": [
+     {
+        "name": "policy4",
+        "description": null,
+        "inputStreams": [
+          "oozieStream"
+        ],
+        "outputStreams": [
+          "testAlertStream"
+        ],
+        "definition": {
+          "type": "siddhi",
+          "value": " from oozieStream#window.externalTime(timestamp, 4 sec)  select ip, jobId , operation, count(1) as visitCount insert into testAlertStream;  "
+        },
+        "partitionSpec": [
+          {
+            "streamId": "oozieStream",
+            "type": "GROUPBY",
+            "columns": [
+              "operation"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT4S",
+              "windowMargin": 1000
+            }
+          }
+        ],
+        "parallelismHint": 0
+      }
+    ],
+    "alertBolt1": [
+      {
+        "name": "policy4",
+        "description": null,
+        "inputStreams": [
+          "oozieStream"
+        ],
+        "outputStreams": [
+          "testAlertStream"
+        ],
+        "definition": {
+          "type": "siddhi",
+          "value": " from oozieStream#window.externalTime(timestamp, 2 sec)  select ip, jobId , operation, count(1) as visitCount insert into testAlertStream;  "
+        },
+        "partitionSpec": [
+          {
+            "streamId": "oozieStream",
+            "type": "GROUPBY",
+            "columns": [
+              "operation"
+            ],
+            "sortSpec": {
+              "windowPeriod": "PT4S",
+              "windowMargin": 1000
+            }
+          }
+        ],
+        "parallelismHint": 0
+      }
+    ]
+  }
+}
