@@ -32,6 +32,5 @@
 
     <modules>
         <module>eagle-app-base</module>
-        <module>eagle-application-service</module>
     </modules>
 </project>
