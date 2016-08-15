@@ -33,11 +33,11 @@
   		<artifactId>eagle-security-common</artifactId>
         <version>${project.version}</version>
   	</dependency>
-    <dependency>
-      <groupId>org.apache.eagle</groupId>
-      <artifactId>eagle-stream-application-manager</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+      <dependency>
+          <groupId>org.apache.eagle</groupId>
+          <artifactId>eagle-policy-base</artifactId>
+          <version>${project.version}</version>
+      </dependency>
     <dependency>
         	<groupId>org.apache.eagle</groupId>
     		<artifactId>eagle-embed-server</artifactId>
@@ -63,6 +63,11 @@
           <artifactId>eagle-embed-hbase</artifactId>
           <version>${project.version}</version>
           <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.eagle</groupId>
+          <artifactId>eagle-app-base</artifactId>
+          <version>${project.version}</version>
       </dependency>
   </dependencies>
 </project>

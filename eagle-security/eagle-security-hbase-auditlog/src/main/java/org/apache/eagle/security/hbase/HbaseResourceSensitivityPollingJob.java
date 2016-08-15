@@ -68,6 +68,6 @@ public class HbaseResourceSensitivityPollingJob extends AbstractResourceSensitiv
                 + eagleServiceHost + ":" + eagleServicePort);
 
         IMetadataServiceClient client = new MetadataServiceClientImpl(eagleServiceHost, eagleServicePort, "/rest");
-        return client.listHBaseSensitivies();
+        return client.listHBaseSensitivities();
     }
 }

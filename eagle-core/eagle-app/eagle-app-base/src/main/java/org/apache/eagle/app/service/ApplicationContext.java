@@ -52,18 +52,22 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
      * @param metadata ApplicationEntity
      * @param application Application
      */
-    public ApplicationContext(Application application, ApplicationEntity metadata, Config config1){
+    public ApplicationContext(Application application, ApplicationEntity metadata, Config envConfig){
         Preconditions.checkNotNull(application,"Application is null");
         Preconditions.checkNotNull(metadata,"ApplicationEntity is null");
         this.application = application;
         this.metadata = metadata;
-        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(),config1);
-        Map<String,Object> applicationConfig = metadata.getConfiguration();
-        if(applicationConfig == null) {
-            applicationConfig = Collections.emptyMap();
+        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(),envConfig);
+        Map<String,Object> executionConfig = metadata.getConfiguration();
+        if(executionConfig == null) {
+            executionConfig = Collections.emptyMap();
         }
-        // TODO: Merge application config with environment config
-        this.config = ConfigFactory.parseMap(applicationConfig);
+
+        // TODO: Decouple hardcoded configuration key
+        executionConfig.put("siteId", metadata.getSite().getSiteId());
+        executionConfig.put("mode", metadata.getMode().name());
+        executionConfig.put("appId", metadata.getAppId());
+        this.config = ConfigFactory.parseMap(executionConfig).withFallback(envConfig);
     }
 
     @Override

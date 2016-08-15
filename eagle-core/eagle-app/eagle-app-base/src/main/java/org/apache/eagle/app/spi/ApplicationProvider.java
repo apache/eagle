@@ -20,6 +20,7 @@ import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.metadata.model.ApplicationDesc;
+import org.apache.eagle.common.module.ModuleRegistry;
 
 public interface ApplicationProvider<T extends Application> {
 
@@ -34,4 +35,6 @@ public interface ApplicationProvider<T extends Application> {
      * @return application instance
      */
     T getApplication();
+
+    void register(ModuleRegistry registry);
 }

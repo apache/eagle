@@ -36,17 +36,6 @@
   		<artifactId>eagle-stream-process-api</artifactId>
         <version>${project.version}</version>
   	</dependency>
-  	<dependency>
-  		<groupId>org.apache.eagle</groupId>
-  		<artifactId>eagle-alert-process</artifactId>
-        <version>${project.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.wso2.orbit.com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-          </exclusion>
-        </exclusions>
-  	</dependency>
     <dependency>
       <groupId>org.apache.eagle</groupId>
       <artifactId>eagle-alert-service</artifactId>
@@ -54,7 +43,17 @@
     </dependency>
       <dependency>
           <groupId>org.apache.eagle</groupId>
+          <artifactId>eagle-metric</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.eagle</groupId>
           <artifactId>eagle-metadata-base</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.eagle</groupId>
+          <artifactId>eagle-metadata-jdbc</artifactId>
           <version>${project.version}</version>
       </dependency>
 	<dependency>

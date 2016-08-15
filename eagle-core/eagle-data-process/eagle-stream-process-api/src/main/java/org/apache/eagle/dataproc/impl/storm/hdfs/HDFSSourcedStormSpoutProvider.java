@@ -43,9 +43,6 @@ public class HDFSSourcedStormSpoutProvider implements StormSpoutProvider {
 			if(conf.equalsIgnoreCase("data collection")){
 				return new DataCollectionHDFSSpout(configContext); 
 			}
-			if(conf.equalsIgnoreCase("user profile generation")){
-				return new UserProfileGenerationHDFSSpout(configContext); 
-			}
 			return null;
 		}
 	}

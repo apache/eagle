@@ -20,7 +20,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dropwizard.Configuration;
 
-class ServerConfig extends Configuration {
+public class ServerConfig extends Configuration {
     private final static String SERVER_NAME = "Apache Eagle";
     private final static String SERVER_VERSION = "0.5.0-incubating";
     private final static String API_BASE_PATH = "/rest/*";

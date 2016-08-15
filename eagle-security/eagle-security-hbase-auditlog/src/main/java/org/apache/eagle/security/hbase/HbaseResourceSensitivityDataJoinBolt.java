@@ -47,13 +47,13 @@ public class HbaseResourceSensitivityDataJoinBolt extends BaseRichBolt {
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
-        // start hive resource data polling
+        // start hbase sensitivity data polling
         try {
             ExternalDataJoiner joiner = new ExternalDataJoiner(
                     HbaseResourceSensitivityPollingJob.class, config, context.getThisComponentId() + "." + context.getThisTaskIndex());
             joiner.start();
         } catch(Exception ex){
-            LOG.error("Fail to bring up quartz scheduler.", ex);
+            LOG.error("Fail bringing up quartz scheduler.", ex);
             throw new IllegalStateException(ex);
         }
     }

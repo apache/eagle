@@ -16,10 +16,13 @@
  */
 package org.apache.eagle.security.auditlog.timer;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.common.config.EagleConfigConstants;
+import org.apache.eagle.security.service.IMetadataServiceClient;
+import org.apache.eagle.security.service.MetadataServiceClientImpl;
 import org.apache.eagle.security.util.ExternalDataCache;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -29,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.security.entity.IPZoneEntity;
+import org.apache.eagle.security.service.IPZoneEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import com.google.common.base.Function;
@@ -44,7 +47,7 @@ public class IPZonePollingJob implements Job{
 			throws JobExecutionException {
 		JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
 		try{
-			List<IPZoneEntity> ipZones = load(jobDataMap);
+			Collection<IPZoneEntity> ipZones = load(jobDataMap);
 			if(ipZones == null){
 				LOG.warn("Ipzone information is empty");
 				return;
@@ -52,7 +55,7 @@ public class IPZonePollingJob implements Job{
 			Map<String, IPZoneEntity> map = Maps.uniqueIndex(ipZones, new Function<IPZoneEntity, String>(){
 				@Override
 				public String apply(IPZoneEntity input) {
-					return input.getTags().get("iphost");
+					return input.getIphost();
 				}
 			});
 			ExternalDataCache.getInstance().setJobResult(getClass(), map);
@@ -61,7 +64,7 @@ public class IPZonePollingJob implements Job{
 		}
 	}
 
-	private List<IPZoneEntity> load(JobDataMap jobDataMap) throws Exception{
+	private Collection<IPZoneEntity> load(JobDataMap jobDataMap) throws Exception{
 		Map<String, Object> map = (Map<String,Object>)jobDataMap.get(EagleConfigConstants.EAGLE_SERVICE);
 		String eagleServiceHost = (String)map.get(EagleConfigConstants.HOST);
 		Integer eagleServicePort = Integer.parseInt(map.get(EagleConfigConstants.PORT).toString());
@@ -69,15 +72,7 @@ public class IPZonePollingJob implements Job{
 		String password = map.containsKey(EagleConfigConstants.PASSWORD) ? (String)map.get(EagleConfigConstants.PASSWORD) : null;
 		// load from eagle database
 		LOG.info("Load ip zone information from eagle service " + eagleServiceHost + ":" + eagleServicePort);
-		IEagleServiceClient client = new EagleServiceClientImpl(eagleServiceHost, eagleServicePort, username, password);
-		String query = "IPZoneService[]{*}";
-		GenericServiceAPIResponseEntity<IPZoneEntity> response = client.search()
-			.pageSize(Integer.MAX_VALUE)
-			.query(query)
-			.send();
-		client.close();
-		if(response.getException() != null)
-			throw new IllegalStateException(response.getException());
-		return response.getObj();
+		IMetadataServiceClient client = new MetadataServiceClientImpl(eagleServiceHost, eagleServicePort, "/rest");
+		return client.listIPZones();
 	}
 }

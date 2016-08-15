@@ -35,7 +35,6 @@ public class HbaseMetadataDAOImpl {
 
     private Configuration hBaseConfiguration;
 
-
     public HbaseMetadataDAOImpl(Configuration config) {
         this.hBaseConfiguration = HBaseConfiguration.create();
         this.hBaseConfiguration.addResource(config);

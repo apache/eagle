@@ -23,6 +23,12 @@ import java.util.Collection;
  * Since 6/10/16.
  */
 public interface ISecurityMetadataDAO {
-    Collection<HBaseSensitivityEntity> listHBaseSensitivies();
+    Collection<HBaseSensitivityEntity> listHBaseSensitivities();
     OpResult addHBaseSensitivity(Collection<HBaseSensitivityEntity> h);
+    Collection<HdfsSensitivityEntity> listHdfsSensitivities();
+    OpResult addHdfsSensitivity(Collection<HdfsSensitivityEntity> h);
+    Collection<IPZoneEntity> listIPZones();
+    OpResult addIPZone(Collection<IPZoneEntity> h);
+    Collection<HiveSensitivityEntity> listHiveSensitivities();
+    OpResult addHiveSensitivity(Collection<HiveSensitivityEntity> h);
 }

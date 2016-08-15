@@ -26,7 +26,6 @@
     <artifactId>eagle-examples</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>eagle-topology-example</module>
         <module>eagle-app-example</module>
     </modules>
 </project>

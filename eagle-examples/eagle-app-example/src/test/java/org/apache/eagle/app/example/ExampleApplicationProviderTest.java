@@ -17,34 +17,46 @@
 package org.apache.eagle.app.example;
 
 import com.google.inject.Inject;
+import org.apache.eagle.app.example.extensions.ExampleEntity;
+import org.apache.eagle.app.example.extensions.ExampleResource;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.test.ServerSimulator;
-import org.apache.eagle.app.test.AppUnitTestRunner;
+import org.apache.eagle.app.test.AppJUnitRunner;
+import org.apache.eagle.common.module.GlobalScope;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@RunWith(AppUnitTestRunner.class)
+@RunWith(AppJUnitRunner.class)
 public class ExampleApplicationProviderTest {
     @Inject private SiteResource siteResource;
     @Inject private ApplicationResource applicationResource;
     @Inject private ServerSimulator simulator;
+    @Inject private ExampleResource exampleResource;
 
     @Test
     public void testApplicationProviderLoading(){
         Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs().getData();
         Assert.assertNotNull(applicationDescs);
         Assert.assertEquals(1,applicationDescs.size());
+    }
+
+    @Test
+    public void testApplicationExtensions(){
+        List<ExampleEntity> entities = exampleResource.getEntities();
+        Assert.assertNotNull(entities);
+        Assert.assertEquals(1,entities.size());
+        Assert.assertEquals(GlobalScope.class,exampleResource.getCommonServiceScope());
     }
 
     /**
@@ -57,7 +69,6 @@ public class ExampleApplicationProviderTest {
      * @throws InterruptedException
      */
     @Test
-    @Ignore
     public void testApplicationLifecycle() throws InterruptedException {
         // Create local site
         SiteEntity siteEntity = new SiteEntity();
@@ -90,7 +101,6 @@ public class ExampleApplicationProviderTest {
         simulator.start("EXAMPLE_APPLICATION", getConf());
     }
 
-    @Ignore
     @Test
     public void testApplicationQuickRunWithAppProvider() throws Exception{
         simulator.start(ExampleApplicationProvider.class, getConf());

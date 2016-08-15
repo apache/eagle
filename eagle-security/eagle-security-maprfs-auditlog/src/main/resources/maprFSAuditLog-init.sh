@@ -32,7 +32,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
            "application":"maprFSAuditLog"
         },
         "enabled": true,
-        "config": "classification.fs.defaultFS=maprfs:///"
+        "config": "classification.fs.defaultFS=hdfs://sandbox.mapr:7222\nclassification.mapr.webhttps=https://sandbox.mapr:8443\nclassification.mapr.username=mapr\nclassification.mapr.password=mapr"
      }
   ]
   '
@@ -48,7 +48,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
         "alias":"MapRFSAuditLogMonitor",
         "groupName":"MapR",
         "features":["common","metadata", "classification"],
-	"config":"{\n\t\"view\": {\n\t\t\"prefix\": \"fileSensitivity\",\n\t\t\"service\": \"FileSensitivityService\",\n\t\t\"keys\": [\n\t\t\t\"filedir\",\n\t\t\t\"sensitivityType\"\n\t\t],\n\t\t\"type\": \"folder\",\n\t\t\"api\": \"hdfsResource\"\n\t}\n}"
+	"config":"{\n\t\"view\": {\n\t\t\"prefix\": \"fileSensitivity\",\n\t\t\"service\": \"FileSensitivityService\",\n\t\t\"keys\": [\n\t\t\t\"filedir\",\n\t\t\t\"sensitivityType\"\n\t\t],\n\t\t\"type\": \"folder\",\n\t\t\"api\": \"maprfsResource\"\n\t}\n}"
      }
   ]
   '
@@ -126,7 +126,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
        "attrDescription": "volume name in mapr",
        "attrType": "string",
        "category": "",
-       "attrValueResolver": ""
+       "attrValueResolver": "org.apache.eagle.service.security.hdfs.resolver.MAPRFSVolumeResolver"
     },
     {
        "tags": {
@@ -137,7 +137,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
        "attrDescription": "destination file or directory, such as /tmp",
        "attrType": "string",
        "category": "",
-       "attrValueResolver": "org.apache.eagle.service.security.hdfs.resolver.HDFSResourceResolver"
+       "attrValueResolver": "org.apache.eagle.service.security.hdfs.resolver.MAPRFSResourceResolver"
     },
     {
        "tags": {
@@ -148,7 +148,7 @@ curl -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:a
        "attrDescription": "source file or directory, such as /tmp",
        "attrType": "string",
        "category": "",
-       "attrValueResolver": "HDFSResourceResolver"
+       "attrValueResolver": "org.apache.eagle.service.security.hdfs.resolver.MAPRFSResourceResolver"
     },
     {
        "tags": {

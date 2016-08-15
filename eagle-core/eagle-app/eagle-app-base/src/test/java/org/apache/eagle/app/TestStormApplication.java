@@ -23,9 +23,13 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
 import org.junit.Ignore;
 
 import java.util.Arrays;
@@ -62,12 +66,36 @@ public class TestStormApplication extends StormApplication{
     }
 
     public final static class Provider extends AbstractApplicationProvider<TestStormApplication> {
-        public Provider(){
-            super("TestApplicationMetadata.xml");
-        }
         @Override
         public TestStormApplication getApplication() {
             return new TestStormApplication();
+        }
+
+        @Override
+        public void register(ModuleRegistry registry) {
+            registry.register(MemoryMetadataStore.class, new AbstractModule() {
+                @Override
+                protected void configure() {
+                    bind(ExtendedDao.class).to(ExtendedDaoImpl.class);
+                }
+            });
+        }
+    }
+
+    private interface ExtendedDao{
+        Class<? extends ExtendedDao> getType();
+    }
+
+    private class ExtendedDaoImpl implements ExtendedDao {
+        private final Config config;
+
+        @Inject
+        public ExtendedDaoImpl(Config config){
+            this.config = config;
+        }
+        @Override
+        public Class<? extends ExtendedDao> getType() {
+            return ExtendedDaoImpl.class;
         }
     }
 }

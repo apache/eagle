@@ -43,13 +43,13 @@ public class ApplicationProviderSPILoader extends ApplicationProviderLoader{
             this.appProviderExtDir = null;
         }
 
-        LOG.info("Using {}: {}",APPLICATIONS_DIR_PROPS_KEY,this.appProviderExtDir);
+        LOG.warn("Using {}: {}",APPLICATIONS_DIR_PROPS_KEY,this.appProviderExtDir);
     }
 
     @Override
     public void load() {
         if(appProviderExtDir != null) {
-            LOG.info("Loading application providers from class loader of jars in {}", appProviderExtDir);
+            LOG.warn("Loading application providers from class loader of jars in {}", appProviderExtDir);
             File loc = new File(appProviderExtDir);
             File[] jarFiles = loc.listFiles(file -> file.getPath().toLowerCase().endsWith(".jar"));
             if (jarFiles != null) {
@@ -65,24 +65,25 @@ public class ApplicationProviderSPILoader extends ApplicationProviderLoader{
                 }
             }
         } else {
-            LOG.info("Loading application providers from context class loader");
+            LOG.warn("Loading application providers from context class loader");
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             loadProviderFromClassLoader(classLoader,(applicationProvider) -> DynamicJarPathFinder.findPath(applicationProvider.getClass()));
         }
     }
 
     private void loadProviderFromClassLoader(ClassLoader jarFileClassLoader, Function<ApplicationProvider,String> jarFileSupplier){
-        ServiceLoader<ApplicationProvider> serviceLoader = ServiceLoader.load(ApplicationProvider.class, jarFileClassLoader);
-        for (ApplicationProvider applicationProvider : serviceLoader) {
-            try {
+        ServiceLoader<ApplicationProvider> serviceLoader = ServiceLoader.load(ApplicationProvider.class);
+        try {
+            for (ApplicationProvider applicationProvider : serviceLoader) {
                 ApplicationProviderConfig providerConfig = new ApplicationProviderConfig();
                 providerConfig.setClassName(applicationProvider.getClass().getCanonicalName());
                 providerConfig.setJarPath(jarFileSupplier.apply(applicationProvider));
                 applicationProvider.prepare(providerConfig, getConfig());
                 registerProvider(applicationProvider);
-            }catch (Throwable ex){
-                LOG.warn("Failed to register application provider {}",applicationProvider,ex);
             }
+        }catch (Throwable ex){
+            LOG.warn("Failed to register application provider",ex);
+            throw new IllegalStateException(ex);
         }
     }
 }

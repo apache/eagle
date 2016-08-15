@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -21,8 +21,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.config.ApplicationProviderDescConfig;
-import org.apache.eagle.app.sink.KafkaStreamSink;
-import org.apache.eagle.app.sink.StreamSink;
+import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationDocs;
 import org.apache.eagle.metadata.model.Configuration;
@@ -32,23 +31,30 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.JAXBException;
 import java.util.List;
 
+/**
+ * Default metadata path is:  /META-INF/providers/${ApplicationProviderClassName}.xml
+ *
+ * @param <T>
+ */
 public abstract class AbstractApplicationProvider<T extends Application> implements ApplicationProvider<T> {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractApplicationProvider.class);
     private final ApplicationDesc applicationDesc;
 
-//    Disable programmable ApplicationProvider approach
-//
-//    public AbstractApplicationProvider(){
-//        applicationDesc = new ApplicationDesc();
-//        applicationDesc.setProviderClass(this.getClass());
-//        configure();
-//    }
-//
-//    protected void configure (){
-//        // do nothing by default
-//    }
+    private final static String METADATA_RESOURCE_PATH="/META-INF/providers/%s.xml";
 
-    protected AbstractApplicationProvider(String applicationDescConfig) {
+    /**
+     * Default metadata path is:  /META-INF/providers/${ApplicationProviderClassName}.xml
+     *
+     * You are not recommended to override this method except you could make sure the path is universal unique
+     *
+     * @return metadata file path
+     */
+    protected final String getMetadata(){
+        return String.format(METADATA_RESOURCE_PATH,this.getClass().getName());
+    }
+
+    protected AbstractApplicationProvider() {
+        String applicationDescConfig = getMetadata();
         applicationDesc = new ApplicationDesc();
         applicationDesc.setProviderClass(this.getClass());
         ApplicationProviderDescConfig descWrapperConfig = ApplicationProviderDescConfig.loadFromXML(this.getClass(), applicationDescConfig);
@@ -131,5 +137,10 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     @Override
     public ApplicationDesc getApplicationDesc() {
         return applicationDesc;
+    }
+
+    @Override
+    public void register(ModuleRegistry registry) {
+        LOG.debug("Registering modules {}",this.getClass().getName());
     }
 }

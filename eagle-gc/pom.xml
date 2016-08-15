@@ -43,7 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.eagle</groupId>
-      <artifactId>eagle-alert-process</artifactId>
+      <artifactId>eagle-app-base</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

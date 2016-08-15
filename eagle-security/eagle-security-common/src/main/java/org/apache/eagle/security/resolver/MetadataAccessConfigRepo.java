@@ -20,39 +20,19 @@ package org.apache.eagle.security.resolver;
 
 
 import com.typesafe.config.*;
-import org.apache.eagle.alert.entity.SiteApplicationServiceEntity;
-import org.apache.eagle.common.config.EagleConfigConstants;
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.policy.common.Constants;
-import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 
 
+@Deprecated
 public class MetadataAccessConfigRepo {
     private static Logger LOG = LoggerFactory.getLogger(MetadataAccessConfigRepo.class);
 
     public Config getConfig(String application, String siteId) throws Exception {
-
-        GenericEntityServiceResource resource = new GenericEntityServiceResource();
-        String queryFormat = Constants.SITE_APPLICATION_SERVICE_ENDPOINT_NAME + "[@application=\"%s\" AND @site=\"%s\"]{*}";
-        GenericServiceAPIResponseEntity ret = resource.search(String.format(queryFormat, application, siteId), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false, 0, null, false);
-        List<SiteApplicationServiceEntity> list = (List<SiteApplicationServiceEntity>) ret.getObj();
-        if (list == null || list.size() == 0)
-            throw new Exception("Config is empty for site=" + siteId +" application=" + application + ".");
-        String originalConfigStr = list.get(0).getConfig();
-        ConfigParseOptions options = ConfigParseOptions.defaults()
-                .setSyntax(ConfigSyntax.PROPERTIES)
-                .setAllowMissing(false);
-        Config originalConfig = ConfigFactory.parseString(originalConfigStr, options);
-        if(!originalConfig.hasPath(EagleConfigConstants.CLASSIFICATION_CONFIG)) {
-            throw new Exception("Fail to get CLASSIFICATION_CONFIG for data classification");
-        }
-        return originalConfig.getConfig(EagleConfigConstants.CLASSIFICATION_CONFIG);
+        return null;
     }
 
     public Configuration convert(Config originalConfig) throws Exception {

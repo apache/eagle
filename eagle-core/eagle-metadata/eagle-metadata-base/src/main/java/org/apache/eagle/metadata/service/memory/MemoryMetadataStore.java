@@ -22,7 +22,7 @@ import org.apache.eagle.metadata.persistence.MetadataStore;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.service.SiteEntityService;
 
-public class MemoryMetadataStore extends MetadataStore {
+public class MemoryMetadataStore extends MetadataStore{
     @Override
     protected void configure() {
         bind(SiteEntityService.class).to(SiteEntityEntityServiceMemoryImpl.class);

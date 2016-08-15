@@ -878,12 +878,61 @@
 					}
 				};
 			};
+
+			//for maprfs, if key is status or volume or src/dst, convert these names to id.
+			$scope.convertToID = function(_condList, key, op, name,  type, site){
+				if(key == "dst" || key == "src") {
+					Entities.maprfsNameToID("fNameResolver", name, site)._promise.then(
+						function(response){
+							console.log("success");
+							console.log(response);
+							_condList.push($scope._CondUnit(key, op, response.data, type));
+						},
+						function(error, status){
+							console.log("error: " + status);
+						}
+					);
+				}
+				else if (key == "status"){
+					Entities.maprfsNameToID("sNameResolver", name, site)._promise.then(
+						function(response){
+							console.log("success");
+							console.log(response);
+							_condList.push($scope._CondUnit(key, op, response.data, type));
+						},
+						function(error, status){
+							console.log("error: " + status);
+						}
+					);
+				}
+				else if (key == "volume") {
+					Entities.maprfsNameToID("vNameResolver", name, site)._promise.then(
+						function(response){
+							console.log("success");
+							console.log(response);
+							_condList.push($scope._CondUnit(key, op, response.data, type));
+						},
+						function(error, status){
+							console.log("error: " + status);
+						}
+					);
+				}
+			};
+
 			// Add condition for policy
 			$scope.addCondition = function(key, op, value, type) {
 				if(value === "" || value === undefined) return false;
 
 				var _condList = $scope.policy.__.conditions[key] = $scope.policy.__.conditions[key] || [];
 				_condList.push($scope._CondUnit(key, op, value, type));
+
+				//if it is mapr application, covert human readable name to ids
+				if(Application.current().tags.application == "maprFSAuditLog")  {
+					if ( key == "dst" || key == "src" || key == "volume" || key == "status")  {
+						$scope.convertToID(_condList, key, op, value , type, Site.current().tags.site);
+					}
+				}
+
 				return true;
 			};
 			// Convert condition list to description string

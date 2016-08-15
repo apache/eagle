@@ -18,6 +18,8 @@ package org.apache.eagle.metadata.resource;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.eagle.common.function.ThrowableConsumer;
+import org.apache.eagle.common.function.ThrowableSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,11 +89,11 @@ public class RESTResponse<T>{
         return RESTResponse.<E>builder().of(func);
     }
 
-    public static <E> RestResponseBuilder<E> async(UnhandledSupplier<E,Exception> func) {
+    public static <E> RestResponseBuilder<E> async(ThrowableSupplier<E,Exception> func) {
         return RESTResponse.<E>builder().async(func);
     }
 
-    public static <E> RestResponseBuilder<E> async(UnhandledConsumer<RestResponseBuilder<E>, Exception> func){
+    public static <E> RestResponseBuilder<E> async(ThrowableConsumer<RestResponseBuilder<E>, Exception> func){
         return RESTResponse.<E>builder().async(func);
     }
 
@@ -168,7 +170,7 @@ public class RESTResponse<T>{
             return this;
         }
 
-        public RestResponseBuilder<E> async(UnhandledSupplier<E,Exception> func) {
+        public RestResponseBuilder<E> async(ThrowableSupplier<E,Exception> func) {
             CompletableFuture future = CompletableFuture.runAsync(() -> {
                 try {
                     this.status(Response.Status.OK).success(true).data(func.get());
@@ -202,7 +204,7 @@ public class RESTResponse<T>{
             throw new WebApplicationException(ex,Response.status(this.status).entity(this.current).build());
         }
 
-        public RestResponseBuilder<E> async(UnhandledConsumer<RestResponseBuilder<E>, Exception> func){
+        public RestResponseBuilder<E> async(ThrowableConsumer<RestResponseBuilder<E>, Exception> func){
             CompletableFuture future = CompletableFuture.runAsync(() -> {
                 try {
                     func.accept(this);
@@ -217,7 +219,7 @@ public class RESTResponse<T>{
             return this;
         }
 
-        public RestResponseBuilder<E> then(UnhandledConsumer<RestResponseBuilder<E>, Exception> func){
+        public RestResponseBuilder<E> then(ThrowableConsumer<RestResponseBuilder<E>, Exception> func){
             try {
                 func.accept(this);
             } catch (Throwable ex) {

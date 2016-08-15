@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import backtype.storm.tuple.Fields;
 import org.apache.eagle.jobrunning.callback.DefaultRunningJobInputStreamCallback;
 import org.apache.eagle.jobrunning.callback.RunningJobMessageId;
 import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig;
@@ -57,7 +58,7 @@ public class JobRunningSpout extends BaseRichSpout {
     public JobRunningSpout(RunningJobCrawlConfig config){
 		this(config, new JobRunningSpoutCollectorInterceptor());
 	}
-	
+
 	/**
 	 * mostly this constructor signature is for unit test purpose as you can put customized interceptor here
 	 * @param config
@@ -69,8 +70,8 @@ public class JobRunningSpout extends BaseRichSpout {
 		this.callback = new DefaultRunningJobInputStreamCallback(interceptor);
 		this.readWriteLock = new ReentrantReadWriteLock();
 	}
-	
-	
+
+
 	/**
 	 * TODO: just copy this part from jobHistorySpout, need to move it to a common place
 	 * @param context
@@ -89,14 +90,14 @@ public class JobRunningSpout extends BaseRichSpout {
 		}
 		throw new IllegalStateException();
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
 		int partitionId = calculatePartitionId(context);
 		// sanity verify 0<=partitionId<=numTotalPartitions-1
 		if(partitionId < 0 || partitionId > config.controlConfig.numTotalPartitions){
-			throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId " + 
+			throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId " +
 					partitionId + " and numTotalPartitions " + config.controlConfig.numTotalPartitions);
 		}
 		Class<? extends JobPartitioner> partitionerCls = config.controlConfig.partitionerCls;
@@ -108,7 +109,7 @@ public class JobRunningSpout extends BaseRichSpout {
 			throw new IllegalStateException(e);
 		}
 		JobFilter jobFilter = new JobFilterByPartition(partitioner, config.controlConfig.numTotalPartitions, partitionId);
-		interceptor.setSpoutOutputCollector(collector);		
+		interceptor.setSpoutOutputCollector(collector);
 		try {
 			zkStateManager = new JobRunningZKStateManager(config);
 			crawler = new RunningJobCrawlerImpl(config, zkStateManager, callback, jobFilter, readWriteLock);
@@ -130,15 +131,12 @@ public class JobRunningSpout extends BaseRichSpout {
         }catch(Exception x){
         }
     }
-	
-	/**
-	 * empty because framework will take care of output fields declaration
-	 */
+
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		
+		declarer.declare(new Fields("f1", "f2"));
 	}
-	
+
 	/**
 	 * add to processedJob
 	 */
@@ -161,10 +159,10 @@ public class JobRunningSpout extends BaseRichSpout {
 					try {readWriteLock.readLock().unlock(); LOG.info("Read lock released");}
 					catch (Throwable t) { LOG.error("Fail to release Read lock", t);}
 				}
-				break;				
+				break;
 			default:
 				break;
-		}	
+		}
     }
 
 	/**
@@ -187,14 +185,14 @@ public class JobRunningSpout extends BaseRichSpout {
 			}
 		}
     }
-   
+
     @Override
     public void deactivate() {
-    	
+
     }
-   
+
     @Override
     public void close() {
-    	
+
     }
 }

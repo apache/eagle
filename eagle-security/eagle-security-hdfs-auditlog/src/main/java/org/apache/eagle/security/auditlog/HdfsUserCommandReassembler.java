@@ -18,11 +18,9 @@
  */
 package org.apache.eagle.security.auditlog;
 
+import backtype.storm.task.OutputCollector;
 import com.typesafe.config.Config;
 import org.apache.eagle.policy.siddhi.AttributeType;
-import org.apache.eagle.policy.siddhi.SiddhiStreamMetadataUtils;
-import org.apache.eagle.datastream.Collector;
-import org.apache.eagle.datastream.JavaStormStreamExecutor2;
 import org.apache.eagle.security.entity.HdfsUserCommandPatternEntity;
 import org.apache.eagle.service.client.EagleServiceConnector;
 import org.slf4j.Logger;
@@ -32,11 +30,10 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import scala.Tuple2;
 
 import java.util.*;
 
-public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String, Map> {
+public class HdfsUserCommandReassembler {
     private static final Logger LOG = LoggerFactory.getLogger(HdfsUserCommandReassembler.class);
     private Config config;
     private InputHandler inputHandler;
@@ -54,7 +51,6 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
         put("cmd", AttributeType.STRING.name());
     }};
 
-    @Override
     public void prepareConfig(Config config) {
         this.config = config;
     }
@@ -69,7 +65,7 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
         @Override
         public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
             Object[] attrValues = inEvents[0].getData();
-            Collector<Tuple2<String, Map>> collector = (Collector<Tuple2<String, Map>>)attrValues[0];
+            OutputCollector collector = (OutputCollector) attrValues[0];
             SortedMap<String, Object> outputEvent = new TreeMap<String, Object>();
             int i = 1;  // output is from second element
             String user = null;
@@ -82,13 +78,47 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
 
             outputEvent.putAll(outputModifier);
             LOG.debug("outputEvent: " + outputEvent);
-            collector.collect(new Tuple2<String, Map>(user, outputEvent));
+            collector.emit(Arrays.asList(user, outputEvent));
         }
     }
 
-    @Override
+    public String convertToStreamDef(String streamName, Map<String, String> eventSchema){
+        StringBuilder sb = new StringBuilder();
+        sb.append("context" + " object,");
+        for(Map.Entry<String, String> entry : eventSchema.entrySet()){
+            appendAttributeNameType(sb, entry.getKey(), entry.getValue());
+        }
+        if(sb.length() > 0){
+            sb.deleteCharAt(sb.length()-1);
+        }
+
+        String siddhiStreamDefFormat = "define stream " + streamName + "(" + "%s" + ");";
+        return String.format(siddhiStreamDefFormat, sb.toString());
+    }
+
+    private void appendAttributeNameType(StringBuilder sb, String attrName, String attrType){
+        sb.append(attrName);
+        sb.append(" ");
+        if(attrType.equalsIgnoreCase(AttributeType.STRING.name())){
+            sb.append("string");
+        }else if(attrType.equalsIgnoreCase(AttributeType.INTEGER.name())){
+            sb.append("int");
+        }else if(attrType.equalsIgnoreCase(AttributeType.LONG.name())){
+            sb.append("long");
+        }else if(attrType.equalsIgnoreCase(AttributeType.BOOL.name())){
+            sb.append("bool");
+        }else if(attrType.equalsIgnoreCase(AttributeType.FLOAT.name())){
+            sb.append("float");
+        }else if(attrType.equalsIgnoreCase(AttributeType.DOUBLE.name())){
+            sb.append("double");
+        }else{
+            LOG.warn("AttrType is not recognized, ignore : " + attrType);
+        }
+        sb.append(",");
+    }
+
     public void init() {
-        String streamDef = SiddhiStreamMetadataUtils.convertToStreamDef(streamName, eventSchema);
+        String streamDef = convertToStreamDef(streamName, eventSchema);
         SiddhiManager siddhiManager = new SiddhiManager();
         StringBuilder sb = new StringBuilder();
         sb.append(streamDef);
@@ -137,8 +167,7 @@ public class HdfsUserCommandReassembler extends JavaStormStreamExecutor2<String,
         executionPlanRuntime.start();
     }
 
-    @Override
-    public void flatMap(List<Object> input, Collector<Tuple2<String, Map>> collector) {
+    public void flatMap(List<Object> input, OutputCollector collector) {
         if(LOG.isDebugEnabled()) LOG.debug("incoming event:" + input.get(1));
         SortedMap<String, Object> toBeCopied = (SortedMap<String, Object>) input.get(1);
         SortedMap<String, Object> event = new TreeMap<>(toBeCopied);

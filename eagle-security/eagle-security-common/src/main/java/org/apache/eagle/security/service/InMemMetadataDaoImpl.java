@@ -37,13 +37,16 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
     private static final Logger LOG = LoggerFactory.getLogger(InMemMetadataDaoImpl.class);
 
     private Map<Pair<String, String>, HBaseSensitivityEntity> hBaseSensitivityEntities = new HashMap<>();
+    private Map<Pair<String, String>, HdfsSensitivityEntity> hdfsSensitivityEntities = new HashMap<>();
+    private Map<String, IPZoneEntity> ipZones = new HashMap<>();
+    private Map<Pair<String, String>, HiveSensitivityEntity> hiveSensitivityEntities = new HashMap<>();
 
     @Inject
     public InMemMetadataDaoImpl() {
     }
 
     @Override
-    public synchronized Collection<HBaseSensitivityEntity> listHBaseSensitivies() {
+    public synchronized Collection<HBaseSensitivityEntity> listHBaseSensitivities() {
         return hBaseSensitivityEntities.values();
     }
 
@@ -52,6 +55,47 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
         for (HBaseSensitivityEntity e : h) {
             Pair p = new ImmutablePair<>(e.getSite(), e.getHbaseResource());
             hBaseSensitivityEntities.put(p, e);
+        }
+        return new OpResult();
+    }
+
+    @Override
+    public Collection<HdfsSensitivityEntity> listHdfsSensitivities() {
+        return hdfsSensitivityEntities.values();
+    }
+
+    @Override
+    public OpResult addHdfsSensitivity(Collection<HdfsSensitivityEntity> h) {
+        for(HdfsSensitivityEntity e : h){
+            Pair p = new ImmutablePair<>(e.getSite(), e.getFiledir());
+            hdfsSensitivityEntities.put(p, e);
+        }
+        return new OpResult();
+    }
+
+    @Override
+    public Collection<IPZoneEntity> listIPZones() {
+        return ipZones.values();
+    }
+
+    @Override
+    public OpResult addIPZone(Collection<IPZoneEntity> h) {
+        for(IPZoneEntity e : h){
+            ipZones.put(e.getIphost(), e);
+        }
+        return new OpResult();
+    }
+
+    @Override
+    public synchronized Collection<HiveSensitivityEntity> listHiveSensitivities() {
+        return hiveSensitivityEntities.values();
+    }
+
+    @Override
+    public synchronized OpResult addHiveSensitivity(Collection<HiveSensitivityEntity> h) {
+        for (HiveSensitivityEntity e : h) {
+            Pair p = new ImmutablePair<>(e.getSite(), e.getHiveResource());
+            hiveSensitivityEntities.put(p, e);
         }
         return new OpResult();
     }

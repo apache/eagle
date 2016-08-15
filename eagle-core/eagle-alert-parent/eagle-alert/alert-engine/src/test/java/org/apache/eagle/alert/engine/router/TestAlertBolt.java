@@ -140,6 +140,7 @@ public class TestAlertBolt {
         // construct event with "value1"
         StreamEvent event1 = new StreamEvent();
         event1.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:00:00")*1000);
+        event1.setMetaVersion("version1");
         Object[] data = new Object[]{"value1"};
         event1.setData(data);
         event1.setStreamId(streamId);
@@ -148,6 +149,7 @@ public class TestAlertBolt {
         // construct another event with "value1"
         StreamEvent event2 = new StreamEvent();
         event2.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:00:00")*1000);
+        event2.setMetaVersion("version1");
         data = new Object[]{"value2"};
         event2.setData(data);
         event2.setStreamId(streamId);
@@ -202,7 +204,7 @@ public class TestAlertBolt {
         int taskId = 1;
         when(context.getComponentId(taskId)).thenReturn("comp1");
         when(context.getComponentOutputFields("comp1", "default")).thenReturn(new Fields("f0"));
-        // case 1: bolt prepared but metadata not initialized
+        // case 1: bolt prepared but metadata not initialized (no bolt.onAlertBoltSpecChange)
         PartitionedEvent pe = new PartitionedEvent();
         pe.setPartitionKey(1);
         pe.setPartition(createPartition());
@@ -220,7 +222,7 @@ public class TestAlertBolt {
         failedCount.set(0);
 
         {
-            // case 2: metadata loaded but empty
+            // case 2: metadata loaded but empty (AlertBoltSepc)
             bolt.onAlertBoltSpecChange(new AlertBoltSpec(), new HashMap());
 
             bolt.execute(input);
@@ -232,14 +234,17 @@ public class TestAlertBolt {
         {
             Map<String, StreamDefinition> sds = new HashMap();
             StreamDefinition sdTest = new StreamDefinition();
-            String streamId = "pd-test";
+            String streamId = "pd-test"; // here streamId is different from the one "test-stream" (StreamEvent)
             sdTest.setStreamId(streamId);
             sds.put(sdTest.getStreamId(), sdTest);
+
             AlertBoltSpec boltSpecs = new AlertBoltSpec();
-            boltSpecs.setVersion("specVersion-"+System.currentTimeMillis());
+            boltSpecs.setVersion("specVersion-" + System.currentTimeMillis());
+
             PolicyDefinition def = new PolicyDefinition();
             def.setName("policy-definition");
             def.setInputStreams(Arrays.asList(streamId));
+
             PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
             definition.setType(PolicyStreamHandlers.NO_DATA_ALERT_ENGINE);
             definition.setValue("PT0M,plain,1,host,host1");
@@ -251,7 +256,83 @@ public class TestAlertBolt {
 
             bolt.execute(input);
             Assert.assertEquals(1, failedCount.get());
+            failedCount.set(0);
         }
+    }
+
+    @Test
+    public void testMetaversionConflict() throws Exception {
+        AtomicInteger failedCount = new AtomicInteger();
+        OutputCollector collector = new OutputCollector(new IOutputCollector(){
+            int count = 0;
+            @Override
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                Assert.assertEquals("testAlertStream", tuple.get(0));
+                AlertStreamEvent event = (AlertStreamEvent) tuple.get(1);
+                System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", streamId, tuple));
+                return null;
+            }
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {            }
+            @Override
+            public void ack(Tuple input) {            }
+            @Override
+            public void fail(Tuple input) {      failedCount.incrementAndGet();      }
+            @Override
+            public void reportError(Throwable error) {            }
+        });
+        AlertBolt bolt = createAlertBolt(collector);
+
+        GeneralTopologyContext context = mock(GeneralTopologyContext.class);
+        int taskId = 1;
+        when(context.getComponentId(taskId)).thenReturn("comp1");
+        when(context.getComponentOutputFields("comp1", "default")).thenReturn(new Fields("f0"));
+        // case 1: bolt prepared but metadata not initialized (no bolt.onAlertBoltSpecChange)
+        PartitionedEvent pe = new PartitionedEvent();
+        pe.setPartitionKey(1);
+        pe.setPartition(createPartition());
+        StreamEvent streamEvent = new StreamEvent();
+        streamEvent.setStreamId("test-stream");
+        streamEvent.setTimestamp(System.currentTimeMillis());
+        streamEvent.setMetaVersion("spec_version_"+System.currentTimeMillis());
+        pe.setEvent(streamEvent);
+
+        PartitionedEventSerializerImpl peSer = new PartitionedEventSerializerImpl(bolt);
+        byte[] serializedEvent = peSer.serialize(pe);
+        Tuple input = new TupleImpl(context, Collections.singletonList(serializedEvent), taskId, "default");
+
+
+        Map<String, StreamDefinition> sds = new HashMap();
+        StreamDefinition sdTest = new StreamDefinition();
+        String streamId = "test-stream";
+        sdTest.setStreamId(streamId);
+        sds.put(sdTest.getStreamId(), sdTest);
+
+        AlertBoltSpec boltSpecs = new AlertBoltSpec();
+        boltSpecs.setVersion("spec_version_" + System.currentTimeMillis());
+        boltSpecs.setTopologyName("alertUnitTopology_1");
+
+        PolicyDefinition def = new PolicyDefinition();
+        def.setName("policy-definition");
+        def.setInputStreams(Arrays.asList(streamId));
+
+        PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
+        definition.setType(PolicyStreamHandlers.NO_DATA_ALERT_ENGINE);
+        definition.setValue("PT0M,plain,1,host,host1");
+        def.setDefinition(definition);
+
+        boltSpecs.getBoltPoliciesMap().put(bolt.getBoltId(), Arrays.asList(def));
+        bolt = createAlertBolt(collector);
+        bolt.onAlertBoltSpecChange(boltSpecs, sds);
+
+        bolt.execute(input);
+
+        // Sleep 10s to wait thread in bolt.execute() to finish works
+        Thread.sleep(10000);
+
+        Assert.assertEquals(0, failedCount.get());
+        failedCount.set(0);
+
     }
 
     @NotNull

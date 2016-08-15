@@ -18,16 +18,25 @@ package org.apache.eagle.app.test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
-import org.apache.eagle.app.ApplicationGuiceModule;
+import org.apache.eagle.app.module.ApplicationExtensionLoader;
+import org.apache.eagle.app.module.ApplicationGuiceModule;
 import org.apache.eagle.common.module.CommonGuiceModule;
+import org.apache.eagle.common.module.GlobalScope;
+import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
 
 public class AppTestGuiceModule extends AbstractModule{
     @Override
     protected void configure() {
-        install(new CommonGuiceModule());
-        install(new ApplicationGuiceModule());
-        install(new MemoryMetadataStore());
+        CommonGuiceModule common = new CommonGuiceModule();
+        ApplicationGuiceModule app = new ApplicationGuiceModule();
+        MemoryMetadataStore store = new MemoryMetadataStore();
+        install(common);
+        install(app);
+        install(store);
+        ModuleRegistry registry =ApplicationExtensionLoader.load(common,app,store);
+        registry.getModules(store.getClass()).forEach(this::install);
+        registry.getModules(GlobalScope.class).forEach(this::install);
         bind(ServerSimulator.class).to(ServerSimulatorImpl.class).in(Singleton.class);
     }
 }

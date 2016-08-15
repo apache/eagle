@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
 @Path("/hbaseResource")
 public class HbaseMetadataBrowseWebResource {
     private static Logger LOG = LoggerFactory.getLogger(HbaseMetadataBrowseWebResource.class);
-    private MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
     final public static String HBASE_APPLICATION = "HBaseAuditLogApplication";
 
     private ApplicationEntityService entityService;
@@ -50,13 +49,12 @@ public class HbaseMetadataBrowseWebResource {
     @Inject
     public HbaseMetadataBrowseWebResource(ApplicationEntityService entityService, Config eagleServerConfig){
         this.entityService = entityService;
-        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
-
+        this.dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
     }
 
     private Map<String, Map<String, String>> getAllSensitivities(){
         Map<String, Map<String, String>> all = new HashMap<>();
-        Collection<HBaseSensitivityEntity> entities = dao.listHBaseSensitivies();
+        Collection<HBaseSensitivityEntity> entities = dao.listHBaseSensitivities();
         for(HBaseSensitivityEntity entity : entities){
             if(!all.containsKey(entity.getSite())){
                 all.put(entity.getSite(), new HashMap<>());
@@ -149,8 +147,8 @@ public class HbaseMetadataBrowseWebResource {
         List<String> columns = null;
         List<HbaseResourceEntity> values = new ArrayList<>();
         try {
-            Config config = repo.getConfig(HBASE_APPLICATION, site);
-            Configuration conf = repo.convert(config);
+            Map<String, Object> config = getAppConfig(site, HBASE_APPLICATION);
+            Configuration conf = convert(config);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
             String tableName = String.format("%s:%s", namespace, table);
             columns = dao.getColumnFamilies(tableName);
