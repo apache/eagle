@@ -20,7 +20,7 @@ package org.apache.eagle.jpm.mr.history.crawler;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
-import org.apache.eagle.jpm.mr.history.storm.JobIdFilter;
+import org.apache.eagle.jpm.util.JobIdFilter;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateLCM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

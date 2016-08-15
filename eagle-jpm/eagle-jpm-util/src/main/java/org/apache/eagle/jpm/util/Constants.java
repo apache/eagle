@@ -84,7 +84,8 @@ public class Constants {
         UNDEFINED, SUCCEEDED, FAILED, KILLED
     }
     public enum ResourceType {
-         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB, CLUSTER_INFO
+        COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB, CLUSTER_INFO, JOB_CONFIGURATION,
+        COMPLETE_MR_JOB
     }
 
     //MR
@@ -109,6 +110,8 @@ public class Constants {
         public static final String PIG_JOB = "pig.script";
         public static final String CASCADING_JOB = "cascading.app.name";
     }
+
+    public static final String HIVE_QUERY_STRING = "hive.query.string";
 
     /**
      * MR task types

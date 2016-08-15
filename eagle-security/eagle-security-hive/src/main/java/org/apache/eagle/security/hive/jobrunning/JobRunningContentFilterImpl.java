@@ -14,13 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jobrunning.job.conf;
+package org.apache.eagle.security.hive.jobrunning;
 
 import java.util.Map;
 
-import org.jsoup.nodes.Document;
+import org.apache.eagle.jpm.util.Constants;
 
-public interface JobConfParser {
+/**
+ * define what content in job running stream should be streamed
+ */
+public class JobRunningContentFilterImpl implements JobRunningContentFilter {
+	private static final long serialVersionUID = 1L;
 	
-	Map<String, String> parse(Document doc);
+	@Override
+	public boolean acceptJobConf(Map<String, String> config) {
+		if (config.containsKey(Constants.HIVE_QUERY_STRING)) {
+			return true;
+		}
+		return false;
+	}
 }

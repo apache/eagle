@@ -30,6 +30,7 @@ import org.apache.eagle.jpm.util.resourceFetch.model.ClusterInfoWrapper;
 import org.apache.eagle.jpm.util.resourceFetch.url.JobListServiceURLBuilderImpl;
 import org.apache.eagle.jpm.util.resourceFetch.url.ServiceURLBuilder;
 import org.apache.eagle.jpm.util.resourceFetch.url.SparkCompleteJobServiceURLBuilderImpl;
+import org.apache.eagle.jpm.util.resourceFetch.url.URLUtil;
 import org.apache.hadoop.mapreduce.Cluster;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -46,7 +47,6 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 	private final HAURLSelector selector;
 	private final ServiceURLBuilder jobListServiceURLBuilder;
 	private final ServiceURLBuilder sparkCompleteJobServiceURLBuilder;
-	
 	private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	
 	static {
@@ -66,13 +66,12 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 		}
 	}
 	
-	private List<AppInfo> doFetchSparkFinishApplicationsList(String lastFinishTime) throws Exception {
+	private List<AppInfo> doFetchFinishApplicationsList(String urlString) throws Exception {
 		List<AppInfo> result;
 		InputStream is = null;
 		try {
 			checkUrl();
-			final String urlString = sparkCompleteJobServiceURLBuilder.build(selector.getSelectedUrl(), lastFinishTime);
-			LOG.info("Going to call yarn api to fetch finished spark job list: " + urlString);
+			LOG.info("Going to call yarn api to fetch finished application list: " + urlString);
 			is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
 			final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
 			if (appWrapper != null && appWrapper.getApps() != null
@@ -94,25 +93,6 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 		return sb.toString();
     }
 
-    private List<AppInfo> doFetchSparkRunningApplicationsList() throws Exception {
-        List<AppInfo> result;
-        InputStream is = null;
-        try {
-            checkUrl();
-            final String urlString = getSparkRunningJobURL();
-            LOG.info("Going to call yarn api to fetch running spark job list: " + urlString);
-            is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.NONE);
-            final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
-            if (appWrapper != null && appWrapper.getApps() != null && appWrapper.getApps().getApp() != null) {
-                result = appWrapper.getApps().getApp();
-                return result;
-            }
-            return null;
-        } finally {
-            if (is != null)  { try { is.close();} catch (Exception e) { } }
-        }
-    }
-
     private String getMRRunningJobURL() {
         return String.format("%s/%s?applicationTypes=MAPREDUCE&state=RUNNING&%s",
                 selector.getSelectedUrl(),
@@ -120,13 +100,22 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
                 Constants.ANONYMOUS_PARAMETER);
     }
 
-	private List<AppInfo> doFetchMRRunningApplicationsList() throws Exception {
+    public String getMRFinishedJobURL(String lastFinishedTime) {
+        String url = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
+        StringBuilder sb = new StringBuilder();
+        sb.append(url).append("/").append(Constants.V2_APPS_URL);
+        sb.append("?applicationTypes=MAPREDUCE&state=FINISHED&finishedTimeBegin=");
+        sb.append(lastFinishedTime).append("&").append(Constants.ANONYMOUS_PARAMETER);
+
+        return sb.toString();
+    }
+
+	private List<AppInfo> doFetchRunningApplicationsList(String urlString) throws Exception {
         List<AppInfo> result;
         InputStream is = null;
         try {
             checkUrl();
-            final String urlString = getMRRunningJobURL();
-            LOG.info("Going to call yarn api to fetch running mr job list: " + urlString);
+            LOG.info("Going to call yarn api to fetch running application list: " + urlString);
             is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
             final AppsWrapper appWrapper = OBJ_MAPPER.readValue(is, AppsWrapper.class);
             if (appWrapper != null && appWrapper.getApps() != null && appWrapper.getApps().getApp() != null) {
@@ -142,11 +131,14 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 	public List<AppInfo> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
 		switch(resoureType) {
 			case COMPLETE_SPARK_JOB:
-				return doFetchSparkFinishApplicationsList((String)parameter[0]);
+                final String urlString = sparkCompleteJobServiceURLBuilder.build((String)parameter[0]);
+                return doFetchFinishApplicationsList(urlString);
 			case RUNNING_SPARK_JOB:
-                return doFetchSparkRunningApplicationsList();
+                return doFetchRunningApplicationsList(getSparkRunningJobURL());
             case RUNNING_MR_JOB:
-                return doFetchMRRunningApplicationsList();
+                return doFetchRunningApplicationsList(getMRRunningJobURL());
+            case COMPLETE_MR_JOB:
+                return doFetchFinishApplicationsList(getMRFinishedJobURL((String)parameter[0]));
 			default:
 				throw new Exception("Not support resourceType :" + resoureType);
 		}

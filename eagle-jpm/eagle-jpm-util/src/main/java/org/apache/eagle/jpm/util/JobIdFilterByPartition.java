@@ -16,8 +16,25 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.storm;
+package org.apache.eagle.jpm.util;
 
-public interface JobIdFilter {
-    boolean accept(String jobId);
+public class JobIdFilterByPartition implements JobIdFilter {
+    private JobIdPartitioner partitioner;
+    private int numTotalPartitions;
+    private int partitionId;
+
+    public JobIdFilterByPartition(JobIdPartitioner partitioner, int numTotalPartitions, int partitionId) {
+        this.partitioner = partitioner;
+        this.numTotalPartitions = numTotalPartitions;
+        this.partitionId = partitionId;
+    }
+
+    @Override
+    public boolean accept(String jobId) {
+        int part = partitioner.partition(numTotalPartitions, jobId);
+        if (part == partitionId) {
+            return true;
+        }
+        return false;
+    }
 }

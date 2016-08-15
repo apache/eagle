@@ -22,10 +22,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import org.apache.eagle.jobrunning.common.JobConstants;
-import org.apache.eagle.jobrunning.common.JobConstants.ResourceType;
-import org.apache.eagle.jobrunning.storm.JobRunningContentFilter;
-import org.apache.eagle.jobrunning.storm.JobRunningContentFilterImpl;
+import org.apache.eagle.jpm.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,12 +54,12 @@ public class JobFilterBolt extends BaseRichBolt {
     public void execute(Tuple input) {
 		String user = input.getString(0);
         String jobId = input.getString(1);
-        ResourceType type = (ResourceType)input.getValue(2);
-        if (type.equals(ResourceType.JOB_CONFIGURATION)) {
+        Constants.ResourceType type = (Constants.ResourceType)input.getValue(2);
+        if (type.equals(Constants.ResourceType.JOB_CONFIGURATION)) {
             Map<String, String> configs = (Map<String, String>)input.getValue(3);
             if (filter.acceptJobConf(configs)) {
                 if(LOG.isDebugEnabled()) {
-                    LOG.debug("Got a hive job, jobID: " + jobId + ", query: " + configs.get(JobConstants.HIVE_QUERY_STRING));
+                    LOG.debug("Got a hive job, jobID: " + jobId + ", query: " + configs.get(Constants.HIVE_QUERY_STRING));
                 } else {
                     LOG.info("Got a hive job, jobID: " + jobId);
                 }
