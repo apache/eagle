@@ -30,6 +30,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(Constants.JPA_TASK_EXECUTION_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
+@Indexes({
+        @Index(name="Index_1_jobId", columns = { "jobId" }, unique = false)
+})
 public class TaskExecutionAPIEntity extends JobBaseAPIEntity {
     @Column("a")
     private String taskStatus;
