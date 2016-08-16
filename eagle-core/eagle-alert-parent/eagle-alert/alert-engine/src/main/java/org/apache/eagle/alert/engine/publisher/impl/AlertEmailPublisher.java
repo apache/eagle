@@ -18,12 +18,7 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
+import com.typesafe.config.Config;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -33,7 +28,11 @@ import org.apache.eagle.alert.engine.publisher.email.AlertEmailGeneratorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class AlertEmailPublisher extends AbstractPublishPlugin {
 
@@ -69,6 +68,7 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
         if(event == null) {
             return;
         }
+
         boolean isSuccess = emailGenerator.sendAlertEmail(event);
         PublishStatus status = new PublishStatus();
         if(!isSuccess) {

@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @since Apr 11, 2016
@@ -32,6 +32,7 @@ public class Publishment {
     private String type;
     private List<String> policyIds;
     private String dedupIntervalMin;
+    private List<String> dedupFields;
     private Map<String, String> properties;
     // the class name to extend the IEventSerializer interface
     private String serializer;
@@ -74,6 +75,14 @@ public class Publishment {
 
     public void setDedupIntervalMin(String dedupIntervalMin) {
         this.dedupIntervalMin = dedupIntervalMin;
+    }
+
+    public List<String> getDedupFields() {
+        return dedupFields;
+    }
+
+    public void setDedupFields(List<String> dedupFields) {
+        this.dedupFields = dedupFields;
     }
 
     public Map<String, String> getProperties() {

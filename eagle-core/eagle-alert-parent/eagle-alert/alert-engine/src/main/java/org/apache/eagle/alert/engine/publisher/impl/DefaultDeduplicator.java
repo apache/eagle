@@ -17,21 +17,23 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 public class DefaultDeduplicator implements AlertDeduplicator {
 	private long dedupIntervalMin;
+	private List<String> customDedupFields = new ArrayList<>();
 	private volatile Map<EventUniq, Long> events = new HashMap<>();
 	private static Logger LOG = LoggerFactory.getLogger(DefaultDeduplicator.class);
 
@@ -52,6 +54,11 @@ public class DefaultDeduplicator implements AlertDeduplicator {
 	public DefaultDeduplicator(long intervalMin) {
 		this.dedupIntervalMin = intervalMin;
 	}
+
+	public DefaultDeduplicator(String intervalMin, List<String> customDedupFields) {
+		setDedupIntervalMin(intervalMin);
+		this.customDedupFields = customDedupFields;
+	}
 	
 	public void clearOldCache() {
 		List<EventUniq> removedkeys = new ArrayList<>();
@@ -65,7 +72,12 @@ public class DefaultDeduplicator implements AlertDeduplicator {
 			events.remove(alertKey);
 		}
 	}
-	
+
+	/***
+	 *
+	 * @param key
+	 * @return
+	 */
 	public AlertDeduplicationStatus checkDedup(EventUniq key) {
 		long current = key.timestamp;
 		if(!events.containsKey(key)) {
@@ -78,7 +90,7 @@ public class DefaultDeduplicator implements AlertDeduplicator {
 			events.put(key, current);
 			return AlertDeduplicationStatus.IGNORED;
 		}
-		
+
 		return AlertDeduplicationStatus.DUPLICATED;
 	}
 	
@@ -86,7 +98,32 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         if (event == null) return null;
 		clearOldCache();
 		AlertStreamEvent result = null;
-		AlertDeduplicationStatus status = checkDedup(new EventUniq(event.getStreamId(), event.getPolicyId(), event.getCreatedTime()));
+
+		// check custom field, and get the field values
+		StreamDefinition streamDefinition = event.getSchema();
+		HashMap<String, String> customFieldValues = new HashMap<>();
+		for (int i = 0; i < event.getData().length; i++){
+			if (i > streamDefinition.getColumns().size()) {
+				if (LOG.isWarnEnabled()) {
+					LOG.warn("output column does not found for event data, this indicate code error!");
+				}
+				continue;
+			}
+			String colName = streamDefinition.getColumns().get(i).getName();
+
+			for (String field : customDedupFields){
+				if (colName.equals(field)){
+					customFieldValues.put(field, event.getData()[i].toString());
+					break;
+				}
+			}
+		}
+
+		AlertDeduplicationStatus status = checkDedup(
+				new EventUniq(event.getStreamId(),
+						event.getPolicyId(),
+						event.getCreatedTime(),
+						customFieldValues));
 		if (!status.equals(AlertDeduplicationStatus.DUPLICATED)) {
 			result = event;
 		} else if(LOG.isDebugEnabled()){
