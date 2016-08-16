@@ -27,6 +27,7 @@ import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
 import org.apache.eagle.dataproc.impl.storm.kafka.KafkaSpoutProvider;
+import storm.kafka.StringScheme;
 
 /**
  * Since 7/27/16.
@@ -52,7 +53,7 @@ public class HBaseAuditLogApplication extends StormApplication {
 
         builder.setSpout("ingest", spout, numOfSpoutTasks);
         BoltDeclarer boltDeclarer = builder.setBolt("parserBolt", bolt, numOfParserTasks);
-        boltDeclarer.fieldsGrouping("ingest", new Fields("f1"));
+        boltDeclarer.fieldsGrouping("ingest", new Fields(StringScheme.STRING_SCHEME_KEY));
 
         HbaseResourceSensitivityDataJoinBolt joinBolt = new HbaseResourceSensitivityDataJoinBolt(config);
         BoltDeclarer joinBoltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);

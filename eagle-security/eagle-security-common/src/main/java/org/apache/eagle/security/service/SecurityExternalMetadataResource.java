@@ -79,4 +79,19 @@ public class SecurityExternalMetadataResource {
     public void addIPZones(Collection<IPZoneEntity> list){
         dao.addIPZone(list);
     }
+
+
+    @Path("/hiveSensitivity")
+    @GET
+    @Produces("application/json")
+    public Collection<HiveSensitivityEntity> getHiveSensitivities(@QueryParam("site") String site){
+        return dao.listHiveSensitivities();
+    }
+
+    @Path("/hiveSensitivity")
+    @POST
+    @Consumes("application/json")
+    public void addHiveSensitivities(Collection<HiveSensitivityEntity> list){
+        dao.addHiveSensitivity(list);
+    }
 }

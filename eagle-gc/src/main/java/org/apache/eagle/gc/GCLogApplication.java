@@ -72,6 +72,7 @@ public class GCLogApplication extends StormApplication{
     }
 
     public static void main(String[] args){
+        System.setProperty("config.resource", "/application-gclog.conf");
         Config config = ConfigFactory.load();
         GCLogApplication app = new GCLogApplication();
         app.run(config);

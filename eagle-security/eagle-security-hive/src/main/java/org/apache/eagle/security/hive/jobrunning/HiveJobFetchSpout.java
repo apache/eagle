@@ -22,7 +22,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
 import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
@@ -120,11 +119,17 @@ public class HiveJobFetchSpout extends BaseRichSpout {
         LOG.info("start to fetch job list");
         try {
             List<AppInfo> apps = rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
+            if(apps == null){
+                apps = new ArrayList<>();
+            }
             handleApps(apps, true);
 
             long fetchTime = Calendar.getInstance().getTimeInMillis();
             if (fetchTime - this.lastFinishAppTime > 60000l) {
                 apps = rmResourceFetcher.getResource(Constants.ResourceType.COMPLETE_MR_JOB, Long.toString(this.lastFinishAppTime));
+                if(apps == null){
+                    apps = new ArrayList<>();
+                }
                 handleApps(apps, false);
                 this.lastFinishAppTime = fetchTime;
                 this.runningJobManager.updateLastFinishTime(partitionId, fetchTime);

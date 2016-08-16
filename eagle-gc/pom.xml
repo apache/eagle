@@ -35,6 +35,12 @@
       <groupId>org.apache.eagle</groupId>
       <artifactId>eagle-metric</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>log4j-over-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.eagle</groupId>

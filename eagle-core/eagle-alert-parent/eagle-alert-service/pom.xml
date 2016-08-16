@@ -35,6 +35,12 @@
   			<groupId>org.apache.eagle</groupId>
   			<artifactId>eagle-service-base</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>log4j-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
   		</dependency>
 	  	<dependency>
   			<groupId>org.wso2.siddhi</groupId>

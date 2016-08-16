@@ -17,7 +17,7 @@
   -->
 
 <application>
-    <type>HbaseAuditLogApplication</type>
+    <type>HBaseAuditLogApplication</type>
     <name>Hbase Audit Log Monitoring Application</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.security.hbase.HBaseAuditLogApplication</appClass>

@@ -24,28 +24,20 @@ import com.typesafe.config.Config;
 public class EagleConfigHelper {
 
     public static String getServiceHost(Config config) {
-        return config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
+        return config.getString(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.HOST);
     }
 
     public static int getServicePort(Config config) {
-        return config.getInt(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
+        return config.getInt(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PORT);
     }
 
     public static String getServiceUser(Config config) {
-        return config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) ?
-               config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) : null;
+        return config.hasPath(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) ?
+               config.getString(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.USERNAME) : null;
     }
 
     public static String getServicePassword(Config config) {
-        return config.hasPath(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) ?
-                config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) : null;
-    }
-
-    public static String getSite(Config config) {
-        return config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.SITE);
-    }
-
-    public static String getApplication(Config config) {
-        return config.getString(EagleConfigConstants.EAGLE_PROPS + "." + EagleConfigConstants.APPLICATION);
+        return config.hasPath(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) ?
+                config.getString(EagleConfigConstants.EAGLE_SERVICE + "." + EagleConfigConstants.PASSWORD) : null;
     }
 }

@@ -157,6 +157,13 @@
             <artifactId>eagle-security-hdfs-web</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- GC log monitoring -->
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-gc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>

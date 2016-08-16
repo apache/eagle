@@ -64,8 +64,8 @@ public class ExternalDataJoiner {
 	
 	public ExternalDataJoiner(Class<? extends Job> jobCls, Config config, String id) throws Exception{
 		this.id = id;
-		Map<String, Object> map = new HashMap<String, Object>();
-        for(Map.Entry<String, ConfigValue> entry : config.getObject("eagleProps").entrySet()){
+		Map<String, Object> map = new HashMap<>();
+        for(Map.Entry<String, ConfigValue> entry : config.getObject("eagleService").entrySet()){
             map.put(entry.getKey(), entry.getValue().unwrapped());
         }
 

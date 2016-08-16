@@ -67,8 +67,8 @@ public class GCMetricGeneratorBolt extends BaseRichBolt {
         String password = EagleConfigHelper.getServicePassword(config);
         listener = new EagleServiceReporterMetricListener(host, port, username, password);
         dimensions = new HashMap<>();
-        dimensions.put(EagleConfigConstants.SITE, EagleConfigHelper.getSite(config));
-        dimensions.put(EagleConfigConstants.APPLICATION, EagleConfigHelper.getApplication(config));
+        dimensions.put(EagleConfigConstants.SITE, config.getString("siteId"));
+        dimensions.put(EagleConfigConstants.APPLICATION, config.getString("appId"));
         gcPausedTimeMetricName = MetricKeyCodeDecoder.codeMetricKey(GCConstants.GC_PAUSE_TIME_METRIC_NAME, dimensions);
 
         this.collector = collector;

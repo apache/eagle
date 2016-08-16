@@ -68,11 +68,10 @@ public class HiveResourceSensitivityPollingJob implements Job {
     }
 
     private Collection<HiveSensitivityEntity> load(JobDataMap jobDataMap) throws Exception {
-        Map<String, Object> map = (Map<String,Object>)jobDataMap.get(EagleConfigConstants.EAGLE_SERVICE);
-        String eagleServiceHost = (String)map.get(EagleConfigConstants.HOST);
-        Integer eagleServicePort = Integer.parseInt(map.get(EagleConfigConstants.PORT).toString());
-        String username = map.containsKey(EagleConfigConstants.USERNAME) ? (String)map.get(EagleConfigConstants.USERNAME) : null;
-        String password = map.containsKey(EagleConfigConstants.PASSWORD) ? (String)map.get(EagleConfigConstants.PASSWORD) : null;
+        String eagleServiceHost = (String)jobDataMap.get(EagleConfigConstants.HOST);
+        Integer eagleServicePort = Integer.parseInt(jobDataMap.get(EagleConfigConstants.PORT).toString());
+        String username = jobDataMap.containsKey(EagleConfigConstants.USERNAME) ? (String)jobDataMap.get(EagleConfigConstants.USERNAME) : null;
+        String password = jobDataMap.containsKey(EagleConfigConstants.PASSWORD) ? (String)jobDataMap.get(EagleConfigConstants.PASSWORD) : null;
 
         // load from eagle database
         LOG.info("Load hive resource sensitivity information from eagle service "
