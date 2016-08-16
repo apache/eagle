@@ -21,6 +21,7 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
 /**
  * Dedup Eagle entities.
+ * TODO: need support de-dup field values
  */
 public interface AlertDeduplicator {
 
