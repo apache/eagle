@@ -35,7 +35,7 @@
 
 			// Initialization
 			var endTime = Time();
-			var startTime = endTime.clone().subtract(6, "hour");
+			var startTime = endTime.clone().subtract(2, "hour");
 
 			$scope.site = $wrapState.param.siteId;
 
@@ -56,7 +56,7 @@
 				 * @property {string} jobList.runningContainers		Running container count
 				 */
 
-				$scope.jobList = Entity.merge($scope.jobList, JPM.list({site: $scope.site}, startTime, endTime, [
+				$scope.jobList = Entity.merge($scope.jobList, JPM.jobList({site: $scope.site}, startTime, endTime, [
 					"jobId",
 					"jobDefId",
 					"jobName",

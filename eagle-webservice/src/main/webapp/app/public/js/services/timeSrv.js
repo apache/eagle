@@ -23,14 +23,16 @@
 		["days", "day", "day"],
 		["hours", "hr", "hr"],
 		["minutes", "min", "min"],
-		["seconds", "s", "s"],
+		["seconds", "s", "s"]
 	];
 
 	var serviceModule = angular.module('eagle.service');
 
 	serviceModule.service('Time', function() {
-		var Time = function (time) {
-			if(arguments.length === 1 && time === undefined) return null;
+		var timeSrv = function (time) {
+			if(arguments.length === 1 && time === undefined) {
+				return null;
+			}
 
 			// Parse string number
 			if(typeof time === "string" && !isNaN(+time)) {
@@ -38,31 +40,31 @@
 			}
 
 			var _mom = new moment(time);
-			_mom.utcOffset(Time.UTC_OFFSET);
+			_mom.utcOffset(timeSrv.UTC_OFFSET);
 			return _mom;
 		};
 
 		// TODO: time zone
-		Time.UTC_OFFSET = 0;
+		timeSrv.UTC_OFFSET = 0;
 
-		Time.FORMAT = "YYYY-MM-DD HH:mm:ss";
+		timeSrv.FORMAT = "YYYY-MM-DD HH:mm:ss";
 
-		Time.format = function (time) {
-			time = Time(time);
-			return time ? time.format(Time.FORMAT) : "-";
+		timeSrv.format = function (time, format) {
+			time = timeSrv(time);
+			return time ? time.format(format || timeSrv.FORMAT) : "-";
 		};
 
-		Time.diff = function (from, to) {
-			from = Time(from);
-			to = Time(to);
+		timeSrv.diff = function (from, to) {
+			from = timeSrv(from);
+			to = timeSrv(to);
 			if (!from || !to) return null;
 			return to.diff(from);
-		}
+		};
 
-		Time.diffStr = function (from, to) {
+		timeSrv.diffStr = function (from, to) {
 			var diff = from;
 			if(arguments.length === 2) {
-				diff = Time.diff(from, to);
+				diff = timeSrv.diff(from, to);
 			}
 			if(diff === null) return "-";
 
@@ -86,6 +88,6 @@
 			return rows.join(", ");
 		};
 
-		return Time;
+		return timeSrv;
 	});
 })();

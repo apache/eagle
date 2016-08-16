@@ -21,20 +21,42 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
-		jpmApp.controller("detailCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
-			PageConfig.title = "Job";
-			$scope.getStateClass = JPM.getStateClass;
+		jpmApp.controller("detailCtrl", function ($q, $wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
+			var startTime, endTime;
+			var metric_allocatedMB, metric_allocatedVCores, metric_runningContainers;
+			var metric_taskDuration;
 
 			$scope.site = $wrapState.param.siteId;
 			$scope.jobId = $wrapState.param.jobId;
 
-			JPM.list({
+			PageConfig.title = "Job";
+			PageConfig.subTitle = $scope.jobId;
+
+			$scope.getStateClass = JPM.getStateClass;
+
+			var jobCond = {
 				jobId: $scope.jobId,
 				site: $scope.site
-			})._promise.then(function (res) {
-				$scope.job = common.getValueByPath(res, "data.obj.0");
-				PageConfig.subTitle = $scope.jobId;
-				console.log(">>>", $scope.job);
+			};
+
+			function metricsToSeries(name, metrics) {
+				var data = $.map(metrics, function (metric) {
+					return {
+						x: metric.timestamp,
+						y: metric.value[0]
+					};
+				});
+				return {
+					name: name,
+					type: "line",
+					data: data
+				};
+			}
+
+			JPM.jobList(jobCond)._promise.then(function (list) {
+				$scope.job = list[list.length - 1];
+				$scope.job = list[0];
+				console.log("[JPM] Fetch job:", $scope.job);
 
 				if(!$scope.job) {
 					$.dialog({
@@ -43,6 +65,46 @@
 					}, function () {
 						$wrapState.go("jpmList", {siteId: $scope.site});
 					});
+					return;
+				}
+
+				startTime = Time($scope.job.startTime).subtract(1, "hour");
+				endTime = Time().add(1, "hour");
+				$scope.isRunning = !$scope.job.currentState || ($scope.job.currentState || "").toUpperCase() === 'RUNNING';
+
+				if($scope.isRunning) {
+					// TODO: Time series interval required
+
+					/*var taskList = JPM.list("RunningTaskExecutionService", jobCond, startTime, endTime, [
+						"elapsedTime",
+						"taskId",
+						"status"
+					]);
+
+					console.log(taskList);*/
+
+					// Dashboard 1: Allocated, vCores & Containers metrics
+					metric_allocatedMB = JPM.metrics(jobCond, "hadoop.job.allocatedmb", startTime, endTime);
+					metric_allocatedVCores = JPM.metrics(jobCond, "hadoop.job.allocatedvcores", startTime, endTime);
+					metric_runningContainers = JPM.metrics(jobCond, "hadoop.job.runningcontainers", startTime, endTime);
+
+					$q.all([metric_allocatedMB._promise, metric_allocatedVCores._promise, metric_runningContainers._promise]).then(function () {
+						var series_allocatedMB = metricsToSeries("allocated MB", metric_allocatedMB);
+						var series_allocatedVCores = metricsToSeries("vCores", metric_allocatedVCores);
+						var series_runningContainers = metricsToSeries("running containers", metric_runningContainers);
+						series_allocatedMB.yAxisIndex = 1;
+						$scope.allocatedSeries = [series_allocatedMB, series_allocatedVCores, series_runningContainers];
+					});
+
+					// Dashboard 2: Task duration
+					/*metric_taskDuration = JPM.metrics(jobCond, "hadoop.task.taskduration", startTime, endTime);
+					metric_taskDuration._promise.then(function () {
+						var series_taskDuration = metricsToSeries("task duration", metric_taskDuration);
+						$scope.taskSeries = [series_taskDuration];
+					});*/
+
+					// Dashboard 3: Running task
+
 				}
 			});
 		});

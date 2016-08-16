@@ -37,16 +37,15 @@
 	}
 </style>
 
-
 <div class="box box-primary">
 	<div class="box-header with-border">
 		<h3 class="box-title">
 			Job List
-			<span ng-hide="jobList._done" class="fa fa-refresh fa-spin no-animate"></span>
+			<span ng-show="!jobList._done || isSorting" class="fa fa-refresh fa-spin no-animate"></span>
 		</h3>
 	</div>
 	<div class="box-body">
-		<div sort-table="jobList">
+		<div sort-table="jobList" is-sorting="isSorting">
 			<div class="datePickerGroup clearfix">
 				<input id="startTime" type="text" class="form-control" data-toggle="datepicker" />
 				<span class="addon">To</span>

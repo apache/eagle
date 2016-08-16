@@ -68,16 +68,20 @@ a {
 /* ========================================================================
  * =                                 Grid                                 =
  * ======================================================================== */
-.row {
-	display: -webkit-box;
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: flex;
-	flex-wrap: wrap;
-}
-.row > [class*='col-'] {
-	display: flex;
-	flex-direction: column;
+
+@media (min-width: 1200px) {
+	.row.flex {
+		display: -webkit-box;
+		display: -webkit-flex;
+		display: -ms-flexbox;
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.row.flex > [class*='col-'] {
+		display: flex;
+		flex-direction: column;
+	}
 }
 
 /* ========================================================================

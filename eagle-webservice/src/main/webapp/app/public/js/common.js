@@ -19,7 +19,13 @@
 (function () {
 	'use strict';
 
-	var common = window.common = {};
+	var scope = {};
+	if(typeof window != 'undefined') {
+		scope = window;
+	} else if(typeof self != 'undefined') {
+		scope = self;
+	}
+	var common = scope.common = {};
 
 	// ============================ Common ============================
 	common.template = function (str, list) {
@@ -31,19 +37,19 @@
 	};
 
 	common.getValueByPath = function (unit, path, defaultValue) {
-		if(unit === null || unit === undefined) throw "Unit or path can't be empty!";
+		if(unit === null || unit === undefined) throw "Unit can't be empty!";
 		if(path === "" || path === null || path === undefined) return unit;
 
 		if(typeof path === "string") {
 			path = path.replace(/\[(\d+)\]/g, ".$1").replace(/^\./, "").split(/\./);
 		}
-		$.each(path, function(i, path) {
-			unit = unit[path];
+		for(var i = 0 ; i < path.length ; i += 1) {
+			unit = unit[path[i]];
 			if(unit === null || unit === undefined) {
 				unit = null;
-				return false;
+				break;
 			}
-		});
+		}
 		if(unit === null && defaultValue !== undefined) {
 			unit = defaultValue;
 		}

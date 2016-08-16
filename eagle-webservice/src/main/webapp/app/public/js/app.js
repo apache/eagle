@@ -29,11 +29,6 @@ var app = {};
 		// ======================================================================================
 		var eagleApp = angular.module('eagleApp', ['ngRoute', 'ngAnimate', 'ui.router', 'eagleControllers', 'eagle.service'].concat(register.appList));
 
-		// GRUNT REPLACEMENT: eagleApp.buildTimestamp = TIMESTAMP
-		eagleApp._TRS = function() {
-			return eagleApp.buildTimestamp || Math.random();
-		};
-
 		// ======================================================================================
 		// =                                   Router config                                    =
 		// ======================================================================================
@@ -72,13 +67,13 @@ var app = {};
 			// ================================== Home ==================================
 				.state('home', {
 					url: "/",
-					templateUrl: "partials/home.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/home.html?_=" + window._TRS(),
 					controller: "homeCtrl",
 					resolve: routeResolve()
 				})
 				.state('setup', {
 					url: "/setup",
-					templateUrl: "partials/setup.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/setup.html?_=" + window._TRS(),
 					controller: "setupCtrl",
 					resolve: routeResolve({ site: false, application: false })
 				})
@@ -86,31 +81,31 @@ var app = {};
 				.state('alert', {
 					abstract: true,
 					url: "/alert/",
-					templateUrl: "partials/alert/main.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/alert/main.html?_=" + window._TRS(),
 					controller: "alertCtrl",
 					resolve: routeResolve(false)
 				})
 				.state('alert.list', {
 					url: "",
-					templateUrl: "partials/alert/list.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/alert/list.html?_=" + window._TRS(),
 					controller: "alertListCtrl",
 					resolve: routeResolve()
 				})
 				.state('alert.policyList', {
 					url: "policyList",
-					templateUrl: "partials/alert/policyList.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/alert/policyList.html?_=" + window._TRS(),
 					controller: "policyListCtrl",
 					resolve: routeResolve()
 				})
 				.state('alert.policyCreate', {
 					url: "policyCreate",
-					templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
 					controller: "policyCreateCtrl",
 					resolve: routeResolve()
 				})
 				.state('alert.policyEdit', {
 					url: "policyEdit/{name}",
-					templateUrl: "partials/alert/policyEdit.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
 					controller: "policyEditCtrl",
 					resolve: routeResolve()
 				})
@@ -118,32 +113,32 @@ var app = {};
 				.state('integration', {
 					abstract: true,
 					url: "/integration/",
-					templateUrl: "partials/integration/main.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/integration/main.html?_=" + window._TRS(),
 					controller: "integrationCtrl",
 					resolve: routeResolve(false)
 				})
 				.state('integration.siteList', {
 					url: "siteList",
-					templateUrl: "partials/integration/siteList.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/integration/siteList.html?_=" + window._TRS(),
 					controller: "integrationSiteListCtrl",
 					resolve: routeResolve({ application: false })
 				})
 				.state('integration.site', {
 					url: "site/:id",
-					templateUrl: "partials/integration/site.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/integration/site.html?_=" + window._TRS(),
 					controller: "integrationSiteCtrl",
 					resolve: routeResolve({ application: false })
 				})
 				.state('integration.streamList', {
 					url: "streamList",
-					templateUrl: "partials/integration/streamList.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/integration/streamList.html?_=" + window._TRS(),
 					controller: "integrationStreamListCtrl",
 					resolve: routeResolve()
 				})
 				// ================================== Site ==================================
 				.state('site', {
 					url: "/site/:id",
-					templateUrl: "partials/site/home.html?_=" + eagleApp._TRS(),
+					templateUrl: "partials/site/home.html?_=" + window._TRS(),
 					controller: "siteCtrl",
 					resolve: routeResolve()
 				})

@@ -36,59 +36,129 @@
 
 	jpmApp.portal({name: "JPM", icon: "home", path: "jpm/list"}, true);
 
-	jpmApp.service("JPM", function ($http, Time) {
+	jpmApp.service("JPM", function ($q, $http, Time) {
 		// TODO: mock auth
 		var _hash = btoa('eagle:secret');
 
 		// TODO: timestamp support
-		var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=JobExecutionService[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		//var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=RunningJobExecutionService[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		var QUERY_METRICS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 
 		var JPM = {};
 
+		JPM.get = function (url) {
+			$http.defaults.withCredentials = true;
+			var promise = $http({
+				url: url,
+				method: "GET",
+				headers: {'Authorization': "Basic " + _hash}
+			}).then(function (res) {
+				return res.data.obj;
+			});
+			$http.defaults.withCredentials = false;
+			return promise;
+		};
+
+		JPM.condition = function (condition) {
+			return $.map(condition, function (value, key) {
+				return "@" + key + '="' + value + '"'
+			}).join(" AND ");
+		};
+
 		/**
-		 * Fetch job list
-		 * @param site
+		 * Fetch eagle query list
+		 * @param query
+		 * @param condition
 		 * @param startTime
 		 * @param endTime
+		 * @param {[]?} fields
+		 * @param {number?} limit
 		 * @return {[]}
 		 */
-		JPM.list = function (condition, startTime, endTime, fields, limit) {
+		JPM.list = function (query, condition, startTime, endTime, fields, limit) {
 			var _list = [];
+			_list._done = false;
 
-			var url = common.template(QUERY_LIST, {
-				condition: $.map(condition, function (value, key) {
-					return "@" + key + '="' + value + '"'
-				}).join(" AND "),
+			var config = {
+				query: query,
+				condition: JPM.condition(condition),
 				startTime: moment(startTime).format(Time.FORMAT),
 				endTime: moment(endTime).format(Time.FORMAT),
 				fields: fields ? $.map(fields, function (field) {
 					return "@" + field;
 				}).join(",") : "*",
 				limit: limit || 10000
-			});
+			};
 
-			$http.defaults.withCredentials = true;
-			_list._done = false;
-			_list._promise = $http({
-				url: url,
-				method: "GET",
-				headers: {
-					'Authorization': "Basic " + _hash
-				}
-			});
-			$http.defaults.withCredentials = false;
-
-			/**
-			 * @param {{}} res
-			 * @param {{}} res.data
-			 * @param {Array} res.data.obj
-			 */
-			_list._promise.then(function (res) {
-				_list._done = true;
+			_list._promise = JPM.get(common.template(QUERY_LIST, config));
+			_list._promise.then(function (data) {
 				_list.splice(0);
-				Array.prototype.push.apply(_list, res.data.obj);
-				return _list
+				Array.prototype.push.apply(_list, data);
+				_list._done = true;
+			});
+			return _list;
+		};
+
+		/**
+		 * Fetch job list
+		 * @param condition
+		 * @param startTime
+		 * @param endTime
+		 * @param {[]?} fields
+		 * @param {number?} limit
+		 * @return {[]}
+		 */
+		JPM.jobList = function (condition, startTime, endTime, fields, limit) {
+			var _list = [];
+			_list._done = false;
+
+			var runningList = JPM.list("RunningJobExecutionService", condition, startTime, endTime, fields, limit);
+			var historyList = JPM.list("JobExecutionService", condition, startTime, endTime, fields, limit);
+
+			runningList._promise.then(function (data) {
+				_list.splice(0);
+				Array.prototype.push.apply(_list, data);
+			});
+
+			_list._promise = $q.all([runningList._promise, historyList._promise]).then(function (args) {
+				_list.splice(0);
+				Array.prototype.push.apply(_list, args[0]);
+				Array.prototype.push.apply(_list, args[1]);
+				_list._done = true;
+
+				return _list;
+			});
+
+			return _list;
+		};
+
+		/**
+		 * Fetch job metric list
+		 * @param condition
+		 * @param metric
+		 * @param startTime
+		 * @param endTime
+		 * @param {number?} limit
+		 * @return {[]}
+		 */
+		JPM.metrics = function (condition, metric, startTime, endTime, limit) {
+			var config = {
+				condition: JPM.condition(condition),
+				startTime: moment(startTime).format(Time.FORMAT),
+				endTime: moment(endTime).format(Time.FORMAT),
+				metric: metric,
+				limit: limit || 10000
+			};
+
+			var _list = [];
+			var metrics_url = common.template(QUERY_METRICS, config);
+			_list._done = false;
+			_list._promise = JPM.get(metrics_url);
+			_list._promise.then(function (data) {
+				_list.splice(0);
+				_list._done = true;
+				Array.prototype.push.apply(_list, data);
+				_list.reverse();
 			});
 
 			return _list;

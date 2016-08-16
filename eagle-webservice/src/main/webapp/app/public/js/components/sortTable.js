@@ -21,32 +21,6 @@
 
 	var eagleComponents = angular.module('eagle.components');
 
-	function hasContent(object, content, depth) {
-		var i, keys;
-
-		depth = depth || 1;
-		if(!content) return true;
-		if(depth > 10) return false;
-
-		if(object === undefined || object === null) {
-			return false;
-		} else if($.isArray(object)) {
-			for(i = 0 ; i < object.length ; i += 1) {
-				if(hasContent(object[i], content, depth + 1)) return true;
-			}
-		} else if(typeof object === "object") {
-			keys = Object.keys(object);
-			for(i = 0 ; i < keys.length ; i += 1) {
-				var value = object[keys[i]];
-				if(hasContent(value, content, depth + 1)) return true;
-			}
-		} else {
-			return (object + "").indexOf(content) >= 0;
-		}
-
-		return false;
-	}
-
 	eagleComponents.directive('sortTable', function($compile) {
 		return {
 			restrict: 'AE',
@@ -59,8 +33,15 @@
 			 * @param $element
 			 * @param {{}} $attrs
 			 * @param {string} $attrs.sortTable
+			 * @param {string?} $attrs.isSorting		Will bind parent variable of sort state
 			 */
 			controller: function($scope, $element, $attrs) {
+				var worker;
+				var worker_id = 0;
+				if(typeof(Worker) !== "undefined") {
+					worker = new Worker("public/js/worker/sortTableWorker.js?_=" + window._TRS());
+				}
+
 				// Initialization
 				$scope.pageNumber = 1;
 				$scope.pageSize = 10;
@@ -69,7 +50,7 @@
 				$scope.orderKey = "";
 				$scope.orderAsc = true;
 
-				// Functions
+				// UI - Column sort
 				$scope.doSort = function(path) {
 					if($scope.orderKey === path) {
 						$scope.orderAsc = !$scope.orderAsc;
@@ -84,6 +65,15 @@
 					}
 					return "fa fa-sort sort-mark";
 				};
+
+				// List filter & sort
+				function setState(bool) {
+					if(!$attrs.isSorting) return;
+
+
+					$scope.$parent[$attrs.isSorting] = bool;
+				}
+
 
 				var cacheSearch = "";
 				var cacheOrder = "";
@@ -100,40 +90,23 @@
 						cacheOrder = $scope.orderKey;
 						cacheOrderAsc = $scope.orderAsc;
 
-						cacheFilteredList = $scope.$parent[$attrs.sortTable] || [];
+						var fullList = $scope.$parent[$attrs.sortTable] || [];
+						if(!cacheFilteredList) cacheFilteredList = fullList;
 
-						if(cacheSearch) {
-							cacheFilteredList = $.grep(cacheFilteredList, function (obj) {
-								return hasContent(obj, cacheSearch);
+						if(!worker) {
+							cacheFilteredList = __sortTable_generateFilteredList(fullList, cacheSearch, cacheOrder, cacheOrderAsc);
+							setState(false);
+						} else {
+							worker_id += 1;
+							setState(true);
+							var list = JSON.stringify(fullList);
+							worker.postMessage({
+								search: cacheSearch,
+								order: cacheOrder,
+								orderAsc: cacheOrderAsc,
+								list: list,
+								id: worker_id
 							});
-						}
-
-						if(cacheOrder) {
-							if (cacheOrderAsc) {
-								cacheFilteredList.sort(function (obj1, obj2) {
-									var val1 = common.getValueByPath(obj1, cacheOrder);
-									var val2 = common.getValueByPath(obj2, cacheOrder);
-
-									if (val1 === val2) {
-										return 0;
-									} else if (val1 < val2) {
-										return -1;
-									}
-									return 1;
-								});
-							} else {
-								cacheFilteredList.sort(function (obj1, obj2) {
-									var val1 = common.getValueByPath(obj1, cacheOrder);
-									var val2 = common.getValueByPath(obj2, cacheOrder);
-
-									if (val1 === val2) {
-										return 0;
-									} else if (val1 < val2) {
-										return 1;
-									}
-									return -1;
-								});
-							}
 						}
 					}
 
@@ -144,12 +117,26 @@
 				$scope.$watch($attrs.sortTable + ".length", function () {
 					cacheFilteredList = null;
 				});
+
+				function workMessage(event) {
+					var data = event.data;
+					if(worker_id !== data.id) return;
+
+					setState(false);
+					cacheFilteredList = data.list;
+					$scope.$apply();
+				}
+				worker.addEventListener("message", workMessage);
+
+				$scope.$on('$destroy', function() {
+					worker.removeEventListener("message", workMessage);
+				});
 			},
 			compile: function ($element) {
 				var contents = $element.contents().remove();
 
 				return {
-					post: function preLink($scope, $element, $attrs) {
+					post: function preLink($scope, $element) {
 						$element.append(contents);
 
 						// Search Box

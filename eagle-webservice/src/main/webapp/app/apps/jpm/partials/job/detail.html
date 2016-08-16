@@ -16,7 +16,22 @@
   limitations under the License.
   -->
 
-<div class="row">
+<style>
+	.jpm-chart,
+	.jpm-chart-container {
+		height: 300px;
+		position: relative;
+	}
+
+	.jpm-chart .overlay {
+		top: 0;
+		bottom: 0;
+		position: absolute;
+		width: 100%;
+	}
+</style>
+
+<div class="row flex">
 	<div class="col-lg-6 col-md-12">
 		<div class="box box-primary" style="height: 100%;">
 			<div class="box-header with-border">
@@ -130,7 +145,7 @@
 							<th>HDFS Write Bytes</th>
 							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}</td>
 						</tr>
-						<tr ng-if="job.currentState !== 'running'">
+						<tr ng-if="!isRunning">
 							<th>Last Map Duration</th>
 							<td>{{Time.diffStr(job.lastMapDuration)}}</td>
 							<th>Last Reduce Duration</th>
@@ -138,16 +153,54 @@
 							<th></th>
 							<td></td>
 						</tr>
-						<tr ng-if="job.currentState === 'running'">
+						<tr ng-if="isRunning">
 							<th>Map Progress</th>
-							<td>{{common.number.toFixed(job.mapProgress * 100)}}%</td>
+							<td>{{common.number.toFixed(job.mapProgress)}}%</td>
 							<th>Reduce Progress</th>
-							<td>{{common.number.toFixed(job.reduceProgress * 100)}}%</td>
+							<td>{{common.number.toFixed(job.reduceProgress)}}%</td>
 							<th></th>
 							<td></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
+
+			<div ng-if="!job" class="overlay">
+				<i class="fa fa-refresh fa-spin"></i>
+			</div>
 		</div>
+	</div>
+</div>
+
+<div class="box box-primary" ng-if="isRunning">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Running Metrics
+		</h3>
+	</div>
+	<div class="box-body">
+		<div class="row">
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="allocatedSeries"></div>
+					<div ng-if="(allocatedSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="taskSeries"></div>
+					<div ng-if="(taskSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div ng-if="!job" class="overlay">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
 </div>
