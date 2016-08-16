@@ -40,8 +40,11 @@
 		return {
 			restrict: 'AE',
 			scope: {
-				title: "@",
-				series: "="
+				title: "@?title",
+				series: "=",
+				category: "=?category",
+				xTitle: "@?xTitle",
+				yTitle: "@?yTitle"
 			},
 			controller: function ($scope, $element, $attrs, Time) {
 				var i;
@@ -53,9 +56,10 @@
 
 					var maxYAxis = 0;
 					var legendList = [];
-					var categoryList = [];
+					var categoryList = $scope.category ? $scope.category : [];
+
 					var seriesList = $.map($scope.series || [], function (series, id) {
-						if(id === 0) {
+						if(id === 0 && !$scope.category) {
 							categoryList = $.map(series.data, function (point) {
 								return Time.format(point.x, "YY/MM/DD HH:mm");
 							});
@@ -65,7 +69,7 @@
 						if(series.yAxisIndex) maxYAxis = Math.max(series.yAxisIndex, maxYAxis);
 
 						return $.extend({}, series, {
-							data: $.map(series.data, function (point) {
+							data: $scope.category ? series.data : $.map(series.data, function (point) {
 								return point.y;
 							})
 						});
@@ -73,7 +77,10 @@
 
 					var yAxis = [];
 					for(i = 0 ; i <= maxYAxis ; i += 1) {
-						yAxis.push({type: "value"});
+						yAxis.push({
+							name: $scope.yTitle,
+							type: "value"
+						});
 					}
 
 					var option = {
@@ -90,6 +97,7 @@
 							containLabel: true
 						},
 						xAxis: {
+							name: $scope.xTitle,
 							type: 'category',
 							data: categoryList,
 							axisTick: { show: false }
@@ -97,6 +105,8 @@
 						yAxis: yAxis,
 						series: seriesList
 					};
+
+					console.log("~~>", $scope, $attrs);
 
 					chart.setOption(option);
 				}

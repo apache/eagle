@@ -42,6 +42,7 @@
 
 		// TODO: timestamp support
 		var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		var QUERY_GROUPS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		var QUERY_METRICS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 
 		var JPM = {};
@@ -52,7 +53,13 @@
 				url: url,
 				method: "GET",
 				headers: {'Authorization': "Basic " + _hash}
-			}).then(function (res) {
+			}).then(
+				/**
+				 * @param {{}} res
+				 * @param {{}} res.data
+				 * @param {{}} res.data.obj
+				 */
+				function (res) {
 				return res.data.obj;
 			});
 			$http.defaults.withCredentials = false;
@@ -63,6 +70,42 @@
 			return $.map(condition, function (value, key) {
 				return "@" + key + '="' + value + '"'
 			}).join(" AND ");
+		};
+
+		/**
+		 * Fetch eagle query list
+		 * @param query
+		 * @param condition
+		 * @param startTime
+		 * @param endTime
+		 * @param {[]?} groups
+		 * @param {string} field
+		 * @param {number?} limit
+		 * @return {[]}
+		 */
+		JPM.groups = function (query, condition, startTime, endTime, groups, field, limit) {
+			var _list = [];
+			_list._done = false;
+
+			var config = {
+				query: query,
+				condition: JPM.condition(condition),
+				startTime: moment(startTime).format(Time.FORMAT),
+				endTime: moment(endTime).format(Time.FORMAT),
+				groups: $.map(groups, function (group) {
+					return "@" + group;
+				}).join(","),
+				fields: field,
+				limit: limit || 10000
+			};
+
+			_list._promise = JPM.get(common.template(QUERY_GROUPS, config));
+			_list._promise.then(function (data) {
+				_list.splice(0);
+				Array.prototype.push.apply(_list, data);
+				_list._done = true;
+			});
+			return _list;
 		};
 
 		/**

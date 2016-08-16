@@ -22,9 +22,11 @@
 	 */
 	register(function (jpmApp) {
 		jpmApp.controller("detailCtrl", function ($q, $wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
+			var i;
 			var startTime, endTime;
 			var metric_allocatedMB, metric_allocatedVCores, metric_runningContainers;
 			var metric_taskDuration;
+			var nodeTaskCountList;
 
 			$scope.site = $wrapState.param.siteId;
 			$scope.jobId = $wrapState.param.jobId;
@@ -102,10 +104,35 @@
 						var series_taskDuration = metricsToSeries("task duration", metric_taskDuration);
 						$scope.taskSeries = [series_taskDuration];
 					});*/
-
-					// Dashboard 3: Running task
-
 				}
+
+				// Dashboard 3: Running task
+				nodeTaskCountList = JPM.groups("TaskExecutionService", jobCond, startTime, endTime, ["hostname"], "count", 1000000);
+				nodeTaskCountList._promise.then(function () {
+					var nodeTaskCountMap = [];
+
+					$.each(nodeTaskCountList, function (i, obj) {
+						var count = obj.value[0];
+						nodeTaskCountMap[count] = (nodeTaskCountMap[count] || 0) + 1;
+					});
+
+					console.log("-->", nodeTaskCountMap.length);
+					$scope.nodeTaskCountCategory = [];
+					for(i = 0 ; i < nodeTaskCountMap.length ; i += 1) {
+						nodeTaskCountMap[i] = nodeTaskCountMap[i] || 0;
+						$scope.nodeTaskCountCategory.push(i + " tasks");
+					}
+
+					nodeTaskCountMap.splice(0, 1);
+					$scope.nodeTaskCountCategory.splice(0, 1);
+
+					$scope.nodeTaskCountSeries = [{
+						name: "node count",
+						type: "line",
+						data: nodeTaskCountMap
+					}];
+					console.log(">>>", nodeTaskCountMap, $scope.nodeTaskCountCategory);
+				});
 			});
 		});
 	});

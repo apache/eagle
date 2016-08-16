@@ -204,3 +204,24 @@
 		<i class="fa fa-refresh fa-spin"></i>
 	</div>
 </div>
+
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Statistic
+		</h3>
+	</div>
+	<div class="box-body">
+		<div class="row">
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="nodeTaskCountSeries" category="nodeTaskCountCategory"
+					></div>
+					<div ng-if="(nodeTaskCountSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
