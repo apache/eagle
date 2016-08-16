@@ -17,13 +17,11 @@
 package org.apache.eagle.security.hive.jobrunning;
 
 import backtype.storm.topology.base.BaseRichSpout;
-import org.apache.eagle.job.DefaultJobPartitionerImpl;
-import org.apache.eagle.job.JobPartitioner;
-import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig;
-import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig.ControlConfig;
-import org.apache.eagle.jobrunning.config.RunningJobCrawlConfig.RunningJobEndpointConfig;
+import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
+import org.apache.eagle.security.hive.config.RunningJobCrawlConfig;
+import org.apache.eagle.security.hive.config.RunningJobCrawlConfig.ControlConfig;
+import org.apache.eagle.security.hive.config.RunningJobCrawlConfig.RunningJobEndpointConfig;
 import org.apache.eagle.dataproc.impl.storm.zookeeper.ZKStateConfig;
-import org.apache.eagle.jobrunning.storm.JobRunningSpout;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,15 +65,15 @@ public class HiveJobRunningSourcedStormSpoutProvider {
 		RunningJobCrawlConfig crawlConfig = new RunningJobCrawlConfig(endPointConfig, controlConfig, zkStateConfig);
 
 		try{
-			controlConfig.partitionerCls = (Class<? extends JobPartitioner>)Class.forName(config.getString("dataSourceConfig.partitionerCls"));
+			controlConfig.partitionerCls = (Class<? extends DefaultJobIdPartitioner>)Class.forName(config.getString("dataSourceConfig.partitionerCls"));
 		}
 		catch(Exception ex){
 			LOG.warn("failing find job id partitioner class " + config.getString("dataSourceConfig.partitionerCls"));
 			//throw new IllegalStateException("jobId partitioner class does not exist " + config.getString("dataSourceConfig.partitionerCls"));
-            controlConfig.partitionerCls = DefaultJobPartitionerImpl.class;
+            controlConfig.partitionerCls = DefaultJobIdPartitioner.class;
         }
 
-		JobRunningSpout spout = new JobRunningSpout(crawlConfig);
+		HiveJobFetchSpout spout = new HiveJobFetchSpout(crawlConfig);
 		return spout;
 	}
 }

@@ -28,8 +28,6 @@
     <description>Eagle Data Process Framework</description>
     <modules>
         <module>eagle-stream-process-base</module>
-    	<module>eagle-storm-jobrunning-spout</module>
-    	<module>eagle-job-common</module>
         <module>eagle-stream-process-api</module>
     </modules>
 </project>
