@@ -19,7 +19,7 @@ package org.apache.eagle.jpm.spark.crawl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.jpm.entity.*;
+import org.apache.eagle.jpm.spark.entity.*;
 import org.apache.eagle.jpm.util.JSONUtil;
 import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.SparkEntityConstant;

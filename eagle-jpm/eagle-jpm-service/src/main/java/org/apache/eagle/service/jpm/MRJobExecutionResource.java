@@ -19,6 +19,7 @@
 package org.apache.eagle.service.jpm;
 
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
@@ -26,10 +27,7 @@ import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.*;
 
@@ -129,7 +127,7 @@ public class MRJobExecutionResource {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
         List<TaggedLogAPIEntity> jobs = new ArrayList<>();
         String condition = buildCondition(jobId, jobDefId, site);
-        int pageSize = 10000;
+        int pageSize = Integer.MAX_VALUE;
         if (condition == null) {
             response.setException(new Exception("Search condition is empty"));
             response.setSuccess(false);
@@ -165,5 +163,88 @@ public class MRJobExecutionResource {
         response.setMeta(meta);
         return response;
     }
+
+    public List<Long> parseTimeList(String timelist) {
+        List<Long> times = new ArrayList<>();
+        String [] strs = timelist.split("[,\\s]");
+        for (String str : strs) {
+            try {
+                times.add(Long.parseLong(str));
+            } catch (Exception ex) {
+                LOG.warn(str + " is not a number");
+            }
+        }
+        return times;
+    }
+
+    public int getPosition(List<Long> times, Long duration) {
+        for (int i = 1; i < times.size(); i++) {
+            if (duration < times.get(i)) {
+                return i - 1;
+            }
+        }
+        return times.size() - 1;
+    }
+
+    public void getTopTasks(List<MRJobTaskGroupResponse.UnitTaskCount> list, long top) {
+        for (MRJobTaskGroupResponse.UnitTaskCount taskCounter : list) {
+            Iterator<TaskExecutionAPIEntity> iterator = taskCounter.entities.iterator();
+            for (int i = 0; i < top && iterator.hasNext(); i++) {
+                taskCounter.topEntities.add(iterator.next());
+            }
+            taskCounter.entities.clear();
+        }
+    }
+
+
+    @GET
+    @Path("{jobId}/taskCounts")
+    @Produces(MediaType.APPLICATION_JSON)
+    public MRJobTaskGroupResponse getTaskCounts(@PathParam("jobId") String jobId,
+                                                @QueryParam("site") String site,
+                                                @QueryParam("times") String timeList,
+                                                @QueryParam("top") long top) {
+        MRJobTaskGroupResponse response = new MRJobTaskGroupResponse();
+        List<Long> times = parseTimeList(timeList);
+
+        if (jobId == null || site == null || timeList.isEmpty()) {
+            response.errMessage = "Error: jobId == null || site == null || timeList.isEmpty()";
+            return response;
+        }
+        List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
+        List<MRJobTaskGroupResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
+
+        for (int i = 0; i < times.size(); i++) {
+            runningTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i)));
+            finishedTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i)));
+        }
+
+        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME, site, jobId);
+        GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> res =
+                resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
+        if (res.isSuccess() && res.getObj() != null) {
+            for (TaskExecutionAPIEntity o : res.getObj()) {
+                int index = getPosition(times, o.getElapsedTime());
+
+                if (o.getStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
+                    MRJobTaskGroupResponse.UnitTaskCount counter = runningTaskCount.get(index);
+                    counter.taskCount++;
+                    counter.entities.add(o);
+                } else if (o.getFinishTime() != 0) {
+                    MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
+                    counter.taskCount++;
+                    counter.entities.add(o);
+                }
+            }
+        }
+        if (top > 0)  {
+            getTopTasks(runningTaskCount, top);
+            response.runningTaskCount = runningTaskCount;
+            getTopTasks(finishedTaskCount, top);
+            response.finishedTaskCount = finishedTaskCount;
+        }
+        return response;
+    }
+
 
 }

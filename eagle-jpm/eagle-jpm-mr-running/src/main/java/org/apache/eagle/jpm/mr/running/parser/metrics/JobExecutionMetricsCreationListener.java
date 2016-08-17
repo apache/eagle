@@ -18,7 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.parser.metrics;
 
-import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 

@@ -88,6 +88,9 @@ public class Constants {
         COMPLETE_MR_JOB
     }
 
+    public static final String TASK_RUNNING = "RUNNING";
+    public static final String TASK_FINISHED = "FINISHED";
+
     //MR
     public static final String JPA_JOB_CONFIG_SERVICE_NAME = "JobConfigService";
     public static final String JPA_JOB_EVENT_SERVICE_NAME = "JobEventService";

@@ -20,11 +20,11 @@ package org.apache.eagle.jpm.mr.running.parser;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
-import org.apache.eagle.jpm.mr.running.entities.JobConfig;
-import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.running.entities.TaskAttemptExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.running.entities.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
+import org.apache.eagle.jpm.mr.runningentity.JobConfig;
+import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.runningentity.TaskAttemptExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.MRJobTagName;
