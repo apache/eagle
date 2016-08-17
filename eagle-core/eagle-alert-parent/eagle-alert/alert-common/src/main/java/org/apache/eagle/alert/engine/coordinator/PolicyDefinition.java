@@ -240,6 +240,6 @@ public class PolicyDefinition implements Serializable{
 
     @Override
     public String toString() {
-        return String.format("{name=\"%s\",definition=%s}",this.getName(),this.getDefinition().toString());
+        return String.format("{name=\"%s\",definition=%s}",this.getName(),this.getDefinition()==null?"null": this.getDefinition().toString());
     }
 }

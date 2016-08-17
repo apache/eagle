@@ -44,7 +44,6 @@ public class AlertStreamEvent extends StreamEvent {
         this.policy = policy;
     }
 
-
     public String getPolicyId() {
         return policy.getName();
     }
