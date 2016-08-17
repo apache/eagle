@@ -18,15 +18,29 @@
 
 package org.apache.eagle.jpm.spark.entity;
 
-import org.apache.eagle.log.entity.repo.EntityRepository;
+import org.apache.eagle.log.entity.meta.EntitySerDeser;
+import org.apache.eagle.log.entity.meta.MapSerDeser;
 
-public class JPMEntityRepository extends EntityRepository {
-    public JPMEntityRepository() {
-        entitySet.add(SparkApp.class);
-        entitySet.add(SparkJob.class);
-        entitySet.add(SparkStage.class);
-        entitySet.add(SparkTask.class);
-        entitySet.add(SparkExecutor.class);
-        serDeserMap.put(JobConfig.class, new JobConfigSerDeser());
+import java.util.Map;
+
+public class JobConfigSerDeser implements EntitySerDeser<JobConfig> {
+    private static final MapSerDeser INSTANCE = new MapSerDeser();
+
+    @Override
+    public JobConfig deserialize(byte[] bytes) {
+        Map map = INSTANCE.deserialize(bytes);
+        JobConfig config = new JobConfig();
+        config.setConfig(map);
+        return config;
+    }
+
+    @Override
+    public byte[] serialize(JobConfig jobConfig) {
+        return INSTANCE.serialize(jobConfig.getConfig());
+    }
+
+    @Override
+    public Class<JobConfig> type() {
+        return JobConfig.class;
     }
 }
