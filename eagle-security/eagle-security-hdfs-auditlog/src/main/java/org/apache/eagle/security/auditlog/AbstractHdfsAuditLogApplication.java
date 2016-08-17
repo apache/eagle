@@ -76,11 +76,11 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
             boltDeclarer.customGrouping("ingest", new CustomPartitionGrouping(createStrategy(config)));
         }
 
-        FileSensitivityDataJoinBolt sensitivityDataJoinBolt = new FileSensitivityDataJoinBolt(config);
+        HdfsSensitivityDataEnrichBolt sensitivityDataJoinBolt = new HdfsSensitivityDataEnrichBolt(config);
         BoltDeclarer sensitivityDataJoinBoltDeclarer = builder.setBolt("sensitivityJoin", sensitivityDataJoinBolt, numOfSensitivityJoinTasks);
         sensitivityDataJoinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
 
-        IPZoneDataJoinBolt ipZoneDataJoinBolt = new IPZoneDataJoinBolt(config);
+        IPZoneDataEnrichBolt ipZoneDataJoinBolt = new IPZoneDataEnrichBolt(config);
         BoltDeclarer ipZoneDataJoinBoltDeclarer = builder.setBolt("ipZoneJoin", ipZoneDataJoinBolt, numOfIPZoneJoinTasks);
         ipZoneDataJoinBoltDeclarer.fieldsGrouping("sensitivityJoin", new Fields("user"));
 

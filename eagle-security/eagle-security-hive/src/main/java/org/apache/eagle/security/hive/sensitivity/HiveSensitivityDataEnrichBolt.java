@@ -16,16 +16,12 @@
  */
 package org.apache.eagle.security.hive.sensitivity;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
-import org.apache.eagle.security.entity.HiveResourceSensitivityAPIEntity;
-import org.apache.eagle.security.util.ExternalDataCache;
-import org.apache.eagle.security.util.ExternalDataJoiner;
+import org.apache.eagle.security.service.HiveSensitivityEntity;
+import org.apache.eagle.security.enrich.AbstractDataEnrichBolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,40 +32,21 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HiveResourceSensitivityDataJoinBolt extends BaseRichBolt {
-    private final static Logger LOG = LoggerFactory.getLogger(HiveResourceSensitivityDataJoinBolt.class);
-    private OutputCollector collector;
-    private Config config;
+public class HiveSensitivityDataEnrichBolt extends AbstractDataEnrichBolt<HiveSensitivityEntity, String> {
+    private final static Logger LOG = LoggerFactory.getLogger(HiveSensitivityDataEnrichBolt.class);
 
-    public HiveResourceSensitivityDataJoinBolt(Config config){
-        this.config = config;
-    }
-    @Override
-    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.collector = collector;
-        // start hive resource data polling
-        try {
-            ExternalDataJoiner joiner = new ExternalDataJoiner(
-                    HiveResourceSensitivityPollingJob.class, config, context.getThisComponentId() + "." + context.getThisTaskIndex());
-            joiner.start();
-        } catch(Exception ex){
-            LOG.error("Fail to bring up quartz scheduler.", ex);
-            throw new IllegalStateException(ex);
-        }
+    public HiveSensitivityDataEnrichBolt(Config config){
+        super(config, new HiveSensitivityDataEnrichLCM(config));
     }
 
     @Override
-    public void execute(Tuple input) {
+    public void executeWithEnrich(Tuple input, Map<String, HiveSensitivityEntity> map) {
         String user = input.getString(0);
         Map<String, Object> event = (Map<String, Object>)input.getValue(1);
-        Map<String, HiveResourceSensitivityAPIEntity> map =
-                (Map<String, HiveResourceSensitivityAPIEntity>) ExternalDataCache
-                        .getInstance()
-                        .getJobResult(HiveResourceSensitivityPollingJob.class);
 
         String resource = (String)event.get("resource");
         List<String> resourceList = Arrays.asList(resource.split("\\s*,\\s*"));
-        HiveResourceSensitivityAPIEntity sensitivityEntity = null;
+        HiveSensitivityEntity sensitivityEntity = null;
 
         // Check if hive resource contains sensitive data.
         for (String s : resourceList) {

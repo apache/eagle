@@ -30,7 +30,7 @@ import org.apache.eagle.app.sink.StormStreamSink;
 import org.apache.eagle.security.hive.jobrunning.HiveJobRunningSourcedStormSpoutProvider;
 import org.apache.eagle.security.hive.jobrunning.HiveQueryParserBolt;
 import org.apache.eagle.security.hive.jobrunning.JobFilterBolt;
-import org.apache.eagle.security.hive.sensitivity.HiveResourceSensitivityDataJoinBolt;
+import org.apache.eagle.security.hive.sensitivity.HiveSensitivityDataEnrichBolt;
 
 /**
  * Since 8/11/16.
@@ -64,7 +64,7 @@ public class HiveQueryMonitoringApplication extends StormApplication {
         BoltDeclarer parserBoltDeclarer = builder.setBolt("parserBolt", parserBolt, numOfParserTasks);
         parserBoltDeclarer.fieldsGrouping("filterBolt", new Fields("user"));
 
-        HiveResourceSensitivityDataJoinBolt joinBolt = new HiveResourceSensitivityDataJoinBolt(config);
+        HiveSensitivityDataEnrichBolt joinBolt = new HiveSensitivityDataEnrichBolt(config);
         BoltDeclarer joinBoltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);
         joinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("user"));
 

@@ -35,10 +35,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-public class MetadataServiceClientImpl implements IMetadataServiceClient {
+public class SecurityDataEnrichServiceClientImpl implements ISecurityDataEnrichServiceClient {
     private static final long serialVersionUID = 3003976065082684128L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MetadataServiceClientImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityDataEnrichServiceClientImpl.class);
 
     private static final String METADATA_LIST_HBASE_SENSITIVITY_PATH = "/metadata/security/hbaseSensitivity";
     private static final String METADATA_ADD_HBASE_SENSITIVITY_PATH = "/metadata/security/hbaseSensitivity";
@@ -64,13 +64,13 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
     private transient Client client;
     private String basePath;
 
-    public MetadataServiceClientImpl(Config config) {
+    public SecurityDataEnrichServiceClientImpl(Config config) {
         this(config.getString(EAGLE_CORRELATION_SERVICE_HOST), config.getInt(EAGLE_CORRELATION_SERVICE_PORT), config
                 .getString(EAGLE_CORRELATION_CONTEXT));
         basePath = buildBasePath();
     }
 
-    public MetadataServiceClientImpl(String host, int port, String context) {
+    public SecurityDataEnrichServiceClientImpl(String host, int port, String context) {
         this.host = host;
         this.port = port;
         this.context = context;

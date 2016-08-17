@@ -60,7 +60,7 @@ public class MAPRFSResourceWebResource
             HDFSFileSystem fileSystem = new HDFSFileSystem(conf);
             fileStatuses = fileSystem.browse(filePath);
             // Join with File Sensitivity Info
-            HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner();
+            HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner(null);
             result = joiner.joinFileSensitivity(site, fileStatuses);
             LOG.info("Successfully browsed files in MAPRFS .");
         } catch( Exception ex ) {

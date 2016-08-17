@@ -32,7 +32,6 @@ import com.typesafe.config.Config;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.security.entity.FileStatusEntity;
-import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 import org.apache.eagle.security.service.ISecurityMetadataDAO;
 import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
@@ -79,7 +78,7 @@ public class HDFSResourceWebResource {
 			HDFSFileSystem fileSystem = new HDFSFileSystem(conf);
 			fileStatuses = fileSystem.browse(filePath);
 			// Join with File Sensitivity Info
-			HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner();
+			HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner(dao);
 			result = joiner.joinFileSensitivity(site, fileStatuses);
 			LOG.info("Successfully browsed files in HDFS .");
 		} catch( Exception ex ) {

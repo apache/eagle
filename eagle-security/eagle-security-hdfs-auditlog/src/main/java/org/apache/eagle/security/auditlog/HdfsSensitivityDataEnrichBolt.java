@@ -16,21 +16,15 @@
  */
 package org.apache.eagle.security.auditlog;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
-import org.apache.eagle.security.auditlog.timer.FileSensitivityPollingJob;
 import org.apache.eagle.security.auditlog.util.SimplifyPath;
-import org.apache.eagle.security.entity.FileSensitivityAPIEntity;
-import org.apache.eagle.security.util.ExternalDataCache;
-import org.apache.eagle.security.util.ExternalDataJoiner;
+import org.apache.eagle.security.service.HdfsSensitivityEntity;
+import org.apache.eagle.security.enrich.AbstractDataEnrichBolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -38,39 +32,19 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FileSensitivityDataJoinBolt extends BaseRichBolt {
-    private static Logger LOG = LoggerFactory.getLogger(FileSensitivityDataJoinBolt.class);
-    private Config config;
-    private OutputCollector collector;
+public class HdfsSensitivityDataEnrichBolt extends AbstractDataEnrichBolt<HdfsSensitivityEntity, String> {
+    private static Logger LOG = LoggerFactory.getLogger(HdfsSensitivityDataEnrichBolt.class);
 
-    public FileSensitivityDataJoinBolt(Config config){
-        this.config = config;
-    }
-
-
-    @Override
-    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.collector = collector;
-        // start hdfs sensitivity data polling
-        try{
-            ExternalDataJoiner joiner = new ExternalDataJoiner(
-                    FileSensitivityPollingJob.class, config, context.getThisComponentId() + "." + context.getThisTaskIndex());
-            joiner.start();
-        }catch(Exception ex){
-            LOG.error("Fail bringing up quartz scheduler", ex);
-            throw new IllegalStateException(ex);
-        }
+    public HdfsSensitivityDataEnrichBolt(Config config){
+        super(config, new HdfsSensitivityDataEnrichLCM(config));
     }
 
     @Override
-    public void execute(Tuple input) {
+    public void executeWithEnrich(Tuple input, Map<String, HdfsSensitivityEntity> map) {
         try {
             Map<String, Object> toBeCopied = (Map<String, Object>) input.getValue(0);
             Map<String, Object> event = new TreeMap<String, Object>(toBeCopied);
-            Map<String, FileSensitivityAPIEntity> map =
-                    (Map<String, FileSensitivityAPIEntity>) ExternalDataCache.getInstance().
-                            getJobResult(FileSensitivityPollingJob.class);
-            FileSensitivityAPIEntity e = null;
+            HdfsSensitivityEntity e = null;
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Receive map: " + map + "event: " + event);
             }

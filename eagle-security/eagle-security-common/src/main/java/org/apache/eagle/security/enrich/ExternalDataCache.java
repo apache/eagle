@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.security.util;
+package org.apache.eagle.security.enrich;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.quartz.Job;
-
 public class ExternalDataCache {
-	private Map<Class<? extends Job>, Object> map = new ConcurrentHashMap<Class<? extends Job>, Object>();
+	private Map<Class<? extends DataEnrichLCM>, Object> map = new ConcurrentHashMap<>();
 	
 	private static final ExternalDataCache instance = new ExternalDataCache();
 	
@@ -33,11 +31,11 @@ public class ExternalDataCache {
 		return instance;
 	}
 	
-	public Object getJobResult(Class<? extends Job> cls){
+	public Object getJobResult(Class<? extends DataEnrichLCM> cls){
 		return map.get(cls);
 	}
 	
-	public void setJobResult(Class<? extends Job> cls, Object jobResult){
+	public void setJobResult(Class<? extends DataEnrichLCM> cls, Object jobResult){
 		map.put(cls, jobResult);
 	}
 }

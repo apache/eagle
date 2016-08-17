@@ -24,53 +24,31 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
-import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.security.enrich.AbstractDataEnrichBolt;
 import org.apache.eagle.security.entity.OozieResourceSensitivityAPIEntity;
-import org.apache.eagle.security.util.ExternalDataCache;
-import org.apache.eagle.security.util.ExternalDataJoiner;
+import org.apache.eagle.security.enrich.ExternalDataCache;
+import org.apache.eagle.security.enrich.ExternalDataJoiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-public class OozieResourceSensitivityDataJoinBolt extends BaseRichBolt {
+public class OozieResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt<OozieResourceSensitivityAPIEntity, String> {
     private final static Logger LOG = LoggerFactory.getLogger(OozieResourceSensitivityDataJoinBolt.class);
     private Config config;
     private OutputCollector collector;
 
     public OozieResourceSensitivityDataJoinBolt(Config config){
-        this.config = config;
+        super(config, new OozieSensitivityDataEnrichLCM(config));
     }
 
     @Override
-    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.collector = collector;
-        // start hbase sensitivity data polling
+    public void executeWithEnrich(Tuple input, Map<String, OozieResourceSensitivityAPIEntity> map) {
         try {
-            ExternalDataJoiner joiner = new ExternalDataJoiner(
-                    OozieResourceSensitivityPollingJob.class, config, context.getThisComponentId() + "." + context.getThisTaskIndex());
-            joiner.start();
-        } catch(Exception ex){
-            LOG.error("Fail bringing up quartz scheduler.", ex);
-            throw new IllegalStateException(ex);
-        }
-    }
-
-    @Override
-    public void execute(Tuple input) {
-        try {
-            @SuppressWarnings("unchecked")
             Map<String, Object> event = (Map<String, Object>) input.getValue(0);
-            @SuppressWarnings("unchecked")
-            Map<String, OozieResourceSensitivityAPIEntity> map =
-                    (Map<String, OozieResourceSensitivityAPIEntity>) ExternalDataCache
-                            .getInstance()
-                            .getJobResult(OozieResourceSensitivityPollingJob.class);
             LOG.info(">>>> event: " + event + " >>>> map: " + map);
 
             String resource = (String) event.get("jobId");
