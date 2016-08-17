@@ -39,6 +39,7 @@ import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
+import org.apache.eagle.alert.engine.utils.SingletonExecutor;
 import org.apache.eagle.alert.metric.MetricSystem;
 import org.apache.eagle.alert.metric.source.MetricSource;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
@@ -50,8 +51,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * Since 5/1/16.
@@ -70,7 +70,6 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     private volatile Map<String, PolicyDefinition> cachedPolicies = new HashMap<>(); // for one streamGroup, there are multiple policies
 
     private AlertBoltSpec spec;
-
     public AlertBolt(String boltId, Config config, IMetadataChangeNotifyService changeNotifyService){
         super(boltId, changeNotifyService, config);
         this.boltId = boltId;
@@ -99,8 +98,6 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
             return registry;
         }
     }
-
-    private ExecutorService executors = Executors.newFixedThreadPool(5);
 
     @Override
     public void execute(Tuple input) {
@@ -133,6 +130,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                 system.report();
                 system.stop();
 
+                ExecutorService executors = SingletonExecutor.getExecutorService();
                 executors.submit(() -> {
                     // if spec version is out-of-date, need to refresh it
                     if (specVersionOutofdate){
@@ -212,8 +210,6 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         sdf = sds;
         specVersion = spec.getVersion();
         this.spec = spec;
-
-
     }
 
 }
