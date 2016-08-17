@@ -20,19 +20,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Ignore;
 
-@Ignore
 public class TestHBaseBase {
     protected static EmbeddedHbase hbase;
 
     @BeforeClass
     public static void setUpHBase() {
         hbase = EmbeddedHbase.getInstance();
-    }
-
-    @Test
-    @Ignore(value="get rid of false failures")
-    public void test() {
-
     }
 
 }
