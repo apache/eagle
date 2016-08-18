@@ -30,18 +30,14 @@ public class TestListQueryCompiler {
     @Test
     public void test() throws Exception {
         try {
-            try {
-                String queryWithCondition = "JobExecutionService[@site=\"apollo\"]{*}";
-                ListQueryCompiler compiler1 = new ListQueryCompiler(queryWithCondition);
-            } catch (EagleQueryParseException ex) {}
-            try {
-                String queryWithSquareBrackets = "JobExecutionService[@jobId=\"[A9BB756F29494F3C8281117FE58A4632/361C947C782F44748BFD840CE2FDBFB8] com.ebay.scalding.coview.CoviewsBasedOnSojornerData[site=2, runDate=2016-08-17, nDays=7}]/(4/5)\"]{*}";
-                ListQueryCompiler compiler1 = new ListQueryCompiler(queryWithSquareBrackets);
-            } catch (EagleQueryParseException ex) {}
-            try {
-                String queryWithoutCondition = "JobExecutionService[]{*}";
-                ListQueryCompiler compiler1 = new ListQueryCompiler(queryWithoutCondition);
-            } catch (EagleQueryParseException ex) {}
+            String queryWithCondition = "TestTimeSeriesAPIEntity[@site=\"test\"]{*}";
+            ListQueryCompiler compiler = new ListQueryCompiler(queryWithCondition);
+            String queryWithSquareBrackets = "TestTimeSeriesAPIEntity[@condition=\"[A9BB756BFB8] Data[site=2]/(4/5)\"]{*}";
+            new ListQueryCompiler(queryWithSquareBrackets);
+            String queryWithoutCondition = "TestTimeSeriesAPIEntity[]{*}";
+            new ListQueryCompiler(queryWithoutCondition);
+            String query = "TestTimeSeriesAPIEntity[@condition=\"[A9BB756BFB8]{4/5}\"]{*}";
+            new ListQueryCompiler(query);
         } catch (IllegalArgumentException e) {
             LOG.error(e.getMessage());
             Assert.assertTrue(false);
