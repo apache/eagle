@@ -19,7 +19,6 @@ package org.apache.eagle.metadata.model;
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +32,13 @@ public class ApplicationEntity extends PersistenceEntity {
     private String appId;
     private SiteEntity site;
 
-    /**
-     * TODO: Think about keeping ApplicationDesc as a reference or deep clone into current instance
-     */
     private ApplicationDesc descriptor;
 
     private Map<String,Object> configuration = new HashMap<>();
     private Map<String,String> context = new HashMap<>();
     private List<StreamDesc> streams;
     private Mode mode = Mode.CLUSTER;
+    private String jarPath;
     private Status status = Status.INITIALIZED;
 
     public SiteEntity getSite() {
@@ -80,7 +77,7 @@ public class ApplicationEntity extends PersistenceEntity {
     public void ensureDefault() {
         super.ensureDefault();
         if(this.appId == null){
-            this.appId = String.format("EAGLE_APP[TYPE=%s,SITE=%s]",this.getDescriptor().getType(),this.getSite().getSiteId());
+            this.appId = String.format("%s-%s", this.getDescriptor().getType(), this.getSite().getSiteId());
         }
         if(this.status == null){
             this.status = Status.INITIALIZED;
@@ -101,6 +98,14 @@ public class ApplicationEntity extends PersistenceEntity {
 
     public void setMode(Mode mode) {
         this.mode = mode;
+    }
+
+    public String getJarPath() {
+        return jarPath;
+    }
+
+    public void setJarPath(String jarPath) {
+        this.jarPath = jarPath;
     }
 
     public Status getStatus() {

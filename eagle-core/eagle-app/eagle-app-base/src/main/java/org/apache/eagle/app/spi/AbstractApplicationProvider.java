@@ -81,7 +81,6 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
 
     @Override
     public void prepare(ApplicationProviderConfig providerConfig, Config envConfig) {
-        this.applicationDesc.setJarPath(providerConfig.getJarPath());
     }
 
     protected void setVersion(String version) {

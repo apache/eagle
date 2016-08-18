@@ -67,6 +67,7 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
         executionConfig.put("siteId", metadata.getSite().getSiteId());
         executionConfig.put("mode", metadata.getMode().name());
         executionConfig.put("appId", metadata.getAppId());
+        executionConfig.put("jarPath", metadata.getJarPath());
         this.config = ConfigFactory.parseMap(executionConfig).withFallback(envConfig);
     }
 

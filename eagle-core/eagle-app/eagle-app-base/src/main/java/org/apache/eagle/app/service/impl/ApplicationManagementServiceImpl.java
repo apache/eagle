@@ -64,6 +64,9 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     public ApplicationEntity install(ApplicationOperations.InstallOperation operation) throws EntityNotFoundException {
         Preconditions.checkNotNull(operation.getSiteId(),"siteId is null");
         Preconditions.checkNotNull(operation.getAppType(),"appType is null");
+        if(operation.getMode().equals(ApplicationEntity.Mode.CLUSTER)){
+            Preconditions.checkNotNull(operation.getJarPath(),"jarPath is null when mode is CLUSTER");
+        }
         SiteEntity siteEntity = siteEntityService.getBySiteId(operation.getSiteId());
         Preconditions.checkNotNull(siteEntity,"Site with ID: "+operation.getSiteId()+" is not found");
         ApplicationDesc appDesc = applicationProviderService.getApplicationDescByType(operation.getAppType());
@@ -72,6 +75,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setDescriptor(appDesc);
         applicationEntity.setSite(siteEntity);
         applicationEntity.setMode(operation.getMode());
+        applicationEntity.setJarPath(operation.getJarPath());
         applicationEntity.ensureDefault();
 
         /**

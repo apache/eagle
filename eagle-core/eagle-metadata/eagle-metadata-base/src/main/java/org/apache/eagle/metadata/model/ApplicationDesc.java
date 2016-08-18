@@ -30,12 +30,10 @@ public class ApplicationDesc implements Serializable {
     private String version;
     private String description;
     private Class<?> appClass;
-    private String jarPath;
     private String viewPath;
     private Class<?> providerClass;
     private Configuration configuration;
     private List<StreamDefinition> streams;
-//    private Class<?> sinkClass;
     private ApplicationDocs docs;
 
     public String getDescription() {
@@ -62,10 +60,6 @@ public class ApplicationDesc implements Serializable {
         return viewPath;
     }
 
-    public String getJarPath() {
-        return jarPath;
-    }
-
     public void setType(String type) {
         this.type = type;
     }
@@ -80,9 +74,6 @@ public class ApplicationDesc implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-    public void setJarPath(String jarPath) {
-        this.jarPath = jarPath;
     }
 
     public void setViewPath(String viewPath) {
@@ -107,21 +98,13 @@ public class ApplicationDesc implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("ApplicationDesc [type=%s, name=%s, version=%s, appClass=%s, viewPath=%s, jarPath=%s, providerClass=%s, configuration= %s properties, description=%s",
-                    getType(),getName(),getVersion(),getAppClass(), getViewPath(),getJarPath(),getProviderClass(), getConfiguration() == null ? 0: getConfiguration().size(),getDescription());
+        return String.format("ApplicationDesc [type=%s, name=%s, version=%s, appClass=%s, viewPath=%s, providerClass=%s, configuration= %s properties, description=%s",
+                    getType(),getName(),getVersion(),getAppClass(), getViewPath(),getProviderClass(), getConfiguration() == null ? 0: getConfiguration().size(),getDescription());
     }
 
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
     }
-
-//    public Class<?> getSinkType() {
-//        return sinkClass;
-//    }
-//
-//    public void setSinkClass(Class<?> sinkClass) {
-//        this.sinkClass = sinkClass;
-//    }
 
     public List<StreamDefinition> getStreams() {
         return streams;

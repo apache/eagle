@@ -35,6 +35,7 @@ public final class ApplicationOperations {
         private String siteId;
         private String appType;
         private ApplicationEntity.Mode mode = ApplicationEntity.Mode.LOCAL;
+        private String jarPath;
         private Map<String,Object> configuration;
 
         public InstallOperation(){}
@@ -81,6 +82,14 @@ public final class ApplicationOperations {
 
         public void setMode(ApplicationEntity.Mode mode) {
             this.mode = mode;
+        }
+
+        public String getJarPath() {
+            return jarPath;
+        }
+
+        public void setJarPath(String jarPath) {
+            this.jarPath = jarPath;
         }
 
         @Override
