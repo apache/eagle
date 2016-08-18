@@ -126,6 +126,7 @@ public class MRJobExecutionResource {
                                                           @QueryParam("site") String site) {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
         List<TaggedLogAPIEntity> jobs = new ArrayList<>();
+        Set<String> jobIds = new HashSet<>();
         String condition = buildCondition(jobId, jobDefId, site);
         int pageSize = Integer.MAX_VALUE;
         if (condition == null) {
@@ -139,16 +140,30 @@ public class MRJobExecutionResource {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String queryFormat = "%s[%s]{*}";
-        String queryString = String.format(queryFormat, Constants.JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME, condition);
-        GenericServiceAPIResponseEntity<TaggedLogAPIEntity> res =
-                resource.search(queryString, null, null, pageSize, null, false, true,  0L, 0, true, 0, null, false);
+        String queryString = String.format(queryFormat, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, condition);
+        GenericServiceAPIResponseEntity<TaggedLogAPIEntity> res = resource.search(queryString, null, null, pageSize, null, false, true,  0L, 0, true, 0, null, false);
         if (res.isSuccess() && res.getObj() != null) {
-            jobs.addAll(res.getObj());
+            for (TaggedLogAPIEntity o : res.getObj()) {
+                jobs.add(o);
+                jobIds.add(o.getTags().get(JOB_ID.toString()));
+            }
         }
-        queryString = String.format(queryFormat, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, condition);
+        queryString = String.format(queryFormat, Constants.JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME, condition);
         res = resource.search(queryString, null, null, pageSize, null, false, true,  0L, 0, true, 0, null, false);
         if (res.isSuccess() && res.getObj() != null) {
-            jobs.addAll(res.getObj());
+            for (TaggedLogAPIEntity o : res.getObj()) {
+                if (! isDuplicate(jobIds, o)) {
+                    jobs.add(o);
+                }
+            }
+        }
+        if (jobs.size() > 0) {
+            Collections.sort(jobs, new Comparator<TaggedLogAPIEntity>() {
+                @Override
+                public int compare(TaggedLogAPIEntity o1, TaggedLogAPIEntity o2) {
+                    return o1.getTimestamp() > o2.getTimestamp() ? 1 : (o1.getTimestamp() == o2.getTimestamp() ? 0 : -1);
+                }
+            });
         }
         stopWatch.stop();
         if (res.isSuccess()) {
