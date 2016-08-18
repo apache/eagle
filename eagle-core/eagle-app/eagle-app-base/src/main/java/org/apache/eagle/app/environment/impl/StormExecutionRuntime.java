@@ -85,6 +85,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         }
         conf.put(backtype.storm.Config.NIMBUS_HOST, nimbusHost);
         conf.put(backtype.storm.Config.NIMBUS_THRIFT_PORT, nimbusThriftPort);
+        conf.put(Config.STORM_THRIFT_TRANSPORT_PLUGIN, "backtype.storm.security.auth.SimpleTransportPlugin");
         return conf;
     }
 
@@ -96,8 +97,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         LOG.info("Starting {} ({})",topologyName,executor.getClass().getCanonicalName());
         Config conf = getStormConfig();
         if(config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()){
-//            if(config.getString("jarPath") == null) config.setJarPath(DynamicJarPathFinder.findPath(executor.getClass()));
-            String jarFile = config.getString("jarPath");
+            String jarFile = config.hasPath("jarPath") ? config.getString("jarPath") : null;
             if(jarFile == null){
                 jarFile = DynamicJarPathFinder.findPath(executor.getClass());
             }
@@ -118,11 +118,13 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
             getLocalCluster().submitTopology(topologyName, conf, topology);
             LOG.info("Submitted");
         }
+        LOG.info("Started {} ({})",topologyName,executor.getClass().getCanonicalName());
     }
 
     @Override
     public void stop(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         String appId = config.getString("appId");
+        LOG.info("Stopping topology {} ..." + appId);
         if(config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()){
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig()).getClient();
             try {
@@ -135,6 +137,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
             killOptions.set_wait_secs(0);
             getLocalCluster().killTopologyWithOpts(appId,killOptions);
         }
+        LOG.info("Stopped topology {} ..." + appId);
     }
 
     @Override
