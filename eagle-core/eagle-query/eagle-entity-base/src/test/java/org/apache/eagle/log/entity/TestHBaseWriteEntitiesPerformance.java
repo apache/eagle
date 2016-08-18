@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+@Ignore
 public class TestHBaseWriteEntitiesPerformance extends TestHBaseBase {
 	private EntityDefinition ed;
 	private final static Logger LOG = LoggerFactory.getLogger(TestHBaseWriteEntitiesPerformance.class);

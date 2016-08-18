@@ -2,7 +2,7 @@
 {
 	"name":"log-stream-join-output",
 	"type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
-	"inputStreams": [
+	"policyIds": [
 		"log_stream_join_output"
 	],
 	"properties": {
