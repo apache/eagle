@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  *
+  ~  *  * Licensed to the Apache Software Foundation (ASF) under one or more
+  ~  *  * contributor license agreements.  See the NOTICE file distributed with
+  ~  *  * this work for additional information regarding copyright ownership.
+  ~  *  * The ASF licenses this file to You under the Apache License, Version 2.0
+  ~  *  * (the "License"); you may not use this file except in compliance with
+  ~  *  * the License.  You may obtain a copy of the License at
+  ~  *  * <p/>
+  ~  *  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *  * <p/>
+  ~  *  * Unless required by applicable law or agreed to in writing, software
+  ~  *  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  *  * See the License for the specific language governing permissions and
+  ~  *  * limitations under the License.
+  ~  *
+  ~  */
+  -->
+
+<application>
+    <type>HdfsAuditLogApplication</type>
+    <name>Hdfs Audit Log Monitoring Application</name>
+    <version>0.5.0-incubating</version>
+    <appClass>org.apache.eagle.security.auditlog.HdfsAuditLogApplication</appClass>
+    <viewPath>/apps/example</viewPath>
+    <configuration>
+        <!-- topology related configurations -->
+        <property>
+            <name>topology.numOfSpoutTasks</name>
+            <displayName>topology.numOfSpoutTasks</displayName>
+            <value>2</value>
+            <description>number of spout tasks</description>
+        </property>
+        <property>
+            <name>topology.numOfParserTasks</name>
+            <displayName>topology.numOfParserTasks</displayName>
+            <value>2</value>
+            <description>number of parser tasks</description>
+        </property>
+        <property>
+            <name>topology.numOfJoinTasks</name>
+            <displayName>topology.numOfJoinTasks</displayName>
+            <value>2</value>
+            <description>number of external join tasks</description>
+        </property>
+        <property>
+            <name>topology.numOfSinkTasks</name>
+            <displayName>topology.numOfSinkTasks</displayName>
+            <value>2</value>
+            <description>number of sink tasks</description>
+        </property>
+
+        <!-- data source configurations -->
+        <property>
+            <name>dataSourceConfig.topic</name>
+            <displayName>dataSourceConfig.topic</displayName>
+            <value>hdfs_audit_log</value>
+            <description>data source topic</description>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkConnection</name>
+            <displayName>dataSourceConfig.zkConnection</displayName>
+            <value>server.eagle.apache.org</value>
+            <description>zk connection</description>
+        </property>
+        <property>
+            <name>dataSourceConfig.txZkServers</name>
+            <displayName>dataSourceConfig.txZkServers</displayName>
+            <value>server.eagle.apache.org:2181</value>
+            <description>zookeeper server for offset transaction</description>
+        </property>
+        <property>
+            <name>dataSourceConfig.schemeCls</name>
+            <displayName>dataSourceConfig.schemeCls</displayName>
+            <value>storm.kafka.StringScheme</value>
+            <description>scheme class</description>
+        </property>
+
+        <!-- data enrich configurations -->
+        <property>
+            <name>dataEnrich.dataJoinPollIntervalSec</name>
+            <displayName>eagleProps.dataJoinPollIntervalSec</displayName>
+            <value>30</value>
+            <description>interval in seconds for polling</description>
+        </property>
+
+        <!-- eagle service configurations -->
+        <property>
+            <name>eagleService.host</name>
+            <displayName>eagleService.host</displayName>
+            <value>localhost</value>
+            <description>eagle service host</description>
+        </property>
+        <property>
+            <name>eagleService.port</name>
+            <displayName>eagleService.port</displayName>
+            <value>9090</value>
+            <description>eagle service port</description>
+        </property>
+        <property>
+            <name>eagleService.username</name>
+            <displayName>eagleService.username</displayName>
+            <value>admin</value>
+            <description>eagle service username</description>
+        </property>
+        <property>
+            <name>eagleService.password</name>
+            <displayName>eagleService.password</displayName>
+            <value>secret</value>
+            <description>eagle service password</description>
+        </property>
+
+        <!-- data sink configurations -->
+        <property>
+            <name>dataSinkConfig.topic</name>
+            <displayName>dataSinkConfig.topic</displayName>
+            <value>hdfs_audit_log_parsed</value>
+            <description>topic for kafka data sink</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.brokerList</name>
+            <displayName>dataSinkConfig.brokerList</displayName>
+            <value>server.eagle.apache.org:6667</value>
+            <description>kafka broker list</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.serializerClass</name>
+            <displayName>dataSinkConfig.serializerClass</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>serializer class Kafka message value</description>
+        </property>
+        <property>
+            <name>dataSinkConfig.keySerializerClass</name>
+            <displayName>dataSinkConfig.keySerializerClass</displayName>
+            <value>kafka.serializer.StringEncoder</value>
+            <description>serializer class Kafka message key</description>
+        </property>
+
+        <!-- web app related configurations -->
+        <property>
+            <name>fs.defaultFS</name>
+            <displayName>fs.defaultFS</displayName>
+            <value>hdfs://server.eagle.apache.org:8020</value>
+            <description>hdfs endpoint</description>
+        </property>
+    </configuration>
+    <streams>
+        <stream>
+            <streamId>hdfs_audit_log_stream</streamId>
+            <description>Hdfs Audit Log Stream</description>
+            <validate>true</validate>
+            <timeseries>true</timeseries>
+            <columns>
+                <column>
+                    <name>action</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>host</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>status</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+            </columns>
+        </stream>
+    </streams>
+    <docs>
+        <install>
+# Step 1: Create source kafka topic named "${site}_example_source_topic"
+
+./bin/kafka-topics.sh --create --topic example_source_topic --replication-factor 1 --replication 1
+
+# Step 2: Set up data collector to flow data into kafka topic in
+
+./bin/logstash -f log_collector.conf
+
+## `log_collector.conf` sample as following:
+
+input {
+
+}
+filter {
+
+}
+output{
+
+}
+
+# Step 3: start application
+
+# Step 4: monitor with featured portal or alert with policies
+        </install>
+        <uninstall>
+# Step 1: stop and uninstall application
+# Step 2: delete kafka topic named "${site}_example_source_topic"
+# Step 3: stop logstash
+        </uninstall>
+    </docs>
+</application>

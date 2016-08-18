@@ -62,8 +62,10 @@ public class ScheduleState {
     private String generateTime;
     private int code = 200;
     private String message = "OK";
+    private int scheduleTimeMillis;
 
     public ScheduleState() {
+        this.generateTime = String.valueOf(new Date().getTime());
     }
 
     public ScheduleState(String version, 
@@ -210,6 +212,14 @@ public class ScheduleState {
 
     public void setStreamSnapshots(List<VersionedStreamDefinition> streamSnapshots) {
         this.streamSnapshots = streamSnapshots;
+    }
+
+    public int getScheduleTimeMillis() {
+        return scheduleTimeMillis;
+    }
+
+    public void setScheduleTimeMillis(int scheduleTimeMillis) {
+        this.scheduleTimeMillis = scheduleTimeMillis;
     }
 
 }

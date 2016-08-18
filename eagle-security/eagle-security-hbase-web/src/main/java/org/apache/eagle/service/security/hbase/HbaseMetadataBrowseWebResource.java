@@ -1,24 +1,32 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *  * Licensed to the Apache Software Foundation (ASF) under one or more
+ *  * contributor license agreements.  See the NOTICE file distributed with
+ *  * this work for additional information regarding copyright ownership.
+ *  * The ASF licenses this file to You under the Apache License, Version 2.0
+ *  * (the "License"); you may not use this file except in compliance with
+ *  * the License.  You may obtain a copy of the License at
+ *  * <p/>
+ *  * http://www.apache.org/licenses/LICENSE-2.0
+ *  * <p/>
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.apache.eagle.service.security.hbase;
 
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.security.entity.HbaseResourceEntity;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
+import org.apache.eagle.security.service.HBaseSensitivityEntity;
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.common.EagleExceptionWrapper;
 import org.apache.eagle.service.security.hbase.dao.HbaseMetadataDAOImpl;
 import org.apache.hadoop.conf.Configuration;
@@ -33,10 +41,42 @@ import java.util.regex.Pattern;
 @Path("/hbaseResource")
 public class HbaseMetadataBrowseWebResource {
     private static Logger LOG = LoggerFactory.getLogger(HbaseMetadataBrowseWebResource.class);
-    private HbaseSensitivityResourceService dao = new HbaseSensitivityResourceService();
-    private Map<String, Map<String, String>> maps = dao.getAllHbaseSensitivityMap();
-    private MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
-    final public static String HBASE_APPLICATION = "hbaseSecurityLog";
+    final public static String HBASE_APPLICATION = "HBaseAuditLogApplication";
+
+    private ApplicationEntityService entityService;
+    private ISecurityMetadataDAO dao;
+
+    @Inject
+    public HbaseMetadataBrowseWebResource(ApplicationEntityService entityService, Config eagleServerConfig){
+        this.entityService = entityService;
+        this.dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
+    }
+
+    private Map<String, Map<String, String>> getAllSensitivities(){
+        Map<String, Map<String, String>> all = new HashMap<>();
+        Collection<HBaseSensitivityEntity> entities = dao.listHBaseSensitivities();
+        for(HBaseSensitivityEntity entity : entities){
+            if(!all.containsKey(entity.getSite())){
+                all.put(entity.getSite(), new HashMap<>());
+            }
+            all.get(entity.getSite()).put(entity.getHbaseResource(), entity.getSensitivityType());
+        }
+        return all;
+    }
+
+    private Map<String, Object> getAppConfig(String site, String appType){
+        ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
+        return entity.getConfiguration();
+    }
+
+
+    private Configuration convert(Map<String, Object> originalConfig) throws Exception {
+        Configuration config = new Configuration();
+        for (Map.Entry<String, Object> entry : originalConfig.entrySet()) {
+            config.set(entry.getKey().toString(), entry.getValue().toString());
+        }
+        return config;
+    }
 
     @Path("/namespaces")
     @GET
@@ -47,8 +87,8 @@ public class HbaseMetadataBrowseWebResource {
         List<HbaseResourceEntity> values = new ArrayList<>();
         HbaseMetadataBrowseWebResponse response = new HbaseMetadataBrowseWebResponse();
         try {
-            Config config = repo.getConfig(HBASE_APPLICATION, site);
-            Configuration conf = repo.convert(config);
+            Map<String, Object> config = getAppConfig(site, HBASE_APPLICATION);
+            Configuration conf = convert(config);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
             namespaces = dao.getNamespaces();
 
@@ -76,8 +116,8 @@ public class HbaseMetadataBrowseWebResource {
         List<String> tables = null;
         List<HbaseResourceEntity> values = new ArrayList<>();
         try {
-            Config config = repo.getConfig(HBASE_APPLICATION, site);
-            Configuration conf = repo.convert(config);
+            Map<String, Object> config = getAppConfig(site, HBASE_APPLICATION);
+            Configuration conf = convert(config);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
             tables = dao.getTables(namespace);
         }catch(Exception ex){
@@ -107,8 +147,8 @@ public class HbaseMetadataBrowseWebResource {
         List<String> columns = null;
         List<HbaseResourceEntity> values = new ArrayList<>();
         try {
-            Config config = repo.getConfig(HBASE_APPLICATION, site);
-            Configuration conf = repo.convert(config);
+            Map<String, Object> config = getAppConfig(site, HBASE_APPLICATION);
+            Configuration conf = convert(config);
             HbaseMetadataDAOImpl dao = new HbaseMetadataDAOImpl(conf);
             String tableName = String.format("%s:%s", namespace, table);
             columns = dao.getColumnFamilies(tableName);
@@ -132,6 +172,7 @@ public class HbaseMetadataBrowseWebResource {
 
 
     String checkSensitivity(String site, String resource, Set<String> childSensitiveTypes) {
+        Map<String, Map<String, String>> maps = getAllSensitivities();
         String sensitiveType = null;
         if (maps != null && maps.get(site) != null) {
             Map<String, String> map = maps.get(site);

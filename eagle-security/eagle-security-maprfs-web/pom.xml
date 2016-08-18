@@ -64,6 +64,14 @@
           <artifactId>eagle-security-common</artifactId>
           <version>${project.version}</version>
       </dependency>
+      <dependency>
+          <groupId>com.mapr.hadoop</groupId>
+          <artifactId>maprfs</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+      </dependency>
   </dependencies>
 </project>
 

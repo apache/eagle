@@ -22,6 +22,8 @@ package org.apache.eagle.alert.engine.publisher.impl;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.HashMap;
+
 /**
  * @since Mar 19, 2015
  */
@@ -30,6 +32,7 @@ public class EventUniq {
 	public String policyId;
 	public Long timestamp;	 // event's createTimestamp
 	public long createdTime; // created time, for cache removal;
+	public HashMap<String, String> customFieldValues;
 
 	public EventUniq(String streamId, String policyId, long timestamp) {
 		this.streamId = streamId;
@@ -38,20 +41,34 @@ public class EventUniq {
 		this.createdTime = System.currentTimeMillis();
 	}
 
+	public EventUniq(String streamId, String policyId, long timestamp, HashMap<String, String> customFieldValues) {
+		this.streamId = streamId;
+		this.timestamp = timestamp;
+		this.policyId = policyId;
+		this.createdTime = System.currentTimeMillis();
+		this.customFieldValues = customFieldValues;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof EventUniq) {
 			EventUniq au = (EventUniq) obj;
-			return (this.streamId.equalsIgnoreCase(au.streamId) & this.policyId.equalsIgnoreCase(au.policyId));
+			boolean result = this.streamId.equalsIgnoreCase(au.streamId) & this.policyId.equalsIgnoreCase(au.policyId);
+			if (this.customFieldValues != null && au.customFieldValues != null) {
+				result = result & this.customFieldValues.equals(au.customFieldValues);
+			}
+			return result;
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-				.append(streamId)
-				.append(policyId)
-				.build();
+		HashCodeBuilder builder = new HashCodeBuilder().append(streamId).append(policyId);
+
+		if (customFieldValues != null){
+			builder.append(customFieldValues);
+		}
+		return builder.build();
 	}
 }

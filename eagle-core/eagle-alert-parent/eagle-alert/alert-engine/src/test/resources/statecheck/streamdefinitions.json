@@ -1,0 +1,98 @@
+[
+  {
+    "streamId": "perfmon_latency_stream",
+    "dataSource": "perfmon_datasource",
+    "description": "the data stream for perfmon latency metrics",
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "host",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "timestamp",
+        "type": "LONG",
+        "defaultValue": 0,
+        "required": true
+      },
+      {
+        "name": "metric",
+        "type": "STRING",
+        "defaultValue": "perfmon_latency",
+        "required": true
+      },
+      {
+        "name": "pool",
+        "type": "STRING",
+        "defaultValue": "raptor_general",
+        "required": true
+      },
+      {
+        "name": "value",
+        "type": "DOUBLE",
+        "defaultValue": 0.0,
+        "required": true
+      },
+      {
+        "name": "colo",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true
+      }
+    ]
+  },
+  {
+    "streamId": "perfmon_latency_check_output",
+    "dataSource": "",
+    "description": "the data stream for perfmon latency state output",
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "host",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "timestamp",
+        "type": "LONG",
+        "defaultValue": 0,
+        "required": true
+      },
+      {
+        "name": "metric",
+        "type": "STRING",
+        "defaultValue": "perfmon_latency",
+        "required": true
+      },
+      {
+        "name": "pool",
+        "type": "STRING",
+        "defaultValue": "raptor_general",
+        "required": true
+      },
+      {
+        "name": "value",
+        "type": "DOUBLE",
+        "defaultValue": 0.0,
+        "required": true
+      },
+      {
+        "name": "colo",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "latencyState",
+        "type": "INT",
+        "defaultValue": 0,
+        "required": true
+      }
+    ]
+  }
+]

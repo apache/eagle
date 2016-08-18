@@ -16,6 +16,13 @@
  */
 package org.apache.eagle.service.security.hdfs.resolver;
 
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
+import org.apache.eagle.security.service.HBaseSensitivityEntity;
+import org.apache.eagle.security.service.HdfsSensitivityEntity;
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
@@ -24,16 +31,17 @@ import org.apache.eagle.service.security.hdfs.HDFSResourceSensitivityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class HDFSSensitivityTypeResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
     private final static Logger LOG = LoggerFactory.getLogger(HDFSSensitivityTypeResolver.class);
-    private HDFSResourceSensitivityService dao = new HDFSResourceSensitivityService();
-    private Map<String, Map<String, String>> maps = dao.getAllFileSensitivityMap();
+    private ISecurityMetadataDAO dao;
 
+    @Inject
+    public HDFSSensitivityTypeResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
+    }
 
     private final static String SENSITIVETYPE_ATTRIBUTE_RESOLVE_FORMAT_HINT = "Sensitive type should be composed of a-z, A-Z, 0-9 or -";
 
@@ -41,6 +49,7 @@ public class HDFSSensitivityTypeResolver implements AttributeResolvable<GenericA
         String query = request.getQuery().trim();
         String site = request.getSite().trim();
         List<String> res = new ArrayList<>();
+        Map<String, Map<String, String>> maps = getAllSensitivities();
         Map<String, String> map = maps.get(site);
 
         if(map == null) {
@@ -71,5 +80,17 @@ public class HDFSSensitivityTypeResolver implements AttributeResolvable<GenericA
     @Override
     public Class<GenericAttributeResolveRequest> getRequestClass() {
         return GenericAttributeResolveRequest.class;
+    }
+
+    private Map<String, Map<String, String>> getAllSensitivities(){
+        Map<String, Map<String, String>> all = new HashMap<>();
+        Collection<HdfsSensitivityEntity> entities = dao.listHdfsSensitivities();
+        for(HdfsSensitivityEntity entity : entities){
+            if(!all.containsKey(entity.getSite())){
+                all.put(entity.getSite(), new HashMap<>());
+            }
+            all.get(entity.getSite()).put(entity.getFiledir(), entity.getSensitivityType());
+        }
+        return all;
     }
 }

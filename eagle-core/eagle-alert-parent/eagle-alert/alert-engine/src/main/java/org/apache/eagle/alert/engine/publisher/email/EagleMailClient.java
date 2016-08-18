@@ -20,7 +20,6 @@ package org.apache.eagle.alert.engine.publisher.email;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -51,12 +50,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EagleMailClient {
-//	private static final String CONFIG_FILE = "config.properties";
+	private static final Logger LOG = LoggerFactory.getLogger(EagleMailClient.class);
 	private static final String BASE_PATH = "templates/";
 
 	private VelocityEngine velocityEngine;
 	private Session session;
-	private static final Logger LOG = LoggerFactory.getLogger(EagleMailClient.class);
 
 	public EagleMailClient() {
 		this(new Properties());
@@ -71,34 +69,37 @@ public class EagleMailClient {
 
 			config.put("mail.transport.protocol", "smtp");
 			if(Boolean.parseBoolean(config.getProperty(AlertEmailConstants.CONF_MAIL_AUTH))){
-				session = Session.getDefaultInstance(config, new Authenticator() {
+				session = Session.getInstance(config, new Authenticator() {
 					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(config.getProperty(AlertEmailConstants.CONF_AUTH_USER), config.getProperty(AlertEmailConstants.CONF_AUTH_PASSWORD));
+						return new PasswordAuthentication(
+								config.getProperty(AlertEmailConstants.CONF_AUTH_USER),
+								config.getProperty(AlertEmailConstants.CONF_AUTH_PASSWORD)
+						);
 					}
 				});
+			} else {
+				session = Session.getInstance(config, new Authenticator() {});
 			}
-			else session = Session.getDefaultInstance(config, new Authenticator() {});
-			final String debugMode =  config.getProperty(AlertEmailConstants.CONF_MAIL_DEBUG, "false");
-			final boolean debug =  Boolean.parseBoolean(debugMode);
+
+			final String debugMode = config.getProperty(AlertEmailConstants.CONF_MAIL_DEBUG, "false");
+			final boolean debug = Boolean.parseBoolean(debugMode);
+            LOG.info("Set email debug mode: " + debugMode);
 			session.setDebug(debug);
 		} catch (Exception e) {
-            LOG.error("Failed connect to smtp server",e);
+            LOG.error("Failed to connect to smtp server", e);
 		}
 	}
 
-	private boolean _send(String from, String to, String cc, String title,
-			String content) {
+	private boolean _send(String from, String to, String cc, String title, String content) {
 		Message msg = new MimeMessage(session);
 		try {
 			msg.setFrom(new InternetAddress(from));
 			msg.setSubject(title);
 			if (to != null) {
-				msg.setRecipients(Message.RecipientType.TO,
-						InternetAddress.parse(to));
+				msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			}
 			if (cc != null) {
-				msg.setRecipients(Message.RecipientType.CC,
-						InternetAddress.parse(cc));
+				msg.setRecipients(Message.RecipientType.CC, InternetAddress.parse(cc));
 			}
 			//msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(DEFAULT_BCC_ADDRESS));
 			msg.setContent(content, "text/html;charset=utf-8");
@@ -106,10 +107,10 @@ public class EagleMailClient {
 			Transport.send(msg);
 			return true;
 		} catch (AddressException e) {
-			LOG.info("Send mail failed, got an AddressException: " + e.getMessage(), e);
+			LOG.info("Failed to send mail, got an AddressException: " + e.getMessage(), e);
 			return false;
 		} catch (MessagingException e) {
-			LOG.info("Send mail failed, got an AddressException: " + e.getMessage(), e);
+			LOG.info("Failed to send mail, got an AddressException: " + e.getMessage(), e);
 			return false;
 		}
 	}
@@ -120,12 +121,10 @@ public class EagleMailClient {
 			mail.setFrom(new InternetAddress(from));
 			mail.setSubject(title);
 			if (to != null) {
-				mail.setRecipients(Message.RecipientType.TO,
-						InternetAddress.parse(to));
+				mail.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			}
 			if (cc != null) {
-				mail.setRecipients(Message.RecipientType.CC,
-						InternetAddress.parse(cc));
+				mail.setRecipients(Message.RecipientType.CC, InternetAddress.parse(cc));
 			}
 			
 			//mail.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(DEFAULT_BCC_ADDRESS));
@@ -146,10 +145,10 @@ public class EagleMailClient {
 			Transport.send(mail);
 			return true;
 		} catch (AddressException e) {
-			LOG.info("Send mail failed, got an AddressException: " + e.getMessage(), e);
+			LOG.info("Failed to send mail, got an AddressException: " + e.getMessage(), e);
 			return false;
 		} catch (MessagingException e) {
-			LOG.info("Send mail failed, got an AddressException: " + e.getMessage(), e);
+			LOG.info("Failed to send mail, got an AddressException: " + e.getMessage(), e);
 			return false;
 		}
 	}
@@ -176,6 +175,7 @@ public class EagleMailClient {
 		final StringWriter writer = new StringWriter();
 		t.merge(context, writer);
 		if(LOG.isDebugEnabled()) LOG.debug(writer.toString());
+
 		return this.send(from, to, cc, title, writer.toString());
 	}
 
@@ -187,7 +187,6 @@ public class EagleMailClient {
 		Template t = null;
 
 		List<MimeBodyPart> mimeBodyParts = new ArrayList<MimeBodyPart>();
-		Map<String,String> cid = new HashMap<String,String>();
 
 		for (Map.Entry<String,File> entry : attachments.entrySet()) {
 			final String attachment = entry.getKey();
@@ -200,7 +199,6 @@ public class EagleMailClient {
 					mimeBodyPart.setFileName(attachment);
 					mimeBodyPart.setDisposition(MimeBodyPart.ATTACHMENT);
 					mimeBodyPart.setContentID(attachment);
-					cid.put(attachment,mimeBodyPart.getContentID());
 					mimeBodyParts.add(mimeBodyPart);
 				} catch (MessagingException e) {
 					LOG.error("Generate mail failed, got exception while attaching files: " + e.getMessage(), e);
@@ -209,9 +207,6 @@ public class EagleMailClient {
 				LOG.error("Attachment: " + attachment + " is null or not exists");
 			}
 		}
-		//TODO remove cid, because not used at all
-		if(LOG.isDebugEnabled()) LOG.debug("Cid maps: "+cid);
-		context.put("cid", cid);
 
 		try {
 			t = velocityEngine.getTemplate(BASE_PATH + templatePath);
@@ -225,8 +220,7 @@ public class EagleMailClient {
 			} catch (ResourceNotFoundException e) {
 				try {
 					t = velocityEngine.getTemplate("/" + templatePath);
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					LOG.error("Template not found:"+ "/" + templatePath, ex);
 				}
 			}
@@ -235,6 +229,7 @@ public class EagleMailClient {
 		final StringWriter writer = new StringWriter();
 		t.merge(context, writer);
 		if(LOG.isDebugEnabled()) LOG.debug(writer.toString());
+
 		return this._send(from, to, cc, title, writer.toString(), mimeBodyParts);
 	}
 }

@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-stream-application-manager</artifactId>
+            <artifactId>eagle-app-base</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

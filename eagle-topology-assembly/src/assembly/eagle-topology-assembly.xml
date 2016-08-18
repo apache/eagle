@@ -5,7 +5,7 @@
    The ASF licenses this file to You under the Apache License, Version 2.0
    (the "License"); you may not use this file except in compliance with
    the License.  You may obtain a copy of the License at
- 
+
       http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
@@ -36,17 +36,16 @@
                     <exclude>**/*storm.yaml</exclude>
                     <exclude>**/*storm.yaml.1</exclude>
                     <exclude>**/log4j.properties</exclude>
+                    <exclude>**/org.apache.eagle.app.spi.ApplicationProvider</exclude>
                 </excludes>
             </unpackOptions>
             <excludes>
-                <exclude>org.apache.storm:storm-core</exclude>
                 <exclude>org.slf4j:slf4j-api</exclude>
-                <exclude>org.slf4j:log4j-over-slf4j</exclude>
                 <exclude>org.slf4j:slf4j-log4j12</exclude>
-                <exclude>log4j:log4j</exclude>
-                <exclude>asm:asm</exclude>
-                <exclude>org.apache.log4j.wso2:log4j</exclude>
-                <exclude>log4j:apache-log4j-extras</exclude>
+                <exclude>io.dropwizard:**</exclude>
+                <exclude>com.sun.jersey:**</exclude>
+                <exclude>com.sun.jersey.contribs:**</exclude>
+                <exclude>org.apache.storm:storm-core</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

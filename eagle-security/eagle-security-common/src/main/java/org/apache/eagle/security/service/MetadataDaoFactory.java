@@ -14,55 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.eagle.security.service;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
 
 /**
  * @since Apr 12, 2016
  *
  */
 public class MetadataDaoFactory {
-
-    private static final MetadataDaoFactory INSTANCE = new MetadataDaoFactory();
     private static final Logger LOG = LoggerFactory.getLogger(MetadataDaoFactory.class);
 
-    private ISecurityMetadataDAO dao;
+    public static ISecurityMetadataDAO getMetadataDAO(Config eagleServerConfig) {
+        String storeCls = eagleServerConfig.getString("metadata.store");
 
-    private MetadataDaoFactory() {
-        Config config = ConfigFactory.load();
-        Config datastoreConfig = config.getConfig("datastore");
-        if (datastoreConfig == null) {
-            LOG.warn("datastore is not configured, use in-memory store !!!");
-            dao = new InMemMetadataDaoImpl(datastoreConfig);
+        ISecurityMetadataDAO dao = null;
+        if (storeCls.equalsIgnoreCase("org.apache.eagle.metadata.service.memory.MemoryMetadataStore")) {
+            dao = new InMemMetadataDaoImpl();
         } else {
-            String clsName = datastoreConfig.getString("metadataDao");
-            Class<?> clz;
-            try {
-                clz = Thread.currentThread().getContextClassLoader().loadClass(clsName);
-                if (ISecurityMetadataDAO.class.isAssignableFrom(clz)) {
-                    Constructor<?> cotr = clz.getConstructor(Config.class);
-                    dao = (ISecurityMetadataDAO) cotr.newInstance(datastoreConfig);
-                } else {
-                    throw new Exception("metadataDao configuration need to be implementation of IMetadataDao! ");
-                }
-            } catch (Exception e) {
-                LOG.error("error when initialize the dao, fall back to in memory mode!", e);
-                dao = new InMemMetadataDaoImpl(datastoreConfig);
-            }
+            dao = new JDBCSecurityMetadataDAO(eagleServerConfig);
         }
-    }
-
-    public static MetadataDaoFactory getInstance() {
-        return INSTANCE;
-    }
-
-    public ISecurityMetadataDAO getMetadataDao() {
         return dao;
     }
 }

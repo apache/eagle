@@ -16,7 +16,9 @@
  */
 package org.apache.eagle.service.security.hive.resolver;
 
+import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
@@ -39,6 +41,11 @@ public class HiveCommandResolver implements AttributeResolvable<GenericAttribute
 
     private final static List<String> commands = Arrays.asList(cmdStrs);
 
+    private ApplicationEntityService entityService;
+
+    public HiveCommandResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+        this.entityService = entityService;
+    }
 
     public List<String> resolve(GenericAttributeResolveRequest request) throws AttributeResolveException {
         String query = request.getQuery().trim();

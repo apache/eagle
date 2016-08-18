@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyHandler;
 import org.apache.eagle.alert.engine.mock.MockSampleMetadataFactory;
 import org.apache.eagle.alert.engine.mock.MockStreamCollector;
@@ -59,12 +60,13 @@ public class SiddhiCEPPolicyEventHandlerTest {
         SiddhiPolicyHandler handler;
         MockStreamCollector collector;
 
-        handler = new SiddhiPolicyHandler(createDefinition("sampleStream_1","sampleStream_2"));
+        handler = new SiddhiPolicyHandler(createDefinition("sampleStream_1","sampleStream_2"), 0);
         collector = new MockStreamCollector();
         PolicyDefinition policyDefinition = MockSampleMetadataFactory.createSingleMetricSamplePolicy();
         PolicyHandlerContext context = new PolicyHandlerContext();
         context.setPolicyDefinition(policyDefinition);
         context.setPolicyCounter(new MultiCountMetric());
+        context.setPolicyEvaluator(new PolicyGroupEvaluatorImpl("evalutorId"));
         handler.prepare(collector,context);
         StreamEvent event = StreamEvent.Builder()
                 .schema(MockSampleMetadataFactory.createSampleStreamDefinition("sampleStream_1"))
@@ -105,11 +107,13 @@ public class SiddhiCEPPolicyEventHandlerTest {
             mutex.release();
         };
 
-        handler = new SiddhiPolicyHandler(ssd);
+        handler = new SiddhiPolicyHandler(ssd, 0);
         PolicyHandlerContext context = new PolicyHandlerContext();
         context.setPolicyDefinition(policyDefinition);
         context.setPolicyCounter(new MultiCountMetric());
+        context.setPolicyEvaluator(new PolicyGroupEvaluatorImpl("evalutorId"));
         handler.prepare(collector,context);
+
 
         long ts_1 = System.currentTimeMillis();
         long ts_2 = System.currentTimeMillis()+1;

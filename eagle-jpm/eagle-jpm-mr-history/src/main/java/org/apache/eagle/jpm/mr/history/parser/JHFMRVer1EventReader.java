@@ -20,7 +20,7 @@ package org.apache.eagle.jpm.mr.history.parser;
 
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.entities.JobExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.history.jobcounter.JobCounters;
+import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.jpm.mr.history.parser.JHFMRVer1Parser.Keys;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Counter;
@@ -85,7 +85,7 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
         String rack = null;
         // we get rack/hostname based on task's status
         if (values.get(Keys.TASK_STATUS).equals(EagleTaskStatus.SUCCESS.name())) {
-            // in CDH4.1.4, the hostname has the format of /default/rack128/phxdpehdc10dn0338.stratus.phx.ebay.com
+            // in CDH4.1.4, the hostname has the format of /default/rack128/some.server.address
             // if not specified, the hostname has the format  of /default-rack/<hostname>
             String decoratedHostname = values.get(Keys.HOSTNAME);
             String[] tmp = decoratedHostname.split("/");

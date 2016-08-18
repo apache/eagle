@@ -22,7 +22,7 @@ import backtype.storm.metric.api.MultiCountMetric;
  */
 public class PolicyHandlerContext {
     private PolicyDefinition policyDefinition;
-    private PolicyGroupEvaluator parentEvaluator;
+    private PolicyGroupEvaluator policyEvaluator;
     private MultiCountMetric policyCounter;
     private String policyEvaluatorId;
 
@@ -34,12 +34,12 @@ public class PolicyHandlerContext {
         this.policyDefinition = policyDefinition;
     }
 
-    public PolicyGroupEvaluator getParentEvaluator() {
-        return parentEvaluator;
+    public PolicyGroupEvaluator getPolicyEvaluator() {
+        return policyEvaluator;
     }
 
-    public void setParentEvaluator(PolicyGroupEvaluator parentEvaluator) {
-        this.parentEvaluator = parentEvaluator;
+    public void setPolicyEvaluator(PolicyGroupEvaluator policyEvaluator) {
+        this.policyEvaluator = policyEvaluator;
     }
 
     public void setPolicyCounter(MultiCountMetric metric) {

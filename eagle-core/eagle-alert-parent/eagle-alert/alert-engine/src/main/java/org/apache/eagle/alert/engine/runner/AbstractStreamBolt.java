@@ -16,33 +16,53 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.utils.AlertConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
-
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
+import org.apache.eagle.alert.engine.StreamContext;
+import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
+import org.apache.eagle.alert.engine.model.PartitionedEvent;
+import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
+import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
+import org.apache.eagle.alert.engine.serialization.Serializers;
+import org.apache.eagle.alert.utils.AlertConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"rawtypes", "serial"})
-public abstract class AbstractStreamBolt extends BaseRichBolt {
+public abstract class AbstractStreamBolt extends BaseRichBolt implements SerializationMetadataProvider {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractStreamBolt.class);
     private IMetadataChangeNotifyService changeNotifyService;
+
+    public Config getConfig() {
+        return config;
+    }
+
     private Config config;
     private List<String> outputStreamIds;
     protected OutputCollector collector;
     protected Map stormConf;
 
-    public AbstractStreamBolt(IMetadataChangeNotifyService changeNotifyService, Config config){
+    private String boltId;
+    protected PartitionedEventSerializer serializer;
+    protected volatile Map<String, StreamDefinition> sdf  = new HashMap<String, StreamDefinition>();
+    protected volatile String specVersion = "Not Initialized";
+    protected volatile boolean specVersionOutofdate = false;
+    protected StreamContext streamContext;
+
+    public AbstractStreamBolt(String boltId, IMetadataChangeNotifyService changeNotifyService, Config config) {
+        this.boltId = boltId;
         this.changeNotifyService = changeNotifyService;
         this.config = config;
     }
@@ -57,15 +77,29 @@ public abstract class AbstractStreamBolt extends BaseRichBolt {
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.stormConf = stormConf;
         Preconditions.checkNotNull(this.changeNotifyService, "IMetadataChangeNotifyService is not set yet");
+        this.stormConf = stormConf;
         this.collector = collector;
+        this.serializer = Serializers.newPartitionedEventSerializer(this);
         internalPrepare(collector,this.changeNotifyService,this.config,context);
+    }
+
+
+    protected PartitionedEvent deserialize(Object object) throws IOException {
+        // byte[] in higher priority
+        if(object instanceof byte[]) {
+            return serializer.deserialize((byte[]) object);
+        } else if (object instanceof PartitionedEvent){
+            return (PartitionedEvent) object;
+        } else {
+            throw new IllegalStateException(String.format("Unsupported event class '%s', expect byte array or PartitionedEvent!", object == null ? null : object.getClass().getCanonicalName()));
+        }
     }
 
     /**
      * subclass should implement more initialization for example
      * 1) register metadata change
+     * 2) init stream context
      * @param collector
      * @param metadataManager
      * @param config
@@ -91,5 +125,18 @@ public abstract class AbstractStreamBolt extends BaseRichBolt {
         } else {
             declarer.declare(new Fields(AlertConstants.FIELD_0));
         }
+    }
+
+    @Override
+    public StreamDefinition getStreamDefinition(String streamId) throws StreamDefinitionNotFoundException {
+        if (sdf.containsKey(streamId)) {
+            return sdf.get(streamId);
+        } else {
+            throw new StreamDefinitionNotFoundException(streamId, specVersion);
+        }
+    }
+
+    public String getBoltId() {
+        return boltId;
     }
 }

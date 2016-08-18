@@ -29,20 +29,19 @@
   <packaging>jar</packaging>
 
   <dependencies>
-  	  <dependency>
-	      <groupId>org.apache.eagle</groupId>
-	  	  <artifactId>eagle-storm-jobrunning-spout</artifactId>
-          <version>${project.version}</version>
-	   </dependency>
-      <dependency>
-          <groupId>org.apache.eagle</groupId>
-          <artifactId>eagle-stream-application-manager</artifactId>
-          <version>${project.version}</version>
-      </dependency>
 	   <dependency>
 	      <groupId>org.apache.curator</groupId>
 	  	  <artifactId>curator-framework</artifactId>
 	   </dependency>
+	  <dependency>
+		  <groupId>org.apache.eagle</groupId>
+		  <artifactId>eagle-jpm-util</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.jsoup</groupId>
+          <artifactId>jsoup</artifactId>
+      </dependency>
 	   <dependency>
 	      <groupId>org.apache.curator</groupId>
 	  	  <artifactId>curator-recipes</artifactId>
@@ -89,6 +88,11 @@
 	  <dependency>
 		  <groupId>org.scala-lang</groupId>
 		  <artifactId>scala-library</artifactId>
+	  </dependency>
+	  <dependency>
+		  <groupId>org.apache.eagle</groupId>
+		  <artifactId>eagle-app-base</artifactId>
+		  <version>${project.version}</version>
 	  </dependency>
   </dependencies>
 </project>

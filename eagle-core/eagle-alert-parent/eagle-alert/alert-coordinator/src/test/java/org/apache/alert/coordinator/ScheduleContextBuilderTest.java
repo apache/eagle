@@ -38,6 +38,7 @@ import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 import org.apache.eagle.alert.coordinator.provider.ScheduleContextBuilder;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition.Definition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn.Type;
@@ -91,7 +92,7 @@ public class ScheduleContextBuilderTest {
         Assert.assertTrue(context.getPolicyAssignments().containsKey(TEST_POLICY_1));
         StreamWorkSlotQueue queue = SchedulerTest.getQueue(context, assignment1.getQueueId()).getRight();
 
-        client.listPolicies().remove(0);
+        client.removePolicy(0);
         context = builder.buildContext();
         Assert.assertFalse(context.getPolicyAssignments().containsKey(TEST_POLICY_1));
 
@@ -102,7 +103,7 @@ public class ScheduleContextBuilderTest {
     }
 
     @Test
-    public void test_changed_policy() {
+    public void test_changed_policy_partition() {
         InMemMetadataServiceClient client = getSampleMetadataService();
         ScheduleContextBuilder builder = new ScheduleContextBuilder(client);
         PolicyAssignment assignment1 = client.getVersionedSpec().getAssignments().get(0);
@@ -140,6 +141,56 @@ public class ScheduleContextBuilderTest {
     }
 
     @Test
+    public void test_changed_policy_parallelism() {
+        InMemMetadataServiceClient client = getSampleMetadataService();
+        ScheduleContextBuilder builder = new ScheduleContextBuilder(client);
+        PolicyAssignment assignment1 = client.getVersionedSpec().getAssignments().get(0);
+
+        IScheduleContext context = builder.buildContext();
+        Assert.assertTrue(context.getPolicyAssignments().containsKey(TEST_POLICY_1));
+
+        StreamWorkSlotQueue queue = SchedulerTest.getQueue(context, assignment1.getQueueId()).getRight();
+
+        PolicyDefinition pd1 = client.listPolicies().get(0);
+        pd1.setParallelismHint(4); // default queue is 5 , change to smaller, has no effect
+
+        context = builder.buildContext();
+        PolicyAssignment assignmentNew = context.getPolicyAssignments().values().iterator().next();
+        StreamWorkSlotQueue queueNew = SchedulerTest.getQueue(context, assignmentNew.getQueueId()).getRight();
+        Assert.assertNotNull(queueNew);
+        // just to make sure queueNew is present
+        Assert.assertEquals(queue.getQueueId(), queueNew.getQueueId());
+
+        // default queue is 5 , change to bigger 6, policy assignment removed
+        pd1.setParallelismHint(queue.getQueueSize() + 1);
+        context = builder.buildContext();
+
+        Assert.assertFalse(context.getPolicyAssignments().values().iterator().hasNext());
+    }
+
+    @Test
+    public void test_changed_policy_definition() {
+        InMemMetadataServiceClient client = getSampleMetadataService();
+        ScheduleContextBuilder builder = new ScheduleContextBuilder(client);
+        PolicyAssignment assignment1 = client.getVersionedSpec().getAssignments().get(0);
+
+        IScheduleContext context = builder.buildContext();
+        Assert.assertTrue(context.getPolicyAssignments().containsKey(TEST_POLICY_1));
+
+        StreamWorkSlotQueue queue = SchedulerTest.getQueue(context, assignment1.getQueueId()).getRight();
+
+        PolicyDefinition pd1 = client.listPolicies().get(0);
+        pd1.getDefinition().value = "define.. new...";
+
+        context = builder.buildContext();
+        PolicyAssignment assignmentNew = context.getPolicyAssignments().values().iterator().next();
+        StreamWorkSlotQueue queueNew = SchedulerTest.getQueue(context, assignmentNew.getQueueId()).getRight();
+        Assert.assertNotNull(queueNew);
+        // just to make sure queueNew is present
+        Assert.assertEquals(queue.getQueueId(), queueNew.getQueueId());
+    }
+
+    @Test
     public void test_renamed_topologies() {
         InMemMetadataServiceClient client = getSampleMetadataService();
         ScheduleContextBuilder builder = new ScheduleContextBuilder(client);
@@ -167,12 +218,11 @@ public class ScheduleContextBuilderTest {
 
     public static InMemMetadataServiceClient getSampleMetadataService() {
         InMemMetadataServiceClient client = new InMemMetadataServiceClient();
-        client.listTopologies().add(createSampleTopology());
-        client.listDataSources().add(createKafka2TupleMetadata());
-        // client.listSpoutMetadata().add(createS)
-        client.listPolicies().add(createPolicy());
-        client.listPublishment().add(createPublishment());
-        client.listStreams().add(createStreamDefinition());
+        client.addTopology(createSampleTopology());
+        client.addDataSource(createKafka2TupleMetadata());
+        client.addPolicy(createPolicy());
+        client.addPublishment(createPublishment());
+        client.addStreamDefinition(createStreamDefinition());
         client.addScheduleState(createScheduleState());
         return client;
     }
@@ -195,9 +245,15 @@ public class ScheduleContextBuilderTest {
         WorkSlot slot0 = new WorkSlot(TOPO1, TOPO1 + "-alert-" + 0);
         WorkSlot slot1 = new WorkSlot(TOPO1, TOPO1 + "-alert-" + 1);
         WorkSlot slot2 = new WorkSlot(TOPO1, TOPO1 + "-alert-" + 2);
+        WorkSlot slot3 = new WorkSlot(TOPO1, TOPO1 + "-alert-" + 3);
+        WorkSlot slot4 = new WorkSlot(TOPO1, TOPO1 + "-alert-" + 4);
+        WorkSlot slot5 = new WorkSlot(TOPO1, TOPO1 + "-alert-" + 5);
         slots.add(slot0);
         slots.add(slot1);
         slots.add(slot2);
+        slots.add(slot3);
+        slots.add(slot4);
+        slots.add(slot5);
 
         StreamWorkSlotQueue q = new StreamWorkSlotQueue(streamGroup, false, new HashMap<>(), slots);
         ms.addQueues(q);
@@ -216,6 +272,7 @@ public class ScheduleContextBuilderTest {
         def.setInputStreams(Arrays.asList(TEST_STREAM_DEF_1));
         def.setOutputStreams(Arrays.asList(OUT_STREAM1));
         def.setParallelismHint(5);
+        def.setDefinition(new Definition());
 
         streamGroup = new StreamGroup();
         par = new StreamPartition();

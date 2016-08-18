@@ -16,12 +16,14 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 /**
  * @since Apr 5, 2016
@@ -36,6 +38,8 @@ public class PolicyDefinition implements Serializable{
     private List<String> outputStreams = new ArrayList<String>();
 
     private Definition definition;
+    private Definition stateDefinition;
+    private PolicyStatus policyStatus = PolicyStatus.ENABLED;
 
     // one stream only have one partition in one policy, since we don't support stream alias
     private List<StreamPartition> partitionSpec = new ArrayList<StreamPartition>();
@@ -79,6 +83,14 @@ public class PolicyDefinition implements Serializable{
         return definition;
     }
 
+    public Definition getStateDefinition() {
+        return stateDefinition;
+    }
+
+    public void setStateDefinition(Definition stateDefinition) {
+        this.stateDefinition = stateDefinition;
+    }
+
     public void setDefinition(Definition definition) {
         this.definition = definition;
     }
@@ -103,7 +115,15 @@ public class PolicyDefinition implements Serializable{
         this.parallelismHint = parallelism;
     }
 
-    @Override
+    public PolicyStatus getPolicyStatus() {
+		return policyStatus;
+	}
+
+	public void setPolicyStatus(PolicyStatus policyStatus) {
+		this.policyStatus = policyStatus;
+	}
+
+	@Override
     public int hashCode() {
         return new HashCodeBuilder().
                 append(name).
@@ -128,6 +148,7 @@ public class PolicyDefinition implements Serializable{
                 CollectionUtils.isEqualCollection(another.inputStreams, this.inputStreams) &&
                 CollectionUtils.isEqualCollection(another.outputStreams, this.outputStreams) &&
                 another.definition.equals(this.definition) &&
+                Objects.equals(this.definition, another.definition) &&
                 CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec) 
 //                && another.parallelismHint == this.parallelismHint
                 ) {
@@ -141,6 +162,9 @@ public class PolicyDefinition implements Serializable{
 
         public String type;
         public String value;
+
+        private List<String> inputStreams = new ArrayList<String>();
+        private List<String> outputStreams = new ArrayList<String>();
 
         public Definition(String type,String value){
             this.type = type;
@@ -164,8 +188,10 @@ public class PolicyDefinition implements Serializable{
             if(!(that instanceof Definition))
                 return false;
             Definition another = (Definition)that;
-            if(another.type.equals(this.type) &&
-                    another.value.equals(this.value))
+            if(another.type.equals(this.type)
+                    && another.value.equals(this.value)
+                    && ListUtils.isEqualList(another.inputStreams, this.inputStreams)
+                    && ListUtils.isEqualList(another.outputStreams, this.outputStreams))
                 return true;
             return false;
         }
@@ -186,14 +212,34 @@ public class PolicyDefinition implements Serializable{
             this.value = value;
         }
 
+        public void setInputStreams(List<String> inputStreams) {
+            this.inputStreams = inputStreams;
+        }
+
+        public void setOutputStreams(List<String> outputStreams) {
+            this.outputStreams = outputStreams;
+        }
+
+        public List<String> getInputStreams() {
+            return inputStreams;
+        }
+
+        public List<String> getOutputStreams() {
+            return outputStreams;
+        }
+
         @Override
         public String toString() {
-            return String.format("{type=\"%s\",value=\"%s\"",type,value);
+            return String.format("{type=\"%s\",value=\"%s\", inputStreams=\"%s\", outputStreams=\"%s\" }",type,value, inputStreams, outputStreams);
         }
+    }
+    
+    public static enum PolicyStatus {
+    	ENABLED, DISABLED
     }
 
     @Override
     public String toString() {
-        return String.format("{name=\"%s\",definition=%s}",this.getName(),this.getDefinition().toString());
+        return String.format("{name=\"%s\",definition=%s}",this.getName(),this.getDefinition()==null?"null": this.getDefinition().toString());
     }
 }

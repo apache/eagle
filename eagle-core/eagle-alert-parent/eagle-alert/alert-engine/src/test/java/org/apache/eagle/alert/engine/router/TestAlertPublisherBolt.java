@@ -18,15 +18,21 @@
 
 package org.apache.eagle.alert.engine.router;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.SimpleType;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.coordinator.StreamColumn;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
+import org.apache.eagle.alert.engine.publisher.impl.AlertPublishPluginsFactory;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
 import org.apache.eagle.alert.engine.runner.AlertPublisherBolt;
 import org.apache.eagle.alert.engine.runner.MapComparator;
@@ -35,12 +41,10 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Since 5/14/16.
@@ -87,8 +91,7 @@ public class TestAlertPublisherBolt {
         comparator.compare();
         Assert.assertTrue(comparator.getModified().size() == 1);
 
-        AlertPublisher alertPublisher = new AlertPublisherImpl("alert-publisher-test");
-        AlertPublisherBolt publisherBolt = new AlertPublisherBolt(alertPublisher, null, null);
+        AlertPublisherBolt publisherBolt = new AlertPublisherBolt("alert-publisher-test", null, null);
         publisherBolt.onAlertPublishSpecChange(spec1, null);
         publisherBolt.onAlertPublishSpecChange(spec2, null);
     }
@@ -108,5 +111,48 @@ public class TestAlertPublisherBolt {
         List<T> l = objectMapper.readValue(TestAlertPublisherBolt.class.getResourceAsStream(path), type);
         return l;
     }
+
+    private AlertStreamEvent createWithStreamDef(String hostname, String appName){
+        AlertStreamEvent alert = new AlertStreamEvent();
+        PolicyDefinition policy = new PolicyDefinition();
+        policy.setName("perfmon_cpu_host_check");
+        alert.setPolicy(policy);
+        alert.setCreatedTime(System.currentTimeMillis());
+        alert.setData(new Object[]{appName, hostname});
+        alert.setStreamId("testAlertStream");
+        alert.setCreatedBy(this.toString());
+
+        // build stream definition
+        StreamDefinition sd = new StreamDefinition();
+        StreamColumn appColumn = new StreamColumn();
+        appColumn.setName("appname");
+        appColumn.setType(StreamColumn.Type.STRING);
+
+        StreamColumn hostColumn = new StreamColumn();
+        hostColumn.setName("hostname");
+        hostColumn.setType(StreamColumn.Type.STRING);
+
+        sd.setColumns(Arrays.asList(appColumn, hostColumn));
+
+        alert.setSchema(sd);
+        return alert;
+    }
+
+    @Test
+    public void testCustomFieldDedupEvent() throws Exception {
+        List<Publishment> pubs = loadEntities("/router/publishments.json", Publishment.class);
+
+        AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(pubs.get(0), null, null);
+        AlertStreamEvent event1 = createWithStreamDef("host1", "testapp1");
+        AlertStreamEvent event2 = createWithStreamDef("host2", "testapp1");
+        AlertStreamEvent event3 = createWithStreamDef("host2", "testapp2");
+
+        Assert.assertNotNull(plugin.dedup(event1));
+        Assert.assertNull(plugin.dedup(event2));
+        Assert.assertNotNull(plugin.dedup(event3));
+
+    }
+
+
 
 }

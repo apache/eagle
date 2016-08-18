@@ -16,21 +16,21 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.evaluator.CompositePolicyHandler;
 import org.apache.eagle.alert.engine.evaluator.PolicyGroupEvaluator;
 import org.apache.eagle.alert.engine.evaluator.PolicyHandlerContext;
 import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
-import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandlers;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     private static final long serialVersionUID = -5499413193675985288L;
@@ -41,7 +41,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     // mapping from policy name to PolicyDefinition
     private volatile Map<String,PolicyDefinition> policyDefinitionMap = new HashMap<>();
     // mapping from policy name to PolicyStreamHandler
-    private volatile Map<String,PolicyStreamHandler> policyStreamHandlerMap = new HashMap<>();
+    private volatile Map<String,CompositePolicyHandler> policyStreamHandlerMap = new HashMap<>();
     private String policyEvaluatorId;
     private StreamContext context;
 
@@ -82,7 +82,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
      */
     private void dispatch(PartitionedEvent partitionedEvent){
         boolean handled = false;
-        for(Map.Entry<String,PolicyStreamHandler> policyStreamHandler: policyStreamHandlerMap.entrySet()){
+        for(Map.Entry<String,CompositePolicyHandler> policyStreamHandler: policyStreamHandlerMap.entrySet()){
             if(isAcceptedByPolicy(partitionedEvent,policyDefinitionMap.get(policyStreamHandler.getKey()))){
                 try {
                     handled = true;
@@ -102,16 +102,16 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
         }
     }
 
-    private static boolean isAcceptedByPolicy(PartitionedEvent event, PolicyDefinition policy){
-        return policy.getInputStreams() != null
-                && policy.getInputStreams().contains(event.getEvent().getStreamId())
-                && policy.getPartitionSpec().contains(event.getPartition());
+    private static boolean isAcceptedByPolicy(PartitionedEvent event, PolicyDefinition policy) {
+        return policy.getPartitionSpec().contains(event.getPartition()) &&
+                ( policy.getInputStreams().contains(event.getEvent().getStreamId()) ||
+                    policy.getDefinition().getInputStreams().contains(event.getEvent().getStreamId()) );
     }
 
     @Override
     public void onPolicyChange(List<PolicyDefinition> added, List<PolicyDefinition> removed, List<PolicyDefinition> modified, Map<String, StreamDefinition> sds) {
         Map<String,PolicyDefinition> copyPolicies = new HashMap<>(policyDefinitionMap);
-        Map<String,PolicyStreamHandler> copyHandlers = new HashMap<>(policyStreamHandlerMap);
+        Map<String,CompositePolicyHandler> copyHandlers = new HashMap<>(policyStreamHandlerMap);
         for(PolicyDefinition pd : added){
             inplaceAdd(copyPolicies, copyHandlers, pd, sds);
         }
@@ -131,17 +131,17 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
         this.policyStreamHandlerMap = copyHandlers;
     }
 
-    private void inplaceAdd(Map<String, PolicyDefinition> policies, Map<String, PolicyStreamHandler> handlers, PolicyDefinition policy, Map<String, StreamDefinition> sds) {
+    private void inplaceAdd(Map<String, PolicyDefinition> policies, Map<String, CompositePolicyHandler> handlers, PolicyDefinition policy, Map<String, StreamDefinition> sds) {
         if(handlers.containsKey(policy.getName())){
             LOG.error("metadata calculation error, try to add existing PolicyDefinition " + policy);
         }else {
             policies.put(policy.getName(), policy);
-            PolicyStreamHandler handler = PolicyStreamHandlers.createHandler(policy.getDefinition().type, sds);
+            CompositePolicyHandler handler = new CompositePolicyHandler(sds);
             try {
                 PolicyHandlerContext context = new PolicyHandlerContext();
                 context.setPolicyCounter(this.context.counter());
                 context.setPolicyDefinition(policy);
-                context.setParentEvaluator(this);
+                context.setPolicyEvaluator(this);
                 context.setPolicyEvaluatorId(policyEvaluatorId);
                 handler.prepare(collector, context);
                 handlers.put(policy.getName(), handler);
@@ -153,7 +153,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
         }
     }
 
-    private void inplaceRemove(Map<String, PolicyDefinition> policies, Map<String, PolicyStreamHandler> handlers, PolicyDefinition policy)  {
+    private void inplaceRemove(Map<String, PolicyDefinition> policies, Map<String, CompositePolicyHandler> handlers, PolicyDefinition policy)  {
         if(handlers.containsKey(policy.getName())) {
             PolicyStreamHandler handler = handlers.get(policy.getName());
             try {
@@ -169,4 +169,10 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
             LOG.error("metadata calculation error, try to remove nonexisting PolicyDefinition: "+policy);
         }
     }
+
+
+    public CompositePolicyHandler getPolicyHandler(String policy) {
+        return policyStreamHandlerMap.get(policy);
+    }
+
 }

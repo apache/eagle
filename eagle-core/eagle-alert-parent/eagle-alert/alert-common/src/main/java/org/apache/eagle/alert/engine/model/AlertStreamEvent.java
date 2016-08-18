@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.alert.engine.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.utils.DateTimeUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * streamId stands for alert type instead of source event streamId
@@ -44,7 +44,6 @@ public class AlertStreamEvent extends StreamEvent {
         this.policy = policy;
     }
 
-
     public String getPolicyId() {
         return policy.getName();
     }
@@ -59,8 +58,8 @@ public class AlertStreamEvent extends StreamEvent {
                 dataStrings.add(null);
             }
         }
-        return String.format("AlertStreamEvent[stream=%S,timestamp=%s,data=[%s], policy=%s, createdBy=%s]",
-                this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()), StringUtils.join(dataStrings,","),this.getPolicy().getName(),this.getCreatedBy());
+        return String.format("AlertStreamEvent[stream=%S,timestamp=%s,data=[%s], policy=%s, createdBy=%s, metaVersion=%s]",
+                this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()), StringUtils.join(dataStrings,","),this.getPolicy().getName(),this.getCreatedBy(),this.getMetaVersion());
     }
 
     public String getCreatedBy() {

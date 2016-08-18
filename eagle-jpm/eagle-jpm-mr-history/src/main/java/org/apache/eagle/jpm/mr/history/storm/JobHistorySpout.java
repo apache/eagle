@@ -22,14 +22,20 @@ import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
-import org.apache.eagle.dataproc.core.ValuesArray;
 import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
 import org.apache.eagle.jpm.mr.history.crawler.*;
+import org.apache.eagle.jpm.mr.history.entities.JobProcessTimeStampEntity;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
+import org.apache.eagle.jpm.util.JobIdFilter;
+import org.apache.eagle.jpm.util.JobIdFilterByPartition;
+import org.apache.eagle.jpm.util.JobIdPartitioner;
+import org.apache.eagle.service.client.IEagleServiceClient;
+import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,6 +92,7 @@ public class JobHistorySpout extends BaseRichSpout {
     private JHFInputStreamCallback callback;
     private JHFConfigManager configManager;
     private JobHistoryLCM m_jhfLCM;
+    private final static int MAX_RETRY_TIMES = 3;
 
     public JobHistorySpout(JobHistoryContentFilter filter, JHFConfigManager configManager) {
         this(filter, configManager, new JobHistorySpoutCollectorInterceptor());
@@ -159,7 +166,8 @@ public class JobHistorySpout extends BaseRichSpout {
     public void nextTuple() {
         try {
             Long modifiedTime = driver.crawl();
-            interceptor.collect(new ValuesArray(partitionId, modifiedTime));
+            zkState.updateProcessedTimeStamp(partitionId, modifiedTime);
+            updateProcessedTimeStamp(modifiedTime);
         } catch (Exception ex) {
             LOG.error("fail crawling job history file and continue ...", ex);
             try {
@@ -181,7 +189,6 @@ public class JobHistorySpout extends BaseRichSpout {
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("partitionId", "timeStamp"));
     }
 
     /**
@@ -204,5 +211,70 @@ public class JobHistorySpout extends BaseRichSpout {
 
     @Override
     public void close() {
+    }
+
+    private void updateProcessedTimeStamp(long modifiedTime) {
+        if (partitionId != 0) {
+            return;
+        }
+
+        //update latest process time
+        long minTimeStamp = modifiedTime;
+        for (int i = 1; i < numTotalPartitions; i++) {
+            long time = zkState.readProcessedTimeStamp(i);
+            if (time <= minTimeStamp) {
+                minTimeStamp = time;
+            }
+        }
+
+        if (minTimeStamp == 0l) {
+            return;
+        }
+
+        LOG.info("update process time stamp {}", minTimeStamp);
+        final JHFConfigManager.EagleServiceConfig eagleServiceConfig = configManager.getEagleServiceConfig();
+        final JHFConfigManager.JobExtractorConfig jobExtractorConfig = configManager.getJobExtractorConfig();
+        Map<String, String> baseTags = new HashMap<String, String>() { {
+            put("site", jobExtractorConfig.site);
+        } };
+        JobProcessTimeStampEntity entity = new JobProcessTimeStampEntity();
+        entity.setCurrentTimeStamp(minTimeStamp);
+        entity.setTimestamp(minTimeStamp);
+        entity.setTags(baseTags);
+
+        IEagleServiceClient client = new EagleServiceClientImpl(
+                eagleServiceConfig.eagleServiceHost,
+                eagleServiceConfig.eagleServicePort,
+                eagleServiceConfig.username,
+                eagleServiceConfig.password);
+
+        client.getJerseyClient().setReadTimeout(jobExtractorConfig.readTimeoutSeconds * 1000);
+
+        List<JobProcessTimeStampEntity> entities = new ArrayList<>();
+        entities.add(entity);
+
+        int tried = 0;
+        while (tried <= MAX_RETRY_TIMES) {
+            try {
+                LOG.info("start flushing JobProcessTimeStampEntity entities of total number " + entities.size());
+                client.create(entities);
+                LOG.info("finish flushing entities of total number " + entities.size());
+                break;
+            } catch (Exception ex) {
+                if (tried < MAX_RETRY_TIMES) {
+                    LOG.error("Got exception to flush, retry as " + (tried + 1) + " times", ex);
+                } else {
+                    LOG.error("Got exception to flush, reach max retry times " + MAX_RETRY_TIMES, ex);
+                }
+            }
+            tried ++;
+        }
+
+        client.getJerseyClient().destroy();
+        try {
+            client.close();
+        } catch (Exception e) {
+            LOG.error("failed to close eagle service client ", e);
+        }
     }
 }

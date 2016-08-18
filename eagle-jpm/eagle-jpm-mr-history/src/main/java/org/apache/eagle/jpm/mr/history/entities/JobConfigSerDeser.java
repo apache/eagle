@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.mr.history.entities;
 
-import org.apache.eagle.jpm.mr.history.common.JobConfig;
 import org.apache.eagle.log.entity.meta.EntitySerDeser;
 import org.apache.hadoop.hbase.util.Bytes;
 

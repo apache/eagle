@@ -20,8 +20,8 @@ import org.apache.eagle.jpm.util.Constants;
 
 import java.util.List;
 
-public interface ResourceFetcher {
-
-	List<Object> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception;
+public interface ResourceFetcher<T> {
+    //continue to refactor later
+	List<T> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception;
 
 }

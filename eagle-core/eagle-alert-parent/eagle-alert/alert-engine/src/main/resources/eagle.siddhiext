@@ -15,5 +15,4 @@
 # limitations under the License.
 #
 
-# externalTimeBatch=org.apache.eagle.policy.siddhi.extension.ExternalTimeBatchWindowProcessor
 collect=org.apache.eagle.alert.engine.siddhi.extension.AttributeCollectAggregator

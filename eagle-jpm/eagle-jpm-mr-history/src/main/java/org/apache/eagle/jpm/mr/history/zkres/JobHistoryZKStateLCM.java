@@ -28,4 +28,6 @@ public interface JobHistoryZKStateLCM {
     void addProcessedJob(String date, String jobId);
     void truncateProcessedJob(String date);
     void truncateEverything();
+    long readProcessedTimeStamp(int partitionId);
+    void updateProcessedTimeStamp(int partitionId, long timeStamp);
 }

@@ -35,8 +35,11 @@
         <module>eagle-jpm-spark-running</module>
         <module>eagle-jpm-spark-history</module>
         <module>eagle-jpm-mr-history</module>
-         <module>eagle-jpm-entity</module>
+        <module>eagle-jpm-entity</module>
+        <module>eagle-hadoop-queue</module>
         <module>eagle-jpm-util</module>
+        <module>eagle-jpm-mr-running</module>
+        <module>eagle-jpm-app</module>
   </modules>
 
     <dependencies>

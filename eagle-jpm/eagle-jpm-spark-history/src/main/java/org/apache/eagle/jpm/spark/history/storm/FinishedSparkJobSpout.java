@@ -71,10 +71,13 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
     public void nextTuple() {
         LOG.info("Start to run tuple");
         try {
-            long fetchTime = Calendar.getInstance().getTimeInMillis();
+            Calendar calendar = Calendar.getInstance();
+            long fetchTime = calendar.getTimeInMillis();
+            calendar.setTimeInMillis(this.lastFinishAppTime);
+            LOG.info("Last finished time = {}", calendar.getTime());
             if (fetchTime - this.lastFinishAppTime > this.config.stormConfig.spoutCrawlInterval) {
-                List apps = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, new Long(lastFinishAppTime).toString());
-                List<AppInfo> appInfos = (null != apps ? (List<AppInfo>)apps.get(0):new ArrayList<AppInfo>());
+                List<AppInfo> appInfos = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, Long.toString(lastFinishAppTime));
+                //List<AppInfo> appInfos = (null != apps ? (List<AppInfo>)apps.get(0):new ArrayList<AppInfo>());
                 LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
                 for (AppInfo app: appInfos) {
                     String appId = app.getId();
@@ -123,7 +126,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
         if (this.failTimes.containsKey(appId)) {
             failTimes = this.failTimes.get(appId);
         }
-        failTimes ++;
+        failTimes++;
         if (failTimes >= FAIL_MAX_TIMES) {
             this.failTimes.remove(appId);
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
