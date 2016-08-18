@@ -67,7 +67,7 @@ public class EmbeddedHbase {
 	        conf.setInt("test.hbase.zookeeper.property.clientPort", port);
 	        conf.set("zookeeper.znode.parent", znode);
 	        conf.setInt("hbase.zookeeper.property.maxClientCnxns", 200);
-			conf.set("hbase.master.ipc.address", "localhost");
+
 	        conf.setInt("hbase.master.info.port", -1);//avoid port clobbering
 	        // start mini hbase cluster
 	        hBaseCluster = util.startMiniCluster();

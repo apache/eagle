@@ -39,7 +39,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-@Ignore
 public class TestHBaseLogReader2 {
 	private final static Logger LOG = LoggerFactory.getLogger(TestHBaseLogReader2.class);
     private static EmbeddedHbase hbase = EmbeddedHbase.getInstance();
