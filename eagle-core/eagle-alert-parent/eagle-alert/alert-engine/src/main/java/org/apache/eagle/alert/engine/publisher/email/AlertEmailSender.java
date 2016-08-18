@@ -80,17 +80,17 @@ public class AlertEmailSender implements Runnable {
     private Properties parseMailClientConfig(Map<String, String> mailProps) {
         if (mailProps == null) return null;
         Properties props = new Properties();
-        String mailHost = mailProps.get(AlertEmailConstants.CONF_MAIL_SERVER);
+        String mailHost = mailProps.get(AlertEmailConstants.CONF_MAIL_HOST);
         String mailPort = mailProps.get(AlertEmailConstants.CONF_MAIL_PORT);
         if (mailHost == null || mailPort == null || mailHost.isEmpty()) {
             LOG.warn("SMTP server is unset, will exit");
             return null;
         }
-        props.put(AlertEmailConstants.MAIL_HOST, mailHost);
-        props.put(AlertEmailConstants.MAIL_PORT, mailPort);
+        props.put(AlertEmailConstants.CONF_MAIL_HOST, mailHost);
+        props.put(AlertEmailConstants.CONF_MAIL_PORT, mailPort);
 
         String smtpAuth = mailProps.getOrDefault(AlertEmailConstants.CONF_MAIL_AUTH, "false");
-        props.put(AlertEmailConstants.MAIL_AUTH, smtpAuth);
+        props.put(AlertEmailConstants.CONF_MAIL_AUTH, smtpAuth);
         if (Boolean.parseBoolean(smtpAuth)) {
             props.put(AlertEmailConstants.CONF_AUTH_USER, mailProps.get(AlertEmailConstants.CONF_AUTH_USER));
             props.put(AlertEmailConstants.CONF_AUTH_PASSWORD, mailProps.get(AlertEmailConstants.CONF_AUTH_PASSWORD));

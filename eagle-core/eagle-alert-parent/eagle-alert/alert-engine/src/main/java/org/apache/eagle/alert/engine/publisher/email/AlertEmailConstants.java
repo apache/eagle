@@ -20,20 +20,15 @@ package org.apache.eagle.alert.engine.publisher.email;
 
 public class AlertEmailConstants {
 
-    public static final String MAIL_AUTH = "mail.smtp.auth";
-    public static final String MAIL_HOST = "mail.smtp.host";
-    public static final String MAIL_PORT = "mail.smtp.port";
-
     public static final String CONN_PLAINTEXT = "plaintext";
     public static final String CONN_TLS = "tls";
     public static final String CONN_SSL = "ssl";
 
-    public static final String CONF_MAIL_SERVER = "smtp.server";
-    public static final String CONF_MAIL_PORT = "smtp.port";
-    public static final String CONF_MAIL_CONN = "connection";
-    public static final String CONF_MAIL_DEBUG = "mailDebug";
-    public static final String CONF_MAIL_AUTH = "smtp.auth.enable";
-    public static final String CONF_AUTH_USER = "auth.username";
-    public static final String CONF_AUTH_PASSWORD = "auth.password";
-
+    public static final String CONF_MAIL_HOST = "mail.smtp.host";
+    public static final String CONF_MAIL_PORT = "mail.smtp.port";
+    public static final String CONF_MAIL_AUTH = "mail.smtp.auth";
+    public static final String CONF_AUTH_USER = "mail.username";
+    public static final String CONF_AUTH_PASSWORD = "mail.password";
+    public static final String CONF_MAIL_CONN = "mail.connection";
+    public static final String CONF_MAIL_DEBUG = "mail.debug";
 }
