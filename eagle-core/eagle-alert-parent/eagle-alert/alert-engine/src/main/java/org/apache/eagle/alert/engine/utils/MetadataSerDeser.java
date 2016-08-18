@@ -40,7 +40,8 @@ public class MetadataSerDeser {
             K spec = mapper.readValue(is, typeRef);
             return spec;
         }catch(Exception ex){
-            LOG.error("error in deserializing metadata of type {} from input stream", new TypeReference<K>(){}.getType().getTypeName(), ex);
+            LOG.error("error in deserializing metadata of type {} from input stream",
+                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), ex);
         }
         return null;
     }
@@ -52,7 +53,8 @@ public class MetadataSerDeser {
             K spec = mapper.readValue(is, cls);
             return spec;
         }catch(Exception ex){
-            LOG.error("Got error to deserialize metadata of type {} from input stream", new TypeReference<K>(){}.getType().getTypeName(), ex);
+            LOG.error("Got error to deserialize metadata of type {} from input stream",
+                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), ex);
         }
         return null;
     }
@@ -64,7 +66,8 @@ public class MetadataSerDeser {
             K spec = mapper.readValue(json, typeRef);
             return spec;
         }catch(Exception ex){
-            LOG.error("error in deserializing metadata of type {} from {}", new TypeReference<K>(){}.getType().getTypeName(), json, ex);
+            LOG.error("error in deserializing metadata of type {} from {}",
+                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), json, ex);
         }
         return null;
     }
@@ -75,7 +78,8 @@ public class MetadataSerDeser {
             K spec = mapper.readValue(json, cls);
             return spec;
         }catch(Exception ex){
-            LOG.error("error in deserializing metadata of type {} from {}", new TypeReference<K>(){}.getType().getTypeName(), json, ex);
+            LOG.error("error in deserializing metadata of type {} from {}",
+                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), json, ex);
         }
         return null;
     }
@@ -86,7 +90,8 @@ public class MetadataSerDeser {
             String json = mapper.writeValueAsString(spec);
             return json;
         }catch(Exception ex){
-            LOG.error("error in serializing object {} with type {}", spec, new TypeReference<K>(){}.getType().getTypeName(), ex);
+            LOG.error("error in serializing object {} with type {}", spec,
+                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), ex);
         }
         return null;
     }
