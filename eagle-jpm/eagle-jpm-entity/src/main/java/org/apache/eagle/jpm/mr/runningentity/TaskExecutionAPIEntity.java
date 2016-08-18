@@ -34,26 +34,24 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Indexes({
         @Index(name="Index_1_jobId", columns = { "jobId" }, unique = false)
 })
-@Tags({"site", "jobId", "JobName", "jobDefId", "jobType", "taskType", "taskId", "user", "queue"})
+@Tags({"site", "jobId", "JobName", "jobDefId", "jobType", "taskType", "taskId", "user", "queue", "hostname"})
 public class TaskExecutionAPIEntity extends TaggedLogAPIEntity {
     @Column("a")
     private long startTime;
     @Column("b")
-    private long finishTime;
+    private long endTime;
     @Column("c")
-    private long elapsedTime;
+    private long duration;
     @Column("d")
     private double progress;
     @Column("e")
-    private String status;
+    private String taskStatus;
     @Column("f")
     private String successfulAttempt;
     @Column("g")
     private String statusDesc;
     @Column("h")
     private JobCounters jobCounters;
-    @Column("i")
-    private String host;
 
     public long getStartTime() {
         return startTime;
@@ -64,22 +62,22 @@ public class TaskExecutionAPIEntity extends TaggedLogAPIEntity {
         valueChanged("startTime");
     }
 
-    public long getFinishTime() {
-        return finishTime;
+    public long getEndTime() {
+        return endTime;
     }
 
-    public void setFinishTime(long finishTime) {
-        this.finishTime = finishTime;
-        valueChanged("finishTime");
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+        valueChanged("endTime");
     }
 
-    public long getElapsedTime() {
-        return elapsedTime;
+    public long getDuration() {
+        return duration;
     }
 
-    public void setElapsedTime(long elapsedTime) {
-        this.elapsedTime = elapsedTime;
-        valueChanged("elapsedTime");
+    public void setDuration(long duration) {
+        this.duration = duration;
+        valueChanged("duration");
     }
 
     public double getProgress() {
@@ -91,13 +89,13 @@ public class TaskExecutionAPIEntity extends TaggedLogAPIEntity {
         valueChanged("progress");
     }
 
-    public String getStatus() {
-        return status;
+    public String getTaskStatus() {
+        return taskStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-        valueChanged("status");
+    public void setTaskStatus(String taskStatus) {
+        this.taskStatus = taskStatus;
+        valueChanged("taskStatus");
     }
 
     public String getSuccessfulAttempt() {
@@ -125,14 +123,5 @@ public class TaskExecutionAPIEntity extends TaggedLogAPIEntity {
     public void setJobCounters(JobCounters jobCounters) {
         this.jobCounters = jobCounters;
         valueChanged("jobCounters");
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-        valueChanged("host");
     }
 }

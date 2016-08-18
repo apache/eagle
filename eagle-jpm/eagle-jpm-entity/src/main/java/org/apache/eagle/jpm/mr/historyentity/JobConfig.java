@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +16,23 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.entities;
+package org.apache.eagle.jpm.mr.historyentity;
 
-import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class JobBaseAPIEntity extends TaggedLogAPIEntity {
+public final class JobConfig {
+    private Map<String, String> config = new TreeMap<>();
+
+    public Map<String, String> getConfig() {
+        return config;
+    }
+
+    public void setConfig(Map<String, String> config) {
+        this.config = config;
+    }
+    
+    public String toString(){
+        return config.toString();
+    }
 }

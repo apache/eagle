@@ -16,46 +16,29 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.entities;
+package org.apache.eagle.jpm.mr.historyentity;
 
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@Table("eaglejpa_anomaly")
+@Table("eaglejpa")
 @ColumnFamily("f")
-@Prefix("tacount")
-@Service(Constants.JPA_TASK_ATTEMPT_COUNTER_SERVICE_NAME)
+@Prefix("jevent")
+@Service(Constants.JPA_JOB_EVENT_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
-public class TaskAttemptCounterAPIEntity extends JobBaseAPIEntity {
+public class JobEventAPIEntity extends JobBaseAPIEntity {
+
     @Column("a")
-    private int totalCount;
-    @Column("b")
-    private int failedCount;
-    @Column("c")
-    private int killedCount;
-    
-    public int getKilledCount() {
-        return killedCount;
+    private String eventType;
+
+    public String getEventType() {
+        return eventType;
     }
-    public void setKilledCount(int killedCount) {
-        this.killedCount = killedCount;
-        _pcs.firePropertyChange("killedCount", null, null);
-    }
-    public int getFailedCount() {
-        return failedCount;
-    }
-    public void setFailedCount(int failedCount) {
-        this.failedCount = failedCount;
-        _pcs.firePropertyChange("failedCount", null, null);
-    }
-    public int getTotalCount() {
-        return totalCount;
-    }
-    public void setTotalCount(int totalCount) {
-        this.totalCount = totalCount;
-        _pcs.firePropertyChange("totalCount", null, null);
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+        _pcs.firePropertyChange("eventType", null, null);
     }
 }

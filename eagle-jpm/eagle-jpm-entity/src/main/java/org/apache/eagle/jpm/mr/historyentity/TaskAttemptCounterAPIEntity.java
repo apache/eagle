@@ -16,7 +16,7 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.entities;
+package org.apache.eagle.jpm.mr.historyentity;
 
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.meta.*;
@@ -25,43 +25,37 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa_anomaly")
 @ColumnFamily("f")
-@Prefix("taskfailurecount")
-@Service(Constants.JPA_TASK_FAILURE_COUNT_SERVICE_NAME)
+@Prefix("tacount")
+@Service(Constants.JPA_TASK_ATTEMPT_COUNTER_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
-public class TaskFailureCountAPIEntity extends JobBaseAPIEntity {
+public class TaskAttemptCounterAPIEntity extends JobBaseAPIEntity {
     @Column("a")
-    private int failureCount;
+    private int totalCount;
     @Column("b")
-    private String error;
+    private int failedCount;
     @Column("c")
-    private String taskStatus;
-
-
-    public String getTaskStatus() {
-        return taskStatus;
+    private int killedCount;
+    
+    public int getKilledCount() {
+        return killedCount;
     }
-
-    public void setTaskStatus(String taskStatus) {
-        this.taskStatus = taskStatus;
-        _pcs.firePropertyChange("taskStatus", null, null);
+    public void setKilledCount(int killedCount) {
+        this.killedCount = killedCount;
+        _pcs.firePropertyChange("killedCount", null, null);
     }
-
-    public String getError() {
-        return error;
+    public int getFailedCount() {
+        return failedCount;
     }
-
-    public void setError(String error) {
-        this.error = error;
-        _pcs.firePropertyChange("error", null, null);
+    public void setFailedCount(int failedCount) {
+        this.failedCount = failedCount;
+        _pcs.firePropertyChange("failedCount", null, null);
     }
-
-    public int getFailureCount() {
-        return failureCount;
+    public int getTotalCount() {
+        return totalCount;
     }
-
-    public void setFailureCount(int failureCount) {
-        this.failureCount = failureCount;
-        _pcs.firePropertyChange("failureCount", null, null);
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+        _pcs.firePropertyChange("totalCount", null, null);
     }
 }

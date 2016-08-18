@@ -435,10 +435,10 @@ public class MRJobParser implements Runnable {
 
             taskExecutionAPIEntity.setTimestamp(app.getStartedTime());
             taskExecutionAPIEntity.setStartTime(task.getStartTime());
-            taskExecutionAPIEntity.setFinishTime(task.getFinishTime());
-            taskExecutionAPIEntity.setElapsedTime(task.getElapsedTime());
+            taskExecutionAPIEntity.setEndTime(task.getFinishTime());
+            taskExecutionAPIEntity.setDuration(task.getElapsedTime());
             taskExecutionAPIEntity.setProgress(task.getProgress());
-            taskExecutionAPIEntity.setStatus(task.getState());
+            taskExecutionAPIEntity.setTaskStatus(task.getState());
             taskExecutionAPIEntity.setSuccessfulAttempt(task.getSuccessfulAttempt());
             taskExecutionAPIEntity.setStatusDesc(task.getStatus());
 
@@ -450,7 +450,8 @@ public class MRJobParser implements Runnable {
 
                 TaskAttemptExecutionAPIEntity taskAttemptExecutionAPIEntity = fetchTaskAttempt.apply(Pair.of(jobId, task.getId()));
                 if (taskAttemptExecutionAPIEntity != null) {
-                    taskExecutionAPIEntity.setHost(taskAttemptExecutionAPIEntity.getTags().get(MRJobTagName.HOSTNAME.toString()));
+                    taskExecutionAPIEntity.getTags().put(MRJobTagName.HOSTNAME.toString(), taskAttemptExecutionAPIEntity.getTags().get(MRJobTagName.HOSTNAME.toString()));
+                    //taskExecutionAPIEntity.setHost(taskAttemptExecutionAPIEntity.getTags().get(MRJobTagName.HOSTNAME.toString()));
                 }
             }
 

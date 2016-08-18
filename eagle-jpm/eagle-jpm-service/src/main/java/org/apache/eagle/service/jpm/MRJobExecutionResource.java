@@ -178,6 +178,7 @@ public class MRJobExecutionResource {
     }
 
     public int getPosition(List<Long> times, Long duration) {
+        duration = duration / 1000;
         for (int i = 1; i < times.size(); i++) {
             if (duration < times.get(i)) {
                 return i - 1;
@@ -196,6 +197,15 @@ public class MRJobExecutionResource {
         }
     }
 
+    public void initTaskCountList(List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount,
+                                  List<MRJobTaskGroupResponse.UnitTaskCount> finishedTaskCount,
+                                  List<Long> times,
+                                  Comparator comparator) {
+        for (int i = 0; i < times.size(); i++) {
+            runningTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i), comparator));
+            finishedTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i), comparator));
+        }
+    }
 
     @GET
     @Path("{jobId}/taskCounts")
@@ -214,26 +224,34 @@ public class MRJobExecutionResource {
         List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
         List<MRJobTaskGroupResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
-        for (int i = 0; i < times.size(); i++) {
-            runningTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i)));
-            finishedTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i)));
-        }
-
-        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME, site, jobId);
-        GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> res =
+        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId);
+        GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> history_res =
                 resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
-        if (res.isSuccess() && res.getObj() != null) {
-            for (TaskExecutionAPIEntity o : res.getObj()) {
-                int index = getPosition(times, o.getElapsedTime());
-
-                if (o.getStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
-                    MRJobTaskGroupResponse.UnitTaskCount counter = runningTaskCount.get(index);
-                    counter.taskCount++;
-                    counter.entities.add(o);
-                } else if (o.getFinishTime() != 0) {
-                    MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
-                    counter.taskCount++;
-                    counter.entities.add(o);
+        if (history_res.isSuccess() && history_res.getObj() != null && history_res.getObj().size() > 0) {
+            initTaskCountList(runningTaskCount, finishedTaskCount, times, new HistoryTaskComparator());
+            for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o : history_res.getObj()) {
+                int index = getPosition(times, o.getDuration());
+                MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
+                counter.taskCount++;
+                counter.entities.add(o);
+            }
+        } else {
+            query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME, site, jobId);
+            GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> running_res =
+                    resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
+            if (running_res.isSuccess() && running_res.getObj() != null) {
+                initTaskCountList(runningTaskCount, finishedTaskCount, times, new RunningTaskComparator());
+                for (TaskExecutionAPIEntity o : running_res.getObj()) {
+                    int index = getPosition(times, o.getDuration());
+                    if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
+                        MRJobTaskGroupResponse.UnitTaskCount counter = runningTaskCount.get(index);
+                        counter.taskCount++;
+                        counter.entities.add(o);
+                    } else if (o.getEndTime() != 0) {
+                        MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
+                        counter.taskCount++;
+                        counter.entities.add(o);
+                    }
                 }
             }
         }
@@ -246,5 +264,23 @@ public class MRJobExecutionResource {
         return response;
     }
 
+    static class RunningTaskComparator implements Comparator<TaskExecutionAPIEntity> {
+        @Override
+        public int compare(TaskExecutionAPIEntity o1, TaskExecutionAPIEntity o2) {
+            Long time1 = o1.getDuration();
+            Long time2 = o2.getDuration();
+            return (time1 > time2 ? -1 : (time1 == time2) ? 0 : 1);
+        }
+    }
+
+    static class HistoryTaskComparator implements Comparator<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> {
+        @Override
+        public int compare(org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o1,
+                           org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o2) {
+            Long time1 = o1.getDuration();
+            Long time2 = o2.getDuration();
+            return (time1 > time2 ? -1 : (time1 == time2) ? 0 : 1);
+        }
+    }
 
 }

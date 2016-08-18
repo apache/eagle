@@ -18,10 +18,6 @@
 
 package org.apache.eagle.service.jpm;
 
-import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
-import org.apache.hadoop.hbase.master.snapshot.TakeSnapshotHandler;
-import org.apache.hadoop.mapred.Task;
-
 import java.util.*;
 
 class MRJobTaskGroupResponse {
@@ -32,21 +28,14 @@ class MRJobTaskGroupResponse {
    static class UnitTaskCount {
         public long timeBucket;
         public int taskCount;
-        public Set<TaskExecutionAPIEntity> entities;
-        public List<TaskExecutionAPIEntity> topEntities;
+        public Set entities;
+        public List topEntities;
 
-        UnitTaskCount(long timeBucket) {
+        UnitTaskCount(long timeBucket, Comparator comparator) {
             this.timeBucket = timeBucket;
             this.taskCount = 0;
-            entities = new TreeSet<>(new TaskComparator());
+            entities = new TreeSet<>(comparator);
             topEntities = new ArrayList<>();
-        }
-    }
-
-    static class TaskComparator implements Comparator<TaskExecutionAPIEntity> {
-        @Override
-        public int compare(TaskExecutionAPIEntity o1, TaskExecutionAPIEntity o2) {
-            return (o1.getElapsedTime() > o2.getElapsedTime()) ? -1 : (o1.getElapsedTime() == o2.getElapsedTime() ? 0 : 1);
         }
     }
 }

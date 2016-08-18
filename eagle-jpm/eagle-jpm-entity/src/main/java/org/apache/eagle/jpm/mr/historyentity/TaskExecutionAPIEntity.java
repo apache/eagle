@@ -16,7 +16,7 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.entities;
+package org.apache.eagle.jpm.mr.historyentity;
 
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;

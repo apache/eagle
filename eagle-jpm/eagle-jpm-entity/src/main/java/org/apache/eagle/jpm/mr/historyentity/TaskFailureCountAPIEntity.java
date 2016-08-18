@@ -16,29 +16,52 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.entities;
+package org.apache.eagle.jpm.mr.historyentity;
 
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@Table("eaglejpa")
+@Table("eaglejpa_anomaly")
 @ColumnFamily("f")
-@Prefix("jevent")
-@Service(Constants.JPA_JOB_EVENT_SERVICE_NAME)
+@Prefix("taskfailurecount")
+@Service(Constants.JPA_TASK_FAILURE_COUNT_SERVICE_NAME)
 @TimeSeries(true)
 @Partition({"site"})
-public class JobEventAPIEntity extends JobBaseAPIEntity {
-
+public class TaskFailureCountAPIEntity extends JobBaseAPIEntity {
     @Column("a")
-    private String eventType;
+    private int failureCount;
+    @Column("b")
+    private String error;
+    @Column("c")
+    private String taskStatus;
 
-    public String getEventType() {
-        return eventType;
+
+    public String getTaskStatus() {
+        return taskStatus;
     }
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-        _pcs.firePropertyChange("eventType", null, null);
+
+    public void setTaskStatus(String taskStatus) {
+        this.taskStatus = taskStatus;
+        _pcs.firePropertyChange("taskStatus", null, null);
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+        _pcs.firePropertyChange("error", null, null);
+    }
+
+    public int getFailureCount() {
+        return failureCount;
+    }
+
+    public void setFailureCount(int failureCount) {
+        this.failureCount = failureCount;
+        _pcs.firePropertyChange("failureCount", null, null);
     }
 }

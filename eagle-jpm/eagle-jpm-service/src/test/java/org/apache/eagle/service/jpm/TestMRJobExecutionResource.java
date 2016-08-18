@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class TestMRJobExecutionResource {
@@ -35,15 +36,9 @@ public class TestMRJobExecutionResource {
         List<Long> times = resource.parseTimeList(timeList);
         Assert.assertTrue(times.size() == 4);
 
-        long val = 25;
+        long val = 25 * 1000;
         int index = resource.getPosition(times, val);
         Assert.assertTrue(index == 2);
-
-        List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
-        for (int i = 0; i < times.size(); i++) {
-            runningTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i)));
-        }
-        Assert.assertTrue(runningTaskCount.get(0) != null);
     }
 
     @Test
@@ -53,22 +48,22 @@ public class TestMRJobExecutionResource {
         List<Long> times = resource.parseTimeList(timeList);
 
         TaskExecutionAPIEntity test1 = new TaskExecutionAPIEntity();
-        test1.setElapsedTime(15);
-        test1.setStatus("running");
+        test1.setDuration(15 * 1000);
+        test1.setTaskStatus("running");
         TaskExecutionAPIEntity test4 = new TaskExecutionAPIEntity();
-        test4.setElapsedTime(13);
-        test4.setStatus("running");
+        test4.setDuration(13 * 1000);
+        test4.setTaskStatus("running");
         TaskExecutionAPIEntity test2 = new TaskExecutionAPIEntity();
-        test2.setElapsedTime(0);
-        test2.setFinishTime(100);
-        test2.setStatus("x");
+        test2.setDuration(0 * 1000);
+        test2.setEndTime(100);
+        test2.setTaskStatus("x");
         TaskExecutionAPIEntity test3 = new TaskExecutionAPIEntity();
-        test3.setElapsedTime(19);
-        test3.setStatus("running");
+        test3.setDuration(19 * 1000);
+        test3.setTaskStatus("running");
         TaskExecutionAPIEntity test5 = new TaskExecutionAPIEntity();
-        test5.setElapsedTime(20);
-        test5.setFinishTime(28);
-        test5.setStatus("x");
+        test5.setDuration(20 * 1000);
+        test5.setEndTime(28);
+        test5.setTaskStatus("x");
         List<TaskExecutionAPIEntity> tasks = new ArrayList<>();
         tasks.add(test1);
         tasks.add(test2);
@@ -79,19 +74,16 @@ public class TestMRJobExecutionResource {
         List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
         List<MRJobTaskGroupResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
-        for (int i = 0; i < times.size(); i++) {
-            runningTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i)));
-            finishedTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i)));
-        }
+        Comparator comparator = new MRJobExecutionResource.RunningTaskComparator();
+        resource.initTaskCountList(runningTaskCount, finishedTaskCount, times, comparator);
 
         for (TaskExecutionAPIEntity o : tasks) {
-            int index = resource.getPosition(times, o.getElapsedTime());
-
-            if (o.getStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
+            int index = resource.getPosition(times, o.getDuration());
+            if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
                 MRJobTaskGroupResponse.UnitTaskCount counter = runningTaskCount.get(index);
                 counter.taskCount++;
                 counter.entities.add(o);
-            } else if (o.getFinishTime() != 0) {
+            } else if (o.getEndTime() != 0) {
                 MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
                 counter.taskCount++;
                 counter.entities.add(o);

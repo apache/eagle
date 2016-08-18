@@ -33,7 +33,7 @@ public class TaskExecutionMetricsCreationListener extends AbstractMetricsCreatio
         if (entity != null) {
             Long currentTime = System.currentTimeMillis();
             Map<String, String> tags = entity.getTags();
-            metrics.add(metricWrapper(currentTime, Constants.TASK_EXECUTION_TIME, entity.getElapsedTime(), tags));
+            metrics.add(metricWrapper(currentTime, Constants.TASK_EXECUTION_TIME, entity.getDuration(), tags));
         }
         return metrics;
     }
