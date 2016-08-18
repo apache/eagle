@@ -23,6 +23,7 @@ import org.apache.eagle.alert.engine.evaluator.PolicyHandlerContext;
 import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
+import org.apache.eagle.alert.engine.utils.AlertStreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,15 +81,16 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
             throw new IllegalArgumentException("policy inputStream size has to be 1 for absence alert");
         // validate outputStream has to contain only one stream
         if(policyDef.getOutputStreams().size() != 1)
-            throw new IllegalArgumentException("policy outputStream size has to be 1 for absense alert");
+            throw new IllegalArgumentException("policy outputStream size has to be 1 for absence alert");
 
         String is = inputStreams.get(0);
         StreamDefinition sd = sds.get(is);
 
         String policyValue = policyDef.getDefinition().getValue();
 
-        // assume that absence alert policy value consists of "numOfFields, f1_name, f2_name, f1_value, f2_value, absence_window_rule_type, startTimeOffset, endTimeOffset}
-        String[] segments = policyValue.split(",");
+        // Assume that absence alert policy value consists of
+        // "numOfFields, f1_name, f2_name, f1_value, f2_value, absence_window_rule_type, startTimeOffset, endTimeOffset"
+        String[] segments = policyValue.split(",\\s*");
         int offset = 0;
         // populate wisb field names
         int numOfFields = Integer.parseInt(segments[offset++]);
@@ -124,7 +126,13 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
             columnValues.add(o.toString());
         }
 
-        driver.process(columnValues, event.getTimestamp());
+        boolean isAbsenceAlert = driver.process(columnValues, event.getTimestamp());
+
+        // Publishing alerts.
+        if (isAbsenceAlert) {
+            AlertStreamEvent alertEvent = AlertStreamUtils.createAlertEvent(event, context, sds);
+            collector.emit(alertEvent);
+        }
     }
 
     @Override
