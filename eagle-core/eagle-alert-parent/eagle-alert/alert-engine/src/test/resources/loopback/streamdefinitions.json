@@ -1,0 +1,195 @@
+[
+  {
+    "streamId": "syslog_stream",
+    "dataSource": "network_syslog_datasource",
+    "description": "the data stream for syslog events",
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "dims_hostname",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "facility_code",
+        "type": "INT",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "facility_name",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "severity_code",
+        "type": "INT",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "severity_name",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "msg",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "msgid",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "procid",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "dims_appname",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "name",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "namespace",
+        "type": "STRING",
+        "defaultValue": "",
+        "required": true,
+        "description": null
+      },
+      {
+        "name": "epochMillis",
+        "type": "LONG",
+        "defaultValue": 0,
+        "required": true,
+        "description": null
+      }
+    ]
+  },
+  {
+    "streamId":"syslog_severity_critical_check",
+    "dataSource":"network_syslog_alert_datasource",
+    "description":"the data stream for syslog events",
+    "validate":false,
+    "timeseries":false,
+    "columns":[
+      {
+        "name":"dims_hostname",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"facility_code",
+        "type":"INT",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"facility_name",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"severity_code",
+        "type":"INT",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"severity_name",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"msg",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"msgid",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"procid",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"dims_appname",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"name",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"namespace",
+        "type":"STRING",
+        "defaultValue":"",
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"epochMillis",
+        "type":"LONG",
+        "defaultValue":0,
+        "required":true,
+        "description":null
+      },
+      {
+        "name":"alertKey",
+        "type":"STRING",
+        "defaultValue": "",
+        "required":true,
+        "description":null
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+[
+
+{
+  "type": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
+  "name":"network-syslog-publish",
+  "policyIds": ["syslog_severity_critical_check", "syslog_aggregation_alert"],
+  "dedupIntervalMin": "PT0M",
+  "properties":{
+    "kafka_broker":"localhost:9092",
+    "topic":"syslog_alerts"
+  },
+  "serializer" : "org.apache.eagle.alert.engine.publisher.impl.JsonEventSerializer"
+}
+
+]

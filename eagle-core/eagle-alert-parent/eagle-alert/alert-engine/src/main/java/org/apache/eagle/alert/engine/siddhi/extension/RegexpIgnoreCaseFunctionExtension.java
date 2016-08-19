@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.policy.siddhi.extension;
+package org.apache.eagle.alert.engine.siddhi.extension;
 
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.exception.ExecutionPlanRuntimeException;

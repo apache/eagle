@@ -25,6 +25,8 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.stream.output.StreamCallback;
+import org.wso2.siddhi.core.util.EventPrinter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -111,4 +113,5 @@ public class TestSiddhiExternalTimeBatch {
         e.setData(new Object[]{host, timestamp, "missingblocks", "site1", 14.0});
         return e;
     }
+
 }
