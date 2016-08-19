@@ -19,8 +19,8 @@
 
 package org.apache.eagle.security.partition;
 
-import org.apache.eagle.partition.PartitionAlgorithm;
-import org.apache.eagle.partition.Weight;
+import org.apache.eagle.dataproc.impl.storm.partition.PartitionAlgorithm;
+import org.apache.eagle.dataproc.impl.storm.partition.Weight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

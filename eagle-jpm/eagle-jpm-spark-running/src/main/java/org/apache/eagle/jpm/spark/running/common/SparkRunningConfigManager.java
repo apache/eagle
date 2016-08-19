@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.spark.running.common;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
+import org.apache.eagle.common.config.ConfigOptionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

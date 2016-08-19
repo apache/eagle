@@ -20,10 +20,10 @@
 package org.apache.eagle.security.partition;
 
 import com.sun.jersey.api.client.WebResource;
+import org.apache.eagle.dataproc.impl.storm.partition.DataDistributionDao;
+import org.apache.eagle.dataproc.impl.storm.partition.Weight;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.metric.MetricConstants;
-import org.apache.eagle.partition.DataDistributionDao;
-import org.apache.eagle.partition.Weight;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.EagleServiceSingleEntityQueryRequest;
 import org.apache.eagle.service.client.IEagleServiceClient;

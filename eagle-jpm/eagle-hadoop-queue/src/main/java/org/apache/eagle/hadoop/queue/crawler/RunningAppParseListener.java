@@ -23,7 +23,7 @@ package org.apache.eagle.hadoop.queue.crawler;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.common.DateTimeUtil;
-import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.hadoop.queue.model.applications.App;
 import org.apache.eagle.hadoop.queue.model.applications.Apps;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMessageId;

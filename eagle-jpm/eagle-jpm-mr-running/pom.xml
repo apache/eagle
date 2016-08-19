@@ -38,22 +38,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-stream-process-api</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.wso2.orbit.com.lmax</groupId>
-                    <artifactId>disruptor</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-stream-process-base</artifactId>
+            <artifactId>eagle-data-process</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
