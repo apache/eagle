@@ -23,7 +23,7 @@ import java.util.*;
 class MRJobTaskGroupResponse {
     public List<UnitTaskCount> runningTaskCount;
     public List<UnitTaskCount> finishedTaskCount;
-    String errMessage;
+    public String errMessage;
 
    static class UnitTaskCount {
         public long timeBucket;

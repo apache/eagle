@@ -125,6 +125,12 @@ public class MRJobExecutionResource {
                                                           @QueryParam("jobDefId") String jobDefId,
                                                           @QueryParam("site") String site) {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
+        if ((jobId == null && jobDefId == null) || site == null) {
+            response.setException(new IllegalArgumentException("Error: (jobId == null && jobDefId == null) || site == null"));
+            response.setSuccess(false);
+            return response;
+        }
+
         List<TaggedLogAPIEntity> jobs = new ArrayList<>();
         Set<String> jobIds = new HashSet<>();
         String condition = buildCondition(jobId, jobDefId, site);
@@ -227,18 +233,17 @@ public class MRJobExecutionResource {
     @Produces(MediaType.APPLICATION_JSON)
     public MRJobTaskGroupResponse getTaskCounts(@PathParam("jobId") String jobId,
                                                 @QueryParam("site") String site,
-                                                @QueryParam("times") String timeList,
+                                                @QueryParam("timelineInSecs") String timeList,
                                                 @QueryParam("top") long top) {
         MRJobTaskGroupResponse response = new MRJobTaskGroupResponse();
-        List<Long> times = parseTimeList(timeList);
-
-        if (jobId == null || site == null || timeList.isEmpty()) {
-            response.errMessage = "Error: jobId == null || site == null || timeList.isEmpty()";
+        if (jobId == null || site == null || timeList == null || timeList.isEmpty()) {
+            response.errMessage = "IllegalArgumentException: jobId == null || site == null || timelineInSecs == null or isEmpty";
             return response;
         }
         List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
         List<MRJobTaskGroupResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
+        List<Long> times = parseTimeList(timeList);
         String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId);
         GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> history_res =
                 resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
