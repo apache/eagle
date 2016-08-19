@@ -88,6 +88,9 @@ public class Constants {
         COMPLETE_MR_JOB
     }
 
+    public static final String TASK_RUNNING = "RUNNING";
+    public static final String TASK_FINISHED = "FINISHED";
+
     //MR
     public static final String JPA_JOB_CONFIG_SERVICE_NAME = "JobConfigService";
     public static final String JPA_JOB_EVENT_SERVICE_NAME = "JobEventService";
@@ -154,14 +157,12 @@ public class Constants {
         TOTAL_LAUNCHED_MAPS
     }
 
-    public static final String metricFormat = "%s.%s";
+    public static final String hadoopMetricFormat = "hadoop.%s.%s";
     public static final String ALLOCATED_MB = "allocatedmb";
     public static final String ALLOCATED_VCORES = "allocatedvcores";
     public static final String RUNNING_CONTAINERS = "runningcontainers";
     public static final String TASK_EXECUTION_TIME = "taskduration";
     public static final String JOB_LEVEL = "job";
     public static final String TASK_LEVEL = "task";
-
-    public static final String JOB_DEFINITION_ID_KEY = "jobDefId";
 
 }

@@ -35,7 +35,7 @@ public class HAURLSelectorImpl implements HAURLSelector {
 	
 	private volatile boolean reselectInProgress;
 	private final Constants.CompressionType compressionType;
-	private static final long MAX_RETRY_TIME = 3;
+	private static final long MAX_RETRY_TIME = 2;
 	private static final Logger LOG = LoggerFactory.getLogger(HAURLSelectorImpl.class);
 	
 	public HAURLSelectorImpl(String[] urls, ServiceURLBuilder builder, Constants.CompressionType compressionType) {
@@ -86,7 +86,7 @@ public class HAURLSelectorImpl implements HAURLSelector {
 						}
 						LOG.info("try url " + urlToCheck + "fail for " + (time+1) + " times, sleep 5 seconds before try again. ");
 						try {
-							Thread.sleep(5 * 1000);
+							Thread.sleep(1 * 1000);
 						}
 						catch (InterruptedException ex) { /* Do Nothing */}
 					}
