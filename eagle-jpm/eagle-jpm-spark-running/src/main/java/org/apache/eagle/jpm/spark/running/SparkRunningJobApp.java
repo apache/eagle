@@ -22,7 +22,6 @@ import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
 import org.apache.eagle.jpm.spark.running.storm.SparkRunningJobFetchSpout;
 import org.apache.eagle.jpm.spark.running.storm.SparkRunningJobParseBolt;
 
@@ -30,37 +29,37 @@ public class SparkRunningJobApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         //1. trigger init conf
-        SparkRunningConfigManager sparkRunningConfigManager = SparkRunningConfigManager.getInstance(config);
+        SparkRunningJobAppConfig sparkRunningJobAppConfig = SparkRunningJobAppConfig.getInstance(config);
 
         //2. init topology
         TopologyBuilder topologyBuilder = new TopologyBuilder();
-        String spoutName = "sparkRunningJobFetchSpout";
-        String boltName = "sparkRunningJobParseBolt";
-        int parallelism = sparkRunningConfigManager.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
-        int tasks = sparkRunningConfigManager.getConfig().getInt("envContextConfig.tasks." + spoutName);
+        final String spoutName = SparkRunningJobAppConfig.JOB_FETCH_SPOUT_NAME;
+        final String boltName = SparkRunningJobAppConfig.JOB_PARSE_BOLT_NAME;
+        int parallelism = sparkRunningJobAppConfig.getTopologyConfig().jobFetchSpoutParallism;
+        int tasks = sparkRunningJobAppConfig.getTopologyConfig().jobFetchSpoutTasksNum;
         if (parallelism > tasks) {
             parallelism = tasks;
         }
         topologyBuilder.setSpout(
                 spoutName,
                 new SparkRunningJobFetchSpout(
-                        sparkRunningConfigManager.getJobExtractorConfig(),
-                        sparkRunningConfigManager.getEndpointConfig(),
-                        sparkRunningConfigManager.getZkStateConfig()),
+                        sparkRunningJobAppConfig.getJobExtractorConfig(),
+                        sparkRunningJobAppConfig.getEndpointConfig(),
+                        sparkRunningJobAppConfig.getZkStateConfig()),
                 parallelism
         ).setNumTasks(tasks);
 
-        parallelism = sparkRunningConfigManager.getConfig().getInt("envContextConfig.parallelismConfig." + boltName);
-        tasks = sparkRunningConfigManager.getConfig().getInt("envContextConfig.tasks." + boltName);
+        parallelism = sparkRunningJobAppConfig.getTopologyConfig().jobParseBoltParallism;
+        tasks = sparkRunningJobAppConfig.getTopologyConfig().jobParseBoltTasksNum;
         if (parallelism > tasks) {
             parallelism = tasks;
         }
         topologyBuilder.setBolt(boltName,
                 new SparkRunningJobParseBolt(
-                        sparkRunningConfigManager.getZkStateConfig(),
-                        sparkRunningConfigManager.getEagleServiceConfig(),
-                        sparkRunningConfigManager.getEndpointConfig(),
-                        sparkRunningConfigManager.getJobExtractorConfig()),
+                        sparkRunningJobAppConfig.getZkStateConfig(),
+                        sparkRunningJobAppConfig.getEagleServiceConfig(),
+                        sparkRunningJobAppConfig.getEndpointConfig(),
+                        sparkRunningJobAppConfig.getJobExtractorConfig()),
                 parallelism).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
 
         return topologyBuilder.createTopology();

@@ -20,7 +20,7 @@ package org.apache.eagle.jpm.spark.running.parser;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.spark.crawl.EventType;
-import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
+import org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig;
 import org.apache.eagle.jpm.spark.running.entities.*;
 import org.apache.eagle.jpm.spark.running.recover.SparkRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
@@ -64,7 +64,7 @@ public class SparkApplicationParser implements Runnable {
     private Map<Integer, Pair<Integer, Pair<Long, Long>>> stagesTime;
     private Set<Integer> completeStages;
     private Configuration hdfsConf;
-    private SparkRunningConfigManager.EndpointConfig endpointConfig;
+    private SparkRunningJobAppConfig.EndpointConfig endpointConfig;
     private final Object lock = new Object();
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
     private Map<String, String> commonTags = new HashMap<>();
@@ -78,9 +78,9 @@ public class SparkApplicationParser implements Runnable {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public SparkApplicationParser(SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig,
-                                  SparkRunningConfigManager.EndpointConfig endpointConfig,
-                                  SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig,
+    public SparkApplicationParser(SparkRunningJobAppConfig.EagleServiceConfig eagleServiceConfig,
+                                  SparkRunningJobAppConfig.EndpointConfig endpointConfig,
+                                  SparkRunningJobAppConfig.JobExtractorConfig jobExtractorConfig,
                                   AppInfo app, Map<String, SparkAppEntity> sparkApp,
                                   SparkRunningJobManager sparkRunningJobManager, ResourceFetcher rmResourceFetcher) {
         this.sparkAppEntityCreationHandler = new SparkAppEntityCreationHandler(eagleServiceConfig);
