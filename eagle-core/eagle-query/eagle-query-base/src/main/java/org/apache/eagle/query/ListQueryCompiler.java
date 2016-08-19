@@ -42,7 +42,7 @@ public class ListQueryCompiler {
 	/**
 	 * syntax is <EntityName>[<Filter>]{<Projection>}
 	 */
-	private final static String listRegex = "^([^\\[]+)\\[([^\\]]*)\\]\\{(.+)\\}$";
+	private final static String listRegex = "^([^\\[]+)\\[(.*)\\]\\{(.+)\\}$";
 	private final static Pattern _listPattern = Pattern.compile(listRegex);
 
 	/**
@@ -62,10 +62,10 @@ public class ListQueryCompiler {
 	 */
 
 	/** The regular expression before add EXP{<Expression>} in query **/
-	private final static String aggRegex = "^([^\\[]+)\\[([^\\]]*)\\]<([^>]*)>\\{(.+)\\}$";
+	private final static String aggRegex = "^([^\\[]+)\\[(.*)\\]<([^>]*)>\\{(.+)\\}$";
 	private final static Pattern _aggPattern = Pattern.compile(aggRegex);
 
-	private final static String sortRegex = "^([^\\[]+)\\[([^\\]]*)\\]<([^>]*)>\\{(.+)\\}\\.\\{(.+)\\}$";
+	private final static String sortRegex = "^([^\\[]+)\\[(.*)\\]<([^>]*)>\\{(.+)\\}\\.\\{(.+)\\}$";
 	private final static Pattern _sortPattern = Pattern.compile(sortRegex);
 	
 	private String _serviceName;
