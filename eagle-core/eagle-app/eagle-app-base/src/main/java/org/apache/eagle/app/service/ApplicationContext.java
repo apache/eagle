@@ -73,15 +73,17 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
 
     @Override
     public void onInstall() {
-        List<StreamDesc> streamDescCollection = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
-            StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(streamDefinition.getStreamId(),this.config);
-            StreamDesc streamDesc = new StreamDesc();
-            streamDesc.setSchema(streamDefinition);
-            streamDesc.setSink(streamSinkConfig);
-            streamDesc.setStreamId(streamDefinition.getStreamId());
-            return streamDesc;
-        })).collect(Collectors.toList());
-        metadata.setStreams(streamDescCollection);
+        if(metadata.getDescriptor().getStreams()!=null) {
+            List<StreamDesc> streamDescCollection = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
+                StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(streamDefinition.getStreamId(), this.config);
+                StreamDesc streamDesc = new StreamDesc();
+                streamDesc.setSchema(streamDefinition);
+                streamDesc.setSink(streamSinkConfig);
+                streamDesc.setStreamId(streamDefinition.getStreamId());
+                return streamDesc;
+            })).collect(Collectors.toList());
+            metadata.setStreams(streamDescCollection);
+        }
     }
 
     @Override

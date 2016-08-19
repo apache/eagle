@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.spark.running.recover;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
+import org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig;
 import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
@@ -30,7 +30,7 @@ import java.util.*;
 public class SparkRunningJobManager implements Serializable {
     private RunningJobManager runningJobManager;
 
-    public SparkRunningJobManager(SparkRunningConfigManager.ZKStateConfig config) {
+    public SparkRunningJobManager(SparkRunningJobAppConfig.ZKStateConfig config) {
         this.runningJobManager = new RunningJobManager(config.zkQuorum,
                 config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot);
     }
