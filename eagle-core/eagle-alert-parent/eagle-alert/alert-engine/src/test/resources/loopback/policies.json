@@ -1,0 +1,50 @@
+[
+  {
+    "name": "syslog_severity_critical_check",
+    "description": "syslog.severity > 3 then error",
+    "inputStreams": [
+      "syslog_stream"
+    ],
+    "outputStreams": [
+      "syslog_severity_critical_output"
+    ],
+    "definition": {
+      "type": "siddhi",
+      "value": "from syslog_stream[(severity_name == \"EMERG\" or severity_name == \"ALERT\" or severity_name ==\"CRIT\") and (regex:find(\"The system is overheating\", msg) or regex:find(\"Power Supply is not responding\",msg) or regex:find(\"Memory inconsistency detected\", msg))] select 'alert' as name, 'CRITICAL' as alertSeverity, namespace, facility_name, facility_code, severity_code,severity_name ,dims_hostname, dims_appname, msgid,  msg, epochMillis, str:concat('ab', 'c') as alertKey insert into syslog_severity_critical_output;"
+    },
+    "partitionSpec": [
+      {
+        "streamId": "syslog_stream",
+        "type": "GROUPBY",
+        "columns": [
+          "dims_hostname"
+        ]
+      }
+    ],
+    "parallelismHint": 10
+  },
+  {
+    "name": "syslog_parent_alert",
+    "description": "aggregate alerts into parent alerts",
+    "inputStreams": [
+      "syslog_severity_critical_output"
+    ],
+    "outputStreams": [
+      "syslog_parent_alert_aggregate_out"
+    ],
+    "definition": {
+      "type": "siddhi",
+      "value": "from syslog_severity_critical_output#window.externalTimeBatch(timestamp, 3min) select 'AggregateAlert' as name, 'CRITICAL' as alertSeverity, namespace, facility_name, facility_code, severity_code,severity_name ,dims_hostname, dims_appname, msgid,  msg, epochMillis, str:subStr(alertKey, 0, 20) as alertKey insert into syslog_parent_alert_aggregate_out;"
+    },
+    "partitionSpec": [
+      {
+        "streamId": "syslog_severity_critical_output",
+        "type": "GROUPBY",
+        "columns": [
+          "dims_hostname"
+        ]
+      }
+    ],
+    "parallelismHint": 10
+  }
+]

@@ -24,6 +24,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
+import org.wso2.siddhi.core.util.EventPrinter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -240,4 +241,33 @@ public class SiddhiPolicyTest {
         e.setData(new Object[] {"facitliy", "SEVERITY_EMERG", "HOSTNAME-" + 11 , "MSGID-...", "Timestamp", "conn-sss", "op-msg", "msgId..", "command-...", "name-", "namespace", System.currentTimeMillis()});
         handler.send(e);
     }
+
+
+    @Test
+    public void testStrConcat() throws Exception {
+        String ql = " define stream log(timestamp long, switchLabel string, port string, message string); " +
+                " from log select timestamp, str:concat(switchLabel, '===', port) as alertKey, message insert into output; ";
+        SiddhiManager manager = new SiddhiManager();
+        ExecutionPlanRuntime runtime = manager.createExecutionPlanRuntime(ql);
+        runtime.addCallback("output", new StreamCallback() {
+            @Override
+            public void receive(Event[] events) {
+                EventPrinter.print(events);
+            }
+        });
+
+        runtime.start();
+
+        InputHandler logInput = runtime.getInputHandler("log");
+
+        Event e = new Event();
+        e.setTimestamp(System.currentTimeMillis());
+        e.setData(new Object[] {System.currentTimeMillis(), "switch-ra-slc-01", "port01", "log-message...."});
+        logInput.send(e);
+
+        Thread.sleep(1000);
+        runtime.shutdown();
+
+    }
+
 }
