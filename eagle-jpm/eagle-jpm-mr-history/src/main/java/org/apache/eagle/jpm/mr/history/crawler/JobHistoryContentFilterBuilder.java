@@ -35,6 +35,8 @@ public class JobHistoryContentFilterBuilder {
     private List<Pattern> m_jobConfKeyInclusionPatterns;
     private List<Pattern> m_jobConfKeyExclusionPatterns;
 
+    private String jobNameKey;
+
     public static JobHistoryContentFilterBuilder newBuilder(){
         return new JobHistoryContentFilterBuilder();
     }
@@ -78,6 +80,11 @@ public class JobHistoryContentFilterBuilder {
         return this;
     }
 
+    public JobHistoryContentFilterBuilder setJobNameKey(String jobNameKey) {
+        this.jobNameKey = jobNameKey;
+        return this;
+    }
+
     public JobHistoryContentFilter build() {
         JobHistoryContentFilterImpl filter = new JobHistoryContentFilterImpl();
         filter.setAcceptJobFile(m_acceptJobFile);
@@ -85,6 +92,7 @@ public class JobHistoryContentFilterBuilder {
         filter.setMustHaveJobConfKeyPatterns(m_mustHaveJobConfKeyPatterns);
         filter.setJobConfKeyInclusionPatterns(m_jobConfKeyInclusionPatterns);
         filter.setJobConfKeyExclusionPatterns(m_jobConfKeyExclusionPatterns);
+        filter.setJobNameKey(jobNameKey);
         LOG.info("job history content filter:" + filter);
         return filter;
     }

@@ -28,6 +28,8 @@ public class JobHistoryContentFilterImpl implements JobHistoryContentFilter {
     private List<Pattern> m_jobConfKeyInclusionPatterns;
     private List<Pattern> m_jobConfKeyExclusionPatterns;
 
+    private String jobNameKey;
+
     @Override
     public boolean acceptJobFile() {
         return m_acceptJobFile;
@@ -51,6 +53,15 @@ public class JobHistoryContentFilterImpl implements JobHistoryContentFilter {
     @Override
     public List<Pattern> getJobConfKeyExclusionPatterns() {
         return m_jobConfKeyExclusionPatterns;
+    }
+
+    @Override
+    public String getJobNameKey() {
+        return jobNameKey;
+    }
+
+    public void setJobNameKey(String jobNameKey) {
+        this.jobNameKey = jobNameKey;
     }
 
     public void setAcceptJobFile(boolean acceptJobFile) {

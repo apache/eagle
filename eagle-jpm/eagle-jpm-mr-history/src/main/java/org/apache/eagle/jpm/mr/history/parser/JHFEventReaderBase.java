@@ -18,9 +18,9 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
-import org.apache.eagle.jpm.mr.history.entities.JobConfig;
+import org.apache.eagle.jpm.mr.historyentity.JobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
-import org.apache.eagle.jpm.mr.history.entities.*;
+import org.apache.eagle.jpm.mr.historyentity.*;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.MRJobTagName;
@@ -167,20 +167,21 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
            m_user = values.get(Keys.USER);
            m_queueName = values.get(Keys.JOB_QUEUE);
            m_jobName = values.get(Keys.JOBNAME);
-           m_jobDefId = m_jobName;
 
            // If given job name then use it as norm job name, otherwise use eagle JobNameNormalization rule to generate.
            String jobDefId = null;
-           if(configuration != null ) jobDefId = configuration.get(Constants.JOB_DEFINITION_ID_KEY);
+           if(configuration != null ) {
+               jobDefId = configuration.get(m_filter.getJobNameKey());
+           }
 
            if(jobDefId == null) {
                m_jobDefId = JobNameNormalization.getInstance().normalize(m_jobName);
            } else {
-               LOG.debug("Got normJobName from job configuration for " + id + ": " + jobDefId);
+               LOG.debug("Got JobDefId from job configuration for " + id + ": " + jobDefId);
                m_jobDefId = jobDefId;
            }
 
-           LOG.info("NormJobName of " + id + ": " + m_jobDefId);
+           LOG.info("JobDefId of " + id + ": " + m_jobDefId);
 
            m_jobSubmitEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
            m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
@@ -222,6 +223,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
            m_jobExecutionEntity.setCurrentState(values.get(Keys.JOB_STATUS));
            m_jobExecutionEntity.setStartTime(m_jobLaunchEventEntity.getTimestamp());
            m_jobExecutionEntity.setEndTime(m_jobFinishEventEntity.getTimestamp());
+           m_jobExecutionEntity.setDurationTime(m_jobExecutionEntity.getEndTime() - m_jobExecutionEntity.getStartTime());
            m_jobExecutionEntity.setTimestamp(m_jobLaunchEventEntity.getTimestamp());
            m_jobExecutionEntity.setSubmissionTime(m_jobSubmitEventEntity.getTimestamp());
            if (values.get(Keys.FAILED_MAPS) != null) {
