@@ -19,9 +19,9 @@
 package org.apache.eagle.jpm.mr.running.config;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.common.config.ConfigOptionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
 
 import java.io.Serializable;
 
