@@ -29,13 +29,11 @@ import com.codahale.metrics.MetricRegistry;
 import com.typesafe.config.Config;
 import org.apache.eagle.common.config.EagleConfigConstants;
 import org.apache.eagle.common.config.EagleConfigHelper;
-import org.apache.eagle.datastream.*;
 import org.apache.eagle.gc.common.GCConstants;
 import org.apache.eagle.gc.model.GCPausedEvent;
 import org.apache.eagle.metric.reportor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.util.*;
 

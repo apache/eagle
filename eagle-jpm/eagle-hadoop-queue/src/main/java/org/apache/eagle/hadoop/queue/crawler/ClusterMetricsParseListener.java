@@ -24,7 +24,7 @@ package org.apache.eagle.hadoop.queue.crawler;
 import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.common.DateTimeUtil;
-import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.hadoop.queue.model.clusterMetrics.ClusterMetrics;
 import org.apache.eagle.hadoop.queue.storm.HadoopQueueMessageId;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;

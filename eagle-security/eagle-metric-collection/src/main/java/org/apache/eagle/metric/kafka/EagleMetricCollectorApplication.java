@@ -43,15 +43,7 @@ public class EagleMetricCollectorApplication extends StormApplication{
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         String deserClsName = config.getString("dataSourceConfig.deserializerClass");
-        final KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, config) {
-            @Override
-            public List<Object> deserialize(byte[] ser) {
-                Object tmp = deserializer.deserialize(ser);
-                Map<String, Object> map = (Map<String, Object>)tmp;
-                if(tmp == null) return null;
-                return Arrays.asList(map.get("user"), map.get("timestamp"));
-            }
-        };
+        KafkaSourcedSpoutScheme scheme = new KafkaSourcedSpoutScheme(deserClsName, config);
 
         TopologyBuilder builder = new TopologyBuilder();
         BaseRichSpout spout1 = new KafkaOffsetSourceSpoutProvider().getSpout(config);
