@@ -145,7 +145,8 @@
 
         <!-- start of [lib/share] -->
         <fileSet>
-            <directory>${project.basedir}/../eagle-external/eagle-log4jkafka/target/eagle-log4jkafka-build/lib</directory>
+            <directory>${project.basedir}/../eagle-external/eagle-log4jkafka/target/eagle-log4jkafka-build/lib
+            </directory>
             <outputDirectory>lib/share</outputDirectory>
             <includes>
                 <include>**</include>

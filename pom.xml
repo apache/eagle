@@ -14,7 +14,9 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache</groupId>
@@ -29,7 +31,8 @@
     <url>https://eagle.incubator.apache.org</url>
     <inceptionYear>2015</inceptionYear>
     <description>
-        Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize attacks, malicious activities in Hadoop and take actions in real time.
+        Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize
+        attacks, malicious activities in Hadoop and take actions in real time.
     </description>
     <organization>
         <name>Apache Software Foundation</name>
@@ -135,7 +138,7 @@
         <module>eagle-server</module>
         <module>eagle-jpm</module>
         <module>eagle-server-assembly</module>
-  </modules>
+    </modules>
     <properties>
         <!-- General Properties -->
         <java.version>1.8</java.version>
@@ -405,7 +408,7 @@
                 <groupId>com.mapr.hadoop</groupId>
                 <artifactId>maprfs</artifactId>
                 <version>${maprfs.version}</version>
-             </dependency>
+            </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
@@ -968,14 +971,18 @@
         <profile>
             <id>mapr</id>
             <!--<activation>-->
-                <!--<activeByDefault>true</activeByDefault>-->
+            <!--<activeByDefault>true</activeByDefault>-->
             <!--</activation>-->
             <repositories>
                 <repository>
                     <id>mapr-releases</id>
                     <url>http://repository.mapr.com/maven/</url>
-                    <snapshots><enabled>false</enabled></snapshots>
-                    <releases><enabled>true</enabled></releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
                 </repository>
             </repositories>
             <dependencyManagement>
@@ -1253,8 +1260,12 @@
         <repository>
             <id>mapr-releases</id>
             <url>http://repository.mapr.com/maven/</url>
-            <snapshots><enabled>false</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
         </repository>
         <repository>
             <id>siddhi cep engine</id>
