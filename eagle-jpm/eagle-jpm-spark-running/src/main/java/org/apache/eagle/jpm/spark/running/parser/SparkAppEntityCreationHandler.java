@@ -18,7 +18,7 @@
 
 package org.apache.eagle.jpm.spark.running.parser;
 
-import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
+import org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -32,9 +32,9 @@ public class SparkAppEntityCreationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(SparkAppEntityCreationHandler.class);
 
     private List<TaggedLogAPIEntity> entities = new ArrayList<>();
-    private SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig;
+    private SparkRunningJobAppConfig.EagleServiceConfig eagleServiceConfig;
 
-    public SparkAppEntityCreationHandler(SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
+    public SparkAppEntityCreationHandler(SparkRunningJobAppConfig.EagleServiceConfig eagleServiceConfig) {
         this.eagleServiceConfig = eagleServiceConfig;
     }
 

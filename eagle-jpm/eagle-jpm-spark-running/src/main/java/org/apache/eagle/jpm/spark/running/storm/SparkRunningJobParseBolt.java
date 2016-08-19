@@ -23,7 +23,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
+import org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig;
 import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
 import org.apache.eagle.jpm.spark.running.parser.SparkApplicationParser;
 import org.apache.eagle.jpm.spark.running.recover.SparkRunningJobManager;
@@ -44,17 +44,17 @@ import java.util.concurrent.ExecutorService;
 public class SparkRunningJobParseBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(SparkRunningJobParseBolt.class);
 
-    private SparkRunningConfigManager.ZKStateConfig zkStateConfig;
-    private SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig;
-    private SparkRunningConfigManager.EndpointConfig endpointConfig;
-    private SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig;
+    private SparkRunningJobAppConfig.ZKStateConfig zkStateConfig;
+    private SparkRunningJobAppConfig.EagleServiceConfig eagleServiceConfig;
+    private SparkRunningJobAppConfig.EndpointConfig endpointConfig;
+    private SparkRunningJobAppConfig.JobExtractorConfig jobExtractorConfig;
     private ExecutorService executorService;
     private Map<String, SparkApplicationParser> runningSparkParsers;
     private ResourceFetcher resourceFetcher;
-    public SparkRunningJobParseBolt(SparkRunningConfigManager.ZKStateConfig zkStateConfig,
-                                    SparkRunningConfigManager.EagleServiceConfig eagleServiceConfig,
-                                    SparkRunningConfigManager.EndpointConfig endpointConfig,
-                                    SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig) {
+    public SparkRunningJobParseBolt(SparkRunningJobAppConfig.ZKStateConfig zkStateConfig,
+                                    SparkRunningJobAppConfig.EagleServiceConfig eagleServiceConfig,
+                                    SparkRunningJobAppConfig.EndpointConfig endpointConfig,
+                                    SparkRunningJobAppConfig.JobExtractorConfig jobExtractorConfig) {
         this.zkStateConfig = zkStateConfig;
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;

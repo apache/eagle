@@ -21,7 +21,7 @@ import org.apache.eagle.app.example.extensions.ExampleEntity;
 import org.apache.eagle.app.example.extensions.ExampleResource;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
-import org.apache.eagle.app.test.ServerSimulator;
+import org.apache.eagle.app.test.ApplicationSimulator;
 import org.apache.eagle.app.test.AppJUnitRunner;
 import org.apache.eagle.common.module.GlobalScope;
 import org.apache.eagle.metadata.model.ApplicationDesc;
@@ -41,7 +41,7 @@ import java.util.Map;
 public class ExampleApplicationProviderTest {
     @Inject private SiteResource siteResource;
     @Inject private ApplicationResource applicationResource;
-    @Inject private ServerSimulator simulator;
+    @Inject private ApplicationSimulator simulator;
     @Inject private ExampleResource exampleResource;
 
     @Test

@@ -16,7 +16,7 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.spark.running.common;
+package org.apache.eagle.jpm.spark.running;
 
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.util.ConfigOptionParser;
@@ -25,16 +25,22 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class SparkRunningConfigManager implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(SparkRunningConfigManager.class);
+public class SparkRunningJobAppConfig implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(SparkRunningJobAppConfig.class);
+    static final String JOB_FETCH_SPOUT_NAME = "sparkRunningJobFetchSpout";
+    static final String JOB_PARSE_BOLT_NAME = "sparkRunningJobParseBolt";
 
     public String getEnv() {
         return env;
     }
     private String env;
 
-    public ZKStateConfig getZkStateConfig() { return zkStateConfig; }
+    ZKStateConfig getZkStateConfig() { return zkStateConfig; }
     private ZKStateConfig zkStateConfig;
+    private TopologyConfig topologyConfig;
+    public TopologyConfig getTopologyConfig(){
+        return topologyConfig;
+    }
 
     public EagleServiceConfig getEagleServiceConfig() {
         return eagleServiceConfig;
@@ -50,6 +56,13 @@ public class SparkRunningConfigManager implements Serializable {
         return endpointConfig;
     }
     private EndpointConfig endpointConfig;
+
+    public static class TopologyConfig implements Serializable {
+        public int jobFetchSpoutParallism;
+        public int jobFetchSpoutTasksNum;
+        public int jobParseBoltParallism;
+        public int jobParseBoltTasksNum;
+    }
 
     public static class ZKStateConfig implements Serializable {
         public String zkQuorum;
@@ -89,30 +102,34 @@ public class SparkRunningConfigManager implements Serializable {
     }
     private Config config;
 
-    private static SparkRunningConfigManager manager = new SparkRunningConfigManager();
+    private static SparkRunningJobAppConfig manager = new SparkRunningJobAppConfig();
 
-    private SparkRunningConfigManager() {
+    private SparkRunningJobAppConfig() {
         this.eagleServiceConfig = new EagleServiceConfig();
         this.jobExtractorConfig = new JobExtractorConfig();
         this.endpointConfig = new EndpointConfig();
         this.zkStateConfig = new ZKStateConfig();
+        this.topologyConfig = new TopologyConfig();
     }
 
-    public static SparkRunningConfigManager getInstance(String[] args) {
-        manager.init(args);
-        return manager;
-    }
-
-    private void init(String[] args) {
+    public static SparkRunningJobAppConfig getInstance(String[] args) {
         try {
             LOG.info("Loading from configuration file");
-            this.config = new ConfigOptionParser().load(args);
+            manager.init(new ConfigOptionParser().load(args));
         } catch (Exception e) {
             LOG.error("failed to load config");
         }
+        return manager;
+    }
 
+    public static SparkRunningJobAppConfig getInstance(Config config) {
+        manager.init(config);
+        return manager;
+    }
+
+    private void init(Config config){
+        this.config = config;
         this.env = config.getString("envContextConfig.env");
-
         this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");
         this.zkStateConfig.zkPort = config.getString("zookeeperConfig.zkPort");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeperConfig.zkSessionTimeoutMs");
@@ -120,6 +137,7 @@ public class SparkRunningConfigManager implements Serializable {
         this.zkStateConfig.zkRetryInterval = config.getInt("zookeeperConfig.zkRetryInterval");
         this.zkStateConfig.zkRoot = config.getString("zookeeperConfig.zkRoot");
         this.zkStateConfig.recoverEnabled = config.getBoolean("zookeeperConfig.recoverEnabled");
+
 
         // parse eagle service endpoint
         this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
@@ -140,9 +158,15 @@ public class SparkRunningConfigManager implements Serializable {
         this.endpointConfig.nnEndpoint = config.getString("dataSourceConfig.nnEndpoint");
         this.endpointConfig.keyTab = config.getString("dataSourceConfig.keytab");
         this.endpointConfig.principal = config.getString("dataSourceConfig.principal");
-        this.endpointConfig.rmUrls = config.getStringList("dataSourceConfig.rmUrls").toArray(new String[0]);
 
-        LOG.info("Successfully initialized SparkRunningConfigManager");
+        this.endpointConfig.rmUrls = config.getString("dataSourceConfig.rmUrls").split(",");
+
+        this.topologyConfig.jobFetchSpoutParallism = config.getInt("envContextConfig.parallelismConfig." + JOB_FETCH_SPOUT_NAME);
+        this.topologyConfig.jobFetchSpoutTasksNum = config.getInt("envContextConfig.tasks." + JOB_FETCH_SPOUT_NAME);
+        this.topologyConfig.jobParseBoltParallism = config.getInt("envContextConfig.parallelismConfig." + JOB_PARSE_BOLT_NAME);
+        this.topologyConfig.jobParseBoltTasksNum = config.getInt("envContextConfig.tasks." + JOB_PARSE_BOLT_NAME);
+
+        LOG.info("Successfully initialized SparkRunningJobAppConfig");
         LOG.info("env: " + this.env);
         LOG.info("site: " + this.jobExtractorConfig.site);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);

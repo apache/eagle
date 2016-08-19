@@ -32,13 +32,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ServerSimulatorImpl extends ServerSimulator {
+public class ApplicationSimulatorImpl extends ApplicationSimulator {
     private final Config config;
     private final SiteResource siteResource;
     private final ApplicationResource applicationResource;
 
     @Inject
-    public ServerSimulatorImpl(Config config, SiteResource siteResource, ApplicationResource applicationResource){
+    public ApplicationSimulatorImpl(Config config, SiteResource siteResource, ApplicationResource applicationResource){
         this.config = config;
         this.siteResource = siteResource;
         this.applicationResource = applicationResource;

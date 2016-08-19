@@ -24,7 +24,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import org.apache.eagle.jpm.spark.running.common.SparkRunningConfigManager;
+import org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig;
 import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
 import org.apache.eagle.jpm.spark.running.recover.SparkRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
@@ -40,18 +40,18 @@ import java.util.*;
 public class SparkRunningJobFetchSpout extends BaseRichSpout {
     private static final Logger LOG = LoggerFactory.getLogger(SparkRunningJobFetchSpout.class);
 
-    private SparkRunningConfigManager.ZKStateConfig zkStateConfig;
-    private SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig;
-    private SparkRunningConfigManager.EndpointConfig endpointConfig;
+    private SparkRunningJobAppConfig.ZKStateConfig zkStateConfig;
+    private SparkRunningJobAppConfig.JobExtractorConfig jobExtractorConfig;
+    private SparkRunningJobAppConfig.EndpointConfig endpointConfig;
     private ResourceFetcher resourceFetcher;
     private SpoutOutputCollector collector;
     private boolean init;
     private transient SparkRunningJobManager sparkRunningJobManager;
     private Set<String> runningYarnApps;
 
-    public SparkRunningJobFetchSpout(SparkRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                                     SparkRunningConfigManager.EndpointConfig endpointConfig,
-                                     SparkRunningConfigManager.ZKStateConfig zkStateConfig) {
+    public SparkRunningJobFetchSpout(SparkRunningJobAppConfig.JobExtractorConfig jobExtractorConfig,
+                                     SparkRunningJobAppConfig.EndpointConfig endpointConfig,
+                                     SparkRunningJobAppConfig.ZKStateConfig zkStateConfig) {
         this.jobExtractorConfig = jobExtractorConfig;
         this.endpointConfig = endpointConfig;
         this.zkStateConfig = zkStateConfig;
