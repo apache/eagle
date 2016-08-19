@@ -19,7 +19,7 @@
 package org.apache.eagle.hadoop.queue.crawler;
 
 import backtype.storm.spout.SpoutOutputCollector;
-import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.MetricName;
 import org.apache.eagle.hadoop.queue.model.scheduler.*;

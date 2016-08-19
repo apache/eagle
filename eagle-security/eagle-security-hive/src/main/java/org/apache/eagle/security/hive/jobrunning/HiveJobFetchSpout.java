@@ -22,7 +22,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import org.apache.eagle.dataproc.core.ValuesArray;
+import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;

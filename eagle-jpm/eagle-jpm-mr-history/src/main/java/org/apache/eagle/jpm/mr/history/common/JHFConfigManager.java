@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.mr.history.common;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.dataproc.util.ConfigOptionParser;
+import org.apache.eagle.common.config.ConfigOptionParser;
 import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
 import org.apache.eagle.jpm.util.JobIdPartitioner;
 import org.slf4j.Logger;
