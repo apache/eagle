@@ -22,13 +22,13 @@ import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MetadataStoreFactory {
+public class MetadataStoreModuleFactory {
     private final static Logger LOG = LoggerFactory.getLogger(MetadataStore.class);
     public static final String METADATA_STORE_CONFIG_KEY = "metadata.store";
 
     private static MetadataStore instance;
 
-    public static MetadataStore getInstance(){
+    public static MetadataStore getModule(){
         String metadataStoreClass = null;
         if(instance == null) {
             try {

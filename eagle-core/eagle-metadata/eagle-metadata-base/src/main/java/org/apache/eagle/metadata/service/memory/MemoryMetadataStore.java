@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.metadata.service.memory;
 
+import com.google.inject.Singleton;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.InMemMetadataDaoImpl;
 import org.apache.eagle.metadata.persistence.MetadataStore;
@@ -25,8 +26,8 @@ import org.apache.eagle.metadata.service.SiteEntityService;
 public class MemoryMetadataStore extends MetadataStore{
     @Override
     protected void configure() {
-        bind(SiteEntityService.class).to(SiteEntityEntityServiceMemoryImpl.class);
-        bind(ApplicationEntityService.class).to(ApplicationEntityServiceMemoryImpl.class);
-        bind(IMetadataDao.class).to(InMemMetadataDaoImpl.class);
+        bind(SiteEntityService.class).to(SiteEntityEntityServiceMemoryImpl.class).in(Singleton.class);
+        bind(ApplicationEntityService.class).to(ApplicationEntityServiceMemoryImpl.class).in(Singleton.class);
+        bind(IMetadataDao.class).to(InMemMetadataDaoImpl.class).in(Singleton.class);
     }
 }

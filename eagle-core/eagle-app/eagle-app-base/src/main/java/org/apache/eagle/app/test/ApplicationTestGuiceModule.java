@@ -18,8 +18,12 @@ package org.apache.eagle.app.test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.module.ApplicationExtensionLoader;
 import org.apache.eagle.app.module.ApplicationGuiceModule;
+import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.service.impl.ApplicationProviderServiceImpl;
+import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.common.module.CommonGuiceModule;
 import org.apache.eagle.common.module.GlobalScope;
 import org.apache.eagle.common.module.ModuleRegistry;
@@ -29,7 +33,8 @@ public class ApplicationTestGuiceModule extends AbstractModule{
     @Override
     protected void configure() {
         CommonGuiceModule common = new CommonGuiceModule();
-        ApplicationGuiceModule app = new ApplicationGuiceModule();
+        ApplicationProviderService instance = new ApplicationProviderServiceImpl(ConfigFactory.load());
+        ApplicationGuiceModule app = new ApplicationGuiceModule(instance);
         MemoryMetadataStore store = new MemoryMetadataStore();
         install(common);
         install(app);

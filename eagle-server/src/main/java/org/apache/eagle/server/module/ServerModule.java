@@ -18,14 +18,20 @@ package org.apache.eagle.server.module;
 
 import com.google.inject.AbstractModule;
 import org.apache.eagle.app.module.ApplicationGuiceModule;
+import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.common.module.CommonGuiceModule;
-import org.apache.eagle.metadata.persistence.MetadataStoreFactory;
+import org.apache.eagle.metadata.persistence.MetadataStoreModuleFactory;
 
-public class ServeModule extends AbstractModule {
+public class ServerModule extends AbstractModule {
+    private ApplicationProviderService appProviderInst;
+    public ServerModule(ApplicationProviderService appProviderInst){
+        this.appProviderInst = appProviderInst;
+    }
+
     @Override
     protected void configure() {
         install(new CommonGuiceModule());
-        install(new ApplicationGuiceModule());
-        install(MetadataStoreFactory.getInstance());
+        install(new ApplicationGuiceModule(appProviderInst));
+        install(MetadataStoreModuleFactory.getModule());
     }
 }
