@@ -19,7 +19,9 @@
 
 package org.apache.eagle.security.hbase;
 
+import com.google.inject.AbstractModule;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import org.apache.eagle.common.module.ModuleRegistry;
 
 /**
  * Since 8/5/16.
@@ -28,5 +30,17 @@ public class HBaseAuditLogAppProvider extends AbstractApplicationProvider<HBaseA
     @Override
     public HBaseAuditLogApplication getApplication() {
         return new HBaseAuditLogApplication();
+    }
+
+    @Override
+    public void register(ModuleRegistry registry) {
+
+    }
+
+    private static class MyModule extends AbstractModule {
+        @Override
+        protected void configure() {
+
+        }
     }
 }
