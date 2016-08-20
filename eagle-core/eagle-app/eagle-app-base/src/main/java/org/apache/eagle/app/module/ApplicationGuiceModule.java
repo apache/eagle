@@ -18,19 +18,23 @@ package org.apache.eagle.app.module;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import com.google.inject.util.Providers;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.impl.ApplicationManagementServiceImpl;
 import org.apache.eagle.app.service.ApplicationProviderService;
-import org.apache.eagle.app.service.impl.ApplicationProviderServiceImpl;
 import org.apache.eagle.metadata.service.ApplicationDescService;
 
 
 public class ApplicationGuiceModule extends AbstractModule {
+    private ApplicationProviderService appProviderInst;
+    public ApplicationGuiceModule(ApplicationProviderService appProviderInst){
+        this.appProviderInst = appProviderInst;
+    }
+
     @Override
     protected void configure() {
-        bind(ApplicationProviderServiceImpl.class).in(Singleton.class);
-        bind(ApplicationProviderService.class).to(ApplicationProviderServiceImpl.class).in(Singleton.class);
-        bind(ApplicationDescService.class).to(ApplicationProviderServiceImpl.class).in(Singleton.class);
+        bind(ApplicationProviderService.class).toProvider(Providers.of(appProviderInst));
+        bind(ApplicationDescService.class).toProvider(Providers.of(appProviderInst));
         bind(ApplicationManagementService.class).to(ApplicationManagementServiceImpl.class).in(Singleton.class);
     }
 }
