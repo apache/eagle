@@ -18,6 +18,9 @@
 package org.apache.eagle.security.hbase;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +40,7 @@ public class HbaseAuditLogParser implements Serializable {
     private final static String ALLOWED = "allowed";
     private final static String DENIED = "denied";
     private final static Pattern loggerPattern = Pattern.compile("^([\\d\\s\\-:,]+)\\s+(\\w+)\\s+(.*)");
-    private final static Pattern loggerContextPattern = Pattern.compile("\\w+:\\s*\\(user=(.*),\\s*scope=(.*),\\s*family=(.*),\\s*action=(.*)\\)");
+    private final static Pattern loggerContextPattern = Pattern.compile("\\w+:\\s*\\((.*)\\s*\\)");
     private final static Pattern allowedPattern = Pattern.compile(ALLOWED);
 
 
@@ -75,13 +78,53 @@ public class HbaseAuditLogParser implements Serializable {
                 } catch (Exception e) {
                     context = "";
                 }
-                Matcher contextMatcher = loggerContextPattern.matcher(context);
+
+                Matcher contextMatcher = loggerContextPattern.matcher(context.replaceAll("\\s+",""));
                 if(contextMatcher.find()) {
-                    user = contextMatcher.group(1);
-                    scope = contextMatcher.group(2);
-                    family = contextMatcher.group(3);
-                    action = contextMatcher.group(4);
+                    boolean paramsOpen = false;
+
+                    List<String> kvs = new LinkedList<String>(Arrays.asList(contextMatcher.group(1).split(",")));
+
+                    while (!kvs.isEmpty()) {
+                        String kv = kvs.get(0);
+
+                        if (kv.split("=").length < 2) {
+                            kvs.remove(0);
+                            continue;
+                        }
+
+                        String k = kv.split("=")[0];
+                        String v = kv.split("=")[1];
+
+                        if (paramsOpen && kv.substring(kv.length() - 1).equals("]")) {
+                            paramsOpen = false;
+                            v = v.substring(0, v.length() - 1);
+                        }
+
+                        switch (k) {
+                            case "user":
+                                user = v;
+                                break;
+                            case "scope":
+                                scope = v;
+                                break;
+                            case "family":
+                                family = v;
+                                break;
+                            case "action":
+                                action = v;
+                                break;
+                            case "params":
+                                kvs.add(v.substring(1) + "=" + kv.split("=")[2]);
+                                paramsOpen = true;
+                                break;
+                            default: break;
+                        }
+
+                        kvs.remove(0);
+                    }
                 }
+
                 if(StringUtils.isNotEmpty(family)) {
                     if(!scope.contains(":")) scope = "default:" + scope;
                     scope = String.format("%s:%s", scope, family);
@@ -102,6 +145,4 @@ public class HbaseAuditLogParser implements Serializable {
         return null;
     }
 }
-
-
 
