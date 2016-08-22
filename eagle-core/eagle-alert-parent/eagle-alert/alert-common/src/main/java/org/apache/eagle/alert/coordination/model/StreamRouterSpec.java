@@ -18,7 +18,9 @@ package org.apache.eagle.alert.coordination.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 
@@ -71,5 +73,19 @@ public class StreamRouterSpec {
     public String toString() {
         return String.format("StreamRouterSpec[streamId=%s,partition=%s, queue=[%s]]", this.getStreamId(),
                 this.getPartition(), this.getTargetQueue());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof StreamRouterSpec)) {
+            return false;
+        }
+        StreamRouterSpec that = (StreamRouterSpec) other;
+        return Objects.equals(streamId, that.streamId) &&
+                Objects.equals(partition, that.partition) &&
+                CollectionUtils.isEqualCollection(targetQueue, that.targetQueue);
     }
 }
