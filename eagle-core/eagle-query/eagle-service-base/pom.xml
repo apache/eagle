@@ -28,6 +28,10 @@
 	<artifactId>eagle-service-base</artifactId>
 	<packaging>jar</packaging>
 	<name>eagle-service-base</name>
+    <properties>
+        <powermock.version>1.6.5</powermock.version>
+        <powermock-api-mockito.version>1.6.5</powermock-api-mockito.version>
+    </properties>
 
 	<dependencies>
         <!-- put eagle-storage-base dependency at the top for using asm 4.0 jar !-->
@@ -72,5 +76,18 @@
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>${powermock-api-mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 </project>
