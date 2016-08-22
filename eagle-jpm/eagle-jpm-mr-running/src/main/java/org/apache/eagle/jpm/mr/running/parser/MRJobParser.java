@@ -193,6 +193,12 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_ID.toString(), id);
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), mrJob.getName());
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), jobDefId);
+            if (mrJobConfigs.get(id) != null) {
+                JobConfig jobConfig = mrJobConfigs.get(id);
+                if (jobConfig.containsKey(this.configKeys.get(0))) {
+                    jobExecutionAPIEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), jobConfig.get(this.configKeys.get(0)));
+                }
+            }
             jobExecutionAPIEntity.setTimestamp(app.getStartedTime());
             jobExecutionAPIEntity.setSubmissionTime(app.getStartedTime());
             jobExecutionAPIEntity.setStartTime(mrJob.getStartTime());
