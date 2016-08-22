@@ -197,14 +197,12 @@
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance"/>
 
-        <!-- Disable Import Order -->
-        <!--<module name="CustomImportOrder">-->
-        <!--<property name="ordered" value="false"/>-->
-        <!--<property name="specialImportsRegExp" value="org.apache.eagle"/>-->
-        <!--<property name="sortImportsInGroupAlphabetically" value="true"/>-->
-        <!--<property name="separateLineBetweenGroups" value="false"/>-->
-        <!--<property name="customImportOrderRules" value="STATIC###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE"/>-->
-        <!--</module>-->
+        <module name="CustomImportOrder">
+            <property name="specialImportsRegExp" value="org.apache.eagle"/>
+            <property name="sortImportsInGroupAlphabetically" value="true"/>
+            <property name="separateLineBetweenGroups" value="false"/>
+            <property name="customImportOrderRules" value="STATIC###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE"/>
+        </module>
 
         <module name="MethodParamPad"/>
         <module name="OperatorWrap">

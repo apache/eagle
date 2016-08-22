@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.service.hbase;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Ignore;
@@ -28,9 +29,10 @@ public class TestHBaseBase {
         hbase = EmbeddedHbase.getInstance();
     }
 
-    @Test
-    @Ignore(value="get rid of No runnable methods")
-    public void test() {
-
+    @AfterClass
+    public static void shutdownHBase() {
+        if (hbase != null) {
+            hbase.shutdown();
+        }
     }
 }
