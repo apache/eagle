@@ -20,11 +20,11 @@ import backtype.storm.spout.Scheme;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
-import org.apache.eagle.datastream.utils.NameConstants;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -35,7 +35,7 @@ import java.util.Properties;
  */
 public class KafkaSourcedSpoutScheme implements Scheme {
 	protected SpoutKafkaMessageDeserializer deserializer;
-	
+
 	public KafkaSourcedSpoutScheme(String deserClsName, Config context){
 		try{
 			Properties prop = new Properties();
@@ -48,25 +48,21 @@ public class KafkaSourcedSpoutScheme implements Scheme {
 			throw new RuntimeException("Failed to create new instance for decoder class " + deserClsName, ex);
 		}
 	}
-	
+
 	@Override
 	public List<Object> deserialize(byte[] ser) {
 		Object tmp = deserializer.deserialize(ser);
-		if(tmp == null)
-			return null;
-		// the following tasks are executed within the same process of kafka spout
-		return Arrays.asList(tmp);
+		Map<String, Object> map = (Map<String, Object>)tmp;
+		if(tmp == null) return null;
+		return Arrays.asList(map.get("user"), map.get("timestamp"));
 	}
 
     /**
      * Default only f0, but it requires to be overrode if different
-     *
-     * TODO: Handle the schema with KeyValue based structure
-     *
      * @return Fields
      */
 	@Override
 	public Fields getOutputFields() {
-        return new Fields(NameConstants.FIELD_PREFIX()+"0");
+        return new Fields(NameConstants.FIELD_PREFIX+"0");
 	}
 }

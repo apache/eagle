@@ -20,8 +20,8 @@ package org.apache.eagle.metric.kafka;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
-import org.apache.eagle.partition.DataDistributionDao;
-import org.apache.eagle.partition.PartitionAlgorithm;
+import org.apache.eagle.dataproc.impl.storm.partition.DataDistributionDao;
+import org.apache.eagle.dataproc.impl.storm.partition.PartitionAlgorithm;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
 import org.apache.eagle.security.partition.GreedyPartitionAlgorithm;
 import org.junit.Ignore;

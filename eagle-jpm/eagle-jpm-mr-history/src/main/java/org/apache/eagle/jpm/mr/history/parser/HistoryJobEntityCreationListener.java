@@ -19,7 +19,7 @@
 package org.apache.eagle.jpm.mr.history.parser;
 
 
-import org.apache.eagle.jpm.mr.history.entities.JobBaseAPIEntity;
+import org.apache.eagle.jpm.mr.historyentity.JobBaseAPIEntity;
 
 /**
  * generalizing this listener would decouple entity creation and entity handling, also will help unit testing

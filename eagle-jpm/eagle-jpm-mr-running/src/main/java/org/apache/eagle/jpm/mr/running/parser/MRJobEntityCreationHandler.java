@@ -19,21 +19,18 @@
 package org.apache.eagle.jpm.mr.running.parser;
 
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
-import org.apache.eagle.jpm.mr.running.entities.JobExecutionAPIEntity;
-import org.apache.eagle.jpm.mr.running.entities.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.running.parser.metrics.JobExecutionMetricsCreationListener;
 import org.apache.eagle.jpm.mr.running.parser.metrics.TaskExecutionMetricsCreationListener;
-import org.apache.eagle.jpm.util.Utils;
+import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MRJobEntityCreationHandler {
@@ -53,10 +50,14 @@ public class MRJobEntityCreationHandler {
     public void add(TaggedLogAPIEntity entity) {
         entities.add(entity);
         List<GenericMetricEntity> metricEntities;
-        if (entity instanceof TaskExecutionAPIEntity) {
+        /*if (entity instanceof TaskExecutionAPIEntity) {
             metricEntities = taskMetricsListener.generateMetrics((TaskExecutionAPIEntity) entity);
             entities.addAll(metricEntities);
         } else if (entity instanceof JobExecutionAPIEntity) {
+            metricEntities = jobMetricsListener.generateMetrics((JobExecutionAPIEntity) entity);
+            entities.addAll(metricEntities);
+        }*/
+        if (entity instanceof JobExecutionAPIEntity) {
             metricEntities = jobMetricsListener.generateMetrics((JobExecutionAPIEntity) entity);
             entities.addAll(metricEntities);
         }
@@ -71,10 +72,10 @@ public class MRJobEntityCreationHandler {
             return true;
         }
         IEagleServiceClient client = new EagleServiceClientImpl(
-                eagleServiceConfig.eagleServiceHost,
-                eagleServiceConfig.eagleServicePort,
-                eagleServiceConfig.username,
-                eagleServiceConfig.password);
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password);
         client.getJerseyClient().setReadTimeout(eagleServiceConfig.readTimeoutSeconds * 1000);
         try {
             LOG.info("start to flush mr job entities, size {}", entities.size());
@@ -90,6 +91,7 @@ public class MRJobEntityCreationHandler {
             try {
                 client.close();
             } catch (Exception e) {
+                // ignored exception
             }
         }
 

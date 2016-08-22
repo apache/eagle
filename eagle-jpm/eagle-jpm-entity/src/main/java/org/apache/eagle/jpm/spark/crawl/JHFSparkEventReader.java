@@ -19,8 +19,8 @@ package org.apache.eagle.jpm.spark.crawl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import jline.internal.Log;
-import org.apache.eagle.jpm.entity.*;
+import org.apache.eagle.jpm.spark.entity.JobConfig;
+import org.apache.eagle.jpm.spark.entity.*;
 import org.apache.eagle.jpm.util.JSONUtil;
 import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.SparkEntityConstant;
@@ -673,7 +673,7 @@ public class JHFSparkEventReader {
             int executorPB = Integer.parseInt(memory.substring(0, memory.length() - 1));
             return 1024l * 1024 * 1024 * 1024 * 1024 * executorPB;
         }
-        Log.info("Cannot parse memory info " +  memory);
+        LOG.info("Cannot parse memory info " +  memory);
         return 0l;
     }
 

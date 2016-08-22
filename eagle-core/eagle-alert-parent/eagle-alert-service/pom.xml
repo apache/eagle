@@ -58,9 +58,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-stream-process-base</artifactId>
+            <artifactId>eagle-data-process</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
-
