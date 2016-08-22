@@ -23,16 +23,16 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.List;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Users {
-	private List<User> user;
+    private List<User> user;
 
-	public List<User> getUser() {
-		return user;
-	}
+    public List<User> getUser() {
+        return user;
+    }
 
-	public void setUser(List<User> user) {
-		this.user = user;
-	}
+    public void setUser(List<User> user) {
+        this.user = user;
+    }
 }

@@ -16,34 +16,37 @@
  */
 package org.apache.eagle.service.security.hive.resolver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
-import org.apache.eagle.service.security.hive.dao.*;
+import org.apache.eagle.service.security.hive.dao.HiveMetadataAccessConfig;
+import org.apache.eagle.service.security.hive.dao.HiveMetadataDAO;
+import org.apache.eagle.service.security.hive.dao.HiveMetadataDAOFactory;
 import org.apache.eagle.service.security.hive.res.HiveMetadataBrowseWebResource;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
-public class HiveMetadataResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
-	private final static Logger LOG = LoggerFactory.getLogger(HiveMetadataResolver.class);
-    private final static String HIVE_ATTRIBUTE_RESOLVE_FORMAT_HINT =
-            "hive metadata resolve must be {\"site\":\"${site}\", \"query\"=\"/{db}/{table}/{column}\"}";
+
+public class HiveMetadataResolver implements AttributeResolvable<GenericAttributeResolveRequest, String> {
+    private static final Logger LOG = LoggerFactory.getLogger(HiveMetadataResolver.class);
+    private static final String HIVE_ATTRIBUTE_RESOLVE_FORMAT_HINT =
+        "hive metadata resolve must be {\"site\":\"${site}\", \"query\"=\"/{db}/{table}/{column}\"}";
 
     private ApplicationEntityService entityService;
 
-    public HiveMetadataResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+    public HiveMetadataResolver(ApplicationEntityService entityService, Config eagleServerConfig) {
         this.entityService = entityService;
     }
 
@@ -56,31 +59,31 @@ public class HiveMetadataResolver implements AttributeResolvable<GenericAttribut
 
         try {
             Map<String, Object> config = getAppConfig(request.getSite(), HiveMetadataBrowseWebResource.HIVE_APPLICATION);
-            Config typesafeConfig  = ConfigFactory.parseMap(config);
+            Config typesafeConfig = ConfigFactory.parseMap(config);
             HiveMetadataAccessConfig hiveConfig = HiveMetadataAccessConfig.config2Entity(typesafeConfig);
             HiveMetadataDAO dao = new HiveMetadataDAOFactory().getHiveMetadataDAO(hiveConfig);
             if (subResources.length == 0) { // query all databases with "/"
                 return filterAndCombineAttribue("/", dao.getDatabases(), null);
-            }else if(subResources.length == 2){ // query all tables given a database
-                if(query.endsWith("/")) {
+            } else if (subResources.length == 2) { // query all tables given a database
+                if (query.endsWith("/")) {
                     prefix = String.format("/%s/", subResources[1]);
                     return filterAndCombineAttribue(prefix, dao.getTables(subResources[1]), null);
                 }
                 return filterAndCombineAttribue("/", dao.getDatabases(), subResources[1]);
-            }else if(subResources.length == 3){
-                if(query.endsWith("/")) {
+            } else if (subResources.length == 3) {
+                if (query.endsWith("/")) {
                     prefix = String.format("/%s/%s/", subResources[1], subResources[2]);
                     return filterAndCombineAttribue(prefix, dao.getColumns(subResources[1], subResources[2]), null);
                 } else {
                     prefix = String.format("/%s/", subResources[1]);
                     return filterAndCombineAttribue(prefix, dao.getTables(subResources[1]), subResources[2]);
                 }
-            }else if(subResources.length == 4) {
+            } else if (subResources.length == 4) {
                 prefix = String.format("/%s/%s/", subResources[1], subResources[2]);
                 return filterAndCombineAttribue(prefix, dao.getColumns(subResources[1], subResources[2]), subResources[3]);
             }
 
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error fetching hive metadata", ex);
             throw new AttributeResolveException(ex);
         }
@@ -89,7 +92,7 @@ public class HiveMetadataResolver implements AttributeResolvable<GenericAttribut
 
     @Override
     public void validateRequest(GenericAttributeResolveRequest request) throws BadAttributeResolveRequestException {
-    	String query = request.getQuery();
+        String query = request.getQuery();
         String site = request.getSite();
         if (query == null || !query.startsWith("/") || query.split("/").length > 4 || site == null || site.length() == 0) {
             throw new BadAttributeResolveRequestException(HIVE_ATTRIBUTE_RESOLVE_FORMAT_HINT);
@@ -98,18 +101,18 @@ public class HiveMetadataResolver implements AttributeResolvable<GenericAttribut
 
     public List<String> filterAndCombineAttribue(String prefix, List<String> attrs, String target) {
         List<String> result = new ArrayList<>();
-        if(target == null) {
-            for (String attr : attrs){
+        if (target == null) {
+            for (String attr : attrs) {
                 result.add(String.format("%s%s", prefix, attr));
             }
         } else {
             Pattern pattern = Pattern.compile("^" + target, Pattern.CASE_INSENSITIVE);
             for (String attr : attrs) {
-                if (pattern.matcher(attr).find()){
+                if (pattern.matcher(attr).find()) {
                     result.add(String.format("%s%s", prefix, attr));
                 }
             }
-            if(result.size() == 0) {
+            if (result.size() == 0) {
                 for (String attr : attrs) {
                     result.add(String.format("%s%s", prefix, attr));
                 }
@@ -123,7 +126,7 @@ public class HiveMetadataResolver implements AttributeResolvable<GenericAttribut
         return GenericAttributeResolveRequest.class;
     }
 
-    private Map<String, Object> getAppConfig(String site, String appType){
+    private Map<String, Object> getAppConfig(String site, String appType) {
         ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
         return entity.getConfiguration();
     }

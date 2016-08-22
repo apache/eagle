@@ -50,11 +50,11 @@
             <directory>${project.build.outputDirectory}/</directory>
             <outputDirectory>/</outputDirectory>
             <!--<includes>-->
-                <!--<include>*.conf</include>-->
-                <!--<include>*.xml</include>-->
-                <!--<include>*.properties</include>-->
-                <!--<include>*.config</include>-->
-                <!--<include>classes/META-INF/*</include>-->
+            <!--<include>*.conf</include>-->
+            <!--<include>*.xml</include>-->
+            <!--<include>*.properties</include>-->
+            <!--<include>*.config</include>-->
+            <!--<include>classes/META-INF/*</include>-->
             <!--</includes>-->
 
             <excludes>

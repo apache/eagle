@@ -17,34 +17,35 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.apache.eagle</groupId>
-		<artifactId>eagle-query-parent</artifactId>
-		<version>0.5.0-incubating-SNAPSHOT</version>
+    <parent>
+        <groupId>org.apache.eagle</groupId>
+        <artifactId>eagle-query-parent</artifactId>
+        <version>0.5.0-incubating-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
-	</parent>
+    </parent>
 
-	<artifactId>eagle-audit-base</artifactId>
-	<packaging>jar</packaging>
-	<name>eagle-audit-base</name>
+    <artifactId>eagle-audit-base</artifactId>
+    <packaging>jar</packaging>
+    <name>eagle-audit-base</name>
 
-	<dependencies>
+    <dependencies>
 
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-client-base</artifactId>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-client-base</artifactId>
             <version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-entity-base</artifactId>
-            <version>${project.version}</version>
-		</dependency>
+        </dependency>
 
-	</dependencies>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-entity-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+    </dependencies>
 
 </project>

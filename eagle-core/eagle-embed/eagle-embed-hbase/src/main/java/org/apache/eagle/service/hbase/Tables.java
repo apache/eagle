@@ -21,7 +21,8 @@ import java.util.List;
 
 public class Tables {
     List<String> tables = new ArrayList<String>();
-    public Tables(){
+
+    public Tables() {
         tables.add("eagle_metric");
 
         tables.add("actiondetail");
