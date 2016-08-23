@@ -268,7 +268,6 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
            }
            m_jobExecutionEntity.setAvgMapTaskDuration(this.sumMapTaskDuration * 1.0 / m_numTotalMaps);
            if (m_numTotalReduces == 0) {
-               m_numTotalReduces++;
                m_jobExecutionEntity.setMaxReduceTaskDuration(0);
                m_jobExecutionEntity.setAvgReduceTaskDuration(0);
            } else {
