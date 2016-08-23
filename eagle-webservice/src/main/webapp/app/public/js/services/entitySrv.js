@@ -31,14 +31,13 @@
 
 		function wrapList(list, promise) {
 			list._done = false;
-			list._promise = promise;
-			promise.then(function (res) {
+			list._promise = promise.then(function (res) {
 				var data = res.data;
 				list.splice(0);
 				Array.prototype.push.apply(list, data.data);
 				list._done = true;
 
-				return list;
+				return res;
 			});
 			return withThen(list);
 		}

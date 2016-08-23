@@ -76,16 +76,18 @@
 		};
 
 		Site.getPromise = function (config) {
-			return $q.all([Site.list._promise, Application.getPromise()]).then(function() {
+			var siteList = Site.list;
+
+			return $q.all([siteList._promise, Application.getPromise()]).then(function() {
 				// Site check
-				if(config.site !== false && Site.list.length === 0) {
+				if(config.site !== false && siteList.length === 0) {
 					$wrapState.go('setup', 1);
 					return $q.reject(Site);
 				}
 
 				// Application check
 				if(config.application !== false && Application.list.length === 0) {
-					$wrapState.go('integration.site', {id: Site.list[0].siteId}, 1);
+					$wrapState.go('integration.site', {id: siteList[0].siteId}, 1);
 					return $q.reject(Site);
 				}
 

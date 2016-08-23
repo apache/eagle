@@ -32,6 +32,14 @@
 		site: true,
 		templateUrl: "partials/job/detail.html",
 		controller: "detailCtrl"
+	}).route("jpmCompare", {
+		url: "/jpm/compare/:jobId",
+		site: true,
+		sync: function () {
+
+		},
+		templateUrl: "partials/job/detail.html",
+		controller: "detailCtrl"
 	});
 
 	jpmApp.portal({name: "JPM", icon: "home", path: "jpm/list"}, true);

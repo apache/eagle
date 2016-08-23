@@ -62,6 +62,7 @@ var app = {};
 		}
 
 		eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
+			$urlRouterProvider.deferIntercept();
 			$urlRouterProvider.otherwise("/");
 			$stateProvider
 			// ================================== Home ==================================
@@ -155,7 +156,7 @@ var app = {};
 		// ======================================================================================
 		var STATE_NAME_MATCH = /^[^.]*/;
 
-		eagleApp.controller('MainCtrl', function ($scope, $wrapState, PageConfig, Portal, Entity, Site, Application, UI, Time) {
+		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, PageConfig, Portal, Entity, Site, Application, UI, Time) {
 			window._WrapState = $scope.$wrapState = $wrapState;
 			window._PageConfig = $scope.PageConfig = PageConfig;
 			window._Portal = $scope.Portal = Portal;
@@ -179,6 +180,26 @@ var app = {};
 					PageConfig.reset();
 				}
 			});
+
+			$scope.$on('$locationChangeSuccess',
+				/**
+				 * @param {{}} e
+				 * @param {function} e.preventDefault
+				 */
+				function(e, newUrl, oldUrl) {
+					e.preventDefault();
+
+					// Check if page needn't update
+					for(var i = 0 ; i < register.routeList.length ; i += 1) {
+						var route = register.routeList[i];
+						if(route.sync && !route.sync(newUrl, oldUrl)) {
+							return;
+						}
+					}
+
+					$urlRouter.sync();
+			});
+			$urlRouter.listen();
 
 			// ================================ Function ================================
 			// Get side bar navigation item class
