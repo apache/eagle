@@ -23,6 +23,18 @@
 		position: relative;
 	}
 
+	.jpm-chart {
+		margin-bottom: 15px;
+	}
+
+	.jpm-chart-container.scroll {
+		overflow-y: auto;
+	}
+
+	.jpm-chart h3 {
+		margin: 0 0 10px 0;
+	}
+
 	.jpm-chart .overlay {
 		top: 0;
 		bottom: 0;
@@ -71,7 +83,7 @@
 							<th>Submission Time</th>
 							<td>{{Time.format(job.submissionTime)}}</td>
 							<th>Duration</th>
-							<td class="text-light-blue">{{Time.diffStr(job.startTime, job.endTime)}}</td>
+							<td class="text-light-blue">{{Time.diffStr(job.durationTime)}}</td>
 						</tr>
 						<tr>
 							<th>Start Time</th>
@@ -172,15 +184,15 @@
 	</div>
 </div>
 
-<div class="box box-primary" ng-if="isRunning">
+<div class="box box-primary">
 	<div class="box-header with-border">
 		<h3 class="box-title">
-			Running Metrics
+			Dashboards
 		</h3>
 	</div>
 	<div class="box-body">
 		<div class="row">
-			<div class="col-sm-12 col-md-6">
+			<div class="col-sm-12 col-md-12">
 				<div class="jpm-chart">
 					<div chart class="jpm-chart-container" series="allocatedSeries"></div>
 					<div ng-if="(allocatedSeries || []).length === 0" class="overlay">
@@ -189,35 +201,215 @@
 				</div>
 			</div>
 
+			<div class="col-sm-12 col-md-6" ng-hide="taskBucket">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="taskSeries" category="taskCategory" ng-click="taskSeriesClick"></div>
+					<div ng-if="(taskSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-12 col-md-6" ng-show="taskBucket">
+				<div class="jpm-chart">
+					<div class="jpm-chart-container scroll">
+						<h3>
+							<a class="fa fa-arrow-circle-o-left" ng-click="backToTaskSeries()"></a>
+							Top Tasks
+						</h3>
+
+						<table class="table table-sm table-bordered no-margin">
+							<thead>
+								<tr>
+									<!--th>Task</th-->
+									<th>Host</th>
+									<th>HDFS Read</th>
+									<th>HDFS Write</th>
+									<th>Local Read</th>
+									<th>Local Write</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="task in taskBucket.topEntities track by $index">
+									<!--td>{{task.tags.taskId}}</td-->
+									<td>{{task.host || "[" + task.tags.taskId + "]"}}</td>
+									<td>{{common.number.format(task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)}}</td>
+									<td>{{common.number.format(task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}</td>
+									<td>{{common.number.format(task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_READ)}}</td>
+									<td>{{common.number.format(task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_WRITTEN)}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
 			<div class="col-sm-12 col-md-6">
 				<div class="jpm-chart">
-					<div chart class="jpm-chart-container" series="taskSeries"></div>
-					<div ng-if="(taskSeries || []).length === 0" class="overlay">
+					<div chart class="jpm-chart-container" series="nodeTaskCountSeries" category="nodeTaskCountCategory"
+					></div>
+					<div ng-if="(nodeTaskCountSeries || []).length === 0" class="overlay">
 						<i class="fa fa-refresh fa-spin"></i>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-	<div ng-if="!job" class="overlay">
-		<i class="fa fa-refresh fa-spin"></i>
-	</div>
 </div>
 
-<div class="box box-primary">
+<div class="box box-primary" ng-if="job.tags.jobDefId">
 	<div class="box-header with-border">
 		<h3 class="box-title">
-			Statistic
+			Comparison
+			<small>Click to compare job</small>
 		</h3>
 	</div>
 	<div class="box-body">
+		<div class="jpm-chart">
+			<div chart="compareChart" class="jpm-chart-container" series="historyJobDurationSeries" category="historyJobCategory"
+				 ng-click="compareJobSelect"></div>
+			<div ng-if="(historyJobDurationSeries || []).length === 0" class="overlay">
+				<i class="fa fa-refresh fa-spin"></i>
+			</div>
+		</div>
+	</div>
+	<div ng-if="comparedJob" class="box-footer">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Field</th>
+					<th>Compared</th>
+					<th>Current</th>
+					<th>Field</th>
+					<th>Compared</th>
+					<th>Current</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>Job Id</th>
+					<td><a ui-sref="jpmDetail({siteId: site, jobId: comparedJob.tags.jobId})">{{comparedJob.tags.jobId}}</a></td>
+					<td>{{job.tags.jobId}}</td>
+					<th>Duration</th>
+					<td>{{Time.diffStr(comparedJob.durationTime)}}</td>
+					<td>
+						{{Time.diffStr(job.durationTime)}}
+						<span class="{{jobCompareClass('durationTime')}}">{{jobCompareValue('durationTime')}}</span>
+					</td>
+				</tr>
+				<tr>
+					<th>Total Maps</th>
+					<td>{{common.number.toFixed(comparedJob.numTotalMaps)}}</td>
+					<td>
+						{{common.number.toFixed(job.numTotalMaps)}}
+						<span class="{{jobCompareClass('numTotalMaps')}}">{{jobCompareValue('numTotalMaps')}}</span>
+					</td>
+					<th>Total Reduces</th>
+					<td>{{common.number.toFixed(comparedJob.numTotalReduces)}}</td>
+					<td>
+						{{common.number.toFixed(job.numTotalReduces)}}
+						<span class="{{jobCompareClass('numTotalReduces')}}">{{jobCompareValue('numTotalReduces')}}</span>
+					</td>
+				</tr>
+				<tr>
+					<th>HDFS Read Bytes</th>
+					<td>{{common.number.toFixed(comparedJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)}}</td>
+					<td>
+						{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)}}
+						<span class="{{jobCompareClass(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','HDFS_BYTES_READ'])}}">
+							{{jobCompareValue(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','HDFS_BYTES_READ'])}}
+						</span>
+					</td>
+					<th>HDFS Write Bytes</th>
+					<td>{{common.number.toFixed(comparedJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}</td>
+					<td>
+						{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}
+						<span class="{{jobCompareClass(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','HDFS_BYTES_WRITTEN'])}}">
+							{{jobCompareValue(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','HDFS_BYTES_WRITTEN'])}}
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<th>Local Read Bytes</th>
+					<td>{{common.number.toFixed(comparedJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_READ)}}</td>
+					<td>
+						{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_READ)}}
+						<span class="{{jobCompareClass(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','FILE_BYTES_READ'])}}">
+							{{jobCompareValue(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','FILE_BYTES_READ'])}}
+						</span>
+					</td>
+					<th>Local Write Bytes</th>
+					<td>{{common.number.toFixed(comparedJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_WRITTEN)}}</td>
+					<td>
+						{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_WRITTEN)}}
+						<span class="{{jobCompareClass(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','FILE_BYTES_WRITTEN'])}}">
+							{{jobCompareValue(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','FILE_BYTES_WRITTEN'])}}
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<th>Last Map Duration</th>
+					<td>{{common.number.toFixed(comparedJob.lastMapDuration)}}</td>
+					<td>
+						{{common.number.toFixed(job.lastMapDuration)}}
+						<span class="{{jobCompareClass('lastMapDuration')}}">{{jobCompareValue('lastMapDuration')}}</span>
+					</td>
+					<th>Last Reduce Duration</th>
+					<td>{{common.number.toFixed(comparedJob.lastReduceDuration)}}</td>
+					<td>
+						{{common.number.toFixed(job.lastReduceDuration)}}
+						<span class="{{jobCompareClass('lastReduceDuration')}}">{{jobCompareValue('lastReduceDuration')}}</span>
+					</td>
+				</tr>
+				<tr>
+					<th>Data Local Maps</th>
+					<td>{{common.number.toFixed(comparedJob.dataLocalMapsPercentage * 100)}}%</td>
+					<td>
+						{{common.number.toFixed(job.dataLocalMapsPercentage * 100)}}%
+						<span class="{{jobCompareClass('dataLocalMapsPercentage')}}">{{jobCompareValue('dataLocalMapsPercentage')}}</span>
+					</td>
+					<th>Rack Local Maps</th>
+					<td>{{common.number.toFixed(comparedJob.rackLocalMapsPercentage * 100)}}%</td>
+					<td>
+						{{common.number.toFixed(job.rackLocalMapsPercentage * 100)}}%
+						<span class="{{jobCompareClass('rackLocalMapsPercentage')}}">{{jobCompareValue('rackLocalMapsPercentage')}}</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
 		<div class="row">
-			<div class="col-sm-12 col-md-6">
+			<div class="col-lg-6 col-md-12">
 				<div class="jpm-chart">
-					<div chart class="jpm-chart-container" series="nodeTaskCountSeries" category="nodeTaskCountCategory"
-					></div>
-					<div ng-if="(nodeTaskCountSeries || []).length === 0" class="overlay">
+					<div chart class="jpm-chart-container" series="comparisonContainerSeries"
+						 category="comparisonContainerCategories"></div>
+					<div ng-if="(comparisonContainerSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-12">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="comparisonAllocatedMBSeries"
+						 category="comparisonAllocatedMBCategories"></div>
+					<div ng-if="(comparisonAllocatedMBSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-12">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="comparisonAllocatedVCoresSeries"
+						 category="comparisonAllocatedVCoresCategories"></div>
+					<div ng-if="(comparisonAllocatedVCoresSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6" ng-hide="taskBucket">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="comparedTaskSeries" category="taskCategory" option="taskOption"></div>
+					<div ng-if="(comparedTaskSeries || []).length === 0" class="overlay">
 						<i class="fa fa-refresh fa-spin"></i>
 					</div>
 				</div>

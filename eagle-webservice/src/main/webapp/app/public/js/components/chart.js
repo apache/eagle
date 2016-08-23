@@ -23,7 +23,7 @@
 
 
 	eagleComponents.directive('chart', function($compile) {
-		var charts = {};
+		var charts = window.charts = {};
 
 		function chartResize() {
 			setTimeout(function () {
@@ -44,7 +44,13 @@
 				series: "=",
 				category: "=?category",
 				xTitle: "@?xTitle",
-				yTitle: "@?yTitle"
+				yTitle: "@?yTitle",
+
+				option: "=?option",
+
+				click: "=?ngClick",
+
+				chart: "@?chart"
 			},
 			controller: function ($scope, $element, $attrs, Time) {
 				var i;
@@ -52,8 +58,6 @@
 				charts[chart.id] = chart;
 
 				function refreshChart() {
-					console.log("!!!!! Refresh chart", $scope.series);
-
 					var maxYAxis = 0;
 					var legendList = [];
 					var categoryList = $scope.category ? $scope.category : [];
@@ -106,16 +110,38 @@
 						series: seriesList
 					};
 
-					console.log("~~>", $scope, $attrs);
+					if($scope.option) {
+						option = common.merge(option, $scope.option);
+					}
 
 					chart.setOption(option);
 				}
 
+				// Event handle
+				chart.on("click", function (e) {
+					if($scope.click) {
+						$scope.click(e);
+					}
+				});
+
+				// Insert chart object to parent scope
+				if($attrs.chart) {
+					$scope.$parent.$parent[$attrs.chart] = chart;
+				}
+
+				chart.refresh = function () {
+					refreshChart();
+				};
+
+				// Render
 				refreshChart();
 				$scope.$watch("series", refreshChart);
 
 				$scope.$on('$destroy', function() {
 					delete charts[chart.id];
+					chart.dispose();
+
+					delete $scope.$parent.$parent[$attrs.chart];
 				});
 			},
 			template: '<div>Loading...</div>',

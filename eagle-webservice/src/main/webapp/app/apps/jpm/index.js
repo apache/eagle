@@ -44,24 +44,39 @@
 		var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		var QUERY_GROUPS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		var QUERY_METRICS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		var QUERY_MR_JOBS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/search';
+		var QUERY_TASK_STATISTIC = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/${jobId}/taskCounts?site=${site}&timelineInSecs=${times}&top=${top}';
 
 		var JPM = {};
 
-		JPM.get = function (url) {
-			$http.defaults.withCredentials = true;
-			var promise = $http({
-				url: url,
-				method: "GET",
-				headers: {'Authorization': "Basic " + _hash}
-			}).then(
+		function wrapList(promise) {
+			var _list = [];
+			_list._done = false;
+
+			_list._promise = promise.then(
 				/**
 				 * @param {{}} res
 				 * @param {{}} res.data
 				 * @param {{}} res.data.obj
 				 */
 				function (res) {
-				return res.data.obj;
+				_list.splice(0);
+				Array.prototype.push.apply(_list, res.data.obj);
+				_list._done = true;
+				return _list;
 			});
+			return _list;
+		}
+
+		JPM.get = function (url, params) {
+			$http.defaults.withCredentials = true;
+			var promise = $http({
+				url: url,
+				method: "GET",
+				params: params,
+				headers: {'Authorization': "Basic " + _hash}
+			});
+
 			$http.defaults.withCredentials = false;
 			return promise;
 		};
@@ -84,9 +99,6 @@
 		 * @return {[]}
 		 */
 		JPM.groups = function (query, condition, startTime, endTime, groups, field, limit) {
-			var _list = [];
-			_list._done = false;
-
 			var config = {
 				query: query,
 				condition: JPM.condition(condition),
@@ -99,13 +111,7 @@
 				limit: limit || 10000
 			};
 
-			_list._promise = JPM.get(common.template(QUERY_GROUPS, config));
-			_list._promise.then(function (data) {
-				_list.splice(0);
-				Array.prototype.push.apply(_list, data);
-				_list._done = true;
-			});
-			return _list;
+			return wrapList(JPM.get(common.template(QUERY_GROUPS, config)));
 		};
 
 		/**
@@ -119,9 +125,6 @@
 		 * @return {[]}
 		 */
 		JPM.list = function (query, condition, startTime, endTime, fields, limit) {
-			var _list = [];
-			_list._done = false;
-
 			var config = {
 				query: query,
 				condition: JPM.condition(condition),
@@ -133,13 +136,7 @@
 				limit: limit || 10000
 			};
 
-			_list._promise = JPM.get(common.template(QUERY_LIST, config));
-			_list._promise.then(function (data) {
-				_list.splice(0);
-				Array.prototype.push.apply(_list, data);
-				_list._done = true;
-			});
-			return _list;
+			return wrapList(JPM.get(common.template(QUERY_LIST, config)));
 		};
 
 		/**
@@ -193,18 +190,67 @@
 				limit: limit || 10000
 			};
 
-			var _list = [];
 			var metrics_url = common.template(QUERY_METRICS, config);
-			_list._done = false;
-			_list._promise = JPM.get(metrics_url);
-			_list._promise.then(function (data) {
-				_list.splice(0);
-				_list._done = true;
-				Array.prototype.push.apply(_list, data);
+			var _list = wrapList(JPM.get(metrics_url));
+			_list._promise.then(function () {
 				_list.reverse();
 			});
-
 			return _list;
+		};
+
+		JPM.taskDistribution = function (site, jobId, times, top) {
+			var url = common.template(QUERY_TASK_STATISTIC, {
+				site: site,
+				jobId: jobId,
+				times: times,
+				top: top || 10
+			});
+			return JPM.get(url);
+		};
+
+		/**
+		 * Get job list by sam jobDefId
+		 * @param {string} site
+		 * @param {string} jobDefId
+		 * @return {[]}
+		 */
+		JPM.findMRJobs = function (site, jobDefId) {
+			return wrapList(JPM.get(QUERY_MR_JOBS, {
+				site: site,
+				jobDefId: jobDefId
+			}));
+		};
+
+		JPM.metricsToInterval = function (metricList, interval) {
+			if(metricList.length === 0) return [];
+
+			var list = $.map(metricList, function (metric) {
+				var timestamp = Math.floor(metric.timestamp / interval) * interval;
+				var remainderPtg = (metric.timestamp % interval) / interval;
+				return {
+					timestamp: remainderPtg < 0.5 ? timestamp : timestamp + interval,
+					value: [metric.value[0]]
+				};
+			});
+
+			var resultList = [list[0]];
+			for(var i = 1 ; i < list.length ; i += 1) {
+				var start = list[i - 1];
+				var end = list[i];
+
+				var distance = (end.timestamp - start.timestamp);
+				if(distance > 0) {
+					var steps = distance / interval;
+					var des = (end.value[0] - start.value[0]) / steps;
+					for (var j = 1; j <= steps; j += 1) {
+						resultList.push({
+							timestamp: start.timestamp + j * interval,
+							value: [start.value[0] + des * j]
+						});
+					}
+				}
+			}
+			return resultList;
 		};
 
 		JPM.getStateClass = function (state) {

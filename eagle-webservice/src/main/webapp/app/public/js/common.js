@@ -133,6 +133,25 @@
 		return target;
 	};
 
+	function merge(obj1, obj2) {
+		$.each(obj2, function (key, value) {
+			if(typeof obj1[key] === "object" && typeof value === "object" && !common.isEmpty(value)) {
+				merge(obj1[key], value);
+			} else {
+				obj1[key] = value;
+			}
+		});
+	}
+
+	common.merge = function (mergedObj) {
+		for(var i = 1 ; i < arguments.length ; i += 1) {
+			var obj = arguments[i];
+			merge(mergedObj, obj);
+		}
+
+		return mergedObj;
+	};
+
 	// ============================ Array =============================
 	common.array = {};
 
@@ -203,9 +222,25 @@
 	// ============================ Number ============================
 	common.number = {};
 
+	common.number.isNumber = function (num) {
+		return typeof num === "number" && !isNaN(num);
+	};
+
 	common.number.toFixed = function (num, fixed) {
-		if(num === undefined || num === null || isNaN(num)) return "-";
+		if(!common.number.isNumber(num)) return "-";
 		num = Number(num);
 		return num.toFixed(fixed || 0);
+	};
+
+
+	common.number.format = function (num, fixed) {
+		if(!common.number.isNumber(num)) return "-";
+		return common.number.toFixed(num, fixed).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	};
+
+	common.number.compare = function (num1, num2) {
+		if(!common.number.isNumber(num1) || !common.number.isNumber(num2)) return "-";
+		if(num1 === 0) return 'N/A';
+		return (num2 - num1) / num1;
 	};
 })();

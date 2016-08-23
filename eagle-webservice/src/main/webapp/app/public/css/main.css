@@ -111,6 +111,12 @@ table.table pre.inline {
 	background: transparent;
 }
 
+table.table.table-sm th,
+table.table.table-sm td {
+	padding: 3px 5px;
+	line-height: 120%;
+}
+
 /* ========================================================================
  * =                                 Box                                  =
  * ======================================================================== */

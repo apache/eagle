@@ -78,7 +78,9 @@
 				if(interval > 0) match = true;
 
 				if(match) {
-					rows.push(interval + (interval > 1 ? unit[1] : unit[2]));
+					if(interval !== 0) {
+						rows.push(interval + (interval > 1 ? unit[1] : unit[2]));
+					}
 
 					rest -=1;
 					if(rest === 0) return false;
