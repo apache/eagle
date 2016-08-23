@@ -57,7 +57,9 @@ public class DefaultDeduplicator implements AlertDeduplicator {
 
 	public DefaultDeduplicator(String intervalMin, List<String> customDedupFields) {
 		setDedupIntervalMin(intervalMin);
-		this.customDedupFields = customDedupFields;
+		if (customDedupFields != null){
+			this.customDedupFields = customDedupFields;
+		}
 	}
 	
 	public void clearOldCache() {

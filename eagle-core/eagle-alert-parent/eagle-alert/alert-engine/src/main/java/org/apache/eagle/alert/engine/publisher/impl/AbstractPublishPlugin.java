@@ -46,7 +46,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
         try {
             Object obj = Class.forName(serializerClz).getConstructor(Map.class).newInstance(conf);
             if (!(obj instanceof IEventSerializer)) {
-                throw new Exception(String.format("serializer %s of publishement %s is not subclass to %s!",
+                throw new Exception(String.format("serializer %s of publishment %s is not subclass to %s!",
                         publishment.getSerializer(),
                         publishment.getName(),
                         IEventSerializer.class.getName()));

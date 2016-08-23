@@ -153,6 +153,16 @@ public class TestAlertPublisherBolt {
 
     }
 
+    @Test
+    public void testEmptyCustomFieldDedupEvent() throws Exception {
+        List<Publishment> pubs = loadEntities("/router/publishments-empty-dedup-field.json", Publishment.class);
 
+        AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(pubs.get(0), null, null);
+        AlertStreamEvent event1 = createWithStreamDef("host1", "testapp1");
+        AlertStreamEvent event2 = createWithStreamDef("host2", "testapp2");
 
+        Assert.assertNotNull(plugin.dedup(event1));
+        Assert.assertNull(plugin.dedup(event2));
+
+    }
 }
