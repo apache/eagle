@@ -198,7 +198,8 @@ public class RunningJobManager implements Serializable {
             if (curator.checkExists().forPath(path) != null) {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
                 LOG.info("delete job {} for yarn app {}, path {} ", jobId, yarnAppId, path);
-                if (curator.getChildren().forPath(path).size() == 0) {
+                String yarnPath = this.zkRoot + "/" + yarnAppId;
+                if (curator.getChildren().forPath(yarnPath).size() == 0) {
                     delete(yarnAppId);
                 }
             }
