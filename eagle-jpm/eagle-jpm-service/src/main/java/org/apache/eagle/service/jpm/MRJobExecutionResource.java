@@ -19,17 +19,25 @@
 package org.apache.eagle.service.jpm;
 
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
+import org.apache.eagle.service.generic.ListQueryResource;
+import org.apache.eagle.service.jpm.MRJobTaskCountResponse.TaskCountPerJobResponse;
+import org.apache.eagle.service.jpm.MRJobTaskCountResponse.JobCountPerDurationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.text.ParseException;
 import java.util.*;
+import java.util.function.Function;
 
 import static org.apache.eagle.jpm.util.MRJobTagName.JOB_ID;
 
@@ -185,73 +193,33 @@ public class MRJobExecutionResource {
         return response;
     }
 
-    public List<Long> parseTimeList(String timelist) {
-        List<Long> times = new ArrayList<>();
-        String [] strs = timelist.split("[,\\s]");
-        for (String str : strs) {
-            try {
-                times.add(Long.parseLong(str));
-            } catch (Exception ex) {
-                LOG.warn(str + " is not a number");
-            }
-        }
-        return times;
-    }
 
-    public int getPosition(List<Long> times, Long duration) {
-        duration = duration / 1000;
-        for (int i = 1; i < times.size(); i++) {
-            if (duration < times.get(i)) {
-                return i - 1;
-            }
-        }
-        return times.size() - 1;
-    }
-
-    public void getTopTasks(List<MRJobTaskGroupResponse.UnitTaskCount> list, long top) {
-        for (MRJobTaskGroupResponse.UnitTaskCount taskCounter : list) {
-            Iterator<TaskExecutionAPIEntity> iterator = taskCounter.entities.iterator();
-            for (int i = 0; i < top && iterator.hasNext(); i++) {
-                taskCounter.topEntities.add(iterator.next());
-            }
-            taskCounter.entities.clear();
-        }
-    }
-
-    public void initTaskCountList(List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount,
-                                  List<MRJobTaskGroupResponse.UnitTaskCount> finishedTaskCount,
-                                  List<Long> times,
-                                  Comparator comparator) {
-        for (int i = 0; i < times.size(); i++) {
-            runningTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i), comparator));
-            finishedTaskCount.add(new MRJobTaskGroupResponse.UnitTaskCount(times.get(i), comparator));
-        }
-    }
 
     @GET
     @Path("{jobId}/taskCounts")
     @Produces(MediaType.APPLICATION_JSON)
-    public MRJobTaskGroupResponse getTaskCounts(@PathParam("jobId") String jobId,
-                                                @QueryParam("site") String site,
-                                                @QueryParam("timelineInSecs") String timeList,
-                                                @QueryParam("top") long top) {
-        MRJobTaskGroupResponse response = new MRJobTaskGroupResponse();
+    public TaskCountPerJobResponse getTaskCountsPerJob(@PathParam("jobId") String jobId,
+                                                      @QueryParam("site") String site,
+                                                      @QueryParam("timelineInSecs") String timeList,
+                                                      @QueryParam("top") long top) {
+        TaskCountPerJobResponse response = new TaskCountPerJobResponse();
         if (jobId == null || site == null || timeList == null || timeList.isEmpty()) {
             response.errMessage = "IllegalArgumentException: jobId == null || site == null || timelineInSecs == null or isEmpty";
             return response;
         }
-        List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
-        List<MRJobTaskGroupResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
+        TaskCountPerJobHelper helper = new TaskCountPerJobHelper();
+        List<MRJobTaskCountResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
+        List<MRJobTaskCountResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
-        List<Long> times = parseTimeList(timeList);
+        List<Long> times = helper.parseTimeList(timeList);
         String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId);
         GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> history_res =
                 resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
         if (history_res.isSuccess() && history_res.getObj() != null && history_res.getObj().size() > 0) {
-            initTaskCountList(runningTaskCount, finishedTaskCount, times, new HistoryTaskComparator());
+            helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountPerJobHelper.HistoryTaskComparator());
             for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o : history_res.getObj()) {
-                int index = getPosition(times, o.getDuration());
-                MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
+                int index = helper.getPosition(times, o.getDuration());
+                MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
                 counter.taskCount++;
                 counter.entities.add(o);
             }
@@ -260,15 +228,15 @@ public class MRJobExecutionResource {
             GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> running_res =
                     resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
             if (running_res.isSuccess() && running_res.getObj() != null) {
-                initTaskCountList(runningTaskCount, finishedTaskCount, times, new RunningTaskComparator());
+                helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountPerJobHelper.RunningTaskComparator());
                 for (TaskExecutionAPIEntity o : running_res.getObj()) {
-                    int index = getPosition(times, o.getDuration());
+                    int index = helper.getPosition(times, o.getDuration());
                     if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
-                        MRJobTaskGroupResponse.UnitTaskCount counter = runningTaskCount.get(index);
+                        MRJobTaskCountResponse.UnitTaskCount counter = runningTaskCount.get(index);
                         counter.taskCount++;
                         counter.entities.add(o);
                     } else if (o.getEndTime() != 0) {
-                        MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
+                        MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
                         counter.taskCount++;
                         counter.entities.add(o);
                     }
@@ -276,31 +244,141 @@ public class MRJobExecutionResource {
             }
         }
         if (top > 0)  {
-            getTopTasks(runningTaskCount, top);
+            helper.getTopTasks(runningTaskCount, top);
             response.runningTaskCount = runningTaskCount;
-            getTopTasks(finishedTaskCount, top);
+            helper.getTopTasks(finishedTaskCount, top);
             response.finishedTaskCount = finishedTaskCount;
         }
         return response;
     }
 
-    static class RunningTaskComparator implements Comparator<TaskExecutionAPIEntity> {
-        @Override
-        public int compare(TaskExecutionAPIEntity o1, TaskExecutionAPIEntity o2) {
-            Long time1 = o1.getDuration();
-            Long time2 = o2.getDuration();
-            return (time1 > time2 ? -1 : (time1 == time2) ? 0 : 1);
+    @GET
+    @Path("jobCounts")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JobCountPerDurationResponse getJobCountPerDuration(@QueryParam("site") String site,
+                                                              @QueryParam("startTime") String startTime,
+                                                              @QueryParam("endTime") String endTime,
+                                                              @QueryParam("intervalInSecs") long intervalInSecs) {
+        JobCountPerDurationResponse response = new JobCountPerDurationResponse();
+        JobCountPerDurationHelper helper = new JobCountPerDurationHelper();
+        if (site == null || startTime == null || endTime == null) {
+            response.errMessage = "IllegalArgument: site, startTime, endTime, or metric is null";
+            return response;
+        }
+        if (intervalInSecs <= 0) {
+            response.errMessage = String.format("IllegalArgument: intervalInSecs=%s is invalid", intervalInSecs);
+            return response;
+        }
+        long startTimeInMills;
+        String searchStartTime = startTime;
+        String searchEndTime = endTime;
+        try {
+            startTimeInMills = DateTimeUtil.humanDateToSeconds(startTime) * DateTimeUtil.ONESECOND;
+            searchStartTime = helper.moveTimeforwardOneDay(searchStartTime);
+        } catch (Exception e) {
+            response.errMessage = e.getMessage();
+            return response;
+        }
+        String query = String.format("%s[@site=\"%s\" AND @endTime>=%s]{@startTime,@endTime}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, startTimeInMills);
+        GenericServiceAPIResponseEntity<JobExecutionAPIEntity> history_res =
+                resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
+        if (!history_res.isSuccess() || history_res.getObj() == null) {
+            response.errMessage = String.format("Catch an exception: %s with query=%s", history_res.getException(), query);
+            return response;
+        }
+
+        try {
+            long startTimeInSecs = DateTimeUtil.humanDateToSeconds(startTime);
+            long endTimeInSecs = DateTimeUtil.humanDateToSeconds(endTime);
+            return helper.getJobCount(history_res.getObj(), startTimeInSecs, endTimeInSecs, intervalInSecs);
+        } catch (Exception e) {
+            response.errMessage = e.getMessage();
+            return response;
         }
     }
 
-    static class HistoryTaskComparator implements Comparator<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> {
-        @Override
-        public int compare(org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o1,
-                           org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o2) {
-            Long time1 = o1.getDuration();
-            Long time2 = o2.getDuration();
-            return (time1 > time2 ? -1 : (time1 == time2) ? 0 : 1);
+    @GET
+    @Path("jobMetrics/entities")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Object getJobMetricsByEntitiesQuery(@QueryParam("site") String site,
+                                           @QueryParam("timePoint") String timePoint,
+                                           @QueryParam("metricName") String metricName,
+                                           @QueryParam("intervalmin") long intervalmin,
+                                           @QueryParam("top") int top) {
+        return getJobMetrics(site, timePoint, metricName, intervalmin, top, queryMetricEntitiesFunc);
+    }
+
+    @GET
+    @Path("jobMetrics/list")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Object getJobMetricsByListQuery(@QueryParam("site") String site,
+                                @QueryParam("timePoint") String timePoint,
+                                @QueryParam("metricName") String metricName,
+                                @QueryParam("intervalmin") long intervalmin,
+                                @QueryParam("top") int top) {
+        return getJobMetrics(site, timePoint, metricName, intervalmin, top, queryMetricListFunc);
+    }
+
+    public Object getJobMetrics(String site, String timePoint, String metricName, long intervalmin, int top,
+                                Function6<String, String, String, Long, Integer, String, Object> metricQueryFunc) {
+        GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
+        JobCountPerDurationHelper helper = new JobCountPerDurationHelper();
+        if (site == null || timePoint == null || metricName == null) {
+            response.setException(new IllegalArgumentException("Error: site, timePoint, metricName may be unset"));
+            response.setSuccess(false);
+            return response;
         }
+        long timePointsInMills;
+        String searchStartTime = timePoint;
+        String searchEndTime = timePoint;
+        try {
+            timePointsInMills = DateTimeUtil.humanDateToSeconds(timePoint) * DateTimeUtil.ONESECOND;
+            searchStartTime = helper.moveTimeforwardOneDay(searchStartTime);
+
+        } catch (ParseException e) {
+            response.setException(e);
+            response.setSuccess(false);
+            return response;
+        }
+        if (intervalmin <= 0) {
+            LOG.warn("query parameter intervalmin <= 0, use default value 5 instead");
+            intervalmin = 5;
+        }
+        if (top <= 0) {
+            LOG.warn("query parameter top <= 0, use default value 10 instead");
+            top = 10;
+        }
+        String query = String.format("%s[@site=\"%s\" AND @startTime<=\"%s\" AND @endTime>=\"%s\"]{@startTime,@endTime}",
+                Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, timePointsInMills, timePointsInMills);
+        GenericServiceAPIResponseEntity<JobExecutionAPIEntity> history_res =
+                resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
+        if (!history_res.isSuccess() || history_res.getObj() == null) {
+            return history_res;
+        }
+
+        List<String> timeDuration = helper.getSearchTimeDuration(history_res.getObj());
+        LOG.info(String.format("new search time range: startTime=%s, endTime=%s", timeDuration.get(0), timeDuration.get(1)));
+        query = String.format("%s[@site=\"%s\"]<@jobId>{sum(value)}.{sum(value) desc}", Constants.GENERIC_METRIC_SERVICE, site);
+        return metricQueryFunc.apply(query, timeDuration.get(0), timeDuration.get(1), intervalmin, top, metricName);
+    }
+
+    Function6<String, String, String, Long, Integer, String, Object> queryMetricEntitiesFunc
+            = (query, startTime, endTime, intervalmin, top, metricName) -> {
+        GenericEntityServiceResource resource = new GenericEntityServiceResource();
+        return resource.search(query, startTime, endTime, Integer.MAX_VALUE, null,
+                false, true, intervalmin, top, true, 0, metricName, false);
+    };
+
+    Function6<String, String, String, Long, Integer, String, Object> queryMetricListFunc
+            = (query, startTime, endTime, intervalmin, top, metricName) -> {
+        ListQueryResource resource = new ListQueryResource();
+        return resource.listQuery(query, startTime, endTime, Integer.MAX_VALUE, null,
+                false, true, intervalmin, top, true, 0, metricName, false);
+    };
+
+    @FunctionalInterface
+    interface Function6 <A, B, C, D, E, F, R> {
+        public R apply (A a, B b, C c, D d, E e, F f);
     }
 
 }

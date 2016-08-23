@@ -20,12 +20,20 @@ package org.apache.eagle.service.jpm;
 
 import java.util.*;
 
-class MRJobTaskGroupResponse {
-    public List<UnitTaskCount> runningTaskCount;
-    public List<UnitTaskCount> finishedTaskCount;
+public class MRJobTaskCountResponse {
     public String errMessage;
 
-   static class UnitTaskCount {
+
+    public static class TaskCountPerJobResponse extends MRJobTaskCountResponse {
+        public List<UnitTaskCount> runningTaskCount;
+        public List<UnitTaskCount> finishedTaskCount;
+    }
+
+    public static class JobCountPerDurationResponse extends MRJobTaskCountResponse {
+        public List<UnitJobCount> jobCounts;
+    }
+
+    static class UnitTaskCount {
         public long timeBucket;
         public int taskCount;
         public Set entities;
@@ -36,6 +44,16 @@ class MRJobTaskGroupResponse {
             this.taskCount = 0;
             entities = new TreeSet<>(comparator);
             topEntities = new ArrayList<>();
+        }
+    }
+
+    static class UnitJobCount {
+        public long timeBucket;
+        public long jobCount;
+
+        UnitJobCount(long timeBucket, long jobCount) {
+            this.timeBucket = timeBucket;
+            this.jobCount = jobCount;
         }
     }
 }
