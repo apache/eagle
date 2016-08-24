@@ -18,7 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.parser;
 
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
+import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.parser.metrics.JobExecutionMetricsCreationListener;
 import org.apache.eagle.jpm.mr.running.parser.metrics.TaskExecutionMetricsCreationListener;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
@@ -37,11 +37,11 @@ public class MRJobEntityCreationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobEntityCreationHandler.class);
 
     private List<TaggedLogAPIEntity> entities = new ArrayList<>();
-    private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
+    private MRRunningJobConfig.EagleServiceConfig eagleServiceConfig;
     private JobExecutionMetricsCreationListener jobMetricsListener;
     private TaskExecutionMetricsCreationListener taskMetricsListener;
 
-    public MRJobEntityCreationHandler(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig) {
+    public MRJobEntityCreationHandler(MRRunningJobConfig.EagleServiceConfig eagleServiceConfig) {
         this.eagleServiceConfig = eagleServiceConfig;
         jobMetricsListener = new JobExecutionMetricsCreationListener();
         taskMetricsListener = new TaskExecutionMetricsCreationListener();

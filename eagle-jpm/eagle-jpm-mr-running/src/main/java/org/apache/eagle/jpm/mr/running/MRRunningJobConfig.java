@@ -16,17 +16,18 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.running.config;
+package org.apache.eagle.jpm.mr.running;
 
 import org.apache.eagle.common.config.ConfigOptionParser;
+
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class MRRunningConfigManager implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(MRRunningConfigManager.class);
+public class MRRunningJobConfig implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(MRRunningJobConfig.class);
 
     public String getEnv() {
         return env;
@@ -93,28 +94,32 @@ public class MRRunningConfigManager implements Serializable {
 
     private Config config;
 
-    private static MRRunningConfigManager manager = new MRRunningConfigManager();
+    private static MRRunningJobConfig manager = new MRRunningJobConfig();
 
-    private MRRunningConfigManager() {
+    private MRRunningJobConfig() {
         this.eagleServiceConfig = new EagleServiceConfig();
         this.jobExtractorConfig = new JobExtractorConfig();
         this.endpointConfig = new EndpointConfig();
         this.zkStateConfig = new ZKStateConfig();
     }
 
-    public static MRRunningConfigManager getInstance(String[] args) {
-        manager.init(args);
+    public static MRRunningJobConfig getInstance(String[] args) {
+        try {
+            LOG.info("Loading from configuration file");
+            return getInstance(new ConfigOptionParser().load(args));
+        } catch (Exception e) {
+            LOG.error("failed to load config");
+            throw new IllegalArgumentException("Failed to load config", e);
+        }
+    }
+
+    public static MRRunningJobConfig getInstance(Config config) {
+        manager.init(config);
         return manager;
     }
 
-    private void init(String[] args) {
-        try {
-            LOG.info("Loading from configuration file");
-            this.config = new ConfigOptionParser().load(args);
-        } catch (Exception e) {
-            LOG.error("failed to load config");
-        }
-
+    private void init(Config config) {
+        this.config = config;
         this.env = config.getString("envContextConfig.env");
 
         //parse eagle zk
@@ -140,9 +145,9 @@ public class MRRunningConfigManager implements Serializable {
         this.jobExtractorConfig.topAndBottomTaskByElapsedTime = config.getInt("jobExtractorConfig.topAndBottomTaskByElapsedTime");
 
         //parse data source config
-        this.endpointConfig.rmUrls = config.getStringList("dataSourceConfig.rmUrls").toArray(new String[0]);
+        this.endpointConfig.rmUrls = config.getString("dataSourceConfig.rmUrls").split(",");
 
-        LOG.info("Successfully initialized MRRunningConfigManager");
+        LOG.info("Successfully initialized MRRunningJobConfig");
         LOG.info("env: " + this.env);
         LOG.info("site: " + this.jobExtractorConfig.site);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);

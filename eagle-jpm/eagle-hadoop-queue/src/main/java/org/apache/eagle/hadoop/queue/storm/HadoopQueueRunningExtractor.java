@@ -18,16 +18,17 @@
 
 package org.apache.eagle.hadoop.queue.storm;
 
-import backtype.storm.spout.SpoutOutputCollector;
-import com.typesafe.config.Config;
-import org.apache.eagle.hadoop.queue.crawler.ClusterMetricsCrawler;
-import org.apache.eagle.hadoop.queue.crawler.RunningAppsCrawler;
-import org.apache.eagle.hadoop.queue.crawler.SchedulerInfoCrawler;
 import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
 import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
 import org.apache.eagle.hadoop.queue.common.YarnURLSelectorImpl;
+import org.apache.eagle.hadoop.queue.crawler.ClusterMetricsCrawler;
+import org.apache.eagle.hadoop.queue.crawler.RunningAppsCrawler;
+import org.apache.eagle.hadoop.queue.crawler.SchedulerInfoCrawler;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.ha.HAURLSelector;
+
+import backtype.storm.spout.SpoutOutputCollector;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +39,10 @@ import java.util.concurrent.*;
 
 public class HadoopQueueRunningExtractor {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(HadoopQueueRunningExtractor.class);
-    private final static int MAX_NUM_THREADS = 10;
-    private final static int MAX_WAIT_TIME = 10;
-    private final static String DEFAULT_SITE = "sandbox";
+    private static final Logger LOGGER = LoggerFactory.getLogger(HadoopQueueRunningExtractor.class);
+    private static final int MAX_NUM_THREADS = 10;
+    private static final int MAX_WAIT_TIME = 10;
+    private static final String DEFAULT_SITE = "sandbox";
 
     private String site;
     private String urlBases;
@@ -53,10 +54,10 @@ public class HadoopQueueRunningExtractor {
     public HadoopQueueRunningExtractor(Config eagleConf, SpoutOutputCollector collector) {
         site = HadoopYarnResourceUtils.getConfigValue(eagleConf, "eagleProps.site", DEFAULT_SITE);
         urlBases = HadoopYarnResourceUtils.getConfigValue(eagleConf, "dataSourceConfig.RMEndPoints", "");
-        if(urlBases == null){
+        if (urlBases == null) {
             throw new IllegalArgumentException(site + ".baseurl is null");
         }
-        String [] urls = urlBases.split(",");
+        String[] urls = urlBases.split(",");
         urlSelector = new YarnURLSelectorImpl(urls, Constants.CompressionType.GZIP);
         executorService = Executors.newFixedThreadPool(MAX_NUM_THREADS);
         this.collector = collector;

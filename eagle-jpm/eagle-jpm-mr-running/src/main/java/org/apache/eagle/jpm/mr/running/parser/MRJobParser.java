@@ -18,7 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.parser;
 
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
+import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobConfig;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
@@ -77,14 +77,14 @@ public class MRJobParser implements Runnable {
     private boolean first;
     private Set<String> finishedTaskIds;
     private List<String> configKeys;
-    private MRRunningConfigManager.JobExtractorConfig jobExtractorConfig;
+    private MRRunningJobConfig.JobExtractorConfig jobExtractorConfig;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public MRJobParser(MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                       MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
+    public MRJobParser(MRRunningJobConfig.JobExtractorConfig jobExtractorConfig,
+                       MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
                        MRRunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
                        List<String> configKeys) {
@@ -393,8 +393,8 @@ public class MRJobParser implements Runnable {
         Comparator<MRTask> byElapsedTimeDecrease = (e1, e2) -> -1 * Long.compare(e1.getElapsedTime(), e2.getElapsedTime());
         //2, get finished bottom n
         Iterator<MRTask> taskIteratorIncrease = tasks.stream()
-                .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
-                .sorted(byElapsedTimeIncrease).iterator();
+            .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
+            .sorted(byElapsedTimeIncrease).iterator();
         int i = 0;
         while (taskIteratorIncrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
             MRTask mrTask = taskIteratorIncrease.next();
@@ -405,8 +405,8 @@ public class MRJobParser implements Runnable {
         }
         //3, fetch finished top n
         Iterator<MRTask> taskIteratorDecrease = tasks.stream()
-                .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
-                .sorted(byElapsedTimeDecrease).iterator();
+            .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
+            .sorted(byElapsedTimeDecrease).iterator();
         i = 0;
         while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
             MRTask mrTask = taskIteratorDecrease.next();
@@ -417,8 +417,8 @@ public class MRJobParser implements Runnable {
         }
         //4, fetch running top n
         taskIteratorDecrease = tasks.stream()
-                .filter(task -> task.getState().equals(Constants.TaskState.RUNNING.toString()))
-                .sorted(byElapsedTimeDecrease).iterator();
+            .filter(task -> task.getState().equals(Constants.TaskState.RUNNING.toString()))
+            .sorted(byElapsedTimeDecrease).iterator();
         i = 0;
         while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
             MRTask mrTask = taskIteratorDecrease.next();
@@ -560,12 +560,12 @@ public class MRJobParser implements Runnable {
                     //we must flush entities before delete from zk in case of missing finish state of jobs
                     //delete from zk if needed
                     mrJobEntityMap.keySet()
-                            .stream()
-                            .filter(
-                                jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString())
-                                    || mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
-                            .forEach(
-                                jobId -> this.runningJobManager.delete(app.getId(), jobId));
+                        .stream()
+                        .filter(
+                            jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString())
+                                || mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
+                        .forEach(
+                            jobId -> this.runningJobManager.delete(app.getId(), jobId));
                 }
 
                 LOG.info("finish process yarn application " + app.getId());

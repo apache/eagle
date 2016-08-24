@@ -18,13 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.storm;
 
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
+import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
@@ -32,6 +26,13 @@ import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.jpm.util.resourcefetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
+
+import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichSpout;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,17 +41,18 @@ import java.util.*;
 
 public class MRRunningJobFetchSpout extends BaseRichSpout {
     private static final Logger LOG = LoggerFactory.getLogger(MRRunningJobFetchSpout.class);
-    private MRRunningConfigManager.JobExtractorConfig jobExtractorConfig;
-    private MRRunningConfigManager.EndpointConfig endpointConfig;
-    private MRRunningConfigManager.ZKStateConfig zkStateConfig;
+    private MRRunningJobConfig.JobExtractorConfig jobExtractorConfig;
+    private MRRunningJobConfig.EndpointConfig endpointConfig;
+    private MRRunningJobConfig.ZKStateConfig zkStateConfig;
     private ResourceFetcher resourceFetcher;
     private SpoutOutputCollector collector;
     private boolean init;
     private transient MRRunningJobManager runningJobManager;
     private Set<String> runningYarnApps;
-    public MRRunningJobFetchSpout(MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                                  MRRunningConfigManager.EndpointConfig endpointConfig,
-                                  MRRunningConfigManager.ZKStateConfig zkStateConfig) {
+
+    public MRRunningJobFetchSpout(MRRunningJobConfig.JobExtractorConfig jobExtractorConfig,
+                                  MRRunningJobConfig.EndpointConfig endpointConfig,
+                                  MRRunningJobConfig.ZKStateConfig zkStateConfig) {
         this.jobExtractorConfig = jobExtractorConfig;
         this.endpointConfig = endpointConfig;
         this.zkStateConfig = zkStateConfig;
