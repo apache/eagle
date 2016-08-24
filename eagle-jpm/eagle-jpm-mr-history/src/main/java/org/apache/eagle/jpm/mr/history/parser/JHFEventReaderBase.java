@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,6 +70,9 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
     protected final Configuration configuration;
 
+    private long sumMapTaskDuration;
+    private long sumReduceTaskDuration;
+
     public Constants.JobType fetchJobType(Configuration config) {
         if (config.get(Constants.JobConfiguration.CASCADING_JOB) != null) {
             return Constants.JobType.CASCADING;
@@ -121,6 +124,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         if (this.configuration != null && this.m_jobType == null) {
             this.setJobType(fetchJobType(this.configuration).toString());
         }
+        this.sumMapTaskDuration = 0l;
+        this.sumReduceTaskDuration = 0l;
     }
 
     public void register(HistoryJobEntityLifecycleListener lifecycleListener) {
@@ -269,6 +274,13 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                     m_jobExecutionEntity.setRackLocalMapsPercentage(m_jobExecutionEntity.getRackLocalMaps() * 1.0 / m_jobExecutionEntity.getTotalLaunchedMaps());
                 }
             }
+            m_jobExecutionEntity.setAvgMapTaskDuration(this.sumMapTaskDuration * 1.0 / m_numTotalMaps);
+            if (m_numTotalReduces == 0) {
+                m_jobExecutionEntity.setMaxReduceTaskDuration(0);
+                m_jobExecutionEntity.setAvgReduceTaskDuration(0);
+            } else {
+                m_jobExecutionEntity.setAvgReduceTaskDuration(this.sumReduceTaskDuration * 1.0 / m_numTotalReduces);
+            }
             entityCreated(m_jobExecutionEntity);
         }
     }
@@ -342,6 +354,20 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             if (taskType.equals(Constants.TaskType.REDUCE.toString()) && duration > m_jobExecutionEntity.getLastReduceDuration()) {
                 m_jobExecutionEntity.setLastReduceDuration(duration);
             }
+
+            if (taskType.equals(Constants.TaskType.MAP.toString()) && entity.getDuration() > m_jobExecutionEntity.getMaxMapTaskDuration()) {
+                m_jobExecutionEntity.setMaxMapTaskDuration(entity.getDuration());
+            }
+            if (taskType.equals(Constants.TaskType.REDUCE.toString()) && entity.getDuration() > m_jobExecutionEntity.getMaxReduceTaskDuration()) {
+                m_jobExecutionEntity.setMaxReduceTaskDuration(entity.getDuration());
+            }
+
+            if (taskType.equals(Constants.TaskType.MAP.toString())) {
+                this.sumMapTaskDuration += entity.getDuration();
+            } else {
+                this.sumReduceTaskDuration += entity.getDuration();
+            }
+
             entityCreated(entity);
             //_taskStartTime.remove(taskID); // clean this taskID
         } else if ((recType == RecordTypes.MapAttempt || recType == RecordTypes.ReduceAttempt) && startTime != null) { // task attempt start

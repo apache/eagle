@@ -73,6 +73,14 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     private long lastReduceDuration;
     @Column("s")
     private long durationTime;
+    @Column("u")
+    private double avgMapTaskDuration;
+    @Column("v")
+    private double avgReduceTaskDuration;
+    @Column("w")
+    private double maxMapTaskDuration;
+    @Column("x")
+    private double maxReduceTaskDuration;
 
     public long getDurationTime() {
         return durationTime;
@@ -226,5 +234,41 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     public void setLastReduceDuration(long lastReduceDuration) {
         this.lastReduceDuration = lastReduceDuration;
         valueChanged("lastReduceDuration");
+    }
+
+    public double getAvgMapTaskDuration() {
+        return avgMapTaskDuration;
+    }
+
+    public void setAvgMapTaskDuration(double avgMapTaskDuration) {
+        this.avgMapTaskDuration = avgMapTaskDuration;
+        valueChanged("avgMapTaskDuration");
+    }
+
+    public double getAvgReduceTaskDuration() {
+        return avgReduceTaskDuration;
+    }
+
+    public void setAvgReduceTaskDuration(double avgReduceTaskDuration) {
+        this.avgReduceTaskDuration = avgReduceTaskDuration;
+        valueChanged("avgReduceTaskDuration");
+    }
+
+    public double getMaxMapTaskDuration() {
+        return maxMapTaskDuration;
+    }
+
+    public void setMaxMapTaskDuration(double maxMapTaskDuration) {
+        this.maxMapTaskDuration = maxMapTaskDuration;
+        valueChanged("maxMapTaskDuration");
+    }
+
+    public double getMaxReduceTaskDuration() {
+        return maxReduceTaskDuration;
+    }
+
+    public void setMaxReduceTaskDuration(double maxReduceTaskDuration) {
+        this.maxReduceTaskDuration = maxReduceTaskDuration;
+        valueChanged("maxReduceTaskDuration");
     }
 }
