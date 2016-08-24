@@ -53,10 +53,10 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
 
     @Override
     public void jobEntityCreated(JobBaseAPIEntity entity) throws Exception {
-        if (entity != null ) {
+        if (entity != null) {
             if (entity instanceof TaskAttemptExecutionAPIEntity) {
                 taskAttemptEntityCreated((TaskAttemptExecutionAPIEntity) entity);
-            } else if(entity instanceof JobExecutionAPIEntity) {
+            } else if (entity instanceof JobExecutionAPIEntity) {
                 this.m_jobExecutionAPIEntity = (JobExecutionAPIEntity) entity;
             }
         }
@@ -74,24 +74,28 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
             JobCounters jobCounters = m_jobExecutionAPIEntity.getJobCounters();
 
             if (jobCounters == null) {
-                LOG.warn("no job counter found for "+this.m_jobExecutionAPIEntity);
+                LOG.warn("no job counter found for " + this.m_jobExecutionAPIEntity);
                 jobCounters = new JobCounters();
             }
 
-            Map<String,Map<String,Long>> counters = jobCounters.getCounters();
+            Map<String, Map<String, Long>> counters = jobCounters.getCounters();
 
-            Map<String,Long> mapTaskAttemptCounter = this.m_mapTaskAttemptCounterAgg.result();
-            if (mapTaskAttemptCounter == null) mapTaskAttemptCounter = new HashMap<>();
+            Map<String, Long> mapTaskAttemptCounter = this.m_mapTaskAttemptCounterAgg.result();
+            if (mapTaskAttemptCounter == null) {
+                mapTaskAttemptCounter = new HashMap<>();
+            }
             mapTaskAttemptCounter.put(Constants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.m_mapAttemptDuration);
-            counters.put(Constants.MAP_TASK_ATTEMPT_COUNTER,mapTaskAttemptCounter);
+            counters.put(Constants.MAP_TASK_ATTEMPT_COUNTER, mapTaskAttemptCounter);
 
-            Map<String,Long> reduceTaskAttemptCounter = this.m_reduceTaskAttemptCounterAgg.result();
-            if (reduceTaskAttemptCounter == null) reduceTaskAttemptCounter = new HashMap<>();
+            Map<String, Long> reduceTaskAttemptCounter = this.m_reduceTaskAttemptCounterAgg.result();
+            if (reduceTaskAttemptCounter == null) {
+                reduceTaskAttemptCounter = new HashMap<>();
+            }
             reduceTaskAttemptCounter.put(Constants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.m_reduceAttemptDuration);
-            counters.put(Constants.REDUCE_TASK_ATTEMPT_COUNTER,reduceTaskAttemptCounter);
+            counters.put(Constants.REDUCE_TASK_ATTEMPT_COUNTER, reduceTaskAttemptCounter);
 
             counters.put(Constants.MAP_TASK_ATTEMPT_FILE_SYSTEM_COUNTER, this.m_mapFileSystemCounterAgg.result());
-            counters.put(Constants.REDUCE_TASK_ATTEMPT_FILE_SYSTEM_COUNTER,this.m_reduceFileSystemTaskCounterAgg.result());
+            counters.put(Constants.REDUCE_TASK_ATTEMPT_FILE_SYSTEM_COUNTER, this.m_reduceFileSystemTaskCounterAgg.result());
 
             jobCounters.setCounters(counters);
 
@@ -122,9 +126,9 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            LOG.warn("Unknown task type of task attempt execution entity: "+objectMapper.writeValueAsString(entity));
+            LOG.warn("Unknown task type of task attempt execution entity: " + objectMapper.writeValueAsString(entity));
         } catch (Exception e) {
-            LOG.error(e.getMessage(),e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -137,13 +141,14 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
 
     interface JobCounterAggregateFunction {
         void accumulate(Map<String, Long> mapCounters);
-        Map<String,Long> result();
+
+        Map<String, Long> result();
     }
 
     static class JobCounterSumFunction implements JobCounterAggregateFunction {
         final Map<String, Long> result;
 
-        public JobCounterSumFunction(){
+        public JobCounterSumFunction() {
             result = new HashMap<>();
         }
 
@@ -153,7 +158,7 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
         @Override
         public void accumulate(Map<String, Long> counters) {
             if (counters != null) {
-                for (Map.Entry<String,Long> taskEntry: counters.entrySet()) {
+                for (Map.Entry<String, Long> taskEntry : counters.entrySet()) {
                     String counterName = taskEntry.getKey();
                     long counterValue = taskEntry.getValue();
 
