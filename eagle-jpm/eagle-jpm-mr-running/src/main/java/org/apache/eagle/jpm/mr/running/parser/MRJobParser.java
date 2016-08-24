@@ -18,8 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.parser;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
+import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobConfig;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
@@ -33,7 +32,8 @@ import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
 import org.apache.eagle.jpm.util.resourceFetch.connection.URLConnectionUtils;
 import org.apache.eagle.jpm.util.resourceFetch.model.*;
-import org.apache.eagle.jpm.util.resourceFetch.model.JobCounters;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -43,12 +43,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.*;
 import java.util.function.Function;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class MRJobParser implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobParser.class);
@@ -58,6 +58,7 @@ public class MRJobParser implements Runnable {
         FINISHED,
         APP_FINISHED
     }
+
     private AppInfo app;
     private static final int MAX_RETRY_TIMES = 2;
     private MRJobEntityCreationHandler mrJobEntityCreationHandler;
@@ -77,13 +78,14 @@ public class MRJobParser implements Runnable {
     private boolean first;
     private Set<String> finishedTaskIds;
     private List<String> configKeys;
-    private MRRunningConfigManager.JobExtractorConfig jobExtractorConfig;
+    private MRRunningJobConfig.JobExtractorConfig jobExtractorConfig;
+
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public MRJobParser(MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                       MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
+    public MRJobParser(MRRunningJobConfig.JobExtractorConfig jobExtractorConfig,
+                       MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
                        MRRunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
                        List<String> configKeys) {
@@ -102,7 +104,7 @@ public class MRJobParser implements Runnable {
         this.commonTags.put(MRJobTagName.USER.toString(), app.getUser());
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
-        this.parserStatus  = ParserStatus.FINISHED;
+        this.parserStatus = ParserStatus.FINISHED;
         this.rmResourceFetcher = rmResourceFetcher;
         this.first = true;
         this.finishedTaskIds = new HashSet<>();
@@ -187,7 +189,7 @@ public class MRJobParser implements Runnable {
                 mrJobEntityMap.put(id, new JobExecutionAPIEntity());
             }
 
-            String jobDefId = JobNameNormalization.getInstance().normalize(mrJob.getName());
+            final String jobDefId = JobNameNormalization.getInstance().normalize(mrJob.getName());
             JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(id);
             jobExecutionAPIEntity.setTags(new HashMap<>(commonTags));
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_ID.toString(), id);
@@ -248,7 +250,9 @@ public class MRJobParser implements Runnable {
             Utils.closeInputStream(is);
         }
 
-        if (jobCounters.getCounterGroup() == null) return true;
+        if (jobCounters.getCounterGroup() == null) {
+            return true;
+        }
         JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(jobId);
         org.apache.eagle.jpm.util.jobcounter.JobCounters jobCounter = new org.apache.eagle.jpm.util.jobcounter.JobCounters();
         Map<String, Map<String, Long>> groups = new HashMap<>();
@@ -261,17 +265,19 @@ public class MRJobParser implements Runnable {
 
             Map<String, Long> counterValues = groups.get(counterGroupName);
             List<JobCounterItem> items = jobCounterGroup.getCounter();
-            if (items == null) continue;
+            if (items == null) {
+                continue;
+            }
             for (JobCounterItem item : items) {
                 String key = item.getName();
                 counterValues.put(key, item.getTotalCounterValue());
                 if (counterGroupName.equals(Constants.JOB_COUNTER)) {
                     if (key.equals(Constants.JobCounter.DATA_LOCAL_MAPS.toString())) {
-                        jobExecutionAPIEntity.setDataLocalMaps((int)item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setDataLocalMaps((int) item.getTotalCounterValue());
                     } else if (key.equals(Constants.JobCounter.RACK_LOCAL_MAPS.toString())) {
-                        jobExecutionAPIEntity.setRackLocalMaps((int)item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setRackLocalMaps((int) item.getTotalCounterValue());
                     } else if (key.equals(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString())) {
-                        jobExecutionAPIEntity.setTotalLaunchedMaps((int)item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setTotalLaunchedMaps((int) item.getTotalCounterValue());
                     }
                 }
             }
@@ -280,8 +286,10 @@ public class MRJobParser implements Runnable {
         jobCounter.setCounters(groups);
         jobExecutionAPIEntity.setJobCounters(jobCounter);
         if (jobExecutionAPIEntity.getTotalLaunchedMaps() > 0) {
-            jobExecutionAPIEntity.setDataLocalMapsPercentage(jobExecutionAPIEntity.getDataLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
-            jobExecutionAPIEntity.setRackLocalMapsPercentage(jobExecutionAPIEntity.getRackLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
+            jobExecutionAPIEntity.setDataLocalMapsPercentage(
+                jobExecutionAPIEntity.getDataLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
+            jobExecutionAPIEntity.setRackLocalMapsPercentage(
+                jobExecutionAPIEntity.getRackLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
         }
         return true;
     };
@@ -290,7 +298,13 @@ public class MRJobParser implements Runnable {
         org.apache.eagle.jpm.util.jobcounter.JobCounters jobCounter = new org.apache.eagle.jpm.util.jobcounter.JobCounters();
         String jobId = jobAndTaskId.getLeft();
         String taskId = jobAndTaskId.getRight();
-        String taskCounterURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_TASKS_URL + "/" + taskId + "/" + Constants.MR_JOB_COUNTERS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
+        String taskCounterURL = app.getTrackingUrl()
+            + Constants.MR_JOBS_URL
+            + "/" + jobId
+            + "/" + Constants.MR_TASKS_URL
+            + "/" + taskId
+            + "/" + Constants.MR_JOB_COUNTERS_URL
+            + "?" + Constants.ANONYMOUS_PARAMETER;
         InputStream is = null;
         TaskCounters taskCounters = null;
         try {
@@ -304,7 +318,9 @@ public class MRJobParser implements Runnable {
             Utils.closeInputStream(is);
         }
 
-        if (taskCounters.getTaskCounterGroup() == null) return jobCounter;
+        if (taskCounters.getTaskCounterGroup() == null) {
+            return jobCounter;
+        }
         Map<String, Map<String, Long>> groups = new HashMap<>();
 
         for (TaskCounterGroup taskCounterGroup : taskCounters.getTaskCounterGroup()) {
@@ -314,7 +330,9 @@ public class MRJobParser implements Runnable {
 
             Map<String, Long> counterValues = groups.get(taskCounterGroup.getCounterGroupName());
             List<TaskCounterItem> items = taskCounterGroup.getCounter();
-            if (items == null) continue;
+            if (items == null) {
+                continue;
+            }
             for (TaskCounterItem item : items) {
                 counterValues.put(item.getName(), item.getValue());
             }
@@ -328,7 +346,14 @@ public class MRJobParser implements Runnable {
     private Function<Pair<String, String>, TaskAttemptExecutionAPIEntity> fetchTaskAttempt = jobAndTaskId -> {
         String jobId = jobAndTaskId.getLeft();
         String taskId = jobAndTaskId.getRight();
-        String taskAttemptURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_TASKS_URL + "/" + taskId + "/" + Constants.MR_TASK_ATTEMPTS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
+        String taskAttemptURL = app.getTrackingUrl()
+            + Constants.MR_JOBS_URL
+            + "/" + jobId
+            + "/" + Constants.MR_TASKS_URL
+            + "/" + taskId
+            + "/" + Constants.MR_TASK_ATTEMPTS_URL
+            + "?" + Constants.ANONYMOUS_PARAMETER;
+
         InputStream is = null;
         List<MRTaskAttempt> taskAttempts = null;
         try {
@@ -377,8 +402,8 @@ public class MRJobParser implements Runnable {
         Comparator<MRTask> byElapsedTimeDecrease = (e1, e2) -> -1 * Long.compare(e1.getElapsedTime(), e2.getElapsedTime());
         //2, get finished bottom n
         Iterator<MRTask> taskIteratorIncrease = tasks.stream()
-                .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
-                .sorted(byElapsedTimeIncrease).iterator();
+            .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
+            .sorted(byElapsedTimeIncrease).iterator();
         int i = 0;
         while (taskIteratorIncrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
             MRTask mrTask = taskIteratorIncrease.next();
@@ -389,8 +414,8 @@ public class MRJobParser implements Runnable {
         }
         //3, fetch finished top n
         Iterator<MRTask> taskIteratorDecrease = tasks.stream()
-                .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
-                .sorted(byElapsedTimeDecrease).iterator();
+            .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
+            .sorted(byElapsedTimeDecrease).iterator();
         i = 0;
         while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
             MRTask mrTask = taskIteratorDecrease.next();
@@ -401,8 +426,8 @@ public class MRJobParser implements Runnable {
         }
         //4, fetch running top n
         taskIteratorDecrease = tasks.stream()
-                .filter(task -> task.getState().equals(Constants.TaskState.RUNNING.toString()))
-                .sorted(byElapsedTimeDecrease).iterator();
+            .filter(task -> task.getState().equals(Constants.TaskState.RUNNING.toString()))
+            .sorted(byElapsedTimeDecrease).iterator();
         i = 0;
         while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
             MRTask mrTask = taskIteratorDecrease.next();
@@ -463,10 +488,10 @@ public class MRJobParser implements Runnable {
 
             mrJobEntityCreationHandler.add(taskExecutionAPIEntity);
 
-            if (task.getState().equals(Constants.TaskState.SUCCEEDED.toString()) ||
-                    task.getState().equals(Constants.TaskState.FAILED.toString()) ||
-                    task.getState().equals(Constants.TaskState.KILLED.toString()) ||
-                    task.getState().equals(Constants.TaskState.KILL_WAIT.toString())) {
+            if (task.getState().equals(Constants.TaskState.SUCCEEDED.toString())
+                || task.getState().equals(Constants.TaskState.FAILED.toString())
+                || task.getState().equals(Constants.TaskState.KILLED.toString())
+                || task.getState().equals(Constants.TaskState.KILL_WAIT.toString())) {
                 //LOG.info("mr job {} task {} has finished", jobId, task.getId());
                 this.finishedTaskIds.add(task.getId());
             }
@@ -544,12 +569,12 @@ public class MRJobParser implements Runnable {
                     //we must flush entities before delete from zk in case of missing finish state of jobs
                     //delete from zk if needed
                     mrJobEntityMap.keySet()
-                            .stream()
-                            .filter(
-                                    jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString()) ||
-                                            mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
-                            .forEach(
-                                    jobId -> this.runningJobManager.delete(app.getId(), jobId));
+                        .stream()
+                        .filter(
+                            jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString())
+                                || mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
+                        .forEach(
+                            jobId -> this.runningJobManager.delete(app.getId(), jobId));
                 }
 
                 LOG.info("finish process yarn application " + app.getId());

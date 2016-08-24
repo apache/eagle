@@ -18,11 +18,12 @@
 
 package org.apache.eagle.jpm.mr.running.recover;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
+import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.*;
@@ -30,7 +31,7 @@ import java.util.*;
 public class MRRunningJobManager implements Serializable {
     private RunningJobManager runningJobManager;
 
-    public MRRunningJobManager(MRRunningConfigManager.ZKStateConfig config) {
+    public MRRunningJobManager(MRRunningJobConfig.ZKStateConfig config) {
         this.runningJobManager = new RunningJobManager(config.zkQuorum,
                 config.zkSessionTimeoutMs, config.zkRetryTimes, config.zkRetryInterval, config.zkRoot);
     }

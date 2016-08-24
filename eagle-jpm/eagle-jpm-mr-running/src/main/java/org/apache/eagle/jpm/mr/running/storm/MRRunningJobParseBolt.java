@@ -18,12 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.storm;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Tuple;
-import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
+import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.running.parser.MRJobParser;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
@@ -31,6 +26,12 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
+
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,19 +42,20 @@ import java.util.concurrent.Executors;
 public class MRRunningJobParseBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(MRRunningJobParseBolt.class);
 
-    private MRRunningConfigManager.EndpointConfig endpointConfig;
-    private MRRunningConfigManager.JobExtractorConfig jobExtractorConfig;
-    private MRRunningConfigManager.ZKStateConfig zkStateConfig;
+    private MRRunningJobConfig.EndpointConfig endpointConfig;
+    private MRRunningJobConfig.JobExtractorConfig jobExtractorConfig;
+    private MRRunningJobConfig.ZKStateConfig zkStateConfig;
     private ExecutorService executorService;
     private Map<String, MRJobParser> runningMRParsers;
     private transient MRRunningJobManager runningJobManager;
-    private MRRunningConfigManager.EagleServiceConfig eagleServiceConfig;
+    private MRRunningJobConfig.EagleServiceConfig eagleServiceConfig;
     private ResourceFetcher resourceFetcher;
     private List<String> configKeys;
-    public MRRunningJobParseBolt(MRRunningConfigManager.EagleServiceConfig eagleServiceConfig,
-                                 MRRunningConfigManager.EndpointConfig endpointConfig,
-                                 MRRunningConfigManager.JobExtractorConfig jobExtractorConfig,
-                                 MRRunningConfigManager.ZKStateConfig zkStateConfig,
+
+    public MRRunningJobParseBolt(MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
+                                 MRRunningJobConfig.EndpointConfig endpointConfig,
+                                 MRRunningJobConfig.JobExtractorConfig jobExtractorConfig,
+                                 MRRunningJobConfig.ZKStateConfig zkStateConfig,
                                  List<String> configKeys) {
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;
@@ -96,8 +98,8 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
                     LOG.info("remove parser {}", appId);
                 });
 
-        if (appInfo.getState().equals(Constants.AppState.FINISHED.toString()) ||
-                applicationParser.status() == MRJobParser.ParserStatus.FINISHED) {
+        if (appInfo.getState().equals(Constants.AppState.FINISHED.toString())
+            || applicationParser.status() == MRJobParser.ParserStatus.FINISHED) {
             applicationParser.setStatus(MRJobParser.ParserStatus.RUNNING);
             executorService.execute(applicationParser);
         }
