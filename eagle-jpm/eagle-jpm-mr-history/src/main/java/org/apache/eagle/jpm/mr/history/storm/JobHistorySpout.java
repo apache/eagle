@@ -18,19 +18,20 @@
 
 package org.apache.eagle.jpm.mr.history.storm;
 
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
-import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
+import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.*;
-import org.apache.eagle.jpm.mr.historyentity.JobProcessTimeStampEntity;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
+import org.apache.eagle.jpm.mr.historyentity.JobProcessTimeStampEntity;
 import org.apache.eagle.jpm.util.JobIdFilter;
 import org.apache.eagle.jpm.util.JobIdFilterByPartition;
 import org.apache.eagle.jpm.util.JobIdPartitioner;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
+
+import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichSpout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,28 +44,30 @@ import java.util.Map;
 /**
  * Zookeeper znode structure
  * -zkRoot
- *   - partitions
- *      - 0 (20150101)
- *      - 1 (20150101)
- *      - 2 (20150101)
- *      - ... ...
- *      - N-1 (20150102)
- *   - jobs
- *      - 20150101
- *        - job1
- *        - job2
- *        - job3
- *      - 20150102
- *        - job1
- *        - job2
- *        - job3
- *
+ * - partitions
+ * - 0 (20150101)
+ * - 1 (20150101)
+ * - 2 (20150101)
+ * - ... ...
+ * - N-1 (20150102)
+ * - jobs
+ * - 20150101
+ * - job1
+ * - job2
+ * - job3
+ * - 20150102
+ * - job1
+ * - job2
+ * - job3
+ * <p>
  * Spout can have multiple instances, which is supported by storm parallelism primitive.
- *
+ * </p>
+ * <p>
  * Under znode partitions, N child znodes (name is 0 based integer) would be created with each znode mapped to one spout instance. All jobs will be partitioned into N
  * partitions by applying JobPartitioner class to each job Id. The value of each partition znode is the date when the last job in this partition
  * is successfully processed.
- *
+ * </p>
+ * <p>
  * processing steps
  * 1) In constructor,
  * 2) In open(), calculate jobPartitionId for current spout (which should be exactly same to spout taskId within TopologyContext)
@@ -74,10 +77,9 @@ import java.util.Map;
  * 7) process job files (job history file and job configuration xml file)
  * 8) add job Id to current date slot say for example 20150102 after this job is successfully processed
  * 9) clean up all slots with date less than currentProcessDate - 2 days. (2 days should be configurable)
- *
+ * </p>
  * Note:
  * if one spout instance crashes and is brought up again, open() method would be invoked again, we need think of this scenario.
- *
  */
 
 public class JobHistorySpout extends BaseRichSpout {
@@ -90,20 +92,18 @@ public class JobHistorySpout extends BaseRichSpout {
     private JobHistoryContentFilter contentFilter;
     private JobHistorySpoutCollectorInterceptor interceptor;
     private JHFInputStreamCallback callback;
-    private JHFConfigManager configManager;
-    private JobHistoryLCM m_jhfLCM;
-    private final static int MAX_RETRY_TIMES = 3;
+    private MRHistoryJobConfig configManager;
+    private JobHistoryLCM jhfLCM;
+    private static final int MAX_RETRY_TIMES = 3;
 
-    public JobHistorySpout(JobHistoryContentFilter filter, JHFConfigManager configManager) {
+    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig configManager) {
         this(filter, configManager, new JobHistorySpoutCollectorInterceptor());
     }
 
     /**
-     * mostly this constructor signature is for unit test purpose as you can put customized interceptor here
-     * @param filter
-     * @param adaptor
+     * mostly this constructor signature is for unit test purpose as you can put customized interceptor here.
      */
-    public JobHistorySpout(JobHistoryContentFilter filter, JHFConfigManager configManager, JobHistorySpoutCollectorInterceptor adaptor) {
+    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig configManager, JobHistorySpoutCollectorInterceptor adaptor) {
         this.contentFilter = filter;
         this.configManager = configManager;
         this.interceptor = adaptor;
@@ -131,15 +131,15 @@ public class JobHistorySpout extends BaseRichSpout {
         partitionId = calculatePartitionId(context);
         // sanity verify 0<=partitionId<=numTotalPartitions-1
         if (partitionId < 0 || partitionId > numTotalPartitions) {
-            throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId " +
-                    partitionId + " and numTotalPartitions " + numTotalPartitions);
+            throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId "
+                + partitionId + " and numTotalPartitions " + numTotalPartitions);
         }
         Class<? extends JobIdPartitioner> partitionerCls = configManager.getControlConfig().partitionerCls;
         JobIdPartitioner partitioner;
         try {
             partitioner = partitionerCls.newInstance();
         } catch (Exception e) {
-            LOG.error("failing instantiating job partitioner class " + partitionerCls,e);
+            LOG.error("failing instantiating job partitioner class " + partitionerCls, e);
             throw new IllegalStateException(e);
         }
         JobIdFilter jobIdFilter = new JobIdFilterByPartition(partitioner, numTotalPartitions, partitionId);
@@ -148,14 +148,14 @@ public class JobHistorySpout extends BaseRichSpout {
         interceptor.setSpoutOutputCollector(collector);
 
         try {
-            m_jhfLCM = new JobHistoryDAOImpl(configManager.getJobHistoryEndpointConfig());
+            jhfLCM = new JobHistoryDAOImpl(configManager.getJobHistoryEndpointConfig());
             driver = new JHFCrawlerDriverImpl(configManager.getJobHistoryEndpointConfig(),
-                    configManager.getControlConfig(),
-                    callback,
-                    zkState,
-                    m_jhfLCM,
-                    jobIdFilter,
-                    partitionId);
+                configManager.getControlConfig(),
+                callback,
+                zkState,
+                jhfLCM,
+                jobIdFilter,
+                partitionId);
         } catch (Exception e) {
             LOG.error("failing creating crawler driver");
             throw new IllegalStateException(e);
@@ -171,7 +171,7 @@ public class JobHistorySpout extends BaseRichSpout {
         } catch (Exception ex) {
             LOG.error("fail crawling job history file and continue ...", ex);
             try {
-                m_jhfLCM.freshFileSystem();
+                jhfLCM.freshFileSystem();
             } catch (Exception e) {
                 LOG.error("failed to fresh file system ", e);
             }
@@ -179,27 +179,27 @@ public class JobHistorySpout extends BaseRichSpout {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
-
+                // ignored
             }
         }
     }
 
     /**
-     * empty because framework will take care of output fields declaration
+     * empty because framework will take care of output fields declaration.
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
     }
 
     /**
-     * add to processedJob
+     * add to processedJob.
      */
     @Override
     public void ack(Object jobId) {
     }
 
     /**
-     * job is not fully processed
+     * job is not fully processed.
      */
     @Override
     public void fail(Object jobId) {
@@ -227,26 +227,28 @@ public class JobHistorySpout extends BaseRichSpout {
             }
         }
 
-        if (minTimeStamp == 0l) {
+        if (minTimeStamp == 0L) {
             return;
         }
 
         LOG.info("update process time stamp {}", minTimeStamp);
-        final JHFConfigManager.EagleServiceConfig eagleServiceConfig = configManager.getEagleServiceConfig();
-        final JHFConfigManager.JobExtractorConfig jobExtractorConfig = configManager.getJobExtractorConfig();
-        Map<String, String> baseTags = new HashMap<String, String>() { {
-            put("site", jobExtractorConfig.site);
-        } };
+        final MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = configManager.getEagleServiceConfig();
+        final MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig = configManager.getJobExtractorConfig();
+        Map<String, String> baseTags = new HashMap<String, String>() {
+            {
+                put("site", jobExtractorConfig.site);
+            }
+        };
         JobProcessTimeStampEntity entity = new JobProcessTimeStampEntity();
         entity.setCurrentTimeStamp(minTimeStamp);
         entity.setTimestamp(minTimeStamp);
         entity.setTags(baseTags);
 
         IEagleServiceClient client = new EagleServiceClientImpl(
-                eagleServiceConfig.eagleServiceHost,
-                eagleServiceConfig.eagleServicePort,
-                eagleServiceConfig.username,
-                eagleServiceConfig.password);
+            eagleServiceConfig.eagleServiceHost,
+            eagleServiceConfig.eagleServicePort,
+            eagleServiceConfig.username,
+            eagleServiceConfig.password);
 
         client.getJerseyClient().setReadTimeout(jobExtractorConfig.readTimeoutSeconds * 1000);
 
@@ -267,7 +269,7 @@ public class JobHistorySpout extends BaseRichSpout {
                     LOG.error("Got exception to flush, reach max retry times " + MAX_RETRY_TIMES, ex);
                 }
             }
-            tried ++;
+            tried++;
         }
 
         client.getJerseyClient().destroy();

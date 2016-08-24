@@ -24,15 +24,15 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Callback interface for reading back log events from JobHistory. This interface 
- * should be implemented and passed to JobHistory.parseHistory() 
- *
+ * Callback interface for reading back log events from JobHistory. This interface
+ * should be implemented and passed to JobHistory.parseHistory()
  */
-public interface JHFMRVer1PerLineListener{
+public interface JHFMRVer1PerLineListener {
     /**
-     * Callback method for history parser. 
-     * @param recType type of record, which is the first entry in the line. 
-     * @param values a map of key-value pairs as thry appear in history.
+     * Callback method for history parser.
+     *
+     * @param recType type of record, which is the first entry in the line.
+     * @param values  a map of key-value pairs as thry appear in history.
      * @throws IOException
      */
     void handle(RecordTypes recType, Map<Keys, String> values) throws Exception;

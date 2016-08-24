@@ -18,11 +18,12 @@
 
 package org.apache.eagle.jpm.mr.history.zkres;
 
+import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.ZKStateConfig;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.RetryNTimes;
-import org.apache.eagle.jpm.mr.history.common.JHFConfigManager.ZKStateConfig;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +46,10 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
 
     private CuratorFramework newCurator(ZKStateConfig config) throws Exception {
         return CuratorFrameworkFactory.newClient(
-                config.zkQuorum,
-                config.zkSessionTimeoutMs,
-                15000,
-                new RetryNTimes(config.zkRetryTimes, config.zkRetryInterval)
+            config.zkQuorum,
+            config.zkSessionTimeoutMs,
+            15000,
+            new RetryNTimes(config.zkRetryTimes, config.zkRetryInterval)
         );
     }
 
@@ -86,7 +87,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
             if (_curator.checkExists().forPath(path) != null) {
                 _curator.delete().forPath(path);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             LOG.error("fail reading forceStartFrom znode", ex);
         }
     }
@@ -102,27 +103,28 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     /**
      * under zkRoot, znode forceStartFrom is used to force job is crawled from that date
      * IF
-     *    forceStartFrom znode is provided, and its value is valid date with format "YYYYMMDD",
+     * forceStartFrom znode is provided, and its value is valid date with format "YYYYMMDD",
      * THEN
-     *    rebuild all partitions with the forceStartFrom
+     * rebuild all partitions with the forceStartFrom
      * ELSE
-     *    IF
-     *       partition structure is changed
-     *    THEN
-     *       IF
-     *          there is valid mindate for existing partitions
-     *       THEN
-     *          rebuild job partitions from that valid mindate
-     *       ELSE
-     *          rebuild job partitions from (today - BACKOFF_DAYS)
-     *       END
-     *    ELSE
-     *      do nothing
-     *    END
+     * IF
+     * partition structure is changed
+     * THEN
+     * IF
+     * there is valid mindate for existing partitions
+     * THEN
+     * rebuild job partitions from that valid mindate
+     * ELSE
+     * rebuild job partitions from (today - BACKOFF_DAYS)
      * END
-     *
-     *
+     * ELSE
+     * do nothing
+     * END
+     * END
+     * <p>
      * forceStartFrom is deleted once its value is used, so next time when topology is restarted, program can run from where topology is stopped last time
+     * </p>
+     * .
      */
     @Override
     public void ensureJobPartitions(int numTotalPartitions) {
@@ -137,7 +139,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
             if (forceStartFrom != null) {
                 try {
                     minDate = Integer.valueOf(forceStartFrom);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     LOG.error("failing converting forceStartFrom znode value to integer with value " + forceStartFrom);
                     throw new IllegalStateException();
                 }
@@ -153,16 +155,18 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
                         LOG.info("znode partitions structure is changed, current partition count " + currentCount + ", future count " + numTotalPartitions);
                     }
                 }
-                if (!structureChanged)
+                if (!structureChanged) {
                     return; // do nothing
+                }
 
                 if (pathExists) {
                     List<String> partitions = _curator.getChildren().forPath(path);
                     for (String partition : partitions) {
                         String date = new String(_curator.getData().forPath(path + "/" + partition), "UTF-8");
                         int tmp = Integer.valueOf(date);
-                        if(tmp < minDate)
+                        if (tmp < minDate) {
                             minDate = tmp;
+                        }
                     }
                 }
 
@@ -178,7 +182,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         } finally {
             try {
                 lock.release();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 LOG.error("fail releasing lock", e);
                 throw new RuntimeException(e);
             }
@@ -195,9 +199,9 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
 
         for (int i = 0; i < numTotalPartitions; i++) {
             _curator.create()
-                    .creatingParentsIfNeeded()
-                    .withMode(CreateMode.PERSISTENT)
-                    .forPath(path + "/" + i, startingDate.getBytes("UTF-8"));
+                .creatingParentsIfNeeded()
+                .withMode(CreateMode.PERSISTENT)
+                .forPath(path + "/" + i, startingDate.getBytes("UTF-8"));
         }
     }
 
@@ -222,9 +226,9 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         try {
             if (_curator.checkExists().forPath(path) == null) {
                 _curator.create()
-                        .creatingParentsIfNeeded()
-                        .withMode(CreateMode.PERSISTENT)
-                        .forPath(path, date.getBytes("UTF-8"));
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.PERSISTENT)
+                    .forPath(path, date.getBytes("UTF-8"));
             } else {
                 _curator.setData().forPath(path, date.getBytes("UTF-8"));
             }
@@ -240,9 +244,9 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         try {
             if (_curator.checkExists().forPath(path) == null) {
                 _curator.create()
-                        .creatingParentsIfNeeded()
-                        .withMode(CreateMode.PERSISTENT)
-                        .forPath(path);
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.PERSISTENT)
+                    .forPath(path);
             } else {
                 _curator.setData().forPath(path);
             }
@@ -311,10 +315,10 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         try {
             if (_curator.checkExists().forPath(path) == null) {
                 _curator.create()
-                        .creatingParentsIfNeeded()
-                        .withMode(CreateMode.PERSISTENT)
-                        .forPath(path);
-                return 0l;
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.PERSISTENT)
+                    .forPath(path);
+                return 0L;
             } else {
                 return Long.parseLong(new String(_curator.getData().forPath(path), "UTF-8"));
             }
@@ -330,9 +334,9 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         try {
             if (_curator.checkExists().forPath(path) == null) {
                 _curator.create()
-                        .creatingParentsIfNeeded()
-                        .withMode(CreateMode.PERSISTENT)
-                        .forPath(path);
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.PERSISTENT)
+                    .forPath(path);
             }
 
             _curator.setData().forPath(path, (timeStamp + "").getBytes("UTF-8"));
