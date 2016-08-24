@@ -32,8 +32,9 @@ public class OozieMetadataDAOImpl implements OozieMetadataDAO {
     private OozieMetadataAccessConfig config;
 
     public OozieMetadataDAOImpl(OozieMetadataAccessConfig config) {
-        if (config.getAccessType() == null)
+        if (config.getAccessType() == null) {
             throw new BadOozieMetadataAccessConfigException("access Type is null, options: [oozie_api]");
+        }
         this.config = config;
     }
 

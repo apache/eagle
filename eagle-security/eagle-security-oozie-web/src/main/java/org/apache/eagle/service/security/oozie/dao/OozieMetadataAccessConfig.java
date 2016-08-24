@@ -61,26 +61,26 @@ public class OozieMetadataAccessConfig {
         return "accessType:" + accessType + ",oozieUrl:" + oozieUrl + ",filter:" + filter + ",authType:" + authType;
     }
 
-    public final static class OOZIECONF {
-        public final static String ACCESSTYPE = "accessType";
-        public final static String OOZIEURL = "oozieUrl";
-        public final static String FILTER = "filter";
-        public final static String AUTHTYPE = "authType";
+    public static final class OozieConf {
+        public static final String ACCESSTYPE = "accessType";
+        public static final String OOZIEURL = "oozieUrl";
+        public static final String FILTER = "filter";
+        public static final String AUTHTYPE = "authType";
     }
 
     public static OozieMetadataAccessConfig config2Entity(Config config) {
         OozieMetadataAccessConfig oozieconf = new OozieMetadataAccessConfig();
-        if(config.hasPath(OOZIECONF.ACCESSTYPE)) {
-            oozieconf.setAccessType(config.getString(OOZIECONF.ACCESSTYPE));
+        if (config.hasPath(OozieConf.ACCESSTYPE)) {
+            oozieconf.setAccessType(config.getString(OozieConf.ACCESSTYPE));
         }
-        if(config.hasPath(OOZIECONF.OOZIEURL)) {
-            oozieconf.setOozieUrl(config.getString(OOZIECONF.OOZIEURL));
+        if (config.hasPath(OozieConf.OOZIEURL)) {
+            oozieconf.setOozieUrl(config.getString(OozieConf.OOZIEURL));
         }
-        if(config.hasPath(OOZIECONF.FILTER)) {
-            oozieconf.setFilter(config.getString(OOZIECONF.FILTER));
+        if (config.hasPath(OozieConf.FILTER)) {
+            oozieconf.setFilter(config.getString(OozieConf.FILTER));
         }
-        if(config.hasPath(OOZIECONF.AUTHTYPE)) {
-            oozieconf.setAuthType(config.getString(OOZIECONF.AUTHTYPE));
+        if (config.hasPath(OozieConf.AUTHTYPE)) {
+            oozieconf.setAuthType(config.getString(OozieConf.AUTHTYPE));
         }
         return oozieconf;
     }

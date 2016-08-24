@@ -27,32 +27,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OozieSensitivityMetadataDAOImpl implements OozieSensitivityMetadataDAO{
+public class OozieSensitivityMetadataDAOImpl implements OozieSensitivityMetadataDAO {
     private static Logger LOG = LoggerFactory.getLogger(OozieSensitivityMetadataDAOImpl.class);
 
     @Override
-    public Map<String, Map<String, String>> getAllOozieSensitivityMap(){
+    public Map<String, Map<String, String>> getAllOozieSensitivityMap() {
         GenericEntityServiceResource resource = new GenericEntityServiceResource();
         /* parameters are: query, startTime, endTime, pageSzie, startRowkey, treeAgg, timeSeries, intervalmin, top, filterIfMissing,
         * parallel, metricName*/
         GenericServiceAPIResponseEntity ret = resource.search("OozieResourceSensitivityService[]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
                 0, null, false);
         List<OozieResourceSensitivityAPIEntity> list = (List<OozieResourceSensitivityAPIEntity>) ret.getObj();
-        if( list == null )
+        if (list == null) {
             return Collections.emptyMap();
+        }
         Map<String, Map<String, String>> res = new HashMap<String, Map<String, String>>();
 
-        for(OozieResourceSensitivityAPIEntity entity : list){
+        for (OozieResourceSensitivityAPIEntity entity : list) {
             String site = entity.getTags().get("site");
-            if(entity.getTags().containsKey("oozieResource")) {
-                if(res.get(site) == null){
+            if (entity.getTags().containsKey("oozieResource")) {
+                if (res.get(site) == null) {
                     res.put(site, new HashMap<String, String>());
                 }
                 Map<String, String> resSensitivityMap = res.get(site);
                 resSensitivityMap.put(entity.getTags().get("oozieResource"), entity.getSensitivityType());
-            }
-            else {
-                if(LOG.isDebugEnabled()) {
+            } else {
+                if (LOG.isDebugEnabled()) {
                     LOG.debug("An invalid sensitivity entity is detected" + entity);
                 }
             }
@@ -61,17 +61,18 @@ public class OozieSensitivityMetadataDAOImpl implements OozieSensitivityMetadata
     }
 
     @Override
-    public Map<String, String> getOozieSensitivityMap(String site){
+    public Map<String, String> getOozieSensitivityMap(String site) {
         GenericEntityServiceResource resource = new GenericEntityServiceResource();
         String queryFormat = "OozieResourceSensitivityService[@site=\"%s\"]{*}";
         GenericServiceAPIResponseEntity ret = resource.search(String.format(queryFormat, site), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,
                 0, null, false);
         List<OozieResourceSensitivityAPIEntity> list = (List<OozieResourceSensitivityAPIEntity>) ret.getObj();
-        if( list == null )
+        if (list == null) {
             return Collections.emptyMap();
+        }
         Map<String, String> resSensitivityMap = new HashMap<String, String>();
-        for(OozieResourceSensitivityAPIEntity entity : list){
-            if(entity.getTags().containsKey("oozieResource")) {
+        for (OozieResourceSensitivityAPIEntity entity : list) {
+            if (entity.getTags().containsKey("oozieResource")) {
                 resSensitivityMap.put(entity.getTags().get("oozieResource"), entity.getSensitivityType());
             }
         }
