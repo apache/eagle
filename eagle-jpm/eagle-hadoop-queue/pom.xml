@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-stream-process-api</artifactId>
+            <artifactId>eagle-data-process</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>

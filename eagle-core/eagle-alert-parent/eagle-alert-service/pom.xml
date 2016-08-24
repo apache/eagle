@@ -16,50 +16,50 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.apache.eagle</groupId>
-		<artifactId>eagle-alert-parent</artifactId>
-		<version>0.5.0-incubating-SNAPSHOT</version>
+    <parent>
+        <groupId>org.apache.eagle</groupId>
+        <artifactId>eagle-alert-parent</artifactId>
+        <version>0.5.0-incubating-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
-	</parent>
+    </parent>
 
-	<artifactId>eagle-alert-service</artifactId>
-	<packaging>jar</packaging>
-	<name>eagle-alert-service</name>
+    <artifactId>eagle-alert-service</artifactId>
+    <packaging>jar</packaging>
+    <name>eagle-alert-service</name>
 
-	<dependencies>
-	  	<dependency>
-  			<groupId>org.apache.eagle</groupId>
-  			<artifactId>eagle-service-base</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>log4j-over-slf4j</artifactId>
-				</exclusion>
-			</exclusions>
-  		</dependency>
-	  	<dependency>
-  			<groupId>org.wso2.siddhi</groupId>
-  			<artifactId>siddhi-core</artifactId>
-  		</dependency>
-		<dependency>
-  			<groupId>org.wso2.siddhi</groupId>
-  			<artifactId>siddhi-extension-string</artifactId>
-  		</dependency>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-metadata-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-stream-process-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-service-base</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-extension-string</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-metadata-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-data-process</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
-

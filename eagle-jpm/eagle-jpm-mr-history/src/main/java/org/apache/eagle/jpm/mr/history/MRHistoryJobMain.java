@@ -40,11 +40,14 @@ public class MRHistoryJobMain {
 
             //2. init JobHistoryContentFilter
             JobHistoryContentFilterBuilder builder = JobHistoryContentFilterBuilder.newBuilder().acceptJobFile().acceptJobConfFile();
-            List<String> confKeyPatterns = jhfAppConf.getStringList("MRConfigureKeys");
+            List<String> confKeyPatterns = jhfAppConf.getStringList("MRConfigureKeys.jobConfigKey");
             confKeyPatterns.add(Constants.JobConfiguration.CASCADING_JOB);
             confKeyPatterns.add(Constants.JobConfiguration.HIVE_JOB);
             confKeyPatterns.add(Constants.JobConfiguration.PIG_JOB);
             confKeyPatterns.add(Constants.JobConfiguration.SCOOBI_JOB);
+
+            String jobNameKey = jhfAppConf.getString("MRConfigureKeys.jobNameKey");
+            builder.setJobNameKey(jobNameKey);
 
             for (String key : confKeyPatterns) {
                 builder.includeJobKeyPatterns(Pattern.compile(key));

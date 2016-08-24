@@ -18,7 +18,7 @@
 
 package org.apache.eagle.jpm.mr.running.parser.metrics;
 
-import org.apache.eagle.jpm.mr.running.entities.TaskExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 
@@ -33,13 +33,13 @@ public class TaskExecutionMetricsCreationListener extends AbstractMetricsCreatio
         if (entity != null) {
             Long currentTime = System.currentTimeMillis();
             Map<String, String> tags = entity.getTags();
-            metrics.add(metricWrapper(currentTime, Constants.TASK_EXECUTION_TIME, entity.getElapsedTime(), tags));
+            metrics.add(metricWrapper(currentTime, Constants.TASK_EXECUTION_TIME, entity.getDuration(), tags));
         }
         return metrics;
     }
 
     @Override
     public String buildMetricName(String field) {
-        return String.format(Constants.metricFormat, Constants.TASK_LEVEL, field);
+        return String.format(Constants.hadoopMetricFormat, Constants.TASK_LEVEL, field);
     }
 }

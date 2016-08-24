@@ -20,7 +20,7 @@ package org.apache.eagle.metric.kafka;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.eagle.common.config.EagleConfigConstants;
-import org.apache.eagle.partition.DataDistributionDao;
+import org.apache.eagle.dataproc.impl.storm.partition.DataDistributionDao;
 import org.apache.eagle.security.partition.DataDistributionDaoImpl;
 import org.junit.Ignore;
 import org.junit.Test;
