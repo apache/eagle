@@ -19,21 +19,17 @@
 package org.apache.eagle.jpm.util.jobcounter;
 
 public class JobCounterException extends Exception {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = -4525162176188266862L;
 
     /**
-     * Default constructor of JobCounterException
+     * Default constructor of JobCounterException.
      */
     public JobCounterException() {
         super();
     }
 
     /**
-     * Constructor of JobCounterException
+     * Constructor of JobCounterException.
      * 
      * @param message error message
      */
@@ -42,7 +38,7 @@ public class JobCounterException extends Exception {
     }
 
     /**
-     * Constructor of JobCounterException
+     * Constructor of JobCounterException.
      * 
      * @param message error message
      * @param cause the cause of the exception
@@ -53,7 +49,7 @@ public class JobCounterException extends Exception {
     }
 
     /**
-     * Constructor of JobCounterException
+     * Constructor of JobCounterException.
      * 
      * @param cause the cause of the exception
      */

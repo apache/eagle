@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.mr.running.parser;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.running.config.MRRunningConfigManager;
 import org.apache.eagle.jpm.mr.running.recover.MRRunningJobManager;
 import org.apache.eagle.jpm.mr.runningentity.JobConfig;
@@ -29,11 +28,12 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.Utils;
-import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
-import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
-import org.apache.eagle.jpm.util.resourceFetch.connection.URLConnectionUtils;
-import org.apache.eagle.jpm.util.resourceFetch.model.*;
-import org.apache.eagle.jpm.util.resourceFetch.model.JobCounters;
+import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
+import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import org.apache.eagle.jpm.util.resourcefetch.connection.URLConnectionUtils;
+import org.apache.eagle.jpm.util.resourcefetch.model.*;
+import org.apache.eagle.jpm.util.resourcefetch.model.JobCounters;
+import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -42,13 +42,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.*;
 import java.util.function.Function;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class MRJobParser implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(MRJobParser.class);
@@ -58,6 +57,7 @@ public class MRJobParser implements Runnable {
         FINISHED,
         APP_FINISHED
     }
+
     private AppInfo app;
     private static final int MAX_RETRY_TIMES = 2;
     private MRJobEntityCreationHandler mrJobEntityCreationHandler;
@@ -78,6 +78,7 @@ public class MRJobParser implements Runnable {
     private Set<String> finishedTaskIds;
     private List<String> configKeys;
     private MRRunningConfigManager.JobExtractorConfig jobExtractorConfig;
+
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
@@ -187,11 +188,11 @@ public class MRJobParser implements Runnable {
                 mrJobEntityMap.put(id, new JobExecutionAPIEntity());
             }
 
-            String jobDefId = JobNameNormalization.getInstance().normalize(mrJob.getName());
             JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(id);
             jobExecutionAPIEntity.setTags(new HashMap<>(commonTags));
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_ID.toString(), id);
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), mrJob.getName());
+            String jobDefId = JobNameNormalization.getInstance().normalize(mrJob.getName());
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), jobDefId);
             if (mrJobConfigs.get(id) != null) {
                 JobConfig jobConfig = mrJobConfigs.get(id);
@@ -248,7 +249,9 @@ public class MRJobParser implements Runnable {
             Utils.closeInputStream(is);
         }
 
-        if (jobCounters.getCounterGroup() == null) return true;
+        if (jobCounters.getCounterGroup() == null) {
+            return true;
+        }
         JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(jobId);
         org.apache.eagle.jpm.util.jobcounter.JobCounters jobCounter = new org.apache.eagle.jpm.util.jobcounter.JobCounters();
         Map<String, Map<String, Long>> groups = new HashMap<>();
@@ -261,7 +264,9 @@ public class MRJobParser implements Runnable {
 
             Map<String, Long> counterValues = groups.get(counterGroupName);
             List<JobCounterItem> items = jobCounterGroup.getCounter();
-            if (items == null) continue;
+            if (items == null) {
+                continue;
+            }
             for (JobCounterItem item : items) {
                 String key = item.getName();
                 counterValues.put(key, item.getTotalCounterValue());
@@ -290,7 +295,11 @@ public class MRJobParser implements Runnable {
         org.apache.eagle.jpm.util.jobcounter.JobCounters jobCounter = new org.apache.eagle.jpm.util.jobcounter.JobCounters();
         String jobId = jobAndTaskId.getLeft();
         String taskId = jobAndTaskId.getRight();
-        String taskCounterURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_TASKS_URL + "/" + taskId + "/" + Constants.MR_JOB_COUNTERS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
+        String taskCounterURL = app.getTrackingUrl()
+            + Constants.MR_JOBS_URL + "/"
+            + jobId + "/" + Constants.MR_TASKS_URL + "/"
+            + taskId + "/" + Constants.MR_JOB_COUNTERS_URL
+            + "?" + Constants.ANONYMOUS_PARAMETER;
         InputStream is = null;
         TaskCounters taskCounters = null;
         try {
@@ -304,7 +313,9 @@ public class MRJobParser implements Runnable {
             Utils.closeInputStream(is);
         }
 
-        if (taskCounters.getTaskCounterGroup() == null) return jobCounter;
+        if (taskCounters.getTaskCounterGroup() == null) {
+            return jobCounter;
+        }
         Map<String, Map<String, Long>> groups = new HashMap<>();
 
         for (TaskCounterGroup taskCounterGroup : taskCounters.getTaskCounterGroup()) {
@@ -314,7 +325,9 @@ public class MRJobParser implements Runnable {
 
             Map<String, Long> counterValues = groups.get(taskCounterGroup.getCounterGroupName());
             List<TaskCounterItem> items = taskCounterGroup.getCounter();
-            if (items == null) continue;
+            if (items == null) {
+                continue;
+            }
             for (TaskCounterItem item : items) {
                 counterValues.put(item.getName(), item.getValue());
             }
@@ -328,7 +341,10 @@ public class MRJobParser implements Runnable {
     private Function<Pair<String, String>, TaskAttemptExecutionAPIEntity> fetchTaskAttempt = jobAndTaskId -> {
         String jobId = jobAndTaskId.getLeft();
         String taskId = jobAndTaskId.getRight();
-        String taskAttemptURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_TASKS_URL + "/" + taskId + "/" + Constants.MR_TASK_ATTEMPTS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
+        String taskAttemptURL = app.getTrackingUrl()
+            + Constants.MR_JOBS_URL + "/"
+            + jobId + "/" + Constants.MR_TASKS_URL + "/"
+            + taskId + "/" + Constants.MR_TASK_ATTEMPTS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
         InputStream is = null;
         List<MRTaskAttempt> taskAttempts = null;
         try {
@@ -463,10 +479,10 @@ public class MRJobParser implements Runnable {
 
             mrJobEntityCreationHandler.add(taskExecutionAPIEntity);
 
-            if (task.getState().equals(Constants.TaskState.SUCCEEDED.toString()) ||
-                    task.getState().equals(Constants.TaskState.FAILED.toString()) ||
-                    task.getState().equals(Constants.TaskState.KILLED.toString()) ||
-                    task.getState().equals(Constants.TaskState.KILL_WAIT.toString())) {
+            if (task.getState().equals(Constants.TaskState.SUCCEEDED.toString())
+                || task.getState().equals(Constants.TaskState.FAILED.toString())
+                || task.getState().equals(Constants.TaskState.KILLED.toString())
+                || task.getState().equals(Constants.TaskState.KILL_WAIT.toString())) {
                 //LOG.info("mr job {} task {} has finished", jobId, task.getId());
                 this.finishedTaskIds.add(task.getId());
             }
@@ -546,10 +562,10 @@ public class MRJobParser implements Runnable {
                     mrJobEntityMap.keySet()
                             .stream()
                             .filter(
-                                    jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString()) ||
-                                            mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
+                                jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString())
+                                    || mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
                             .forEach(
-                                    jobId -> this.runningJobManager.delete(app.getId(), jobId));
+                                jobId -> this.runningJobManager.delete(app.getId(), jobId));
                 }
 
                 LOG.info("finish process yarn application " + app.getId());

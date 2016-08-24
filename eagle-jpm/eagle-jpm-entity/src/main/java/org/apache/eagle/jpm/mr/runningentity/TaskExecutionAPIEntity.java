@@ -24,7 +24,7 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eagleMRRunningTasks")
 @ColumnFamily("f")
 @Prefix("tasks_exec")
@@ -32,8 +32,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-        @Index(name="Index_1_jobId", columns = { "jobId" }, unique = false)
-})
+        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false)
+    })
 @Tags({"site", "jobId", "JobName", "jobDefId", "jobType", "taskType", "taskId", "user", "queue", "hostname"})
 public class TaskExecutionAPIEntity extends TaggedLogAPIEntity {
     @Column("a")

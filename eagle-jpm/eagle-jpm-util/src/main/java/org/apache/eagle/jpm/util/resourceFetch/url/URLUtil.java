@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.util.resourceFetch.url;
+package org.apache.eagle.jpm.util.resourcefetch.url;
 
 /**
  * URL utils.

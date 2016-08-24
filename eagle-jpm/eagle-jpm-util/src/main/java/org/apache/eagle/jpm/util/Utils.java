@@ -54,7 +54,7 @@ public class Utils {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSzzz");
             Date parsedDate = dateFormat.parse(date);
             timestamp = parsedDate.getTime();
-        } catch(ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
@@ -68,21 +68,21 @@ public class Utils {
     public static long parseMemory(String memory) {
         if (memory.endsWith("g") || memory.endsWith("G")) {
             int executorGB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024l * 1024 * 1024 * executorGB;
+            return 1024L * 1024 * 1024 * executorGB;
         } else if (memory.endsWith("m") || memory.endsWith("M")) {
             int executorMB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024l * 1024 * executorMB;
+            return 1024L * 1024 * executorMB;
         } else if (memory.endsWith("k") || memory.endsWith("K")) {
             int executorKB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024l * executorKB;
+            return 1024L * executorKB;
         } else if (memory.endsWith("t") || memory.endsWith("T")) {
             int executorTB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024l * 1024 * 1024 * 1024 * executorTB;
+            return 1024L * 1024 * 1024 * 1024 * executorTB;
         } else if (memory.endsWith("p") || memory.endsWith("P")) {
             int executorPB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024l * 1024 * 1024 * 1024 * 1024 * executorPB;
+            return 1024L * 1024 * 1024 * 1024 * 1024 * executorPB;
         }
-        LOG.info("Cannot parse memory info " +  memory);
-        return 0l;
+        LOG.info("Cannot parse memory info " + memory);
+        return 0L;
     }
 }

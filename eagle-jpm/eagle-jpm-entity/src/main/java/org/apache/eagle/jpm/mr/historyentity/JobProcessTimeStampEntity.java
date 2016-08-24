@@ -23,7 +23,7 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa_process")
 @ColumnFamily("f")
 @Prefix("process")
@@ -37,6 +37,7 @@ public class JobProcessTimeStampEntity extends TaggedLogAPIEntity {
     public long getCurrentTimeStamp() {
         return currentTimeStamp;
     }
+
     public void setCurrentTimeStamp(long currentTimeStamp) {
         this.currentTimeStamp = currentTimeStamp;
         _pcs.firePropertyChange("currentTimeStamp", null, null);

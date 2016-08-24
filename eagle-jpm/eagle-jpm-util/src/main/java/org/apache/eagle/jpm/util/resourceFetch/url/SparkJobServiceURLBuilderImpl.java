@@ -17,7 +17,7 @@
  *
  */
 
-package org.apache.eagle.jpm.util.resourceFetch.url;
+package org.apache.eagle.jpm.util.resourcefetch.url;
 
 import org.apache.eagle.jpm.util.Constants;
 

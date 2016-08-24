@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TaskFailureListener implements HistoryJobEntityCreationListener {
-    private static final Logger logger = LoggerFactory.getLogger(TaskFailureListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskFailureListener.class);
     private static final String MR_ERROR_CATEGORY_CONFIG_FILE_NAME = "MRErrorCategory.config";
     private static final int BATCH_SIZE = 1000;
     private static final int MAX_RETRY_TIMES = 3;
@@ -53,7 +53,7 @@ public class TaskFailureListener implements HistoryJobEntityCreationListener {
             is = TaskFailureListener.class.getClassLoader().getResourceAsStream(MR_ERROR_CATEGORY_CONFIG_FILE_NAME);
             URL url = TaskFailureListener.class.getClassLoader().getResource(MR_ERROR_CATEGORY_CONFIG_FILE_NAME);
             if (url != null) {
-                logger.info("Feeder is going to load configuration file: " + url.toString());
+                LOG.info("Feeder is going to load configuration file: " + url.toString());
             }
             classifier = new MRErrorClassifier(is);
         } catch (IOException ex) {
@@ -63,6 +63,7 @@ public class TaskFailureListener implements HistoryJobEntityCreationListener {
                 try {
                     is.close();
                 } catch (IOException e) {
+                    LOG.warn("exception found {}", e);
                 }
             }
         }
@@ -121,16 +122,16 @@ public class TaskFailureListener implements HistoryJobEntityCreationListener {
         int tried = 0;
         while (tried <= MAX_RETRY_TIMES) {
             try {
-                logger.info("start flushing entities of total number " + failureTasks.size());
+                LOG.info("start flushing entities of total number " + failureTasks.size());
                 client.create(failureTasks);
-                logger.info("finish flushing entities of total number " + failureTasks.size());
+                LOG.info("finish flushing entities of total number " + failureTasks.size());
                 failureTasks.clear();
                 break;
             } catch (Exception ex) {
                 if (tried < MAX_RETRY_TIMES) {
-                    logger.error("Got exception to flush, retry as " + (tried + 1) + " times", ex);
+                    LOG.error("Got exception to flush, retry as " + (tried + 1) + " times", ex);
                 } else {
-                    logger.error("Got exception to flush, reach max retry times " + MAX_RETRY_TIMES, ex);
+                    LOG.error("Got exception to flush, reach max retry times " + MAX_RETRY_TIMES, ex);
                     throw ex;
                 }
             }

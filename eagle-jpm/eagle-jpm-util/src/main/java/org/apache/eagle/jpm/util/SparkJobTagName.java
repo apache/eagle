@@ -34,11 +34,12 @@ public enum SparkJobTagName {
 
 
     private String tagName;
-    private SparkJobTagName(String tagName){
+
+    private SparkJobTagName(String tagName) {
         this.tagName = tagName;
     }
 
-    public String toString(){
+    public String toString() {
         return this.tagName;
     }
 }

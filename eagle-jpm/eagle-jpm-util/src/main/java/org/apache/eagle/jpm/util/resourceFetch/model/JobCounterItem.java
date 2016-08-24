@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.util.resourceFetch.model;
+package org.apache.eagle.jpm.util.resourcefetch.model;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JobCounterItem {
     private String name;
@@ -31,24 +31,31 @@ public class JobCounterItem {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public long getTotalCounterValue() {
         return totalCounterValue;
     }
+
     public void setTotalCounterValue(long totalCounterValue) {
         this.totalCounterValue = totalCounterValue;
     }
+
     public long getMapCounterValue() {
         return mapCounterValue;
     }
+
     public void setMapCounterValue(long mapCounterValue) {
         this.mapCounterValue = mapCounterValue;
     }
+
     public long getReduceCounterValue() {
         return reduceCounterValue;
     }
+
     public void setReduceCounterValue(long reduceCounterValue) {
         this.reduceCounterValue = reduceCounterValue;
     }

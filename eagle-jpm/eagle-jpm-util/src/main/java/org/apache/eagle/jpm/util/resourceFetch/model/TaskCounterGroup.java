@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.util.resourceFetch.model;
+package org.apache.eagle.jpm.util.resourcefetch.model;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.List;
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskCounterGroup {
     public String getCounterGroupName() {

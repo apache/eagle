@@ -20,6 +20,5 @@ package org.apache.eagle.jpm.spark.crawl;
 import java.io.InputStream;
 
 public interface JHFInputStreamReader {
-    public void read(InputStream is) throws Exception;
-
+    void read(InputStream is) throws Exception;
 }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.util.resourceFetch;
+package org.apache.eagle.jpm.util.resourcefetch;
 
 import org.apache.eagle.jpm.util.Constants;
 
@@ -22,6 +22,6 @@ import java.util.List;
 
 public interface ResourceFetcher<T> {
     //continue to refactor later
-	List<T> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception;
+    List<T> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception;
 
 }

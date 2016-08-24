@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.util.resourceFetch.model;
+package org.apache.eagle.jpm.util.resourcefetch.model;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.List;
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JobCounters {
     private String id;
@@ -30,12 +31,15 @@ public class JobCounters {
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public List<JobCounterGroup> getCounterGroup() {
         return counterGroup;
     }
+
     public void setCounterGroup(List<JobCounterGroup> counterGroup) {
         this.counterGroup = counterGroup;
     }

@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.util.resourceFetch.url;
+package org.apache.eagle.jpm.util.resourcefetch.url;
 
 public interface ServiceURLBuilder {
-	String build(String... parameters);
+    String build(String... parameters);
 }

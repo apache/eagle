@@ -22,7 +22,7 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa_anomaly")
 @ColumnFamily("f")
 @Prefix("tacount")
@@ -40,20 +40,25 @@ public class TaskAttemptCounterAPIEntity extends JobBaseAPIEntity {
     public int getKilledCount() {
         return killedCount;
     }
+
     public void setKilledCount(int killedCount) {
         this.killedCount = killedCount;
         _pcs.firePropertyChange("killedCount", null, null);
     }
+
     public int getFailedCount() {
         return failedCount;
     }
+
     public void setFailedCount(int failedCount) {
         this.failedCount = failedCount;
         _pcs.firePropertyChange("failedCount", null, null);
     }
+
     public int getTotalCount() {
         return totalCount;
     }
+
     public void setTotalCount(int totalCount) {
         this.totalCount = totalCount;
         _pcs.firePropertyChange("totalCount", null, null);

@@ -28,91 +28,95 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JobNameNormalization {
-	private static Logger logger = LoggerFactory.getLogger(JobNameNormalization.class);
-	private static JobNameNormalization instance = new JobNameNormalization();
-	private static final String JOB_NAME_NORMALIZATION_RULES_KEY = "job.name.normalization.rules.key";
-	private static final String PARAMETERIZED_PREFIX = "\\$";
-	private static final String MULTIPLE_RULE_DILIMITER = ";";
-	/**
-	 * map from source string to target string
-	 * source string is regular expression, for example ^(.*)[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}$
-	 * target string is parameterized string, for example $1, $2
-	 */
-	private List<JobNameNormalizationRule> _rules = new ArrayList<JobNameNormalizationRule>();
-	
-	private enum NormalizationOp{
-		REPLACE("=>");
-		private String value;
-		private NormalizationOp(String value){
-			this.value = value;
-		}
-		public String toString(){
-			return value;
-		}
-	}
-	
-	static class JobNameNormalizationRule{
-		Pattern pattern;
-		NormalizationOp op;
-		String target;
-	}
-	
-	private JobNameNormalization(){
-		try{
-			// load normalization rules
-			Config conf = ConfigFactory.load();
-			String key = JOB_NAME_NORMALIZATION_RULES_KEY.toLowerCase();
-			String value = conf.getString(key);
-			if(value == null){
-				logger.info("no job name normalization rules are loaded");
-				return;
-			}
-			// multiple rules are concatenated with semicolon, i.e. ;
-			String rules[] = value.split(MULTIPLE_RULE_DILIMITER);
-			for(String rule : rules){
-				rule = rule.trim();
-				logger.info("jobNormalizationRule is loaded " + rule);
-				addRule(rule);
-			}
-		}catch(Exception ex){
-			logger.error("fail loading job name normalization rules", ex);
-			throw new RuntimeException(ex);
-		}
-	}
-	
-	public static JobNameNormalization getInstance(){
-		return instance;
-	}
-	
-	private void addRule(String rule){
-		for(NormalizationOp op : NormalizationOp.values()){
-			// split the rule to be source and target string
-			String elements[] = rule.split(op.toString());
-			if(elements == null || elements.length != 2) return;
-			JobNameNormalizationRule r = new JobNameNormalizationRule();
-			r.pattern = Pattern.compile(elements[0].trim());
-			r.op = op;
-			r.target = elements[1].trim();
-			_rules.add(r);
-			break;  //once one Op is matched, exit
-		}
-	
-	}
-	
-	public String normalize(String jobName){
-		String normalizedJobName = jobName;
-		// go through each rules and do actions
-		for(JobNameNormalizationRule rule : _rules){
-			Pattern p = rule.pattern;
-			Matcher m = p.matcher(jobName);
-			if(m.find()){
-				normalizedJobName = rule.target;
-				int c = m.groupCount();
-				for(int i=1; i<c+1; i++){
-					normalizedJobName = normalizedJobName.replaceAll(PARAMETERIZED_PREFIX+String.valueOf(i), m.group(i));
-				}
-			}
-		}
-		return normalizedJobName;
-	}
+    private static Logger LOG = LoggerFactory.getLogger(JobNameNormalization.class);
+    private static JobNameNormalization instance = new JobNameNormalization();
+    private static final String JOB_NAME_NORMALIZATION_RULES_KEY = "job.name.normalization.rules.key";
+    private static final String PARAMETERIZED_PREFIX = "\\$";
+    private static final String MULTIPLE_RULE_DILIMITER = ";";
+    /**
+     * map from source string to target string.
+     * source string is regular expression, for example ^(.*)[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}$
+     * target string is parameterized string, for example $1, $2
+     */
+    private List<JobNameNormalizationRule> _rules = new ArrayList<JobNameNormalizationRule>();
+
+    private enum NormalizationOp {
+        REPLACE("=>");
+        private String value;
+
+        private NormalizationOp(String value) {
+            this.value = value;
+        }
+
+        public String toString() {
+            return value;
+        }
+    }
+
+    static class JobNameNormalizationRule {
+        Pattern pattern;
+        NormalizationOp op;
+        String target;
+    }
+
+    private JobNameNormalization() {
+        try {
+            // load normalization rules
+            Config conf = ConfigFactory.load();
+            String key = JOB_NAME_NORMALIZATION_RULES_KEY.toLowerCase();
+            String value = conf.getString(key);
+            if (value == null) {
+                LOG.info("no job name normalization rules are loaded");
+                return;
+            }
+            // multiple rules are concatenated with semicolon, i.e. ;
+            String[] rules = value.split(MULTIPLE_RULE_DILIMITER);
+            for (String rule : rules) {
+                rule = rule.trim();
+                LOG.info("jobNormalizationRule is loaded " + rule);
+                addRule(rule);
+            }
+        } catch (Exception ex) {
+            LOG.error("fail loading job name normalization rules", ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static JobNameNormalization getInstance() {
+        return instance;
+    }
+
+    private void addRule(String rule) {
+        for (NormalizationOp op : NormalizationOp.values()) {
+            // split the rule to be source and target string
+            String[] elements = rule.split(op.toString());
+            if (elements == null || elements.length != 2) {
+                return;
+            }
+            JobNameNormalizationRule r = new JobNameNormalizationRule();
+            r.pattern = Pattern.compile(elements[0].trim());
+            r.op = op;
+            r.target = elements[1].trim();
+            _rules.add(r);
+            break;  //once one Op is matched, exit
+        }
+
+    }
+
+    public String normalize(String jobName) {
+        String normalizedJobName = jobName;
+        // go through each rules and do actions
+        for (JobNameNormalizationRule rule : _rules) {
+            Pattern p = rule.pattern;
+            Matcher m = p.matcher(jobName);
+            if (m.find()) {
+                normalizedJobName = rule.target;
+                int c = m.groupCount();
+                for (int i = 1; i < c + 1; i++) {
+                    normalizedJobName = normalizedJobName.replaceAll(PARAMETERIZED_PREFIX + String.valueOf(i), m.group(i));
+                }
+            }
+        }
+        return normalizedJobName;
+    }
 }
