@@ -17,10 +17,10 @@
 
 package org.apache.eagle.jpm.spark.running.entities;
 
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.apache.eagle.jpm.util.Constants;
 
 @Table("eagleSparkRunningStages")
 @ColumnFamily("f")
@@ -40,27 +40,27 @@ public class SparkStageEntity extends TaggedLogAPIEntity {
     @Column("d")
     private int numFailedTasks = 0;
     @Column("e")
-    private long executorRunTime = 0l;
+    private long executorRunTime = 0L;
     @Column("f")
-    private long inputBytes = 0l;
+    private long inputBytes = 0L;
     @Column("g")
-    private long inputRecords = 0l;
+    private long inputRecords = 0L;
     @Column("h")
-    private long outputBytes = 0l;
+    private long outputBytes = 0L;
     @Column("i")
-    private long outputRecords = 0l;
+    private long outputRecords = 0L;
     @Column("j")
-    private long shuffleReadBytes = 0l;
+    private long shuffleReadBytes = 0L;
     @Column("k")
-    private long shuffleReadRecords = 0l;
+    private long shuffleReadRecords = 0L;
     @Column("l")
-    private long shuffleWriteBytes = 0l;
+    private long shuffleWriteBytes = 0L;
     @Column("m")
-    private long shuffleWriteRecords = 0l;
+    private long shuffleWriteRecords = 0L;
     @Column("n")
-    private long memoryBytesSpilled = 0l;
+    private long memoryBytesSpilled = 0L;
     @Column("o")
-    private long diskBytesSpilled = 0l;
+    private long diskBytesSpilled = 0L;
     @Column("p")
     private String name;
     @Column("q")

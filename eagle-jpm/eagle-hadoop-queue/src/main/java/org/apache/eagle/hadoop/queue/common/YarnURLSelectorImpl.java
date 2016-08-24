@@ -19,7 +19,7 @@
 package org.apache.eagle.hadoop.queue.common;
 
 import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.jpm.util.resourceFetch.ha.AbstractURLSelector;
+import org.apache.eagle.jpm.util.resourcefetch.ha.AbstractURLSelector;
 
 public class YarnURLSelectorImpl extends AbstractURLSelector {
 

@@ -36,7 +36,7 @@ import java.util.TreeMap;
 /**
  * Since 8/12/16.
  */
-public class OozieAuditLogParserBolt extends BaseRichBolt{
+public class OozieAuditLogParserBolt extends BaseRichBolt {
     private static Logger LOG = LoggerFactory.getLogger(OozieAuditLogParserBolt.class);
     private OutputCollector collector;
 
@@ -72,9 +72,9 @@ public class OozieAuditLogParserBolt extends BaseRichBolt{
             map.put("errorcode", entity.errorcode);
             map.put("errormessage", entity.errormessage);
             collector.emit(Arrays.asList(map));
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error in parsing oozie audit log", ex);
-        }finally {
+        } finally {
             collector.ack(input);
         }
     }

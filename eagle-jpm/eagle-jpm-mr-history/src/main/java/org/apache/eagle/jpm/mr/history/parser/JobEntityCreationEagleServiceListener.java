@@ -62,7 +62,7 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
     }
 
     /**
-     * We need save network bandwidth as well
+     * We need save network bandwidth as well.
      */
     @Override
     public void flush() throws Exception {

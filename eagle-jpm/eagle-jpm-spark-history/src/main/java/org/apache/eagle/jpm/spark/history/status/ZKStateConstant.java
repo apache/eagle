@@ -21,7 +21,7 @@ package org.apache.eagle.jpm.spark.history.status;
 
 public class ZKStateConstant {
 
-    public enum AppStatus{
+    public enum AppStatus {
         INIT, SENT_FOR_PARSE, FINISHED, FAILED
     }
 }

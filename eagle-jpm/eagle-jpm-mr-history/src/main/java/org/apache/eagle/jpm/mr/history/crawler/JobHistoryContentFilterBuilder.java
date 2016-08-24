@@ -27,56 +27,57 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class JobHistoryContentFilterBuilder {
-    private final static Logger LOG = LoggerFactory.getLogger(JobHistoryContentFilterBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobHistoryContentFilterBuilder.class);
 
-    private boolean m_acceptJobFile;
-    private boolean m_acceptJobConfFile;
-    private List<Pattern> m_mustHaveJobConfKeyPatterns;
-    private List<Pattern> m_jobConfKeyInclusionPatterns;
-    private List<Pattern> m_jobConfKeyExclusionPatterns;
+    private boolean acceptJobFile;
+    private boolean acceptJobConfFile;
+    private List<Pattern> mustHaveJobConfKeyPatterns;
+    private List<Pattern> jobConfKeyInclusionPatterns;
+    private List<Pattern> jobConfKeyExclusionPatterns;
 
     private String jobNameKey;
 
-    public static JobHistoryContentFilterBuilder newBuilder(){
+    public static JobHistoryContentFilterBuilder newBuilder() {
         return new JobHistoryContentFilterBuilder();
     }
 
     public JobHistoryContentFilterBuilder acceptJobFile() {
-        this.m_acceptJobFile = true;
+        this.acceptJobFile = true;
         return this;
     }
 
     public JobHistoryContentFilterBuilder acceptJobConfFile() {
-        this.m_acceptJobConfFile = true;
+        this.acceptJobConfFile = true;
         return this;
     }
 
     public JobHistoryContentFilterBuilder mustHaveJobConfKeyPatterns(Pattern ...patterns) {
-        m_mustHaveJobConfKeyPatterns = Arrays.asList(patterns);
-        if (m_jobConfKeyInclusionPatterns != null) {
+        mustHaveJobConfKeyPatterns = Arrays.asList(patterns);
+        if (jobConfKeyInclusionPatterns != null) {
             List<Pattern> list = new ArrayList<Pattern>();
-            list.addAll(m_jobConfKeyInclusionPatterns);
+            list.addAll(jobConfKeyInclusionPatterns);
             list.addAll(Arrays.asList(patterns));
-            m_jobConfKeyInclusionPatterns = list;
+            jobConfKeyInclusionPatterns = list;
+        } else {
+            jobConfKeyInclusionPatterns = Arrays.asList(patterns);
         }
-        else
-            m_jobConfKeyInclusionPatterns = Arrays.asList(patterns);
         return this;
     }
 
     public JobHistoryContentFilterBuilder includeJobKeyPatterns(Pattern ... patterns) {
-        if (m_jobConfKeyInclusionPatterns != null) {
+        if (jobConfKeyInclusionPatterns != null) {
             List<Pattern> list = new ArrayList<Pattern>();
-            list.addAll(m_jobConfKeyInclusionPatterns);
+            list.addAll(jobConfKeyInclusionPatterns);
             list.addAll(Arrays.asList(patterns));
-            m_jobConfKeyInclusionPatterns = list;
-        } else
-            m_jobConfKeyInclusionPatterns = Arrays.asList(patterns);
+            jobConfKeyInclusionPatterns = list;
+        } else {
+            jobConfKeyInclusionPatterns = Arrays.asList(patterns);
+        }
         return this;
     }
 
     public JobHistoryContentFilterBuilder excludeJobKeyPatterns(Pattern ...patterns) {
-        m_jobConfKeyExclusionPatterns = Arrays.asList(patterns);
+        jobConfKeyExclusionPatterns = Arrays.asList(patterns);
         return this;
     }
 
@@ -87,11 +88,11 @@ public class JobHistoryContentFilterBuilder {
 
     public JobHistoryContentFilter build() {
         JobHistoryContentFilterImpl filter = new JobHistoryContentFilterImpl();
-        filter.setAcceptJobFile(m_acceptJobFile);
-        filter.setAcceptJobConfFile(m_acceptJobConfFile);
-        filter.setMustHaveJobConfKeyPatterns(m_mustHaveJobConfKeyPatterns);
-        filter.setJobConfKeyInclusionPatterns(m_jobConfKeyInclusionPatterns);
-        filter.setJobConfKeyExclusionPatterns(m_jobConfKeyExclusionPatterns);
+        filter.setAcceptJobFile(acceptJobFile);
+        filter.setAcceptJobConfFile(acceptJobConfFile);
+        filter.setMustHaveJobConfKeyPatterns(mustHaveJobConfKeyPatterns);
+        filter.setJobConfKeyInclusionPatterns(jobConfKeyInclusionPatterns);
+        filter.setJobConfKeyExclusionPatterns(jobConfKeyExclusionPatterns);
         filter.setJobNameKey(jobNameKey);
         LOG.info("job history content filter:" + filter);
         return filter;

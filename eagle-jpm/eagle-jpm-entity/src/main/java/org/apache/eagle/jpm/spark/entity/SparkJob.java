@@ -18,10 +18,10 @@
 
 package org.apache.eagle.jpm.spark.entity;
 
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.apache.eagle.jpm.util.Constants;
 
 @Table("eglesprk_jobs")
 @ColumnFamily("f")
@@ -31,34 +31,34 @@ import org.apache.eagle.jpm.util.Constants;
 @TimeSeries(true)
 @Tags({"site","sprkAppId", "sprkAppAttemptId", "sprkAppName", "normSprkAppName", "jobId","user", "queue"})
 @Partition({"site"})
-public class SparkJob extends TaggedLogAPIEntity{
+public class SparkJob extends TaggedLogAPIEntity {
 
     @Column("a")
     private long  submissionTime;
     @Column("b")
     private long completionTime;
     @Column("c")
-    private int numStages=0;
+    private int numStages = 0;
     @Column("d")
     private String status;
     @Column("e")
-    private int numTask=0;
+    private int numTask = 0;
     @Column("f")
-    private int numActiveTasks=0;
+    private int numActiveTasks = 0;
     @Column("g")
-    private int numCompletedTasks=0;
+    private int numCompletedTasks = 0;
     @Column("h")
-    private int numSkippedTasks=0;
+    private int numSkippedTasks = 0;
     @Column("i")
-    private int numFailedTasks=0;
+    private int numFailedTasks = 0;
     @Column("j")
-    private int numActiveStages=0;
+    private int numActiveStages = 0;
     @Column("k")
-    private int numCompletedStages=0;
+    private int numCompletedStages = 0;
     @Column("l")
-    private int numSkippedStages=0;
+    private int numSkippedStages = 0;
     @Column("m")
-    private int numFailedStages=0;
+    private int numFailedStages = 0;
 
     public long getSubmissionTime() {
         return submissionTime;

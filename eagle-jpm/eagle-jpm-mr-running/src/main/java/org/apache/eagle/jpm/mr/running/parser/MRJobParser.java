@@ -28,11 +28,11 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.Utils;
-import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
-import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
-import org.apache.eagle.jpm.util.resourceFetch.connection.URLConnectionUtils;
-import org.apache.eagle.jpm.util.resourceFetch.model.*;
-
+import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
+import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import org.apache.eagle.jpm.util.resourcefetch.connection.URLConnectionUtils;
+import org.apache.eagle.jpm.util.resourcefetch.model.*;
+import org.apache.eagle.jpm.util.resourcefetch.model.JobCounters;
 import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -42,7 +42,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.*;
@@ -104,7 +103,7 @@ public class MRJobParser implements Runnable {
         this.commonTags.put(MRJobTagName.USER.toString(), app.getUser());
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
-        this.parserStatus = ParserStatus.FINISHED;
+        this.parserStatus  = ParserStatus.FINISHED;
         this.rmResourceFetcher = rmResourceFetcher;
         this.first = true;
         this.finishedTaskIds = new HashSet<>();
@@ -189,11 +188,11 @@ public class MRJobParser implements Runnable {
                 mrJobEntityMap.put(id, new JobExecutionAPIEntity());
             }
 
-            final String jobDefId = JobNameNormalization.getInstance().normalize(mrJob.getName());
             JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(id);
             jobExecutionAPIEntity.setTags(new HashMap<>(commonTags));
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_ID.toString(), id);
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), mrJob.getName());
+            String jobDefId = JobNameNormalization.getInstance().normalize(mrJob.getName());
             jobExecutionAPIEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), jobDefId);
             if (mrJobConfigs.get(id) != null) {
                 JobConfig jobConfig = mrJobConfigs.get(id);
@@ -273,11 +272,11 @@ public class MRJobParser implements Runnable {
                 counterValues.put(key, item.getTotalCounterValue());
                 if (counterGroupName.equals(Constants.JOB_COUNTER)) {
                     if (key.equals(Constants.JobCounter.DATA_LOCAL_MAPS.toString())) {
-                        jobExecutionAPIEntity.setDataLocalMaps((int) item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setDataLocalMaps((int)item.getTotalCounterValue());
                     } else if (key.equals(Constants.JobCounter.RACK_LOCAL_MAPS.toString())) {
-                        jobExecutionAPIEntity.setRackLocalMaps((int) item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setRackLocalMaps((int)item.getTotalCounterValue());
                     } else if (key.equals(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString())) {
-                        jobExecutionAPIEntity.setTotalLaunchedMaps((int) item.getTotalCounterValue());
+                        jobExecutionAPIEntity.setTotalLaunchedMaps((int)item.getTotalCounterValue());
                     }
                 }
             }
@@ -286,10 +285,8 @@ public class MRJobParser implements Runnable {
         jobCounter.setCounters(groups);
         jobExecutionAPIEntity.setJobCounters(jobCounter);
         if (jobExecutionAPIEntity.getTotalLaunchedMaps() > 0) {
-            jobExecutionAPIEntity.setDataLocalMapsPercentage(
-                jobExecutionAPIEntity.getDataLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
-            jobExecutionAPIEntity.setRackLocalMapsPercentage(
-                jobExecutionAPIEntity.getRackLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
+            jobExecutionAPIEntity.setDataLocalMapsPercentage(jobExecutionAPIEntity.getDataLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
+            jobExecutionAPIEntity.setRackLocalMapsPercentage(jobExecutionAPIEntity.getRackLocalMaps() * 1.0 / jobExecutionAPIEntity.getTotalLaunchedMaps());
         }
         return true;
     };
@@ -299,11 +296,9 @@ public class MRJobParser implements Runnable {
         String jobId = jobAndTaskId.getLeft();
         String taskId = jobAndTaskId.getRight();
         String taskCounterURL = app.getTrackingUrl()
-            + Constants.MR_JOBS_URL
-            + "/" + jobId
-            + "/" + Constants.MR_TASKS_URL
-            + "/" + taskId
-            + "/" + Constants.MR_JOB_COUNTERS_URL
+            + Constants.MR_JOBS_URL + "/"
+            + jobId + "/" + Constants.MR_TASKS_URL + "/"
+            + taskId + "/" + Constants.MR_JOB_COUNTERS_URL
             + "?" + Constants.ANONYMOUS_PARAMETER;
         InputStream is = null;
         TaskCounters taskCounters = null;
@@ -347,13 +342,9 @@ public class MRJobParser implements Runnable {
         String jobId = jobAndTaskId.getLeft();
         String taskId = jobAndTaskId.getRight();
         String taskAttemptURL = app.getTrackingUrl()
-            + Constants.MR_JOBS_URL
-            + "/" + jobId
-            + "/" + Constants.MR_TASKS_URL
-            + "/" + taskId
-            + "/" + Constants.MR_TASK_ATTEMPTS_URL
-            + "?" + Constants.ANONYMOUS_PARAMETER;
-
+            + Constants.MR_JOBS_URL + "/"
+            + jobId + "/" + Constants.MR_TASKS_URL + "/"
+            + taskId + "/" + Constants.MR_TASK_ATTEMPTS_URL + "?" + Constants.ANONYMOUS_PARAMETER;
         InputStream is = null;
         List<MRTaskAttempt> taskAttempts = null;
         try {

@@ -16,11 +16,7 @@
  */
 package org.apache.eagle.service.security.oozie;
 
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.security.entity.OozieResourceEntity;
-import org.apache.eagle.security.entity.OozieResourceSensitivityAPIEntity;
-import org.apache.eagle.service.generic.GenericEntityServiceResource;
-import org.apache.eagle.service.security.oozie.dao.OozieSensitivityMetadataDAO;
 import org.apache.eagle.service.security.oozie.dao.OozieSensitivityMetadataDAOImpl;
 import org.apache.oozie.client.CoordinatorJob;
 import org.apache.oozie.client.rest.JsonTags;
@@ -41,9 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.easymock.EasyMock.expect;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.expectNew;
-import static org.powermock.api.easymock.PowerMock.replay;
+import static org.powermock.api.easymock.PowerMock.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OozieResourceSensitivityDataJoiner.class)

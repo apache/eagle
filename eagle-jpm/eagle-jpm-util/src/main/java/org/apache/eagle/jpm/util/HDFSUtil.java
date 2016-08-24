@@ -33,12 +33,12 @@ public class HDFSUtil {
     }
 
     public static void login(Configuration kConfig) throws IOException {
-        if(kConfig.get("hdfs.kerberos.principal") == null || kConfig.get("hdfs.kerberos.principal").isEmpty()){
+        if (kConfig.get("hdfs.kerberos.principal") == null || kConfig.get("hdfs.kerberos.principal").isEmpty()) {
             return;
         }
-       kConfig.setBoolean("hadoop.security.authorization", true);
-       kConfig.set("hadoop.security.authentication", "kerberos");
-       UserGroupInformation.setConfiguration(kConfig);
-       UserGroupInformation.loginUserFromKeytab(kConfig.get("hdfs.kerberos.principal"), kConfig.get("hdfs.keytab.file"));
-     }
+        kConfig.setBoolean("hadoop.security.authorization", true);
+        kConfig.set("hadoop.security.authentication", "kerberos");
+        UserGroupInformation.setConfiguration(kConfig);
+        UserGroupInformation.loginUserFromKeytab(kConfig.get("hdfs.kerberos.principal"), kConfig.get("hdfs.keytab.file"));
+    }
 }

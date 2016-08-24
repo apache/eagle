@@ -31,7 +31,7 @@ public class SparkFilesystemInputStreamReaderImpl implements JHFInputStreamReade
     private SparkApplicationInfo app;
 
 
-    public SparkFilesystemInputStreamReaderImpl(String site, SparkApplicationInfo app){
+    public SparkFilesystemInputStreamReaderImpl(String site, SparkApplicationInfo app) {
         this.site = site;
         this.app = app;
     }
@@ -45,7 +45,7 @@ public class SparkFilesystemInputStreamReaderImpl implements JHFInputStreamReade
         parser.parse(is);
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         SparkFilesystemInputStreamReaderImpl impl = new SparkFilesystemInputStreamReaderImpl("apollo-phx", new SparkApplicationInfo());
         impl.read(new FileInputStream(new File("E:\\eagle\\application_1459803563374_535667_1")));
     }

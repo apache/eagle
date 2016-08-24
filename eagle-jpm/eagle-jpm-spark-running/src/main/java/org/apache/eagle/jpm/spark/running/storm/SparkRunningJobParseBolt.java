@@ -23,9 +23,9 @@ import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
 import org.apache.eagle.jpm.spark.running.parser.SparkApplicationParser;
 import org.apache.eagle.jpm.spark.running.recover.SparkRunningJobManager;
 import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
-import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
-import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
+import org.apache.eagle.jpm.util.resourcefetch.RMResourceFetcher;
+import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
+import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -53,6 +53,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
     private ExecutorService executorService;
     private Map<String, SparkApplicationParser> runningSparkParsers;
     private ResourceFetcher resourceFetcher;
+
     public SparkRunningJobParseBolt(SparkRunningJobAppConfig.ZKStateConfig zkStateConfig,
                                     SparkRunningJobAppConfig.EagleServiceConfig eagleServiceConfig,
                                     SparkRunningJobAppConfig.EndpointConfig endpointConfig,
@@ -94,8 +95,8 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
                     LOG.info("remove parser {}", appId);
                 });
 
-        if (appInfo.getState().equals(Constants.AppState.FINISHED.toString()) ||
-                applicationParser.status() == SparkApplicationParser.ParserStatus.FINISHED) {
+        if (appInfo.getState().equals(Constants.AppState.FINISHED.toString())
+            || applicationParser.status() == SparkApplicationParser.ParserStatus.FINISHED) {
             applicationParser.setStatus(SparkApplicationParser.ParserStatus.RUNNING);
             executorService.execute(applicationParser);
         }

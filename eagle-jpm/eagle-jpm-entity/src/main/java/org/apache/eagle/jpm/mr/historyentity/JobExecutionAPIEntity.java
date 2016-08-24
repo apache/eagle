@@ -23,7 +23,7 @@ import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa")
 @ColumnFamily("f")
 @Prefix("jexec")
@@ -31,8 +31,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-    @Index(name="Index_1_jobId", columns = { "jobId" }, unique = true),
-    @Index(name="Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
+    @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = true),
+    @Index(name = "Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
     })
 public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     @Column("a")
@@ -85,6 +85,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     public long getDurationTime() {
         return durationTime;
     }
+
     public void setDurationTime(long durationTime) {
         this.durationTime = durationTime;
         valueChanged("durationTime");
@@ -93,59 +94,75 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     public String getCurrentState() {
         return currentState;
     }
+
     public void setCurrentState(String currentState) {
         this.currentState = currentState;
         _pcs.firePropertyChange("currentState", null, null);
     }
+
     public long getStartTime() {
         return startTime;
     }
+
     public void setStartTime(long startTime) {
         this.startTime = startTime;
         _pcs.firePropertyChange("startTime", null, null);
     }
+
     public long getEndTime() {
         return endTime;
     }
+
     public void setEndTime(long endTime) {
         this.endTime = endTime;
         _pcs.firePropertyChange("endTime", null, null);
     }
+
     public int getNumTotalMaps() {
         return numTotalMaps;
     }
+
     public void setNumTotalMaps(int numTotalMaps) {
         this.numTotalMaps = numTotalMaps;
         _pcs.firePropertyChange("numTotalMaps", null, null);
     }
+
     public int getNumFailedMaps() {
         return numFailedMaps;
     }
+
     public void setNumFailedMaps(int numFailedMaps) {
         this.numFailedMaps = numFailedMaps;
         _pcs.firePropertyChange("numFailedMaps", null, null);
     }
+
     public int getNumFinishedMaps() {
         return numFinishedMaps;
     }
+
     public void setNumFinishedMaps(int numFinishedMaps) {
         this.numFinishedMaps = numFinishedMaps;
         _pcs.firePropertyChange("numFinishedMaps", null, null);
     }
+
     public int getNumTotalReduces() {
         return numTotalReduces;
     }
+
     public void setNumTotalReduces(int numTotalReduces) {
         this.numTotalReduces = numTotalReduces;
         _pcs.firePropertyChange("numTotalReduces", null, null);
     }
+
     public int getNumFailedReduces() {
         return numFailedReduces;
     }
+
     public void setNumFailedReduces(int numFailedReduces) {
         this.numFailedReduces = numFailedReduces;
         _pcs.firePropertyChange("numFailedReduces", null, null);
     }
+
     public int getNumFinishedReduces() {
         return numFinishedReduces;
     }

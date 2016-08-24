@@ -33,7 +33,7 @@ public class JHFSparkParser implements JHFParserBase {
 
     JHFSparkEventReader eventReader;
 
-    public JHFSparkParser(JHFSparkEventReader reader){
+    public JHFSparkParser(JHFSparkEventReader reader) {
         this.eventReader = reader;
     }
 
@@ -41,22 +41,22 @@ public class JHFSparkParser implements JHFParserBase {
     public void parse(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         try {
-            String line = null;
+            String line;
 
             JSONParser parser = new JSONParser();
-            while((line = reader.readLine()) != null){
-                try{
+            while ((line = reader.readLine()) != null) {
+                try {
                     JSONObject eventObj = (JSONObject) parser.parse(line);
                     String eventType = (String) eventObj.get("Event");
                     logger.info("Event type: " + eventType);
                     this.eventReader.read(eventObj);
-                }catch(Exception e){
+                } catch (Exception e) {
                     logger.error(String.format("Invalid json string. Fail to parse %s.", line), e);
                 }
             }
             this.eventReader.clearReader();
         } finally {
-            if(reader != null){
+            if (reader != null) {
                 reader.close();
             }
         }

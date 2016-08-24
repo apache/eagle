@@ -37,14 +37,12 @@ import java.util.Map;
 
 /**
  * Listener holds all informations related to one whole job history file, so it's stateful and does not support multithreading.
- *
- * @author yonzhang
  */
 public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer1PerLineListener {
     private static final Logger logger = LoggerFactory.getLogger(JHFMRVer1EventReader.class);
 
     /**
-     * baseTags stores the basic tag name values which might be used for persisting various entities
+     * baseTags stores the basic tag name values which might be used for persisting various entities.
      * baseTags includes: cluster, datacenter and jobName
      * baseTags are used for all job/task related entities
      *
@@ -93,12 +91,12 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
             String[] tmp = decoratedHostname.split("/");
             hostname = tmp[tmp.length - 1];
             rack = tmp[tmp.length - 2];
-            m_host2RackMapping.put(hostname, rack);
+            host2RackMapping.put(hostname, rack);
         } else if (values.get(Keys.TASK_STATUS).equals(EagleTaskStatus.KILLED.name()) || values.get(Keys.TASK_STATUS).equals(EagleTaskStatus.FAILED.name())) {
             hostname = values.get(Keys.HOSTNAME);
             // make every effort to get RACK information
             hostname = (hostname == null) ? "" : hostname;
-            rack = m_host2RackMapping.get(hostname);
+            rack = host2RackMapping.get(hostname);
         }
 
         values.put(Keys.HOSTNAME, hostname);
@@ -149,6 +147,6 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
     }
 
     public JobExecutionAPIEntity jobExecution() {
-        return m_jobExecutionEntity;
+        return jobExecutionEntity;
     }
 }

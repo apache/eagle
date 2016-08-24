@@ -32,7 +32,7 @@ public final class JobConfig {
         this.config = config;
     }
     
-    public String toString(){
+    public String toString() {
         return config.toString();
     }
 }

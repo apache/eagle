@@ -16,12 +16,13 @@
  */
 package org.apache.eagle.service.security.oozie.dao;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
 
-public class OozieMetadataAccessConfigDAOImpl implements OozieMetadataAccessConfigDAO{
+import com.typesafe.config.Config;
+
+public class OozieMetadataAccessConfigDAOImpl implements OozieMetadataAccessConfigDAO {
     @Override
-    public OozieMetadataAccessConfig getConfig(String site) throws Exception{
+    public OozieMetadataAccessConfig getConfig(String site) throws Exception {
         MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
         Config config = repo.getConfig("oozieAuditLog", site);
         return OozieMetadataAccessConfig.config2Entity(config);

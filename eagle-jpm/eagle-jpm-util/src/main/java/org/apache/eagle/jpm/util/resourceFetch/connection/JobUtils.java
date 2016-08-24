@@ -14,30 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.util.resourceFetch.connection;
+package org.apache.eagle.jpm.util.resourcefetch.connection;
 
 import org.apache.eagle.jpm.util.Constants;
 
 public class JobUtils {
-	
-	public static String checkAndAddLastSlash(String urlBase) {
-		if (!urlBase.endsWith("/")) {
-			return urlBase + "/";
-		}
-		return urlBase;
-	}
-	
-	public static String getJobIDByAppID(String appID) {
-		if (appID.startsWith(Constants.APPLICATION_PREFIX)) {
-			return appID.replace(Constants.APPLICATION_PREFIX, Constants.JOB_PREFIX);
-		}
-		return null;
-	}
 
-	public static String getAppIDByJobID(String jobID) {
-		if (jobID.startsWith(Constants.JOB_PREFIX)) {
-			return jobID.replace(Constants.JOB_PREFIX, Constants.APPLICATION_PREFIX);
-		}
-		return null;
-	}
+    public static String checkAndAddLastSlash(String urlBase) {
+        if (!urlBase.endsWith("/")) {
+            return urlBase + "/";
+        }
+        return urlBase;
+    }
+
+    public static String getJobIDByAppID(String appID) {
+        if (appID.startsWith(Constants.APPLICATION_PREFIX)) {
+            return appID.replace(Constants.APPLICATION_PREFIX, Constants.JOB_PREFIX);
+        }
+        return null;
+    }
+
+    public static String getAppIDByJobID(String jobID) {
+        if (jobID.startsWith(Constants.JOB_PREFIX)) {
+            return jobID.replace(Constants.JOB_PREFIX, Constants.APPLICATION_PREFIX);
+        }
+        return null;
+    }
 }
