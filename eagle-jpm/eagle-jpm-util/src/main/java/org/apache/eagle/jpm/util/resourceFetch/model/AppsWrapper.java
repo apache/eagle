@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.util.resourceFetch.model;
+package org.apache.eagle.jpm.util.resourcefetch.model;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AppsWrapper {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Applications apps;
+    private Applications apps;
 
-	public Applications getApps() {
-		return apps;
-	}
+    public Applications getApps() {
+        return apps;
+    }
 
-	public void setApps(Applications apps) {
-		this.apps = apps;
-	}
-	
+    public void setApps(Applications apps) {
+        this.apps = apps;
+    }
+
 }

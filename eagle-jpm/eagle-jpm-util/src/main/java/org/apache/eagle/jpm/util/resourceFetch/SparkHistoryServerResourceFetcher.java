@@ -17,13 +17,13 @@
  *
  */
 
-package org.apache.eagle.jpm.util.resourceFetch;
+package org.apache.eagle.jpm.util.resourcefetch;
 
 import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
-import org.apache.eagle.jpm.util.resourceFetch.model.SparkApplication;
-import org.apache.eagle.jpm.util.resourceFetch.url.ServiceURLBuilder;
-import org.apache.eagle.jpm.util.resourceFetch.url.SparkJobServiceURLBuilderImpl;
+import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import org.apache.eagle.jpm.util.resourcefetch.model.SparkApplication;
+import org.apache.eagle.jpm.util.resourcefetch.url.ServiceURLBuilder;
+import org.apache.eagle.jpm.util.resourcefetch.url.SparkJobServiceURLBuilderImpl;
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -49,10 +49,11 @@ public class SparkHistoryServerResourceFetcher implements ResourceFetcher<SparkA
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public SparkHistoryServerResourceFetcher(String historyServerURL, String userName, String pwd){
+    public SparkHistoryServerResourceFetcher(String historyServerURL, String userName, String pwd) {
         this.historyServerURL = historyServerURL;
         this.sparkDetailJobServiceURLBuilder = new SparkJobServiceURLBuilderImpl();
-        this.auth = "Basic " + new String(new Base64().encode(String.format("%s:%s", userName, pwd).getBytes()));;
+        this.auth = "Basic " + new String(new Base64().encode(String.format("%s:%s", userName, pwd).getBytes()));
+        ;
     }
 
     private List<SparkApplication> doFetchSparkApplicationDetail(String appId) throws Exception {
@@ -66,14 +67,20 @@ public class SparkHistoryServerResourceFetcher implements ResourceFetcher<SparkA
         } catch (FileNotFoundException e) {
             return null;
         } finally {
-            if (is != null) { try {is.close();} catch (Exception e) { } }
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Exception e) {
+                    LOG.warn("{}", e);
+                }
+            }
         }
     }
 
-    public List<SparkApplication> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception{
-        switch(resoureType) {
+    public List<SparkApplication> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception {
+        switch (resoureType) {
             case SPARK_JOB_DETAIL:
-                return doFetchSparkApplicationDetail((String)parameter[0]);
+                return doFetchSparkApplicationDetail((String) parameter[0]);
             default:
                 throw new Exception("Not support resourceType :" + resoureType);
         }

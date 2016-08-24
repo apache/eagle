@@ -17,11 +17,11 @@
 
 package org.apache.eagle.jpm.spark.running.entities;
 
-import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.apache.eagle.jpm.util.Constants;
 
 @Table("eagleSparkRunningApps")
 @ColumnFamily("f")
@@ -265,11 +265,14 @@ public class SparkAppEntity extends TaggedLogAPIEntity {
         return driveMemoryBytes;
     }
 
-    public int getCompleteTasks(){ return completeTasks;}
+    public int getCompleteTasks() {
+        return completeTasks;
+    }
 
     public JobConfig getConfig() {
         return config;
     }
+
     public void setStartTime(long startTime) {
         this.startTime = startTime;
         valueChanged("startTime");
@@ -420,7 +423,7 @@ public class SparkAppEntity extends TaggedLogAPIEntity {
         valueChanged("driveMemoryBytes");
     }
 
-    public void setCompleteTasks(int completeTasks){
+    public void setCompleteTasks(int completeTasks) {
         this.completeTasks = completeTasks;
         valueChanged("completeTasks");
     }

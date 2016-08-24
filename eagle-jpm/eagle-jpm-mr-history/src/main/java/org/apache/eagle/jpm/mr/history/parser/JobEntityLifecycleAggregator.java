@@ -18,37 +18,36 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.jpm.mr.historyentity.JobBaseAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.mr.historyentity.TaskAttemptExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleListener {
-    private final static Logger LOG = LoggerFactory.getLogger(JobEntityLifecycleAggregator.class);
-    private JobExecutionAPIEntity m_jobExecutionAPIEntity;
-    private final JobCounterAggregateFunction m_mapTaskAttemptCounterAgg;
-    private final JobCounterAggregateFunction m_reduceTaskAttemptCounterAgg;
+    private static final Logger LOG = LoggerFactory.getLogger(JobEntityLifecycleAggregator.class);
+    private JobExecutionAPIEntity jobExecutionAPIEntity;
+    private final JobCounterAggregateFunction mapTaskAttemptCounterAgg;
+    private final JobCounterAggregateFunction reduceTaskAttemptCounterAgg;
 
-    private final JobCounterAggregateFunction m_mapFileSystemCounterAgg;
-    private final JobCounterAggregateFunction m_reduceFileSystemTaskCounterAgg;
+    private final JobCounterAggregateFunction mapFileSystemCounterAgg;
+    private final JobCounterAggregateFunction reduceFileSystemTaskCounterAgg;
 
-    private long m_mapAttemptDuration = 0;
-    private long m_reduceAttemptDuration = 0;
+    private long mapAttemptDuration = 0;
+    private long reduceAttemptDuration = 0;
     private boolean jobFinished = false;
 
     public JobEntityLifecycleAggregator() {
-        this.m_mapTaskAttemptCounterAgg = new JobCounterSumFunction();
-        this.m_reduceTaskAttemptCounterAgg = new JobCounterSumFunction();
-        this.m_mapFileSystemCounterAgg = new JobCounterSumFunction();
-        this.m_reduceFileSystemTaskCounterAgg = new JobCounterSumFunction();
+        this.mapTaskAttemptCounterAgg = new JobCounterSumFunction();
+        this.reduceTaskAttemptCounterAgg = new JobCounterSumFunction();
+        this.mapFileSystemCounterAgg = new JobCounterSumFunction();
+        this.reduceFileSystemTaskCounterAgg = new JobCounterSumFunction();
     }
 
     @Override
@@ -57,7 +56,7 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
             if (entity instanceof TaskAttemptExecutionAPIEntity) {
                 taskAttemptEntityCreated((TaskAttemptExecutionAPIEntity) entity);
             } else if (entity instanceof JobExecutionAPIEntity) {
-                this.m_jobExecutionAPIEntity = (JobExecutionAPIEntity) entity;
+                this.jobExecutionAPIEntity = (JobExecutionAPIEntity) entity;
             }
         }
     }
@@ -65,44 +64,44 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
     @Override
     public void jobFinish() {
         try {
-            if (m_jobExecutionAPIEntity == null) {
+            if (jobExecutionAPIEntity == null) {
                 throw new IOException("No JobExecutionAPIEntity found before flushing");
             }
 
             LOG.debug("Updating aggregated task attempts to job level counters");
 
-            JobCounters jobCounters = m_jobExecutionAPIEntity.getJobCounters();
+            JobCounters jobCounters = jobExecutionAPIEntity.getJobCounters();
 
             if (jobCounters == null) {
-                LOG.warn("no job counter found for " + this.m_jobExecutionAPIEntity);
+                LOG.warn("no job counter found for " + this.jobExecutionAPIEntity);
                 jobCounters = new JobCounters();
             }
 
             Map<String, Map<String, Long>> counters = jobCounters.getCounters();
 
-            Map<String, Long> mapTaskAttemptCounter = this.m_mapTaskAttemptCounterAgg.result();
+            Map<String, Long> mapTaskAttemptCounter = this.mapTaskAttemptCounterAgg.result();
             if (mapTaskAttemptCounter == null) {
                 mapTaskAttemptCounter = new HashMap<>();
             }
-            mapTaskAttemptCounter.put(Constants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.m_mapAttemptDuration);
+            mapTaskAttemptCounter.put(Constants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.mapAttemptDuration);
             counters.put(Constants.MAP_TASK_ATTEMPT_COUNTER, mapTaskAttemptCounter);
 
-            Map<String, Long> reduceTaskAttemptCounter = this.m_reduceTaskAttemptCounterAgg.result();
+            Map<String, Long> reduceTaskAttemptCounter = this.reduceTaskAttemptCounterAgg.result();
             if (reduceTaskAttemptCounter == null) {
                 reduceTaskAttemptCounter = new HashMap<>();
             }
-            reduceTaskAttemptCounter.put(Constants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.m_reduceAttemptDuration);
+            reduceTaskAttemptCounter.put(Constants.TaskAttemptCounter.TASK_ATTEMPT_DURATION.toString(), this.reduceAttemptDuration);
             counters.put(Constants.REDUCE_TASK_ATTEMPT_COUNTER, reduceTaskAttemptCounter);
 
-            counters.put(Constants.MAP_TASK_ATTEMPT_FILE_SYSTEM_COUNTER, this.m_mapFileSystemCounterAgg.result());
-            counters.put(Constants.REDUCE_TASK_ATTEMPT_FILE_SYSTEM_COUNTER, this.m_reduceFileSystemTaskCounterAgg.result());
+            counters.put(Constants.MAP_TASK_ATTEMPT_FILE_SYSTEM_COUNTER, this.mapFileSystemCounterAgg.result());
+            counters.put(Constants.REDUCE_TASK_ATTEMPT_FILE_SYSTEM_COUNTER, this.reduceFileSystemTaskCounterAgg.result());
 
             jobCounters.setCounters(counters);
 
-            m_jobExecutionAPIEntity.setJobCounters(jobCounters);
+            jobExecutionAPIEntity.setJobCounters(jobCounters);
             jobFinished = true;
         } catch (Exception e) {
-            LOG.error("Failed to update job execution entity: " + this.m_jobExecutionAPIEntity.toString() + ", due to " + e.getMessage(), e);
+            LOG.error("Failed to update job execution entity: " + this.jobExecutionAPIEntity.toString() + ", due to " + e.getMessage(), e);
         }
     }
 
@@ -112,14 +111,14 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
 
         if (taskType != null && jobCounters != null && jobCounters.getCounters() != null) {
             if (Constants.TaskType.MAP.toString().equals(taskType.toUpperCase())) {
-                m_mapAttemptDuration += entity.getDuration();
-                this.m_mapTaskAttemptCounterAgg.accumulate(jobCounters.getCounters().get(Constants.TASK_COUNTER));
-                this.m_mapFileSystemCounterAgg.accumulate(jobCounters.getCounters().get(Constants.FILE_SYSTEM_COUNTER));
+                mapAttemptDuration += entity.getDuration();
+                this.mapTaskAttemptCounterAgg.accumulate(jobCounters.getCounters().get(Constants.TASK_COUNTER));
+                this.mapFileSystemCounterAgg.accumulate(jobCounters.getCounters().get(Constants.FILE_SYSTEM_COUNTER));
                 return;
             } else if (Constants.TaskType.REDUCE.toString().equals(taskType.toUpperCase())) {
-                m_reduceAttemptDuration += entity.getDuration();
-                this.m_reduceTaskAttemptCounterAgg.accumulate(jobCounters.getCounters().get(Constants.TASK_COUNTER));
-                this.m_reduceFileSystemTaskCounterAgg.accumulate(jobCounters.getCounters().get(Constants.FILE_SYSTEM_COUNTER));
+                reduceAttemptDuration += entity.getDuration();
+                this.reduceTaskAttemptCounterAgg.accumulate(jobCounters.getCounters().get(Constants.TASK_COUNTER));
+                this.reduceFileSystemTaskCounterAgg.accumulate(jobCounters.getCounters().get(Constants.FILE_SYSTEM_COUNTER));
                 return;
             }
         }
@@ -151,10 +150,7 @@ public class JobEntityLifecycleAggregator implements HistoryJobEntityLifecycleLi
         public JobCounterSumFunction() {
             result = new HashMap<>();
         }
-
-        /**
-         * @param counters
-         */
+        
         @Override
         public void accumulate(Map<String, Long> counters) {
             if (counters != null) {

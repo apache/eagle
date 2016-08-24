@@ -19,15 +19,11 @@
 package org.apache.eagle.jpm.mr.history.parser;
 
 /**
- * used to warn that one job history file has not yet completed writing to hdfs
+ * used to warn that one job history file has not yet completed writing to hdfs.
  * This happens when feeder catches up and the history file has not been written into hdfs completely
  *
- * @author yonzhang
  */
 public class JHFWriteNotCompletedException extends Exception {
-    /**
-     *
-     */
     private static final long serialVersionUID = -3060175780718218490L;
 
     public JHFWriteNotCompletedException(String msg) {

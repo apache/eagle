@@ -24,9 +24,14 @@ import java.util.regex.Pattern;
 
 public interface JobHistoryContentFilter extends Serializable {
     boolean acceptJobFile();
+
     boolean acceptJobConfFile();
+
     List<Pattern> getMustHaveJobConfKeyPatterns();
+
     List<Pattern> getJobConfKeyInclusionPatterns();
+
     List<Pattern> getJobConfKeyExclusionPatterns();
+    
     String getJobNameKey();
 }

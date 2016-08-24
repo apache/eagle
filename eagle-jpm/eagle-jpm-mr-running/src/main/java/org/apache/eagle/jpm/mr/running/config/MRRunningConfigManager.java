@@ -18,8 +18,8 @@
 
 package org.apache.eagle.jpm.mr.running.config;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.common.config.ConfigOptionParser;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,27 +27,35 @@ import java.io.Serializable;
 
 public class MRRunningConfigManager implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRRunningConfigManager.class);
+
     public String getEnv() {
         return env;
     }
+
     private String env;
 
-    public ZKStateConfig getZkStateConfig() { return zkStateConfig; }
+    public ZKStateConfig getZkStateConfig() {
+        return zkStateConfig;
+    }
+
     private ZKStateConfig zkStateConfig;
 
     public EagleServiceConfig getEagleServiceConfig() {
         return eagleServiceConfig;
     }
+
     private EagleServiceConfig eagleServiceConfig;
 
     public JobExtractorConfig getJobExtractorConfig() {
         return jobExtractorConfig;
     }
+
     private JobExtractorConfig jobExtractorConfig;
 
     public EndpointConfig getEndpointConfig() {
         return endpointConfig;
     }
+
     private EndpointConfig endpointConfig;
 
     public static class ZKStateConfig implements Serializable {
@@ -82,6 +90,7 @@ public class MRRunningConfigManager implements Serializable {
     public Config getConfig() {
         return config;
     }
+
     private Config config;
 
     private static MRRunningConfigManager manager = new MRRunningConfigManager();

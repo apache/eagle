@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.util.resourceFetch.connection;
+package org.apache.eagle.jpm.util.resourcefetch.connection;
 
 import org.apache.eagle.jpm.util.Constants;
 
@@ -26,44 +26,43 @@ import java.util.zip.GZIPInputStream;
 
 public class InputStreamUtils {
 
-	private static final int CONNECTION_TIMEOUT = 10 * 1000;
-	private static final int READ_TIMEOUT = 5 * 60 * 1000;
-	private static final String GZIP_HTTP_HEADER = "Accept-Encoding";
-	private static final String GZIP_COMPRESSION = "gzip";
-	
-	private static InputStream openGZIPInputStream(URL url, String auth, int timeout) throws IOException {
-		final URLConnection connection = url.openConnection();
-		connection.setConnectTimeout(CONNECTION_TIMEOUT);
-		connection.setReadTimeout(timeout);
-		connection.addRequestProperty(GZIP_HTTP_HEADER, GZIP_COMPRESSION);
-		if (null != auth){
-			connection.setRequestProperty ("Authorization", auth);
-		}
-		return new GZIPInputStream(connection.getInputStream());
-	}
-	
-	private static InputStream openInputStream(URL url, String auth, int timeout) throws IOException {
-		URLConnection connection = url.openConnection();
-		connection.setConnectTimeout(timeout);
-		if (null != auth){
-			connection.setRequestProperty ("Authorization", auth);
-		}
+    private static final int CONNECTION_TIMEOUT = 10 * 1000;
+    private static final int READ_TIMEOUT = 5 * 60 * 1000;
+    private static final String GZIP_HTTP_HEADER = "Accept-Encoding";
+    private static final String GZIP_COMPRESSION = "gzip";
 
-		return connection.getInputStream();
-	}
-	
-	public static InputStream getInputStream(String urlString, String auth, Constants.CompressionType compressionType, int timeout) throws Exception {
-		final URL url = URLConnectionUtils.getUrl(urlString);
-		if (compressionType.equals(Constants.CompressionType.GZIP)) {
-			return openGZIPInputStream(url, auth, timeout);
-		}
-		else { // CompressionType.NONE
-			return openInputStream(url, auth, timeout);
-		}
-	}
-	
-	public static InputStream getInputStream(String urlString, String auth, Constants.CompressionType compressionType) throws Exception {
-		return getInputStream(urlString, auth, compressionType, READ_TIMEOUT);
-	}
+    private static InputStream openGZIPInputStream(URL url, String auth, int timeout) throws IOException {
+        final URLConnection connection = url.openConnection();
+        connection.setConnectTimeout(CONNECTION_TIMEOUT);
+        connection.setReadTimeout(timeout);
+        connection.addRequestProperty(GZIP_HTTP_HEADER, GZIP_COMPRESSION);
+        if (null != auth) {
+            connection.setRequestProperty("Authorization", auth);
+        }
+        return new GZIPInputStream(connection.getInputStream());
+    }
+
+    private static InputStream openInputStream(URL url, String auth, int timeout) throws IOException {
+        URLConnection connection = url.openConnection();
+        connection.setConnectTimeout(timeout);
+        if (null != auth) {
+            connection.setRequestProperty("Authorization", auth);
+        }
+
+        return connection.getInputStream();
+    }
+
+    public static InputStream getInputStream(String urlString, String auth, Constants.CompressionType compressionType, int timeout) throws Exception {
+        final URL url = URLConnectionUtils.getUrl(urlString);
+        if (compressionType.equals(Constants.CompressionType.GZIP)) {
+            return openGZIPInputStream(url, auth, timeout);
+        } else { // CompressionType.NONE
+            return openInputStream(url, auth, timeout);
+        }
+    }
+
+    public static InputStream getInputStream(String urlString, String auth, Constants.CompressionType compressionType) throws Exception {
+        return getInputStream(urlString, auth, compressionType, READ_TIMEOUT);
+    }
 
 }

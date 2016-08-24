@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.spark.running.parser;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.spark.crawl.EventType;
 import org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig;
 import org.apache.eagle.jpm.spark.running.entities.*;
@@ -27,9 +26,10 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.SparkJobTagName;
 import org.apache.eagle.jpm.util.Utils;
-import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
-import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
-import org.apache.eagle.jpm.util.resourceFetch.model.*;
+import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
+import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import org.apache.eagle.jpm.util.resourcefetch.model.*;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -189,12 +189,12 @@ public class SparkApplicationParser implements Runnable {
                     //we must flush entities before delete from zk in case of missing finish state of jobs
                     //delete from zk if needed
                     sparkAppEntityMap.keySet()
-                            .stream()
-                            .filter(
-                                    jobId -> sparkAppEntityMap.get(jobId).getYarnState().equals(Constants.AppState.FINISHED.toString()) ||
-                                            sparkAppEntityMap.get(jobId).getYarnState().equals(Constants.AppState.FAILED.toString()))
-                            .forEach(
-                                    jobId -> this.sparkRunningJobManager.delete(app.getId(), jobId));
+                        .stream()
+                        .filter(
+                            jobId -> sparkAppEntityMap.get(jobId).getYarnState().equals(Constants.AppState.FINISHED.toString())
+                                || sparkAppEntityMap.get(jobId).getYarnState().equals(Constants.AppState.FAILED.toString()))
+                        .forEach(
+                            jobId -> this.sparkRunningJobManager.delete(app.getId(), jobId));
                 }
 
                 LOG.info("finish process yarn application " + app.getId());
@@ -243,12 +243,12 @@ public class SparkApplicationParser implements Runnable {
         JobConfig jobConfig = null;
 
         try (FileSystem hdfs = HDFSUtil.getFileSystem(this.hdfsConf)) {
-//             // For Yarn version >= 2.7,
-//             // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
-//             String attemptIdFormatted = String.format("%06d", attemptId);
-//             // remove "application_" to get the number part of appID.
-//             String sparkAppIdNum = sparkAppId.substring(12);
-//             String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+            //             // For Yarn version >= 2.7,
+            //             // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
+            //             String attemptIdFormatted = String.format("%06d", attemptId);
+            //             // remove "application_" to get the number part of appID.
+            //             String sparkAppIdNum = sparkAppId.substring(12);
+            //             String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
 
             // For Yarn version 2.4.x
             // log name: application_1464382345557_269065_1
@@ -277,8 +277,8 @@ public class SparkApplicationParser implements Runnable {
     }
 
     private boolean isClientMode(JobConfig jobConfig) {
-        return jobConfig.containsKey(Constants.SPARK_MASTER_KEY) &&
-               jobConfig.get(Constants.SPARK_MASTER_KEY).equalsIgnoreCase("yarn-client");
+        return jobConfig.containsKey(Constants.SPARK_MASTER_KEY)
+            && jobConfig.get(Constants.SPARK_MASTER_KEY).equalsIgnoreCase("yarn-client");
     }
 
     private boolean fetchSparkApps() {
@@ -315,10 +315,10 @@ public class SparkApplicationParser implements Runnable {
                 lastSavedAttempt = Integer.parseInt(sparkAppEntityMap.get(id).getTags().get(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString()));
             }
             for (int j = lastSavedAttempt; j <= currentAttempt; j++) {
-                SparkAppEntity attemptEntity = new SparkAppEntity();
                 commonTags.put(SparkJobTagName.SPARK_APP_NAME.toString(), sparkApplication.getName());
                 commonTags.put(SparkJobTagName.SPARK_APP_ATTEMPT_ID.toString(), "" + j);
                 commonTags.put(SparkJobTagName.SPARK_APP_ID.toString(), id);
+                SparkAppEntity attemptEntity = new SparkAppEntity();
                 attemptEntity.setTags(new HashMap<>(commonTags));
                 attemptEntity.setAppInfo(app);
 
@@ -340,9 +340,9 @@ public class SparkApplicationParser implements Runnable {
                     JobConfig jobConfig = attemptEntity.getConfig();
                     attemptEntity.setExecMemoryBytes(Utils.parseMemory(jobConfig.get(Constants.SPARK_EXECUTOR_MEMORY_KEY)));
 
-                    attemptEntity.setDriveMemoryBytes(isClientMode(jobConfig) ?
-                            0 :
-                            Utils.parseMemory(jobConfig.get(Constants.SPARK_DRIVER_MEMORY_KEY)));
+                    attemptEntity.setDriveMemoryBytes(isClientMode(jobConfig)
+                        ? 0
+                        : Utils.parseMemory(jobConfig.get(Constants.SPARK_DRIVER_MEMORY_KEY)));
                     attemptEntity.setExecutorCores(Integer.parseInt(jobConfig.get(Constants.SPARK_EXECUTOR_CORES_KEY)));
                     // spark.driver.cores may not be set.
                     String driverCoresStr = jobConfig.get(Constants.SPARK_DRIVER_CORES_KEY);

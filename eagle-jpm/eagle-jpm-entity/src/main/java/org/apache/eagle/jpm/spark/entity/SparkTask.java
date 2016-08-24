@@ -18,10 +18,10 @@
 
 package org.apache.eagle.jpm.spark.entity;
 
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.apache.eagle.jpm.util.Constants;
 
 @Table("eglesprk_tasks")
 @ColumnFamily("f")
@@ -31,7 +31,7 @@ import org.apache.eagle.jpm.util.Constants;
 @TimeSeries(true)
 @Tags({"site","sprkAppId", "sprkAppAttemptId", "sprkAppName", "normSprkAppName", "jobId", "jobName", "stageId","stageAttemptId","taskIndex","taskAttemptId","user", "queue"})
 @Partition({"site"})
-public class SparkTask extends TaggedLogAPIEntity{
+public class SparkTask extends TaggedLogAPIEntity {
 
     @Column("a")
     private int taskId;

@@ -29,37 +29,37 @@ public class JSONUtil {
         return null;
     }
 
-    public static Integer getInt(JSONObject obj, String field){
-        if(obj.containsKey(field)){
-            return ((Long)obj.get(field)).intValue();
+    public static Integer getInt(JSONObject obj, String field) {
+        if (obj.containsKey(field)) {
+            return ((Long) obj.get(field)).intValue();
         }
         return null;
     }
 
-    public static Long getLong(JSONObject obj, String field){
-        if(obj.containsKey(field)){
-            return (Long)obj.get(field);
+    public static Long getLong(JSONObject obj, String field) {
+        if (obj.containsKey(field)) {
+            return (Long) obj.get(field);
         }
         return null;
     }
 
-    public static Boolean getBoolean(JSONObject obj, String field){
-        if(obj.containsKey(field)){
-            return (Boolean)obj.get(field);
+    public static Boolean getBoolean(JSONObject obj, String field) {
+        if (obj.containsKey(field)) {
+            return (Boolean) obj.get(field);
         }
         return null;
     }
 
-    public static JSONObject getJSONObject(JSONObject obj, String field){
-        if(obj.containsKey(field)){
-            return (JSONObject)obj.get(field);
+    public static JSONObject getJSONObject(JSONObject obj, String field) {
+        if (obj.containsKey(field)) {
+            return (JSONObject) obj.get(field);
         }
         return null;
     }
 
-    public static JSONArray getJSONArray(JSONObject obj, String field){
-        if(obj.containsKey(field)){
-            return (JSONArray)obj.get(field);
+    public static JSONArray getJSONArray(JSONObject obj, String field) {
+        if (obj.containsKey(field)) {
+            return (JSONArray) obj.get(field);
         }
         return null;
     }

@@ -16,10 +16,10 @@
  *
  */
 
-package org.apache.eagle.jpm.util.resourceFetch.ha;
+package org.apache.eagle.jpm.util.resourcefetch.ha;
 
 import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.jpm.util.resourceFetch.connection.InputStreamUtils;
+import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
 import org.apache.hadoop.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,13 @@ public abstract class AbstractURLSelector implements HAURLSelector {
             LOG.info("get input stream from url: " + urlString + " failed. ");
             return false;
         } finally {
-            if (is != null) { try {	is.close(); } catch (IOException e) {/*Do nothing*/} }
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    LOG.warn("{}", e);
+                }
+            }
         }
         return true;
     }
@@ -66,9 +72,13 @@ public abstract class AbstractURLSelector implements HAURLSelector {
 
     @Override
     public void reSelectUrl() throws IOException {
-        if (reselectInProgress) return;
-        synchronized(this) {
-            if (reselectInProgress) return;
+        if (reselectInProgress) {
+            return;
+        }
+        synchronized (this) {
+            if (reselectInProgress) {
+                return;
+            }
             reselectInProgress = true;
             try {
                 LOG.info("Going to reselect url");
@@ -81,16 +91,16 @@ public abstract class AbstractURLSelector implements HAURLSelector {
                             LOG.info("Successfully switch to new url : " + selectedUrl);
                             return;
                         }
-                        LOG.info("try url " + urlToCheck + "fail for " + (time+1) + " times, sleep 5 seconds before try again. ");
+                        LOG.info("try url " + urlToCheck + "fail for " + (time + 1) + " times, sleep 5 seconds before try again. ");
                         try {
                             Thread.sleep(5 * 1000);
+                        } catch (InterruptedException ex) {
+                            LOG.warn("{}", ex);
                         }
-                        catch (InterruptedException ex) { /* Do Nothing */}
                     }
                 }
-                throw new IOException("No alive url found: "+ StringUtils.join(";", Arrays.asList(this.urls)));
-            }
-            finally {
+                throw new IOException("No alive url found: " + StringUtils.join(";", Arrays.asList(this.urls)));
+            } finally {
                 reselectInProgress = false;
             }
         }

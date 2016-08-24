@@ -43,10 +43,10 @@ public class JHFMRVer1Parser implements JHFParserBase {
     static final Pattern pattern = Pattern.compile(KEY + "=" + "\"" + VALUE + "\"");
     static final String MAX_COUNTER_COUNT = "10000";
 
-    private JHFMRVer1EventReader m_reader;
+    private JHFMRVer1EventReader reader;
 
     public JHFMRVer1Parser(JHFMRVer1EventReader reader) {
-        this.m_reader = reader;
+        this.reader = reader;
     }
 
     /**
@@ -85,13 +85,14 @@ public class JHFMRVer1Parser implements JHFParserBase {
                     buf.append("\n");
                     continue;
                 }
-                parseLine(buf.toString(), m_reader, isEscaped);
+                parseLine(buf.toString(), this.reader, isEscaped);
                 buf = new StringBuffer();
-            } while ((line = reader.readLine()) != null);
+            }
+            while ((line = reader.readLine()) != null);
 
             // flush to tell listener that we have finished parsing
             logger.info("finish parsing job history file and close");
-            m_reader.close();
+            this.reader.close();
         } catch (Exception ex) {
             logger.error("can not parse correctly ", ex);
             throw ex;
@@ -120,10 +121,6 @@ public class JHFMRVer1Parser implements JHFParserBase {
             }
             parseBuffer.put(Keys.valueOf(parts[0]), value);
         }
-
-//        if(conf!=null){
-//            parseBuffer.put(Keys.NORM_JOBNAME, conf.get(JPAConstants.JOB_CONF_NORM_JOBNAME_KEY));
-//        }
 
         try {
             l.handle(RecordTypes.valueOf(recType), parseBuffer);

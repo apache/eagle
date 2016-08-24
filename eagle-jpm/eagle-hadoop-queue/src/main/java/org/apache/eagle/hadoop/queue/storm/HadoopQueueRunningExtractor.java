@@ -27,7 +27,7 @@ import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
 import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
 import org.apache.eagle.hadoop.queue.common.YarnURLSelectorImpl;
 import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.jpm.util.resourceFetch.ha.HAURLSelector;
+import org.apache.eagle.jpm.util.resourcefetch.ha.HAURLSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

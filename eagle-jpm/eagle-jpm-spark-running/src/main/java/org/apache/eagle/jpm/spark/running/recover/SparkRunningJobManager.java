@@ -18,14 +18,15 @@
 
 package org.apache.eagle.jpm.spark.running.recover;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig;
 import org.apache.eagle.jpm.spark.running.entities.SparkAppEntity;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
-import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
+import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SparkRunningJobManager implements Serializable {
     private RunningJobManager runningJobManager;

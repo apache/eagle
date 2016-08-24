@@ -86,7 +86,7 @@ public final class CounterGroupDictionary {
             final Properties prop = new Properties();
             try {
                 prop.load(is);
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 final String errMsg = "Failed to load JobCounter.conf, reason: " + ex.getMessage();
                 LOG.error(errMsg, ex);
                 throw new JobCounterException(errMsg, ex);
@@ -100,6 +100,7 @@ public final class CounterGroupDictionary {
                 try {
                     is.close();
                 } catch (IOException e) {
+                    LOG.warn("{}", e);
                 }
             }
         }
@@ -162,18 +163,22 @@ public final class CounterGroupDictionary {
             this.description = description;
             this.groupKey = groupKey;
         }
+
         @Override
         public int getIndex() {
             return index;
         }
+
         @Override
         public List<String> getNames() {
             return counterNames;
         }
+
         @Override
         public String getDescription() {
             return description;
         }
+
         @Override
         public CounterGroupKey getGroupKey() {
             return groupKey;
@@ -200,22 +205,27 @@ public final class CounterGroupDictionary {
         public int getIndex() {
             return index;
         }
+
         @Override
         public String getName() {
             return name;
         }
+
         @Override
         public String getDescription() {
             return description;
         }
+
         @Override
         public int getCounterNumber() {
             return counterKeys.length;
         }
+
         @Override
         public List<CounterKey> listCounterKeys() {
             return Arrays.asList(counterKeys);
         }
+
         @Override
         public CounterKey getCounterKeyByName(String name) {
             for (CounterKey counterKey : counterKeys) {
@@ -227,6 +237,7 @@ public final class CounterGroupDictionary {
             }
             return null;
         }
+
         @Override
         public CounterKey getCounterKeyByID(int index) {
             if (index < 0 || index >= counterKeys.length) {
