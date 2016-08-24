@@ -26,15 +26,19 @@
 		var _targetPriority = 0;
 
 		// Go
-		$wrapState.go = function(state, param, priority) {
+		$wrapState.go = function(state, param, option, priority) {
 			setTimeout(function() {
 				_targetState = null;
 				_targetPriority = 0;
 			});
 
 			if(typeof param !== "object") {
-				param = {};
 				priority = param;
+				param = {};
+				option = {};
+			} else if(typeof option !== "object") {
+				priority = option;
+				option = {};
 			}
 
 			priority = priority === true ? 1 : (priority || 0);
@@ -49,7 +53,7 @@
 					$state.reload();
 				} else {
 					console.log("[Wrap State] Go:", state, param, priority);
-					$state.go(state, param);
+					$state.go(state, param, option);
 				}
 				_targetState = state;
 				_targetPriority = priority;

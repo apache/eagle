@@ -167,10 +167,20 @@ var app = {};
 			window._Time = $scope.Time = Time;
 			$scope.common = common;
 
+			var state_next;
+			var state_current;
+			var param_next;
+			var param_current;
+
 			// ============================== Route Update ==============================
 			$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
 				console.log("[Switch] current ->", current, currentParam);
 				console.log("[Switch] next ->", next, nextParam);
+
+				state_next = next || {};
+				state_current = current || {};
+				param_next = nextParam;
+				param_current = currentParam;
 
 				var currentName = (current || {}).name || "";
 				var nextName = (next || {}).name || "";
@@ -185,6 +195,8 @@ var app = {};
 				/**
 				 * @param {{}} e
 				 * @param {function} e.preventDefault
+				 * @param {string} newUrl
+				 * @param {string} oldUrl
 				 */
 				function(e, newUrl, oldUrl) {
 					e.preventDefault();
@@ -192,8 +204,12 @@ var app = {};
 					// Check if page needn't update
 					for(var i = 0 ; i < register.routeList.length ; i += 1) {
 						var route = register.routeList[i];
-						if(route.sync && !route.sync(newUrl, oldUrl)) {
-							return;
+						try {
+							if (route.config.sync && !route.config.sync(newUrl, oldUrl, state_next, param_next, state_current, param_current)) {
+								return;
+							}
+						} catch(err) {
+							console.error("[Sync] Route sync error:", route, err);
 						}
 					}
 

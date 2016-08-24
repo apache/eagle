@@ -52,7 +52,7 @@
 					<span class="label label-{{getStateClass(job.currentState)}}">{{job.currentState}}</span>
 				</h3>
 				<div class="pull-right box-tools">
-					<a class="btn btn-primary btn-xs">
+					<a ui-sref="jpmCompare({siteId: site, jobDefId: job.tags.jobDefId, to: job.tags.jobId})" class="btn btn-primary btn-xs">
 						<span class="fa fa-code-fork"></span>
 						Compare
 					</a>

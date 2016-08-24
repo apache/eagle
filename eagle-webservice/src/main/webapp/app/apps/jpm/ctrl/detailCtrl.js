@@ -22,8 +22,6 @@
 	 */
 	register(function (jpmApp) {
 		jpmApp.controller("detailCtrl", function ($q, $wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
-			// TODO: invalid job def id. [] {} <> not support!
-
 			var TASK_BUCKET_TIMES = [0, 30, 60, 120, 300, 600, 1800, 3600, 7200, 18000];
 			var i;
 			var startTime, endTime;
@@ -44,21 +42,6 @@
 				jobId: $scope.jobId,
 				site: $scope.site
 			};
-
-			function metricsToSeries(name, metrics, rawData) {
-				var data = $.map(metrics, function (metric) {
-					return rawData ? metric.value[0] : {
-						x: metric.timestamp,
-						y: metric.value[0]
-					};
-				});
-				return {
-					name: name,
-					symbol: 'none',
-					type: "line",
-					data: data
-				};
-			}
 
 			function taskDistribution(jobId) {
 				return JPM.taskDistribution($scope.site, jobId, TASK_BUCKET_TIMES.join(",")).then(
@@ -177,9 +160,9 @@
 				metric_runningContainers = JPM.metrics(jobCond, "hadoop.job.runningcontainers", startTime, endTime);
 
 				$q.all([metric_allocatedMB._promise, metric_allocatedVCores._promise, metric_runningContainers._promise]).then(function () {
-					var series_allocatedMB = metricsToSeries("allocated MB", metric_allocatedMB);
-					var series_allocatedVCores = metricsToSeries("vCores", metric_allocatedVCores);
-					var series_runningContainers = metricsToSeries("running containers", metric_runningContainers);
+					var series_allocatedMB = JPM.metricsToSeries("allocated MB", metric_allocatedMB);
+					var series_allocatedVCores = JPM.metricsToSeries("vCores", metric_allocatedVCores);
+					var series_runningContainers = JPM.metricsToSeries("running containers", metric_runningContainers);
 					series_allocatedMB.yAxisIndex = 1;
 					$scope.allocatedSeries = [series_allocatedMB, series_allocatedVCores, series_runningContainers];
 				});
@@ -312,8 +295,8 @@
 								var compared_interval_metric_runningContainers = JPM.metricsToInterval(compared_metric_runningContainers, 1000 * 60);
 
 								// Convert metrics to chart series
-								var series_runningContainers = metricsToSeries("current job running containers", interval_metric_runningContainers, true);
-								var series_compared_runningContainers = metricsToSeries("compared job running containers", compared_interval_metric_runningContainers, true);
+								var series_runningContainers = JPM.metricsToSeries("current job running containers", interval_metric_runningContainers, true);
+								var series_compared_runningContainers = JPM.metricsToSeries("compared job running containers", compared_interval_metric_runningContainers, true);
 
 								$scope.comparisonContainerCategories = intervalCategories(interval_metric_runningContainers, compared_interval_metric_runningContainers);
 								$scope.comparisonContainerSeries = [series_runningContainers, series_compared_runningContainers];
@@ -327,8 +310,8 @@
 								var compared_interval_metric_allocatedMB = JPM.metricsToInterval(compared_metric_allocatedMB, 1000 * 60);
 
 								// Convert metrics to chart series
-								var series_allocatedMB = metricsToSeries("current job allocated MB", interval_metric_allocatedMB, true);
-								var series_compared_allocatedMB = metricsToSeries("compared job allocated MB", compared_interval_metric_allocatedMB, true);
+								var series_allocatedMB = JPM.metricsToSeries("current job allocated MB", interval_metric_allocatedMB, true);
+								var series_compared_allocatedMB = JPM.metricsToSeries("compared job allocated MB", compared_interval_metric_allocatedMB, true);
 
 								$scope.comparisonAllocatedMBCategories = intervalCategories(interval_metric_allocatedMB, compared_interval_metric_allocatedMB);
 								$scope.comparisonAllocatedMBSeries = [series_allocatedMB, series_compared_allocatedMB];
@@ -342,8 +325,8 @@
 								var compared_interval_metric_allocatedVCores = JPM.metricsToInterval(compared_metric_allocatedVCores, 1000 * 60);
 
 								// Convert metrics to chart series
-								var series_allocatedVCores = metricsToSeries("current job vCores", interval_metric_allocatedVCores, true);
-								var series_compared_allocatedVCores = metricsToSeries("compared job vCores", compared_interval_metric_allocatedVCores, true);
+								var series_allocatedVCores = JPM.metricsToSeries("current job vCores", interval_metric_allocatedVCores, true);
+								var series_compared_allocatedVCores = JPM.metricsToSeries("compared job vCores", compared_interval_metric_allocatedVCores, true);
 
 								$scope.comparisonAllocatedVCoresCategories = intervalCategories(interval_metric_allocatedVCores, compared_interval_metric_allocatedVCores);
 								$scope.comparisonAllocatedVCoresSeries = [series_allocatedVCores, series_compared_allocatedVCores];

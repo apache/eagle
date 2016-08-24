@@ -33,13 +33,11 @@
 		templateUrl: "partials/job/detail.html",
 		controller: "detailCtrl"
 	}).route("jpmCompare", {
-		url: "/jpm/compare/:jobId",
+		url: "/jpm/compare/:jobDefId?from&to",
 		site: true,
-		sync: function () {
-
-		},
-		templateUrl: "partials/job/detail.html",
-		controller: "detailCtrl"
+		reloadOnSearch: false,
+		templateUrl: "partials/job/compare.html",
+		controller: "compareCtrl"
 	});
 
 	jpmApp.portal({name: "JPM", icon: "home", path: "jpm/list"}, true);
@@ -229,6 +227,28 @@
 			}));
 		};
 
+		/**
+		 * Convert Entity list data to Chart supported series
+		 * @param name
+		 * @param metrics
+		 * @param rawData
+		 * @return {{name: *, symbol: string, type: string, data: *}}
+		 */
+		JPM.metricsToSeries = function(name, metrics, rawData) {
+			var data = $.map(metrics, function (metric) {
+				return rawData ? metric.value[0] : {
+					x: metric.timestamp,
+					y: metric.value[0]
+				};
+			});
+			return {
+				name: name,
+				symbol: 'none',
+				type: "line",
+				data: data
+			};
+		}
+
 		JPM.metricsToInterval = function (metricList, interval) {
 			if(metricList.length === 0) return [];
 
@@ -285,4 +305,5 @@
 
 	jpmApp.require("ctrl/listCtrl.js");
 	jpmApp.require("ctrl/detailCtrl.js");
+	jpmApp.require("ctrl/compareCtrl.js");
 })();
