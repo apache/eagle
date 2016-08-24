@@ -18,7 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.crawler;
 
-import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
+import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.parser.JHFParserBase;
 import org.apache.eagle.jpm.mr.history.parser.JHFParserFactory;
 import org.slf4j.Logger;
@@ -33,16 +33,16 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
 
 
     private JobHistoryContentFilter m_filter;
-    private JHFConfigManager m_configManager;
+    private MRHistoryJobConfig m_configManager;
 
-    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, JHFConfigManager configManager, EagleOutputCollector eagleCollector) {
+    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, MRHistoryJobConfig configManager, EagleOutputCollector eagleCollector) {
         this.m_filter = filter;
         this.m_configManager = configManager;
     }
 
     @Override
     public void onInputStream(InputStream jobFileInputStream, org.apache.hadoop.conf.Configuration conf) throws Exception {
-        final JHFConfigManager.JobExtractorConfig jobExtractorConfig = m_configManager.getJobExtractorConfig();
+        final MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig = m_configManager.getJobExtractorConfig();
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() { {
             put("site", jobExtractorConfig.site);

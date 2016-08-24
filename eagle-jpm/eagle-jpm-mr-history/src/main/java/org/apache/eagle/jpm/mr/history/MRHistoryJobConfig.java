@@ -16,47 +16,63 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.common;
+package org.apache.eagle.jpm.mr.history;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.common.config.ConfigOptionParser;
 import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
 import org.apache.eagle.jpm.util.JobIdPartitioner;
+
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class JHFConfigManager implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(JHFConfigManager.class);
+public class MRHistoryJobConfig implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobConfig.class);
 
     private static final String JOB_CONFIGURE_KEY_CONF_FILE = "JobConfigKeys.conf";
 
     public String getEnv() {
         return env;
     }
+
     private String env;
 
-    public ZKStateConfig getZkStateConfig() { return zkStateConfig; }
+    public ZKStateConfig getZkStateConfig() {
+        return zkStateConfig;
+    }
+
     private ZKStateConfig zkStateConfig;
 
-    public JobHistoryEndpointConfig getJobHistoryEndpointConfig() { return jobHistoryEndpointConfig; }
+    public JobHistoryEndpointConfig getJobHistoryEndpointConfig() {
+        return jobHistoryEndpointConfig;
+    }
+
     private JobHistoryEndpointConfig jobHistoryEndpointConfig;
 
-    public ControlConfig getControlConfig() { return controlConfig; }
+    public ControlConfig getControlConfig() {
+        return controlConfig;
+    }
+
     private ControlConfig controlConfig;
 
-    public JobExtractorConfig getJobExtractorConfig() { return jobExtractorConfig; }
+    public JobExtractorConfig getJobExtractorConfig() {
+        return jobExtractorConfig;
+    }
+
     private JobExtractorConfig jobExtractorConfig;
 
     public EagleServiceConfig getEagleServiceConfig() {
         return eagleServiceConfig;
     }
+
     private EagleServiceConfig eagleServiceConfig;
 
     public Config getConfig() {
         return config;
     }
+
     private Config config;
 
     public static class ZKStateConfig implements Serializable {
@@ -97,14 +113,14 @@ public class JHFConfigManager implements Serializable {
         public String password;
     }
 
-    private static JHFConfigManager manager = new JHFConfigManager();
+    private static MRHistoryJobConfig manager = new MRHistoryJobConfig();
 
     /**
      * As this is singleton object and constructed while this class is being initialized,
      * so any exception within this constructor will be wrapped with java.lang.ExceptionInInitializerError.
      * And this is unrecoverable and hard to troubleshooting.
      */
-    private JHFConfigManager() {
+    private MRHistoryJobConfig() {
         this.zkStateConfig = new ZKStateConfig();
         this.jobHistoryEndpointConfig = new JobHistoryEndpointConfig();
         this.controlConfig = new ControlConfig();
@@ -112,25 +128,35 @@ public class JHFConfigManager implements Serializable {
         this.eagleServiceConfig = new EagleServiceConfig();
     }
 
-    public static JHFConfigManager getInstance(String []args) {
+    public static MRHistoryJobConfig getInstance(String[] args) {
         manager.init(args);
         return manager;
     }
 
+    public static MRHistoryJobConfig getInstance(Config config) {
+        manager.init(config);
+        return manager;
+    }
+
     /**
-     * read configuration file and load hbase config etc
+     * read configuration file and load hbase config etc.
      */
     private void init(String[] args) {
         // TODO: Probably we can remove the properties file path check in future
         try {
             LOG.info("Loading from configuration file");
-            this.config = new ConfigOptionParser().load(args);
+            init(new ConfigOptionParser().load(args));
         } catch (Exception e) {
             LOG.error("failed to load config");
         }
+    }
 
+    /**
+     * read configuration file and load hbase config etc.
+     */
+    private void init(Config config) {
+        this.config = config;
         this.env = config.getString("envContextConfig.env");
-
         //parse eagle job extractor
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
         this.jobExtractorConfig.mrVersion = config.getString("jobExtractorConfig.mrVersion");
@@ -160,7 +186,7 @@ public class JHFConfigManager implements Serializable {
             LOG.warn("can not initialize partitioner class, use org.apache.eagle.jpm.util.DefaultJobIdPartitioner", e);
             this.controlConfig.partitionerCls = DefaultJobIdPartitioner.class;
         } finally {
-            LOG.info("Loaded partitioner class: {}",this.controlConfig.partitionerCls);
+            LOG.info("Loaded partitioner class: {}", this.controlConfig.partitionerCls);
         }
         this.controlConfig.zeroBasedMonth = config.getBoolean("dataSourceConfig.zeroBasedMonth");
         this.controlConfig.timeZone = config.getString("dataSourceConfig.timeZone");
@@ -172,7 +198,7 @@ public class JHFConfigManager implements Serializable {
         this.eagleServiceConfig.username = config.getString("eagleProps.eagleService.username");
         this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
 
-        LOG.info("Successfully initialized JHFConfigManager");
+        LOG.info("Successfully initialized MRHistoryJobConfig");
         LOG.info("env: " + this.env);
         LOG.info("zookeeper.quorum: " + this.zkStateConfig.zkQuorum);
         LOG.info("zookeeper.property.clientPort: " + this.zkStateConfig.zkPort);

@@ -28,13 +28,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class MRErrorClassifier {
-    
+
     private final List<ErrorCategory> categories = new ArrayList<ErrorCategory>();
 
     public MRErrorClassifier(InputStream configStream) throws IOException {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(configStream));
         String line;
-        while((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             line = line.trim();
             if (line.isEmpty() || line.startsWith("#")) {
                 continue;
@@ -58,7 +58,7 @@ public final class MRErrorClassifier {
             categories.add(category);
         }
     }
-    
+
     public List<ErrorCategory> getErrorCategories() {
         return categories;
     }
@@ -72,31 +72,36 @@ public final class MRErrorClassifier {
         }
         return "UNKNOWN";
     }
-    
+
     public static class ErrorCategory {
         private String name;
         private Pattern pattern;
         private boolean needTransform;
-        
+
         public String getName() {
             return name;
         }
+
         public void setName(String name) {
             this.name = name;
         }
+
         public Pattern getPattern() {
             return pattern;
         }
+
         public void setPattern(Pattern pattern) {
             this.pattern = pattern;
         }
+
         public boolean isNeedTransform() {
             return needTransform;
         }
+
         public void setNeedTransform(boolean needTransform) {
             this.needTransform = needTransform;
         }
-        
+
         public String classify(String error) {
             Matcher matcher = pattern.matcher(error);
             if (matcher.find()) {

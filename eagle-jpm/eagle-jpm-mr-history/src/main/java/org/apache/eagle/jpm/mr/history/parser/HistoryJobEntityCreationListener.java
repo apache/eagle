@@ -22,16 +22,18 @@ package org.apache.eagle.jpm.mr.history.parser;
 import org.apache.eagle.jpm.mr.historyentity.JobBaseAPIEntity;
 
 /**
- * generalizing this listener would decouple entity creation and entity handling, also will help unit testing
- * @author yonzhang
+ * generalizing this listener would decouple entity creation and entity handling, also will help unit testing.
  *
+ * @author yonzhang
  */
 public interface HistoryJobEntityCreationListener {
     /**
      * job entity created event
+     *
      * @param entity
      */
     void jobEntityCreated(JobBaseAPIEntity entity) throws Exception;
+
     /**
      * for streaming processing, flush would help commit the last several entities
      */

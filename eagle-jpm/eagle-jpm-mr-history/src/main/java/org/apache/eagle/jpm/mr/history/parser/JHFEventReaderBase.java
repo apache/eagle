@@ -18,14 +18,13 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
-import org.apache.eagle.jpm.mr.historyentity.JobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
+import org.apache.eagle.jpm.mr.history.parser.JHFMRVer1Parser.Keys;
 import org.apache.eagle.jpm.mr.historyentity.*;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
-import org.apache.eagle.jpm.mr.history.parser.JHFMRVer1Parser.Keys;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.jobhistory.EventType;
 import org.slf4j.Logger;
@@ -72,10 +71,18 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     protected final Configuration configuration;
 
     public Constants.JobType fetchJobType(Configuration config) {
-        if (config.get(Constants.JobConfiguration.CASCADING_JOB) != null) { return Constants.JobType.CASCADING; }
-        if (config.get(Constants.JobConfiguration.HIVE_JOB) != null) { return Constants.JobType.HIVE; }
-        if (config.get(Constants.JobConfiguration.PIG_JOB) != null) { return Constants.JobType.PIG; }
-        if (config.get(Constants.JobConfiguration.SCOOBI_JOB) != null) {return Constants.JobType.SCOOBI; }
+        if (config.get(Constants.JobConfiguration.CASCADING_JOB) != null) {
+            return Constants.JobType.CASCADING;
+        }
+        if (config.get(Constants.JobConfiguration.HIVE_JOB) != null) {
+            return Constants.JobType.HIVE;
+        }
+        if (config.get(Constants.JobConfiguration.PIG_JOB) != null) {
+            return Constants.JobType.PIG;
+        }
+        if (config.get(Constants.JobConfiguration.SCOOBI_JOB) != null) {
+            return Constants.JobType.SCOOBI;
+        }
         return Constants.JobType.NOTAVALIABLE;
     }
 
@@ -83,6 +90,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
      * baseTags stores the basic tag name values which might be used for persisting various entities
      * baseTags includes: cluster, datacenter and jobName
      * baseTags are used for all job/task related entities
+     *
      * @param baseTags
      */
     public JHFEventReaderBase(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter) {
@@ -115,7 +123,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         }
     }
 
-    public void register(HistoryJobEntityLifecycleListener lifecycleListener){
+    public void register(HistoryJobEntityLifecycleListener lifecycleListener) {
         this.jobEntityLifecycleListeners.add(lifecycleListener);
     }
 
@@ -127,7 +135,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         }
         try {
             flush();
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw new IOException(ex);
         }
     }
@@ -141,8 +149,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     }
 
     /**
-       * @param id
-       */
+     * @param id
+     */
     private void setJobID(String id) {
         this.m_jobId = id;
     }
@@ -152,121 +160,121 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     }
 
     protected void handleJob(EventType eventType, Map<Keys, String> values, Object totalCounters) throws Exception {
-       String id = values.get(Keys.JOBID);
+        String id = values.get(Keys.JOBID);
 
-       if (m_jobId == null) {
-           setJobID(id);
-       } else if (!m_jobId.equals(id)) {
-           String msg = "Current job ID '" + id + "' does not match previously stored value '" + m_jobId + "'";
-           LOG.error(msg);
-           throw new ImportException(msg);
-       }
+        if (m_jobId == null) {
+            setJobID(id);
+        } else if (!m_jobId.equals(id)) {
+            String msg = "Current job ID '" + id + "' does not match previously stored value '" + m_jobId + "'";
+            LOG.error(msg);
+            throw new ImportException(msg);
+        }
 
-       if (values.get(Keys.SUBMIT_TIME) != null) {  // job submitted
-           m_jobSubmitEventEntity.setTimestamp(Long.valueOf(values.get(Keys.SUBMIT_TIME)));
-           m_user = values.get(Keys.USER);
-           m_queueName = values.get(Keys.JOB_QUEUE);
-           m_jobName = values.get(Keys.JOBNAME);
+        if (values.get(Keys.SUBMIT_TIME) != null) {  // job submitted
+            m_jobSubmitEventEntity.setTimestamp(Long.valueOf(values.get(Keys.SUBMIT_TIME)));
+            m_user = values.get(Keys.USER);
+            m_queueName = values.get(Keys.JOB_QUEUE);
+            m_jobName = values.get(Keys.JOBNAME);
 
-           // If given job name then use it as norm job name, otherwise use eagle JobNameNormalization rule to generate.
-           String jobDefId = null;
-           if(configuration != null ) {
-               jobDefId = configuration.get(m_filter.getJobNameKey());
-           }
+            // If given job name then use it as norm job name, otherwise use eagle JobNameNormalization rule to generate.
+            String jobDefId = null;
+            if (configuration != null) {
+                jobDefId = configuration.get(m_filter.getJobNameKey());
+            }
 
-           if(jobDefId == null) {
-               m_jobDefId = JobNameNormalization.getInstance().normalize(m_jobName);
-           } else {
-               LOG.debug("Got JobDefId from job configuration for " + id + ": " + jobDefId);
-               m_jobDefId = jobDefId;
-           }
+            if (jobDefId == null) {
+                m_jobDefId = JobNameNormalization.getInstance().normalize(m_jobName);
+            } else {
+                LOG.debug("Got JobDefId from job configuration for " + id + ": " + jobDefId);
+                m_jobDefId = jobDefId;
+            }
 
-           LOG.info("JobDefId of " + id + ": " + m_jobDefId);
+            LOG.info("JobDefId of " + id + ": " + m_jobDefId);
 
-           m_jobSubmitEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-           m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
-           m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), EagleJobStatus.SUBMITTED.name());
-           m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-           m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
-           m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(),this.m_jobType);
-           entityCreated(m_jobSubmitEventEntity);
-       } else if(values.get(Keys.LAUNCH_TIME) != null) {  // job launched
-           m_jobLaunchEventEntity.setTimestamp(Long.valueOf(values.get(Keys.LAUNCH_TIME)));
-           m_jobLauchTime = m_jobLaunchEventEntity.getTimestamp();
-           m_jobLaunchEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-           m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
-           m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), EagleJobStatus.LAUNCHED.name());
-           m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-           m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
-           m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(),this.m_jobType);
-           m_numTotalMaps = Integer.valueOf(values.get(Keys.TOTAL_MAPS));
-           m_numTotalReduces = Integer.valueOf(values.get(Keys.TOTAL_REDUCES));
-           entityCreated(m_jobLaunchEventEntity);
-       } else if(values.get(Keys.FINISH_TIME) != null) {  // job finished
-           m_jobFinishEventEntity.setTimestamp(Long.valueOf(values.get(Keys.FINISH_TIME)));
-           m_jobFinishEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-           m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
-           m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), values.get(Keys.JOB_STATUS));
-           m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-           m_jobFinishEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
-           m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(),this.m_jobType);
-           entityCreated(m_jobFinishEventEntity);
+            m_jobSubmitEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
+            m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
+            m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), EagleJobStatus.SUBMITTED.name());
+            m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
+            m_jobSubmitEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
+            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(), this.m_jobType);
+            entityCreated(m_jobSubmitEventEntity);
+        } else if (values.get(Keys.LAUNCH_TIME) != null) {  // job launched
+            m_jobLaunchEventEntity.setTimestamp(Long.valueOf(values.get(Keys.LAUNCH_TIME)));
+            m_jobLauchTime = m_jobLaunchEventEntity.getTimestamp();
+            m_jobLaunchEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
+            m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
+            m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), EagleJobStatus.LAUNCHED.name());
+            m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
+            m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
+            m_jobLaunchEventEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(), this.m_jobType);
+            m_numTotalMaps = Integer.valueOf(values.get(Keys.TOTAL_MAPS));
+            m_numTotalReduces = Integer.valueOf(values.get(Keys.TOTAL_REDUCES));
+            entityCreated(m_jobLaunchEventEntity);
+        } else if (values.get(Keys.FINISH_TIME) != null) {  // job finished
+            m_jobFinishEventEntity.setTimestamp(Long.valueOf(values.get(Keys.FINISH_TIME)));
+            m_jobFinishEventEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
+            m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
+            m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_STATUS.toString(), values.get(Keys.JOB_STATUS));
+            m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
+            m_jobFinishEventEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
+            m_jobFinishEventEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(), this.m_jobType);
+            entityCreated(m_jobFinishEventEntity);
 
-           // populate jobExecutionEntity entity
-           m_jobExecutionEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
-           m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
-           m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
-           m_jobExecutionEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
-           m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_QUEUE.toString(), m_queueName);
-           m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(),this.m_jobType);
+            // populate jobExecutionEntity entity
+            m_jobExecutionEntity.getTags().put(MRJobTagName.USER.toString(), m_user);
+            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_ID.toString(), m_jobId);
+            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_NAME.toString(), m_jobName);
+            m_jobExecutionEntity.getTags().put(MRJobTagName.JOD_DEF_ID.toString(), m_jobDefId);
+            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_QUEUE.toString(), m_queueName);
+            m_jobExecutionEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(), this.m_jobType);
 
-           m_jobExecutionEntity.setCurrentState(values.get(Keys.JOB_STATUS));
-           m_jobExecutionEntity.setStartTime(m_jobLaunchEventEntity.getTimestamp());
-           m_jobExecutionEntity.setEndTime(m_jobFinishEventEntity.getTimestamp());
-           m_jobExecutionEntity.setDurationTime(m_jobExecutionEntity.getEndTime() - m_jobExecutionEntity.getStartTime());
-           m_jobExecutionEntity.setTimestamp(m_jobLaunchEventEntity.getTimestamp());
-           m_jobExecutionEntity.setSubmissionTime(m_jobSubmitEventEntity.getTimestamp());
-           if (values.get(Keys.FAILED_MAPS) != null) {
-               // for Artemis
-               m_jobExecutionEntity.setNumFailedMaps(Integer.valueOf(values.get(Keys.FAILED_MAPS)));
-           }
-           if (values.get(Keys.FAILED_REDUCES) != null) {
-               // for Artemis
-               m_jobExecutionEntity.setNumFailedReduces(Integer.valueOf(values.get(Keys.FAILED_REDUCES)));
-           }
-           m_jobExecutionEntity.setNumFinishedMaps(Integer.valueOf(values.get(Keys.FINISHED_MAPS)));
-           m_jobExecutionEntity.setNumFinishedReduces(Integer.valueOf(values.get(Keys.FINISHED_REDUCES)));
-           m_jobExecutionEntity.setNumTotalMaps(m_numTotalMaps);
-           m_jobExecutionEntity.setNumTotalReduces(m_numTotalReduces);
-           if (values.get(Keys.COUNTERS) != null || totalCounters != null) {
-               JobCounters jobCounters = parseCounters(totalCounters);
-               m_jobExecutionEntity.setJobCounters(jobCounters);
-               if (jobCounters.getCounters().containsKey(Constants.JOB_COUNTER)) {
-                   Map<String, Long> counters = jobCounters.getCounters().get(Constants.JOB_COUNTER);
-                   if (counters.containsKey(Constants.JobCounter.DATA_LOCAL_MAPS.toString())) {
-                       m_jobExecutionEntity.setDataLocalMaps(counters.get(Constants.JobCounter.DATA_LOCAL_MAPS.toString()).intValue());
-                   }
+            m_jobExecutionEntity.setCurrentState(values.get(Keys.JOB_STATUS));
+            m_jobExecutionEntity.setStartTime(m_jobLaunchEventEntity.getTimestamp());
+            m_jobExecutionEntity.setEndTime(m_jobFinishEventEntity.getTimestamp());
+            m_jobExecutionEntity.setDurationTime(m_jobExecutionEntity.getEndTime() - m_jobExecutionEntity.getStartTime());
+            m_jobExecutionEntity.setTimestamp(m_jobLaunchEventEntity.getTimestamp());
+            m_jobExecutionEntity.setSubmissionTime(m_jobSubmitEventEntity.getTimestamp());
+            if (values.get(Keys.FAILED_MAPS) != null) {
+                // for Artemis
+                m_jobExecutionEntity.setNumFailedMaps(Integer.valueOf(values.get(Keys.FAILED_MAPS)));
+            }
+            if (values.get(Keys.FAILED_REDUCES) != null) {
+                // for Artemis
+                m_jobExecutionEntity.setNumFailedReduces(Integer.valueOf(values.get(Keys.FAILED_REDUCES)));
+            }
+            m_jobExecutionEntity.setNumFinishedMaps(Integer.valueOf(values.get(Keys.FINISHED_MAPS)));
+            m_jobExecutionEntity.setNumFinishedReduces(Integer.valueOf(values.get(Keys.FINISHED_REDUCES)));
+            m_jobExecutionEntity.setNumTotalMaps(m_numTotalMaps);
+            m_jobExecutionEntity.setNumTotalReduces(m_numTotalReduces);
+            if (values.get(Keys.COUNTERS) != null || totalCounters != null) {
+                JobCounters jobCounters = parseCounters(totalCounters);
+                m_jobExecutionEntity.setJobCounters(jobCounters);
+                if (jobCounters.getCounters().containsKey(Constants.JOB_COUNTER)) {
+                    Map<String, Long> counters = jobCounters.getCounters().get(Constants.JOB_COUNTER);
+                    if (counters.containsKey(Constants.JobCounter.DATA_LOCAL_MAPS.toString())) {
+                        m_jobExecutionEntity.setDataLocalMaps(counters.get(Constants.JobCounter.DATA_LOCAL_MAPS.toString()).intValue());
+                    }
 
-                   if (counters.containsKey(Constants.JobCounter.RACK_LOCAL_MAPS.toString())) {
-                       m_jobExecutionEntity.setRackLocalMaps(counters.get(Constants.JobCounter.RACK_LOCAL_MAPS.toString()).intValue());
-                   }
+                    if (counters.containsKey(Constants.JobCounter.RACK_LOCAL_MAPS.toString())) {
+                        m_jobExecutionEntity.setRackLocalMaps(counters.get(Constants.JobCounter.RACK_LOCAL_MAPS.toString()).intValue());
+                    }
 
-                   if (counters.containsKey(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString())) {
-                       m_jobExecutionEntity.setTotalLaunchedMaps(counters.get(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString()).intValue());
-                   }
-               }
+                    if (counters.containsKey(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString())) {
+                        m_jobExecutionEntity.setTotalLaunchedMaps(counters.get(Constants.JobCounter.TOTAL_LAUNCHED_MAPS.toString()).intValue());
+                    }
+                }
 
-               if (m_jobExecutionEntity.getTotalLaunchedMaps() > 0) {
-                   m_jobExecutionEntity.setDataLocalMapsPercentage(m_jobExecutionEntity.getDataLocalMaps() * 1.0 / m_jobExecutionEntity.getTotalLaunchedMaps());
-                   m_jobExecutionEntity.setRackLocalMapsPercentage(m_jobExecutionEntity.getRackLocalMaps() * 1.0 / m_jobExecutionEntity.getTotalLaunchedMaps());
-               }
-           }
-           entityCreated(m_jobExecutionEntity);
-       }
+                if (m_jobExecutionEntity.getTotalLaunchedMaps() > 0) {
+                    m_jobExecutionEntity.setDataLocalMapsPercentage(m_jobExecutionEntity.getDataLocalMaps() * 1.0 / m_jobExecutionEntity.getTotalLaunchedMaps());
+                    m_jobExecutionEntity.setRackLocalMapsPercentage(m_jobExecutionEntity.getRackLocalMaps() * 1.0 / m_jobExecutionEntity.getTotalLaunchedMaps());
+                }
+            }
+            entityCreated(m_jobExecutionEntity);
+        }
     }
 
     private void entityCreated(JobBaseAPIEntity entity) throws Exception {
-        for (HistoryJobEntityLifecycleListener lifecycleListener: this.jobEntityLifecycleListeners) {
+        for (HistoryJobEntityLifecycleListener lifecycleListener : this.jobEntityLifecycleListeners) {
             lifecycleListener.jobEntityCreated(entity);
         }
 
@@ -283,11 +291,12 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     protected abstract JobCounters parseCounters(Object value) throws IOException;
 
     /**
-      * for one task ID, it has several sequential task events, i.e.
-      * task_start -> task_attempt_start -> task_attempt_finish -> task_attempt_start -> task_attempt_finish -> ... -> task_end
-      * @param values
-      * @throws IOException
-      */
+     * for one task ID, it has several sequential task events, i.e.
+     * task_start -> task_attempt_start -> task_attempt_finish -> task_attempt_start -> task_attempt_finish -> ... -> task_end
+     *
+     * @param values
+     * @throws IOException
+     */
     @SuppressWarnings("serial")
     protected void handleTask(RecordTypes recType, EventType eventType, final Map<Keys, String> values, Object counters) throws Exception {
         String taskAttemptID = values.get(Keys.TASK_ATTEMPT_ID);
@@ -296,7 +305,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         final String taskType = values.get(Keys.TASK_TYPE);
         final String taskID = values.get(Keys.TASKID);
 
-        Map<String, String> taskBaseTags = new HashMap<String, String>(){{
+        Map<String, String> taskBaseTags = new HashMap<String, String>() {{
             put(MRJobTagName.TASK_TYPE.toString(), taskType);
             put(MRJobTagName.USER.toString(), m_user);
             //put(MRJobTagName.JOB_NAME.toString(), _jobName);
@@ -376,11 +385,12 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         Map<String, String> prop = new TreeMap<>();
 
         if (m_filter.acceptJobConfFile()) {
-            Iterator<Map.Entry<String, String> > iter = configuration.iterator();
+            Iterator<Map.Entry<String, String>> iter = configuration.iterator();
             while (iter.hasNext()) {
                 String key = iter.next().getKey();
-                if (included(key) && !excluded(key))
+                if (included(key) && !excluded(key)) {
                     prop.put(key, configuration.get(key));
+                }
             }
         }
 
@@ -416,15 +426,17 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                     break;
                 }
             }
-            if (!matched)
+            if (!matched) {
                 return false;
+            }
         }
         return true;
     }
 
     private boolean included(String key) {
-        if (m_filter.getJobConfKeyInclusionPatterns() == null)
+        if (m_filter.getJobConfKeyInclusionPatterns() == null) {
             return true;
+        }
         for (Pattern p : m_filter.getJobConfKeyInclusionPatterns()) {
             Matcher m = p.matcher(key);
             if (m.matches()) {
@@ -436,12 +448,14 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     }
 
     private boolean excluded(String key) {
-        if (m_filter.getJobConfKeyExclusionPatterns() == null)
+        if (m_filter.getJobConfKeyExclusionPatterns() == null) {
             return false;
+        }
         for (Pattern p : m_filter.getJobConfKeyExclusionPatterns()) {
             Matcher m = p.matcher(key);
-            if (m.matches())
+            if (m.matches()) {
                 return true;
+            }
         }
         return false;
     }

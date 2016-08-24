@@ -17,9 +17,10 @@
 */
 
 package org.apache.eagle.jpm.mr.history.parser;
+
 /**
- * Record types are identifiers for each line of log in history files. 
- * A record type appears as the first token in a single line of log. 
+ * Record types are identifiers for each line of log in history files.
+ * A record type appears as the first token in a single line of log.
  */
 public enum RecordTypes {
     Jobtracker, Job, Task, MapAttempt, ReduceAttempt, Meta
