@@ -29,7 +29,6 @@ import org.apache.eagle.alert.engine.router.StreamRoute;
 import org.apache.eagle.alert.engine.router.StreamRoutePartitionFactory;
 import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -49,10 +48,10 @@ public class SparkStreamRouterBoltOutputCollector implements PartitionedEventCol
     private Map<StreamPartition, StreamRouterSpec> routeSpecMap;
     private Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap;
 
-    public SparkStreamRouterBoltOutputCollector() {
-        this.outputCollector = new LinkedList<Tuple2<Integer, PartitionedEvent>>();
-        this.routeSpecMap = new HashMap<>();
-        this.routePartitionerMap = new HashMap<>();
+    public SparkStreamRouterBoltOutputCollector(Map<StreamPartition, StreamRouterSpec> routeSpecMap, Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap) {
+        this.outputCollector = new LinkedList<>();
+        this.routeSpecMap = routeSpecMap;
+        this.routePartitionerMap = routePartitionerMap;
     }
 
     public List<Tuple2<Integer, PartitionedEvent>> emitResult() {
@@ -99,7 +98,7 @@ public class SparkStreamRouterBoltOutputCollector implements PartitionedEventCol
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Emitted to partition {} with message {}", partitionIndex, emittedEvent);
                         }
-                        outputCollector.add(new Tuple2<Integer, PartitionedEvent>(partitionIndex, event));
+                        outputCollector.add(new Tuple2<>(partitionIndex, event));
                     } catch (RuntimeException ex) {
                         LOG.error("Failed to emit to partition {} with {}", partitionIndex, newEvent, ex);
                         throw ex;
@@ -149,7 +148,6 @@ public class SparkStreamRouterBoltOutputCollector implements PartitionedEventCol
                 inplaceAdd(copyRouteSpecMap, copyRoutePartitionerMap, spec, sds);
             }
         }
-
         // switch
         routeSpecMap = copyRouteSpecMap;
         routePartitionerMap = copyRoutePartitionerMap;
@@ -179,8 +177,12 @@ public class SparkStreamRouterBoltOutputCollector implements PartitionedEventCol
     private List<StreamRoutePartitioner> calculatePartitioner(StreamRouterSpec streamRouterSpec, Map<String, StreamDefinition> sds) throws Exception {
         List<StreamRoutePartitioner> routePartitioners = new ArrayList<>();
         for (PolicyWorkerQueue pwq : streamRouterSpec.getTargetQueue()) {
+            List<String> bolts = new ArrayList<>();
+            for (WorkSlot work : pwq.getWorkers()) {
+                bolts.add(work.getBoltId());
+            }
             routePartitioners.add(StreamRoutePartitionFactory.createRoutePartitioner(
-                    Lists.transform(pwq.getWorkers(), WorkSlot::getBoltId),
+                    bolts,
                     sds.get(streamRouterSpec.getPartition().getStreamId()),
                     streamRouterSpec.getPartition()));
         }
@@ -193,5 +195,13 @@ public class SparkStreamRouterBoltOutputCollector implements PartitionedEventCol
 
     public void flush() {
 
+    }
+
+    public Map<StreamPartition, StreamRouterSpec> getRouteSpecMap() {
+        return this.routeSpecMap;
+    }
+
+    public Map<StreamPartition, List<StreamRoutePartitioner>> getRoutePartitionerMap() {
+        return this.routePartitionerMap;
     }
 }

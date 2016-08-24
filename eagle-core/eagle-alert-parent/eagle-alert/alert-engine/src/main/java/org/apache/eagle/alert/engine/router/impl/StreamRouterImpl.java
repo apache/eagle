@@ -27,6 +27,8 @@ import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.router.StreamRouter;
 import org.apache.eagle.alert.engine.router.StreamSortHandler;
+import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
+import org.apache.eagle.alert.engine.sorter.StreamTimeClockListener;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockManager;
 import org.apache.eagle.alert.engine.sorter.impl.StreamSortWindowHandlerImpl;
 import org.apache.eagle.alert.engine.sorter.impl.StreamTimeClockManagerImpl;
@@ -63,6 +65,18 @@ public class StreamRouterImpl implements StreamRouter {
         this.streamTimeClockManager = new StreamTimeClockManagerImpl();
         this.streamSortHandlers = new HashMap<>();
         this.outputCollector = outputCollector;
+        this.context = context;
+    }
+
+    public void prepare(StreamContext context, PartitionedEventCollector outputCollector, Map<StreamTimeClockListener, String> listenerStreamIdMap, Map<String, StreamTimeClock> streamIdTimeClockMap, Map<StreamPartition, StreamSortHandler> streamSortHandlerMap) {
+
+        this.streamSortHandlers = streamSortHandlerMap;
+        this.outputCollector = outputCollector;
+        listenerStreamIdMap.forEach((k,v)->{
+            StreamSortWindowHandlerImpl streamwindow = (StreamSortWindowHandlerImpl)k;
+            streamwindow.updateOutputCollector(this.outputCollector);
+        });
+        this.streamTimeClockManager = new StreamTimeClockManagerImpl(listenerStreamIdMap, streamIdTimeClockMap);
         this.context = context;
     }
 
@@ -155,9 +169,19 @@ public class StreamRouterImpl implements StreamRouter {
                     }
                 }
             }
-
             // atomic switch
             this.streamSortHandlers = copy;
         }
+    }
+
+    public Map<String, StreamTimeClock> getStreamTimeClock() {
+        return streamTimeClockManager.getAllStreamTimeClock();
+    }
+
+    public Map<StreamTimeClockListener, String> getAllListenerStreamIdMap() {
+        return streamTimeClockManager.getAllListenerStreamIdMap();
+    }
+    public Map<StreamPartition,StreamSortHandler> getAllStreamSortHandlerMap() {
+        return this.streamSortHandlers;
     }
 }

@@ -216,7 +216,7 @@ R: ClassTag](
 
     override def restore() {
       // this is assuming that the topics don't change during execution, which is true currently
-      val topics = fromOffsets.keySet
+      val topics = currentOffsets.keySet
       val leaders = KafkaCluster.checkErrors(kc.findLeaders(topics))
 
       batchForTime.toSeq.sortBy(_._1)(Time.ordering).foreach { case (t, b) =>

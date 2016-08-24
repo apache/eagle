@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class AlertBoltOutputCollectorSparkWrapper implements AlertStreamCollector {
-    private final LinkedList<Tuple2<String, AlertStreamEvent>> collector = new LinkedList<Tuple2<String, AlertStreamEvent>>();
+    private final LinkedList<Tuple2<String, AlertStreamEvent>> collector = new LinkedList<>();
 
     public AlertBoltOutputCollectorSparkWrapper() {
     }
@@ -41,7 +41,7 @@ public class AlertBoltOutputCollectorSparkWrapper implements AlertStreamCollecto
         if (collector.isEmpty()) {
             return Collections.emptyList();
         }
-        LinkedList<Tuple2<String, AlertStreamEvent>> result = new LinkedList<Tuple2<String, AlertStreamEvent>>();
+        LinkedList<Tuple2<String, AlertStreamEvent>> result = new LinkedList<>();
         result.addAll(collector);
         return result;
     }

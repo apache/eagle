@@ -17,6 +17,7 @@
 package org.apache.eagle.alert.engine.sorter;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  *
@@ -37,6 +38,10 @@ public interface StreamTimeClockManager extends StreamTimeClockTrigger, Serializ
     StreamTimeClock createStreamTimeClock(String streamId);
 
     StreamTimeClock getStreamTimeClock(String streamId);
+
+    Map<String,StreamTimeClock> getAllStreamTimeClock();
+
+    Map<StreamTimeClockListener, String> getAllListenerStreamIdMap();
 
     /**
      * @param streamId

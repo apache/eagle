@@ -17,8 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
-import org.apache.eagle.alert.coordination.model.PublishSpec;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
 import kafka.common.TopicAndPartition;
@@ -33,38 +32,37 @@ import scala.Tuple2;
 import scala.collection.JavaConversions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Publisher implements VoidFunction<JavaPairRDD<String, AlertStreamEvent>> {
 
-    private AtomicReference<PublishSpec> publishSpecRef;
-    private AtomicReference<Map<String, StreamDefinition>> sdsRef;
     private String alertPublishBoltName;
     private KafkaCluster kafkaCluster;
     private String groupId;
     private AtomicReference<OffsetRange[]> offsetRanges;
+    private AtomicReference<Map<String, List<Publishment>>> publishmentsChangInfoRef;
     private static final Logger LOG = LoggerFactory.getLogger(Publisher.class);
 
-    public Publisher(AtomicReference<PublishSpec> publishSpecRef, AtomicReference<Map<String, StreamDefinition>> sdsRef, String alertPublishBoltName, KafkaCluster kafkaCluster, String groupId, AtomicReference<OffsetRange[]> offsetRanges) {
-        this.publishSpecRef = publishSpecRef;
-        this.sdsRef = sdsRef;
+    public Publisher(String alertPublishBoltName, KafkaCluster kafkaCluster, String groupId, AtomicReference<OffsetRange[]> offsetRanges,AtomicReference<Map<String, List<Publishment>>> publishmentsChangInfoRef) {
         this.alertPublishBoltName = alertPublishBoltName;
         this.kafkaCluster = kafkaCluster;
         this.groupId = groupId;
         this.offsetRanges = offsetRanges;
+        this.publishmentsChangInfoRef = publishmentsChangInfoRef;
     }
 
     @Override
     public void call(JavaPairRDD<String, AlertStreamEvent> rdd) throws Exception {
-        rdd.foreachPartition(new AlertPublisherBoltFunction(publishSpecRef, sdsRef, alertPublishBoltName));
+        rdd.foreachPartition(new AlertPublisherBoltFunction(alertPublishBoltName,publishmentsChangInfoRef));
         updateOffset();
     }
 
     private void updateOffset() {
         for (OffsetRange eachOffsetRange : offsetRanges.get()) {
             TopicAndPartition topicAndPartition = new TopicAndPartition(eachOffsetRange.topic(), eachOffsetRange.partition());
-            Map<TopicAndPartition, Object> topicAndPartitionObjectMap = new HashMap<TopicAndPartition, Object>();
+            Map<TopicAndPartition, Object> topicAndPartitionObjectMap = new HashMap<>();
             topicAndPartitionObjectMap.put(topicAndPartition, eachOffsetRange.untilOffset());
 
             scala.collection.mutable.Map<TopicAndPartition, Object> map = JavaConversions.mapAsScalaMap(topicAndPartitionObjectMap);

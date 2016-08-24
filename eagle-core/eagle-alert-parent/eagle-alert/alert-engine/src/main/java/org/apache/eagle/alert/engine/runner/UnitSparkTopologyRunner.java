@@ -19,21 +19,16 @@ package org.apache.eagle.alert.engine.runner;
 
 import static org.apache.eagle.alert.engine.utils.SpecUtils.getTopicsByConfig;
 
-import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
-import org.apache.eagle.alert.coordination.model.PublishSpec;
-import org.apache.eagle.alert.coordination.model.RouterSpec;
-import org.apache.eagle.alert.coordination.model.SpoutSpec;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.spark.function.ChangePartitionTo;
-import org.apache.eagle.alert.engine.spark.function.CorrelationSpoutSparkFunction;
-import org.apache.eagle.alert.engine.spark.function.FetchSpecAndTopicFunction;
-import org.apache.eagle.alert.engine.spark.function.RefreshTopicFunction;
-import org.apache.eagle.alert.engine.spark.function.StreamRouteBoltFunction;
-import org.apache.eagle.alert.engine.spark.function.AlertBoltFunction;
-import org.apache.eagle.alert.engine.spark.function.Publisher;
 
-import com.typesafe.config.Config;
+import org.apache.eagle.alert.coordination.model.*;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.spark.function.*;
+import org.apache.eagle.alert.engine.spark.model.PolicyState;
+import org.apache.eagle.alert.engine.spark.model.RouteState;
+import org.apache.eagle.alert.engine.spark.model.WindowState;
+
 import kafka.common.TopicAndPartition;
+import com.typesafe.config.Config;
 import kafka.message.MessageAndMetadata;
 import kafka.serializer.StringDecoder;
 import org.apache.spark.SparkConf;
@@ -51,10 +46,7 @@ import scala.Tuple2;
 import scala.collection.JavaConversions;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UnitSparkTopologyRunner implements Serializable {
@@ -62,15 +54,22 @@ public class UnitSparkTopologyRunner implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(UnitSparkTopologyRunner.class);
     //kafka config
     private KafkaCluster kafkaCluster = null;
-    private Map<String, String> kafkaParams = new HashMap<String, String>();
-    private Map<TopicAndPartition, Long> fromOffsets = new HashMap<TopicAndPartition, Long>();
-    private final AtomicReference<OffsetRange[]> offsetRanges = new AtomicReference<OffsetRange[]>();
-    private final AtomicReference<Map<String, StreamDefinition>> sdsRef = new AtomicReference<Map<String, StreamDefinition>>();
-    private final AtomicReference<SpoutSpec> spoutSpecRef = new AtomicReference<SpoutSpec>();
-    private final AtomicReference<RouterSpec> routerSpecRef = new AtomicReference<RouterSpec>();
-    private final AtomicReference<AlertBoltSpec> alertBoltSpecRef = new AtomicReference<AlertBoltSpec>();
-    private final AtomicReference<PublishSpec> publishSpecRef = new AtomicReference<PublishSpec>();
-    private final AtomicReference<Set<String>> topicsRef = new AtomicReference<Set<String>>();
+    private Map<String, String> kafkaParams = new HashMap<>();
+    private Map<TopicAndPartition, Long> fromOffsets = new HashMap<>();
+    private final AtomicReference<OffsetRange[]> offsetRanges = new AtomicReference<>();
+    //common config
+    private final AtomicReference<Map<String, StreamDefinition>> sdsRef = new AtomicReference<>();
+    private final AtomicReference<SpoutSpec> spoutSpecRef = new AtomicReference<>();
+    private final AtomicReference<AlertBoltSpec> alertBoltSpecRef = new AtomicReference<>();
+    private final AtomicReference<HashSet<String>> topicsRef = new AtomicReference<>();
+    //route config ref
+    private final AtomicReference<Map<StreamPartition, StreamSortSpec>> cachedSSSRef = new AtomicReference<>(new HashMap<>());
+    private final AtomicReference<Map<StreamPartition, StreamRouterSpec>> cachedSRSRef = new AtomicReference<>(new HashMap<>());
+    private final AtomicReference<Map<String, Map<StreamPartition, StreamSortSpec>>> sssChangInfoRef = new AtomicReference<>();
+    private final AtomicReference<Map<String, Collection<StreamRouterSpec>>> srsChangInfoRef = new AtomicReference<>();
+    //publishments config ref
+    private final AtomicReference<Map<String, List<Publishment>>> publishmentsChangInfoRef = new AtomicReference<>();
+    private AtomicReference<Map<String, Publishment>> cachedPublishmentsRef = new AtomicReference<>(new HashMap<>());
     private String groupId;
     //Zookeeper server string: host1:port1[,host2:port2,...]
     private String zkServers = null;
@@ -79,7 +78,6 @@ public class UnitSparkTopologyRunner implements Serializable {
     private static final int DEFAULT_BATCH_DURATION_SECOND = 2;
     private static final String SPARK_EXECUTOR_CORES = "topology.core";
     private static final String SPARK_EXECUTOR_MEMORY = "topology.memory";
-    private static final String alertBoltNamePrefix = "alertBolt";
     private static final String alertPublishBoltName = "alertPublishBolt";
     private static final String LOCAL_MODE = "topology.localMode";
     private static final String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
@@ -88,15 +86,21 @@ public class UnitSparkTopologyRunner implements Serializable {
     private static final String SLIDE_DURATION_SECOND = "topology.slideDurations";
     private static final String WINDOW_DURATIONS_SECOND = "topology.windowDurations";
     private static final String TOPOLOGY_MASTER = "topology.master";
+    private static final String DRIVER_MEMORY = "topology.driverMemory";
+    private static final String DRIVER_CORES = "topology.driverCores";
+    private static final String DEPLOY_MODE = "topology.deployMode";
+    private static final String CHECKPOINT_PATH = "topology.checkpointPath";
+
+
     private SparkConf sparkConf;
 
     private final Config config;
+
 
     public UnitSparkTopologyRunner(Config config) {
 
         prepareKafkaConfig(config);
         prepareSparkConfig(config);
-
         this.config = config;
         this.zkServers = config.getString("zkConfig.zkQuorum");
 
@@ -105,6 +109,7 @@ public class UnitSparkTopologyRunner implements Serializable {
     public void run() throws InterruptedException {
         long batchDuration = config.hasPath(BATCH_DURATION) ? config.getLong(BATCH_DURATION) : DEFAULT_BATCH_DURATION_SECOND;
         JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(batchDuration));
+        jssc.checkpoint(config.getString(CHECKPOINT_PATH));
         buildTopology(jssc, config);
         LOG.info("Starting Spark Streaming");
         jssc.start();
@@ -142,26 +147,37 @@ public class UnitSparkTopologyRunner implements Serializable {
                 new RefreshTopicFunction(this.topicsRef, this.groupId, this.kafkaCluster, this.zkServers),
                 message -> message);
 
+        WindowState winstate = new WindowState(jssc);
+        RouteState routeState = new RouteState(jssc);
+        PolicyState policyState = new PolicyState(jssc);
+
         JavaPairDStream<String, String> pairDStream = messages
-                .transform(new FetchSpecAndTopicFunction(offsetRanges,
+                .transform(new ProcessSpecFunction(offsetRanges,
                         spoutSpecRef,
                         sdsRef,
                         alertBoltSpecRef,
-                        publishSpecRef,
-                        routerSpecRef,
                         topicsRef,
-                        config))
+                        config,
+                        cachedSSSRef,
+                        cachedSRSRef,
+                        sssChangInfoRef,
+                        srsChangInfoRef,
+                        winstate,
+                        routeState,
+                        policyState,
+                        cachedPublishmentsRef,
+                        publishmentsChangInfoRef))
                 .mapToPair(km -> new Tuple2<>(km.topic(), km.message()));
 
         pairDStream
                 .window(Durations.seconds(windowDurations), Durations.seconds(slideDurations))
                 .flatMapToPair(new CorrelationSpoutSparkFunction(numOfRouter, spoutSpecRef, sdsRef))
                 .transformToPair(new ChangePartitionTo(numOfRouter))
-                .mapPartitionsToPair(new StreamRouteBoltFunction("streamBolt", routerSpecRef, sdsRef))
+                .mapPartitionsToPair(new StreamRouteBoltFunction("streamBolt", sdsRef, sssChangInfoRef, srsChangInfoRef, winstate, routeState))
                 .transformToPair(new ChangePartitionTo(numOfAlertBolts))
-                .mapPartitionsToPair(new AlertBoltFunction(alertBoltNamePrefix, sdsRef, alertBoltSpecRef, numOfAlertBolts))
+                .mapPartitionsToPair(new AlertBoltFunction(sdsRef, alertBoltSpecRef, policyState))
                 .repartition(numOfPublishTasks)
-                .foreachRDD(new Publisher(publishSpecRef, sdsRef, alertPublishBoltName, kafkaCluster, groupId, offsetRanges));
+                .foreachRDD(new Publisher(alertPublishBoltName, kafkaCluster, groupId, offsetRanges,publishmentsChangInfoRef));
     }
 
     private void prepareKafkaConfig(Config config) {
@@ -197,9 +213,16 @@ public class UnitSparkTopologyRunner implements Serializable {
         }
         String sparkExecutorCores = config.getString(SPARK_EXECUTOR_CORES);
         String sparkExecutorMemory = config.getString(SPARK_EXECUTOR_MEMORY);
+        String driverMemory = config.getString(DRIVER_MEMORY);
+        String driverCore = config.getString(DRIVER_CORES);
+        String deployMode = config.getString(DEPLOY_MODE);
         sparkConf.set("spark.executor.cores", sparkExecutorCores);
         sparkConf.set("spark.executor.memory", sparkExecutorMemory);
+        sparkConf.set("spark.driver.memory", driverMemory);
+        sparkConf.set("spark.driver.cores", driverCore);
+        sparkConf.set("spark.submit.deployMode", deployMode);
         sparkConf.set("spark.streaming.dynamicAllocation.enable", "true");
+
         this.sparkConf = sparkConf;
     }
 }

@@ -5,7 +5,7 @@
     "alertBolt0": [
       {
         "name": "policy4",
-        "description": null,
+        "description": "alertBolt0policy4",
         "inputStreams": [
           "oozieStream"
         ],
@@ -35,7 +35,7 @@
     "alertBolt1": [
       {
         "name": "policy4",
-        "description": null,
+        "description": "alertBolt1policy4",
         "inputStreams": [
           "oozieStream"
         ],

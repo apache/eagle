@@ -76,7 +76,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
             LOG.error("covert tuple value to map error");
             return Collections.emptyIterator();
         }
-        List<Object> tuple = new ArrayList<Object>(2);
+        List<Object> tuple = new ArrayList<>(2);
         String topic = message._1;
         tuple.add(0, topic);
         tuple.add(1, value);
@@ -103,7 +103,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
             LOG.warn("StreamDefinition {} is not found within {}, ignore this message", streamId, sds);
             return Collections.emptyIterator();
         }
-        List<Tuple2<Integer, PartitionedEvent>> outputTuple2s = new ArrayList<Tuple2<Integer, PartitionedEvent>>(5);
+        List<Tuple2<Integer, PartitionedEvent>> outputTuple2s = new ArrayList<>(5);
 
         Long timestamp = (Long) tupleContent.get(2);
         StreamEvent event = convertToStreamEventByStreamDefinition(timestamp, messageContent, sds.get(streamId));
@@ -121,7 +121,7 @@ public class CorrelationSpoutSparkFunction implements PairFlatMapFunction<Tuple2
                 // filter out message
                 if (mod >= groupingStrategy.startSequence && mod < groupingStrategy.startSequence + numOfRouterBolts) {
                     PartitionedEvent pEvent = new PartitionedEvent(event, groupingStrategy.partition, hash);
-                    outputTuple2s.add(new Tuple2<Integer, PartitionedEvent>(mod, pEvent));
+                    outputTuple2s.add(new Tuple2<>(mod, pEvent));
                 }
             }
         }

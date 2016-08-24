@@ -28,19 +28,19 @@ import scala.Tuple2;
 import scala.collection.JavaConversions;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RefreshTopicFunction implements Function<scala.collection.immutable.Map<TopicAndPartition, Object>, scala.collection.immutable.Map<TopicAndPartition, Object>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RefreshTopicFunction.class);
-    private AtomicReference<Set<String>> topicsRef = new AtomicReference<Set<String>>();
+    private AtomicReference<HashSet<String>> topicsRef = new AtomicReference<>();
     private String groupId;
     private KafkaCluster kafkaCluster;
     private String zkServers;
 
-    public RefreshTopicFunction(AtomicReference<Set<String>> topicsRef, String groupId, KafkaCluster kafkaCluster, String zkServers) {
+    public RefreshTopicFunction(AtomicReference<HashSet<String>> topicsRef, String groupId, KafkaCluster kafkaCluster, String zkServers) {
         this.topicsRef = topicsRef;
         this.groupId = groupId;
         this.kafkaCluster = kafkaCluster;
@@ -55,9 +55,7 @@ public class RefreshTopicFunction implements Function<scala.collection.immutable
         Map<TopicAndPartition, Object> oldOffsetJavaMap = JavaConversions.mapAsJavaMap(oldOffset);
 
         Map<TopicAndPartition, Long> oldOffsetWithTypeMap = new HashMap<>(oldOffsetJavaMap.size());
-        oldOffsetJavaMap.forEach((topicAndPartition, offset) -> {
-            oldOffsetWithTypeMap.put(topicAndPartition, Long.parseLong(offset.toString()));
-        });
+        oldOffsetJavaMap.forEach((topicAndPartition, offset) -> oldOffsetWithTypeMap.put(topicAndPartition, Long.parseLong(offset.toString())));
 
         Map<TopicAndPartition, Object> newOffset = EagleKafkaUtils.refreshOffsets(topicsRef.get(),
                 oldOffsetWithTypeMap,

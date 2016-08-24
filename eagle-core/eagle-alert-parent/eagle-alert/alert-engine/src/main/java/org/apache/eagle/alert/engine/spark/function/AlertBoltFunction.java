@@ -22,84 +22,101 @@ import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.PolicyGroupEvaluator;
+import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorSparkWrapper;
 import org.apache.eagle.alert.engine.evaluator.impl.PolicyGroupEvaluatorImpl;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.runner.MapComparator;
+import org.apache.eagle.alert.engine.spark.model.PolicyState;
+import org.apache.eagle.alert.engine.utils.Constants;
 
 import org.apache.spark.api.java.function.PairFlatMapFunction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 import backtype.storm.metric.api.MultiCountMetric;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<Integer, PartitionedEvent>>, String, AlertStreamEvent> {
-    private static final Logger LOG = LoggerFactory.getLogger(AlertBoltFunction.class);
 
-    private String alertBoltNamePrefix;
+    private static final Logger LOG = LoggerFactory.getLogger(AlertBoltFunction.class);
     private AtomicReference<Map<String, StreamDefinition>> sdsRef;
     private AtomicReference<AlertBoltSpec> alertBoltSpecRef;
-    private int numOfAlertBolts;
+    private PolicyState policyState;
 
-    public AlertBoltFunction(String alertBoltNamePrefix, AtomicReference<Map<String, StreamDefinition>> sdsRef, AtomicReference<AlertBoltSpec> alertBoltSpecRef, int numOfAlertBolts) {
-        this.alertBoltNamePrefix = alertBoltNamePrefix;
+    public AlertBoltFunction(AtomicReference<Map<String, StreamDefinition>> sdsRef, AtomicReference<AlertBoltSpec> alertBoltSpecRef, PolicyState policyState) {
         this.sdsRef = sdsRef;
         this.alertBoltSpecRef = alertBoltSpecRef;
-        this.numOfAlertBolts = numOfAlertBolts;
+        this.policyState = policyState;
     }
 
     @Override
     public Iterator<Tuple2<String, AlertStreamEvent>> call(Iterator<Tuple2<Integer, PartitionedEvent>> tuple2Iterator) throws Exception {
-        Map<String, StreamDefinition> sdf = sdsRef.get();
-        AlertBoltSpec alertBoltSpec = alertBoltSpecRef.get();
-        AlertBoltOutputCollectorSparkWrapper alertOutputCollector = new AlertBoltOutputCollectorSparkWrapper();
-        PolicyGroupEvaluatorImpl[] evaluators = new PolicyGroupEvaluatorImpl[numOfAlertBolts];
-        for (int i = 0; i < numOfAlertBolts; i++) {
-            evaluators[i] = new PolicyGroupEvaluatorImpl(alertBoltNamePrefix + i);
-            //TODO StreamContext need to be more abstract
-            evaluators[i].init(new StreamContextImpl(null, new MultiCountMetric(), null), alertOutputCollector);
-            onAlertBoltSpecChange(evaluators[i], alertBoltSpec, sdf);
-        }
 
+        PolicyGroupEvaluatorImpl policyGroupEvaluator = null;
+        AlertBoltOutputCollectorSparkWrapper alertOutputCollector = null;
+        AlertBoltSpec spec;
+        Map<String, StreamDefinition> sds;
+        int partitionNum = Constants.UNKNOW_PARTITION;
         while (tuple2Iterator.hasNext()) {
             Tuple2<Integer, PartitionedEvent> tuple2 = tuple2Iterator.next();
+            if (partitionNum == Constants.UNKNOW_PARTITION) {
+                partitionNum = tuple2._1;
+            }
+            if (policyGroupEvaluator == null) {
+                spec = alertBoltSpecRef.get();
+                sds = sdsRef.get();
+                String boltId = Constants.ALERTBOLTNAME_PREFIX + partitionNum;
+                policyGroupEvaluator = new PolicyGroupEvaluatorImpl(boltId + "-evaluator_stage1");
+                alertOutputCollector = new AlertBoltOutputCollectorSparkWrapper();
+                //TODO StreamContext need to be more abstract
+                Map<String, PolicyDefinition> policyDefinitionMap = policyState.getPolicyDefinitionByBoltId(boltId);
+                Map<String, PolicyStreamHandler> policyStreamHandlerMap = policyState.getPolicyStreamHandlerByBoltId(boltId);
+                policyGroupEvaluator.init(new StreamContextImpl(null, new MultiCountMetric(), null), alertOutputCollector, policyDefinitionMap, policyStreamHandlerMap);
+                onAlertBoltSpecChange(boltId, spec, sds, policyGroupEvaluator, policyState);
+            }
             PartitionedEvent event = tuple2._2;
-            evaluators[tuple2._1].nextEvent(event);
+            policyGroupEvaluator.nextEvent(event);
         }
 
-        cleanup(evaluators, alertOutputCollector);
+        cleanup(policyGroupEvaluator, alertOutputCollector);
+        if(alertOutputCollector == null){
+            return Collections.emptyIterator();
+        }
         return alertOutputCollector.emitResult().iterator();
     }
 
-    public void onAlertBoltSpecChange(PolicyGroupEvaluator policyGroupEvaluator, AlertBoltSpec spec, Map<String, StreamDefinition> sds) {
-
-        Map<String, PolicyDefinition> cachedPolicies = new HashMap<>(); // for one streamGroup, there are multiple policies
-        List<PolicyDefinition> newPolicies = spec.getBoltPoliciesMap().get(policyGroupEvaluator.getName());
+    private void onAlertBoltSpecChange(String boltId, AlertBoltSpec spec, Map<String, StreamDefinition> sds, PolicyGroupEvaluatorImpl policyGroupEvaluator, PolicyState policyState) {
+        List<PolicyDefinition> newPolicies = spec.getBoltPoliciesMap().get(boltId);
         if (newPolicies == null) {
-            LOG.info("no policy with AlertBoltSpec {} for this bolt {}", spec, policyGroupEvaluator.getName());
+            LOG.info("no new policy with AlertBoltSpec {} for this bolt {}", spec, boltId);
             return;
         }
 
         Map<String, PolicyDefinition> newPoliciesMap = new HashMap<>();
         newPolicies.forEach(p -> newPoliciesMap.put(p.getName(), p));
-        MapComparator<String, PolicyDefinition> comparator = new MapComparator<>(newPoliciesMap, cachedPolicies);
+        MapComparator<String, PolicyDefinition> comparator = new MapComparator<>(newPoliciesMap, policyState.getCachedPolicyByBoltId(boltId));
         comparator.compare();
         policyGroupEvaluator.onPolicyChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), sds);
+
+        policyState.store(boltId, newPoliciesMap, policyGroupEvaluator.getPolicyDefinitionMap(), policyGroupEvaluator.getPolicyStreamHandlerMap());
     }
 
-    public void cleanup(PolicyGroupEvaluatorImpl[] policyGroupEvaluators, AlertBoltOutputCollectorSparkWrapper alertOutputCollector) {
-        for (int i = 0; i < numOfAlertBolts; i++) {
-            policyGroupEvaluators[i].close();
+    public void cleanup(PolicyGroupEvaluator policyGroupEvaluator, AlertBoltOutputCollectorSparkWrapper alertOutputCollector) {
+        if (policyGroupEvaluator != null) {
+            policyGroupEvaluator.close();
         }
-
-        alertOutputCollector.flush();
-        alertOutputCollector.close();
+        if (alertOutputCollector != null) {
+            alertOutputCollector.flush();
+            alertOutputCollector.close();
+        }
     }
 }

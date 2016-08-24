@@ -14,34 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.engine.sorter;
 
-import java.io.Serializable;
+package org.apache.eagle.alert.engine.utils;
 
-/**
- * The time clock per stream
- *
- * Should be thread-safe between getTime and moveForward
- *
- * By default, we currently simple support event timestamp now
- */
-public interface StreamTimeClock extends Serializable {
-    /**
-     * Get stream id
-     *
-     * @return stream id
-     */
-    String getStreamId();
-
-    /**
-     * Get current time
-     *
-     * @return current timestamp value
-     */
-    long getTime();
-
-    /**
-     * @param timestamp move forward current time to given timestamp
-     */
-    void moveForward(long timestamp);
+public class Constants {
+    public static final String ADDED = "added";
+    public static final String REMOVED = "removed";
+    public static final String MODIFIED = "modified";
+    public static final int UNKNOW_PARTITION = -1;
+    public static final String ALERTBOLTNAME_PREFIX = "alertBolt";
+    public static final String BEFORE_MODIFIED = "beforemodified";
 }

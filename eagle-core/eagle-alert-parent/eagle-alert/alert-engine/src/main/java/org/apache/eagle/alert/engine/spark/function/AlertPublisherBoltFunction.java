@@ -17,13 +17,11 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
-import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
-import org.apache.eagle.alert.engine.runner.MapComparator;
+import org.apache.eagle.alert.engine.utils.Constants;
 
 import org.apache.spark.api.java.function.VoidFunction;
 import org.slf4j.Logger;
@@ -34,62 +32,31 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AlertPublisherBoltFunction implements VoidFunction<Iterator<Tuple2<String, AlertStreamEvent>>> {
     private static final Logger LOG = LoggerFactory.getLogger(AlertPublisherBoltFunction.class);
 
-    private Map<String, Publishment> cachedPublishments = new HashMap<>();
 
-    private AtomicReference<PublishSpec> publishSpecRef;
-    private AtomicReference<Map<String, StreamDefinition>> sdsRef;
     private String alertPublishBoltName = "alertPublishBolt";
+    private AtomicReference<Map<String, List<Publishment>>> publishmentsChangInfoRef;
 
-    public AlertPublisherBoltFunction(AtomicReference<PublishSpec> publishSpecRef, AtomicReference<Map<String, StreamDefinition>> sdsRef, String alertPublishBoltName) {
-        this.publishSpecRef = publishSpecRef;
-        this.sdsRef = sdsRef;
+    public AlertPublisherBoltFunction(String alertPublishBoltName, AtomicReference<Map<String, List<Publishment>>> publishmentsChangInfoRef) {
         this.alertPublishBoltName = alertPublishBoltName;
+        this.publishmentsChangInfoRef = publishmentsChangInfoRef;
     }
 
     @Override
     public void call(Iterator<Tuple2<String, AlertStreamEvent>> tuple2Iterator) throws Exception {
-
         AlertPublisher alertPublisher = new AlertPublisherImpl(alertPublishBoltName);
         alertPublisher.init(null, new HashMap<>());
-        PublishSpec pubSpec = publishSpecRef.get();
-        Map<String, StreamDefinition> sds = sdsRef.get();
-        onAlertPublishSpecChange(alertPublisher, pubSpec, sds);
+        Map<String, List<Publishment>> publishmentsChangInfo = publishmentsChangInfoRef.get();
+        alertPublisher.onPublishChange(publishmentsChangInfo.get(Constants.ADDED), publishmentsChangInfo.get(Constants.REMOVED), publishmentsChangInfo.get(Constants.MODIFIED), publishmentsChangInfo.get(Constants.BEFORE_MODIFIED));
         while (tuple2Iterator.hasNext()) {
             Tuple2<String, AlertStreamEvent> tuple2 = tuple2Iterator.next();
             AlertStreamEvent alertEvent = tuple2._2;
             LOG.info("AlertPublisherBoltFunction " + alertEvent);
             alertPublisher.nextEvent(alertEvent);
         }
-
-    }
-
-    private void onAlertPublishSpecChange(AlertPublisher alertPublisher, PublishSpec pubSpec, Map<String, StreamDefinition> sds) {
-        if (pubSpec == null) {
-            return;
-        }
-
-        List<Publishment> newPublishments = pubSpec.getPublishments();
-        if (newPublishments == null) {
-            LOG.info("no publishments with PublishSpec {} for this topology", pubSpec);
-            return;
-        }
-
-        Map<String, Publishment> newPublishmentsMap = new HashMap<>();
-        newPublishments.forEach(p -> newPublishmentsMap.put(p.getName(), p));
-        MapComparator<String, Publishment> comparator = new MapComparator<>(newPublishmentsMap, cachedPublishments);
-        comparator.compare();
-
-        List<Publishment> beforeModified = new ArrayList<>();
-        comparator.getModified().forEach(p -> beforeModified.add(cachedPublishments.get(p.getName())));
-        alertPublisher.onPublishChange(comparator.getAdded(), comparator.getRemoved(), comparator.getModified(), beforeModified);
-
-        // switch
-        cachedPublishments = newPublishmentsMap;
     }
 }

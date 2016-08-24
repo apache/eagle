@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
@@ -27,7 +28,7 @@ import org.apache.eagle.alert.utils.DateTimeUtil;
  *
  * TODO: maybe need to synchronize time clock globally, how to?
  */
-public class StreamTimeClockInLocalMemory implements StreamTimeClock {
+public class StreamTimeClockInLocalMemory implements StreamTimeClock, Serializable {
     private final AtomicLong currentTime;
     private final String streamId;
 
