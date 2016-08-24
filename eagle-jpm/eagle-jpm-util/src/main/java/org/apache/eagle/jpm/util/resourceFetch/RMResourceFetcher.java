@@ -91,11 +91,11 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
     }
 
     private String getSparkRunningJobURL() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(selector.getSelectedUrl()).append("/").append(Constants.V2_APPS_URL);
-        sb.append("?applicationTypes=SPARK&state=RUNNING&");
-        sb.append(Constants.ANONYMOUS_PARAMETER);
-        return sb.toString();
+        return selector.getSelectedUrl()
+                + "/"
+                + Constants.V2_APPS_URL
+                + "?applicationTypes=SPARK&state=RUNNING&"
+                + Constants.ANONYMOUS_PARAMETER;
     }
 
     private String getMRRunningJobURL() {
@@ -105,14 +105,11 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
             Constants.ANONYMOUS_PARAMETER);
     }
 
-    public String getMRFinishedJobURL(String lastFinishedTime) {
+    private String getMRFinishedJobURL(String lastFinishedTime) {
         String url = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
-        StringBuilder sb = new StringBuilder();
-        sb.append(url).append("/").append(Constants.V2_APPS_URL);
-        sb.append("?applicationTypes=MAPREDUCE&state=FINISHED&finishedTimeBegin=");
-        sb.append(lastFinishedTime).append("&").append(Constants.ANONYMOUS_PARAMETER);
-
-        return sb.toString();
+        return url + "/" + "Constants.V2_APPS_URL"
+                + "?applicationTypes=MAPREDUCE&state=FINISHED&finishedTimeBegin="
+                + lastFinishedTime + "&" + Constants.ANONYMOUS_PARAMETER;
     }
 
     private List<AppInfo> doFetchRunningApplicationsList(String urlString, Constants.CompressionType compressionType) throws Exception {
@@ -139,10 +136,10 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
         }
     }
 
-    private List<AppInfo> getResource(Constants.ResourceType resoureType, Constants.CompressionType compressionType, Object... parameter) throws Exception {
-        switch (resoureType) {
+    private List<AppInfo> getResource(Constants.ResourceType resourceType, Constants.CompressionType compressionType, Object... parameter) throws Exception {
+        switch (resourceType) {
             case COMPLETE_SPARK_JOB:
-                final String urlString = sparkCompleteJobServiceURLBuilder.build((String) parameter[0]);
+                final String urlString = sparkCompleteJobServiceURLBuilder.build(selector.getSelectedUrl(), (String) parameter[0]);
                 return doFetchFinishApplicationsList(urlString, compressionType);
             case RUNNING_SPARK_JOB:
                 return doFetchRunningApplicationsList(getSparkRunningJobURL(), compressionType);
@@ -151,22 +148,20 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
             case COMPLETE_MR_JOB:
                 return doFetchFinishApplicationsList(getMRFinishedJobURL((String) parameter[0]), compressionType);
             default:
-                throw new Exception("Not support resourceType :" + resoureType);
+                throw new Exception("Not support resourceType :" + resourceType);
         }
     }
 
-    public List<AppInfo> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception {
+    public List<AppInfo> getResource(Constants.ResourceType resourceType, Object... parameter) throws Exception {
         try {
-            return getResource(resoureType, Constants.CompressionType.GZIP, parameter);
+            return getResource(resourceType, Constants.CompressionType.GZIP, parameter);
         } catch (java.util.zip.ZipException ex) {
-            return getResource(resoureType, Constants.CompressionType.NONE, parameter);
+            return getResource(resourceType, Constants.CompressionType.NONE, parameter);
         }
     }
 
     private String getClusterInfoURL() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(selector.getSelectedUrl()).append("/").append(Constants.YARN_API_CLUSTER_INFO).append("?" + Constants.ANONYMOUS_PARAMETER);
-        return sb.toString();
+        return selector.getSelectedUrl() + "/" + Constants.YARN_API_CLUSTER_INFO + "?" + Constants.ANONYMOUS_PARAMETER;
     }
 
     public ClusterInfo getClusterInfo() throws Exception {

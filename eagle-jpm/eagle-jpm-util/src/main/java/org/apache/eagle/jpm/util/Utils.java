@@ -59,7 +59,7 @@ public class Utils {
         }
 
         if (timestamp == 0L) {
-            LOG.error("Not able to parse date: " + date);
+            LOG.warn("Not able to parse date: " + date);
         }
 
         return timestamp;
@@ -82,7 +82,8 @@ public class Utils {
             int executorPB = Integer.parseInt(memory.substring(0, memory.length() - 1));
             return 1024L * 1024 * 1024 * 1024 * 1024 * executorPB;
         }
-        LOG.info("Cannot parse memory info " + memory);
+        LOG.warn("Cannot parse memory info " +  memory);
+
         return 0L;
     }
 }

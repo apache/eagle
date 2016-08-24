@@ -76,11 +76,13 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
             if (fetchTime - this.lastFinishAppTime > this.config.stormConfig.spoutCrawlInterval) {
                 List<AppInfo> appInfos = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, Long.toString(lastFinishAppTime));
                 //List<AppInfo> appInfos = (null != apps ? (List<AppInfo>)apps.get(0):new ArrayList<AppInfo>());
-                LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
-                for (AppInfo app: appInfos) {
-                    String appId = app.getId();
-                    if (!zkState.hasApplication(appId)) {
-                        zkState.addFinishedApplication(appId, app.getQueue(), app.getState(), app.getFinalStatus(), app.getUser(), app.getName());
+                if (appInfos != null) {
+                    LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
+                    for (AppInfo app : appInfos) {
+                        String appId = app.getId();
+                        if (!zkState.hasApplication(appId)) {
+                            zkState.addFinishedApplication(appId, app.getQueue(), app.getState(), app.getFinalStatus(), app.getUser(), app.getName());
+                        }
                     }
                 }
                 this.lastFinishAppTime = fetchTime;
