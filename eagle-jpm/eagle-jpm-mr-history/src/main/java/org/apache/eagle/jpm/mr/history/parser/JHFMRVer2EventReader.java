@@ -33,14 +33,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
 public class JHFMRVer2EventReader extends JHFEventReaderBase {
     private static final Logger logger = LoggerFactory.getLogger(JHFMRVer2EventReader.class);
 
     /**
-     * Create a new Event Reader
+     * Create a new Event Reader.
      *
      * @throws IOException
      */
@@ -455,7 +454,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
         String[] tmp = rackname.split("/");
         String rack = tmp[tmp.length - 1];
         values.put(Keys.RACK, rack);
-        m_host2RackMapping.put(values.get(Keys.HOSTNAME), rack);
+        host2RackMapping.put(values.get(Keys.HOSTNAME), rack);
     }
 
     private void handleMapAttemptFailed(Event wrapper) throws Exception {

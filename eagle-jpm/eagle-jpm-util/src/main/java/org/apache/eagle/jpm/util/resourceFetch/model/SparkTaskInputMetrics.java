@@ -17,12 +17,12 @@
  *
  */
 
-package org.apache.eagle.jpm.util.resourceFetch.model;
+package org.apache.eagle.jpm.util.resourcefetch.model;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SparkTaskInputMetrics {
     private long bytesRead;

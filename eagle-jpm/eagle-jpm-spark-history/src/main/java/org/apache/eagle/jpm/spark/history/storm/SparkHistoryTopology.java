@@ -19,32 +19,32 @@
 
 package org.apache.eagle.jpm.spark.history.storm;
 
+import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
-import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
 
 public class SparkHistoryTopology {
 
-    private SparkHistoryCrawlConfig SHConfig;
+    private SparkHistoryCrawlConfig sparkHistoryCrawlConfig;
 
-    public SparkHistoryTopology(SparkHistoryCrawlConfig config){
-        this.SHConfig = config;
+    public SparkHistoryTopology(SparkHistoryCrawlConfig config) {
+        this.sparkHistoryCrawlConfig = config;
     }
 
     public TopologyBuilder getBuilder() {
         TopologyBuilder builder = new TopologyBuilder();
         String spoutName = "sparkHistoryJobSpout";
         String boltName = "sparkHistoryJobBolt";
-        com.typesafe.config.Config config = this.SHConfig.getConfig();
+        com.typesafe.config.Config config = this.sparkHistoryCrawlConfig.getConfig();
         builder.setSpout(spoutName,
-                new FinishedSparkJobSpout(SHConfig),
+                new FinishedSparkJobSpout(sparkHistoryCrawlConfig),
                 config.getInt("storm.parallelismConfig." + spoutName)
         ).setNumTasks(config.getInt("storm.tasks." + spoutName));
 
         builder.setBolt(boltName,
-                new SparkJobParseBolt(SHConfig),
+                new SparkJobParseBolt(sparkHistoryCrawlConfig),
                 config.getInt("storm.parallelismConfig." + boltName)
         ).setNumTasks(config.getInt("storm.tasks." + boltName)).shuffleGrouping(spoutName);
         return builder;

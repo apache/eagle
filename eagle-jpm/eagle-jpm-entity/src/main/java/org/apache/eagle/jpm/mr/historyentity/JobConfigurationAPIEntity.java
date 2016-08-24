@@ -22,7 +22,7 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa")
 @ColumnFamily("f")
 @Prefix("jconf")
@@ -30,9 +30,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-        @Index(name="Index_1_jobId", columns = { "jobId" }, unique = true),
-        @Index(name="Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
-})
+        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = true),
+        @Index(name = "Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
+    })
 public class JobConfigurationAPIEntity extends JobBaseAPIEntity {
     
     @Column("a")
@@ -45,20 +45,25 @@ public class JobConfigurationAPIEntity extends JobBaseAPIEntity {
     public JobConfig getJobConfig() {
         return jobConfig;
     }
+
     public void setJobConfig(JobConfig jobConfig) {
         this.jobConfig = jobConfig;
         _pcs.firePropertyChange("jobConfig", null, null);
     }
+
     public String getConfigJobName() {
         return configJobName;
     }
+
     public void setConfigJobName(String configJobName) {
         this.configJobName = configJobName;
         _pcs.firePropertyChange("configJobName", null, null);
     }
+
     public String getAlertEmailList() {
         return alertEmailList;
     }
+
     public void setAlertEmailList(String alertEmailList) {
         this.alertEmailList = alertEmailList;
         _pcs.firePropertyChange("alertEmailList", null, null);

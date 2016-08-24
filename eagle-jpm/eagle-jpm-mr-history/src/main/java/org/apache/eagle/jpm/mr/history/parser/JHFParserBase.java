@@ -20,12 +20,9 @@ package org.apache.eagle.jpm.mr.history.parser;
 
 import java.io.InputStream;
 
-/**
- * @author yonzhang
- */
 public interface JHFParserBase {
     /**
-     * this method will ensure to close the inputstream
+     * this method will ensure to close the inputStream.
      *
      * @param is
      * @throws Exception

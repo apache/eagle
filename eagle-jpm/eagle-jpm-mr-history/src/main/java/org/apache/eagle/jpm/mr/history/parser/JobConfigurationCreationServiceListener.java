@@ -33,7 +33,7 @@ public class JobConfigurationCreationServiceListener implements HistoryJobEntity
     private static final Logger logger = LoggerFactory.getLogger(JobConfigurationCreationServiceListener.class);
     private static final int MAX_RETRY_TIMES = 3;
     private MRHistoryJobConfig configManager;
-    private JobConfigurationAPIEntity m_jobConfigurationEntity;
+    private JobConfigurationAPIEntity jobConfigurationEntity;
 
     public JobConfigurationCreationServiceListener(MRHistoryJobConfig configManager) {
         this.configManager = configManager;
@@ -43,7 +43,7 @@ public class JobConfigurationCreationServiceListener implements HistoryJobEntity
     public void jobEntityCreated(JobBaseAPIEntity entity) throws Exception {
         if (entity != null) {
             if (entity instanceof JobConfigurationAPIEntity) {
-                this.m_jobConfigurationEntity = (JobConfigurationAPIEntity) entity;
+                this.jobConfigurationEntity = (JobConfigurationAPIEntity) entity;
             }
         }
     }
@@ -65,7 +65,7 @@ public class JobConfigurationCreationServiceListener implements HistoryJobEntity
 
         client.getJerseyClient().setReadTimeout(jobExtractorConfig.readTimeoutSeconds * 1000);
         List<JobConfigurationAPIEntity> list = new ArrayList<>();
-        list.add(m_jobConfigurationEntity);
+        list.add(jobConfigurationEntity);
 
         int tried = 0;
         while (tried <= MAX_RETRY_TIMES) {
@@ -82,7 +82,7 @@ public class JobConfigurationCreationServiceListener implements HistoryJobEntity
                 }
             } finally {
                 list.clear();
-                m_jobConfigurationEntity = null;
+                jobConfigurationEntity = null;
                 client.getJerseyClient().destroy();
                 client.close();
             }

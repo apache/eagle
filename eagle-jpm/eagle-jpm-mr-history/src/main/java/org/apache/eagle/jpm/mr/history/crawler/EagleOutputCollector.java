@@ -21,9 +21,9 @@ import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import java.io.Serializable;
 
 /**
- * expose simple interface for streaming executor to populate output data
+ * expose simple interface for streaming executor to populate output data.
  *
  */
-public interface EagleOutputCollector extends Serializable{
-	void collect(ValuesArray t);
+public interface EagleOutputCollector extends Serializable {
+    void collect(ValuesArray t);
 }

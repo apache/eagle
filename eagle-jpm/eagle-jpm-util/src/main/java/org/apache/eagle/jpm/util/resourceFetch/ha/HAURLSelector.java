@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.util.resourceFetch.ha;
+package org.apache.eagle.jpm.util.resourcefetch.ha;
 
 import java.io.IOException;
 
 public interface HAURLSelector {
-	
-	boolean checkUrl(String url);
-		
-	void reSelectUrl() throws IOException;
-	
-	String getSelectedUrl();
+
+    boolean checkUrl(String url);
+
+    void reSelectUrl() throws IOException;
+
+    String getSelectedUrl();
 }

@@ -33,10 +33,10 @@ import java.io.InputStream;
 
 public class JHFMRVer2Parser implements JHFParserBase {
     private static final Logger logger = LoggerFactory.getLogger(JHFMRVer2Parser.class);
-    private JHFMRVer2EventReader _reader;
+    private JHFMRVer2EventReader reader;
 
     public JHFMRVer2Parser(JHFMRVer2EventReader reader) {
-        this._reader = reader;
+        this.reader = reader;
     }
 
     @SuppressWarnings( {"rawtypes", "deprecation"})
@@ -58,11 +58,11 @@ public class JHFMRVer2Parser implements JHFParserBase {
             Event wrapper;
             while ((wrapper = getNextEvent(datumReader, decoder)) != null) {
                 ++eventCtr;
-                _reader.handleEvent(wrapper);
+                reader.handleEvent(wrapper);
             }
-            _reader.parseConfiguration();
+            reader.parseConfiguration();
             // don't need put to finally as it's a kind of flushing data
-            _reader.close();
+            reader.close();
             logger.info("reader used " + (System.currentTimeMillis() - start) + "ms");
         } catch (Exception ioe) {
             logger.error("Caught exception parsing history file after " + eventCtr + " events", ioe);

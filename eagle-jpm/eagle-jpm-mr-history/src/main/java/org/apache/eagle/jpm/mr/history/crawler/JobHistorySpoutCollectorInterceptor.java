@@ -18,18 +18,18 @@
 
 package org.apache.eagle.jpm.mr.history.crawler;
 
-import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.dataproc.impl.storm.ValuesArray;
+import backtype.storm.spout.SpoutOutputCollector;
 
 public class JobHistorySpoutCollectorInterceptor implements EagleOutputCollector {
-    private SpoutOutputCollector m_collector;
+    private SpoutOutputCollector collector;
 
     public void setSpoutOutputCollector(SpoutOutputCollector collector) {
-        this.m_collector = collector;
+        this.collector = collector;
     }
 
     @Override
     public void collect(ValuesArray t) {
-        m_collector.emit(t);
+        collector.emit(t);
     }
 }

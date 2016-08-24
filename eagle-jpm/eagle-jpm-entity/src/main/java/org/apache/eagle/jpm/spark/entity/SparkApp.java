@@ -18,10 +18,10 @@
 
 package org.apache.eagle.jpm.spark.entity;
 
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.apache.eagle.jpm.util.Constants;
 
 @Table("eglesprk_apps")
 @ColumnFamily("f")
@@ -31,7 +31,7 @@ import org.apache.eagle.jpm.util.Constants;
 @TimeSeries(true)
 @Tags({"site","sprkAppId", "sprkAppAttemptId", "sprkAppName", "normSprkAppName","user", "queue"})
 @Partition({"site"})
-public class SparkApp extends TaggedLogAPIEntity{
+public class SparkApp extends TaggedLogAPIEntity {
 
     @Column("a")
     private long  startTime;
@@ -222,11 +222,14 @@ public class SparkApp extends TaggedLogAPIEntity{
         return driveMemoryBytes;
     }
 
-    public int getCompleteTasks(){ return completeTasks;}
+    public int getCompleteTasks() {
+        return completeTasks;
+    }
 
     public JobConfig getConfig() {
         return config;
     }
+
     public void setStartTime(long startTime) {
         this.startTime = startTime;
         valueChanged("startTime");
@@ -377,7 +380,7 @@ public class SparkApp extends TaggedLogAPIEntity{
         valueChanged("driveMemoryBytes");
     }
 
-    public void setCompleteTasks(int completeTasks){
+    public void setCompleteTasks(int completeTasks) {
         this.completeTasks = completeTasks;
         valueChanged("completeTasks");
     }

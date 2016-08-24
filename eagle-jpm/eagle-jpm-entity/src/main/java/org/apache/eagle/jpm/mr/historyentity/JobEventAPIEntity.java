@@ -22,7 +22,7 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa")
 @ColumnFamily("f")
 @Prefix("jevent")
@@ -30,13 +30,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 public class JobEventAPIEntity extends JobBaseAPIEntity {
-
     @Column("a")
     private String eventType;
 
     public String getEventType() {
         return eventType;
     }
+
     public void setEventType(String eventType) {
         this.eventType = eventType;
         _pcs.firePropertyChange("eventType", null, null);
