@@ -17,6 +17,10 @@
 package org.apache.eagle.alert.coordination.model;
 
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.Objects;
+
 /**
  * A slot is simply a bolt.
  */
@@ -44,9 +48,28 @@ public class WorkSlot {
 
     }
 
+
     public WorkSlot(String topo, String boltId) {
         this.topologyName = topo;
         this.boltId = boltId;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof WorkSlot)) {
+            return false;
+        }
+        WorkSlot workSlot = (WorkSlot) other;
+        return Objects.equals(topologyName, workSlot.topologyName) &&
+                Objects.equals(boltId, workSlot.boltId);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(topologyName).append(boltId).build();
     }
 
     public String toString() {
