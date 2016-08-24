@@ -27,13 +27,47 @@
 	// ==============================================================
 
 	// ==============================================================
+	// =                          Function                          =
+	// ==============================================================
+	// Format dashboard unit. Will adjust format with old version and add miss attributes.
+	feature.service("DashboardFormatter", function() {
+		return {
+			parse: function(unit) {
+				unit = unit || {};
+				unit.groups = unit.groups || [];
+
+				$.each(unit.groups, function (i, group) {
+					group.charts = group.charts || [];
+					$.each(group.charts, function (i, chart) {
+						if (!chart.metrics && chart.metric) {
+							chart.metrics = [{
+								aggregations: chart.aggregations,
+								dataSource: chart.dataSource,
+								metric: chart.metric
+							}];
+
+							delete chart.aggregations;
+							delete chart.dataSource;
+							delete chart.metric;
+						} else if (!chart.metrics) {
+							chart.metrics = [];
+						}
+					});
+				});
+
+				return unit;
+			}
+		};
+	});
+
+	// ==============================================================
 	// =                         Controller                         =
 	// ==============================================================
 
 	// ========================= Dashboard ==========================
 	feature.navItem("dashboard", "Metrics", "line-chart");
 
-	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Authorization, Application, Entities) {
+	feature.controller('dashboard', function(PageConfig, $scope, $http, $q, UI, Site, Authorization, Application, Entities, DashboardFormatter) {
 		var _siteApp = Site.currentSiteApplication();
 		var _druidConfig = _siteApp.configObj.druid;
 		var _refreshInterval;
@@ -80,7 +114,7 @@
 		// ====================== Function ======================
 		$scope.setAuthRefresh = function(item) {
 			$scope.autoRefreshSelect = item;
-			$scope.chartRefresh(true);
+			$scope.refreshAllChart(true);
 		};
 
 		$scope.refreshTimeDisplay = function() {
@@ -161,27 +195,36 @@
 		// Confirm new metric
 		$scope.confirmSelectMetric = function() {
 			var group = $scope.tabHolder.selectedPane.data;
-			$("#metricMDL").modal('hide');
-
-			group.charts.push({
-				chart: "line",
+			var metric = {
 				dataSource: $scope._newMetricDataSrc.dataSource,
 				metric: $scope._newMetricDataMetric,
 				aggregations: ["max"]
-			});
+			};
+			$("#metricMDL").modal('hide');
 
-			$scope.chartRefresh();
+			if($scope.metricForConfigChart) {
+				$scope.configPreviewChart.metrics.push(metric);
+				$scope.refreshChart($scope.configPreviewChart, true, true);
+			} else {
+				group.charts.push({
+					chart: "line",
+					metrics: [metric]
+				});
+				$scope.refreshAllChart();
+			}
 		};
 
 		// ======================== Menu ========================
+		function _checkGroupName(entity) {
+			if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
+				return "Group name conflict";
+			}
+		}
+
 		$scope.newGroup = function() {
 			if($scope.lock) return;
 
-			UI.createConfirm("Group", {}, [{field: "name"}], function(entity) {
-				if(common.array.find(entity.name, $scope.dashboard.groups, "name")) {
-					return "Group name conflict";
-				}
-			}).then(null, null, function(holder) {
+			UI.createConfirm("Group", {}, [{field: "name"}], _checkGroupName).then(null, null, function(holder) {
 				$scope.dashboard.groups.push({
 					name: holder.entity.name,
 					charts: []
@@ -193,6 +236,14 @@
 				}, 0);
 			});
 		};
+
+		function renameGroup() {
+			var group = $scope.tabHolder.selectedPane.data;
+			UI.updateConfirm("Group", {}, [{field: "name", name: "New Name"}], _checkGroupName).then(null, null, function(holder) {
+				group.name = holder.entity.name;
+				holder.closeFunc();
+			});
+		}
 
 		function deleteGroup() {
 			var group = $scope.tabHolder.selectedPane.data;
@@ -215,6 +266,7 @@
 		$scope.menu = Authorization.isRole('ROLE_ADMIN') ? [
 			{icon: "cog", title: "Configuration", list: [
 				_menu_newChart,
+				{icon: "pencil", title: "Rename Group", func: renameGroup},
 				{icon: "trash", title: "Delete Group", danger: true, func: deleteGroup}
 			]},
 			{icon: "plus", title: "New Group", func: $scope.newGroup}
@@ -227,8 +279,8 @@
 		});
 		$scope.dashboardList._promise.then(function(list) {
 			$scope.dashboardEntity = list[0];
-			$scope.dashboard = $scope.dashboardEntity ? common.parseJSON($scope.dashboardEntity.value) : {groups: []};
-			$scope.chartRefresh();
+			$scope.dashboard = DashboardFormatter.parse(common.parseJSON($scope.dashboardEntity.value));
+			$scope.refreshAllChart();
 		}).finally(function() {
 			$scope.dashboardReady = true;
 		});
@@ -265,6 +317,8 @@
 		// ======================= Chart ========================
 		$scope.configTargetChart = null;
 		$scope.configPreviewChart = null;
+		$scope.metricForConfigChart = false;
+		$scope.viewChart = null;
 
 		$scope.chartConfig = {
 			xType: "time"
@@ -279,36 +333,51 @@
 
 		$scope.chartSeriesList = [
 			{name: "Min", series: "min"},
-			{name: "Max", series: "max"}
+			{name: "Max", series: "max"},
+			{name: "Avg", series: "avg"},
+			{name: "Count", series: "count"},
+			{name: "Sum", series: "sum"}
 		];
 
 		$scope.newChart = function() {
+			$scope.metricForConfigChart = false;
 			$("#metricMDL").modal();
 		};
 
 		$scope.configPreviewChartMinimumCheck = function() {
 			$scope.configPreviewChart.min = $scope.configPreviewChart.min === 0 ? undefined : 0;
-			window.ccc1 = $scope.getChartConfig($scope.configPreviewChart);
 		};
 
-		$scope.seriesChecked = function(chart, series) {
-			if(!chart) return false;
-			return $.inArray(series, chart.aggregations || []) !== -1;
+		$scope.seriesChecked = function(metric, series) {
+			if(!metric) return false;
+			return $.inArray(series, metric.aggregations || []) !== -1;
 		};
-		$scope.seriesCheckClick = function(chart, series) {
-			if(!chart) return;
-			if($scope.seriesChecked(chart, series)) {
-				common.array.remove(series, chart.aggregations);
+		$scope.seriesCheckClick = function(metric, series, chart) {
+			if(!metric || !chart) return;
+			if($scope.seriesChecked(metric, series)) {
+				common.array.remove(series, metric.aggregations);
 			} else {
-				chart.aggregations.push(series);
+				metric.aggregations.push(series);
 			}
 			$scope.chartSeriesUpdate(chart);
 		};
 
 		$scope.chartSeriesUpdate = function(chart) {
-			chart._data = $.map(chart._oriData, function(series) {
-				if($.inArray(series.key, chart.aggregations) !== -1) return series;
+			chart._data = $.map(chart._oriData, function(groupData, i) {
+				var metric = chart.metrics[i];
+				return $.map(groupData, function(series) {
+					if($.inArray(series._key, metric.aggregations) !== -1) return series;
+				});
 			});
+		};
+
+		$scope.configAddMetric = function() {
+			$scope.metricForConfigChart = true;
+			$("#metricMDL").modal();
+		};
+
+		$scope.configRemoveMetric = function(metric) {
+			common.array.remove(metric, $scope.configPreviewChart.metrics);
 		};
 
 		$scope.getChartConfig = function(chart) {
@@ -323,6 +392,9 @@
 		$scope.configChart = function(chart) {
 			$scope.configTargetChart = chart;
 			$scope.configPreviewChart = $.extend({}, chart);
+			$scope.configPreviewChart.metrics = $.map(chart.metrics, function(metric) {
+				return $.extend({}, metric, {aggregations: (metric.aggregations || []).slice()});
+			});
 			delete $scope.configPreviewChart._config;
 			$("#chartMDL").modal();
 			setTimeout(function() {
@@ -332,68 +404,164 @@
 
 		$scope.confirmUpdateChart = function() {
 			$("#chartMDL").modal('hide');
-			common.extend($scope.configTargetChart, $scope.configPreviewChart);
+			$.extend($scope.configTargetChart, $scope.configPreviewChart);
 			$scope.chartSeriesUpdate($scope.configTargetChart);
 			if($scope.configTargetChart._holder) $scope.configTargetChart._holder.refreshAll();
+			$scope.configPreviewChart = null;
 		};
 
 		$scope.deleteChart = function(group, chart) {
 			UI.deleteConfirm(chart.metric).then(null, null, function(holder) {
 				common.array.remove(chart, group.charts);
 				holder.closeFunc();
-				$scope.chartRefresh();
+				$scope.refreshAllChart(false, true);
 			});
 		};
 
-		$scope.chartRefresh = function(forceRefresh) {
+		$scope.showChart = function(chart) {
+			$scope.viewChart = chart;
+			$("#chartViewMDL").modal();
+			setTimeout(function() {
+				$(window).resize();
+			}, 200);
+		};
+
+		$scope.refreshChart = function(chart, forceRefresh, refreshAll) {
+			var _intervals = $scope.startTime.toISOString() + "/" + $scope.endTime.toISOString();
+
+			function _refreshChart() {
+				if (chart._holder) {
+					if (refreshAll) {
+						chart._holder.refreshAll();
+					} else {
+						chart._holder.refresh();
+					}
+				}
+			}
+
+			var _tmpData, _metricPromiseList;
+
+			if (chart._data && !forceRefresh) {
+				// Refresh chart without reload
+				_refreshChart();
+			} else {
+				// Refresh chart with reload
+				_tmpData = [];
+				_metricPromiseList = $.map(chart.metrics, function (metric, k) {
+					// Each Metric
+					var _query = JSON.stringify({
+						"queryType": "groupBy",
+						"dataSource": metric.dataSource,
+						"granularity": $scope.autoRefreshSelect.timeDes,
+						"dimensions": ["metric"],
+						"filter": {"type": "selector", "dimension": "metric", "value": metric.metric},
+						"aggregations": [
+							{
+								"type": "max",
+								"name": "max",
+								"fieldName": "maxValue"
+							},
+							{
+								"type": "min",
+								"name": "min",
+								"fieldName": "maxValue"
+							},
+							{
+								"type": "count",
+								"name": "count",
+								"fieldName": "maxValue"
+							},
+							{
+								"type": "longSum",
+								"name": "sum",
+								"fieldName": "maxValue"
+							}
+						],
+						"postAggregations" : [
+							{
+								"type": "javascript",
+								"name": "avg",
+								"fieldNames": ["sum", "count"],
+								"function": "function(sum, cnt) { return sum / cnt;}"
+							}
+						],
+						"intervals": [_intervals]
+					});
+
+					return $http.post(_druidConfig.broker + "/druid/v2", _query, {withCredentials: false}).then(function (response) {
+						var _data = nvd3.convert.druid([response.data]);
+						_tmpData[k] = _data;
+
+						// Process series name
+						$.each(_data, function(i, series) {
+							series._key = series.key;
+							if(chart.metrics.length > 1) {
+								series.key = metric.metric.replace(/^.*\./, "") + "-" +series._key;
+							}
+						});
+					});
+				});
+
+				$q.all(_metricPromiseList).then(function() {
+					chart._oriData = _tmpData;
+					$scope.chartSeriesUpdate(chart);
+					_refreshChart();
+				});
+			}
+		};
+
+		$scope.refreshAllChart = function(forceRefresh, refreshAll) {
 			setTimeout(function() {
 				$scope.endTime = app.time.now();
 				$scope.startTime = $scope.autoRefreshSelect.getStartTime($scope.endTime);
-				var _intervals = $scope.startTime.toISOString() + "/" + $scope.endTime.toISOString();
 
 				$scope.refreshTimeDisplay();
 
 				$.each($scope.dashboard.groups, function (i, group) {
 					$.each(group.charts, function (j, chart) {
-						var _data = JSON.stringify({
-							"queryType": "groupBy",
-							"dataSource": chart.dataSource,
-							"granularity": $scope.autoRefreshSelect.timeDes,
-							"dimensions": ["metric"],
-							"filter": {"type": "selector", "dimension": "metric", "value": chart.metric},
-							"aggregations": [
-								{
-									"type": "max",
-									"name": "max",
-									"fieldName": "maxValue"
-								},
-								{
-									"type": "min",
-									"name": "min",
-									"fieldName": "maxValue"
-								}
-							],
-							"intervals": [_intervals]
-						});
-
-						if (!chart._data || forceRefresh) {
-							$http.post(_druidConfig.broker + "/druid/v2", _data, {withCredentials: false}).then(function (response) {
-								chart._oriData = nvd3.convert.druid([response.data]);
-								$scope.chartSeriesUpdate(chart);
-								if(chart._holder) chart._holder.refresh();
-							});
-						} else {
-							if(chart._holder) chart._holder.refresh();
-						}
+						$scope.refreshChart(chart, forceRefresh, refreshAll);
 					});
 				});
+
+				$(window).resize();
 			}, 0);
+		};
+
+		$scope.chartSwitchRefresh = function(source, target) {
+			var _oriSize = source.size;
+			source.size = target.size;
+			target.size = _oriSize;
+
+			if(source._holder) source._holder.refreshAll();
+			if(target._holder) target._holder.refreshAll();
+
 		};
 
 		_refreshInterval = setInterval(function() {
 			if(!$scope.dashboardReady) return;
-			$scope.chartRefresh(true);
+			$scope.refreshAllChart(true);
 		}, 1000 * 30);
+
+		// > Chart UI
+		$scope.configChartSize = function(chart, sizeOffset) {
+			chart.size = (chart.size || 6) + sizeOffset;
+			if(chart.size <= 0) chart.size = 1;
+			if(chart.size > 12) chart.size = 12;
+			setTimeout(function() {
+				$(window).resize();
+			}, 1);
+		};
+
+		// ========================= UI =========================
+		$("#metricMDL").on('hidden.bs.modal', function () {
+			if($(".modal-backdrop").length) {
+				$("body").addClass("modal-open");
+			}
+		});
+
+		$("#chartViewMDL").on('hidden.bs.modal', function () {
+			$scope.viewChart = null;
+		});
 
 		// ====================== Clean Up ======================
 		$scope.$on('$destroy', function() {
