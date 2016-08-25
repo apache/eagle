@@ -110,6 +110,10 @@ public class MRJobParser implements Runnable {
         this.configKeys = configKeys;
     }
 
+    public void setAppInfo(AppInfo app) {
+        this.app = app;
+    }
+
     public ParserStatus status() {
         return this.parserStatus;
     }
@@ -206,6 +210,7 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setStartTime(mrJob.getStartTime());
             jobExecutionAPIEntity.setDurationTime(mrJob.getElapsedTime());
             jobExecutionAPIEntity.setCurrentState(mrJob.getState());
+            jobExecutionAPIEntity.setInternalState(mrJob.getState());
             jobExecutionAPIEntity.setNumTotalMaps(mrJob.getMapsTotal());
             jobExecutionAPIEntity.setMapsCompleted(mrJob.getMapsCompleted());
             jobExecutionAPIEntity.setNumTotalReduces(mrJob.getReducesTotal());
