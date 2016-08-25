@@ -31,7 +31,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-    @Index(name = "Index_1_jobId", columns = { "jobID" }, unique = false)
+    @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false)
     })
 public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
     @Column("a")

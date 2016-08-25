@@ -120,7 +120,8 @@ public class MRJobParser implements Runnable {
 
     private void finishMRJob(String mrJobId) {
         JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(mrJobId);
-        jobExecutionAPIEntity.setCurrentState(Constants.AppState.FINISHED.toString());
+        jobExecutionAPIEntity.setInternalState(Constants.AppState.FINISHED.toString());
+        jobExecutionAPIEntity.setCurrentState(Constants.AppState.RUNNING.toString());
         mrJobConfigs.remove(mrJobId);
         if (mrJobConfigs.size() == 0) {
             this.parserStatus = ParserStatus.APP_FINISHED;
@@ -562,8 +563,8 @@ public class MRJobParser implements Runnable {
                     mrJobEntityMap.keySet()
                         .stream()
                         .filter(
-                            jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString())
-                                || mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
+                            jobId -> mrJobEntityMap.get(jobId).getInternalState().equals(Constants.AppState.FINISHED.toString())
+                                || mrJobEntityMap.get(jobId).getInternalState().equals(Constants.AppState.FAILED.toString()))
                         .forEach(
                             jobId -> this.runningJobManager.delete(app.getId(), jobId));
                 }

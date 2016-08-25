@@ -81,6 +81,14 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     private double maxMapTaskDuration;
     @Column("x")
     private double maxReduceTaskDuration;
+    @Column("y")
+    private int totalMapAttempts;
+    @Column("z")
+    private int failedMapAttempts;
+    @Column("ab")
+    private int totalReduceAttempts;
+    @Column("ac")
+    private int failedReduceAttempts;
 
     public long getDurationTime() {
         return durationTime;
@@ -287,5 +295,41 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     public void setMaxReduceTaskDuration(double maxReduceTaskDuration) {
         this.maxReduceTaskDuration = maxReduceTaskDuration;
         valueChanged("maxReduceTaskDuration");
+    }
+
+    public int getTotalMapAttempts() {
+        return totalMapAttempts;
+    }
+
+    public void setTotalMapAttempts(int totalMapAttempts) {
+        this.totalMapAttempts = totalMapAttempts;
+        valueChanged("totalMapAttempts");
+    }
+
+    public int getFailedMapAttempts() {
+        return failedMapAttempts;
+    }
+
+    public void setFailedMapAttempts(int failedMapAttempts) {
+        this.failedMapAttempts = failedMapAttempts;
+        valueChanged("failedMapAttempts");
+    }
+
+    public int getTotalReduceAttempts() {
+        return totalReduceAttempts;
+    }
+
+    public void setTotalReduceAttempts(int totalReduceAttempts) {
+        this.totalReduceAttempts = totalReduceAttempts;
+        valueChanged("totalReduceAttempts");
+    }
+
+    public int getFailedReduceAttempts() {
+        return failedReduceAttempts;
+    }
+
+    public void setFailedReduceAttempts(int failedReduceAttempts) {
+        this.failedReduceAttempts = failedReduceAttempts;
+        valueChanged("failedReduceAttempts");
     }
 }

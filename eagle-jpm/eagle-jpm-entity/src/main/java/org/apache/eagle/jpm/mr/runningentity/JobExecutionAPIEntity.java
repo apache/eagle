@@ -110,6 +110,8 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     private int totalLaunchedMaps;
     @Column("aj")
     private long submissionTime;
+    @Column("ak")
+    private String internalState;
 
     public JobConfig getJobConfig() {
         return jobConfig;
@@ -433,5 +435,14 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     public void setSubmissionTime(long submissionTime) {
         this.submissionTime = submissionTime;
         valueChanged("submissionTime");
+    }
+
+    public String getInternalState() {
+        return internalState;
+    }
+
+    public void setInternalState(String internalState) {
+        this.internalState = internalState;
+        valueChanged("internalState");
     }
 }
