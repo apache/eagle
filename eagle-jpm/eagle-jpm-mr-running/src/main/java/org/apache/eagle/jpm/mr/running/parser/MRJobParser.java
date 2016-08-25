@@ -110,6 +110,10 @@ public class MRJobParser implements Runnable {
         this.configKeys = configKeys;
     }
 
+    public void setAppInfo(AppInfo app) {
+        this.app = app;
+    }
+
     public ParserStatus status() {
         return this.parserStatus;
     }
@@ -120,7 +124,8 @@ public class MRJobParser implements Runnable {
 
     private void finishMRJob(String mrJobId) {
         JobExecutionAPIEntity jobExecutionAPIEntity = mrJobEntityMap.get(mrJobId);
-        jobExecutionAPIEntity.setCurrentState(Constants.AppState.FINISHED.toString());
+        jobExecutionAPIEntity.setInternalState(Constants.AppState.FINISHED.toString());
+        jobExecutionAPIEntity.setCurrentState(Constants.AppState.RUNNING.toString());
         mrJobConfigs.remove(mrJobId);
         if (mrJobConfigs.size() == 0) {
             this.parserStatus = ParserStatus.APP_FINISHED;
@@ -205,6 +210,7 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setStartTime(mrJob.getStartTime());
             jobExecutionAPIEntity.setDurationTime(mrJob.getElapsedTime());
             jobExecutionAPIEntity.setCurrentState(mrJob.getState());
+            jobExecutionAPIEntity.setInternalState(mrJob.getState());
             jobExecutionAPIEntity.setNumTotalMaps(mrJob.getMapsTotal());
             jobExecutionAPIEntity.setMapsCompleted(mrJob.getMapsCompleted());
             jobExecutionAPIEntity.setNumTotalReduces(mrJob.getReducesTotal());
@@ -562,8 +568,8 @@ public class MRJobParser implements Runnable {
                     mrJobEntityMap.keySet()
                         .stream()
                         .filter(
-                            jobId -> mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FINISHED.toString())
-                                || mrJobEntityMap.get(jobId).getCurrentState().equals(Constants.AppState.FAILED.toString()))
+                            jobId -> mrJobEntityMap.get(jobId).getInternalState().equals(Constants.AppState.FINISHED.toString())
+                                || mrJobEntityMap.get(jobId).getInternalState().equals(Constants.AppState.FAILED.toString()))
                         .forEach(
                             jobId -> this.runningJobManager.delete(app.getId(), jobId));
                 }

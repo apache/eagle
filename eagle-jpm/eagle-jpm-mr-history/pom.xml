@@ -56,6 +56,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-jpm-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-data-process</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -104,13 +109,7 @@
             <artifactId>hadoop-mapreduce-client-core</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-app-base</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>

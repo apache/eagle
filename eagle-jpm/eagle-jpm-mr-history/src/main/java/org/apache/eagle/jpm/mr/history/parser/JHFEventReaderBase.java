@@ -111,6 +111,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
         jobExecutionEntity = new JobExecutionAPIEntity();
         jobExecutionEntity.setTags(new HashMap<>(baseTags));
+        jobExecutionEntity.setNumFailedMaps(0);
+        jobExecutionEntity.setNumFailedReduces(0);
 
         taskRunningHosts = new HashMap<>();
 
@@ -350,7 +352,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             if (values.get(Keys.COUNTERS) != null || counters != null) {
                 entity.setJobCounters(parseCounters(counters));
             }
-            long duration = entity.getEndTime() - jobSubmitEventEntity.getTimestamp();
+            long duration = entity.getEndTime() - jobLaunchTime;
             if (taskType.equals(Constants.TaskType.MAP.toString()) && duration > jobExecutionEntity.getLastMapDuration()) {
                 jobExecutionEntity.setLastMapDuration(duration);
             }
@@ -367,8 +369,16 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
             if (taskType.equals(Constants.TaskType.MAP.toString())) {
                 this.sumMapTaskDuration += entity.getDuration();
+                if (entity.getTaskStatus().equals(EagleTaskStatus.FAILED.name())
+                    || entity.getTaskStatus().equals(EagleTaskStatus.KILLED.name())) {
+                    jobExecutionEntity.setNumFailedMaps(1 + jobExecutionEntity.getNumFailedMaps());
+                }
             } else {
                 this.sumReduceTaskDuration += entity.getDuration();
+                if (entity.getTaskStatus().equals(EagleTaskStatus.FAILED.name())
+                    || entity.getTaskStatus().equals(EagleTaskStatus.KILLED.name())) {
+                    jobExecutionEntity.setNumFailedReduces(1 + jobExecutionEntity.getNumFailedReduces());
+                }
             }
 
             entityCreated(entity);
@@ -402,6 +412,21 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                 entity.setJobCounters(parseCounters(counters));
             }
             entity.setTaskAttemptID(taskAttemptID);
+
+            if (recType == RecordTypes.MapAttempt) {
+                jobExecutionEntity.setTotalMapAttempts(1 + jobExecutionEntity.getTotalMapAttempts());
+                if (entity.getTaskStatus().equals(EagleTaskStatus.FAILED.name())
+                    || entity.getTaskStatus().equals(EagleTaskStatus.KILLED.name())) {
+                    jobExecutionEntity.setFailedMapAttempts(1 + jobExecutionEntity.getFailedMapAttempts());
+                }
+            } else {
+                jobExecutionEntity.setTotalReduceAttempts(1 + jobExecutionEntity.getTotalReduceAttempts());
+                if (entity.getTaskStatus().equals(EagleTaskStatus.FAILED.name())
+                    || entity.getTaskStatus().equals(EagleTaskStatus.KILLED.name())) {
+                    jobExecutionEntity.setFailedReduceAttempts(1 + jobExecutionEntity.getFailedReduceAttempts());
+                }
+            }
+
             entityCreated(entity);
             taskAttemptStartTime.remove(taskAttemptID);
         } else {

@@ -24,5 +24,6 @@ public enum EagleJobStatus {
     PREP,
     RUNNING,
     SUCCESS,
+    KILLED,
     FAILED;
 }
