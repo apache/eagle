@@ -127,7 +127,7 @@ public class PolicyDefinition implements Serializable{
     public int hashCode() {
         return new HashCodeBuilder().
                 append(name).
-                append(description).
+//                append(description).
                 append(inputStreams).
                 append(outputStreams).
                 append(definition).
@@ -144,7 +144,7 @@ public class PolicyDefinition implements Serializable{
             return false;
         PolicyDefinition another = (PolicyDefinition)that;
         if(another.name.equals(this.name) &&
-                another.description.equals(this.description) &&
+//                another.description.equals(this.description) &&
                 CollectionUtils.isEqualCollection(another.inputStreams, this.inputStreams) &&
                 CollectionUtils.isEqualCollection(another.outputStreams, this.outputStreams) &&
                 another.definition.equals(this.definition) &&
