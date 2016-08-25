@@ -78,6 +78,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>alert-engine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${jersey.version}</version>
