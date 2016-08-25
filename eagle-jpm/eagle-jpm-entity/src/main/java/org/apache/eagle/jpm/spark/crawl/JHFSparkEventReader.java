@@ -709,6 +709,7 @@ public class JHFSparkEventReader {
 
     private void doFlush(List entities) throws Exception {
         LOG.info("start flushing entities of total number " + entities.size());
+        client.create(entities);
         LOG.info("finish flushing entities of total number " + entities.size());
     }
 }
