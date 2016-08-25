@@ -21,6 +21,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.scheme.JsonScheme;
 import org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector;
 import org.apache.eagle.alert.metadata.IMetadataDao;
@@ -34,9 +35,7 @@ import org.apache.eagle.metadata.model.StreamDesc;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -103,9 +102,16 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
                     datasource.setTopic(kafkaCfg.getTopicId());
                     datasource.setSchemeCls(JsonScheme.class.getCanonicalName());
                     Tuple2StreamMetadata tuple2Stream = new Tuple2StreamMetadata();
+                    Set<String> activeStreamNames = new HashSet<>();
+                    activeStreamNames.add(streamDesc.getSchema().getStreamId());
+                    tuple2Stream.setActiveStreamNames(activeStreamNames);
+                    tuple2Stream.setTimestampColumn("timestamp");
+                    tuple2Stream.setStreamNameSelectorCls(JsonStringStreamNameSelector.class.getCanonicalName());
                     datasource.setCodec(tuple2Stream);
                     alertMetadataService.addDataSource(datasource);
 
+                    StreamDefinition sd = streamDesc.getSchema();
+                    sd.setDataSource(metadata.getAppId());
                     alertMetadataService.createStream(streamDesc.getSchema());
                 }
             }
