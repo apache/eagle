@@ -28,14 +28,23 @@ var __sortTable_generateFilteredList;
 		isArray = Array.isArray;
 	}
 
+	function hasContentByPathList(object, content, pathList) {
+		for(var i = 0 ; i < pathList.length ; i += 1) {
+			var path = pathList[i];
+			var value = common.getValueByPath(object, path);
+			if((value + "").toUpperCase().indexOf(content) >= 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	function hasContent(object, content, depth) {
 		var i, keys;
 
 		depth = depth || 1;
 		if(!content) return true;
 		if(depth > 10) return false;
-
-		content = (content + "").toUpperCase();
 
 		if(object === undefined || object === null) {
 			return false;
@@ -56,15 +65,20 @@ var __sortTable_generateFilteredList;
 		return false;
 	}
 
-	__sortTable_generateFilteredList = function(list, search, order, orderAsc) {
-		'use strict';
-
-		var _list;
+	__sortTable_generateFilteredList = function(list, search, order, orderAsc, searchPathList) {
+		var i, _list;
+		var _search = (search + "").toUpperCase();
 
 		if (search) {
 			_list = [];
-			for(var i = 0 ; i < list.length ; i += 1) {
-				if(hasContent(list[i], search)) _list.push(list[i]);
+			if(searchPathList) {
+				for(i = 0 ; i < list.length ; i += 1) {
+					if(hasContentByPathList(list[i], _search, searchPathList)) _list.push(list[i]);
+				}
+			} else {
+				for(i = 0 ; i < list.length ; i += 1) {
+					if(hasContent(list[i], _search)) _list.push(list[i]);
+				}
 			}
 		} else {
 			_list = list;
@@ -99,5 +113,5 @@ var __sortTable_generateFilteredList;
 		}
 
 		return _list;
-	}
+	};
 })();

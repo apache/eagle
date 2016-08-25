@@ -135,8 +135,10 @@
 
 	function merge(obj1, obj2) {
 		$.each(obj2, function (key, value) {
-			if(typeof obj1[key] === "object" && typeof value === "object" && !common.isEmpty(value)) {
-				merge(obj1[key], value);
+			var oriValue = obj1[key];
+
+			if(typeof oriValue === "object" && typeof value === "object" && !common.isEmpty(value)) {
+				merge(oriValue, value);
 			} else {
 				obj1[key] = value;
 			}
@@ -150,6 +152,15 @@
 		}
 
 		return mergedObj;
+	};
+
+	// ============================ String ============================
+	common.string = {};
+	common.string.safeText = function (str) {
+		return str
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;');
 	};
 
 	// ============================ Array =============================

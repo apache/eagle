@@ -29,7 +29,7 @@
 	 */
 	register(function (jpmApp) {
 		jpmApp.controller("listCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
-			PageConfig.title = "Job Performance Monitoring";
+			PageConfig.title = "YARN Jobs";
 			PageConfig.subTitle = "list";
 			$scope.getStateClass = JPM.getStateClass;
 
@@ -38,6 +38,7 @@
 			var startTime = endTime.clone().subtract(2, "hour");
 
 			$scope.site = $wrapState.param.siteId;
+			$scope.searchPathList = [["tags", "jobId"], ["tags", "user"], ["tags", "queue"]];
 
 			$scope.refreshList = function () {
 				/**
@@ -72,8 +73,9 @@
 					"runningContainers"
 				], 100000));
 				$scope.jobList._then(function () {
+					var now = Time();
 					$.each($scope.jobList, function (i, job) {
-						job.duration = Time.diff(job.startTime, job.endTime);
+						job.duration = Time.diff(job.startTime, job.endTime || now);
 					});
 				});
 			};

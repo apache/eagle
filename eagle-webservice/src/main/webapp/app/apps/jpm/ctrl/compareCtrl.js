@@ -109,7 +109,6 @@
 
 				// ========================= Job Trend ==========================
 				function refreshParam() {
-					console.log("!!!!!");
 					browserAction = false;
 					$wrapState.go(".", {
 						from: common.getValueByPath($scope.fromJob, "tags.jobId"),
@@ -151,10 +150,10 @@
 
 					markPoint.data = [];
 					if(!common.isEmpty(fromX)) {
-						markPoint.data.push(getMarkPoint("<Job1>", fromX, fromY, "#00c0ef"));
+						markPoint.data.push(getMarkPoint("<From Job>", fromX, fromY, "#00c0ef"));
 					}
 					if(!common.isEmpty(toX)) {
-						markPoint.data.push(getMarkPoint("<Job2>", toX, toY, "#3c8dbc"));
+						markPoint.data.push(getMarkPoint("<To Job>", toX, toY, "#3c8dbc"));
 					}
 
 					$scope.trendChart.refresh();
@@ -166,14 +165,35 @@
 					return job.durationTime;
 				});
 
+				$scope.jobTrendOption = {
+					yAxis: [{
+						axisLabel: {
+							formatter: function (value) {
+								return Time.diffStr(value);
+							}
+						}
+					}],
+					tooltip: {
+						formatter: function (points) {
+							var point = points[0];
+							return point.name + "<br/>" +
+								'<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+								point.seriesName + ": " + Time.diffStr(point.value);
+						}
+					}
+				};
+
 				var markPoint = {
-					data: []
+					data: [],
+					silent: true
 				};
 
 				$scope.jobTrendSeries = [{
 					name: "Job Duration",
 					type: "line",
 					data: jobListTrend,
+					symbolSize: 10,
+					showAllSymbol: false,
 					markPoint: markPoint
 				}];
 
@@ -208,6 +228,10 @@
 				};
 
 				// ======================= Job Comparison =======================
+				$scope.taskOption = {
+					xAxis: {axisTick: { show: true }}
+				};
+
 				function getComparedValue(path) {
 					var val1 = common.getValueByPath($scope.fromJob, path);
 					var val2 = common.getValueByPath($scope.toJob, path);
@@ -244,7 +268,6 @@
 
 				function refreshComparisonDashboard() {
 					if(!$scope.fromJob || !$scope.toJob) return;
-					console.log("Refresh comparison!!!");
 
 					var fromJobCond = {
 						jobId: $scope.fromJob.tags.jobId,
@@ -327,6 +350,7 @@
 				function jobRefresh() {
 					$scope.fromJob = findJob($wrapState.param.from);
 					$scope.toJob = findJob($wrapState.param.to);
+					$(window).resize();
 					refreshTrendMarkPoint();
 					refreshComparisonDashboard();
 				}

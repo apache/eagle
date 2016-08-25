@@ -19,20 +19,25 @@
 <style>
 	.datePickerGroup {
 		float: right;
+		margin: -7px;
 	}
 
 	.datePickerGroup > input {
-		width: 150px;
+		width: 135px;
 		display: inline-block;
 		float: left;
+		height: 32px;
+		padding: 2px 7px;
 	}
 	.datePickerGroup > .addon {
 		float: left;
 		display: inline-block;
 		border-top: 1px solid #d2d6de;
 		border-bottom: 1px solid #d2d6de;
-		padding: 6px;
-		height: 34px;
+		padding: 5px;
+		height: 32px;
+		width: 30px;
+		text-align: center;
 		background: #f4f4f4;
 	}
 </style>
@@ -43,28 +48,29 @@
 			Job List
 			<span ng-show="!jobList._done || isSorting" class="fa fa-refresh fa-spin no-animate"></span>
 		</h3>
+
+		<div class="datePickerGroup clearfix">
+			<input id="startTime" type="text" class="form-control" data-toggle="datepicker" />
+			<span class="addon">To</span>
+			<input id="endTime" type="text" class="form-control" data-toggle="datepicker" data-position="right" />
+		</div>
 	</div>
 	<div class="box-body">
-		<div sort-table="jobList" is-sorting="isSorting">
-			<div class="datePickerGroup clearfix">
-				<input id="startTime" type="text" class="form-control" data-toggle="datepicker" />
-				<span class="addon">To</span>
-				<input id="endTime" type="text" class="form-control" data-toggle="datepicker" data-position="right" />
-			</div>
-
+		<div sort-table="jobList" is-sorting="isSorting" search-path-list="searchPathList">
 			<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th sortpath="tags.jobId">Job</th>
+						<th sortpath="tags.jobId">Job ID</th>
 						<th sortpath="currentState">Status</th>
-						<th sortpath="tags.user">User</th>
+						<th sortpath="tags.user" width="10">User</th>
 						<th sortpath="tags.queue">Queue</th>
 						<th sortpath="submissionTime">Submission Time</th>
-						<th sortpath="startTime">Execution Time</th>
+						<th sortpath="startTime">Start Time</th>
+						<th sortpath="endTime">End Time</th>
 						<th sortpath="duration">Duration</th>
 						<th sortpath="numTotalMaps">Map Tasks</th>
 						<th sortpath="numTotalReduces">Reduce Tasks</th>
-						<th sortpath="runningContainers">Allocated Containers</th>
+						<th sortpath="runningContainers">Containers</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -73,7 +79,7 @@
 							<a ui-sref="jpmDetail({siteId: site, jobId: item.tags.jobId})">{{item.tags.jobId}}</a>
 						</td>
 						<td class="text-center">
-							<span class="label label-{{getStateClass(item.currentState)}}">
+							<span class="label label-sm label-{{getStateClass(item.currentState)}}">
 								{{item.currentState}}
 							</span>
 						</td>
@@ -81,6 +87,7 @@
 						<td>{{item.tags.queue}}</td>
 						<td>{{Time.format(item.submissionTime)}}</td>
 						<td>{{Time.format(item.startTime)}}</td>
+						<td>{{Time.format(item.endTime)}}</td>
 						<td>{{Time.diffStr(item.duration)}}</td>
 						<td>{{item.numTotalMaps}}</td>
 						<td>{{item.numTotalReduces}}</td>

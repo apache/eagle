@@ -23,7 +23,7 @@ self.addEventListener("message", function (event) {
 	var data = event.data;
 	var list = JSON.parse(data.list);
 
-	list = __sortTable_generateFilteredList(list, data.search, data.order, data.orderAsc);
+	list = __sortTable_generateFilteredList(list, data.search, data.order, data.orderAsc, data.searchPathList);
 
 	self.postMessage({
 		list: list,

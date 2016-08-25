@@ -27,7 +27,6 @@
 			var startTime, endTime;
 			var metric_allocatedMB, metric_allocatedVCores, metric_runningContainers;
 			var nodeTaskCountList;
-			var historyJobList;
 
 			$scope.site = $wrapState.param.siteId;
 			$scope.jobId = $wrapState.param.jobId;
@@ -101,38 +100,6 @@
 				return ">" + curDes;
 			});
 
-			$scope.taskOption = {
-				xAxis: {axisTick: { show: true }}
-			};
-
-			function intervalCategories(list1, list2) {
-				var len = Math.max(list1.length, list2.length);
-				var category = [];
-				for(var i = 0 ; i < len ; i += 1) {
-					category.push((i + 1) + "min");
-				}
-				return category;
-			}
-
-			function getComparedValue(path) {
-				var val1 = common.getValueByPath($scope.comparedJob, path);
-				var val2 = common.getValueByPath($scope.job, path);
-				return common.number.compare(val1, val2);
-			}
-
-			$scope.jobCompareClass = function (path) {
-				var diff = getComparedValue(path);
-				if(typeof diff !== "number" || Math.abs(diff) < 0.01) return "hide";
-				if(diff < 0.05) return "text-success";
-				if(diff < 0.15) return "text-warning";
-				return "text-danger";
-			};
-
-			$scope.jobCompareValue = function (path) {
-				var diff = getComparedValue(path);
-				return "(" + (diff >= 0 ? "+" : "") + Math.floor(diff * 100) + "%)";
-			};
-
 			// =========================================================================
 			// =                               Fetch Job                               =
 			// =========================================================================
@@ -154,20 +121,25 @@
 				endTime = Time().add(1, "hour");
 				$scope.isRunning = !$scope.job.currentState || ($scope.job.currentState || "").toUpperCase() === 'RUNNING';
 
-				// Dashboard 1: Allocated, vCores & Containers metrics
+				// Dashboard 1: Allocated MB
 				metric_allocatedMB = JPM.metrics(jobCond, "hadoop.job.allocatedmb", startTime, endTime);
+
+				metric_allocatedMB._promise.then(function () {
+					var series_allocatedMB = JPM.metricsToSeries("allocated MB", metric_allocatedMB);
+					$scope.allocatedSeries = [series_allocatedMB];
+				});
+
+				// Dashboard 2: vCores & Containers metrics
 				metric_allocatedVCores = JPM.metrics(jobCond, "hadoop.job.allocatedvcores", startTime, endTime);
 				metric_runningContainers = JPM.metrics(jobCond, "hadoop.job.runningcontainers", startTime, endTime);
 
-				$q.all([metric_allocatedMB._promise, metric_allocatedVCores._promise, metric_runningContainers._promise]).then(function () {
-					var series_allocatedMB = JPM.metricsToSeries("allocated MB", metric_allocatedMB);
+				$q.all([metric_allocatedVCores._promise, metric_runningContainers._promise]).then(function () {
 					var series_allocatedVCores = JPM.metricsToSeries("vCores", metric_allocatedVCores);
 					var series_runningContainers = JPM.metricsToSeries("running containers", metric_runningContainers);
-					series_allocatedMB.yAxisIndex = 1;
-					$scope.allocatedSeries = [series_allocatedMB, series_allocatedVCores, series_runningContainers];
+					$scope.vCoresSeries = [series_allocatedVCores, series_runningContainers];
 				});
 
-				// Dashboard 2: Task duration
+				// Dashboard 3: Task duration
 				taskDistribution($scope.job.tags.jobId).then(function (data) {
 					$scope.taskSeries = data.taskSeries;
 
@@ -184,10 +156,10 @@
 					};
 				});
 
-				// Dashboard 3: Running task
+				// Dashboard 4: Running task
 				nodeTaskCountList = JPM.groups(
-					$scope.isRunning ? "RunningTaskExecutionService" : "TaskExecutionService"
-					, jobCond, startTime, endTime, ["hostname"], "count", 1000000);
+					$scope.isRunning ? "RunningTaskExecutionService" : "TaskExecutionService",
+					jobCond, startTime, endTime, ["hostname"], "count", 1000000);
 				nodeTaskCountList._promise.then(function () {
 					var nodeTaskCountMap = [];
 
@@ -207,146 +179,11 @@
 
 					$scope.nodeTaskCountSeries = [{
 						name: "node count",
-						type: "line",
+						type: "bar",
 						data: nodeTaskCountMap
 					}];
 				});
 
-				// ==================================================================
-				// =                         Job Comparison                         =
-				// ==================================================================
-				if($scope.job.tags.jobDefId) {
-					$scope.historyJobCategory = [];
-					historyJobList = JPM.findMRJobs($scope.site, $scope.job.tags.jobDefId);
-					historyJobList._promise.then(function () {
-						/**
-						 * @param {{}} job
-						 * @param {number} job.durationTime
-						 */
-						var historyJobDurationList = $.map(historyJobList, function (job) {
-							var time = Time.format(job.startTime);
-							$scope.historyJobCategory.push(time);
-							return job.durationTime;
-						});
-
-						var currentX = 0, currentY = 0;
-						$.each(historyJobList, function (index, job) {
-							if($scope.job.tags.jobId === job.tags.jobId) {
-								currentX = index;
-								currentY = job.durationTime;
-							}
-						});
-
-						function getMarkPoint(name, x, y, color) {
-							return {
-								name: name,
-								silent: true,
-								coord: [x, y],
-								symbolSize: 20,
-								label: {
-									normal: { show: false },
-									emphasis: { show: false }
-								}, itemStyle: {
-									normal: { color: color }
-								}
-							};
-						}
-
-						var markPoint = {
-							data: [getMarkPoint("<Current Job>", currentX, currentY, "#3c8dbc")]
-						};
-
-						$scope.historyJobDurationSeries = [{
-							name: "Job Duration",
-							type: "line",
-							data: historyJobDurationList,
-							markPoint: markPoint
-						}];
-
-						$scope.compareJobSelect = function (e) {
-							var index = e.dataIndex;
-							var job = historyJobList[index];
-							if(!job || job.tags.jobId === $scope.job.tags.jobId) return;
-							$scope.comparedJob = job;
-
-							markPoint.data[1] = getMarkPoint("<Compared Job>", index, job.durationTime, "#00c0ef");
-
-							$scope.compareChart.refresh();
-
-							// Clear
-							$scope.comparisonContainerSeries = null;
-							$scope.comparisonAllocatedMBSeries = null;
-
-							// Compare Data
-							var compared_metric_allocatedMB, compared_metric_runningContainers, compared_metric_allocatedVCores;
-
-							var startTime = Time($scope.job.startTime).subtract(1, "hour");
-							var endTime = Time().add(1, "hour");
-							var jobCond = {
-								jobId: job.tags.jobId,
-								site: $scope.site
-							};
-
-							// Compared Dashboard 1: Containers metrics
-							compared_metric_runningContainers = JPM.metrics(jobCond, "hadoop.job.runningcontainers", startTime, endTime);
-							compared_metric_runningContainers._promise.then(function () {
-								// Align the metrics from different job in same interval
-								var interval_metric_runningContainers = JPM.metricsToInterval(metric_runningContainers, 1000 * 60);
-								var compared_interval_metric_runningContainers = JPM.metricsToInterval(compared_metric_runningContainers, 1000 * 60);
-
-								// Convert metrics to chart series
-								var series_runningContainers = JPM.metricsToSeries("current job running containers", interval_metric_runningContainers, true);
-								var series_compared_runningContainers = JPM.metricsToSeries("compared job running containers", compared_interval_metric_runningContainers, true);
-
-								$scope.comparisonContainerCategories = intervalCategories(interval_metric_runningContainers, compared_interval_metric_runningContainers);
-								$scope.comparisonContainerSeries = [series_runningContainers, series_compared_runningContainers];
-							});
-
-							// Compared Dashboard 2: Allocated
-							compared_metric_allocatedMB = JPM.metrics(jobCond, "hadoop.job.allocatedmb", startTime, endTime);
-							compared_metric_allocatedMB._promise.then(function () {
-								// Align the metrics from different job in same interval
-								var interval_metric_allocatedMB = JPM.metricsToInterval(metric_allocatedMB, 1000 * 60);
-								var compared_interval_metric_allocatedMB = JPM.metricsToInterval(compared_metric_allocatedMB, 1000 * 60);
-
-								// Convert metrics to chart series
-								var series_allocatedMB = JPM.metricsToSeries("current job allocated MB", interval_metric_allocatedMB, true);
-								var series_compared_allocatedMB = JPM.metricsToSeries("compared job allocated MB", compared_interval_metric_allocatedMB, true);
-
-								$scope.comparisonAllocatedMBCategories = intervalCategories(interval_metric_allocatedMB, compared_interval_metric_allocatedMB);
-								$scope.comparisonAllocatedMBSeries = [series_allocatedMB, series_compared_allocatedMB];
-							});
-
-							// Compared Dashboard 3: vCores
-							compared_metric_allocatedVCores = JPM.metrics(jobCond, "hadoop.job.allocatedvcores", startTime, endTime);
-							compared_metric_allocatedVCores._promise.then(function () {
-								// Align the metrics from different job in same interval
-								var interval_metric_allocatedVCores = JPM.metricsToInterval(metric_allocatedVCores, 1000 * 60);
-								var compared_interval_metric_allocatedVCores = JPM.metricsToInterval(compared_metric_allocatedVCores, 1000 * 60);
-
-								// Convert metrics to chart series
-								var series_allocatedVCores = JPM.metricsToSeries("current job vCores", interval_metric_allocatedVCores, true);
-								var series_compared_allocatedVCores = JPM.metricsToSeries("compared job vCores", compared_interval_metric_allocatedVCores, true);
-
-								$scope.comparisonAllocatedVCoresCategories = intervalCategories(interval_metric_allocatedVCores, compared_interval_metric_allocatedVCores);
-								$scope.comparisonAllocatedVCoresSeries = [series_allocatedVCores, series_compared_allocatedVCores];
-							});
-
-							// Compared Dashboard 2: Task duration
-							taskDistribution($scope.comparedJob.tags.jobId).then(function (data) {
-								var comparedTaskSeries = $.map(data.taskSeries, function (series) {
-									return $.extend({}, series, {name: "Compared " + series.name});
-								});
-								$scope.comparedTaskSeries = $scope.taskSeries.concat(comparedTaskSeries);
-							});
-						};
-
-						/*console.log("~>", historyJobList);
-						console.log("~>", $scope.historyJobCategory);
-						console.log("~>", historyJobDurationList);*/
-						// TODO: wait for job task
-					});
-				}
 			});
 		});
 	});

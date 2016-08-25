@@ -40,7 +40,7 @@
 		controller: "compareCtrl"
 	});
 
-	jpmApp.portal({name: "JPM", icon: "home", path: "jpm/list"}, true);
+	jpmApp.portal({name: "YARN Jobs", icon: "home", path: "jpm/list"}, true);
 
 	jpmApp.service("JPM", function ($q, $http, Time) {
 		// TODO: mock auth
@@ -89,7 +89,7 @@
 
 		JPM.condition = function (condition) {
 			return $.map(condition, function (value, key) {
-				return "@" + key + '="' + value + '"'
+				return "@" + key + '="' + value + '"';
 			}).join(" AND ");
 		};
 
@@ -247,7 +247,7 @@
 				type: "line",
 				data: data
 			};
-		}
+		};
 
 		JPM.metricsToInterval = function (metricList, interval) {
 			if(metricList.length === 0) return [];

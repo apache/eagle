@@ -34,6 +34,7 @@
 			 * @param {{}} $attrs
 			 * @param {string} $attrs.sortTable
 			 * @param {string?} $attrs.isSorting		Will bind parent variable of sort state
+			 * @param {[]?} $attrs.searchPathList		Filter search path list
 			 */
 			controller: function($scope, $element, $attrs) {
 				var worker;
@@ -70,7 +71,6 @@
 				function setState(bool) {
 					if(!$attrs.isSorting) return;
 
-
 					$scope.$parent[$attrs.isSorting] = bool;
 				}
 
@@ -94,7 +94,7 @@
 						if(!cacheFilteredList) cacheFilteredList = fullList;
 
 						if(!worker) {
-							cacheFilteredList = __sortTable_generateFilteredList(fullList, cacheSearch, cacheOrder, cacheOrderAsc);
+							cacheFilteredList = __sortTable_generateFilteredList(fullList, cacheSearch, cacheOrder, cacheOrderAsc, $scope.$parent[$attrs.searchPathList]);
 							setState(false);
 						} else {
 							worker_id += 1;
@@ -104,6 +104,7 @@
 								search: cacheSearch,
 								order: cacheOrder,
 								orderAsc: cacheOrderAsc,
+								searchPathList: $scope.$parent[$attrs.searchPathList],
 								list: list,
 								id: worker_id
 							});
@@ -137,7 +138,15 @@
 
 				return {
 					post: function preLink($scope, $element) {
+						$scope.defaultPageSizeList = [10, 25, 50, 100];
+
 						$element.append(contents);
+
+						// Tool Container
+						var $toolContainer = $(
+							'<div class="tool-container clearfix">' +
+							'</div>'
+						).insertBefore($element.find("table"));
 
 						// Search Box
 						var $search = $(
@@ -145,8 +154,20 @@
 							'<input type="search" class="form-control input-sm" placeholder="Search" ng-model="search" />' +
 							'<span class="fa fa-search" />' +
 							'</div>'
-						).insertBefore($element.find("table"));
+						).appendTo($toolContainer);
 						$compile($search)($scope);
+
+						// Page Size
+						var $pageSize = $(
+							'<div class="page-size">' +
+							'Show' +
+							'<select class="form-control" ng-model="pageSize" convert-to-number>' +
+							'<option ng-repeat="size in pageSizeList || defaultPageSizeList track by $index">{{size}}</option>' +
+							'</select>' +
+							'Entities' +
+							'</div>'
+						).appendTo($toolContainer);
+						$compile($pageSize)($scope);
 
 						// Sort Column
 						$element.find("table [sortpath]").each(function () {
@@ -159,7 +180,6 @@
 
 						// Repeat Items
 						var $tr = $element.find("table [ts-repeat], table > tbody > tr").filter(":first");
-						//$tr.attr("ng-repeat", 'item in (filteredList = (' + $attrs.sortTable + ' | filter: search | orderBy: orderKey)).slice((pageNumber - 1) * pageSize, pageNumber * pageSize) track by $index');
 						$tr.attr("ng-repeat", 'item in getFilteredList().slice((pageNumber - 1) * pageSize, pageNumber * pageSize) track by $index');
 						$compile($tr)($scope);
 
@@ -175,6 +195,20 @@
 						$compile($navigation)($scope);
 					}
 				};
+			}
+		};
+	});
+
+	eagleComponents.directive('convertToNumber', function() {
+		return {
+			require: 'ngModel',
+			link: function(scope, element, attrs, ngModel) {
+				ngModel.$parsers.push(function(val) {
+					return parseInt(val, 10);
+				});
+				ngModel.$formatters.push(function(val) {
+					return '' + val;
+				});
 			}
 		};
 	});

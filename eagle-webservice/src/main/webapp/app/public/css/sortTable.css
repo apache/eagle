@@ -17,22 +17,35 @@
  * limitations under the License.
  */
 
-[sort-table] .search-box {
+[sort-table] .tool-container .search-box {
 	margin: 0 0 10px 0;
 	position: relative;
 	max-width: 250px;
+	float: left;
 }
 
-[sort-table] .search-box input {
+[sort-table] .tool-container .search-box input {
 	padding-left: 28px;
 }
 
-[sort-table] .search-box .fa-search {
+[sort-table] .tool-container .search-box .fa-search {
 	pointer-events:none;
 	position: absolute;
 	top: 8px;
 	left: 8px;
 	opacity: 0.5;
+}
+
+[sort-table] .tool-container .page-size {
+	float: right;
+}
+
+[sort-table] .tool-container .page-size select {
+	width: initial;
+	display: inline-block;
+	margin: 0 7px;
+	height: 26px;
+	padding: 0 5px;
 }
 
 [sort-table] .fa.sort-mark {
