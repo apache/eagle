@@ -18,10 +18,7 @@
 package org.apache.eagle.jpm.spark.crawl;
 
 import org.apache.eagle.jpm.spark.entity.*;
-import org.apache.eagle.jpm.util.JSONUtil;
-import org.apache.eagle.jpm.util.JobNameNormalization;
-import org.apache.eagle.jpm.util.SparkEntityConstant;
-import org.apache.eagle.jpm.util.SparkJobTagName;
+import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.service.client.impl.EagleServiceBaseClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -37,8 +34,9 @@ import java.util.*;
 public class JHFSparkEventReader {
     private static final Logger LOG = LoggerFactory.getLogger(JHFSparkEventReader.class);
 
-    public static final int FLUSH_LIMIT = 500;
+    private static final int FLUSH_LIMIT = 500;
     private long firstTaskLaunchTime;
+    private long lastEventTime;
 
     private Map<String, SparkExecutor> executors;
     private SparkApp app;
@@ -75,7 +73,6 @@ public class JHFSparkEventReader {
 
     public void read(JSONObject eventObj) throws Exception {
         String eventType = (String) eventObj.get("Event");
-        LOG.info("Event type: " + eventType);
         if (eventType.equalsIgnoreCase(EventType.SparkListenerApplicationStart.toString())) {
             handleAppStarted(eventObj);
         } else if (eventType.equalsIgnoreCase(EventType.SparkListenerEnvironmentUpdate.toString())) {
@@ -107,7 +104,6 @@ public class JHFSparkEventReader {
         }
 
     }
-
 
     private void handleEnvironmentSet(JSONObject event) {
         app.setConfig(new JobConfig());
@@ -142,15 +138,9 @@ public class JHFSparkEventReader {
         }
     }
 
-
     private boolean isClientMode(JobConfig config) {
-        if (config.getConfig().get("spark.master").equalsIgnoreCase("yarn-client")) {
-            return true;
-        } else {
-            return false;
-        }
+        return config.getConfig().get("spark.master").equalsIgnoreCase("yarn-client");
     }
-
 
     private void handleAppStarted(JSONObject event) {
         //need update all entities tag before app start
@@ -174,11 +164,14 @@ public class JHFSparkEventReader {
         }
 
         this.app.setStartTime(appStartTime);
+        this.lastEventTime = appStartTime;
     }
 
     private void handleExecutorAdd(JSONObject event) throws Exception {
         String executorID = (String) event.get("Executor ID");
-        SparkExecutor executor = this.initiateExecutor(executorID, JSONUtil.getLong(event, "Timestamp"));
+        long executorAddTime = JSONUtil.getLong(event, "Timestamp");
+        this.lastEventTime = executorAddTime;
+        SparkExecutor executor = this.initiateExecutor(executorID, executorAddTime);
 
         JSONObject executorInfo = JSONUtil.getJSONObject(event, "Executor Info");
 
@@ -187,6 +180,7 @@ public class JHFSparkEventReader {
     private void handleBlockManagerAdd(JSONObject event) throws Exception {
         long maxMemory = JSONUtil.getLong(event, "Maximum Memory");
         long timestamp = JSONUtil.getLong(event, "Timestamp");
+        this.lastEventTime = timestamp;
         JSONObject blockInfo = JSONUtil.getJSONObject(event, "Block Manager ID");
         String executorID = JSONUtil.getString(blockInfo, "Executor ID");
         String hostport = String.format("%s:%s", JSONUtil.getString(blockInfo, "Host"), JSONUtil.getLong(blockInfo, "Port"));
@@ -202,11 +196,9 @@ public class JHFSparkEventReader {
 
     private void handleTaskEnd(JSONObject event) {
         JSONObject taskInfo = JSONUtil.getJSONObject(event, "Task Info");
-        Integer taskId = JSONUtil.getInt(taskInfo, "Task ID");
-        SparkTask task = null;
-        if (tasks.containsKey(taskId)) {
-            task = tasks.get(taskId);
-        } else {
+        int taskId = JSONUtil.getInt(taskInfo, "Task ID");
+        SparkTask task = tasks.get(taskId);
+        if (task == null) {
             return;
         }
 
@@ -261,19 +253,20 @@ public class JHFSparkEventReader {
 
     private SparkTask initializeTask(JSONObject event) {
         SparkTask task = new SparkTask();
-        task.setTags(new HashMap(this.app.getTags()));
+        task.setTags(new HashMap<>(this.app.getTags()));
         task.setTimestamp(app.getTimestamp());
 
-        task.getTags().put(SparkJobTagName.SPARK_SATGE_ID.toString(), JSONUtil.getLong(event, "Stage ID").toString());
-        task.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), JSONUtil.getLong(event, "Stage Attempt ID").toString());
+        task.getTags().put(SparkJobTagName.SPARK_SATGE_ID.toString(), Long.toString(JSONUtil.getLong(event, "Stage ID")));
+        task.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), Long.toString(JSONUtil.getLong(event, "Stage Attempt ID")));
 
         JSONObject taskInfo = JSONUtil.getJSONObject(event, "Task Info");
         int taskId = JSONUtil.getInt(taskInfo, "Task ID");
         task.setTaskId(taskId);
 
-        task.getTags().put(SparkJobTagName.SPARK_TASK_INDEX.toString(), JSONUtil.getInt(taskInfo, "Index").toString());
-        task.getTags().put(SparkJobTagName.SPARK_TASK_ATTEMPT_ID.toString(), JSONUtil.getInt(taskInfo, "Attempt").toString());
+        task.getTags().put(SparkJobTagName.SPARK_TASK_INDEX.toString(), Integer.toString(JSONUtil.getInt(taskInfo, "Index")));
+        task.getTags().put(SparkJobTagName.SPARK_TASK_ATTEMPT_ID.toString(), Integer.toString(JSONUtil.getInt(taskInfo, "Attempt")));
         long launchTime = JSONUtil.getLong(taskInfo, "Launch Time");
+        this.lastEventTime = launchTime;
         if (taskId == 0) {
             this.setFirstTaskLaunchTime(launchTime);
         }
@@ -295,15 +288,16 @@ public class JHFSparkEventReader {
         return this.firstTaskLaunchTime;
     }
 
-
     private void handleJobStart(JSONObject event) {
         SparkJob job = new SparkJob();
-        job.setTags(new HashMap(this.app.getTags()));
+        job.setTags(new HashMap<>(this.app.getTags()));
         job.setTimestamp(app.getTimestamp());
 
-        Integer jobId = JSONUtil.getInt(event, "Job ID");
-        job.getTags().put(SparkJobTagName.SPARK_JOB_ID.toString(), jobId.toString());
-        job.setSubmissionTime(JSONUtil.getLong(event, "Submission Time"));
+        int jobId = JSONUtil.getInt(event, "Job ID");
+        job.getTags().put(SparkJobTagName.SPARK_JOB_ID.toString(), Integer.toString(jobId));
+        long submissionTime = JSONUtil.getLong(event, "Submission Time");
+        job.setSubmissionTime(submissionTime);
+        this.lastEventTime = submissionTime;
 
         //for complete application, no active stages/tasks
         job.setNumActiveStages(0);
@@ -316,8 +310,8 @@ public class JHFSparkEventReader {
         job.setNumStages(stages.size());
         for (int i = 0; i < stages.size(); i++) {
             JSONObject stageInfo = (JSONObject) stages.get(i);
-            Integer stageId = JSONUtil.getInt(stageInfo, "Stage ID");
-            Integer stageAttemptId = JSONUtil.getInt(stageInfo, "Stage Attempt ID");
+            int stageId = JSONUtil.getInt(stageInfo, "Stage ID");
+            int stageAttemptId = JSONUtil.getInt(stageInfo, "Stage Attempt ID");
             String stageName = JSONUtil.getString(stageInfo, "Stage Name");
             int numTasks = JSONUtil.getInt(stageInfo, "Number of Tasks");
             this.initiateStage(jobId, stageId, stageAttemptId, stageName, numTasks);
@@ -326,14 +320,14 @@ public class JHFSparkEventReader {
 
     private void handleStageSubmit(JSONObject event) {
         JSONObject stageInfo = JSONUtil.getJSONObject(event, "Stage Info");
-        Integer stageId = JSONUtil.getInt(stageInfo, "Stage ID");
-        Integer stageAttemptId = JSONUtil.getInt(stageInfo, "Stage Attempt ID");
-        String key = this.generateStageKey(stageId.toString(), stageAttemptId.toString());
+        int stageId = JSONUtil.getInt(stageInfo, "Stage ID");
+        int stageAttemptId = JSONUtil.getInt(stageInfo, "Stage Attempt ID");
+        String key = this.generateStageKey(Integer.toString(stageId), Integer.toString(stageAttemptId));
         stageTaskStatusMap.put(key, new HashMap<Integer, Boolean>());
 
-        if (!stages.containsKey(this.generateStageKey(stageId.toString(), stageAttemptId.toString()))) {
+        if (!stages.containsKey(this.generateStageKey(Integer.toString(stageId), Integer.toString(stageAttemptId)))) {
             //may be further attempt for one stage
-            String baseAttempt = this.generateStageKey(stageId.toString(), "0");
+            String baseAttempt = this.generateStageKey(Integer.toString(stageId), "0");
             if (stages.containsKey(baseAttempt)) {
                 SparkStage stage = stages.get(baseAttempt);
                 String jobId = stage.getTags().get(SparkJobTagName.SPARK_JOB_ID.toString());
@@ -343,14 +337,13 @@ public class JHFSparkEventReader {
                 this.initiateStage(Integer.parseInt(jobId), stageId, stageAttemptId, stageName, numTasks);
             }
         }
-
     }
 
     private void handleStageComplete(JSONObject event) {
         JSONObject stageInfo = JSONUtil.getJSONObject(event, "Stage Info");
-        Integer stageId = JSONUtil.getInt(stageInfo, "Stage ID");
-        Integer stageAttemptId = JSONUtil.getInt(stageInfo, "Stage Attempt ID");
-        String key = this.generateStageKey(stageId.toString(), stageAttemptId.toString());
+        int stageId = JSONUtil.getInt(stageInfo, "Stage ID");
+        int stageAttemptId = JSONUtil.getInt(stageInfo, "Stage Attempt ID");
+        String key = this.generateStageKey(Integer.toString(stageId), Integer.toString(stageAttemptId));
         SparkStage stage = stages.get(key);
 
         // If "Submission Time" is not available, use the "Launch Time" of "Task ID" = 0.
@@ -359,7 +352,10 @@ public class JHFSparkEventReader {
             submissionTime = this.getFirstTaskLaunchTime();
         }
         stage.setSubmitTime(submissionTime);
-        stage.setCompleteTime(JSONUtil.getLong(stageInfo, "Completion Time"));
+
+        long completeTime = JSONUtil.getLong(stageInfo, "Completion Time");
+        stage.setCompleteTime(completeTime);
+        this.lastEventTime = completeTime;
 
         if (stageInfo.containsKey("Failure Reason")) {
             stage.setStatus(SparkEntityConstant.SparkStageStatus.FAILED.toString());
@@ -371,14 +367,19 @@ public class JHFSparkEventReader {
     private void handleExecutorRemoved(JSONObject event) {
         String executorID = JSONUtil.getString(event, "Executor ID");
         SparkExecutor executor = executors.get(executorID);
-        executor.setEndTime(JSONUtil.getLong(event, "Timestamp"));
-
+        long removedTime = JSONUtil.getLong(event, "Timestamp");
+        executor.setEndTime(removedTime);
+        this.lastEventTime = removedTime;
     }
 
     private void handleJobEnd(JSONObject event) {
-        Integer jobId = JSONUtil.getInt(event, "Job ID");
+        int jobId = JSONUtil.getInt(event, "Job ID");
         SparkJob job = jobs.get(jobId);
-        job.setCompletionTime(JSONUtil.getLong(event, "Completion Time"));
+
+        long completionTime = JSONUtil.getLong(event, "Completion Time");
+        job.setCompletionTime(completionTime);
+        this.lastEventTime = completionTime;
+
         JSONObject jobResult = JSONUtil.getJSONObject(event, "Job Result");
         String result = JSONUtil.getString(jobResult, "Result");
         if (result.equalsIgnoreCase("JobSucceeded")) {
@@ -391,6 +392,7 @@ public class JHFSparkEventReader {
     private void handleAppEnd(JSONObject event) {
         long endTime = JSONUtil.getLong(event, "Timestamp");
         app.setEndTime(endTime);
+        this.lastEventTime = endTime;
     }
 
     public void clearReader() throws Exception {
@@ -405,7 +407,7 @@ public class JHFSparkEventReader {
 
         List<SparkStage> needStoreStages = new ArrayList<>();
         for (SparkStage stage : this.stages.values()) {
-            Integer jobId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_JOB_ID.toString()));
+            int jobId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_JOB_ID.toString()));
             if (stage.getSubmitTime() == 0 || stage.getCompleteTime() == 0) {
                 SparkJob job = this.jobs.get(jobId);
                 job.setNumSkippedStages(job.getNumSkippedStages() + 1);
@@ -427,8 +429,9 @@ public class JHFSparkEventReader {
         this.flushEntities(jobs.values(), false);
 
         app.setExecutors(executors.values().size());
-        long executorMemory = parseExecutorMemory((String) this.getConfigVal(this.app.getConfig(), "spark.executor.memory", String.class.getName()));
-        long driverMemory = parseExecutorMemory(this.isClientMode(app.getConfig())
+
+        long executorMemory = Utils.parseMemory((String) this.getConfigVal(this.app.getConfig(), "spark.executor.memory", String.class.getName()));
+        long driverMemory = Utils.parseMemory(this.isClientMode(app.getConfig())
             ? (String) this.getConfigVal(this.app.getConfig(), "spark.yarn.am.memory", String.class.getName())
             : (String) this.getConfigVal(app.getConfig(), "spark.driver.memory", String.class.getName()));
 
@@ -460,7 +463,10 @@ public class JHFSparkEventReader {
                 executor.setCores(executorCore);
                 executor.setMemoryOverhead(executorMemoryOverhead);
             }
-            if (executor.getEndTime() == 0) {
+            if (app.getEndTime() <= 0L) {
+                app.setEndTime(this.lastEventTime);
+            }
+            if (executor.getEndTime() <= 0L) {
                 executor.setEndTime(app.getEndTime());
             }
             this.aggregateExecutorToApp(executor);
@@ -473,21 +479,28 @@ public class JHFSparkEventReader {
 
     private long getMemoryOverhead(JobConfig config, long executorMemory, String fieldName) {
         long result = 0L;
-        if (config.getConfig().containsKey(fieldName)) {
-            result = this.parseExecutorMemory(config.getConfig().get(fieldName) + "m");
+        String fieldValue = config.getConfig().get(fieldName);
+        if (fieldValue != null) {
+            result = Utils.parseMemory(fieldValue + "m");
             if (result == 0L) {
-                result = this.parseExecutorMemory(config.getConfig().get(fieldName));
+               result = Utils.parseMemory(fieldValue);
             }
         }
 
         if (result == 0L) {
-            result = Math.max(this.parseExecutorMemory(conf.getString("spark.defaultVal.spark.yarn.overhead.min")), executorMemory * conf.getInt("spark.defaultVal." + fieldName + ".factor") / 100);
+            result = Math.max(
+                    Utils.parseMemory(conf.getString("spark.defaultVal.spark.yarn.overhead.min")),
+                    executorMemory * conf.getInt("spark.defaultVal." + fieldName + ".factor") / 100);
         }
         return result;
     }
 
     private void aggregateExecutorToApp(SparkExecutor executor) {
-        app.setTotalExecutorTime(app.getTotalExecutorTime() + (executor.getEndTime() - executor.getStartTime()));
+        long totalExecutorTime = app.getTotalExecutorTime() + executor.getEndTime() - executor.getStartTime();
+        if (totalExecutorTime < 0L) {
+            totalExecutorTime = 0L;
+        }
+        app.setTotalExecutorTime(totalExecutorTime);
     }
 
     private void aggregateJobToApp(SparkJob job) {
@@ -589,7 +602,7 @@ public class JHFSparkEventReader {
     }
 
     private void aggregateToJob(SparkStage stage) {
-        Integer jobId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_JOB_ID.toString()));
+        int jobId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_JOB_ID.toString()));
         SparkJob job = jobs.get(jobId);
         job.setNumCompletedTasks(job.getNumCompletedTasks() + stage.getNumCompletedTasks());
         job.setNumFailedTasks(job.getNumFailedTasks() + stage.getNumFailedTasks());
@@ -601,16 +614,16 @@ public class JHFSparkEventReader {
             if (!hasStagePriorAttemptSuccess(stage)) {
                 job.setNumCompletedStages(job.getNumCompletedStages() + 1);
             }
-
         } else {
             job.setNumFailedStages(job.getNumFailedStages() + 1);
         }
     }
 
     private boolean hasStagePriorAttemptSuccess(SparkStage stage) {
-        Integer stageAttemptId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString()));
-        for (Integer i = 0; i < stageAttemptId; i++) {
-            SparkStage previousStage = stages.get(this.generateStageKey(stage.getTags().get(SparkJobTagName.SPARK_SATGE_ID.toString()), i.toString()));
+        int stageAttemptId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString()));
+        for (int i = 0; i < stageAttemptId; i++) {
+            SparkStage previousStage = stages.get(this.generateStageKey(
+                    stage.getTags().get(SparkJobTagName.SPARK_SATGE_ID.toString()), Integer.toString(i)));
             if (previousStage.getStatus().equalsIgnoreCase(SparkEntityConstant.SparkStageStatus.COMPLETE.toString())) {
                 return true;
             }
@@ -623,19 +636,20 @@ public class JHFSparkEventReader {
         return String.format("%s-%s", stageId, stageAttemptId);
     }
 
-    private void initiateStage(Integer jobId, Integer stageId, Integer stageAttemptId, String name, int numTasks) {
+    private void initiateStage(int jobId, int stageId, int stageAttemptId, String name, int numTasks) {
         SparkStage stage = new SparkStage();
-        stage.setTags(new HashMap(this.app.getTags()));
+        stage.setTags(new HashMap<>(this.app.getTags()));
         stage.setTimestamp(app.getTimestamp());
-        stage.getTags().put(SparkJobTagName.SPARK_JOB_ID.toString(), jobId.toString());
-        stage.getTags().put(SparkJobTagName.SPARK_SATGE_ID.toString(), stageId.toString());
-        stage.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), stageAttemptId.toString());
+        stage.getTags().put(SparkJobTagName.SPARK_JOB_ID.toString(), Integer.toString(jobId));
+        stage.getTags().put(SparkJobTagName.SPARK_SATGE_ID.toString(), Integer.toString(stageId));
+        stage.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), Integer.toString(stageAttemptId));
         stage.setName(name);
         stage.setNumActiveTasks(0);
         stage.setNumTasks(numTasks);
-        stage.setSchedulingPool(this.app.getConfig().getConfig().get("spark.scheduler.pool") == null ? "default" : this.app.getConfig().getConfig().get("spark.scheduler.pool"));
+        stage.setSchedulingPool(this.app.getConfig().getConfig().get("spark.scheduler.pool") == null ?
+                "default" : this.app.getConfig().getConfig().get("spark.scheduler.pool"));
 
-        String stageKey = this.generateStageKey(stageId.toString(), stageAttemptId.toString());
+        String stageKey = this.generateStageKey(Integer.toString(stageId), Integer.toString(stageAttemptId));
         stages.put(stageKey, stage);
         this.jobStageMap.get(jobId).add(stageKey);
     }
@@ -644,7 +658,7 @@ public class JHFSparkEventReader {
     private SparkExecutor initiateExecutor(String executorID, long startTime) throws Exception {
         if (!executors.containsKey(executorID)) {
             SparkExecutor executor = new SparkExecutor();
-            executor.setTags(new HashMap(this.app.getTags()));
+            executor.setTags(new HashMap<>(this.app.getTags()));
             executor.getTags().put(SparkJobTagName.SPARK_EXECUTOR_ID.toString(), executorID);
             executor.setStartTime(startTime);
             executor.setTimestamp(app.getTimestamp());
@@ -661,28 +675,6 @@ public class JHFSparkEventReader {
         } else {
             return JobNameNormalization.getInstance().normalize(jobName);
         }
-    }
-
-    private long parseExecutorMemory(String memory) {
-
-        if (memory.endsWith("g") || memory.endsWith("G")) {
-            int executorGB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024L * 1024 * 1024 * executorGB;
-        } else if (memory.endsWith("m") || memory.endsWith("M")) {
-            int executorMB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024L * 1024 * executorMB;
-        } else if (memory.endsWith("k") || memory.endsWith("K")) {
-            int executorKB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024L * executorKB;
-        } else if (memory.endsWith("t") || memory.endsWith("T")) {
-            int executorTB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024L * 1024 * 1024 * 1024 * executorTB;
-        } else if (memory.endsWith("p") || memory.endsWith("P")) {
-            int executorPB = Integer.parseInt(memory.substring(0, memory.length() - 1));
-            return 1024L * 1024 * 1024 * 1024 * 1024 * executorPB;
-        }
-        LOG.info("Cannot parse memory info " + memory);
-        return 0L;
     }
 
     private void flushEntities(Object entity, boolean forceFlush) {

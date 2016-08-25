@@ -60,7 +60,7 @@ public class SparkJobParseBolt extends BaseRichBolt {
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
-        this.hdfsConf  = new Configuration();
+        this.hdfsConf = new Configuration();
         this.hdfsConf.set("fs.defaultFS", config.hdfsConfig.endpoint);
         this.hdfsConf.setBoolean("fs.hdfs.impl.disable.cache", true);
         this.hdfsConf.set("hdfs.kerberos.principal", config.hdfsConfig.principal);
@@ -73,17 +73,16 @@ public class SparkJobParseBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
         String appId = tuple.getStringByField("appId");
-        FileSystem hdfs = null;
-        try {
-            if (!zkState.hasApplication(appId)) {
-                //may already be processed due to some reason
-                collector.ack(tuple);
-                return;
-            }
+        if (!zkState.hasApplication(appId)) {
+            //may already be processed due to some reason
+            collector.ack(tuple);
+            return;
+        }
 
+        try (FileSystem hdfs = HDFSUtil.getFileSystem(this.hdfsConf)) {
             SparkApplicationInfo info = zkState.getApplicationInfo(appId);
             //first try to get attempts under the application
-            hdfs = HDFSUtil.getFileSystem(this.hdfsConf);
+
             Set<String> inprogressSet = new HashSet<String>();
             List<String> attemptLogNames = this.getAttemptLogNameList(appId, hdfs, inprogressSet);
 
@@ -111,14 +110,6 @@ public class SparkJobParseBolt extends BaseRichBolt {
             LOG.error("Fail to process application {}", appId, e);
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FAILED);
             collector.fail(tuple);
-        } finally {
-            if (null != hdfs) {
-                try {
-                    hdfs.close();
-                } catch (Exception e) {
-                    LOG.error("Fail to close hdfs");
-                }
-            }
         }
     }
 
@@ -163,7 +154,18 @@ public class SparkJobParseBolt extends BaseRichBolt {
 
             boolean exists = true;
             while (exists) {
+                // For Yarn version 2.4.x
+                // log name: application_1464382345557_269065_1
                 String attemptIdString = Integer.toString(attemptId);
+
+                // For Yarn version >= 2.7,
+                // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
+//                String attemptIdFormatted = String.format("%06d", attemptId);
+//
+//                // remove "application_" to get the number part of appID.
+//                String sparkAppIdNum = appId.substring(12);
+//                String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+
                 String appAttemptLogName = this.getAppAttemptLogName(appId, attemptIdString);
                 LOG.info("Attempt ID: {}, App Attempt Log: {}", attemptIdString, appAttemptLogName);
 

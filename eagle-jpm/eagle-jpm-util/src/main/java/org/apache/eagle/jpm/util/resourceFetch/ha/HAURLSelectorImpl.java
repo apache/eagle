@@ -94,7 +94,7 @@ public class HAURLSelectorImpl implements HAURLSelector {
                         }
                         LOG.info("try url " + urlToCheck + "fail for " + (time + 1) + " times, sleep 5 seconds before try again. ");
                         try {
-                            Thread.sleep(1 * 1000);
+                            Thread.sleep(1000);
                         } catch (InterruptedException ex) {
                             LOG.warn("{}", ex);
                         }
