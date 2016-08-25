@@ -57,7 +57,7 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     protected void execute(Object key, Map event,BasicOutputCollector collector) {
         try {
             String output = new ObjectMapper().writeValueAsString(event);
-            producer.send(new KeyedMessage(this.topicId, event.get("user"), output));
+            producer.send(new KeyedMessage(this.topicId, key, output));
         }catch(Exception ex){
             LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);

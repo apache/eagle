@@ -117,7 +117,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>dataSinkConfig.topic</displayName>
-            <value>hdfs_audit_log_parsed</value>
+            <value>hdfs_audit_log_enriched</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
@@ -149,8 +149,8 @@
     </configuration>
     <streams>
         <stream>
-            <streamId>hdfs_audit_log_stream</streamId>
-            <description>Hdfs Audit Log Stream</description>
+            <streamId>hdfs_audit_log_enriched_stream</streamId>
+            <description>Hdfs Audit Log Enriched Stream</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>
