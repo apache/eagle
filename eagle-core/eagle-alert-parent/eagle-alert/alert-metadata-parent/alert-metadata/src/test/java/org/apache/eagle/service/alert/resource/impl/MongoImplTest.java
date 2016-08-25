@@ -25,6 +25,7 @@ import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -79,7 +80,21 @@ public class MongoImplTest {
     @AfterClass
     public static void teardown() {
         if (mongod != null) {
-            mongod.stop();
+            try {
+                mongod.stop();
+            }
+            catch (IllegalStateException e) {
+                // catch this exception for the unstable stopping mongodb
+                // reason: the exception is usually thrown out with below message format when stop() returns null value,
+                //         but actually this should have been captured in ProcessControl.stopOrDestroyProcess() by destroying
+                //         the process ultimately
+                if (e.getMessage() != null && e.getMessage().matches("^Couldn't kill.*process!.*")) {
+                    // if matches, do nothing, just ignore the exception
+                }
+                else {
+                    LOG.warn(String.format("Ignored error for stopping mongod process, see stack trace: %s", ExceptionUtils.getStackTrace(e)));
+                }
+            }
             mongodExe.stop();
         }
     }
