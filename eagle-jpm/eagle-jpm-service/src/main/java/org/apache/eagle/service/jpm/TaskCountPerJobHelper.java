@@ -19,6 +19,7 @@
 package org.apache.eagle.service.jpm;
 
 import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
+import org.apache.eagle.jpm.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,15 @@ public class TaskCountPerJobHelper {
                 taskCounter.topEntities.add(iterator.next());
             }
             taskCounter.entities.clear();
+        }
+    }
+
+    public void taskCount(MRJobTaskCountResponse.UnitTaskCount counter, String taskType) {
+        counter.taskCount++;
+        if (taskType.equalsIgnoreCase(Constants.TaskType.MAP.toString())) {
+            counter.mapTaskCount++;
+        } else if (taskType.equalsIgnoreCase(Constants.TaskType.REDUCE.toString())) {
+            counter.reduceTaskCount++;
         }
     }
 

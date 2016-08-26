@@ -19,6 +19,7 @@
 package org.apache.eagle.service.jpm;
 
 import static org.apache.eagle.jpm.util.MRJobTagName.JOB_ID;
+import static org.apache.eagle.jpm.util.MRJobTagName.TASK_TYPE;
 
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
@@ -28,18 +29,17 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.apache.eagle.service.generic.ListQueryResource;
-import org.apache.eagle.service.jpm.MRJobTaskCountResponse.TaskCountPerJobResponse;
 import org.apache.eagle.service.jpm.MRJobTaskCountResponse.JobCountPerDurationResponse;
+import org.apache.eagle.service.jpm.MRJobTaskCountResponse.TaskCountPerJobResponse;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.text.ParseException;
-
 
 @Path("mrJobs")
 public class MRJobExecutionResource {
@@ -220,7 +220,7 @@ public class MRJobExecutionResource {
             for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o : historyRes.getObj()) {
                 int index = helper.getPosition(times, o.getDuration());
                 MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
-                counter.taskCount++;
+                helper.taskCount(counter, o.getTags().get(TASK_TYPE.toString()));
                 counter.entities.add(o);
             }
         } else {
@@ -233,11 +233,11 @@ public class MRJobExecutionResource {
                     int index = helper.getPosition(times, o.getDuration());
                     if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
                         MRJobTaskCountResponse.UnitTaskCount counter = runningTaskCount.get(index);
-                        counter.taskCount++;
+                        helper.taskCount(counter, o.getTags().get(TASK_TYPE.toString()));
                         counter.entities.add(o);
                     } else if (o.getEndTime() != 0) {
                         MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
-                        counter.taskCount++;
+                        helper.taskCount(counter, o.getTags().get(TASK_TYPE.toString()));
                         counter.entities.add(o);
                     }
                 }
@@ -280,17 +280,17 @@ public class MRJobExecutionResource {
             return response;
         }
         String query = String.format("%s[@site=\"%s\" AND @endTime>=%s]{@startTime,@endTime}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, startTimeInMills);
-        GenericServiceAPIResponseEntity<JobExecutionAPIEntity> history_res =
+        GenericServiceAPIResponseEntity<JobExecutionAPIEntity> historyRes =
                 resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
-        if (!history_res.isSuccess() || history_res.getObj() == null) {
-            response.errMessage = String.format("Catch an exception: %s with query=%s", history_res.getException(), query);
+        if (!historyRes.isSuccess() || historyRes.getObj() == null) {
+            response.errMessage = String.format("Catch an exception: %s with query=%s", historyRes.getException(), query);
             return response;
         }
 
         try {
             long startTimeInSecs = DateTimeUtil.humanDateToSeconds(startTime);
             long endTimeInSecs = DateTimeUtil.humanDateToSeconds(endTime);
-            return helper.getJobCount(history_res.getObj(), startTimeInSecs, endTimeInSecs, intervalInSecs);
+            return helper.getJobCount(historyRes.getObj(), startTimeInSecs, endTimeInSecs, intervalInSecs);
         } catch (Exception e) {
             response.errMessage = e.getMessage();
             return response;
@@ -350,13 +350,13 @@ public class MRJobExecutionResource {
         }
         String query = String.format("%s[@site=\"%s\" AND @startTime<=\"%s\" AND @endTime>=\"%s\"]{@startTime,@endTime}",
                 Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, timePointsInMills, timePointsInMills);
-        GenericServiceAPIResponseEntity<JobExecutionAPIEntity> history_res =
+        GenericServiceAPIResponseEntity<JobExecutionAPIEntity> historyRes =
                 resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
-        if (!history_res.isSuccess() || history_res.getObj() == null) {
-            return history_res;
+        if (!historyRes.isSuccess() || historyRes.getObj() == null) {
+            return historyRes;
         }
 
-        List<String> timeDuration = helper.getSearchTimeDuration(history_res.getObj());
+        List<String> timeDuration = helper.getSearchTimeDuration(historyRes.getObj());
         LOG.info(String.format("new search time range: startTime=%s, endTime=%s", timeDuration.get(0), timeDuration.get(1)));
         query = String.format("%s[@site=\"%s\"]<@jobId>{sum(value)}.{sum(value) desc}", Constants.GENERIC_METRIC_SERVICE, site);
         return metricQueryFunc.apply(query, timeDuration.get(0), timeDuration.get(1), intervalmin, top, metricName);
@@ -377,8 +377,8 @@ public class MRJobExecutionResource {
     };
 
     @FunctionalInterface
-    interface Function6 <A, B, C, D, E, F, R> {
-        public R apply (A a, B b, C c, D d, E e, F f);
+    interface Function6<A, B, C, D, E, F, R> {
+        public R apply(A a, B b, C c, D d, E e, F f);
     }
 
 }

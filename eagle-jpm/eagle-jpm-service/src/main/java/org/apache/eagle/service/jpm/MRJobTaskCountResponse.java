@@ -36,12 +36,16 @@ public class MRJobTaskCountResponse {
     static class UnitTaskCount {
         public long timeBucket;
         public int taskCount;
+        public int mapTaskCount;
+        public int reduceTaskCount;
         public Set entities;
         public List topEntities;
 
         UnitTaskCount(long timeBucket, Comparator comparator) {
             this.timeBucket = timeBucket;
             this.taskCount = 0;
+            this.mapTaskCount = 0;
+            this.reduceTaskCount = 0;
             entities = new TreeSet<>(comparator);
             topEntities = new ArrayList<>();
         }
