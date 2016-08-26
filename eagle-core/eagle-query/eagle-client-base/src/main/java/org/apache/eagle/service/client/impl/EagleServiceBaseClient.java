@@ -53,7 +53,7 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
 
     private final String host;
     private final int port;
-    private final String basePath;
+    private final String context;
     private String username;
     private String password;
     protected boolean silence = false;
@@ -81,8 +81,8 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
     public EagleServiceBaseClient(String host, int port, String basePath, String username, String password) {
         this.host = host;
         this.port = port;
-        this.basePath = basePath;
-        this.baseEndpoint = buildBathPath().toString();
+        this.context = basePath;
+        this.baseEndpoint = buildBasePath();
         this.username = username;
         this.password = password;
 
@@ -129,14 +129,18 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
         this(host,port,DEFAULT_BASE_PATH);
     }
 
-    protected final StringBuilder buildBathPath() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("http://");
-        sb.append(host);
-        sb.append(":");
-        sb.append(port);
-        sb.append(basePath);
-        return sb;
+    private String buildBasePath() {
+        if (host.startsWith("http://") || host.startsWith("https://")) {
+            return host + ":" + port + context;
+        } else {
+            // https
+            if (port == 443) {
+                return "https://" + host + ":" + port + context;
+            } else {
+                // http
+                return "http://" + host + ":" + port + context;
+            }
+        }
     }
 
     protected static String marshall(List<?> entities) throws JsonMappingException, JsonGenerationException, IOException {
