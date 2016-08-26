@@ -41,9 +41,9 @@ public class CoordinatorClient implements Closeable {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(CoordinatorClient.class);
 
-    private static final String EAGLE_COORDINATOR_SERVICE_CONTEXT = "coordinatorService.context";
-    private static final String EAGLE_COORDINATOR_SERVICE_PORT = "coordinatorService.port";
-    private static final String EAGLE_COORDINATOR_SERVICE_HOST = "coordinatorService.host";
+    private static final String EAGLE_COORDINATOR_SERVICE_CONTEXT = "metadataService.context";
+    private static final String EAGLE_COORDINATOR_SERVICE_PORT = "metadataService.port";
+    private static final String EAGLE_COORDINATOR_SERVICE_HOST = "metadataService.host";
     private static final String COORDINATOR_SCHEDULE_API = "/coordinator/build";
 
     private String host;

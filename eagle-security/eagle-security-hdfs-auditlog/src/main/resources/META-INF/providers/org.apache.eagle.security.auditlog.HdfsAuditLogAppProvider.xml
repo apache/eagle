@@ -155,7 +155,11 @@
             <timeseries>true</timeseries>
             <columns>
                 <column>
-                    <name>action</name>
+                    <name>src</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>dst</name>
                     <type>string</type>
                 </column>
                 <column>
@@ -163,12 +167,28 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>status</name>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>allowed</name>
+                    <type>bool</type>
+                </column>
+                <column>
+                    <name>user</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>timestamp</name>
-                    <type>long</type>
+                    <name>cmd</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>sensitivityType</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>securityZone</name>
+                    <type>string</type>
                 </column>
             </columns>
         </stream>

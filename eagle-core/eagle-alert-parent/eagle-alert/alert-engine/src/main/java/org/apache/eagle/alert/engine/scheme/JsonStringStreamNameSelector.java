@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
  */
 public class JsonStringStreamNameSelector implements StreamNameSelector {
     private final static Logger LOG = LoggerFactory.getLogger(JsonStringStreamNameSelector.class);
-    private final static String USER_PROVIDED_STREAM_NAME_PROPERTY = "userProvidedStreamName";
-    private final static String FIELD_NAMES_TO_INFER_STREAM_NAME_PROPERTY = "fieldNamesToInferStreamName";
-    private final static String STREAM_NAME_FORMAT = "streamNameFormat";
+    public final static String USER_PROVIDED_STREAM_NAME_PROPERTY = "userProvidedStreamName";
+    public final static String FIELD_NAMES_TO_INFER_STREAM_NAME_PROPERTY = "fieldNamesToInferStreamName";
+    public final static String STREAM_NAME_FORMAT = "streamNameFormat";
 
     private String userProvidedStreamName;
     private String[] fieldNamesToInferStreamName;
