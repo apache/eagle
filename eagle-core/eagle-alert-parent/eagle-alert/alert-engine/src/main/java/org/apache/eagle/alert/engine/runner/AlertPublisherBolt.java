@@ -34,6 +34,7 @@ import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
 import org.apache.eagle.alert.utils.AlertConstants;
+import org.apache.eagle.alert.utils.MapComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

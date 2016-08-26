@@ -16,25 +16,26 @@
  */
 package org.apache.eagle.alert.coordinator.trigger;
 
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.service.IMetadataServiceClient;
+import org.apache.eagle.alert.utils.MapComparator;
+
+import com.google.common.base.Stopwatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.service.IMetadataServiceClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Stopwatch;
 
 /**
- * Poll policy change and notify listeners
+ * Poll policy change and notify listeners.
  */
-public class DynamicPolicyLoader implements Runnable{
+public class DynamicPolicyLoader implements Runnable {
     private static Logger LOG = LoggerFactory.getLogger(DynamicPolicyLoader.class);
 
     private IMetadataServiceClient client;
@@ -42,7 +43,7 @@ public class DynamicPolicyLoader implements Runnable{
     private Map<String, PolicyDefinition> cachedPolicies = new HashMap<>();
     private List<PolicyChangeListener> listeners = new ArrayList<>();
 
-    public DynamicPolicyLoader(IMetadataServiceClient client){
+    public DynamicPolicyLoader(IMetadataServiceClient client) {
         this.client = client;
     }
 
@@ -52,7 +53,7 @@ public class DynamicPolicyLoader implements Runnable{
 
     /**
      * When it is run at the first time, due to cachedPolicies being empty, all existing policies are expected
-     * to be addedPolicies
+     * to be addedPolicies.
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -64,22 +65,20 @@ public class DynamicPolicyLoader implements Runnable{
             List<PolicyDefinition> current = client.listPolicies();
             Map<String, PolicyDefinition> currPolicies = new HashMap<>();
             current.forEach(pe -> currPolicies.put(pe.getName(), pe));
-
-            Collection<String> addedPolicies = CollectionUtils.subtract(currPolicies.keySet(), cachedPolicies.keySet());
-            Collection<String> removedPolicies = CollectionUtils.subtract(cachedPolicies.keySet(), currPolicies.keySet());
-            Collection<String> potentiallyModifiedPolicies = CollectionUtils.intersection(currPolicies.keySet(), cachedPolicies.keySet());
+            MapComparator<String, PolicyDefinition> comparator = new MapComparator<>(currPolicies, cachedPolicies);
+            comparator.compare();
 
             List<String> reallyModifiedPolicies = new ArrayList<>();
-            for (String updatedPolicy : potentiallyModifiedPolicies) {
+            for (String updatedPolicy : comparator.getModifiedKeys()) {
                 if (!currPolicies.get(updatedPolicy).equals(cachedPolicies.get(updatedPolicy))) {
                     reallyModifiedPolicies.add(updatedPolicy);
                 }
             }
 
             boolean policyChanged = false;
-            if (addedPolicies.size() != 0 ||
-                    removedPolicies.size() != 0 ||
-                    reallyModifiedPolicies.size() != 0) {
+            if (comparator.getAddedKeys().size() != 0
+                    || comparator.getRemoved().size() != 0
+                    || reallyModifiedPolicies.size() != 0) {
                 policyChanged = true;
             }
 
@@ -89,7 +88,7 @@ public class DynamicPolicyLoader implements Runnable{
             }
             synchronized (this) {
                 for (PolicyChangeListener listener : listeners) {
-                    listener.onPolicyChange(current, addedPolicies, removedPolicies, reallyModifiedPolicies);
+                    listener.onPolicyChange(current, comparator.getAddedKeys(), comparator.getRemovedKeys(), reallyModifiedPolicies);
                 }
             }
 

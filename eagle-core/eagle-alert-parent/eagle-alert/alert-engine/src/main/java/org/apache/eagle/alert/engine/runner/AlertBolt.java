@@ -45,6 +45,7 @@ import org.apache.eagle.alert.metric.source.MetricSource;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.eagle.alert.utils.AlertConstants;
+import org.apache.eagle.alert.utils.MapComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
