@@ -19,11 +19,11 @@ package org.apache.eagle.jpm.util;
 
 public class SparkEntityConstant {
 
-    public enum SPARK_STAGE_STATUS{
+    public enum SparkStageStatus {
         COMPLETE, FAILED
     }
 
-    public enum SPARK_JOB_STATUS{
+    public enum SparkJobStatus {
         SUCCEEDED, FAILED
     }
 }

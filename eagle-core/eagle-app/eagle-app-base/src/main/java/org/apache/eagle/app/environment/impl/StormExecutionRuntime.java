@@ -60,6 +60,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     private final static String STORM_NIMBUS_HOST_DEFAULT = "localhost";
     private final static Integer STORM_NIMBUS_THRIFT_DEFAULT = 6627;
     private final static String STORM_NIMBUS_THRIFT_CONF_PATH = "application.storm.nimbusThriftPort";
+    private static final String WORKERS = "workers";
 
     public backtype.storm.Config getStormConfig(){
         backtype.storm.Config conf = new backtype.storm.Config();
@@ -86,6 +87,9 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         conf.put(backtype.storm.Config.NIMBUS_HOST, nimbusHost);
         conf.put(backtype.storm.Config.NIMBUS_THRIFT_PORT, nimbusThriftPort);
         conf.put(Config.STORM_THRIFT_TRANSPORT_PLUGIN, "backtype.storm.security.auth.SimpleTransportPlugin");
+        if (environment.config().hasPath(WORKERS)) {
+            conf.setNumWorkers(environment.config().getInt(WORKERS));
+        }
         return conf;
     }
 
@@ -96,7 +100,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         StormTopology topology = executor.execute(config, environment);
         LOG.info("Starting {} ({})",topologyName,executor.getClass().getCanonicalName());
         Config conf = getStormConfig();
-        if(config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()){
+        if(config.getString("mode").equals(ApplicationEntity.Mode.CLUSTER.name())){
             String jarFile = config.hasPath("jarPath") ? config.getString("jarPath") : null;
             if(jarFile == null){
                 jarFile = DynamicJarPathFinder.findPath(executor.getClass());

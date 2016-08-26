@@ -35,11 +35,15 @@ public class JobConfigSerDeser implements EntitySerDeser<JobConfig> {
         String sb = Bytes.toString(bytes);
         String[] keyValue = sb.split(",");
         for (String pair : keyValue) {
-            String str[] = pair.split(":");
-            if (pair.equals("") || str[0].equals("")) continue;            
+            String[] str = pair.split(":");
+            if (pair.equals("") || str[0].equals("")) {
+                continue;
+            }
             String key = str[0];
             String value = "";
-            if (str.length == 2) value = str[1];
+            if (str.length == 2) {
+                value = str[1];
+            }
             map.put(key, value);
         }
         return jc;
@@ -49,14 +53,15 @@ public class JobConfigSerDeser implements EntitySerDeser<JobConfig> {
     public byte[] serialize(JobConfig conf) {
         Map<String, String> map = conf.getConfig();
         StringBuilder sb = new StringBuilder();
-        for (Entry<String, String> entry : map.entrySet())
+        for (Entry<String, String> entry : map.entrySet()) {
             sb.append(entry.getKey() + ":" + entry.getValue() + ",");
+        }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString().getBytes();
     }
 
     @Override
-    public Class<JobConfig> type(){
+    public Class<JobConfig> type() {
         return JobConfig.class;
     }
 }

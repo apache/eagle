@@ -22,7 +22,7 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa_anomaly")
 @ColumnFamily("f")
 @Prefix("taskfailurecount")
@@ -36,7 +36,6 @@ public class TaskFailureCountAPIEntity extends JobBaseAPIEntity {
     private String error;
     @Column("c")
     private String taskStatus;
-
 
     public String getTaskStatus() {
         return taskStatus;

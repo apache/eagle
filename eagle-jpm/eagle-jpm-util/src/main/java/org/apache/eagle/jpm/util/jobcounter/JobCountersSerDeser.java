@@ -37,7 +37,7 @@ public class JobCountersSerDeser implements EntitySerDeser<JobCounters> {
             return counters;
         }
 
-        final Map<String, Map<String, Long> > groupMap = counters.getCounters();
+        final Map<String, Map<String, Long>> groupMap = counters.getCounters();
         int pos = 0;
         final int totalGroups = Bytes.toInt(bytes, pos);
         pos += 4;

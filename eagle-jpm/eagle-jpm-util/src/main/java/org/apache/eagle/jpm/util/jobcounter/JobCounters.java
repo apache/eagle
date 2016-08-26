@@ -35,7 +35,7 @@ public final class JobCounters implements Serializable {
         this.counters = counters;
     }
     
-    public String toString(){
+    public String toString() {
         return counters.toString();
     }
 

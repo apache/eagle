@@ -20,12 +20,12 @@ package org.apache.eagle.jpm.mr.runningentity;
 
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
-import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
+import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eagleMRRunningJobs")
 @ColumnFamily("f")
 @Prefix("jobs")
@@ -33,9 +33,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-        @Index(name="Index_1_jobId", columns = { "jobId" }, unique = true),
-        @Index(name="Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
-})
+        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = true),
+        @Index(name = "Index_2_jobDefId", columns = { "jobDefId" }, unique = false)
+    })
 @Tags({"site", "jobId", "jobName", "jobDefId", "jobType", "user", "queue"})
 public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     @Column("a")
@@ -110,6 +110,8 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     private int totalLaunchedMaps;
     @Column("aj")
     private long submissionTime;
+    @Column("ak")
+    private String internalState;
 
     public JobConfig getJobConfig() {
         return jobConfig;
@@ -433,5 +435,14 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     public void setSubmissionTime(long submissionTime) {
         this.submissionTime = submissionTime;
         valueChanged("submissionTime");
+    }
+
+    public String getInternalState() {
+        return internalState;
+    }
+
+    public void setInternalState(String internalState) {
+        this.internalState = internalState;
+        valueChanged("internalState");
     }
 }

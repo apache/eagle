@@ -18,28 +18,30 @@
 
 package org.apache.eagle.service.jpm;
 
-import org.apache.commons.lang.time.StopWatch;
+
+import static org.apache.eagle.jpm.util.MRJobTagName.JOB_ID;
+
 import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
+
+import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.*;
-
-import static org.apache.eagle.jpm.util.MRJobTagName.JOB_ID;
 
 @Path("mrJobs")
 public class MRJobExecutionResource {
     GenericEntityServiceResource resource = new GenericEntityServiceResource();
-    public final static String ELAPSEDMS = "elapsedms";
-    public final static String TOTAL_RESULTS = "totalResults";
+    public static final String ELAPSEDMS = "elapsedms";
+    public static final String TOTAL_RESULTS = "totalResults";
 
-    private final static Logger LOG = LoggerFactory.getLogger(MRJobExecutionResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MRJobExecutionResource.class);
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -57,7 +59,7 @@ public class MRJobExecutionResource {
         List<TaggedLogAPIEntity> jobs = new ArrayList<>();
         List<TaggedLogAPIEntity> finishedJobs = new ArrayList<>();
         Set<String> jobIds = new HashSet<>();
-        Map<String,Object> meta = new HashMap<>();
+        final Map<String,Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
 
         stopWatch.start();
@@ -134,7 +136,7 @@ public class MRJobExecutionResource {
         List<TaggedLogAPIEntity> jobs = new ArrayList<>();
         Set<String> jobIds = new HashSet<>();
         String condition = buildCondition(jobId, jobDefId, site);
-        int pageSize = Integer.MAX_VALUE;
+        final int pageSize = Integer.MAX_VALUE;
         if (condition == null) {
             response.setException(new Exception("Search condition is empty"));
             response.setSuccess(false);
@@ -142,7 +144,7 @@ public class MRJobExecutionResource {
         }
         LOG.debug("search condition=" + condition);
 
-        Map<String,Object> meta = new HashMap<>();
+        final Map<String,Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String queryFormat = "%s[%s]{*}";
@@ -245,11 +247,11 @@ public class MRJobExecutionResource {
 
         List<Long> times = parseTimeList(timeList);
         String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId);
-        GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> history_res =
+        GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> historyRes =
                 resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
-        if (history_res.isSuccess() && history_res.getObj() != null && history_res.getObj().size() > 0) {
+        if (historyRes.isSuccess() && historyRes.getObj() != null && historyRes.getObj().size() > 0) {
             initTaskCountList(runningTaskCount, finishedTaskCount, times, new HistoryTaskComparator());
-            for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o : history_res.getObj()) {
+            for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o : historyRes.getObj()) {
                 int index = getPosition(times, o.getDuration());
                 MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
                 counter.taskCount++;
@@ -257,11 +259,11 @@ public class MRJobExecutionResource {
             }
         } else {
             query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME, site, jobId);
-            GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> running_res =
+            GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> runningRes =
                     resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
-            if (running_res.isSuccess() && running_res.getObj() != null) {
+            if (runningRes.isSuccess() && runningRes.getObj() != null) {
                 initTaskCountList(runningTaskCount, finishedTaskCount, times, new RunningTaskComparator());
-                for (TaskExecutionAPIEntity o : running_res.getObj()) {
+                for (TaskExecutionAPIEntity o : runningRes.getObj()) {
                     int index = getPosition(times, o.getDuration());
                     if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
                         MRJobTaskGroupResponse.UnitTaskCount counter = runningTaskCount.get(index);

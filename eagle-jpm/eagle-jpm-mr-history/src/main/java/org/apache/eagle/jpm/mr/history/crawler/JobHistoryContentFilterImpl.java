@@ -22,37 +22,37 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class JobHistoryContentFilterImpl implements JobHistoryContentFilter {
-    private boolean m_acceptJobFile;
-    private boolean m_acceptJobConfFile;
-    private List<Pattern> m_mustHaveJobConfKeyPatterns;
-    private List<Pattern> m_jobConfKeyInclusionPatterns;
-    private List<Pattern> m_jobConfKeyExclusionPatterns;
+    private boolean acceptJobFile;
+    private boolean acceptJobConfFile;
+    private List<Pattern> mustHaveJobConfKeyPatterns;
+    private List<Pattern> jobConfKeyInclusionPatterns;
+    private List<Pattern> jobConfKeyExclusionPatterns;
 
     private String jobNameKey;
 
     @Override
     public boolean acceptJobFile() {
-        return m_acceptJobFile;
+        return acceptJobFile;
     }
 
     @Override
     public boolean acceptJobConfFile() {
-        return m_acceptJobConfFile;
+        return acceptJobConfFile;
     }
 
     @Override
     public List<Pattern> getMustHaveJobConfKeyPatterns() {
-        return m_mustHaveJobConfKeyPatterns;
+        return mustHaveJobConfKeyPatterns;
     }
 
     @Override
     public List<Pattern> getJobConfKeyInclusionPatterns() {
-        return m_jobConfKeyInclusionPatterns;
+        return jobConfKeyInclusionPatterns;
     }
 
     @Override
     public List<Pattern> getJobConfKeyExclusionPatterns() {
-        return m_jobConfKeyExclusionPatterns;
+        return jobConfKeyExclusionPatterns;
     }
 
     @Override
@@ -65,40 +65,40 @@ public class JobHistoryContentFilterImpl implements JobHistoryContentFilter {
     }
 
     public void setAcceptJobFile(boolean acceptJobFile) {
-        this.m_acceptJobFile = acceptJobFile;
+        this.acceptJobFile = acceptJobFile;
     }
 
     public void setAcceptJobConfFile(boolean acceptJobConfFile) {
-        this.m_acceptJobConfFile = acceptJobConfFile;
+        this.acceptJobConfFile = acceptJobConfFile;
     }
 
     public void setJobConfKeyInclusionPatterns(
             List<Pattern> jobConfKeyInclusionPatterns) {
-        this.m_jobConfKeyInclusionPatterns = jobConfKeyInclusionPatterns;
+        this.jobConfKeyInclusionPatterns = jobConfKeyInclusionPatterns;
     }
 
     public void setJobConfKeyExclusionPatterns(
             List<Pattern> jobConfKeyExclusionPatterns) {
-        this.m_jobConfKeyExclusionPatterns = jobConfKeyExclusionPatterns;
+        this.jobConfKeyExclusionPatterns = jobConfKeyExclusionPatterns;
     }
 
     public void setMustHaveJobConfKeyPatterns(List<Pattern> mustHaveJobConfKeyPatterns) {
-        this.m_mustHaveJobConfKeyPatterns = mustHaveJobConfKeyPatterns;
+        this.mustHaveJobConfKeyPatterns = mustHaveJobConfKeyPatterns;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("job history file:");
-        sb.append(m_acceptJobFile);
+        sb.append(acceptJobFile);
         sb.append(", job config file:");
-        sb.append(m_acceptJobConfFile);
-        if(m_acceptJobConfFile){
+        sb.append(acceptJobConfFile);
+        if (acceptJobConfFile) {
             sb.append(", must contain keys:");
-            sb.append(m_mustHaveJobConfKeyPatterns);
+            sb.append(mustHaveJobConfKeyPatterns);
             sb.append(", include keys:");
-            sb.append(m_jobConfKeyInclusionPatterns);
+            sb.append(jobConfKeyInclusionPatterns);
             sb.append(", exclude keys:");
-            sb.append(m_jobConfKeyExclusionPatterns);
+            sb.append(jobConfKeyExclusionPatterns);
         }
         return sb.toString();
     }

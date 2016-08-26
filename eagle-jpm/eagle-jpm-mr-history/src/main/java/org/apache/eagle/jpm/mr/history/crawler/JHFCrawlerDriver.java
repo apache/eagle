@@ -20,8 +20,8 @@ package org.apache.eagle.jpm.mr.history.crawler;
 
 public interface JHFCrawlerDriver {
     /**
-     * return -1 if failed or there is no file to crawl
-     * return modified time of the file if succeed
+     * return -1 if failed or there is no file to crawl.
+     * return modified time of the file if succeed.
      */
     long crawl() throws Exception;
 }

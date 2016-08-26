@@ -21,10 +21,11 @@ package org.apache.eagle.jpm.util.jobcounter;
 import java.util.List;
 
 public interface CounterKey {
-
     List<String> getNames();
+
     String getDescription();
+
     int getIndex();
+
     CounterGroupKey getGroupKey();
-    
 }

@@ -36,11 +36,12 @@ public enum MRJobTagName {
     RULE_TYPE("ruleType"),
     JOB_TYPE("jobType");
 
-    private String tagName; 
+    private String tagName;
+
     private MRJobTagName(String tagName) {
         this.tagName = tagName;
     }
-    
+
     public String toString() {
 
         return this.tagName;

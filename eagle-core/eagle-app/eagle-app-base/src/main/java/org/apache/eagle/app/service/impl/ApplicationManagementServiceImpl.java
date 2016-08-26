@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.app.service.ApplicationContext;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationManagementService;
@@ -45,6 +46,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     private final SiteEntityService siteEntityService;
     private final ApplicationProviderService applicationProviderService;
     private final ApplicationEntityService applicationEntityService;
+    private final IMetadataDao alertMetadataService;
     private final Config config;
     private final static Logger LOGGER = LoggerFactory.getLogger(ApplicationManagementServiceImpl.class);
 
@@ -53,11 +55,13 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
             Config config,
             SiteEntityService siteEntityService,
             ApplicationProviderService applicationProviderService,
-            ApplicationEntityService applicationEntityService){
+            ApplicationEntityService applicationEntityService,
+            IMetadataDao alertMetadataService){
         this.config = config;
         this.siteEntityService = siteEntityService;
         this.applicationProviderService = applicationProviderService;
         this.applicationEntityService = applicationEntityService;
+        this.alertMetadataService = alertMetadataService;
     }
 
     @Override
@@ -97,7 +101,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setConfiguration(appConfig);
         ApplicationContext applicationContext = new ApplicationContext(
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-                applicationEntity,config);
+                applicationEntity,config, alertMetadataService);
         applicationContext.onInstall();
         return applicationEntityService.create(applicationEntity);
     }
@@ -107,7 +111,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         ApplicationContext applicationContext = new ApplicationContext(
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-                applicationEntity,config);
+                applicationEntity,config, alertMetadataService);
         // TODO: Check status, skip stop if already STOPPED
         try {
             applicationContext.onStop();
@@ -123,7 +127,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         ApplicationContext applicationContext = new ApplicationContext(
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-                applicationEntity,config);
+                applicationEntity,config, alertMetadataService);
         applicationContext.onStart();
         return applicationEntity;
     }
@@ -133,7 +137,7 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(),operation.getAppId());
         ApplicationContext applicationContext = new ApplicationContext(
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-                applicationEntity,config);
+                applicationEntity,config, alertMetadataService);
         applicationContext.onStop();
         return applicationEntity;
     }

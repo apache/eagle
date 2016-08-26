@@ -56,6 +56,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-jpm-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-data-process</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -105,7 +110,6 @@
             <version>${hadoop.version}</version>
         </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>

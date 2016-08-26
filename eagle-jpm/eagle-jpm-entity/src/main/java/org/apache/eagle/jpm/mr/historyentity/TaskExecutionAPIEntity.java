@@ -23,7 +23,7 @@ import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa_task")
 @ColumnFamily("f")
 @Prefix("texec")
@@ -31,8 +31,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @TimeSeries(true)
 @Partition({"site"})
 @Indexes({
-        @Index(name="Index_1_jobId", columns = { "jobId" }, unique = false)
-})
+        @Index(name = "Index_1_jobId", columns = { "jobId" }, unique = false)
+    })
 public class TaskExecutionAPIEntity extends JobBaseAPIEntity {
     @Column("a")
     private String taskStatus;
@@ -50,41 +50,52 @@ public class TaskExecutionAPIEntity extends JobBaseAPIEntity {
     public String getTaskStatus() {
         return taskStatus;
     }
+
     public void setTaskStatus(String taskStatus) {
         this.taskStatus = taskStatus;
         _pcs.firePropertyChange("taskStatus", null, null);
     }
+
     public long getStartTime() {
         return startTime;
     }
+
     public void setStartTime(long startTime) {
         this.startTime = startTime;
         _pcs.firePropertyChange("startTime", null, null);
     }
+
     public long getEndTime() {
         return endTime;
     }
+
     public void setEndTime(long endTime) {
         this.endTime = endTime;
         _pcs.firePropertyChange("endTime", null, null);
     }
+
     public long getDuration() {
         return duration;
     }
+
     public void setDuration(long duration) {
         this.duration = duration;
         _pcs.firePropertyChange("duration", null, null);
     }
+
     public String getError() {
         return error;
     }
+
     public void setError(String error) {
         this.error = error;
         _pcs.firePropertyChange("error", null, null);
     }
+
     public JobCounters getJobCounters() {
         return jobCounters;
     }
+
     public void setJobCounters(JobCounters jobCounters) {
         this.jobCounters = jobCounters;
         _pcs.firePropertyChange("jobCounters", null, null);

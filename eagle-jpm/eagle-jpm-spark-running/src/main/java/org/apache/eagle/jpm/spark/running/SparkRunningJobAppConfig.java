@@ -18,8 +18,8 @@
 
 package org.apache.eagle.jpm.spark.running;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.common.config.ConfigOptionParser;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,28 +33,36 @@ public class SparkRunningJobAppConfig implements Serializable {
     public String getEnv() {
         return env;
     }
+
     private String env;
 
-    ZKStateConfig getZkStateConfig() { return zkStateConfig; }
+    ZKStateConfig getZkStateConfig() {
+        return zkStateConfig;
+    }
+
     private ZKStateConfig zkStateConfig;
     private TopologyConfig topologyConfig;
-    public TopologyConfig getTopologyConfig(){
+
+    public TopologyConfig getTopologyConfig() {
         return topologyConfig;
     }
 
     public EagleServiceConfig getEagleServiceConfig() {
         return eagleServiceConfig;
     }
+
     private EagleServiceConfig eagleServiceConfig;
 
     public JobExtractorConfig getJobExtractorConfig() {
         return jobExtractorConfig;
     }
+
     private JobExtractorConfig jobExtractorConfig;
 
     public EndpointConfig getEndpointConfig() {
         return endpointConfig;
     }
+
     private EndpointConfig endpointConfig;
 
     public static class TopologyConfig implements Serializable {
@@ -100,6 +108,7 @@ public class SparkRunningJobAppConfig implements Serializable {
     public Config getConfig() {
         return config;
     }
+
     private Config config;
 
     private static SparkRunningJobAppConfig manager = new SparkRunningJobAppConfig();
@@ -127,7 +136,7 @@ public class SparkRunningJobAppConfig implements Serializable {
         return manager;
     }
 
-    private void init(Config config){
+    private void init(Config config) {
         this.config = config;
         this.env = config.getString("envContextConfig.env");
         this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");

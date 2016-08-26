@@ -18,7 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.crawler;
 
-import org.apache.eagle.jpm.mr.history.common.JHFConfigManager;
+import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.parser.JHFParserBase;
 import org.apache.eagle.jpm.mr.history.parser.JHFParserFactory;
 import org.slf4j.Logger;
@@ -32,30 +32,32 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultJHFInputStreamCallback.class);
 
 
-    private JobHistoryContentFilter m_filter;
-    private JHFConfigManager m_configManager;
+    private JobHistoryContentFilter filter;
+    private MRHistoryJobConfig configManager;
 
-    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, JHFConfigManager configManager, EagleOutputCollector eagleCollector) {
-        this.m_filter = filter;
-        this.m_configManager = configManager;
+    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, MRHistoryJobConfig configManager, EagleOutputCollector eagleCollector) {
+        this.filter = filter;
+        this.configManager = configManager;
     }
 
     @Override
     public void onInputStream(InputStream jobFileInputStream, org.apache.hadoop.conf.Configuration conf) throws Exception {
-        final JHFConfigManager.JobExtractorConfig jobExtractorConfig = m_configManager.getJobExtractorConfig();
+        final MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig = configManager.getJobExtractorConfig();
         @SuppressWarnings("serial")
-        Map<String, String> baseTags = new HashMap<String, String>() { {
-            put("site", jobExtractorConfig.site);
-        } };
+        Map<String, String> baseTags = new HashMap<String, String>() {
+            {
+                put("site", jobExtractorConfig.site);
+            }
+        };
 
-        if (!m_filter.acceptJobFile()) {
+        if (!filter.acceptJobFile()) {
             // close immediately if we don't need job file
             jobFileInputStream.close();
         } else {
             //get parser and parse, do not need to emit data now
-            JHFParserBase parser = JHFParserFactory.getParser(m_configManager,
+            JHFParserBase parser = JHFParserFactory.getParser(configManager,
                     baseTags,
-                    conf, m_filter);
+                    conf, filter);
             parser.parse(jobFileInputStream);
             jobFileInputStream.close();
         }

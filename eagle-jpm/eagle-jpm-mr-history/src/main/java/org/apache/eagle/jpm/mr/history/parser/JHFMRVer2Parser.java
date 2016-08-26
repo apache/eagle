@@ -19,8 +19,9 @@
 package org.apache.eagle.jpm.mr.history.parser;
 
 import org.apache.avro.Schema;
-import org.apache.avro.io.*;
-import org.apache.avro.specific.SpecificData;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.io.JsonDecoder;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.hadoop.mapreduce.jobhistory.Event;
 import org.slf4j.Logger;
@@ -32,36 +33,36 @@ import java.io.InputStream;
 
 public class JHFMRVer2Parser implements JHFParserBase {
     private static final Logger logger = LoggerFactory.getLogger(JHFMRVer2Parser.class);
-    private JHFMRVer2EventReader _reader;
-    
-    public JHFMRVer2Parser(JHFMRVer2EventReader reader){
-        this._reader = reader;
+    private JHFMRVer2EventReader reader;
+
+    public JHFMRVer2Parser(JHFMRVer2EventReader reader) {
+        this.reader = reader;
     }
 
-    @SuppressWarnings({ "rawtypes", "deprecation" })
+    @SuppressWarnings( {"rawtypes", "deprecation"})
     @Override
     public void parse(InputStream is) throws Exception {
         int eventCtr = 0;
         try {
-             long start = System.currentTimeMillis();
-             DataInputStream in = new DataInputStream(is);
-             String version = in.readLine();
-             if (!"Avro-Json".equals(version)) {
-                 throw new IOException("Incompatible event log version: " + version);
-             }
-                
-             Schema schema = Schema.parse(in.readLine());
-             SpecificDatumReader datumReader = new SpecificDatumReader(schema);
-             JsonDecoder decoder = DecoderFactory.get().jsonDecoder(schema, in);
+            long start = System.currentTimeMillis();
+            DataInputStream in = new DataInputStream(is);
+            String version = in.readLine();
+            if (!"Avro-Json".equals(version)) {
+                throw new IOException("Incompatible event log version: " + version);
+            }
 
-             Event wrapper;
-             while ((wrapper = getNextEvent(datumReader, decoder)) != null) {
-                 ++eventCtr;
-                 _reader.handleEvent(wrapper);
-             }
-             _reader.parseConfiguration();
-             // don't need put to finally as it's a kind of flushing data
-             _reader.close();
+            Schema schema = Schema.parse(in.readLine());
+            SpecificDatumReader datumReader = new SpecificDatumReader(schema);
+            JsonDecoder decoder = DecoderFactory.get().jsonDecoder(schema, in);
+
+            Event wrapper;
+            while ((wrapper = getNextEvent(datumReader, decoder)) != null) {
+                ++eventCtr;
+                reader.handleEvent(wrapper);
+            }
+            reader.parseConfiguration();
+            // don't need put to finally as it's a kind of flushing data
+            reader.close();
             logger.info("reader used " + (System.currentTimeMillis() - start) + "ms");
         } catch (Exception ioe) {
             logger.error("Caught exception parsing history file after " + eventCtr + " events", ioe);
@@ -71,13 +72,13 @@ public class JHFMRVer2Parser implements JHFParserBase {
                 is.close();
             }
         }
-      }
-    
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    }
+
+    @SuppressWarnings( {"rawtypes", "unchecked"})
     public Event getNextEvent(DatumReader datumReader, JsonDecoder decoder) throws Exception {
         Event wrapper;
         try {
-            wrapper = (Event)datumReader.read(null, decoder);
+            wrapper = (Event) datumReader.read(null, decoder);
         } catch (java.io.EOFException e) {            // at EOF
             return null;
         }

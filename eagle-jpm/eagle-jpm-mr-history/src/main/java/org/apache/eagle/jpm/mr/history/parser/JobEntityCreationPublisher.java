@@ -22,23 +22,19 @@ import org.apache.eagle.jpm.mr.historyentity.JobBaseAPIEntity;
 
 import java.util.Vector;
 
-/**
- * not thread safe
- * @author yonzhang
- *
- */
 public class JobEntityCreationPublisher {
     private Vector<HistoryJobEntityCreationListener> listeners = new Vector<>(2);
-    public void addListener(HistoryJobEntityCreationListener l){
+
+    public void addListener(HistoryJobEntityCreationListener l) {
         listeners.add(l);
     }
-    
+
     public void notifiyListeners(JobBaseAPIEntity entity) throws Exception {
         for (HistoryJobEntityCreationListener l : listeners) {
             l.jobEntityCreated(entity);
         }
     }
-    
+
     public void flush() throws Exception {
         for (HistoryJobEntityCreationListener l : listeners) {
             l.flush();
