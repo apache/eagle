@@ -17,15 +17,17 @@
  *
  */
 
-package org.apache.eagle.jpm.spark.history.config;
-
+package org.apache.eagle.jpm.spark.history;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 import java.io.Serializable;
 
-public class SparkHistoryCrawlConfig implements Serializable {
+public class SparkHistoryJobAppConfig implements Serializable {
+    final static String SPARK_HISTORY_JOB_FETCH_SPOUT_NAME = "sparkHistoryJobFetchSpout";
+    final static String SPARK_HISTORY_JOB_PARSE_BOLT_NAME = "sparkHistoryJobParseBolt";
+
     public ZKStateConfig zkStateConfig;
     public JobHistoryEndpointConfig jobHistoryConfig;
     public HDFSConfig hdfsConfig;
@@ -34,45 +36,55 @@ public class SparkHistoryCrawlConfig implements Serializable {
     public StormConfig stormConfig;
 
     private Config config;
+
+    private static SparkHistoryJobAppConfig manager = new SparkHistoryJobAppConfig();
     
     public Config getConfig() {
         return config;
     }
 
-    public SparkHistoryCrawlConfig() {
-        this.config = ConfigFactory.load();
-
+    public SparkHistoryJobAppConfig() {
         this.zkStateConfig = new ZKStateConfig();
+        this.jobHistoryConfig = new JobHistoryEndpointConfig();
+        this.hdfsConfig = new HDFSConfig();
+        this.info = new BasicInfo();
+        this.eagleInfo = new EagleInfo();
+        this.stormConfig = new StormConfig();
+    }
+
+    public static SparkHistoryJobAppConfig getInstance(Config config) {
+        manager.init(config);
+        return manager;
+    }
+
+    private void init(Config config) {
+        this.config = config;
+
         this.zkStateConfig.zkQuorum = config.getString("dataSourceConfig.zkQuorum");
         this.zkStateConfig.zkRetryInterval = config.getInt("dataSourceConfig.zkRetryInterval");
         this.zkStateConfig.zkRetryTimes = config.getInt("dataSourceConfig.zkRetryTimes");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.zkSessionTimeoutMs");
         this.zkStateConfig.zkRoot = config.getString("dataSourceConfig.zkRoot");
 
-        this.jobHistoryConfig = new JobHistoryEndpointConfig();
         jobHistoryConfig.historyServerUrl = config.getString("dataSourceConfig.spark.history.server.url");
         jobHistoryConfig.historyServerUserName = config.getString("dataSourceConfig.spark.history.server.username");
-        jobHistoryConfig.historyServerUserPwd = config.getString("dataSourceConfig.spark.history.server.pwd");
-        jobHistoryConfig.rms = config.getStringList("dataSourceConfig.rm.url").toArray(new String[0]);
+        jobHistoryConfig.historyServerUserPwd = config.getString("dataSourceConfig.spark.history.server.password");
+        jobHistoryConfig.rms = config.getString("dataSourceConfig.rm.url").split(",\\s*");
 
-        this.hdfsConfig = new HDFSConfig();
-        this.hdfsConfig.baseDir = config.getString("dataSourceConfig.hdfs.baseDir");
+        this.hdfsConfig.baseDir = config.getString("dataSourceConfig.hdfs.eventLog");
         this.hdfsConfig.endpoint = config.getString("dataSourceConfig.hdfs.endPoint");
         this.hdfsConfig.principal = config.getString("dataSourceConfig.hdfs.principal");
         this.hdfsConfig.keytab = config.getString("dataSourceConfig.hdfs.keytab");
 
-        this.info = new BasicInfo();
-        info.site = String.format("%s-%s",config.getString("basic.cluster"),config.getString("basic.datacenter"));
-        info.jobConf = config.getStringList("basic.jobConf.additional.info").toArray(new String[0]);
+        info.site = config.getString("basic.cluster") + "-" + config.getString("basic.dataCenter");
+        info.jobConf = config.getString("basic.jobConf.additional.info").split(",\\s*");
 
-        this.eagleInfo = new EagleInfo();
         this.eagleInfo.host = config.getString("eagleProps.eagle.service.host");
         this.eagleInfo.port = config.getInt("eagleProps.eagle.service.port");
 
-        this.stormConfig = new StormConfig();
         this.stormConfig.mode = config.getString("storm.mode");
         this.stormConfig.topologyName = config.getString("storm.name");
-        this.stormConfig.workerNo = config.getInt("storm.workerNo");
+        this.stormConfig.workerNo = config.getInt("storm.worker.num");
         this.stormConfig.timeoutSec = config.getInt("storm.messageTimeoutSec");
         this.stormConfig.spoutPending = config.getInt("storm.pendingSpout");
         this.stormConfig.spoutCrawlInterval = config.getInt("storm.spoutCrawlInterval");
@@ -118,6 +130,4 @@ public class SparkHistoryCrawlConfig implements Serializable {
         public String host;
         public int port;
     }
-
-
 }
