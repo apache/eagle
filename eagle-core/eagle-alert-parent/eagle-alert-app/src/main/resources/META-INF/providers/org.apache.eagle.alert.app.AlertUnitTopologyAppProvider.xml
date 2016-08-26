@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<application>
+    <type>AlertUnitTopologyApp</type>
+    <name>Alert Unit Topology Application</name>
+    <version>0.5.0-incubating</version>
+    <appClass>org.apache.eagle.alert.app.AlertUnitTopologyApp</appClass>
+    <viewPath>/apps/alert</viewPath>
+    <configuration>
+       <!-- alert topology sizing parameters -->
+        <property>
+            <name>topology.numOfTotalWorkers</name>
+            <displayName>topology.numOfTotalWorkers</displayName>
+            <value>2</value>
+            <description>number of total storm workers</description>
+        </property>
+        <property>
+            <name>topology.numOfSpoutTasks</name>
+            <displayName>topology.numOfSpoutTasks</displayName>
+            <value>1</value>
+            <description>number of spout tasks</description>
+        </property>
+        <property>
+            <name>topology.numOfRouterBolts</name>
+            <displayName>topology.numOfRouterBolts</displayName>
+            <value>4</value>
+            <description>number of router tasks</description>
+        </property>
+        <property>
+            <name>topology.numOfAlertBolts</name>
+            <displayName>topology.numOfAlertBolts</displayName>
+            <value>10</value>
+            <description>number of alert tasks</description>
+        </property>
+        <property>
+            <name>topology.numOfPublishTasks</name>
+            <displayName>topology.numOfPublishTasks</displayName>
+            <value>1</value>
+            <description>number of publish tasks</description>
+        </property>
+        <property>
+            <name>topology.messageTimeoutSecs</name>
+            <displayName>topology.messageTimeoutSecs</displayName>
+            <value>3600</value>
+            <description>number of tuple timeout in seconds</description>
+        </property>
+
+        <!-- alert spout configuration -->
+        <property>
+            <name>spout.kafkaBrokerZkQuorum</name>
+            <displayName>spout.kafkaBrokerZkQuorum</displayName>
+            <value>server.eagle.apache.org:2181</value>
+            <description>zookeeper quorum for spout to consume data</description>
+        </property>
+        <property>
+            <name>spout.kafkaBrokerZkBasePath</name>
+            <displayName>spout.kafkaBrokerZkBasePath</displayName>
+            <value>/brokers</value>
+            <description>zk znode path for kafka brokers</description>
+        </property>
+        <property>
+            <name>spout.stormKafkaUseSameZkQuorumWithKafkaBroker</name>
+            <displayName>spout.stormKafkaUseSameZkQuorumWithKafkaBroker</displayName>
+            <value>true</value>
+            <description>same zookeeper for kafka server and kafka consumer(Storm-Kafka)</description>
+        </property>
+        <property>
+            <name>spout.stormKafkaTransactionZkPath</name>
+            <displayName>spout.stormKafkaTransactionZkPath</displayName>
+            <value>/consumers</value>
+            <description>zk path for storm kafka transaction</description>
+        </property>
+        <property>
+            <name>spout.stormKafkaEagleConsumer</name>
+            <displayName>spout.stormKafkaEagleConsumer</displayName>
+            <value>eagle_consumer</value>
+            <description>zookeeper quorum for spout to consume data</description>
+        </property>
+
+        <!-- zk config for alert engine -->
+        <property>
+            <name>zkConfig.zkQuorum</name>
+            <displayName>zkConfig.zkQuorum</displayName>
+            <value>server.eagle.apache.org:2181</value>
+            <description>zk quorum for alert engine</description>
+        </property>
+        <property>
+            <name>zkConfig.zkRoot</name>
+            <displayName>zkConfig.zkRoot</displayName>
+            <value>/alert</value>
+            <description>zk znode path for alert engine</description>
+        </property>
+
+        <property>
+            <name>metadataService.context</name>
+            <displayName>metadataService.context</displayName>
+            <value>/rest</value>
+            <description>metadata service context path</description>
+        </property>
+        <property>
+            <name>metadataService.host</name>
+            <displayName>metadataService.host</displayName>
+            <value>localhost</value>
+            <description>metadata service host</description>
+        </property>
+        <property>
+            <name>metadataService.port</name>
+            <displayName>metadataService.port</displayName>
+            <value>9090</value>
+            <description>metadata service port</description>
+        </property>
+    </configuration>
+    <docs>
+        <install>
+        </install>
+        <uninstall>
+        </uninstall>
+    </docs>
+</application>

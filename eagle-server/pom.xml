@@ -164,6 +164,13 @@
             <artifactId>eagle-gc</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- Alert unit topology as an application -->
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-alert-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>

@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-log4j.rootLogger=INFO, stdout
+./kafka-topics.sh --topic hdfs_audit_log --zookeeper localhost:2181 --create --replication-factor 1 --partitions 2
 
-# standard output
-log4j.appender.stdout=org.apache.log4j.ConsoleAppender
-log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
-log4j.appender.stdout.layout.ConversionPattern=%d{ISO8601} %p [%t] %c{2}[%L]: %m%n
+./kafka-topics.sh --topic hdfs_audit_log --zookeeper localhost:2181 --create --replication-factor 1 --partitions 2
+
+./kafka-console-producer.sh --topic hdfs_audit_log --broker-list sandbox.hortonworks.com:6667
+
+./kafka-console-consumer.sh --topic hdfs_audit_log_parsed --zookeeper sandbox.hortonworks.com:2181 --from-beginning
