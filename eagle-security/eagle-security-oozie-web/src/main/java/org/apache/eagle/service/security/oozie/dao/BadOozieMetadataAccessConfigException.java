@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.service.security.oozie.dao;
 
-public class BadOozieMetadataAccessConfigException extends RuntimeException{
-    public BadOozieMetadataAccessConfigException(Exception ex){
+public class BadOozieMetadataAccessConfigException extends RuntimeException {
+    public BadOozieMetadataAccessConfigException(Exception ex) {
         super(ex);
     }
 
-    public BadOozieMetadataAccessConfigException(String msg){
+    public BadOozieMetadataAccessConfigException(String msg) {
         super(msg);
     }
 }

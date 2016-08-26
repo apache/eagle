@@ -17,11 +17,11 @@
 -->
 
 <metainfo>
-  <schemaVersion>2.0</schemaVersion>
-  <services>
-    <service>
-      <name>EAGLE</name>
-      <extends>common-services/EAGLE/0.0.1</extends>
-    </service>
-  </services>
+    <schemaVersion>2.0</schemaVersion>
+    <services>
+        <service>
+            <name>EAGLE</name>
+            <extends>common-services/EAGLE/0.0.1</extends>
+        </service>
+    </services>
 </metainfo>

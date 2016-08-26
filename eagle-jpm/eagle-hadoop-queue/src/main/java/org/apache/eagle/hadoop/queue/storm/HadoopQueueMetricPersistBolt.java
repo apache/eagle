@@ -18,19 +18,20 @@
 
 package org.apache.eagle.hadoop.queue.storm;
 
+import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
+import org.apache.eagle.hadoop.queue.model.scheduler.RunningQueueAPIEntity;
+import org.apache.eagle.log.entity.GenericMetricEntity;
+import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
+import org.apache.eagle.service.client.EagleServiceConnector;
+import org.apache.eagle.service.client.IEagleServiceClient;
+import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
-import org.apache.eagle.hadoop.queue.model.scheduler.RunningQueueAPIEntity;
-import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
-import org.apache.eagle.log.entity.GenericMetricEntity;
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.service.client.EagleServiceConnector;
-import org.apache.eagle.service.client.IEagleServiceClient;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ import java.util.Map;
 
 public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
 
-    private final static Logger LOG = LoggerFactory.getLogger(HadoopQueueMetricPersistBolt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueMetricPersistBolt.class);
 
     private Config config;
     private IEagleServiceClient client;
@@ -65,7 +66,7 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.METRIC.toString())) {
             List<GenericMetricEntity> metrics = (List<GenericMetricEntity>) data;
             writeMetrics(metrics);
-         } else if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.ENTITY.toString())) {
+        } else if (dataType.equalsIgnoreCase(HadoopClusterConstants.DataType.ENTITY.toString())) {
             List<RunningQueueAPIEntity> entities = (List<RunningQueueAPIEntity>) data;
             writeEntities(entities);
         }
@@ -77,12 +78,12 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
 
     }
 
-    private void writeEntities(List<RunningQueueAPIEntity> entities){
+    private void writeEntities(List<RunningQueueAPIEntity> entities) {
         try {
             GenericServiceAPIResponseEntity response = client.create(entities);
-            if(!response.isSuccess()){
+            if (!response.isSuccess()) {
                 LOG.error("Got exception from eagle service: " + response.getException());
-            }else{
+            } else {
                 LOG.info("Successfully wrote " + entities.size() + " RunningQueueAPIEntity entities");
             }
         } catch (Exception e) {
@@ -91,12 +92,12 @@ public class HadoopQueueMetricPersistBolt extends BaseRichBolt {
         entities.clear();
     }
 
-    private void writeMetrics(List<GenericMetricEntity> entities){
+    private void writeMetrics(List<GenericMetricEntity> entities) {
         try {
             GenericServiceAPIResponseEntity response = client.create(entities);
-            if(response.isSuccess()){
+            if (response.isSuccess()) {
                 LOG.info("Successfully wrote " + entities.size() + " GenericMetricEntity entities");
-            }else{
+            } else {
                 LOG.error(response.getException());
             }
         } catch (Exception e) {

@@ -19,11 +19,12 @@ package org.apache.eagle.service.security.oozie.dao;
 import java.util.Map;
 
 /**
- * retrieve oozie sensitivity metadata directly from table
+ * retrieve oozie sensitivity metadata directly from table.
  */
 public interface OozieSensitivityMetadataDAO {
     // site to (resource, sensitivityType)
     Map<String, Map<String, String>> getAllOozieSensitivityMap();
+
     // resource to sensitivityType
     Map<String, String> getOozieSensitivityMap(String site);
 }

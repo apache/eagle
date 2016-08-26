@@ -17,8 +17,9 @@
  */
 package org.apache.eagle.security.oozie.parse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.common.DateTimeUtil;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -37,17 +38,17 @@ public class OozieAuditLogParser {
     private static final String OOZIEAUDIT_FLAG = "(\\w+:\\d+)";
     private static final String PREFIX_REGEX = TIMESTAMP_REGEX + WHITE_SPACE_REGEX + LOG_LEVEL_REGEX
             + WHITE_SPACE_REGEX;
-    private final static String IP = "IP";
-    private final static String USER = "USER";
-    private final static String GROUP = "GROUP";
-    private final static String APP = "APP";
-    private final static String JOBID = "JOBID";
-    private final static String OPERATION = "OPERATION";
-    private final static String PARAMETER = "PARAMETER";
-    private final static String STATUS = "STATUS";
-    private final static String HTTPCODE = "HTTPCODE";
-    private final static String ERRORCODE = "ERRORCODE";
-    private final static String ERRORMESSAGE = "ERRORMESSAGE";
+    private static final String IP = "IP";
+    private static final String USER = "USER";
+    private static final String GROUP = "GROUP";
+    private static final String APP = "APP";
+    private static final String JOBID = "JOBID";
+    private static final String OPERATION = "OPERATION";
+    private static final String PARAMETER = "PARAMETER";
+    private static final String STATUS = "STATUS";
+    private static final String HTTPCODE = "HTTPCODE";
+    private static final String ERRORCODE = "ERRORCODE";
+    private static final String ERRORMESSAGE = "ERRORMESSAGE";
     private static final Pattern LOG_PATTERN = constructPattern();
 
     public OozieAuditLogObject parse(String logLine) throws Exception {

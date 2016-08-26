@@ -332,9 +332,9 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
             spoutConfig.zkPort = utils.getZkPort();
         }
         // transaction update interval
-        spoutConfig.stateUpdateIntervalMs = config.getLong("spout.stormKafkaStateUpdateIntervalMs");
+        spoutConfig.stateUpdateIntervalMs = config.hasPath("spout.stormKafkaStateUpdateIntervalMs") ? config.getInt("spout.stormKafkaStateUpdateIntervalMs") : 2000;
         // Kafka fetch size
-        spoutConfig.fetchSizeBytes = config.getInt("spout.stormKafkaFetchSizeBytes");
+        spoutConfig.fetchSizeBytes = config.hasPath("spout.stormKafkaFetchSizeBytes") ? config.getInt("spout.stormKafkaFetchSizeBytes") : 1048586;
         // "startOffsetTime" is for test usage, prod should not use this
         if (config.hasPath("spout.stormKafkaStartOffsetTime")) {
             spoutConfig.startOffsetTime = config.getInt("spout.stormKafkaStartOffsetTime");

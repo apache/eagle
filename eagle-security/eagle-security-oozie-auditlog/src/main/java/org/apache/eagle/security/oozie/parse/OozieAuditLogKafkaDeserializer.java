@@ -17,7 +17,6 @@
  */
 package org.apache.eagle.security.oozie.parse;
 
-
 import org.apache.eagle.dataproc.impl.storm.kafka.SpoutKafkaMessageDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ public class OozieAuditLogKafkaDeserializer implements SpoutKafkaMessageDeserial
     private static Logger LOG = LoggerFactory.getLogger(OozieAuditLogKafkaDeserializer.class);
     private Properties props;
 
-    public OozieAuditLogKafkaDeserializer(Properties props){
+    public OozieAuditLogKafkaDeserializer(Properties props) {
         this.props = props;
     }
 
@@ -41,12 +40,12 @@ public class OozieAuditLogKafkaDeserializer implements SpoutKafkaMessageDeserial
 
         OozieAuditLogParser parser = new OozieAuditLogParser();
         OozieAuditLogObject entity = null;
-        try{
+        try {
             entity = parser.parse(logLine);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("Failing oozie parse audit log message", ex);
         }
-        if(entity == null){
+        if (entity == null) {
             LOG.warn("Event ignored as it can't be correctly parsed, the log is ", logLine);
             return null;
         }

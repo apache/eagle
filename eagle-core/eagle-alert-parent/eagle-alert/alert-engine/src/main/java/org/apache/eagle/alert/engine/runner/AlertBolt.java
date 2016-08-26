@@ -115,8 +115,8 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
                         specVersion.contains("spec_version_") && stream_event_version.contains("spec_version_")){
 //                    Long timestamp_of_specVersion = Long.valueOf(specVersion.split("spec_version_")[1]);
 //                    Long timestamp_of_streamEventVersion = Long.valueOf(stream_event_version.split("spec_version_")[1]);
-                    Long timestamp_of_specVersion = Long.valueOf(specVersion.substring(13));
-                    Long timestamp_of_streamEventVersion = Long.valueOf(stream_event_version.substring(13));
+                    long timestamp_of_specVersion = Long.valueOf(specVersion.substring(13));
+                    long timestamp_of_streamEventVersion = Long.valueOf(stream_event_version.substring(13));
                     specVersionOutofdate = timestamp_of_specVersion < timestamp_of_streamEventVersion;
                     if (!specVersionOutofdate){
                         pe.getEvent().setMetaVersion(specVersion);

@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class OozieResourceSensitivityDataJoiner {
 
-    private final static Logger LOG = LoggerFactory.getLogger(OozieResourceSensitivityDataJoiner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OozieResourceSensitivityDataJoiner.class);
 
     public List<OozieResourceEntity> joinOozieResourceSensitivity(String site, List<CoordinatorJob> coordinatorJobs) {
 

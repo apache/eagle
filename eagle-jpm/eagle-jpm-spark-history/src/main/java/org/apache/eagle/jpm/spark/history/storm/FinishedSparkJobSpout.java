@@ -19,26 +19,24 @@
 
 package org.apache.eagle.jpm.spark.history.storm;
 
+import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
+import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
+import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.resourcefetch.RMResourceFetcher;
+import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
+import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
-import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
-import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
-import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.jpm.util.resourceFetch.RMResourceFetcher;
-import org.apache.eagle.jpm.util.resourceFetch.ResourceFetcher;
-import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class FinishedSparkJobSpout extends BaseRichSpout {
@@ -52,7 +50,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
 
     private static final int FAIL_MAX_TIMES = 5;
 
-    public FinishedSparkJobSpout(SparkHistoryCrawlConfig config){
+    public FinishedSparkJobSpout(SparkHistoryCrawlConfig config) {
         this.config = config;
     }
 
@@ -78,11 +76,13 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
             if (fetchTime - this.lastFinishAppTime > this.config.stormConfig.spoutCrawlInterval) {
                 List<AppInfo> appInfos = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, Long.toString(lastFinishAppTime));
                 //List<AppInfo> appInfos = (null != apps ? (List<AppInfo>)apps.get(0):new ArrayList<AppInfo>());
-                LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
-                for (AppInfo app: appInfos) {
-                    String appId = app.getId();
-                    if (!zkState.hasApplication(appId)) {
-                        zkState.addFinishedApplication(appId, app.getQueue(), app.getState(), app.getFinalStatus(), app.getUser(), app.getName());
+                if (appInfos != null) {
+                    LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
+                    for (AppInfo app : appInfos) {
+                        String appId = app.getId();
+                        if (!zkState.hasApplication(appId)) {
+                            zkState.addFinishedApplication(appId, app.getQueue(), app.getState(), app.getFinalStatus(), app.getUser(), app.getName());
+                        }
                     }
                 }
                 this.lastFinishAppTime = fetchTime;
@@ -102,15 +102,14 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
             }
         } catch (Exception e) {
             LOG.error("Fail to run next tuple", e);
-           // this.takeRest(10);
         }
-
     }
 
     private void takeRest(int seconds) {
         try {
             Thread.sleep(seconds * 1000);
-        } catch(InterruptedException e) {
+        } catch (InterruptedException e) {
+            LOG.warn("exception found {}", e);
         }
     }
 

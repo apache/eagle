@@ -21,9 +21,9 @@ import java.io.InputStream;
 
 public interface JHFParserBase {
     /**
-     * this method will ensure to close the inputstream
+     * this method will ensure to close the inputStream.
      * @param is
      * @throws Exception
      */
-    public void parse(InputStream is) throws Exception;
+    void parse(InputStream is) throws Exception;
 }

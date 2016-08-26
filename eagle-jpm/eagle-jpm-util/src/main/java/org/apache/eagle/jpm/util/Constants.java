@@ -21,21 +21,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Constants {
-    private final static Logger LOG = LoggerFactory.getLogger(Constants.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Constants.class);
 
     public static final String GENERIC_METRIC_SERVICE = "GenericMetricService";
 
     //SPARK
-    public final static String SPARK_APP_SERVICE_ENDPOINT_NAME = "SparkAppService";
-    public final static String SPARK_JOB_SERVICE_ENDPOINT_NAME = "SparkJobService";
-    public final static String SPARK_STAGE_SERVICE_ENDPOINT_NAME = "SparkStageService";
-    public final static String SPARK_TASK_SERVICE_ENDPOINT_NAME = "SparkTaskService";
-    public final static String SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "SparkExecutorService";
-    public final static String RUNNING_SPARK_APP_SERVICE_ENDPOINT_NAME = "RunningSparkAppService";
-    public final static String RUNNING_SPARK_JOB_SERVICE_ENDPOINT_NAME = "RunningSparkJobService";
-    public final static String RUNNING_SPARK_STAGE_SERVICE_ENDPOINT_NAME = "RunningSparkStageService";
-    public final static String RUNNING_SPARK_TASK_SERVICE_ENDPOINT_NAME = "RunningSparkTaskService";
-    public final static String RUNNING_SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "RunningSparkExecutorService";
+    public static final String SPARK_APP_SERVICE_ENDPOINT_NAME = "SparkAppService";
+    public static final String SPARK_JOB_SERVICE_ENDPOINT_NAME = "SparkJobService";
+    public static final String SPARK_STAGE_SERVICE_ENDPOINT_NAME = "SparkStageService";
+    public static final String SPARK_TASK_SERVICE_ENDPOINT_NAME = "SparkTaskService";
+    public static final String SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "SparkExecutorService";
+    public static final String RUNNING_SPARK_APP_SERVICE_ENDPOINT_NAME = "RunningSparkAppService";
+    public static final String RUNNING_SPARK_JOB_SERVICE_ENDPOINT_NAME = "RunningSparkJobService";
+    public static final String RUNNING_SPARK_STAGE_SERVICE_ENDPOINT_NAME = "RunningSparkStageService";
+    public static final String RUNNING_SPARK_TASK_SERVICE_ENDPOINT_NAME = "RunningSparkTaskService";
+    public static final String RUNNING_SPARK_EXECUTOR_SERVICE_ENDPOINT_NAME = "RunningSparkExecutorService";
     public static final String APPLICATION_PREFIX = "application";
     public static final String JOB_PREFIX = "job";
     public static final String V2_APPS_URL = "ws/v1/cluster/apps";
@@ -55,7 +55,7 @@ public class Constants {
     public static final String SPARK_YARN_DRIVER_MEMORY_OVERHEAD_KEY = "spark.yarn.driver.memoryOverhead";
     public static final String SPARK_YARN_am_MEMORY_OVERHEAD_KEY = "spark.yarn.am.memoryOverhead";
 
-    public static final String SPARK_APPS_URL ="api/v1/applications";
+    public static final String SPARK_APPS_URL = "api/v1/applications";
     public static final String SPARK_EXECUTORS_URL = "executors";
     public static final String SPARK_JOBS_URL = "jobs";
     public static final String SPARK_STAGES_URL = "stages";
@@ -70,21 +70,27 @@ public class Constants {
     public enum CompressionType {
         GZIP, NONE
     }
+
     public enum JobState {
         NEW, INITED, RUNNING, SUCCEEDED, FAILED, KILL_WAIT, KILLED, ERROR, FINISHED, ALL
     }
+
     public enum TaskState {
         NEW, SCHEDULED, RUNNING, SUCCEEDED, FAILED, KILL_WAIT, KILLED
     }
+
     public enum StageState {
         ACTIVE, COMPLETE, PENDING
     }
+
     public enum AppState {
         NEW, NEW_SAVING, SUBMITTED, ACCEPTED, RUNNING, FINISHED, FAILED, KILLED
     }
+
     public enum AppStatus {
         UNDEFINED, SUCCEEDED, FAILED, KILLED
     }
+
     public enum ResourceType {
         COMPLETE_SPARK_JOB, SPARK_JOB_DETAIL, RUNNING_SPARK_JOB, RUNNING_MR_JOB, CLUSTER_INFO, JOB_CONFIGURATION,
         COMPLETE_MR_JOB
@@ -119,7 +125,7 @@ public class Constants {
     public static final String HIVE_QUERY_STRING = "hive.query.string";
 
     /**
-     * MR task types
+     * MR task types.
      */
     public enum TaskType {
         SETUP, MAP, REDUCE, CLEANUP
@@ -130,9 +136,10 @@ public class Constants {
         NOTAVALIABLE("N/A")
         ;
         private String value;
-        JobType(String value){
+        JobType(String value) {
             this.value = value;
         }
+
         @Override
         public String toString() {
             return this.value;

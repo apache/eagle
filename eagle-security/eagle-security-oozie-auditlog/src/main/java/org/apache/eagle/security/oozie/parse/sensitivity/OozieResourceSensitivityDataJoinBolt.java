@@ -17,17 +17,14 @@
  */
 package org.apache.eagle.security.oozie.parse.sensitivity;
 
+import org.apache.eagle.security.enrich.AbstractDataEnrichBolt;
+import org.apache.eagle.security.entity.OozieResourceSensitivityAPIEntity;
+
 import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
-import org.apache.eagle.security.enrich.AbstractDataEnrichBolt;
-import org.apache.eagle.security.entity.OozieResourceSensitivityAPIEntity;
-import org.apache.eagle.security.enrich.ExternalDataCache;
-import org.apache.eagle.security.enrich.ExternalDataJoiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,11 +34,11 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public class OozieResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt<OozieResourceSensitivityAPIEntity, String> {
-    private final static Logger LOG = LoggerFactory.getLogger(OozieResourceSensitivityDataJoinBolt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OozieResourceSensitivityDataJoinBolt.class);
     private Config config;
     private OutputCollector collector;
 
-    public OozieResourceSensitivityDataJoinBolt(Config config){
+    public OozieResourceSensitivityDataJoinBolt(Config config) {
         super(config, new OozieSensitivityDataEnrichLCM(config));
     }
 
@@ -72,9 +69,9 @@ public class OozieResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt
             }
             LOG.info("After oozie resource sensitivity lookup: " + newEvent);
             collector.emit(Arrays.asList(newEvent.get("user"), newEvent));
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error join external sensitivity data", ex);
-        }finally {
+        } finally {
             collector.ack(input);
         }
     }

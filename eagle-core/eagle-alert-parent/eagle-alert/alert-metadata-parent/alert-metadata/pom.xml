@@ -11,57 +11,57 @@
 	~ * See the License for the specific language governing permissions and ~ 
 	* limitations under the License. ~ */ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.apache.eagle</groupId>
-		<artifactId>alert-metadata-parent</artifactId>
-		<version>0.5.0-incubating-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>org.apache.eagle</groupId>
+        <artifactId>alert-metadata-parent</artifactId>
+        <version>0.5.0-incubating-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>alert-metadata</artifactId>
-	<packaging>jar</packaging>
+    <artifactId>alert-metadata</artifactId>
+    <packaging>jar</packaging>
 
-	<dependencies>
-		<!-- Storm depends on org.ow2.asm:asm:4.0 -->
-		<!-- Jersey depends on asm:asm:3.0 -->
+    <dependencies>
+        <!-- Storm depends on org.ow2.asm:asm:4.0 -->
+        <!-- Jersey depends on asm:asm:3.0 -->
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>alert-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>${mongodb.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql-connector-java.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.ddlutils</groupId>
-			<artifactId>ddlutils</artifactId>
-			<version>${ddlutils.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>de.flapdoodle.embed</groupId>
-			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<version>1.50.5</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.inject</groupId>
-			<artifactId>guice</artifactId>
-			<version>3.0</version>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>alert-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>${mongodb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ddlutils</groupId>
+            <artifactId>ddlutils</artifactId>
+            <version>${ddlutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>1.50.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0</version>
+        </dependency>
+    </dependencies>
 </project>

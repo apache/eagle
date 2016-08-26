@@ -18,8 +18,6 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
-/**
- */
 public class ImportException extends RuntimeException {
     private static final long serialVersionUID = -706778307046285820L;
 

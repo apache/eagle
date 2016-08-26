@@ -22,13 +22,12 @@ import org.apache.eagle.jpm.mr.historyentity.JobBaseAPIEntity;
 
 public interface HistoryJobEntityLifecycleListener extends HistoryJobEntityCreationListener {
     /**
-     * job entity created event
-     * @param entity
+     * job entity created event.
      */
     void jobEntityCreated(JobBaseAPIEntity entity) throws Exception;
 
     /**
-     * Job finished
+     * Job finished.
      */
     void jobFinish();
 }

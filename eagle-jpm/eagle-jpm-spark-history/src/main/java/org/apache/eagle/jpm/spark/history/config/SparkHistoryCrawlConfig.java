@@ -25,7 +25,7 @@ import com.typesafe.config.ConfigFactory;
 
 import java.io.Serializable;
 
-public class SparkHistoryCrawlConfig implements Serializable{
+public class SparkHistoryCrawlConfig implements Serializable {
     public ZKStateConfig zkStateConfig;
     public JobHistoryEndpointConfig jobHistoryConfig;
     public HDFSConfig hdfsConfig;
@@ -34,6 +34,7 @@ public class SparkHistoryCrawlConfig implements Serializable{
     public StormConfig stormConfig;
 
     private Config config;
+    
     public Config getConfig() {
         return config;
     }

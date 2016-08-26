@@ -30,7 +30,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 public class OozieResourceSensitivityAPIEntity extends TaggedLogAPIEntity {
     private static final long serialVersionUID = 2L;
     /**
-     * sensitivityType can be multi-value attribute, and values can be separated by "|"
+     * sensitivityType can be multi-value attribute, and values can be separated by "|".
      */
     @Column("a")
     private String sensitivityType;

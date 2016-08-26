@@ -19,9 +19,9 @@
 package org.apache.eagle.jpm.mr.history.parser;
 
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
+import org.apache.eagle.jpm.mr.history.parser.JHFMRVer1Parser.Keys;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
-import org.apache.eagle.jpm.mr.history.parser.JHFMRVer1Parser.Keys;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.CounterGroup;
@@ -37,16 +37,15 @@ import java.util.Map;
 
 /**
  * Listener holds all informations related to one whole job history file, so it's stateful and does not support multithreading.
- * @author yonzhang
- *
  */
 public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer1PerLineListener {
     private static final Logger logger = LoggerFactory.getLogger(JHFMRVer1EventReader.class);
 
     /**
-     * baseTags stores the basic tag name values which might be used for persisting various entities
+     * baseTags stores the basic tag name values which might be used for persisting various entities.
      * baseTags includes: cluster, datacenter and jobName
      * baseTags are used for all job/task related entities
+     *
      * @param baseTags
      */
     public JHFMRVer1EventReader(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter) {
@@ -55,7 +54,7 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
 
     @Override
     public void handle(RecordTypes recType, Map<Keys, String> values)
-          throws Exception {
+        throws Exception {
         switch (recType) {
             case Job:
                 handleJob(null, values, values.get(Keys.COUNTERS));
@@ -76,11 +75,12 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
                 ;
         }
     }
-     
+
     private void ensureRackHostnameAfterAttemptFinish(Map<Keys, String> values) {
         // only care about attempt finish
-        if (values.get(Keys.FINISH_TIME) == null)
+        if (values.get(Keys.FINISH_TIME) == null) {
             return;
+        }
         String hostname = null;
         String rack = null;
         // we get rack/hostname based on task's status
@@ -91,25 +91,25 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
             String[] tmp = decoratedHostname.split("/");
             hostname = tmp[tmp.length - 1];
             rack = tmp[tmp.length - 2];
-            m_host2RackMapping.put(hostname, rack);
-        } else if(values.get(Keys.TASK_STATUS).equals(EagleTaskStatus.KILLED.name()) || values.get(Keys.TASK_STATUS).equals(EagleTaskStatus.FAILED.name())) {
+            host2RackMapping.put(hostname, rack);
+        } else if (values.get(Keys.TASK_STATUS).equals(EagleTaskStatus.KILLED.name()) || values.get(Keys.TASK_STATUS).equals(EagleTaskStatus.FAILED.name())) {
             hostname = values.get(Keys.HOSTNAME);
             // make every effort to get RACK information
             hostname = (hostname == null) ? "" : hostname;
-            rack = m_host2RackMapping.get(hostname);
+            rack = host2RackMapping.get(hostname);
         }
-          
+
         values.put(Keys.HOSTNAME, hostname);
         values.put(Keys.RACK, rack);
     }
-    
+
     @Override
     protected JobCounters parseCounters(Object value) throws IOException {
         JobCounters jc = new JobCounters();
         Map<String, Map<String, Long>> groups = new HashMap<String, Map<String, Long>>();
-        Counters counters = new Counters(); 
+        Counters counters = new Counters();
         try {
-            CountersStrings.parseEscapedCompactString((String)value, counters);
+            CountersStrings.parseEscapedCompactString((String) value, counters);
         } catch (Exception ex) {
             logger.error("can not parse job history", ex);
             throw new IOException(ex);
@@ -118,7 +118,7 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
         while (it.hasNext()) {
             CounterGroup cg = it.next();
 
-           // hardcoded to exclude business level counters
+            // hardcoded to exclude business level counters
             if (!cg.getName().equals("org.apache.hadoop.mapreduce.FileSystemCounter")
                 && !cg.getName().equals("org.apache.hadoop.mapreduce.TaskCounter")
                 && !cg.getName().equals("org.apache.hadoop.mapreduce.JobCounter")
@@ -128,7 +128,9 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
                 && !cg.getName().equals("org.apache.hadoop.mapred.Task$Counter")                   // for artemis
                 && !cg.getName().equals("org.apache.hadoop.mapreduce.lib.input.FileInputFormat$Counter")  // for artemis
                 && !cg.getName().equals("org.apache.hadoop.mapreduce.lib.input.FileOutputFormat$Counter")
-            ) continue;
+                ) {
+                continue;
+            }
 
             groups.put(cg.getName(), new HashMap<String, Long>());
             Map<String, Long> counterValues = groups.get(cg.getName());
@@ -143,8 +145,8 @@ public class JHFMRVer1EventReader extends JHFEventReaderBase implements JHFMRVer
         jc.setCounters(groups);
         return jc;
     }
-    
+
     public JobExecutionAPIEntity jobExecution() {
-        return m_jobExecutionEntity;
+        return jobExecutionEntity;
     }
 }

@@ -32,8 +32,9 @@ public class JobConfig implements Serializable {
     public void setConfig(Map<String, String> config) {
         this.config = config;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         return config.toString();
     }
 }

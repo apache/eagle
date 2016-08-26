@@ -17,9 +17,11 @@
 
 package org.apache.eagle.security.oozie.parse.sensitivity;
 
-import com.typesafe.config.Config;
+
 import org.apache.eagle.security.enrich.AbstractDataEnrichLCM;
 import org.apache.eagle.security.service.ISecurityDataEnrichServiceClient;
+
+import com.typesafe.config.Config;
 
 import java.util.Collection;
 
@@ -27,9 +29,10 @@ import java.util.Collection;
  * Since 8/16/16.
  */
 public class OozieSensitivityDataEnrichLCM extends AbstractDataEnrichLCM {
-    public OozieSensitivityDataEnrichLCM(Config config){
+    public OozieSensitivityDataEnrichLCM(Config config) {
         super(config);
     }
+
     @Override
     protected Collection loadFromService(ISecurityDataEnrichServiceClient client) {
         return null;

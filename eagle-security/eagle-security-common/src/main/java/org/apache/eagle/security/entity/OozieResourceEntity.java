@@ -32,7 +32,7 @@ public class OozieResourceEntity implements Serializable {
     }
 
     public OozieResourceEntity(String jobId, String name) {
-        this(jobId,name,null);
+        this(jobId, name, null);
     }
 
     public String getJobId() {
@@ -72,11 +72,11 @@ public class OozieResourceEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "OozieResourceEntity{" +
-                "jobId='" + jobId + '\'' +
-                ", name='" + name + '\'' +
-                ", sensitiveType='" + sensitiveType + '\'' +
-                '}';
+        return "OozieResourceEntity{"
+                + "jobId='" + jobId + '\''
+                + ", name='" + name + '\''
+                + ", sensitiveType='" + sensitiveType + '\''
+                + '}';
     }
 }
 

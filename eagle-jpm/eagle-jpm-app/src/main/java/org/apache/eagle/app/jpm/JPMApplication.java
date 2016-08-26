@@ -16,6 +16,9 @@
  */
 package org.apache.eagle.app.jpm;
 
+import org.apache.eagle.app.StormApplication;
+import org.apache.eagle.app.environment.impl.StormEnvironment;
+
 import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -24,8 +27,6 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.StormApplication;
-import org.apache.eagle.app.environment.impl.StormEnvironment;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -41,16 +42,16 @@ public class JPMApplication extends StormApplication {
     }
 
     private class RandomEventSpout extends BaseRichSpout {
-        private SpoutOutputCollector _collector;
+        private SpoutOutputCollector collector;
         @Override
         public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
-            _collector = spoutOutputCollector;
+            collector = spoutOutputCollector;
         }
 
         @Override
         public void nextTuple() {
-            _collector.emit(Arrays.asList("disk.usage",System.currentTimeMillis(),"host_1",56.7));
-            _collector.emit(Arrays.asList("cpu.usage",System.currentTimeMillis(),"host_2",99.8));
+            collector.emit(Arrays.asList("disk.usage",System.currentTimeMillis(),"host_1",56.7));
+            collector.emit(Arrays.asList("cpu.usage",System.currentTimeMillis(),"host_2",99.8));
         }
 
         @Override

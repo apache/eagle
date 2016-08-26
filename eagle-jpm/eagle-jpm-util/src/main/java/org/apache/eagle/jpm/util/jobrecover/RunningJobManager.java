@@ -18,11 +18,11 @@
 
 package org.apache.eagle.jpm.util.jobrecover;
 
+import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
-import org.apache.eagle.jpm.util.resourceFetch.model.AppInfo;
 import org.apache.zookeeper.CreateMode;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -36,9 +36,9 @@ public class RunningJobManager implements Serializable {
     public static final Logger LOG = LoggerFactory.getLogger(RunningJobManager.class);
     private String zkRoot;
     private CuratorFramework curator;
-    private final static String ENTITY_TAGS_KEY = "entityTags";
-    private final static String APP_INFO_KEY = "appInfo";
-    private final static String ZNODE_LAST_FINISH_TIME = "lastFinishTime";
+    private static final String ENTITY_TAGS_KEY = "entityTags";
+    private static final String APP_INFO_KEY = "appInfo";
+    private static final String ZNODE_LAST_FINISH_TIME = "lastFinishTime";
 
     private CuratorFramework newCurator(String zkQuorum, int zkSessionTimeoutMs, int zkRetryTimes, int zkRetryInterval) throws Exception {
         return CuratorFrameworkFactory.newClient(
@@ -62,6 +62,7 @@ public class RunningJobManager implements Serializable {
                         .forPath(this.zkRoot);
             }
         } catch (Exception e) {
+            LOG.warn("{}", e);
         }
     }
 
@@ -85,7 +86,6 @@ public class RunningJobManager implements Serializable {
             }
             JSONObject object = new JSONObject(fields);
             Map<String, Map<String, String>> parseResult = parse(object);
-            Map<String, String> tags = parseResult.get(ENTITY_TAGS_KEY);
 
             Map<String, String> appInfoMap = parseResult.get(APP_INFO_KEY);
             AppInfo appInfo = new AppInfo();
@@ -110,6 +110,7 @@ public class RunningJobManager implements Serializable {
             appInfo.setAllocatedVCores(Integer.parseInt(appInfoMap.get("allocatedVCores")));
             appInfo.setRunningContainers(Integer.parseInt(appInfoMap.get("runningContainers")));
 
+            Map<String, String> tags = parseResult.get(ENTITY_TAGS_KEY);
             result.put(jobId, Pair.of(tags, appInfo));
         }
         return result;
@@ -142,7 +143,6 @@ public class RunningJobManager implements Serializable {
     public boolean update(String yarnAppId, String jobId, Map<String, String> tags, AppInfo app) {
         String path = this.zkRoot + "/" + yarnAppId + "/" + jobId;
         //InterProcessMutex lock = new InterProcessMutex(curator, path);
-        Map<String, String> fields = new HashMap<>();
         Map<String, String> appInfo = new HashMap<>();
         appInfo.put("id", app.getId());
         appInfo.put("user", app.getUser());
@@ -165,6 +165,7 @@ public class RunningJobManager implements Serializable {
         appInfo.put("allocatedVCores", app.getAllocatedVCores() + "");
         appInfo.put("runningContainers", app.getRunningContainers() + "");
 
+        Map<String, String> fields = new HashMap<>();
         fields.put(ENTITY_TAGS_KEY, (new JSONObject(tags)).toString());
         fields.put(APP_INFO_KEY, (new JSONObject(appInfo)).toString());
         try {
@@ -198,7 +199,8 @@ public class RunningJobManager implements Serializable {
             if (curator.checkExists().forPath(path) != null) {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
                 LOG.info("delete job {} for yarn app {}, path {} ", jobId, yarnAppId, path);
-                if (curator.getChildren().forPath(path).size() == 0) {
+                String yarnPath = this.zkRoot + "/" + yarnAppId;
+                if (curator.getChildren().forPath(yarnPath).size() == 0) {
                     delete(yarnAppId);
                 }
             }
@@ -262,7 +264,7 @@ public class RunningJobManager implements Serializable {
             LOG.error("failed to recover last finish time {}", e);
         }
 
-        return 0l;
+        return 0L;
     }
 
     public void updateLastFinishTime(int partitionId, Long lastFinishTime) {

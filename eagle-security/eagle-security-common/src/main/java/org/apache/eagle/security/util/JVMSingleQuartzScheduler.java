@@ -25,27 +25,27 @@ import org.slf4j.LoggerFactory;
  * Quartz scheduler is created not thread safe, so a singleton has to be there if we want a JVM level single scheduler
  */
 public class JVMSingleQuartzScheduler {
-	private static final Logger LOG = LoggerFactory.getLogger(JVMSingleQuartzScheduler.class);
-	
-	private static JVMSingleQuartzScheduler instance = new JVMSingleQuartzScheduler();
-	private Scheduler sched;
-	
-	public static JVMSingleQuartzScheduler getInstance(){
-		return instance;
-	}
-	
-	private JVMSingleQuartzScheduler(){
-		try{
-			SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory(); 
-			sched = schedFact.getScheduler(); 
-			sched.start();
-		}catch(Exception ex){
-			LOG.error("Fail starting quartz scheduler", ex);
-			throw new IllegalStateException(ex);
-		}
-	}
-	
-	public Scheduler getScheduler(){
-		return sched;
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(JVMSingleQuartzScheduler.class);
+
+    private static JVMSingleQuartzScheduler instance = new JVMSingleQuartzScheduler();
+    private Scheduler sched;
+
+    public static JVMSingleQuartzScheduler getInstance() {
+        return instance;
+    }
+
+    private JVMSingleQuartzScheduler() {
+        try {
+            SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
+            sched = schedFact.getScheduler();
+            sched.start();
+        } catch (Exception ex) {
+            LOG.error("Fail starting quartz scheduler", ex);
+            throw new IllegalStateException(ex);
+        }
+    }
+
+    public Scheduler getScheduler() {
+        return sched;
+    }
 }

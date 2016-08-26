@@ -117,7 +117,7 @@
         <property>
             <name>dataSinkConfig.topic</name>
             <displayName>dataSinkConfig.topic</displayName>
-            <value>hdfs_audit_log_parsed</value>
+            <value>hdfs_audit_log_enriched</value>
             <description>topic for kafka data sink</description>
         </property>
         <property>
@@ -149,13 +149,17 @@
     </configuration>
     <streams>
         <stream>
-            <streamId>hdfs_audit_log_stream</streamId>
-            <description>Hdfs Audit Log Stream</description>
+            <streamId>hdfs_audit_log_enriched_stream</streamId>
+            <description>Hdfs Audit Log Enriched Stream</description>
             <validate>true</validate>
             <timeseries>true</timeseries>
             <columns>
                 <column>
-                    <name>action</name>
+                    <name>src</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>dst</name>
                     <type>string</type>
                 </column>
                 <column>
@@ -163,12 +167,28 @@
                     <type>string</type>
                 </column>
                 <column>
-                    <name>status</name>
+                    <name>timestamp</name>
+                    <type>long</type>
+                </column>
+                <column>
+                    <name>allowed</name>
+                    <type>bool</type>
+                </column>
+                <column>
+                    <name>user</name>
                     <type>string</type>
                 </column>
                 <column>
-                    <name>timestamp</name>
-                    <type>long</type>
+                    <name>cmd</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>sensitivityType</name>
+                    <type>string</type>
+                </column>
+                <column>
+                    <name>securityZone</name>
+                    <type>string</type>
                 </column>
             </columns>
         </stream>

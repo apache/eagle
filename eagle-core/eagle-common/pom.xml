@@ -16,76 +16,77 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.apache.eagle</groupId>
-		<artifactId>eagle-core</artifactId>
-		<version>0.5.0-incubating-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.apache.eagle</groupId>
+        <artifactId>eagle-core</artifactId>
+        <version>0.5.0-incubating-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-	<artifactId>eagle-common</artifactId>
-	<packaging>jar</packaging>
-	<name>eagle-common</name>
+    <artifactId>eagle-common</artifactId>
+    <packaging>jar</packaging>
+    <name>eagle-common</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.wso2.siddhi</groupId>
-			<artifactId>siddhi-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hbase</groupId>
-			<artifactId>hbase-client</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.netflix.archaius</groupId>
-			<artifactId>archaius-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty-util</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.netflix.archaius</groupId>
+            <artifactId>archaius-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
         </dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
 

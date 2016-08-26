@@ -21,43 +21,43 @@ package org.apache.eagle.hadoop.queue.model.scheduler;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
-	private String username;
-	private ResourcesUsed resourcesUsed;
-	private int numPendingApplications;
-	private int numActiveApplications;
+    private String username;
+    private ResourcesUsed resourcesUsed;
+    private int numPendingApplications;
+    private int numActiveApplications;
 
-	public String getUsername() {
-		return username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public ResourcesUsed getResourcesUsed() {
-		return resourcesUsed;
-	}
+    public ResourcesUsed getResourcesUsed() {
+        return resourcesUsed;
+    }
 
-	public void setResourcesUsed(ResourcesUsed resourcesUsed) {
-		this.resourcesUsed = resourcesUsed;
-	}
+    public void setResourcesUsed(ResourcesUsed resourcesUsed) {
+        this.resourcesUsed = resourcesUsed;
+    }
 
-	public int getNumPendingApplications() {
-		return numPendingApplications;
-	}
+    public int getNumPendingApplications() {
+        return numPendingApplications;
+    }
 
-	public void setNumPendingApplications(int numPendingApplications) {
-		this.numPendingApplications = numPendingApplications;
-	}
+    public void setNumPendingApplications(int numPendingApplications) {
+        this.numPendingApplications = numPendingApplications;
+    }
 
-	public int getNumActiveApplications() {
-		return numActiveApplications;
-	}
+    public int getNumActiveApplications() {
+        return numActiveApplications;
+    }
 
-	public void setNumActiveApplications(int numActiveApplications) {
-		this.numActiveApplications = numActiveApplications;
-	}
+    public void setNumActiveApplications(int numActiveApplications) {
+        this.numActiveApplications = numActiveApplications;
+    }
 }

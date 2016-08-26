@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<application>
+    <type>SPARK_HISTORY_JOB_APP</type>
+    <name>Spark History Job Monitoring</name>
+    <version>0.5.0-incubating</version>
+    <appClass>org.apache.eagle.jpm.mr.history.MRHistoryJobApplication</appClass>
+    <viewPath>/apps/jpm</viewPath>
+    <configuration>
+        <!-- org.apache.eagle.jpm.mr.history.MRHistoryJobConfig -->
+        <property>
+            <name>jobExtractorConfig.site</name>
+            <displayName>Site ID</displayName>
+            <value>sandbox</value>
+        </property>
+        <property>
+            <name>jobExtractorConfig.mrVersion</name>
+            <value>MRVer2</value>
+        </property>
+        <property>
+            <name>jobExtractorConfig.readTimeOutSeconds</name>
+            <displayName>zkPort</displayName>
+            <value>10</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkQuorum</name>
+            <value>sandbox.hortonworks.com:2181</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkPort</name>
+            <value>2181</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkSessionTimeoutMs</name>
+            <value>15000</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkRetryTimes</name>
+            <value>3</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkRetryInterval</name>
+            <value>20000</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.zkRoot</name>
+            <value>/test_mrjobhistory</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.basePath</name>
+            <value>/mr-history/done</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.jobTrackerName</name>
+            <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.nnEndpoint</name>
+            <value>hdfs://sandbox.hortonworks.com:8020</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.pathContainsJobTrackerName</name>
+            <value>false</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.principal</name>
+            <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.keytab</name>
+            <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.dryRun</name>
+            <value>false</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.partitionerCls</name>
+            <value>org.apache.eagle.jpm.util.DefaultJobIdPartitioner</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.zeroBasedMonth</name>
+            <value>false</value>
+        </property>
+        <property>
+            <name>MRConfigureKeys.jobConfigKey</name>
+            <value>mapreduce.map.output.compress,
+                mapreduce.map.output.compress.codec,
+                mapreduce.output.fileoutputformat.compress,
+                mapreduce.output.fileoutputformat.compress.type,
+                mapreduce.output.fileoutputformat.compress.codec,
+                mapred.output.format.class,
+                dataplatform.etl.info,
+                mapreduce.map.memory.mb,
+                mapreduce.reduce.memory.mb,
+                mapreduce.map.java.opts,
+                mapreduce.reduce.java.opts</value>
+        </property>
+        <property>
+            <name>MRConfigureKeys.jobNameKey</name>
+            <value>eagle.job.name</value>
+        </property>
+        <property>
+            <name>envContextConfig.parallelismConfig.mrHistoryJobExecutor</name>
+            <value>6</value>
+        </property>
+        <property>
+            <name>envContextConfig.tasks.mrHistoryJobExecutor</name>
+            <value>6</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.host</name>
+            <description>eagleProps.eagleService.host</description>
+            <value>sandbox.hortonworks.com</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.port</name>
+            <description>eagleProps.eagleService.port</description>
+            <value>9099</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.username</name>
+            <description>eagleProps.eagleService.username</description>
+            <value>admin</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.password</name>
+            <description>eagleProps.eagleService.password</description>
+            <value>secret</value>
+        </property>
+    </configuration>
+    <docs>
+        <install>
+        </install>
+        <uninstall>
+        </uninstall>
+    </docs>
+</application>

@@ -16,31 +16,28 @@
  */
 package org.apache.eagle.storage.hbase;
 
+import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.log.entity.meta.EntityDefinition;
+import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
+import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
+import org.apache.eagle.service.hbase.TestHBaseBase;
+import org.apache.eagle.storage.DataStorageManager;
+import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
+import org.apache.eagle.storage.operation.CreateStatement;
+import org.apache.eagle.storage.operation.QueryStatement;
+import org.apache.eagle.storage.operation.RawQuery;
+import org.apache.eagle.storage.result.ModifyResult;
+import org.apache.eagle.storage.result.QueryResult;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.eagle.log.entity.meta.EntityDefinition;
-import org.apache.eagle.log.entity.meta.EntityDefinitionManager;
-import org.apache.eagle.storage.operation.CreateStatement;
-
-import org.apache.eagle.storage.operation.QueryStatement;
-import org.junit.*;
-
-import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
-import org.apache.eagle.service.hbase.TestHBaseBase;
-import org.apache.eagle.storage.DataStorageManager;
-import org.apache.eagle.storage.exception.IllegalDataStorageTypeException;
-import org.apache.eagle.storage.operation.RawQuery;
-import org.apache.eagle.storage.result.ModifyResult;
-import org.apache.eagle.storage.result.QueryResult;
-import org.apache.eagle.common.DateTimeUtil;
-
-/**
- * @since 3/23/15
- */
-@Ignore
 public class TestHBaseStatement extends TestHBaseBase {
 
     EntityDefinition entityDefinition;
@@ -59,18 +56,20 @@ public class TestHBaseStatement extends TestHBaseBase {
 
     @Test
     public void testCreate() throws IllegalDataStorageTypeException, IOException {
-        List<TestTimeSeriesAPIEntity> entities = new ArrayList<TestTimeSeriesAPIEntity>();
+        final List<TestTimeSeriesAPIEntity> entities = new ArrayList<>();
         TestTimeSeriesAPIEntity entity = new TestTimeSeriesAPIEntity();
         entity.setField1(1);
         entity.setField2(2);
-        entity.setField3(10000000l);
-        entity.setField4(10000000l);
+        entity.setField3(10000000L);
+        entity.setField4(10000000L);
         entity.setField5(0.12345678);
-        entity.setTags(new HashMap<String, String>() {{
-            put("cluster", "test");
-            put("datacenter", "test");
-            put("name","unit.test.name");
-        }});
+        entity.setTags(new HashMap<String, String>() {
+            {
+                put("cluster", "test");
+                put("datacenter", "test");
+                put("name","unit.test.name");
+            }
+        });
 
         entities.add(entity);
 
@@ -93,7 +92,7 @@ public class TestHBaseStatement extends TestHBaseBase {
         query.setPageSize(Integer.MAX_VALUE);
         query.setFilterIfMissing(false);
         query.setStartTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(0));
-        query.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(System.currentTimeMillis()+25 * 3600 * 1000));
+        query.setEndTime(DateTimeUtil.millisecondsToHumanDateWithSeconds(System.currentTimeMillis() + 25 * 3600 * 1000));
         QueryStatement queryStatement = new QueryStatement(query);
         QueryResult<?> entityResult = queryStatement.execute(DataStorageManager.newDataStorage("hbase"));
         assert entityResult != null;
