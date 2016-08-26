@@ -49,11 +49,11 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     @Column("e")
     private int numTotalMaps;
     @Column("f")
-    private int mapsCompleted;
+    private int numFinishedMaps;
     @Column("g")
     private int numTotalReduces;
     @Column("h")
-    private int reducesCompleted;
+    private int numFinishedReduces;
     @Column("i")
     private double mapProgress;
     @Column("j")
@@ -176,13 +176,13 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
         valueChanged("numTotalMaps");
     }
 
-    public int getMapsCompleted() {
-        return mapsCompleted;
+    public int getNumFinishedMaps() {
+        return numFinishedMaps;
     }
 
-    public void setMapsCompleted(int mapsCompleted) {
-        this.mapsCompleted = mapsCompleted;
-        valueChanged("mapsCompleted");
+    public void setNumFinishedMaps(int numFinishedMaps) {
+        this.numFinishedMaps = numFinishedMaps;
+        valueChanged("numFinishedMaps");
     }
 
     public int getNumTotalReduces() {
@@ -194,13 +194,13 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
         valueChanged("numTotalReduces");
     }
 
-    public int getReducesCompleted() {
-        return reducesCompleted;
+    public int getNumFinishedReduces() {
+        return numFinishedReduces;
     }
 
-    public void setReducesCompleted(int reducesCompleted) {
-        this.reducesCompleted = reducesCompleted;
-        valueChanged("reducesCompleted");
+    public void setNumFinishedReduces(int numFinishedReduces) {
+        this.numFinishedReduces = numFinishedReduces;
+        valueChanged("numFinishedReduces");
     }
 
     public double getMapProgress() {

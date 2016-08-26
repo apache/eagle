@@ -212,9 +212,9 @@ public class MRJobParser implements Runnable {
             jobExecutionAPIEntity.setCurrentState(mrJob.getState());
             jobExecutionAPIEntity.setInternalState(mrJob.getState());
             jobExecutionAPIEntity.setNumTotalMaps(mrJob.getMapsTotal());
-            jobExecutionAPIEntity.setMapsCompleted(mrJob.getMapsCompleted());
+            jobExecutionAPIEntity.setNumFinishedMaps(mrJob.getMapsCompleted());
             jobExecutionAPIEntity.setNumTotalReduces(mrJob.getReducesTotal());
-            jobExecutionAPIEntity.setReducesCompleted(mrJob.getReducesCompleted());
+            jobExecutionAPIEntity.setNumFinishedReduces(mrJob.getReducesCompleted());
             jobExecutionAPIEntity.setMapProgress(mrJob.getMapProgress());
             jobExecutionAPIEntity.setReduceProgress(mrJob.getReduceProgress());
             jobExecutionAPIEntity.setMapsPending(mrJob.getMapsPending());
