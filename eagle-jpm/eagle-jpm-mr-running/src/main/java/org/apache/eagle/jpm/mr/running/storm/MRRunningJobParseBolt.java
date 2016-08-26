@@ -88,6 +88,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
             LOG.info("create application parser for {}", appInfo.getId());
         } else {
             applicationParser = runningMRParsers.get(appInfo.getId());
+            applicationParser.setAppInfo(appInfo);
         }
 
         Set<String> runningParserIds = new HashSet<>(runningMRParsers.keySet());
