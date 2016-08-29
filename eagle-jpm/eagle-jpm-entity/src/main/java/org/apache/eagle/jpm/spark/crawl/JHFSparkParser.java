@@ -50,7 +50,7 @@ public class JHFSparkParser implements JHFParserBase {
                     try {
                         this.eventReader.read(eventObj);
                     } catch (Exception e) {
-                        logger.error("Fail to read eventObj. Exception: " + e);
+                        e.printStackTrace();
                     }
                 }
             }

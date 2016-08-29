@@ -30,23 +30,24 @@ public class JSONUtils {
         }
 
         try {
-            return obj.get(field).toString();
+            return (String) obj.get(field);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public static int getInt(JSONObject obj, String field) {
+    public static int getInt(JSONObject obj, String field) throws JSONException {
         if (obj == null || StringUtils.isEmpty(field)) {
             return 0;
         }
-
+        Object object = obj.get(field);
         try {
-            return (int) obj.get(field);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return 0;
+            return object instanceof Number ? ((Number) object).intValue()
+                    : Integer.parseInt((String) object);
+        } catch (Exception e) {
+            throw new JSONException("JSONObject[" + field
+                    + "] is not an int.");
         }
     }
 

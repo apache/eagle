@@ -34,7 +34,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class SparkTask extends TaggedLogAPIEntity {
 
     @Column("a")
-    private int taskId;
+    private long taskId;
     @Column("b")
     private long launchTime;
     @Column("c")
@@ -80,7 +80,7 @@ public class SparkTask extends TaggedLogAPIEntity {
     @Column("v")
     private boolean failed;
 
-    public int getTaskId() {
+    public long getTaskId() {
         return taskId;
     }
 
@@ -177,7 +177,7 @@ public class SparkTask extends TaggedLogAPIEntity {
         valueChanged("failed");
     }
 
-    public void setTaskId(int taskId) {
+    public void setTaskId(long taskId) {
         this.taskId = taskId;
         valueChanged("taskId");
     }
