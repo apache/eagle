@@ -14,13 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.jpm.spark.running;
 
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
+import com.google.inject.Inject;
+import org.apache.eagle.app.test.ApplicationSimulator;
+import org.apache.eagle.app.test.ApplicationTestBase;
+import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppProvider;
+import org.junit.Test;
 
-public class SparkRunningJobAppProvider extends AbstractApplicationProvider<SparkRunningJobApp> {
-    @Override
-    public SparkRunningJobApp getApplication() {
-        return new SparkRunningJobApp();
+public class SparkHistoryJobAppProviderTest extends ApplicationTestBase {
+    @Inject
+    ApplicationSimulator simulator;
+
+    @Test
+    public void testRunWithProvider(){
+        simulator.start(SparkHistoryJobAppProvider.class);
     }
 }

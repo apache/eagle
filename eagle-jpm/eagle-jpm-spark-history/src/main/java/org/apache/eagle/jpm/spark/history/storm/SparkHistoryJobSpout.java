@@ -19,7 +19,7 @@
 
 package org.apache.eagle.jpm.spark.history.storm;
 
-import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
+import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
 import org.apache.eagle.jpm.util.Constants;
@@ -39,18 +39,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FinishedSparkJobSpout extends BaseRichSpout {
-    private static final Logger LOG = LoggerFactory.getLogger(FinishedSparkJobSpout.class);
+public class SparkHistoryJobSpout extends BaseRichSpout {
+    private static final Logger LOG = LoggerFactory.getLogger(SparkHistoryJobSpout.class);
     private SpoutOutputCollector collector;
     private JobHistoryZKStateManager zkState;
-    private SparkHistoryCrawlConfig config;
+    private SparkHistoryJobAppConfig config;
     private ResourceFetcher rmFetch;
     private long lastFinishAppTime = 0;
     private Map<String, Integer> failTimes;
 
     private static final int FAIL_MAX_TIMES = 5;
 
-    public FinishedSparkJobSpout(SparkHistoryCrawlConfig config) {
+    public SparkHistoryJobSpout(SparkHistoryJobAppConfig config) {
         this.config = config;
     }
 
@@ -64,7 +64,7 @@ public class FinishedSparkJobSpout extends BaseRichSpout {
         zkState.resetApplications();
     }
 
-
+    @SuppressWarnings("unchecked")
     @Override
     public void nextTuple() {
         LOG.info("Start to run tuple");

@@ -20,7 +20,7 @@
 package org.apache.eagle.jpm.spark.history.status;
 
 import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
-import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
+import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.transaction.CuratorTransactionBridge;
@@ -40,7 +40,7 @@ public class JobHistoryZKStateManager {
     private CuratorFramework curator;
     private static String START_TIMESTAMP = "lastAppTime";
 
-    private CuratorFramework newCurator(SparkHistoryCrawlConfig config) throws Exception {
+    private CuratorFramework newCurator(SparkHistoryJobAppConfig config) throws Exception {
         return CuratorFrameworkFactory.newClient(
                 config.zkStateConfig.zkQuorum,
                 config.zkStateConfig.zkSessionTimeoutMs,
@@ -49,7 +49,7 @@ public class JobHistoryZKStateManager {
         );
     }
 
-    public JobHistoryZKStateManager(SparkHistoryCrawlConfig config) {
+    public JobHistoryZKStateManager(SparkHistoryJobAppConfig config) {
         this.zkRoot = config.zkStateConfig.zkRoot + "/" + config.info.site;
 
         try {

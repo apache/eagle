@@ -102,9 +102,9 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
                     datasource.setTopic(kafkaCfg.getTopicId());
                     datasource.setSchemeCls(JsonScheme.class.getCanonicalName());
                     Tuple2StreamMetadata tuple2Stream = new Tuple2StreamMetadata();
-                    Set<String> activeStreamNames = new HashSet<>();
-                    activeStreamNames.add(streamDesc.getSchema().getStreamId());
-                    tuple2Stream.setActiveStreamNames(activeStreamNames);
+                    Properties prop = new Properties();
+                    prop.put(JsonStringStreamNameSelector.USER_PROVIDED_STREAM_NAME_PROPERTY, streamDesc.getStreamId());
+                    tuple2Stream.setStreamNameSelectorProp(prop);
                     tuple2Stream.setTimestampColumn("timestamp");
                     tuple2Stream.setStreamNameSelectorCls(JsonStringStreamNameSelector.class.getCanonicalName());
                     datasource.setCodec(tuple2Stream);

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one or more
   ~ contributor license agreements.  See the NOTICE file distributed with
@@ -15,22 +15,21 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.apache.eagle</groupId>
-        <artifactId>eagle-core</artifactId>
-        <version>0.5.0-incubating-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-alert-parent</artifactId>
-    <packaging>pom</packaging>
-
-    <name>eagle-alert-parent</name>
-    <modules>
-        <module>eagle-alert</module>
-        <module>eagle-alert-service</module>
-    <module>eagle-alert-app</module>
-  </modules>
+    <version>0.5.0-incubating-SNAPSHOT</version>
+  </parent>
+  <artifactId>eagle-alert-app</artifactId>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.eagle</groupId>
+      <artifactId>eagle-app-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>
