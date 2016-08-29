@@ -52,7 +52,7 @@ public class ZookeeperEmbedded {
 
     public void shutdown() {
         try {
-            if (!zookeeper.getState().equals(CuratorFrameworkState.STOPPED)) {
+            if (zookeeper != null && !(CuratorFrameworkState.STOPPED).equals(zookeeper.getState())) {
                 zookeeper.close();
             }
 
