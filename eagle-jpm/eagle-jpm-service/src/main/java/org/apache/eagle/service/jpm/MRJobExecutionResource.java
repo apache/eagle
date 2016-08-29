@@ -65,14 +65,14 @@ public class MRJobExecutionResource {
         List<TaggedLogAPIEntity> jobs = new ArrayList<>();
         List<TaggedLogAPIEntity> finishedJobs = new ArrayList<>();
         Set<String> jobIds = new HashSet<>();
-        final Map<String,Object> meta = new HashMap<>();
+        final Map<String, Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
 
         stopWatch.start();
         String jobQuery = String.format(query, Constants.JPA_JOB_EXECUTION_SERVICE_NAME);
         GenericServiceAPIResponseEntity<TaggedLogAPIEntity> res =
-                resource.search(jobQuery, startTime, endTime, pageSize, startRowkey, treeAgg, timeSeries, intervalmin,
-                top,filterIfMissing, parallel, metricName, verbose);
+            resource.search(jobQuery, startTime, endTime, pageSize, startRowkey, treeAgg, timeSeries, intervalmin,
+                top, filterIfMissing, parallel, metricName, verbose);
         if (res.isSuccess() && res.getObj() != null) {
             for (TaggedLogAPIEntity o : res.getObj()) {
                 finishedJobs.add(o);
@@ -80,10 +80,10 @@ public class MRJobExecutionResource {
             }
             jobQuery = String.format(query, Constants.JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME);
             res = resource.search(jobQuery, startTime, endTime, pageSize, startRowkey, treeAgg, timeSeries, intervalmin,
-                    top,filterIfMissing, parallel, metricName, verbose);
+                top, filterIfMissing, parallel, metricName, verbose);
             if (res.isSuccess() && res.getObj() != null) {
                 for (TaggedLogAPIEntity o : res.getObj()) {
-                    if (! isDuplicate(jobIds, o)) {
+                    if (!isDuplicate(jobIds, o)) {
                         jobs.add(o);
                     }
                 }
@@ -98,7 +98,7 @@ public class MRJobExecutionResource {
             response.setException(new Exception(res.getException()));
         }
         meta.put(TOTAL_RESULTS, jobs.size());
-        meta.put(ELAPSEDMS,stopWatch.getTime());
+        meta.put(ELAPSEDMS, stopWatch.getTime());
         response.setObj(jobs);
         response.setMeta(meta);
         return response;
@@ -113,7 +113,7 @@ public class MRJobExecutionResource {
     }
 
     private String buildCondition(String jobId, String jobDefId, String site) {
-        String conditionFormat = "@site=\"%s\"" ;
+        String conditionFormat = "@site=\"%s\"";
         String condition = null;
         if (jobDefId != null) {
             conditionFormat = conditionFormat + " AND @jobDefId=\"%s\"";
@@ -150,12 +150,12 @@ public class MRJobExecutionResource {
         }
         LOG.debug("search condition=" + condition);
 
-        final Map<String,Object> meta = new HashMap<>();
+        final Map<String, Object> meta = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String queryFormat = "%s[%s]{*}";
         String queryString = String.format(queryFormat, Constants.JPA_JOB_EXECUTION_SERVICE_NAME, condition);
-        GenericServiceAPIResponseEntity<TaggedLogAPIEntity> res = resource.search(queryString, null, null, pageSize, null, false, true,  0L, 0, true, 0, null, false);
+        GenericServiceAPIResponseEntity<TaggedLogAPIEntity> res = resource.search(queryString, null, null, pageSize, null, false, true, 0L, 0, true, 0, null, false);
         if (res.isSuccess() && res.getObj() != null) {
             for (TaggedLogAPIEntity o : res.getObj()) {
                 jobs.add(o);
@@ -163,10 +163,10 @@ public class MRJobExecutionResource {
             }
         }
         queryString = String.format(queryFormat, Constants.JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME, condition);
-        res = resource.search(queryString, null, null, pageSize, null, false, true,  0L, 0, true, 0, null, false);
+        res = resource.search(queryString, null, null, pageSize, null, false, true, 0L, 0, true, 0, null, false);
         if (res.isSuccess() && res.getObj() != null) {
             for (TaggedLogAPIEntity o : res.getObj()) {
-                if (! isDuplicate(jobIds, o)) {
+                if (!isDuplicate(jobIds, o)) {
                     jobs.add(o);
                 }
             }
@@ -187,21 +187,20 @@ public class MRJobExecutionResource {
             response.setException(new Exception(res.getException()));
         }
         meta.put(TOTAL_RESULTS, jobs.size());
-        meta.put(ELAPSEDMS,stopWatch.getTime());
+        meta.put(ELAPSEDMS, stopWatch.getTime());
         response.setObj(jobs);
         response.setMeta(meta);
         return response;
     }
 
 
-
     @GET
     @Path("{jobId}/taskCounts")
     @Produces(MediaType.APPLICATION_JSON)
     public TaskCountPerJobResponse getTaskCountsPerJob(@PathParam("jobId") String jobId,
-                                                      @QueryParam("site") String site,
-                                                      @QueryParam("timelineInSecs") String timeList,
-                                                      @QueryParam("top") long top) {
+                                                       @QueryParam("site") String site,
+                                                       @QueryParam("timelineInSecs") String timeList,
+                                                       @QueryParam("top") long top) {
         TaskCountPerJobResponse response = new TaskCountPerJobResponse();
         if (jobId == null || site == null || timeList == null || timeList.isEmpty()) {
             response.errMessage = "IllegalArgumentException: jobId == null || site == null || timelineInSecs == null or isEmpty";
@@ -214,41 +213,42 @@ public class MRJobExecutionResource {
         List<Long> times = helper.parseTimeList(timeList);
         String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId);
         GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> historyRes =
-                resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
+            resource.search(query, null, null, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
         if (historyRes.isSuccess() && historyRes.getObj() != null && historyRes.getObj().size() > 0) {
             helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountPerJobHelper.HistoryTaskComparator());
             for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o : historyRes.getObj()) {
                 int index = helper.getPosition(times, o.getDuration());
                 MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
-                helper.taskCount(counter, o.getTags().get(TASK_TYPE.toString()));
+                helper.countTask(counter, o.getTags().get(TASK_TYPE.toString()));
                 counter.entities.add(o);
             }
         } else {
             query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_RUNNING_TASK_EXECUTION_SERVICE_NAME, site, jobId);
             GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> runningRes =
-                    resource.search(query,  null, null, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
+                resource.search(query, null, null, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
             if (runningRes.isSuccess() && runningRes.getObj() != null) {
                 helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountPerJobHelper.RunningTaskComparator());
                 for (TaskExecutionAPIEntity o : runningRes.getObj()) {
                     int index = helper.getPosition(times, o.getDuration());
                     if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
                         MRJobTaskCountResponse.UnitTaskCount counter = runningTaskCount.get(index);
-                        helper.taskCount(counter, o.getTags().get(TASK_TYPE.toString()));
+                        helper.countTask(counter, o.getTags().get(TASK_TYPE.toString()));
                         counter.entities.add(o);
                     } else if (o.getEndTime() != 0) {
                         MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
-                        helper.taskCount(counter, o.getTags().get(TASK_TYPE.toString()));
+                        helper.countTask(counter, o.getTags().get(TASK_TYPE.toString()));
                         counter.entities.add(o);
                     }
                 }
             }
         }
-        if (top > 0)  {
+        if (top > 0) {
             helper.getTopTasks(runningTaskCount, top);
             response.runningTaskCount = runningTaskCount;
             helper.getTopTasks(finishedTaskCount, top);
             response.finishedTaskCount = finishedTaskCount;
         }
+        response.topNumber = top;
         return response;
     }
 
@@ -281,7 +281,7 @@ public class MRJobExecutionResource {
         }
         String query = String.format("%s[@site=\"%s\" AND @endTime>=%s]{@startTime,@endTime}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, startTimeInMills);
         GenericServiceAPIResponseEntity<JobExecutionAPIEntity> historyRes =
-                resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
+            resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
         if (!historyRes.isSuccess() || historyRes.getObj() == null) {
             response.errMessage = String.format("Catch an exception: %s with query=%s", historyRes.getException(), query);
             return response;
@@ -301,10 +301,10 @@ public class MRJobExecutionResource {
     @Path("jobMetrics/entities")
     @Produces(MediaType.APPLICATION_JSON)
     public Object getJobMetricsByEntitiesQuery(@QueryParam("site") String site,
-                                           @QueryParam("timePoint") String timePoint,
-                                           @QueryParam("metricName") String metricName,
-                                           @QueryParam("intervalmin") long intervalmin,
-                                           @QueryParam("top") int top) {
+                                               @QueryParam("timePoint") String timePoint,
+                                               @QueryParam("metricName") String metricName,
+                                               @QueryParam("intervalmin") long intervalmin,
+                                               @QueryParam("top") int top) {
         return getJobMetrics(site, timePoint, metricName, intervalmin, top, queryMetricEntitiesFunc);
     }
 
@@ -312,10 +312,10 @@ public class MRJobExecutionResource {
     @Path("jobMetrics/list")
     @Produces(MediaType.APPLICATION_JSON)
     public Object getJobMetricsByListQuery(@QueryParam("site") String site,
-                                @QueryParam("timePoint") String timePoint,
-                                @QueryParam("metricName") String metricName,
-                                @QueryParam("intervalmin") long intervalmin,
-                                @QueryParam("top") int top) {
+                                           @QueryParam("timePoint") String timePoint,
+                                           @QueryParam("metricName") String metricName,
+                                           @QueryParam("intervalmin") long intervalmin,
+                                           @QueryParam("top") int top) {
         return getJobMetrics(site, timePoint, metricName, intervalmin, top, queryMetricListFunc);
     }
 
@@ -328,18 +328,6 @@ public class MRJobExecutionResource {
             response.setSuccess(false);
             return response;
         }
-        long timePointsInMills;
-        String searchStartTime = timePoint;
-        String searchEndTime = timePoint;
-        try {
-            timePointsInMills = DateTimeUtil.humanDateToSeconds(timePoint) * DateTimeUtil.ONESECOND;
-            searchStartTime = helper.moveTimeforwardOneDay(searchStartTime);
-
-        } catch (ParseException e) {
-            response.setException(e);
-            response.setSuccess(false);
-            return response;
-        }
         if (intervalmin <= 0) {
             LOG.warn("query parameter intervalmin <= 0, use default value 5 instead");
             intervalmin = 5;
@@ -348,10 +336,22 @@ public class MRJobExecutionResource {
             LOG.warn("query parameter top <= 0, use default value 10 instead");
             top = 10;
         }
+
+        long timePointsInMills;
+        String searchStartTime = timePoint;
+        String searchEndTime = timePoint;
+        try {
+            timePointsInMills = DateTimeUtil.humanDateToSeconds(timePoint) * DateTimeUtil.ONESECOND;
+            searchStartTime = helper.moveTimeforwardOneDay(searchStartTime);
+        } catch (ParseException e) {
+            response.setException(e);
+            response.setSuccess(false);
+            return response;
+        }
         String query = String.format("%s[@site=\"%s\" AND @startTime<=\"%s\" AND @endTime>=\"%s\"]{@startTime,@endTime}",
-                Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, timePointsInMills, timePointsInMills);
+            Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, timePointsInMills, timePointsInMills);
         GenericServiceAPIResponseEntity<JobExecutionAPIEntity> historyRes =
-                resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true,  0L, 0, true, 0, null, false);
+            resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
         if (!historyRes.isSuccess() || historyRes.getObj() == null) {
             return historyRes;
         }
@@ -363,18 +363,18 @@ public class MRJobExecutionResource {
     }
 
     Function6<String, String, String, Long, Integer, String, Object> queryMetricEntitiesFunc
-            = (query, startTime, endTime, intervalmin, top, metricName) -> {
-        GenericEntityServiceResource resource = new GenericEntityServiceResource();
-        return resource.search(query, startTime, endTime, Integer.MAX_VALUE, null,
-                false, true, intervalmin, top, true, 0, metricName, false);
-    };
+        = (query, startTime, endTime, intervalmin, top, metricName) -> {
+            GenericEntityServiceResource resource = new GenericEntityServiceResource();
+            return resource.search(query, startTime, endTime, Integer.MAX_VALUE, null,
+            false, true, intervalmin, top, true, 0, metricName, false);
+        };
 
     Function6<String, String, String, Long, Integer, String, Object> queryMetricListFunc
-            = (query, startTime, endTime, intervalmin, top, metricName) -> {
-        ListQueryResource resource = new ListQueryResource();
-        return resource.listQuery(query, startTime, endTime, Integer.MAX_VALUE, null,
-                false, true, intervalmin, top, true, 0, metricName, false);
-    };
+        = (query, startTime, endTime, intervalmin, top, metricName) -> {
+            ListQueryResource resource = new ListQueryResource();
+            return resource.listQuery(query, startTime, endTime, Integer.MAX_VALUE, null,
+            false, true, intervalmin, top, true, 0, metricName, false);
+        };
 
     @FunctionalInterface
     interface Function6<A, B, C, D, E, F, R> {

@@ -25,6 +25,7 @@ public class MRJobTaskCountResponse {
 
 
     public static class TaskCountPerJobResponse extends MRJobTaskCountResponse {
+        public long topNumber;
         public List<UnitTaskCount> runningTaskCount;
         public List<UnitTaskCount> finishedTaskCount;
     }

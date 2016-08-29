@@ -30,7 +30,7 @@ import java.util.List;
 
 public class TaskCountPerJobHelper {
 
-    private final static Logger LOG = LoggerFactory.getLogger(TaskCountPerJobHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskCountPerJobHelper.class);
 
     public List<Long> parseTimeList(String timelist) {
         List<Long> times = new ArrayList<>();
@@ -65,7 +65,7 @@ public class TaskCountPerJobHelper {
         }
     }
 
-    public void taskCount(MRJobTaskCountResponse.UnitTaskCount counter, String taskType) {
+    public void countTask(MRJobTaskCountResponse.UnitTaskCount counter, String taskType) {
         counter.taskCount++;
         if (taskType.equalsIgnoreCase(Constants.TaskType.MAP.toString())) {
             counter.mapTaskCount++;

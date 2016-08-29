@@ -30,7 +30,7 @@ import java.util.List;
 public class JobCountPerDurationHelper {
 
     public void initJobCountList(List<UnitJobCount> jobCounts, long startTime, long endTime, long intervalInSecs) {
-        for (long i = startTime/intervalInSecs; i * intervalInSecs <= endTime; i++) {
+        for (long i = startTime / intervalInSecs; i * intervalInSecs <= endTime; i++) {
             jobCounts.add(new UnitJobCount(i * intervalInSecs, 0));
         }
     }
@@ -56,7 +56,7 @@ public class JobCountPerDurationHelper {
         List<UnitJobCount> jobCounts = new ArrayList<>();
         initJobCountList(jobCounts, startTimeInSecs, endTimeInSecs, intervalInSecs);
         for (JobExecutionAPIEntity jobDuration: jobDurations) {
-            countJob(jobCounts, jobDuration.getStartTime()/1000, jobDuration.getEndTime()/1000, intervalInSecs);
+            countJob(jobCounts, jobDuration.getStartTime() / 1000, jobDuration.getEndTime() / 1000, intervalInSecs);
         }
         response.jobCounts = jobCounts;
         return response;
