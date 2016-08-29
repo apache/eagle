@@ -25,7 +25,7 @@ import com.typesafe.config.ConfigFactory;
 /**
  * Since 8/11/16.
  */
-public class MapRFSAuditLogApplication extends AbstractHdfsAuditLogApplication {
+public class MapRFSAuditLogApplication extends AbstractMapRFSAuditLogApplication {
     @Override
     public BaseRichBolt getParserBolt() {
         return new MapRFSAuditLogParserBolt();
