@@ -17,6 +17,7 @@
 
 package org.apache.eagle.jpm.spark.crawl;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.eagle.jpm.spark.entity.*;
 import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -109,12 +110,12 @@ public class JHFSparkEventReader {
         app.setConfig(new JobConfig());
         JSONObject sparkProps = (JSONObject) event.get("Spark Properties");
 
-        List<String> jobConfs = conf.getStringList("basic.jobConf.additional.info");
+        String[] additionalJobConf = conf.getString("basic.jobConf.additional.info").split(",\\s*");
         String[] props = {"spark.yarn.app.id", "spark.executor.memory", "spark.driver.host", "spark.driver.port",
             "spark.driver.memory", "spark.scheduler.pool", "spark.executor.cores", "spark.yarn.am.memory",
             "spark.yarn.am.cores", "spark.yarn.executor.memoryOverhead", "spark.yarn.driver.memoryOverhead", "spark.yarn.am.memoryOverhead", "spark.master"};
-        jobConfs.addAll(Arrays.asList(props));
-        for (String prop : jobConfs) {
+        String[] jobConf = (String[])ArrayUtils.addAll(additionalJobConf, props);
+        for (String prop : jobConf) {
             if (sparkProps.containsKey(prop)) {
                 app.getConfig().getConfig().put(prop, (String) sparkProps.get(prop));
             }
@@ -698,10 +699,10 @@ public class JHFSparkEventReader {
     private EagleServiceBaseClient initiateClient() {
         String host = conf.getString("eagleProps.eagle.service.host");
         int port = conf.getInt("eagleProps.eagle.service.port");
-        String userName = conf.getString("eagleProps.eagle.service.userName");
-        String pwd = conf.getString("eagleProps.eagle.service.pwd");
+        String userName = conf.getString("eagleProps.eagle.service.username");
+        String pwd = conf.getString("eagleProps.eagle.service.password");
         client = new EagleServiceClientImpl(host, port, userName, pwd);
-        int timeout = conf.getInt("eagleProps.eagle.service.read_timeout");
+        int timeout = conf.getInt("eagleProps.eagle.service.read.timeout");
         client.getJerseyClient().setReadTimeout(timeout * 1000);
 
         return client;

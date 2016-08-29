@@ -22,7 +22,7 @@ package org.apache.eagle.jpm.spark.history.storm;
 import org.apache.eagle.jpm.spark.crawl.JHFInputStreamReader;
 import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
 import org.apache.eagle.jpm.spark.crawl.SparkFilesystemInputStreamReaderImpl;
-import org.apache.eagle.jpm.spark.history.config.SparkHistoryCrawlConfig;
+import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
 import org.apache.eagle.jpm.util.HDFSUtil;
@@ -43,17 +43,17 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.*;
 
-public class SparkJobParseBolt extends BaseRichBolt {
+public class SparkHistoryJobParseBolt extends BaseRichBolt {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SparkJobParseBolt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SparkHistoryJobParseBolt.class);
 
     private OutputCollector collector;
     private ResourceFetcher historyServerFetcher;
-    private SparkHistoryCrawlConfig config;
+    private SparkHistoryJobAppConfig config;
     private JobHistoryZKStateManager zkState;
     private Configuration hdfsConf;
 
-    public SparkJobParseBolt(SparkHistoryCrawlConfig config) {
+    public SparkHistoryJobParseBolt(SparkHistoryJobAppConfig config) {
         this.config = config;
     }
 
