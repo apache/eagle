@@ -29,7 +29,7 @@ import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.generic.GenericEntityServiceResource;
 import org.apache.eagle.service.generic.ListQueryResource;
-import org.apache.eagle.service.jpm.MRJobTaskCountResponse.JobCountPerDurationResponse;
+import org.apache.eagle.service.jpm.MRJobTaskCountResponse.JobCountResponse;
 import org.apache.eagle.service.jpm.MRJobTaskCountResponse.TaskCountPerJobResponse;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -194,6 +194,8 @@ public class MRJobExecutionResource {
     }
 
 
+
+
     @GET
     @Path("{jobId}/taskCounts")
     @Produces(MediaType.APPLICATION_JSON)
@@ -206,7 +208,7 @@ public class MRJobExecutionResource {
             response.errMessage = "IllegalArgumentException: jobId == null || site == null || timelineInSecs == null or isEmpty";
             return response;
         }
-        TaskCountPerJobHelper helper = new TaskCountPerJobHelper();
+        TaskCountByDurationHelper helper = new TaskCountByDurationHelper();
         List<MRJobTaskCountResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
         List<MRJobTaskCountResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
@@ -215,7 +217,7 @@ public class MRJobExecutionResource {
         GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> historyRes =
             resource.search(query, null, null, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
         if (historyRes.isSuccess() && historyRes.getObj() != null && historyRes.getObj().size() > 0) {
-            helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountPerJobHelper.HistoryTaskComparator());
+            helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountByDurationHelper.HistoryTaskComparator());
             for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o : historyRes.getObj()) {
                 int index = helper.getPosition(times, o.getDuration());
                 MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
@@ -227,7 +229,7 @@ public class MRJobExecutionResource {
             GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> runningRes =
                 resource.search(query, null, null, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
             if (runningRes.isSuccess() && runningRes.getObj() != null) {
-                helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountPerJobHelper.RunningTaskComparator());
+                helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountByDurationHelper.RunningTaskComparator());
                 for (TaskExecutionAPIEntity o : runningRes.getObj()) {
                     int index = helper.getPosition(times, o.getDuration());
                     if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
@@ -253,14 +255,14 @@ public class MRJobExecutionResource {
     }
 
     @GET
-    @Path("jobCounts")
+    @Path("runningJobCounts")
     @Produces(MediaType.APPLICATION_JSON)
-    public JobCountPerDurationResponse getJobCountPerDuration(@QueryParam("site") String site,
-                                                              @QueryParam("startTime") String startTime,
-                                                              @QueryParam("endTime") String endTime,
-                                                              @QueryParam("intervalInSecs") long intervalInSecs) {
-        JobCountPerDurationResponse response = new JobCountPerDurationResponse();
-        JobCountPerDurationHelper helper = new JobCountPerDurationHelper();
+    public JobCountResponse getRunningJobCount(@QueryParam("site") String site,
+                                               @QueryParam("startTime") String startTime,
+                                               @QueryParam("endTime") String endTime,
+                                               @QueryParam("intervalInSecs") long intervalInSecs) {
+        JobCountResponse response = new JobCountResponse();
+        MRJobCountHelper helper = new MRJobCountHelper();
         if (site == null || startTime == null || endTime == null) {
             response.errMessage = "IllegalArgument: site, startTime, endTime, or metric is null";
             return response;
@@ -279,7 +281,7 @@ public class MRJobExecutionResource {
             response.errMessage = e.getMessage();
             return response;
         }
-        String query = String.format("%s[@site=\"%s\" AND @endTime>=%s]{@startTime,@endTime}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, startTimeInMills);
+        String query = String.format("%s[@site=\"%s\" AND @endTime>=%s]{@startTime,@endTime,@jobType}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, startTimeInMills);
         GenericServiceAPIResponseEntity<JobExecutionAPIEntity> historyRes =
             resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
         if (!historyRes.isSuccess() || historyRes.getObj() == null) {
@@ -290,7 +292,7 @@ public class MRJobExecutionResource {
         try {
             long startTimeInSecs = DateTimeUtil.humanDateToSeconds(startTime);
             long endTimeInSecs = DateTimeUtil.humanDateToSeconds(endTime);
-            return helper.getJobCount(historyRes.getObj(), startTimeInSecs, endTimeInSecs, intervalInSecs);
+            return helper.getRunningJobCount(historyRes.getObj(), startTimeInSecs, endTimeInSecs, intervalInSecs);
         } catch (Exception e) {
             response.errMessage = e.getMessage();
             return response;
@@ -322,7 +324,7 @@ public class MRJobExecutionResource {
     public Object getJobMetrics(String site, String timePoint, String metricName, long intervalmin, int top,
                                 Function6<String, String, String, Long, Integer, String, Object> metricQueryFunc) {
         GenericServiceAPIResponseEntity response = new GenericServiceAPIResponseEntity();
-        JobCountPerDurationHelper helper = new JobCountPerDurationHelper();
+        MRJobCountHelper helper = new MRJobCountHelper();
         if (site == null || timePoint == null || metricName == null) {
             response.setException(new IllegalArgumentException("Error: site, timePoint, metricName may be unset"));
             response.setSuccess(false);
@@ -378,7 +380,29 @@ public class MRJobExecutionResource {
 
     @FunctionalInterface
     interface Function6<A, B, C, D, E, F, R> {
-        public R apply(A a, B b, C c, D d, E e, F f);
+        R apply(A a, B b, C c, D d, E e, F f);
     }
 
+    @GET
+    @Path("jobCount")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JobCountResponse getJobCountGroupByDuration(@QueryParam("site") String site,
+                                                       @QueryParam("timelineInSecs") String timeList,
+                                                       @QueryParam("startTime") String startTime,
+                                                       @QueryParam("endTime") String endTime) {
+        JobCountResponse response = new JobCountResponse();
+        MRJobCountHelper helper = new MRJobCountHelper();
+        if (site == null || startTime == null || endTime == null || timeList == null) {
+            response.errMessage = "IllegalArgument: site, startTime, endTime, or timelineInSecs is null";
+            return response;
+        }
+        String query = String.format("%s[@site=\"%s\"]{@durationTime,@jobType}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site);
+        GenericServiceAPIResponseEntity<JobExecutionAPIEntity> historyRes =
+            resource.search(query, startTime, endTime, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
+        if (!historyRes.isSuccess() || historyRes.getObj() == null) {
+            response.errMessage = String.format("Catch an exception: %s with query=%s", historyRes.getException(), query);
+            return response;
+        }
+        return helper.getHistoryJobCount(historyRes.getObj(), timeList);
+    }
 }

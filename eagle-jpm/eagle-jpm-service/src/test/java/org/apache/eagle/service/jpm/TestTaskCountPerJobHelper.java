@@ -24,11 +24,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class TestTaskCountPerJobHelper {
-    TaskCountPerJobHelper helper = new TaskCountPerJobHelper();
+    TaskCountByDurationHelper helper = new TaskCountByDurationHelper();
+
     @Test
     public void test() {
         String timeList = " 0, 10,20,40 ";
@@ -42,9 +42,6 @@ public class TestTaskCountPerJobHelper {
 
     @Test
     public void test2() {
-        String timeList = " 0, 10,20,40 ";
-        List<Long> times = helper.parseTimeList(timeList);
-
         TaskExecutionAPIEntity test1 = new TaskExecutionAPIEntity();
         test1.setDuration(15 * 1000);
         test1.setTaskStatus("running");
@@ -72,7 +69,10 @@ public class TestTaskCountPerJobHelper {
         List<MRJobTaskCountResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
         List<MRJobTaskCountResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
-        helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountPerJobHelper.RunningTaskComparator());
+        String timeList = " 0, 10,20,40 ";
+        List<Long> times = helper.parseTimeList(timeList);
+
+        helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountByDurationHelper.RunningTaskComparator());
 
         for (TaskExecutionAPIEntity o : tasks) {
             int index = helper.getPosition(times, o.getDuration());

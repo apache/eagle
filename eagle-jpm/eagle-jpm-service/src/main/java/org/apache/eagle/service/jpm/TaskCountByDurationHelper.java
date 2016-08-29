@@ -28,11 +28,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-public class TaskCountPerJobHelper {
+public class TaskCountByDurationHelper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TaskCountPerJobHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskCountByDurationHelper.class);
 
-    public List<Long> parseTimeList(String timelist) {
+    public static List<Long> parseTimeList(String timelist) {
         List<Long> times = new ArrayList<>();
         String [] strs = timelist.split("[,\\s]");
         for (String str : strs) {
@@ -45,7 +45,7 @@ public class TaskCountPerJobHelper {
         return times;
     }
 
-    public int getPosition(List<Long> times, Long duration) {
+    public static int getPosition(List<Long> times, Long duration) {
         duration = duration / 1000;
         for (int i = 1; i < times.size(); i++) {
             if (duration < times.get(i)) {

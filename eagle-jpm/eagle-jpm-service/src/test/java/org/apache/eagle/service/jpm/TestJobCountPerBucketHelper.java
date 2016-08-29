@@ -28,10 +28,11 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestJobCountPerDurationHelper {
-    JobCountPerDurationHelper helper = new JobCountPerDurationHelper();
+public class TestJobCountPerBucketHelper {
+    MRJobCountHelper helper = new MRJobCountHelper();
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestJobCountPerDurationHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestJobCountPerBucketHelper.class);
+
     @Test
     public void test() throws ParseException {
         String timeString = "2016-08-22 20:13:00";
@@ -60,10 +61,10 @@ public class TestJobCountPerDurationHelper {
         List<MRJobTaskCountResponse.UnitJobCount> jobCounts = new ArrayList<>();
         long intervalSecs = 5;
         helper.initJobCountList(jobCounts, 3, 31, intervalSecs);
-        helper.countJob(jobCounts, 5, 10, intervalSecs);
-        helper.countJob(jobCounts, 13, 18, intervalSecs);
-        helper.countJob(jobCounts, 18, 28, intervalSecs);
-        helper.countJob(jobCounts, 25, 33, intervalSecs);
+        helper.countJob(jobCounts, 5, 10, intervalSecs, "hive");
+        helper.countJob(jobCounts, 13, 18, intervalSecs, "hive");
+        helper.countJob(jobCounts, 18, 28, intervalSecs, "hive");
+        helper.countJob(jobCounts, 25, 33, intervalSecs, "hive");
         Assert.assertTrue(jobCounts.size() == 7);
         Assert.assertTrue(jobCounts.get(1).jobCount == 1);
         Assert.assertTrue(jobCounts.get(5).jobCount == 2);
@@ -72,14 +73,15 @@ public class TestJobCountPerDurationHelper {
     @Test
     public void test4() throws ParseException {
         List<MRJobTaskCountResponse.UnitJobCount> jobCounts = new ArrayList<>();
-        long intervalSecs = 60*15;
+        long intervalSecs = 60 * 15;
         String startTime = "2016-08-22 20:13:00";
         String endTime = "2016-08-22 24:13:00";
         helper.initJobCountList(jobCounts, DateTimeUtil.humanDateToSeconds(startTime), DateTimeUtil.humanDateToSeconds(endTime), intervalSecs);
         helper.countJob(jobCounts,
                 DateTimeUtil.humanDateToSeconds("2016-08-22 20:23:00"),
                 DateTimeUtil.humanDateToSeconds("2016-08-22 20:30:00"),
-                intervalSecs);
+                intervalSecs,
+                "hive");
         Assert.assertTrue(jobCounts.get(2).jobCount == 1);
     }
 }

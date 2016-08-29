@@ -23,14 +23,13 @@ import java.util.*;
 public class MRJobTaskCountResponse {
     public String errMessage;
 
-
     public static class TaskCountPerJobResponse extends MRJobTaskCountResponse {
         public long topNumber;
         public List<UnitTaskCount> runningTaskCount;
         public List<UnitTaskCount> finishedTaskCount;
     }
 
-    public static class JobCountPerDurationResponse extends MRJobTaskCountResponse {
+    public static class JobCountResponse extends MRJobTaskCountResponse {
         public List<UnitJobCount> jobCounts;
     }
 
@@ -55,10 +54,12 @@ public class MRJobTaskCountResponse {
     static class UnitJobCount {
         public long timeBucket;
         public long jobCount;
+        public Map<String, Long> jobCountByType;
 
-        UnitJobCount(long timeBucket, long jobCount) {
+        UnitJobCount(long timeBucket) {
             this.timeBucket = timeBucket;
-            this.jobCount = jobCount;
+            this.jobCount = 0;
+            this.jobCountByType = new HashMap<>();
         }
     }
 }
