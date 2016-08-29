@@ -21,6 +21,8 @@ import org.apache.eagle.security.util.LogParseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * e.g. 2015-09-21 21:36:52,172 INFO FSNamesystem.audit: allowed=true   ugi=hadoop (auth:KERBEROS)     ip=/x.x.x.x   cmd=getfileinfo src=/tmp   dst=null        perm=null       proto=rpc
@@ -28,44 +30,27 @@ import java.io.Serializable;
 
 public final class HDFSAuditLogParser implements Serializable{
 	private final static Logger LOG = LoggerFactory.getLogger(HDFSAuditLogParser.class);
+	private final static Pattern loggerPattern = Pattern.compile("(.+)\\s+INFO.+allowed=(.*)\\s+ugi=(.*)\\s+ip=/(.*)\\s+cmd=(.*)\\s+src=(.*)\\s+dst=(.*)\\s+perm=(.*)\\s+proto=(.*)");
 
-	public HDFSAuditLogParser(){
-	}
-
-	public static String parseUser(String ugi) {
-		/** e.g.
-		 * .1)user@APD.xyz.com
-		 * .2)hadoop/123.dc1.xyz.com@xyz.com (auth:KERBEROS)
-		 * .3)hadoop (auth:KERBEROS)
-		 */
-		int index = ugi.indexOf("/");
-		if (index != -1) return ugi.substring(0, index).trim();
-		index = ugi.indexOf("@");
-		if (index != -1) return ugi.substring(0, index).trim();
-		index = ugi.indexOf("(");
-		return ugi.substring(0, index).trim();
-	}
+	public HDFSAuditLogParser(){}
 
 	public HDFSAuditLogObject parse(String log) throws Exception{
-		int index0 = log.indexOf(" ");
-		index0 = log.indexOf(" ",index0+1);
-		String data = log.substring(0, index0).trim();
-		int index1 = log.indexOf("allowed="); int len1 = 8;
-		int index2 = log.indexOf("ugi="); int len2 = 4;
-		int index3 = log.indexOf("ip=/"); int len3 = 4;
-		int index4 = log.indexOf("cmd="); int len4 = 4;
-		int index5 = log.indexOf("src="); int len5= 4;
-		int index6 = log.indexOf("dst="); int len6 = 4;
-		int index7 = log.indexOf("perm=");
 
-		String allowed = log.substring(index1 + len1, index2).trim();
-		String ugi = log.substring(index2 + len2, index3).trim();
-		String ip = log.substring(index3 + len3, index4).trim();
-		String cmd = log.substring(index4 + len4, index5).trim();
-		String src = log.substring(index5 + len5, index6).trim();
-		String dst = log.substring(index6 + len6, index7).trim();
+		Matcher loggerMatcher = loggerPattern.matcher(log);
 
-		HDFSAuditLogObject entity = new HDFSAuditLogObject();
+		if(!loggerMatcher.find())
+			LOG.warn("Regex matching failed for HDFS audit log: " + log);
+
+		String date = loggerMatcher.group(1).trim();
+		String allowed = loggerMatcher.group(2).trim();
+		String ugi = loggerMatcher.group(3).trim();
+		String ip = loggerMatcher.group(4).trim();
+		String cmd = loggerMatcher.group(5).trim();
+		String src = loggerMatcher.group(6).trim();
+		String dst = loggerMatcher.group(7).trim();
+		String perm = loggerMatcher.group(8).trim();
+		String proto = loggerMatcher.group(9).trim();
+
 		String user = LogParseUtil.parseUserFromUGI(ugi);
 		if (src != null && src.equals("null")) {
 			src = null;
@@ -74,13 +59,15 @@ public final class HDFSAuditLogParser implements Serializable{
 		if (dst != null && dst.equals("null")) {
 			dst = null;
 		}
+
+		HDFSAuditLogObject entity = new HDFSAuditLogObject();
 		entity.user = user;
 		entity.cmd = cmd;
 		entity.src = src;
 		entity.dst = dst;
 		entity.host = ip;
 		entity.allowed = Boolean.valueOf(allowed);
-		entity.timestamp = DateTimeUtil.humanDateToMilliseconds(data);
+		entity.timestamp = DateTimeUtil.humanDateToMilliseconds(date);
 		return entity;
 	}
 }
