@@ -17,14 +17,14 @@
 
 package org.apache.eagle.jpm.spark.crawl;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.eagle.jpm.spark.entity.*;
 import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.service.client.impl.EagleServiceBaseClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -353,7 +353,7 @@ public class JHFSparkEventReader {
         stage.setCompleteTime(completeTime);
         this.lastEventTime = completeTime;
 
-        if (stageInfo.containsKey("Failure Reason")) {
+        if (stageInfo != null && stageInfo.containsKey("Failure Reason")) {
             stage.setStatus(SparkEntityConstant.SparkStageStatus.FAILED.toString());
         } else {
             stage.setStatus(SparkEntityConstant.SparkStageStatus.COMPLETE.toString());

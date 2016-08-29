@@ -19,6 +19,13 @@
 
 package org.apache.eagle.jpm.spark.history.storm;
 
+import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichSpout;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
+import backtype.storm.utils.Utils;
 import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
@@ -26,16 +33,10 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.RMResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,9 +47,6 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
     private SparkHistoryJobAppConfig config;
     private ResourceFetcher rmFetch;
     private long lastFinishAppTime = 0;
-    private Map<String, Integer> failTimes;
-
-    private static final int FAIL_MAX_TIMES = 5;
 
     public SparkHistoryJobSpout(SparkHistoryJobAppConfig config) {
         this.config = config;
@@ -57,7 +55,6 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
     @Override
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         rmFetch = new RMResourceFetcher(config.jobHistoryConfig.rms);
-        this.failTimes = new HashMap<>();
         this.collector = spoutOutputCollector;
         this.zkState = new JobHistoryZKStateManager(config);
         this.lastFinishAppTime = zkState.readLastFinishedTimestamp();
@@ -75,7 +72,6 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
             LOG.info("Last finished time = {}", calendar.getTime());
             if (fetchTime - this.lastFinishAppTime > this.config.stormConfig.spoutCrawlInterval) {
                 List<AppInfo> appInfos = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, Long.toString(lastFinishAppTime));
-                //List<AppInfo> appInfos = (null != apps ? (List<AppInfo>)apps.get(0):new ArrayList<AppInfo>());
                 if (appInfos != null) {
                     LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
                     for (AppInfo app : appInfos) {
@@ -120,29 +116,15 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
 
     @Override
     public void fail(Object msgId) {
-        String appId = (String) msgId;
-        int failTimes = 0;
-        if (this.failTimes.containsKey(appId)) {
-            failTimes = this.failTimes.get(appId);
-        }
-        failTimes++;
-        if (failTimes >= FAIL_MAX_TIMES) {
-            this.failTimes.remove(appId);
-            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
-            LOG.error(String.format("Application %s has failed for over %s times, drop it.", appId, FAIL_MAX_TIMES));
-        } else {
-            this.failTimes.put(appId, failTimes);
-            collector.emit(new Values(appId), appId);
-            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.SENT_FOR_PARSE);
-        }
+        // Sleep 3 seconds and retry.
+        Utils.sleep(3000);
+
+        collector.emit(new Values(msgId), msgId);
+        zkState.updateApplicationStatus((String)msgId, ZKStateConstant.AppStatus.SENT_FOR_PARSE);
     }
 
     @Override
     public void ack(Object msgId) {
-        String appId = (String) msgId;
-        if (this.failTimes.containsKey(appId)) {
-            this.failTimes.remove(appId);
-        }
 
     }
 

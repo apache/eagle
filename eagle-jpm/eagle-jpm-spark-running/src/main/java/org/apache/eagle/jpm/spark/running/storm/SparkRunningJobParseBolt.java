@@ -71,6 +71,7 @@ public class SparkRunningJobParseBolt extends BaseRichBolt {
         this.resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void execute(Tuple tuple) {
         AppInfo appInfo = (AppInfo)tuple.getValue(1);
