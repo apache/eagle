@@ -62,7 +62,7 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         builder.setSpout("ingest", spout, numOfSpoutTasks);
 
 
-        HdfsAuditLogParserBolt parserBolt = new HdfsAuditLogParserBolt();
+        BaseRichBolt parserBolt = getParserBolt();
         BoltDeclarer boltDeclarer = builder.setBolt("parserBolt", parserBolt, numOfParserTasks);
 
         Boolean useDefaultPartition = !config.hasPath("eagleProps.useDefaultPartition") || config.getBoolean("eagleProps.useDefaultPartition");

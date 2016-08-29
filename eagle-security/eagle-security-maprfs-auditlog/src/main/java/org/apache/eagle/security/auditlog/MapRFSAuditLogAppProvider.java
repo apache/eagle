@@ -1,4 +1,4 @@
-package org.apache.eagle.service.security.hdfs.rest;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,16 +15,15 @@ package org.apache.eagle.service.security.hdfs.rest;/*
  * limitations under the License.
  */
 
+package org.apache.eagle.security.auditlog;
 
-import org.junit.Assert;
-import org.junit.Test;
 
-public class MapRNameResolverTest {
-    @Test
-    public void testResolver () {
-        MapRNameResolver resolver = new MapRNameResolver();
-        Assert.assertEquals("2049.2692.136572", resolver.getFid("/test0","mapr"));
-        Assert.assertEquals("0", resolver.getSid("success", "mapr"));
-        Assert.assertEquals("mapr.cluster.root","186635570");
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
+
+public class MapRFSAuditLogAppProvider extends AbstractApplicationProvider<MapRFSAuditLogApplication> {
+    @Override
+    public MapRFSAuditLogApplication getApplication() {
+        return new MapRFSAuditLogApplication();
     }
 }
+

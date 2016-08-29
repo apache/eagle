@@ -17,6 +17,9 @@
 
 package org.apache.eagle.service.security.hdfs.resolver;
 
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
@@ -49,12 +52,16 @@ public class MAPRStatusCodeResolver implements AttributeResolvable<GenericAttrib
 
     private final static List<String> statusList = Arrays.asList(statusCodes);
 
-    public MAPRStatusCodeResolver () {
+
+    @Inject
+    public MAPRStatusCodeResolver(){
         //construct hashmap for status code query
         for(int i = 0; i < statusCodes.length; i++){
             statusCodeMap.put(statusCodes[i],String.valueOf(i));
         }
+
     }
+
 
     //conver human readable status code to id
     public String getStatusCodeID(String code){
