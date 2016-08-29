@@ -162,6 +162,7 @@ public class PolicyDefinition implements Serializable{
 
         public String type;
         public String value;
+        public String handlerClass;
 
         private List<String> inputStreams = new ArrayList<String>();
         private List<String> outputStreams = new ArrayList<String>();
@@ -226,6 +227,14 @@ public class PolicyDefinition implements Serializable{
 
         public List<String> getOutputStreams() {
             return outputStreams;
+        }
+
+        public String getHandlerClass() {
+            return handlerClass;
+        }
+
+        public void setHandlerClass(String handlerClass) {
+            this.handlerClass = handlerClass;
         }
 
         @Override
