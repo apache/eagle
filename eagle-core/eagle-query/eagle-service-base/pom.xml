@@ -29,10 +29,6 @@
     <artifactId>eagle-service-base</artifactId>
     <packaging>jar</packaging>
     <name>eagle-service-base</name>
-    <properties>
-        <powermock.version>1.6.5</powermock.version>
-        <powermock-api-mockito.version>1.6.5</powermock-api-mockito.version>
-    </properties>
 
     <dependencies>
         <!-- put eagle-storage-base dependency at the top for using asm 4.0 jar !-->
