@@ -47,7 +47,7 @@ public class HbaseResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt
 
             HBaseSensitivityEntity sensitivityEntity = null;
 
-            if (map != null && resource != "") {
+            if (map != null && !"".equals(resource)) {
                 for (String key : map.keySet()) {
                     Pattern pattern = Pattern.compile(key, Pattern.CASE_INSENSITIVE);
                     if (pattern.matcher(resource).find()) {

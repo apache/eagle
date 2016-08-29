@@ -101,7 +101,7 @@ public class HbaseMetadataResolver implements AttributeResolvable<GenericAttribu
 
     public List<String> filterAndCombineAttribue(String prefix, List<String> attrs, String target) {
         List<String> result = new ArrayList<>();
-        String format = (prefix == "" ? "%s%s" : "%s:%s");
+        String format = ("".equals(prefix)  ? "%s%s" : "%s:%s");
 
         if(target == null) {
             for (String attr : attrs){
