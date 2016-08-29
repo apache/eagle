@@ -57,21 +57,23 @@ public class OozieAuditLogParserBolt extends BaseRichBolt {
             } catch (Exception ex) {
                 LOG.error("Failing oozie parse audit log message", ex);
             }
-            Map<String, Object> map = new TreeMap<String, Object>();
-            map.put("timestamp", entity.timestamp);
-            map.put("level", entity.level);
-            map.put("ip", entity.ip);
-            map.put("user", entity.user);
-            map.put("group", entity.group);
-            map.put("app", entity.app);
-            map.put("jobId", entity.jobId);
-            map.put("operation", entity.operation);
-            map.put("parameter", entity.parameter);
-            map.put("status", entity.status);
-            map.put("httpcode", entity.httpcode);
-            map.put("errorcode", entity.errorcode);
-            map.put("errormessage", entity.errormessage);
-            collector.emit(Arrays.asList(map));
+            if(entity != null) {
+                Map<String, Object> map = new TreeMap<String, Object>();
+                map.put("timestamp", entity.timestamp);
+                map.put("level", entity.level);
+                map.put("ip", entity.ip);
+                map.put("user", entity.user);
+                map.put("group", entity.group);
+                map.put("app", entity.app);
+                map.put("jobId", entity.jobId);
+                map.put("operation", entity.operation);
+                map.put("parameter", entity.parameter);
+                map.put("status", entity.status);
+                map.put("httpcode", entity.httpcode);
+                map.put("errorcode", entity.errorcode);
+                map.put("errormessage", entity.errormessage);
+                collector.emit(Arrays.asList(map));
+            }
         } catch (Exception ex) {
             LOG.error("error in parsing oozie audit log", ex);
         } finally {
