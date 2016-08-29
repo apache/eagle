@@ -45,13 +45,13 @@ public class JHFSparkParser implements JHFParserBase {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 isValidJson = true;
-                try {
-                    JSONObject eventObj = parseAndValidateJSON(line);
-                    if (isValidJson) {
+                JSONObject eventObj = parseAndValidateJSON(line);
+                if (isValidJson) {
+                    try {
                         this.eventReader.read(eventObj);
+                    } catch (Exception e) {
+                        logger.error("Fail to read eventObj. Exception: " + e);
                     }
-                } catch(Exception e) {
-                    logger.error(String.format("Fail to parse %s.", line), e);
                 }
             }
 
