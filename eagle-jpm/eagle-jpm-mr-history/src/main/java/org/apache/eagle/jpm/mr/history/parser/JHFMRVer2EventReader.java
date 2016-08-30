@@ -289,7 +289,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
             values.put(Keys.FINISH_TIME, js.getFinishTime().toString());
         }
         if (js.getStatus() != null) {
-            values.put(Keys.TASK_STATUS, normalizeTaskStatus(js.getStatus().toString()));
+            values.put(Keys.TASK_STATUS, js.getStatus().toString());
         }
         handleTask(RecordTypes.Task, wrapper.getType(), values, js.getCounters());
     }
@@ -308,7 +308,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
             values.put(Keys.FINISH_TIME, js.getFinishTime().toString());
         }
         if (js.getStatus() != null) {
-            values.put(Keys.TASK_STATUS, normalizeTaskStatus(js.getStatus().toString()));
+            values.put(Keys.TASK_STATUS, js.getStatus().toString());
         }
         if (js.getError() != null) {
             values.put(Keys.ERROR, js.getError().toString());
@@ -381,7 +381,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
             values.put(Keys.TASK_TYPE, js.getTaskType().toString());
         }
         if (js.getTaskStatus() != null) {
-            values.put(Keys.TASK_STATUS, normalizeTaskStatus(js.getTaskStatus().toString()));
+            values.put(Keys.TASK_STATUS, js.getTaskStatus().toString());
         }
         if (js.getAttemptId() != null) {
             values.put(Keys.TASK_ATTEMPT_ID, js.getAttemptId().toString());
@@ -419,7 +419,7 @@ public class JHFMRVer2EventReader extends JHFEventReaderBase {
             values.put(Keys.TASK_TYPE, js.getTaskType().toString());
         }
         if (js.getTaskStatus() != null) {
-            values.put(Keys.TASK_STATUS, normalizeTaskStatus(js.getTaskStatus().toString()));
+            values.put(Keys.TASK_STATUS, js.getTaskStatus().toString());
         }
         if (js.getAttemptId() != null) {
             values.put(Keys.TASK_ATTEMPT_ID, js.getAttemptId().toString());
