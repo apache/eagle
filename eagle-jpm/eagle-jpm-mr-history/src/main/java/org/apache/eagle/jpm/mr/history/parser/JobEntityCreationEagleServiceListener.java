@@ -19,7 +19,9 @@
 package org.apache.eagle.jpm.mr.history.parser;
 
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
+import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.mr.historyentity.*;
+import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -27,7 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCreationListener {
     private static final Logger logger = LoggerFactory.getLogger(JobEntityCreationEagleServiceListener.class);
@@ -39,6 +43,8 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
     List<JobEventAPIEntity> jobEvents = new ArrayList<>();
     List<TaskExecutionAPIEntity> taskExecs = new ArrayList<>();
     List<TaskAttemptExecutionAPIEntity> taskAttemptExecs = new ArrayList<>();
+    private JobHistoryZKStateManager zkState;
+    private TimeZone timeZone;
 
     public JobEntityCreationEagleServiceListener(MRHistoryJobConfig configManager) {
         this(configManager, BATCH_SIZE);
@@ -50,6 +56,8 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             throw new IllegalArgumentException("batchSize must be greater than 0 when it is provided");
         }
         this.batchSize = batchSize;
+        zkState = new JobHistoryZKStateManager(configManager.getZkStateConfig());
+        timeZone = TimeZone.getTimeZone(configManager.getControlConfig().timeZone);
     }
 
     @Override
@@ -59,6 +67,15 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             flush();
             list.clear();
         }
+    }
+
+    private String timeStamp2Date(long timeStamp) {
+        GregorianCalendar cal = new GregorianCalendar(timeZone);
+        cal.setTimeInMillis(timeStamp);
+        return  String.format("%4d%02d%02d",
+            cal.get(GregorianCalendar.YEAR),
+            cal.get(GregorianCalendar.MONTH) + 1,
+            cal.get(GregorianCalendar.DAY_OF_MONTH));
     }
 
     /**
@@ -80,6 +97,9 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             JobBaseAPIEntity entity = list.get(i);
             if (entity instanceof JobExecutionAPIEntity) {
                 jobs.add((JobExecutionAPIEntity) entity);
+                this.zkState.updateProcessedJob(timeStamp2Date(entity.getTimestamp()),
+                    entity.getTags().get(MRJobTagName.JOB_ID.toString()),
+                    ((JobExecutionAPIEntity) entity).getCurrentState());
             } else if (entity instanceof JobEventAPIEntity) {
                 jobEvents.add((JobEventAPIEntity) entity);
             } else if (entity instanceof TaskExecutionAPIEntity) {

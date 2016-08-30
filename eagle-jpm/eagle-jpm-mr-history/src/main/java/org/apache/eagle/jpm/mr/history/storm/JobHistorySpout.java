@@ -149,7 +149,9 @@ public class JobHistorySpout extends BaseRichSpout {
 
         try {
             jhfLCM = new JobHistoryDAOImpl(configManager.getJobHistoryEndpointConfig());
-            driver = new JHFCrawlerDriverImpl(configManager.getJobHistoryEndpointConfig(),
+            driver = new JHFCrawlerDriverImpl(
+                configManager.getEagleServiceConfig(),
+                configManager.getJobExtractorConfig(),
                 configManager.getControlConfig(),
                 callback,
                 zkState,

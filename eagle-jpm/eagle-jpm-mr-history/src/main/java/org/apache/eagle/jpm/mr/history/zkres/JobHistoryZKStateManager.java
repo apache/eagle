@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.zkres;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.ZKStateConfig;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public static final String ZNODE_FORCE_START_FROM = "forceStartFrom";
     public static final String ZNODE_PARTITIONS = "partitions";
     public static final String ZNODE_JOBS = "jobs";
+    public static final String ZNODE_JOB_IDS = "jobIds";
     public static final String ZNODE_TIMESTAMPS = "timeStamps";
 
     public static final int BACKOFF_DAYS = 0;
@@ -268,6 +271,12 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
                 _curator.delete().deletingChildrenIfNeeded().forPath(path);
                 LOG.info("really truncated all data for day " + date);
             }
+
+            String jobIdPath = zkRoot + "/" + ZNODE_JOB_IDS + "/" + date;
+            if (_curator.checkExists().forPath(jobIdPath) != null) {
+                _curator.delete().deletingChildrenIfNeeded().forPath(jobIdPath);
+                LOG.info("really truncated all jobIds for day " + date);
+            }
         } catch (Exception e) {
             LOG.error("fail truncating processed jobs", e);
             throw new RuntimeException(e);
@@ -342,6 +351,43 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
             _curator.setData().forPath(path, (timeStamp + "").getBytes("UTF-8"));
         } catch (Exception e) {
             LOG.error("fail to update timeStamp for partition " + partitionId, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Pair<String, String>> getProcessedJobs(String date) {
+        List<Pair<String, String>> result = new ArrayList<>();
+        String path = zkRoot + "/" + ZNODE_JOB_IDS + "/" + date;
+        try {
+            if (_curator.checkExists().forPath(path) != null) {
+                List<String> jobs = _curator.getChildren().forPath(path);
+                for (String job : jobs) {
+                    String jobPath = path + "/" + job;
+                    String status = new String(_curator.getData().forPath(jobPath), "UTF-8");
+                    result.add(Pair.of(job, status));
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("fail read processed jobs", e);
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public void updateProcessedJob(String date, String jobId, String status) {
+        String path = zkRoot + "/" + ZNODE_JOB_IDS + "/" + date + "/" + jobId;
+        try {
+            if (_curator.checkExists().forPath(path) == null) {
+                _curator.create()
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.PERSISTENT)
+                    .forPath(path);
+            }
+            _curator.setData().forPath(path, status.getBytes("UTF-8"));
+        } catch (Exception e) {
+            LOG.error("fail adding processed jobs", e);
             throw new RuntimeException(e);
         }
     }
