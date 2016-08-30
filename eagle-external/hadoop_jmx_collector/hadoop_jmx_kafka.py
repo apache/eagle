@@ -64,6 +64,23 @@ class NNCapacityUsageMetric(JmxMetricListener):
             capacityusage = round(float(bean['CapacityUsed']) / float(bean['CapacityTotal']) * 100, 2)
             self.collector.on_bean_kv(self.PREFIX, "capacityusage", capacityusage)
 
+class NNNodeUsageMetric(JmxMetricListener):
+    PREFIX = "hadoop.namenode.nodeusage"
+
+    def on_bean(self, bean):
+        if bean["name"] == "Hadoop:service=NameNode,name=NameNodeInfo":
+            nodeusagedic = json.loads(bean["NodeUsage"]);
+            nodeusage_detail_dic = nodeusagedic["nodeUsage"];
+            min = round( float(nodeusage_detail_dic["min"].strip('%')) ,2 );
+            max = round( float(nodeusage_detail_dic["max"].strip('%')) ,2 );
+            median = round( float(nodeusage_detail_dic["median"].strip('%')) ,2 );
+            stddev = round( float(nodeusage_detail_dic["stdDev"].strip('%')) ,2 );
+            self.collector.on_bean_kv(self.PREFIX, "min", min)
+            self.collector.on_bean_kv(self.PREFIX, "max", max)
+            self.collector.on_bean_kv(self.PREFIX, "median", median)
+            self.collector.on_bean_kv(self.PREFIX, "stddev", stddev)
+
+
 class JournalTransactionInfoMetric(JmxMetricListener):
     PREFIX = "hadoop.namenode.journaltransaction"
 
@@ -83,6 +100,7 @@ if __name__ == '__main__':
             NNHAMetric(),
             MemortUsageMetric(),
             JournalTransactionInfoMetric(),
-            NNCapacityUsageMetric()
+            NNCapacityUsageMetric(),
+            NNNodeUsageMetric()
     )
     Runner.run(collector)
