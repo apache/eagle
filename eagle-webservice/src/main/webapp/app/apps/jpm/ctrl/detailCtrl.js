@@ -103,7 +103,7 @@
 			// =========================================================================
 			// =                               Fetch Job                               =
 			// =========================================================================
-			JPM.jobList(jobCond)._promise.then(function (list) {
+			JPM.findMRJobs($scope.site, undefined, $scope.jobId)._promise.then(function (list) {
 				$scope.job = list[list.length - 1];
 				console.log("[JPM] Fetch job:", $scope.job);
 
@@ -119,6 +119,8 @@
 
 				startTime = Time($scope.job.startTime).subtract(1, "hour");
 				endTime = Time().add(1, "hour");
+				$scope.startTimestamp = $scope.job.startTime;
+				$scope.endTimestamp = $scope.job.endTime;
 				$scope.isRunning = !$scope.job.currentState || ($scope.job.currentState || "").toUpperCase() === 'RUNNING';
 
 				// Dashboard 1: Allocated MB

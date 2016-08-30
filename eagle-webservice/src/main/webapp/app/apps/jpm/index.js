@@ -32,6 +32,11 @@
 		site: true,
 		templateUrl: "partials/job/detail.html",
 		controller: "detailCtrl"
+	}).route("jpmJobTask", {
+		url: "/jpm/jobTask/:jobId?startTime&endTime",
+		site: true,
+		templateUrl: "partials/job/task.html",
+		controller: "jobTaskCtrl"
 	}).route("jpmCompare", {
 		url: "/jpm/compare/:jobDefId?from&to",
 		site: true,
@@ -51,6 +56,7 @@
 		var QUERY_GROUPS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		var QUERY_METRICS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		var QUERY_MR_JOBS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/search';
+		var QUERY_JOB_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		var QUERY_TASK_STATISTIC = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/${jobId}/taskCounts?site=${site}&timelineInSecs=${times}&top=${top}';
 
 		var JPM = {};
@@ -108,8 +114,8 @@
 			var config = {
 				query: query,
 				condition: JPM.condition(condition),
-				startTime: moment(startTime).format(Time.FORMAT),
-				endTime: moment(endTime).format(Time.FORMAT),
+				startTime: Time.format(startTime),
+				endTime: Time.format(endTime),
 				groups: $.map(groups, function (group) {
 					return "@" + group;
 				}).join(","),
@@ -122,10 +128,10 @@
 
 		/**
 		 * Fetch eagle query list
-		 * @param query
-		 * @param condition
-		 * @param startTime
-		 * @param endTime
+		 * @param {string} query
+		 * @param {{}?} condition
+		 * @param {(string|number|{})?} startTime
+		 * @param {(string|number|{})?} endTime
 		 * @param {[]?} fields
 		 * @param {number?} limit
 		 * @return {[]}
@@ -134,9 +140,9 @@
 			var config = {
 				query: query,
 				condition: JPM.condition(condition),
-				startTime: moment(startTime).format(Time.FORMAT),
-				endTime: moment(endTime).format(Time.FORMAT),
-				fields: fields ? $.map(fields, function (field) {
+				startTime: Time.format(startTime),
+				endTime: Time.format(endTime),
+				fields: (fields || []).length > 0 ? $.map(fields, function (field) {
 					return "@" + field;
 				}).join(",") : "*",
 				limit: limit || 10000
@@ -155,27 +161,18 @@
 		 * @return {[]}
 		 */
 		JPM.jobList = function (condition, startTime, endTime, fields, limit) {
-			var _list = [];
-			_list._done = false;
+			var config = {
+				condition: JPM.condition(condition),
+				startTime: Time.format(startTime),
+				endTime: Time.format(endTime),
+				fields: (fields || []).length > 0 ? $.map(fields, function (field) {
+					return "@" + field;
+				}).join(",") : "*",
+				limit: limit || 10000
+			};
 
-			var runningList = JPM.list("RunningJobExecutionService", condition, startTime, endTime, fields, limit);
-			var historyList = JPM.list("JobExecutionService", condition, startTime, endTime, fields, limit);
-
-			runningList._promise.then(function (data) {
-				_list.splice(0);
-				Array.prototype.push.apply(_list, data);
-			});
-
-			_list._promise = $q.all([runningList._promise, historyList._promise]).then(function (args) {
-				_list.splice(0);
-				Array.prototype.push.apply(_list, args[0]);
-				Array.prototype.push.apply(_list, args[1]);
-				_list._done = true;
-
-				return _list;
-			});
-
-			return _list;
+			var jobList_url = common.template(QUERY_JOB_LIST, config);
+			return wrapList(JPM.get(jobList_url));
 		};
 
 		/**
@@ -190,8 +187,8 @@
 		JPM.metrics = function (condition, metric, startTime, endTime, limit) {
 			var config = {
 				condition: JPM.condition(condition),
-				startTime: moment(startTime).format(Time.FORMAT),
-				endTime: moment(endTime).format(Time.FORMAT),
+				startTime: Time.format(startTime),
+				endTime: Time.format(endTime),
 				metric: metric,
 				limit: limit || 10000
 			};
@@ -217,13 +214,15 @@
 		/**
 		 * Get job list by sam jobDefId
 		 * @param {string} site
-		 * @param {string} jobDefId
+		 * @param {string|undefined?} jobDefId
+		 * @param {string|undefined?} jobId
 		 * @return {[]}
 		 */
-		JPM.findMRJobs = function (site, jobDefId) {
+		JPM.findMRJobs = function (site, jobDefId, jobId) {
 			return wrapList(JPM.get(QUERY_MR_JOBS, {
 				site: site,
-				jobDefId: jobDefId
+				jobDefId: jobDefId,
+				jobId: jobId
 			}));
 		};
 
@@ -305,5 +304,6 @@
 
 	jpmApp.require("ctrl/listCtrl.js");
 	jpmApp.require("ctrl/detailCtrl.js");
+	jpmApp.require("ctrl/jobTaskCtrl.js");
 	jpmApp.require("ctrl/compareCtrl.js");
 })();

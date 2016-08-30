@@ -68,6 +68,15 @@
 							<td class="text-break">{{job.tags.jobDefId}}</td>
 						</tr>
 						<tr>
+							<th>Job Id</th>
+							<td class="text-break">
+								{{job.tags.jobId}}
+								<a class="fa fa-link" href="{{job.trackingUrl}}" target="_blank" ng-if="job.trackingUrl"></a>
+							</td>
+							<th>Job Exec Id</th>
+							<td class="text-break">{{job.tags.jobExecId}}</td>
+						</tr>
+						<tr>
 							<th>User</th>
 							<td>{{job.tags.user}}</td>
 							<th>Queue</th>
@@ -78,12 +87,6 @@
 							<td>{{job.tags.site}}</td>
 							<th>Job Type</th>
 							<td>{{job.tags.jobType}}</td>
-						</tr>
-						<tr>
-							<th>Job Id</th>
-							<td class="text-break">{{job.tags.jobId}}</td>
-							<th>Job Exec Id</th>
-							<td class="text-break">{{job.tags.jobExecId}}</td>
 						</tr>
 						<tr>
 							<th>Submission Time</th>
@@ -195,6 +198,13 @@
 		<h3 class="box-title">
 			Dashboards
 		</h3>
+		<div class="pull-right box-tools">
+			<a ui-sref="jpmJobTask({siteId: site, jobId: job.tags.jobId, startTime: startTimestamp, endTime: endTimestamp})"
+			   class="btn btn-primary btn-xs" target="_blank" ng-if="!isRunning">
+				<span class="fa fa-map"></span>
+				Task Statistic
+			</a>
+		</div>
 	</div>
 	<div class="box-body">
 		<div class="row">

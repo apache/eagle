@@ -28,17 +28,24 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
+		var JOB_STATES = ["NEW", "NEW_SAVING", "SUBMITTED", "ACCEPTED", "RUNNING", "FINISHED", "SUCCESS", "FAILED", "KILLED"];
+
 		jpmApp.controller("listCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
 			PageConfig.title = "YARN Jobs";
 			PageConfig.subTitle = "list";
 			$scope.getStateClass = JPM.getStateClass;
+			$scope.tableScope = {};
 
 			// Initialization
 			var endTime = Time();
 			var startTime = endTime.clone().subtract(2, "hour");
 
 			$scope.site = $wrapState.param.siteId;
-			$scope.searchPathList = [["tags", "jobId"], ["tags", "user"], ["tags", "queue"]];
+			$scope.searchPathList = [["tags", "jobId"], ["tags", "user"], ["tags", "queue"], ["currentState"]];
+
+			$scope.fillSearch = function (key) {
+				$("#jobList").find(".search-box input").val(key).trigger('input');
+			};
 
 			$scope.refreshList = function () {
 				/**
@@ -72,10 +79,31 @@
 					"numTotalReduces",
 					"runningContainers"
 				], 100000));
+				$scope.jobStateList = [];
+
 				$scope.jobList._then(function () {
 					var now = Time();
+					var jobStates = {};
 					$.each($scope.jobList, function (i, job) {
+						jobStates[job.currentState] = (jobStates[job.currentState] || 0) + 1;
 						job.duration = Time.diff(job.startTime, job.endTime || now);
+					});
+
+					$scope.jobStateList = $.map(JOB_STATES, function (state) {
+						var value = jobStates[state];
+						delete  jobStates[state];
+						if(!value) return null;
+						return {
+							key: state,
+							value: value
+						};
+					});
+
+					$.each(jobStates, function (key, value) {
+						$scope.jobStateList.push({
+							key: key,
+							value: value
+						});
 					});
 				});
 			};

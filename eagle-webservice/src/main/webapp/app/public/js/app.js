@@ -172,6 +172,12 @@ var app = {};
 			var param_next;
 			var param_current;
 
+			Object.defineProperty(window, "scope", {
+				get: function () {
+					return angular.element("#content .ng-scope").scope();
+				}
+			});
+
 			// ============================== Route Update ==============================
 			$scope.$on('$stateChangeStart', function (event, next, nextParam, current, currentParam) {
 				console.log("[Switch] current ->", current, currentParam);

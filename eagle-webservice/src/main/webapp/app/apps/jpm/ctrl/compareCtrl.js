@@ -44,6 +44,14 @@
 			// ==================================================================
 			var jobList = JPM.findMRJobs($scope.site, $scope.jobDefId);
 			jobList._promise.then(function () {
+				if(jobList.length <= 1) {
+					$.dialog({
+						title: "No statistic info",
+						content: "Current job do not have enough statistic info. Please check 'jobDefId' if your job have run many times."
+					});
+					return;
+				}
+
 				function findJob(jobId) {
 					return common.array.find(jobId, jobList, "tags.jobId");
 				}

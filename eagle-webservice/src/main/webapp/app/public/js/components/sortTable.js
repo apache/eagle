@@ -32,8 +32,9 @@
 			 * @param $scope
 			 * @param $element
 			 * @param {{}} $attrs
-			 * @param {string} $attrs.sortTable
+			 * @param {string} $attrs.sortTable			Data source
 			 * @param {string?} $attrs.isSorting		Will bind parent variable of sort state
+			 * @param {string?} $attrs.scope			Will bind parent variable of current scope
 			 * @param {[]?} $attrs.searchPathList		Filter search path list
 			 */
 			controller: function($scope, $element, $attrs) {
@@ -132,6 +133,11 @@
 				$scope.$on('$destroy', function() {
 					worker.removeEventListener("message", workMessage);
 				});
+
+				// Scope bind
+				if($attrs.scope) {
+					$scope.$parent[$attrs.scope] = $scope;
+				}
 			},
 			compile: function ($element) {
 				var contents = $element.contents().remove();

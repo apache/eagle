@@ -67,6 +67,7 @@
 				diff = timeSrv.diff(from, to);
 			}
 			if(diff === null) return "-";
+			if(diff === 0) return "0s";
 
 			var match = false;
 			var rows = [];
