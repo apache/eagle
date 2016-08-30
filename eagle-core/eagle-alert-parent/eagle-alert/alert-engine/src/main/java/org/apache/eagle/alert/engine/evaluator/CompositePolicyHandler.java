@@ -49,7 +49,7 @@ public class CompositePolicyHandler implements PolicyStreamHandler {
     public void prepare(Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception {
         this.collector = collector;
         // TODO: create two handlers
-        policyHandler = PolicyStreamHandlers.createHandler(context.getPolicyDefinition().getDefinition().type, sds);
+        policyHandler = PolicyStreamHandlers.createHandler(context.getPolicyDefinition().getDefinition(), sds);
         policyHandler.prepare(collector, context);
         handlers.add(policyHandler);
 

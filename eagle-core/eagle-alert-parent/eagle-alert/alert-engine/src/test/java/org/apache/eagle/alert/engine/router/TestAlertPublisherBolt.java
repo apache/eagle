@@ -78,6 +78,59 @@ public class TestAlertPublisherBolt {
         return alert;
     }
 
+
+    @Test
+    public void testMapComparatorAdded() {
+
+        PublishSpec spec1 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishForAdd1.json"), PublishSpec.class);
+        PublishSpec spec2 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishForAdd0.json"), PublishSpec.class);
+
+        Map<String, Publishment> map1 = new HashMap<>();
+        Map<String, Publishment> map2 = new HashMap<>();
+        spec1.getPublishments().forEach(p -> map1.put(p.getName(), p));
+        spec2.getPublishments().forEach(p -> map2.put(p.getName(), p));
+
+        MapComparator<String, Publishment> comparator = new MapComparator<>(map1, map2);
+        comparator.compare();
+        Assert.assertTrue(comparator.getAdded().size() == 1);
+
+    }
+
+    @Test
+    public void testMapComparatorRemoved() {
+
+        PublishSpec spec1 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishForAdd0.json"), PublishSpec.class);
+        PublishSpec spec2 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishForAdd1.json"), PublishSpec.class);
+
+        Map<String, Publishment> map1 = new HashMap<>();
+        Map<String, Publishment> map2 = new HashMap<>();
+        spec1.getPublishments().forEach(p -> map1.put(p.getName(), p));
+        spec2.getPublishments().forEach(p -> map2.put(p.getName(), p));
+
+        MapComparator<String, Publishment> comparator = new MapComparator<>(map1, map2);
+        comparator.compare();
+        Assert.assertTrue(comparator.getRemoved().size() == 1);
+
+    }
+
+    @Test
+    public void testMapComparatorModified() {
+
+        PublishSpec spec1 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishForAdd0.json"), PublishSpec.class);
+        PublishSpec spec2 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishForMdyValue.json"), PublishSpec.class);
+
+        Map<String, Publishment> map1 = new HashMap<>();
+        Map<String, Publishment> map2 = new HashMap<>();
+        spec1.getPublishments().forEach(p -> map1.put(p.getName(), p));
+        spec2.getPublishments().forEach(p -> map2.put(p.getName(), p));
+
+        MapComparator<String, Publishment> comparator = new MapComparator<>(map1, map2);
+        comparator.compare();
+        Assert.assertTrue(comparator.getModified().size() == 1);
+
+    }
+
+
     @Test
     public void testMapComparator() {
         PublishSpec spec1 = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishSpec.json"), PublishSpec.class);

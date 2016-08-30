@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,32 +16,10 @@
  * limitations under the License.
 */
 
-package org.apache.eagle.jpm.mr.history.zkres;
+package org.apache.eagle.jpm.spark.history;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.List;
-
-public interface JobHistoryZKStateLCM {
-    void ensureJobPartitions(int numTotalPartitions);
-
-    String readProcessedDate(int partitionId);
-
-    List<String> readProcessedJobs(String date);
-
-    void updateProcessedDate(int partitionId, String date);
-
-    void addProcessedJob(String date, String jobId);
-
-    void updateProcessedJob(String date, String jobId, String status);
-
-    void truncateProcessedJob(String date);
-
-    void truncateEverything();
-
-    long readProcessedTimeStamp(int partitionId);
-
-    void updateProcessedTimeStamp(int partitionId, long timeStamp);
-
-    List<Pair<String, String>> getProcessedJobs(String date);
+public class SparkHistoryJobMain {
+    public static void main(String[] args) {
+        new SparkHistoryJobApp().run(args);
+    }
 }

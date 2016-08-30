@@ -70,6 +70,7 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
     private volatile Map<String, PolicyDefinition> cachedPolicies = new HashMap<>(); // for one streamGroup, there are multiple policies
 
     private AlertBoltSpec spec;
+
     public AlertBolt(String boltId, Config config, IMetadataChangeNotifyService changeNotifyService){
         super(boltId, changeNotifyService, config);
         this.boltId = boltId;

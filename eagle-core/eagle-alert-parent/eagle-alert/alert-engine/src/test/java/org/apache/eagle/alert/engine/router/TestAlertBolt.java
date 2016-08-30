@@ -41,13 +41,14 @@ import org.apache.eagle.alert.engine.runner.AlertBolt;
 import org.apache.eagle.alert.engine.runner.TestStreamRouterBolt;
 import org.apache.eagle.alert.engine.serialization.impl.PartitionedEventSerializerImpl;
 import org.apache.eagle.alert.utils.DateTimeUtil;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.mockito.Matchers.any;
@@ -59,6 +60,9 @@ import static org.mockito.Mockito.when;
  */
 @SuppressWarnings({"rawtypes", "unused"})
 public class TestAlertBolt {
+
+    public static final String TEST_STREAM = "test-stream";
+
     /**
      * Following knowledge is guaranteed in
      *
@@ -164,7 +168,6 @@ public class TestAlertBolt {
         bolt.cleanup();
     }
 
-    @NotNull
     public static AlertBolt createAlertBolt(OutputCollector collector) {
         Config config = ConfigFactory.load();
         PolicyGroupEvaluator policyGroupEvaluator = new PolicyGroupEvaluatorImpl("testPolicyGroupEvaluatorImpl");
@@ -260,6 +263,7 @@ public class TestAlertBolt {
         }
     }
 
+    //TODO: no data alert failed, need to check when no data alert merged.
     @Test
     public void testMetaversionConflict() throws Exception {
         AtomicInteger failedCount = new AtomicInteger();
@@ -283,25 +287,6 @@ public class TestAlertBolt {
         });
         AlertBolt bolt = createAlertBolt(collector);
 
-        GeneralTopologyContext context = mock(GeneralTopologyContext.class);
-        int taskId = 1;
-        when(context.getComponentId(taskId)).thenReturn("comp1");
-        when(context.getComponentOutputFields("comp1", "default")).thenReturn(new Fields("f0"));
-        // case 1: bolt prepared but metadata not initialized (no bolt.onAlertBoltSpecChange)
-        PartitionedEvent pe = new PartitionedEvent();
-        pe.setPartitionKey(1);
-        pe.setPartition(createPartition());
-        StreamEvent streamEvent = new StreamEvent();
-        streamEvent.setStreamId("test-stream");
-        streamEvent.setTimestamp(System.currentTimeMillis());
-        streamEvent.setMetaVersion("spec_version_"+System.currentTimeMillis());
-        pe.setEvent(streamEvent);
-
-        PartitionedEventSerializerImpl peSer = new PartitionedEventSerializerImpl(bolt);
-        byte[] serializedEvent = peSer.serialize(pe);
-        Tuple input = new TupleImpl(context, Collections.singletonList(serializedEvent), taskId, "default");
-
-
         Map<String, StreamDefinition> sds = new HashMap();
         StreamDefinition sdTest = new StreamDefinition();
         String streamId = "test-stream";
@@ -318,13 +303,16 @@ public class TestAlertBolt {
 
         PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
         definition.setType(PolicyStreamHandlers.NO_DATA_ALERT_ENGINE);
-        definition.setValue("PT0M,plain,1,host,host1");
+        definition.setValue("PT0M,provided,1,host,host1");
         def.setDefinition(definition);
+        def.setPartitionSpec(Arrays.asList(createPartition()));
+        def.setOutputStreams(Arrays.asList("out"));
 
         boltSpecs.getBoltPoliciesMap().put(bolt.getBoltId(), Arrays.asList(def));
         bolt = createAlertBolt(collector);
         bolt.onAlertBoltSpecChange(boltSpecs, sds);
 
+        Tuple input = createTuple(bolt, boltSpecs.getVersion());
         bolt.execute(input);
 
         // Sleep 10s to wait thread in bolt.execute() to finish works
@@ -335,12 +323,87 @@ public class TestAlertBolt {
 
     }
 
-    @NotNull
+    private Tuple createTuple(AlertBolt bolt, String version) throws IOException {
+        GeneralTopologyContext context = mock(GeneralTopologyContext.class);
+        int taskId = 1;
+        when(context.getComponentId(taskId)).thenReturn("comp1");
+        when(context.getComponentOutputFields("comp1", "default")).thenReturn(new Fields("f0"));
+        // case 1: bolt prepared but metadata not initialized (no bolt.onAlertBoltSpecChange)
+        PartitionedEvent pe = new PartitionedEvent();
+        pe.setPartitionKey(1);
+        pe.setPartition(createPartition());
+        StreamEvent streamEvent = new StreamEvent();
+        streamEvent.setStreamId(TEST_STREAM);
+        streamEvent.setTimestamp(System.currentTimeMillis());
+        streamEvent.setMetaVersion(version);
+        pe.setEvent(streamEvent);
+
+        PartitionedEventSerializerImpl peSer = new PartitionedEventSerializerImpl(bolt);
+        byte[] serializedEvent = peSer.serialize(pe);
+        return new TupleImpl(context, Collections.singletonList(serializedEvent), taskId, "default");
+    }
+
     private StreamPartition createPartition() {
         StreamPartition sp = new StreamPartition();
+        sp.setStreamId(TEST_STREAM);
         sp.setType(StreamPartition.Type.GROUPBY);
         return sp;
     }
 
+    @Test
+    public void testExtendDefinition() throws IOException {
+        PolicyDefinition def = new PolicyDefinition();
+        def.setName("policy-definition");
+        def.setInputStreams(Arrays.asList(TEST_STREAM));
+
+        PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
+        definition.setType(PolicyStreamHandlers.CUSTOMIZED_ENGINE);
+        definition.setHandlerClass("org.apache.eagle.alert.engine.router.CustomizedHandler");
+        definition.setValue("PT0M,plain,1,host,host1");
+        def.setDefinition(definition);
+        def.setPartitionSpec(Arrays.asList(createPartition()));
+
+        AlertBoltSpec boltSpecs = new AlertBoltSpec();
+
+        AtomicBoolean recieved = new AtomicBoolean(false);
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
+            @Override
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                recieved.set(true);
+                return Collections.emptyList();
+            }
+
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {}
+
+            @Override
+            public void ack(Tuple input) {}
+
+            @Override
+            public void fail(Tuple input) {}
+
+            @Override
+            public void reportError(Throwable error) {}
+        });
+        AlertBolt bolt = createAlertBolt(collector);
+
+        boltSpecs.getBoltPoliciesMap().put(bolt.getBoltId(), Arrays.asList(def));
+        boltSpecs.setVersion("spec_"+System.currentTimeMillis());
+        // stream def map
+        Map<String, StreamDefinition> sds = new HashMap();
+        StreamDefinition sdTest = new StreamDefinition();
+        sdTest.setStreamId(TEST_STREAM);
+        sds.put(sdTest.getStreamId(), sdTest);
+
+        bolt.onAlertBoltSpecChange(boltSpecs, sds);
+
+        // how to assert
+        Tuple t = createTuple(bolt, boltSpecs.getVersion());
+
+        bolt.execute(t);
+
+        Assert.assertTrue(recieved.get());
+    }
 
 }
+
