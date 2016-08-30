@@ -403,6 +403,12 @@ public class MRJobExecutionResource {
             response.errMessage = String.format("Catch an exception: %s with query=%s", historyRes.getException(), query);
             return response;
         }
-        return helper.getHistoryJobCount(historyRes.getObj(), timeList);
+        try {
+            return helper.getHistoryJobCount(historyRes.getObj(), timeList);
+        } catch (Exception e) {
+            response.errMessage = e.getMessage();
+            return response;
+        }
+
     }
 }
