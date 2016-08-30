@@ -46,7 +46,7 @@ public class JHFParserFactory {
 
         switch (f) {
             case MRVer2:
-                JHFMRVer2EventReader reader2 = new JHFMRVer2EventReader(baseTags, configuration, filter);
+                JHFMRVer2EventReader reader2 = new JHFMRVer2EventReader(baseTags, configuration, filter, configManager.getJobHistoryEndpointConfig());
                 reader2.addListener(new JobEntityCreationEagleServiceListener(configManager));
                 reader2.addListener(new TaskFailureListener(configManager));
                 reader2.addListener(new TaskAttemptCounterListener(configManager));
@@ -57,7 +57,7 @@ public class JHFParserFactory {
                 break;
             case MRVer1:
             default:
-                JHFMRVer1EventReader reader1 = new JHFMRVer1EventReader(baseTags, configuration, filter);
+                JHFMRVer1EventReader reader1 = new JHFMRVer1EventReader(baseTags, configuration, filter, configManager.getJobHistoryEndpointConfig());
                 reader1.addListener(new JobEntityCreationEagleServiceListener(configManager));
                 reader1.addListener(new TaskFailureListener(configManager));
                 reader1.addListener(new TaskAttemptCounterListener(configManager));

@@ -89,6 +89,17 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     private int totalReduceAttempts;
     @Column("ac")
     private int failedReduceAttempts;
+    @Column("ad")
+    private String trackingUrl;
+
+    public String getTrackingUrl() {
+        return trackingUrl;
+    }
+
+    public void setTrackingUrl(String trackingUrl) {
+        this.trackingUrl = trackingUrl;
+        valueChanged("trackingUrl");
+    }
 
     public long getDurationTime() {
         return durationTime;

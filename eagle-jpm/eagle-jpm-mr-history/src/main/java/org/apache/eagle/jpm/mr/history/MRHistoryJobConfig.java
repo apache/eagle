@@ -86,6 +86,7 @@ public class MRHistoryJobConfig implements Serializable {
 
     public static class JobHistoryEndpointConfig implements Serializable {
         public String nnEndpoint;
+        public String mrHistoryServerUrl;
         public String basePath;
         public boolean pathContainsJobTrackerName;
         public String jobTrackerName;
@@ -173,6 +174,7 @@ public class MRHistoryJobConfig implements Serializable {
         this.jobHistoryEndpointConfig.basePath = config.getString("dataSourceConfig.basePath");
         this.jobHistoryEndpointConfig.jobTrackerName = config.getString("dataSourceConfig.jobTrackerName");
         this.jobHistoryEndpointConfig.nnEndpoint = config.getString("dataSourceConfig.nnEndpoint");
+        this.jobHistoryEndpointConfig.mrHistoryServerUrl = config.getString("dataSourceConfig.mrHistoryServerUrl");
         this.jobHistoryEndpointConfig.pathContainsJobTrackerName = config.getBoolean("dataSourceConfig.pathContainsJobTrackerName");
         this.jobHistoryEndpointConfig.principal = config.getString("dataSourceConfig.principal");
         this.jobHistoryEndpointConfig.keyTab = config.getString("dataSourceConfig.keytab");

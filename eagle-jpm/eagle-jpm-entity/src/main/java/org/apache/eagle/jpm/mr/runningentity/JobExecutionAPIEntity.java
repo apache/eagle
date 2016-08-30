@@ -112,6 +112,18 @@ public class JobExecutionAPIEntity extends TaggedLogAPIEntity {
     private long submissionTime;
     @Column("ak")
     private String internalState;
+    @Column("al")
+    private String trackingUrl;
+
+    public String getTrackingUrl() {
+        return trackingUrl;
+    }
+
+    public void setTrackingUrl(String trackingUrl) {
+        this.trackingUrl = trackingUrl;
+        valueChanged("trackingUrl");
+    }
+
 
     public JobConfig getJobConfig() {
         return jobConfig;

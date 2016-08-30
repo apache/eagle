@@ -207,6 +207,7 @@ public class MRJobParser implements Runnable {
             }
             jobExecutionAPIEntity.setTimestamp(app.getStartedTime());
             jobExecutionAPIEntity.setSubmissionTime(app.getStartedTime());
+            jobExecutionAPIEntity.setTrackingUrl(app.getTrackingUrl());
             jobExecutionAPIEntity.setStartTime(mrJob.getStartTime());
             jobExecutionAPIEntity.setDurationTime(mrJob.getElapsedTime());
             jobExecutionAPIEntity.setCurrentState(mrJob.getState());

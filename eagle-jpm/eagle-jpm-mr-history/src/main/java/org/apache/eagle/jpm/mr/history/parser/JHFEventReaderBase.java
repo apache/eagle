@@ -18,6 +18,8 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.JobHistoryEndpointConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.parser.JHFMRVer1Parser.Keys;
 import org.apache.eagle.jpm.mr.historyentity.*;
@@ -65,6 +67,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     protected String queueName;
     protected Long jobLaunchTime;
     protected JobHistoryContentFilter filter;
+    private JobHistoryEndpointConfig jobHistoryEndpointConfig;
 
     protected final List<HistoryJobEntityLifecycleListener> jobEntityLifecycleListeners = new ArrayList<>();
 
@@ -96,8 +99,9 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
      *
      * @param baseTags
      */
-    public JHFEventReaderBase(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter) {
+    public JHFEventReaderBase(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter, JobHistoryEndpointConfig jobHistoryEndpointConfig) {
         this.filter = filter;
+        this.jobHistoryEndpointConfig = jobHistoryEndpointConfig;
 
         this.baseTags = baseTags;
         jobSubmitEventEntity = new JobEventAPIEntity();
@@ -153,6 +157,11 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         for (HistoryJobEntityLifecycleListener listener : this.jobEntityLifecycleListeners) {
             listener.flush();
         }
+    }
+
+    private String buildJobTrackingUrl(String jobId) {
+        String jobTrackingUrlBase = this.jobHistoryEndpointConfig.mrHistoryServerUrl + "/jobhistory/job/";
+        return FilenameUtils.concat(jobTrackingUrlBase, jobId);
     }
 
     /**
@@ -236,6 +245,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             jobExecutionEntity.getTags().put(MRJobTagName.JOB_QUEUE.toString(), queueName);
             jobExecutionEntity.getTags().put(MRJobTagName.JOB_TYPE.toString(), this.jobType);
 
+            jobExecutionEntity.setTrackingUrl(buildJobTrackingUrl(jobId));
             jobExecutionEntity.setCurrentState(values.get(Keys.JOB_STATUS));
             jobExecutionEntity.setStartTime(jobLaunchEventEntity.getTimestamp());
             jobExecutionEntity.setEndTime(jobFinishEventEntity.getTimestamp());
