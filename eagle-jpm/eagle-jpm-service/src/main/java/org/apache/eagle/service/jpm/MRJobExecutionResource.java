@@ -258,13 +258,13 @@ public class MRJobExecutionResource {
     @Path("runningJobCounts")
     @Produces(MediaType.APPLICATION_JSON)
     public JobCountResponse getRunningJobCount(@QueryParam("site") String site,
-                                               @QueryParam("startTime") String startTime,
-                                               @QueryParam("endTime") String endTime,
+                                               @QueryParam("durationBegin") String startTime,
+                                               @QueryParam("durationEnd") String endTime,
                                                @QueryParam("intervalInSecs") long intervalInSecs) {
         JobCountResponse response = new JobCountResponse();
         MRJobCountHelper helper = new MRJobCountHelper();
         if (site == null || startTime == null || endTime == null) {
-            response.errMessage = "IllegalArgument: site, startTime, endTime, or metric is null";
+            response.errMessage = "IllegalArgument: site, durationBegin, durationEnd, or metric is null";
             return response;
         }
         if (intervalInSecs <= 0) {
@@ -388,12 +388,12 @@ public class MRJobExecutionResource {
     @Produces(MediaType.APPLICATION_JSON)
     public JobCountResponse getJobCountGroupByDuration(@QueryParam("site") String site,
                                                        @QueryParam("timelineInSecs") String timeList,
-                                                       @QueryParam("startTime") String startTime,
-                                                       @QueryParam("endTime") String endTime) {
+                                                       @QueryParam("jobStartTimeBegin") String startTime,
+                                                       @QueryParam("jobStartTimeEnd") String endTime) {
         JobCountResponse response = new JobCountResponse();
         MRJobCountHelper helper = new MRJobCountHelper();
         if (site == null || startTime == null || endTime == null || timeList == null) {
-            response.errMessage = "IllegalArgument: site, startTime, endTime, or timelineInSecs is null";
+            response.errMessage = "IllegalArgument: site, jobStartTimeBegin, jobStartTimeEnd, or timelineInSecs is null";
             return response;
         }
         String query = String.format("%s[@site=\"%s\"]{@durationTime,@jobType}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site);
