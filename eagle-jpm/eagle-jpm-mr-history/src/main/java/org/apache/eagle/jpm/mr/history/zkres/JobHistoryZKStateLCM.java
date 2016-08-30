@@ -18,6 +18,8 @@
 
 package org.apache.eagle.jpm.mr.history.zkres;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.List;
 
 public interface JobHistoryZKStateLCM {
@@ -31,6 +33,8 @@ public interface JobHistoryZKStateLCM {
 
     void addProcessedJob(String date, String jobId);
 
+    void updateProcessedJob(String date, String jobId, String status);
+
     void truncateProcessedJob(String date);
 
     void truncateEverything();
@@ -38,4 +42,6 @@ public interface JobHistoryZKStateLCM {
     long readProcessedTimeStamp(int partitionId);
 
     void updateProcessedTimeStamp(int partitionId, long timeStamp);
+
+    List<Pair<String, String>> getProcessedJobs(String date);
 }
