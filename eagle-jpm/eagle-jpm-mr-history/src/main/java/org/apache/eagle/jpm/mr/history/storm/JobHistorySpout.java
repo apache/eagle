@@ -87,7 +87,6 @@ public class JobHistorySpout extends BaseRichSpout {
 
     private int partitionId;
     private int numTotalPartitions;
-    private transient JobHistoryZKStateManager zkState;
     private transient JHFCrawlerDriver driver;
     private JobHistoryContentFilter contentFilter;
     private JobHistorySpoutCollectorInterceptor interceptor;
@@ -143,8 +142,8 @@ public class JobHistorySpout extends BaseRichSpout {
             throw new IllegalStateException(e);
         }
         JobIdFilter jobIdFilter = new JobIdFilterByPartition(partitioner, numTotalPartitions, partitionId);
-        zkState = new JobHistoryZKStateManager(configManager.getZkStateConfig());
-        zkState.ensureJobPartitions(numTotalPartitions);
+        JobHistoryZKStateManager.instance().init(configManager.getZkStateConfig());
+        JobHistoryZKStateManager.instance().ensureJobPartitions(numTotalPartitions);
         interceptor.setSpoutOutputCollector(collector);
 
         try {
@@ -154,7 +153,6 @@ public class JobHistorySpout extends BaseRichSpout {
                 configManager.getJobExtractorConfig(),
                 configManager.getControlConfig(),
                 callback,
-                zkState,
                 jhfLCM,
                 jobIdFilter,
                 partitionId);
@@ -168,7 +166,7 @@ public class JobHistorySpout extends BaseRichSpout {
     public void nextTuple() {
         try {
             Long modifiedTime = driver.crawl();
-            zkState.updateProcessedTimeStamp(partitionId, modifiedTime);
+            JobHistoryZKStateManager.instance().updateProcessedTimeStamp(partitionId, modifiedTime);
             updateProcessedTimeStamp(modifiedTime);
         } catch (Exception ex) {
             LOG.error("fail crawling job history file and continue ...", ex);
@@ -223,7 +221,7 @@ public class JobHistorySpout extends BaseRichSpout {
         //update latest process time
         long minTimeStamp = modifiedTime;
         for (int i = 1; i < numTotalPartitions; i++) {
-            long time = zkState.readProcessedTimeStamp(i);
+            long time = JobHistoryZKStateManager.instance().readProcessedTimeStamp(i);
             if (time <= minTimeStamp) {
                 minTimeStamp = time;
             }
