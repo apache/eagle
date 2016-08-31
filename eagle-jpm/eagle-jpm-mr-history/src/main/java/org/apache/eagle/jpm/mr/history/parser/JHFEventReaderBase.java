@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -161,7 +163,14 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
     private String buildJobTrackingUrl(String jobId) {
         String jobTrackingUrlBase = this.jobHistoryEndpointConfig.mrHistoryServerUrl + "/jobhistory/job/";
-        return FilenameUtils.concat(jobTrackingUrlBase, jobId);
+        try {
+            URI oldUri = new URI(jobTrackingUrlBase);
+            URI resolved = oldUri.resolve(jobId);
+            return resolved.toString();
+        } catch (URISyntaxException e) {
+            LOG.warn("Tracking url build failed with baseURL=%s, resolvePart=%s", jobTrackingUrlBase, jobId);
+            return jobTrackingUrlBase;
+        }
     }
 
     /**
