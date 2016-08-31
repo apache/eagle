@@ -197,7 +197,7 @@ public class MRJobExecutionResource {
 
 
     @GET
-    @Path("{jobId}/taskCounts")
+    @Path("{jobId}/taskCountsByDuration")
     @Produces(MediaType.APPLICATION_JSON)
     public TaskCountPerJobResponse getTaskCountsPerJob(@PathParam("jobId") String jobId,
                                                        @QueryParam("site") String site,
@@ -264,7 +264,7 @@ public class MRJobExecutionResource {
         JobCountResponse response = new JobCountResponse();
         MRJobCountHelper helper = new MRJobCountHelper();
         if (site == null || startTime == null || endTime == null) {
-            response.errMessage = "IllegalArgument: site, durationBegin, durationEnd, or metric is null";
+            response.errMessage = "IllegalArgument: site, durationBegin, durationEnd is null";
             return response;
         }
         if (intervalInSecs <= 0) {
@@ -384,7 +384,7 @@ public class MRJobExecutionResource {
     }
 
     @GET
-    @Path("jobCount")
+    @Path("jobCountsByDuration")
     @Produces(MediaType.APPLICATION_JSON)
     public JobCountResponse getJobCountGroupByDuration(@QueryParam("site") String site,
                                                        @QueryParam("timelineInSecs") String timeList,

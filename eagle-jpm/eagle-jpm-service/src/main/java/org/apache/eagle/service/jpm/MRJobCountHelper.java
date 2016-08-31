@@ -50,7 +50,7 @@ public class MRJobCountHelper {
         List<UnitJobCount> jobCounts = new ArrayList<>();
         initJobCountList(jobCounts, startTimeInSecs, endTimeInSecs, intervalInSecs);
         for (JobExecutionAPIEntity jobDuration: jobDurations) {
-            countJob(jobCounts, jobDuration.getStartTime() / 1000, jobDuration.getEndTime() / 1000, intervalInSecs, jobDuration.getTags().get(MRJobTagName.JOB_TYPE));
+            countJob(jobCounts, jobDuration.getStartTime() / 1000, jobDuration.getEndTime() / 1000, intervalInSecs, jobDuration.getTags().get(MRJobTagName.JOB_TYPE.toString()));
         }
         response.jobCounts = jobCounts;
         return response;
@@ -66,13 +66,16 @@ public class MRJobCountHelper {
         for (JobExecutionAPIEntity job : jobDurations) {
             int jobIndex = TaskCountByDurationHelper.getPosition(times, job.getDurationTime());
             UnitJobCount counter = jobCounts.get(jobIndex);
-            countJob(counter, job.getTags().get(MRJobTagName.JOB_TYPE));
+            countJob(counter, job.getTags().get(MRJobTagName.JOB_TYPE.toString()));
         }
         response.jobCounts = jobCounts;
         return response;
     }
 
     public void countJob(UnitJobCount counter, String jobType) {
+        if (null  ==  jobType) {
+            jobType = "null";
+        }
         counter.jobCount++;
         if (counter.jobCountByType.containsKey(jobType)) {
             counter.jobCountByType.put(jobType, counter.jobCountByType.get(jobType) + 1);
