@@ -112,14 +112,41 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationContext applicationContext = new ApplicationContext(
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
                 applicationEntity,config, alertMetadataService);
-        // TODO: Check status, skip stop if already STOPPED
+        // TODO: Check status
         try {
-            applicationContext.onStop();
+            ApplicationEntity.Status status = applicationEntity.getStatus();
+            switch (status){
+                case STARTING: {
+                    LOGGER.info("application is starting, please try it latter");
+                    break;
+                }
+                case RUNNING:{
+                    LOGGER.info("Trying to uninstall a running application, please stop it first");
+                    break;
+                }
+                case STOPPING:{
+                    LOGGER.info("application is stopping, please try it latter");
+                    break;
+                }
+                case UNINSTALLING:{
+                    LOGGER.info("application is uninstalling, please wait");
+                    break;
+                }
+                case UNINSTALLED:{
+                    LOGGER.info("application has already been uninstalled");
+                    break;
+                }
+                //installed,stopped
+                default:{
+                    applicationEntity.setStatus(ApplicationEntity.Status.UNINSTALLING);
+                    applicationContext.onUninstall();
+                    return applicationEntityService.delete(applicationEntity);
+                }
+            }
         }catch (Throwable throwable){
             LOGGER.error(throwable.getMessage(),throwable);
         }
-        applicationContext.onUninstall();
-        return applicationEntityService.delete(applicationEntity);
+        return applicationEntity;
     }
 
     @Override
@@ -128,7 +155,38 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationContext applicationContext = new ApplicationContext(
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
                 applicationEntity,config, alertMetadataService);
-        applicationContext.onStart();
+        try {
+            ApplicationEntity.Status status = applicationEntity.getStatus();
+            switch (status){
+                case STARTING:{
+                    LOGGER.info("application is starting, please wait");
+                    break;
+                    }
+                case RUNNING:{
+                    LOGGER.info("application is already running");
+                    break;
+                    }
+                case STOPPING:{
+                    LOGGER.info("application is stopping, please try it latter");
+                    break;
+                    }
+                case UNINSTALLING:{
+                    LOGGER.info("application is uninstalling, please try it latter");
+                    break;
+                    }
+                case UNINSTALLED:{
+                    LOGGER.info("application has been uninstalled, please install it first");
+                    break;
+                    }
+                //installed, stopped,
+                default:{
+                    applicationEntity.setStatus(ApplicationEntity.Status.STARTING);
+                    applicationContext.onStart();
+                 }
+            }
+        } catch(Throwable throwable) {
+            LOGGER.error("Failed to start application", throwable);
+        }
         return applicationEntity;
     }
 
@@ -139,6 +197,37 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
                 applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
                 applicationEntity,config, alertMetadataService);
         applicationContext.onStop();
+        try {
+            ApplicationEntity.Status status = applicationEntity.getStatus();
+            switch (status){
+                case INSTALLED:
+                case UNINSTALLED:
+                case STOPPED:{
+                    LOGGER.info("application is already stopped");
+                    return applicationEntity;
+                }
+                case STARTING:{
+                    LOGGER.info("application is starting, please try it latter");
+                    return applicationEntity;
+                }
+                case STOPPING:{
+                    LOGGER.info("application is stopping, please wait");
+                    return applicationEntity;
+                }
+                case UNINSTALLING:{
+                    LOGGER.info("application is uninstalling, please try it latter");
+                    return applicationEntity;
+                }
+                //running
+                default:{
+                    applicationEntity.setStatus(ApplicationEntity.Status.STOPPING);
+                    applicationContext.onStop();
+                }
+            }
+
+        }catch (Throwable throwable){
+            LOGGER.error("Failed to stop application",throwable);
+        }
         return applicationEntity;
     }
 }

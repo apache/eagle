@@ -102,5 +102,9 @@
             <artifactId>junit</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+        </dependency>
     </dependencies>
 </project>

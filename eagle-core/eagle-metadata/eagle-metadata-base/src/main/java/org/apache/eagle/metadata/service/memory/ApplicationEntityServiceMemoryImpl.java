@@ -56,6 +56,7 @@ public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityServ
         entity.ensureDefault();
         if(getBySiteIdAndAppType(entity.getSite().getSiteId(),entity.getDescriptor().getType()) != null)
             throw new IllegalArgumentException("Duplicated appId: "+entity.getAppId());
+        entity.setStatus(ApplicationEntity.Status.INSTALLED);
         applicationEntityMap.put(entity.getUuid(),entity);
         return entity;
     }
@@ -96,6 +97,7 @@ public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityServ
     @Override
     public ApplicationEntity delete(ApplicationEntity applicationEntity) {
         ApplicationEntity entity = getByUUIDOrAppId(applicationEntity.getUuid(),applicationEntity.getAppId());
+        entity.setStatus(ApplicationEntity.Status.UNINSTALLED);
         return applicationEntityMap.remove(entity.getUuid());
     }
 }

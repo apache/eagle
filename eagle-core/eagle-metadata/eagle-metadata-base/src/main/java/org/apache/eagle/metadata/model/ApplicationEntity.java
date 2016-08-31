@@ -112,7 +112,7 @@ public class ApplicationEntity extends PersistenceEntity {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public synchronized void setStatus(Status status) {
         this.status = status;
     }
 
@@ -126,6 +126,9 @@ public class ApplicationEntity extends PersistenceEntity {
 
     public static enum Status{
         INITIALIZED("INITIALIZED"),
+        INSTALLED("INSTALLED"),
+        UNINSTALLING("UNINSTALLING"),
+        UNINSTALLED("UNINSTALLED"),
         STARTING("STARTING"),
         RUNNING("RUNNING"),
         STOPPING("STOPPING"),

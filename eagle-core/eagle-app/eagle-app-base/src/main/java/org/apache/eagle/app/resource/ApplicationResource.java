@@ -18,6 +18,8 @@ package org.apache.eagle.app.resource;
 
 
 import com.google.inject.Inject;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationProviderService;
@@ -25,16 +27,45 @@ import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.resource.RESTResponse;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 
+import static org.apache.eagle.metadata.utils.HttpRequest.httpGetWithoutCredentials;
+
 @Path("/apps")
 public class ApplicationResource {
+    private final static Logger LOG = LoggerFactory.getLogger(ApplicationResource.class);
+
     private final ApplicationProviderService providerService;
     private final ApplicationManagementService applicationManagementService;
     private final ApplicationEntityService entityService;
+
+    private ApplicationEntity.Status extractStatus(JSONObject response, String appUuid) {
+        ApplicationEntity.Status status = ApplicationEntity.Status.UNINSTALLED;
+        try {
+            JSONArray list = (JSONArray) response.get("topologies");
+            for(int i = 0; i< list.length();i++ ){
+                JSONObject topology = (JSONObject) list.get(i);
+                if(topology.getString("id").equals(appUuid)) {
+                    status = ApplicationEntity.Status.valueOf((topology.getString("status")).toUpperCase());
+                    return status;
+                }
+            }
+        } catch (JSONException e){
+            LOG.info("application is not running or not existed", e);
+        } catch (Exception e){
+            LOG.info("failed to get application status from storm UI rest service", e);
+        }
+
+        return status;
+    }
 
     @Inject
     public ApplicationResource(
@@ -89,6 +120,22 @@ public class ApplicationResource {
     public RESTResponse<ApplicationEntity> getApplicationEntityByUUID(@PathParam("appUuid") String appUuid){
         return RESTResponse.async(()->entityService.getByUUID(appUuid)).get();
     }
+
+    @GET
+    @Path("/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<ApplicationEntity.Status> getApplicationStatusByUUID(@QueryParam("appUuid") String appUuid){
+        return RESTResponse.async(
+                ()->{
+                    Config config = ConfigFactory.load();
+                    String host = config.getString("application.storm.uiHost");
+                    String port = config.getString("application.storm.uiPort");
+                    JSONObject response = httpGetWithoutCredentials("http://" + host + ":" + port + "/api/v1/topology/summary");
+                    return extractStatus(response, appUuid);
+                }
+        ).get();
+    }
+
 
     /**
      * <b>Request:</b>
