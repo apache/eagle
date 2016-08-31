@@ -21,7 +21,9 @@ package org.apache.eagle.alert.engine.coordinator;
 import java.util.Objects;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PublishmentType {
 
     private String type;

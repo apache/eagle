@@ -17,15 +17,17 @@
 package org.apache.eagle.alert.engine.coordinator;
 
 
-import java.io.Serializable;
-
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.joda.time.Period;
+
+import java.io.Serializable;
 
 /**
  * streamId is the key
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamSortSpec implements Serializable{
     private static final long serialVersionUID = 3626506441441584937L;
     private String windowPeriod="";

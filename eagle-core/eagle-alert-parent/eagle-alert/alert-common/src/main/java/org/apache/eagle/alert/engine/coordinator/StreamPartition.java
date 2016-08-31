@@ -22,6 +22,7 @@ import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
  * StreamPartition defines how a data stream is partitioned and sorted
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * columns are fields based on which stream is grouped
  * sortSpec defines how data is sorted
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamPartition implements Serializable {
     private static final long serialVersionUID = -3361648309136926040L;
 

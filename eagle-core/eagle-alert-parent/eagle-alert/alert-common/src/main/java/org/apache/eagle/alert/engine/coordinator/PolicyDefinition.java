@@ -19,6 +19,7 @@ package org.apache.eagle.alert.engine.coordinator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.Objects;
  * @since Apr 5, 2016
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PolicyDefinition implements Serializable{
     private static final long serialVersionUID = 377581499339572414L;
     // unique identifier
@@ -157,6 +159,7 @@ public class PolicyDefinition implements Serializable{
         return false;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Definition implements Serializable{
         private static final long serialVersionUID = -622366527887848346L;
 

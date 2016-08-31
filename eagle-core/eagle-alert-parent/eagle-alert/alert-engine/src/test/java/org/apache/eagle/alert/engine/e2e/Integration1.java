@@ -23,11 +23,6 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import kafka.admin.AdminUtils;
-import kafka.utils.ZKStringSerializer$;
-import org.I0Itec.zkclient.ZkClient;
-import org.apache.eagle.alert.config.ZKConfig;
-import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.UnitTopologyMain;
@@ -42,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -137,21 +131,6 @@ public class Integration1 {
 
             Utils.sleep(1000 * 60l * 5);
         }
-    }
-
-    public static void makeSureTopic(String topic) {
-        System.setProperty("config.resource", SIMPLE_CONFIG);
-        ConfigFactory.invalidateCaches();
-        Config config = ConfigFactory.load();
-        ZKConfig zkconfig = ZKConfigBuilder.getZKConfig(config);
-
-        ZkClient zkClient = new ZkClient(zkconfig.zkQuorum, 10000, 10000, ZKStringSerializer$.MODULE$);
-        Properties topicConfiguration = new Properties();
-//        ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
-        AdminUtils.createTopic(zkClient, topic, 1, 1, topicConfiguration);// RackAwareMode.Disabled$.MODULE$);
-
-        AdminUtils.createTopic(zkClient, topic, 1, 1, topicConfiguration);
-
     }
 
     public static void proactive_schedule(Config config) throws Exception {
