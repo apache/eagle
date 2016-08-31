@@ -40,6 +40,13 @@
 		text-align: center;
 		background: #f4f4f4;
 	}
+	.datePickerGroup > button {
+		float: left;
+		height: 32px;
+		padding: 5px 10px;
+		border-radius: 0;
+		border-left: 0;
+	}
 
 	.box .box-header .box-title small a {
 		cursor: pointer;
@@ -64,10 +71,6 @@
 		<h3 class="box-title">
 			Job List
 			<small>
-				<!--span class="label label-sm label-{{getStateClass(key)}}" ng-class="{active: (tableScope.search || '').toUpperCase() === key}"
-					  ng-repeat="(key, value) in jobStates" ng-click="fillSearch(key)">
-					{{key}}: {{value}}
-				</span-->
 				<a class="no-select text-{{getStateClass(state.key)}}" ng-class="{active: (tableScope.search || '').toUpperCase() === state.key}"
 					  ng-repeat="state in jobStateList" ng-click="fillSearch(state.key)">
 					{{state.key}}: {{state.value}}
@@ -77,9 +80,10 @@
 		</h3>
 
 		<div class="datePickerGroup clearfix">
-			<input id="startTime" type="text" class="form-control" data-toggle="datepicker" />
+			<input id="startTime" type="text" class="form-control" data-toggle="datepicker" ng-model="startTimeInput" />
 			<span class="addon">To</span>
-			<input id="endTime" type="text" class="form-control" data-toggle="datepicker" data-position="right" />
+			<input id="endTime" type="text" class="form-control" data-toggle="datepicker" data-position="right" ng-model="endTimeInput" />
+			<button class="btn btn-primary" ng-disabled="!checkDateRange()" ng-click="changeDateRange()">Go</button>
 		</div>
 	</div>
 	<div class="box-body">

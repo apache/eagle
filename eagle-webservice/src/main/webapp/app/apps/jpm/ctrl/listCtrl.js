@@ -17,28 +17,42 @@
  */
 
 (function () {
-	function verifyTime(str, format) {
-		var date = moment(str);
-		if(str === date.format(format)) {
-			return date;
-		}
-	}
-
 	/**
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
-		var JOB_STATES = ["NEW", "NEW_SAVING", "SUBMITTED", "ACCEPTED", "RUNNING", "FINISHED", "SUCCESS", "FAILED", "KILLED"];
+		var JOB_STATES = ["NEW", "NEW_SAVING", "SUBMITTED", "ACCEPTED", "RUNNING", "FINISHED", "SUCCEEDED", "FAILED", "KILLED"];
 
 		jpmApp.controller("listCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
+			function verifyTime(str, format) {
+				var date = Time(str);
+				if(str === Time.format(date, format)) {
+					return date;
+				}
+			}
+
+			// Initialization
+			var startTime = verifyTime($wrapState.param.startTime, Time.FORMAT);
+			var endTime = verifyTime($wrapState.param.endTime, Time.FORMAT);
+			if(!startTime || !endTime) {
+				endTime = Time();
+				startTime = endTime.clone().subtract(2, "hour");
+
+				$wrapState.go(".", {
+					startTime: Time.format(startTime),
+					endTime: Time.format(endTime)
+				}, {location: "replace"});
+
+				return;
+			}
+
 			PageConfig.title = "YARN Jobs";
 			PageConfig.subTitle = "list";
 			$scope.getStateClass = JPM.getStateClass;
 			$scope.tableScope = {};
 
-			// Initialization
-			var endTime = Time();
-			var startTime = endTime.clone().subtract(2, "hour");
+			$scope.startTimeInput = Time.format(startTime);
+			$scope.endTimeInput = Time.format(endTime);
 
 			$scope.site = $wrapState.param.siteId;
 			$scope.searchPathList = [["tags", "jobId"], ["tags", "user"], ["tags", "queue"], ["currentState"]];
@@ -107,27 +121,35 @@
 					});
 				});
 			};
-			$scope.refreshList();
 
 			// Time component
 			$element.on("change.jpm", "#startTime", function () {
 				var time = verifyTime($(this).val(), Time.FORMAT);
 				if(time) {
-					startTime = time;
-					$scope.refreshList();
+					$(this).trigger("input");
 				}
 			});
 			$element.on("change.jpm", "#endTime", function () {
 				var time = verifyTime($(this).val(), Time.FORMAT);
 				if(time) {
-					endTime = time;
-					$scope.refreshList();
+					$(this).trigger("input");
 				}
 			});
-			setTimeout(function () {
-				$("#startTime").val(startTime.format(Time.FORMAT));
-				$("#endTime").val(endTime.format(Time.FORMAT));
-			}, 0);
+
+			$scope.checkDateRange = function () {
+				var startTime = verifyTime($scope.startTimeInput, Time.FORMAT);
+				var endTime = verifyTime($scope.endTimeInput, Time.FORMAT);
+				return startTime && endTime;
+			};
+			$scope.changeDateRange = function () {
+				startTime = verifyTime($scope.startTimeInput, Time.FORMAT);
+				endTime = verifyTime($scope.endTimeInput, Time.FORMAT);
+
+				$scope.refreshList();
+			};
+
+			// Load list
+			$scope.refreshList();
 
 			// Clean up
 			$scope.$on('$destroy', function() {

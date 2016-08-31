@@ -35,8 +35,13 @@
 			}
 
 			// Parse string number
-			if(typeof time === "string" && !isNaN(+time)) {
-				time = +time;
+			if(typeof time === "string") {
+				if(!isNaN(+time)) {
+					time = +time;
+				} else {
+					time = new moment(time);
+					time.add(time.utcOffset(), "minutes");
+				}
 			}
 
 			var _mom = new moment(time);
@@ -89,6 +94,19 @@
 			});
 
 			return rows.join(", ");
+		};
+
+		timeSrv.millionFormat = function (num) {
+			if(!num) return "-";
+			num = Math.floor(num / 1000);
+			var s = num % 60;
+			num = Math.floor(num / 60);
+			var m = num % 60;
+			num = Math.floor(num / 60);
+			var h = num % 60;
+			return common.string.preFill(h, "0") + ":" +
+				common.string.preFill(m, "0") + ":" +
+				common.string.preFill(s, "0");
 		};
 
 		return timeSrv;

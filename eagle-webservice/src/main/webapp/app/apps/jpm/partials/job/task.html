@@ -38,6 +38,22 @@
 <div class="box box-primary">
 	<div class="box-header with-border">
 		<h3 class="box-title">
+			Task Schedule Trend
+		</h3>
+	</div>
+	<div class="box-body">
+		<div class="jpm-chart">
+			<div chart class="jpm-chart-container" series="scheduleSeries" category="scheduleCategory"></div>
+			<div ng-if="(scheduleSeries || []).length === 0" class="overlay">
+				<i class="fa fa-refresh fa-spin"></i>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">
 			Dashboards
 		</h3>
 	</div>
@@ -47,6 +63,46 @@
 				<div class="jpm-chart">
 					<div chart class="jpm-chart-container" series="statusSeries" category="bucketCategory" option="statusOption"></div>
 					<div ng-if="(statusSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="durationSeries" category="bucketCategory" option="durationOption"></div>
+					<div ng-if="(durationSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="hdfsReadSeries" category="bucketCategory" option="hdfsReadOption"></div>
+					<div ng-if="(hdfsReadSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="hdfsWriteSeries" category="bucketCategory" option="hdfsWriteOption"></div>
+					<div ng-if="(hdfsWriteSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="localReadSeries" category="bucketCategory" option="localReadOption"></div>
+					<div ng-if="(localReadSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="localWriteSeries" category="bucketCategory" option="localWriteOption"></div>
+					<div ng-if="(localWriteSeries || []).length === 0" class="overlay">
 						<i class="fa fa-refresh fa-spin"></i>
 					</div>
 				</div>

@@ -23,7 +23,7 @@
 	var jpmApp = register(['ngRoute', 'ngAnimate', 'ui.router', 'eagle.service']);
 
 	jpmApp.route("jpmList", {
-		url: "/jpm/list",
+		url: "/jpm/list?startTime&endTime",
 		site: true,
 		templateUrl: "partials/job/list.html",
 		controller: "listCtrl"
@@ -57,7 +57,7 @@
 		var QUERY_METRICS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		var QUERY_MR_JOBS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/search';
 		var QUERY_JOB_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		var QUERY_TASK_STATISTIC = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/${jobId}/taskCounts?site=${site}&timelineInSecs=${times}&top=${top}';
+		var QUERY_TASK_STATISTIC = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/${jobId}/taskCountsByDuration?site=${site}&timelineInSecs=${times}&top=${top}';
 
 		var JPM = {};
 
@@ -290,6 +290,7 @@
 				case "RUNNING":
 					return "info";
 				case "SUCCESS":
+				case "SUCCEEDED":
 					return "success";
 				case "FINISHED":
 					return "primary";

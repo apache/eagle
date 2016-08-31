@@ -22,6 +22,7 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
+		var TREND_INTERVAL = 60;
 		var BUCKET_COUNT = 30;
 		var TASK_FIELDS = [
 			"rack",
@@ -34,17 +35,19 @@
 			"jobCounters"
 		];
 
-		//var TASK_STATUS = ["NEW", "SCHEDULED", "RUNNING", "SUCCEEDED", "FAILED", "KILL_WAIT", "KILLED"];
-		var TASK_STATUS = ["SUCCEEDED", "FAILED", "KILLED"];
-		var TASK_STATUS = ["SUCCESS", "FAIL", "KILL"];
-		var TASK_STATUS_COLOR = ["#00a65a", "#dd4b39", "#999"];
-
 		/**
 		 * @typedef {{}} Task
 		 * @property {string} taskStatus
 		 * @property {number} startTime
 		 * @property {number} endTime
+		 * @property {{}} jobCounters
+		 * @property {{}} jobCounters.counters
+		 * @property {{}} tags
+		 * @property {string} tags.taskType
 		 * @property {number} _bucket
+		 * @property {number} _bucketStart
+		 * @property {number} _bucketEnd
+		 * @property {number} _duration
 		 */
 
 		jpmApp.controller("jobTaskCtrl", function ($wrapState, $scope, PageConfig, Time, JPM) {
@@ -59,7 +62,6 @@
 
 			var timeDiff = endTime - startTime;
 			var timeDes = Math.ceil(timeDiff / BUCKET_COUNT);
-			console.log(">>>", timeDiff, timeDes);
 
 			$scope.bucketCategory = [];
 			for(var i = 0 ; i < BUCKET_COUNT ; i += 1) {
@@ -71,7 +73,128 @@
 			// ==========================================================================
 			$scope.list = JPM.list("TaskExecutionService", {site: $scope.site, jobId: $scope.jobId}, startTime, endTime, TASK_FIELDS, 1000000);
 			$scope.list._promise.then(function () {
-				console.log(">>>", $scope.list);
+				var i;
+
+				function getHeatMapOption(categoryList, maxCount) {
+					return {
+						animation: false,
+						tooltip: {
+							trigger: 'item',
+							formatter: function (point) {
+								if(point.data) {
+									return categoryList[point.data[1]] + ":<br/>" +
+										'<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+										$scope.bucketCategory[point.data[0]] + ": " +
+										point.data[2];
+								}
+								return "";
+							}
+						},
+						xAxis: {splitArea: {show: true}},
+						yAxis: [{
+							type: 'category',
+							data: categoryList,
+							splitArea: {show: true},
+							axisTick: {show: false}
+						}],
+						grid: { bottom: "50" },
+						visualMap: {
+							min: 0,
+							max: maxCount,
+							calculable: true,
+							orient: 'horizontal',
+							left: 'right',
+							inRange: {
+								color: ["#00a65a", "#ffdc62", "#dd4b39"]
+							}
+						}
+					};
+				}
+
+				function fillBucket(countList, task, maxCount) {
+					for(var bucketId = task._bucketStart ; bucketId <= task._bucketEnd ; bucketId += 1) {
+						var count = countList[bucketId] = (countList[bucketId] || 0) + 1;
+						maxCount = Math.max(maxCount, count);
+					}
+					return maxCount;
+				}
+
+				function bucketToSeries(categoryList, buckets, name) {
+					var bucket_data = $.map(categoryList, function (category, index) {
+						var list = [];
+						var dataList = buckets[category] || [];
+						for(var i = 0 ; i < BUCKET_COUNT ; i += 1) {
+							list.push([i, index, dataList[i] || 0]);
+						}
+						return list;
+					});
+
+					return [{
+						name: name,
+						type: "heatmap",
+						data: bucket_data,
+						itemStyle: {
+							normal: {
+								borderColor: "#FFF"
+							}
+						},
+						label: {
+							normal: {
+								show: true,
+								formatter: function (point) {
+									if(point.data[2] === 0) return "-";
+									return " ";
+								}
+							}
+						}
+					}];
+				}
+
+				// ========================= Schedule Trend =========================
+				var trend_map_countList = [];
+				var trend_reduce_countList = [];
+				$.each($scope.list,
+					/**
+					 * @param {number} i
+					 * @param {Task} task
+					 */
+					function (i, task) {
+						var _task = {
+							_bucketStart: Math.floor((task.startTime - startTime) / TREND_INTERVAL),
+							_bucketEnd: Math.floor((task.endTime - startTime) / TREND_INTERVAL)
+						};
+
+						switch (task.tags.taskType) {
+							case "MAP":
+								fillBucket(trend_map_countList, _task);
+								break;
+							case "REDUCE":
+								fillBucket(trend_reduce_countList, _task);
+								break;
+							default:
+								console.warn("Task type not match:", task.tags.taskType, task);
+						}
+					});
+
+				$scope.scheduleCategory = [];
+				for(i = 0 ; i < Math.max(trend_map_countList.length, trend_reduce_countList.length) ; i += 1) {
+					$scope.scheduleCategory.push(Time.format(startTime + i * TREND_INTERVAL).replace(" ", "\n"));
+				}
+
+				$scope.scheduleSeries = [{
+					name: "Map Task Count",
+					type: "line",
+					showSymbol: false,
+					areaStyle: {normal: {}},
+					data: trend_map_countList
+				}, {
+					name: "Reduce Task Count",
+					type: "line",
+					showSymbol: false,
+					areaStyle: {normal: {}},
+					data: trend_reduce_countList
+				}];
+
 				// ======================= Bucket Distribution ======================
 				$.each($scope.list,
 					/**
@@ -80,51 +203,157 @@
 					 */
 					function (i, task) {
 						task._bucket = Math.floor((task.startTime - startTime + (task.endTime - task.startTime) / 2) / timeDes);
+						task._bucketStart = Math.floor((task.startTime - startTime) / timeDes);
+						task._bucketEnd = Math.floor((task.endTime - startTime) / timeDes);
+						task._duration = task.endTime - task.startTime;
 					});
 
-
 				// ======================== Status Statistic ========================
-				$scope.statusOption = {
-					xAxis: {
-						axisTick: { show: true },
-						scale: false
-					}
-				};
+				var TASK_STATUS = ["SUCCEEDED", "FAILED", "KILLED"];
 
 				var bucket_status = {};
+				var bucket_status_maxCount = 0;
 				$.each($scope.list,
 					/**
 					 * @param {number} i
 					 * @param {Task} task
 					 */
 					function (i, task) {
-						var status = bucket_status[task.taskStatus] = (bucket_status[task.taskStatus] || []);
-						status[task._bucket] = (status[task._bucket] || 0) + 1;
+						var countList = bucket_status[task.taskStatus] = (bucket_status[task.taskStatus] || []);
+
+						bucket_status_maxCount = fillBucket(countList, task, bucket_status_maxCount);
 					});
 
-				$scope.statusSeries = $.map(TASK_STATUS, function (status, index) {
-					return {
-						name: status,
-						type: "scatter",
-						itemStyle: {normal: {color: TASK_STATUS_COLOR[index]}},
-						data: $.map(bucket_status[status] || [], function (count, i) {
-							if(!count) return;
-							var size = Math.log(1 + count) * 5;
-							return [[i, 1 + index, size]];
-						}),
-						symbolSize: function (data) {
-							return data[2];
-						}
-					};
-				});
-				$scope.statusSeries.push({
-					name: "?",
-					type: "line",
-					data: $.map($scope.bucketCategory, function () {return 0;})
+				$scope.statusSeries = bucketToSeries(TASK_STATUS, bucket_status, "Task Status");
+				$scope.statusOption = getHeatMapOption(TASK_STATUS, bucket_status_maxCount);
+
+				// ======================= Duration Statistic =======================
+				var TASK_DURATION = [0, 120 * 1000, 300 * 1000, 600 * 1000, 1800 * 1000, 3600 * 1000];
+				var bucket_durations = {};
+				var bucket_durations_maxCount = 0;
+
+				var TASK_DURATION_DISTRIBUTION = $.map(TASK_DURATION, function (start, i) {
+					var end = TASK_DURATION[i + 1];
+					if(i === 0) {
+						return "<" + Time.diffStr(end);
+					} else if(end) {
+						return Time.diffStr(start) + "~" + Time.diffStr(end);
+					}
+					return ">" + Time.diffStr(start);
 				});
 
-				console.log(">>>", $scope.statusSeries);
-				console.log(">>>", JSON.stringify( $scope.statusSeries[0].data));
+				$.each($scope.list,
+					/**
+					 * @param {number} i
+					 * @param {Task} task
+					 */
+					function (i, task) {
+						var durationBucket = TASK_DURATION_DISTRIBUTION[common.number.inRange(TASK_DURATION, task._duration)];
+						var countList = bucket_durations[durationBucket] = (bucket_durations[durationBucket] || []);
+
+						bucket_durations_maxCount = fillBucket(countList, task, bucket_durations_maxCount);
+					});
+
+				$scope.durationSeries = bucketToSeries(TASK_DURATION_DISTRIBUTION, bucket_durations, "Task Duration Distribution");
+				$scope.durationOption = getHeatMapOption(TASK_DURATION_DISTRIBUTION, bucket_durations_maxCount);
+
+				// ======================= HDFS Read Statistic ======================
+				var TASK_HDFS_BYTES = [0, 5 * 1024 * 1024, 20 * 1024 * 1024, 100 * 1024 * 1024, 256 * 1024 * 1024, 1024 * 1024 * 1024];
+				var bucket_hdfs_reads = {};
+				var bucket_hdfs_reads_maxCount = 0;
+
+				var TASK_HDFS_DISTRIBUTION = $.map(TASK_HDFS_BYTES, function (start, i) {
+					var end = TASK_HDFS_BYTES[i + 1];
+					if(i === 0) {
+						return "<" + common.number.abbr(end, true);
+					} else if(end) {
+						return common.number.abbr(start, true) + "~" + common.number.abbr(end, true);
+					}
+					return ">" + common.number.abbr(start, true);
+				});
+
+				$.each($scope.list,
+					/**
+					 * @param {number} i
+					 * @param {Task} task
+					 */
+					function (i, task) {
+						var durationBucket = TASK_HDFS_DISTRIBUTION[common.number.inRange(TASK_HDFS_BYTES, task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)];
+						var countList = bucket_hdfs_reads[durationBucket] = (bucket_hdfs_reads[durationBucket] || []);
+
+						bucket_hdfs_reads_maxCount = fillBucket(countList, task, bucket_hdfs_reads_maxCount);
+					});
+
+				$scope.hdfsReadSeries = bucketToSeries(TASK_HDFS_DISTRIBUTION, bucket_hdfs_reads, "Task HDFS Read Distribution");
+				$scope.hdfsReadOption = getHeatMapOption(TASK_HDFS_DISTRIBUTION, bucket_hdfs_reads_maxCount);
+
+				// ====================== HDFS Write Statistic ======================
+				var bucket_hdfs_writes = {};
+				var bucket_hdfs_writes_maxCount = 0;
+
+				$.each($scope.list,
+					/**
+					 * @param {number} i
+					 * @param {Task} task
+					 */
+					function (i, task) {
+						var durationBucket = TASK_HDFS_DISTRIBUTION[common.number.inRange(TASK_HDFS_BYTES, task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)];
+						var countList = bucket_hdfs_writes[durationBucket] = (bucket_hdfs_writes[durationBucket] || []);
+
+						bucket_hdfs_writes_maxCount = fillBucket(countList, task, bucket_hdfs_writes_maxCount);
+					});
+
+				$scope.hdfsWriteSeries = bucketToSeries(TASK_HDFS_DISTRIBUTION, bucket_hdfs_writes, "Task HDFS Write Distribution");
+				$scope.hdfsWriteOption = getHeatMapOption(TASK_HDFS_DISTRIBUTION, bucket_hdfs_writes_maxCount);
+
+				// ====================== Local Read Statistic ======================
+				var TASK_LOCAL_BYTES = [0, 20 * 1024 * 1024, 100 * 1024 * 1024, 256 * 1024 * 1024, 1024 * 1024 * 1024, 2 * 1024 * 1024 * 1024];
+				var bucket_local_reads = {};
+				var bucket_local_reads_maxCount = 0;
+
+				var TASK_LOCAL_DISTRIBUTION = $.map(TASK_LOCAL_BYTES, function (start, i) {
+					var end = TASK_LOCAL_BYTES[i + 1];
+					if(i === 0) {
+						return "<" + common.number.abbr(end, true);
+					} else if(end) {
+						return common.number.abbr(start, true) + "~" + common.number.abbr(end, true);
+					}
+					return ">" + common.number.abbr(start, true);
+				});
+
+				$.each($scope.list,
+					/**
+					 * @param {number} i
+					 * @param {Task} task
+					 */
+					function (i, task) {
+						var durationBucket = TASK_LOCAL_DISTRIBUTION[common.number.inRange(TASK_LOCAL_BYTES, task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_READ)];
+						var countList = bucket_local_reads[durationBucket] = (bucket_local_reads[durationBucket] || []);
+
+						bucket_local_reads_maxCount = fillBucket(countList, task, bucket_local_reads_maxCount);
+					});
+
+				$scope.localReadSeries = bucketToSeries(TASK_LOCAL_DISTRIBUTION, bucket_local_reads, "Task Local Read Distribution");
+				$scope.localReadOption = getHeatMapOption(TASK_LOCAL_DISTRIBUTION, bucket_local_reads_maxCount);
+
+				// ====================== Local Write Statistic =====================
+				var bucket_local_writes = {};
+				var bucket_local_writes_maxCount = 0;
+
+				$.each($scope.list,
+					/**
+					 * @param {number} i
+					 * @param {Task} task
+					 */
+					function (i, task) {
+						var durationBucket = TASK_LOCAL_DISTRIBUTION[common.number.inRange(TASK_HDFS_BYTES, task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_WRITTEN)];
+						var countList = bucket_local_writes[durationBucket] = (bucket_local_writes[durationBucket] || []);
+
+						bucket_local_writes_maxCount = fillBucket(countList, task, bucket_local_writes_maxCount);
+					});
+
+				$scope.localWriteSeries = bucketToSeries(TASK_LOCAL_DISTRIBUTION, bucket_local_writes, "Task Local Write Distribution");
+				$scope.localWriteOption = getHeatMapOption(TASK_LOCAL_DISTRIBUTION, bucket_local_writes_maxCount);
 			});
 		});
 	});

@@ -163,6 +163,15 @@
 			.replace(/>/g, '&gt;');
 	};
 
+	common.string.preFill = function (str, key, len) {
+		str = str + "";
+		len = len || 2;
+		while(str.length < len) {
+			str = key + str;
+		}
+		return str;
+	};
+
 	// ============================ Array =============================
 	common.array = {};
 
@@ -243,15 +252,48 @@
 		return num.toFixed(fixed || 0);
 	};
 
-
 	common.number.format = function (num, fixed) {
 		if(!common.number.isNumber(num)) return "-";
 		return common.number.toFixed(num, fixed).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	};
 
+	common.number.abbr = function (number, isByte, decPlaces) {
+		decPlaces = decPlaces || 2;
+		decPlaces = Math.pow(10, decPlaces);
+		const abbrev = isByte ? ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['K', 'M', 'B', 'T', 'Q'];
+		const base = isByte ? 1024 : 1000;
+		const sign = number < 0 ? -1 : 1;
+		var unit = '';
+		number = Math.abs(number);
+
+		for(var i = abbrev.length - 1; i >= 0; i--) {
+			const size = Math.pow(base, i + 1);
+			if(size <= number) {
+				number = Math.round(number * decPlaces / size) / decPlaces;
+				if((number === base) && (i < abbrev.length - 1)) {
+					number = 1;
+					i++;
+				}
+				unit = abbrev[i];
+				break;
+			}
+		}
+		unit = unit ? unit : "";
+		return number * sign + unit;
+	}
+
 	common.number.compare = function (num1, num2) {
 		if(!common.number.isNumber(num1) || !common.number.isNumber(num2)) return "-";
 		if(num1 === 0) return 'N/A';
 		return (num2 - num1) / num1;
+	};
+
+	common.number.inRange = function (rangList, num) {
+		for(var i = 0 ; i < rangList.length - 1 ; i += 1) {
+			var start = rangList[i];
+			var end = rangList[i + 1];
+			if(start <= num && num < end) return i;
+		}
+		return rangList.length - 1;
 	};
 })();
