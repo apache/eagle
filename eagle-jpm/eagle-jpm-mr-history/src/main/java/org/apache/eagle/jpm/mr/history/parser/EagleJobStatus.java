@@ -23,7 +23,7 @@ public enum EagleJobStatus {
     LAUNCHED,
     PREP,
     RUNNING,
-    SUCCESS,
+    SUCCEEDED,
     KILLED,
     FAILED;
 }

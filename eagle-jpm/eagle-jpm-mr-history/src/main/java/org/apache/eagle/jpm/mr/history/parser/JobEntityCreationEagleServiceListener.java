@@ -43,7 +43,6 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
     List<JobEventAPIEntity> jobEvents = new ArrayList<>();
     List<TaskExecutionAPIEntity> taskExecs = new ArrayList<>();
     List<TaskAttemptExecutionAPIEntity> taskAttemptExecs = new ArrayList<>();
-    private JobHistoryZKStateManager zkState;
     private TimeZone timeZone;
 
     public JobEntityCreationEagleServiceListener(MRHistoryJobConfig configManager) {
@@ -56,7 +55,6 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             throw new IllegalArgumentException("batchSize must be greater than 0 when it is provided");
         }
         this.batchSize = batchSize;
-        zkState = new JobHistoryZKStateManager(configManager.getZkStateConfig());
         timeZone = TimeZone.getTimeZone(configManager.getControlConfig().timeZone);
     }
 
@@ -92,12 +90,13 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             eagleServiceConfig.password);
 
         client.getJerseyClient().setReadTimeout(jobExtractorConfig.readTimeoutSeconds * 1000);
+        JobHistoryZKStateManager zkState = new JobHistoryZKStateManager(configManager.getZkStateConfig());
         logger.info("start flushing entities of total number " + list.size());
         for (int i = 0; i < list.size(); i++) {
             JobBaseAPIEntity entity = list.get(i);
             if (entity instanceof JobExecutionAPIEntity) {
                 jobs.add((JobExecutionAPIEntity) entity);
-                this.zkState.updateProcessedJob(timeStamp2Date(entity.getTimestamp()),
+                zkState.updateProcessedJob(timeStamp2Date(entity.getTimestamp()),
                     entity.getTags().get(MRJobTagName.JOB_ID.toString()),
                     ((JobExecutionAPIEntity) entity).getCurrentState());
             } else if (entity instanceof JobEventAPIEntity) {
@@ -108,6 +107,7 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
                 taskAttemptExecs.add((TaskAttemptExecutionAPIEntity) entity);
             }
         }
+        zkState.close();
         GenericServiceAPIResponseEntity result;
         if (jobs.size() > 0) {
             logger.info("flush JobExecutionAPIEntity of number " + jobs.size());

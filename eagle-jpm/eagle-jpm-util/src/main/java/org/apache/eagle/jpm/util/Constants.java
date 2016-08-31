@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 public class Constants {
     private static final Logger LOG = LoggerFactory.getLogger(Constants.class);
 
+    public static final String GENERIC_METRIC_SERVICE = "GenericMetricService";
+
     //SPARK
     public static final String SPARK_APP_SERVICE_ENDPOINT_NAME = "SparkAppService";
     public static final String SPARK_JOB_SERVICE_ENDPOINT_NAME = "SparkJobService";

@@ -24,29 +24,24 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-public class TestMRJobExecutionResource {
+public class TestTaskCountPerJobHelper {
+    TaskCountByDurationHelper helper = new TaskCountByDurationHelper();
 
     @Test
     public void test() {
-        MRJobExecutionResource resource = new MRJobExecutionResource();
         String timeList = " 0, 10,20,40 ";
-        List<Long> times = resource.parseTimeList(timeList);
+        List<Long> times = helper.parseTimeList(timeList);
         Assert.assertTrue(times.size() == 4);
 
         long val = 25 * 1000;
-        int index = resource.getPosition(times, val);
+        int index = helper.getPosition(times, val);
         Assert.assertTrue(index == 2);
     }
 
     @Test
     public void test2() {
-        MRJobExecutionResource resource = new MRJobExecutionResource();
-        String timeList = " 0, 10,20,40 ";
-        List<Long> times = resource.parseTimeList(timeList);
-
         TaskExecutionAPIEntity test1 = new TaskExecutionAPIEntity();
         test1.setDuration(15 * 1000);
         test1.setTaskStatus("running");
@@ -71,27 +66,29 @@ public class TestMRJobExecutionResource {
         tasks.add(test4);
         tasks.add(test5);
 
-        List<MRJobTaskGroupResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
-        List<MRJobTaskGroupResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
+        List<MRJobTaskCountResponse.UnitTaskCount> runningTaskCount = new ArrayList<>();
+        List<MRJobTaskCountResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
-        Comparator comparator = new MRJobExecutionResource.RunningTaskComparator();
-        resource.initTaskCountList(runningTaskCount, finishedTaskCount, times, comparator);
+        String timeList = " 0, 10,20,40 ";
+        List<Long> times = helper.parseTimeList(timeList);
+
+        helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountByDurationHelper.RunningTaskComparator());
 
         for (TaskExecutionAPIEntity o : tasks) {
-            int index = resource.getPosition(times, o.getDuration());
+            int index = helper.getPosition(times, o.getDuration());
             if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
-                MRJobTaskGroupResponse.UnitTaskCount counter = runningTaskCount.get(index);
+                MRJobTaskCountResponse.UnitTaskCount counter = runningTaskCount.get(index);
                 counter.taskCount++;
                 counter.entities.add(o);
             } else if (o.getEndTime() != 0) {
-                MRJobTaskGroupResponse.UnitTaskCount counter = finishedTaskCount.get(index);
+                MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
                 counter.taskCount++;
                 counter.entities.add(o);
             }
         }
         int top = 2;
         if (top > 0)  {
-            resource.getTopTasks(runningTaskCount, top);
+            helper.getTopTasks(runningTaskCount, top);
         }
         Assert.assertTrue(runningTaskCount.get(1).taskCount == 3);
         Assert.assertTrue(runningTaskCount.get(1).topEntities.size() == 2);

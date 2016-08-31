@@ -247,7 +247,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
         JobCountEntity entity = new JobCountEntity();
         entity.setTotal(jobs.size());
         entity.setFail(0);
-        jobs.stream().filter(job -> !job.getRight().equals(EagleJobStatus.SUCCESS.toString())).forEach(
+        jobs.stream().filter(job -> !job.getRight().equals(EagleJobStatus.SUCCEEDED.toString())).forEach(
             job -> entity.setFail(1 + entity.getFail())
         );
 
