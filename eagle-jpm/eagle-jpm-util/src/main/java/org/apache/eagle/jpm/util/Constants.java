@@ -177,5 +177,6 @@ public class Constants {
     public static final String REDUCE_COUNT_RATIO = "reduce.count.ratio";
     public static final String JOB_LEVEL = "job";
     public static final String TASK_LEVEL = "task";
+    public static final String JOB_COUNT_PER_DAY = "hadoop.job.day.count";
 
 }

@@ -19,6 +19,7 @@
 package org.apache.eagle.jpm.mr.history.crawler;
 
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
+import org.apache.eagle.jpm.mr.history.metrics.JobCountMetricsGenerator;
 import org.apache.eagle.jpm.mr.history.parser.EagleJobStatus;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.mr.historyentity.JobCountEntity;
@@ -62,15 +63,12 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private JobIdFilter jobFilter;
     private int partitionId;
     private TimeZone timeZone;
-    private MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig;
-    private MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig;
+    private JobCountMetricsGenerator jobCountMetricsGenerator;
 
     public JHFCrawlerDriverImpl(MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig,
                                 MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig,
                                 MRHistoryJobConfig.ControlConfig controlConfig, JHFInputStreamCallback reader,
                                 JobHistoryLCM historyLCM, JobIdFilter jobFilter, int partitionId) throws Exception {
-        this.eagleServiceConfig = eagleServiceConfig;
-        this.jobExtractorConfig = jobExtractorConfig;
         this.zeroBasedMonth = controlConfig.zeroBasedMonth;
         this.dryRun = controlConfig.dryRun;
         if (this.dryRun)  {
@@ -81,6 +79,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
         this.partitionId = partitionId;
         this.jobFilter = jobFilter;
         timeZone = TimeZone.getTimeZone(controlConfig.timeZone);
+        jobCountMetricsGenerator = new JobCountMetricsGenerator(eagleServiceConfig, jobExtractorConfig, timeZone);
     }
 
     /**
@@ -191,7 +190,13 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
                 jobHistoryFile);
         processedJobFileNames.add(jobHistoryFile);
 
-        flushJobCount();
+        jobCountMetricsGenerator.flush(
+            String.format(FORMAT_JOB_PROCESS_DATE,
+                this.processDate.year,
+                this.processDate.month + 1,
+                this.processDate.day),
+            this.processDate.year, this.processDate.month, this.processDate.day
+        );
         Long modifiedTime = item.getLeft();
         return modifiedTime;
     }
@@ -235,44 +240,6 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
         if (list != null) {
             this.processedJobFileNames = new HashSet<>(list);
         }
-    }
-
-    private void flushJobCount() throws Exception {
-        List<Pair<String, String>> jobs = JobHistoryZKStateManager.instance().getProcessedJobs(
-            String.format(FORMAT_JOB_PROCESS_DATE, this.processDate.year, this.processDate.month + 1, this.processDate.day)
-        );
-        JobCountEntity entity = new JobCountEntity();
-        entity.setTotal(jobs.size());
-        entity.setFail(0);
-        jobs.stream().filter(job -> !job.getRight().equals(EagleJobStatus.SUCCEEDED.toString())).forEach(
-            job -> entity.setFail(1 + entity.getFail())
-        );
-
-        IEagleServiceClient client = new EagleServiceClientImpl(
-            eagleServiceConfig.eagleServiceHost,
-            eagleServiceConfig.eagleServicePort,
-            eagleServiceConfig.username,
-            eagleServiceConfig.password);
-
-
-        GregorianCalendar cal = new GregorianCalendar(this.processDate.year, this.processDate.month, this.processDate.day, 0, 0, 0);
-        cal.setTimeZone(timeZone);
-        entity.setTimestamp(cal.getTimeInMillis());
-        @SuppressWarnings("serial")
-        Map<String, String> baseTags = new HashMap<String, String>() {
-            {
-                put("site", jobExtractorConfig.site);
-            }
-        };
-        entity.setTags(baseTags);
-        List<JobCountEntity> entities = new ArrayList<>();
-        entities.add(entity);
-
-        LOG.info("start flushing entities of total number " + entities.size());
-        client.create(entities);
-        LOG.info("finish flushing entities of total number " + entities.size());
-        client.getJerseyClient().destroy();
-        client.close();
     }
 
     private void advanceOneDay() throws Exception {
