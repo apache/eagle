@@ -43,7 +43,7 @@ public class JsonEventSerializer implements IEventSerializer {
     public Object serialize(AlertStreamEvent event) {
         String result = streamEventToJson(event);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("serialized alert event : ", result);
+            LOG.debug("serialized alert event : {}", result);
         }
         return result;
     }

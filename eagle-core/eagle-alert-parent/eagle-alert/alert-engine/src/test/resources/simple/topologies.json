@@ -2,7 +2,7 @@
 {
 	"name": "alertUnitTopology_1",
 	"numOfSpout":1,
-	"numOfAlertBolt": 10,
+	"numOfAlertBolt": 20,
 	"numOfGroupBolt": 4,
 	"spoutId": "alertEngineSpout",
 	"groupNodeIds" : [
@@ -21,7 +21,17 @@
 		"alertBolt6",
 		"alertBolt7",
 		"alertBolt8",
-		"alertBolt9"
+		"alertBolt9",
+		"alertBolt10",
+		"alertBolt11",
+		"alertBolt12",
+		"alertBolt13",
+		"alertBolt14",
+		"alertBolt15",
+		"alertBolt16",
+		"alertBolt17",
+		"alertBolt18",
+		"alertBolt19"
 	],
 	"pubBoltId" : "alertPublishBolt",
 	"spoutParallelism": 1,

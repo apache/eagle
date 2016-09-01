@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class StreamColumn implements Serializable {
@@ -33,13 +33,22 @@ public class StreamColumn implements Serializable {
     private Object defaultValue;
     private boolean required;
     private String description;
+    private String nodataExpression;
 
     public String toString() {
-        return String.format("StreamColumn=name[%s], type=[%s], defaultValue=[%s], required=[%s]", name, type,
-                defaultValue, required);
+        return String.format("StreamColumn=name[%s], type=[%s], defaultValue=[%s], required=[%s], nodataExpression=[%s]", 
+        		name, type, defaultValue, required, nodataExpression);
     }
 
-    public String getName() {
+    public String getNodataExpression() {
+		return nodataExpression;
+	}
+
+	public void setNodataExpression(String nodataExpression) {
+		this.nodataExpression = nodataExpression;
+	}
+
+	public String getName() {
         return name;
     }
 

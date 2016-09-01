@@ -16,4 +16,3 @@
 #
 
 collect=org.apache.eagle.alert.engine.siddhi.extension.AttributeCollectAggregator
-collectWithDistinct=org.apache.eagle.alert.engine.siddhi.extension.AttributeCollectWithDistinctAggregator

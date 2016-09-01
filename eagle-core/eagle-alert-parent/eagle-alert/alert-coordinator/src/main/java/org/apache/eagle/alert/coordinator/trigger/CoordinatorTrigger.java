@@ -64,7 +64,7 @@ public class CoordinatorTrigger implements Runnable {
                 Stopwatch watch = Stopwatch.createStarted();
 
                 // schedule
-                IScheduleContext context = new ScheduleContextBuilder(client).buildContext();
+                IScheduleContext context = new ScheduleContextBuilder(config, client).buildContext();
                 TopologyMgmtService mgmtService = new TopologyMgmtService();
                 IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
 

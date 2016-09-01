@@ -128,7 +128,7 @@ public class Coordinator {
     		ScheduleState state = null;
     		try {
     			Stopwatch watch = Stopwatch.createStarted();
-    	        IScheduleContext context = new ScheduleContextBuilder(client).buildContext();
+    	        IScheduleContext context = new ScheduleContextBuilder(config, client).buildContext();
     	        TopologyMgmtService mgmtService = new TopologyMgmtService();
     	        IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
     	
