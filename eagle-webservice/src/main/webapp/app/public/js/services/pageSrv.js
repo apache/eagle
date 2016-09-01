@@ -74,6 +74,20 @@
 			(isSite ? sitePortalList : mainPortalList).push(portal);
 		};
 
+		function convertSitePortal(site, portal) {
+			portal = $.extend({}, portal, {
+				path: portal.path ? "#/site/" + site.siteId + "/" + portal.path.replace(/^[\\\/]/, "") : null
+			});
+
+			if(portal.list) {
+				portal.list = $.map(portal.list, function (portal) {
+					return convertSitePortal(site, portal);
+				});
+			}
+
+			return portal;
+		}
+
 		Portal.refresh = function () {
 			// TODO: check admin
 
@@ -93,9 +107,7 @@
 				sitePortals[site.siteId] = [backHome].concat($.map(sitePortalList, function (portal) {
 					var hasApp = !!common.array.find(portal.application, site.applicationList, "descriptor.type");
 					if(hasApp) {
-						return $.extend({}, portal, {
-							path: "#/site/" + site.siteId + "/" + portal.path.replace(/^[\\\/]/, "")
-						});
+						return convertSitePortal(site, portal);
 					}
 				}));
 			});

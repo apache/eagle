@@ -45,7 +45,10 @@
 		controller: "compareCtrl"
 	});
 
-	jpmApp.portal({name: "YARN Jobs", icon: "home", path: "jpm/list"}, true);
+	jpmApp.portal({name: "YARN Jobs", icon: "home", list: [
+		{name: "Job List", path: "jpm/list"},
+		{name: "Job Overview", path: "jpm/overview"}
+	]}, true);
 
 	jpmApp.service("JPM", function ($q, $http, Time) {
 		// TODO: mock auth
