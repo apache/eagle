@@ -172,6 +172,9 @@ public class Constants {
     public static final String ALLOCATED_VCORES = "allocatedvcores";
     public static final String RUNNING_CONTAINERS = "runningcontainers";
     public static final String TASK_EXECUTION_TIME = "taskduration";
+    public static final String JOB_EXECUTION_TIME = "jobduration";
+    public static final String MAP_COUNT_RATIO = "map.count.ratio";
+    public static final String REDUCE_COUNT_RATIO = "reduce.count.ratio";
     public static final String JOB_LEVEL = "job";
     public static final String TASK_LEVEL = "task";
 

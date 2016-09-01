@@ -16,9 +16,9 @@
  *
  */
 
-package org.apache.eagle.jpm.mr.running.parser.metrics;
+package org.apache.eagle.jpm.mr.history.metrics;
 
-import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
+import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.jpm.util.metrics.AbstractMetricsCreationListener;
@@ -33,17 +33,31 @@ public class JobExecutionMetricsCreationListener extends AbstractMetricsCreation
     public List<GenericMetricEntity> generateMetrics(JobExecutionAPIEntity entity) {
         List<GenericMetricEntity> metrics = new ArrayList<>();
         if (entity != null) {
-            Long currentTime = System.currentTimeMillis();
+            Long timeStamp = entity.getTimestamp();
             Map<String, String> tags = entity.getTags();
-            metrics.add(metricWrapper(currentTime, Constants.ALLOCATED_MB, new double[]{entity.getAllocatedMB()}, tags));
-            metrics.add(metricWrapper(currentTime, Constants.ALLOCATED_VCORES, new double[]{entity.getAllocatedVCores()}, tags));
-            metrics.add(metricWrapper(currentTime, Constants.RUNNING_CONTAINERS, new double[]{entity.getRunningContainers()}, tags));
+            metrics.add(metricWrapper(timeStamp,
+                Constants.JOB_EXECUTION_TIME,
+                new double[]{entity.getDurationTime()},
+                tags));
+
+            metrics.add(metricWrapper(
+                timeStamp,
+                Constants.MAP_COUNT_RATIO,
+                new double[]{entity.getNumTotalMaps(), 1.0 * entity.getNumFailedMaps() / entity.getNumTotalMaps()},
+                tags));
+
+            metrics.add(metricWrapper(
+                timeStamp,
+                Constants.REDUCE_COUNT_RATIO,
+                new double[]{entity.getNumTotalReduces(), 1.0 * entity.getNumFailedReduces() / entity.getNumTotalReduces()},
+                tags));
+
             org.apache.eagle.jpm.util.jobcounter.JobCounters jobCounters = entity.getJobCounters();
             if (jobCounters != null && jobCounters.getCounters() != null) {
                 for (Map<String, Long> metricGroup : jobCounters.getCounters().values()) {
                     for (Map.Entry<String, Long> entry : metricGroup.entrySet()) {
                         String metricName = entry.getKey().toLowerCase();
-                        metrics.add(metricWrapper(currentTime, metricName, new double[]{entry.getValue()}, tags));
+                        metrics.add(metricWrapper(timeStamp, "history." + metricName, new double[]{entry.getValue()}, tags));
                     }
                 }
             }
