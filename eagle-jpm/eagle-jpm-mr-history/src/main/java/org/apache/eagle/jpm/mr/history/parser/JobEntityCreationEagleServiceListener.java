@@ -90,13 +90,12 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             eagleServiceConfig.password);
 
         client.getJerseyClient().setReadTimeout(jobExtractorConfig.readTimeoutSeconds * 1000);
-        JobHistoryZKStateManager zkState = new JobHistoryZKStateManager(configManager.getZkStateConfig());
         logger.info("start flushing entities of total number " + list.size());
         for (int i = 0; i < list.size(); i++) {
             JobBaseAPIEntity entity = list.get(i);
             if (entity instanceof JobExecutionAPIEntity) {
                 jobs.add((JobExecutionAPIEntity) entity);
-                zkState.updateProcessedJob(timeStamp2Date(entity.getTimestamp()),
+                JobHistoryZKStateManager.instance().updateProcessedJob(timeStamp2Date(entity.getTimestamp()),
                     entity.getTags().get(MRJobTagName.JOB_ID.toString()),
                     ((JobExecutionAPIEntity) entity).getCurrentState());
             } else if (entity instanceof JobEventAPIEntity) {
@@ -107,7 +106,6 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
                 taskAttemptExecs.add((TaskAttemptExecutionAPIEntity) entity);
             }
         }
-        zkState.close();
         GenericServiceAPIResponseEntity result;
         if (jobs.size() > 0) {
             logger.info("flush JobExecutionAPIEntity of number " + jobs.size());

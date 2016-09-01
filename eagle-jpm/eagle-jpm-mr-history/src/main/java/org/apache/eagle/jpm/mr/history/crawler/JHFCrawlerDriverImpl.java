@@ -20,7 +20,7 @@ package org.apache.eagle.jpm.mr.history.crawler;
 
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.parser.EagleJobStatus;
-import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateLCM;
+import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.mr.historyentity.JobCountEntity;
 import org.apache.eagle.jpm.util.JobIdFilter;
 import org.apache.commons.lang3.tuple.Pair;
@@ -58,7 +58,6 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private JHFInputStreamCallback reader;
     protected boolean zeroBasedMonth = true;
 
-    private JobHistoryZKStateLCM zkStateLcm;
     private JobHistoryLCM jhfLCM;
     private JobIdFilter jobFilter;
     private int partitionId;
@@ -69,7 +68,6 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     public JHFCrawlerDriverImpl(MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig,
                                 MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig,
                                 MRHistoryJobConfig.ControlConfig controlConfig, JHFInputStreamCallback reader,
-                                JobHistoryZKStateLCM zkStateLCM,
                                 JobHistoryLCM historyLCM, JobIdFilter jobFilter, int partitionId) throws Exception {
         this.eagleServiceConfig = eagleServiceConfig;
         this.jobExtractorConfig = jobExtractorConfig;
@@ -80,7 +78,6 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
         }
         this.reader = reader;
         jhfLCM = historyLCM;//new JobHistoryDAOImpl(jobHistoryConfig);
-        this.zkStateLcm = zkStateLCM;
         this.partitionId = partitionId;
         this.jobFilter = jobFilter;
         timeZone = TimeZone.getTimeZone(controlConfig.timeZone);
@@ -187,7 +184,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
                     jobHistoryFile,
                 reader);
         }
-        zkStateLcm.addProcessedJob(String.format(FORMAT_JOB_PROCESS_DATE,
+        JobHistoryZKStateManager.instance().addProcessedJob(String.format(FORMAT_JOB_PROCESS_DATE,
                 this.processDate.year,
                 this.processDate.month + 1,
                 this.processDate.day),
@@ -202,7 +199,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private void updateProcessDate() throws Exception {
         String line = String.format(FORMAT_JOB_PROCESS_DATE, this.processDate.year,
                 this.processDate.month + 1, this.processDate.day);
-        zkStateLcm.updateProcessedDate(partitionId, line);
+        JobHistoryZKStateManager.instance().updateProcessedDate(partitionId, line);
     }
 
     private int getActualMonth(int month) {
@@ -220,7 +217,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     }
 
     private void readAndCacheLastProcessedDate() throws Exception {
-        String lastProcessedDate = zkStateLcm.readProcessedDate(partitionId);
+        String lastProcessedDate = JobHistoryZKStateManager.instance().readProcessedDate(partitionId);
         Matcher m = PATTERN_JOB_PROCESS_DATE.matcher(lastProcessedDate);
         if (m.find() && m.groupCount() == 3) {
             this.processDate.year = Integer.parseInt(m.group(1));
@@ -233,7 +230,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
         GregorianCalendar cal = new GregorianCalendar(timeZone);
         cal.set(this.processDate.year, this.processDate.month, this.processDate.day, 0, 0, 0);
         cal.add(Calendar.DATE, 1);
-        List<String> list = zkStateLcm.readProcessedJobs(String.format(FORMAT_JOB_PROCESS_DATE, cal.get(Calendar.YEAR),
+        List<String> list = JobHistoryZKStateManager.instance().readProcessedJobs(String.format(FORMAT_JOB_PROCESS_DATE, cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH)));
         if (list != null) {
             this.processedJobFileNames = new HashSet<>(list);
@@ -241,7 +238,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     }
 
     private void flushJobCount() throws Exception {
-        List<Pair<String, String>> jobs = zkStateLcm.getProcessedJobs(
+        List<Pair<String, String>> jobs = JobHistoryZKStateManager.instance().getProcessedJobs(
             String.format(FORMAT_JOB_PROCESS_DATE, this.processDate.year, this.processDate.month + 1, this.processDate.day)
         );
         JobCountEntity entity = new JobCountEntity();
@@ -300,7 +297,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
         cal.add(Calendar.DATE, -1 - PROCESSED_JOB_KEEP_DAYS);
         String line = String.format(FORMAT_JOB_PROCESS_DATE, cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
-        zkStateLcm.truncateProcessedJob(line);
+        JobHistoryZKStateManager.instance().truncateProcessedJob(line);
     }
 
     private boolean isToday() {

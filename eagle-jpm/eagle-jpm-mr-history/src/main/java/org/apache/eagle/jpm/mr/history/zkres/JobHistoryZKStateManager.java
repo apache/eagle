@@ -47,6 +47,8 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
 
     public static final int BACKOFF_DAYS = 0;
 
+    private static JobHistoryZKStateManager jobHistoryZKStateManager = new JobHistoryZKStateManager();
+
     private CuratorFramework newCurator(ZKStateConfig config) throws Exception {
         return CuratorFrameworkFactory.newClient(
             config.zkQuorum,
@@ -56,7 +58,11 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         );
     }
 
-    public JobHistoryZKStateManager(ZKStateConfig config) {
+    public static JobHistoryZKStateManager instance() {
+        return jobHistoryZKStateManager;
+    }
+
+    public void init(ZKStateConfig config) {
         this.zkRoot = config.zkRoot;
 
         try {
