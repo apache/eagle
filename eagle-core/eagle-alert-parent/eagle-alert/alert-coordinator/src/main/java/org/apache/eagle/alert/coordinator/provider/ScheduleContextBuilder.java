@@ -61,6 +61,7 @@ public class ScheduleContextBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(ScheduleContextBuilder.class);
     private static final String UNIQUE_BOLT_ID = "%s-%s";// toponame-boltname
 
+    private Config config;
     private IMetadataServiceClient client;
 
     private Map<String, Topology> topologies;
@@ -73,10 +74,12 @@ public class ScheduleContextBuilder {
     private Map<String, TopologyUsage> usages;
 
     public ScheduleContextBuilder(Config config) {
+    	this.config = config;
         client = new MetadataServiceClientImpl(config);
     }
 
-    public ScheduleContextBuilder(IMetadataServiceClient client) {
+    public ScheduleContextBuilder(Config config, IMetadataServiceClient client) {
+    	this.config = config;
         this.client = client;
     }
 
@@ -89,10 +92,13 @@ public class ScheduleContextBuilder {
         topologies = listToMap(client.listTopologies());
         kafkaSources = listToMap(client.listDataSources());
         // filter out disabled policies
-        policies = listToMap(client.listPolicies().stream().filter(
-        		(t) -> t.getPolicyStatus() != PolicyStatus.DISABLED).collect(Collectors.toList()));
+        List<PolicyDefinition> enabledPolicies = client.listPolicies().stream().filter(
+        		(t) -> t.getPolicyStatus() != PolicyStatus.DISABLED).collect(Collectors.toList());
+        policies = listToMap(enabledPolicies);
         publishments = listToMap(client.listPublishment());
         streamDefinitions = listToMap(client.listStreams());
+        // generate data sources, policies, publishments for nodata alert
+        new NodataMetadataGenerator().execute(config, streamDefinitions, kafkaSources, policies, publishments);
         
         // TODO: See ScheduleState comments on how to improve the storage
         ScheduleState state = client.getVersionedSpec();
@@ -114,7 +120,7 @@ public class ScheduleContextBuilder {
         return new InMemScheduleConext(topologies, assignments, kafkaSources, policies, publishments,
                 streamDefinitions, monitoredStreamMap, usages);
     }
-
+    
     /**
      * 1.
      * <pre>

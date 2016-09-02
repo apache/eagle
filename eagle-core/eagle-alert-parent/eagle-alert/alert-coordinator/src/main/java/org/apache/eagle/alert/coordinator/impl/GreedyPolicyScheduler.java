@@ -298,6 +298,10 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
      * @return
      */
     private int getQueueSize(int hint) {
+    	if (hint == 0) {
+    		// some policies require single bolt to execute
+    		return 1;
+    	}
         return initialQueueSize * ((hint + initialQueueSize - 1) / initialQueueSize);
     }
 

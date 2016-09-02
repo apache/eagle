@@ -16,16 +16,16 @@
  */
 package org.apache.eagle.alert.engine.evaluator;
 
+import java.util.Map;
+
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.absence.AbsencePolicyHandler;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyHandler;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyStateHandler;
-import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyHandler;
+import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyTimeBatchHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * TODO/FIXME: to support multiple stage definition in single policy. The methods in this class is not good to understand now.(Hard code of 0/1).
@@ -42,7 +42,8 @@ public class PolicyStreamHandlers {
         if (SIDDHI_ENGINE.equals(definition.getType())) {
             return new SiddhiPolicyHandler(sds, 0);// // FIXME: 8/2/16 
         } else if (NO_DATA_ALERT_ENGINE.equals(definition.getType())) {
-            return new NoDataPolicyHandler(sds);
+        	// no data for an entire stream won't trigger gap alert  (use local time & batch window instead)
+        	return new NoDataPolicyTimeBatchHandler(sds);
         } else if (ABSENCE_ALERT_ENGINE.equals(definition.getType())) {
             return new AbsencePolicyHandler(sds);
         } else if (CUSTOMIZED_ENGINE.equals(definition.getType())) {
