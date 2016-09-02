@@ -77,12 +77,12 @@ public class SparkHistoryServerResourceFetcher implements ResourceFetcher<SparkA
         }
     }
 
-    public List<SparkApplication> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception {
-        switch (resoureType) {
+    public List<SparkApplication> getResource(Constants.ResourceType resourceType, Object... parameter) throws Exception {
+        switch (resourceType) {
             case SPARK_JOB_DETAIL:
                 return doFetchSparkApplicationDetail((String) parameter[0]);
             default:
-                throw new Exception("Not support resourceType :" + resoureType);
+                throw new Exception("Not support resourceType :" + resourceType);
         }
     }
 }

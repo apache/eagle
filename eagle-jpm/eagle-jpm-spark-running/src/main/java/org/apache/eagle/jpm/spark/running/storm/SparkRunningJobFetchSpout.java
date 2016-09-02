@@ -67,6 +67,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
         this.sparkRunningJobManager = new SparkRunningJobManager(zkStateConfig);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void nextTuple() {
         LOG.info("Start to fetch spark running jobs");
@@ -154,8 +155,7 @@ public class SparkRunningJobFetchSpout extends BaseRichSpout {
         //content of path /apps/spark/running/yarnAppId/appId is SparkAppEntity(current attempt)
         //as we know, a yarn application may contains many spark applications
         //so, the returned results is a Map, key is yarn appId
-        Map<String, Map<String, SparkAppEntity>> result = this.sparkRunningJobManager.recover();
-        return result;
+        return this.sparkRunningJobManager.recover();
     }
 
     @Override

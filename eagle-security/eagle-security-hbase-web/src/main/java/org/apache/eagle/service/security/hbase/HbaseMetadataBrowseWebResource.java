@@ -73,7 +73,7 @@ public class HbaseMetadataBrowseWebResource {
     private Configuration convert(Map<String, Object> originalConfig) throws Exception {
         Configuration config = new Configuration();
         for (Map.Entry<String, Object> entry : originalConfig.entrySet()) {
-            config.set(entry.getKey().toString(), entry.getValue().toString());
+            config.set(entry.getKey(), entry.getValue().toString());
         }
         return config;
     }
@@ -125,12 +125,11 @@ public class HbaseMetadataBrowseWebResource {
             response.setException(EagleExceptionWrapper.wrap(ex));
         }
         if(tables != null) {
-            String resource = null;
             for (String table : tables) {
-                resource = String.format("%s:%s", namespace, table);
+                String resource = String.format("%s:%s", namespace, table);
                 Set<String> childSensitiveTypes = new HashSet<>();
-                String senstiveType = checkSensitivity(site, resource, childSensitiveTypes);
-                values.add(new HbaseResourceEntity(resource, namespace, table, null, senstiveType, childSensitiveTypes));
+                String sensitiveType = checkSensitivity(site, resource, childSensitiveTypes);
+                values.add(new HbaseResourceEntity(resource, namespace, table, null, sensitiveType, childSensitiveTypes));
             }
         }
         response.setObj(values);
@@ -157,12 +156,11 @@ public class HbaseMetadataBrowseWebResource {
             response.setException(EagleExceptionWrapper.wrap(ex));
         }
         if(columns != null) {
-            String resource = null;
             for (String col : columns) {
-                resource = String.format("%s:%s:%s", namespace, table, col);
+                String resource = String.format("%s:%s:%s", namespace, table, col);
                 Set<String> childSensitiveTypes = new HashSet<>();
-                String senstiveType = checkSensitivity(site, resource, childSensitiveTypes);
-                values.add(new HbaseResourceEntity(resource, namespace, table, col, senstiveType, childSensitiveTypes));
+                String sensitiveType = checkSensitivity(site, resource, childSensitiveTypes);
+                values.add(new HbaseResourceEntity(resource, namespace, table, col, sensitiveType, childSensitiveTypes));
             }
         }
         response.setObj(values);

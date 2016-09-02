@@ -35,10 +35,11 @@ import java.util.Iterator;
 import java.util.List;
 
 public class JobHistoryZKStateManager {
-    public static final Logger LOG = LoggerFactory.getLogger(JobHistoryZKStateManager.class);
+    private final static Logger LOG = LoggerFactory.getLogger(JobHistoryZKStateManager.class);
+
+    private final static String START_TIMESTAMP = "lastAppTime";
     private String zkRoot;
     private CuratorFramework curator;
-    private static String START_TIMESTAMP = "lastAppTime";
 
     private CuratorFramework newCurator(SparkHistoryJobAppConfig config) throws Exception {
         return CuratorFrameworkFactory.newClient(
@@ -72,7 +73,7 @@ public class JobHistoryZKStateManager {
         InterProcessLock lock = new InterProcessReadWriteLock(curator,jobPath).writeLock();
         try {
             lock.acquire();
-            Iterator<String> iter =  curator.getChildren().forPath(jobPath).iterator();
+            Iterator<String> iter = curator.getChildren().forPath(jobPath).iterator();
             while (iter.hasNext()) {
                 String appId = iter.next();
                 String path = jobPath + "/" + appId;
@@ -104,9 +105,7 @@ public class JobHistoryZKStateManager {
         InterProcessLock lock = new InterProcessReadWriteLock(curator,jobPath).writeLock();
         try {
             lock.acquire();
-            Iterator<String> iter =  curator.getChildren().forPath(jobPath).iterator();
-            while (iter.hasNext()) {
-                String appId = iter.next();
+            (curator.getChildren().forPath(jobPath)).forEach(appId -> {
                 String path = jobPath + "/" + appId;
                 try {
                     if (curator.checkExists().forPath(path) != null) {
@@ -119,7 +118,7 @@ public class JobHistoryZKStateManager {
                     LOG.error("fail to read unprocessed job", e);
                     throw new RuntimeException(e);
                 }
-            }
+            });
 
         } catch (Exception e) {
             LOG.error("fail to read unprocessed jobs", e);
@@ -174,10 +173,7 @@ public class JobHistoryZKStateManager {
     public boolean hasApplication(String appId) {
         String path = zkRoot + "/jobs/" + appId;
         try {
-            if (curator.checkExists().forPath(path) != null) {
-                return true;
-            }
-            return false;
+            return curator.checkExists().forPath(path) != null;
         } catch (Exception e) {
             LOG.error("fail to check whether application exists", e);
             throw new RuntimeException(e);
@@ -191,7 +187,7 @@ public class JobHistoryZKStateManager {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
             }
 
-            name = name.replace("/","_");
+            name = name.replace("/", "_");
             if (name.length() > 50) {
                 name = name.substring(0, 50);
             }
@@ -226,7 +222,6 @@ public class JobHistoryZKStateManager {
     }
 
     public void updateApplicationStatus(String appId, Enum<ZKStateConstant.AppStatus> status) {
-
         String path = zkRoot + "/jobs/" + appId ;
         InterProcessLock lock = new InterProcessReadWriteLock(curator,zkRoot + "/jobs").readLock();
         try {
@@ -238,8 +233,7 @@ public class JobHistoryZKStateManager {
                     curator.setData().forPath(path, status.toString().getBytes("UTF-8"));
                 }
             } else {
-                String errorMsg = String.format("fail to update for application with path %s", path);
-                LOG.error(errorMsg);
+                LOG.error("Failed to update for application with path: " + path);
             }
         } catch (Exception e) {
             LOG.error("fail to update application status", e);
@@ -252,8 +246,6 @@ public class JobHistoryZKStateManager {
             } catch (Exception e) {
                 LOG.error("fail to release lock",e);
             }
-
         }
-
     }
 }

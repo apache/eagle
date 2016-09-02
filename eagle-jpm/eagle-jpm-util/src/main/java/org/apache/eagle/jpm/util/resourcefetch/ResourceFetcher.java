@@ -22,6 +22,6 @@ import java.util.List;
 
 public interface ResourceFetcher<T> {
     //continue to refactor later
-    List<T> getResource(Constants.ResourceType resoureType, Object... parameter) throws Exception;
+    List<T> getResource(Constants.ResourceType resourceType, Object... parameter) throws Exception;
 
 }
