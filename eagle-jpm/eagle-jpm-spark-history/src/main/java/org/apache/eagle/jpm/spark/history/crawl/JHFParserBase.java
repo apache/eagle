@@ -15,10 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.crawl;
+package org.apache.eagle.jpm.spark.history.crawl;
 
-public enum EventType {
-    SparkListenerBlockManagerAdded, SparkListenerEnvironmentUpdate, SparkListenerApplicationStart,
-    SparkListenerExecutorAdded, SparkListenerJobStart,SparkListenerStageSubmitted, SparkListenerTaskStart,SparkListenerBlockManagerRemoved,
-    SparkListenerTaskEnd, SparkListenerStageCompleted, SparkListenerJobEnd, SparkListenerApplicationEnd,SparkListenerExecutorRemoved
+import java.io.InputStream;
+
+public interface JHFParserBase {
+    /**
+     * this method will ensure to close the inputStream.
+     * @param is
+     * @throws Exception
+     */
+    void parse(InputStream is) throws Exception;
 }

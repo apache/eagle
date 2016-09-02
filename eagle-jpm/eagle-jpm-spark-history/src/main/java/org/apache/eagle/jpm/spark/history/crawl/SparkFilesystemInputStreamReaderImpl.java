@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.crawl;
+package org.apache.eagle.jpm.spark.history.crawl;
 
 import org.apache.eagle.jpm.util.SparkJobTagName;
 

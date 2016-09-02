@@ -17,7 +17,7 @@
  *
  */
 
-package org.apache.eagle.jpm.spark.crawl;
+package org.apache.eagle.jpm.spark.history.crawl;
 
 public class SparkApplicationInfo {
 
