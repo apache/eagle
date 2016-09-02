@@ -36,7 +36,7 @@ public class SparkRunningJobApp extends StormApplication {
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         final String spoutName = SparkRunningJobAppConfig.JOB_FETCH_SPOUT_NAME;
         final String boltName = SparkRunningJobAppConfig.JOB_PARSE_BOLT_NAME;
-        int parallelism = sparkRunningJobAppConfig.getTopologyConfig().jobFetchSpoutParallism;
+        int parallelism = sparkRunningJobAppConfig.getTopologyConfig().jobFetchSpoutParallelism;
         int tasks = sparkRunningJobAppConfig.getTopologyConfig().jobFetchSpoutTasksNum;
         if (parallelism > tasks) {
             parallelism = tasks;
@@ -50,7 +50,7 @@ public class SparkRunningJobApp extends StormApplication {
                 parallelism
         ).setNumTasks(tasks);
 
-        parallelism = sparkRunningJobAppConfig.getTopologyConfig().jobParseBoltParallism;
+        parallelism = sparkRunningJobAppConfig.getTopologyConfig().jobParseBoltParallelism;
         tasks = sparkRunningJobAppConfig.getTopologyConfig().jobParseBoltTasksNum;
         if (parallelism > tasks) {
             parallelism = tasks;
