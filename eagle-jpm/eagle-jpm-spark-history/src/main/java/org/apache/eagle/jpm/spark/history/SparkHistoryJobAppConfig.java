@@ -27,6 +27,7 @@ import java.io.Serializable;
 public class SparkHistoryJobAppConfig implements Serializable {
     final static String SPARK_HISTORY_JOB_FETCH_SPOUT_NAME = "sparkHistoryJobFetchSpout";
     final static String SPARK_HISTORY_JOB_PARSE_BOLT_NAME = "sparkHistoryJobParseBolt";
+    private final static String COMMA_SPLITTER = ",\\s*";
 
     public ZKStateConfig zkStateConfig;
     public JobHistoryEndpointConfig jobHistoryConfig;
@@ -69,7 +70,7 @@ public class SparkHistoryJobAppConfig implements Serializable {
         jobHistoryConfig.historyServerUrl = config.getString("dataSourceConfig.spark.history.server.url");
         jobHistoryConfig.historyServerUserName = config.getString("dataSourceConfig.spark.history.server.username");
         jobHistoryConfig.historyServerUserPwd = config.getString("dataSourceConfig.spark.history.server.password");
-        jobHistoryConfig.rms = config.getString("dataSourceConfig.rm.url").split(",\\s*");
+        jobHistoryConfig.rms = config.getString("dataSourceConfig.rm.url").split(COMMA_SPLITTER);
 
         this.hdfsConfig.baseDir = config.getString("dataSourceConfig.hdfs.eventLog");
         this.hdfsConfig.endpoint = config.getString("dataSourceConfig.hdfs.endPoint");
@@ -77,7 +78,7 @@ public class SparkHistoryJobAppConfig implements Serializable {
         this.hdfsConfig.keytab = config.getString("dataSourceConfig.hdfs.keytab");
 
         info.site = config.getString("basic.cluster") + "-" + config.getString("basic.dataCenter");
-        info.jobConf = config.getString("basic.jobConf.additional.info").split(",\\s*");
+        info.jobConf = config.getString("basic.jobConf.additional.info").split(COMMA_SPLITTER);
 
         this.eagleInfo.host = config.getString("eagleProps.eagle.service.host");
         this.eagleInfo.port = config.getInt("eagleProps.eagle.service.port");

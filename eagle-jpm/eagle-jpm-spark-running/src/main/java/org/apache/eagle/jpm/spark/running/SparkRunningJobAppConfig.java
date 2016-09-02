@@ -29,12 +29,7 @@ public class SparkRunningJobAppConfig implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SparkRunningJobAppConfig.class);
     static final String JOB_FETCH_SPOUT_NAME = "sparkRunningJobFetchSpout";
     static final String JOB_PARSE_BOLT_NAME = "sparkRunningJobParseBolt";
-
-    public String getEnv() {
-        return env;
-    }
-
-    private String env;
+    private static final String COMMA_SPLITTER = ",\\s*";
 
     ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
@@ -66,9 +61,9 @@ public class SparkRunningJobAppConfig implements Serializable {
     private EndpointConfig endpointConfig;
 
     public static class TopologyConfig implements Serializable {
-        public int jobFetchSpoutParallism;
+        public int jobFetchSpoutParallelism;
         public int jobFetchSpoutTasksNum;
-        public int jobParseBoltParallism;
+        public int jobParseBoltParallelism;
         public int jobParseBoltTasksNum;
     }
 
@@ -138,7 +133,6 @@ public class SparkRunningJobAppConfig implements Serializable {
 
     private void init(Config config) {
         this.config = config;
-        this.env = config.getString("envContextConfig.env");
         this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");
         this.zkStateConfig.zkPort = config.getString("zookeeperConfig.zkPort");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeperConfig.zkSessionTimeoutMs");
@@ -168,15 +162,14 @@ public class SparkRunningJobAppConfig implements Serializable {
         this.endpointConfig.keyTab = config.getString("dataSourceConfig.keytab");
         this.endpointConfig.principal = config.getString("dataSourceConfig.principal");
 
-        this.endpointConfig.rmUrls = config.getString("dataSourceConfig.rmUrls").split(",");
+        this.endpointConfig.rmUrls = config.getString("dataSourceConfig.rmUrls").split(COMMA_SPLITTER);
 
-        this.topologyConfig.jobFetchSpoutParallism = config.getInt("envContextConfig.parallelismConfig." + JOB_FETCH_SPOUT_NAME);
+        this.topologyConfig.jobFetchSpoutParallelism = config.getInt("envContextConfig.parallelismConfig." + JOB_FETCH_SPOUT_NAME);
         this.topologyConfig.jobFetchSpoutTasksNum = config.getInt("envContextConfig.tasks." + JOB_FETCH_SPOUT_NAME);
-        this.topologyConfig.jobParseBoltParallism = config.getInt("envContextConfig.parallelismConfig." + JOB_PARSE_BOLT_NAME);
+        this.topologyConfig.jobParseBoltParallelism = config.getInt("envContextConfig.parallelismConfig." + JOB_PARSE_BOLT_NAME);
         this.topologyConfig.jobParseBoltTasksNum = config.getInt("envContextConfig.tasks." + JOB_PARSE_BOLT_NAME);
 
         LOG.info("Successfully initialized SparkRunningJobAppConfig");
-        LOG.info("env: " + this.env);
         LOG.info("site: " + this.jobExtractorConfig.site);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);
         LOG.info("eagle.service.port: " + this.eagleServiceConfig.eagleServicePort);
