@@ -19,9 +19,11 @@
 package org.apache.eagle.jpm.mr.history.parser;
 
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
+import org.apache.eagle.jpm.mr.history.metrics.JobExecutionMetricsCreationListener;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.mr.historyentity.*;
 import org.apache.eagle.jpm.util.MRJobTagName;
+import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -43,6 +45,7 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
     List<JobEventAPIEntity> jobEvents = new ArrayList<>();
     List<TaskExecutionAPIEntity> taskExecs = new ArrayList<>();
     List<TaskAttemptExecutionAPIEntity> taskAttemptExecs = new ArrayList<>();
+    private JobExecutionMetricsCreationListener jobExecutionMetricsCreationListener = new JobExecutionMetricsCreationListener();
     private TimeZone timeZone;
 
     public JobEntityCreationEagleServiceListener(MRHistoryJobConfig configManager) {
@@ -91,6 +94,7 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
 
         client.getJerseyClient().setReadTimeout(jobExtractorConfig.readTimeoutSeconds * 1000);
         logger.info("start flushing entities of total number " + list.size());
+        List<GenericMetricEntity> metricEntities = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             JobBaseAPIEntity entity = list.get(i);
             if (entity instanceof JobExecutionAPIEntity) {
@@ -98,6 +102,8 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
                 JobHistoryZKStateManager.instance().updateProcessedJob(timeStamp2Date(entity.getTimestamp()),
                     entity.getTags().get(MRJobTagName.JOB_ID.toString()),
                     ((JobExecutionAPIEntity) entity).getCurrentState());
+
+                metricEntities.addAll(jobExecutionMetricsCreationListener.generateMetrics((JobExecutionAPIEntity)entity));
             } else if (entity instanceof JobEventAPIEntity) {
                 jobEvents.add((JobEventAPIEntity) entity);
             } else if (entity instanceof TaskExecutionAPIEntity) {
@@ -112,6 +118,12 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             result = client.create(jobs);
             checkResult(result);
             jobs.clear();
+        }
+        if (metricEntities.size() > 0) {
+            logger.info("flush job metrics of number " + metricEntities.size());
+            result = client.create(metricEntities);
+            checkResult(result);
+            metricEntities.clear();
         }
         if (jobEvents.size() > 0) {
             logger.info("flush JobEventAPIEntity of number " + jobEvents.size());
@@ -131,6 +143,7 @@ public class JobEntityCreationEagleServiceListener implements HistoryJobEntityCr
             checkResult(result);
             taskAttemptExecs.clear();
         }
+
         logger.info("finish flushing entities of total number " + list.size());
         list.clear();
         client.getJerseyClient().destroy();

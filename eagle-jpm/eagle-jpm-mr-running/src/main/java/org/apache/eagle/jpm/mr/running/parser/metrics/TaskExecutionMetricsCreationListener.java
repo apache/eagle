@@ -21,6 +21,7 @@ package org.apache.eagle.jpm.mr.running.parser.metrics;
 import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericMetricEntity;
+import org.apache.eagle.jpm.util.metrics.AbstractMetricsCreationListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class TaskExecutionMetricsCreationListener extends AbstractMetricsCreatio
         if (entity != null) {
             Long currentTime = System.currentTimeMillis();
             Map<String, String> tags = entity.getTags();
-            metrics.add(metricWrapper(currentTime, Constants.TASK_EXECUTION_TIME, entity.getDuration(), tags));
+            metrics.add(metricWrapper(currentTime, Constants.TASK_EXECUTION_TIME, new double[]{entity.getDuration()}, tags));
         }
         return metrics;
     }

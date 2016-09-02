@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.eagle.jpm.mr.running.parser.metrics;
+package org.apache.eagle.jpm.util.metrics;
 
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericMetricEntity;
@@ -30,13 +30,13 @@ public abstract class AbstractMetricsCreationListener<E extends TaggedLogAPIEnti
 
     protected abstract String buildMetricName(String field);
 
-    protected GenericMetricEntity metricWrapper(Long timestamp, String field, double value, Map<String, String> tags) {
+    protected GenericMetricEntity metricWrapper(Long timestamp, String field, double[] values, Map<String, String> tags) {
         String metricName = buildMetricName(field);
         GenericMetricEntity metricEntity = new GenericMetricEntity();
         metricEntity.setTimestamp(timestamp);
         metricEntity.setTags(tags);
         metricEntity.setPrefix(metricName);
-        metricEntity.setValue(new double[]{value});
+        metricEntity.setValue(values);
         return metricEntity;
     }
 }
