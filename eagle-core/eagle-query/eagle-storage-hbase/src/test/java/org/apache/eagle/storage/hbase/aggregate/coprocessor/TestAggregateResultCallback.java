@@ -16,14 +16,15 @@
  */
 package org.apache.eagle.storage.hbase.aggregate.coprocessor;
 
+import org.apache.eagle.common.ByteUtil;
 import org.apache.eagle.query.aggregate.AggregateFunctionType;
-import org.apache.eagle.storage.hbase.query.coprocessor.AggregateResult;
-import org.apache.eagle.storage.hbase.query.coprocessor.AggregateResultCallback;
-import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateResultCallbackImpl;
 import org.apache.eagle.query.aggregate.raw.GroupbyKey;
 import org.apache.eagle.query.aggregate.raw.GroupbyKeyValue;
 import org.apache.eagle.query.aggregate.raw.GroupbyValue;
-import org.apache.eagle.common.ByteUtil;
+import org.apache.eagle.storage.hbase.query.coprocessor.AggregateResult;
+import org.apache.eagle.storage.hbase.query.coprocessor.AggregateResultCallback;
+import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateResultCallbackImpl;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,7 +36,7 @@ import java.util.List;
 @Ignore
 public class TestAggregateResultCallback {
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         // -----------------------------------------------------------------------------
         // key      |       max      min        count       avg         sum      | count
         // -----------------------------------------------------------------------------
@@ -49,89 +50,88 @@ public class TestAggregateResultCallback {
         // -----------------------------------------------------------------------------
 
         AggregateResultCallback callback = new AggregateResultCallbackImpl(Arrays.asList(
-                        AggregateFunctionType.max,
-                        AggregateFunctionType.min,
-                        AggregateFunctionType.count,
-                        AggregateFunctionType.avg,
-                        AggregateFunctionType.sum));
+                AggregateFunctionType.max,
+                AggregateFunctionType.min,
+                AggregateFunctionType.count,
+                AggregateFunctionType.avg,
+                AggregateFunctionType.sum));
         AggregateResult result1 = AggregateResult.build(
                 Arrays.asList(
-                    new String[]{"a","b"},
-                    new String[]{"a","b"},
-                    new String[]{"a","b","c"},
-                    new String[]{"a","b","c"}
+                        new String[]{"a", "b"},
+                        new String[]{"a", "b"},
+                        new String[]{"a", "b", "c"},
+                        new String[]{"a", "b", "c"}
                 ),
                 Arrays.asList(
-                    new double[]{1.0,2.0,3.0,4.0,5.0},
-                    new double[]{2.0,3.0,6.0,5.0,6.0},
-                    new double[]{3.0,3.0,5.0,5.0,6.0},
-                    new double[]{4.0,5.0,5.0,5.0,7.0}
+                        new double[]{1.0, 2.0, 3.0, 4.0, 5.0},
+                        new double[]{2.0, 3.0, 6.0, 5.0, 6.0},
+                        new double[]{3.0, 3.0, 5.0, 5.0, 6.0},
+                        new double[]{4.0, 5.0, 5.0, 5.0, 7.0}
                 ),
-                Arrays.asList(3,6,5,5),
+                Arrays.asList(3, 6, 5, 5),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
-        callback.update(null,null,result1);
+        callback.update(null, null, result1);
         AggregateResult callbackResult = callback.result();
-        Assert.assertEquals(2,callbackResult.getKeyValues().size());
+        Assert.assertEquals(2, callbackResult.getKeyValues().size());
 
         // == ROW-#0 ==
         // Should be:
         // key      |       max      min        count       avg         sum      | count
         // -----------------------------------------------------------------------------
-        // a,b,c    |       4        3          10          1           13       | 10
+        // a,b      |       2        2          9           1           11       | 9
         GroupbyKeyValue row0 = callbackResult.getKeyValues().get(0);
-//        Assert.assertEquals("a",new String(row0.getKey().getValue().get(0).copyBytes()));
-//        Assert.assertEquals("b",new String(row0.getKey().getValue().get(1).copyBytes()));
-        Assert.assertEquals(new GroupbyKey(Arrays.asList("a".getBytes(),"b".getBytes(),"c".getBytes())),row0.getKey());
-        Assert.assertEquals(4.0,row0.getValue().get(0).get(), 0.00001);
-        Assert.assertEquals(10, ByteUtil.bytesToInt(row0.getValue().getMeta(0).getBytes()));
-        Assert.assertEquals(3.0, row0.getValue().get(1).get(), 0.00001);
-        Assert.assertEquals(10, ByteUtil.bytesToInt(row0.getValue().getMeta(1).getBytes()));
-        Assert.assertEquals(10.0,row0.getValue().get(2).get(), 0.00001);
-        Assert.assertEquals(10, ByteUtil.bytesToInt(row0.getValue().getMeta(2).getBytes()));
-        Assert.assertEquals(1.0,row0.getValue().get(3).get(), 0.00001);
-        Assert.assertEquals(10, ByteUtil.bytesToInt(row0.getValue().getMeta(3).getBytes()));
-        Assert.assertEquals(13.0,row0.getValue().get(4).get(), 0.00001);
-        Assert.assertEquals(10, ByteUtil.bytesToInt(row0.getValue().getMeta(4).getBytes()));
+        Assert.assertEquals(new GroupbyKey(Arrays.asList("a".getBytes(), "b".getBytes())), row0.getKey());
+        Assert.assertEquals(2.0, row0.getValue().get(0).get(), 0.00001);
+        Assert.assertEquals(9, ByteUtil.bytesToInt(row0.getValue().getMeta(4).getBytes()));
+        Assert.assertEquals(2.0, row0.getValue().get(1).get(), 0.00001);
+        Assert.assertEquals(9, ByteUtil.bytesToInt(row0.getValue().getMeta(4).getBytes()));
+        Assert.assertEquals(9.0, row0.getValue().get(2).get(), 0.00001);
+        Assert.assertEquals(9, ByteUtil.bytesToInt(row0.getValue().getMeta(4).getBytes()));
+        Assert.assertEquals(1.0, row0.getValue().get(3).get(), 0.00001);
+        Assert.assertEquals(9, ByteUtil.bytesToInt(row0.getValue().getMeta(4).getBytes()));
+        Assert.assertEquals(11.0, row0.getValue().get(4).get(), 0.00001);
+        Assert.assertEquals(9, ByteUtil.bytesToInt(row0.getValue().getMeta(4).getBytes()));
 
         // == ROW-#1 ==
         // Should be:
         // key      |       max      min        count       avg         sum      | count
         // -----------------------------------------------------------------------------
-        // a,b      |       2        2          9           1           11       | 9
+        // a,b,c    |       4        3          10          1           13       | 10
         GroupbyKeyValue row1 = callbackResult.getKeyValues().get(1);
-        Assert.assertEquals(new GroupbyKey(Arrays.asList("a".getBytes(),"b".getBytes())),row1.getKey());
-        Assert.assertEquals(2.0,row1.getValue().get(0).get(), 0.00001);
-        Assert.assertEquals(9, ByteUtil.bytesToInt(row1.getValue().getMeta(4).getBytes()));
-        Assert.assertEquals(2.0, row1.getValue().get(1).get(), 0.00001);
-        Assert.assertEquals(9, ByteUtil.bytesToInt(row1.getValue().getMeta(4).getBytes()));
-        Assert.assertEquals(9.0,row1.getValue().get(2).get(), 0.00001);
-        Assert.assertEquals(9, ByteUtil.bytesToInt(row1.getValue().getMeta(4).getBytes()));
-        Assert.assertEquals(1.0,row1.getValue().get(3).get(), 0.00001);
-        Assert.assertEquals(9, ByteUtil.bytesToInt(row1.getValue().getMeta(4).getBytes()));
-        Assert.assertEquals(11.0,row1.getValue().get(4).get(), 0.00001);
-        Assert.assertEquals(9, ByteUtil.bytesToInt(row1.getValue().getMeta(4).getBytes()));
+        Assert.assertEquals(new GroupbyKey(Arrays.asList("a".getBytes(), "b".getBytes(), "c".getBytes())), row1.getKey());
+        Assert.assertEquals(4.0, row1.getValue().get(0).get(), 0.00001);
+        Assert.assertEquals(10, ByteUtil.bytesToInt(row1.getValue().getMeta(0).getBytes()));
+        Assert.assertEquals(3.0, row1.getValue().get(1).get(), 0.00001);
+        Assert.assertEquals(10, ByteUtil.bytesToInt(row1.getValue().getMeta(1).getBytes()));
+        Assert.assertEquals(10.0, row1.getValue().get(2).get(), 0.00001);
+        Assert.assertEquals(10, ByteUtil.bytesToInt(row1.getValue().getMeta(2).getBytes()));
+        Assert.assertEquals(1.0, row1.getValue().get(3).get(), 0.00001);
+        Assert.assertEquals(10, ByteUtil.bytesToInt(row1.getValue().getMeta(3).getBytes()));
+        Assert.assertEquals(13.0, row1.getValue().get(4).get(), 0.00001);
+        Assert.assertEquals(10, ByteUtil.bytesToInt(row1.getValue().getMeta(4).getBytes()));
+
     }
 
     @Test
-    public void testAggregateResultTimestamp(){
+    public void testAggregateResultTimestamp() {
         AggregateResult result1 = new AggregateResult();
-        result1.setStartTimestamp(2l);
-        result1.setStopTimestamp(4l);
+        result1.setStartTimestamp(2L);
+        result1.setStopTimestamp(4L);
         AggregateResult result2 = new AggregateResult();
-        result2.setStartTimestamp(1l);
-        result2.setStopTimestamp(3l);
-        AggregateResultCallback  callback = new AggregateResultCallbackImpl(new ArrayList<AggregateFunctionType>());
-        callback.update(null,null,result1);
-        callback.update(null,null,result2);
+        result2.setStartTimestamp(1L);
+        result2.setStopTimestamp(3L);
+        AggregateResultCallback callback = new AggregateResultCallbackImpl(new ArrayList<AggregateFunctionType>());
+        callback.update(null, null, result1);
+        callback.update(null, null, result2);
         AggregateResult result3 = callback.result();
-        Assert.assertEquals(1l,result3.getStartTimestamp());
-        Assert.assertEquals(4l,result3.getStopTimestamp());
+        Assert.assertEquals(1L, result3.getStartTimestamp());
+        Assert.assertEquals(4L, result3.getStopTimestamp());
     }
 
     @Test
-    public void testUpdatePerformance(){
+    public void testUpdatePerformance() {
         AggregateResultCallback callback = new AggregateResultCallbackImpl(
                 Arrays.asList(
                         AggregateFunctionType.max,
@@ -139,10 +139,10 @@ public class TestAggregateResultCallback {
                         AggregateFunctionType.count,
                         AggregateFunctionType.avg));
 
-        for(int i=0;i<1000000;i++) {
+        for (int i = 0; i < 1000000; i++) {
             AggregateResult result1 = new AggregateResult();
             result1.setStartTimestamp(System.currentTimeMillis());
-            List<GroupbyKeyValue> keyValues = new ArrayList<GroupbyKeyValue>();
+            final List<GroupbyKeyValue> keyValues = new ArrayList<GroupbyKeyValue>();
 
             // <a,b> - <1*3, 2*3, 3*3, 4*3>
             GroupbyKey key = new GroupbyKey();
