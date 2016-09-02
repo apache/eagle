@@ -23,6 +23,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.eagle.jpm.spark.entity.*;
 import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.impl.EagleServiceBaseClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.json.simple.JSONArray;
@@ -30,6 +31,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 public class JHFSparkEventReader {
@@ -44,7 +46,7 @@ public class JHFSparkEventReader {
     private Map<Integer, SparkJob> jobs;
     private Map<String, SparkStage> stages;
     private Map<Integer, Set<String>> jobStageMap;
-    private Map<Integer, SparkTask> tasks;
+    private Map<Long, SparkTask> tasks;
     private EagleServiceClientImpl client;
     private Map<String, Map<Integer, Boolean>> stageTaskStatusMap;
 
@@ -61,7 +63,7 @@ public class JHFSparkEventReader {
         jobs = new HashMap<Integer, SparkJob>();
         stages = new HashMap<String, SparkStage>();
         jobStageMap = new HashMap<Integer, Set<String>>();
-        tasks = new HashMap<Integer, SparkTask>();
+        tasks = new HashMap<Long, SparkTask>();
         executors = new HashMap<String, SparkExecutor>();
         stageTaskStatusMap = new HashMap<>();
         conf = ConfigFactory.load();
@@ -72,7 +74,7 @@ public class JHFSparkEventReader {
         return this.app;
     }
 
-    public void read(JSONObject eventObj) throws Exception {
+    public void read(JSONObject eventObj) {
         String eventType = (String) eventObj.get("Event");
         if (eventType.equalsIgnoreCase(EventType.SparkListenerApplicationStart.toString())) {
             handleAppStarted(eventObj);
@@ -168,7 +170,7 @@ public class JHFSparkEventReader {
         this.lastEventTime = appStartTime;
     }
 
-    private void handleExecutorAdd(JSONObject event) throws Exception {
+    private void handleExecutorAdd(JSONObject event) {
         String executorID = (String) event.get("Executor ID");
         long executorAddTime = JSONUtils.getLong(event, "Timestamp", lastEventTime);
         this.lastEventTime = executorAddTime;
@@ -178,7 +180,7 @@ public class JHFSparkEventReader {
 
     }
 
-    private void handleBlockManagerAdd(JSONObject event) throws Exception {
+    private void handleBlockManagerAdd(JSONObject event) {
         long maxMemory = JSONUtils.getLong(event, "Maximum Memory");
         long timestamp = JSONUtils.getLong(event, "Timestamp", lastEventTime);
         this.lastEventTime = timestamp;
@@ -197,7 +199,7 @@ public class JHFSparkEventReader {
 
     private void handleTaskEnd(JSONObject event) {
         JSONObject taskInfo = JSONUtils.getJSONObject(event, "Task Info");
-        int taskId = JSONUtils.getInt(taskInfo, "Task ID");
+        long taskId = JSONUtils.getLong(taskInfo, "Task ID");
         SparkTask task = tasks.get(taskId);
         if (task == null) {
             return;
@@ -261,10 +263,10 @@ public class JHFSparkEventReader {
         task.getTags().put(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString(), Long.toString(JSONUtils.getLong(event, "Stage Attempt ID")));
 
         JSONObject taskInfo = JSONUtils.getJSONObject(event, "Task Info");
-        int taskId = JSONUtils.getInt(taskInfo, "Task ID");
+        long taskId = JSONUtils.getLong(taskInfo, "Task ID");
         task.setTaskId(taskId);
 
-        task.getTags().put(SparkJobTagName.SPARK_TASK_INDEX.toString(), Integer.toString(JSONUtils.getInt(taskInfo, "Index")));
+        task.getTags().put(SparkJobTagName.SPARK_TASK_INDEX.toString(), Long.toString(JSONUtils.getLong(taskInfo, "Index")));
         task.getTags().put(SparkJobTagName.SPARK_TASK_ATTEMPT_ID.toString(), Integer.toString(JSONUtils.getInt(taskInfo, "Attempt")));
         long launchTime = JSONUtils.getLong(taskInfo, "Launch Time", lastEventTime);
         this.lastEventTime = launchTime;
@@ -323,7 +325,7 @@ public class JHFSparkEventReader {
         String key = this.generateStageKey(Integer.toString(stageId), Integer.toString(stageAttemptId));
         stageTaskStatusMap.put(key, new HashMap<Integer, Boolean>());
 
-        if (!stages.containsKey(this.generateStageKey(Integer.toString(stageId), Integer.toString(stageAttemptId)))) {
+        if (!stages.containsKey(key)) {
             //may be further attempt for one stage
             String baseAttempt = this.generateStageKey(Integer.toString(stageId), "0");
             if (stages.containsKey(baseAttempt)) {
@@ -651,7 +653,7 @@ public class JHFSparkEventReader {
     }
 
 
-    private SparkExecutor initiateExecutor(String executorID, long startTime) throws Exception {
+    private SparkExecutor initiateExecutor(String executorID, long startTime) {
         if (!executors.containsKey(executorID)) {
             SparkExecutor executor = new SparkExecutor();
             executor.setTags(new HashMap<>(this.app.getTags()));
@@ -703,9 +705,9 @@ public class JHFSparkEventReader {
         return client;
     }
 
-    private void doFlush(List entities) throws Exception {
-        LOG.info("start flushing entities of total number " + entities.size());
+    private void doFlush(List entities) throws IOException, EagleServiceClientException {
         client.create(entities);
-        LOG.info("finish flushing entities of total number " + entities.size());
+        int size = (entities == null ? 0 : entities.size());
+        LOG.info("finish flushing entities of total number " + size);
     }
 }

@@ -98,9 +98,9 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         String topologyName = config.getString("appId");
         Preconditions.checkNotNull(topologyName,"[appId] is required by null for "+executor.getClass().getCanonicalName());
         StormTopology topology = executor.execute(config, environment);
-        LOG.info("Starting {} ({})",topologyName,executor.getClass().getCanonicalName());
+        LOG.info("Starting {} ({}), mode: {}",topologyName,executor.getClass().getCanonicalName(), config.getString("mode"));
         Config conf = getStormConfig();
-        if(config.getString("mode").equals(ApplicationEntity.Mode.CLUSTER.name())){
+        if(ApplicationEntity.Mode.CLUSTER.name().equalsIgnoreCase(config.getString("mode"))){
             String jarFile = config.hasPath("jarPath") ? config.getString("jarPath") : null;
             if(jarFile == null){
                 jarFile = DynamicJarPathFinder.findPath(executor.getClass());
