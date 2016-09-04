@@ -22,9 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @since Apr 5, 2016
@@ -165,6 +163,7 @@ public class PolicyDefinition implements Serializable{
         public String type;
         public String value;
         public String handlerClass;
+        public Map<String, Object> properties = new HashMap<>();
 
         private List<String> inputStreams = new ArrayList<String>();
         private List<String> outputStreams = new ArrayList<String>();
@@ -237,6 +236,14 @@ public class PolicyDefinition implements Serializable{
 
         public void setHandlerClass(String handlerClass) {
             this.handlerClass = handlerClass;
+        }
+
+        public Map<String, Object> getProperties() {
+            return properties;
+        }
+
+        public void setProperties(Map<String, Object> properties) {
+            this.properties = properties;
         }
 
         @Override
