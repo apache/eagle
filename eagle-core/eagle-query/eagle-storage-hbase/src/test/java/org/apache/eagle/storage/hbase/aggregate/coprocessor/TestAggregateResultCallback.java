@@ -24,16 +24,13 @@ import org.apache.eagle.query.aggregate.raw.GroupbyValue;
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateResult;
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateResultCallback;
 import org.apache.eagle.storage.hbase.query.coprocessor.impl.AggregateResultCallbackImpl;
-
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Ignore
 public class TestAggregateResultCallback {
     @Test
     public void testUpdate() {

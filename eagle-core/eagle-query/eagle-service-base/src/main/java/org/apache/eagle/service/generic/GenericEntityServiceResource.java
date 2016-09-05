@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -456,6 +457,10 @@ public class GenericEntityServiceResource {
         } catch (Exception e) {
             response.setException(e);
             LOG.error(e.getMessage(),e);
+            throw new WebApplicationException(e,
+                    Response.status(Response.Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON_TYPE)
+                    .entity(response).build());
         }finally {
             stopWatch.stop();
         }
