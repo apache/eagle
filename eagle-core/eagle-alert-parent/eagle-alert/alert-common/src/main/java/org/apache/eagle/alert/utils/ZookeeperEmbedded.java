@@ -52,15 +52,18 @@ public class ZookeeperEmbedded {
 
     public void shutdown() {
         try {
-            if (!zookeeper.getState().equals(CuratorFrameworkState.STOPPED)) {
-                zookeeper.close();
+            if(zookeeper!=null) {
+                if (!zookeeper.getState().equals(CuratorFrameworkState.STOPPED)) {
+                    zookeeper.close();
+                }
             }
-
         } catch (Throwable e) {
             e.printStackTrace();
         } finally {
             try {
-                server.close();
+                if(server!=null) {
+                    server.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
