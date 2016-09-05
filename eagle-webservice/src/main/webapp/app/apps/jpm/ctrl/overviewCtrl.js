@@ -26,44 +26,8 @@
 
 			PageConfig.title = "Overview";
 
-			var endTime = Time("day");
-			var startTime = endTime.clone().subtract(2, "day");
-			endTime.add(1, "day").subtract(1, "second");
-
-			JPM.get(JPM.QUERY_MR_JOB_COUNT, {
-				site: $scope.site,
-				intervalInSecs: 900,
-				durationBegin: Time.format(startTime),
-				durationEnd: Time.format(endTime)
-			}).then(
-				/**
-				 * @param {{}} res
-				 * @param {{}} res.data
-				 * @param {[]} res.data.jobCounts
-				 */
-				function (res) {
-					var data = res.data;
-					//var jobTypes = data.jobTypes;
-					var jobCounts = data.jobCounts;
-					console.log(">>>", jobCounts);
-					var jobTypesData = {};
-					$.each(jobCounts,
-						/**
-						 * @param i
-						 * @param {{}} jobCount
-						 * @param {{}} jobCount.timeBucket
-						 * @param {{}} jobCount.jobCountByType
-						 */
-						function (i, jobCount) {
-							var timestamp = jobCount.timeBucket;
-
-							$.each(jobCount.jobCountByType, function (type, count) {
-								var countList = jobTypesData[type] = jobTypesData[type] || [];
-								countList[timestamp] = count;
-							});
-					});
-					console.log(">>>", jobTypesData);
-			});
+			var endTime = Time();
+			var startTime = endTime.clone().subtract(1, "day");
 		});
 	});
 })();

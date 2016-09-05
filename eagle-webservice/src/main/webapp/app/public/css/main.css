@@ -85,6 +85,44 @@ a {
 }
 
 /* ========================================================================
+ * =                              Drop Down                               =
+ * ======================================================================== */
+.dropdown-hover:hover .dropdown-menu {
+	display: block;
+}
+
+header .dropdown-menu > li > a {
+	padding: 8px 10px;
+}
+
+header .dropdown-menu > li:not(:last-child) {
+	border-bottom: 1px solid #f4f4f4;
+}
+
+header .time-picker .customize {
+	padding: 5px 10px 5px 10px;
+}
+header .time-picker .customize label {
+	margin: 0 0 2px 0;
+	padding: 0;
+}
+header .time-picker .customize input,
+header .time-picker .customize .input-group-addon,
+header .time-picker .customize .btn {
+	height: 28px;
+	padding: 0 10px;
+}
+header .time-picker .customize .input-group-addon {
+	border-left: 0;
+	border-right: 0;
+	background: #f4f4f4;
+}
+header .time-picker .customize input {
+	min-width: 130px;
+	padding: 0 5px;
+}
+
+/* ========================================================================
  * =                                Table                                 =
  * ======================================================================== */
 table .info-wrapper .info-detail {
