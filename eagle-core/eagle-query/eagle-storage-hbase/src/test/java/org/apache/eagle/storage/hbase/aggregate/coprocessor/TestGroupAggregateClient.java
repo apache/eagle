@@ -31,10 +31,7 @@ import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DoubleWritable;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +131,7 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 		return result;
 	}
 
-	//@Test
+	@Test
 	public void testGroupAggregateCountClient(){
 		try {
 			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
@@ -149,7 +146,7 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testGroupAggregateAvgClient(){
 		try {
 			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
@@ -164,7 +161,7 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testGroupAggregateMaxClient(){
 		try {
 			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
@@ -179,7 +176,7 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testGroupAggregateSumClient(){
 		try {
 			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
@@ -194,7 +191,7 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testGroupAggregateMinClient(){
 
 		try {
@@ -210,7 +207,7 @@ public class TestGroupAggregateClient extends TestHBaseBase {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testGroupAggregateMultipleClient(){
 		try {
 			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");

@@ -46,7 +46,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
- * AggregateQuery
+ * Coprocessor based AggregateQuery
  *
  * <ol>
  *   <li>Open HBase connection</li>
@@ -54,11 +54,9 @@ import java.util.*;
  *   <li>Build GroupAggregateQuery.GroupAggregateQueryReader to process result and order as sort options</li>
  *   <li>Return result list</li>
  * </ol>
- *
- * @since : 11/7/14,2014
  */
-public class GenericAggregateQuery implements GenericQuery {
-	private static final Logger LOG = LoggerFactory.getLogger(GenericAggregateQuery.class);
+public class GenericCoprocessorAggregateQuery implements GenericQuery {
+	private static final Logger LOG = LoggerFactory.getLogger(GenericCoprocessorAggregateQuery.class);
 	private final List<AggregateFunctionType> sortFuncs;
 	private final List<String> sortFields;
 
@@ -84,7 +82,7 @@ public class GenericAggregateQuery implements GenericQuery {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public GenericAggregateQuery(String serviceName, SearchCondition condition, AggregateCondition aggregateCondition, String metricName)
+	public GenericCoprocessorAggregateQuery(String serviceName, SearchCondition condition, AggregateCondition aggregateCondition, String metricName)
 			throws InstantiationException, IllegalAccessException{
 		this(serviceName, condition, aggregateCondition, metricName,null,null,null,0);
 	}
@@ -102,9 +100,9 @@ public class GenericAggregateQuery implements GenericQuery {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public GenericAggregateQuery(String serviceName, SearchCondition condition,
-	                           AggregateCondition aggregateCondition, String metricName,
-	                           List<SortOption> sortOptions,List<AggregateFunctionType> sortFunctionTypes,List<String> sortFields,int top)
+	public GenericCoprocessorAggregateQuery(String serviceName, SearchCondition condition,
+                                            AggregateCondition aggregateCondition, String metricName,
+                                            List<SortOption> sortOptions, List<AggregateFunctionType> sortFunctionTypes, List<String> sortFields, int top)
 			throws InstantiationException, IllegalAccessException{
 		checkNotNull(serviceName, "serviceName");
 		this.searchCondition = condition;
@@ -170,8 +168,8 @@ public class GenericAggregateQuery implements GenericQuery {
 	/**
 	 * TODO: Return List<GroupAggregateAPIEntity>
 	 *
-	 * @see GenericAggregateQuery.TimeSeriesGroupAggregateQueryReader#result()
-	 * @see GenericAggregateQuery.FlatGroupAggregateQueryReader#result()
+	 * @see GenericCoprocessorAggregateQuery.TimeSeriesGroupAggregateQueryReader#result()
+	 * @see GenericCoprocessorAggregateQuery.FlatGroupAggregateQueryReader#result()
 	 *
  	 */
 	@Override
@@ -244,9 +242,9 @@ public class GenericAggregateQuery implements GenericQuery {
 
 	private abstract class GroupAggregateQueryReader {
 		protected final GenericAggregateReader reader;
-		protected final GenericAggregateQuery query;
+		protected final GenericCoprocessorAggregateQuery query;
 
-		public GroupAggregateQueryReader(GenericAggregateReader reader, GenericAggregateQuery query){
+		public GroupAggregateQueryReader(GenericAggregateReader reader, GenericCoprocessorAggregateQuery query){
 			this.reader = reader;
 			this.query = query;
 		}
@@ -274,7 +272,7 @@ public class GenericAggregateQuery implements GenericQuery {
 	}
 
 	private class FlatGroupAggregateQueryReader extends GroupAggregateQueryReader{
-		public FlatGroupAggregateQueryReader(GenericAggregateReader reader, GenericAggregateQuery query) {
+		public FlatGroupAggregateQueryReader(GenericAggregateReader reader, GenericCoprocessorAggregateQuery query) {
 			super(reader,query);
 		}
 		@Override
@@ -296,7 +294,7 @@ public class GenericAggregateQuery implements GenericQuery {
 		private final List<AggregateFunctionType> sortFuncs;
 		private final int sortAggFuncNum;
 
-		public TimeSeriesGroupAggregateQueryReader(GenericAggregateReader reader, GenericAggregateQuery query) throws IOException {
+		public TimeSeriesGroupAggregateQueryReader(GenericAggregateReader reader, GenericCoprocessorAggregateQuery query) throws IOException {
 			super(reader,query);
 			try {
 				if(entityDef.isTimeSeries()){

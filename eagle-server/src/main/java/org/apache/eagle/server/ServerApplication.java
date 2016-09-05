@@ -25,6 +25,8 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
+import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.server.module.GuideBundleLoader;
 
 import javax.servlet.DispatcherType;
@@ -47,6 +49,8 @@ class ServerApplication extends Application<ServerConfig> {
         environment.getApplicationContext().setContextPath(ServerConfig.getContextPath());
         environment.jersey().register(RESTExceptionMapper.class);
         environment.jersey().setUrlPattern(ServerConfig.getApiBasePath());
+        environment.getObjectMapper().setFilters(TaggedLogAPIEntity.getFilterProvider());
+        environment.getObjectMapper().registerModule(new EntityJsonModule());
 
         // Automatically scan all REST resources
         new PackagesResourceConfig(ServerConfig.getResourcePackage()).getClasses().forEach(environment.jersey()::register);

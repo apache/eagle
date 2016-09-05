@@ -134,7 +134,6 @@ public class StreamColumn implements Serializable {
             return name;
         }
 
-        @org.codehaus.jackson.annotate.JsonCreator
         @com.fasterxml.jackson.annotation.JsonCreator
         public static Type getEnumFromValue(String value) {
             for (Type testEnum : values()) {

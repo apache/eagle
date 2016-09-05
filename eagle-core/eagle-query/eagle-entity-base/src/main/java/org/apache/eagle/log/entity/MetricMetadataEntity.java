@@ -62,56 +62,56 @@ public class MetricMetadataEntity extends TaggedLogAPIEntity {
 	}
 	public void setStoreType(String storeType) {
 		this.storeType = storeType;
-		_pcs.firePropertyChange("storeType", null, null);
+		pcs.firePropertyChange("storeType", null, null);
 	}
 	public String getDisplayName() {
 		return displayName;
 	}
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
-		_pcs.firePropertyChange("displayName", null, null);
+		pcs.firePropertyChange("displayName", null, null);
 	}
 	public String getDefaultDownSamplingFunction() {
 		return defaultDownSamplingFunction;
 	}
 	public void setDefaultDownSamplingFunction(String defaultDownSamplingFunction) {
 		this.defaultDownSamplingFunction = defaultDownSamplingFunction;
-		_pcs.firePropertyChange("defaultDownSamplingFunction", null, null);
+		pcs.firePropertyChange("defaultDownSamplingFunction", null, null);
 	}
 	public String getDefaultAggregateFunction() {
 		return defaultAggregateFunction;
 	}
 	public void setDefaultAggregateFunction(String defaultAggregateFunction) {
 		this.defaultAggregateFunction = defaultAggregateFunction;
-		_pcs.firePropertyChange("defaultAggregateFunction", null, null);
+		pcs.firePropertyChange("defaultAggregateFunction", null, null);
 	}
 	public String getAggFunctions() {
 		return aggFunctions;
 	}
 	public void setAggFunctions(String aggFunctions) {
 		this.aggFunctions = aggFunctions;
-		_pcs.firePropertyChange("aggFunctions", null, null);
+		pcs.firePropertyChange("aggFunctions", null, null);
 	}
 	public String getDownSamplingFunctions() {
 		return downSamplingFunctions;
 	}
 	public void setDownSamplingFunctions(String downSamplingFunctions) {
 		this.downSamplingFunctions = downSamplingFunctions;
-		_pcs.firePropertyChange("downSamplingFunctions", null, null);
+		pcs.firePropertyChange("downSamplingFunctions", null, null);
 	}
 	public String getResolutions() {
 		return resolutions;
 	}
 	public void setResolutions(String resolutions) {
 		this.resolutions = resolutions;
-		_pcs.firePropertyChange("resolutions", null, null);
+		pcs.firePropertyChange("resolutions", null, null);
 	}
 	public String getDrillDownPaths() {
 		return drillDownPaths;
 	}
 	public void setDrillDownPaths(String drillDownPaths) {
 		this.drillDownPaths = drillDownPaths;
-		_pcs.firePropertyChange("drillDownPaths", null, null);
+		pcs.firePropertyChange("drillDownPaths", null, null);
 	}
 	
 }

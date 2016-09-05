@@ -17,9 +17,9 @@
 package org.apache.eagle.alert.engine.coordinator;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.joda.time.Period;
 
 import java.io.Serializable;

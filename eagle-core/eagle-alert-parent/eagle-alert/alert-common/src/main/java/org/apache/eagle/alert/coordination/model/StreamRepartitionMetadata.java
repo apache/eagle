@@ -16,10 +16,11 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * @since Apr 25, 2016

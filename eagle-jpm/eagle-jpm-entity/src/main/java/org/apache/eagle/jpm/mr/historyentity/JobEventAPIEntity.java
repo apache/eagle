@@ -39,6 +39,6 @@ public class JobEventAPIEntity extends JobBaseAPIEntity {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
-        _pcs.firePropertyChange("eventType", null, null);
+        pcs.firePropertyChange("eventType", null, null);
     }
 }

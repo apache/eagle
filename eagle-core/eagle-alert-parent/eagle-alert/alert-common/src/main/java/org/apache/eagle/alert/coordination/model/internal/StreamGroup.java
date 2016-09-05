@@ -48,7 +48,6 @@ public class StreamGroup {
         this.streamPartitions.addAll(sps);
     }
 
-    @org.codehaus.jackson.annotate.JsonIgnore
     @JsonIgnore
     public String getStreamId() {
         StringBuilder sb = new StringBuilder("SG[");

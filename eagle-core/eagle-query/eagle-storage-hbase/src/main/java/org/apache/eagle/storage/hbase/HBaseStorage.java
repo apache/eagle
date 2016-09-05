@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.eagle.audit.common.AuditConstants.AUDIT_EVENT_CREATE;
 import static org.apache.eagle.audit.common.AuditConstants.AUDIT_EVENT_UPDATE;
@@ -203,7 +204,11 @@ public class HBaseStorage extends DataStorageBase {
             result.setFirstTimestamp(reader.getFirstTimeStamp());
             result.setLastTimestamp(reader.getLastTimestamp());
             result.setSize(entities.size());
-            if(!query.isHasAgg()) result.setEntityType((Class<E>) entityDefinition.getEntityClass());
+            if(!query.isHasAgg()) {
+                result.setEntityType((Class<E>) entityDefinition.getEntityClass());
+            } else {
+                result.setEntityType((Class<E>) Map.class);
+            }
             result.setSuccess(true);
         } catch (Exception e) {
             LOG.error(e.getMessage(),e);
