@@ -46,17 +46,17 @@ var app = {};
 				// TODO: need auth module
 			}
 
-			//if(config.site) {
 			resolve.Site = function (Site) {
 				return Site.getPromise(config);
 			};
-			//}
 
-			//if(config.application) {
 			resolve.Application = function (Application) {
 				return Application.getPromise();
 			};
-			//}
+
+			resolve.Time = function (Time) {
+				return Time.getPromise(config);
+			};
 
 			return resolve;
 		}
@@ -147,7 +147,20 @@ var app = {};
 
 			// =========================== Application States ===========================
 			$.each(register.routeList, function (i, route) {
-				$stateProvider.state(route.state, route.config);
+				var config = $.extend({}, route.config);
+				if(route.config.resolve) {
+					var resolve = {};
+					var resolveConfig = {};
+					$.each(route.config.resolve, function (key, value) {
+						if(typeof value === "function") {
+							resolve[key] = value;
+						} else {
+							resolveConfig[key] = value;
+						}
+					});
+					config.resolve = $.extend(routeResolve(resolveConfig), resolve);
+				}
+				$stateProvider.state(route.state, config);
 			});
 		});
 

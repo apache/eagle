@@ -24,6 +24,8 @@
 		var JOB_STATES = ["NEW", "NEW_SAVING", "SUBMITTED", "ACCEPTED", "RUNNING", "FINISHED", "SUCCEEDED", "FAILED", "KILLED"];
 
 		jpmApp.controller("listCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
+			console.error("Yo!");
+
 			function verifyTime(str, format) {
 				var date = Time(str);
 				if(str === Time.format(date, format)) {
@@ -32,7 +34,7 @@
 			}
 
 			// Initialization
-			var startTime = verifyTime($wrapState.param.startTime, Time.FORMAT);
+			/*var startTime = verifyTime($wrapState.param.startTime, Time.FORMAT);
 			var endTime = verifyTime($wrapState.param.endTime, Time.FORMAT);
 			if(!startTime || !endTime) {
 				endTime = Time();
@@ -44,7 +46,7 @@
 				}, {location: "replace"});
 
 				return;
-			}
+			}*/
 
 			PageConfig.title = "YARN Jobs";
 			PageConfig.subTitle = "list";

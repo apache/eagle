@@ -26,9 +26,10 @@
 		url: "/jpm/list?startTime&endTime",
 		site: true,
 		templateUrl: "partials/job/list.html",
-		controller: "listCtrl"
+		controller: "listCtrl",
+		//resolve: { time: true }
 	}).route("jpmOverview", {
-		url: "/jpm/overview",
+		url: "/jpm/overview?startTime&endTime",
 		site: true,
 		templateUrl: "partials/job/overview.html",
 		controller: "overviewCtrl"

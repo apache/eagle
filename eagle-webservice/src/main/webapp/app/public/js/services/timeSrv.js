@@ -28,8 +28,8 @@
 
 	var serviceModule = angular.module('eagle.service');
 
-	serviceModule.service('Time', function() {
-		var timeSrv = function (time) {
+	serviceModule.service('Time', function($q, $wrapState) {
+		var Time = function (time) {
 			var _mom;
 
 			if(arguments.length === 1 && time === undefined) {
@@ -39,7 +39,7 @@
 			switch (time) {
 				case "day":
 					_mom = new moment();
-					_mom.utcOffset(timeSrv.UTC_OFFSET);
+					_mom.utcOffset(Time.UTC_OFFSET);
 					_mom.hours(0).minutes(0).seconds(0);
 					break;
 				default:
@@ -54,32 +54,44 @@
 					}
 
 					_mom = new moment(time);
-					_mom.utcOffset(timeSrv.UTC_OFFSET);
+					_mom.utcOffset(Time.UTC_OFFSET);
 			}
 			return _mom;
 		};
 
+		Time.TIME_RANGE_PICKER = "timeRange";
+		Time.pickerType = null;
+
 		// TODO: time zone
-		timeSrv.UTC_OFFSET = 0;
+		Time.UTC_OFFSET = 0;
 
-		timeSrv.FORMAT = "YYYY-MM-DD HH:mm:ss";
+		Time.FORMAT = "YYYY-MM-DD HH:mm:ss";
 
-		timeSrv.format = function (time, format) {
-			time = timeSrv(time);
-			return time ? time.format(format || timeSrv.FORMAT) : "-";
+		Time.format = function (time, format) {
+			time = Time(time);
+			return time ? time.format(format || Time.FORMAT) : "-";
 		};
 
-		timeSrv.diff = function (from, to) {
-			from = timeSrv(from);
-			to = timeSrv(to);
+		Time.verifyTime = function(str, format) {
+			format = format || Time.FORMAT;
+			var date = Time(str);
+			if(str === Time.format(date, format)) {
+				return date;
+			}
+			return null;
+		};
+
+		Time.diff = function (from, to) {
+			from = Time(from);
+			to = Time(to);
 			if (!from || !to) return null;
 			return to.diff(from);
 		};
 
-		timeSrv.diffStr = function (from, to) {
+		Time.diffStr = function (from, to) {
 			var diff = from;
 			if(arguments.length === 2) {
-				diff = timeSrv.diff(from, to);
+				diff = Time.diff(from, to);
 			}
 			if(diff === null) return "-";
 			if(diff === 0) return "0s";
@@ -106,17 +118,17 @@
 			return rows.join(", ");
 		};
 
-		timeSrv.align = function (time, interval, ceil) {
-			time = timeSrv(time);
+		Time.align = function (time, interval, ceil) {
+			time = Time(time);
 			if(!time) return null;
 
 			var func = ceil ? Math.ceil : Math.floor;
 
 			var timestamp = time.valueOf();
-			return timeSrv(func(timestamp / interval) * interval);
+			return Time(func(timestamp / interval) * interval);
 		};
 
-		timeSrv.millionFormat = function (num) {
+		Time.millionFormat = function (num) {
 			if(!num) return "-";
 			num = Math.floor(num / 1000);
 			var s = num % 60;
@@ -129,6 +141,40 @@
 				common.string.preFill(s, "0");
 		};
 
-		return timeSrv;
+		Time.getPromise = function (config) {
+			var deferred = $q.defer();
+			var startTime, endTime;
+
+			console.warn("Need Time Promise~");
+
+			if(config.time === true && false) {
+				console.log(">>>>>>>>>>>>", $wrapState, $wrapState.param.startTime, $wrapState.param.endTime);
+				Time.pickerType = Time.TIME_RANGE_PICKER;
+				startTime = Time.verifyTime($wrapState.param.startTime);
+				endTime = Time.verifyTime($wrapState.param.endTime);
+				if (!startTime || !endTime) {
+					endTime = Time();
+					startTime = endTime.clone().subtract(2, "hour");
+
+					console.log("[[[[[[[[[[[[[[[[ Do It!!!");
+
+					//setTimeout(function () {
+						$wrapState.go("jpmOverview", {
+							startTime: Time.format(startTime),
+							endTime: Time.format(endTime)
+						}, {location: "replace"});
+					//}, 100);
+
+					return $q.reject(Time);
+				}
+			} else {
+				Time.pickerType = null;
+			}
+
+			deferred.resolve(Time);
+			return deferred.promise;
+		};
+
+		return Time;
 	});
 })();
