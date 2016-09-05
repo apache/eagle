@@ -17,9 +17,9 @@
 package org.apache.eagle.common.config;
 
 public final class EagleConfigConstants {
-    public final static String SERVICE_ENV = "eagle.service.env";
-    public final static String SERVICE_HOST = "eagle.service.host";
-    public final static String SERVICE_PORT = "eagle.service.port";
+    public final static String SERVICE_ENV = "service.env";
+    public final static String SERVICE_HOST = "service.host";
+    public final static String SERVICE_PORT = "service.port";
     public final static String SERVICE_HBASE_ZOOKEEPER_QUORUM = "storage.hbase.hbase-zookeeper-quorum";
     public final static String SERVICE_HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "storage.hbase-zookeeper-property-clientPort";
     public final static String SERVICE_ZOOKEEPER_ZNODE_PARENT = "storage.zookeeper-znode-parent";
