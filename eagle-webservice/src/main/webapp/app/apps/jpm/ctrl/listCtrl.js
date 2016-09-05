@@ -62,6 +62,10 @@
 			};
 
 			$scope.refreshList = function () {
+				// ==========================================================
+				// =                        Job List                        =
+				// ==========================================================
+
 				/**
 				 * @namespace
 				 * @property {[]} jobList
@@ -120,6 +124,91 @@
 						});
 					});
 				});
+
+				// ==========================================================
+				// =                   Running Job Trend                    =
+				// ==========================================================
+				var interval;
+				var timeDiff = Time.diff(startTime, endTime);
+				if(timeDiff <= 1000 * 60 * 60 * 6) {
+					interval = 1000 * 60 * 10;
+				} else if(timeDiff <= 1000 * 60 * 60 * 24) {
+					interval = 1000 * 60 * 30;
+				} else if(timeDiff <= 1000 * 60 * 60 * 24 * 7) {
+					interval = 1000 * 60 * 60;
+				} else {
+					interval = 1000 * 60 * 60 * 24;
+				}
+				var trendStartTime = Time.align(startTime, interval);
+				var trendEndTime = Time.align(endTime, interval);
+				var trendStartTimestamp = trendStartTime.valueOf();
+
+				JPM.get(JPM.QUERY_MR_JOB_COUNT, {
+					site: $scope.site,
+					intervalInSecs: interval / 1000,
+					durationBegin: Time.format(trendStartTime),
+					durationEnd: Time.format(trendEndTime)
+				}).then(
+					/**
+					 * @param {{}} res
+					 * @param {{}} res.data
+					 * @param {[]} res.data.jobCounts
+					 */
+					function (res) {
+						var data = res.data;
+						var jobCounts = data.jobCounts;
+						var jobTypesData = {};
+						$.each(jobCounts,
+							/**
+							 * @param index
+							 * @param {{}} jobCount
+							 * @param {{}} jobCount.timeBucket
+							 * @param {{}} jobCount.jobCountByType
+							 */
+							function (index, jobCount) {
+								$.each(jobCount.jobCountByType, function (type, count) {
+									var countList = jobTypesData[type] = jobTypesData[type] || [];
+									countList[index] = count;
+								});
+							});
+
+						$scope.runningTrendSeries = $.map(jobTypesData, function (countList, type) {
+							var dataList = [];
+							for(var i = 0 ; i < jobCounts.length ; i += 1) {
+								dataList[i] = {
+									x: trendStartTimestamp + i * interval,
+									y: countList[i] || 0
+								};
+							}
+
+							return {
+								name: type,
+								type: "line",
+								stack: "job",
+								showSymbol: false,
+								areaStyle: {normal: {}},
+								data: dataList
+							};
+						});
+					});
+
+				/*$scope.jobTrendClick = function (e) {
+					var index = e.dataIndex;
+					var timestamp = trendStartTimestamp + index * interval;
+					console.log(">>>", timestamp);
+
+					JPM.get(JPM.QUERY_MR_JOB_METRIC_TOP, {
+						site: $scope.site,
+						timePoint: Time.format(timestamp),
+						metricName: "hadoop.job.allocatedmb",
+
+						intervalInSecs: interval / 1000,
+						durationBegin: Time.format(trendStartTime),
+						durationEnd: Time.format(trendEndTime)
+					}).then(function (res) {
+							console.log(">>>>>", res);
+						});
+				}*/
 			};
 
 			// Time component
@@ -144,6 +233,12 @@
 			$scope.changeDateRange = function () {
 				startTime = verifyTime($scope.startTimeInput, Time.FORMAT);
 				endTime = verifyTime($scope.endTimeInput, Time.FORMAT);
+
+				$wrapState.go(".", {
+					site: $scope.site,
+					startTime: Time.format(startTime),
+					endTime: Time.format(endTime)
+				}, {notify: false});
 
 				$scope.refreshList();
 			};

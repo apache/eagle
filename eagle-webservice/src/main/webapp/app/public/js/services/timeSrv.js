@@ -30,22 +30,32 @@
 
 	serviceModule.service('Time', function() {
 		var timeSrv = function (time) {
+			var _mom;
+
 			if(arguments.length === 1 && time === undefined) {
 				return null;
 			}
 
-			// Parse string number
-			if(typeof time === "string") {
-				if(!isNaN(+time)) {
-					time = +time;
-				} else {
-					time = new moment(time);
-					time.add(time.utcOffset(), "minutes");
-				}
-			}
+			switch (time) {
+				case "day":
+					_mom = new moment();
+					_mom.utcOffset(timeSrv.UTC_OFFSET);
+					_mom.hours(0).minutes(0).seconds(0);
+					break;
+				default:
+					// Parse string number
+					if(typeof time === "string") {
+						if(!isNaN(+time)) {
+							time = +time;
+						} else {
+							time = new moment(time);
+							time.add(time.utcOffset(), "minutes");
+						}
+					}
 
-			var _mom = new moment(time);
-			_mom.utcOffset(timeSrv.UTC_OFFSET);
+					_mom = new moment(time);
+					_mom.utcOffset(timeSrv.UTC_OFFSET);
+			}
 			return _mom;
 		};
 
@@ -94,6 +104,16 @@
 			});
 
 			return rows.join(", ");
+		};
+
+		timeSrv.align = function (time, interval, ceil) {
+			time = timeSrv(time);
+			if(!time) return null;
+
+			var func = ceil ? Math.ceil : Math.floor;
+
+			var timestamp = time.valueOf();
+			return timeSrv(func(timestamp / interval) * interval);
 		};
 
 		timeSrv.millionFormat = function (num) {

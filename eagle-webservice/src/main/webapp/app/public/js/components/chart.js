@@ -54,6 +54,7 @@
 			},
 			controller: function ($scope, $element, $attrs, Time) {
 				var i;
+				var lastTooltipEvent;
 				var chart = echarts.init($element[0]);
 				charts[chart.id] = chart;
 
@@ -118,10 +119,25 @@
 				}
 
 				// Event handle
+				var chartClick = false;
 				chart.on("click", function (e) {
 					if($scope.click) {
 						$scope.click(e);
 					}
+					chartClick = true;
+				});
+
+				chart.getZr().on('click', function () {
+					if(!chartClick && $scope.click) {
+						$scope.click($.extend({
+							componentType: "tooltip"
+						}, lastTooltipEvent));
+					}
+					chartClick = false;
+				});
+
+				chart.on('showtip', function (e) {
+					lastTooltipEvent = e;
 				});
 
 				// Insert chart object to parent scope

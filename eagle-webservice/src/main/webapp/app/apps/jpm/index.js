@@ -27,6 +27,11 @@
 		site: true,
 		templateUrl: "partials/job/list.html",
 		controller: "listCtrl"
+	}).route("jpmOverview", {
+		url: "/jpm/overview",
+		site: true,
+		templateUrl: "partials/job/overview.html",
+		controller: "overviewCtrl"
 	}).route("jpmDetail", {
 		url: "/jpm/detail/:jobId",
 		site: true,
@@ -46,23 +51,27 @@
 	});
 
 	jpmApp.portal({name: "YARN Jobs", icon: "home", list: [
-		{name: "Job List", path: "jpm/list"},
-		{name: "Job Overview", path: "jpm/overview"}
+		{name: "Overview", path: "jpm/overview"},
+		{name: "Job List", path: "jpm/list"}
 	]}, true);
 
 	jpmApp.service("JPM", function ($q, $http, Time) {
 		// TODO: mock auth
 		var _hash = btoa('eagle:secret');
 
-		// TODO: timestamp support
-		var QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		var QUERY_GROUPS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		var QUERY_METRICS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		var QUERY_MR_JOBS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/search';
-		var QUERY_JOB_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		var QUERY_TASK_STATISTIC = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/${jobId}/taskCountsByDuration?site=${site}&timelineInSecs=${times}&top=${top}';
-
 		var JPM = {};
+
+		// TODO: timestamp support
+		JPM.QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_GROUPS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_METRICS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_MR_JOBS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/search';
+		JPM.QUERY_JOB_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_TASK_STATISTIC = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/${jobId}/taskCountsByDuration?site=${site}&timelineInSecs=${times}&top=${top}';
+
+		JPM.QUERY_MR_JOB_COUNT = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/runningJobCounts';
+		//JPM.QUERY_MR_JOB_METRIC_TOP = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/jobMetrics/list';
+
 
 		function wrapList(promise) {
 			var _list = [];
@@ -126,7 +135,7 @@
 				limit: limit || 10000
 			};
 
-			return wrapList(JPM.get(common.template(QUERY_GROUPS, config)));
+			return wrapList(JPM.get(common.template(JPM.QUERY_GROUPS, config)));
 		};
 
 		/**
@@ -151,7 +160,7 @@
 				limit: limit || 10000
 			};
 
-			return wrapList(JPM.get(common.template(QUERY_LIST, config)));
+			return wrapList(JPM.get(common.template(JPM.QUERY_LIST, config)));
 		};
 
 		/**
@@ -174,7 +183,7 @@
 				limit: limit || 10000
 			};
 
-			var jobList_url = common.template(QUERY_JOB_LIST, config);
+			var jobList_url = common.template(JPM.QUERY_JOB_LIST, config);
 			return wrapList(JPM.get(jobList_url));
 		};
 
@@ -196,7 +205,7 @@
 				limit: limit || 10000
 			};
 
-			var metrics_url = common.template(QUERY_METRICS, config);
+			var metrics_url = common.template(JPM.QUERY_METRICS, config);
 			var _list = wrapList(JPM.get(metrics_url));
 			_list._promise.then(function () {
 				_list.reverse();
@@ -205,7 +214,7 @@
 		};
 
 		JPM.taskDistribution = function (site, jobId, times, top) {
-			var url = common.template(QUERY_TASK_STATISTIC, {
+			var url = common.template(JPM.QUERY_TASK_STATISTIC, {
 				site: site,
 				jobId: jobId,
 				times: times,
@@ -222,7 +231,7 @@
 		 * @return {[]}
 		 */
 		JPM.findMRJobs = function (site, jobDefId, jobId) {
-			return wrapList(JPM.get(QUERY_MR_JOBS, {
+			return wrapList(JPM.get(JPM.QUERY_MR_JOBS, {
 				site: site,
 				jobDefId: jobDefId,
 				jobId: jobId
@@ -306,6 +315,7 @@
 		return JPM;
 	});
 
+	jpmApp.require("ctrl/overviewCtrl.js");
 	jpmApp.require("ctrl/listCtrl.js");
 	jpmApp.require("ctrl/detailCtrl.js");
 	jpmApp.require("ctrl/jobTaskCtrl.js");
