@@ -103,6 +103,12 @@
 			reloadListenerList.push(func);
 		};
 
+		Time.offReload = function (func) {
+			reloadListenerList = $.grep(reloadListenerList, function(_func) {
+				return _func !== func;
+			});
+		};
+
 		Time.verifyTime = function(str, format) {
 			format = format || Time.FORMAT;
 			var date = Time(str);

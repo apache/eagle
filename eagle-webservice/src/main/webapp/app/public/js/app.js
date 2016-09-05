@@ -153,18 +153,20 @@ var app = {};
 			// =========================== Application States ===========================
 			$.each(register.routeList, function (i, route) {
 				var config = $.extend({}, route.config);
+
+				var resolve = {};
+				var resolveConfig = {};
 				if(route.config.resolve) {
-					var resolve = {};
-					var resolveConfig = {};
 					$.each(route.config.resolve, function (key, value) {
-						if(typeof value === "function") {
+						if (typeof value === "function") {
 							resolve[key] = value;
 						} else {
 							resolveConfig[key] = value;
 						}
 					});
-					config.resolve = $.extend(routeResolve(resolveConfig), resolve);
 				}
+				config.resolve = $.extend(routeResolve(resolveConfig), resolve);
+
 				$stateProvider.state(route.state, config);
 			});
 		});

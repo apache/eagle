@@ -185,44 +185,12 @@
 
 			Time.onReload($scope.refreshList);
 
-			// Time component
-			/*$element.on("change.jpm", "#startTime", function () {
-				var time = verifyTime($(this).val(), Time.FORMAT);
-				if(time) {
-					$(this).trigger("input");
-				}
-			});
-			$element.on("change.jpm", "#endTime", function () {
-				var time = verifyTime($(this).val(), Time.FORMAT);
-				if(time) {
-					$(this).trigger("input");
-				}
-			});
-
-			$scope.checkDateRange = function () {
-				var startTime = verifyTime($scope.startTimeInput, Time.FORMAT);
-				var endTime = verifyTime($scope.endTimeInput, Time.FORMAT);
-				return startTime && endTime;
-			};
-			$scope.changeDateRange = function () {
-				startTime = verifyTime($scope.startTimeInput, Time.FORMAT);
-				endTime = verifyTime($scope.endTimeInput, Time.FORMAT);
-
-				$wrapState.go(".", {
-					site: $scope.site,
-					startTime: Time.format(startTime),
-					endTime: Time.format(endTime)
-				}, {notify: false});
-
-				$scope.refreshList();
-			};*/
-
 			// Load list
 			$scope.refreshList();
 
 			// Clean up
 			$scope.$on('$destroy', function() {
-				$element.off("change.jpm");
+				Time.offReload($scope.refreshList);
 			});
 		});
 	});
