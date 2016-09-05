@@ -67,25 +67,14 @@
 							<li class="dropdown time-picker" ng-if="Time.pickerType === Time.TIME_RANGE_PICKER">
 								<a data-toggle="dropdown" aria-expanded="false">
 									<i class="fa fa-calendar"></i>
-									01-01 08:00 ~ 01-01 08:00
+									{{Time.format("startTime", Time.SHORT_FORMAT)}} ~ {{Time.format("endTime", Time.SHORT_FORMAT)}}
 								</a>
 								<ul class="dropdown-menu">
-									<li><a><i class="fa fa-clock-o"></i>Last 2 Hours</a></li>
-									<li><a><i class="fa fa-clock-o"></i>Last 6 Hours</a></li>
-									<li><a><i class="fa fa-clock-o"></i>Last 12 Hours</a></li>
-									<li><a><i class="fa fa-clock-o"></i>Last 24 Hours</a></li>
-									<li><a><i class="fa fa-clock-o"></i>Last 24 Hours</a></li>
-									<li class="customize">
-										<label>Customize</label>
-										<div class="input-group">
-											<input type="text" class="form-control">
-											<span class="input-group-addon">to</span>
-											<input type="text" class="form-control">
-											<span class="input-group-btn">
-												<button class="btn btn-primary">Go</button>
-											</span>
-										</div>
-									</li>
+									<li><a ng-click="setLastDuration(2)"><i class="fa fa-clock-o"></i>Last 2 Hours</a></li>
+									<li><a ng-click="setLastDuration(6)"><i class="fa fa-clock-o"></i>Last 6 Hours</a></li>
+									<li><a ng-click="setLastDuration(12)"><i class="fa fa-clock-o"></i>Last 12 Hours</a></li>
+									<li><a ng-click="setLastDuration(24)"><i class="fa fa-clock-o"></i>Last 24 Hours</a></li>
+									<li><a ng-click="customizeTimeRange()"><i class="fa fa-clock-o"></i>Customize</a></li>
 								</ul>
 							</li>
 							<li>
@@ -174,6 +163,38 @@
 				</strong>
 			</footer>
 		</div><!-- ./wrapper -->
+
+		<!-- Modal: Time Range Picker -->
+		<div class="modal fade" tabindex="-1" role="dialog" id="eagleTimeRangeMDL">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Customize Time Range</h4>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label for="eagleStartTime">Start Time</label>
+									<input type="text" class="form-control" data-container="body" data-toggle="datepicker" id="eagleStartTime">
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label for="eagleEndTime">End Time</label>
+									<input type="text" class="form-control" data-container="body" data-toggle="datepicker" id="eagleEndTime" data-position="right">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" ng-click="updateTimeRange()">Change</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<!-- ref:js public/js/doc.js -->
 		<script src="../node_modules/jquery/dist/jquery.js"></script>

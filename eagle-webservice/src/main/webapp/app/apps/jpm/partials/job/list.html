@@ -85,12 +85,12 @@
 			<span ng-show="!jobList._done || isSorting" class="fa fa-refresh fa-spin no-animate"></span>
 		</h3>
 
-		<div class="datePickerGroup clearfix">
+		<!--div class="datePickerGroup clearfix">
 			<input id="startTime" type="text" class="form-control" data-toggle="datepicker" ng-model="startTimeInput" />
 			<span class="addon">To</span>
 			<input id="endTime" type="text" class="form-control" data-toggle="datepicker" data-position="right" ng-model="endTimeInput" />
 			<button class="btn btn-primary" ng-disabled="!checkDateRange()" ng-click="changeDateRange()">Go</button>
-		</div>
+		</div-->
 	</div>
 	<div class="box-body">
 		<div id="jobList" sort-table="jobList" is-sorting="isSorting" search-path-list="searchPathList" scope="tableScope">

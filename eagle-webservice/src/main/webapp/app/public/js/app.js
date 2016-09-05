@@ -24,6 +24,12 @@ var app = {};
 	$(document).on("APPLICATION_READY", function (event, register) {
 		console.info("[Eagle] Angular bootstrap...");
 
+		var STATE_NAME_MATCH = /^[^.]*/;
+		var state_next;
+		var state_current;
+		var param_next;
+		var param_current;
+
 		// ======================================================================================
 		// =                                   Initialization                                   =
 		// ======================================================================================
@@ -55,14 +61,13 @@ var app = {};
 			};
 
 			resolve.Time = function (Time) {
-				return Time.getPromise(config);
+				return Time.getPromise(config, state_next, param_next);
 			};
 
 			return resolve;
 		}
 
 		eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
-			$urlRouterProvider.deferIntercept();
 			$urlRouterProvider.otherwise("/");
 			$stateProvider
 			// ================================== Home ==================================
@@ -138,7 +143,7 @@ var app = {};
 				})
 				// ================================== Site ==================================
 				.state('site', {
-					url: "/site/:id",
+					url: "/site/:siteId",
 					templateUrl: "partials/site/home.html?_=" + window._TRS(),
 					controller: "siteCtrl",
 					resolve: routeResolve()
@@ -167,8 +172,6 @@ var app = {};
 		// ======================================================================================
 		// =                                   Main Controller                                  =
 		// ======================================================================================
-		var STATE_NAME_MATCH = /^[^.]*/;
-
 		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, PageConfig, Portal, Entity, Site, Application, UI, Time) {
 			window._WrapState = $scope.$wrapState = $wrapState;
 			window._PageConfig = $scope.PageConfig = PageConfig;
@@ -179,11 +182,6 @@ var app = {};
 			window._UI = $scope.UI = UI;
 			window._Time = $scope.Time = Time;
 			$scope.common = common;
-
-			var state_next;
-			var state_current;
-			var param_next;
-			var param_current;
 
 			Object.defineProperty(window, "scope", {
 				get: function () {
@@ -210,32 +208,6 @@ var app = {};
 				}
 			});
 
-			$scope.$on('$locationChangeSuccess',
-				/**
-				 * @param {{}} e
-				 * @param {function} e.preventDefault
-				 * @param {string} newUrl
-				 * @param {string} oldUrl
-				 */
-				function(e, newUrl, oldUrl) {
-					e.preventDefault();
-
-					// Check if page needn't update
-					for(var i = 0 ; i < register.routeList.length ; i += 1) {
-						var route = register.routeList[i];
-						try {
-							if (route.config.sync && !route.config.sync(newUrl, oldUrl, state_next, param_next, state_current, param_current)) {
-								return;
-							}
-						} catch(err) {
-							console.error("[Sync] Route sync error:", route, err);
-						}
-					}
-
-					$urlRouter.sync();
-			});
-			$urlRouter.listen();
-
 			// ================================ Function ================================
 			// Get side bar navigation item class
 			$scope.getNavClass = function (portal) {
@@ -245,6 +217,30 @@ var app = {};
 					return "active";
 				} else {
 					return "";
+				}
+			};
+
+			// Customize time range
+			$scope.customizeTimeRange = function () {
+				$("#eagleStartTime").val(Time.format("startTime"));
+				$("#eagleEndTime").val(Time.format("endTime"));
+				$("#eagleTimeRangeMDL").modal();
+			};
+
+			$scope.setLastDuration = function (hours) {
+				var endTime = Time();
+				var startTime = endTime.clone().subtract(hours, "hours");
+				Time.timeRange(startTime, endTime);
+			};
+
+			$scope.updateTimeRange = function () {
+				var startTime = Time.verifyTime($("#eagleStartTime").val());
+				var endTime = Time.verifyTime($("#eagleEndTime").val());
+				if(startTime && endTime) {
+					Time.timeRange(startTime, endTime);
+					$("#eagleTimeRangeMDL").modal("hide");
+				} else {
+					alert("Time range not validate");
 				}
 			};
 

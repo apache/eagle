@@ -29,6 +29,9 @@
 	var serviceModule = angular.module('eagle.service');
 
 	serviceModule.service('Time', function($q, $wrapState) {
+		var startTime, endTime;
+		var reloadListenerList = [];
+
 		var Time = function (time) {
 			var _mom;
 
@@ -37,6 +40,12 @@
 			}
 
 			switch (time) {
+				case "startTime":
+					return startTime;
+					break;
+				case "endTime":
+					return endTime;
+					break;
 				case "day":
 					_mom = new moment();
 					_mom.utcOffset(Time.UTC_OFFSET);
@@ -66,10 +75,32 @@
 		Time.UTC_OFFSET = 0;
 
 		Time.FORMAT = "YYYY-MM-DD HH:mm:ss";
+		Time.SHORT_FORMAT = "MM-DD HH:mm";
 
 		Time.format = function (time, format) {
 			time = Time(time);
 			return time ? time.format(format || Time.FORMAT) : "-";
+		};
+
+		Time.startTime = function () {
+			return startTime;
+		};
+
+		Time.endTime = function () {
+			return endTime;
+		};
+
+		Time.timeRange = function (startTimeValue, endTimeValue) {
+			startTime = Time(startTimeValue);
+			endTime = Time(endTimeValue);
+
+			$.each(reloadListenerList, function (i, listener) {
+				listener(Time);
+			});
+		};
+
+		Time.onReload = function (func) {
+			reloadListenerList.push(func);
 		};
 
 		Time.verifyTime = function(str, format) {
@@ -141,38 +172,37 @@
 				common.string.preFill(s, "0");
 		};
 
-		Time.getPromise = function (config) {
-			var deferred = $q.defer();
-			var startTime, endTime;
-
-			console.warn("Need Time Promise~");
-
-			if(config.time === true && false) {
-				console.log(">>>>>>>>>>>>", $wrapState, $wrapState.param.startTime, $wrapState.param.endTime);
+		var promiseLock = false;
+		Time.getPromise = function (config, state, param) {
+			if(config.time === true) {
 				Time.pickerType = Time.TIME_RANGE_PICKER;
-				startTime = Time.verifyTime($wrapState.param.startTime);
-				endTime = Time.verifyTime($wrapState.param.endTime);
-				if (!startTime || !endTime) {
-					endTime = Time();
-					startTime = endTime.clone().subtract(2, "hour");
 
-					console.log("[[[[[[[[[[[[[[[[ Do It!!!");
+				if(!promiseLock) {
+					startTime = Time.verifyTime(param.startTime);
+					endTime = Time.verifyTime(param.endTime);
 
-					//setTimeout(function () {
-						$wrapState.go("jpmOverview", {
-							startTime: Time.format(startTime),
-							endTime: Time.format(endTime)
-						}, {location: "replace"});
-					//}, 100);
+					if (!startTime || !endTime) {
+						endTime = Time();
+						startTime = endTime.clone().subtract(2, "hour");
 
-					return $q.reject(Time);
+						setTimeout(function () {
+							promiseLock = true;
+							$wrapState.go(state.name, $.extend({}, param, {
+								startTime: Time.format(startTime),
+								endTime: Time.format(endTime)
+							}), {location: "replace", notify: false});
+
+							setTimeout(function () {
+								promiseLock = false;
+							}, 100);
+						}, 50);
+					}
 				}
 			} else {
 				Time.pickerType = null;
 			}
 
-			deferred.resolve(Time);
-			return deferred.promise;
+			return $q.when(Time);
 		};
 
 		return Time;

@@ -24,37 +24,22 @@
 		var JOB_STATES = ["NEW", "NEW_SAVING", "SUBMITTED", "ACCEPTED", "RUNNING", "FINISHED", "SUCCEEDED", "FAILED", "KILLED"];
 
 		jpmApp.controller("listCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
-			console.error("Yo!");
 
-			function verifyTime(str, format) {
+			/*function verifyTime(str, format) {
 				var date = Time(str);
 				if(str === Time.format(date, format)) {
 					return date;
 				}
-			}
-
-			// Initialization
-			/*var startTime = verifyTime($wrapState.param.startTime, Time.FORMAT);
-			var endTime = verifyTime($wrapState.param.endTime, Time.FORMAT);
-			if(!startTime || !endTime) {
-				endTime = Time();
-				startTime = endTime.clone().subtract(2, "hour");
-
-				$wrapState.go(".", {
-					startTime: Time.format(startTime),
-					endTime: Time.format(endTime)
-				}, {location: "replace"});
-
-				return;
 			}*/
 
+			// Initialization
 			PageConfig.title = "YARN Jobs";
 			PageConfig.subTitle = "list";
 			$scope.getStateClass = JPM.getStateClass;
 			$scope.tableScope = {};
 
-			$scope.startTimeInput = Time.format(startTime);
-			$scope.endTimeInput = Time.format(endTime);
+			//$scope.startTimeInput = Time.format(startTime);
+			//$scope.endTimeInput = Time.format(endTime);
 
 			$scope.site = $wrapState.param.siteId;
 			$scope.searchPathList = [["tags", "jobId"], ["tags", "user"], ["tags", "queue"], ["currentState"]];
@@ -64,6 +49,9 @@
 			};
 
 			$scope.refreshList = function () {
+				var startTime = Time.startTime();
+				var endTime = Time.endTime();
+
 				// ==========================================================
 				// =                        Job List                        =
 				// ==========================================================
@@ -193,28 +181,12 @@
 							};
 						});
 					});
-
-				/*$scope.jobTrendClick = function (e) {
-					var index = e.dataIndex;
-					var timestamp = trendStartTimestamp + index * interval;
-					console.log(">>>", timestamp);
-
-					JPM.get(JPM.QUERY_MR_JOB_METRIC_TOP, {
-						site: $scope.site,
-						timePoint: Time.format(timestamp),
-						metricName: "hadoop.job.allocatedmb",
-
-						intervalInSecs: interval / 1000,
-						durationBegin: Time.format(trendStartTime),
-						durationEnd: Time.format(trendEndTime)
-					}).then(function (res) {
-							console.log(">>>>>", res);
-						});
-				}*/
 			};
 
+			Time.onReload($scope.refreshList);
+
 			// Time component
-			$element.on("change.jpm", "#startTime", function () {
+			/*$element.on("change.jpm", "#startTime", function () {
 				var time = verifyTime($(this).val(), Time.FORMAT);
 				if(time) {
 					$(this).trigger("input");
@@ -243,7 +215,7 @@
 				}, {notify: false});
 
 				$scope.refreshList();
-			};
+			};*/
 
 			// Load list
 			$scope.refreshList();
