@@ -38,7 +38,7 @@ public class HdfsTopologyExtractorSpout extends BaseRichSpout {
     public HdfsTopologyExtractorSpout(TopologyCheckAppConfig topologyCheckAppConfig) {
         this.topologyCheckAppConfig = topologyCheckAppConfig;
         this.lastFetchTime = 0;
-        this.fetchInterval = topologyCheckAppConfig.topologyConfig.fetchDataIntervalInSecs * DateTimeUtil.ONESECOND;
+        this.fetchInterval = topologyCheckAppConfig.dataExtractorConfig.fetchDataIntervalInSecs * DateTimeUtil.ONESECOND;
     }
 
     @Override

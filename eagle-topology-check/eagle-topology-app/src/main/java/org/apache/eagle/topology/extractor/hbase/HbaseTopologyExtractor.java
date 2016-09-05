@@ -16,11 +16,25 @@
  *
  */
 
-package org.apache.eagle.topology.extractor;
+package org.apache.eagle.topology.extractor.hbase;
+
+import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.eagle.topology.TopologyCheckAppConfig;
+import org.apache.eagle.topology.extractor.TopologyExtractorBase;
+
+public class HbaseTopologyExtractor implements TopologyExtractorBase {
+
+    private HbaseTopologyEntityParser parser;
+    private SpoutOutputCollector outputCollector;
+
+    public HbaseTopologyExtractor(TopologyCheckAppConfig config) {
+        this.parser = new HbaseTopologyEntityParser(config.dataExtractorConfig.site, config.hBaseConfig);
+
+    }
 
 
+    @Override
+    public void extract() {
 
-public interface TopologyExtractorBase {
-
-    void extract();
+    }
 }

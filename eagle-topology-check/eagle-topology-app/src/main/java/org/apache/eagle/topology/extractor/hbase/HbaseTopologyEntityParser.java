@@ -25,7 +25,7 @@ import org.apache.eagle.topology.extractor.TopologyEntityParser;
 
 public class HbaseTopologyEntityParser implements TopologyEntityParser {
 
-    public  HbaseTopologyEntityParser(String site, TopologyCheckAppConfig topologyCheckAppConfig) {}
+    public  HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig) {}
 
     @Override
     public TopologyEntityParserResult parse() {

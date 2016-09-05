@@ -29,12 +29,12 @@ public class TopologyCheckAppConfig implements Serializable {
     final static String TOPOLOGY_DATA_FETCH_SPOUT_NAME = "topologyDataFetcherSpout";
     final static String TOPOLOGY_ENTITY_PERSIST_BOLT_NAME = "topologyEntityPersistBolt";
 
-    public TopologyConfig topologyConfig;
+    public DataExtractorConfig dataExtractorConfig;
     public HBaseConfig hBaseConfig;
     public HdfsConfig hdfsConfig;
     public MRConfig mrConfig;
     public EagleInfo eagleInfo;
-    public List<String> topologyTypes;
+    public List<TopologyConstants.TopologyType> topologyTypes;
 
     public Config config;
 
@@ -45,7 +45,7 @@ public class TopologyCheckAppConfig implements Serializable {
         hdfsConfig = null;
         mrConfig = null;
         eagleInfo = new EagleInfo();
-        topologyConfig = new TopologyConfig();
+        dataExtractorConfig = new DataExtractorConfig();
         topologyTypes = new ArrayList<>();
     }
 
@@ -62,16 +62,16 @@ public class TopologyCheckAppConfig implements Serializable {
         this.eagleInfo.password = config.getString("eagleProps.eagle.service.password");
         this.eagleInfo.username = config.getString("eagleProps.eagle.service.username");
 
-        this.topologyConfig.site = config.getString("dataSourceConfig.site");
-        this.topologyConfig.checkRetryTime = config.getLong("dataSourceConfig.checkRetryTime");
-        this.topologyConfig.fetchDataIntervalInSecs = config.getLong("dataSourceConfig.fetchDataIntervalInSecs");
-        this.topologyConfig.parseThreadPoolSize = config.getInt("dataSourceConfig.parseThreadPoolSize");
-        this.topologyConfig.numDataFetcherSpout = config.getInt("parallelismConfig.topologyDataFetcherSpout");
-        this.topologyConfig.numEntityPersistBolt = config.getInt("parallelismConfig.topologyEntityPersistBolt");
+        this.dataExtractorConfig.site = config.getString("dataExtractorConfig.site");
+        this.dataExtractorConfig.checkRetryTime = config.getLong("dataExtractorConfig.checkRetryTime");
+        this.dataExtractorConfig.fetchDataIntervalInSecs = config.getLong("dataExtractorConfig.fetchDataIntervalInSecs");
+        this.dataExtractorConfig.parseThreadPoolSize = config.getInt("dataExtractorConfig.parseThreadPoolSize");
+        this.dataExtractorConfig.numDataFetcherSpout = config.getInt("dataExtractorConfig.numDataFetcherSpout");
+        this.dataExtractorConfig.numEntityPersistBolt = config.getInt("dataExtractorConfig.numEntityPersistBolt");
 
 
         if (config.hasPath("dataSourceConfig.hbase")) {
-            topologyTypes.add(TopologyConstants.TopologyType.HBASE.toString());
+            topologyTypes.add(TopologyConstants.TopologyType.HBASE);
             hBaseConfig = new HBaseConfig();
             hBaseConfig.keytab = config.getString("dataSourceConfig.hbase.keytab");
             hBaseConfig.principal = config.getString("dataSourceConfig.hbase.principal");
@@ -83,19 +83,19 @@ public class TopologyCheckAppConfig implements Serializable {
         }
 
         if (config.hasPath("dataSourceConfig.mr")) {
-            topologyTypes.add(TopologyConstants.TopologyType.MR.toString());
+            topologyTypes.add(TopologyConstants.TopologyType.MR);
             mrConfig = new MRConfig();
             mrConfig.rmUrls =  config.getString("dataSourceConfig.yarn.rmUrl").split(",\\s*");
         }
 
         if (config.hasPath("dataSourceConfig.hdfs")) {
-            topologyTypes.add(TopologyConstants.TopologyType.HDFS.toString());
+            topologyTypes.add(TopologyConstants.TopologyType.HDFS);
             hdfsConfig = new HdfsConfig();
             hdfsConfig.namenodeUrls = config.getString("dataSourceConfig.hdfs.namenodeUrl").split(",\\s*");
         }
     }
 
-    public static class TopologyConfig implements Serializable {
+    public static class DataExtractorConfig implements Serializable {
         public String site;
         public int numDataFetcherSpout;
         public int numEntityPersistBolt;
