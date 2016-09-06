@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,32 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.eagle.security.oozie.parse.sensitivity;
-
-
-import org.apache.eagle.security.enrich.AbstractDataEnrichLCM;
-import org.apache.eagle.security.service.ISecurityDataEnrichServiceClient;
-
-import com.typesafe.config.Config;
-
-import java.util.Collection;
+package org.apache.eagle.security.service;
 
 /**
- * Since 8/16/16.
+ * Since 6/10/16.
  */
-public class OozieSensitivityDataEnrichLCM extends AbstractDataEnrichLCM {
-    public OozieSensitivityDataEnrichLCM(Config config) {
-        super(config);
+public class OozieSensitivityEntity {
+    private String jobId;
+    private String name;
+    private String sensitivityType;
+
+    public String getJobId() {
+        return jobId;
     }
 
-    @Override
-    protected Collection loadFromService(ISecurityDataEnrichServiceClient client) {
-        return client.listOozieSensitivities();
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
 
-    @Override
-    public Object getCacheKey(Object entity) {
-        return null;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSensitivityType() {
+        return sensitivityType;
+    }
+
+    public void setSensitivityType(String sensitivityType) {
+        this.sensitivityType = sensitivityType;
     }
 }
