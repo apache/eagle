@@ -16,12 +16,18 @@
  */
 package org.apache.eagle.metadata.store.jdbc;
 
-import com.google.inject.Singleton;
+
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.JdbcMetadataDaoImpl;
 import org.apache.eagle.metadata.persistence.MetadataStore;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
+import org.apache.eagle.metadata.service.SiteEntityService;
 import org.apache.eagle.metadata.store.jdbc.provider.JDBCDataSourceProvider;
 import org.apache.eagle.metadata.store.jdbc.provider.JDBCMetadataStoreConfigProvider;
+import org.apache.eagle.metadata.store.jdbc.service.ApplicationEntityServiceJDBCImpl;
+import org.apache.eagle.metadata.store.jdbc.service.SiteEntityServiceJDBCImpl;
+
+import com.google.inject.Singleton;
 
 import javax.sql.DataSource;
 
@@ -32,5 +38,7 @@ public class JDBCMetadataStore extends MetadataStore {
         bind(DataSource.class).toProvider(JDBCDataSourceProvider.class).in(Singleton.class);
         bind(JDBCDataSourceConfig.class).toProvider(JDBCMetadataStoreConfigProvider.class).in(Singleton.class);
         bind(JDBCMetadataQueryService.class).to(JDBCMetadataMetadataStoreServiceImpl.class).in(Singleton.class);
+        bind(ApplicationEntityService.class).to(ApplicationEntityServiceJDBCImpl.class).in(Singleton.class);
+        bind(SiteEntityService.class).to(SiteEntityServiceJDBCImpl.class).in(Singleton.class);
     }
 }
