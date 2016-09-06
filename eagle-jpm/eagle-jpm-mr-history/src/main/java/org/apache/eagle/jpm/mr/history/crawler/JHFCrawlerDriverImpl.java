@@ -65,12 +65,10 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private TimeZone timeZone;
     private JobCountMetricsGenerator jobCountMetricsGenerator;
 
-    public JHFCrawlerDriverImpl(MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig,
-                                MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig,
-                                MRHistoryJobConfig.ControlConfig controlConfig, JHFInputStreamCallback reader,
+    public JHFCrawlerDriverImpl(JHFInputStreamCallback reader,
                                 JobHistoryLCM historyLCM, JobIdFilter jobFilter, int partitionId) throws Exception {
-        this.zeroBasedMonth = controlConfig.zeroBasedMonth;
-        this.dryRun = controlConfig.dryRun;
+        this.zeroBasedMonth = MRHistoryJobConfig.get().getControlConfig().zeroBasedMonth;
+        this.dryRun = MRHistoryJobConfig.get().getControlConfig().dryRun;
         if (this.dryRun)  {
             LOG.info("this is a dry run");
         }
@@ -78,8 +76,8 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
         jhfLCM = historyLCM;//new JobHistoryDAOImpl(jobHistoryConfig);
         this.partitionId = partitionId;
         this.jobFilter = jobFilter;
-        timeZone = TimeZone.getTimeZone(controlConfig.timeZone);
-        jobCountMetricsGenerator = new JobCountMetricsGenerator(eagleServiceConfig, jobExtractorConfig, timeZone);
+        timeZone = TimeZone.getTimeZone(MRHistoryJobConfig.get().getControlConfig().timeZone);
+        jobCountMetricsGenerator = new JobCountMetricsGenerator(timeZone);
     }
 
     /**

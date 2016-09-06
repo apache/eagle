@@ -18,9 +18,9 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.JobHistoryEndpointConfig;
+import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
+import org.apache.eagle.jpm.mr.history.metrics.JobCounterMetricsGenerator;
 import org.apache.eagle.jpm.mr.history.parser.JHFMRVer1Parser.Keys;
 import org.apache.eagle.jpm.mr.historyentity.*;
 import org.apache.eagle.jpm.util.Constants;
@@ -69,7 +69,6 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     protected String queueName;
     protected Long jobLaunchTime;
     protected JobHistoryContentFilter filter;
-    private JobHistoryEndpointConfig jobHistoryEndpointConfig;
 
     protected final List<HistoryJobEntityLifecycleListener> jobEntityLifecycleListeners = new ArrayList<>();
 
@@ -77,6 +76,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
     private long sumMapTaskDuration;
     private long sumReduceTaskDuration;
+
+    private JobCounterMetricsGenerator jobCounterMetricsGenerator;
 
     public Constants.JobType fetchJobType(Configuration config) {
         if (config.get(Constants.JobConfiguration.CASCADING_JOB) != null) {
@@ -101,9 +102,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
      *
      * @param baseTags
      */
-    public JHFEventReaderBase(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter, JobHistoryEndpointConfig jobHistoryEndpointConfig) {
+    public JHFEventReaderBase(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter) {
         this.filter = filter;
-        this.jobHistoryEndpointConfig = jobHistoryEndpointConfig;
 
         this.baseTags = baseTags;
         jobSubmitEventEntity = new JobEventAPIEntity();
@@ -134,6 +134,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         }
         this.sumMapTaskDuration = 0L;
         this.sumReduceTaskDuration = 0L;
+        this.jobCounterMetricsGenerator = new JobCounterMetricsGenerator();
     }
 
     public void register(HistoryJobEntityLifecycleListener lifecycleListener) {
@@ -148,6 +149,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         }
         try {
             flush();
+            this.jobCounterMetricsGenerator.flush();
         } catch (Exception ex) {
             throw new IOException(ex);
         }
@@ -162,7 +164,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
     }
 
     private String buildJobTrackingUrl(String jobId) {
-        String jobTrackingUrlBase = this.jobHistoryEndpointConfig.mrHistoryServerUrl + "/jobhistory/job/";
+        String jobTrackingUrlBase = MRHistoryJobConfig.getInstance(null).getJobHistoryEndpointConfig().mrHistoryServerUrl + "/jobhistory/job/";
         try {
             URI oldUri = new URI(jobTrackingUrlBase);
             URI resolved = oldUri.resolve(jobId);
@@ -303,6 +305,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             } else {
                 jobExecutionEntity.setAvgReduceTaskDuration(this.sumReduceTaskDuration * 1.0 / numTotalReduces);
             }
+            this.jobCounterMetricsGenerator.setBaseTags(jobExecutionEntity.getTags());
             entityCreated(jobExecutionEntity);
         }
     }
@@ -401,6 +404,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             }
 
             entityCreated(entity);
+            this.jobCounterMetricsGenerator.taskExecutionEntityCreated(entity);
             //_taskStartTime.remove(taskID); // clean this taskID
         } else if ((recType == RecordTypes.MapAttempt || recType == RecordTypes.ReduceAttempt) && startTime != null) { // task attempt start
             taskAttemptStartTime.put(taskAttemptID, Long.valueOf(startTime));
