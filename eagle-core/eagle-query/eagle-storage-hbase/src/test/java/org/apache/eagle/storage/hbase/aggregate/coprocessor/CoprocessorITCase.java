@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.storage.hbase.aggregate.coprocessor;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericEntityWriter;
@@ -33,20 +34,14 @@ import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DoubleWritable;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-/**
- * Coprocessor Aggregate Client Integration Test.
- */
-@Ignore
-public class AggregateClientITCase {
+@Ignore("Coprocessor Aggregate Client Integration Test.")
+public class CoprocessorITCase {
     private HTableInterface table;
     private long startTime;
     private long endTime;
@@ -55,11 +50,15 @@ public class AggregateClientITCase {
     private Scan scan;
     private int num = 200;
 
-    private static final Logger LOG = LoggerFactory.getLogger(AggregateClientITCase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CoprocessorITCase.class);
+
+    @BeforeClass
+    public static void before(){
+        System.setProperty("config.resource", "/application-sandbox.conf");
+    }
 
     @Before
     public void setUp() {
-        System.setProperty("config.resource", "/application-sandbox.conf");
         startTime = System.currentTimeMillis();
         try {
             rowkeys = prepareData(num);
@@ -72,6 +71,7 @@ public class AggregateClientITCase {
         client = new AggregateClientImpl();
         scan = new Scan();
         scan.setCaching(200);
+        Config config = EagleConfigFactory.load().getConfig();
 
         ListQueryCompiler compiler = null;
         try {
@@ -130,7 +130,6 @@ public class AggregateClientITCase {
             Assert.assertNotNull(result);
             Assert.assertTrue(result.size() > 0);
         } catch (Exception e) {
-            e.printStackTrace();
             Assert.fail(e.getMessage());
         }
     }
