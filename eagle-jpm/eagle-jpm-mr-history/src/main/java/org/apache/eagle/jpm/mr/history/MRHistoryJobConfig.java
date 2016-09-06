@@ -127,29 +127,19 @@ public class MRHistoryJobConfig implements Serializable {
         this.controlConfig = new ControlConfig();
         this.jobExtractorConfig = new JobExtractorConfig();
         this.eagleServiceConfig = new EagleServiceConfig();
-    }
-
-    public static MRHistoryJobConfig getInstance(String[] args) {
-        manager.init(args);
-        return manager;
+        this.config = null;
     }
 
     public static MRHistoryJobConfig getInstance(Config config) {
-        manager.init(config);
+        if (config != null && manager.config == null) {
+            manager.init(config);
+        }
+
         return manager;
     }
 
-    /**
-     * read configuration file and load hbase config etc.
-     */
-    private void init(String[] args) {
-        // TODO: Probably we can remove the properties file path check in future
-        try {
-            LOG.info("Loading from configuration file");
-            init(new ConfigOptionParser().load(args));
-        } catch (Exception e) {
-            LOG.error("failed to load config");
-        }
+    public static MRHistoryJobConfig get() {
+        return getInstance(null);
     }
 
     /**
