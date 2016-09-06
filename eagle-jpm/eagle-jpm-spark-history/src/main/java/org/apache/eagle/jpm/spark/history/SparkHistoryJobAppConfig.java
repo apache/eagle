@@ -82,7 +82,6 @@ public class SparkHistoryJobAppConfig implements Serializable {
         this.eagleInfo.host = config.getString("eagleProps.eagle.service.host");
         this.eagleInfo.port = config.getInt("eagleProps.eagle.service.port");
 
-        this.stormConfig.topologyName = config.getString("storm.name");
         this.stormConfig.timeoutSec = config.getInt("storm.messageTimeoutSec");
         this.stormConfig.spoutPending = config.getInt("storm.pendingSpout");
         this.stormConfig.spoutCrawlInterval = config.getInt("storm.spoutCrawlInterval");
@@ -117,7 +116,6 @@ public class SparkHistoryJobAppConfig implements Serializable {
 
     public static class StormConfig implements Serializable {
         public int timeoutSec;
-        public String topologyName;
         public int spoutPending;
         public int spoutCrawlInterval;
     }

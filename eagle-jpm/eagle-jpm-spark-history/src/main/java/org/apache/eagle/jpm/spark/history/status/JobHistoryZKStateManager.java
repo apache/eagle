@@ -233,10 +233,11 @@ public class JobHistoryZKStateManager {
                     curator.setData().forPath(path, status.toString().getBytes("UTF-8"));
                 }
             } else {
-                LOG.error("Failed to update for application with path: " + path);
+                LOG.warn("failed to update with status {} due to path {} not existing ", status, path);
+                //throw new RuntimeException("Failed to update for application with path: " + path);
             }
         } catch (Exception e) {
-            LOG.error("fail to update application status", e);
+            LOG.error("fail to update application status as {}", status, e);
             throw new RuntimeException(e);
         } finally {
             try {
