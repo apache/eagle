@@ -1,0 +1,22 @@
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://sandbox.hortonworks.com:8020</value>
+    </property>
+    <property>
+        <name>hbase.zookeeper.property.clientPort</name>
+        <value>2181</value>
+    </property>
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>sandbox.hortonworks.com</value>
+    </property>
+    <property>
+        <name>zookeeper.session.timeout</name>
+        <value>30000</value>
+    </property>
+    <property>
+        <name>zookeeper.znode.parent</name>
+        <value>/hbase-unsecure</value>
+    </property>
+</configuration>

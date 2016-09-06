@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.storage.hbase.aggregate.coprocessor;
+package org.apache.eagle.storage.hbase.integrationtest;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericEntityWriter;
@@ -41,7 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 @Ignore("Coprocessor Aggregate Client Integration Test.")
-public class CoprocessorITCase {
+public class CoprocessorITSuite {
     private HTableInterface table;
     private long startTime;
     private long endTime;
@@ -50,7 +49,7 @@ public class CoprocessorITCase {
     private Scan scan;
     private int num = 200;
 
-    private static final Logger LOG = LoggerFactory.getLogger(CoprocessorITCase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CoprocessorITSuite.class);
 
     @BeforeClass
     public static void before(){
@@ -71,7 +70,6 @@ public class CoprocessorITCase {
         client = new AggregateClientImpl();
         scan = new Scan();
         scan.setCaching(200);
-        Config config = EagleConfigFactory.load().getConfig();
 
         ListQueryCompiler compiler = null;
         try {
