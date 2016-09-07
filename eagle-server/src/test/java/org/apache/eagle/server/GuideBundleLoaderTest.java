@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class GuideBundleLoaderTest {
     @Test
-    public void testLoad(){
+    public void testLoad() {
         GuiceBundle<ServerConfig> bundle = GuideBundleLoader.load();
     }
 }

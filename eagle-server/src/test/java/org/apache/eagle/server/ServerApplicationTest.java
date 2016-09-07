@@ -21,6 +21,6 @@ import org.junit.Test;
 public class ServerApplicationTest {
     @Test
     public void testServerMain() throws Exception {
-        ServerMain.main(new String[]{"server", "src/test/resources/configuration.yml"});
+        ServerMain.main(new String[] {"server", "src/test/resources/configuration.yml"});
     }
 }
