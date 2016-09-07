@@ -85,13 +85,17 @@ public class SecurityDataEnrichServiceClientImpl implements ISecurityDataEnrichS
     }
 
     private String buildBasePath() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("http://");
-        sb.append(host);
-        sb.append(":");
-        sb.append(port);
-        sb.append(context);
-        return sb.toString();
+        if (host.startsWith("http://") || host.startsWith("https://")) {
+            return host + ":" + port + context;
+        } else {
+            // https
+            if (port == 443) {
+                return "https://" + host + ":" + port + context;
+            } else {
+                // http
+                return "http://" + host + ":" + port + context;
+            }
+        }
     }
 
     private <T> List<T> list(String path, GenericType<List<T>> type) {
