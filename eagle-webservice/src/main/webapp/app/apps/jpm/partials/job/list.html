@@ -17,37 +17,6 @@
   -->
 
 <style>
-	.datePickerGroup {
-		float: right;
-		margin: -7px;
-	}
-
-	.datePickerGroup > input {
-		width: 135px;
-		display: inline-block;
-		float: left;
-		height: 32px;
-		padding: 2px 7px;
-	}
-	.datePickerGroup > .addon {
-		float: left;
-		display: inline-block;
-		border-top: 1px solid #d2d6de;
-		border-bottom: 1px solid #d2d6de;
-		padding: 5px;
-		height: 32px;
-		width: 30px;
-		text-align: center;
-		background: #f4f4f4;
-	}
-	.datePickerGroup > button {
-		float: left;
-		height: 32px;
-		padding: 5px 10px;
-		border-radius: 0;
-		border-left: 0;
-	}
-
 	.box .box-header .box-title small a {
 		cursor: pointer;
 		padding: 0 5px;
@@ -70,6 +39,10 @@
 		height: 300px;
 		position: relative;
 	}
+
+	.jpm-chart {
+		margin-bottom: 15px;
+	}
 </style>
 
 <div class="box box-primary">
@@ -84,13 +57,6 @@
 			</small>
 			<span ng-show="!jobList._done || isSorting" class="fa fa-refresh fa-spin no-animate"></span>
 		</h3>
-
-		<!--div class="datePickerGroup clearfix">
-			<input id="startTime" type="text" class="form-control" data-toggle="datepicker" ng-model="startTimeInput" />
-			<span class="addon">To</span>
-			<input id="endTime" type="text" class="form-control" data-toggle="datepicker" data-position="right" ng-model="endTimeInput" />
-			<button class="btn btn-primary" ng-disabled="!checkDateRange()" ng-click="changeDateRange()">Go</button>
-		</div-->
 	</div>
 	<div class="box-body">
 		<div id="jobList" sort-table="jobList" is-sorting="isSorting" search-path-list="searchPathList" scope="tableScope">
@@ -143,8 +109,27 @@
 		</h3>
 	</div>
 	<div class="box-body">
-		<div class="jpm-chart">
-			<div chart class="jpm-chart-container" series="runningTrendSeries" ng-click="jobTrendClick"></div>
+		<div class="row">
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="runningTrendSeries"></div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="runningContainersSeries"></div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="allocatedMBSeries"></div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="allocatedvcoresSeries"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

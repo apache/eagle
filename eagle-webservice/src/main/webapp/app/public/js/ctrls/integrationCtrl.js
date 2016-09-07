@@ -80,13 +80,16 @@
 
 		// Map applications
 		function mapApplications() {
-			var uninstalledApplicationList = common.array.minus(Application.providerList, $scope.site.applicationList, "type", "descriptor.type");
-			$scope.applicationList = $.map($scope.site.applicationList, function (app) {
-				app.installed = true;
-				return app;
-			}).concat($.map(uninstalledApplicationList, function (oriApp) {
-				return { origin: oriApp };
-			}));
+			Site.getPromise().then(function () {
+				$scope.site = Site.find($wrapState.param.id);
+				var uninstalledApplicationList = common.array.minus(Application.providerList, $scope.site.applicationList, "type", "descriptor.type");
+				$scope.applicationList = $.map($scope.site.applicationList, function (app) {
+					app.installed = true;
+					return app;
+				}).concat($.map(uninstalledApplicationList, function (oriApp) {
+					return { origin: oriApp };
+				}));
+			});
 		}
 		mapApplications();
 

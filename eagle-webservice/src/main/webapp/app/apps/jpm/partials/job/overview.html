@@ -16,6 +16,48 @@
   limitations under the License.
   -->
 
+<style>
+	.jpm-chart,
+	.jpm-chart-container {
+		position: relative;
+	}
+
+	.jpm-chart-container {
+		height: 350px;
+	}
+
+	.jpm-chart > h3 {
+		margin: 0 0 10px 0;
+	}
+	.jpm-chart {
+		padding-bottom: 15px;
+		margin-bottom: 15px;
+		border-bottom: 1px solid #f4f4f4;
+	}
+	.jpm-chart:last-child {
+		padding-bottom: 0;
+		margin-bottom: 0;
+		border-bottom: 0;
+	}
+
+	.jpm-chart .overlay {
+		top: 0;
+		bottom: 0;
+		position: absolute;
+		width: 100%;
+	}
+</style>
+
+<div class="form-group">
+	<label class="radio-inline">
+		<input type="radio" ng-checked="type === 'job'" ng-click="switchType('job')"> By Job
+	</label>
+	<label class="radio-inline">
+		<input type="radio" ng-checked="type === 'user'" ng-click="switchType('user')"> By User
+	</label>
+</div>
+
+
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#cpu" data-toggle="tab">CPU Usage</a></li>
@@ -23,4 +65,66 @@
 		<li><a href="#hdfsOPs" data-toggle="tab">HDFS IO OPs</a></li>
 		<li><a href="#diskIO" data-toggle="tab">Disk IO</a></li>
 	</ul>
+	<div class="tab-content keepContent">
+		<div class="tab-pane active" id="cpu">
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top CPU Usage</h3>
+				<div chart class="jpm-chart-container" series="cpuUsageSeries" option="commonOption"></div>
+				<div ng-if="(cpuUsageSeries || []).length === 0" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="hdfsBytes">
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top HDFS Bytes Read</h3>
+				<div chart class="jpm-chart-container" series="hdfsBtyesReadSeries" option="commonOption"></div>
+				<div ng-if="(hdfsBtyesReadSeries || []).length === 0" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top HDFS Bytes Written</h3>
+				<div chart class="jpm-chart-container" series="hdfsBtyesWrittenSeries" option="commonOption"></div>
+				<div ng-if="(hdfsBtyesWrittenSeries || []).length === 0" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="hdfsOPs">
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top HDFS Read OPs</h3>
+				<div chart class="jpm-chart-container" series="hdfsReadOpsSeries" option="commonOption"></div>
+				<div ng-if="(hdfsReadOpsSeries || []).length === 0" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top HDFS Write OPs</h3>
+				<div chart class="jpm-chart-container" series="hdfsWriteOpsSeries" option="commonOption"></div>
+				<div ng-if="(hdfsWriteOpsSeries || []).length === 0" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="diskIO">
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top File Bytes Read</h3>
+				<div chart class="jpm-chart-container" series="fileBytesReadSeries" option="commonOption"></div>
+				<div ng-if="(fileBytesReadSeries || []).length === 0" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top File Bytes Written</h3>
+				<div chart class="jpm-chart-container" series="fileBytesWrittenSeries" option="commonOption"></div>
+				<div ng-if="(fileBytesWrittenSeries || []).length === 0" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

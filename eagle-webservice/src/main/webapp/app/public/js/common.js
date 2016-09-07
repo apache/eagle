@@ -260,14 +260,14 @@
 	common.number.abbr = function (number, isByte, decPlaces) {
 		decPlaces = decPlaces || 2;
 		decPlaces = Math.pow(10, decPlaces);
-		const abbrev = isByte ? ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['K', 'M', 'B', 'T', 'Q'];
-		const base = isByte ? 1024 : 1000;
-		const sign = number < 0 ? -1 : 1;
+		var abbrev = isByte ? ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['K', 'M', 'B', 'T', 'Q'];
+		var base = isByte ? 1024 : 1000;
+		var sign = number < 0 ? -1 : 1;
 		var unit = '';
 		number = Math.abs(number);
 
 		for(var i = abbrev.length - 1; i >= 0; i--) {
-			const size = Math.pow(base, i + 1);
+			var size = Math.pow(base, i + 1);
 			if(size <= number) {
 				number = Math.round(number * decPlaces / size) / decPlaces;
 				if((number === base) && (i < abbrev.length - 1)) {
@@ -280,7 +280,7 @@
 		}
 		unit = unit ? unit : "";
 		return number * sign + unit;
-	}
+	};
 
 	common.number.compare = function (num1, num2) {
 		if(!common.number.isNumber(num1) || !common.number.isNumber(num2)) return "-";

@@ -230,7 +230,7 @@ var app = {};
 			};
 
 			$scope.setLastDuration = function (hours) {
-				var endTime = Time();
+				var endTime = new Time();
 				var startTime = endTime.clone().subtract(hours, "hours");
 				Time.timeRange(startTime, endTime);
 			};

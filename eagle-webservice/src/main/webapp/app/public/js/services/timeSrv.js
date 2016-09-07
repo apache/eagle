@@ -32,7 +32,7 @@
 		var startTime, endTime;
 		var reloadListenerList = [];
 
-		var Time = function (time) {
+		var $Time = function (time) {
 			var _mom;
 
 			if(arguments.length === 1 && time === undefined) {
@@ -42,13 +42,11 @@
 			switch (time) {
 				case "startTime":
 					return startTime;
-					break;
 				case "endTime":
 					return endTime;
-					break;
 				case "day":
 					_mom = new moment();
-					_mom.utcOffset(Time.UTC_OFFSET);
+					_mom.utcOffset($Time.UTC_OFFSET);
 					_mom.hours(0).minutes(0).seconds(0);
 					break;
 				default:
@@ -63,72 +61,80 @@
 					}
 
 					_mom = new moment(time);
-					_mom.utcOffset(Time.UTC_OFFSET);
+					_mom.utcOffset($Time.UTC_OFFSET);
 			}
 			return _mom;
 		};
 
-		Time.TIME_RANGE_PICKER = "timeRange";
-		Time.pickerType = null;
+		$Time.TIME_RANGE_PICKER = "timeRange";
+		$Time.pickerType = null;
+		$Time._reloadListenerList = reloadListenerList;
 
 		// TODO: time zone
-		Time.UTC_OFFSET = 0;
+		$Time.UTC_OFFSET = 0;
 
-		Time.FORMAT = "YYYY-MM-DD HH:mm:ss";
-		Time.SHORT_FORMAT = "MM-DD HH:mm";
+		$Time.FORMAT = "YYYY-MM-DD HH:mm:ss";
+		$Time.SHORT_FORMAT = "MM-DD HH:mm";
 
-		Time.format = function (time, format) {
-			time = Time(time);
-			return time ? time.format(format || Time.FORMAT) : "-";
+		$Time.format = function (time, format) {
+			time = $Time(time);
+			return time ? time.format(format || $Time.FORMAT) : "-";
 		};
 
-		Time.startTime = function () {
+		$Time.startTime = function () {
 			return startTime;
 		};
 
-		Time.endTime = function () {
+		$Time.endTime = function () {
 			return endTime;
 		};
 
-		Time.timeRange = function (startTimeValue, endTimeValue) {
-			startTime = Time(startTimeValue);
-			endTime = Time(endTimeValue);
+		$Time.timeRange = function (startTimeValue, endTimeValue) {
+			startTime = $Time(startTimeValue);
+			endTime = $Time(endTimeValue);
 
 			$.each(reloadListenerList, function (i, listener) {
-				listener(Time);
+				listener($Time);
 			});
 		};
 
-		Time.onReload = function (func) {
+		$Time.onReload = function (func, $scope) {
 			reloadListenerList.push(func);
+
+			// Clean up
+			if($scope) {
+				$scope.$on('$destroy', function() {
+					$Time.offReload(func);
+				});
+			}
 		};
 
-		Time.offReload = function (func) {
+		$Time.offReload = function (func) {
 			reloadListenerList = $.grep(reloadListenerList, function(_func) {
 				return _func !== func;
 			});
 		};
 
-		Time.verifyTime = function(str, format) {
-			format = format || Time.FORMAT;
-			var date = Time(str);
-			if(str === Time.format(date, format)) {
+		$Time.verifyTime = function(str, format) {
+			format = format || $Time.FORMAT;
+			var date = $Time(str);
+			if(str === $Time.format(date, format)) {
 				return date;
 			}
 			return null;
 		};
 
-		Time.diff = function (from, to) {
-			from = Time(from);
-			to = Time(to);
+		$Time.diff = function (from, to) {
+			from = $Time(from);
+			to = $Time(to);
 			if (!from || !to) return null;
 			return to.diff(from);
 		};
 
-		Time.diffStr = function (from, to) {
+		$Time.diffStr = function (from, to) {
 			var diff = from;
 			if(arguments.length === 2) {
-				diff = Time.diff(from, to);
+				diff = $Time.diff(from, to);
 			}
 			if(diff === null) return "-";
 			if(diff === 0) return "0s";
@@ -155,17 +161,32 @@
 			return rows.join(", ");
 		};
 
-		Time.align = function (time, interval, ceil) {
-			time = Time(time);
+		$Time.diffInterval = function (from, to) {
+			var timeDiff = $Time.diff(from, to);
+			if(timeDiff <= 1000 * 60 * 60 * 6) {
+				return 1000 * 60 * 2;
+			} else if(timeDiff <= 1000 * 60 * 60 * 24) {
+				return 1000 * 60 * 15;
+			} else if(timeDiff <= 1000 * 60 * 60 * 24 * 7) {
+				return 1000 * 60 * 30;
+			} else if(timeDiff <= 1000 * 60 * 60 * 24 * 14) {
+				return 1000 * 60 * 60;
+			} else {
+				return 1000 * 60 * 60 * 24;
+			}
+		};
+
+		$Time.align = function (time, interval, ceil) {
+			time = $Time(time);
 			if(!time) return null;
 
 			var func = ceil ? Math.ceil : Math.floor;
 
 			var timestamp = time.valueOf();
-			return Time(func(timestamp / interval) * interval);
+			return $Time(func(timestamp / interval) * interval);
 		};
 
-		Time.millionFormat = function (num) {
+		$Time.millionFormat = function (num) {
 			if(!num) return "-";
 			num = Math.floor(num / 1000);
 			var s = num % 60;
@@ -179,38 +200,38 @@
 		};
 
 		var promiseLock = false;
-		Time.getPromise = function (config, state, param) {
+		$Time.getPromise = function (config, state, param) {
 			if(config.time === true) {
-				Time.pickerType = Time.TIME_RANGE_PICKER;
+				$Time.pickerType = $Time.TIME_RANGE_PICKER;
 
 				if(!promiseLock) {
-					startTime = Time.verifyTime(param.startTime);
-					endTime = Time.verifyTime(param.endTime);
+					startTime = $Time.verifyTime(param.startTime);
+					endTime = $Time.verifyTime(param.endTime);
 
 					if (!startTime || !endTime) {
-						endTime = Time();
+						endTime = $Time();
 						startTime = endTime.clone().subtract(2, "hour");
 
 						setTimeout(function () {
 							promiseLock = true;
 							$wrapState.go(state.name, $.extend({}, param, {
-								startTime: Time.format(startTime),
-								endTime: Time.format(endTime)
+								startTime: $Time.format(startTime),
+								endTime: $Time.format(endTime)
 							}), {location: "replace", notify: false});
 
 							setTimeout(function () {
 								promiseLock = false;
-							}, 100);
-						}, 50);
+							}, 150);
+						}, 100);
 					}
 				}
 			} else {
-				Time.pickerType = null;
+				$Time.pickerType = null;
 			}
 
-			return $q.when(Time);
+			return $q.when($Time);
 		};
 
-		return Time;
+		return $Time;
 	});
 })();

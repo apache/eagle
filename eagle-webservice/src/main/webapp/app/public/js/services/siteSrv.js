@@ -80,13 +80,13 @@
 
 			return $q.all([siteList._promise, Application.getPromise()]).then(function() {
 				// Site check
-				if(config.site !== false && siteList.length === 0) {
+				if(config && config.site !== false && siteList.length === 0) {
 					$wrapState.go('setup', 1);
 					return $q.reject(Site);
 				}
 
 				// Application check
-				if(config.application !== false && Application.list.length === 0) {
+				if(config && config.application !== false && Application.list.length === 0) {
 					$wrapState.go('integration.site', {id: siteList[0].siteId}, 1);
 					return $q.reject(Site);
 				}

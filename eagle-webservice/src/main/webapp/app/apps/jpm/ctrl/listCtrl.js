@@ -115,24 +115,16 @@
 					});
 				});
 
-				// ==========================================================
-				// =                   Running Job Trend                    =
-				// ==========================================================
-				var interval;
-				var timeDiff = Time.diff(startTime, endTime);
-				if(timeDiff <= 1000 * 60 * 60 * 6) {
-					interval = 1000 * 60 * 10;
-				} else if(timeDiff <= 1000 * 60 * 60 * 24) {
-					interval = 1000 * 60 * 30;
-				} else if(timeDiff <= 1000 * 60 * 60 * 24 * 7) {
-					interval = 1000 * 60 * 60;
-				} else {
-					interval = 1000 * 60 * 60 * 24;
-				}
+				// ===========================================================
+				// =                     Statistic Trend                     =
+				// ===========================================================
+				var interval = Time.diffInterval(startTime, endTime);
+				var intervalMin = interval / 1000 / 60;
 				var trendStartTime = Time.align(startTime, interval);
 				var trendEndTime = Time.align(endTime, interval);
 				var trendStartTimestamp = trendStartTime.valueOf();
 
+				// ==================== Running Job Trend ====================
 				JPM.get(JPM.QUERY_MR_JOB_COUNT, {
 					site: $scope.site,
 					intervalInSecs: interval / 1000,
@@ -181,17 +173,40 @@
 							};
 						});
 					});
+
+				// ================= Running Container Trend =================
+				JPM.aggMetricsToEntities(
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.runningcontainers", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
+				)._promise.then(function (list) {
+					$scope.runningContainersSeries = [JPM.metricsToSeries("Running Containers", list)];
+				});
+
+				// ==================== AllocatedMB Trend ====================
+				JPM.aggMetricsToEntities(
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedmb", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
+				)._promise.then(function (list) {
+					$scope.allocatedMBSeries = [JPM.metricsToSeries("Allocated MB", list)];
+				});
+
+				// ==================== AllocatedMB Trend ====================
+				JPM.aggMetricsToEntities(
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedmb", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
+				)._promise.then(function (list) {
+					$scope.allocatedMBSeries = [JPM.metricsToSeries("Allocated MB", list)];
+				});
+
+				// ================= Allocated vCores Trend ==================
+				JPM.aggMetricsToEntities(
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedvcores", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
+				)._promise.then(function (list) {
+					$scope.allocatedvcoresSeries = [JPM.metricsToSeries("Allocated vCores", list)];
+				});
 			};
 
-			Time.onReload($scope.refreshList);
+			Time.onReload($scope.refreshList, $scope);
 
 			// Load list
 			$scope.refreshList();
-
-			// Clean up
-			$scope.$on('$destroy', function() {
-				Time.offReload($scope.refreshList);
-			});
 		});
 	});
 })();
