@@ -20,8 +20,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
-
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

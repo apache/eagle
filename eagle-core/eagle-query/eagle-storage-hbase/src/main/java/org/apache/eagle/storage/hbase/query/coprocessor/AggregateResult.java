@@ -31,8 +31,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Aggregated writable result consist of group-by key-values list and additional meta information
- * 
+ * Aggregated writable result consist of group-by key-values list and additional meta information.
  * <h2>Schema</h2>
  * <pre>
  * {
@@ -42,88 +41,88 @@ import java.util.List;
  * }
  * </pre>
  */
-public class AggregateResult implements Writable,Serializable{
+public class AggregateResult implements Writable, Serializable {
 
-	private final static Logger LOG = LoggerFactory.getLogger(AggregateResult.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AggregateResult.class);
 
-	/**
-	 * Automatically generated default serialVersionUID
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private final WritableList<GroupbyKeyValue> keyValues;
-	
-	private long startTimestamp = 0;
-	
-	public long getStartTimestamp() {
-		return startTimestamp;
-	}
+    /**
+     * Automatically generated default serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
 
-	public void setStartTimestamp(long startTimestamp) {
-		this.startTimestamp = startTimestamp;
-	}
+    private final WritableList<GroupbyKeyValue> keyValues;
 
-	public long getStopTimestamp() {
-		return stopTimestamp;
-	}
+    private long startTimestamp = 0;
 
-	public void setStopTimestamp(long stopTimestamp) {
-		this.stopTimestamp = stopTimestamp;
-	}
+    public long getStartTimestamp() {
+        return startTimestamp;
+    }
 
-	public WritableList<GroupbyKeyValue> getKeyValues() {
-		return keyValues;
-	}
-	
-	public void setKeyValues(List<GroupbyKeyValue> keyValues){
-		this.keyValues.addAll(keyValues);
-	}
-	
-	private long stopTimestamp;
-	
-	public AggregateResult(){
-		this.keyValues = new WritableList<GroupbyKeyValue>(GroupbyKeyValue.class);
-	}
-	
-	@Override
-	public void readFields(DataInput in) throws IOException {
-		this.startTimestamp = in.readLong();
-		this.stopTimestamp = in.readLong();
-		keyValues.readFields(in);
-	}
-	
-	@Override
-	public void write(DataOutput out) throws IOException {
-		out.writeLong(this.startTimestamp);
-		out.writeLong(this.stopTimestamp);
-		keyValues.write(out);
-	}
+    public void setStartTimestamp(long startTimestamp) {
+        this.startTimestamp = startTimestamp;
+    }
+
+    public long getStopTimestamp() {
+        return stopTimestamp;
+    }
+
+    public void setStopTimestamp(long stopTimestamp) {
+        this.stopTimestamp = stopTimestamp;
+    }
+
+    public WritableList<GroupbyKeyValue> getKeyValues() {
+        return keyValues;
+    }
+
+    public void setKeyValues(List<GroupbyKeyValue> keyValues) {
+        this.keyValues.addAll(keyValues);
+    }
+
+    private long stopTimestamp;
+
+    public AggregateResult() {
+        this.keyValues = new WritableList<GroupbyKeyValue>(GroupbyKeyValue.class);
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        this.startTimestamp = in.readLong();
+        this.stopTimestamp = in.readLong();
+        keyValues.readFields(in);
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeLong(this.startTimestamp);
+        out.writeLong(this.stopTimestamp);
+        keyValues.write(out);
+    }
 
 
-	public static AggregateResult build(List<String[]> keys,List<double[]> values,List<Integer> counts,long startTimestamp,long stopTimestamp){
-		if(keys.size() > values.size()){
-			throw new IllegalArgumentException("keys' size: "+keys.size()+" not equal with values' size: "+values.size());
-		}
-		AggregateResult result = new AggregateResult();
-		result.setStartTimestamp(startTimestamp);
-		result.setStopTimestamp(stopTimestamp);
-		WritableList<GroupbyKeyValue> keyValues = new WritableList<GroupbyKeyValue>(GroupbyKeyValue.class,keys.size());
+    public static AggregateResult build(List<String[]> keys, List<double[]> values, List<Integer> counts, long startTimestamp, long stopTimestamp) {
+        if (keys.size() > values.size()) {
+            throw new IllegalArgumentException("keys' size: " + keys.size() + " not equal with values' size: " + values.size());
+        }
+        AggregateResult result = new AggregateResult();
+        result.setStartTimestamp(startTimestamp);
+        result.setStopTimestamp(stopTimestamp);
+        WritableList<GroupbyKeyValue> keyValues = new WritableList<GroupbyKeyValue>(GroupbyKeyValue.class, keys.size());
 
-		for(int i=0;i<keys.size();i++) {
-			String[] key  = keys.get(i);
-			GroupbyKey gkey = new GroupbyKey();
-			for (String k : key) {
-				gkey.addValue(k.getBytes());
-			}
-			GroupbyValue gvalue = new GroupbyValue();
-			double[] value = values.get(i);
-			for(double v:value){
-				gvalue.add(v);
-				gvalue.addMeta(counts.get(i));
-			}
-			keyValues.add(new GroupbyKeyValue(gkey, gvalue));
-		}
-		result.setKeyValues(keyValues);
-		return result;
-	}
+        for (int i = 0; i < keys.size(); i++) {
+            String[] key = keys.get(i);
+            GroupbyKey gkey = new GroupbyKey();
+            for (String k : key) {
+                gkey.addValue(k.getBytes());
+            }
+            GroupbyValue gvalue = new GroupbyValue();
+            double[] value = values.get(i);
+            for (double v : value) {
+                gvalue.add(v);
+                gvalue.addMeta(counts.get(i));
+            }
+            keyValues.add(new GroupbyKeyValue(gkey, gvalue));
+        }
+        result.setKeyValues(keyValues);
+        return result;
+    }
 }

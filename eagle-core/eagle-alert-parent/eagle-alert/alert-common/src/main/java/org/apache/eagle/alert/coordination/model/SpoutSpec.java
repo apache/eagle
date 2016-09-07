@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +83,7 @@ public class SpoutSpec {
         return kafka2TupleMetadataMap;
     }
 
-    @org.codehaus.jackson.annotate.JsonIgnore
+    @JsonIgnore
     public StreamRepartitionMetadata getStream(String streamName) {
         for (List<StreamRepartitionMetadata> meta : this.streamRepartitionMetadataMap.values()) {
             Optional<StreamRepartitionMetadata> m = meta.stream().filter((t) -> t.getStreamId().equalsIgnoreCase(streamName)).findFirst();

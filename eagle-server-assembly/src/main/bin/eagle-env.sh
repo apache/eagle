@@ -18,18 +18,6 @@
 # set EAGLE_HOME
 export EAGLE_HOME=$(dirname $0)/..
 
-# EAGLE_SERVICE_HOST, default is `hostname -f`
-export EAGLE_SERVICE_HOST=localhost
-
-# EAGLE_SERVICE_PORT, default is 9099
-export EAGLE_SERVICE_PORT=9099
-
-# EAGLE_SERVICE_USER
-export EAGLE_SERVICE_USER=admin
-
-# EAGLE_SERVICE_PASSWORD
-export EAGLE_SERVICE_PASSWD=secret
-
 export EAGLE_CLASSPATH=$EAGLE_HOME/conf
 
 # Add eagle shared library jars

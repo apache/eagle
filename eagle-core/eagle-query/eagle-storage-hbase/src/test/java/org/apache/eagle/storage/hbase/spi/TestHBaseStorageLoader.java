@@ -27,7 +27,8 @@ import org.junit.Test;
  * @since 3/20/15
  */
 public class TestHBaseStorageLoader {
-    @Test @Ignore("TODO: Add back after refactoring hbase related unit test cases")
+    @Test
+    @Ignore("TODO: Add back after refactoring hbase related unit test cases")
     public void testHBaseStorageLoader() {
         try {
             assert DataStorageManager.getDataStorageByEagleConfig() instanceof HBaseStorage;

@@ -48,7 +48,7 @@ public class JobConfigurationAPIEntity extends JobBaseAPIEntity {
 
     public void setJobConfig(JobConfig jobConfig) {
         this.jobConfig = jobConfig;
-        _pcs.firePropertyChange("jobConfig", null, null);
+        pcs.firePropertyChange("jobConfig", null, null);
     }
 
     public String getConfigJobName() {
@@ -57,7 +57,7 @@ public class JobConfigurationAPIEntity extends JobBaseAPIEntity {
 
     public void setConfigJobName(String configJobName) {
         this.configJobName = configJobName;
-        _pcs.firePropertyChange("configJobName", null, null);
+        pcs.firePropertyChange("configJobName", null, null);
     }
 
     public String getAlertEmailList() {
@@ -66,6 +66,6 @@ public class JobConfigurationAPIEntity extends JobBaseAPIEntity {
 
     public void setAlertEmailList(String alertEmailList) {
         this.alertEmailList = alertEmailList;
-        _pcs.firePropertyChange("alertEmailList", null, null);
+        pcs.firePropertyChange("alertEmailList", null, null);
     }
 }

@@ -16,15 +16,10 @@
  */
 package org.apache.eagle.alert.utils;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/**
- * @since May 1, 2016
- *
- */
 public class JsonUtils {
 
     public static final ObjectMapper mapper = new ObjectMapper();

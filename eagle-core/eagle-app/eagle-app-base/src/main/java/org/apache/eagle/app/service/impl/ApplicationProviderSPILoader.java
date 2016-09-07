@@ -39,11 +39,10 @@ public class ApplicationProviderSPILoader extends ApplicationProviderLoader{
         super(config);
         if(config.hasPath(APPLICATIONS_DIR_PROPS_KEY)) {
             this.appProviderExtDir = config.getString(APPLICATIONS_DIR_PROPS_KEY);
+            LOG.warn("Using {}: {}",APPLICATIONS_DIR_PROPS_KEY,this.appProviderExtDir);
         }else{
             this.appProviderExtDir = null;
         }
-
-        LOG.warn("Using {}: {}",APPLICATIONS_DIR_PROPS_KEY,this.appProviderExtDir);
     }
 
     @Override

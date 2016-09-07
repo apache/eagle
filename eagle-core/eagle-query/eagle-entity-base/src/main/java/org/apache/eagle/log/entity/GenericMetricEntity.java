@@ -48,6 +48,6 @@ public class GenericMetricEntity extends TaggedLogAPIEntity {
 
 	public void setValue(double[] value) {
 		this.value = value;
-		_pcs.firePropertyChange("value", null, null);
+		pcs.firePropertyChange("value", null, null);
 	}
 }
