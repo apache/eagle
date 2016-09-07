@@ -21,8 +21,8 @@ package org.apache.eagle.alert.service;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Ignore;
 import org.junit.Test;
 

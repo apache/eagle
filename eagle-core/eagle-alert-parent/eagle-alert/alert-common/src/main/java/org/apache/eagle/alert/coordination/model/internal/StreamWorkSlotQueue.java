@@ -76,7 +76,6 @@ public class StreamWorkSlotQueue {
         this.dedicated = dedicated;
     }
 
-    @org.codehaus.jackson.annotate.JsonIgnore
     @JsonIgnore
     public int getQueueSize() {
         return workingSlots.size();
@@ -104,7 +103,6 @@ public class StreamWorkSlotQueue {
         this.topoGroupStartIndex = topoGroupStartIndex;
     }
 
-    @org.codehaus.jackson.annotate.JsonIgnore
     @JsonIgnore
     public int getTopologyGroupStartIndex(String topo) {
         if (topoGroupStartIndex.containsKey(topo)) {

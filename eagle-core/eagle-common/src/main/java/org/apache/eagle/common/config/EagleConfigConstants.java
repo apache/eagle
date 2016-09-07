@@ -17,21 +17,21 @@
 package org.apache.eagle.common.config;
 
 public final class EagleConfigConstants {
-    public final static String SERVICE_ENV = "eagle.service.env";
-    public final static String SERVICE_HOST = "eagle.service.host";
-    public final static String SERVICE_PORT = "eagle.service.port";
-    public final static String SERVICE_HBASE_ZOOKEEPER_QUORUM = "eagle.service.hbase-zookeeper-quorum";
-    public final static String SERVICE_HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "eagle.service.hbase-zookeeper-property-clientPort";
-    public final static String SERVICE_ZOOKEEPER_ZNODE_PARENT = "eagle.service.zookeeper-znode-parent";
-    public final static String SERVICE_HBASE_CLIENT_IPC_POOL_SIZE = "eagle.service.hbase-client-ipc-pool-size";
-    public final static String SERVICE_STORAGE_TYPE = "eagle.service.storage-type";
-    public final static String SERVICE_COPROCESSOR_ENABLED = "eagle.service.coprocessor-enabled";
-    public final static String SERVICE_TABLE_NAME_PREFIXED_WITH_ENVIRONMENT = "eagle.service.table-name-prefixed-with-environment";
-    public final static String SERVICE_HBASE_CLIENT_SCAN_CACHE_SIZE = "eagle.service.hbase-client-scan-cache-size";
-    public final static String SERVICE_THREADPOOL_CORE_SIZE = "eagle.service.threadpool-core-size";
-    public final static String SERVICE_THREADPOOL_MAX_SIZE = "eagle.service.threadpool-max-size";
-    public final static String SERVICE_THREADPOOL_SHRINK_SIZE = "eagle.service.threadpool-shrink-size";
-    public final static String SERVICE_AUDITING_ENABLED = "eagle.service.audit-enabled";
+    public final static String SERVICE_ENV = "service.env";
+    public final static String SERVICE_HOST = "service.host";
+    public final static String SERVICE_PORT = "service.port";
+    public final static String SERVICE_HBASE_ZOOKEEPER_QUORUM = "storage.hbase.hbase-zookeeper-quorum";
+    public final static String SERVICE_HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "storage.hbase-zookeeper-property-clientPort";
+    public final static String SERVICE_ZOOKEEPER_ZNODE_PARENT = "storage.zookeeper-znode-parent";
+    public final static String SERVICE_HBASE_CLIENT_IPC_POOL_SIZE = "storage.hbase-client-ipc-pool-size";
+    public final static String SERVICE_STORAGE_TYPE = "storage.storage-type";
+    public final static String SERVICE_COPROCESSOR_ENABLED = "storage.coprocessor-enabled";
+    public final static String SERVICE_TABLE_NAME_PREFIXED_WITH_ENVIRONMENT = "storage.table-name-prefixed-with-environment";
+    public final static String SERVICE_HBASE_CLIENT_SCAN_CACHE_SIZE = "storage.hbase-client-scan-cache-size";
+    public final static String SERVICE_THREADPOOL_CORE_SIZE = "storage.threadpool-core-size";
+    public final static String SERVICE_THREADPOOL_MAX_SIZE = "storage.threadpool-max-size";
+    public final static String SERVICE_THREADPOOL_SHRINK_SIZE = "storage.threadpool-shrink-size";
+    public final static String SERVICE_AUDITING_ENABLED = "storage.audit-enabled";
 
     public final static String EAGLE_TIME_ZONE = "eagle.timezone";
     public final static String DEFAULT_EAGLE_TIME_ZONE = "UTC";

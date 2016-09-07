@@ -40,6 +40,6 @@ public class JobProcessTimeStampEntity extends TaggedLogAPIEntity {
 
     public void setCurrentTimeStamp(long currentTimeStamp) {
         this.currentTimeStamp = currentTimeStamp;
-        _pcs.firePropertyChange("currentTimeStamp", null, null);
+        pcs.firePropertyChange("currentTimeStamp", null, null);
     }
 }

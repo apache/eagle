@@ -20,11 +20,8 @@ import org.apache.eagle.storage.DataStorage;
 import org.apache.eagle.storage.hbase.HBaseStorage;
 import org.apache.eagle.storage.spi.DataStorageServiceProvider;
 
-/**
- * @since 3/20/15
- */
 public final class HBaseStorageServiceProvider implements DataStorageServiceProvider {
-    private final static String HBASE = "hbase";
+    private static final String HBASE = "hbase";
 
     @Override
     public String getType() {

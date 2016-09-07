@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.correlation.meta;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 /**

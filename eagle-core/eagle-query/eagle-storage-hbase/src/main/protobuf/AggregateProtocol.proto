@@ -27,7 +27,7 @@ option optimize_for = SPEED;
  */
 import "Client.proto";
 
-//
+
 //message ScanWrapper{
 //    required bytes byte_array = 1;
 //}
@@ -43,7 +43,7 @@ message AggregateResult {
 message AggregateRequest {
     required EntityDefinition entity_definition = 1;
     required Scan scan = 2;
-    repeated string groupby_fields= 3;
+    repeated string groupby_fields = 3;
     repeated bytes aggregate_func_types = 4;
     repeated string aggregated_fields = 5;
 }
@@ -51,7 +51,7 @@ message AggregateRequest {
 message TimeSeriesAggregateRequest {
     required EntityDefinition entity_definition = 1;
     required Scan scan = 2;
-    repeated string groupby_fields= 3;
+    repeated string groupby_fields = 3;
     repeated bytes aggregate_func_types = 4;
     repeated string aggregated_fields = 5;
     required int64 start_time = 6;
@@ -60,6 +60,6 @@ message TimeSeriesAggregateRequest {
 }
 
 service AggregateProtocol {
-    rpc aggregate(AggregateRequest) returns (AggregateResult);
-    rpc timeseriesAggregate(TimeSeriesAggregateRequest) returns (AggregateResult);
+    rpc aggregate (AggregateRequest) returns (AggregateResult);
+    rpc timeseriesAggregate (TimeSeriesAggregateRequest) returns (AggregateResult);
 }

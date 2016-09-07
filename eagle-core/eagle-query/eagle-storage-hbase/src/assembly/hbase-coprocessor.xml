@@ -44,6 +44,7 @@
                 <exclude>org.slf4j:slf4j-api</exclude>
                 <exclude>org.slf4j:log4j-over-slf4j</exclude>
                 <exclude>org.slf4j:slf4j-log4j12</exclude>
+                <exclude>com.google.protobuf:protobuf-java</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

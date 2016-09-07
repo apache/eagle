@@ -16,12 +16,11 @@
  */
 package org.apache.eagle.service.client.impl;
 
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.eagle.common.Base64;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
@@ -31,11 +30,13 @@ import org.apache.eagle.service.client.EagleServiceAsyncClient;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.security.SecurityConstants;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
 
     private final static Logger LOG = LoggerFactory.getLogger(EagleServiceBaseClient.class);
 
-    protected static final String DEFAULT_BASE_PATH = "/eagle-service/rest";
+    protected static final String DEFAULT_BASE_PATH = "/rest";
     protected static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
     protected static final String DEFAULT_HTTP_HEADER_CONTENT_TYPE = "application/json";
     protected static final String CONTENT_TYPE = "Content-Type";
@@ -74,7 +75,7 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
     protected final static String GENERIC_ENTITY_PATH = "/entities";
     protected final static String GENERIC_ENTITY_DELETE_PATH = GENERIC_ENTITY_PATH+"/delete";
     private final Client client;
-    private final List<Closeable> closeables = new LinkedList<Closeable>();
+    private final List<Closeable> closeables = new LinkedList<>();
 
     private volatile boolean isStopped = false;
 
@@ -93,7 +94,6 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
         cc.getProperties().put(URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
         this.client = Client.create(cc);
         client.addFilter(new com.sun.jersey.api.client.filter.GZIPContentEncodingFilter());
-        //        Runtime.getRuntime().addShutdownHook(new EagleServiceClientShutdownHook(this));
     }
 
     public EagleServiceBaseClient(String host, int port, String basePath){
@@ -103,23 +103,6 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
     public EagleServiceBaseClient(String host, int port, String username, String password){
         this(host, port, DEFAULT_BASE_PATH, username, password);
     }
-
-//    private class EagleServiceClientShutdownHook extends Thread{
-//        final IEagleServiceClient client;
-//        EagleServiceClientShutdownHook(IEagleServiceClient client){
-//            this.client = client;
-//        }
-//
-//        @Override
-//        public void run() {
-//            LOG.info("Client shutdown hook");
-//            try {
-//                this.client.close();
-//            } catch (IOException e) {
-//                LOG.error(e.getMessage(),e);
-//            }
-//        }
-//    }
 
     public Client getJerseyClient(){
         return client;

@@ -19,10 +19,10 @@ package org.apache.eagle.alert.engine.coordinator;
 import java.io.Serializable;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
  * StreamPartition defines how a data stream is partitioned and sorted
