@@ -43,6 +43,7 @@
 			// ======================================================================
 			// =                          Refresh Overview                          =
 			// ======================================================================
+			// TODO: Optimize the chart count
 			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
 			$scope.refresh = function () {
 				function getTopList(metric, aggregation, scopeVariable) {

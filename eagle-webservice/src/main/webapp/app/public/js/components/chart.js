@@ -35,8 +35,6 @@
 
 		$(window).resize(chartResize);
 		$("body").on("expanded.pushMenu collapsed.pushMenu", chartResize);
-		$("body").on("click", "[data-toggle='tab']", chartResize);
-
 
 		return {
 			restrict: 'AE',

@@ -35,27 +35,73 @@
 	}
 </style>
 
-<div class="box box-primary">
-	<div class="box-header with-border">
-		<h3 class="box-title">
-			Comparison
-			<small>
-				Click to compare job
-				(ctrl + click: set <strong>from Job</strong>, shift + click: set <strong>to Job</strong>)
-			</small>
-		</h3>
-	</div>
-	<div class="box-body">
-		<div class="jpm-chart">
-			<div chart="trendChart" class="jpm-chart-container" series="jobTrendSeries" category="jobTrendCategory"
-				 ng-click="compareJobSelect" option="jobTrendOption"></div>
-			<div ng-if="(jobTrendSeries || []).length === 0" class="overlay">
-				<i class="fa fa-refresh fa-spin"></i>
+<div class="row flex">
+	<div class="col-sm-12 col-md-3">
+		<div class="box box-primary" style="height: 100%;">
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					Summary
+				</h3>
+			</div>
+			<div class="box-body">
+				<table class="table table-striped">
+					<tbody>
+						<tr>
+							<th>Def Id</th>
+							<td>{{jobDefId}}</td>
+						</tr>
+						<tr>
+							<th>Type</th>
+							<td>{{jobList[0].tags.jobType}}</td>
+						</tr>
+						<tr>
+							<th>Site</th>
+							<td>{{jobList[0].tags.site}}</td>
+						</tr>
+						<tr>
+							<th>Owner</th>
+							<td>{{jobList[0].tags.user}}</td>
+						</tr>
+						<tr>
+							<th>Queue</th>
+							<td>{{jobList[0].tags.queue}}</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
+	<div class="col-sm-12 col-md-9">
+		<div class="box box-primary" style="height: 100%;">
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					Comparison
+					<small>
+						Click to compare job
+						(ctrl + click: set <strong>from Job</strong>, shift + click: set <strong>to Job</strong>)
+					</small>
+				</h3>
+			</div>
+			<div class="box-body">
+				<div class="jpm-chart">
+					<div chart="trendChart" class="jpm-chart-container" series="jobTrendSeries" category="jobTrendCategory"
+						 ng-click="compareJobSelect" option="jobTrendOption"></div>
+					<div ng-if="(jobTrendSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
-	<div ng-if="fromJob && toJob" class="box-footer">
+<div class="box box-primary" ng-if="fromJob && toJob">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Comparison
+		</h3>
+	</div>
+	<div class="box-body">
 		<table class="table table-striped">
 			<thead>
 			<tr>

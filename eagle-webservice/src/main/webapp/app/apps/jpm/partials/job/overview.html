@@ -60,13 +60,13 @@
 
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="#cpu" data-toggle="tab">CPU Usage</a></li>
-		<li><a href="#hdfsBytes" data-toggle="tab">HDFS IO Bytes</a></li>
+		<li class="active"><a href="#hdfsBytes" data-toggle="tab">HDFS IO Bytes</a></li>
 		<li><a href="#hdfsOPs" data-toggle="tab">HDFS IO OPs</a></li>
 		<li><a href="#diskIO" data-toggle="tab">Disk IO</a></li>
+		<li><a href="#cpu" data-toggle="tab">CPU Usage</a></li>
 	</ul>
 	<div class="tab-content keepContent">
-		<div class="tab-pane active" id="cpu">
+		<div class="tab-pane" id="cpu">
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top CPU Usage</h3>
 				<div chart class="jpm-chart-container" series="cpuUsageSeries" option="commonOption"></div>
@@ -75,7 +75,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="tab-pane" id="hdfsBytes">
+		<div class="tab-pane active" id="hdfsBytes">
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top HDFS Bytes Read</h3>
 				<div chart class="jpm-chart-container" series="hdfsBtyesReadSeries" option="commonOption"></div>

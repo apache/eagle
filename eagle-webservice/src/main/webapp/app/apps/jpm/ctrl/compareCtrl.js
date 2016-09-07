@@ -34,7 +34,7 @@
 			$scope.fromJob = null;
 			$scope.toJob = null;
 
-			PageConfig.title = "Job";
+			PageConfig.title = "Job History";
 			PageConfig.subTitle = $scope.jobDefId;
 
 			var browserAction = true;
@@ -42,7 +42,7 @@
 			// ==================================================================
 			// =                         Fetch Job List                         =
 			// ==================================================================
-			var jobList = JPM.findMRJobs($scope.site, $scope.jobDefId);
+			var jobList = $scope.jobList = JPM.findMRJobs($scope.site, $scope.jobDefId);
 			jobList._promise.then(function () {
 				if(jobList.length <= 1) {
 					$.dialog({
@@ -201,7 +201,7 @@
 					type: "line",
 					data: jobListTrend,
 					symbolSize: 10,
-					showAllSymbol: false,
+					showSymbol: false,
 					markPoint: markPoint
 				}];
 
