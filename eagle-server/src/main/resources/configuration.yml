@@ -16,7 +16,7 @@
 server:
   applicationConnectors:
     - type: http
-      port: 5050
+      port: 9090
   adminConnectors:
     - type: http
-      port: 5051
+      port: 9091
