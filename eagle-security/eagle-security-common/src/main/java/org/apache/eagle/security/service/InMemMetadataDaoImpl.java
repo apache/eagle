@@ -38,6 +38,7 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
 
     private Map<Pair<String, String>, HBaseSensitivityEntity> hBaseSensitivityEntities = new HashMap<>();
     private Map<Pair<String, String>, HdfsSensitivityEntity> hdfsSensitivityEntities = new HashMap<>();
+    private Map<Pair<String, String>, OozieSensitivityEntity> oozieSensitivityEntities = new HashMap<>();
     private Map<String, IPZoneEntity> ipZones = new HashMap<>();
     private Map<Pair<String, String>, HiveSensitivityEntity> hiveSensitivityEntities = new HashMap<>();
 
@@ -72,6 +73,22 @@ public class InMemMetadataDaoImpl implements ISecurityMetadataDAO {
         }
         return new OpResult();
     }
+
+
+    @Override
+    public Collection<OozieSensitivityEntity> listOozieSensitivities() {
+        return oozieSensitivityEntities.values();
+    }
+
+    @Override
+    public OpResult addOozieSensitivity(Collection<OozieSensitivityEntity> h) {
+        for(OozieSensitivityEntity e : h){
+            Pair p = new ImmutablePair<>(e.getJobId(), e.getName());
+            oozieSensitivityEntities.put(p, e);
+        }
+        return new OpResult();
+    }
+
 
     @Override
     public Collection<IPZoneEntity> listIPZones() {
