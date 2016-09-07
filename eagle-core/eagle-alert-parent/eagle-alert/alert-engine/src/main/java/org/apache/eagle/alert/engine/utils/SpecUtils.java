@@ -17,6 +17,7 @@
 
 package org.apache.eagle.alert.engine.utils;
 
+import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
 
 import com.typesafe.config.Config;
@@ -35,5 +36,12 @@ public class SpecUtils {
     public static Set<String> getTopicsByConfig(Config config) {
         SpecMetadataServiceClientImpl client = new SpecMetadataServiceClientImpl(config);
         return SpecUtils.getTopicsByClient(client);
+    }
+
+    public static Set<String> getTopicsBySpoutSpec(SpoutSpec spoutSpec) {
+        if (spoutSpec == null) {
+            return Collections.emptySet();
+        }
+        return spoutSpec.getKafka2TupleMetadataMap().keySet();
     }
 }

@@ -183,7 +183,7 @@ public class UnitSparkTopologyRunner implements Serializable {
     private void prepareKafkaConfig(Config config) {
         String inputBroker = config.getString("spout.kafkaBrokerZkQuorum");
         this.kafkaParams.put("metadata.broker.list", inputBroker);
-        this.groupId = "eagle" + new Random(10).nextInt();
+        this.groupId = config.getString("topology.groupId");
         this.kafkaParams.put("group.id", this.groupId);
         this.kafkaParams.put("auto.offset.reset", "largest");
         // Newer version of metadata.broker.list:

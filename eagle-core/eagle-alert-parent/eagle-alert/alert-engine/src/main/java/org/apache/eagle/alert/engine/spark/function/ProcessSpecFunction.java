@@ -17,7 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
-import static org.apache.eagle.alert.engine.utils.SpecUtils.getTopicsByClient;
+import static org.apache.eagle.alert.engine.utils.SpecUtils.getTopicsBySpoutSpec;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.*;
@@ -93,12 +93,13 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
     @Override
     public JavaRDD<MessageAndMetadata<String, String>> call(JavaRDD<MessageAndMetadata<String, String>> rdd) throws Exception {
 
-        spoutSpecRef.set(client.getSpoutSpec());
+        SpoutSpec spoutSpec = client.getSpoutSpec();
+        spoutSpecRef.set(spoutSpec);
         alertBoltSpecRef.set(client.getAlertBoltSpec());
         sdsRef.set(client.getSds());
 
 
-        loadTopics();
+        loadTopics(spoutSpec);
         processRouteBoltSpecChange();
         processPublishSpecChange();
         updateOffsetRanges(rdd);
@@ -119,8 +120,8 @@ public class ProcessSpecFunction implements Function<JavaRDD<MessageAndMetadata<
     }
 
 
-    private void loadTopics() {
-        Set<String> newTopics = getTopicsByClient(client);
+    private void loadTopics(SpoutSpec spoutSpec) {
+        Set<String> newTopics = getTopicsBySpoutSpec(spoutSpec);
         Set<String> oldTopics = topicsRef.get();
         LOG.info("Topics were old={}, new={}", oldTopics, newTopics);
         topicsRef.set(new HashSet<>(newTopics));
