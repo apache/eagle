@@ -22,7 +22,10 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,20 +33,22 @@ import java.io.IOException;
 
 @Ignore("Coprocessor CLI Tool Integration Test.")
 public class CoprocessorToolITSuite {
-    private static final String jarPath = "/tmp/hbase/eagle-storage-hbase-latest-coprocessor.jar";
+    private static final String remoteJarPath = "/tmp/eagle-storage-hbase-latest-coprocessor.jar";
+    private static String localJarPath = null;
     private static final Logger LOGGER = LoggerFactory.getLogger(CoprocessorToolITSuite.class);
     private static final String toolITTableName = "coprocessor_it_table";
 
     static {
         Configuration.addDefaultResource("hbase-site-sandbox.xml");
+        localJarPath = CoprocessorJarUtils.getCoprocessorJarFile().getPath();
     }
 
     private void testRegisterCoprocessor(String tableName) throws IOException {
-        CoprocessorTool.main(new String[]{"register",tableName,jarPath});
+        CoprocessorTool.main(new String[]{"enable", tableName, remoteJarPath, localJarPath});
     }
 
     private void testUnregisterCoprocessor(String tableName) throws IOException {
-        CoprocessorTool.main(new String[]{"unregister",tableName,jarPath});
+        CoprocessorTool.main(new String[]{"disable", tableName});
     }
 
     @Before
@@ -65,11 +70,7 @@ public class CoprocessorToolITSuite {
 
     @Test
     public void testRegisterCoprocessor() throws IOException {
-        try {
-            testRegisterCoprocessor("unittest");
-        }catch (IOException ex){
-            LOGGER.error(ex.getMessage(),ex);
-        }
+        testRegisterCoprocessor("unittest");
     }
 
     @After
