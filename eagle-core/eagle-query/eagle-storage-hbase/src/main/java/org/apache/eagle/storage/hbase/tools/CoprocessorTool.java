@@ -16,14 +16,18 @@
  */
 package org.apache.eagle.storage.hbase.tools;
 
+import org.apache.commons.cli.*;
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.Coprocessor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,59 +36,16 @@ import java.util.HashMap;
 
 /**
  * Coprocessor CLI Tool
- *
- * <code>
- * Usage: java org.apache.eagle.storage.hbase.tools.CoprocessorTool [enable/disable] [tableName] [jarOnHdfs] [jarOnLocal]
- * </code>
  */
-public class CoprocessorTool {
+public class CoprocessorTool extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(CoprocessorTool.class);
 
-    private static void printUsage() {
-        System.err.println("Usage: java " + CoprocessorTool.class.getName() + " [enable/disable] [tableName] [jarOnHdfs] [jarOnLocal]");
+    public static void main(String[] args) throws Exception {
+        System.exit(ToolRunner.run(new CoprocessorTool(), args));
     }
 
-    public static void main(String[] args) throws IOException {
-        if (args.length < 2) {
-            printUsage();
-            System.exit(1);
-        }
-        String command = args[0];
-        String tableName = args[1];
-
-        switch (command.toLowerCase()) {
-            case "enable":
-                if (args.length < 3) {
-                    System.err.println("Error: coprocessor jar path is missing");
-                    System.err.println("Usage: java " + CoprocessorTool.class.getName() + " enable " + tableName + " [jarOnHdfs] [jarOnLocal]");
-                    System.exit(1);
-                }
-                String jarPath = args[2];
-                LOGGER.info("Table name: {}", tableName);
-                LOGGER.info("Coprocessor jar on hdfs: {}", jarPath);
-                String localJarPath = null;
-                if (args.length > 3) {
-                    localJarPath = args[3];
-                    LOGGER.info("Coprocessor jar on local: {}", localJarPath);
-                }
-                String[] tableNames = tableName.split(",\\s*");
-                for (String table : tableNames) {
-                    LOGGER.info("Registering coprocessor for table {}", table);
-                    registerCoprocessor(jarPath, table, localJarPath);
-                }
-                break;
-            case "disable":
-                unregisterCoprocessor(tableName);
-                break;
-            default:
-                System.err.println("Unsupported command type: " + command);
-                printUsage();
-                System.exit(1);
-        }
-    }
-
-    private static void unregisterCoprocessor(String tableName) throws IOException {
-        Configuration configuration = new Configuration();
+    private void unregisterCoprocessor(String tableName) throws IOException {
+        Configuration configuration = getConf();
         TableName table = TableName.valueOf(tableName);
         try (HBaseAdmin admin = new HBaseAdmin(configuration)) {
             HTableDescriptor tableDescriptor = admin.getTableDescriptor(table);
@@ -100,8 +61,8 @@ public class CoprocessorTool {
         }
     }
 
-    private static void registerCoprocessor(String jarPath, String tableName, String localJarPath) throws IOException {
-        Configuration configuration = new Configuration();
+    private void registerCoprocessor(String jarPath, String tableName, String localJarPath) throws IOException {
+        Configuration configuration = getConf();
         try (FileSystem fs = FileSystem.get(configuration); HBaseAdmin admin = new HBaseAdmin(configuration)) {
             Path path = new Path(fs.getUri() + Path.SEPARATOR + jarPath);
             LOGGER.info("Checking path {} ... ", path.toString());
@@ -122,7 +83,7 @@ public class CoprocessorTool {
             HTableDescriptor tableDescriptor = admin.getTableDescriptor(table);
             LOGGER.info("Table {} found", tableName);
             if (tableDescriptor.hasCoprocessor(AggregateProtocolEndPoint.class.getName())) {
-                LOGGER.warn("Table '" + tableName + "' already registered coprocessor: " + AggregateProtocolEndPoint.class.getName()+", removing firstly");
+                LOGGER.warn("Table '" + tableName + "' already registered coprocessor: " + AggregateProtocolEndPoint.class.getName() + ", removing firstly");
                 tableDescriptor.removeCoprocessor(AggregateProtocolEndPoint.class.getName());
                 admin.modifyTable(table, tableDescriptor);
                 tableDescriptor = admin.getTableDescriptor(table);
@@ -132,5 +93,65 @@ public class CoprocessorTool {
             admin.modifyTable(table, tableDescriptor);
             LOGGER.info("Succeed to enable coprocessor on table " + tableName);
         }
+    }
+
+    private void printHelpMessage(Options cmdOptions) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("java " + CoprocessorTool.class.getName() + " [--register/--unregister] [OPTIONS]", cmdOptions);
+    }
+
+    @Override
+    public int run(String[] args) throws Exception {
+        Options cmdOptions = new Options();
+        cmdOptions.addOption(new Option("register", false, "Register coprocessor"));
+        cmdOptions.addOption(new Option("unregister", false, "Unregister coprocessor"));
+
+        cmdOptions.addOption("table", true, "HBase table name, separated with comma, for example, table1,table2,..");
+        cmdOptions.addOption("jar", true, "Coprocessor target jar path");
+        cmdOptions.addOption("localJar", true, "Coprocessor local source jar path");
+        cmdOptions.addOption("config", true, "Configuration file");
+
+        cmdOptions.getOption("table").setType(String.class);
+        cmdOptions.getOption("table").setRequired(true);
+        cmdOptions.getOption("jar").setType(String.class);
+        cmdOptions.getOption("jar").setRequired(false);
+        cmdOptions.getOption("localJar").setType(String.class);
+        cmdOptions.getOption("localJar").setRequired(false);
+        cmdOptions.getOption("config").setType(String.class);
+        cmdOptions.getOption("config").setRequired(false);
+
+        GnuParser parser = new GnuParser();
+        CommandLine cmdCli = parser.parse(cmdOptions, args);
+        String tableName = cmdCli.getOptionValue("table");
+        String configFile = cmdCli.getOptionValue("config");
+
+        if (configFile != null) {
+            Configuration.addDefaultResource(configFile);
+        }
+
+        if (cmdCli.hasOption("register")) {
+            if (args.length < 3) {
+                System.err.println("Error: coprocessor jar path is missing");
+                System.err.println("Usage: java " + CoprocessorTool.class.getName() + " enable " + tableName + " [jarOnHdfs] [jarOnLocal]");
+                return 1;
+            }
+            String jarPath = cmdCli.getOptionValue("jar");
+            LOGGER.info("Table name: {}", tableName);
+            LOGGER.info("Coprocessor jar on hdfs: {}", jarPath);
+            String localJarPath = cmdCli.getOptionValue("localJar");
+            LOGGER.info("Coprocessor jar on local: {}", localJarPath);
+
+            String[] tableNames = tableName.split(",\\s*");
+            for (String table : tableNames) {
+                LOGGER.info("Registering coprocessor for table {}", table);
+                registerCoprocessor(jarPath, table, localJarPath);
+            }
+        } else if (cmdCli.hasOption("unregister")) {
+            unregisterCoprocessor(tableName);
+        } else {
+            System.err.println("command is required, --register/--unregister");
+            printHelpMessage(cmdOptions);
+        }
+        return 0;
     }
 }

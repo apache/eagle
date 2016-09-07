@@ -22,10 +22,7 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,16 +40,24 @@ public class CoprocessorToolITSuite {
         localJarPath = CoprocessorJarUtils.getCoprocessorJarFile().getPath();
     }
 
-    private void testRegisterCoprocessor(String tableName) throws IOException {
-        CoprocessorTool.main(new String[]{"enable", tableName, remoteJarPath, localJarPath});
+    private void testRegisterCoprocessor(String tableName) throws Exception {
+        CoprocessorTool.main(new String[]{
+                "--register",
+                "--config","hbase-site-sandbox.xml",
+                "--table",tableName,
+                "--jar",remoteJarPath,
+                "--localJar",localJarPath});
     }
 
-    private void testUnregisterCoprocessor(String tableName) throws IOException {
-        CoprocessorTool.main(new String[]{"disable", tableName});
+    private void testUnregisterCoprocessor(String tableName) throws Exception {
+        CoprocessorTool.main(new String[]{
+            "--unregister",
+            "--config","hbase-site-sandbox.xml",
+            "--table",tableName
+        });
     }
 
-    @Before
-    public void ensureTable() throws IOException {
+    private void ensureTable() throws IOException {
         LOGGER.info("Creating table {}", toolITTableName);
         HBaseAdmin admin = new HBaseAdmin(new Configuration());
         HTableDescriptor hTableDescriptor = new HTableDescriptor(TableName.valueOf(toolITTableName));
@@ -63,21 +68,25 @@ public class CoprocessorToolITSuite {
     }
 
     @Test
-    public void testRegisterAndUnregisterCoprocessor() throws IOException {
-        testRegisterCoprocessor(toolITTableName);
-        testUnregisterCoprocessor(toolITTableName);
+    public void testRegisterAndUnregisterCoprocessor() throws Exception {
+        try {
+            ensureTable();
+            testRegisterCoprocessor(toolITTableName);
+            testUnregisterCoprocessor(toolITTableName);
+        } finally {
+            deleteTable();
+        }
     }
 
-    @Test
-    public void testRegisterCoprocessor() throws IOException {
-        testRegisterCoprocessor("unittest");
-    }
-
-    @After
-    public void deleteTable() throws IOException {
+    private void deleteTable() throws IOException {
         HBaseAdmin admin = new HBaseAdmin(new Configuration());
         admin.disableTable(TableName.valueOf(toolITTableName));
         admin.deleteTable(TableName.valueOf(toolITTableName));
         admin.close();
+    }
+
+    @Test
+    public void testRegisterCoprocessor() throws Exception {
+        testRegisterCoprocessor("unittest");
     }
 }
