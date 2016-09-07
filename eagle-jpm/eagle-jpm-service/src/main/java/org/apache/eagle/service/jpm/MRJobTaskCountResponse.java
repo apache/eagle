@@ -30,6 +30,7 @@ public class MRJobTaskCountResponse {
     }
 
     public static class JobCountResponse extends MRJobTaskCountResponse {
+        public Set<String> jobTypes;
         public List<UnitJobCount> jobCounts;
     }
 
