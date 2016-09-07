@@ -66,6 +66,21 @@ public class SecurityExternalMetadataResource {
         dao.addHdfsSensitivity(list);
     }
 
+    @Path("/oozieSensitivity")
+    @GET
+    @Produces("application/json")
+    public Collection<OozieSensitivityEntity> getOozieSensitivities(@QueryParam("jobId") String site){
+        return dao.listOozieSensitivities();
+    }
+
+    @Path("/oozieSensitivity")
+    @POST
+    @Consumes("application/json")
+    public void addOozieSensitivities(Collection<OozieSensitivityEntity> list){
+        dao.addOozieSensitivity(list);
+    }
+
+
     @Path("/ipzone")
     @GET
     @Produces("application/json")

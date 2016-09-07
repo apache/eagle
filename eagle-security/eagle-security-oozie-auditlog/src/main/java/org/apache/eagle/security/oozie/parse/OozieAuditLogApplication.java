@@ -30,6 +30,7 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import storm.kafka.StringScheme;
 
 /**
  * Since 8/12/16.
@@ -54,8 +55,7 @@ public class OozieAuditLogApplication extends StormApplication {
 
         OozieAuditLogParserBolt parserBolt = new OozieAuditLogParserBolt();
         BoltDeclarer parserBoltDeclarer = builder.setBolt("parserBolt", parserBolt, numOfParserTask);
-        parserBoltDeclarer.fieldsGrouping("ingest", new Fields("f1"));
-
+        parserBoltDeclarer.fieldsGrouping("ingest", new Fields(StringScheme.STRING_SCHEME_KEY));
 
         OozieResourceSensitivityDataJoinBolt joinBolt = new OozieResourceSensitivityDataJoinBolt(config);
         BoltDeclarer boltDeclarer = builder.setBolt("joinBolt", joinBolt, numOfJoinTasks);

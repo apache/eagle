@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 public class OozieResourceSensitivityDataJoinBolt extends AbstractDataEnrichBolt<OozieResourceSensitivityAPIEntity, String> {
     private static final Logger LOG = LoggerFactory.getLogger(OozieResourceSensitivityDataJoinBolt.class);
     private Config config;
-    private OutputCollector collector;
 
     public OozieResourceSensitivityDataJoinBolt(Config config) {
         super(config, new OozieSensitivityDataEnrichLCM(config));
