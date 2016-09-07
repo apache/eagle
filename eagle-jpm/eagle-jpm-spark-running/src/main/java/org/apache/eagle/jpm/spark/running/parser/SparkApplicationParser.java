@@ -18,14 +18,10 @@
 
 package org.apache.eagle.jpm.spark.running.parser;
 
-import org.apache.eagle.jpm.spark.crawl.EventType;
 import org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig;
 import org.apache.eagle.jpm.spark.running.entities.*;
 import org.apache.eagle.jpm.spark.running.recover.SparkRunningJobManager;
-import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.jpm.util.HDFSUtil;
-import org.apache.eagle.jpm.util.SparkJobTagName;
-import org.apache.eagle.jpm.util.Utils;
+import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
 import org.apache.eagle.jpm.util.resourcefetch.model.*;
@@ -219,7 +215,7 @@ public class SparkApplicationParser implements Runnable {
                     if (eventObj != null) {
                         String eventType = (String) eventObj.get("Event");
                         LOG.info("Event type: " + eventType);
-                        if (eventType.equalsIgnoreCase(EventType.SparkListenerEnvironmentUpdate.toString())) {
+                        if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerEnvironmentUpdate.toString())) {
                             stop = true;
                             JSONObject sparkProps = (JSONObject) eventObj.get("Spark Properties");
                             for (Object key : sparkProps.keySet()) {

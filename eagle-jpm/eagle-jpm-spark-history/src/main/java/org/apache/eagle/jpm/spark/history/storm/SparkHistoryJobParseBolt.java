@@ -19,9 +19,9 @@
 
 package org.apache.eagle.jpm.spark.history.storm;
 
-import org.apache.eagle.jpm.spark.crawl.JHFInputStreamReader;
-import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
-import org.apache.eagle.jpm.spark.crawl.SparkFilesystemInputStreamReaderImpl;
+import org.apache.eagle.jpm.spark.history.crawl.JHFInputStreamReader;
+import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
+import org.apache.eagle.jpm.spark.history.crawl.SparkFilesystemInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
@@ -106,9 +106,12 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
             LOG.info("Successfully parse application {}", appId);
             collector.ack(tuple);
+        } catch (RuntimeException e) {
+            LOG.warn("fail to process application {} due to RuntimeException, ignore it", appId, e);
+            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
+            collector.ack(tuple);
         } catch (Exception e) {
-            LOG.error("Fail to process application {}", appId, e);
-            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FAILED);
+            LOG.error("Fail to process application {}, and retry", appId, e);
             collector.fail(tuple);
         }
     }

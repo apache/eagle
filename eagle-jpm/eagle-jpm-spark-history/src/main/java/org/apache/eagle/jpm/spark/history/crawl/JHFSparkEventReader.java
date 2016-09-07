@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.crawl;
+package org.apache.eagle.jpm.spark.history.crawl;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -76,31 +76,31 @@ public class JHFSparkEventReader {
 
     public void read(JSONObject eventObj) {
         String eventType = (String) eventObj.get("Event");
-        if (eventType.equalsIgnoreCase(EventType.SparkListenerApplicationStart.toString())) {
+        if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerApplicationStart.toString())) {
             handleAppStarted(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerEnvironmentUpdate.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerEnvironmentUpdate.toString())) {
             handleEnvironmentSet(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerExecutorAdded.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerExecutorAdded.toString())) {
             handleExecutorAdd(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerBlockManagerAdded.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerBlockManagerAdded.toString())) {
             handleBlockManagerAdd(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerJobStart.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerJobStart.toString())) {
             handleJobStart(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerStageSubmitted.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerStageSubmitted.toString())) {
             handleStageSubmit(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerTaskStart.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerTaskStart.toString())) {
             handleTaskStart(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerTaskEnd.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerTaskEnd.toString())) {
             handleTaskEnd(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerStageCompleted.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerStageCompleted.toString())) {
             handleStageComplete(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerJobEnd.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerJobEnd.toString())) {
             handleJobEnd(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerExecutorRemoved.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerExecutorRemoved.toString())) {
             handleExecutorRemoved(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerApplicationEnd.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerApplicationEnd.toString())) {
             handleAppEnd(eventObj);
-        } else if (eventType.equalsIgnoreCase(EventType.SparkListenerBlockManagerRemoved.toString())) {
+        } else if (eventType.equalsIgnoreCase(SparkEventType.SparkListenerBlockManagerRemoved.toString())) {
             //nothing to do now
         } else {
             LOG.info("Not registered event type:" + eventType);
