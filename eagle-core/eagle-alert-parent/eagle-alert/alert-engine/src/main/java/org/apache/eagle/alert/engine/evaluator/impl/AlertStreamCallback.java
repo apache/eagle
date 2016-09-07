@@ -68,7 +68,7 @@ public class AlertStreamCallback extends StreamCallback {
             event.setTimestamp(e.getTimestamp());
             event.setData(e.getData());
             event.setStreamId(outputStream);
-            event.setPolicy(context.getPolicyDefinition());
+            event.setPolicyId(context.getPolicyDefinition().getName());
             if (this.context.getPolicyEvaluator() != null) {
                 event.setCreatedBy(context.getPolicyEvaluator().getName());
             }

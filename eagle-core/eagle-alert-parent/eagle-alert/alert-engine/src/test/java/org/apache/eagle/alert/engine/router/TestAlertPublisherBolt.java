@@ -70,7 +70,7 @@ public class TestAlertPublisherBolt {
         AlertStreamEvent alert = new AlertStreamEvent();
         PolicyDefinition policy = new PolicyDefinition();
         policy.setName("policy1");
-        alert.setPolicy(policy);
+        alert.setPolicyId(policy.getName());
         alert.setCreatedTime(System.currentTimeMillis());
         alert.setData(new Object[]{"field_1", 2, "field_3"});
         alert.setStreamId(streamId);
@@ -169,7 +169,7 @@ public class TestAlertPublisherBolt {
         AlertStreamEvent alert = new AlertStreamEvent();
         PolicyDefinition policy = new PolicyDefinition();
         policy.setName("perfmon_cpu_host_check");
-        alert.setPolicy(policy);
+        alert.setPolicyId(policy.getName());
         alert.setCreatedTime(System.currentTimeMillis());
         alert.setData(new Object[]{appName, hostname});
         alert.setStreamId("testAlertStream");
