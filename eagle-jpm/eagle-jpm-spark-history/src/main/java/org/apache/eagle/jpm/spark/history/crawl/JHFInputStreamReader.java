@@ -15,16 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.running.entities;
+package org.apache.eagle.jpm.spark.history.crawl;
 
-import org.apache.eagle.log.entity.repo.EntityRepository;
+import java.io.InputStream;
 
-public class JPMEntityRepository extends EntityRepository {
-    public JPMEntityRepository() {
-        entitySet.add(SparkAppEntity.class);
-        entitySet.add(SparkJobEntity.class);
-        entitySet.add(SparkStageEntity.class);
-        entitySet.add(SparkTaskEntity.class);
-        entitySet.add(SparkExecutorEntity.class);
-    }
+public interface JHFInputStreamReader {
+    void read(InputStream is) throws Exception;
 }

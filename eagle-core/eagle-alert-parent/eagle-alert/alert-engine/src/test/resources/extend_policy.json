@@ -1,0 +1,22 @@
+[
+  {
+    "name": "extend-policy",
+    "definition": {
+      "type": "Custom",
+      "handlerClass": "i.o.x.Handler",
+      "value": "",
+      "properties": {
+        "parentKey": {
+          "syslogStream": {
+            "pattern": "%s-%s",
+            "columns": [
+              "a",
+              "b",
+              "d"
+            ]
+          }
+        }
+      }
+    }
+  }
+]

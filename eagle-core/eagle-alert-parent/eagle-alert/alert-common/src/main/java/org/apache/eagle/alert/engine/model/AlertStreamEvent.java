@@ -17,7 +17,6 @@
 package org.apache.eagle.alert.engine.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 
@@ -30,22 +29,17 @@ import java.util.List;
 public class AlertStreamEvent extends StreamEvent {
     private static final long serialVersionUID = 2392131134670106397L;
 
-    // TODO: Keep policy name only instead of policy entity
-    private PolicyDefinition policy;
+    private String policyId;
     private StreamDefinition schema;
     private String createdBy;
     private long createdTime;
 
-    public PolicyDefinition getPolicy() {
-        return policy;
-    }
-
-    public void setPolicy(PolicyDefinition policy) {
-        this.policy = policy;
+    public void setPolicyId(String policyId) {
+        this.policyId = policyId;
     }
 
     public String getPolicyId() {
-        return policy.getName();
+        return policyId;
     }
 
     @Override
@@ -58,8 +52,8 @@ public class AlertStreamEvent extends StreamEvent {
                 dataStrings.add(null);
             }
         }
-        return String.format("AlertStreamEvent[stream=%S,timestamp=%s,data=[%s], policy=%s, createdBy=%s, metaVersion=%s]",
-                this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()), StringUtils.join(dataStrings,","),this.getPolicy().getName(),this.getCreatedBy(),this.getMetaVersion());
+        return String.format("AlertStreamEvent[stream=%S,timestamp=%s,data=[%s], policyId=%s, createdBy=%s, metaVersion=%s]",
+                this.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.getTimestamp()), StringUtils.join(dataStrings,","),this.getPolicyId(),this.getCreatedBy(),this.getMetaVersion());
     }
 
     public String getCreatedBy() {

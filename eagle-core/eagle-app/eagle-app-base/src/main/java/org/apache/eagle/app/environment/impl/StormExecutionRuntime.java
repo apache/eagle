@@ -34,13 +34,13 @@ import scala.Int;
 import storm.trident.spout.RichSpoutBatchExecutor;
 
 public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,StormTopology> {
-    private final static Logger LOG = LoggerFactory.getLogger(StormExecutionRuntime.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StormExecutionRuntime.class);
     private static LocalCluster _localCluster;
 
     private StormEnvironment environment;
 
-    private static LocalCluster getLocalCluster(){
-        if(_localCluster == null){
+    private static LocalCluster getLocalCluster() {
+        if (_localCluster == null) {
             _localCluster = new LocalCluster();
         }
         return _localCluster;
@@ -56,13 +56,13 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         return this.environment;
     }
 
-    private final static String STORM_NIMBUS_HOST_CONF_PATH = "application.storm.nimbusHost";
-    private final static String STORM_NIMBUS_HOST_DEFAULT = "localhost";
-    private final static Integer STORM_NIMBUS_THRIFT_DEFAULT = 6627;
-    private final static String STORM_NIMBUS_THRIFT_CONF_PATH = "application.storm.nimbusThriftPort";
+    private static final String STORM_NIMBUS_HOST_CONF_PATH = "application.storm.nimbusHost";
+    private static final String STORM_NIMBUS_HOST_DEFAULT = "localhost";
+    private static final Integer STORM_NIMBUS_THRIFT_DEFAULT = 6627;
+    private static final String STORM_NIMBUS_THRIFT_CONF_PATH = "application.storm.nimbusThriftPort";
     private static final String WORKERS = "workers";
 
-    public backtype.storm.Config getStormConfig(){
+    public backtype.storm.Config getStormConfig() {
         backtype.storm.Config conf = new backtype.storm.Config();
         conf.put(RichSpoutBatchExecutor.MAX_BATCH_SIZE_CONF, Int.box(64 * 1024));
         conf.put(backtype.storm.Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, Int.box(8));
@@ -71,14 +71,14 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         conf.put(backtype.storm.Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, Int.box(16384));
         conf.put(backtype.storm.Config.NIMBUS_THRIFT_MAX_BUFFER_SIZE, Int.box(20480000));
         String nimbusHost = STORM_NIMBUS_HOST_DEFAULT;
-        if(environment.config().hasPath(STORM_NIMBUS_HOST_CONF_PATH)) {
+        if (environment.config().hasPath(STORM_NIMBUS_HOST_CONF_PATH)) {
             nimbusHost = environment.config().getString(STORM_NIMBUS_HOST_CONF_PATH);
             LOG.info("Overriding {} = {}",STORM_NIMBUS_HOST_CONF_PATH,nimbusHost);
         } else {
             LOG.info("Using default {} = {}",STORM_NIMBUS_HOST_CONF_PATH,STORM_NIMBUS_HOST_DEFAULT);
         }
         Integer nimbusThriftPort =  STORM_NIMBUS_THRIFT_DEFAULT;
-        if(environment.config().hasPath(STORM_NIMBUS_THRIFT_CONF_PATH)) {
+        if (environment.config().hasPath(STORM_NIMBUS_THRIFT_CONF_PATH)) {
             nimbusThriftPort = environment.config().getInt(STORM_NIMBUS_THRIFT_CONF_PATH);
             LOG.info("Overriding {} = {}",STORM_NIMBUS_THRIFT_CONF_PATH,nimbusThriftPort);
         } else {
@@ -94,15 +94,15 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     @Override
-    public void start(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config){
+    public void start(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         String topologyName = config.getString("appId");
-        Preconditions.checkNotNull(topologyName,"[appId] is required by null for "+executor.getClass().getCanonicalName());
+        Preconditions.checkNotNull(topologyName,"[appId] is required by null for " + executor.getClass().getCanonicalName());
         StormTopology topology = executor.execute(config, environment);
-        LOG.info("Starting {} ({}), mode: {}",topologyName,executor.getClass().getCanonicalName(), config.getString("mode"));
+        LOG.info("Starting {} ({}), mode: {}",topologyName, executor.getClass().getCanonicalName(), config.getString("mode"));
         Config conf = getStormConfig();
-        if(ApplicationEntity.Mode.CLUSTER.name().equalsIgnoreCase(config.getString("mode"))){
+        if (ApplicationEntity.Mode.CLUSTER.name().equalsIgnoreCase(config.getString("mode"))) {
             String jarFile = config.hasPath("jarPath") ? config.getString("jarPath") : null;
-            if(jarFile == null){
+            if (jarFile == null) {
                 jarFile = DynamicJarPathFinder.findPath(executor.getClass());
             }
             synchronized (StormExecutionRuntime.class) {
@@ -129,7 +129,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     public void stop(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         String appId = config.getString("appId");
         LOG.info("Stopping topology {} ..." + appId);
-        if(config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()){
+        if (config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()) {
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig()).getClient();
             try {
                 stormClient.killTopology(appId);

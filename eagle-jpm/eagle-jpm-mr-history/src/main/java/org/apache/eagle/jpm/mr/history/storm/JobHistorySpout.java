@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history.storm;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.*;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
@@ -91,22 +92,22 @@ public class JobHistorySpout extends BaseRichSpout {
     private JobHistoryContentFilter contentFilter;
     private JobHistorySpoutCollectorInterceptor interceptor;
     private JHFInputStreamCallback callback;
-    private MRHistoryJobConfig configManager;
     private JobHistoryLCM jhfLCM;
     private static final int MAX_RETRY_TIMES = 3;
+    private Config config;
 
-    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig configManager) {
-        this(filter, configManager, new JobHistorySpoutCollectorInterceptor());
+    public JobHistorySpout(JobHistoryContentFilter filter, Config config) {
+        this(filter, config, new JobHistorySpoutCollectorInterceptor());
     }
 
     /**
      * mostly this constructor signature is for unit test purpose as you can put customized interceptor here.
      */
-    public JobHistorySpout(JobHistoryContentFilter filter, MRHistoryJobConfig configManager, JobHistorySpoutCollectorInterceptor adaptor) {
+    public JobHistorySpout(JobHistoryContentFilter filter, Config config, JobHistorySpoutCollectorInterceptor adaptor) {
         this.contentFilter = filter;
-        this.configManager = configManager;
+        this.config = config;
         this.interceptor = adaptor;
-        callback = new DefaultJHFInputStreamCallback(contentFilter, configManager, interceptor);
+        callback = new DefaultJHFInputStreamCallback(contentFilter, interceptor);
     }
 
     private int calculatePartitionId(TopologyContext context) {
@@ -127,13 +128,14 @@ public class JobHistorySpout extends BaseRichSpout {
     @Override
     public void open(Map conf, TopologyContext context,
                      final SpoutOutputCollector collector) {
+        MRHistoryJobConfig.getInstance(config);
         partitionId = calculatePartitionId(context);
         // sanity verify 0<=partitionId<=numTotalPartitions-1
         if (partitionId < 0 || partitionId > numTotalPartitions) {
             throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId "
                 + partitionId + " and numTotalPartitions " + numTotalPartitions);
         }
-        Class<? extends JobIdPartitioner> partitionerCls = configManager.getControlConfig().partitionerCls;
+        Class<? extends JobIdPartitioner> partitionerCls = MRHistoryJobConfig.get().getControlConfig().partitionerCls;
         JobIdPartitioner partitioner;
         try {
             partitioner = partitionerCls.newInstance();
@@ -142,16 +144,13 @@ public class JobHistorySpout extends BaseRichSpout {
             throw new IllegalStateException(e);
         }
         JobIdFilter jobIdFilter = new JobIdFilterByPartition(partitioner, numTotalPartitions, partitionId);
-        JobHistoryZKStateManager.instance().init(configManager.getZkStateConfig());
+        JobHistoryZKStateManager.instance().init(MRHistoryJobConfig.get().getZkStateConfig());
         JobHistoryZKStateManager.instance().ensureJobPartitions(numTotalPartitions);
         interceptor.setSpoutOutputCollector(collector);
 
         try {
-            jhfLCM = new JobHistoryDAOImpl(configManager.getJobHistoryEndpointConfig());
+            jhfLCM = new JobHistoryDAOImpl(MRHistoryJobConfig.get().getJobHistoryEndpointConfig());
             driver = new JHFCrawlerDriverImpl(
-                configManager.getEagleServiceConfig(),
-                configManager.getJobExtractorConfig(),
-                configManager.getControlConfig(),
                 callback,
                 jhfLCM,
                 jobIdFilter,
@@ -232,11 +231,9 @@ public class JobHistorySpout extends BaseRichSpout {
         }
 
         LOG.info("update process time stamp {}", minTimeStamp);
-        final MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig = configManager.getEagleServiceConfig();
-        final MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig = configManager.getJobExtractorConfig();
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", jobExtractorConfig.site);
+                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
             }
         };
         JobProcessTimeStampEntity entity = new JobProcessTimeStampEntity();
@@ -245,12 +242,12 @@ public class JobHistorySpout extends BaseRichSpout {
         entity.setTags(baseTags);
 
         IEagleServiceClient client = new EagleServiceClientImpl(
-            eagleServiceConfig.eagleServiceHost,
-            eagleServiceConfig.eagleServicePort,
-            eagleServiceConfig.username,
-            eagleServiceConfig.password);
+            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
+            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
+            MRHistoryJobConfig.get().getEagleServiceConfig().username,
+            MRHistoryJobConfig.get().getEagleServiceConfig().password);
 
-        client.getJerseyClient().setReadTimeout(jobExtractorConfig.readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getJobExtractorConfig().readTimeoutSeconds * 1000);
 
         List<JobProcessTimeStampEntity> entities = new ArrayList<>();
         entities.add(entity);

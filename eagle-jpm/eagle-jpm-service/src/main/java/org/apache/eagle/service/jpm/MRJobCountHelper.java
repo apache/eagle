@@ -20,45 +20,61 @@ package org.apache.eagle.service.jpm;
 
 import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
+import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.service.jpm.MRJobTaskCountResponse.JobCountResponse;
 import org.apache.eagle.service.jpm.MRJobTaskCountResponse.UnitJobCount;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MRJobCountHelper {
 
     public void initJobCountList(List<UnitJobCount> jobCounts, long startTime, long endTime, long intervalInSecs) {
         for (long i = startTime / intervalInSecs; i * intervalInSecs <= endTime; i++) {
-            jobCounts.add(new UnitJobCount(i * intervalInSecs));
+            jobCounts.add(new UnitJobCount(i * intervalInSecs * DateTimeUtil.ONESECOND));
         }
     }
 
-    public String moveTimeforwardOneDay(String startTime) throws ParseException {
+    public String moveTimeForwardOneDay(String startTime) throws ParseException {
         long timeInSecs = DateTimeUtil.humanDateToSeconds(startTime);
         timeInSecs -= 24L * 60L * 60L;
         return DateTimeUtil.secondsToHumanDate(timeInSecs);
     }
 
     public JobCountResponse getRunningJobCount(List<JobExecutionAPIEntity> jobDurations,
+                                               List<org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity> runningJobs,
                                         long startTimeInSecs,
                                         long endTimeInSecs,
                                         long intervalInSecs) {
-        JobCountResponse response = new JobCountResponse();
         List<UnitJobCount> jobCounts = new ArrayList<>();
+        Set<String> jobTypes = new HashSet<>();
         initJobCountList(jobCounts, startTimeInSecs, endTimeInSecs, intervalInSecs);
         for (JobExecutionAPIEntity jobDuration: jobDurations) {
-            countJob(jobCounts, jobDuration.getStartTime() / 1000, jobDuration.getEndTime() / 1000, intervalInSecs, jobDuration.getTags().get(MRJobTagName.JOB_TYPE.toString()));
+            String jobType = jobDuration.getTags().get(MRJobTagName.JOB_TYPE.toString());
+            jobTypes.add(jobType);
+            countJob(jobCounts, jobDuration.getStartTime() / 1000, jobDuration.getEndTime() / 1000, intervalInSecs, jobType);
         }
+        for (org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity job : runningJobs) {
+            if (job.getInternalState() != null && !job.getInternalState().equalsIgnoreCase(Constants.JobState.FINISHED.toString())) {
+                String jobType = job.getTags().get(MRJobTagName.JOB_TYPE.toString());
+                jobTypes.add(jobType);
+                countJob(jobCounts, job.getStartTime() / 1000, endTimeInSecs, intervalInSecs, jobType);
+            }
+        }
+        JobCountResponse response = new JobCountResponse();
         response.jobCounts = jobCounts;
+        response.jobTypes = jobTypes;
         return response;
     }
 
     public JobCountResponse getHistoryJobCount(List<JobExecutionAPIEntity> jobDurations, String timeList) {
         JobCountResponse response = new JobCountResponse();
         List<UnitJobCount> jobCounts = new ArrayList<>();
+        Set<String> jobTypes = new HashSet<>();
         List<Long> times = TaskCountByDurationHelper.parseTimeList(timeList);
         for (int i = 0; i < times.size(); i++) {
             jobCounts.add(new UnitJobCount(times.get(i)));
@@ -66,9 +82,12 @@ public class MRJobCountHelper {
         for (JobExecutionAPIEntity job : jobDurations) {
             int jobIndex = TaskCountByDurationHelper.getPosition(times, job.getDurationTime());
             UnitJobCount counter = jobCounts.get(jobIndex);
-            countJob(counter, job.getTags().get(MRJobTagName.JOB_TYPE.toString()));
+            String jobType = job.getTags().get(MRJobTagName.JOB_TYPE.toString());
+            jobTypes.add(jobType);
+            countJob(counter, jobType);
         }
         response.jobCounts = jobCounts;
+        response.jobTypes = jobTypes;
         return response;
     }
 
@@ -85,7 +104,7 @@ public class MRJobCountHelper {
     }
 
     public void countJob(List<UnitJobCount> jobCounts, long jobStartTimeSecs, long jobEndTimeSecs, long intervalInSecs, String jobType) {
-        long startCountPoint = jobCounts.get(0).timeBucket;
+        long startCountPoint = jobCounts.get(0).timeBucket / DateTimeUtil.ONESECOND;
         if (jobEndTimeSecs < startCountPoint) {
             return;
         }

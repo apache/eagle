@@ -91,10 +91,11 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
                 LOG.info("emit " + appId);
                 zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.SENT_FOR_PARSE);
             }
-            LOG.info("{} apps sent.", appIds.size());
 
             if (appIds.isEmpty()) {
-                this.takeRest(60);
+                this.takeRest(10);
+            } else {
+                LOG.info("{} apps sent.", appIds.size());
             }
         } catch (Exception e) {
             LOG.error("Fail to run next tuple", e);

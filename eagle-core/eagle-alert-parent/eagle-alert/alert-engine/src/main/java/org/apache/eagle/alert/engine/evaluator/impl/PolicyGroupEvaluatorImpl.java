@@ -138,12 +138,13 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
             policies.put(policy.getName(), policy);
             CompositePolicyHandler handler = new CompositePolicyHandler(sds);
             try {
-                PolicyHandlerContext context = new PolicyHandlerContext();
-                context.setPolicyCounter(this.context.counter());
-                context.setPolicyDefinition(policy);
-                context.setPolicyEvaluator(this);
-                context.setPolicyEvaluatorId(policyEvaluatorId);
-                handler.prepare(collector, context);
+                PolicyHandlerContext handlerContext = new PolicyHandlerContext();
+                handlerContext.setPolicyCounter(this.context.counter());
+                handlerContext.setPolicyDefinition(policy);
+                handlerContext.setPolicyEvaluator(this);
+                handlerContext.setPolicyEvaluatorId(policyEvaluatorId);
+                handlerContext.setConfig(this.context.config());
+                handler.prepare(collector, handlerContext);
                 handlers.put(policy.getName(), handler);
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);

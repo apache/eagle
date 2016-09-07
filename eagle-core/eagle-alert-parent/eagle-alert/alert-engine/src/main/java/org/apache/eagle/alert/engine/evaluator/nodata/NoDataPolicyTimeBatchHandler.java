@@ -16,12 +16,6 @@
  */
 package org.apache.eagle.alert.engine.evaluator.nodata;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
@@ -35,6 +29,8 @@ import org.apache.storm.guava.base.Joiner;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class NoDataPolicyTimeBatchHandler implements PolicyStreamHandler {
 	
@@ -151,7 +147,7 @@ public class NoDataPolicyTimeBatchHandler implements PolicyStreamHandler {
 		event.setTimestamp(timestamp);
 		event.setData(triggerEvent);
 		event.setStreamId(policyDef.getOutputStreams().get(0));
-		event.setPolicy(context.getPolicyDefinition());
+		event.setPolicyId(context.getPolicyDefinition().getName());
 		if (this.context.getPolicyEvaluator() != null) {
 			event.setCreatedBy(context.getPolicyEvaluator().getName());
 		}

@@ -17,7 +17,6 @@
 package org.apache.eagle.alert.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

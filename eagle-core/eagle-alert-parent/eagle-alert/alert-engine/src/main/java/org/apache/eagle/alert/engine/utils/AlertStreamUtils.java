@@ -41,7 +41,7 @@ public class AlertStreamUtils {
         alertStreamEvent.setTimestamp(event.getTimestamp());
         alertStreamEvent.setData(event.getData());
         alertStreamEvent.setStreamId(policyDef.getOutputStreams().get(0));
-        alertStreamEvent.setPolicy(policyDef);
+        alertStreamEvent.setPolicyId(policyDef.getName());
 
         if (context.getPolicyEvaluator() != null) {
             alertStreamEvent.setCreatedBy(context.getPolicyEvaluator().getName());

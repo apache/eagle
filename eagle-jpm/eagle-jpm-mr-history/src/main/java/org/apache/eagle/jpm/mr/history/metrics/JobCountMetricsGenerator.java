@@ -34,15 +34,9 @@ import java.util.*;
 public class JobCountMetricsGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(JobCountMetricsGenerator.class);
 
-    private MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig;
-    private MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig;
     private TimeZone timeZone;
 
-    public JobCountMetricsGenerator(MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig,
-                                    MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig,
-                                    TimeZone timeZone) {
-        this.eagleServiceConfig = eagleServiceConfig;
-        this.jobExtractorConfig = jobExtractorConfig;
+    public JobCountMetricsGenerator(TimeZone timeZone) {
         this.timeZone = timeZone;
     }
 
@@ -57,10 +51,10 @@ public class JobCountMetricsGenerator {
         }
 
         IEagleServiceClient client = new EagleServiceClientImpl(
-            eagleServiceConfig.eagleServiceHost,
-            eagleServiceConfig.eagleServicePort,
-            eagleServiceConfig.username,
-            eagleServiceConfig.password);
+            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
+            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
+            MRHistoryJobConfig.get().getEagleServiceConfig().username,
+            MRHistoryJobConfig.get().getEagleServiceConfig().password);
 
 
         GregorianCalendar cal = new GregorianCalendar(year, month, day);
@@ -72,7 +66,7 @@ public class JobCountMetricsGenerator {
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", jobExtractorConfig.site);
+                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
             }
         };
         metricEntity.setTags(baseTags);
