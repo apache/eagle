@@ -52,201 +52,201 @@ import org.apache.eagle.service.hbase.TestHBaseBase;
  */
 @Ignore
 public class TestGroupAggregateClient extends TestHBaseBase {
-	HTableInterface table;
-	long startTime;
-	long endTime;
-	List<String> rowkeys;
-	AggregateClient client;
-	Scan scan;
-	int num = 200;
+    HTableInterface table;
+    long startTime;
+    long endTime;
+    List<String> rowkeys;
+    AggregateClient client;
+    Scan scan;
+    int num = 200;
 
-	private final static Logger LOG = LoggerFactory.getLogger(TestGroupAggregateClient.class);
+    private final static Logger LOG = LoggerFactory.getLogger(TestGroupAggregateClient.class);
 
-	@Before
-	public void setUp(){
-		hbase.createTable("unittest", "f");
-		startTime = System.currentTimeMillis();
-		try {
-			rowkeys = prepareData(num);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-		endTime = System.currentTimeMillis();
-		table = EagleConfigFactory.load().getHTable("unittest");
-		client = new AggregateClientImpl();
-		scan = new Scan();
-		scan.setCaching(200);
-		
-		ListQueryCompiler compiler = null;
-		try {
-			compiler = new ListQueryCompiler("TestLogAPIEntity[@cluster=\"test4UT\" and @datacenter=\"dc1\"]{@field1,@field2}");
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-		scan.setFilter(compiler.filter());
-	}
-	
-	@After
-	public void shutdown(){
-		try {
-			hbase.deleteTable("unittest");
-			new HTableFactory().releaseHTableInterface(table);
-		} catch (IOException e) {
-			LOG.error(e.getMessage(),e);
-		}
-	}
-	
-	private List<String> prepareData(int count) throws Exception {
-		List<TaggedLogAPIEntity> list = new ArrayList<TaggedLogAPIEntity>();
-		EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+    @Before
+    public void setUp() {
+        hbase.createTable("unittest", "f");
+        startTime = System.currentTimeMillis();
+        try {
+            rowkeys = prepareData(num);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+        endTime = System.currentTimeMillis();
+        table = EagleConfigFactory.load().getHTable("unittest");
+        client = new AggregateClientImpl();
+        scan = new Scan();
+        scan.setCaching(200);
 
-		if (ed == null) {
-			EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
-			ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
-		}
-		ed.setTimeSeries(true);
-		for(int i=0;i<count;i++){
-			TestLogAPIEntity e = new TestLogAPIEntity();
-			e.setTimestamp(System.currentTimeMillis());
-			e.setField1(1);
-			e.setField2(2);
-			e.setField3(3);
-			e.setField4(4L);
-			e.setField5(5.0);
-			e.setField6(5.0);
-			e.setField7("7");
-			e.setTags(new HashMap<String, String>());
-			e.getTags().put("cluster", "test4UT");
-			e.getTags().put("datacenter", "dc1");
-			e.getTags().put("index", ""+i);
-			e.getTags().put("jobId", "job_"+System.currentTimeMillis());
-			list.add(e);
+        ListQueryCompiler compiler = null;
+        try {
+            compiler = new ListQueryCompiler("TestLogAPIEntity[@cluster=\"test4UT\" and @datacenter=\"dc1\"]{@field1,@field2}");
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
+        scan.setFilter(compiler.filter());
+    }
 
-		}
-		GenericEntityWriter writer = new GenericEntityWriter(ed.getService());
-		LOG.info("Writing "+list.size()+" TestLogAPIEntity entities");
-		List<String> result = writer.write(list);
-		LOG.info("Finish writing test entities");
-		return result;
-	}
+    @After
+    public void shutdown() {
+        try {
+            hbase.deleteTable("unittest");
+            new HTableFactory().releaseHTableInterface(table);
+        } catch (IOException e) {
+            LOG.error(e.getMessage(), e);
+        }
+    }
 
-	@Test
-	public void testGroupAggregateCountClient(){
-		try {
-			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
-			List<GroupbyKeyValue> result = client.aggregate(table,ed,scan, Arrays.asList("cluster","datacenter"),Arrays.asList(AggregateFunctionType.count),Arrays.asList("field2")).getKeyValues();
-			if(LOG.isDebugEnabled()) LOG.debug("COUNT");
-			logGroupbyKeyValue(result);
-			Assert.assertNotNull(result);
-			Assert.assertTrue(result.size()>0);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    private List<String> prepareData(int count) throws Exception {
+        List<TaggedLogAPIEntity> list = new ArrayList<TaggedLogAPIEntity>();
+        EntityDefinition ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
 
-	@Test
-	public void testGroupAggregateAvgClient(){
-		try {
-			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
-			List<GroupbyKeyValue> result = client.aggregate(table,ed,scan, Arrays.asList("cluster","datacenter"),Arrays.asList(AggregateFunctionType.avg),Arrays.asList("field2")).getKeyValues();
-			if(LOG.isDebugEnabled()) LOG.debug("AVG");
-			logGroupbyKeyValue(result);
-			Assert.assertNotNull(result);
-			Assert.assertTrue(result.size()>0);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+        if (ed == null) {
+            EntityDefinitionManager.registerEntity(TestLogAPIEntity.class);
+            ed = EntityDefinitionManager.getEntityDefinitionByEntityClass(TestLogAPIEntity.class);
+        }
+        ed.setTimeSeries(true);
+        for (int i = 0; i < count; i++) {
+            TestLogAPIEntity e = new TestLogAPIEntity();
+            e.setTimestamp(System.currentTimeMillis());
+            e.setField1(1);
+            e.setField2(2);
+            e.setField3(3);
+            e.setField4(4L);
+            e.setField5(5.0);
+            e.setField6(5.0);
+            e.setField7("7");
+            e.setTags(new HashMap<String, String>());
+            e.getTags().put("cluster", "test4UT");
+            e.getTags().put("datacenter", "dc1");
+            e.getTags().put("index", "" + i);
+            e.getTags().put("jobId", "job_" + System.currentTimeMillis());
+            list.add(e);
 
-	@Test
-	public void testGroupAggregateMaxClient(){
-		try {
-			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
-			List<GroupbyKeyValue> result = client.aggregate(table,ed,scan, Arrays.asList("cluster","datacenter"),Arrays.asList(AggregateFunctionType.max),Arrays.asList("field1")).getKeyValues();
-			if(LOG.isDebugEnabled()) LOG.debug("MAX");
-			logGroupbyKeyValue(result);
-			Assert.assertNotNull(result);
-			Assert.assertTrue(result.size()>0);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+        }
+        GenericEntityWriter writer = new GenericEntityWriter(ed.getService());
+        LOG.info("Writing " + list.size() + " TestLogAPIEntity entities");
+        List<String> result = writer.write(list);
+        LOG.info("Finish writing test entities");
+        return result;
+    }
 
-	@Test
-	public void testGroupAggregateSumClient(){
-		try {
-			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
-			List<GroupbyKeyValue> result = client.aggregate(table,ed,scan, Arrays.asList("cluster","datacenter"),Arrays.asList(AggregateFunctionType.sum),Arrays.asList("field2")).getKeyValues();
-			if(LOG.isDebugEnabled()) LOG.debug("MAX");
-			logGroupbyKeyValue(result);
-			Assert.assertNotNull(result);
-			Assert.assertTrue(result.size()>0);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    @Test
+    public void testGroupAggregateCountClient() {
+        try {
+            EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
+            List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.count), Arrays.asList("field2")).getKeyValues();
+            if (LOG.isDebugEnabled()) LOG.debug("COUNT");
+            logGroupbyKeyValue(result);
+            Assert.assertNotNull(result);
+            Assert.assertTrue(result.size() > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
 
-	@Test
-	public void testGroupAggregateMinClient(){
+    @Test
+    public void testGroupAggregateAvgClient() {
+        try {
+            EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
+            List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.avg), Arrays.asList("field2")).getKeyValues();
+            if (LOG.isDebugEnabled()) LOG.debug("AVG");
+            logGroupbyKeyValue(result);
+            Assert.assertNotNull(result);
+            Assert.assertTrue(result.size() > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
 
-		try {
-			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
-			List<GroupbyKeyValue> result = client.aggregate(table,ed,scan, Arrays.asList("cluster","datacenter"),Arrays.asList(AggregateFunctionType.min),Arrays.asList("field2")).getKeyValues();
-			if(LOG.isDebugEnabled()) LOG.debug("MIN");
-			logGroupbyKeyValue(result);
-			Assert.assertNotNull(result);
-			Assert.assertTrue(result.size()>0);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    @Test
+    public void testGroupAggregateMaxClient() {
+        try {
+            EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
+            List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.max), Arrays.asList("field1")).getKeyValues();
+            if (LOG.isDebugEnabled()) LOG.debug("MAX");
+            logGroupbyKeyValue(result);
+            Assert.assertNotNull(result);
+            Assert.assertTrue(result.size() > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
 
-	@Test
-	public void testGroupAggregateMultipleClient(){
-		try {
-			EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
-			List<GroupbyKeyValue> result = client.aggregate(table,ed,scan, Arrays.asList("cluster","datacenter"),
-					Arrays.asList(AggregateFunctionType.min,
-							AggregateFunctionType.max,
-							AggregateFunctionType.avg,
-							AggregateFunctionType.count,
-							AggregateFunctionType.sum),
-					Arrays.asList("field2","field2","field2","field2","field2")).getKeyValues();
-			logGroupbyKeyValue(result);
-			Assert.assertNotNull(result);
-			Assert.assertTrue(result.size() > 0);
-			Assert.assertEquals("test4UT", new String(result.get(0).getKey().getValue().get(0).copyBytes()));
-			Assert.assertEquals("dc1", new String(result.get(0).getKey().getValue().get(1).copyBytes()));
-			Assert.assertEquals(2.0, result.get(0).getValue().get(0).get(), 0.00001);
-			Assert.assertEquals(2.0, result.get(0).getValue().get(1).get(), 0.00001);
-			Assert.assertEquals(2.0, result.get(0).getValue().get(2).get(), 0.00001);
-			Assert.assertTrue(num <= result.get(0).getValue().get(3).get());
-			Assert.assertTrue(2.0 * num <= result.get(0).getValue().get(4).get());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    @Test
+    public void testGroupAggregateSumClient() {
+        try {
+            EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
+            List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.sum), Arrays.asList("field2")).getKeyValues();
+            if (LOG.isDebugEnabled()) LOG.debug("MAX");
+            logGroupbyKeyValue(result);
+            Assert.assertNotNull(result);
+            Assert.assertTrue(result.size() > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
 
-	private void logGroupbyKeyValue(List<GroupbyKeyValue> keyValues){
-		for(GroupbyKeyValue keyValue:keyValues){
-			GroupbyKey key = keyValue.getKey();
-			List<String> keys = new ArrayList<String>();
-			for(BytesWritable bytes:key.getValue()){
-				keys.add(new String(bytes.copyBytes()));
-			}
-			List<Double> vals = new ArrayList<Double>();
-			GroupbyValue val = keyValue.getValue();
-			for(DoubleWritable dw:val.getValue()){
-				vals.add(dw.get());
-			}
-			if(LOG.isDebugEnabled()) LOG.debug("KEY: "+keys+", VALUE: "+vals);
-		}
-	}
+    @Test
+    public void testGroupAggregateMinClient() {
+
+        try {
+            EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
+            List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"), Arrays.asList(AggregateFunctionType.min), Arrays.asList("field2")).getKeyValues();
+            if (LOG.isDebugEnabled()) LOG.debug("MIN");
+            logGroupbyKeyValue(result);
+            Assert.assertNotNull(result);
+            Assert.assertTrue(result.size() > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGroupAggregateMultipleClient() {
+        try {
+            EntityDefinition ed = EntityDefinitionManager.getEntityByServiceName("TestLogAPIEntity");
+            List<GroupbyKeyValue> result = client.aggregate(table, ed, scan, Arrays.asList("cluster", "datacenter"),
+                    Arrays.asList(AggregateFunctionType.min,
+                            AggregateFunctionType.max,
+                            AggregateFunctionType.avg,
+                            AggregateFunctionType.count,
+                            AggregateFunctionType.sum),
+                    Arrays.asList("field2", "field2", "field2", "field2", "field2")).getKeyValues();
+            logGroupbyKeyValue(result);
+            Assert.assertNotNull(result);
+            Assert.assertTrue(result.size() > 0);
+            Assert.assertEquals("test4UT", new String(result.get(0).getKey().getValue().get(0).copyBytes()));
+            Assert.assertEquals("dc1", new String(result.get(0).getKey().getValue().get(1).copyBytes()));
+            Assert.assertEquals(2.0, result.get(0).getValue().get(0).get(), 0.00001);
+            Assert.assertEquals(2.0, result.get(0).getValue().get(1).get(), 0.00001);
+            Assert.assertEquals(2.0, result.get(0).getValue().get(2).get(), 0.00001);
+            Assert.assertTrue(num <= result.get(0).getValue().get(3).get());
+            Assert.assertTrue(2.0 * num <= result.get(0).getValue().get(4).get());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    private void logGroupbyKeyValue(List<GroupbyKeyValue> keyValues) {
+        for (GroupbyKeyValue keyValue : keyValues) {
+            GroupbyKey key = keyValue.getKey();
+            List<String> keys = new ArrayList<String>();
+            for (BytesWritable bytes : key.getValue()) {
+                keys.add(new String(bytes.copyBytes()));
+            }
+            List<Double> vals = new ArrayList<Double>();
+            GroupbyValue val = keyValue.getValue();
+            for (DoubleWritable dw : val.getValue()) {
+                vals.add(dw.get());
+            }
+            if (LOG.isDebugEnabled()) LOG.debug("KEY: " + keys + ", VALUE: " + vals);
+        }
+    }
 }

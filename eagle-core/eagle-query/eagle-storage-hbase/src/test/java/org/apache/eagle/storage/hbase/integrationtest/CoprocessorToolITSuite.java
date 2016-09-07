@@ -43,17 +43,17 @@ public class CoprocessorToolITSuite {
     private void testRegisterCoprocessor(String tableName) throws Exception {
         CoprocessorTool.main(new String[]{
                 "--register",
-                "--config","hbase-site-sandbox.xml",
-                "--table",tableName,
-                "--jar",remoteJarPath,
-                "--localJar",localJarPath});
+                "--config", "hbase-site-sandbox.xml",
+                "--table", tableName,
+                "--jar", remoteJarPath,
+                "--localJar", localJarPath});
     }
 
     private void testUnregisterCoprocessor(String tableName) throws Exception {
         CoprocessorTool.main(new String[]{
-            "--unregister",
-            "--config","hbase-site-sandbox.xml",
-            "--table",tableName
+                "--unregister",
+                "--config", "hbase-site-sandbox.xml",
+                "--table", tableName
         });
     }
 

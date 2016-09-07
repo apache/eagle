@@ -17,7 +17,6 @@
 package org.apache.eagle.server;
 
 import io.dropwizard.jersey.errors.LoggingExceptionMapper;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.eagle.metadata.resource.RESTResponse;
 
 import javax.ws.rs.WebApplicationException;

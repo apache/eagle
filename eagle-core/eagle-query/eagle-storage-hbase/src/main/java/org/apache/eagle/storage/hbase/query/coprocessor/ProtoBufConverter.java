@@ -67,7 +67,6 @@ public final class ProtoBufConverter {
 
     public static ByteString writableToByteString(Writable writable) throws IOException {
         ByteArrayDataOutput dataOutput = ByteStreams.newDataOutput();
-        ;
         writable.write(dataOutput);
         return ByteString.copyFrom(dataOutput.toByteArray());
     }
@@ -76,7 +75,8 @@ public final class ProtoBufConverter {
             EntityDefinition entityDefinition, Scan scan, List<String> groupbyFields,
             List<byte[]> aggregateFuncTypesBytes, List<String> aggregatedFields,
             long startTime, long endTime, long intervalMin) throws IOException {
-        AggregateProtos.TimeSeriesAggregateRequest.Builder builder = AggregateProtos.TimeSeriesAggregateRequest.newBuilder()
+        AggregateProtos.TimeSeriesAggregateRequest.Builder builder =
+                AggregateProtos.TimeSeriesAggregateRequest.newBuilder()
                 .setEntityDefinition(AggregateProtos.EntityDefinition.newBuilder().setByteArray(writableToByteString(entityDefinition)))
                 .setScan(toPBScan(scan));
 

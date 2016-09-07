@@ -92,14 +92,14 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
      * Region-unittest
      *  ,\x82\xB4\x85\xC2\x7F\xFF\xFE\xB6\xC9jNG\xEE!\x5C3\xBB\xAE\xA1
      *  :\x05\xA5\xA9x\xB0\xA1"8\x05\xFB(\xD2VY\xDB\x9A\x06\x09\xA9\x98\xC2\xE3\x8D=,1413960230654.aaf2a6c9f2c87c196f43497243bb2424.
-     * 
+     *
      * RegionID-unittest,1413960230654
      * </pre>
      */
     protected String getLogHeader() {
         HRegion region = this.getCurrentRegion();
         return LOG.isDebugEnabled() ? String.format("Region-%s", region.getRegionNameAsString()) :
-                String.format("Region-%s,%d", region.getTableDesc().getNameAsString(), region.getRegionId());
+            String.format("Region-%s,%d", region.getTableDesc().getNameAsString(), region.getRegionId());
     }
 
     protected class InternalReadReport {
@@ -173,11 +173,11 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
                         String qualifierName = Bytes.toString(kv.getQualifier());
                         // Qualifier qualifier = null;
                         // if(!ed.isTag(qualifierName)){
-                        // 	qualifier = ed.getQualifierNameMap().get(qualifierName);
+                        //  qualifier = ed.getQualifierNameMap().get(qualifierName);
                         //  if(qualifier == null){
                         //      LOG.error("qualifier for   " + qualifierName + " not exist");
                         //      throw new NullPointerException("qualifier for field "+qualifierName+" not exist");
-                        // 	}
+                        //  }
                         // }
                         if (kv.getValue() != null) {
                             kvMap.put(qualifierName, kv.getValue());
@@ -192,7 +192,9 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
                         try {
                             logAPIEntity = HBaseInternalLogHelper.buildEntity(internalLog, ed);
                             if (logAPIEntity instanceof GenericMetricEntity) {
-                                if (singleMetricEntity == null) singleMetricEntity = new GenericMetricShadowEntity();
+                                if (singleMetricEntity == null) {
+                                    singleMetricEntity = new GenericMetricShadowEntity();
+                                }
                                 GenericMetricEntity e = (GenericMetricEntity) logAPIEntity;
                                 if (e.getValue() != null) {
                                     int count = e.getValue().length;
@@ -234,7 +236,8 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
                         LOG.warn("Empty batch of KeyValue");
                     }
                 }
-            } while (hasMoreRows);
+            }
+            while (hasMoreRows);
         } catch (IOException ex) {
             LOG.error(ex.getMessage(), ex);
             throw ex;
@@ -284,13 +287,19 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
                             }
                             qualifierName = qualifier.getDisplayName();
                         }
-                        if (kv.getValue() != null) kvMap.put(qualifierName, kv.getValue());
+                        if (kv.getValue() != null) {
+                            kvMap.put(qualifierName, kv.getValue());
+                        }
                     }
 
-                    if (!kvMap.isEmpty()) listener.qualifierCreated(kvMap);
+                    if (!kvMap.isEmpty()) {
+                        listener.qualifierCreated(kvMap);
+                    }
                     results.clear();
                 } else {
-                    if (LOG.isDebugEnabled()) LOG.warn("Empty batch of KeyValue");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.warn("Empty batch of KeyValue");
+                    }
                 }
             }
             while (hasMoreRows);
@@ -307,14 +316,39 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
     }
 
     @Override
+    public void timeseriesAggregate(RpcController controller, AggregateProtos.TimeSeriesAggregateRequest request, RpcCallback<AggregateProtos.AggregateResult> done) {
+        AggregateResult result = null;
+        try {
+            result = this.aggregate(ProtoBufConverter.fromPBEntityDefinition(request.getEntityDefinition()),
+                ProtoBufConverter.fromPBScan(request.getScan()),
+                ProtoBufConverter.fromPBStringList(request.getGroupbyFieldsList()),
+                ProtoBufConverter.fromPBByteArrayList(request.getAggregateFuncTypesList()),
+                ProtoBufConverter.fromPBStringList(request.getAggregatedFieldsList()),
+                request.getStartTime(),
+                request.getEndTime(),
+                request.getIntervalMin()
+            );
+        } catch (IOException e) {
+            LOG.error("Failed to convert result to PB-based message", e);
+            ResponseConverter.setControllerException(controller, e);
+        }
+        try {
+            done.run(ProtoBufConverter.toPBAggregateResult(result));
+        } catch (IOException e) {
+            LOG.error("Failed to convert result to PB-based message", e);
+            ResponseConverter.setControllerException(controller, e);
+        }
+    }
+
+    @Override
     public void aggregate(RpcController controller, AggregateProtos.AggregateRequest request, RpcCallback<AggregateProtos.AggregateResult> done) {
         AggregateResult result = null;
         try {
             result = this.aggregate(ProtoBufConverter.fromPBEntityDefinition(request.getEntityDefinition()),
-                    ProtoBufConverter.fromPBScan(request.getScan()),
-                    ProtoBufConverter.fromPBStringList(request.getGroupbyFieldsList()),
-                    ProtoBufConverter.fromPBByteArrayList(request.getAggregateFuncTypesList()),
-                    ProtoBufConverter.fromPBStringList(request.getAggregatedFieldsList())
+                ProtoBufConverter.fromPBScan(request.getScan()),
+                ProtoBufConverter.fromPBStringList(request.getGroupbyFieldsList()),
+                ProtoBufConverter.fromPBByteArrayList(request.getAggregateFuncTypesList()),
+                ProtoBufConverter.fromPBStringList(request.getAggregatedFieldsList())
             );
         } catch (IOException e) {
             ResponseConverter.setControllerException(controller, e);
@@ -327,42 +361,18 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
     }
 
     @Override
-    public void timeseriesAggregate(RpcController controller, AggregateProtos.TimeSeriesAggregateRequest request, RpcCallback<AggregateProtos.AggregateResult> done) {
-        AggregateResult result = null;
-        try {
-            result = this.aggregate(ProtoBufConverter.fromPBEntityDefinition(request.getEntityDefinition()),
-                    ProtoBufConverter.fromPBScan(request.getScan()),
-                    ProtoBufConverter.fromPBStringList(request.getGroupbyFieldsList()),
-                    ProtoBufConverter.fromPBByteArrayList(request.getAggregateFuncTypesList()),
-                    ProtoBufConverter.fromPBStringList(request.getAggregatedFieldsList()),
-                    request.getStartTime(),
-                    request.getEndTime(),
-                    request.getIntervalMin()
-            );
-        } catch (IOException e) {
-            LOG.error("Failed to convert result to PB-based message", e);
-            ResponseConverter.setControllerException(controller, e);
-        }
-        try {
-            done.run(ProtoBufConverter.toPBAggregateResult(result));
-        } catch (IOException e) {
-            LOG.error("Failed to convert result to PB-based message", e);
-            ResponseConverter.setControllerException(controller, e);
-        }
-    }
-
-
-    @Override
     public AggregateResult aggregate(EntityDefinition entityDefinition, Scan scan, List<String> groupbyFields,
                                      List<byte[]> aggregateFuncTypes, List<String> aggregatedFields) throws IOException {
         checkNotNull(entityDefinition, "entityDefinition");
         String serviceName = entityDefinition.getService();
         LOG.info(this.getLogHeader() + " raw group aggregate on service: " + serviceName
-                + " by: " + groupbyFields + " func: " + AggregateFunctionType.fromBytesList(aggregateFuncTypes) + " fields: " + aggregatedFields);
-        if (LOG.isDebugEnabled()) LOG.debug("SCAN: " + scan.toJSON());
+            + " by: " + groupbyFields + " func: " + AggregateFunctionType.fromBytesList(aggregateFuncTypes) + " fields: " + aggregatedFields);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SCAN: " + scan.toJSON());
+        }
         final long startTimestamp = System.currentTimeMillis();
         final RawAggregator aggregator = new RawAggregator(groupbyFields,
-                AggregateFunctionType.fromBytesList(aggregateFuncTypes), aggregatedFields, entityDefinition);
+            AggregateFunctionType.fromBytesList(aggregateFuncTypes), aggregatedFields, entityDefinition);
         InternalReadReport report = this.asyncStreamRead(entityDefinition, scan, aggregator);
 
         List<GroupbyKeyValue> keyValues = aggregator.getGroupbyKeyValues();
@@ -373,8 +383,8 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
 
         long _stop = System.currentTimeMillis();
         LOG.info(String.format("%s: scan = %d rows, group = %d keys, startTime = %d, endTime = %d, spend = %d ms",
-                this.getLogHeader(), report.getCounter(), keyValues.size(), report.getStartTimestamp(),
-                report.getStopTimestamp(), (_stop - startTimestamp)));
+            this.getLogHeader(), report.getCounter(), keyValues.size(), report.getStartTimestamp(),
+            report.getStopTimestamp(), (_stop - startTimestamp)));
 
         return result;
     }
@@ -385,14 +395,17 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
         checkNotNull(entityDefinition, "entityDefinition");
         String serviceName = entityDefinition.getService();
         LOG.info(this.getLogHeader() + " time series group aggregate on service: " + serviceName
-                + " by: " + groupbyFields + " func: " + AggregateFunctionType.fromBytesList(aggregateFuncTypes)
-                + " fields: " + aggregatedFields + " intervalMin: " + intervalMin +
-                " from: " + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(startTime)
-                + " to: " + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(endTime));
-        if (LOG.isDebugEnabled()) LOG.debug("SCAN: " + scan.toJSON());
-        long startTimestamp = System.currentTimeMillis();
+            + " by: " + groupbyFields + " func: " + AggregateFunctionType.fromBytesList(aggregateFuncTypes)
+            + " fields: " + aggregatedFields + " intervalMin: " + intervalMin
+            + " from: " + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(startTime)
+            + " to: " + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(endTime));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SCAN: " + scan.toJSON());
+        }
+
+        final long startTimestamp = System.currentTimeMillis();
         final TimeSeriesAggregator aggregator = new TimeSeriesAggregator(groupbyFields,
-                AggregateFunctionType.fromBytesList(aggregateFuncTypes), aggregatedFields, startTime, endTime, intervalMin);
+            AggregateFunctionType.fromBytesList(aggregateFuncTypes), aggregatedFields, startTime, endTime, intervalMin);
         InternalReadReport report = this.asyncStreamRead(entityDefinition, scan, aggregator);
         List<GroupbyKeyValue> keyValues = aggregator.getGroupbyKeyValues();
 
@@ -403,7 +416,7 @@ public class AggregateProtocolEndPoint extends AggregateProtos.AggregateProtocol
 
         long _stop = System.currentTimeMillis();
         LOG.info(String.format("%s: scan = %d rows, group = %d keys, startTime = %d, endTime = %d, spend = %d ms",
-                this.getLogHeader(), report.getCounter(), keyValues.size(), report.getStartTimestamp(), report.getStopTimestamp(), (_stop - startTimestamp)));
+            this.getLogHeader(), report.getCounter(), keyValues.size(), report.getStartTimestamp(), report.getStopTimestamp(), (_stop - startTimestamp)));
 
         return result;
     }

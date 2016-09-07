@@ -52,7 +52,7 @@ public class CoprocessorITSuite {
     private static final Logger LOG = LoggerFactory.getLogger(CoprocessorITSuite.class);
 
     @BeforeClass
-    public static void before(){
+    public static void before() {
         System.setProperty("config.resource", "/application-sandbox.conf");
     }
 
@@ -107,7 +107,7 @@ public class CoprocessorITSuite {
             list.add(e);
         }
         GenericEntityWriter writer = new GenericEntityWriter(ed.getService());
-        LOG.info("Writing {} TestLogAPIEntity entities",list.size());
+        LOG.info("Writing {} TestLogAPIEntity entities", list.size());
         List<String> result = writer.write(list);
         LOG.info("Finish writing test entities");
         return result;

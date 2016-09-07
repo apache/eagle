@@ -25,35 +25,27 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Coprocessor-based Aggregation Universal Client Interface
+ * Coprocessor-based Aggregation Universal Client Interface.
  *
  * <h2>Flat or RAW Aggregation:</h2>
- * <pre>
- * AggregateResult aggregate( HTableInterface table, String serviceName, Scan scan, List<String> groupbyFields, List<AggregateFunctionType> aggregateFuncTypes, List<String> aggregatedFields) throws IOException
- * </pre>
- *
+ * @see #aggregate(HTableInterface, EntityDefinition, Scan, List, List, List)
  * <h2>Time Series Aggregation:</h2>
- * <pre>
- * AggregateResult aggregate(HTableInterface table, String serviceName, Scan scan, List<String> groupbyFields, List<AggregateFunctionType> aggregateFuncTypes, List<String> aggregatedFields, boolean timeSeries, long startTime, long endTime, long intervalMin) throws IOException
- * </pre>
- * @since : 11/3/14,2014
+ * @see #aggregate(HTableInterface, EntityDefinition, Scan, List, List, List, boolean, long, long, long)
+ *
  */
-public interface AggregateClient
-{
+public interface AggregateClient {
 
-	/**
-	 * Flat Aggregation
-	 *
-	 *
-	 * @param table                   HTable connections
-	 * @param scan                    HBase Scan
-	 * @param groupbyFields           Grouped by fields name
-	 * @param aggregateFuncTypes      Aggregate function types
-	 * @param aggregatedFields        Aggregate field names
-	 * @return                        Return AggregateResult
-	 * @throws Exception
-	 */
-	AggregateResult aggregate(final HTableInterface table,                            // HTable connections
+    /**
+     * Flat Aggregation.
+     *
+     * @param table              HTable connections
+     * @param scan               HBase Scan
+     * @param groupbyFields      Grouped by fields name
+     * @param aggregateFuncTypes Aggregate function types
+     * @param aggregatedFields   Aggregate field names
+     * @return Return AggregateResult
+     */
+    AggregateResult aggregate(final HTableInterface table,                            // HTable connections
                               final EntityDefinition entityDefinition,                               // Eagle service name
                               final Scan scan,                                        // HBase Scan
                               final List<String> groupbyFields,                       // Grouped by fields name
@@ -61,21 +53,20 @@ public interface AggregateClient
                               final List<String> aggregatedFields                     // Aggregate field names
     ) throws IOException;
 
-	/**
-	 * Time Series Aggregation
-	 *
-	 * @param table                   HTable connections
-	 * @param entityDefinition        Eagle EntityDefinition
-	 * @param scan                    HBase Scan
-	 * @param groupbyFields           Grouped by fields name
-	 * @param aggregateFuncTypes      Aggregate function types
-	 * @param aggregatedFields        Aggregate field names
-	 * @param timeSeries              Is time series aggregations?
-	 * @param intervalMin             The interval in minutes if it's time series aggregation
-	 * @return                        Return AggregateResult
-	 * @throws Exception
-	 */
-	AggregateResult aggregate(final HTableInterface table,                                // HTable connections
+    /**
+     * Time Series Aggregation.
+     *
+     * @param table              HTable connections
+     * @param entityDefinition   Eagle EntityDefinition
+     * @param scan               HBase Scan
+     * @param groupbyFields      Grouped by fields name
+     * @param aggregateFuncTypes Aggregate function types
+     * @param aggregatedFields   Aggregate field names
+     * @param timeSeries         Is time series aggregations?
+     * @param intervalMin        The interval in minutes if it's time series aggregation
+     * @return Return AggregateResult
+     */
+    AggregateResult aggregate(final HTableInterface table,                                // HTable connections
                               final EntityDefinition entityDefinition,                               // Eagle service name
                               final Scan scan,                                        // HBase Scan
                               final List<String> groupbyFields,                       // Grouped by fields name

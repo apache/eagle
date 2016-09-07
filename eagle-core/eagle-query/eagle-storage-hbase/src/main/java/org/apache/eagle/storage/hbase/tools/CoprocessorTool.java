@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.eagle.storage.hbase.tools;
 
-import org.apache.commons.cli.*;
 import org.apache.eagle.storage.hbase.query.coprocessor.AggregateProtocolEndPoint;
+
+import org.apache.commons.cli.*;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -35,7 +37,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**
- * Coprocessor CLI Tool
+ * Coprocessor CLI Tool.
  */
 public class CoprocessorTool extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(CoprocessorTool.class);

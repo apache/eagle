@@ -1,6 +1,4 @@
-package org.apache.eagle.storage.jdbc.schema;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,15 +15,18 @@ package org.apache.eagle.storage.jdbc.schema;
  * limitations under the License.
  */
 
-import org.apache.ddlutils.Platform;
-import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.model.*;
+package org.apache.eagle.storage.jdbc.schema;
+
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.meta.Qualifier;
 import org.apache.eagle.storage.jdbc.JdbcConstants;
 import org.apache.eagle.storage.jdbc.conn.ConnectionConfig;
 import org.apache.eagle.storage.jdbc.conn.ConnectionConfigFactory;
 import org.apache.eagle.storage.jdbc.conn.ConnectionManagerFactory;
+
+import org.apache.ddlutils.Platform;
+import org.apache.ddlutils.PlatformFactory;
+import org.apache.ddlutils.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -24,7 +24,7 @@ import java.io.File;
 import java.util.Collection;
 
 public class CoprocessorJarUtils {
-    public static File getCoprocessorJarFile(){
+    public static File getCoprocessorJarFile() {
         String projectRootDir = System.getProperty("user.dir");
         String targetDirPath = projectRootDir + "/target/";
         File targetDirFile = new File(targetDirPath);
