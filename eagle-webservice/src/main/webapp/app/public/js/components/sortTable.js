@@ -35,9 +35,11 @@
 			 * @param {string} $attrs.sortTable			Data source
 			 * @param {string?} $attrs.isSorting		Will bind parent variable of sort state
 			 * @param {string?} $attrs.scope			Will bind parent variable of current scope
+			 * @param {string?} $attrs.sortpath			Default sort path
 			 * @param {[]?} $attrs.searchPathList		Filter search path list
 			 */
 			controller: function($scope, $element, $attrs) {
+				var sortmatch;
 				var worker;
 				var worker_id = 0;
 				if(typeof(Worker) !== "undefined") {
@@ -51,6 +53,14 @@
 				$scope.search = "";
 				$scope.orderKey = "";
 				$scope.orderAsc = true;
+
+				if($attrs.sortpath) {
+					sortmatch = $attrs.sortpath.match(/^(-)?(.*)$/);
+					if(sortmatch[1]) {
+						$scope.orderAsc = false;
+					}
+					$scope.orderKey = sortmatch[2];
+				}
 
 				// UI - Column sort
 				$scope.doSort = function(path) {

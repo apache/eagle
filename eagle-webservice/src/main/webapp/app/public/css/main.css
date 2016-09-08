@@ -210,6 +210,10 @@ table.table.table-sm td {
 	word-break:break-all;
 }
 
+.text-no-break {
+	white-space: nowrap;
+}
+
 .no-select {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;

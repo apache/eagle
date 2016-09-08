@@ -37,6 +37,8 @@
 			PageConfig.title = "Job History";
 			PageConfig.subTitle = $scope.jobDefId;
 
+			$scope.getStateClass = JPM.getStateClass;
+
 			var browserAction = true;
 
 			// ==================================================================
@@ -49,7 +51,6 @@
 						title: "No statistic info",
 						content: "Current job do not have enough statistic info. Please check 'jobDefId' if your job have run many times."
 					});
-					return;
 				}
 
 				function findJob(jobId) {
@@ -205,14 +206,16 @@
 					markPoint: markPoint
 				}];
 
-				$scope.compareJobSelect = function (e) {
+				$scope.compareJobSelect = function (e, job) {
 					var index = e.dataIndex;
-					var job = jobList[index];
+					job = job || jobList[index];
 					if(!job) return;
 
-					if(e.event.event.ctrlKey) {
+					var event = e.event ? e.event.event : e;
+
+					if(event.ctrlKey) {
 						$scope.fromJob = job;
-					} else if(e.event.event.shiftKey) {
+					} else if(event.shiftKey) {
 						$scope.toJob = job;
 					} else {
 						if ($scope.fromJob) {

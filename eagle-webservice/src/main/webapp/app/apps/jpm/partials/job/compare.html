@@ -48,7 +48,7 @@
 					<tbody>
 						<tr>
 							<th>Def Id</th>
-							<td>{{jobDefId}}</td>
+							<td class="text-break">{{jobDefId}}</td>
 						</tr>
 						<tr>
 							<th>Type</th>
@@ -100,6 +100,11 @@
 		<h3 class="box-title">
 			Comparison
 		</h3>
+		<div class="box-tools pull-right">
+			<button type="button" class="btn btn-box-tool" data-widget="collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+		</div>
 	</div>
 	<div class="box-body">
 		<table class="table table-striped">
@@ -246,6 +251,43 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+</div>
+
+<div class="box box-primary" ng-if="jobList.length">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			History Jobs
+		</h3>
+	</div>
+	<div class="box-body">
+		<div sort-table="jobList" sortpath="-startTime">
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th width="10" sortpath="currentState">Status</th>
+						<th sortpath="tags.jobId">Id</th>
+						<th sortpath="tags.jobName">Name</th>
+						<th width="140" sortpath="startTime">Start Time</th>
+						<th width="140" sortpath="durationTime">Duration</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><span class="label label-{{getStateClass(item.currentState)}}">{{item.currentState}}</span></td>
+						<td class="text-no-break">
+							<span ng-if="item === fromJob">[From]</span>
+							<span ng-if="item === toJob">[To]</span>
+							<a ng-click="compareJobSelect($event, item)">{{item.tags.jobId}}</a>
+							<a class="fa fa-link" ui-sref="jpmDetail({siteId: site, jobId: item.tags.jobId})" target="_blank"></a>
+						</td>
+						<td class="text-break">{{item.tags.jobName}}</td>
+						<td>{{Time.format(item.startTime)}}</td>
+						<td>{{Time.diffStr(item.durationTime)}}</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>
