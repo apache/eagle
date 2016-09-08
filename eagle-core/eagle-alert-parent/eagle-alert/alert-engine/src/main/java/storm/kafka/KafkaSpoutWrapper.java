@@ -90,9 +90,9 @@ public class KafkaSpoutWrapper extends KafkaSpout implements ISpoutSpecLCM {
 
         // add new topic to metric
         KafkaSpoutMetric.KafkaSpoutMetricContext metricContext = new KafkaSpoutMetric.KafkaSpoutMetricContext();
-        metricContext._connections = _connections;
-        metricContext._coordinator = _coordinator;
-        metricContext._spoutConfig = _spoutConfig;
+        metricContext.connections = _connections;
+        metricContext.coordinator = _coordinator;
+        metricContext.spoutConfig = _spoutConfig;
         kafkaSpoutMetric.addTopic(_spoutConfig.topic, metricContext);
 
         this.collectorWrapper = (SpoutOutputCollectorWrapper) collector;

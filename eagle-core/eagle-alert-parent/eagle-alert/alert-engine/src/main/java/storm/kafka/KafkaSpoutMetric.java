@@ -36,14 +36,14 @@ public class KafkaSpoutMetric implements IMetric {
     private Map<String, KafkaUtils.KafkaOffsetMetric> offsetMetricMap = new ConcurrentHashMap<>();
 
     public static class KafkaSpoutMetricContext {
-        SpoutConfig _spoutConfig;
-        DynamicPartitionConnections _connections;
-        PartitionCoordinator _coordinator;
+        SpoutConfig spoutConfig;
+        DynamicPartitionConnections connections;
+        PartitionCoordinator coordinator;
     }
 
     public void addTopic(String topic, KafkaSpoutMetricContext context) {
         // construct KafkaOffsetMetric
-        KafkaUtils.KafkaOffsetMetric kafkaOffsetMetric = new KafkaUtils.KafkaOffsetMetric(context._spoutConfig.topic, context._connections);
+        KafkaUtils.KafkaOffsetMetric kafkaOffsetMetric = new KafkaUtils.KafkaOffsetMetric(context.spoutConfig.topic, context.connections);
         metricContextMap.put(topic, context);
         offsetMetricMap.put(topic, kafkaOffsetMetric);
     }
@@ -59,7 +59,7 @@ public class KafkaSpoutMetric implements IMetric {
         HashMap spoutMetric = new HashMap();
         for (Map.Entry<String, KafkaSpoutMetricContext> entry : metricContextMap.entrySet()) {
             // construct offset metric
-            List<PartitionManager> pms = entry.getValue()._coordinator.getMyManagedPartitions();
+            List<PartitionManager> pms = entry.getValue().coordinator.getMyManagedPartitions();
             Set<Partition> latestPartitions = new HashSet();
             for (PartitionManager pm : pms) {
                 latestPartitions.add(pm.getPartition());

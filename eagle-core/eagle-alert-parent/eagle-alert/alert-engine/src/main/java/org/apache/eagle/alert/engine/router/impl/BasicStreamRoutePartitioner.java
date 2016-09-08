@@ -64,14 +64,14 @@ public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
     }
 
     protected List<StreamRoute> routeToAll(StreamEvent event) {
-        if (_globalRoutingKeys != null) {
-            _globalRoutingKeys = new ArrayList<>();
+        if (globalRoutingKeys != null) {
+            globalRoutingKeys = new ArrayList<>();
             for (String targetId : outputComponentIds) {
-                _globalRoutingKeys.add(new StreamRoute(targetId, -1, StreamPartition.Type.GLOBAL));
+                globalRoutingKeys.add(new StreamRoute(targetId, -1, StreamPartition.Type.GLOBAL));
             }
         }
-        return _globalRoutingKeys;
+        return globalRoutingKeys;
     }
 
-    private List<StreamRoute> _globalRoutingKeys = null;
+    private List<StreamRoute> globalRoutingKeys = null;
 }
