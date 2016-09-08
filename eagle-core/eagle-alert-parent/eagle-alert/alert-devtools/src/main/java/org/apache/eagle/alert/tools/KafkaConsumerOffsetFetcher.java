@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.tools;
 
+import org.apache.eagle.alert.config.ZKConfig;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
@@ -23,8 +24,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
-import org.apache.eagle.alert.config.ZKConfig;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

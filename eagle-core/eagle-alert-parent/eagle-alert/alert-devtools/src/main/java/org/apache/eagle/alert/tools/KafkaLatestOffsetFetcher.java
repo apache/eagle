@@ -17,12 +17,15 @@
 package org.apache.eagle.alert.tools;
 
 
-import java.util.*;
-
 import kafka.api.PartitionOffsetRequestInfo;
 import kafka.common.TopicAndPartition;
-import kafka.javaapi.*;
+import kafka.javaapi.OffsetResponse;
+import kafka.javaapi.PartitionMetadata;
+import kafka.javaapi.TopicMetadata;
+import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.consumer.SimpleConsumer;
+
+import java.util.*;
 
 public class KafkaLatestOffsetFetcher {
 
