@@ -19,25 +19,28 @@ package org.apache.eagle.alert.engine.publisher.dedup;
 import com.typesafe.config.Config;
 
 public class DedupEventsStoreFactory {
-	
-	public enum DedupEventsStoreType {
-		Mongo, ElasticSearch
-	};
-	
-	public static DedupEventsStore getStore(DedupEventsStoreType type, Config config) {
-		DedupEventsStore accessor = null;
-		switch (type) {
-			case Mongo:
-				accessor = new MongoDedupEventsStore(config);
-				break;
-			case ElasticSearch:
-				
-				break;
-		}
-		if (accessor == null) {
-			throw new RuntimeException(String.format("Dedup events store type %s is NOT supportted", type));
-		}
-		return accessor;
-	}
-	
+
+    public enum DedupEventsStoreType {
+        Mongo, ElasticSearch
+    }
+
+    ;
+
+    public static DedupEventsStore getStore(DedupEventsStoreType type, Config config) {
+        DedupEventsStore accessor = null;
+        switch (type) {
+            case Mongo:
+                accessor = new MongoDedupEventsStore(config);
+                break;
+            case ElasticSearch:
+                break;
+            default:
+                break;
+        }
+        if (accessor == null) {
+            throw new RuntimeException(String.format("Dedup events store type %s is NOT supportted", type));
+        }
+        return accessor;
+    }
+
 }

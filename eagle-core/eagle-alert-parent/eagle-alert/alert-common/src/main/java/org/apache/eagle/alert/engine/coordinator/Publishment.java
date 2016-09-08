@@ -49,22 +49,22 @@ public class Publishment {
     }
 
     public String getDedupStateField() {
-		return dedupStateField;
-	}
+        return dedupStateField;
+    }
 
-	public void setDedupStateField(String dedupStateField) {
-		this.dedupStateField = dedupStateField;
-	}
+    public void setDedupStateField(String dedupStateField) {
+        this.dedupStateField = dedupStateField;
+    }
 
-	public String getDedupStateCloseValue() {
-		return dedupStateCloseValue;
-	}
+    public String getDedupStateCloseValue() {
+        return dedupStateCloseValue;
+    }
 
-	public void setDedupStateCloseValue(String dedupStateCloseValue) {
-		this.dedupStateCloseValue = dedupStateCloseValue;
-	}
+    public void setDedupStateCloseValue(String dedupStateCloseValue) {
+        this.dedupStateCloseValue = dedupStateCloseValue;
+    }
 
-	public String getSerializer() {
+    public String getSerializer() {
         return serializer;
     }
 

@@ -66,15 +66,15 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
             return;
         }
         List<AlertStreamEvent> outputEvents = dedup(event);
-        if(outputEvents == null) {
+        if (outputEvents == null) {
             return;
         }
-        
+
         boolean isSuccess = true;
         for (AlertStreamEvent outputEvent : outputEvents) {
-        	if (!emailGenerator.sendAlertEmail(outputEvent)) {
-        		isSuccess = false;
-        	}
+            if (!emailGenerator.sendAlertEmail(outputEvent)) {
+                isSuccess = false;
+            }
         }
         PublishStatus status = new PublishStatus();
         if (!isSuccess) {

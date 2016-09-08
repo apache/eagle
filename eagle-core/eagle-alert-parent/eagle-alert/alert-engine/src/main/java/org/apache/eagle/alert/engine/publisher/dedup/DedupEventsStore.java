@@ -23,10 +23,10 @@ import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 
 public interface DedupEventsStore {
 
-	public Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> getEvents();
-	
-	public void add(EventUniq eventEniq, ConcurrentLinkedDeque<DedupValue> dedupStateValues);
-	
-	public void remove(EventUniq eventEniq);
-	
+    public Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> getEvents();
+
+    public void add(EventUniq eventEniq, ConcurrentLinkedDeque<DedupValue> dedupStateValues);
+
+    public void remove(EventUniq eventEniq);
+
 }

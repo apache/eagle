@@ -20,54 +20,55 @@ import com.google.common.base.Objects;
 
 public class DedupValue {
 
-	private long firstOccurrence;
-	private String stateFieldValue;
-	private long count;
-	
-	public DedupValue() {}
-	
-	public DedupValue(String stateFieldValue) {
-		this.stateFieldValue = stateFieldValue;
-	}
+    private long firstOccurrence;
+    private String stateFieldValue;
+    private long count;
 
-	public long getCount() {
-		return count;
-	}
-	
-	public void setCount(long count) {
-		this.count = count;
-	}
+    public DedupValue() {
+    }
 
-	public long getFirstOccurrence() {
-		return firstOccurrence;
-	}
+    public DedupValue(String stateFieldValue) {
+        this.stateFieldValue = stateFieldValue;
+    }
 
-	public void setFirstOccurrence(long firstOccurence) {
-		this.firstOccurrence = firstOccurence;
-	}
+    public long getCount() {
+        return count;
+    }
 
-	public String getStateFieldValue() {
-		return stateFieldValue;
-	}
+    public void setCount(long count) {
+        this.count = count;
+    }
 
-	public void setStateFieldValue(String stateFieldValue) {
-		this.stateFieldValue = stateFieldValue;
-	}
-	
-	@Override
-	public boolean equals(Object dedupValue) {
-		return Objects.equal(this.getStateFieldValue(), ((DedupValue) dedupValue).getStateFieldValue());
-	}
-	
-	@Override
-	public int hashCode() {
-		return this.stateFieldValue == null ? "".hashCode() : this.stateFieldValue.hashCode();
-	}
+    public long getFirstOccurrence() {
+        return firstOccurrence;
+    }
 
-	@Override
-	public String toString() {
-		return String.format("DedupValue[state: %s, count: %s, first occurrence %s]", 
-				stateFieldValue, count, firstOccurrence);
-	}
-	
+    public void setFirstOccurrence(long firstOccurence) {
+        this.firstOccurrence = firstOccurence;
+    }
+
+    public String getStateFieldValue() {
+        return stateFieldValue;
+    }
+
+    public void setStateFieldValue(String stateFieldValue) {
+        this.stateFieldValue = stateFieldValue;
+    }
+
+    @Override
+    public boolean equals(Object dedupValue) {
+        return Objects.equal(this.getStateFieldValue(), ((DedupValue) dedupValue).getStateFieldValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.stateFieldValue == null ? "".hashCode() : this.stateFieldValue.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DedupValue[state: %s, count: %s, first occurrence %s]",
+            stateFieldValue, count, firstOccurrence);
+    }
+
 }

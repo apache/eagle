@@ -71,13 +71,13 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             return;
         }
         List<AlertStreamEvent> outputEvents = dedup(event);
-        if(outputEvents == null) {
+        if (outputEvents == null) {
             return;
         }
         PublishStatus status = new PublishStatus();
         try {
             for (AlertStreamEvent outputEvent : outputEvents) {
-            	ProducerRecord record = createRecord(outputEvent, topic);
+                ProducerRecord record = createRecord(outputEvent, topic);
                 if (record == null) {
                     LOG.error(" Alert serialize return null, ignored message! ");
                     return;

@@ -40,10 +40,10 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
     @SuppressWarnings("rawtypes")
     @Override
     public void init(Config config, Publishment publishment, Map conf) throws Exception {
-        this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(), 
-        		publishment.getDedupFields(), publishment.getDedupStateField(), 
-        		publishment.getDedupStateCloseValue(), 
-        		config);
+        this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(),
+            publishment.getDedupFields(), publishment.getDedupStateField(),
+            publishment.getDedupStateCloseValue(),
+            config);
         this.pubName = publishment.getName();
         String serializerClz = publishment.getSerializer();
         try {

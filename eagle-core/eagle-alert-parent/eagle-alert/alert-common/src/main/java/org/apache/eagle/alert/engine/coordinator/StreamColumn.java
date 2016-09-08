@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class StreamColumn implements Serializable {
-	
+
     private static final long serialVersionUID = -5457861313624389106L;
     private String name;
     private Type type;

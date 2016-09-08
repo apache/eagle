@@ -24,39 +24,39 @@ import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 
 public class DedupEntity {
 
-	private EventUniq eventEniq;
-	private List<DedupValue> dedupValues = new ArrayList<DedupValue>();
-	
-	public DedupEntity(EventUniq eventEniq, ConcurrentLinkedDeque<DedupValue> dedupValues) {
-		this.eventEniq = eventEniq;
-		this.dedupValues.addAll(dedupValues);
-	}
-	
-	public DedupEntity(EventUniq eventEniq, List<DedupValue> dedupValues) {
-		this.eventEniq = eventEniq;
-		this.dedupValues = dedupValues;
-	}
+    private EventUniq eventEniq;
+    private List<DedupValue> dedupValues = new ArrayList<DedupValue>();
 
-	public EventUniq getEventEniq() {
-		return eventEniq;
-	}
+    public DedupEntity(EventUniq eventEniq, ConcurrentLinkedDeque<DedupValue> dedupValues) {
+        this.eventEniq = eventEniq;
+        this.dedupValues.addAll(dedupValues);
+    }
 
-	public void setEventEniq(EventUniq eventEniq) {
-		this.eventEniq = eventEniq;
-	}
+    public DedupEntity(EventUniq eventEniq, List<DedupValue> dedupValues) {
+        this.eventEniq = eventEniq;
+        this.dedupValues = dedupValues;
+    }
 
-	public List<DedupValue> getDedupValues() {
-		return dedupValues;
-	}
+    public EventUniq getEventEniq() {
+        return eventEniq;
+    }
 
-	public void setDedupValues(List<DedupValue> dedupValues) {
-		this.dedupValues = dedupValues;
-	}
-	
-	public ConcurrentLinkedDeque<DedupValue> getDedupValuesInConcurrentLinkedDeque() {
-		ConcurrentLinkedDeque<DedupValue> result = new ConcurrentLinkedDeque<DedupValue>();
-		result.addAll(this.getDedupValues());
-		return result;
-	}
+    public void setEventEniq(EventUniq eventEniq) {
+        this.eventEniq = eventEniq;
+    }
+
+    public List<DedupValue> getDedupValues() {
+        return dedupValues;
+    }
+
+    public void setDedupValues(List<DedupValue> dedupValues) {
+        this.dedupValues = dedupValues;
+    }
+
+    public ConcurrentLinkedDeque<DedupValue> getDedupValuesInConcurrentLinkedDeque() {
+        ConcurrentLinkedDeque<DedupValue> result = new ConcurrentLinkedDeque<DedupValue>();
+        result.addAll(this.getDedupValues());
+        return result;
+    }
 
 }

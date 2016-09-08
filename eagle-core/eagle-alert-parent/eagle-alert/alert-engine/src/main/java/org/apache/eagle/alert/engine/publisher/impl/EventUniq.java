@@ -67,15 +67,15 @@ public class EventUniq {
     public int hashCode() {
         HashCodeBuilder builder = new HashCodeBuilder().append(streamId).append(policyId);
 
-		if (customFieldValues != null){
-			builder.append(customFieldValues);
-		}
-		return builder.build();
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("EventUniq[streamId: %s, policyId: %s, timestamp: %s, customFieldValues: %s]", 
-				streamId, policyId, timestamp, Joiner.on(",").withKeyValueSeparator(">").join(customFieldValues));
-	}
+        if (customFieldValues != null) {
+            builder.append(customFieldValues);
+        }
+        return builder.build();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("EventUniq[streamId: %s, policyId: %s, timestamp: %s, customFieldValues: %s]",
+            streamId, policyId, timestamp, Joiner.on(",").withKeyValueSeparator(">").join(customFieldValues));
+    }
 }
