@@ -24,6 +24,7 @@ import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,7 +41,10 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
     @SuppressWarnings("rawtypes")
     @Override
     public void init(Config config, Publishment publishment, Map conf) throws Exception {
-        this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(), publishment.getDedupFields());
+        this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(), 
+        		publishment.getDedupFields(), publishment.getDedupStateField(), 
+        		publishment.getDedupStateCloseValue(), 
+        		config);
         this.pubName = publishment.getName();
         String serializerClz = publishment.getSerializer();
         try {
@@ -64,7 +68,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
     }
 
     @Override
-    public AlertStreamEvent dedup(AlertStreamEvent event) {
+    public List<AlertStreamEvent> dedup(AlertStreamEvent event) {
         return deduplicator.dedup(event);
     }
 

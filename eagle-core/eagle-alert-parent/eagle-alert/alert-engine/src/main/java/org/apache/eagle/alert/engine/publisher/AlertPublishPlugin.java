@@ -18,6 +18,7 @@
 package org.apache.eagle.alert.engine.publisher;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.alert.engine.coordinator.Publishment;
@@ -47,7 +48,7 @@ public interface AlertPublishPlugin extends Closeable {
 
     void onAlert(AlertStreamEvent event) throws Exception;
 
-    AlertStreamEvent dedup(AlertStreamEvent event);
+    List<AlertStreamEvent> dedup(AlertStreamEvent event);
 
     PublishStatus getStatus();
 
