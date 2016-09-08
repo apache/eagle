@@ -17,49 +17,49 @@
 package org.apache.eagle.common.config;
 
 public final class EagleConfigConstants {
-    public final static String SERVICE_ENV = "service.env";
-    public final static String SERVICE_HOST = "service.host";
-    public final static String SERVICE_PORT = "service.port";
-    public final static String SERVICE_HBASE_ZOOKEEPER_QUORUM = "storage.hbase.hbase-zookeeper-quorum";
-    public final static String SERVICE_HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "storage.hbase-zookeeper-property-clientPort";
-    public final static String SERVICE_ZOOKEEPER_ZNODE_PARENT = "storage.zookeeper-znode-parent";
-    public final static String SERVICE_HBASE_CLIENT_IPC_POOL_SIZE = "storage.hbase-client-ipc-pool-size";
-    public final static String SERVICE_STORAGE_TYPE = "storage.storage-type";
-    public final static String SERVICE_COPROCESSOR_ENABLED = "storage.coprocessor-enabled";
-    public final static String SERVICE_TABLE_NAME_PREFIXED_WITH_ENVIRONMENT = "storage.table-name-prefixed-with-environment";
-    public final static String SERVICE_HBASE_CLIENT_SCAN_CACHE_SIZE = "storage.hbase-client-scan-cache-size";
-    public final static String SERVICE_THREADPOOL_CORE_SIZE = "storage.threadpool-core-size";
-    public final static String SERVICE_THREADPOOL_MAX_SIZE = "storage.threadpool-max-size";
-    public final static String SERVICE_THREADPOOL_SHRINK_SIZE = "storage.threadpool-shrink-size";
-    public final static String SERVICE_AUDITING_ENABLED = "storage.audit-enabled";
+    public static final String SERVICE_ENV = "service.env";
+    public static final String SERVICE_HOST = "service.host";
+    public static final String SERVICE_PORT = "service.port";
+    public static final String SERVICE_HBASE_ZOOKEEPER_QUORUM = "storage.hbaseZookeeperQuorum";
+    public static final String SERVICE_HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "storage.hbaseZookeeperPropertyClientPort";
+    public static final String SERVICE_ZOOKEEPER_ZNODE_PARENT = "storage.zookeeperZnodeParent";
+    public static final String SERVICE_HBASE_CLIENT_IPC_POOL_SIZE = "storage.hbaseClientIpcPoolSize";
+    public static final String SERVICE_STORAGE_TYPE = "storage.storageType";
+    public static final String SERVICE_COPROCESSOR_ENABLED = "storage.coprocessorEnabled";
+    public static final String SERVICE_TABLE_NAME_PREFIXED_WITH_ENVIRONMENT = "storage.tableNamePrefixedWithEnvironment";
+    public static final String SERVICE_HBASE_CLIENT_SCAN_CACHE_SIZE = "storage.hbaseClientScanCacheSize";
+    public static final String SERVICE_THREADPOOL_CORE_SIZE = "storage.threadpoolCoreSize";
+    public static final String SERVICE_THREADPOOL_MAX_SIZE = "storage.threadpoolMaxSize";
+    public static final String SERVICE_THREADPOOL_SHRINK_SIZE = "storage.threadpoolShrinkSize";
+    public static final String SERVICE_AUDITING_ENABLED = "storage.auditEnabled";
 
-    public final static String EAGLE_TIME_ZONE = "eagle.timezone";
-    public final static String DEFAULT_EAGLE_TIME_ZONE = "UTC";
+    public static final String EAGLE_TIME_ZONE = "service.timezone";
+    public static final String DEFAULT_EAGLE_TIME_ZONE = "UTC";
 
-    public final static int DEFAULT_THREAD_POOL_CORE_SIZE = 10;
-    public final static int DEFAULT_THREAD_POOL_MAX_SIZE = 20;
-    public final static long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L;
-    public final static String DEFAULT_SERVICE_HOST = "localhost";
-    public final static String DEFAULT_STORAGE_TYPE = "hbase";
-    public final static int DEFAULT_SERVICE_PORT = 8080;
-    public final static String DEFAULT_ZOOKEEPER_ZNODE_PARENT = "/hbase-unsecure";
+    public static final int DEFAULT_THREAD_POOL_CORE_SIZE = 10;
+    public static final int DEFAULT_THREAD_POOL_MAX_SIZE = 20;
+    public static final long DEFAULT_THREAD_POOL_SHRINK_TIME = 60000L;
+    public static final String DEFAULT_SERVICE_HOST = "localhost";
+    public static final String DEFAULT_STORAGE_TYPE = "hbase";
+    public static final int DEFAULT_SERVICE_PORT = 8080;
+    public static final String DEFAULT_ZOOKEEPER_ZNODE_PARENT = "/hbase-unsecure";
 
-    public final static String EAGLE_PROPS="eagleProps";
-    public final static String EAGLE_SERVICE = "eagleService";
-    public final static String HOST = "host";
-    public final static String PORT = "port";
-    public final static String USERNAME = "username";
-    public final static String PASSWORD = "password";
+    public static final String EAGLE_PROPS="eagleProps";
+    public static final String EAGLE_SERVICE = "eagleService";
+    public static final String HOST = "host";
+    public static final String PORT = "port";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
 
-    public final static String SITE = "site";
+    public static final String SITE = "site";
     @Deprecated
-    public final static String DATA_SOURCE = "dataSource";
-    public final static String APPLICATION = "application";
+    public static final String DATA_SOURCE = "dataSource";
+    public static final String APPLICATION = "application";
 
-    public final static String WEB_CONFIG = "web";
-    public final static String APP_CONFIG = "app";
-    public final static String CLASSIFICATION_CONFIG = "classification";
+    public static final String WEB_CONFIG = "web";
+    public static final String APP_CONFIG = "app";
+    public static final String CLASSIFICATION_CONFIG = "classification";
 
-    public final static String LOCAL_MODE = "local";
-    public final static String CLUSTER_MODE = "cluster";
+    public static final String LOCAL_MODE = "local";
+    public static final String CLUSTER_MODE = "cluster";
 }
