@@ -16,41 +16,40 @@
  */
 package org.apache.eagle.app;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.Environment;
+import com.typesafe.config.Config;
 
 import java.io.Serializable;
 
 /**
- * Application Execution Interface
- *
+ * Application Execution Interface.
  * <h1>Design Principle</h1>
  * <ul>
- *  <li>Easy to develop and extend </li>
- *  <li>Easy to test and run locally</li>
- *  <li>Easy to manage lifecycle through framework</li>
+ * <li>Easy to develop and extend </li>
+ * <li>Easy to test and run locally</li>
+ * <li>Easy to manage lifecycle through framework</li>
  * </ul>
  *
- * @param <Proc>
- * @param <Env>
+ * @param <P>
+ * @param <E>
  */
-public interface Application <
-    Env extends Environment,        // Application Environment
-    Proc                            // Application Process
-> extends Serializable {
+public interface Application<
+    E extends Environment,        // Application Environment
+    P                            // Application Process
+    > extends Serializable {
     /**
-     * Execute with application configuration
+     * Execute with application configuration.
      *
-     * @param config application configuration
+     * @param config      application configuration
      * @param environment execution environment
      * @return execution process
      */
-    Proc execute(Config config, Env environment);
+    P execute(Config config, E environment);
 
     /**
-     * Execution Environment type
+     * Execution Environment type.
      *
      * @return application environment type
      */
-    Class<? extends Env> getEnvironmentType();
+    Class<? extends E> getEnvironmentType();
 }

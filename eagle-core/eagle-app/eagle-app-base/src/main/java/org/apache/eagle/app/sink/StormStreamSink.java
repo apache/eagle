@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,26 +16,20 @@
  */
 package org.apache.eagle.app.sink;
 
+import org.apache.eagle.metadata.model.StreamSinkConfig;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
-import kafka.producer.KeyedMessage;
-import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.metadata.model.StreamSinkConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseBasicBolt implements StreamSink<K> {
-    private final static Logger LOG = LoggerFactory.getLogger(StormStreamSink.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StormStreamSink.class);
     private String streamId;
 
     @Override
@@ -49,14 +43,14 @@ public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseBa
     }
 
     /**
-     * Implicitly hides the Tuple protocol inside code as Tuple[Key,Map]
+     * Implicitly hides the Tuple protocol inside code as Tuple[Key,Map].
      */
     @Override
     public void execute(Tuple input, BasicOutputCollector collector) {
         try {
             Map event = null;
             Object key = input.getValue(0);
-            if(input.size()<2){
+            if (input.size() < 2) {
                 event = tupleAsMap(input);
             } else {
                 Object value = input.getValue(1);
@@ -68,22 +62,22 @@ public abstract class StormStreamSink<K extends StreamSinkConfig> extends BaseBa
                     }
                 }
             }
-            execute(key,event,collector);
-        }catch(Exception ex){
+            execute(key, event, collector);
+        } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
         }
     }
 
-    private Map tupleAsMap(Tuple tuple){
+    protected abstract void execute(Object key, Map event, BasicOutputCollector collector);
+
+    private Map tupleAsMap(Tuple tuple) {
         Map values = new HashMap<>();
-        for(String field:tuple.getFields()){
-            values.put(field,tuple.getValueByField(field));
+        for (String field : tuple.getFields()) {
+            values.put(field, tuple.getValueByField(field));
         }
         return values;
     }
-
-    protected abstract void execute(Object key,Map event,BasicOutputCollector collector);
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {

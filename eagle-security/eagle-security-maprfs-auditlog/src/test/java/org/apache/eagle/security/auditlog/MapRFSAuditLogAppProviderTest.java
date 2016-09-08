@@ -17,13 +17,11 @@
 package org.apache.eagle.security.auditlog;
 
 import com.google.inject.Inject;
-import org.apache.eagle.app.test.AppJUnitRunner;
 import org.apache.eagle.app.test.ApplicationSimulator;
+import org.apache.eagle.app.test.ApplicationTestBase;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith(AppJUnitRunner.class)
-public class MapRFSAuditLogAppProviderTest {
+public class MapRFSAuditLogAppProviderTest extends ApplicationTestBase {
     @Inject
     private
     ApplicationSimulator simulator;

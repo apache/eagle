@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.app.environment.impl;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.AbstractEnvironment;
+import com.typesafe.config.Config;
 
 /**
- * Storm Execution Environment Context
+ * Storm Execution Environment Context.
  */
 public class SparkEnvironment extends AbstractEnvironment {
-    public SparkEnvironment(Config config){
+    public SparkEnvironment(Config config) {
         super(config);
     }
 }

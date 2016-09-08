@@ -22,7 +22,7 @@ import org.apache.eagle.app.example.extensions.ExampleResource;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.test.ApplicationSimulator;
-import org.apache.eagle.app.test.AppJUnitRunner;
+import org.apache.eagle.app.test.ApplicationTestBase;
 import org.apache.eagle.common.module.GlobalScope;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -30,15 +30,13 @@ import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(AppJUnitRunner.class)
-public class ExampleApplicationProviderTest {
+public class ExampleApplicationProviderTest extends ApplicationTestBase{
     @Inject private SiteResource siteResource;
     @Inject private ApplicationResource applicationResource;
     @Inject private ApplicationSimulator simulator;

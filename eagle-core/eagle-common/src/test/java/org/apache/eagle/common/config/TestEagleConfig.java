@@ -17,27 +17,26 @@
 package org.apache.eagle.common.config;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+
+import java.util.TimeZone;
 
 /**
  * @since 9/22/15
  */
 public class TestEagleConfig {
-    private EagleConfig config;
-
-    @Before
-    public void setUp(){
-        System.setProperty("config.resource","test-service-config.conf");
-        config = EagleConfigFactory.load();
-    }
 
     @Test
-    public void testInit(){
+    public void testLoadConfig(){
+        System.setProperty("config.resource", "application-test.conf");
+        EagleConfig config = EagleConfigFactory.load();
         Assert.assertEquals("test",config.getEnv());
-        Assert.assertEquals("localhost",config.getServiceHost());
-        Assert.assertEquals(9090,config.getServicePort());
+        Assert.assertEquals("localhost-for-test",config.getZKQuorum());
+        Assert.assertEquals("1234",config.getZKPort());
         Assert.assertEquals("hbase",config.getStorageType());
-        Assert.assertEquals(false,config.isCoprocessorEnabled());
+        Assert.assertEquals(true,config.isCoprocessorEnabled());
+        Assert.assertEquals(9090,config.getServicePort());
+        Assert.assertEquals("localhost",config.getServiceHost());
+        Assert.assertEquals(TimeZone.getTimeZone("UTC"),config.getTimeZone());
     }
 }

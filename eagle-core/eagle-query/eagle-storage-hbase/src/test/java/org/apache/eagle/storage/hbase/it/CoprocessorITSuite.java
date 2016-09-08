@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.storage.hbase.integrationtest;
+package org.apache.eagle.storage.hbase.it;
 
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
@@ -53,7 +53,7 @@ public class CoprocessorITSuite {
 
     @BeforeClass
     public static void before() {
-        System.setProperty("config.resource", "/application-sandbox.conf");
+        System.setProperty("config.resource", "/application-it.conf");
     }
 
     @Before

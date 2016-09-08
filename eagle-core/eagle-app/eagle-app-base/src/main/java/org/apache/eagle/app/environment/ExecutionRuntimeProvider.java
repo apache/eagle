@@ -16,6 +16,6 @@
  */
 package org.apache.eagle.app.environment;
 
-public interface ExecutionRuntimeProvider<Env extends Environment, Proc>{
-    ExecutionRuntime<Env,Proc> get();
+public interface ExecutionRuntimeProvider<E extends Environment, P> {
+    ExecutionRuntime<E, P> get();
 }

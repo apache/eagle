@@ -21,6 +21,7 @@ import org.apache.eagle.metadata.model.ApplicationEntity;
 
 public interface ApplicationManagementService {
     /**
+     * Install application.
      *
      * @param operation
      * @return
@@ -28,6 +29,7 @@ public interface ApplicationManagementService {
     ApplicationEntity install(ApplicationOperations.InstallOperation operation) throws EntityNotFoundException;
 
     /**
+     * Uninstall application.
      *
      * @param operation
      * @return
@@ -35,6 +37,7 @@ public interface ApplicationManagementService {
     ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation);
 
     /**
+     * Start application.
      *
      * @param operation
      * @return
@@ -42,6 +45,7 @@ public interface ApplicationManagementService {
     ApplicationEntity start(ApplicationOperations.StartOperation operation);
 
     /**
+     * Stop application.
      *
      * @param operation
      * @return
