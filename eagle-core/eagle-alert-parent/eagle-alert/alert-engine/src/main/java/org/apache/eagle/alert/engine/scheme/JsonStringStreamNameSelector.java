@@ -19,23 +19,22 @@
 
 package org.apache.eagle.alert.engine.scheme;
 
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.eagle.alert.coordination.model.StreamNameSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * A strategy to get stream name from message tuple.
- * <p>
- * Since 5/5/16.
+ * @since 5/5/16.
  */
 public class JsonStringStreamNameSelector implements StreamNameSelector {
-    private final static Logger LOG = LoggerFactory.getLogger(JsonStringStreamNameSelector.class);
-    public final static String USER_PROVIDED_STREAM_NAME_PROPERTY = "userProvidedStreamName";
-    public final static String FIELD_NAMES_TO_INFER_STREAM_NAME_PROPERTY = "fieldNamesToInferStreamName";
-    public final static String STREAM_NAME_FORMAT = "streamNameFormat";
+    private static final  Logger LOG = LoggerFactory.getLogger(JsonStringStreamNameSelector.class);
+    public static final  String USER_PROVIDED_STREAM_NAME_PROPERTY = "userProvidedStreamName";
+    public static final  String FIELD_NAMES_TO_INFER_STREAM_NAME_PROPERTY = "fieldNamesToInferStreamName";
+    public static final  String STREAM_NAME_FORMAT = "streamNameFormat";
 
     private String userProvidedStreamName;
     private String[] fieldNamesToInferStreamName;

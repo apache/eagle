@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
@@ -33,9 +29,13 @@ import org.apache.eagle.alert.engine.sorter.impl.StreamTimeClockManagerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 public class StreamRouterImpl implements StreamRouter {
     private static final long serialVersionUID = -4640125063690900014L;
-    private final static Logger LOG = LoggerFactory.getLogger(StreamRouterImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamRouterImpl.class);
     private final String name;
     private volatile Map<StreamPartition, StreamSortHandler> streamSortHandlers;
     private PartitionedEventCollector outputCollector;
@@ -43,7 +43,7 @@ public class StreamRouterImpl implements StreamRouter {
     private StreamContext context;
 
     /**
-     * @param name This name should be formed by topologyId + router id, which is built by topology builder
+     * @param name This name should be formed by topologyId + router id, which is built by topology builder.
      */
     public StreamRouterImpl(String name) {
         this.name = name;
@@ -67,7 +67,7 @@ public class StreamRouterImpl implements StreamRouter {
     }
 
     /**
-     * TODO: Potential improvement: if StreamSortHandler is expensive, we can use DISRUPTOR to buffer
+     * TODO: Potential improvement: if StreamSortHandler is expensive, we can use DISRUPTOR to buffer.
      *
      * @param event StreamEvent
      */
@@ -84,8 +84,8 @@ public class StreamRouterImpl implements StreamRouter {
     }
 
     /**
-     * @param event input event
-     * @return whether sorted
+     * @param event input event.
+     * @return whether sorted.
      */
     private boolean dispatchToSortHandler(PartitionedEvent event) {
         if (event.getTimestamp() <= 0) {

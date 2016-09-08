@@ -19,18 +19,12 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.eagle.alert.coordination.model.Tuple2StreamConverter;
 import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.*;
 
 /**
  * Since 5/3/16.

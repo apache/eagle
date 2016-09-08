@@ -17,25 +17,24 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
+import org.apache.eagle.alert.engine.coordinator.Publishment;
+import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
+import org.apache.eagle.alert.engine.publisher.AlertPublisher;
+import com.typesafe.config.Config;
+import org.apache.commons.collections.ListUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.collections.ListUtils;
-import org.apache.eagle.alert.engine.coordinator.Publishment;
-import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
-import org.apache.eagle.alert.engine.publisher.AlertPublisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.typesafe.config.Config;
-
 @SuppressWarnings("rawtypes")
 public class AlertPublisherImpl implements AlertPublisher {
     private static final long serialVersionUID = 4809983246198138865L;
-    private final static Logger LOG = LoggerFactory.getLogger(AlertPublisherImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlertPublisherImpl.class);
     private final String name;
 
     private volatile Map<String, List<String>> policyPublishPluginMapping = new ConcurrentHashMap<>(1);

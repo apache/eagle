@@ -19,21 +19,20 @@
 
 package org.apache.eagle.alert.engine.scheme;
 
+import backtype.storm.spout.Scheme;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import backtype.storm.spout.Scheme;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
-
 /**
- * used for parsing plain string
+ * used for parsing plain string.
  */
 public class PlainStringScheme implements Scheme {
     private static final long serialVersionUID = 5969724968671646310L;

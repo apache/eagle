@@ -17,23 +17,18 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import backtype.storm.generated.GlobalStreamId;
 import backtype.storm.grouping.CustomStreamGrouping;
 import backtype.storm.task.WorkerTopologyContext;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * NOTE: This is copy from storm 1.0.0 code. DON'T modify it.
  *
  * @since May 4, 2016
- *
  */
 public class ShuffleGrouping implements CustomStreamGrouping, Serializable {
     private static final long serialVersionUID = 5035497345182141765L;

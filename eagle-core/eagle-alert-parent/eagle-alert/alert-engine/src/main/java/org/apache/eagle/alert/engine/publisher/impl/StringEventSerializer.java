@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.codec.IEventSerializer;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
+import java.util.Map;
+
 /**
- * @since Jun 3, 2016
+ * @since Jun 3, 2016.
  */
 public class StringEventSerializer implements IEventSerializer {
 

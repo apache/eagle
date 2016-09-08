@@ -16,25 +16,25 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
-import java.util.Comparator;
-
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.sorter.BaseStreamWindow;
+
+import com.google.common.collect.TreeMultiset;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.TreeMultiset;
+import java.util.Comparator;
 
 public class StreamSortedWindowOnHeap extends BaseStreamWindow {
-    private final static Logger LOG = LoggerFactory.getLogger(StreamSortedWindowOnHeap.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamSortedWindowOnHeap.class);
     private final TreeMultiset<PartitionedEvent> treeMultisetCache;
 
     /**
-     * @param start  start time
-     * @param end    end time
-     * @param margin margin time
+     * @param start  start time.
+     * @param end    end time.
+     * @param margin margin time.
      */
     public StreamSortedWindowOnHeap(long start, long end, long margin, Comparator<PartitionedEvent> comparator) {
         super(start, end, margin);

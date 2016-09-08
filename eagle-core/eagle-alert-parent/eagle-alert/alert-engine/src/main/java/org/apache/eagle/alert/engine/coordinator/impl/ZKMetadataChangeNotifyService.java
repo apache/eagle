@@ -16,6 +16,20 @@
  */
 package org.apache.eagle.alert.engine.coordinator.impl;
 
+import org.apache.eagle.alert.config.ConfigBusConsumer;
+import org.apache.eagle.alert.config.ConfigChangeCallback;
+import org.apache.eagle.alert.config.ConfigValue;
+import org.apache.eagle.alert.config.ZKConfig;
+import org.apache.eagle.alert.coordination.model.*;
+import org.apache.eagle.alert.engine.coordinator.MetadataType;
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.service.IMetadataServiceClient;
+import org.apache.eagle.alert.service.MetadataServiceClientImpl;
+import com.typesafe.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,33 +37,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.eagle.alert.config.ConfigBusConsumer;
-import org.apache.eagle.alert.config.ConfigChangeCallback;
-import org.apache.eagle.alert.config.ConfigValue;
-import org.apache.eagle.alert.config.ZKConfig;
-import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
-import org.apache.eagle.alert.coordination.model.PublishSpec;
-import org.apache.eagle.alert.coordination.model.RouterSpec;
-import org.apache.eagle.alert.coordination.model.ScheduleState;
-import org.apache.eagle.alert.coordination.model.SpoutSpec;
-import org.apache.eagle.alert.coordination.model.VersionedPolicyDefinition;
-import org.apache.eagle.alert.coordination.model.VersionedStreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.MetadataType;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.service.IMetadataServiceClient;
-import org.apache.eagle.alert.service.MetadataServiceClientImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.typesafe.config.Config;
-
 /**
  * <b>TODO</b>: performance tuning: It is not JVM level service, so it may cause
  * zookeeper burden in case of too many listeners This does not support
  * dynamically adding topic, all topics should be available when service object
  * is created.
- * <p>
  * ZK path format is as following:
  * <ul>
  * <li>/alert/topology_1/spout</li>
@@ -80,10 +72,6 @@ public class ZKMetadataChangeNotifyService extends AbstractMetadataChangeNotifyS
         LOG.info("init called for client");
     }
 
-    /**
-     * @return
-     * @seeAlso Coordinator
-     */
     private String getMetadataTopicSuffix() {
         switch (type) {
             case ALERT_BOLT:

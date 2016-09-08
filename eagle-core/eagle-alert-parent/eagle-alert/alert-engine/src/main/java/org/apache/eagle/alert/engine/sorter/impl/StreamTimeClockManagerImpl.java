@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,12 +16,6 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockListener;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockManager;
@@ -29,14 +23,20 @@ import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public final class StreamTimeClockManagerImpl implements StreamTimeClockManager {
     private static final long serialVersionUID = -2770823821511195343L;
-    private final static Logger LOG = LoggerFactory.getLogger(StreamTimeClockManagerImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamTimeClockManagerImpl.class);
     private final Map<String, StreamTimeClock> streamIdTimeClockMap;
     private Timer timer;
 
     private final Map<StreamTimeClockListener, String> listenerStreamIdMap;
-    private final static AtomicInteger num = new AtomicInteger();
+    private static final AtomicInteger num = new AtomicInteger();
 
     public StreamTimeClockManagerImpl() {
         listenerStreamIdMap = new HashMap<>();
@@ -54,11 +54,10 @@ public final class StreamTimeClockManagerImpl implements StreamTimeClockManager 
     /**
      * By default, we could keep the current time clock in memory,
      * Eventually we may need to consider the global time synchronization across all nodes
-     * <p>
      * 1) When to initialize window according to start time
      * 2) When to close expired window according to current time
      *
-     * @return StreamTimeClock instance
+     * @return StreamTimeClock instance.
      */
     @Override
     public StreamTimeClock createStreamTimeClock(String streamId) {
@@ -74,10 +73,6 @@ public final class StreamTimeClockManagerImpl implements StreamTimeClockManager 
         }
     }
 
-    /**
-     * @param streamId
-     * @return
-     */
     @Override
     public StreamTimeClock getStreamTimeClock(String streamId) {
         synchronized (streamIdTimeClockMap) {
@@ -89,9 +84,6 @@ public final class StreamTimeClockManagerImpl implements StreamTimeClockManager 
         }
     }
 
-    /**
-     * @param streamId
-     */
     @Override
     public void removeStreamTimeClock(String streamId) {
         synchronized (streamIdTimeClockMap) {

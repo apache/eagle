@@ -16,13 +16,6 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeMap;
-
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
@@ -31,12 +24,16 @@ import org.apache.eagle.alert.engine.sorter.StreamWindowManager;
 import org.apache.eagle.alert.engine.sorter.StreamWindowRepository;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
+
+import org.apache.commons.lang3.time.StopWatch;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
+
 public class StreamWindowManagerImpl implements StreamWindowManager {
-    private final static Logger LOG = LoggerFactory.getLogger(StreamWindowManagerImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamWindowManagerImpl.class);
     private final TreeMap<Long, StreamWindow> windowBuckets;
     private final PartitionedEventCollector collector;
     private final Period windowPeriod;
@@ -64,7 +61,9 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
                 addWindow(window);
                 return window;
             } else {
-                throw new IllegalStateException("Failed to create new window, as " + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(initialTime) + " is too late, only allow timestamp after " + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(rejectTime));
+                throw new IllegalStateException("Failed to create new window, as "
+                    + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(initialTime) + " is too late, only allow timestamp after "
+                    + DateTimeUtil.millisecondsToHumanDateWithMilliseconds(rejectTime));
             }
         }
     }
@@ -139,23 +138,23 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
                     aliveWindow.add(windowBucket);
                 }
             }
-            toRemoved.forEach(this::CloseAndRemoveWindow);
+            toRemoved.forEach(this::closeAndRemoveWindow);
             if (toRemoved.size() > 0) {
                 LOG.info("Windows: {} alive = {}, {} expired = {}", aliveWindow.size(), aliveWindow, toRemoved.size(), toRemoved);
             }
         }
     }
 
-    private void CloseAndRemoveWindow(StreamWindow windowBucket) {
+    private void closeAndRemoveWindow(StreamWindow windowBucket) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        CloseWindow(windowBucket);
+        closeWindow(windowBucket);
         removeWindow(windowBucket);
         stopWatch.stop();
         LOG.info("Removed {} in {} ms", windowBucket, stopWatch.getTime());
     }
 
-    private void CloseWindow(StreamWindow windowBucket) {
+    private void closeWindow(StreamWindow windowBucket) {
         windowBucket.close();
     }
 
@@ -167,7 +166,7 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
             int count = 0;
             for (StreamWindow windowBucket : getWindows()) {
                 count++;
-                CloseWindow(windowBucket);
+                closeWindow(windowBucket);
             }
             windowBuckets.clear();
             stopWatch.stop();

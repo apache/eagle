@@ -16,18 +16,16 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
-
+import backtype.storm.utils.Utils;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.alert.utils.JsonUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import backtype.storm.utils.Utils;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @since May 10, 2016

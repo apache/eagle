@@ -16,23 +16,23 @@
  */
 package org.apache.eagle.alert.engine.serialization.impl;
 
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
+import org.apache.eagle.alert.engine.serialization.Serializer;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
-import org.apache.eagle.alert.engine.serialization.Serializer;
-
 /**
- * Don't serialize streamId
+ * Don't serialize streamId.
  *
  * @see StreamPartition
  */
 public class StreamPartitionSerializer implements Serializer<StreamPartition> {
-    public final static StreamPartitionSerializer INSTANCE = new StreamPartitionSerializer();
+    public static final StreamPartitionSerializer INSTANCE = new StreamPartitionSerializer();
 
     @Override
     public void serialize(StreamPartition partition, DataOutput dataOutput) throws IOException {

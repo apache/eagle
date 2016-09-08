@@ -19,12 +19,11 @@
 
 package org.apache.eagle.alert.engine.topology;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 /**
  * Since 5/4/16.

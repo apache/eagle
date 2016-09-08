@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
-import java.io.IOException;
-
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
@@ -30,8 +28,10 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 public class StreamSortWindowHandlerImpl implements StreamSortHandler {
-    private final static Logger LOG = LoggerFactory.getLogger(StreamSortWindowHandlerImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamSortWindowHandlerImpl.class);
     private StreamWindowManager windowManager;
     private StreamSortSpec streamSortSpecSpec;
     private PartitionedEventCollector outputCollector;
@@ -49,7 +49,7 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
     }
 
     /**
-     * Entry point to manage window lifecycle
+     * Entry point to manage window lifecycle.
      *
      * @param event StreamEvent
      */

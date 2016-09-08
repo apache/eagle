@@ -16,18 +16,18 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.codec.IEventSerializer;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 
 import java.util.Map;
 
 /**
- * @since Jun 3, 2016
+ * @since Jun 3, 2016.
  */
 public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
 

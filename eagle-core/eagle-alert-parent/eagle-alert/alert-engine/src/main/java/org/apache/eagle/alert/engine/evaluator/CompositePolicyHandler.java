@@ -62,7 +62,7 @@ public class CompositePolicyHandler implements PolicyStreamHandler {
 
     @Override
     public void send(StreamEvent event) throws Exception {
-//        policyHandler.send(event);
+        // policyHandler.send(event);
         send(event, 0);
     }
 

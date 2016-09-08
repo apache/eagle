@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.alert.engine.absence;
 
-import org.apache.eagle.alert.engine.evaluator.absence.AbsenceDailyRule;
 import org.apache.eagle.alert.engine.evaluator.absence.AbsenceAlertDriver;
+import org.apache.eagle.alert.engine.evaluator.absence.AbsenceDailyRule;
 import org.apache.eagle.alert.engine.evaluator.absence.AbsenceWindowGenerator;
 import org.junit.Test;
 

@@ -18,6 +18,12 @@
  */
 package org.apache.eagle.alert.engine.topology;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -26,12 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
-
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * Created on 3/12/16.

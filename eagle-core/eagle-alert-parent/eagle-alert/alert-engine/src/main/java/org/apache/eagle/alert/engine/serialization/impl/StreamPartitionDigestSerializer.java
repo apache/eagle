@@ -16,27 +16,23 @@
  */
 package org.apache.eagle.alert.engine.serialization.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.serialization.Serializer;
+
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.apache.eagle.alert.engine.serialization.Serializer;
-
 /**
- * Don't serialize streamId
+ * Don't serialize streamId.
  *
  * @see StreamPartition
  */
 public class StreamPartitionDigestSerializer implements Serializer<StreamPartition> {
-    public final static StreamPartitionDigestSerializer INSTANCE = new StreamPartitionDigestSerializer();
+    public static final StreamPartitionDigestSerializer INSTANCE = new StreamPartitionDigestSerializer();
 
     private final Map<DigestBytes, StreamPartition> checkSumPartitionMap = new HashMap<>();
     private final Map<StreamPartition, DigestBytes> partitionCheckSumMap = new HashMap<>();

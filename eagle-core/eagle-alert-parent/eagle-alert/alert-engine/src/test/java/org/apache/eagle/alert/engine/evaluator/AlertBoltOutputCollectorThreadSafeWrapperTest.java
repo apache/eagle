@@ -16,18 +16,17 @@
  */
 package org.apache.eagle.alert.engine.evaluator;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import backtype.storm.task.IOutputCollector;
+import backtype.storm.task.OutputCollector;
 import org.apache.eagle.alert.engine.evaluator.impl.AlertBoltOutputCollectorThreadSafeWrapper;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.junit.Assert;
 import org.junit.Test;
 
-import backtype.storm.task.IOutputCollector;
-import backtype.storm.task.OutputCollector;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class AlertBoltOutputCollectorThreadSafeWrapperTest {
     @Test

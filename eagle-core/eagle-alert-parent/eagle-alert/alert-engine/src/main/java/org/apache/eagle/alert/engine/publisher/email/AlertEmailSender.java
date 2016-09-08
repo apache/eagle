@@ -17,17 +17,17 @@
  */
 package org.apache.eagle.alert.engine.publisher.email;
 
-import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class AlertEmailSender implements Runnable {
 
@@ -40,8 +40,8 @@ public class AlertEmailSender implements Runnable {
     protected final String origin;
     protected boolean sentSuccessfully = false;
 
-    private final static Logger LOG = LoggerFactory.getLogger(AlertEmailSender.class);
-    private final static int MAX_RETRY_COUNT = 3;
+    private static final Logger LOG = LoggerFactory.getLogger(AlertEmailSender.class);
+    private static final int MAX_RETRY_COUNT = 3;
 
 
     private Map<String, String> mailProps;
@@ -50,7 +50,7 @@ public class AlertEmailSender implements Runnable {
     private String threadName;
 
     /**
-     * Derived class may have some additional context properties to add
+     * Derived class may have some additional context properties to add.
      *
      * @param context velocity context
      * @param env     environment

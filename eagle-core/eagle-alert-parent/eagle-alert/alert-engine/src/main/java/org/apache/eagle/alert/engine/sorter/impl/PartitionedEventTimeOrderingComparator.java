@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
+import org.apache.eagle.alert.engine.model.PartitionedEvent;
+
 import java.util.Comparator;
 import java.util.Objects;
 
-import org.apache.eagle.alert.engine.model.PartitionedEvent;
-
 /**
- * TODO: Stable sorting algorithm for better performance to avoid event resorting with same timestamp?
+ * TODO: Stable sorting algorithm for better performance to avoid event resorting with same timestamp?.
  */
 public class PartitionedEventTimeOrderingComparator implements Comparator<PartitionedEvent> {
     public static final PartitionedEventTimeOrderingComparator INSTANCE = new PartitionedEventTimeOrderingComparator();

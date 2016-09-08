@@ -16,21 +16,20 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
+import org.apache.eagle.alert.engine.AlertStreamCollector;
+import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import backtype.storm.task.OutputCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.eagle.alert.engine.AlertStreamCollector;
-import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import backtype.storm.task.OutputCollector;
-
 /**
- * <h2>Thread Safe Mechanism</h2>
+ * <h2>Thread Safe Mechanism.</h2>
  * <ul>
  * <li>
  * emit() method is thread-safe enough to be called anywhere asynchronously in multi-thread
@@ -43,10 +42,10 @@ import backtype.storm.task.OutputCollector;
 public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCollector {
     private final OutputCollector delegate;
     private final LinkedBlockingQueue<AlertStreamEvent> queue;
-    private final static Logger LOG = LoggerFactory.getLogger(AlertBoltOutputCollectorThreadSafeWrapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlertBoltOutputCollectorThreadSafeWrapper.class);
     private final AtomicLong lastFlushTime = new AtomicLong(System.currentTimeMillis());
     private final AutoAlertFlusher flusher;
-    private final static int MAX_ALERT_DELAY_SECS = 10;
+    private static final int MAX_ALERT_DELAY_SECS = 10;
 
     public AlertBoltOutputCollectorThreadSafeWrapper(OutputCollector outputCollector) {
         this.delegate = outputCollector;
@@ -59,7 +58,7 @@ public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCol
     private static class AutoAlertFlusher extends Thread {
         private final AlertBoltOutputCollectorThreadSafeWrapper collector;
         private boolean stopped = false;
-        private final static Logger LOG = LoggerFactory.getLogger(AutoAlertFlusher.class);
+        private static final Logger LOG = LoggerFactory.getLogger(AutoAlertFlusher.class);
 
         private AutoAlertFlusher(AlertBoltOutputCollectorThreadSafeWrapper collector) {
             this.collector = collector;
@@ -75,6 +74,7 @@ public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCol
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException ignored) {
+                    // ignored
                 }
             }
             LOG.info("Stopped");
@@ -87,7 +87,7 @@ public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCol
     }
 
     /**
-     * Emit method can be called in multi-thread
+     * Emit method can be called in multi-thread.
      *
      * @param event
      */

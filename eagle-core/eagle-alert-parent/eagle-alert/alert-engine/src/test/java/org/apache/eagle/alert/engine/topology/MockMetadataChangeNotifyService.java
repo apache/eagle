@@ -19,10 +19,7 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
@@ -35,7 +32,9 @@ import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Since 5/4/16.

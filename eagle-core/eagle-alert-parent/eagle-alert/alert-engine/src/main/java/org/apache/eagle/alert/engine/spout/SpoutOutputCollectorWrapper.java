@@ -18,11 +18,6 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;
 import org.apache.eagle.alert.coordination.model.StreamRepartitionStrategy;
@@ -34,15 +29,19 @@ import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.utils.StreamIdConversion;
+import backtype.storm.spout.ISpoutOutputCollector;
+import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.spout.ISpoutOutputCollector;
-import backtype.storm.spout.SpoutOutputCollector;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * intercept the message sent from within KafkaSpout and select downstream bolts based on meta-data
- * This is topic based. each topic will have one SpoutOutputCollectorWrapper
+ * This is topic based. each topic will have one SpoutOutputCollectorWrapper.
  */
 public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements ISpoutSpecLCM, SerializationMetadataProvider {
     private static final Logger LOG = LoggerFactory.getLogger(SpoutOutputCollectorWrapper.class);
@@ -60,7 +59,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
     /**
      * @param delegate        actual SpoutOutputCollector to send data to following bolts
      * @param topic           topic for this KafkaSpout to handle
-     * @param numGroupbyBolts bolts following this spout
+     * @param numGroupbyBolts bolts following this spout.
      * @param serializer
      */
     public SpoutOutputCollectorWrapper(CorrelationSpout spout,
@@ -83,7 +82,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
     /**
      * How to assert that numTotalGroupbyBolts >= numOfRouterBolts, otherwise
      * there is runtime issue by default, tuple includes 2 fields field 1: topic
-     * name field 2: map of key/value
+     * name field 2: map of key/value.
      */
     @SuppressWarnings("rawtypes")
     @Override
@@ -99,7 +98,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
         newMessageId.topic = topic;
         /**
          phase 1: tuple to stream converter
-         if this topic multiplexes multiple streams, then retrieve the individual streams
+         if this topic multiplexes multiple streams, then retrieve the individual streams.
          */
         List<Object> convertedTuple = converter.convert(tuple);
         if (convertedTuple == null) {
@@ -201,7 +200,7 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
     }
 
     /**
-     * SpoutSpec may be changed, this class will respond to changes on tuple2StreamMetadataMap and streamRepartitionMetadataMap
+     * SpoutSpec may be changed, this class will respond to changes on tuple2StreamMetadataMap and streamRepartitionMetadataMap.
      *
      * @param spoutSpec
      * @param sds

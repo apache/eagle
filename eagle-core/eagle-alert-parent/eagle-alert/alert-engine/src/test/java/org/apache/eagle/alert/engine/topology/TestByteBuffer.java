@@ -19,10 +19,10 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.nio.ByteBuffer;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.nio.ByteBuffer;
 
 /**
  * Storm 1.0.0 uses ByteBuffer, we need test it

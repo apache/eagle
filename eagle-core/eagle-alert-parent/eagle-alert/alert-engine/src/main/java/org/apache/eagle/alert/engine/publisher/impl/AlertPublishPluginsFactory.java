@@ -18,17 +18,16 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.Map;
 
 /**
- * @Since on 5/11/16.
+ * @since on 5/11/16.
  */
 public class AlertPublishPluginsFactory {
 

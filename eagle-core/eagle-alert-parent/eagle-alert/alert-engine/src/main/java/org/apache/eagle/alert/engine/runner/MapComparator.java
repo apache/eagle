@@ -19,13 +19,9 @@
 
 package org.apache.eagle.alert.engine.runner;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.collections.CollectionUtils;
+
+import java.util.*;
 
 /**
  * Since 5/2/16.

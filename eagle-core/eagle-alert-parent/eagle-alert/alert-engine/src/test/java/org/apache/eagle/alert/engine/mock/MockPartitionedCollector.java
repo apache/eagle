@@ -1,12 +1,12 @@
 package org.apache.eagle.alert.engine.mock;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more

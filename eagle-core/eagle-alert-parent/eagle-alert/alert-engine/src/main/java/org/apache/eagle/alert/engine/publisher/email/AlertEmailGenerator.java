@@ -20,19 +20,15 @@
  */
 package org.apache.eagle.alert.engine.publisher.email;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class AlertEmailGenerator {
     private String tplFile;
@@ -43,9 +39,9 @@ public class AlertEmailGenerator {
 
     private ThreadPoolExecutor executorPool;
 
-    private final static Logger LOG = LoggerFactory.getLogger(AlertEmailGenerator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlertEmailGenerator.class);
 
-    private final static long MAX_TIMEOUT_MS = 60000;
+    private static final long MAX_TIMEOUT_MS = 60000;
 
     public boolean sendAlertEmail(AlertStreamEvent entity) {
         return sendAlertEmail(entity, recipients, null);
@@ -65,7 +61,7 @@ public class AlertEmailGenerator {
         email.setRecipients(recipients);
         email.setCc(cc);
 
-        /** asynchronized email sending */
+        /** asynchronized email sending. */
         AlertEmailSender thread = new AlertEmailSender(email, properties);
 
         if (this.executorPool == null) {

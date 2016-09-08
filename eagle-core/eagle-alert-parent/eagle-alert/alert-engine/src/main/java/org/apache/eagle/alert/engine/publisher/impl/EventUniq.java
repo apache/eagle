@@ -25,7 +25,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.HashMap;
 
 /**
- * @since Mar 19, 2015
+ * @since Mar 19, 2015.
  */
 public class EventUniq {
     public String streamId;

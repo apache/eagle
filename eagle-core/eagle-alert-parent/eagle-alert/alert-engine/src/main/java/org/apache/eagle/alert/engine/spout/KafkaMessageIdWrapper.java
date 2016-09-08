@@ -32,7 +32,7 @@ public class KafkaMessageIdWrapper {
     }
 
     public String topic;
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public String toString() {
         try {

@@ -19,11 +19,11 @@ package org.apache.eagle.alert.engine;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 
 /**
- * Executed in thread-safe trace
+ * Executed in thread-safe trace.
  */
 public interface PartitionedEventCollector extends Collector<PartitionedEvent> {
     /**
-     * @param event to be dropped
+     * @param event to be dropped.
      */
     void drop(PartitionedEvent event);
 }

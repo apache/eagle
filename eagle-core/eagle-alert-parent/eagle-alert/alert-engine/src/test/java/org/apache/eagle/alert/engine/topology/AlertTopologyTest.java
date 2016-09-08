@@ -19,10 +19,13 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Properties;
-
+import backtype.storm.LocalCluster;
+import backtype.storm.topology.BoltDeclarer;
+import backtype.storm.topology.SpoutDeclarer;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.spout.CorrelationSpout;
 import org.apache.eagle.alert.engine.spout.CreateTopicUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -34,14 +37,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.LocalCluster;
-import backtype.storm.topology.BoltDeclarer;
-import backtype.storm.topology.SpoutDeclarer;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Properties;
 
 @SuppressWarnings( {"serial", "unused"})
 public class AlertTopologyTest implements Serializable {

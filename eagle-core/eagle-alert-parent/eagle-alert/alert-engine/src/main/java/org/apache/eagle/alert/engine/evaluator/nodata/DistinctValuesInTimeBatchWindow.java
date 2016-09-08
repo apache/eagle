@@ -16,6 +16,10 @@
  */
 package org.apache.eagle.alert.engine.evaluator.nodata;
 
+import org.apache.eagle.alert.engine.model.StreamEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,10 +27,6 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DistinctValuesInTimeBatchWindow {
 
@@ -41,7 +41,7 @@ public class DistinctValuesInTimeBatchWindow {
     private NoDataPolicyTimeBatchHandler handler;
 
     /**
-     * map from value to max timestamp for this value
+     * map from value to max timestamp for this value.
      */
     private Map<Object, Long> valueMaxTimeMap = new HashMap<>();
 

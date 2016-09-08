@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
+ * this assumes that event comes in time order.
  * Since 7/7/16.
- * this assumes that event comes in time order
  */
 public class AbsenceAlertDriver {
     private static final Logger LOG = LoggerFactory.getLogger(AbsenceAlertDriver.class);
@@ -63,7 +63,7 @@ public class AbsenceAlertDriver {
     }
 
     /**
-     * calculate absolute time range based on current timestamp
+     * calculate absolute time range based on current timestamp.
      *
      * @param currTime milliseconds
      * @return

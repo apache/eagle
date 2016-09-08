@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SiddhiPolicyHandler implements PolicyStreamHandler {
-    private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SiddhiPolicyHandler.class);
     private ExecutionPlanRuntime executionRuntime;
     private SiddhiManager siddhiManager;
     private Map<String, StreamDefinition> sds;
@@ -90,8 +90,8 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
             if (executionRuntime.getStreamDefinitionMap().containsKey(outputStream)) {
                 this.executionRuntime.addCallback(outputStream,
                     new AlertStreamCallback(
-                        outputStream, SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream))
-                        , collector, context, currentIndex));
+                        outputStream, SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream)),
+                        collector, context, currentIndex));
             } else {
                 throw new IllegalStateException("Undefined output stream " + outputStream);
             }

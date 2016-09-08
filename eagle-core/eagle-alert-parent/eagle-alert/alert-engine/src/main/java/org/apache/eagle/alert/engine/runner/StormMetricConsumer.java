@@ -16,29 +16,23 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.metric.IMetricSystem;
 import org.apache.eagle.alert.metric.MetricSystem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backtype.storm.metric.api.IMetricsConsumer;
 import backtype.storm.task.IErrorReporter;
 import backtype.storm.task.TopologyContext;
-
 import com.codahale.metrics.Gauge;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigParseOptions;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
- * Share same metric system
+ * Share same metric system.
  */
 public class StormMetricConsumer implements IMetricsConsumer {
     public static final Logger LOG = LoggerFactory.getLogger(StormMetricConsumer.class);
@@ -53,10 +47,12 @@ public class StormMetricConsumer implements IMetricsConsumer {
         topologyName = config.getString("topology.name");
         topologyId = context.getStormId();
         metricSystem = MetricSystem.load(config);
-        metricSystem.tags(new HashMap<String, Object>() {{
-            put("topologyName", topologyName);
-            put("topologyId", topologyId);
-        }});
+        metricSystem.tags(new HashMap<String, Object>() {
+            {
+                put("topologyName", topologyName);
+                put("topologyId", topologyId);
+            }
+        });
         metricSystem.start();
     }
 

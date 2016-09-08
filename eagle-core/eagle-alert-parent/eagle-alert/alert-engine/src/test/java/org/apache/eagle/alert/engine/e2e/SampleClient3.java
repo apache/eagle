@@ -16,12 +16,11 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import java.util.Properties;
-
-import org.apache.kafka.clients.producer.KafkaProducer;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.kafka.clients.producer.KafkaProducer;
+
+import java.util.Properties;
 
 /**
  * @since Jun 12, 2016

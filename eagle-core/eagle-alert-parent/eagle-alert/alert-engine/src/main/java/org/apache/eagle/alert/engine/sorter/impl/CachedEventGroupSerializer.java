@@ -16,22 +16,22 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.utils.SerializableUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.mapdb.DataInput2;
 import org.mapdb.DataOutput2;
 import org.mapdb.serializer.GroupSerializerObjectArray;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * @deprecated performance is worse, should investigate
+ * @deprecated performance is worse, should investigate.
  */
 public class CachedEventGroupSerializer extends GroupSerializerObjectArray<PartitionedEvent[]> {
     private Map<Integer, StreamPartition> hashCodePartitionDict = new HashMap<>();

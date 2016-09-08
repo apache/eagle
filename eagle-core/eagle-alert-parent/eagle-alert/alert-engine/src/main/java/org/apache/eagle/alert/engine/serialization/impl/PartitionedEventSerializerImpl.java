@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.alert.engine.serialization.impl;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
@@ -27,23 +23,27 @@ import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.engine.serialization.Serializer;
 import org.apache.eagle.alert.engine.utils.CompressionUtils;
-
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 /**
  * Stream Metadata Cached Serializer
- * <p>
- * Performance:
- * <p>
+ *
+ * <p> Performance:
+ *
  * 1) VS Kryo Direct: reduce 73.4% space (bytes) and 42.5 % time (ms).
  * 2) VS Java Native: reduce 92.5% space (bytes) and 94.2% time (ms)
- * <p>
- * Tips:
- * <p>
+ * </p>
+ *
+ * <p>Tips:
  * 1) Without-compression performs better than with compression for small event
- * <p>
- * TODO: Cache Partition would save little space but almost half of serialization time, how to balance the performance?
+ * </p>
+ *
+ * <p>TODO: Cache Partition would save little space but almost half of serialization time, how to balance the performance?</p>
  *
  * @see PartitionedEvent
  */
@@ -53,8 +53,8 @@ public class PartitionedEventSerializerImpl implements Serializer<PartitionedEve
     private final boolean compress;
 
     /**
-     * @param serializationMetadataProvider metadata provider
-     * @param compress                      false by default
+     * @param serializationMetadataProvider metadata provider.
+     * @param compress                      false by default.
      */
     public PartitionedEventSerializerImpl(SerializationMetadataProvider serializationMetadataProvider, boolean compress) {
         this.streamEventSerializer = new StreamEventSerializer(serializationMetadataProvider);
@@ -76,6 +76,13 @@ public class PartitionedEventSerializerImpl implements Serializer<PartitionedEve
     }
 
     @Override
+    public byte[] serialize(PartitionedEvent entity) throws IOException {
+        ByteArrayDataOutput dataOutput = ByteStreams.newDataOutput();
+        this.serialize(entity, dataOutput);
+        return compress ? CompressionUtils.compress(dataOutput.toByteArray()) : dataOutput.toByteArray();
+    }
+
+    @Override
     public PartitionedEvent deserialize(DataInput dataInput) throws IOException {
         PartitionedEvent event = new PartitionedEvent();
         event.setPartitionKey(dataInput.readLong());
@@ -87,12 +94,6 @@ public class PartitionedEventSerializerImpl implements Serializer<PartitionedEve
         return event;
     }
 
-    @Override
-    public byte[] serialize(PartitionedEvent entity) throws IOException {
-        ByteArrayDataOutput dataOutput = ByteStreams.newDataOutput();
-        this.serialize(entity, dataOutput);
-        return compress ? CompressionUtils.compress(dataOutput.toByteArray()) : dataOutput.toByteArray();
-    }
 
     @Override
     public PartitionedEvent deserialize(byte[] bytes) throws IOException {

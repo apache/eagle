@@ -17,10 +17,10 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
+import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,11 +75,6 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         }
     }
 
-    /***
-     *
-     * @param key
-     * @return
-     */
     public AlertDeduplicationStatus checkDedup(EventUniq key) {
         long current = key.timestamp;
         if (!events.containsKey(key)) {

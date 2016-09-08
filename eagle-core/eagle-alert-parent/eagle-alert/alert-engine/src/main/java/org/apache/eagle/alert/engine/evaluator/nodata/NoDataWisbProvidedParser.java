@@ -25,10 +25,10 @@ import java.util.Set;
  * Since 6/29/16.
  */
 public class NoDataWisbProvidedParser implements NoDataWisbParser {
-    @Override
     /**
-     * policy value consists of "windowPeriod, type, numOfFields, f1_name, f2_name, f1_value, f2_value, f1_value, f2_value"
+     * policy value consists of "windowPeriod, type, numOfFields, f1_name, f2_name, f1_value, f2_value, f1_value, f2_value".
      */
+    @Override
     public Set<List<String>> parse(String[] args) {
         int numOfFields = Integer.parseInt(args[2]);
         Set<List<String>> wisbValues = new HashSet<>();

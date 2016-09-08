@@ -1,10 +1,10 @@
 package org.apache.eagle.alert.engine.evaluator;
 
-import java.io.Serializable;
-
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
+
+import java.io.Serializable;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -35,7 +35,7 @@ public interface PolicyGroupEvaluator extends PolicyChangeListener, Serializable
     void init(StreamContext context, AlertStreamCollector collector);
 
     /**
-     * Evaluate event
+     * Evaluate event.
      */
     void nextEvent(PartitionedEvent event);
 

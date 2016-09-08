@@ -17,29 +17,6 @@
  */
 package org.apache.eagle.alert.engine.publisher.email;
 
-import java.io.File;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -48,6 +25,18 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.*;
 
 public class EagleMailClient {
     private static final Logger LOG = LoggerFactory.getLogger(EagleMailClient.class);
@@ -91,7 +80,7 @@ public class EagleMailClient {
         }
     }
 
-    private boolean _send(String from, String to, String cc, String title, String content) {
+    private boolean sendInternal(String from, String to, String cc, String title, String content) {
         Message msg = new MimeMessage(session);
         try {
             msg.setFrom(new InternetAddress(from));
@@ -116,7 +105,7 @@ public class EagleMailClient {
         }
     }
 
-    private boolean _send(String from, String to, String cc, String title, String content, List<MimeBodyPart> attachments) {
+    private boolean sendInternal(String from, String to, String cc, String title, String content, List<MimeBodyPart> attachments) {
         MimeMessage mail = new MimeMessage(session);
         try {
             mail.setFrom(new InternetAddress(from));
@@ -141,7 +130,7 @@ public class EagleMailClient {
             }
 
             mail.setContent(multipart);
-//			mail.setContent(content, "text/html;charset=utf-8");
+            //  mail.setContent(content, "text/html;charset=utf-8");
             LOG.info(String.format("Going to send mail: from[%s], to[%s], cc[%s], title[%s]", from, to, cc, title));
             Transport.send(mail);
             return true;
@@ -156,7 +145,7 @@ public class EagleMailClient {
 
     public boolean send(String from, String to, String cc, String title,
                         String content) {
-        return this._send(from, to, cc, title, content);
+        return this.sendInternal(from, to, cc, title, content);
     }
 
     public boolean send(String from, String to, String cc, String title,
@@ -165,6 +154,7 @@ public class EagleMailClient {
         try {
             t = velocityEngine.getTemplate(BASE_PATH + templatePath);
         } catch (ResourceNotFoundException ex) {
+            // ignored
         }
         if (t == null) {
             try {
@@ -214,7 +204,7 @@ public class EagleMailClient {
         try {
             t = velocityEngine.getTemplate(BASE_PATH + templatePath);
         } catch (ResourceNotFoundException ex) {
-//			LOGGER.error("Template not found:"+BASE_PATH + templatePath, ex);
+            // ignored
         }
 
         if (t == null) {
@@ -235,6 +225,6 @@ public class EagleMailClient {
             LOG.debug(writer.toString());
         }
 
-        return this._send(from, to, cc, title, writer.toString(), mimeBodyParts);
+        return this.sendInternal(from, to, cc, title, writer.toString(), mimeBodyParts);
     }
 }

@@ -16,24 +16,23 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SiddhiDefinitionAdapter {
-    private final static Logger LOG = LoggerFactory.getLogger(SiddhiDefinitionAdapter.class);
-    public final static String DEFINE_STREAM_TEMPLATE = "define stream %s ( %s );";
+    private static final Logger LOG = LoggerFactory.getLogger(SiddhiDefinitionAdapter.class);
+    public static final String DEFINE_STREAM_TEMPLATE = "define stream %s ( %s );";
 
     public static String buildStreamDefinition(StreamDefinition streamDefinition) {
         List<String> columns = new ArrayList<>();
@@ -83,12 +82,12 @@ public class SiddhiDefinitionAdapter {
     /**
      * public enum Type {
      * STRING, INT, LONG, FLOAT, DOUBLE, BOOL, OBJECT
-     * }
+     * }.
      */
-    private final static Map<StreamColumn.Type, Attribute.Type> _EAGLE_SIDDHI_TYPE_MAPPING = new HashMap<>();
-    private final static Map<StreamColumn.Type, Class<?>> _EAGLE_JAVA_TYPE_MAPPING = new HashMap<>();
-    private final static Map<Class<?>, StreamColumn.Type> _JAVA_EAGLE_TYPE_MAPPING = new HashMap<>();
-    private final static Map<Attribute.Type, StreamColumn.Type> _SIDDHI_EAGLE_TYPE_MAPPING = new HashMap<>();
+    private static final Map<StreamColumn.Type, Attribute.Type> _EAGLE_SIDDHI_TYPE_MAPPING = new HashMap<>();
+    private static final Map<StreamColumn.Type, Class<?>> _EAGLE_JAVA_TYPE_MAPPING = new HashMap<>();
+    private static final Map<Class<?>, StreamColumn.Type> _JAVA_EAGLE_TYPE_MAPPING = new HashMap<>();
+    private static final Map<Attribute.Type, StreamColumn.Type> _SIDDHI_EAGLE_TYPE_MAPPING = new HashMap<>();
 
     static {
         _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.STRING, Attribute.Type.STRING);

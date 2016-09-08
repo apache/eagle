@@ -52,9 +52,7 @@ public class AlertStreamCallback extends StreamCallback {
     }
 
     /**
-     * Possibly more than one event will be triggered for alerting
-     *
-     * @param events
+     * Possibly more than one event will be triggered for alerting.
      */
     @Override
     public void receive(Event[] events) {

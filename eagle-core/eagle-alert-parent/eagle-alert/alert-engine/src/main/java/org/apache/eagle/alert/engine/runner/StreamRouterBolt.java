@@ -16,12 +16,6 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import backtype.storm.metric.api.MultiCountMetric;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.tuple.Tuple;
-import com.typesafe.config.Config;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
@@ -33,13 +27,21 @@ import org.apache.eagle.alert.engine.router.impl.StreamRouterBoltOutputCollector
 import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.utils.AlertConstants;
+
+import backtype.storm.metric.api.MultiCountMetric;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.tuple.Tuple;
+import com.typesafe.config.Config;
+import org.apache.commons.collections.CollectionUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouterBoltSpecListener, SerializationMetadataProvider {
-    private final static Logger LOG = LoggerFactory.getLogger(StreamRouterBolt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamRouterBolt.class);
     private static final long serialVersionUID = -7611470889316430372L;
     private StreamRouter router;
     private StreamRouterBoltOutputCollector routeCollector;
@@ -160,7 +162,7 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
     }
 
     /**
-     * in correlation cases, multiple streams will go to the same queue for correlation policy
+     * in correlation cases, multiple streams will go to the same queue for correlation policy.
      *
      * @param spec
      */

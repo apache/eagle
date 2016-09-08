@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.alert.engine.evaluator;
 
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.absence.AbsencePolicyHandler;
@@ -26,6 +24,8 @@ import org.apache.eagle.alert.engine.evaluator.impl.SiddhiPolicyStateHandler;
 import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyTimeBatchHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * TODO/FIXME: to support multiple stage definition in single policy. The methods in this class is not good to understand now.(Hard code of 0/1).

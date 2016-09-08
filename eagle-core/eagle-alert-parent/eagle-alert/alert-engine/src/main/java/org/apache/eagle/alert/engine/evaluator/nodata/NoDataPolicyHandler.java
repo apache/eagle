@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.alert.engine.evaluator.nodata;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -25,6 +24,7 @@ import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +39,10 @@ import java.util.*;
  * 2. timestamp field: timestamp column
  * 3. wiri safe time window: how long window is good for full set of wiri
  * 4. wisb: full set
- * <p>
  * No data policy definition should include
  * fixed fields and dynamic fields
  * fixed fields are leading fields : windowPeriod, type, numOfFields, f1_name, f2_name
  * dynamic fields depend on wisb type.
- * <p>
  * policy would be like:
  * {
  * "name": "noDataAlertPolicy",
@@ -182,7 +180,7 @@ public class NoDataPolicyHandler implements PolicyStreamHandler {
 
     private AlertStreamEvent createAlertEvent(long timestamp, Object[] triggerEvent) {
         String is = policyDef.getInputStreams().get(0);
-        StreamDefinition sd = sds.get(is);
+        final StreamDefinition sd = sds.get(is);
 
         AlertStreamEvent event = new AlertStreamEvent();
         event.setTimestamp(timestamp);

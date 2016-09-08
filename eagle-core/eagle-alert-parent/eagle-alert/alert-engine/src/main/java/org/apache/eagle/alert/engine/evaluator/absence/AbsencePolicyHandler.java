@@ -106,7 +106,7 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
             expectValues.add(fn);
         }
         offset += numOfFields;
-        String absence_window_rule_type = segments[offset++];
+        String absenceWindowRuleType = segments[offset++];
         AbsenceDailyRule rule = new AbsenceDailyRule();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));

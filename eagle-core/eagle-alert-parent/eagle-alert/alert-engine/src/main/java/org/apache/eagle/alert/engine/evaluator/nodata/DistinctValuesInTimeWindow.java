@@ -16,21 +16,16 @@
  */
 package org.apache.eagle.alert.engine.evaluator.nodata;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import java.util.*;
 
 /**
  * Since 6/28/16.
  * to get distinct values within a specified time window
  * valueMaxTimeMap : each distinct value is associated with max timestamp it ever had
  * timeSortedMap : map sorted by timestamp first and then value
- * With the above 2 data structure, we can get distinct values in LOG(N)
+ * With the above 2 data structure, we can get distinct values in LOG(N).
  */
 public class DistinctValuesInTimeWindow {
     public static class ValueAndTime {
@@ -79,11 +74,11 @@ public class DistinctValuesInTimeWindow {
     }
 
     /**
-     * map from value to max timestamp for this value
+     * map from value to max timestamp for this value.
      */
     private Map<Object, Long> valueMaxTimeMap = new HashMap<>();
     /**
-     * map sorted by time(max timestamp for the value) and then value
+     * map sorted by time(max timestamp for the value) and then value.
      */
     private SortedMap<ValueAndTime, ValueAndTime> timeSortedMap = new TreeMap<>(new ValueAndTimeComparator());
     private long maxTimestamp = 0L;
@@ -91,7 +86,7 @@ public class DistinctValuesInTimeWindow {
     private boolean windowSlided;
 
     /**
-     * @param window - milliseconds
+     * @param window - milliseconds.
      */
     public DistinctValuesInTimeWindow(long window) {
         this.window = window;

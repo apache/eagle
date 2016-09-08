@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class SiddhiPolicyStateHandler extends SiddhiPolicyHandler {
 
-    private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyStateHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SiddhiPolicyStateHandler.class);
 
     public SiddhiPolicyStateHandler(Map<String, StreamDefinition> sds, int index) {
         super(sds, index);

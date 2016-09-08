@@ -16,18 +16,18 @@
  */
 package org.apache.eagle.alert.engine.sorter;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
- * TODO: Make sure thread-safe
- * TODO: Leverage Off-Heap Memory to persist append-only events collection
+ * TODO: Make sure thread-safe.
+ * TODO: Leverage Off-Heap Memory to persist append-only events collection.
  */
 public abstract class BaseStreamWindow implements StreamWindow {
     private final long endTime;
@@ -35,16 +35,11 @@ public abstract class BaseStreamWindow implements StreamWindow {
     private final long margin;
     private final AtomicBoolean expired;
     private final long createdTime;
-    private final static Logger LOG = LoggerFactory.getLogger(BaseStreamWindow.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseStreamWindow.class);
     private PartitionedEventCollector collector;
     private final AtomicLong lastFlushedStreamTime;
     private final AtomicLong lastFlushedSystemTime;
 
-    /**
-     * @param startTime
-     * @param endTime
-     * @param marginTime
-     */
     public BaseStreamWindow(long startTime, long endTime, long marginTime) {
         if (startTime >= endTime) {
             throw new IllegalArgumentException("startTime: " + startTime + " >= endTime: " + endTime + ", expected: startTime < endTime");
@@ -120,13 +115,16 @@ public abstract class BaseStreamWindow implements StreamWindow {
     public synchronized void onTick(StreamTimeClock clock, long globalSystemTime) {
         if (!expired()) {
             if (clock.getTime() >= endTime + margin) {
-                LOG.info("Expiring {} at stream time:{}, latency:{}, window: {}", clock.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
+                LOG.info("Expiring {} at stream time:{}, latency:{}, window: {}", clock.getStreamId(),
+                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
                 lastFlushedStreamTime.set(clock.getTime());
                 lastFlushedSystemTime.set(globalSystemTime);
                 flush();
                 expired.set(true);
             } else if (globalSystemTime - lastFlushedSystemTime.get() >= endTime + margin - startTime && size() > 0) {
-                LOG.info("Flushing {} at system time: {}, stream time: {}, latency: {}, window: {}", clock.getStreamId(), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(globalSystemTime), DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
+                LOG.info("Flushing {} at system time: {}, stream time: {}, latency: {}, window: {}", clock.getStreamId(),
+                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(globalSystemTime),
+                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
                 lastFlushedStreamTime.set(clock.getTime());
                 lastFlushedSystemTime.set(globalSystemTime);
                 flush();
@@ -167,8 +165,8 @@ public abstract class BaseStreamWindow implements StreamWindow {
     }
 
     /**
-     * @param collector
-     * @return max timestamp
+     * @param collector PartitionedEventCollector.
+     * @return max timestamp.
      */
     protected abstract void flush(PartitionedEventCollector collector);
 

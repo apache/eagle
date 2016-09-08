@@ -16,13 +16,12 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
-import java.util.Arrays;
-
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-
 import backtype.storm.task.OutputCollector;
+
+import java.util.Arrays;
 
 public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
     private final OutputCollector delegate;

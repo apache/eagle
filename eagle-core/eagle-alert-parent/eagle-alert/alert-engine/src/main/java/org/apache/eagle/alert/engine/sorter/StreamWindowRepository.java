@@ -16,59 +16,58 @@
  */
 package org.apache.eagle.alert.engine.sorter;
 
+import org.apache.eagle.alert.engine.sorter.impl.StreamSortedWindowInMapDB;
+import org.apache.eagle.alert.engine.sorter.impl.StreamSortedWindowOnHeap;
+import com.google.common.base.Preconditions;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.eagle.alert.engine.sorter.impl.StreamSortedWindowInMapDB;
-import org.apache.eagle.alert.engine.sorter.impl.StreamSortedWindowOnHeap;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-
 /**
  * ===== Benchmark Result Report =====<br/><br/>
- * <p>
- * Num. Operation   Type                            Time<br/>
- * ---- ---------   ----                            ----<br/>
- * 1000	FlushTime	DIRECT_MEMORY            	:	55<br/>
- * 1000	FlushTime	FILE_RAF                 	:	63<br/>
- * 1000	FlushTime	MEMORY                   	:	146<br/>
- * 1000	FlushTime	ONHEAP                   	:	17<br/>
- * 1000	InsertTime	DIRECT_MEMORY           	:	68<br/>
- * 1000	InsertTime	FILE_RAF                	:	223<br/>
- * 1000	InsertTime	MEMORY                  	:	273<br/>
- * 1000	InsertTime	ONHEAP                  	:	20<br/>
- * 10000	FlushTime	DIRECT_MEMORY           	:	551<br/>
- * 10000	FlushTime	FILE_RAF                	:	668<br/>
- * 10000	FlushTime	MEMORY                  	:	643<br/>
- * 10000	FlushTime	ONHEAP                  	:	5<br/>
- * 10000	InsertTime	DIRECT_MEMORY          	:	446<br/>
- * 10000	InsertTime	FILE_RAF               	:	2095<br/>
- * 10000	InsertTime	MEMORY                 	:	784<br/>
- * 10000	InsertTime	ONHEAP                 	:	29<br/>
- * 100000	FlushTime	DIRECT_MEMORY          	:	6139<br/>
- * 100000	FlushTime	FILE_RAF               	:	6237<br/>
- * 100000	FlushTime	MEMORY                 	:	6238<br/>
- * 100000	FlushTime	ONHEAP                 	:	18<br/>
- * 100000	InsertTime	DIRECT_MEMORY         	:	4499<br/>
- * 100000	InsertTime	FILE_RAF              	:	22343<br/>
- * 100000	InsertTime	MEMORY                	:	4962<br/>
- * 100000	InsertTime	ONHEAP                	:	107<br/>
- * 1000000	FlushTime	DIRECT_MEMORY         	:	61356<br/>
- * 1000000	FlushTime	FILE_RAF              	:	63025<br/>
- * 1000000	FlushTime	MEMORY                	:	61380<br/>
- * 1000000	FlushTime	ONHEAP                	:	47<br/>
- * 1000000	InsertTime	DIRECT_MEMORY        	:	43637<br/>
- * 1000000	InsertTime	FILE_RAF             	:	464481<br/>
- * 1000000	InsertTime	MEMORY               	:	44367<br/>
- * 1000000	InsertTime	ONHEAP               	:	2040<br/>
  *
+ * <p>Num. Operation   Type                            Time<br/>
+ * ---- ---------   ----                            ----<br/>
+ * 1000    FlushTime    DIRECT_MEMORY                :    55<br/>
+ * 1000    FlushTime    FILE_RAF                     :    63<br/>
+ * 1000    FlushTime    MEMORY                       :    146<br/>
+ * 1000    FlushTime    ONHEAP                       :    17<br/>
+ * 1000    InsertTime    DIRECT_MEMORY               :    68<br/>
+ * 1000    InsertTime    FILE_RAF                    :    223<br/>
+ * 1000    InsertTime    MEMORY                      :    273<br/>
+ * 1000    InsertTime    ONHEAP                      :    20<br/>
+ * 10000    FlushTime    DIRECT_MEMORY               :    551<br/>
+ * 10000    FlushTime    FILE_RAF                    :    668<br/>
+ * 10000    FlushTime    MEMORY                      :    643<br/>
+ * 10000    FlushTime    ONHEAP                      :    5<br/>
+ * 10000    InsertTime    DIRECT_MEMORY              :    446<br/>
+ * 10000    InsertTime    FILE_RAF                   :    2095<br/>
+ * 10000    InsertTime    MEMORY                     :    784<br/>
+ * 10000    InsertTime    ONHEAP                     :    29<br/>
+ * 100000    FlushTime    DIRECT_MEMORY              :    6139<br/>
+ * 100000    FlushTime    FILE_RAF                   :    6237<br/>
+ * 100000    FlushTime    MEMORY                     :    6238<br/>
+ * 100000    FlushTime    ONHEAP                     :    18<br/>
+ * 100000    InsertTime    DIRECT_MEMORY             :    4499<br/>
+ * 100000    InsertTime    FILE_RAF                  :    22343<br/>
+ * 100000    InsertTime    MEMORY                    :    4962<br/>
+ * 100000    InsertTime    ONHEAP                    :    107<br/>
+ * 1000000    FlushTime    DIRECT_MEMORY             :    61356<br/>
+ * 1000000    FlushTime    FILE_RAF                  :    63025<br/>
+ * 1000000    FlushTime    MEMORY                    :    61380<br/>
+ * 1000000    FlushTime    ONHEAP                    :    47<br/>
+ * 1000000    InsertTime    DIRECT_MEMORY            :    43637<br/>
+ * 1000000    InsertTime    FILE_RAF                 :    464481<br/>
+ * 1000000    InsertTime    MEMORY                   :    44367<br/>
+ * 1000000    InsertTime    ONHEAP                   :    2040<br/>
+ * </p>
  * @see StreamSortedWindowOnHeap
  * @see org.mapdb.DBMaker
  */
@@ -104,7 +103,7 @@ public class StreamWindowRepository {
         FILE_RAF
     }
 
-    private final static Logger LOG = LoggerFactory.getLogger(StreamWindowRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamWindowRepository.class);
     private final Map<StorageType, DB> dbPool;
 
     private StreamWindowRepository() {
@@ -114,7 +113,7 @@ public class StreamWindowRepository {
     private static StreamWindowRepository repository;
 
     /**
-     * Close automatically when JVM exists
+     * Close automatically when JVM exists.
      *
      * @return StreamWindowRepository singletonInstance
      */
@@ -209,12 +208,6 @@ public class StreamWindowRepository {
     }
 
     public interface StreamWindowStrategy {
-        /**
-         * @param start
-         * @param end
-         * @param margin
-         * @return
-         */
         StreamWindow createWindow(long start, long end, long margin, StreamWindowRepository repository);
     }
 
@@ -228,8 +221,8 @@ public class StreamWindowRepository {
     }
 
     public static class WindowSizeStrategy implements StreamWindowStrategy {
-        private final static long ONE_HOUR = 3600 * 1000;
-        private final static long FIVE_HOURS = 5 * 3600 * 1000;
+        private static final long ONE_HOUR = 3600 * 1000;
+        private static final long FIVE_HOURS = 5 * 3600 * 1000;
         private final long onheapWindowSizeLimit;
         private final long offheapWindowSizeLimit;
 

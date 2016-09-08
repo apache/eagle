@@ -16,26 +16,21 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import storm.trident.partition.GlobalGrouping;
 import backtype.storm.generated.GlobalStreamId;
 import backtype.storm.grouping.CustomStreamGrouping;
 import backtype.storm.task.WorkerTopologyContext;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import storm.trident.partition.GlobalGrouping;
+
+import java.util.*;
 
 public class RoutePhysicalGrouping implements CustomStreamGrouping {
     private static final long serialVersionUID = -511915083994148362L;
-    private final static Logger LOG = LoggerFactory.getLogger(RoutePhysicalGrouping.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RoutePhysicalGrouping.class);
     private List<Integer> outdegreeTasks;
     private ShuffleGrouping shuffleGroupingDelegate;
     private GlobalGrouping globalGroupingDelegate;

@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.alert.engine.nodata;
 
+import org.apache.eagle.alert.engine.evaluator.nodata.DistinctValuesInTimeWindow;
+import org.junit.Test;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import org.apache.eagle.alert.engine.evaluator.nodata.DistinctValuesInTimeWindow;
-import org.junit.Test;
 
 /**
  * Since 6/28/16.

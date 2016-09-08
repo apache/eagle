@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * alert email bean
- * one email consists of a list of email component
+ * one email consists of a list of email component.
  */
 public class AlertEmailContext {
     private Map<String, String> alertContext;

@@ -35,7 +35,7 @@ import java.util.Map;
 public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     private static final long serialVersionUID = -5499413193675985288L;
 
-    private final static Logger LOG = LoggerFactory.getLogger(PolicyGroupEvaluatorImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PolicyGroupEvaluatorImpl.class);
 
     private AlertStreamCollector collector;
     // mapping from policy name to PolicyDefinition
@@ -77,7 +77,7 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     }
 
     /**
-     * fixme make selection of PolicyStreamHandler to be more efficient
+     * fixme make selection of PolicyStreamHandler to be more efficient.
      *
      * @param partitionedEvent PartitionedEvent
      */
@@ -104,9 +104,9 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     }
 
     private static boolean isAcceptedByPolicy(PartitionedEvent event, PolicyDefinition policy) {
-        return policy.getPartitionSpec().contains(event.getPartition()) &&
-            (policy.getInputStreams().contains(event.getEvent().getStreamId()) ||
-                policy.getDefinition().getInputStreams().contains(event.getEvent().getStreamId()));
+        return policy.getPartitionSpec().contains(event.getPartition())
+            && (policy.getInputStreams().contains(event.getEvent().getStreamId())
+            || policy.getDefinition().getInputStreams().contains(event.getEvent().getStreamId()));
     }
 
     @Override

@@ -19,37 +19,33 @@ package org.apache.eagle.alert.engine.sorter;
 
 /**
  * Possible implementation:
- * <p>
- * 1) EventTimeClockTrigger (by default)
- * 2) SystemTimeClockTrigger
+ *
+ * <p>1) EventTimeClockTrigger (by default).
+ * 2) SystemTimeClockTrigger.</p>
  */
 public interface StreamTimeClockTrigger {
     /**
-     * @param streamId stream id to listen to
-     * @param listener to watch on streamId
+     * @param streamId stream id to listen to.
+     * @param listener to watch on streamId.
      */
     void registerListener(String streamId, StreamTimeClockListener listener);
 
-    /**
-     * @param streamClock
-     * @param listener
-     */
     void registerListener(StreamTimeClock streamClock, StreamTimeClockListener listener);
 
     /**
-     * @param listener listener to remove
+     * @param listener listener to remove.
      */
     void removeListener(StreamTimeClockListener listener);
 
     /**
-     * Trigger tick of all listeners on certain stream
+     * Trigger tick of all listeners on certain stream.
      *
      * @param streamId stream id
      */
     void triggerTickOn(String streamId);
 
     /**
-     * Update time per new event time on stream
+     * Update time per new event time on stream.
      *
      * @param streamId
      * @param timestamp

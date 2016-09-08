@@ -19,6 +19,12 @@
 
 package org.apache.eagle.alert.engine.runner;
 
+import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
+import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
+import org.apache.eagle.alert.engine.spout.CorrelationSpout;
+import org.apache.eagle.alert.utils.AlertConstants;
+import org.apache.eagle.alert.utils.StreamIdConversion;
+
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.StormTopology;
@@ -28,11 +34,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigRenderOptions;
-import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
-import org.apache.eagle.alert.engine.spout.CorrelationSpout;
-import org.apache.eagle.alert.utils.AlertConstants;
-import org.apache.eagle.alert.utils.StreamIdConversion;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,19 +50,19 @@ import java.util.List;
  */
 public class UnitTopologyRunner {
     private static final Logger LOG = LoggerFactory.getLogger(UnitTopologyRunner.class);
-    public final static String spoutName = "alertEngineSpout";
-    private final static String streamRouterBoltNamePrefix = "streamRouterBolt";
-    private final static String alertBoltNamePrefix = "alertBolt";
-    public final static String alertPublishBoltName = "alertPublishBolt";
+    public static final String spoutName = "alertEngineSpout";
+    private static final String streamRouterBoltNamePrefix = "streamRouterBolt";
+    private static final String alertBoltNamePrefix = "alertBolt";
+    public static final String alertPublishBoltName = "alertPublishBolt";
 
-    public final static String TOTAL_WORKER_NUM = "topology.numOfTotalWorkers";
-    public final static String SPOUT_TASK_NUM = "topology.numOfSpoutTasks";
-    public final static String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
-    public final static String ALERT_TASK_NUM = "topology.numOfAlertBolts";
-    public final static String PUBLISH_TASK_NUM = "topology.numOfPublishTasks";
-    public final static String LOCAL_MODE = "topology.localMode";
-    public final static String MESSAGE_TIMEOUT_SECS = "topology.messageTimeoutSecs";
-    public final static int DEFAULT_MESSAGE_TIMEOUT_SECS = 3600;
+    public static final String TOTAL_WORKER_NUM = "topology.numOfTotalWorkers";
+    public static final String SPOUT_TASK_NUM = "topology.numOfSpoutTasks";
+    public static final String ROUTER_TASK_NUM = "topology.numOfRouterBolts";
+    public static final String ALERT_TASK_NUM = "topology.numOfAlertBolts";
+    public static final String PUBLISH_TASK_NUM = "topology.numOfPublishTasks";
+    public static final String LOCAL_MODE = "topology.localMode";
+    public static final String MESSAGE_TIMEOUT_SECS = "topology.messageTimeoutSecs";
+    public static final int DEFAULT_MESSAGE_TIMEOUT_SECS = 3600;
 
     private final IMetadataChangeNotifyService metadataChangeNotifyService;
     private backtype.storm.Config givenStormConfig = null;
@@ -83,7 +85,7 @@ public class UnitTopologyRunner {
 
         StreamRouterBolt[] routerBolts = new StreamRouterBolt[numOfRouterBolts];
         AlertBolt[] alertBolts = new AlertBolt[numOfAlertBolts];
-        AlertPublisherBolt publisherBolt;
+
 
         TopologyBuilder builder = new TopologyBuilder();
 
@@ -103,7 +105,7 @@ public class UnitTopologyRunner {
         }
 
         // construct AlertPublishBolt object
-        publisherBolt = new AlertPublisherBolt(alertPublishBoltName, config, getMetadataChangeNotifyService());
+        AlertPublisherBolt publisherBolt = new AlertPublisherBolt(alertPublishBoltName, config, getMetadataChangeNotifyService());
 
         // connect spout and router bolt, also define output streams for downstreaming alert bolt
         for (int i = 0; i < numOfRouterBolts; i++) {
@@ -142,6 +144,14 @@ public class UnitTopologyRunner {
         }
 
         return builder.createTopology();
+    }
+
+    public StormTopology buildTopology(String topologyId, Config config) {
+        int numOfSpoutTasks = config.getInt("topology.numOfSpoutTasks");
+        int numOfRouterBolts = config.getInt("topology.numOfRouterBolts");
+        int numOfAlertBolts = config.getInt("topology.numOfAlertBolts");
+        int numOfPublishTasks = config.getInt("topology.numOfPublishTasks");
+        return buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
     }
 
     private void run(String topologyId,
@@ -191,14 +201,6 @@ public class UnitTopologyRunner {
         boolean localMode = config.getBoolean(LOCAL_MODE);
         int numOfTotalWorkers = config.getInt(TOTAL_WORKER_NUM);
         run(topologyId, numOfTotalWorkers, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config, localMode);
-    }
-
-    public StormTopology buildTopology(String topologyId, Config config) {
-        int numOfSpoutTasks = config.getInt("topology.numOfSpoutTasks");
-        int numOfRouterBolts = config.getInt("topology.numOfRouterBolts");
-        int numOfAlertBolts = config.getInt("topology.numOfAlertBolts");
-        int numOfPublishTasks = config.getInt("topology.numOfPublishTasks");
-        return buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
     }
 
     public IMetadataChangeNotifyService getMetadataChangeNotifyService() {

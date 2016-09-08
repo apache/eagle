@@ -46,11 +46,7 @@ public class AbsenceWindowProcessor {
     }
 
     /**
-     * return true if it is certain that expected attributes don't occur during startTime and endTime, else return false
-     *
-     * @param appearAttrs
-     * @param occurTime
-     * @return
+     * return true if it is certain that expected attributes don't occur during startTime and endTime, else return false.
      */
     public void process(List<Object> appearAttrs, long occurTime) {
         if (expired) {
@@ -60,8 +56,8 @@ public class AbsenceWindowProcessor {
             case not_sure:
                 if (occurTime < window.startTime) {
                     break;
-                } else if (occurTime >= window.startTime &&
-                    occurTime <= window.endTime) {
+                } else if (occurTime >= window.startTime
+                    && occurTime <= window.endTime) {
                     if (expectAttrs.equals(appearAttrs)) {
                         status = OccurStatus.occured;
                     }

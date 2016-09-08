@@ -18,7 +18,6 @@ package org.apache.eagle.alert.engine;
 
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.TopologyContext;
-
 import com.typesafe.config.Config;
 
 public class StreamContextImpl implements StreamContext {

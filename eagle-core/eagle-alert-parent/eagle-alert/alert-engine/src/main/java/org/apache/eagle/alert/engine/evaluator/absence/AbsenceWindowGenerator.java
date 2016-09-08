@@ -27,8 +27,9 @@ public class AbsenceWindowGenerator {
     }
 
     /**
-     * @param currTime
-     * @return
+     * nextWindow.
+     *
+     * @param currTime current timestamp
      */
     public AbsenceWindow nextWindow(long currTime) {
         AbsenceWindow window = new AbsenceWindow();

@@ -17,12 +17,12 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * The producer is thread safe and sharing a single producer instance across threads will generally be faster than

@@ -16,17 +16,15 @@
  */
 package org.apache.eagle.alert.engine.nodata;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-
 import org.apache.eagle.alert.engine.evaluator.nodata.DistinctValuesInTimeBatchWindow;
 import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyTimeBatchHandler;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.*;
 
 public class TestDistinctValuesInTimeBatchWindow {
 

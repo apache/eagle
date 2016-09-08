@@ -18,10 +18,6 @@
  */
 package org.apache.eagle.alert.engine.siddhi.extension;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +26,10 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @since Apr 1, 2016

@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
-import java.io.IOException;
-import java.util.Comparator;
-
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.utils.SerializableUtils;
 import org.jetbrains.annotations.NotNull;
@@ -27,17 +24,12 @@ import org.mapdb.DataOutput2;
 import org.mapdb.Serializer;
 import org.mapdb.serializer.GroupSerializer;
 
+import java.io.IOException;
+import java.util.Comparator;
+
 
 public class PartitionedEventGroupSerializer implements GroupSerializer<PartitionedEvent[]> {
     private static final GroupSerializer<byte[]> delegate = Serializer.BYTE_ARRAY;
-
-    private static PartitionedEvent[] deserialize(byte[] bytes) {
-        return (PartitionedEvent[]) SerializableUtils.deserializeFromCompressedByteArray(bytes, "deserialize as stream event");
-    }
-
-    private static byte[] serialize(PartitionedEvent[] events) {
-        return SerializableUtils.serializeToCompressedByteArray(events);
-    }
 
     @Override
     public int valueArraySearch(Object keys, PartitionedEvent[] key) {
@@ -105,8 +97,17 @@ public class PartitionedEventGroupSerializer implements GroupSerializer<Partitio
         delegate.serialize(out, serialize(value));
     }
 
+    private static byte[] serialize(PartitionedEvent[] events) {
+        return SerializableUtils.serializeToCompressedByteArray(events);
+    }
+
     @Override
     public PartitionedEvent[] deserialize(@NotNull DataInput2 input, int available) throws IOException {
         return deserialize(delegate.deserialize(input, available));
     }
+
+    private static PartitionedEvent[] deserialize(byte[] bytes) {
+        return (PartitionedEvent[]) SerializableUtils.deserializeFromCompressedByteArray(bytes, "deserialize as stream event");
+    }
+
 }

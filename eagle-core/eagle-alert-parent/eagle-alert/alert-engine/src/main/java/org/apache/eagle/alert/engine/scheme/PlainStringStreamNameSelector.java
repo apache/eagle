@@ -19,12 +19,12 @@
 
 package org.apache.eagle.alert.engine.scheme;
 
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.eagle.alert.coordination.model.StreamNameSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Since 5/3/16.
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class PlainStringStreamNameSelector implements StreamNameSelector {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(PlainStringStreamNameSelector.class);
-    private final static String USER_PROVIDED_STREAM_NAME_PROPERTY = "userProvidedStreamName";
+    private static final String USER_PROVIDED_STREAM_NAME_PROPERTY = "userProvidedStreamName";
     private static final String DEFAULT_STRING_STREAM_NAME = "defaultStringStream";
 
     private String streamName;

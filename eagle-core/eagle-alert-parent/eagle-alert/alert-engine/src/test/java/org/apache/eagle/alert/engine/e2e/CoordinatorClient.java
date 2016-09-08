@@ -16,21 +16,19 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import java.io.Closeable;
-import java.io.IOException;
-
-import javax.ws.rs.core.MediaType;
-
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.typesafe.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.MediaType;
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * @since May 9, 2016

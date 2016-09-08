@@ -22,20 +22,13 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.sorter.StreamTimeClockListener;
 
 public interface StreamSortHandler extends StreamTimeClockListener {
-    /**
-     * @param streamId
-     * @param streamSortSpecSpec
-     * @param outputCollector
-     */
+
     void prepare(String streamId, StreamSortSpec streamSortSpecSpec, PartitionedEventCollector outputCollector);
 
     /**
-     * @param event StreamEvent
+     * @param event StreamEvent.
      */
     void nextEvent(PartitionedEvent event);
 
-    /**
-     *
-     */
     void close();
 }

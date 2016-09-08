@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.BitSet;
 
 /**
+ * StreamEventSerializer.
+ *
  * @see StreamEvent
  */
 public class StreamEventSerializer implements Serializer<StreamEvent> {
@@ -38,10 +40,6 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
         this.serializationMetadataProvider = serializationMetadataProvider;
     }
 
-    /**
-     * @param objects
-     * @return
-     */
     private BitSet isNullBitSet(Object[] objects) {
         BitSet bitSet = new BitSet();
         int i = 0;
@@ -57,9 +55,9 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
         // Bryant: here "metaVersion/streamId" writes to dataOutputUTF
         String metaVersion = event.getMetaVersion();
         String streamId = event.getStreamId();
-        String metaVersion_streamId = String.format("%s/%s", metaVersion, streamId);
+        String metaVersionStreamId = String.format("%s/%s", metaVersion, streamId);
 
-        dataOutput.writeUTF(metaVersion_streamId);
+        dataOutput.writeUTF(metaVersionStreamId);
         dataOutput.writeLong(event.getTimestamp());
         if (event.getData() == null || event.getData().length == 0) {
             dataOutput.writeInt(0);
@@ -88,9 +86,9 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
     @Override
     public StreamEvent deserialize(DataInput dataInput) throws IOException {
         StreamEvent event = new StreamEvent();
-        String metaVersion_streamId = dataInput.readUTF();
-        String streamId = metaVersion_streamId.split("/")[1];
-        String metaVersion = metaVersion_streamId.split("/")[0];
+        String metaVersionStreamId = dataInput.readUTF();
+        String streamId = metaVersionStreamId.split("/")[1];
+        String metaVersion = metaVersionStreamId.split("/")[0];
         event.setStreamId(streamId);
         event.setMetaVersion(metaVersion);
 

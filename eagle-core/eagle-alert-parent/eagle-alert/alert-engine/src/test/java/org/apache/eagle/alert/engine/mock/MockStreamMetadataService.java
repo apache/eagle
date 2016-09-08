@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.alert.engine.mock;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MockStreamMetadataService {
     private final Map<String, StreamDefinition> streamSchemaMap = new HashMap<>();

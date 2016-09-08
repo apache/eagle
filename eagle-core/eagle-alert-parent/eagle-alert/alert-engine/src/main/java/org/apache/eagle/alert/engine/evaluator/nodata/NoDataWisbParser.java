@@ -25,7 +25,7 @@ import java.util.Set;
 public interface NoDataWisbParser {
     /**
      * parse policy definition and return WISB values for one or multiple fields
-     * for example host and data center are 2 fields for no data alert, then WISB is a list of two values
+     * for example host and data center are 2 fields for no data alert, then WISB is a list of two values.
      *
      * @param args some information parsed from policy defintion
      * @return list of list of field values

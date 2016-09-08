@@ -16,8 +16,7 @@
  */
 package org.apache.eagle.alert.engine.sorter;
 
-import java.util.List;
-
+import com.google.common.collect.Ordering;
 import org.apache.eagle.alert.engine.mock.MockPartitionedCollector;
 import org.apache.eagle.alert.engine.mock.MockSampleMetadataFactory;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
@@ -29,7 +28,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Ordering;
+import java.util.List;
 
 @SuppressWarnings("unused")
 public class StreamWindowTestSuite {

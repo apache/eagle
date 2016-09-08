@@ -1,8 +1,4 @@
-package org.apache.eagle.alert.engine.publisher;
-
-import java.io.Serializable;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,14 +14,12 @@ import java.io.Serializable;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.engine.publisher;
+
+import java.io.Serializable;
+
 public interface AlertSink extends Serializable {
-    /**
-     * @throws Exception
-     */
     void open() throws Exception;
 
-    /**
-     * @throws Exception
-     */
     void close() throws Exception;
 }

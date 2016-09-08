@@ -19,19 +19,18 @@
 
 package org.apache.eagle.alert.engine.scheme;
 
+import backtype.storm.spout.Scheme;
+import backtype.storm.tuple.Fields;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-
-import backtype.storm.spout.Scheme;
-import backtype.storm.tuple.Fields;
-
 /**
- * Expects flat Json scheme
+ * Expects flat Json scheme.
  */
 public class JsonScheme implements Scheme {
     private static final long serialVersionUID = -8352896475656975577L;

@@ -16,17 +16,17 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.router.StreamRoute;
 import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
     private final List<String> outputComponentIds;

@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.alert.engine.utils;
 
-import java.text.ParseException;
-
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.text.ParseException;
 
 public class TimePeriodUtilsTest {
     @Test

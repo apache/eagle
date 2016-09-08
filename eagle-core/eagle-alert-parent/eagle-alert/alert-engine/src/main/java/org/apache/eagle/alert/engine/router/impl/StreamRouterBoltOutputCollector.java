@@ -18,13 +18,6 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
@@ -40,21 +33,20 @@ import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
 import org.apache.eagle.alert.engine.router.StreamRouteSpecListener;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 import org.apache.eagle.alert.utils.StreamIdConversion;
+import backtype.storm.task.OutputCollector;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.task.OutputCollector;
-
-import com.google.common.collect.Lists;
+import java.util.*;
 
 /**
  * After sorting, one stream's message will be routed based on its StreamPartition
- * One stream may have multiple StreamPartitions based on how this stream is grouped by
- * <p>
+ * One stream may have multiple StreamPartitions based on how this stream is grouped by.
  * TODO: Add metric statistics
  */
 public class StreamRouterBoltOutputCollector implements PartitionedEventCollector, StreamRouteSpecListener {
-    private final static Logger LOG = LoggerFactory.getLogger(StreamRouterBoltOutputCollector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamRouterBoltOutputCollector.class);
     private final OutputCollector outputCollector;
     private final Object outputLock = new Object();
     //    private final List<String> outputStreamIds;
@@ -69,7 +61,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         this.outputCollector = outputCollector;
         this.routeSpecMap = new HashMap<>();
         this.routePartitionerMap = new HashMap<>();
-//        this.outputStreamIds = outputStreamIds;
+        // this.outputStreamIds = outputStreamIds;
         this.streamContext = streamContext;
         this.serializer = serializer;
     }

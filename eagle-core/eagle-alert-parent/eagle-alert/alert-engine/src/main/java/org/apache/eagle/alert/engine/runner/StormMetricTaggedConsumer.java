@@ -16,29 +16,23 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.metric.IMetricSystem;
 import org.apache.eagle.alert.metric.MetricSystem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backtype.storm.metric.api.IMetricsConsumer;
 import backtype.storm.task.IErrorReporter;
 import backtype.storm.task.TopologyContext;
-
 import com.codahale.metrics.Gauge;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigParseOptions;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
- * Per MetricSystem instance per task
+ * Per MetricSystem instance per task.
  */
 public class StormMetricTaggedConsumer implements IMetricsConsumer {
     public static final Logger LOG = LoggerFactory.getLogger(StormMetricTaggedConsumer.class);
@@ -65,12 +59,14 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
             if (metricSystem == null) {
                 metricSystem = MetricSystem.load(config);
                 metricSystems.put(uniqueTaskKey, metricSystem);
-                metricSystem.tags(new HashMap<String, Object>() {{
-                    put("topology", topologyName);
-                    put("stormId", stormId);
-                    put("component", taskInfo.srcComponentId);
-                    put("task", taskInfo.srcTaskId);
-                }});
+                metricSystem.tags(new HashMap<String, Object>() {
+                    {
+                        put("topology", topologyName);
+                        put("stormId", stormId);
+                        put("component", taskInfo.srcComponentId);
+                        put("task", taskInfo.srcTaskId);
+                    }
+                });
                 metricSystem.start();
                 LOG.info("Initialized metric reporter for {}", uniqueTaskKey);
             }

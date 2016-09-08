@@ -16,9 +16,7 @@
  */
 package org.apache.eagle.alert.engine.sorter;
 
-import java.util.Arrays;
-import java.util.Iterator;
-
+import com.google.common.collect.TreeMultiset;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
@@ -26,7 +24,8 @@ import org.apache.eagle.alert.engine.sorter.impl.PartitionedEventTimeOrderingCom
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.TreeMultiset;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * Since 5/10/16.

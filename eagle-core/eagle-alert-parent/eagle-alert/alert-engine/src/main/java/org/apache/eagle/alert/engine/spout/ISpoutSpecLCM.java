@@ -19,10 +19,10 @@
 
 package org.apache.eagle.alert.engine.spout;
 
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+
+import java.util.Map;
 
 /**
  * topic to stream metadata lifecycle method

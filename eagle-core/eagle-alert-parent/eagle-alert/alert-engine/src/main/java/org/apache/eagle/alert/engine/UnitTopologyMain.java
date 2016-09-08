@@ -19,28 +19,30 @@
 
 package org.apache.eagle.alert.engine;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
 import org.apache.eagle.alert.config.ZKConfig;
 import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
-
 import backtype.storm.generated.StormTopology;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+
 
 /**
- * Since 5/3/16. Make sure unit topology can be started either from command line
+ * Make sure unit topology can be started either from command line
  * or from remote A few parameters for starting unit topology 1. number of spout
  * tasks 2. number of router bolts 3. number of alert bolts 4. number of publish
  * bolts
- * <p>
- * Connections 1. spout and router bolt 2. router bolt and alert bolt 3. alert
- * bolt and publish bolt
+ *
+ * <p>Connections 1. spout and router bolt 2. router bolt and alert bolt 3. alert
+ * bolt and publish bolt.</p>
+ *
+ * @since 5/3/16.
+ *
  */
 public class UnitTopologyMain {
 

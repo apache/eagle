@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.alert.engine.utils;
 
-import java.io.IOException;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class CompressionUtilsTest {
     private final static Logger LOG = LoggerFactory.getLogger(CompressionUtilsTest.class);

@@ -18,14 +18,6 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
@@ -37,28 +29,26 @@ import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider
 import org.apache.eagle.alert.engine.serialization.Serializers;
 import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.alert.utils.StreamIdConversion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import storm.kafka.BrokerHosts;
-import storm.kafka.KafkaSpoutMetric;
-import storm.kafka.KafkaSpoutWrapper;
-import storm.kafka.SpoutConfig;
-import storm.kafka.ZkHosts;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-
 import com.typesafe.config.Config;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import storm.kafka.*;
+
+import java.text.MessageFormat;
+import java.util.*;
 
 /**
  * wrap KafkaSpout to provide parallel processing of messages for multiple Kafka topics
- * <p>
- * 1. onNewConfig() is interface for outside to update new metadata. Upon new metadata, this class will calculate if there is any new topic, removed topic or
- * updated topic
+ *
+ * <p>1. onNewConfig() is interface for outside to update new metadata. Upon new metadata, this class will calculate if there is any new topic, removed topic or
+ * updated topic</p>
  */
 public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener, SerializationMetadataProvider {
     private static final long serialVersionUID = -5280723341236671580L;
@@ -90,7 +80,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     private volatile Map<String, StreamDefinition> sds;
 
     /**
-     * FIXME one single changeNotifyService may have issues as possibly multiple spout tasks will register themselves and initialize service
+     * FIXME one single changeNotifyService may have issues as possibly multiple spout tasks will register themselves and initialize service.
      *
      * @param config
      * @param topologyId
@@ -106,7 +96,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
      * @param topologyId       used for distinguishing kafka offset for different topologies
      * @param numOfRouterBolts used for generating streamId and routing
      * @param spoutName        used for generating streamId between spout and router bolt
-     * @param routerBoltName   used for generating streamId between spout and router bolt
+     * @param routerBoltName   used for generating streamId between spout and router bolt.
      */
     public CorrelationSpout(Config config, String topologyId, IMetadataChangeNotifyService changeNotifyService, int numOfRouterBolts, String spoutName, String routerBoltName) {
         this.config = config;
@@ -126,7 +116,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     }
 
     /**
-     * the only output field is for StreamEvent
+     * the only output field is for StreamEvent.
      *
      * @param declarer
      */
@@ -182,7 +172,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
 
     /**
      * find the correct wrapper to do ack that means msgId should be mapped to
-     * wrapper
+     * wrapper.
      *
      * @param msgId
      */
@@ -291,8 +281,8 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
      * consumerId by default is EagleConsumer unless it is specified by "stormKafkaEagleConsumer"
      * Note2: put topologyId as part of zkState because one topic by design can be consumed by multiple topologies so one topology needs to know
      * processed offset for itself
-     * <p>
-     * TODO: Should avoid use Config.get in deep calling stack, should generate config bean as early as possible
+     *
+     * <p>TODO: Should avoid use Config.get in deep calling stack, should generate config bean as early as possible
      *
      * @param conf
      * @param context

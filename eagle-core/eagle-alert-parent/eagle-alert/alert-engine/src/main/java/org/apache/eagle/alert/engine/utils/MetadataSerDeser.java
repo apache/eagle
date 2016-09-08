@@ -19,13 +19,13 @@
 
 package org.apache.eagle.alert.engine.utils;
 
-import java.io.InputStream;
-
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
 
 /**
  * Since 5/6/16.

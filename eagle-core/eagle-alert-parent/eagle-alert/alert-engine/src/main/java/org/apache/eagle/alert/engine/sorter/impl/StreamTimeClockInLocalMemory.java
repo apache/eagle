@@ -16,15 +16,14 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.eagle.alert.engine.sorter.StreamTimeClock;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 
 /**
- * In memory thread-safe time clock service
- * <p>
+ * In memory thread-safe time clock service.
  * TODO: maybe need to synchronize time clock globally, how to?
  */
 public class StreamTimeClockInLocalMemory implements StreamTimeClock {
