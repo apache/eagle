@@ -18,11 +18,11 @@
 
 package org.apache.eagle.alert.metadata;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.engine.coordinator.PublishmentType;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ import java.sql.SQLException;
 
 public class MetadataUtils {
 
-    private final static Logger LOG = LoggerFactory.getLogger(MetadataUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MetadataUtils.class);
 
     public static <T> String getKey(T t) {
         if (t instanceof StreamDefinition) {

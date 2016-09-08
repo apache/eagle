@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.alert.metadata;
 
-import java.io.Closeable;
-import java.util.List;
-
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -26,6 +23,9 @@ import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+
+import java.io.Closeable;
+import java.util.List;
 
 public interface IMetadataDao extends Closeable {
 

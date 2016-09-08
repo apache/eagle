@@ -18,14 +18,12 @@
 
 package org.apache.eagle.service.topology.resource.impl;
 
-
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.UnitTopologyMain;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
-
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.Nimbus;

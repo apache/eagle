@@ -16,15 +16,15 @@
  */
 package org.apache.eagle.service.alert.resolver.impl;
 
+import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.GenericAttributeResolveRequest;
-import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * @since 6/16/15
+ * @since 6/16/15.
  */
 public class BooleanAttributeResolver implements AttributeResolvable<GenericAttributeResolveRequest,String> {
     @Override

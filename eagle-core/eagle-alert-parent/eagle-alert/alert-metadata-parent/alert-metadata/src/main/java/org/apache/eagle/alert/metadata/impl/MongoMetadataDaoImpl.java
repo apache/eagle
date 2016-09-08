@@ -16,6 +16,16 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
+import org.apache.eagle.alert.coordination.model.*;
+import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
+import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
+import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
+import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
+import org.apache.eagle.alert.metadata.resource.Models;
+import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
@@ -30,16 +40,6 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.coordination.model.*;
-import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
-import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
-import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
-import org.apache.eagle.alert.coordination.model.internal.Topology;
-import org.apache.eagle.alert.engine.coordinator.*;
-import org.apache.eagle.alert.metadata.IMetadataDao;
-import org.apache.eagle.alert.metadata.MetadataUtils;
-import org.apache.eagle.alert.metadata.resource.Models;
-import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
 import org.bson.BsonString;
@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @since Apr 11, 2016
+ * @since Apr 11, 2016.
  */
 public class MongoMetadataDaoImpl implements IMetadataDao {
 
@@ -135,18 +135,18 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
         spoutSpecs = db.getCollection("spoutSpecs");
         {
-            IndexOptions io_internal = new IndexOptions().background(true).unique(true).name("topologyIdIndex");
-            BsonDocument doc_internal = new BsonDocument();
-            doc_internal.append("topologyId", new BsonInt32(1));
-            spoutSpecs.createIndex(doc_internal, io_internal);
+            IndexOptions ioInternal = new IndexOptions().background(true).unique(true).name("topologyIdIndex");
+            BsonDocument docInternal = new BsonDocument();
+            docInternal.append("topologyId", new BsonInt32(1));
+            spoutSpecs.createIndex(docInternal, ioInternal);
         }
 
         alertSpecs = db.getCollection("alertSpecs");
         {
-            IndexOptions io_internal = new IndexOptions().background(true).unique(true).name("topologyNameIndex");
-            BsonDocument doc_internal = new BsonDocument();
-            doc_internal.append("topologyName", new BsonInt32(1));
-            alertSpecs.createIndex(doc_internal, io_internal);
+            IndexOptions ioInternal = new IndexOptions().background(true).unique(true).name("topologyNameIndex");
+            BsonDocument docInternal = new BsonDocument();
+            docInternal.append("topologyName", new BsonInt32(1));
+            alertSpecs.createIndex(docInternal, ioInternal);
         }
 
         groupSpecs = db.getCollection("groupSpecs");
@@ -173,22 +173,6 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return list(cluster, StreamingCluster.class);
     }
 
-    private <T> List<T> list(MongoCollection<Document> collection, Class<T> clz) {
-        List<T> result = new LinkedList<T>();
-        collection.find().map(new Function<Document, T>() {
-            @Override
-            public T apply(Document t) {
-                String json = t.toJson();
-                try {
-                    return mapper.readValue(json, clz);
-                } catch (IOException e) {
-                    LOG.error("deserialize config item failed!", e);
-                }
-                return null;
-            }
-        }).into(result);
-        return result;
-    }
 
     private <T> OpResult addOrReplace(MongoCollection<Document> collection, T t) {
         BsonDocument filter = new BsonDocument();
@@ -358,10 +342,9 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return state;
     }
 
-    /***
+    /**
      * get the basic ScheduleState, and then based on the version to get all sub-part(spoutSpecs/alertSpecs/etc)
      * to form a completed ScheduleState.
-     *
      * @return the latest ScheduleState
      */
     @Override
@@ -474,7 +457,24 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return result;
     }
 
-    /***
+    private <T> List<T> list(MongoCollection<Document> collection, Class<T> clz) {
+        List<T> result = new LinkedList<T>();
+        collection.find().map(new Function<Document, T>() {
+            @Override
+            public T apply(Document t) {
+                String json = t.toJson();
+                try {
+                    return mapper.readValue(json, clz);
+                } catch (IOException e) {
+                    LOG.error("deserialize config item failed!", e);
+                }
+                return null;
+            }
+        }).into(result);
+        return result;
+    }
+
+    /**
      * write ScheduleState to several collections. basic info writes to ScheduleState, other writes to collections
      * named by spoutSpecs/alertSpecs/etc.
      *

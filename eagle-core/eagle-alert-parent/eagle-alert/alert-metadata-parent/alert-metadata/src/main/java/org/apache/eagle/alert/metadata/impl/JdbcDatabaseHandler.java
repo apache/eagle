@@ -18,12 +18,12 @@
 
 package org.apache.eagle.alert.metadata.impl;
 
+import org.apache.eagle.alert.metadata.MetadataUtils;
+import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.metadata.MetadataUtils;
-import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +38,12 @@ public class JdbcDatabaseHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(JdbcDatabaseHandler.class);
 
-    private final String INSERT_STATEMENT = "INSERT INTO %s VALUES (?, ?)";
-    private final String DELETE_STATEMENT = "DELETE FROM %s WHERE id=?";
-    private final String UPDATE_STATEMENT = "UPDATE %s set value=? WHERE id=?";
-    private final String QUERY_ALL_STATEMENT = "SELECT value FROM %s";
-    private final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=?";
-    private final String QUERY_ORDERBY_STATEMENT = "SELECT value FROM %s ORDER BY id %s";
+    private static final String INSERT_STATEMENT = "INSERT INTO %s VALUES (?, ?)";
+    private static final String DELETE_STATEMENT = "DELETE FROM %s WHERE id=?";
+    private static final String UPDATE_STATEMENT = "UPDATE %s set value=? WHERE id=?";
+    private static final String QUERY_ALL_STATEMENT = "SELECT value FROM %s";
+    private static final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=?";
+    private static final String QUERY_ORDERBY_STATEMENT = "SELECT value FROM %s ORDER BY id %s";
 
     private Map<String, String> tblNameMap = new HashMap<>();
 

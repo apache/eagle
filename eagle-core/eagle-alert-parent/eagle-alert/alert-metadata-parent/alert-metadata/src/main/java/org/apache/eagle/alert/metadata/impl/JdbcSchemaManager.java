@@ -18,16 +18,18 @@
 
 package org.apache.eagle.alert.metadata.impl;
 
-import com.typesafe.config.Config;
-import org.apache.ddlutils.Platform;
-import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.model.*;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.metadata.MetadataUtils;
+import com.typesafe.config.Config;
+import org.apache.ddlutils.Platform;
+import org.apache.ddlutils.PlatformFactory;
+import org.apache.ddlutils.model.Column;
+import org.apache.ddlutils.model.Database;
+import org.apache.ddlutils.model.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +42,7 @@ import java.util.Map;
 
 public class JdbcSchemaManager {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JdbcSchemaManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JdbcSchemaManager.class);
     private Database database;
     private Platform platform;
 

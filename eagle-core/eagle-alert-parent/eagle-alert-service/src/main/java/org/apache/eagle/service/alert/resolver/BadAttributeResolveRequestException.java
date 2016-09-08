@@ -17,15 +17,15 @@
 package org.apache.eagle.service.alert.resolver;
 
 public class BadAttributeResolveRequestException extends Exception {
-    public BadAttributeResolveRequestException(Exception ex){
+    public BadAttributeResolveRequestException(Exception ex) {
         super(ex);
     }
 
-    public BadAttributeResolveRequestException(String msg){
+    public BadAttributeResolveRequestException(String msg) {
         super(msg);
     }
 
-    public BadAttributeResolveRequestException(String msg, Exception ex){
+    public BadAttributeResolveRequestException(String msg, Exception ex) {
         super(msg, ex);
     }
 }
