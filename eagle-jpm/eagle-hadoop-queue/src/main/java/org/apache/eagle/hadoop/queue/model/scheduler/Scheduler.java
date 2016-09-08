@@ -21,16 +21,16 @@ package org.apache.eagle.hadoop.queue.model.scheduler;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Scheduler {
-	public SchedulerInfo getSchedulerInfo() {
-		return schedulerInfo;
-	}
+    public SchedulerInfo getSchedulerInfo() {
+        return schedulerInfo;
+    }
 
-	public void setSchedulerInfo(SchedulerInfo schedulerInfo) {
-		this.schedulerInfo = schedulerInfo;
-	}
+    public void setSchedulerInfo(SchedulerInfo schedulerInfo) {
+        this.schedulerInfo = schedulerInfo;
+    }
 
-	private SchedulerInfo schedulerInfo;
+    private SchedulerInfo schedulerInfo;
 }

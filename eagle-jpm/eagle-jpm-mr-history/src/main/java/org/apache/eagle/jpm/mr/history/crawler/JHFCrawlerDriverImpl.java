@@ -20,15 +20,12 @@ package org.apache.eagle.jpm.mr.history.crawler;
 
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.metrics.JobCountMetricsGenerator;
-import org.apache.eagle.jpm.mr.history.parser.EagleJobStatus;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
-import org.apache.eagle.jpm.mr.historyentity.JobCountEntity;
 import org.apache.eagle.jpm.util.JobIdFilter;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.service.client.IEagleServiceClient;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

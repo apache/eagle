@@ -17,15 +17,15 @@
 
 package org.apache.eagle.jpm.spark.history.crawl;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.eagle.jpm.spark.entity.*;
 import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.service.client.EagleServiceClientException;
 import org.apache.eagle.service.client.impl.EagleServiceBaseClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.commons.lang.ArrayUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -116,7 +116,7 @@ public class JHFSparkEventReader {
         String[] props = {"spark.yarn.app.id", "spark.executor.memory", "spark.driver.host", "spark.driver.port",
             "spark.driver.memory", "spark.scheduler.pool", "spark.executor.cores", "spark.yarn.am.memory",
             "spark.yarn.am.cores", "spark.yarn.executor.memoryOverhead", "spark.yarn.driver.memoryOverhead", "spark.yarn.am.memoryOverhead", "spark.master"};
-        String[] jobConf = (String[])ArrayUtils.addAll(additionalJobConf, props);
+        String[] jobConf = (String[]) ArrayUtils.addAll(additionalJobConf, props);
         for (String prop : jobConf) {
             if (sparkProps.containsKey(prop)) {
                 app.getConfig().getConfig().put(prop, (String) sparkProps.get(prop));
@@ -481,14 +481,14 @@ public class JHFSparkEventReader {
         if (fieldValue != null) {
             result = Utils.parseMemory(fieldValue + "m");
             if (result == 0L) {
-               result = Utils.parseMemory(fieldValue);
+                result = Utils.parseMemory(fieldValue);
             }
         }
 
         if (result == 0L) {
             result = Math.max(
-                    Utils.parseMemory(conf.getString("spark.defaultVal.spark.yarn.overhead.min")),
-                    executorMemory * conf.getInt("spark.defaultVal." + fieldName + ".factor") / 100);
+                Utils.parseMemory(conf.getString("spark.defaultVal.spark.yarn.overhead.min")),
+                executorMemory * conf.getInt("spark.defaultVal." + fieldName + ".factor") / 100);
         }
         return result;
     }
@@ -621,7 +621,7 @@ public class JHFSparkEventReader {
         int stageAttemptId = Integer.parseInt(stage.getTags().get(SparkJobTagName.SPARK_STAGE_ATTEMPT_ID.toString()));
         for (int i = 0; i < stageAttemptId; i++) {
             SparkStage previousStage = stages.get(this.generateStageKey(
-                    stage.getTags().get(SparkJobTagName.SPARK_SATGE_ID.toString()), Integer.toString(i)));
+                stage.getTags().get(SparkJobTagName.SPARK_SATGE_ID.toString()), Integer.toString(i)));
             if (previousStage.getStatus().equalsIgnoreCase(SparkEntityConstant.SparkStageStatus.COMPLETE.toString())) {
                 return true;
             }
@@ -644,8 +644,8 @@ public class JHFSparkEventReader {
         stage.setName(name);
         stage.setNumActiveTasks(0);
         stage.setNumTasks(numTasks);
-        stage.setSchedulingPool(this.app.getConfig().getConfig().get("spark.scheduler.pool") == null ?
-                "default" : this.app.getConfig().getConfig().get("spark.scheduler.pool"));
+        stage.setSchedulingPool(this.app.getConfig().getConfig().get("spark.scheduler.pool") == null
+            ? "default" : this.app.getConfig().getConfig().get("spark.scheduler.pool"));
 
         String stageKey = this.generateStageKey(Integer.toString(stageId), Integer.toString(stageAttemptId));
         stages.put(stageKey, stage);

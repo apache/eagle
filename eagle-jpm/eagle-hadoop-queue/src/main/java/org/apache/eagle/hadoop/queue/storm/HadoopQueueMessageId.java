@@ -18,10 +18,10 @@
 
 package org.apache.eagle.hadoop.queue.storm;
 
-import com.google.common.base.Objects;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataSource;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants.DataType;
+import com.google.common.base.Objects;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class HadoopQueueMessageId {
     private String dataType;
@@ -41,8 +41,8 @@ public class HadoopQueueMessageId {
         }
         final HadoopQueueMessageId other = (HadoopQueueMessageId) obj;
         return Objects.equal(this.dataType, other.dataType)
-                && Objects.equal(this.dataSource, other.dataSource)
-                && Objects.equal(this.timestamp, other.timestamp);
+            && Objects.equal(this.dataSource, other.dataSource)
+            && Objects.equal(this.timestamp, other.timestamp);
     }
 
     @Override

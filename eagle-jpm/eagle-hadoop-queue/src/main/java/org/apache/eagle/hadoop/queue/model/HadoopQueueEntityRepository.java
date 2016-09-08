@@ -21,7 +21,7 @@ import org.apache.eagle.hadoop.queue.model.scheduler.RunningQueueAPIEntity;
 import org.apache.eagle.log.entity.repo.EntityRepository;
 
 public class HadoopQueueEntityRepository extends EntityRepository {
-	public HadoopQueueEntityRepository() {
-		this.registerEntity(RunningQueueAPIEntity.class);
-	}
+    public HadoopQueueEntityRepository() {
+        this.registerEntity(RunningQueueAPIEntity.class);
+    }
 }

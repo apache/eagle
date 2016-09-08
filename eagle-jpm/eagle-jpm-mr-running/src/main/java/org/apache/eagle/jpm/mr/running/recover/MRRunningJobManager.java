@@ -21,9 +21,9 @@ package org.apache.eagle.jpm.mr.running.recover;
 import org.apache.eagle.jpm.mr.running.MRRunningJobConfig;
 import org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
+import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.jpm.util.resourcefetch.model.AppInfo;
 
 import java.io.Serializable;
 import java.util.HashMap;

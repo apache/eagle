@@ -20,13 +20,12 @@
 package org.apache.eagle.jpm.spark.history;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 import java.io.Serializable;
 
 public class SparkHistoryJobAppConfig implements Serializable {
-    final static String SPARK_HISTORY_JOB_FETCH_SPOUT_NAME = "sparkHistoryJobFetchSpout";
-    final static String SPARK_HISTORY_JOB_PARSE_BOLT_NAME = "sparkHistoryJobParseBolt";
+    static final String SPARK_HISTORY_JOB_FETCH_SPOUT_NAME = "sparkHistoryJobFetchSpout";
+    static final String SPARK_HISTORY_JOB_PARSE_BOLT_NAME = "sparkHistoryJobParseBolt";
 
     public ZKStateConfig zkStateConfig;
     public JobHistoryEndpointConfig jobHistoryConfig;
