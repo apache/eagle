@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class StreamColumn implements Serializable {
+	
     private static final long serialVersionUID = -5457861313624389106L;
     private String name;
     private Type type;
