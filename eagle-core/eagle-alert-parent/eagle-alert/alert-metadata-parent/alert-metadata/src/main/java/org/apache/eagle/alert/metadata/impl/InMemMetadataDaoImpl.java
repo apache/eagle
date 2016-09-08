@@ -47,9 +47,8 @@ import com.typesafe.config.Config;
 /**
  * In memory service for simple service start. Make all service API as
  * synchronized.
- * 
- * @since Apr 11, 2016
  *
+ * @since Apr 11, 2016
  */
 public class InMemMetadataDaoImpl implements IMetadataDao {
 

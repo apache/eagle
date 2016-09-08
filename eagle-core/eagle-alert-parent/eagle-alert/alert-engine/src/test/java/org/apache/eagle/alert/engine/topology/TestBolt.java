@@ -36,11 +36,12 @@ import backtype.storm.tuple.Tuple;
  * Created by yonzhang on 4/7/16.
  */
 @Ignore
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings( {"rawtypes", "serial"})
 public class TestBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(TestBolt.class);
     private OutputCollector collector;
     private long count;
+
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
@@ -50,7 +51,7 @@ public class TestBolt extends BaseRichBolt {
     public void execute(Tuple input) {
         LOG.info("data is coming: " + input);
         count++;
-        if(count % 10 == 0){
+        if (count % 10 == 0) {
             LOG.info("count = " + count);
         }
         collector.ack(input);

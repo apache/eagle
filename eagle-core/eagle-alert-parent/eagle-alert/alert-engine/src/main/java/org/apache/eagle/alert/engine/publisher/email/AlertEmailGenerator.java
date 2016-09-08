@@ -45,7 +45,7 @@ public class AlertEmailGenerator {
 
     private final static Logger LOG = LoggerFactory.getLogger(AlertEmailGenerator.class);
 
-    private final static long MAX_TIMEOUT_MS =60000;
+    private final static long MAX_TIMEOUT_MS = 60000;
 
     public boolean sendAlertEmail(AlertStreamEvent entity) {
         return sendAlertEmail(entity, recipients, null);
@@ -64,11 +64,13 @@ public class AlertEmailGenerator {
         email.setSender(sender);
         email.setRecipients(recipients);
         email.setCc(cc);
-        
+
         /** asynchronized email sending */
         AlertEmailSender thread = new AlertEmailSender(email, properties);
 
-        if(this.executorPool == null) throw new IllegalStateException("Invoking thread executor pool but it's is not set yet");
+        if (this.executorPool == null) {
+            throw new IllegalStateException("Invoking thread executor pool but it's is not set yet");
+        }
 
         LOG.info("Sending email  in asynchronous to: " + recipients + ", cc: " + cc);
         Future<?> future = this.executorPool.submit(thread);
@@ -79,10 +81,10 @@ public class AlertEmailGenerator {
             //LOG.info(String.format("Successfully send email to %s", recipients));
         } catch (InterruptedException | ExecutionException e) {
             status = false;
-            LOG.error(String.format("Failed to send email to %s, due to:%s", recipients, e),e);
+            LOG.error(String.format("Failed to send email to %s, due to:%s", recipients, e), e);
         } catch (TimeoutException e) {
             status = false;
-            LOG.error(String.format("Failed to send email to %s due to timeout exception, max timeout: %s ms ", recipients, MAX_TIMEOUT_MS),e);
+            LOG.error(String.format("Failed to send email to %s due to timeout exception, max timeout: %s ms ", recipients, MAX_TIMEOUT_MS), e);
         }
         return status;
     }

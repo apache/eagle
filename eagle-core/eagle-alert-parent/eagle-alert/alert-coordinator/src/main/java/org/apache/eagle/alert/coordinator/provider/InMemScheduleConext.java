@@ -32,7 +32,6 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
 /**
  * @since Mar 28, 2016
- *
  */
 public class InMemScheduleConext implements IScheduleContext {
 
@@ -60,9 +59,9 @@ public class InMemScheduleConext implements IScheduleContext {
     }
 
     public InMemScheduleConext(Map<String, Topology> topologies2, Map<String, PolicyAssignment> assignments,
-            Map<String, Kafka2TupleMetadata> kafkaSources, Map<String, PolicyDefinition> policies2,
-            Map<String, Publishment> publishments2, Map<String, StreamDefinition> streamDefinitions,
-            Map<StreamGroup, MonitoredStream> monitoredStreamMap, Map<String, TopologyUsage> usages2) {
+                               Map<String, Kafka2TupleMetadata> kafkaSources, Map<String, PolicyDefinition> policies2,
+                               Map<String, Publishment> publishments2, Map<String, StreamDefinition> streamDefinitions,
+                               Map<StreamGroup, MonitoredStream> monitoredStreamMap, Map<String, TopologyUsage> usages2) {
         this.topologies = topologies2;
         this.policyAssignments = assignments;
         this.datasources = kafkaSources;

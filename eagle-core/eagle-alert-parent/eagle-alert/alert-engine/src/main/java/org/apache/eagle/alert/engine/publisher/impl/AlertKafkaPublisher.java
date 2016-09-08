@@ -57,7 +57,7 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public void onAlert(AlertStreamEvent event) throws Exception {
         if (producer == null) {
@@ -65,7 +65,7 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             return;
         }
         event = dedup(event);
-        if(event == null) {
+        if (event == null) {
             return;
         }
         PublishStatus status = new PublishStatus();
@@ -86,7 +86,7 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             status.successful = false;
             status.errorMessage = String.format("Failed to send message to %s, due to:%s", brokerList, e);
             LOG.error(status.errorMessage, e);
-        } catch (Exception ex ) {
+        } catch (Exception ex) {
             LOG.error("fail writing alert to Kafka bus", ex);
             status.successful = false;
             status.errorMessage = ex.getMessage();

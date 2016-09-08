@@ -21,7 +21,7 @@ import java.util.Collection;
 
 /**
  * TODO: Reuse existing expired window to avoid recreating new windows again and again
- *
+ * <p>
  * Single stream window manager
  */
 public interface StreamWindowManager extends StreamTimeClockListener, Closeable {

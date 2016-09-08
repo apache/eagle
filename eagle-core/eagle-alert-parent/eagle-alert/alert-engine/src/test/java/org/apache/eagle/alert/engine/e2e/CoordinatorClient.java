@@ -20,6 +20,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
+
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,6 @@ import com.typesafe.config.Config;
 
 /**
  * @since May 9, 2016
- *
  */
 public class CoordinatorClient implements Closeable {
 
@@ -53,7 +53,7 @@ public class CoordinatorClient implements Closeable {
 
     public CoordinatorClient(Config config) {
         this(config.getString(EAGLE_COORDINATOR_SERVICE_HOST), config.getInt(EAGLE_COORDINATOR_SERVICE_PORT), config
-                .getString(EAGLE_COORDINATOR_SERVICE_CONTEXT));
+            .getString(EAGLE_COORDINATOR_SERVICE_CONTEXT));
         basePath = buildBasePath();
     }
 

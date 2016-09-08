@@ -42,7 +42,7 @@ public class PlainStringScheme implements Scheme {
     private String topic;
 
     @SuppressWarnings("rawtypes")
-    public PlainStringScheme(String topic, Map conf){
+    public PlainStringScheme(String topic, Map conf) {
         this.topic = topic;
     }
 
@@ -57,7 +57,7 @@ public class PlainStringScheme implements Scheme {
         return new Fields(STRING_SCHEME_KEY);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public List<Object> deserialize(byte[] ser) {
         Map m = new HashMap<>();

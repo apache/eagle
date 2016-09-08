@@ -43,7 +43,7 @@ import com.typesafe.config.ConfigParseOptions;
 public class StormMetricTaggedConsumer implements IMetricsConsumer {
     public static final Logger LOG = LoggerFactory.getLogger(StormMetricTaggedConsumer.class);
     private String topologyName;
-    private Map<String,MetricSystem> metricSystems;
+    private Map<String, MetricSystem> metricSystems;
     private String stormId;
     private Config config;
 
@@ -62,27 +62,27 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
         synchronized (metricSystems) {
             String uniqueTaskKey = buildUniqueTaskKey(taskInfo);
             MetricSystem metricSystem = metricSystems.get(uniqueTaskKey);
-            if(metricSystem == null){
+            if (metricSystem == null) {
                 metricSystem = MetricSystem.load(config);
-                metricSystems.put(uniqueTaskKey,metricSystem);
-                metricSystem.tags(new HashMap<String,Object>(){{
-                    put("topology",topologyName);
-                    put("stormId",stormId);
-                    put("component",taskInfo.srcComponentId);
-                    put("task",taskInfo.srcTaskId);
+                metricSystems.put(uniqueTaskKey, metricSystem);
+                metricSystem.tags(new HashMap<String, Object>() {{
+                    put("topology", topologyName);
+                    put("stormId", stormId);
+                    put("component", taskInfo.srcComponentId);
+                    put("task", taskInfo.srcTaskId);
                 }});
                 metricSystem.start();
-                LOG.info("Initialized metric reporter for {}",uniqueTaskKey);
+                LOG.info("Initialized metric reporter for {}", uniqueTaskKey);
             }
-            report(metricSystem,taskInfo,dataPoints);
-            if(LOG.isDebugEnabled()) {
+            report(metricSystem, taskInfo, dataPoints);
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Reported {} metric points from {}", dataPoints.size(), uniqueTaskKey);
             }
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void report(MetricSystem metricSystem,TaskInfo taskInfo,Collection<DataPoint> dataPoints){
+    @SuppressWarnings( {"unchecked", "rawtypes"})
+    private void report(MetricSystem metricSystem, TaskInfo taskInfo, Collection<DataPoint> dataPoints) {
         List<String> metricList = new LinkedList<>();
         for (DataPoint dataPoint : dataPoints) {
             if (dataPoint.value instanceof Map) {
@@ -115,15 +115,16 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
         metricSystem.registry().removeMatching((name, metric) -> metricList.indexOf(name) < 0);
         metricSystem.report();
         metricSystem.registry().getGauges().values().forEach((gauge -> {
-            if(gauge instanceof DataPointGauge){
-                ((DataPointGauge)gauge).reset();
+            if (gauge instanceof DataPointGauge) {
+                ((DataPointGauge) gauge).reset();
             }
         }));
     }
 
     private static class DataPointGauge implements Gauge<Object> {
         private Object value;
-        public DataPointGauge(Object initialValue){
+
+        public DataPointGauge(Object initialValue) {
             this.setValue(initialValue);
         }
 
@@ -132,21 +133,21 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
             return value;
         }
 
-        public void setValue(Object value){
+        public void setValue(Object value) {
             this.value = value;
         }
 
-        public void reset(){
+        public void reset() {
             this.value = 0;
         }
     }
 
-    private static String buildUniqueTaskKey(TaskInfo taskInfo){
-        return String.format("%s[%s]",taskInfo.srcComponentId,taskInfo.srcTaskId);
+    private static String buildUniqueTaskKey(TaskInfo taskInfo) {
+        return String.format("%s[%s]", taskInfo.srcComponentId, taskInfo.srcTaskId);
     }
 
-    private static String buildSimpleMetricName(TaskInfo taskInfo,String ... name ){
-        return String.join(".",StringUtils.join(name,".").replace("/","."));
+    private static String buildSimpleMetricName(TaskInfo taskInfo, String... name) {
+        return String.join(".", StringUtils.join(name, ".").replace("/", "."));
     }
 
     @Override

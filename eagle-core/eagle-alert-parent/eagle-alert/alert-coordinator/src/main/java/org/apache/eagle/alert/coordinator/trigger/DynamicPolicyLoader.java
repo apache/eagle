@@ -34,7 +34,7 @@ import com.google.common.base.Stopwatch;
 /**
  * Poll policy change and notify listeners
  */
-public class DynamicPolicyLoader implements Runnable{
+public class DynamicPolicyLoader implements Runnable {
     private static Logger LOG = LoggerFactory.getLogger(DynamicPolicyLoader.class);
 
     private IMetadataServiceClient client;
@@ -42,7 +42,7 @@ public class DynamicPolicyLoader implements Runnable{
     private Map<String, PolicyDefinition> cachedPolicies = new HashMap<>();
     private List<PolicyChangeListener> listeners = new ArrayList<>();
 
-    public DynamicPolicyLoader(IMetadataServiceClient client){
+    public DynamicPolicyLoader(IMetadataServiceClient client) {
         this.client = client;
     }
 
@@ -78,8 +78,8 @@ public class DynamicPolicyLoader implements Runnable{
 
             boolean policyChanged = false;
             if (addedPolicies.size() != 0 ||
-                    removedPolicies.size() != 0 ||
-                    reallyModifiedPolicies.size() != 0) {
+                removedPolicies.size() != 0 ||
+                reallyModifiedPolicies.size() != 0) {
                 policyChanged = true;
             }
 

@@ -29,18 +29,18 @@ public class PartitionedEventTimeOrderingComparator implements Comparator<Partit
 
     @Override
     public int compare(PartitionedEvent o1, PartitionedEvent o2) {
-        if(Objects.equals(o1,o2)){
+        if (Objects.equals(o1, o2)) {
             return 0;
-        }else {
-            if(o1 == null && o2 == null){
+        } else {
+            if (o1 == null && o2 == null) {
                 return 0;
-            }else if(o1 != null && o2 == null){
+            } else if (o1 != null && o2 == null) {
                 return 1;
-            }else if(o1 == null){
+            } else if (o1 == null) {
                 return -1;
             }
             // Unstable Sorting Algorithm
-            if(o1.getTimestamp() <= o2.getTimestamp()){
+            if (o1.getTimestamp() <= o2.getTimestamp()) {
                 return -1;
             } else {
                 return 1;

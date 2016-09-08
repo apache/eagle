@@ -16,18 +16,17 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * The alert specification for topology bolts.
- * 
+ *
  * @since Apr 29, 2016
  */
 public class AlertBoltSpec {
@@ -64,19 +63,19 @@ public class AlertBoltSpec {
         this.topologyName = topologyName;
     }
 
-//    public List<PolicyDefinition> getBoltPolicy(String boltId) {
-//        return boltPoliciesMap.get(boltId);
-//    }
-//
-//    public void addBoltPolicy(String boltId, PolicyDefinition pd) {
-//        if (boltPoliciesMap.containsKey(boltId)) {
-//            boltPoliciesMap.get(boltId).add(pd);
-//        } else {
-//            List<PolicyDefinition> list = new ArrayList<PolicyDefinition>();
-//            boltPoliciesMap.put(boltId, list);
-//            list.add(pd);
-//        }
-//    }
+    //    public List<PolicyDefinition> getBoltPolicy(String boltId) {
+    //        return boltPoliciesMap.get(boltId);
+    //    }
+    //
+    //    public void addBoltPolicy(String boltId, PolicyDefinition pd) {
+    //        if (boltPoliciesMap.containsKey(boltId)) {
+    //            boltPoliciesMap.get(boltId).add(pd);
+    //        } else {
+    //            List<PolicyDefinition> list = new ArrayList<PolicyDefinition>();
+    //            boltPoliciesMap.put(boltId, list);
+    //            list.add(pd);
+    //        }
+    //    }
 
     public void addBoltPolicy(String boltId, String policyName) {
         if (boltPolicyIdsMap.containsKey(boltId)) {

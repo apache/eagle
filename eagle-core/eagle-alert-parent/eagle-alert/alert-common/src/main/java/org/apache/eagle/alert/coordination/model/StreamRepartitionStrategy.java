@@ -16,19 +16,19 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+
+import org.apache.commons.collections.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-
 public class StreamRepartitionStrategy {
-    public StreamPartition partition ;
+    public StreamPartition partition;
 
     public int numTotalParticipatingRouterBolts = 0;      // how many group-by bolts participate policy evaluation
     public int startSequence = 0;            // what is the sequence for the first bolt in this topology among all bolts
     public List<String> totalTargetBoltIds = new ArrayList<String>();
-    
+
     public int hashCode() {
         int hashcode = 1 * 31;
         hashcode += partition.hashCode();
@@ -37,14 +37,14 @@ public class StreamRepartitionStrategy {
         }
         return hashcode;
     }
-    
+
     public boolean equals(Object obj) {
         if (!(obj instanceof StreamRepartitionStrategy)) {
             return false;
         }
         StreamRepartitionStrategy o = (StreamRepartitionStrategy) obj;
         return partition.equals(o.partition)
-                && CollectionUtils.isEqualCollection(totalTargetBoltIds, o.totalTargetBoltIds);
+            && CollectionUtils.isEqualCollection(totalTargetBoltIds, o.totalTargetBoltIds);
     }
 
     public StreamPartition getPartition() {

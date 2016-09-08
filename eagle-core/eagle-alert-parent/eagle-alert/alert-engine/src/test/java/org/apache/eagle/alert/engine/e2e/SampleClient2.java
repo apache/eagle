@@ -31,10 +31,9 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since May 10, 2016
- *
  */
 public class SampleClient2 {
-    
+
 //    private static final Logger LOG = LoggerFactory.getLogger(SampleClient2.class);
 
     public static class LogEntity {
@@ -62,7 +61,7 @@ public class SampleClient2 {
         AtomicLong base1 = new AtomicLong(System.currentTimeMillis());
         AtomicLong base2 = new AtomicLong(System.currentTimeMillis());
         AtomicLong count = new AtomicLong();
-        
+
         Config config = ConfigFactory.load();
 
         try (KafkaProducer<String, String> proceduer = SampleClient1.createProceduer(config)) {
@@ -86,7 +85,7 @@ public class SampleClient2 {
     }
 
     private static void sendMetric(AtomicLong base1, AtomicLong base2, AtomicLong count,
-            KafkaProducer<String, String> proceduer, int i) {
+                                   KafkaProducer<String, String> proceduer, int i) {
         {
             Pair<Long, String> pair = createLogEntity(base1, i);
             ProducerRecord<String, String> logRecord = new ProducerRecord<>("eslogs", pair.getRight());

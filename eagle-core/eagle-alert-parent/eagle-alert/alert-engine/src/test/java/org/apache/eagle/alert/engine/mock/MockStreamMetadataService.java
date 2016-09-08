@@ -22,18 +22,18 @@ import java.util.Map;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
 
-public class MockStreamMetadataService{
-    private final Map<String,StreamDefinition> streamSchemaMap = new HashMap<>();
+public class MockStreamMetadataService {
+    private final Map<String, StreamDefinition> streamSchemaMap = new HashMap<>();
 
     public StreamDefinition getStreamDefinition(String streamId) throws StreamDefinitionNotFoundException {
-        if(streamSchemaMap.containsKey(streamId)) {
+        if (streamSchemaMap.containsKey(streamId)) {
             return streamSchemaMap.get(streamId);
-        }else {
+        } else {
             throw new StreamDefinitionNotFoundException(streamId);
         }
     }
 
-    public void registerStream(String streamId, StreamDefinition schema){
-        streamSchemaMap.put(streamId,schema);
+    public void registerStream(String streamId, StreamDefinition schema) {
+        streamSchemaMap.put(streamId, schema);
     }
 }

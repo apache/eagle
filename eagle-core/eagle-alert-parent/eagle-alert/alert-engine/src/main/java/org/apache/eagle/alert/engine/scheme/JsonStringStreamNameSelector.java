@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A strategy to get stream name from message tuple.
- * 
+ * <p>
  * Since 5/5/16.
  */
 public class JsonStringStreamNameSelector implements StreamNameSelector {
@@ -70,5 +70,5 @@ public class JsonStringStreamNameSelector implements StreamNameSelector {
         }
         return "defaultStringStream";
     }
-    
+
 }

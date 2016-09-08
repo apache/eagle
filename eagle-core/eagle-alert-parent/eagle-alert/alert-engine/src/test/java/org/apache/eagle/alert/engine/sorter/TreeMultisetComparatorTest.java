@@ -37,7 +37,7 @@ public class TreeMultisetComparatorTest {
      * when they are added into TreeMultiset, the second event will be replaced by the first event
      */
     @Test
-    public void testComparator(){
+    public void testComparator() {
         TreeMultiset<PartitionedEvent> set = TreeMultiset.create(PartitionedEventTimeOrderingComparator.INSTANCE);
 
         // construct PartitionEvent1
@@ -50,7 +50,7 @@ public class TreeMultisetComparatorTest {
         event1.setPartition(sp);
         event1.setPartitionKey(1000);
         StreamEvent e1 = new StreamEvent();
-        e1.setData(new Object[]{18.4});
+        e1.setData(new Object[] {18.4});
         e1.setStreamId("testStreamId");
         e1.setTimestamp(1462909984000L);
         event1.setEvent(e1);
@@ -60,7 +60,7 @@ public class TreeMultisetComparatorTest {
         event2.setPartition(sp);
         event2.setPartitionKey(1000);
         StreamEvent e2 = new StreamEvent();
-        e2.setData(new Object[]{16.3});
+        e2.setData(new Object[] {16.3});
         e2.setStreamId("testStreamId");
         e2.setTimestamp(1462909984000L);
         event2.setEvent(e2);
@@ -70,7 +70,7 @@ public class TreeMultisetComparatorTest {
         event3.setPartition(sp);
         event3.setPartitionKey(1000);
         StreamEvent e3 = new StreamEvent();
-        e3.setData(new Object[]{14.3});
+        e3.setData(new Object[] {14.3});
         e3.setStreamId("testStreamId");
         e3.setTimestamp(1462909984001L);
         event3.setEvent(e3);
@@ -79,13 +79,13 @@ public class TreeMultisetComparatorTest {
         event4.setPartition(sp);
         event4.setPartitionKey(1000);
         StreamEvent e4 = new StreamEvent();
-        e4.setData(new Object[]{14.3});
+        e4.setData(new Object[] {14.3});
         e4.setStreamId("testStreamId");
         e4.setTimestamp(1462909984001L);
         event4.setEvent(e4);
 
-        Assert.assertNotEquals(event2,event3);
-        Assert.assertEquals(event3,event4);
+        Assert.assertNotEquals(event2, event3);
+        Assert.assertEquals(event3, event4);
 
         // check content in set
         set.add(event1);
@@ -96,15 +96,15 @@ public class TreeMultisetComparatorTest {
         set.forEach(System.out::println);
 
 
-        Assert.assertEquals(-1,PartitionedEventTimeOrderingComparator.INSTANCE.compare(event1,event2));
-        Assert.assertEquals(-1,PartitionedEventTimeOrderingComparator.INSTANCE.compare(event1,event3));
-        Assert.assertEquals(-1,PartitionedEventTimeOrderingComparator.INSTANCE.compare(event2,event3));
-        Assert.assertEquals(0,PartitionedEventTimeOrderingComparator.INSTANCE.compare(event3,event4));
+        Assert.assertEquals(-1, PartitionedEventTimeOrderingComparator.INSTANCE.compare(event1, event2));
+        Assert.assertEquals(-1, PartitionedEventTimeOrderingComparator.INSTANCE.compare(event1, event3));
+        Assert.assertEquals(-1, PartitionedEventTimeOrderingComparator.INSTANCE.compare(event2, event3));
+        Assert.assertEquals(0, PartitionedEventTimeOrderingComparator.INSTANCE.compare(event3, event4));
 
         Iterator<PartitionedEvent> it = set.iterator();
-        Assert.assertEquals(16.3,it.next().getData()[0]);
-        Assert.assertEquals(18.4,it.next().getData()[0]);
-        Assert.assertEquals(14.3,it.next().getData()[0]);
-        Assert.assertEquals(14.3,it.next().getData()[0]);
+        Assert.assertEquals(16.3, it.next().getData()[0]);
+        Assert.assertEquals(18.4, it.next().getData()[0]);
+        Assert.assertEquals(14.3, it.next().getData()[0]);
+        Assert.assertEquals(14.3, it.next().getData()[0]);
     }
 }

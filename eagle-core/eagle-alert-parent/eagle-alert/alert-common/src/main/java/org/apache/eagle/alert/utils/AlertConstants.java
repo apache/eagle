@@ -1,6 +1,4 @@
-package org.apache.eagle.alert.utils;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,12 +14,14 @@ package org.apache.eagle.alert.utils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class AlertConstants {
-    public final static String FIELD_0 = "f0";
-    public final static String FIELD_1 = "f1";
-    public final static String FIELD_2 = "f2";
-    public final static String FIELD_3 = "f3";
+package org.apache.eagle.alert.utils;
 
-    public final static String DEFAULT_SPOUT_NAME = "alertEngineSpout";
-    public final static String DEFAULT_ROUTERBOLT_NAME = "streamRouterBolt";
+public class AlertConstants {
+    public static final String FIELD_0 = "f0";
+    public static final String FIELD_1 = "f1";
+    public static final String FIELD_2 = "f2";
+    public static final String FIELD_3 = "f3";
+
+    public static final String DEFAULT_SPOUT_NAME = "alertEngineSpout";
+    public static final String DEFAULT_ROUTERBOLT_NAME = "streamRouterBolt";
 }

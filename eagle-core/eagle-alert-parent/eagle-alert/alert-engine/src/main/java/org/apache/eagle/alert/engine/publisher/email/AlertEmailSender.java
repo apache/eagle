@@ -44,21 +44,22 @@ public class AlertEmailSender implements Runnable {
     private final static int MAX_RETRY_COUNT = 3;
 
 
-
     private Map<String, String> mailProps;
 
 
     private String threadName;
+
     /**
      * Derived class may have some additional context properties to add
+     *
      * @param context velocity context
-     * @param env environment
+     * @param env     environment
      */
     protected void additionalContext(VelocityContext context, String env) {
         // By default there's no additional context added
     }
 
-    public AlertEmailSender(AlertEmailContext alertEmail){
+    public AlertEmailSender(AlertEmailContext alertEmail) {
         this.recipients = alertEmail.getRecipients();
         this.configFileName = alertEmail.getVelocityTplFile();
         this.subject = alertEmail.getSubject();
@@ -69,16 +70,18 @@ public class AlertEmailSender implements Runnable {
         String tmp = ManagementFactory.getRuntimeMXBean().getName();
         this.origin = tmp.split("@")[1] + "(pid:" + tmp.split("@")[0] + ")";
         threadName = Thread.currentThread().getName();
-        LOG.info("Initialized "+threadName+": origin is : " + this.origin+", recipient of the email: " + this.recipients +", velocity TPL file: " + this.configFileName);
+        LOG.info("Initialized " + threadName + ": origin is : " + this.origin + ", recipient of the email: " + this.recipients + ", velocity TPL file: " + this.configFileName);
     }
 
-    public AlertEmailSender(AlertEmailContext alertEmail, Map<String, String> mailProps){
+    public AlertEmailSender(AlertEmailContext alertEmail, Map<String, String> mailProps) {
         this(alertEmail);
         this.mailProps = mailProps;
     }
 
     private Properties parseMailClientConfig(Map<String, String> mailProps) {
-        if (mailProps == null) return null;
+        if (mailProps == null) {
+            return null;
+        }
         Properties props = new Properties();
         String mailHost = mailProps.get(AlertEmailConstants.CONF_MAIL_HOST);
         String mailPort = mailProps.get(AlertEmailConstants.CONF_MAIL_PORT);
@@ -103,7 +106,7 @@ public class AlertEmailSender implements Runnable {
         if (smtpConn.equalsIgnoreCase(AlertEmailConstants.CONN_SSL)) {
             props.put("mail.smtp.socketFactory.port", "465");
             props.put("mail.smtp.socketFactory.class",
-                    "javax.net.ssl.SSLSocketFactory");
+                "javax.net.ssl.SSLSocketFactory");
         }
         props.put(AlertEmailConstants.CONF_MAIL_DEBUG, mailProps.getOrDefault(AlertEmailConstants.CONF_MAIL_DEBUG, "false"));
         return props;
@@ -113,15 +116,14 @@ public class AlertEmailSender implements Runnable {
     public void run() {
         int count = 0;
         boolean success = false;
-        while(count++ < MAX_RETRY_COUNT && !success){
-            LOG.info("Sending email, tried: " + count+", max: " + MAX_RETRY_COUNT);
+        while (count++ < MAX_RETRY_COUNT && !success) {
+            LOG.info("Sending email, tried: " + count + ", max: " + MAX_RETRY_COUNT);
             try {
                 final EagleMailClient client;
                 if (mailProps != null) {
                     Properties props = parseMailClientConfig(mailProps);
                     client = new EagleMailClient(props);
-                }
-                else {
+                } else {
                     client = new EagleMailClient();
                 }
 
@@ -137,19 +139,18 @@ public class AlertEmailSender implements Runnable {
 
                 success = client.send(sender, recipients, cc, title, configFileName, context, null);
                 LOG.info("Success of sending email: " + success);
-                if(!success && count < MAX_RETRY_COUNT) {
+                if (!success && count < MAX_RETRY_COUNT) {
                     LOG.info("Sleep for a while before retrying");
                     Thread.sleep(10 * 1000);
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 LOG.warn("Sending mail exception", e);
             }
         }
         if (success) {
             sentSuccessfully = true;
             LOG.info(String.format("Successfully send email, thread: %s", threadName));
-        } else{
+        } else {
             LOG.warn(String.format("Fail sending email after tries %s times, thread: %s", MAX_RETRY_COUNT, threadName));
         }
     }

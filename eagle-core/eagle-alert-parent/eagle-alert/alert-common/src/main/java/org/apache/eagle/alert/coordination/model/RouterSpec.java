@@ -22,10 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * @since Apr 29, 2016
- *
- */
 public class RouterSpec {
     private String version;
     private String topologyName;

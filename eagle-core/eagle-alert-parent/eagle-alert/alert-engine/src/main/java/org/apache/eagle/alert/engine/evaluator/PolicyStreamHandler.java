@@ -22,6 +22,8 @@ import org.apache.eagle.alert.engine.model.StreamEvent;
  */
 public interface PolicyStreamHandler {
     void prepare(Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception;
+
     void send(StreamEvent event) throws Exception;
+
     void close() throws Exception;
 }

@@ -23,10 +23,8 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 
 /**
  * Schedule result for one policy
- * 
- * 
- * @since Apr 26, 2016
  *
+ * @since Apr 26, 2016
  */
 public class ScheduleResult {
     int code;

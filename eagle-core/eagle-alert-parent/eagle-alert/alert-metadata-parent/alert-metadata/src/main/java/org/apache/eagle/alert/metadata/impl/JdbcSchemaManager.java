@@ -48,9 +48,10 @@ public class JdbcSchemaManager {
 
     public static Map<String, String> tblNameMap = new HashMap<>();
 
-    private JdbcSchemaManager(){}
+    private JdbcSchemaManager() {
+    }
 
-    private static void registerTableName(String clzName, String tblName){
+    private static void registerTableName(String clzName, String tblName) {
         tblNameMap.put(clzName, tblName);
     }
 
@@ -66,8 +67,8 @@ public class JdbcSchemaManager {
         registerTableName(Topology.class.getSimpleName(), "topology");
     }
 
-    public static JdbcSchemaManager getInstance(){
-        if(instance == null) {
+    public static JdbcSchemaManager getInstance() {
+        if (instance == null) {
             instance = new JdbcSchemaManager();
         }
         return instance;
@@ -84,28 +85,28 @@ public class JdbcSchemaManager {
             LOG.info("Loaded " + database);
 
             Database _database = identifyNewTables();
-            if(_database.getTableCount() > 0) {
+            if (_database.getTableCount() > 0) {
                 LOG.info("Creating {} new tables (totally {} tables)", _database.getTableCount(), database.getTableCount());
                 this.platform.createTables(connection, _database, false, true);
-                LOG.info("Created {} new tables: ",_database.getTableCount(), _database.getTables());
+                LOG.info("Created {} new tables: ", _database.getTableCount(), _database.getTables());
             } else {
                 LOG.debug("All the {} tables have already been created, no new tables", database.getTableCount());
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage(),e);
+            LOG.error(e.getMessage(), e);
             throw new IllegalStateException(e);
         } finally {
-            if (connection != null){
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    LOG.warn(e.getMessage(),e);
+                    LOG.warn(e.getMessage(), e);
                 }
             }
         }
     }
 
-    private Database identifyNewTables(){
+    private Database identifyNewTables() {
         Database _database = new Database();
         _database.setName(database.getName());
         Collection<String> tableNames = tblNameMap.values();
@@ -127,7 +128,7 @@ public class JdbcSchemaManager {
         this.platform.shutdownDatabase();
     }
 
-    private Table createTable(String tableName){
+    private Table createTable(String tableName) {
         Table table = new Table();
         table.setName(tableName);
         buildTable(table);

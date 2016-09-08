@@ -55,13 +55,13 @@ import java.util.Map;
 
 /**
  * @since Apr 11, 2016
- *
  */
 public class MongoMetadataDaoImpl implements IMetadataDao {
 
     private static final String DB_NAME = "ump_alert_metadata";
     private static final Logger LOG = LoggerFactory.getLogger(MongoMetadataDaoImpl.class);
     private static final ObjectMapper mapper = new ObjectMapper();
+
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -350,7 +350,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             }
         }).first();
 
-        if (state != null){
+        if (state != null) {
             // based on version, to add content from collections of spoutSpecs/alertSpecs/etc..
             state = addDetailForScheduleState(state, versionId);
         }
@@ -381,7 +381,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             }
         }).first();
 
-        if (state != null){
+        if (state != null) {
             String version = state.getVersion();
             // based on version, to add content from collections of spoutSpecs/alertSpecs/etc..
             state = addDetailForScheduleState(state, version);
@@ -390,55 +390,55 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return state;
     }
 
-    private ScheduleState addDetailForScheduleState(ScheduleState state, String version){
+    private ScheduleState addDetailForScheduleState(ScheduleState state, String version) {
         Map<String, SpoutSpec> spoutMaps = maps(spoutSpecs, SpoutSpec.class, version);
-        if (spoutMaps.size() !=0){
+        if (spoutMaps.size() != 0) {
             state.setSpoutSpecs(spoutMaps);
         }
 
         Map<String, AlertBoltSpec> alertMaps = maps(alertSpecs, AlertBoltSpec.class, version);
-        if (alertMaps.size() !=0){
+        if (alertMaps.size() != 0) {
             state.setAlertSpecs(alertMaps);
         }
 
         Map<String, RouterSpec> groupMaps = maps(groupSpecs, RouterSpec.class, version);
-        if (groupMaps.size() !=0){
+        if (groupMaps.size() != 0) {
             state.setGroupSpecs(groupMaps);
         }
 
         Map<String, PublishSpec> publishMaps = maps(publishSpecs, PublishSpec.class, version);
-        if (publishMaps.size() !=0){
+        if (publishMaps.size() != 0) {
             state.setPublishSpecs(publishMaps);
         }
 
         List<VersionedPolicyDefinition> policyLists = list(policySnapshots, VersionedPolicyDefinition.class, version);
-        if (policyLists.size() !=0){
+        if (policyLists.size() != 0) {
             state.setPolicySnapshots(policyLists);
         }
 
         List<VersionedStreamDefinition> streamLists = list(streamSnapshots, VersionedStreamDefinition.class, version);
-        if (streamLists.size() !=0){
+        if (streamLists.size() != 0) {
             state.setStreamSnapshots(streamLists);
         }
 
         List<MonitoredStream> monitorLists = list(monitoredStreams, MonitoredStream.class, version);
-        if (monitorLists.size() !=0){
+        if (monitorLists.size() != 0) {
             state.setMonitoredStreams(monitorLists);
         }
 
         List<PolicyAssignment> assignmentLists = list(assignments, PolicyAssignment.class, version);
-        if (assignmentLists.size() !=0){
+        if (assignmentLists.size() != 0) {
             state.setAssignments(assignmentLists);
         }
         return state;
     }
 
-    private <T> Map<String, T> maps(MongoCollection<Document> collection, Class<T> clz, String version){
+    private <T> Map<String, T> maps(MongoCollection<Document> collection, Class<T> clz, String version) {
         BsonDocument doc = new BsonDocument();
         doc.append("version", new BsonString(version));
 
         Map<String, T> maps = new HashMap<String, T>();
-        String mapKey = (clz == SpoutSpec.class)? "topologyId" : "topologyName";
+        String mapKey = (clz == SpoutSpec.class) ? "topologyId" : "topologyName";
         collection.find(doc).forEach(new Block<Document>() {
             @Override
             public void apply(Document document) {
@@ -454,7 +454,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return maps;
     }
 
-    private <T> List<T> list(MongoCollection<Document> collection, Class<T> clz, String version){
+    private <T> List<T> list(MongoCollection<Document> collection, Class<T> clz, String version) {
         BsonDocument doc = new BsonDocument();
         doc.append("version", new BsonString(version));
 
@@ -485,45 +485,45 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     public OpResult addScheduleState(ScheduleState state) {
         OpResult result = new OpResult();
         try {
-            for (String key: state.getSpoutSpecs().keySet()){
+            for (String key : state.getSpoutSpecs().keySet()) {
                 SpoutSpec spoutSpec = state.getSpoutSpecs().get(key);
                 addOne(spoutSpecs, spoutSpec);
             }
 
-            for (String key: state.getAlertSpecs().keySet()){
+            for (String key : state.getAlertSpecs().keySet()) {
                 AlertBoltSpec alertBoltSpec = state.getAlertSpecs().get(key);
                 addOne(alertSpecs, alertBoltSpec);
             }
 
-            for (String key: state.getGroupSpecs().keySet()){
+            for (String key : state.getGroupSpecs().keySet()) {
                 RouterSpec groupSpec = state.getGroupSpecs().get(key);
                 addOne(groupSpecs, groupSpec);
             }
 
-            for (String key: state.getPublishSpecs().keySet()){
+            for (String key : state.getPublishSpecs().keySet()) {
                 PublishSpec publishSpec = state.getPublishSpecs().get(key);
                 addOne(publishSpecs, publishSpec);
             }
 
-            for (VersionedPolicyDefinition policySnapshot: state.getPolicySnapshots()){
+            for (VersionedPolicyDefinition policySnapshot : state.getPolicySnapshots()) {
                 addOne(policySnapshots, policySnapshot);
             }
 
-            for (VersionedStreamDefinition streamSnapshot: state.getStreamSnapshots()){
+            for (VersionedStreamDefinition streamSnapshot : state.getStreamSnapshots()) {
                 addOne(streamSnapshots, streamSnapshot);
             }
 
-            for (MonitoredStream monitoredStream: state.getMonitoredStreams()){
+            for (MonitoredStream monitoredStream : state.getMonitoredStreams()) {
                 addOne(monitoredStreams, monitoredStream);
             }
 
-            for (PolicyAssignment assignment: state.getAssignments()){
+            for (PolicyAssignment assignment : state.getAssignments()) {
                 addOne(assignments, assignment);
             }
 
             ScheduleStateBase stateBase = new ScheduleStateBase(
-                    state.getVersion(), state.getGenerateTime(), state.getCode(),
-                    state.getMessage(), state.getScheduleTimeMillis());
+                state.getVersion(), state.getGenerateTime(), state.getCode(),
+                state.getMessage(), state.getScheduleTimeMillis());
 
             addOne(scheduleStates, stateBase);
 

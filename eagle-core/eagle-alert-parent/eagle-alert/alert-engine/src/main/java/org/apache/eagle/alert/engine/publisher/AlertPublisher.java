@@ -27,7 +27,10 @@ import com.typesafe.config.Config;
 public interface AlertPublisher extends AlertPublishListener, Serializable {
     @SuppressWarnings("rawtypes")
     void init(Config config, Map stormConfig);
+
     String getName();
+
     void nextEvent(AlertStreamEvent event);
+
     void close();
 }

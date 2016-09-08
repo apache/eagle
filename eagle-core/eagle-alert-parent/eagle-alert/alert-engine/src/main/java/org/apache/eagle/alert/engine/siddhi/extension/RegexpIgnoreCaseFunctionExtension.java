@@ -45,17 +45,17 @@ public class RegexpIgnoreCaseFunctionExtension extends RegexpFunctionExtension {
     protected void init(ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         if (attributeExpressionExecutors.length != 2) {
             throw new ExecutionPlanValidationException("Invalid no of arguments passed to str:regexpIgnoreCase() function, required 2, " +
-                    "but found " + attributeExpressionExecutors.length);
+                "but found " + attributeExpressionExecutors.length);
         }
         if (attributeExpressionExecutors[0].getReturnType() != Attribute.Type.STRING) {
             throw new ExecutionPlanValidationException("Invalid parameter type found for the first argument of str:regexpIgnoreCase() function, " +
-                    "required "+ Attribute.Type.STRING+", but found "+attributeExpressionExecutors[0].getReturnType().toString());
+                "required " + Attribute.Type.STRING + ", but found " + attributeExpressionExecutors[0].getReturnType().toString());
         }
         if (attributeExpressionExecutors[1].getReturnType() != Attribute.Type.STRING) {
             throw new ExecutionPlanValidationException("Invalid parameter type found for the second argument of str:regexpIgnoreCase() function, " +
-                    "required "+ Attribute.Type.STRING+", but found "+attributeExpressionExecutors[1].getReturnType().toString());
+                "required " + Attribute.Type.STRING + ", but found " + attributeExpressionExecutors[1].getReturnType().toString());
         }
-        if(attributeExpressionExecutors[1] instanceof ConstantExpressionExecutor){
+        if (attributeExpressionExecutors[1] instanceof ConstantExpressionExecutor) {
             isRegexConstant = true;
             regexConstant = (String) ((ConstantExpressionExecutor) attributeExpressionExecutors[1]).getValue();
             patternConstant = Pattern.compile(regexConstant, Pattern.CASE_INSENSITIVE);
@@ -76,7 +76,7 @@ public class RegexpIgnoreCaseFunctionExtension extends RegexpFunctionExtension {
         }
         String source = (String) data[0];
 
-        if(!isRegexConstant){
+        if (!isRegexConstant) {
             regex = (String) data[1];
             pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
             matcher = pattern.matcher(source);

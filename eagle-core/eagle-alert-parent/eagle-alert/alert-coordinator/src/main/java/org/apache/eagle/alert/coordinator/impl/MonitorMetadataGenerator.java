@@ -49,9 +49,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @since Apr 26, 2016
  * Given current policy placement, figure out monitor metadata
- * 
+ * <p>
  * TODO: refactor to eliminate the duplicate of stupid if-notInMap-then-create....
- * FIXME: too many duplicated code logic : check null; add list to map; add to list.. 
+ * FIXME: too many duplicated code logic : check null; add list to map; add to list..
  */
 public class MonitorMetadataGenerator {
 
@@ -76,15 +76,15 @@ public class MonitorMetadataGenerator {
         Map<String, PublishSpec> publishSpecsMap = generatePublishMetadata();
 
         String uniqueVersion = generateVersion();
-        ScheduleState status = new ScheduleState(uniqueVersion, 
-                topoSpoutSpecsMap, 
-                groupSpecsMap, 
-                alertSpecsMap,
-                publishSpecsMap, 
-                context.getPolicyAssignments().values(), 
-                context.getMonitoredStreams().values(),
-                context.getPolicies().values(),
-                context.getStreamSchemas().values());
+        ScheduleState status = new ScheduleState(uniqueVersion,
+            topoSpoutSpecsMap,
+            groupSpecsMap,
+            alertSpecsMap,
+            publishSpecsMap,
+            context.getPolicyAssignments().values(),
+            context.getMonitoredStreams().values(),
+            context.getPolicies().values(),
+            context.getStreamSchemas().values());
         return status;
     }
 
@@ -159,7 +159,7 @@ public class MonitorMetadataGenerator {
                 spec = new RouterSpec(u.getTopoName());
                 groupSpecsMap.put(u.getTopoName(), spec);
             }
-            
+
             for (MonitoredStream ms : u.getMonitoredStream()) {
                 // mutiple stream on the same policy group : for correlation group case:
                 for (StreamPartition partiton : ms.getStreamGroup().getStreamPartitions()) {
@@ -184,7 +184,7 @@ public class MonitorMetadataGenerator {
 
     private Map<String, SpoutSpec> generateSpoutMonitorMetadata() {
         Map<String, StreamWorkSlotQueue> queueMap = buildQueueMap();
-        
+
         Map<String, SpoutSpec> topoSpoutSpecsMap = new HashMap<String, SpoutSpec>();
         // streamName -> StreamDefinition
         Map<String, StreamDefinition> streamSchemaMap = context.getStreamSchemas();
@@ -207,7 +207,7 @@ public class MonitorMetadataGenerator {
             Map<String, List<StreamRepartitionMetadata>> streamsMap = new HashMap<String, List<StreamRepartitionMetadata>>();
             for (String policyName : usage.getPolicies()) {
                 PolicyDefinition def = context.getPolicies().get(policyName);
-                
+
                 PolicyAssignment assignment = context.getPolicyAssignments().get(policyName);
                 if (assignment == null) {
                     LOG.error(" can not find assignment for policy {} ! ", policyName);
@@ -246,7 +246,7 @@ public class MonitorMetadataGenerator {
     /**
      * Work queue not a root level object, thus we need to build a map from
      * MonitoredStream for later quick lookup
-     * 
+     *
      * @return
      */
     private Map<String, StreamWorkSlotQueue> buildQueueMap() {
@@ -260,7 +260,7 @@ public class MonitorMetadataGenerator {
     }
 
     private void addGroupingStrategy(Map<String, List<StreamRepartitionMetadata>> streamsMap, String stream,
-            StreamDefinition schema, String topicName, String datasourceName, StreamRepartitionStrategy gs) {
+                                     StreamDefinition schema, String topicName, String datasourceName, StreamRepartitionStrategy gs) {
         List<StreamRepartitionMetadata> dsStreamMeta;
         if (streamsMap.containsKey(topicName)) {
             dsStreamMeta = streamsMap.get(topicName);

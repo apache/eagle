@@ -23,10 +23,9 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
 /**
  * @since Jun 3, 2016
- *
  */
 public class StringEventSerializer implements IEventSerializer {
-    
+
     @SuppressWarnings("rawtypes")
     public StringEventSerializer(Map stormConf) {
     }

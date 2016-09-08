@@ -36,123 +36,123 @@ import org.slf4j.LoggerFactory;
 
 public class TestNoDataPolicyTimeBatchHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TestNoDataPolicyTimeBatchHandler.class);
-	
-	private static final String inputStream = "testInputStream";
-	private static final String outputStream = "testOutputStream";
+    private static final Logger LOG = LoggerFactory.getLogger(TestNoDataPolicyTimeBatchHandler.class);
 
-	@Before
-	public void setup() {
-	}
+    private static final String inputStream = "testInputStream";
+    private static final String outputStream = "testOutputStream";
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testDynamic1() throws Exception {
-		Map<String, StreamDefinition> sds = new HashMap<>();
-		sds.put("testInputStream", buildStreamDef());
-		sds.put("testOutputStream", buildOutputStreamDef());
-		NoDataPolicyTimeBatchHandler handler = new NoDataPolicyTimeBatchHandler(sds);
+    @Before
+    public void setup() {
+    }
 
-		PolicyHandlerContext context = new PolicyHandlerContext();
-		context.setPolicyDefinition(buildPolicyDef_dynamic());
-		handler.prepare(new TestCollector(), context);
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testDynamic1() throws Exception {
+        Map<String, StreamDefinition> sds = new HashMap<>();
+        sds.put("testInputStream", buildStreamDef());
+        sds.put("testOutputStream", buildOutputStreamDef());
+        NoDataPolicyTimeBatchHandler handler = new NoDataPolicyTimeBatchHandler(sds);
 
-		long now = System.currentTimeMillis();
-		
-		handler.send(buildStreamEvt(now, "host1", 12.5));
-		
-		Thread.sleep(2000);
-		
-		handler.send(buildStreamEvt(now, "host2", 12.6));
-		handler.send(buildStreamEvt(now, "host1", 20.9));
-		handler.send(buildStreamEvt(now, "host2", 22.1));
-		handler.send(buildStreamEvt(now, "host2", 22.1));
-		
-		Thread.sleep(5000);
-		
-		handler.send(buildStreamEvt(now, "host2", 22.1));
-		handler.send(buildStreamEvt(now, "host2", 22.3));
-		
-		Thread.sleep(5000);
-		
-		handler.send(buildStreamEvt(now, "host2", 22.9));
-		handler.send(buildStreamEvt(now, "host1", 41.6));
-		handler.send(buildStreamEvt(now, "host2", 45.6));
-		
-		Thread.sleep(1000);
-	}
-	
-	@SuppressWarnings("rawtypes")
-    private static class TestCollector implements Collector{
+        PolicyHandlerContext context = new PolicyHandlerContext();
+        context.setPolicyDefinition(buildPolicyDef_dynamic());
+        handler.prepare(new TestCollector(), context);
+
+        long now = System.currentTimeMillis();
+
+        handler.send(buildStreamEvt(now, "host1", 12.5));
+
+        Thread.sleep(2000);
+
+        handler.send(buildStreamEvt(now, "host2", 12.6));
+        handler.send(buildStreamEvt(now, "host1", 20.9));
+        handler.send(buildStreamEvt(now, "host2", 22.1));
+        handler.send(buildStreamEvt(now, "host2", 22.1));
+
+        Thread.sleep(5000);
+
+        handler.send(buildStreamEvt(now, "host2", 22.1));
+        handler.send(buildStreamEvt(now, "host2", 22.3));
+
+        Thread.sleep(5000);
+
+        handler.send(buildStreamEvt(now, "host2", 22.9));
+        handler.send(buildStreamEvt(now, "host1", 41.6));
+        handler.send(buildStreamEvt(now, "host2", 45.6));
+
+        Thread.sleep(1000);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static class TestCollector implements Collector {
         @Override
         public void emit(Object o) {
-            AlertStreamEvent e = (AlertStreamEvent)o;
+            AlertStreamEvent e = (AlertStreamEvent) o;
             Object[] data = e.getData();
-            
+
             LOG.info("alert data: {}, {}", data[1], data[0]);
-            
+
             Assert.assertEquals("host1", data[1]);
         }
     }
 
-	private PolicyDefinition buildPolicyDef_dynamic() {
-		PolicyDefinition pd = new PolicyDefinition();
-		PolicyDefinition.Definition def = new PolicyDefinition.Definition();
-		def.setValue("PT5S,dynamic,1,host");
-		def.setType("nodataalert");
-		pd.setDefinition(def);
-		pd.setInputStreams(Arrays.asList(inputStream));
-		pd.setOutputStreams(Arrays.asList(outputStream));
-		pd.setName("nodataalert-test");
-		return pd;
-	}
+    private PolicyDefinition buildPolicyDef_dynamic() {
+        PolicyDefinition pd = new PolicyDefinition();
+        PolicyDefinition.Definition def = new PolicyDefinition.Definition();
+        def.setValue("PT5S,dynamic,1,host");
+        def.setType("nodataalert");
+        pd.setDefinition(def);
+        pd.setInputStreams(Arrays.asList(inputStream));
+        pd.setOutputStreams(Arrays.asList(outputStream));
+        pd.setName("nodataalert-test");
+        return pd;
+    }
 
-	private StreamDefinition buildStreamDef() {
-		StreamDefinition sd = new StreamDefinition();
-		StreamColumn tsColumn = new StreamColumn();
-		tsColumn.setName("timestamp");
-		tsColumn.setType(StreamColumn.Type.LONG);
+    private StreamDefinition buildStreamDef() {
+        StreamDefinition sd = new StreamDefinition();
+        StreamColumn tsColumn = new StreamColumn();
+        tsColumn.setName("timestamp");
+        tsColumn.setType(StreamColumn.Type.LONG);
 
-		StreamColumn hostColumn = new StreamColumn();
-		hostColumn.setName("host");
-		hostColumn.setType(StreamColumn.Type.STRING);
+        StreamColumn hostColumn = new StreamColumn();
+        hostColumn.setName("host");
+        hostColumn.setType(StreamColumn.Type.STRING);
 
-		StreamColumn valueColumn = new StreamColumn();
-		valueColumn.setName("value");
-		valueColumn.setType(StreamColumn.Type.DOUBLE);
+        StreamColumn valueColumn = new StreamColumn();
+        valueColumn.setName("value");
+        valueColumn.setType(StreamColumn.Type.DOUBLE);
 
-		sd.setColumns(Arrays.asList(tsColumn, hostColumn, valueColumn));
-		sd.setDataSource("testDataSource");
-		sd.setStreamId("testInputStream");
-		return sd;
-	}
-	
-	private StreamDefinition buildOutputStreamDef() {
-		StreamDefinition sd = new StreamDefinition();
-		StreamColumn tsColumn = new StreamColumn();
-		tsColumn.setName("timestamp");
-		tsColumn.setType(StreamColumn.Type.LONG);
+        sd.setColumns(Arrays.asList(tsColumn, hostColumn, valueColumn));
+        sd.setDataSource("testDataSource");
+        sd.setStreamId("testInputStream");
+        return sd;
+    }
 
-		StreamColumn hostColumn = new StreamColumn();
-		hostColumn.setName("host");
-		hostColumn.setType(StreamColumn.Type.STRING);
+    private StreamDefinition buildOutputStreamDef() {
+        StreamDefinition sd = new StreamDefinition();
+        StreamColumn tsColumn = new StreamColumn();
+        tsColumn.setName("timestamp");
+        tsColumn.setType(StreamColumn.Type.LONG);
 
-		StreamColumn valueColumn = new StreamColumn();
-		valueColumn.setName("originalStreamName");
-		valueColumn.setType(StreamColumn.Type.STRING);
+        StreamColumn hostColumn = new StreamColumn();
+        hostColumn.setName("host");
+        hostColumn.setType(StreamColumn.Type.STRING);
 
-		sd.setColumns(Arrays.asList(tsColumn, hostColumn, valueColumn));
-		sd.setDataSource("testDataSource");
-		sd.setStreamId("testOutputStream");
-		return sd;
-	}
+        StreamColumn valueColumn = new StreamColumn();
+        valueColumn.setName("originalStreamName");
+        valueColumn.setType(StreamColumn.Type.STRING);
 
-	private StreamEvent buildStreamEvt(long ts, String host, double value) {
-		StreamEvent e = new StreamEvent();
-		e.setData(new Object[] { ts, host, value });
-		e.setStreamId(inputStream);
-		e.setTimestamp(ts);
-		return e;
-	}
+        sd.setColumns(Arrays.asList(tsColumn, hostColumn, valueColumn));
+        sd.setDataSource("testDataSource");
+        sd.setStreamId("testOutputStream");
+        return sd;
+    }
+
+    private StreamEvent buildStreamEvt(long ts, String host, double value) {
+        StreamEvent e = new StreamEvent();
+        e.setData(new Object[] {ts, host, value});
+        e.setStreamId(inputStream);
+        e.setTimestamp(ts);
+        return e;
+    }
 
 }

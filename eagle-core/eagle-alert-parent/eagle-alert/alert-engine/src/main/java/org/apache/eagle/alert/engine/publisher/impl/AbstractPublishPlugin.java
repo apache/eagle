@@ -28,7 +28,6 @@ import java.util.Map;
 
 /**
  * @since Jun 3, 2016
- *
  */
 public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
 
@@ -47,9 +46,9 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
             Object obj = Class.forName(serializerClz).getConstructor(Map.class).newInstance(conf);
             if (!(obj instanceof IEventSerializer)) {
                 throw new Exception(String.format("serializer %s of publishment %s is not subclass to %s!",
-                        publishment.getSerializer(),
-                        publishment.getName(),
-                        IEventSerializer.class.getName()));
+                    publishment.getSerializer(),
+                    publishment.getName(),
+                    IEventSerializer.class.getName()));
             }
             serializer = (IEventSerializer) obj;
         } catch (Exception e) {

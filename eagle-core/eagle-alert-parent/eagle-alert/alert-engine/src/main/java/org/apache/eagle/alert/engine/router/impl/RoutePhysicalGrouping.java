@@ -39,32 +39,32 @@ public class RoutePhysicalGrouping implements CustomStreamGrouping {
     private List<Integer> outdegreeTasks;
     private ShuffleGrouping shuffleGroupingDelegate;
     private GlobalGrouping globalGroupingDelegate;
-    private Map<String,Integer> connectedTargetIds;
+    private Map<String, Integer> connectedTargetIds;
 
     @Override
     public void prepare(WorkerTopologyContext context, GlobalStreamId stream, List<Integer> targetTasks) {
         this.outdegreeTasks = new ArrayList<>(targetTasks);
         shuffleGroupingDelegate = new ShuffleGrouping();
-        shuffleGroupingDelegate.prepare(context,stream,targetTasks);
+        shuffleGroupingDelegate.prepare(context, stream, targetTasks);
         globalGroupingDelegate = new GlobalGrouping();
-        globalGroupingDelegate.prepare(context,stream,targetTasks);
+        globalGroupingDelegate.prepare(context, stream, targetTasks);
         connectedTargetIds = new HashMap<>();
-        for(Integer targetId:targetTasks){
+        for (Integer targetId : targetTasks) {
             String targetComponentId = context.getComponentId(targetId);
-            connectedTargetIds.put(targetComponentId,targetId);
+            connectedTargetIds.put(targetComponentId, targetId);
         }
-        LOG.info("OutDegree components: [{}]", StringUtils.join(connectedTargetIds.values(),","));
+        LOG.info("OutDegree components: [{}]", StringUtils.join(connectedTargetIds.values(), ","));
     }
 
     @Override
     public List<Integer> chooseTasks(int taskId, List<Object> values) {
         Object routingKeyObj = values.get(0);
-        if(routingKeyObj!=null){
+        if (routingKeyObj != null) {
             PartitionedEvent partitionedEvent = (PartitionedEvent) routingKeyObj;
             if (partitionedEvent.getPartition().getType() == StreamPartition.Type.GLOBAL) {
-                return globalGroupingDelegate.chooseTasks(taskId,values);
+                return globalGroupingDelegate.chooseTasks(taskId, values);
             } else if (partitionedEvent.getPartition().getType() == StreamPartition.Type.GROUPBY) {
-                return Collections.singletonList(outdegreeTasks.get((int)(partitionedEvent.getPartitionKey() % this.outdegreeTasks.size())));
+                return Collections.singletonList(outdegreeTasks.get((int) (partitionedEvent.getPartitionKey() % this.outdegreeTasks.size())));
             }
             // Shuffle by defaults
             return shuffleGroupingDelegate.chooseTasks(taskId, values);

@@ -32,29 +32,29 @@ import java.util.*;
 
 /**
  * Since 7/6/16.
- *  * policy would be like:
+ * * policy would be like:
  * {
- "name": "absenceAlertPolicy",
- "description": "absenceAlertPolicy",
- "inputStreams": [
- "absenceAlertStream"
- ],
- "outputStreams": [
- "absenceAlertStream_out"
- ],
- "definition": {
- "type": "absencealert",
- "value": "1,jobID,job1,daily_rule,14:00:00,15:00:00"
- },
- "partitionSpec": [
- {
- "streamId": "absenceAlertStream",
- "type": "GROUPBY",
- "columns" : ["jobID"]
- }
- ],
- "parallelismHint": 2
- }
+ * "name": "absenceAlertPolicy",
+ * "description": "absenceAlertPolicy",
+ * "inputStreams": [
+ * "absenceAlertStream"
+ * ],
+ * "outputStreams": [
+ * "absenceAlertStream_out"
+ * ],
+ * "definition": {
+ * "type": "absencealert",
+ * "value": "1,jobID,job1,daily_rule,14:00:00,15:00:00"
+ * },
+ * "partitionSpec": [
+ * {
+ * "streamId": "absenceAlertStream",
+ * "type": "GROUPBY",
+ * "columns" : ["jobID"]
+ * }
+ * ],
+ * "parallelismHint": 2
+ * }
  */
 public class AbsencePolicyHandler implements PolicyStreamHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AbsencePolicyHandler.class);
@@ -66,7 +66,7 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
     private volatile List<Object> expectValues = new ArrayList<>();
     private AbsenceAlertDriver driver;
 
-    public AbsencePolicyHandler(Map<String, StreamDefinition> sds){
+    public AbsencePolicyHandler(Map<String, StreamDefinition> sds) {
         this.sds = sds;
     }
 
@@ -77,11 +77,13 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
         this.policyDef = context.getPolicyDefinition();
         List<String> inputStreams = policyDef.getInputStreams();
         // validate inputStreams has to contain only one stream
-        if(inputStreams.size() != 1)
+        if (inputStreams.size() != 1) {
             throw new IllegalArgumentException("policy inputStream size has to be 1 for absence alert");
+        }
         // validate outputStream has to contain only one stream
-        if(policyDef.getOutputStreams().size() != 1)
+        if (policyDef.getOutputStreams().size() != 1) {
             throw new IllegalArgumentException("policy outputStream size has to be 1 for absence alert");
+        }
 
         String is = inputStreams.get(0);
         StreamDefinition sd = sds.get(is);
@@ -94,12 +96,12 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
         int offset = 0;
         // populate wisb field names
         int numOfFields = Integer.parseInt(segments[offset++]);
-        for(int i = offset; i < offset+numOfFields; i++){
+        for (int i = offset; i < offset + numOfFields; i++) {
             String fn = segments[i];
             expectFieldIndices.add(sd.getColumnIndex(fn));
         }
         offset += numOfFields;
-        for(int i = offset; i < offset+numOfFields; i++){
+        for (int i = offset; i < offset + numOfFields; i++) {
             String fn = segments[i];
             expectValues.add(fn);
         }
@@ -120,7 +122,7 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
     public void send(StreamEvent event) throws Exception {
         Object[] data = event.getData();
         List<Object> columnValues = new ArrayList<>();
-        for(int i=0; i<expectFieldIndices.size(); i++){
+        for (int i = 0; i < expectFieldIndices.size(); i++) {
             Object o = data[expectFieldIndices.get(i)];
             // convert value to string
             columnValues.add(o.toString());

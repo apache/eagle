@@ -32,11 +32,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * StreamSortedWindow based on MapDB to support off-heap or disk storage.
- *
+ * <p>
  * Stable sorting algorithm
- *
+ * <p>
  * <br/><br/>
- *
+ * <p>
  * See <a href="http://www.mapdb.org">http://www.mapdb.org</a>
  */
 public class StreamSortedWindowInMapDB extends BaseStreamWindow {
@@ -44,7 +44,7 @@ public class StreamSortedWindowInMapDB extends BaseStreamWindow {
     private BTreeMap<Long, PartitionedEvent[]> bTreeMap;
     private final static Logger LOG = LoggerFactory.getLogger(StreamSortedWindowInMapDB.class);
     private final AtomicInteger size;
-    private  long replaceOpCount = 0;
+    private long replaceOpCount = 0;
     private final static PartitionedEventGroupSerializer STREAM_EVENT_GROUP_SERIALIZER = new PartitionedEventGroupSerializer();
 
     /**
@@ -52,29 +52,29 @@ public class StreamSortedWindowInMapDB extends BaseStreamWindow {
      * @param end
      * @param margin
      * @param db
-     * @param mapId physical map id, used to decide whether to reuse or not
+     * @param mapId  physical map id, used to decide whether to reuse or not
      */
     @SuppressWarnings("unused")
-    public StreamSortedWindowInMapDB(long start, long end, long margin,DB db,String mapId) {
+    public StreamSortedWindowInMapDB(long start, long end, long margin, DB db, String mapId) {
         super(start, end, margin);
         this.mapId = mapId;
         try {
             bTreeMap = db.<Long, StreamEvent>treeMap(mapId).
-                    keySerializer(Serializer.LONG).
-                    valueSerializer(STREAM_EVENT_GROUP_SERIALIZER).
-                    createOrOpen();
-            LOG.debug("Created BTree map {}",mapId);
-        } catch (Error error){
-            LOG.info("Failed create BTree {}",mapId,error);
+                keySerializer(Serializer.LONG).
+                valueSerializer(STREAM_EVENT_GROUP_SERIALIZER).
+                createOrOpen();
+            LOG.debug("Created BTree map {}", mapId);
+        } catch (Error error) {
+            LOG.info("Failed create BTree {}", mapId, error);
         }
         size = new AtomicInteger(0);
     }
 
     /**
      * Assumed: most of adding operation will do putting only and few require replacing.
-     *
+     * <p>
      * <ol>
- *     <li>
+     * <li>
      * First of all, always try to put with created event directly
      * </li>
      * <li>
@@ -82,31 +82,34 @@ public class StreamSortedWindowInMapDB extends BaseStreamWindow {
      * replace operation will cause more consumption
      * </li>
      * </ol>
+     *
      * @param event coming-in event
      * @return whether success
      */
     @Override
     public synchronized boolean add(PartitionedEvent event) {
         long timestamp = event.getEvent().getTimestamp();
-        if(accept(timestamp)) {
-            boolean absent = bTreeMap.putIfAbsentBoolean(timestamp, new PartitionedEvent[]{event});
+        if (accept(timestamp)) {
+            boolean absent = bTreeMap.putIfAbsentBoolean(timestamp, new PartitionedEvent[] {event});
             if (!absent) {
                 size.incrementAndGet();
                 return true;
             } else {
-                if(LOG.isDebugEnabled()) LOG.debug("Duplicated timestamp {}, will reduce performance as replacing",timestamp);
-                PartitionedEvent[] oldValue = bTreeMap.get(timestamp);
-                PartitionedEvent[] newValue = oldValue == null ? new PartitionedEvent[1]: Arrays.copyOf(oldValue,oldValue.length+1);
-                newValue[newValue.length-1] = event;
-                PartitionedEvent[] removedValue = bTreeMap.replace(timestamp,newValue);
-                replaceOpCount ++;
-                if(replaceOpCount % 1000 == 0){
-                    LOG.warn("Too many events ({}) with overlap timestamp, may reduce insertion performance",replaceOpCount);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Duplicated timestamp {}, will reduce performance as replacing", timestamp);
                 }
-                if(removedValue!=null) {
+                PartitionedEvent[] oldValue = bTreeMap.get(timestamp);
+                PartitionedEvent[] newValue = oldValue == null ? new PartitionedEvent[1] : Arrays.copyOf(oldValue, oldValue.length + 1);
+                newValue[newValue.length - 1] = event;
+                PartitionedEvent[] removedValue = bTreeMap.replace(timestamp, newValue);
+                replaceOpCount++;
+                if (replaceOpCount % 1000 == 0) {
+                    LOG.warn("Too many events ({}) with overlap timestamp, may reduce insertion performance", replaceOpCount);
+                }
+                if (removedValue != null) {
                     size.incrementAndGet();
                 } else {
-                    throw new IllegalStateException("Failed to replace key "+timestamp+" with "+newValue.length+" entities array to replace old "+oldValue.length+" entities array");
+                    throw new IllegalStateException("Failed to replace key " + timestamp + " with " + newValue.length + " entities array to replace old " + oldValue.length + " entities array");
                 }
                 return true;
             }
@@ -119,8 +122,8 @@ public class StreamSortedWindowInMapDB extends BaseStreamWindow {
     protected synchronized void flush(PartitionedEventCollector collector) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        bTreeMap.valueIterator().forEachRemaining((events)->{
-            for(PartitionedEvent event:events){
+        bTreeMap.valueIterator().forEachRemaining((events) -> {
+            for (PartitionedEvent event : events) {
                 collector.emit(event);
             }
         });
@@ -132,10 +135,10 @@ public class StreamSortedWindowInMapDB extends BaseStreamWindow {
     }
 
     @Override
-    public synchronized void close(){
+    public synchronized void close() {
         super.close();
         bTreeMap.close();
-        LOG.info("Closed {}",this.mapId);
+        LOG.info("Closed {}", this.mapId);
     }
 
     @Override

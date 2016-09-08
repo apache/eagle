@@ -35,7 +35,8 @@ import com.typesafe.config.ConfigFactory;
 
 public class MetadataServiceClientImpTest {
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void test() {
         System.out.println("loading metadatas...");
         try {

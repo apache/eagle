@@ -36,9 +36,9 @@ import org.junit.Test;
  * Since 5/3/16.
  */
 public class TestTuple2StreamConverter {
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Test
-    public void test(){
+    public void test() {
         Tuple2StreamMetadata metadata = new Tuple2StreamMetadata();
         Set activeStreamNames = new HashSet<>();
         activeStreamNames.add("defaultStringStream");

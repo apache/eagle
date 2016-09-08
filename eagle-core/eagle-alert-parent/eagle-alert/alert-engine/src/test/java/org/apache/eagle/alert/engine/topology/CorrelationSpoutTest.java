@@ -50,17 +50,17 @@ public class CorrelationSpoutTest {
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(CorrelationSpoutTest.class);
     private String dataSourceName = "ds-name";
 
-    @SuppressWarnings({ "serial", "rawtypes" })
+    @SuppressWarnings( {"serial", "rawtypes"})
     @Test
-    public void testMetadataInjestion_emptyMetadata() throws Exception{
+    public void testMetadataInjestion_emptyMetadata() throws Exception {
         String topoId = "testMetadataInjection";
         Config config = ConfigFactory.load();
         AtomicBoolean validated = new AtomicBoolean(false);
         CorrelationSpout spout = new CorrelationSpout(config, topoId, null, 1) {
             @Override
             protected KafkaSpoutWrapper createKafkaSpout(Map conf, TopologyContext context,
-                    SpoutOutputCollector collector, String topic, String schemeClsName, SpoutSpec streamMetadatas, Map<String, StreamDefinition> sds)
-                    throws Exception {
+                                                         SpoutOutputCollector collector, String topic, String schemeClsName, SpoutSpec streamMetadatas, Map<String, StreamDefinition> sds)
+                throws Exception {
                 validated.set(true);
                 return null;
             }
@@ -72,7 +72,7 @@ public class CorrelationSpoutTest {
         ds.setTopic("name-of-topic1");
         ds.setSchemeCls("PlainStringScheme");
         ds.setCodec(new Tuple2StreamMetadata());
-        Map<String,Kafka2TupleMetadata> dsMap = new HashMap<String, Kafka2TupleMetadata>();
+        Map<String, Kafka2TupleMetadata> dsMap = new HashMap<String, Kafka2TupleMetadata>();
         dsMap.put(ds.getName(), ds);
 
         StreamRepartitionMetadata m1 = new StreamRepartitionMetadata(ds.getName(), "s1");
@@ -81,12 +81,12 @@ public class CorrelationSpoutTest {
         dataSources.put(ds.getName(), Arrays.asList(m1));
 
         SpoutSpec newMetadata = new SpoutSpec(topoId, dataSources, null, dsMap);
-        
+
         spout.onReload(newMetadata, null);
         Assert.assertTrue(validated.get());
     }
 
-    @SuppressWarnings({ "serial", "rawtypes" })
+    @SuppressWarnings( {"serial", "rawtypes"})
     @Test
     public void testMetadataInjestion_oneNewTopic2Streams() throws Exception {
         String topoId = "testMetadataInjection";
@@ -94,15 +94,15 @@ public class CorrelationSpoutTest {
 
         Config config = ConfigFactory.load();
         final AtomicBoolean verified = new AtomicBoolean(false);
-        CorrelationSpout spout = new CorrelationSpout(config, topoId, null, 1)  {
+        CorrelationSpout spout = new CorrelationSpout(config, topoId, null, 1) {
             @Override
-            protected KafkaSpoutWrapper createKafkaSpout(Map conf, 
-                    TopologyContext context,
-                    SpoutOutputCollector collector, 
-                    String topic, 
-                    String topic2SchemeClsName,
-                    SpoutSpec streamMetadatas,
-                    Map<String, StreamDefinition> sds) {
+            protected KafkaSpoutWrapper createKafkaSpout(Map conf,
+                                                         TopologyContext context,
+                                                         SpoutOutputCollector collector,
+                                                         String topic,
+                                                         String topic2SchemeClsName,
+                                                         SpoutSpec streamMetadatas,
+                                                         Map<String, StreamDefinition> sds) {
                 Assert.assertEquals(1, streamMetadatas.getStreamRepartitionMetadataMap().size());
                 Assert.assertTrue(streamMetadatas.getStream("s1") != null);
                 Assert.assertTrue(streamMetadatas.getStream("s2") != null);
@@ -128,7 +128,7 @@ public class CorrelationSpoutTest {
 
     private Map<String, Kafka2TupleMetadata> createDatasource(final String topicName, final String dataSourceName) {
         Kafka2TupleMetadata ds = new Kafka2TupleMetadata();
-        
+
         ds.setName(dataSourceName);
         ds.setType("KAFKA");
         ds.setProperties(new HashMap<String, String>());
@@ -140,9 +140,9 @@ public class CorrelationSpoutTest {
         return dsMap;
     }
 
-    @SuppressWarnings({ "serial", "rawtypes" })
+    @SuppressWarnings( {"serial", "rawtypes"})
     @Test
-    public void testMetadataInjestion_deleteOneTopic() throws Exception{
+    public void testMetadataInjestion_deleteOneTopic() throws Exception {
         String topoId = "testMetadataInjection";
         final String topicName = "testTopic";
         Config config = ConfigFactory.load();
@@ -151,11 +151,12 @@ public class CorrelationSpoutTest {
             @Override
             protected KafkaSpoutWrapper createKafkaSpout(Map conf, TopologyContext context, SpoutOutputCollector collector, final String topic,
                                                          String schemeClsName, SpoutSpec streamMetadatas,
-                                                         Map<String, StreamDefinition> sds){
+                                                         Map<String, StreamDefinition> sds) {
                 return new KafkaSpoutWrapper(null, null);
             }
+
             @Override
-            protected void removeKafkaSpout(KafkaSpoutWrapper wrapper){
+            protected void removeKafkaSpout(KafkaSpoutWrapper wrapper) {
                 LOG.info("successfully verified removed topic and streams");
                 verified.set(true);
             }
@@ -174,8 +175,8 @@ public class CorrelationSpoutTest {
         // delete new topic
         try {
             spout.onReload(new SpoutSpec(topoId, new HashMap<String, List<StreamRepartitionMetadata>>(), new HashMap<>(), new HashMap<String, Kafka2TupleMetadata>()),
-                    null);
-        }catch(Exception ex){
+                null);
+        } catch (Exception ex) {
             LOG.error("error reloading spout metadata", ex);
             throw ex;
         }

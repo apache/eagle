@@ -28,7 +28,6 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since May 1, 2016
- *
  */
 public class InMemoryTest {
 
@@ -36,11 +35,11 @@ public class InMemoryTest {
 
     @Test
     public void test_AddPolicy() {
-        
+
         LoggerFactory.getLogger(InMemoryTest.class);
-        
+
         MetadataDaoFactory.getInstance().getMetadataDao();
-        
+
         PolicyDefinition pd = new PolicyDefinition();
         pd.setName("pd1");
         dao.addPolicy(pd);

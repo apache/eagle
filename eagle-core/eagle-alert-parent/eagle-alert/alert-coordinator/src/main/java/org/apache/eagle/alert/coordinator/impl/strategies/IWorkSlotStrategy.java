@@ -23,7 +23,6 @@ import org.apache.eagle.alert.coordination.model.WorkSlot;
 
 /**
  * @since Apr 27, 2016
- *
  */
 public interface IWorkSlotStrategy {
 

@@ -38,7 +38,7 @@ import com.typesafe.config.ConfigFactory;
  * or from remote A few parameters for starting unit topology 1. number of spout
  * tasks 2. number of router bolts 3. number of alert bolts 4. number of publish
  * bolts
- *
+ * <p>
  * Connections 1. spout and router bolt 2. router bolt and alert bolt 3. alert
  * bolt and publish bolt
  */
@@ -48,7 +48,7 @@ public class UnitTopologyMain {
         // command line parse
         Options options = new Options();
         options.addOption("c", true,
-                "config URL (valid file name) - defaults application.conf according to typesafe config default behavior.");
+            "config URL (valid file name) - defaults application.conf according to typesafe config default behavior.");
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
@@ -64,7 +64,7 @@ public class UnitTopologyMain {
         ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
         new UnitTopologyRunner(changeNotifyService).run(topologyId, config);
     }
-    
+
     public static void runTopology(Config config, backtype.storm.Config stormConfig) {
         // load config and start
         String topologyId = config.getString("topology.name");
@@ -77,7 +77,7 @@ public class UnitTopologyMain {
         ZKMetadataChangeNotifyService changeNotifyService = new ZKMetadataChangeNotifyService(zkConfig, topologyId);
         return changeNotifyService;
     }
-    
+
     public static StormTopology createTopology(Config config) {
         String topologyId = config.getString("topology.name");
         ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);

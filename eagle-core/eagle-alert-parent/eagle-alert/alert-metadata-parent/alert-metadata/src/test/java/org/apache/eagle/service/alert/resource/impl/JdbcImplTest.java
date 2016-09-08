@@ -69,7 +69,8 @@ public class JdbcImplTest {
 
     private String TOPO_NAME = "topoName";
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void test_apis() {
         // publishment
         {
@@ -155,7 +156,8 @@ public class JdbcImplTest {
         Assert.assertEquals(state.getVersion(), versionId);
     }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void test_readCurrentState() {
         test_addstate();
         ScheduleState state = dao.getScheduleState();

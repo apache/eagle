@@ -32,17 +32,17 @@ public class StreamSortedWindowOnHeap extends BaseStreamWindow {
     private final TreeMultiset<PartitionedEvent> treeMultisetCache;
 
     /**
-     * @param start start time
-     * @param end end time
+     * @param start  start time
+     * @param end    end time
      * @param margin margin time
      */
-    public StreamSortedWindowOnHeap(long start, long end, long margin, Comparator<PartitionedEvent> comparator ){
-        super(start,end,margin);
+    public StreamSortedWindowOnHeap(long start, long end, long margin, Comparator<PartitionedEvent> comparator) {
+        super(start, end, margin);
         treeMultisetCache = TreeMultiset.create(comparator);
     }
 
-    public StreamSortedWindowOnHeap(long start, long end, long margin){
-        this(start,end,margin,new PartitionedEventTimeOrderingComparator());
+    public StreamSortedWindowOnHeap(long start, long end, long margin) {
+        this(start, end, margin, new PartitionedEventTimeOrderingComparator());
     }
 
     @Override
@@ -52,7 +52,9 @@ public class StreamSortedWindowOnHeap extends BaseStreamWindow {
                 treeMultisetCache.add(partitionedEvent);
                 return true;
             } else {
-                if(LOG.isDebugEnabled()) LOG.debug("{} is not acceptable, ignored", partitionedEvent);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("{} is not acceptable, ignored", partitionedEvent);
+                }
                 return false;
             }
         }
@@ -67,7 +69,7 @@ public class StreamSortedWindowOnHeap extends BaseStreamWindow {
             int size = treeMultisetCache.size();
             treeMultisetCache.clear();
             stopWatch.stop();
-            LOG.info("Flushed {} events in {} ms from {}", size, stopWatch.getTime(),this.toString());
+            LOG.info("Flushed {} events in {} ms from {}", size, stopWatch.getTime(), this.toString());
         }
     }
 

@@ -176,9 +176,9 @@ object ProducerTool {
 
     val reader = Class.forName(readerClass).newInstance().asInstanceOf[MessageReader[AnyRef, AnyRef]]
 
-    if (messageData.size()>0) {
+    if (messageData.size() > 0) {
       reader.init(new ByteArrayInputStream(messageData.get(0).getBytes(StandardCharsets.UTF_8)), cmdLineProps)
-    } else if (messageFile.size()>0) {
+    } else if (messageFile.size() > 0) {
       reader.init(FileUtils.openInputStream(new File(messageFile.get(0))), cmdLineProps)
     } else {
       reader.init(System.in, cmdLineProps)

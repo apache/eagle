@@ -35,10 +35,10 @@ public class KafkaConsumerOffsetFetcher {
     public ObjectMapper mapper;
     public String zkPathToPartition;
 
-    public KafkaConsumerOffsetFetcher(ZKConfig config, String ... parameters) {
+    public KafkaConsumerOffsetFetcher(ZKConfig config, String... parameters) {
         try {
             this.curator = CuratorFrameworkFactory.newClient(config.zkQuorum, config.zkSessionTimeoutMs, 15000,
-                    new RetryNTimes(config.zkRetryTimes, config.zkRetryInterval));
+                new RetryNTimes(config.zkRetryTimes, config.zkRetryInterval));
             curator.start();
             this.zkRoot = config.zkRoot;
             mapper = new ObjectMapper();

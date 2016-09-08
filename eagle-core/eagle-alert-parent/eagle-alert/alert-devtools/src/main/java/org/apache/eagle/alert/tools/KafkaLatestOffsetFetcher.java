@@ -18,6 +18,7 @@ package org.apache.eagle.alert.tools;
 
 
 import java.util.*;
+
 import kafka.api.PartitionOffsetRequestInfo;
 import kafka.common.TopicAndPartition;
 import kafka.javaapi.*;
@@ -50,7 +51,9 @@ public class KafkaLatestOffsetFetcher {
             String clientName = "Client_" + topic + "_" + partition;
             SimpleConsumer consumer = new SimpleConsumer(leadBroker, port, 100000, 64 * 1024, clientName);
             long latestOffset = getLatestOffset(consumer, topic, partition, clientName);
-            if (consumer != null) consumer.close();
+            if (consumer != null) {
+                consumer.close();
+            }
             ret.put(partition, latestOffset);
         }
         return ret;
@@ -63,7 +66,7 @@ public class KafkaLatestOffsetFetcher {
         kafka.javaapi.OffsetRequest request = new kafka.javaapi.OffsetRequest(requestInfo, kafka.api.OffsetRequest.CurrentVersion(), clientName);
         OffsetResponse response = consumer.getOffsetsBefore(request);
         if (response.hasError()) {
-            throw new RuntimeException("Error fetching data offset from the broker. Reason: " + response.errorCode(topic, partition) );
+            throw new RuntimeException("Error fetching data offset from the broker. Reason: " + response.errorCode(topic, partition));
         }
         long[] offsets = response.offsets(topic, partition);
         return offsets[0];
@@ -85,11 +88,15 @@ public class KafkaLatestOffsetFetcher {
                         partitionMetadata.put(part.partitionId(), part);
                     }
                 }
-                if (partitionMetadata.size() == partitionCount) break;
+                if (partitionMetadata.size() == partitionCount) {
+                    break;
+                }
             } catch (Exception e) {
                 throw new RuntimeException("Error communicating with Broker [" + broker + "] " + "to find Leader for [" + topic + "] Reason: ", e);
             } finally {
-                if (consumer != null) consumer.close();
+                if (consumer != null) {
+                    consumer.close();
+                }
             }
         }
         return partitionMetadata;

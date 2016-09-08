@@ -36,19 +36,18 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since May 10, 2016
- *
  */
 public class Integration2 {
 
     private ExecutorService executors = Executors.newFixedThreadPool(5);
-    
+
     /**
      * <pre>
      * Create topic
      * liasu@xxxx:~$ $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic eslogs
      * liasu@xxxx:~$ $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic bootfailures
      * </pre>
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) throws Exception {
@@ -72,7 +71,8 @@ public class Integration2 {
                 UnitTopologyMain.main(args);
             } catch (Exception e) {
                 e.printStackTrace();
-            }});
+            }
+        });
 
         executors.submit(() -> SampleClient2.main(args));
 
@@ -83,7 +83,8 @@ public class Integration2 {
         }
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void test3() throws Exception {
         SiddhiManager sm = new SiddhiManager();
         String s1 = " define stream esStream(instanceUuid string, timestamp long, logLevel string, message string, reqId string, host string, component string); ";
@@ -103,14 +104,14 @@ public class Integration2 {
         InputHandler input2 = epr.getInputHandler("ifStream");
 
         epr.start();
-        
+
         long base = 1462880695837l;
-        
+
         while (true) {
             sendEvent(input1, input2, base);
-            
+
             base = base + 3000;
-            
+
             Utils.sleep(3000);
         }
 
@@ -121,25 +122,25 @@ public class Integration2 {
             Event e = new Event();
             e.setTimestamp(base);
             e.setData(new Object[] {
-                    "instance-guid-c2a1c926-b590-418e-bf57-41469d7891fa",
-                    base,
-                    "ERROR",
-                    "NullPointException",
-                    "req-id-82dab92c-9e45-4ad8-8793-96e912831f00",
-                    "nova.host",
-                    "NOVA"
+                "instance-guid-c2a1c926-b590-418e-bf57-41469d7891fa",
+                base,
+                "ERROR",
+                "NullPointException",
+                "req-id-82dab92c-9e45-4ad8-8793-96e912831f00",
+                "nova.host",
+                "NOVA"
             });
             input1.send(e);
         }
-        
+
         {
             Event e = new Event();
             e.setTimestamp(base);
             e.setData(new Object[] {"instance-guid-c2a1c926-b590-418e-bf57-41469d7891fa",
-                    base,
-                    "req-id-82dab92c-9e45-4ad8-8793-96e912831f00",
-                    "boot failure for when try start the given vm!",
-                    "boot-vm-data-center.corp.com"});
+                base,
+                "req-id-82dab92c-9e45-4ad8-8793-96e912831f00",
+                "boot failure for when try start the given vm!",
+                "boot-vm-data-center.corp.com"});
             input2.send(e);
         }
     }

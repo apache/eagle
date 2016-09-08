@@ -23,7 +23,6 @@ import org.apache.eagle.alert.engine.sorter.StreamTimeClockListener;
 
 public interface StreamSortHandler extends StreamTimeClockListener {
     /**
-     *
      * @param streamId
      * @param streamSortSpecSpec
      * @param outputCollector

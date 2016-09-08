@@ -5,27 +5,33 @@
   "publishments": [
     {
       "type": "org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
-      "name":"email-testAlertStream",
-      "policyIds": ["policy1", "policy2", "policy3"],
+      "name": "email-testAlertStream",
+      "policyIds": [
+        "policy1",
+        "policy2",
+        "policy3"
+      ],
       "dedupIntervalMin": "PT1M",
-      "properties":{
-        "subject":"UMP Test Alert",
-        "template":"",
-	  "sender": "sender@corp.com",
-	  "recipients": "receiver@corp.com",
-	  "smtp.server":"mailhost.com",
+      "properties": {
+        "subject": "UMP Test Alert",
+        "template": "",
+        "sender": "sender@corp.com",
+        "recipients": "receiver@corp.com",
+        "smtp.server": "mailhost.com",
         "connection": "plaintext",
         "smtp.port": "25"
       }
     },
     {
       "type": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
-      "name":"kafka-testAlertStream",
-      "policyIds": ["testPolicy"],
+      "name": "kafka-testAlertStream",
+      "policyIds": [
+        "testPolicy"
+      ],
       "dedupIntervalMin": "PT1M",
-      "properties":{
-        "kafka_broker":"sandbox.hortonworks.com:6667",
-        "topic":"test_kafka"
+      "properties": {
+        "kafka_broker": "sandbox.hortonworks.com:6667",
+        "topic": "test_kafka"
       }
     }
   ]

@@ -36,9 +36,9 @@ public class MemoryUsageGaugeSetTest {
         LOG.info("Starting testJVMMetrics");
         final MetricRegistry metrics = new MetricRegistry();
         ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build();
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .build();
         metrics.registerAll(new MemoryUsageGaugeSet());
         metrics.register("sample", (Gauge<Double>) () -> 0.1234);
         reporter.start(1, TimeUnit.SECONDS);

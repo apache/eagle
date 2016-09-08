@@ -36,7 +36,7 @@ public class PartitionedEventDigestSerializer implements Serializer<PartitionedE
     private final Serializer<StreamEvent> streamEventSerializer;
     private final Serializer<StreamPartition> streamPartitionSerializer;
 
-    public PartitionedEventDigestSerializer(SerializationMetadataProvider serializationMetadataProvider){
+    public PartitionedEventDigestSerializer(SerializationMetadataProvider serializationMetadataProvider) {
         this.streamEventSerializer = new StreamEventSerializer(serializationMetadataProvider);
         this.streamPartitionSerializer = StreamPartitionDigestSerializer.INSTANCE;
     }
@@ -44,8 +44,8 @@ public class PartitionedEventDigestSerializer implements Serializer<PartitionedE
     @Override
     public void serialize(PartitionedEvent entity, DataOutput dataOutput) throws IOException {
         dataOutput.writeLong(entity.getPartitionKey());
-        streamEventSerializer.serialize(entity.getEvent(),dataOutput);
-        streamPartitionSerializer.serialize(entity.getPartition(),dataOutput);
+        streamEventSerializer.serialize(entity.getEvent(), dataOutput);
+        streamPartitionSerializer.serialize(entity.getPartition(), dataOutput);
     }
 
     @Override

@@ -29,16 +29,16 @@ import org.junit.Test;
  */
 public class TestByteBuffer {
     @Test
-    public void testBB(){
+    public void testBB() {
         ByteBuffer bb = ByteBuffer.allocate(100);
-        bb.put((byte)12);
+        bb.put((byte) 12);
         Assert.assertTrue(bb.hasArray());
         bb.rewind();
         Assert.assertEquals(12, bb.get());
     }
 
     @Test
-    public void testMultipleStrings() throws Exception{
+    public void testMultipleStrings() throws Exception {
         ByteBuffer bb = ByteBuffer.allocate(100);
         bb.put("abc".getBytes("UTF-8"));
         bb.put("xyz".getBytes("UTF-8"));

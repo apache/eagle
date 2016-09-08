@@ -32,7 +32,6 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since May 10, 2016
- *
  */
 public class Integration3 {
 
@@ -56,12 +55,12 @@ public class Integration3 {
      * Assumption:
      * <p>
      * start metadata service 8080 /rest
-     * 
+     * <p>
      * <pre>
      * user@kafka-host:~$ $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic syslog_events
      * </pre>
      * <p>
-     * 
+     *
      * @throws InterruptedException
      */
     @Test

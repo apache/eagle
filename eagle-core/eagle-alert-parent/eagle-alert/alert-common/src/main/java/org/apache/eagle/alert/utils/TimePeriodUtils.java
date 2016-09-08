@@ -23,40 +23,27 @@ import scala.Int;
 
 public class TimePeriodUtils {
     /**
-     * For example: timestamp stands for time: 1990/01/07 12:45 and period is PT30, then result is 1990/01/07 12:30
-     *
-     * @param seconds
-     * @param period
+     * For example: timestamp stands for time: 1990/01/07 12:45 and period is PT30, then result is 1990/01/07 12:30.
      *
      * @return formatted timestamp
      */
-    public static long formatSecondsByPeriod(long seconds,Seconds period){
+    public static long formatSecondsByPeriod(long seconds, Seconds period) {
         return seconds - (seconds % Int.int2long(period.getSeconds()));
     }
 
-    /**
-     * @param seconds
-     * @param period
-     * @return
-     */
-    public static long formatSecondsByPeriod(long seconds,Period period){
+    public static long formatSecondsByPeriod(long seconds, Period period) {
         return seconds - (seconds % Int.int2long(period.toStandardSeconds().getSeconds()));
     }
 
-    /**
-     * @param milliseconds
-     * @param period
-     * @return milliseconds
-     */
-    public static long formatMillisecondsByPeriod(long milliseconds,Period period){
-        return formatSecondsByPeriod(milliseconds/1000,period)*1000;
+    public static long formatMillisecondsByPeriod(long milliseconds, Period period) {
+        return formatSecondsByPeriod(milliseconds / 1000, period) * 1000;
     }
 
-    public static int getSecondsOfPeriod(Period period){
+    public static int getSecondsOfPeriod(Period period) {
         return period.toStandardSeconds().getSeconds();
     }
 
-    public static int getMillisecondsOfPeriod(Period period){
+    public static int getMillisecondsOfPeriod(Period period) {
         return getSecondsOfPeriod(period) * 1000;
     }
 }

@@ -32,7 +32,6 @@ import com.typesafe.config.Config;
  */
 public interface AlertPublishPlugin extends Closeable {
     /**
-     * 
      * @param config
      * @param publishment
      * @param configProperties - storm config that would be useful for some implementation

@@ -28,7 +28,8 @@ public class MockStreamCollector implements Collector<AlertStreamEvent> {
     @SuppressWarnings("unused")
     private final static Logger LOG = LoggerFactory.getLogger(MockStreamCollector.class);
     private List<AlertStreamEvent> cache;
-    public MockStreamCollector(){
+
+    public MockStreamCollector() {
         cache = new LinkedList<>();
     }
 
@@ -37,15 +38,15 @@ public class MockStreamCollector implements Collector<AlertStreamEvent> {
         // LOG.info("PartitionedEventCollector received: {}",event);
     }
 
-    public void clear(){
+    public void clear() {
         cache.clear();
     }
 
-    public List<AlertStreamEvent> get(){
+    public List<AlertStreamEvent> get() {
         return cache;
     }
 
-    public int size(){
+    public int size() {
         return cache.size();
     }
 }

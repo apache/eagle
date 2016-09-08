@@ -37,7 +37,6 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since Jun 27, 2016
- *
  */
 public class ServiceApp extends Application<AlertDropWizardConfiguration> {
 
@@ -76,12 +75,12 @@ public class ServiceApp extends Application<AlertDropWizardConfiguration> {
         swaggerConfig.setVersion("v1.2");
         swaggerConfig.setBasePath("/rest");
         swaggerConfig
-                .setResourcePackage("org.apache.eagle.alert.coordinator.resource,org.apache.eagle.service.metadata.resource");
+            .setResourcePackage("org.apache.eagle.alert.coordinator.resource,org.apache.eagle.service.metadata.resource");
         swaggerConfig.setScan(true);
 
         // simple CORS filter
         environment.servlets().addFilter("corsFilter", new SimpleCORSFiler())
-                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+            .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
         // context listener
         environment.servlets().addServletListeners(new CoordinatorListener());

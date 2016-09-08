@@ -20,23 +20,23 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  * <b></b>
  * 1. Group by SingleStream[stream_1.col1]
- *
+ * <p>
  * Shuffle(stream_1,[col1])
- *
+ * <p>
  * <b></b>
  * 2. Group by SingleStream[stream_1.col1,stream_1.col2]
- *
+ * <p>
  * Shuffle(stream_1,[col1,col2])
- *
+ * <p>
  * <b></b>
  * 3. Group by JoinedStream[stream_1.col1,stream_1.col2,stream_2.col3]
- *
+ * <p>
  * Shuffle(stream_1.col1,stream_1.col2) + Global(stream_2.col3)
  */
-public class StreamRoute implements Serializable{
+public class StreamRoute implements Serializable {
     private static final long serialVersionUID = 4649184902196034940L;
 
     private String targetComponentId;
@@ -51,7 +51,7 @@ public class StreamRoute implements Serializable{
         this.targetComponentId = targetComponentId;
     }
 
-    public StreamRoute(String targetComponentId, int partitionKey, StreamPartition.Type type){
+    public StreamRoute(String targetComponentId, int partitionKey, StreamPartition.Type type) {
         this.setTargetComponentId(targetComponentId);
         this.setPartitionKey(partitionKey);
         this.setPartitionType(type);

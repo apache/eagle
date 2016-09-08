@@ -38,9 +38,8 @@ import org.apache.eagle.alert.service.IMetadataServiceClient;
 /**
  * According to metadata servic client semantic, change to the interface returned value should not direclty change the
  * states.
- * 
- * @since May 5, 2016
  *
+ * @since May 5, 2016
  */
 @SuppressWarnings("serial")
 public class InMemMetadataServiceClient implements IMetadataServiceClient {
@@ -73,7 +72,7 @@ public class InMemMetadataServiceClient implements IMetadataServiceClient {
     public List<PolicyDefinition> listPolicies() {
         return Collections.unmodifiableList(policies);
     }
-    
+
     public void removePolicy(int idx) {
         policies.remove(idx);
     }

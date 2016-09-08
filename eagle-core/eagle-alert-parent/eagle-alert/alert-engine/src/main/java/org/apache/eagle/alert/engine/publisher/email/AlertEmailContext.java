@@ -38,33 +38,43 @@ public class AlertEmailContext {
     public void setAlertContext(Map<String, String> alertContext) {
         this.alertContext = alertContext;
     }
+
     public String getVelocityTplFile() {
         return velocityTplFile;
     }
+
     public void setVelocityTplFile(String velocityTplFile) {
         this.velocityTplFile = velocityTplFile;
     }
+
     public String getRecipients() {
         return recipients;
     }
+
     public void setRecipients(String recipients) {
         this.recipients = recipients;
     }
+
     public String getSender() {
         return sender;
     }
+
     public void setSender(String sender) {
         this.sender = sender;
     }
+
     public String getSubject() {
         return subject;
     }
+
     public void setSubject(String subject) {
         this.subject = subject;
     }
+
     public String getCc() {
         return cc;
     }
+
     public void setCc(String cc) {
         this.cc = cc;
     }

@@ -54,16 +54,18 @@ public class JsonScheme implements Scheme {
     @SuppressWarnings("rawtypes")
     public List<Object> deserialize(byte[] ser) {
         try {
-            if(ser != null ) {
+            if (ser != null) {
                 Map map = mapper.readValue(ser, Map.class);
                 return Arrays.asList(topic, map);
-            }else{
-                if(LOG.isDebugEnabled()) LOG.debug("Content is null, ignore");
+            } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Content is null, ignore");
+                }
             }
         } catch (IOException e) {
             try {
                 LOG.error("Failed to deserialize as JSON: {}", new String(ser, "UTF-8"), e);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 LOG.error(ex.getMessage(), ex);
             }
         }

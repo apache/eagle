@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"rawtypes", "serial"})
+@SuppressWarnings( {"rawtypes", "serial"})
 public abstract class AbstractStreamBolt extends BaseRichBolt implements SerializationMetadataProvider {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractStreamBolt.class);
     private IMetadataChangeNotifyService changeNotifyService;
@@ -56,7 +56,7 @@ public abstract class AbstractStreamBolt extends BaseRichBolt implements Seriali
 
     private String boltId;
     protected PartitionedEventSerializer serializer;
-    protected volatile Map<String, StreamDefinition> sdf  = new HashMap<String, StreamDefinition>();
+    protected volatile Map<String, StreamDefinition> sdf = new HashMap<String, StreamDefinition>();
     protected volatile String specVersion = "Not Initialized";
     protected volatile boolean specVersionOutofdate = false;
     protected StreamContext streamContext;
@@ -67,11 +67,11 @@ public abstract class AbstractStreamBolt extends BaseRichBolt implements Seriali
         this.config = config;
     }
 
-    public void declareOutputStreams(List<String> outputStreamIds){
+    public void declareOutputStreams(List<String> outputStreamIds) {
         this.outputStreamIds = outputStreamIds;
     }
 
-    protected List<String> getOutputStreamIds(){
+    protected List<String> getOutputStreamIds() {
         return this.outputStreamIds;
     }
 
@@ -81,15 +81,15 @@ public abstract class AbstractStreamBolt extends BaseRichBolt implements Seriali
         this.stormConf = stormConf;
         this.collector = collector;
         this.serializer = Serializers.newPartitionedEventSerializer(this);
-        internalPrepare(collector,this.changeNotifyService,this.config,context);
+        internalPrepare(collector, this.changeNotifyService, this.config, context);
     }
 
 
     protected PartitionedEvent deserialize(Object object) throws IOException {
         // byte[] in higher priority
-        if(object instanceof byte[]) {
+        if (object instanceof byte[]) {
             return serializer.deserialize((byte[]) object);
-        } else if (object instanceof PartitionedEvent){
+        } else if (object instanceof PartitionedEvent) {
             return (PartitionedEvent) object;
         } else {
             throw new IllegalStateException(String.format("Unsupported event class '%s', expect byte array or PartitionedEvent!", object == null ? null : object.getClass().getCanonicalName()));
@@ -100,15 +100,16 @@ public abstract class AbstractStreamBolt extends BaseRichBolt implements Seriali
      * subclass should implement more initialization for example
      * 1) register metadata change
      * 2) init stream context
+     *
      * @param collector
      * @param metadataManager
      * @param config
      * @param context
      */
     public abstract void internalPrepare(
-            OutputCollector collector,
-            IMetadataChangeNotifyService metadataManager,
-            Config config, TopologyContext context);
+        OutputCollector collector,
+        IMetadataChangeNotifyService metadataManager,
+        Config config, TopologyContext context);
 
     @Override
     public void cleanup() {
@@ -117,10 +118,10 @@ public abstract class AbstractStreamBolt extends BaseRichBolt implements Seriali
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        if(this.outputStreamIds!=null){
+        if (this.outputStreamIds != null) {
             LOG.info("declare streams: {} ", outputStreamIds);
-            for(String streamId:this.outputStreamIds){
-                declarer.declareStream(streamId,new Fields(AlertConstants.FIELD_0));
+            for (String streamId : this.outputStreamIds) {
+                declarer.declareStream(streamId, new Fields(AlertConstants.FIELD_0));
             }
         } else {
             declarer.declare(new Fields(AlertConstants.FIELD_0));

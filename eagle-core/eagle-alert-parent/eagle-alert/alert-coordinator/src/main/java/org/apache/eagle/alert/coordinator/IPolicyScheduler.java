@@ -20,7 +20,6 @@ import org.apache.eagle.alert.coordination.model.ScheduleState;
 
 /**
  * @since Mar 24, 2016
- *
  */
 public interface IPolicyScheduler {
 

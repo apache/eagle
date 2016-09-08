@@ -46,49 +46,49 @@ public class StormMetricConsumer implements IMetricsConsumer {
     private IMetricSystem metricSystem;
     private String topologyId;
 
-    @SuppressWarnings({ "serial", "rawtypes" })
+    @SuppressWarnings( {"serial", "rawtypes"})
     @Override
     public void prepare(Map stormConf, Object registrationArgument, TopologyContext context, IErrorReporter errorReporter) {
         Config config = ConfigFactory.parseString((String) registrationArgument, ConfigParseOptions.defaults());
         topologyName = config.getString("topology.name");
         topologyId = context.getStormId();
         metricSystem = MetricSystem.load(config);
-        metricSystem.tags(new HashMap<String,Object>(){{
-            put("topologyName",topologyName);
-            put("topologyId",topologyId);
+        metricSystem.tags(new HashMap<String, Object>() {{
+            put("topologyName", topologyName);
+            put("topologyId", topologyId);
         }});
         metricSystem.start();
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public void handleDataPoints(TaskInfo taskInfo, Collection<DataPoint> dataPoints) {
         synchronized (metricSystem) {
             List<String> metricList = new LinkedList<>();
-            for(DataPoint dataPoint:dataPoints){
-                if(dataPoint.value instanceof Map) {
-                    Map<String,Object> values = (Map<String, Object>) dataPoint.value;
-                    for(Map.Entry<String,Object> entry:values.entrySet()){
+            for (DataPoint dataPoint : dataPoints) {
+                if (dataPoint.value instanceof Map) {
+                    Map<String, Object> values = (Map<String, Object>) dataPoint.value;
+                    for (Map.Entry<String, Object> entry : values.entrySet()) {
                         String metricName = buildMetricName(taskInfo, dataPoint.name, entry.getKey());
                         metricList.add(metricName);
                         Gauge gauge = metricSystem.registry().getGauges().get(metricName);
-                        if(gauge == null) {
+                        if (gauge == null) {
                             LOG.info("Register metric {}", metricName);
                             gauge = new DataPointGauge(entry.getValue());
-                            metricSystem.registry().register(metricName,gauge);
-                        }else{
+                            metricSystem.registry().register(metricName, gauge);
+                        } else {
                             ((DataPointGauge) gauge).setValue(entry.getValue());
                         }
                     }
                 } else {
                     String metricName = buildMetricName(taskInfo, dataPoint.name);
                     metricList.add(metricName);
-                    LOG.info("Register metric {}",metricName);
+                    LOG.info("Register metric {}", metricName);
                     Gauge gauge = metricSystem.registry().getGauges().get(metricName);
-                    if(gauge == null) {
+                    if (gauge == null) {
                         LOG.info("Register metric {}", metricName);
                         gauge = new DataPointGauge(dataPoint.value);
-                        metricSystem.registry().register(metricName,gauge);
+                        metricSystem.registry().register(metricName, gauge);
                     } else {
                         ((DataPointGauge) gauge).setValue(dataPoint.value);
                     }
@@ -97,17 +97,18 @@ public class StormMetricConsumer implements IMetricsConsumer {
             metricSystem.registry().removeMatching((name, metric) -> metricList.indexOf(name) < 0);
             metricSystem.report();
             metricSystem.registry().getGauges().values().forEach((gauge -> {
-                if(gauge instanceof DataPointGauge){
-                    ((DataPointGauge)gauge).reset();
+                if (gauge instanceof DataPointGauge) {
+                    ((DataPointGauge) gauge).reset();
                 }
             }));
-            LOG.info("Reported {} metric data points from {} [{}]",dataPoints.size(),taskInfo.srcComponentId,taskInfo.srcTaskId);
+            LOG.info("Reported {} metric data points from {} [{}]", dataPoints.size(), taskInfo.srcComponentId, taskInfo.srcTaskId);
         }
     }
 
     private class DataPointGauge implements Gauge<Object> {
         private Object value;
-        public DataPointGauge(Object initialValue){
+
+        public DataPointGauge(Object initialValue) {
             this.value = initialValue;
         }
 
@@ -116,17 +117,17 @@ public class StormMetricConsumer implements IMetricsConsumer {
             return value;
         }
 
-        public void setValue(Object value){
+        public void setValue(Object value) {
             this.value = value;
         }
 
-        public void reset(){
+        public void reset() {
             this.value = 0;
         }
     }
 
-    private String buildMetricName(TaskInfo taskInfo,String ... name ){
-        return String.join(".",StringUtils.join(name,".").replace("/","."),taskInfo.srcComponentId,taskInfo.srcTaskId+"");
+    private String buildMetricName(TaskInfo taskInfo, String... name) {
+        return String.join(".", StringUtils.join(name, ".").replace("/", "."), taskInfo.srcComponentId, taskInfo.srcTaskId + "");
     }
 
     @Override

@@ -34,64 +34,69 @@ public class MetadataSerDeser {
     private static final Logger LOG = LoggerFactory.getLogger(MetadataSerDeser.class);
 
     @SuppressWarnings("rawtypes")
-    public static <K> K deserialize(InputStream is, TypeReference typeRef){
+    public static <K> K deserialize(InputStream is, TypeReference typeRef) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             K spec = mapper.readValue(is, typeRef);
             return spec;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error in deserializing metadata of type {} from input stream",
-                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), ex);
+                new TypeReference<K>() {
+                }.getType().getClass().getCanonicalName(), ex);
         }
         return null;
     }
 
-    public static <K> K deserialize(InputStream is, Class<K> cls){
+    public static <K> K deserialize(InputStream is, Class<K> cls) {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS,true);
+        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         try {
             K spec = mapper.readValue(is, cls);
             return spec;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("Got error to deserialize metadata of type {} from input stream",
-                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), ex);
+                new TypeReference<K>() {
+                }.getType().getClass().getCanonicalName(), ex);
         }
         return null;
     }
 
     @SuppressWarnings("rawtypes")
-    public static <K> K deserialize(String json, TypeReference typeRef){
+    public static <K> K deserialize(String json, TypeReference typeRef) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             K spec = mapper.readValue(json, typeRef);
             return spec;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error in deserializing metadata of type {} from {}",
-                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), json, ex);
+                new TypeReference<K>() {
+                }.getType().getClass().getCanonicalName(), json, ex);
         }
         return null;
     }
 
-    public static <K> K deserialize(String json, Class<K> cls){
+    public static <K> K deserialize(String json, Class<K> cls) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             K spec = mapper.readValue(json, cls);
             return spec;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error in deserializing metadata of type {} from {}",
-                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), json, ex);
+                new TypeReference<K>() {
+                }.getType().getClass().getCanonicalName(), json, ex);
         }
         return null;
     }
 
-    public static <K> String serialize(K spec){
+    public static <K> String serialize(K spec) {
         ObjectMapper mapper = new ObjectMapper();
-        try{
+        try {
             String json = mapper.writeValueAsString(spec);
             return json;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error in serializing object {} with type {}", spec,
-                    new TypeReference<K>(){}.getType().getClass().getCanonicalName(), ex);
+                new TypeReference<K>() {
+                }.getType().getClass().getCanonicalName(), ex);
         }
         return null;
     }

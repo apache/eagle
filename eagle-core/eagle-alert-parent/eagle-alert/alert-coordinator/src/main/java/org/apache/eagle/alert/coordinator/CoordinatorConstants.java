@@ -18,7 +18,6 @@ package org.apache.eagle.alert.coordinator;
 
 /**
  * @since Apr 22, 2016
- *
  */
 public class CoordinatorConstants {
     public static final String CONFIG_ITEM_COORDINATOR = "coordinator";

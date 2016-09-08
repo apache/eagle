@@ -39,13 +39,13 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
 
     private AlertStreamCollector collector;
     // mapping from policy name to PolicyDefinition
-    private volatile Map<String,PolicyDefinition> policyDefinitionMap = new HashMap<>();
+    private volatile Map<String, PolicyDefinition> policyDefinitionMap = new HashMap<>();
     // mapping from policy name to PolicyStreamHandler
-    private volatile Map<String,CompositePolicyHandler> policyStreamHandlerMap = new HashMap<>();
+    private volatile Map<String, CompositePolicyHandler> policyStreamHandlerMap = new HashMap<>();
     private String policyEvaluatorId;
     private StreamContext context;
 
-    public PolicyGroupEvaluatorImpl(String policyEvaluatorId){
+    public PolicyGroupEvaluatorImpl(String policyEvaluatorId) {
         this.policyEvaluatorId = policyEvaluatorId;
     }
 
@@ -67,34 +67,35 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     }
 
     public void close() {
-        for(PolicyStreamHandler handler: policyStreamHandlerMap.values()){
+        for (PolicyStreamHandler handler : policyStreamHandlerMap.values()) {
             try {
                 handler.close();
             } catch (Exception e) {
-                LOG.error("Failed to close handler {}",handler.toString(),e);
+                LOG.error("Failed to close handler {}", handler.toString(), e);
             }
         }
     }
 
     /**
      * fixme make selection of PolicyStreamHandler to be more efficient
+     *
      * @param partitionedEvent PartitionedEvent
      */
-    private void dispatch(PartitionedEvent partitionedEvent){
+    private void dispatch(PartitionedEvent partitionedEvent) {
         boolean handled = false;
-        for(Map.Entry<String,CompositePolicyHandler> policyStreamHandler: policyStreamHandlerMap.entrySet()){
-            if(isAcceptedByPolicy(partitionedEvent,policyDefinitionMap.get(policyStreamHandler.getKey()))){
+        for (Map.Entry<String, CompositePolicyHandler> policyStreamHandler : policyStreamHandlerMap.entrySet()) {
+            if (isAcceptedByPolicy(partitionedEvent, policyDefinitionMap.get(policyStreamHandler.getKey()))) {
                 try {
                     handled = true;
                     this.context.counter().scope("eval_count").incr();
                     policyStreamHandler.getValue().send(partitionedEvent.getEvent());
                 } catch (Exception e) {
                     this.context.counter().scope("fail_count").incr();
-                    LOG.error("{} failed to handle {}",policyStreamHandler.getValue(), partitionedEvent.getEvent(), e);
+                    LOG.error("{} failed to handle {}", policyStreamHandler.getValue(), partitionedEvent.getEvent(), e);
                 }
             }
         }
-        if(!handled){
+        if (!handled) {
             this.context.counter().scope("drop_count").incr();
             LOG.warn("Drop stream non-matched event {}, which should not be sent to evaluator", partitionedEvent);
         } else {
@@ -104,21 +105,21 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
 
     private static boolean isAcceptedByPolicy(PartitionedEvent event, PolicyDefinition policy) {
         return policy.getPartitionSpec().contains(event.getPartition()) &&
-                ( policy.getInputStreams().contains(event.getEvent().getStreamId()) ||
-                    policy.getDefinition().getInputStreams().contains(event.getEvent().getStreamId()) );
+            (policy.getInputStreams().contains(event.getEvent().getStreamId()) ||
+                policy.getDefinition().getInputStreams().contains(event.getEvent().getStreamId()));
     }
 
     @Override
     public void onPolicyChange(List<PolicyDefinition> added, List<PolicyDefinition> removed, List<PolicyDefinition> modified, Map<String, StreamDefinition> sds) {
-        Map<String,PolicyDefinition> copyPolicies = new HashMap<>(policyDefinitionMap);
-        Map<String,CompositePolicyHandler> copyHandlers = new HashMap<>(policyStreamHandlerMap);
-        for(PolicyDefinition pd : added){
+        Map<String, PolicyDefinition> copyPolicies = new HashMap<>(policyDefinitionMap);
+        Map<String, CompositePolicyHandler> copyHandlers = new HashMap<>(policyStreamHandlerMap);
+        for (PolicyDefinition pd : added) {
             inplaceAdd(copyPolicies, copyHandlers, pd, sds);
         }
-        for(PolicyDefinition pd : removed){
+        for (PolicyDefinition pd : removed) {
             inplaceRemove(copyPolicies, copyHandlers, pd);
         }
-        for(PolicyDefinition pd : modified){
+        for (PolicyDefinition pd : modified) {
             inplaceRemove(copyPolicies, copyHandlers, pd);
             inplaceAdd(copyPolicies, copyHandlers, pd, sds);
         }
@@ -132,9 +133,9 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
     }
 
     private void inplaceAdd(Map<String, PolicyDefinition> policies, Map<String, CompositePolicyHandler> handlers, PolicyDefinition policy, Map<String, StreamDefinition> sds) {
-        if(handlers.containsKey(policy.getName())){
+        if (handlers.containsKey(policy.getName())) {
             LOG.error("metadata calculation error, try to add existing PolicyDefinition " + policy);
-        }else {
+        } else {
             policies.put(policy.getName(), policy);
             CompositePolicyHandler handler = new CompositePolicyHandler(sds);
             try {
@@ -154,20 +155,20 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
         }
     }
 
-    private void inplaceRemove(Map<String, PolicyDefinition> policies, Map<String, CompositePolicyHandler> handlers, PolicyDefinition policy)  {
-        if(handlers.containsKey(policy.getName())) {
+    private void inplaceRemove(Map<String, PolicyDefinition> policies, Map<String, CompositePolicyHandler> handlers, PolicyDefinition policy) {
+        if (handlers.containsKey(policy.getName())) {
             PolicyStreamHandler handler = handlers.get(policy.getName());
             try {
                 handler.close();
             } catch (Exception e) {
-                LOG.error("Failed to close handler {}",handler,e);
-            }finally {
+                LOG.error("Failed to close handler {}", handler, e);
+            } finally {
                 policies.remove(policy.getName());
                 handlers.remove(policy.getName());
-                LOG.info("Removed policy: {}",policy);
+                LOG.info("Removed policy: {}", policy);
             }
         } else {
-            LOG.error("metadata calculation error, try to remove nonexisting PolicyDefinition: "+policy);
+            LOG.error("metadata calculation error, try to remove nonexisting PolicyDefinition: " + policy);
         }
     }
 

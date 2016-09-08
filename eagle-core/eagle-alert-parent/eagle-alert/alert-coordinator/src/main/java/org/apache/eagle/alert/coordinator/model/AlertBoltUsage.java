@@ -25,7 +25,6 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 
 /**
  * @since Mar 28, 2016
- *
  */
 public class AlertBoltUsage {
 
@@ -76,7 +75,7 @@ public class AlertBoltUsage {
     public List<StreamWorkSlotQueue> getReferQueues() {
         return referQueues;
     }
-    
+
     public int getQueueSize() {
         return referQueues.size();
     }

@@ -41,7 +41,7 @@ public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
 
     @Override
     public List<StreamRoute> partition(StreamEvent event) {
-        switch (this.streamPartition.getType()){
+        switch (this.streamPartition.getType()) {
             case GLOBAL:
                 return routeToAll(event);
             case GROUPBY:
@@ -52,19 +52,19 @@ public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
     }
 
     protected List<StreamRoute> routeByGroupByKey(StreamEvent event) {
-        int partitionKey = new HashCodeBuilder().append(event.getData(streamDefinition,this.streamPartition.getColumns())).build();
+        int partitionKey = new HashCodeBuilder().append(event.getData(streamDefinition, this.streamPartition.getColumns())).build();
         String selectedOutputStream = outputComponentIds.get(Math.abs(partitionKey) % this.outputComponentIds.size());
         return Collections.singletonList(new StreamRoute(selectedOutputStream, partitionKey, StreamPartition.Type.GROUPBY));
     }
 
     protected List<StreamRoute> routeByShuffle(StreamEvent event) {
         long random = System.currentTimeMillis();
-        int hash = Math.abs((int)random);
-        return Arrays.asList(new StreamRoute(outputComponentIds.get(hash % outputComponentIds.size()),-1,StreamPartition.Type.SHUFFLE));
+        int hash = Math.abs((int) random);
+        return Arrays.asList(new StreamRoute(outputComponentIds.get(hash % outputComponentIds.size()), -1, StreamPartition.Type.SHUFFLE));
     }
 
     protected List<StreamRoute> routeToAll(StreamEvent event) {
-        if(_globalRoutingKeys!=null) {
+        if (_globalRoutingKeys != null) {
             _globalRoutingKeys = new ArrayList<>();
             for (String targetId : outputComponentIds) {
                 _globalRoutingKeys.add(new StreamRoute(targetId, -1, StreamPartition.Type.GLOBAL));

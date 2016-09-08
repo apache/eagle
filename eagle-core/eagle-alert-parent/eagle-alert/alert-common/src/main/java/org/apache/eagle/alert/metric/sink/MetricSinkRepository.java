@@ -1,9 +1,4 @@
-package org.apache.eagle.alert.metric.sink;
-
-import java.util.HashMap;
-import java.util.Map;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,16 +14,21 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class MetricSinkRepository {
-    private final static Map<String,Class<? extends MetricSink>> sinkTypeClassMapping = new HashMap<>();
+package org.apache.eagle.alert.metric.sink;
 
-    public static void register(String sinkType,Class<? extends MetricSink> sinkClass){
-        sinkTypeClassMapping.put(sinkType,sinkClass);
+import java.util.HashMap;
+import java.util.Map;
+
+public class MetricSinkRepository {
+    private static final Map<String, Class<? extends MetricSink>> sinkTypeClassMapping = new HashMap<>();
+
+    public static void register(String sinkType, Class<? extends MetricSink> sinkClass) {
+        sinkTypeClassMapping.put(sinkType, sinkClass);
     }
 
-    public static MetricSink createSink(String sinkType){
+    public static MetricSink createSink(String sinkType) {
         if (!sinkTypeClassMapping.containsKey(sinkType)) {
-            throw new IllegalArgumentException("Unknown sink type: "+sinkType);
+            throw new IllegalArgumentException("Unknown sink type: " + sinkType);
         }
         try {
             return sinkTypeClassMapping.get(sinkType).newInstance();
@@ -38,10 +38,10 @@ public class MetricSinkRepository {
     }
 
     static {
-        register("kafka",KafkaSink.class);
-        register("jmx",JmxSink.class);
-        register("elasticsearch",ElasticSearchSink.class);
-        register("stdout",ConsoleSink.class);
-        register("logger",Slf4jSink.class);
+        register("kafka", KafkaSink.class);
+        register("jmx", JmxSink.class);
+        register("elasticsearch", ElasticSearchSink.class);
+        register("stdout", ConsoleSink.class);
+        register("logger", Slf4jSink.class);
     }
 }

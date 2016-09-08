@@ -36,13 +36,14 @@ public class MapComparator<K, V> {
     private List<V> added = new ArrayList<>();
     private List<V> removed = new ArrayList<>();
     private List<V> modified = new ArrayList<>();
-    public MapComparator(Map<K, V> map1, Map<K, V> map2){
+
+    public MapComparator(Map<K, V> map1, Map<K, V> map2) {
         this.map1 = map1;
         this.map2 = map2;
     }
 
     @SuppressWarnings("unchecked")
-    public void compare(){
+    public void compare() {
         Set<K> keys1 = map1.keySet();
         Set<K> keys2 = map2.keySet();
         Collection<K> addedKeys = CollectionUtils.subtract(keys1, keys2);
@@ -52,21 +53,21 @@ public class MapComparator<K, V> {
         addedKeys.forEach(k -> added.add(map1.get(k)));
         removedKeys.forEach(k -> removed.add(map2.get(k)));
         modifiedKeys.forEach(k -> {
-            if(!map1.get(k).equals(map2.get(k))){
+            if (!map1.get(k).equals(map2.get(k))) {
                 modified.add(map1.get(k));
             }
         });
     }
 
-    public List<V> getAdded(){
+    public List<V> getAdded() {
         return added;
     }
 
-    public List<V> getRemoved(){
+    public List<V> getRemoved() {
         return removed;
     }
 
-    public List<V> getModified(){
+    public List<V> getModified() {
         return modified;
     }
 }

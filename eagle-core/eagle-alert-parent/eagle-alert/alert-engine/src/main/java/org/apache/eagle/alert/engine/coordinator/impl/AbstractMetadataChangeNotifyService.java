@@ -43,9 +43,9 @@ import com.typesafe.config.Config;
 /**
  * notify 3 components of metadata change Spout, StreamRouterBolt and AlertBolt
  */
-@SuppressWarnings({ "serial" })
+@SuppressWarnings( {"serial"})
 public abstract class AbstractMetadataChangeNotifyService implements IMetadataChangeNotifyService, Closeable,
-        Serializable {
+    Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractMetadataChangeNotifyService.class);
     private final List<StreamRouterBoltSpecListener> streamRouterBoltSpecListeners = new ArrayList<>();
     private final List<SpoutSpecListener> spoutSpecListeners = new ArrayList<>();

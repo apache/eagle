@@ -24,25 +24,26 @@ import org.apache.eagle.alert.utils.DateTimeUtil;
 
 /**
  * In memory thread-safe time clock service
- *
+ * <p>
  * TODO: maybe need to synchronize time clock globally, how to?
  */
 public class StreamTimeClockInLocalMemory implements StreamTimeClock {
     private final AtomicLong currentTime;
     private final String streamId;
 
-    public StreamTimeClockInLocalMemory(String streamId,long initialTime){
+    public StreamTimeClockInLocalMemory(String streamId, long initialTime) {
         this.streamId = streamId;
         this.currentTime = new AtomicLong(initialTime);
     }
-    public StreamTimeClockInLocalMemory(String streamId){
-        this(streamId,0L);
+
+    public StreamTimeClockInLocalMemory(String streamId) {
+        this(streamId, 0L);
     }
 
     @Override
-    public void moveForward(long timestamp){
-        if(timestamp < currentTime.get()){
-            throw new IllegalArgumentException(timestamp +" < "+currentTime.get()+", should not move time back");
+    public void moveForward(long timestamp) {
+        if (timestamp < currentTime.get()) {
+            throw new IllegalArgumentException(timestamp + " < " + currentTime.get() + ", should not move time back");
         }
         this.currentTime.set(timestamp);
     }
@@ -59,6 +60,6 @@ public class StreamTimeClockInLocalMemory implements StreamTimeClock {
 
     @Override
     public String toString() {
-        return String.format("StreamClock[streamId=%s, now=%s]",streamId, DateTimeUtil.millisecondsToHumanDateWithMilliseconds(currentTime.get()));
+        return String.format("StreamClock[streamId=%s, now=%s]", streamId, DateTimeUtil.millisecondsToHumanDateWithMilliseconds(currentTime.get()));
     }
 }

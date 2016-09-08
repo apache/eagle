@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouterBoltSpecListener, SerializationMetadataProvider{
+public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouterBoltSpecListener, SerializationMetadataProvider {
     private final static Logger LOG = LoggerFactory.getLogger(StreamRouterBolt.class);
     private static final long serialVersionUID = -7611470889316430372L;
     private StreamRouter router;
@@ -56,8 +56,8 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
 
     @Override
     public void internalPrepare(OutputCollector collector, IMetadataChangeNotifyService changeNotifyService, Config config, TopologyContext context) {
-        streamContext = new StreamContextImpl(config,context.registerMetric("eagle.router",new MultiCountMetric(),60),context);
-        routeCollector = new StreamRouterBoltOutputCollector(getBoltId(),collector,this.getOutputStreamIds(),streamContext,serializer);
+        streamContext = new StreamContextImpl(config, context.registerMetric("eagle.router", new MultiCountMetric(), 60), context);
+        routeCollector = new StreamRouterBoltOutputCollector(getBoltId(), collector, this.getOutputStreamIds(), streamContext, serializer);
         router.prepare(streamContext, routeCollector);
         changeNotifyService.registerListener(this);
         changeNotifyService.init(config, MetadataType.STREAM_ROUTER_BOLT);
@@ -70,7 +70,7 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
             this.router.nextEvent(deserialize(input.getValueByField(AlertConstants.FIELD_0)).withAnchor(input));
         } catch (Exception ex) {
             this.streamContext.counter().scope("fail_count").incr();
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
             this.collector.fail(input);
         }
     }
@@ -83,6 +83,7 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
 
     /**
      * Compare with metadata snapshot cache to generate diff like added, removed and modified between different versions.
+     *
      * @param spec
      */
     @SuppressWarnings("unchecked")
@@ -92,7 +93,7 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
 
         // figure out added, removed, modified StreamSortSpec
         Map<StreamPartition, StreamSortSpec> newSSS = new HashMap<>();
-        spec.getRouterSpecs().forEach(t ->  {
+        spec.getRouterSpecs().forEach(t -> {
             if (t.getPartition().getSortSpec() != null) {
                 newSSS.put(t.getPartition(), t.getPartition().getSortSpec());
             }
@@ -110,11 +111,11 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
         addedStreamIds.forEach(s -> added.put(s, newSSS.get(s)));
         removedStreamIds.forEach(s -> removed.put(s, cachedSSS.get(s)));
         modifiedStreamIds.forEach(s -> {
-            if(!newSSS.get(s).equals(cachedSSS.get(s))){ // this means StreamSortSpec is changed for one specific streamId
+            if (!newSSS.get(s).equals(cachedSSS.get(s))) { // this means StreamSortSpec is changed for one specific streamId
                 modified.put(s, newSSS.get(s));
             }
         });
-        if(LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug("added StreamSortSpec " + added);
             LOG.debug("removed StreamSortSpec " + removed);
             LOG.debug("modified StreamSortSpec " + modified);
@@ -140,12 +141,12 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
         addedStreamPartitions.forEach(s -> addedRouterSpecs.add(newSRS.get(s)));
         removedStreamPartitions.forEach(s -> removedRouterSpecs.add(cachedSRS.get(s)));
         modifiedStreamPartitions.forEach(s -> {
-            if(!newSRS.get(s).equals(cachedSRS.get(s))){ // this means StreamRouterSpec is changed for one specific StreamPartition
+            if (!newSRS.get(s).equals(cachedSRS.get(s))) { // this means StreamRouterSpec is changed for one specific StreamPartition
                 modifiedRouterSpecs.add(newSRS.get(s));
             }
         });
 
-        if(LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug("added StreamRouterSpec " + addedRouterSpecs);
             LOG.debug("removed StreamRouterSpec " + removedRouterSpecs);
             LOG.debug("modified StreamRouterSpec " + modifiedRouterSpecs);
@@ -160,18 +161,19 @@ public class StreamRouterBolt extends AbstractStreamBolt implements StreamRouter
 
     /**
      * in correlation cases, multiple streams will go to the same queue for correlation policy
+     *
      * @param spec
      */
-    private void sanityCheck(RouterSpec spec){
+    private void sanityCheck(RouterSpec spec) {
         Set<String> totalRequestedSlots = new HashSet<>();
-        for(StreamRouterSpec s : spec.getRouterSpecs()){
-            for(PolicyWorkerQueue q : s.getTargetQueue()){
+        for (StreamRouterSpec s : spec.getRouterSpecs()) {
+            for (PolicyWorkerQueue q : s.getTargetQueue()) {
                 List<String> workers = new ArrayList<>();
                 q.getWorkers().forEach(w -> workers.add(w.getBoltId()));
                 totalRequestedSlots.addAll(workers);
             }
         }
-        if(totalRequestedSlots.size() > getOutputStreamIds().size()){
+        if (totalRequestedSlots.size() > getOutputStreamIds().size()) {
             String error = String.format("Requested slots are not consistent with provided slots, %s, %s", totalRequestedSlots, getOutputStreamIds());
             LOG.error(error);
             throw new IllegalStateException(error);

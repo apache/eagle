@@ -39,9 +39,10 @@ public class MockStreamReceiver extends BaseRichSpout {
     private final static Logger LOG = LoggerFactory.getLogger(MockStreamReceiver.class);
     private SpoutOutputCollector collector;
     private List<String> outputStreamIds;
-    public MockStreamReceiver(int partition){
+
+    public MockStreamReceiver(int partition) {
         outputStreamIds = new ArrayList<>(partition);
-        for(int i=0;i<partition;i++){
+        for (int i = 0; i < partition; i++) {
             outputStreamIds.add(StreamIdConversion.generateStreamIdByPartition(i));
         }
     }
@@ -53,7 +54,8 @@ public class MockStreamReceiver extends BaseRichSpout {
     }
 
     @Override
-    public void close() {}
+    public void close() {
+    }
 
     /**
      * This unit test is not to mock the end2end logic of correlation spout,
@@ -62,18 +64,18 @@ public class MockStreamReceiver extends BaseRichSpout {
     @Override
     public void nextTuple() {
         PartitionedEvent event = MockSampleMetadataFactory.createRandomOutOfTimeOrderEventGroupedByName("sampleStream_1");
-        LOG.info("Receive {}",event);
+        LOG.info("Receive {}", event);
         collector.emit(outputStreamIds.get(
-                // group by the first field in event i.e. name
-                (int) (event.getPartitionKey() % outputStreamIds.size())),
-                Collections.singletonList(event));
+            // group by the first field in event i.e. name
+            (int) (event.getPartitionKey() % outputStreamIds.size())),
+            Collections.singletonList(event));
         Utils.sleep(500);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        for(String streamId:outputStreamIds) {
-            declarer.declareStream(streamId,new Fields(AlertConstants.FIELD_0));
+        for (String streamId : outputStreamIds) {
+            declarer.declareStream(streamId, new Fields(AlertConstants.FIELD_0));
         }
     }
 }

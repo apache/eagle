@@ -43,7 +43,7 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
 
     private int currentIndex = 0; // the index of current definition statement inside the policy definition
 
-    public SiddhiPolicyHandler(Map<String, StreamDefinition> sds, int index){
+    public SiddhiPolicyHandler(Map<String, StreamDefinition> sds, int index) {
         this.sds = sds;
         this.currentIndex = index;
     }
@@ -59,44 +59,46 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
             coreDefinition.setOutputStreams(policyDefinition.getOutputStreams());
         }
 
-        for(String inputStream : coreDefinition.getInputStreams()) {
+        for (String inputStream : coreDefinition.getInputStreams()) {
             builder.append(SiddhiDefinitionAdapter.buildStreamDefinition(sds.get(inputStream)));
             builder.append("\n");
         }
         builder.append(coreDefinition.value);
-        if(LOG.isDebugEnabled()) LOG.debug("Generated siddhi execution plan: {} from definition: {}", builder.toString(), coreDefinition);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Generated siddhi execution plan: {} from definition: {}", builder.toString(), coreDefinition);
+        }
         return builder.toString();
     }
 
     @Override
     public void prepare(final Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception {
-        LOG.info("Initializing handler for policy {}",context.getPolicyDefinition());
+        LOG.info("Initializing handler for policy {}", context.getPolicyDefinition());
         this.policy = context.getPolicyDefinition();
         this.siddhiManager = new SiddhiManager();
         String plan = generateExecutionPlan(policy, sds);
         try {
             this.executionRuntime = siddhiManager.createExecutionPlanRuntime(plan);
-            LOG.info("Created siddhi runtime {}",executionRuntime.getName());
-        }catch (Exception parserException){
-            LOG.error("Failed to create siddhi runtime for policy: {}, siddhi plan: \n\n{}\n",context.getPolicyDefinition().getName(),plan,parserException);
+            LOG.info("Created siddhi runtime {}", executionRuntime.getName());
+        } catch (Exception parserException) {
+            LOG.error("Failed to create siddhi runtime for policy: {}, siddhi plan: \n\n{}\n", context.getPolicyDefinition().getName(), plan, parserException);
             throw parserException;
         }
 
         // add output stream callback
         List<String> outputStreams = getOutputStreams(policy);
-        for(final String outputStream: outputStreams) {
+        for (final String outputStream : outputStreams) {
             if (executionRuntime.getStreamDefinitionMap().containsKey(outputStream)) {
                 this.executionRuntime.addCallback(outputStream,
-                        new AlertStreamCallback(
-                                outputStream, SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream))
-                                , collector, context, currentIndex));
+                    new AlertStreamCallback(
+                        outputStream, SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionRuntime.getStreamDefinitionMap().get(outputStream))
+                        , collector, context, currentIndex));
             } else {
                 throw new IllegalStateException("Undefined output stream " + outputStream);
             }
         }
         this.executionRuntime.start();
         this.context = context;
-        LOG.info("Initialized policy handler for policy: {}",policy.getName());
+        LOG.info("Initialized policy handler for policy: {}", policy.getName());
     }
 
     protected List<String> getOutputStreams(PolicyDefinition policy) {
@@ -104,29 +106,29 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
     }
 
     public void send(StreamEvent event) throws Exception {
-        context.getPolicyCounter().scope(String.format("%s.%s",this.context.getPolicyDefinition().getName(),"receive_count")).incr();
+        context.getPolicyCounter().scope(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "receive_count")).incr();
         String streamId = event.getStreamId();
         InputHandler inputHandler = executionRuntime.getInputHandler(streamId);
-        if(inputHandler != null){
-            context.getPolicyCounter().scope(String.format("%s.%s",this.context.getPolicyDefinition().getName(),"eval_count")).incr();
-            inputHandler.send(event.getTimestamp(),event.getData());
-            
+        if (inputHandler != null) {
+            context.getPolicyCounter().scope(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "eval_count")).incr();
+            inputHandler.send(event.getTimestamp(), event.getData());
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug("sent event to siddhi stream {} ", streamId);
             }
-        }else{
-            context.getPolicyCounter().scope(String.format("%s.%s",this.context.getPolicyDefinition().getName(),"drop_count")).incr();
-            LOG.warn("No input handler found for stream {}",streamId);
+        } else {
+            context.getPolicyCounter().scope(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "drop_count")).incr();
+            LOG.warn("No input handler found for stream {}", streamId);
         }
     }
 
     public void close() throws Exception {
-        LOG.info("Closing handler for policy {}",this.policy.getName());
+        LOG.info("Closing handler for policy {}", this.policy.getName());
         this.executionRuntime.shutdown();
-        LOG.info("Shutdown siddhi runtime {}",this.executionRuntime.getName());
+        LOG.info("Shutdown siddhi runtime {}", this.executionRuntime.getName());
         this.siddhiManager.shutdown();
-        LOG.info("Shutdown siddhi manager {}",this.siddhiManager);
-        LOG.info("Closed handler for policy {}",this.policy.getName());
+        LOG.info("Shutdown siddhi manager {}", this.siddhiManager);
+        LOG.info("Closed handler for policy {}", this.policy.getName());
     }
 
     @Override

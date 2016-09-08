@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public class StreamWindowManagerImpl implements StreamWindowManager {
     private final static Logger LOG = LoggerFactory.getLogger(StreamWindowManagerImpl.class);
-    private final TreeMap<Long,StreamWindow> windowBuckets;
+    private final TreeMap<Long, StreamWindow> windowBuckets;
     private final PartitionedEventCollector collector;
     private final Period windowPeriod;
     private final long windowMargin;
@@ -45,7 +45,7 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
     private final Comparator<PartitionedEvent> comparator;
     private long rejectTime;
 
-    public StreamWindowManagerImpl(Period windowPeriod, long windowMargin, Comparator<PartitionedEvent> comparator, PartitionedEventCollector collector){
+    public StreamWindowManagerImpl(Period windowPeriod, long windowMargin, Comparator<PartitionedEvent> comparator, PartitionedEventCollector collector) {
         this.windowBuckets = new TreeMap<>();
         this.windowPeriod = windowPeriod;
         this.windowMargin = windowMargin;
@@ -69,7 +69,7 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
         }
     }
 
-    private void addWindow(StreamWindow window){
+    private void addWindow(StreamWindow window) {
         if (!windowBuckets.containsKey(window.startTime())) {
             windowBuckets.put(window.startTime(), window);
         } else {
@@ -121,37 +121,41 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
     }
 
     @Override
-    public void onTick(StreamTimeClock clock,long globalSystemTime) {
+    public void onTick(StreamTimeClock clock, long globalSystemTime) {
         synchronized (windowBuckets) {
             List<StreamWindow> toRemoved = new ArrayList<>();
             List<StreamWindow> aliveWindow = new ArrayList<>();
 
             for (StreamWindow windowBucket : windowBuckets.values()) {
                 windowBucket.onTick(clock, globalSystemTime);
-                if (windowBucket.rejectTime() > rejectTime) rejectTime = windowBucket.rejectTime();
+                if (windowBucket.rejectTime() > rejectTime) {
+                    rejectTime = windowBucket.rejectTime();
+                }
             }
             for (StreamWindow windowBucket : windowBuckets.values()) {
-                if (windowBucket.expired() || windowBucket.endTime() <=rejectTime) {
+                if (windowBucket.expired() || windowBucket.endTime() <= rejectTime) {
                     toRemoved.add(windowBucket);
                 } else {
                     aliveWindow.add(windowBucket);
                 }
             }
             toRemoved.forEach(this::CloseAndRemoveWindow);
-            if (toRemoved.size() > 0) LOG.info("Windows: {} alive = {}, {} expired = {}", aliveWindow.size(), aliveWindow, toRemoved.size(), toRemoved);
+            if (toRemoved.size() > 0) {
+                LOG.info("Windows: {} alive = {}, {} expired = {}", aliveWindow.size(), aliveWindow, toRemoved.size(), toRemoved);
+            }
         }
     }
 
-    private void CloseAndRemoveWindow(StreamWindow windowBucket){
+    private void CloseAndRemoveWindow(StreamWindow windowBucket) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         CloseWindow(windowBucket);
         removeWindow(windowBucket);
         stopWatch.stop();
-        LOG.info("Removed {} in {} ms",windowBucket,stopWatch.getTime());
+        LOG.info("Removed {} in {} ms", windowBucket, stopWatch.getTime());
     }
 
-    private void CloseWindow(StreamWindow windowBucket){
+    private void CloseWindow(StreamWindow windowBucket) {
         windowBucket.close();
     }
 

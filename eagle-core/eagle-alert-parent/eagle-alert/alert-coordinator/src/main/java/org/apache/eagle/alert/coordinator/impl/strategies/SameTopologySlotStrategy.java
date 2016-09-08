@@ -42,13 +42,12 @@ import com.typesafe.config.ConfigFactory;
 /**
  * A simple strategy that only find the bolts in the same topology as the
  * required work slots.
- * 
+ * <p>
  * Invariant:<br/>
  * One slot queue only on the one topology.<br/>
  * One topology doesn't contains two same partition slot queues.
- * 
- * @since Apr 27, 2016
  *
+ * @since Apr 27, 2016
  */
 public class SameTopologySlotStrategy implements IWorkSlotStrategy {
 
@@ -58,11 +57,11 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
     private final StreamGroup partitionGroup;
     private final TopologyMgmtService mgmtService;
 
-//    private final int numOfPoliciesBoundPerBolt;
+    //    private final int numOfPoliciesBoundPerBolt;
     private final double topoLoadUpbound;
 
     public SameTopologySlotStrategy(IScheduleContext context, StreamGroup streamPartitionGroup,
-            TopologyMgmtService mgmtService) {
+                                    TopologyMgmtService mgmtService) {
         this.context = context;
         this.partitionGroup = streamPartitionGroup;
         this.mgmtService = mgmtService;
@@ -73,13 +72,12 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
     }
 
     /**
-     * @param isDedicated
-     *            - not used yet!
+     * @param isDedicated - not used yet!
      */
     @Override
     public List<WorkSlot> reserveWorkSlots(int size, boolean isDedicated, Map<String, Object> properties) {
         Iterator<Topology> it = context.getTopologies().values().stream().filter((t) -> t.getNumOfAlertBolt() >= size)
-                .iterator();
+            .iterator();
         // priority strategy first???
         List<WorkSlot> slots = new ArrayList<WorkSlot>();
         while (it.hasNext()) {
@@ -147,7 +145,7 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
         if (u == null || u.getLoad() > topoLoadUpbound) {
             return false;
         }
-        
+
         return true;
     }
 

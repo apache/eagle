@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * @since Apr 1, 2016
- *
  */
 public class AttributeCollectAggregator extends AttributeAggregator {
 

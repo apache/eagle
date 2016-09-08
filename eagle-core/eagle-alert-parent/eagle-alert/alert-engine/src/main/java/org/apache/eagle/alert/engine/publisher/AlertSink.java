@@ -20,13 +20,11 @@ import java.io.Serializable;
  */
 public interface AlertSink extends Serializable {
     /**
-     *
      * @throws Exception
      */
     void open() throws Exception;
 
     /**
-     *
      * @throws Exception
      */
     void close() throws Exception;

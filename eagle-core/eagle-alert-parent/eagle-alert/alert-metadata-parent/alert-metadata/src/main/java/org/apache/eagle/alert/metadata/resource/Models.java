@@ -32,9 +32,8 @@ import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 
 /**
  * This models used for metadata export/import to easy of test.
- * 
- * @since May 23, 2016
  *
+ * @since May 23, 2016
  */
 public class Models {
     public List<StreamingCluster> clusters = new ArrayList<StreamingCluster>();

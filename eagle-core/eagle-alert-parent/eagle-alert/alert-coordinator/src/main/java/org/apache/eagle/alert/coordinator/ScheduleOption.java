@@ -18,11 +18,10 @@ package org.apache.eagle.alert.coordinator;
 
 /**
  * A runtime option for one schedule processing.
- * 
+ * <p>
  * Could used for configuration override.
- * 
- * @since Apr 19, 2016
  *
+ * @since Apr 19, 2016
  */
 public class ScheduleOption {
     private int policiesPerBolt;

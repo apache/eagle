@@ -38,17 +38,17 @@ import org.apache.eagle.alert.engine.serialization.Serializer;
 public class StreamPartitionDigestSerializer implements Serializer<StreamPartition> {
     public final static StreamPartitionDigestSerializer INSTANCE = new StreamPartitionDigestSerializer();
 
-    private final Map<DigestBytes,StreamPartition> checkSumPartitionMap = new HashMap<>();
-    private final Map<StreamPartition,DigestBytes> partitionCheckSumMap = new HashMap<>();
+    private final Map<DigestBytes, StreamPartition> checkSumPartitionMap = new HashMap<>();
+    private final Map<StreamPartition, DigestBytes> partitionCheckSumMap = new HashMap<>();
 
     @Override
     public void serialize(StreamPartition partition, DataOutput dataOutput) throws IOException {
         DigestBytes checkSum = partitionCheckSumMap.get(partition);
-        if(checkSum == null){
+        if (checkSum == null) {
             try {
                 checkSum = digestCheckSum(partition);
-                partitionCheckSumMap.put(partition,checkSum);
-                checkSumPartitionMap.put(checkSum,partition);
+                partitionCheckSumMap.put(partition, checkSum);
+                checkSumPartitionMap.put(checkSum, partition);
             } catch (NoSuchAlgorithmException e) {
                 throw new IOException(e);
             }
@@ -63,8 +63,8 @@ public class StreamPartitionDigestSerializer implements Serializer<StreamPartiti
         byte[] checksum = new byte[checkSumLen];
         dataInput.readFully(checksum);
         StreamPartition partition = checkSumPartitionMap.get(new DigestBytes(checksum));
-        if(partition == null){
-            throw new IOException("Illegal partition checksum: "+checksum);
+        if (partition == null) {
+            throw new IOException("Illegal partition checksum: " + checksum);
         }
         return partition;
     }
@@ -72,7 +72,7 @@ public class StreamPartitionDigestSerializer implements Serializer<StreamPartiti
     private class DigestBytes {
         private final byte[] data;
 
-        public DigestBytes(byte[] bytes){
+        public DigestBytes(byte[] bytes) {
             this.data = bytes;
         }
 
@@ -85,10 +85,12 @@ public class StreamPartitionDigestSerializer implements Serializer<StreamPartiti
         public int hashCode() {
             return Arrays.hashCode(data);
         }
-        public int size(){
+
+        public int size() {
             return data.length;
         }
-        public byte[] toByteArray(){
+
+        public byte[] toByteArray() {
             return data;
         }
     }

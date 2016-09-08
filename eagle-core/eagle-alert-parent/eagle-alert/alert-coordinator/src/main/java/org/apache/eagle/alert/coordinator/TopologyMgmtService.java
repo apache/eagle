@@ -30,7 +30,6 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since Mar 29, 2016
- *
  */
 public class TopologyMgmtService {
 
@@ -61,21 +60,21 @@ public class TopologyMgmtService {
         boltParallelism = config.getInt(CoordinatorConstants.BOLT_PARALLELISM);
         numberOfBoltsPerTopology = config.getInt(NUM_OF_ALERT_BOLTS_PER_TOPOLOGY);
     }
-    
+
     public int getNumberOfAlertBoltsInTopology() {
         return numberOfBoltsPerTopology;
     }
 
     /**
      * TODO: call topology mgmt API to create a topology
-     * 
+     *
      * @return
      */
     public TopologyMeta creatTopology() {
         // TODO
         throw new UnsupportedOperationException("not supported yet!");
     }
-    
+
     public List<TopologyMeta> listTopologies() {
         // TODO
         return Collections.emptyList();

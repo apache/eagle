@@ -44,7 +44,6 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since May 5, 2016
- *
  */
 public class CoordinatorTest {
 
@@ -63,7 +62,7 @@ public class CoordinatorTest {
         zkEmbed.shutdown();
     }
 
-    @SuppressWarnings({ "resource", "unused" })
+    @SuppressWarnings( {"resource", "unused"})
     @Ignore
     @Test
     public void test() throws Exception {
@@ -92,7 +91,7 @@ public class CoordinatorTest {
         Assert.assertTrue(validated.get());
     }
 
-    @SuppressWarnings({ "resource", "unused" })
+    @SuppressWarnings( {"resource", "unused"})
     @Test
     public void test_01() throws Exception {
         before();
@@ -138,7 +137,7 @@ public class CoordinatorTest {
         ConfigFactory.invalidateCaches();
         ConfigFactory.load().getConfig("coordinator");
     }
-    
+
     @Test
     public void test_Schedule() {
         Coordinator.startSchedule();

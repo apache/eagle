@@ -19,13 +19,12 @@ package org.apache.eagle.alert.coordinator.model;
 
 /**
  * @since Mar 28, 2016
- *
  */
 public class GroupBoltUsage {
 
     private String boltId;
     private double load;
-    
+
     public GroupBoltUsage(String boltId) {
         this.boltId = boltId;
     }

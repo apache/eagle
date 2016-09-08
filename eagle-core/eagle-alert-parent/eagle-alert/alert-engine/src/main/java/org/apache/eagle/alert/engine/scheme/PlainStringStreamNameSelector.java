@@ -37,11 +37,13 @@ public class PlainStringStreamNameSelector implements StreamNameSelector {
 
     private String streamName;
 
-    public PlainStringStreamNameSelector(Properties prop){
+    public PlainStringStreamNameSelector(Properties prop) {
         streamName = prop.getProperty(USER_PROVIDED_STREAM_NAME_PROPERTY);
-        if(streamName == null)
+        if (streamName == null) {
             streamName = DEFAULT_STRING_STREAM_NAME;
+        }
     }
+
     @Override
     public String getStreamName(Map<String, Object> tuple) {
         return streamName;

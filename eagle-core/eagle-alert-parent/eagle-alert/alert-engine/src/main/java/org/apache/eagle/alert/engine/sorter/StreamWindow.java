@@ -23,14 +23,14 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
  * <h2>Tumbling Window instead Sliding Window</h2>
  * We could have time overlap to sort out-of-ordered stream,
  * but each window should never have events overlap, otherwise will have logic problem.
- *
- *
+ * <p>
+ * <p>
  * <h2>Ingestion Time Policy</h2>
  * Different notions of time, namely processing time, event time, and ingestion time.
- *
+ * <p>
  * <ol>
  * <li>
- *  In processing time, windows are defined with respect to the wall clock of the machine that builds and processes a window, i.e., a one minute processing time window collects elements for exactly one minute.
+ * In processing time, windows are defined with respect to the wall clock of the machine that builds and processes a window, i.e., a one minute processing time window collects elements for exactly one minute.
  * </li>
  * <li>
  * In event time, windows are defined with respect to timestamps that are attached to each event record. This is common for many types of events, such as log entries, sensor data, etc, where the timestamp usually represents the time at which the event occurred. Event time has several benefits over processing time. First of all, it decouples the program semantics from the actual serving speed of the source and the processing performance of system. Hence you can process historic data, which is served at maximum speed, and continuously produced data with the same program. It also prevents semantically incorrect results in case of backpressure or delays due to failure recovery. Second, event time windows compute correct results, even if events arrive out-of-order of their timestamp which is common if a data stream gathers events from distributed sources.
@@ -86,7 +86,6 @@ public interface StreamWindow extends StreamTimeClockListener {
     boolean alive();
 
     /**
-     *
      * @param event
      */
     boolean add(PartitionedEvent event);
@@ -106,7 +105,6 @@ public interface StreamWindow extends StreamTimeClockListener {
     void register(PartitionedEventCollector collector);
 
     /**
-     *
      * @return
      */
     int size();

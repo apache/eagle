@@ -27,7 +27,7 @@ public class AbsenceWindow {
     public long startTime;
     public long endTime;
 
-    public String toString(){
+    public String toString() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         String t1 = sdf.format(new Date(startTime));

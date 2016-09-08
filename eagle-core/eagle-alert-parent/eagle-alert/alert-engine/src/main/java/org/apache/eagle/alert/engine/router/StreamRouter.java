@@ -24,7 +24,10 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
  */
 public interface StreamRouter extends StreamSortSpecListener, Serializable {
     void prepare(StreamContext context, PartitionedEventCollector outputCollector);
+
     void nextEvent(PartitionedEvent event);
+
     String getName();
+
     void close();
 }

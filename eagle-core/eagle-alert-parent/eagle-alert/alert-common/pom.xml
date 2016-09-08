@@ -83,8 +83,8 @@
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>org.codehaus.jackson</groupId>-->
-            <!--<artifactId>jackson-jaxrs</artifactId>-->
+        <!--<groupId>org.codehaus.jackson</groupId>-->
+        <!--<artifactId>jackson-jaxrs</artifactId>-->
         <!--</dependency>-->
         <dependency>
             <groupId>joda-time</groupId>

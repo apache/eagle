@@ -33,7 +33,7 @@ import org.apache.eagle.alert.service.IMetadataServiceClient;
 public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
-    public List<SpoutSpec>  listSpoutMetadata() {
+    public List<SpoutSpec> listSpoutMetadata() {
         return null;
     }
 
@@ -79,7 +79,7 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void addScheduleState(ScheduleState state) {
-        
+
     }
 
     @Override
@@ -89,7 +89,7 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void addStreamingCluster(StreamingCluster cluster) {
-        
+
     }
 
     @Override
@@ -99,7 +99,7 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void addTopology(Topology t) {
-        
+
     }
 
     @Override
@@ -109,7 +109,7 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void addPolicy(PolicyDefinition policy) {
-        
+
     }
 
     @Override
@@ -119,7 +119,7 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void addStreamDefinition(StreamDefinition streamDef) {
-        
+
     }
 
     @Override
@@ -129,7 +129,7 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void addDataSource(Kafka2TupleMetadata k2t) {
-        
+
     }
 
     @Override
@@ -139,7 +139,7 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void addPublishment(Publishment pub) {
-        
+
     }
 
     @Override
@@ -149,6 +149,6 @@ public class MockMetadataServiceClient implements IMetadataServiceClient {
 
     @Override
     public void clear() {
-        
+
     }
 }

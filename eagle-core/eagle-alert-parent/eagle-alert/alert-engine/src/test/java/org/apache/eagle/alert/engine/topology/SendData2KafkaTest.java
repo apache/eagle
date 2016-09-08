@@ -36,13 +36,11 @@ import org.junit.Test;
 /**
  * Created on 3/12/16.
  */
-@SuppressWarnings({"serial", "unchecked", "rawtypes", "resource"})
-public class SendData2KafkaTest implements Serializable{
+@SuppressWarnings( {"serial", "unchecked", "rawtypes", "resource"})
+public class SendData2KafkaTest implements Serializable {
     /**
-     *
      * {"timestamp": 10000, "metric": "esErrorLogEvent", "instanceUuid": "vm-InstanceId1", "host":"test-host1", "type":"nova", "stack":"NullPointException-..........."}
-     {"timestamp": 10000, "metric": "instanceFailureLogEvent", "instanceUuid": "vm-InstanceId1", "message":"instance boot failure for user liasu!"}
-     *
+     * {"timestamp": 10000, "metric": "instanceFailureLogEvent", "instanceUuid": "vm-InstanceId1", "message":"instance boot failure for user liasu!"}
      */
     @Test
     @Ignore

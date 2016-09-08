@@ -33,13 +33,13 @@ public class AbsenceWindowProcessor {
     private boolean expired; // to mark if the time range has been went through
     private OccurStatus status = OccurStatus.not_sure;
 
-    public enum OccurStatus{
+    public enum OccurStatus {
         not_sure,
         occured,
         absent
     }
 
-    public AbsenceWindowProcessor(List<Object> expectAttrs, AbsenceWindow window){
+    public AbsenceWindowProcessor(List<Object> expectAttrs, AbsenceWindow window) {
         this.expectAttrs = expectAttrs;
         this.window = window;
         expired = false;
@@ -47,51 +47,56 @@ public class AbsenceWindowProcessor {
 
     /**
      * return true if it is certain that expected attributes don't occur during startTime and endTime, else return false
+     *
      * @param appearAttrs
      * @param occurTime
      * @return
      */
-    public void process(List<Object> appearAttrs, long occurTime){
-        if(expired)
+    public void process(List<Object> appearAttrs, long occurTime) {
+        if (expired) {
             throw new IllegalStateException("Expired window can't recieve events");
-        switch(status) {
+        }
+        switch (status) {
             case not_sure:
-                if(occurTime < window.startTime) {
+                if (occurTime < window.startTime) {
                     break;
-                }else if(occurTime >= window.startTime &&
-                        occurTime <= window.endTime) {
-                    if(expectAttrs.equals(appearAttrs)) {
+                } else if (occurTime >= window.startTime &&
+                    occurTime <= window.endTime) {
+                    if (expectAttrs.equals(appearAttrs)) {
                         status = OccurStatus.occured;
                     }
                     break;
-                }else{
+                } else {
                     status = OccurStatus.absent;
                     break;
                 }
             case occured:
-                if(occurTime > window.endTime)
+                if (occurTime > window.endTime) {
                     expired = true;
+                }
                 break;
             default:
                 break;
         }
         // reset status
-        if(status == OccurStatus.absent){
+        if (status == OccurStatus.absent) {
             expired = true;
         }
     }
 
-    public OccurStatus checkStatus(){
+    public OccurStatus checkStatus() {
         return status;
     }
-    public boolean checkExpired(){
+
+    public boolean checkExpired() {
         return expired;
     }
-    public AbsenceWindow currWindow(){
+
+    public AbsenceWindow currWindow() {
         return window;
     }
 
-    public String toString(){
+    public String toString() {
         return "expectAttrs=" + expectAttrs + ", status=" + status + ", expired=" + expired + ", window=[" + window + "]";
     }
 }

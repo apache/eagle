@@ -39,10 +39,10 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
 
     public void prepare(String streamId, StreamSortSpec streamSortSpecSpec, PartitionedEventCollector outputCollector) {
         this.windowManager = new StreamWindowManagerImpl(
-                Period.parse(streamSortSpecSpec.getWindowPeriod()),
-                streamSortSpecSpec.getWindowMargin(),
-                PartitionedEventTimeOrderingComparator.INSTANCE,
-                outputCollector);
+            Period.parse(streamSortSpecSpec.getWindowPeriod()),
+            streamSortSpecSpec.getWindowMargin(),
+            PartitionedEventTimeOrderingComparator.INSTANCE,
+            outputCollector);
         this.streamSortSpecSpec = streamSortSpecSpec;
         this.streamId = streamId;
         this.outputCollector = outputCollector;
@@ -57,7 +57,7 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
         final long eventTime = event.getEvent().getTimestamp();
         boolean handled = false;
 
-        synchronized (this.windowManager){
+        synchronized (this.windowManager) {
             for (StreamWindow window : this.windowManager.getWindows()) {
                 if (window.alive() && window.add(event)) {
                     handled = true;
@@ -75,8 +75,8 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
             }
         }
 
-        if(!handled){
-            if(LOG.isDebugEnabled()) {
+        if (!handled) {
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Drop expired event {}", event);
             }
             outputCollector.drop(event);
@@ -84,7 +84,7 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
     }
 
     @Override
-    public void onTick(StreamTimeClock clock,long globalSystemTime) {
+    public void onTick(StreamTimeClock clock, long globalSystemTime) {
         windowManager.onTick(clock, globalSystemTime);
     }
 
@@ -93,7 +93,7 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
         try {
             windowManager.close();
         } catch (IOException e) {
-            LOG.error("Got exception while closing window manager",e);
+            LOG.error("Got exception while closing window manager", e);
         }
     }
 
@@ -103,10 +103,10 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
     }
 
     @Override
-    public int hashCode(){
-        if(streamSortSpecSpec == null){
+    public int hashCode() {
+        if (streamSortSpecSpec == null) {
             throw new NullPointerException("streamSortSpec is null");
-        }else{
+        } else {
             return streamSortSpecSpec.hashCode();
         }
     }

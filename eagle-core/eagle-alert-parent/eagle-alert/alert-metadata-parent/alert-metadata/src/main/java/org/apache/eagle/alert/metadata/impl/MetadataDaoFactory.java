@@ -27,7 +27,6 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since Apr 12, 2016
- *
  */
 public class MetadataDaoFactory {
 

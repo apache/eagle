@@ -18,9 +18,9 @@ package org.apache.eagle.alert.engine.sorter;
 
 /**
  * The time clock per stream
- *
+ * <p>
  * Should be thread-safe between getTime and moveForward
- *
+ * <p>
  * By default, we currently simple support event timestamp now
  */
 public interface StreamTimeClock {

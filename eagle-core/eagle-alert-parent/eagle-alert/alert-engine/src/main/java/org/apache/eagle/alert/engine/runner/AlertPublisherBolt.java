@@ -48,7 +48,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
     private final AlertPublisher alertPublisher;
     private volatile Map<String, Publishment> cachedPublishments = new HashMap<>();
 
-    public AlertPublisherBolt(String alertPublisherName, Config config, IMetadataChangeNotifyService coordinatorService){
+    public AlertPublisherBolt(String alertPublisherName, Config config, IMetadataChangeNotifyService coordinatorService) {
         super(alertPublisherName, coordinatorService, config);
         this.alertPublisher = new AlertPublisherImpl(alertPublisherName);
     }
@@ -58,7 +58,7 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
         coordinatorService.registerListener(this);
         coordinatorService.init(config, MetadataType.ALERT_PUBLISH_BOLT);
         this.alertPublisher.init(config, stormConf);
-        streamContext = new StreamContextImpl(config,context.registerMetric("eagle.publisher",new MultiCountMetric(),60),context);
+        streamContext = new StreamContextImpl(config, context.registerMetric("eagle.publisher", new MultiCountMetric(), 60), context);
     }
 
     @Override
@@ -68,9 +68,9 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
             alertPublisher.nextEvent((AlertStreamEvent) input.getValueByField(AlertConstants.FIELD_1));
             this.collector.ack(input);
             streamContext.counter().scope("ack_count");
-        } catch (Exception ex){
+        } catch (Exception ex) {
             streamContext.counter().scope("fail_count");
-            LOG.error(ex.getMessage(),ex);
+            LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
         }
     }
@@ -88,10 +88,12 @@ public class AlertPublisherBolt extends AbstractStreamBolt implements AlertPubli
 
     @Override
     public void onAlertPublishSpecChange(PublishSpec pubSpec, Map<String, StreamDefinition> sds) {
-        if(pubSpec == null) return;
+        if (pubSpec == null) {
+            return;
+        }
 
         List<Publishment> newPublishments = pubSpec.getPublishments();
-        if(newPublishments == null) {
+        if (newPublishments == null) {
             LOG.info("no publishments with PublishSpec {} for this topology", pubSpec);
             return;
         }

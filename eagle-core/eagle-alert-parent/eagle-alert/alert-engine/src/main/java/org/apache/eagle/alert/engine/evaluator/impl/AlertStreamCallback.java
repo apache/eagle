@@ -59,7 +59,7 @@ public class AlertStreamCallback extends StreamCallback {
     @Override
     public void receive(Event[] events) {
         String policyName = context.getPolicyDefinition().getName();
-        CompositePolicyHandler handler = ((PolicyGroupEvaluatorImpl)context.getPolicyEvaluator()).getPolicyHandler(policyName);
+        CompositePolicyHandler handler = ((PolicyGroupEvaluatorImpl) context.getPolicyEvaluator()).getPolicyHandler(policyName);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Generated {} alerts from policy '{}' in {}, index of definiton {} ", events.length, policyName, context.getPolicyEvaluatorId(), currentIndex);
         }
@@ -75,18 +75,21 @@ public class AlertStreamCallback extends StreamCallback {
             event.setCreatedTime(System.currentTimeMillis());
             event.setSchema(definition);
 
-            if (LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Generate new alert event: {}", event);
+            }
             try {
                 if (handler == null) {
                     // extreme case: the handler is removed from the evaluator. Just emit.
-                    if (LOG.isDebugEnabled()) LOG.debug(" handler not found when callback received event, directly emit. policy removed? ");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(" handler not found when callback received event, directly emit. policy removed? ");
+                    }
                     collector.emit(event);
                 } else {
                     handler.send(event, currentIndex + 1);
                 }
             } catch (Exception ex) {
-                LOG.error(String.format("send event %s to index %d failed with exception. ",event, currentIndex), ex);
+                LOG.error(String.format("send event %s to index %d failed with exception. ", event, currentIndex), ex);
             }
         }
         context.getPolicyCounter().scope(String.format("%s.%s", this.context.getPolicyDefinition().getName(), "alert_count")).incrBy(events.length);

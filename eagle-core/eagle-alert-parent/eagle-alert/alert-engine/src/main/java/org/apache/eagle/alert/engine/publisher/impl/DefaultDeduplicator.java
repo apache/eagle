@@ -32,121 +32,123 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class DefaultDeduplicator implements AlertDeduplicator {
-	private long dedupIntervalMin;
-	private List<String> customDedupFields = new ArrayList<>();
-	private volatile Map<EventUniq, Long> events = new HashMap<>();
-	private static Logger LOG = LoggerFactory.getLogger(DefaultDeduplicator.class);
+    private long dedupIntervalMin;
+    private List<String> customDedupFields = new ArrayList<>();
+    private volatile Map<EventUniq, Long> events = new HashMap<>();
+    private static Logger LOG = LoggerFactory.getLogger(DefaultDeduplicator.class);
 
-	public enum AlertDeduplicationStatus{
-		NEW,
-		DUPLICATED,
-		IGNORED
-	}
-	
-	public DefaultDeduplicator() {
-		this.dedupIntervalMin = 0;
-	}
+    public enum AlertDeduplicationStatus {
+        NEW,
+        DUPLICATED,
+        IGNORED
+    }
 
-	public DefaultDeduplicator(String intervalMin) {
-		setDedupIntervalMin(intervalMin);
-	}
-	
-	public DefaultDeduplicator(long intervalMin) {
-		this.dedupIntervalMin = intervalMin;
-	}
+    public DefaultDeduplicator() {
+        this.dedupIntervalMin = 0;
+    }
 
-	public DefaultDeduplicator(String intervalMin, List<String> customDedupFields) {
-		setDedupIntervalMin(intervalMin);
-		if (customDedupFields != null){
-			this.customDedupFields = customDedupFields;
-		}
-	}
-	
-	public void clearOldCache() {
-		List<EventUniq> removedkeys = new ArrayList<>();
-		for (Entry<EventUniq, Long> entry : events.entrySet()) {
-			EventUniq entity = entry.getKey();
-			if (System.currentTimeMillis() - 7 * DateUtils.MILLIS_PER_DAY > entity.createdTime) {
-				removedkeys.add(entry.getKey());
-			}
-		}
-		for (EventUniq alertKey : removedkeys) {
-			events.remove(alertKey);
-		}
-	}
+    public DefaultDeduplicator(String intervalMin) {
+        setDedupIntervalMin(intervalMin);
+    }
 
-	/***
-	 *
-	 * @param key
-	 * @return
-	 */
-	public AlertDeduplicationStatus checkDedup(EventUniq key) {
-		long current = key.timestamp;
-		if(!events.containsKey(key)) {
-			events.put(key, current);
-			return AlertDeduplicationStatus.NEW;
-		}
-		
-		long last = events.get(key);
-		if(current - last >= dedupIntervalMin * DateUtils.MILLIS_PER_MINUTE) {
-			events.put(key, current);
-			return AlertDeduplicationStatus.IGNORED;
-		}
+    public DefaultDeduplicator(long intervalMin) {
+        this.dedupIntervalMin = intervalMin;
+    }
 
-		return AlertDeduplicationStatus.DUPLICATED;
-	}
-	
-	public AlertStreamEvent dedup(AlertStreamEvent event) {
-        if (event == null) return null;
-		clearOldCache();
-		AlertStreamEvent result = null;
+    public DefaultDeduplicator(String intervalMin, List<String> customDedupFields) {
+        setDedupIntervalMin(intervalMin);
+        if (customDedupFields != null) {
+            this.customDedupFields = customDedupFields;
+        }
+    }
 
-		// check custom field, and get the field values
-		StreamDefinition streamDefinition = event.getSchema();
-		HashMap<String, String> customFieldValues = new HashMap<>();
-		for (int i = 0; i < event.getData().length; i++){
-			if (i > streamDefinition.getColumns().size()) {
-				if (LOG.isWarnEnabled()) {
-					LOG.warn("output column does not found for event data, this indicate code error!");
-				}
-				continue;
-			}
-			String colName = streamDefinition.getColumns().get(i).getName();
+    public void clearOldCache() {
+        List<EventUniq> removedkeys = new ArrayList<>();
+        for (Entry<EventUniq, Long> entry : events.entrySet()) {
+            EventUniq entity = entry.getKey();
+            if (System.currentTimeMillis() - 7 * DateUtils.MILLIS_PER_DAY > entity.createdTime) {
+                removedkeys.add(entry.getKey());
+            }
+        }
+        for (EventUniq alertKey : removedkeys) {
+            events.remove(alertKey);
+        }
+    }
 
-			for (String field : customDedupFields){
-				if (colName.equals(field)){
-					customFieldValues.put(field, event.getData()[i].toString());
-					break;
-				}
-			}
-		}
+    /***
+     *
+     * @param key
+     * @return
+     */
+    public AlertDeduplicationStatus checkDedup(EventUniq key) {
+        long current = key.timestamp;
+        if (!events.containsKey(key)) {
+            events.put(key, current);
+            return AlertDeduplicationStatus.NEW;
+        }
 
-		AlertDeduplicationStatus status = checkDedup(
-				new EventUniq(event.getStreamId(),
-						event.getPolicyId(),
-						event.getCreatedTime(),
-						customFieldValues));
-		if (!status.equals(AlertDeduplicationStatus.DUPLICATED)) {
-			result = event;
-		} else if(LOG.isDebugEnabled()){
-			LOG.debug("Alert event is skipped because it's duplicated: {}", event.toString());
-		}
-		return result;
-	}
+        long last = events.get(key);
+        if (current - last >= dedupIntervalMin * DateUtils.MILLIS_PER_MINUTE) {
+            events.put(key, current);
+            return AlertDeduplicationStatus.IGNORED;
+        }
 
-	@Override
-	public void setDedupIntervalMin(String newDedupIntervalMin) {
-		if (newDedupIntervalMin == null || newDedupIntervalMin.isEmpty()) {
-			dedupIntervalMin = 0;
+        return AlertDeduplicationStatus.DUPLICATED;
+    }
+
+    public AlertStreamEvent dedup(AlertStreamEvent event) {
+        if (event == null) {
+            return null;
+        }
+        clearOldCache();
+        AlertStreamEvent result = null;
+
+        // check custom field, and get the field values
+        StreamDefinition streamDefinition = event.getSchema();
+        HashMap<String, String> customFieldValues = new HashMap<>();
+        for (int i = 0; i < event.getData().length; i++) {
+            if (i > streamDefinition.getColumns().size()) {
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("output column does not found for event data, this indicate code error!");
+                }
+                continue;
+            }
+            String colName = streamDefinition.getColumns().get(i).getName();
+
+            for (String field : customDedupFields) {
+                if (colName.equals(field)) {
+                    customFieldValues.put(field, event.getData()[i].toString());
+                    break;
+                }
+            }
+        }
+
+        AlertDeduplicationStatus status = checkDedup(
+            new EventUniq(event.getStreamId(),
+                event.getPolicyId(),
+                event.getCreatedTime(),
+                customFieldValues));
+        if (!status.equals(AlertDeduplicationStatus.DUPLICATED)) {
+            result = event;
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("Alert event is skipped because it's duplicated: {}", event.toString());
+        }
+        return result;
+    }
+
+    @Override
+    public void setDedupIntervalMin(String newDedupIntervalMin) {
+        if (newDedupIntervalMin == null || newDedupIntervalMin.isEmpty()) {
+            dedupIntervalMin = 0;
             return;
-		}
-		try {
-			Period period = Period.parse(newDedupIntervalMin);
-			this.dedupIntervalMin = period.toStandardMinutes().getMinutes();
-		} catch (Exception e) {
-			LOG.warn("Fail to pares deDupIntervalMin, will disable deduplication instead", e);
-			this.dedupIntervalMin = 0;
-		}
-	}
+        }
+        try {
+            Period period = Period.parse(newDedupIntervalMin);
+            this.dedupIntervalMin = period.toStandardMinutes().getMinutes();
+        } catch (Exception e) {
+            LOG.warn("Fail to pares deDupIntervalMin, will disable deduplication instead", e);
+            this.dedupIntervalMin = 0;
+        }
+    }
 
 }

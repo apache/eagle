@@ -22,7 +22,6 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
 
 public interface PartitionedEventSerializer {
     /**
-     *
      * @param entity
      * @return
      * @throws IOException
@@ -30,7 +29,6 @@ public interface PartitionedEventSerializer {
     byte[] serialize(PartitionedEvent entity) throws IOException;
 
     /**
-     *
      * @param bytes
      * @return
      * @throws IOException

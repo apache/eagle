@@ -38,7 +38,7 @@ public class AbsenceAlertDriver {
 
     public boolean process(List<Object> appearAttrs, long occurTime) {
         // initialize window
-        if(processor == null){
+        if (processor == null) {
             processor = nextProcessor(occurTime);
             LOG.info("initialized a new window {}", processor);
         }
@@ -46,8 +46,8 @@ public class AbsenceAlertDriver {
         AbsenceWindowProcessor.OccurStatus status = processor.checkStatus();
         boolean expired = processor.checkExpired();
         boolean isAbsenceAlert = false;
-        if (expired){
-            if(status == AbsenceWindowProcessor.OccurStatus.absent){
+        if (expired) {
+            if (status == AbsenceWindowProcessor.OccurStatus.absent) {
                 // send alert
                 LOG.info("===================");
                 LOG.info("|| Absence Alert ||");
@@ -64,6 +64,7 @@ public class AbsenceAlertDriver {
 
     /**
      * calculate absolute time range based on current timestamp
+     *
      * @param currTime milliseconds
      * @return
      */

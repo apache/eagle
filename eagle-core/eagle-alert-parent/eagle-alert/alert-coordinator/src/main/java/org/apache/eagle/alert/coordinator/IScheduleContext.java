@@ -30,7 +30,6 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
 /**
  * @since Mar 28, 2016
- *
  */
 public interface IScheduleContext {
 
@@ -48,7 +47,7 @@ public interface IScheduleContext {
     Map<String, PolicyAssignment> getPolicyAssignments();
 
     Map<StreamGroup, MonitoredStream> getMonitoredStreams();
-    
+
     Map<String, Publishment> getPublishments();
 
 }

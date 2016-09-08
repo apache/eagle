@@ -28,7 +28,6 @@ import java.util.List;
 
 /**
  * @since May 5, 2016
- *
  */
 @Path("/alert")
 @Produces("application/json")

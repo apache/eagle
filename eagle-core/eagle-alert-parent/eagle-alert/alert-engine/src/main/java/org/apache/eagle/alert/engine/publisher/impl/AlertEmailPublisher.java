@@ -60,18 +60,18 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
 
     @Override
     public void onAlert(AlertStreamEvent event) throws Exception {
-        if(emailGenerator == null) {
+        if (emailGenerator == null) {
             LOG.warn("emailGenerator is null due to the incorrect configurations");
             return;
         }
         event = dedup(event);
-        if(event == null) {
+        if (event == null) {
             return;
         }
 
         boolean isSuccess = emailGenerator.sendAlertEmail(event);
         PublishStatus status = new PublishStatus();
-        if(!isSuccess) {
+        if (!isSuccess) {
             status.errorMessage = "Failed to send email";
             status.successful = false;
         } else {
@@ -85,7 +85,7 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
     public void update(String dedupIntervalMin, Map<String, String> pluginProperties) {
         super.update(dedupIntervalMin, pluginProperties);
 
-        if (pluginProperties != null && ! emailConfig.equals(pluginProperties)) {
+        if (pluginProperties != null && !emailConfig.equals(pluginProperties)) {
             emailConfig = new HashMap<>(pluginProperties);
             emailGenerator = createEmailGenerator(pluginProperties);
         }
@@ -111,31 +111,33 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
         }
         String sender = notificationConfig.get(PublishConstants.SENDER);
         String recipients = notificationConfig.get(PublishConstants.RECIPIENTS);
-        if(sender == null || recipients == null) {
+        if (sender == null || recipients == null) {
             LOG.warn("email sender or recipients is null");
             return null;
         }
         AlertEmailGenerator gen = AlertEmailGeneratorBuilder.newBuilder().
-                withMailProps(notificationConfig).
-                withSubject(subject).
-                withSender(sender).
-                withRecipients(recipients).
-                withTplFile(tplFileName).
-                withExecutorPool(this.executorPool).build();
+            withMailProps(notificationConfig).
+            withSubject(subject).
+            withSender(sender).
+            withRecipients(recipients).
+            withTplFile(tplFileName).
+            withExecutorPool(this.executorPool).build();
         return gen;
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return new HashCodeBuilder().append(getClass().getCanonicalName()).toHashCode();
     }
 
     @Override
-    public boolean equals(Object o){
-        if(o == this)
+    public boolean equals(Object o) {
+        if (o == this) {
             return true;
-        if(!(o instanceof AlertEmailPublisher))
+        }
+        if (!(o instanceof AlertEmailPublisher)) {
             return false;
+        }
         return true;
     }
 

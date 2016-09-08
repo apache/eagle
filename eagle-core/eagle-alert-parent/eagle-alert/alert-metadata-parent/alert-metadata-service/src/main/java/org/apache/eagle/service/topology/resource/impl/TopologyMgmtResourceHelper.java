@@ -39,10 +39,10 @@ public class TopologyMgmtResourceHelper {
             Method m = t.getClass().getMethod("getName");
             return (String) m.invoke(t);
         } catch (NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException
-                | IllegalArgumentException e) {
+            | IllegalArgumentException e) {
             LOG.error(" getName not found on given class :" + t.getClass().getName());
         }
         throw new RuntimeException(String.format("no getName() found on target class %s for matching", t.getClass()
-                .getName()));
+            .getName()));
     }
 }

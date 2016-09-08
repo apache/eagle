@@ -45,7 +45,7 @@ public class CompressionUtils {
         }
     }
 
-    public static byte[] decompress(byte[] compressed) throws IOException{
+    public static byte[] decompress(byte[] compressed) throws IOException {
         if (compressed == null || compressed.length == 0) {
             return compressed;
         }

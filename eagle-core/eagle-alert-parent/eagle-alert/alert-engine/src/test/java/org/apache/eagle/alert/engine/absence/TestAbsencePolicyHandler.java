@@ -42,11 +42,11 @@ public class TestAbsencePolicyHandler {
     private static final String outputStream = "testOutputStream";
 
     @Test
-    public void test() throws Exception{
+    public void test() throws Exception {
         test(buildPolicyDef_provided());
     }
 
-    public void test(PolicyDefinition pd) throws Exception{
+    public void test(PolicyDefinition pd) throws Exception {
         Map<String, StreamDefinition> sds = new HashMap<>();
         StreamDefinition sd = buildStreamDef();
         sds.put("testInputStream", sd);
@@ -62,14 +62,14 @@ public class TestAbsencePolicyHandler {
     private static class TestCollector implements Collector {
         @Override
         public void emit(Object o) {
-            AlertStreamEvent e = (AlertStreamEvent)o;
+            AlertStreamEvent e = (AlertStreamEvent) o;
             Object[] data = e.getData();
             Assert.assertEquals("host2", data[1]);
             LOG.info(e.toString());
         }
     }
 
-    private PolicyDefinition buildPolicyDef_provided(){
+    private PolicyDefinition buildPolicyDef_provided() {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
         def.setValue("1,jobID,job1,daily_rule,14:00:00,15:00:00");
@@ -81,7 +81,7 @@ public class TestAbsencePolicyHandler {
         return pd;
     }
 
-    private StreamDefinition buildStreamDef(){
+    private StreamDefinition buildStreamDef() {
         StreamDefinition sd = new StreamDefinition();
         StreamColumn tsColumn = new StreamColumn();
         tsColumn.setName("timestamp");
@@ -101,9 +101,9 @@ public class TestAbsencePolicyHandler {
         return sd;
     }
 
-    private StreamEvent buildStreamEvt(long ts, String jobID, String status){
+    private StreamEvent buildStreamEvt(long ts, String jobID, String status) {
         StreamEvent e = new StreamEvent();
-        e.setData(new Object[]{ts, jobID, status});
+        e.setData(new Object[] {ts, jobID, status});
         e.setStreamId(inputStream);
         e.setTimestamp(ts);
         return e;

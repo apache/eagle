@@ -31,7 +31,7 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
  * Step 3: nextEvent
  * Step 4: close
  */
-public interface PolicyGroupEvaluator extends PolicyChangeListener, Serializable{
+public interface PolicyGroupEvaluator extends PolicyChangeListener, Serializable {
     void init(StreamContext context, AlertStreamCollector collector);
 
     /**

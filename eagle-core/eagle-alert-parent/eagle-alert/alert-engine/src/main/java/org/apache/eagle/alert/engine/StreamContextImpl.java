@@ -26,7 +26,7 @@ public class StreamContextImpl implements StreamContext {
     private final MultiCountMetric counter;
 
     public StreamContextImpl(Config config, MultiCountMetric counter, TopologyContext context) {
-        this.counter=counter;
+        this.counter = counter;
         this.config = config;
     }
 

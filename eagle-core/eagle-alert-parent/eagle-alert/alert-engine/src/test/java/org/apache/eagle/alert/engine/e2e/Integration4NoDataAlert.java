@@ -51,8 +51,9 @@ public class Integration4NoDataAlert {
             kafka.shutdown();
         }
     }
+
     @Test
-    public void testTriggerNoData() throws Exception{
+    public void testTriggerNoData() throws Exception {
         System.setProperty("config.resource", "/nodata/application-nodata.conf");
         ConfigFactory.invalidateCaches();
         Config config = ConfigFactory.load();
@@ -71,9 +72,10 @@ public class Integration4NoDataAlert {
         });
 
         // wait 20 seconds for topology to bring up
-        try{
+        try {
             Thread.sleep(20000);
-        }catch(Exception ex){}
+        } catch (Exception ex) {
+        }
 
         // send mock data
         executors.submit(() -> {

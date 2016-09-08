@@ -46,41 +46,42 @@ import backtype.storm.tuple.Tuple;
 /**
  * Since 4/29/16.
  */
-@SuppressWarnings({ "rawtypes", "serial" })
+@SuppressWarnings( {"rawtypes", "serial"})
 public class TestStormCustomGroupingRouting implements Serializable {
     @Ignore
     @Test
-    public void testRoutingByCustomGrouping() throws Exception{
+    public void testRoutingByCustomGrouping() throws Exception {
         Config conf = new Config();
         conf.setNumWorkers(2); // use two worker processes
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         topologyBuilder.setSpout("blue-spout", new BlueSpout()); // parallelism hint
 
         topologyBuilder.setBolt("green-bolt-1", new GreenBolt(0)).setNumTasks(2)
-                .customGrouping("blue-spout", new CustomStreamGrouping(){
-                    int count = 0;
-                    List<Integer> targetTask;
-                    @Override
-                    public void prepare(WorkerTopologyContext context, GlobalStreamId stream, List<Integer> targetTasks) {
-                        this.targetTask = targetTasks;
-                    }
+            .customGrouping("blue-spout", new CustomStreamGrouping() {
+                int count = 0;
+                List<Integer> targetTask;
 
-                    @Override
-                    public List<Integer> chooseTasks(int taskId, List<Object> values) {
-                        if(count % 2 == 0) {
-                            count++;
-                            return Arrays.asList(targetTask.get(0));
-                        }else{
-                            count++;
-                            return Arrays.asList(targetTask.get(1));
-                        }
+                @Override
+                public void prepare(WorkerTopologyContext context, GlobalStreamId stream, List<Integer> targetTasks) {
+                    this.targetTask = targetTasks;
+                }
+
+                @Override
+                public List<Integer> chooseTasks(int taskId, List<Object> values) {
+                    if (count % 2 == 0) {
+                        count++;
+                        return Arrays.asList(targetTask.get(0));
+                    } else {
+                        count++;
+                        return Arrays.asList(targetTask.get(1));
                     }
-                });
+                }
+            });
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("mytopology", new HashMap(), topologyBuilder.createTopology());
 
-        while(true) {
+        while (true) {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
@@ -92,8 +93,10 @@ public class TestStormCustomGroupingRouting implements Serializable {
     private static class BlueSpout extends BaseRichSpout {
         int count = 0;
         private SpoutOutputCollector collector;
-        public BlueSpout(){
+
+        public BlueSpout() {
         }
+
         @Override
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
             declarer.declare(new Fields("a"));
@@ -106,16 +109,16 @@ public class TestStormCustomGroupingRouting implements Serializable {
 
         @Override
         public void nextTuple() {
-            if(count % 2 == 0) {
+            if (count % 2 == 0) {
                 this.collector.emit(Arrays.asList("testdata" + count));
                 count++;
-            }else{
+            } else {
                 this.collector.emit(Arrays.asList("testdata" + count));
                 count++;
             }
-            try{
+            try {
                 Thread.sleep(10000);
-            }catch(Exception ex){
+            } catch (Exception ex) {
 
             }
         }
@@ -123,9 +126,11 @@ public class TestStormCustomGroupingRouting implements Serializable {
 
     private static class GreenBolt extends BaseRichBolt {
         private int id;
-        public GreenBolt(int id){
+
+        public GreenBolt(int id) {
             this.id = id;
         }
+
         @Override
         public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         }

@@ -18,7 +18,6 @@ package org.apache.eagle.alert.metadata.resource;
 
 /**
  * @since Apr 11, 2016
- *
  */
 public class OpResult {
 

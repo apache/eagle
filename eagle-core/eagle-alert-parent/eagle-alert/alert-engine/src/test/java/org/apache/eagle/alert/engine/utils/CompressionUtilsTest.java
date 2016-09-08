@@ -33,11 +33,11 @@ public class CompressionUtilsTest {
         byte[] compressed = CompressionUtils.compress(original);
         byte[] decompressed = CompressionUtils.decompress(compressed);
 
-        LOG.info("original size: {}",original.length);
-        LOG.info("compressed size: {}",compressed.length);
-        LOG.info("decompressed size: {}",decompressed.length);
+        LOG.info("original size: {}", original.length);
+        LOG.info("compressed size: {}", compressed.length);
+        LOG.info("decompressed size: {}", decompressed.length);
 
         String decompressedValue = new String(decompressed);
-        Assert.assertEquals(value,decompressedValue);
+        Assert.assertEquals(value, decompressedValue);
     }
 }

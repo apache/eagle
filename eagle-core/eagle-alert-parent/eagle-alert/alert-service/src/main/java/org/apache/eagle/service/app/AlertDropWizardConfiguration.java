@@ -22,7 +22,6 @@ import javax.validation.Valid;
 
 /**
  * @since Jun 27, 2016
- *
  */
 public class AlertDropWizardConfiguration extends Configuration {
 

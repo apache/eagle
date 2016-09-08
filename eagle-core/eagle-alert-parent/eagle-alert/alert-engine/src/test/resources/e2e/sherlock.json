@@ -1,4 +1,5 @@
-{"SchemaCompModel": {
+{
+  "SchemaCompModel": {
     "syslog": {
       "demo": {
         "tsdType": "SherlockLog",

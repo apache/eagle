@@ -37,7 +37,6 @@ import com.typesafe.config.Config;
 
 /**
  * @since Jun 27, 2016
- *
  */
 public class CoordinatorTrigger implements Runnable {
     // TODO : support configurable in coordiantor
@@ -77,7 +76,7 @@ public class CoordinatorTrigger implements Runnable {
 
                 watch.stop();
                 LOG.info("CoordinatorTrigger ended, used time {} sm.", watch.elapsed(TimeUnit.MILLISECONDS));
-            }  else {
+            } else {
                 LOG.info("CoordinatorTrigger found isPeriodicallyForceBuildEnable = false, skipped build");
             }
         } catch (Exception e) {

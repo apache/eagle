@@ -42,8 +42,8 @@ public class PolicyStreamHandlers {
         if (SIDDHI_ENGINE.equals(definition.getType())) {
             return new SiddhiPolicyHandler(sds, 0);// // FIXME: 8/2/16 
         } else if (NO_DATA_ALERT_ENGINE.equals(definition.getType())) {
-        	// no data for an entire stream won't trigger gap alert  (use local time & batch window instead)
-        	return new NoDataPolicyTimeBatchHandler(sds);
+            // no data for an entire stream won't trigger gap alert  (use local time & batch window instead)
+            return new NoDataPolicyTimeBatchHandler(sds);
         } else if (ABSENCE_ALERT_ENGINE.equals(definition.getType())) {
             return new AbsencePolicyHandler(sds);
         } else if (CUSTOMIZED_ENGINE.equals(definition.getType())) {

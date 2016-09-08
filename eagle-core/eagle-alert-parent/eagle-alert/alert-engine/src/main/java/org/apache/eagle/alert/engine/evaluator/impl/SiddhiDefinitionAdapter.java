@@ -33,102 +33,102 @@ import com.google.common.base.Preconditions;
 
 public class SiddhiDefinitionAdapter {
     private final static Logger LOG = LoggerFactory.getLogger(SiddhiDefinitionAdapter.class);
-    public final static String DEFINE_STREAM_TEMPLATE =  "define stream %s ( %s );";
+    public final static String DEFINE_STREAM_TEMPLATE = "define stream %s ( %s );";
 
-    public static String buildStreamDefinition(StreamDefinition streamDefinition){
+    public static String buildStreamDefinition(StreamDefinition streamDefinition) {
         List<String> columns = new ArrayList<>();
-        Preconditions.checkNotNull(streamDefinition,"StreamDefinition is null");
-        if(streamDefinition.getColumns()!=null) {
+        Preconditions.checkNotNull(streamDefinition, "StreamDefinition is null");
+        if (streamDefinition.getColumns() != null) {
             for (StreamColumn column : streamDefinition.getColumns()) {
                 columns.add(String.format("%s %s", column.getName(), convertToSiddhiAttributeType(column.getType()).toString().toLowerCase()));
             }
-        }else{
-            LOG.warn("No columns found for stream {}"+streamDefinition.getStreamId());
+        } else {
+            LOG.warn("No columns found for stream {}" + streamDefinition.getStreamId());
         }
-        return String.format(DEFINE_STREAM_TEMPLATE, streamDefinition.getStreamId(),StringUtils.join(columns,","));
+        return String.format(DEFINE_STREAM_TEMPLATE, streamDefinition.getStreamId(), StringUtils.join(columns, ","));
     }
 
-    public static Attribute.Type convertToSiddhiAttributeType(StreamColumn.Type type){
-        if(_EAGLE_SIDDHI_TYPE_MAPPING.containsKey(type)){
+    public static Attribute.Type convertToSiddhiAttributeType(StreamColumn.Type type) {
+        if (_EAGLE_SIDDHI_TYPE_MAPPING.containsKey(type)) {
             return _EAGLE_SIDDHI_TYPE_MAPPING.get(type);
         }
 
-        throw new IllegalArgumentException("Unknown stream type: "+type);
+        throw new IllegalArgumentException("Unknown stream type: " + type);
     }
 
-    public static Class<?> convertToJavaAttributeType(StreamColumn.Type type){
-        if(_EAGLE_JAVA_TYPE_MAPPING.containsKey(type)){
+    public static Class<?> convertToJavaAttributeType(StreamColumn.Type type) {
+        if (_EAGLE_JAVA_TYPE_MAPPING.containsKey(type)) {
             return _EAGLE_JAVA_TYPE_MAPPING.get(type);
         }
 
-        throw new IllegalArgumentException("Unknown stream type: "+type);
+        throw new IllegalArgumentException("Unknown stream type: " + type);
     }
 
-    public static StreamColumn.Type convertFromJavaAttributeType(Class<?> type){
-        if(_JAVA_EAGLE_TYPE_MAPPING.containsKey(type)){
+    public static StreamColumn.Type convertFromJavaAttributeType(Class<?> type) {
+        if (_JAVA_EAGLE_TYPE_MAPPING.containsKey(type)) {
             return _JAVA_EAGLE_TYPE_MAPPING.get(type);
         }
 
-        throw new IllegalArgumentException("Unknown stream type: "+type);
+        throw new IllegalArgumentException("Unknown stream type: " + type);
     }
 
-    public static StreamColumn.Type convertFromSiddhiAttributeType(Attribute.Type type){
-        if(_SIDDHI_EAGLE_TYPE_MAPPING.containsKey(type)){
+    public static StreamColumn.Type convertFromSiddhiAttributeType(Attribute.Type type) {
+        if (_SIDDHI_EAGLE_TYPE_MAPPING.containsKey(type)) {
             return _SIDDHI_EAGLE_TYPE_MAPPING.get(type);
         }
 
-        throw new IllegalArgumentException("Unknown siddhi type: "+type);
+        throw new IllegalArgumentException("Unknown siddhi type: " + type);
     }
 
     /**
      * public enum Type {
-     *   STRING, INT, LONG, FLOAT, DOUBLE, BOOL, OBJECT
+     * STRING, INT, LONG, FLOAT, DOUBLE, BOOL, OBJECT
      * }
      */
-    private final static Map<StreamColumn.Type,Attribute.Type> _EAGLE_SIDDHI_TYPE_MAPPING = new HashMap<>();
-    private final static Map<StreamColumn.Type,Class<?>> _EAGLE_JAVA_TYPE_MAPPING = new HashMap<>();
-    private final static Map<Class<?>,StreamColumn.Type> _JAVA_EAGLE_TYPE_MAPPING = new HashMap<>();
-    private final static Map<Attribute.Type,StreamColumn.Type> _SIDDHI_EAGLE_TYPE_MAPPING = new HashMap<>();
+    private final static Map<StreamColumn.Type, Attribute.Type> _EAGLE_SIDDHI_TYPE_MAPPING = new HashMap<>();
+    private final static Map<StreamColumn.Type, Class<?>> _EAGLE_JAVA_TYPE_MAPPING = new HashMap<>();
+    private final static Map<Class<?>, StreamColumn.Type> _JAVA_EAGLE_TYPE_MAPPING = new HashMap<>();
+    private final static Map<Attribute.Type, StreamColumn.Type> _SIDDHI_EAGLE_TYPE_MAPPING = new HashMap<>();
 
     static {
-        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.STRING,Attribute.Type.STRING);
-        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.INT,Attribute.Type.INT);
-        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.LONG,Attribute.Type.LONG);
-        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.FLOAT,Attribute.Type.FLOAT);
-        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.DOUBLE,Attribute.Type.DOUBLE);
-        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.BOOL,Attribute.Type.BOOL);
-        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.OBJECT,Attribute.Type.OBJECT);
+        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.STRING, Attribute.Type.STRING);
+        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.INT, Attribute.Type.INT);
+        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.LONG, Attribute.Type.LONG);
+        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.FLOAT, Attribute.Type.FLOAT);
+        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.DOUBLE, Attribute.Type.DOUBLE);
+        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.BOOL, Attribute.Type.BOOL);
+        _EAGLE_SIDDHI_TYPE_MAPPING.put(StreamColumn.Type.OBJECT, Attribute.Type.OBJECT);
 
-        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.STRING,String.class);
-        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.INT,Integer.class);
-        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.LONG,Long.class);
-        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.FLOAT,Float.class);
-        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.DOUBLE,Double.class);
-        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.BOOL,Boolean.class);
-        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.OBJECT,Object.class);
+        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.STRING, String.class);
+        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.INT, Integer.class);
+        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.LONG, Long.class);
+        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.FLOAT, Float.class);
+        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.DOUBLE, Double.class);
+        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.BOOL, Boolean.class);
+        _EAGLE_JAVA_TYPE_MAPPING.put(StreamColumn.Type.OBJECT, Object.class);
 
-        _JAVA_EAGLE_TYPE_MAPPING.put(String.class,StreamColumn.Type.STRING);
-        _JAVA_EAGLE_TYPE_MAPPING.put(Integer.class,StreamColumn.Type.INT);
-        _JAVA_EAGLE_TYPE_MAPPING.put(Long.class,StreamColumn.Type.LONG);
-        _JAVA_EAGLE_TYPE_MAPPING.put(Float.class,StreamColumn.Type.FLOAT);
-        _JAVA_EAGLE_TYPE_MAPPING.put(Double.class,StreamColumn.Type.DOUBLE);
-        _JAVA_EAGLE_TYPE_MAPPING.put(Boolean.class,StreamColumn.Type.BOOL);
-        _JAVA_EAGLE_TYPE_MAPPING.put(Object.class,StreamColumn.Type.OBJECT);
+        _JAVA_EAGLE_TYPE_MAPPING.put(String.class, StreamColumn.Type.STRING);
+        _JAVA_EAGLE_TYPE_MAPPING.put(Integer.class, StreamColumn.Type.INT);
+        _JAVA_EAGLE_TYPE_MAPPING.put(Long.class, StreamColumn.Type.LONG);
+        _JAVA_EAGLE_TYPE_MAPPING.put(Float.class, StreamColumn.Type.FLOAT);
+        _JAVA_EAGLE_TYPE_MAPPING.put(Double.class, StreamColumn.Type.DOUBLE);
+        _JAVA_EAGLE_TYPE_MAPPING.put(Boolean.class, StreamColumn.Type.BOOL);
+        _JAVA_EAGLE_TYPE_MAPPING.put(Object.class, StreamColumn.Type.OBJECT);
 
-        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.STRING,StreamColumn.Type.STRING);
-        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.INT,StreamColumn.Type.INT);
-        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.LONG,StreamColumn.Type.LONG);
-        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.FLOAT,StreamColumn.Type.FLOAT);
-        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.DOUBLE,StreamColumn.Type.DOUBLE);
-        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.BOOL,StreamColumn.Type.BOOL);
-        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.OBJECT,StreamColumn.Type.OBJECT);
+        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.STRING, StreamColumn.Type.STRING);
+        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.INT, StreamColumn.Type.INT);
+        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.LONG, StreamColumn.Type.LONG);
+        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.FLOAT, StreamColumn.Type.FLOAT);
+        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.DOUBLE, StreamColumn.Type.DOUBLE);
+        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.BOOL, StreamColumn.Type.BOOL);
+        _SIDDHI_EAGLE_TYPE_MAPPING.put(Attribute.Type.OBJECT, StreamColumn.Type.OBJECT);
     }
 
-    public static StreamDefinition convertFromSiddiDefinition(AbstractDefinition siddhiDefinition){
+    public static StreamDefinition convertFromSiddiDefinition(AbstractDefinition siddhiDefinition) {
         StreamDefinition streamDefinition = new StreamDefinition();
         streamDefinition.setStreamId(siddhiDefinition.getId());
         List<StreamColumn> columns = new ArrayList<>(siddhiDefinition.getAttributeNameArray().length);
-        for(Attribute attribute:siddhiDefinition.getAttributeList()){
+        for (Attribute attribute : siddhiDefinition.getAttributeList()) {
             StreamColumn column = new StreamColumn();
             column.setType(convertFromSiddhiAttributeType(attribute.getType()));
             column.setName(attribute.getName());
@@ -136,7 +136,7 @@ public class SiddhiDefinitionAdapter {
         }
         streamDefinition.setColumns(columns);
         streamDefinition.setTimeseries(true);
-        streamDefinition.setDescription("Auto-generated stream schema from siddhi for "+siddhiDefinition.getId());
+        streamDefinition.setDescription("Auto-generated stream schema from siddhi for " + siddhiDefinition.getId());
         return streamDefinition;
     }
 }

@@ -44,22 +44,22 @@ import org.apache.eagle.alert.metadata.resource.OpResult;
 
 /**
  * @since Apr 11, 2016
- *
  */
 @Path("/metadata")
 @Produces("application/json")
 @Consumes("application/json")
 public class MetadataResource {
 
-//    private IMetadataDao dao = MetadataDaoFactory.getInstance().getMetadataDao();
+    //    private IMetadataDao dao = MetadataDaoFactory.getInstance().getMetadataDao();
     private final IMetadataDao dao;
 
-    public MetadataResource(){
-        this.dao = MetadataDaoFactory.getInstance().getMetadataDao();;
+    public MetadataResource() {
+        this.dao = MetadataDaoFactory.getInstance().getMetadataDao();
+        ;
     }
 
     @Inject
-    public MetadataResource(IMetadataDao dao){
+    public MetadataResource(IMetadataDao dao) {
         this.dao = dao;
     }
 
@@ -68,7 +68,7 @@ public class MetadataResource {
     public List<StreamingCluster> listClusters() {
         return dao.listClusters();
     }
-    
+
     @Path("/clear")
     @POST
     public OpResult clear() {
@@ -97,7 +97,7 @@ public class MetadataResource {
     @POST
     public List<OpResult> addClusters(List<StreamingCluster> clusters) {
         List<OpResult> results = new LinkedList<>();
-        for (StreamingCluster cluster: clusters) {
+        for (StreamingCluster cluster : clusters) {
             results.add(dao.addCluster(cluster));
         }
         return results;
@@ -113,7 +113,7 @@ public class MetadataResource {
     @DELETE
     public List<OpResult> removeClusters(List<String> clusterIds) {
         List<OpResult> results = new LinkedList<>();
-        for (String cluster: clusterIds) {
+        for (String cluster : clusterIds) {
             results.add(dao.removeCluster(cluster));
         }
         return results;
@@ -135,7 +135,7 @@ public class MetadataResource {
     @POST
     public List<OpResult> addStreams(List<StreamDefinition> streams) {
         List<OpResult> results = new LinkedList<>();
-        for (StreamDefinition stream: streams) {
+        for (StreamDefinition stream : streams) {
             results.add(dao.createStream(stream));
         }
         return results;
@@ -151,7 +151,7 @@ public class MetadataResource {
     @DELETE
     public List<OpResult> removeStreams(List<String> streamIds) {
         List<OpResult> results = new LinkedList<>();
-        for (String streamId: streamIds) {
+        for (String streamId : streamIds) {
             results.add(dao.removeStream(streamId));
         }
         return results;
@@ -173,7 +173,7 @@ public class MetadataResource {
     @POST
     public List<OpResult> addDataSources(List<Kafka2TupleMetadata> datasources) {
         List<OpResult> results = new LinkedList<>();
-        for (Kafka2TupleMetadata ds: datasources) {
+        for (Kafka2TupleMetadata ds : datasources) {
             results.add(dao.addDataSource(ds));
         }
         return results;
@@ -189,7 +189,7 @@ public class MetadataResource {
     @DELETE
     public List<OpResult> removeDataSources(List<String> datasourceIds) {
         List<OpResult> results = new LinkedList<>();
-        for (String ds: datasourceIds) {
+        for (String ds : datasourceIds) {
             results.add(dao.removeDataSource(ds));
         }
         return results;
@@ -211,7 +211,7 @@ public class MetadataResource {
     @POST
     public List<OpResult> addPolicies(List<PolicyDefinition> policies) {
         List<OpResult> results = new LinkedList<>();
-        for (PolicyDefinition policy: policies) {
+        for (PolicyDefinition policy : policies) {
             results.add(dao.addPolicy(policy));
         }
         return results;
@@ -227,7 +227,7 @@ public class MetadataResource {
     @DELETE
     public List<OpResult> removePolicies(List<String> policies) {
         List<OpResult> results = new LinkedList<>();
-        for (String policy: policies) {
+        for (String policy : policies) {
             results.add(dao.removePolicy(policy));
         }
         return results;
@@ -249,7 +249,7 @@ public class MetadataResource {
     @POST
     public List<OpResult> addPublishments(List<Publishment> publishments) {
         List<OpResult> results = new LinkedList<>();
-        for (Publishment publishment: publishments) {
+        for (Publishment publishment : publishments) {
             results.add(dao.addPublishment(publishment));
         }
         return results;
@@ -265,7 +265,7 @@ public class MetadataResource {
     @DELETE
     public List<OpResult> removePublishments(List<String> pubIds) {
         List<OpResult> results = new LinkedList<>();
-        for (String pub: pubIds) {
+        for (String pub : pubIds) {
             results.add(dao.removePublishment(pub));
         }
         return results;
@@ -287,7 +287,7 @@ public class MetadataResource {
     @POST
     public List<OpResult> addPublishmentTypes(List<PublishmentType> publishmentTypes) {
         List<OpResult> results = new LinkedList<>();
-        for (PublishmentType pubType: publishmentTypes) {
+        for (PublishmentType pubType : publishmentTypes) {
             results.add(dao.addPublishmentType(pubType));
         }
         return results;
@@ -303,7 +303,7 @@ public class MetadataResource {
     @DELETE
     public List<OpResult> removePublishmentTypes(List<String> pubTypes) {
         List<OpResult> results = new LinkedList<>();
-        for (String pubType: pubTypes) {
+        for (String pubType : pubTypes) {
             results.add(dao.removePublishmentType(pubType));
         }
         return results;
@@ -355,7 +355,7 @@ public class MetadataResource {
     @POST
     public List<OpResult> addTopologies(List<Topology> topologies) {
         List<OpResult> results = new LinkedList<>();
-        for (Topology t: topologies) {
+        for (Topology t : topologies) {
             results.add(dao.addTopology(t));
         }
         return results;
@@ -371,7 +371,7 @@ public class MetadataResource {
     @DELETE
     public List<OpResult> removeTopologies(List<String> topologies) {
         List<OpResult> results = new LinkedList<>();
-        for (String t: topologies) {
+        for (String t : topologies) {
             results.add(dao.removeTopology(t));
         }
         return results;

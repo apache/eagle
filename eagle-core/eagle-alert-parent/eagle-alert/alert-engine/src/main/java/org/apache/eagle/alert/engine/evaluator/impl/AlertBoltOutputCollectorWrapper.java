@@ -29,7 +29,7 @@ public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
     private final Object outputLock;
     private final StreamContext streamContext;
 
-    public AlertBoltOutputCollectorWrapper(OutputCollector outputCollector, Object outputLock, StreamContext streamContext){
+    public AlertBoltOutputCollectorWrapper(OutputCollector outputCollector, Object outputLock, StreamContext streamContext) {
         this.delegate = outputCollector;
         this.outputLock = outputLock;
         this.streamContext = streamContext;

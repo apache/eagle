@@ -63,8 +63,8 @@ public class WorkSlot {
             return false;
         }
         WorkSlot workSlot = (WorkSlot) other;
-        return Objects.equals(topologyName, workSlot.topologyName) &&
-                Objects.equals(boltId, workSlot.boltId);
+        return Objects.equals(topologyName, workSlot.topologyName)
+            && Objects.equals(boltId, workSlot.boltId);
     }
 
     @Override

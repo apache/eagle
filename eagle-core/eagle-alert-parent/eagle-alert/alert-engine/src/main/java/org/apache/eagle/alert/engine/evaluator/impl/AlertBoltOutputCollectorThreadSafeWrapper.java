@@ -33,10 +33,10 @@ import backtype.storm.task.OutputCollector;
  * <h2>Thread Safe Mechanism</h2>
  * <ul>
  * <li>
- *     emit() method is thread-safe enough to be called anywhere asynchronously in multi-thread
+ * emit() method is thread-safe enough to be called anywhere asynchronously in multi-thread
  * </li>
  * <li>
- *     flush() method must be called synchronously, because Storm OutputCollector is not thread-safe
+ * flush() method must be called synchronously, because Storm OutputCollector is not thread-safe
  * </li>
  * </ul>
  */
@@ -88,6 +88,7 @@ public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCol
 
     /**
      * Emit method can be called in multi-thread
+     *
      * @param event
      */
     @Override
@@ -95,7 +96,7 @@ public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCol
         try {
             queue.put(event);
         } catch (InterruptedException e) {
-            LOG.error(e.getMessage(),e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -104,7 +105,7 @@ public class AlertBoltOutputCollectorThreadSafeWrapper implements AlertStreamCol
      */
     @Override
     public void flush() {
-        if(!queue.isEmpty()) {
+        if (!queue.isEmpty()) {
             List<AlertStreamEvent> events = new ArrayList<>();
             queue.drainTo(events);
             events.forEach((event) -> delegate.emit(Arrays.asList(event.getStreamId(), event)));

@@ -58,7 +58,7 @@ public class KafkaSpoutMetric implements IMetric {
         offsetMetricMap.remove(topic);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public Object getValueAndReset() {
         HashMap spoutMetric = new HashMap();
@@ -76,16 +76,16 @@ public class KafkaSpoutMetric implements IMetric {
                 offsetMetric.setLatestEmittedOffset(pm.getPartition(), pm.lastCompletedOffset());
             }
             Object o = offsetMetric.getValueAndReset();
-            if(o != null) {
+            if (o != null) {
                 ((HashMap) o).forEach(
-                        (k, v) -> spoutMetric.put(k + "_" + entry.getKey(), v)
+                    (k, v) -> spoutMetric.put(k + "_" + entry.getKey(), v)
                 );
             }
 
             // construct partition metric
             for (PartitionManager pm : pms) {
                 pm.getMetricsDataMap().forEach(
-                        (k, v) -> spoutMetric.put(k + "_" + entry.getKey(), v)
+                    (k, v) -> spoutMetric.put(k + "_" + entry.getKey(), v)
                 );
             }
         }

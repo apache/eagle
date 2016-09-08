@@ -73,11 +73,11 @@ public class AttributeCollectWithDistinctAggregator extends AttributeAggregator 
 
     @Override
     public Object processAdd(Object arg0) {
-    	// AttributeAggregator.process is already synchronized
-    	if (value.contains(arg0)) {
-    		value.remove(arg0);
-    	}
-    	value.add(arg0);
+        // AttributeAggregator.process is already synchronized
+        if (value.contains(arg0)) {
+            value.remove(arg0);
+        }
+        value.add(arg0);
         if (LOG.isDebugEnabled()) {
             LOG.debug("processAdd: current values are : " + value);
         }
@@ -86,11 +86,11 @@ public class AttributeCollectWithDistinctAggregator extends AttributeAggregator 
 
     @Override
     public Object processAdd(Object[] arg0) {
-    	// AttributeAggregator.process is already synchronized
-    	if (value.contains(arg0)) {
-    		value.remove(arg0);
-    	}
-    	value.add(arg0);
+        // AttributeAggregator.process is already synchronized
+        if (value.contains(arg0)) {
+            value.remove(arg0);
+        }
+        value.add(arg0);
         if (LOG.isDebugEnabled()) {
             LOG.debug("processAdd: current values are : " + value);
         }
@@ -120,5 +120,5 @@ public class AttributeCollectWithDistinctAggregator extends AttributeAggregator 
         value.clear();
         return value;
     }
-    
+
 }

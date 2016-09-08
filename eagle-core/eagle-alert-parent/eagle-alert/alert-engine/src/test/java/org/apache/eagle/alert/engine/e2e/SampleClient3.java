@@ -25,17 +25,15 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since Jun 12, 2016
- *
  */
 public class SampleClient3 {
-    
-    
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     public static void main(String[] args) throws Exception {
         System.setProperty("config.resource", "/e2e/application-e2e.conf");
         ConfigFactory.invalidateCaches();
-        
+
         Config config = ConfigFactory.load();
         KafkaProducer producer = createByteProceduer(config);
 
@@ -52,7 +50,7 @@ public class SampleClient3 {
 //        }
     }
 
-//    private static SherlockEvent createEvent(TimeSeriesDataSchemaManager manager) throws Exception {
+    //    private static SherlockEvent createEvent(TimeSeriesDataSchemaManager manager) throws Exception {
 //
 //        SherlockEventBuilder builder = SherlockEvent.newBuilder();
 //        builder.setEpochMillis(System.currentTimeMillis());

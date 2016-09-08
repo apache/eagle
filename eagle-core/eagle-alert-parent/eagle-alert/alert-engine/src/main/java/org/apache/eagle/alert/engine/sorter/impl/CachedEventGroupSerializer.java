@@ -34,18 +34,19 @@ import org.mapdb.serializer.GroupSerializerObjectArray;
  * @deprecated performance is worse, should investigate
  */
 public class CachedEventGroupSerializer extends GroupSerializerObjectArray<PartitionedEvent[]> {
-    private Map<Integer,StreamPartition> hashCodePartitionDict = new HashMap<>();
-    private void writePartitionedEvent(DataOutput2 out,PartitionedEvent event) throws IOException {
+    private Map<Integer, StreamPartition> hashCodePartitionDict = new HashMap<>();
+
+    private void writePartitionedEvent(DataOutput2 out, PartitionedEvent event) throws IOException {
         out.packLong(event.getPartitionKey());
         int partitionHashCode = 0;
-        if(event.getPartition()!=null) {
+        if (event.getPartition() != null) {
             partitionHashCode = event.getPartition().hashCode();
             if (!hashCodePartitionDict.containsKey(partitionHashCode)) {
                 hashCodePartitionDict.put(partitionHashCode, event.getPartition());
             }
         }
         out.packInt(partitionHashCode);
-        if(event.getEvent()!=null) {
+        if (event.getEvent() != null) {
             byte[] eventBytes = SerializableUtils.serializeToCompressedByteArray(event.getEvent());
             out.packInt(eventBytes.length);
             out.write(eventBytes);
@@ -58,11 +59,11 @@ public class CachedEventGroupSerializer extends GroupSerializerObjectArray<Parti
         PartitionedEvent event = new PartitionedEvent();
         event.setPartitionKey(in.unpackLong());
         int partitionHashCode = in.unpackInt();
-        if(partitionHashCode!=0 && hashCodePartitionDict.containsKey(partitionHashCode)) {
+        if (partitionHashCode != 0 && hashCodePartitionDict.containsKey(partitionHashCode)) {
             event.setPartition(hashCodePartitionDict.get(partitionHashCode));
         }
         int eventBytesLen = in.unpackInt();
-        if(eventBytesLen > 0) {
+        if (eventBytesLen > 0) {
             byte[] eventBytes = new byte[eventBytesLen];
             in.readFully(eventBytes);
             event.setEvent((StreamEvent) SerializableUtils.deserializeFromCompressedByteArray(eventBytes, "Deserialize event from bytes"));
@@ -74,7 +75,7 @@ public class CachedEventGroupSerializer extends GroupSerializerObjectArray<Parti
     public void serialize(DataOutput2 out, PartitionedEvent[] value) throws IOException {
         out.packInt(value.length);
         for (PartitionedEvent event : value) {
-            writePartitionedEvent(out,event);
+            writePartitionedEvent(out, event);
         }
     }
 
@@ -105,9 +106,9 @@ public class CachedEventGroupSerializer extends GroupSerializerObjectArray<Parti
 
     @Override
     public int compare(PartitionedEvent[] o1, PartitionedEvent[] o2) {
-        if(o1.length>0 && o2.length>0) {
+        if (o1.length > 0 && o2.length > 0) {
             return (int) (o1[0].getTimestamp() - o2[0].getTimestamp());
-        }else{
+        } else {
             return 0;
         }
     }

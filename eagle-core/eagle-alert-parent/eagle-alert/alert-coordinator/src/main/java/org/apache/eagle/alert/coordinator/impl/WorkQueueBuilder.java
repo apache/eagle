@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @since Apr 27, 2016
- *
  */
 public class WorkQueueBuilder {
 
@@ -49,7 +48,7 @@ public class WorkQueueBuilder {
     }
 
     public StreamWorkSlotQueue createQueue(MonitoredStream stream, boolean isDedicated, int size,
-            Map<String, Object> properties) {
+                                           Map<String, Object> properties) {
         // FIXME: make extensible and configurable
         IWorkSlotStrategy strategy = new SameTopologySlotStrategy(context, stream.getStreamGroup(), mgmtService);
         List<WorkSlot> slots = strategy.reserveWorkSlots(size, isDedicated, properties);
@@ -58,7 +57,7 @@ public class WorkQueueBuilder {
             return null;
         }
         StreamWorkSlotQueue queue = new StreamWorkSlotQueue(stream.getStreamGroup(), isDedicated, properties,
-                slots);
+            slots);
         calculateGroupIndexAndCount(queue);
         assignQueueSlots(stream, queue);// build reverse reference
         stream.addQueues(queue);

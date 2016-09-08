@@ -33,7 +33,6 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since May 9, 2016
- *
  */
 public class SampleClient1 {
     @SuppressWarnings("unused")
@@ -42,7 +41,7 @@ public class SampleClient1 {
     private static final String PERFMON_CPU_STREAM = "perfmon_cpu_stream";
     private static final String PERFMON_MEM_STREAM = "perfmon_mem_stream";
 
-//    private static int hostIndx = 1;
+    //    private static int hostIndx = 1;
     private static String hostTemp = "host-000%d.datacenter.corp.com";
 
     /**
@@ -88,7 +87,7 @@ public class SampleClient1 {
         Pair<Long, String> pair = createEntity(base, stream, hostIndex);
         base = pair.getKey();
         ProducerRecord<String, String> record = new ProducerRecord<String, String>("perfmon_metrics",
-                pair.getRight());
+            pair.getRight());
         proceduer.send(record);
         return base;
     }
