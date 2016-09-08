@@ -16,9 +16,9 @@
  */
 package org.apache.eagle.common.config;
 
-import com.typesafe.config.Config;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.HTableInterface;
+import com.typesafe.config.Config;
 
 import java.util.TimeZone;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -27,7 +27,7 @@ public interface EagleConfig {
 
     boolean isCoprocessorEnabled();
 
-	HTableInterface getHTable(String tableName);
+    HTableInterface getHTable(String tableName);
 
     Configuration getHbaseConf();
 
@@ -35,26 +35,26 @@ public interface EagleConfig {
 
     ThreadPoolExecutor getExecutor();
 
-	String getZKQuorum();
+    String getZKQuorum();
 
-	String getZKPort();
+    String getZKPort();
 
-	String getServiceHost();
+    String getServiceHost();
 
-	int getServicePort();
+    int getServicePort();
 
     String getEnv();
 
     boolean isTableNamePrefixedWithEnvironment();
-	
+
     int getHBaseClientScanCacheSize();
 
     TimeZone getTimeZone();
-    
+
     boolean isServiceAuditingEnabled();
 
     /**
-     * @return root config
+     * @return root config.
      */
     Config getConfig();
 }
