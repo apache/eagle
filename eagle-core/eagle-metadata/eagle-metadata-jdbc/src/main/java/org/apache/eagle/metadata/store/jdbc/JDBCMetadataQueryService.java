@@ -27,7 +27,6 @@ import java.util.List;
 
 public interface JDBCMetadataQueryService {
     /**
-     *
      * @param sql
      * @return
      * @throws SQLException
@@ -35,7 +34,6 @@ public interface JDBCMetadataQueryService {
     boolean execute(String sql) throws SQLException;
 
     /**
-     *
      * @param tableName
      * @return
      * @throws SQLException
@@ -52,10 +50,9 @@ public interface JDBCMetadataQueryService {
      * @throws E
      * @throws SQLException
      */
-    <T, E extends Throwable> int insert(String insertSql, Collection<T> entities, ThrowableConsumer2<PreparedStatement,T,E> mapper) throws E, SQLException;
+    <T, E extends Throwable> int insert(String insertSql, Collection<T> entities, ThrowableConsumer2<PreparedStatement, T, E> mapper) throws E, SQLException;
 
     /**
-     *
      * @param tableName
      * @return
      * @throws SQLException
@@ -64,9 +61,29 @@ public interface JDBCMetadataQueryService {
 
     /**
      * @param querySql sql query text
-     * @param mapper result set to entity mapper
+     * @param mapper   result set to entity mapper
      * @param <T>
      * @return entity list
      */
-    <T,E extends Throwable> List<T> query(String querySql, ThrowableFunction<ResultSet,T,E> mapper) throws SQLException,E;
+    <T, E extends Throwable> List<T> query(String querySql, ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E;
+
+    /**
+     * @param querySql sql query text
+     * @param entity   query condition
+     * @param mapper1
+     * @param mapper   result set to entity mapper
+     * @param <T>
+     * @return entity list
+     */
+    <T, E extends Throwable> List<T> queryWithCond(String querySql, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper1, ThrowableFunction<ResultSet, T, E> mapper) throws SQLException, E;
+
+    /**
+     * @param updateSql update query text
+     * @param entity   update condition
+     * @param mapper
+     * @param <T>
+     * @return entity list
+     */
+    <T, E extends Throwable> int update(String updateSql, T entity, ThrowableConsumer2<PreparedStatement, T, E> mapper) throws SQLException, E;
+
 }
