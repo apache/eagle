@@ -16,13 +16,6 @@
  */
 package org.apache.eagle.alert.engine.coordinator.impl;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
@@ -34,28 +27,30 @@ import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
 import org.apache.eagle.alert.engine.router.SpoutSpecListener;
 import org.apache.eagle.alert.engine.router.StreamRouterBoltSpecListener;
+import com.google.common.base.Preconditions;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.typesafe.config.Config;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
- * notify 3 components of metadata change Spout, StreamRouterBolt and AlertBolt
+ * notify 3 components of metadata change Spout, StreamRouterBolt and AlertBolt.
  */
-@SuppressWarnings({ "serial" })
-public abstract class AbstractMetadataChangeNotifyService implements IMetadataChangeNotifyService, Closeable,
-        Serializable {
-    private final static Logger LOG = LoggerFactory.getLogger(AbstractMetadataChangeNotifyService.class);
+@SuppressWarnings( {"serial"})
+public abstract class AbstractMetadataChangeNotifyService implements IMetadataChangeNotifyService, Closeable, Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractMetadataChangeNotifyService.class);
     private final List<StreamRouterBoltSpecListener> streamRouterBoltSpecListeners = new ArrayList<>();
     private final List<SpoutSpecListener> spoutSpecListeners = new ArrayList<>();
     private final List<AlertBoltSpecListener> alertBoltSpecListeners = new ArrayList<>();
     private final List<AlertPublishSpecListener> alertPublishSpecListeners = new ArrayList<>();
     protected MetadataType type;
 
-    /**
-     * @param config
-     */
     @Override
     public void init(Config config, MetadataType type) {
         this.type = type;

@@ -21,20 +21,22 @@ package org.apache.eagle.alert.engine.evaluator.absence;
  */
 public class AbsenceWindowGenerator {
     private AbsenceRule rule;
-    public AbsenceWindowGenerator(AbsenceRule rule){
+
+    public AbsenceWindowGenerator(AbsenceRule rule) {
         this.rule = rule;
     }
 
     /**
-     * @param currTime
-     * @return
+     * nextWindow.
+     *
+     * @param currTime current timestamp
      */
-    public AbsenceWindow nextWindow(long currTime){
+    public AbsenceWindow nextWindow(long currTime) {
         AbsenceWindow window = new AbsenceWindow();
-        if(rule instanceof AbsenceDailyRule){
-            AbsenceDailyRule r = (AbsenceDailyRule)rule;
+        if (rule instanceof AbsenceDailyRule) {
+            AbsenceDailyRule r = (AbsenceDailyRule) rule;
             long adjustment = 0; // if today's window already expires, then adjust to tomorrow's window
-            if(currTime % AbsenceDailyRule.DAY_MILLI_SECONDS > r.startOffset){
+            if (currTime % AbsenceDailyRule.DAY_MILLI_SECONDS > r.startOffset) {
                 adjustment = AbsenceDailyRule.DAY_MILLI_SECONDS;
             }
             // use current timestamp to round down to day
@@ -43,7 +45,7 @@ public class AbsenceWindowGenerator {
             window.startTime = day + r.startOffset;
             window.endTime = day + r.endOffset;
             return window;
-        }else{
+        } else {
             throw new UnsupportedOperationException("not supported rule " + rule);
         }
     }

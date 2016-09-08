@@ -18,20 +18,12 @@
 
 package org.apache.eagle.service.topology.resource.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.UnitTopologyMain;
-import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
-import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
+import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.apache.eagle.alert.metadata.IMetadataDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.Nimbus;
@@ -39,38 +31,47 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.generated.TopologySummary;
 import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
-
 import com.typesafe.config.ConfigFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 
 public class TopologyMgmtResourceImpl {
     private static final IMetadataDao dao = MetadataDaoFactory.getInstance().getMetadataDao();
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TopologyMgmtResourceImpl.class);
 
-    private final String DEFAULT_NIMBUS_HOST = "sandbox.hortonworks.com";
-    private final Integer DEFAULT_NIMBUS_THRIFT_PORT = 6627;
-    private final String STORM_JAR_PATH = "topology.stormJarPath";
+    private static final String DEFAULT_NIMBUS_HOST = "sandbox.hortonworks.com";
+    private static final Integer DEFAULT_NIMBUS_THRIFT_PORT = 6627;
+    private static final String STORM_JAR_PATH = "topology.stormJarPath";
 
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings( {"rawtypes", "unchecked"})
     private Map getStormConf(List<StreamingCluster> clusters, String clusterId) throws Exception {
-        Map<String, Object> storm_conf = Utils.readStormConfig();
-        if(clusterId == null) {
-            storm_conf.put(Config.NIMBUS_HOST, DEFAULT_NIMBUS_HOST);
-            storm_conf.put(Config.NIMBUS_THRIFT_PORT, DEFAULT_NIMBUS_THRIFT_PORT);
+        Map<String, Object> stormConf = Utils.readStormConfig();
+        if (clusterId == null) {
+            stormConf.put(Config.NIMBUS_HOST, DEFAULT_NIMBUS_HOST);
+            stormConf.put(Config.NIMBUS_THRIFT_PORT, DEFAULT_NIMBUS_THRIFT_PORT);
         } else {
-            if(clusters == null) clusters = dao.listClusters();
+            if (clusters == null) {
+                clusters = dao.listClusters();
+            }
             Optional<StreamingCluster> scOp = TopologyMgmtResourceHelper.findById(clusters, clusterId);
             StreamingCluster cluster;
-            if(scOp.isPresent()) {
+            if (scOp.isPresent()) {
                 cluster = scOp.get();
             } else {
                 throw new Exception("Fail to find cluster: " + clusterId);
             }
-            storm_conf.put(Config.NIMBUS_HOST, cluster.getDeployments().getOrDefault(StreamingCluster.NIMBUS_HOST, DEFAULT_NIMBUS_HOST));
-            storm_conf.put(Config.NIMBUS_THRIFT_PORT, Integer.valueOf(cluster.getDeployments().get(StreamingCluster.NIMBUS_THRIFT_PORT)));
+            stormConf.put(Config.NIMBUS_HOST, cluster.getDeployments().getOrDefault(StreamingCluster.NIMBUS_HOST, DEFAULT_NIMBUS_HOST));
+            stormConf.put(Config.NIMBUS_THRIFT_PORT, Integer.valueOf(cluster.getDeployments().get(StreamingCluster.NIMBUS_THRIFT_PORT)));
         }
-        return storm_conf;
+        return stormConf;
     }
 
     private void createTopologyHelper(Topology topologyDef, com.typesafe.config.Config config) {
@@ -90,7 +91,7 @@ public class TopologyMgmtResourceImpl {
     private StormTopology createTopology(Topology topologyDef) {
         com.typesafe.config.Config topologyConf = ConfigFactory.load("topology-sample-definition.conf");
         String stormJarPath = "";
-        if(topologyConf.hasPath(STORM_JAR_PATH)) {
+        if (topologyConf.hasPath(STORM_JAR_PATH)) {
             stormJarPath = topologyConf.getString(STORM_JAR_PATH);
         }
         System.setProperty("storm.jar", stormJarPath);
@@ -101,7 +102,7 @@ public class TopologyMgmtResourceImpl {
     public void startTopology(String topologyName) throws Exception {
         Optional<Topology> tdop = TopologyMgmtResourceHelper.findById(dao.listTopologies(), topologyName);
         Topology topologyDef;
-        if(tdop.isPresent()) {
+        if (tdop.isPresent()) {
             topologyDef = tdop.get();
         } else {
             topologyDef = new Topology();
@@ -113,7 +114,7 @@ public class TopologyMgmtResourceImpl {
     public void stopTopology(String topologyName) throws Exception {
         Optional<Topology> tdop = TopologyMgmtResourceHelper.findById(dao.listTopologies(), topologyName);
         Topology topologyDef;
-        if(tdop.isPresent()) {
+        if (tdop.isPresent()) {
             topologyDef = tdop.get();
         } else {
             throw new Exception("Fail to find topology " + topologyName);
@@ -122,12 +123,12 @@ public class TopologyMgmtResourceImpl {
         stormClient.killTopology(topologyName);
     }
 
-    @SuppressWarnings({ "rawtypes", "unused" })
+    @SuppressWarnings( {"rawtypes", "unused"})
     private TopologySummary getTopologySummery(List<StreamingCluster> clusters, Topology topologyDef) throws Exception {
-        Map storm_conf = getStormConf(clusters, topologyDef.getClusterName());
-        Nimbus.Client stormClient = NimbusClient.getConfiguredClient(storm_conf).getClient();
+        Map stormConf = getStormConf(clusters, topologyDef.getClusterName());
+        Nimbus.Client stormClient = NimbusClient.getConfiguredClient(stormConf).getClient();
         Optional<TopologySummary> tOp = stormClient.getClusterInfo().get_topologies().stream().filter(topology -> topology.get_name().equalsIgnoreCase(topologyDef.getName())).findFirst();
-        if(tOp.isPresent()) {
+        if (tOp.isPresent()) {
             String id = tOp.get().get_id();
             //StormTopology stormTopology= stormClient.getTopology(id);
             return tOp.get();
@@ -141,9 +142,9 @@ public class TopologyMgmtResourceImpl {
         List<StreamingCluster> clusters = dao.listClusters();
 
         List<TopologyStatus> topologies = new ArrayList<>();
-        for(Topology topologyDef : topologyDefinitions) {
+        for (Topology topologyDef : topologyDefinitions) {
             TopologySummary topologySummary = getTopologySummery(clusters, topologyDef);
-            if(topologySummary != null) {
+            if (topologySummary != null) {
                 TopologyStatus t = new TopologyStatus();
                 t.setName(topologySummary.get_name());
                 t.setId(topologySummary.get_id());

@@ -19,10 +19,7 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
@@ -35,23 +32,25 @@ import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Since 5/4/16.
  */
-@SuppressWarnings({"serial"})
+@SuppressWarnings( {"serial"})
 public class MockMetadataChangeNotifyService extends AbstractMetadataChangeNotifyService implements Runnable {
     private final static Logger LOG = LoggerFactory.getLogger(MockMetadataChangeNotifyService.class);
     @SuppressWarnings("unused")
-    private static final String[] topics = new String[]{"testTopic3", "testTopic4", "testTopic5"};
+    private static final String[] topics = new String[] {"testTopic3", "testTopic4", "testTopic5"};
     @SuppressWarnings("unused")
     private String topologyName;
     @SuppressWarnings("unused")
     private String spoutId;
     private Map<String, StreamDefinition> sds;
 
-    public MockMetadataChangeNotifyService(String topologyName, String spoutId){
+    public MockMetadataChangeNotifyService(String topologyName, String spoutId) {
         this.topologyName = topologyName;
         this.spoutId = spoutId;
     }
@@ -83,28 +82,29 @@ public class MockMetadataChangeNotifyService extends AbstractMetadataChangeNotif
         }
     }
 
-    private Map<String, StreamDefinition> defineStreamDefinitions(){
+    private Map<String, StreamDefinition> defineStreamDefinitions() {
         Map<String, StreamDefinition> sds = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testStreamDefinitionsSpec.json"),
-                new TypeReference<Map<String, StreamDefinition>>() {});
+            new TypeReference<Map<String, StreamDefinition>>() {
+            });
         return sds;
     }
 
-    private void notifySpout(List<String> plainStringTopics, List<String> jsonStringTopics){
+    private void notifySpout(List<String> plainStringTopics, List<String> jsonStringTopics) {
         SpoutSpec newSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testSpoutSpec.json"), SpoutSpec.class);
         notifySpout(newSpec, sds);
     }
 
-    private void populateRouterMetadata(){
+    private void populateRouterMetadata() {
         RouterSpec boltSpec = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testStreamRouterBoltSpec.json"), RouterSpec.class);
         notifyStreamRouterBolt(boltSpec, sds);
     }
 
-    private void populateAlertBoltSpec(){
+    private void populateAlertBoltSpec() {
         AlertBoltSpec spec = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testAlertBoltSpec.json"), AlertBoltSpec.class);
         notifyAlertBolt(spec, sds);
     }
 
-    private void notifyAlertPublishBolt(){
+    private void notifyAlertPublishBolt() {
         PublishSpec spec = MetadataSerDeser.deserialize(getClass().getResourceAsStream("/testPublishSpec.json"), PublishSpec.class);
         notifyAlertPublishBolt(spec, sds);
     }

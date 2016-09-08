@@ -18,16 +18,18 @@
 
 package org.apache.eagle.alert.metadata.impl;
 
-import com.typesafe.config.Config;
-import org.apache.ddlutils.Platform;
-import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.model.*;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.metadata.MetadataUtils;
+import com.typesafe.config.Config;
+import org.apache.ddlutils.Platform;
+import org.apache.ddlutils.PlatformFactory;
+import org.apache.ddlutils.model.Column;
+import org.apache.ddlutils.model.Database;
+import org.apache.ddlutils.model.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +42,7 @@ import java.util.Map;
 
 public class JdbcSchemaManager {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JdbcSchemaManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JdbcSchemaManager.class);
     private Database database;
     private Platform platform;
 
@@ -48,9 +50,10 @@ public class JdbcSchemaManager {
 
     public static Map<String, String> tblNameMap = new HashMap<>();
 
-    private JdbcSchemaManager(){}
+    private JdbcSchemaManager() {
+    }
 
-    private static void registerTableName(String clzName, String tblName){
+    private static void registerTableName(String clzName, String tblName) {
         tblNameMap.put(clzName, tblName);
     }
 
@@ -66,8 +69,8 @@ public class JdbcSchemaManager {
         registerTableName(Topology.class.getSimpleName(), "topology");
     }
 
-    public static JdbcSchemaManager getInstance(){
-        if(instance == null) {
+    public static JdbcSchemaManager getInstance() {
+        if (instance == null) {
             instance = new JdbcSchemaManager();
         }
         return instance;
@@ -84,28 +87,28 @@ public class JdbcSchemaManager {
             LOG.info("Loaded " + database);
 
             Database _database = identifyNewTables();
-            if(_database.getTableCount() > 0) {
+            if (_database.getTableCount() > 0) {
                 LOG.info("Creating {} new tables (totally {} tables)", _database.getTableCount(), database.getTableCount());
                 this.platform.createTables(connection, _database, false, true);
-                LOG.info("Created {} new tables: ",_database.getTableCount(), _database.getTables());
+                LOG.info("Created {} new tables: ", _database.getTableCount(), _database.getTables());
             } else {
                 LOG.debug("All the {} tables have already been created, no new tables", database.getTableCount());
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage(),e);
+            LOG.error(e.getMessage(), e);
             throw new IllegalStateException(e);
         } finally {
-            if (connection != null){
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    LOG.warn(e.getMessage(),e);
+                    LOG.warn(e.getMessage(), e);
                 }
             }
         }
     }
 
-    private Database identifyNewTables(){
+    private Database identifyNewTables() {
         Database _database = new Database();
         _database.setName(database.getName());
         Collection<String> tableNames = tblNameMap.values();
@@ -127,7 +130,7 @@ public class JdbcSchemaManager {
         this.platform.shutdownDatabase();
     }
 
-    private Table createTable(String tableName){
+    private Table createTable(String tableName) {
         Table table = new Table();
         table.setName(tableName);
         buildTable(table);

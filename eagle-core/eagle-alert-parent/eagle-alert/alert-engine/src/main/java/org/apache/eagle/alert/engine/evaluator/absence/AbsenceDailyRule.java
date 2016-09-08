@@ -20,7 +20,7 @@ package org.apache.eagle.alert.engine.evaluator.absence;
  * Since 7/7/16.
  */
 public class AbsenceDailyRule implements AbsenceRule {
-    public static final long DAY_MILLI_SECONDS = 86400*1000L;
+    public static final long DAY_MILLI_SECONDS = 86400 * 1000L;
     public long startOffset;
     public long endOffset;
 }

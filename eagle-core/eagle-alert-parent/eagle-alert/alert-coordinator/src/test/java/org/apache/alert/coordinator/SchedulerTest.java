@@ -70,9 +70,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 /**
- * 
  * @since Apr 22, 2016
- *
  */
 public class SchedulerTest {
 
@@ -375,7 +373,7 @@ public class SchedulerTest {
                 StreamWorkSlotQueue queue1 = getQueue(context, pa1.getQueueId()).getRight();
                 StreamWorkSlotQueue queue3 = getQueue(context, pa3.getQueueId()).getRight();
                 Assert.assertNotEquals(queue1.getWorkingSlots().get(0).getTopologyName(),
-                        queue3.getWorkingSlots().get(0).getTopologyName());
+                    queue3.getWorkingSlots().get(0).getTopologyName());
             }
         }
         // group spec
@@ -722,7 +720,7 @@ public class SchedulerTest {
         List<Topology> topos = loadEntities(base + "topologies.json", Topology.class);
         for (Topology t : topos) {
             context.addTopology(t);
-            
+
             TopologyUsage u = new TopologyUsage(t.getName());
             for (String gnid : t.getGroupNodeIds()) {
                 u.getGroupUsages().put(gnid, new GroupBoltUsage(gnid));

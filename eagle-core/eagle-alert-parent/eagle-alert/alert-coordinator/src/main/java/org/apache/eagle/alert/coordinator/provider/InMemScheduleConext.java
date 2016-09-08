@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.alert.coordinator.provider;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -29,10 +26,11 @@ import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * @since Mar 28, 2016
- *
+ * @since Mar 28, 2016.
  */
 public class InMemScheduleConext implements IScheduleContext {
 
@@ -60,9 +58,9 @@ public class InMemScheduleConext implements IScheduleContext {
     }
 
     public InMemScheduleConext(Map<String, Topology> topologies2, Map<String, PolicyAssignment> assignments,
-            Map<String, Kafka2TupleMetadata> kafkaSources, Map<String, PolicyDefinition> policies2,
-            Map<String, Publishment> publishments2, Map<String, StreamDefinition> streamDefinitions,
-            Map<StreamGroup, MonitoredStream> monitoredStreamMap, Map<String, TopologyUsage> usages2) {
+                               Map<String, Kafka2TupleMetadata> kafkaSources, Map<String, PolicyDefinition> policies2,
+                               Map<String, Publishment> publishments2, Map<String, StreamDefinition> streamDefinitions,
+                               Map<StreamGroup, MonitoredStream> monitoredStreamMap, Map<String, TopologyUsage> usages2) {
         this.topologies = topologies2;
         this.policyAssignments = assignments;
         this.datasources = kafkaSources;

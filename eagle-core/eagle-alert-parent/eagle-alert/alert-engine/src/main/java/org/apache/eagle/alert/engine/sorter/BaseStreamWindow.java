@@ -16,18 +16,18 @@
  */
 package org.apache.eagle.alert.engine.sorter;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.utils.DateTimeUtil;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
- * TODO: Make sure thread-safe
- * TODO: Leverage Off-Heap Memory to persist append-only events collection
+ * TODO: Make sure thread-safe.
+ * TODO: Leverage Off-Heap Memory to persist append-only events collection.
  */
 public abstract class BaseStreamWindow implements StreamWindow {
     private final long endTime;
@@ -35,22 +35,17 @@ public abstract class BaseStreamWindow implements StreamWindow {
     private final long margin;
     private final AtomicBoolean expired;
     private final long createdTime;
-    private final static Logger LOG = LoggerFactory.getLogger(BaseStreamWindow.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseStreamWindow.class);
     private PartitionedEventCollector collector;
     private final AtomicLong lastFlushedStreamTime;
     private final AtomicLong lastFlushedSystemTime;
 
-    /**
-     * @param startTime
-     * @param endTime
-     * @param marginTime
-     */
-    public BaseStreamWindow(long startTime, long endTime, long marginTime){
-        if(startTime >= endTime){
-            throw new IllegalArgumentException("startTime: "+startTime+" >= endTime: "+endTime+", expected: startTime < endTime");
+    public BaseStreamWindow(long startTime, long endTime, long marginTime) {
+        if (startTime >= endTime) {
+            throw new IllegalArgumentException("startTime: " + startTime + " >= endTime: " + endTime + ", expected: startTime < endTime");
         }
-        if(marginTime > endTime - startTime){
-            throw new IllegalArgumentException("marginTime: "+marginTime+" > endTime: "+endTime+" - startTime "+startTime+", expected: marginTime < endTime - startTime");
+        if (marginTime > endTime - startTime) {
+            throw new IllegalArgumentException("marginTime: " + marginTime + " > endTime: " + endTime + " - startTime " + startTime + ", expected: marginTime < endTime - startTime");
         }
         this.startTime = startTime;
         this.endTime = endTime;
@@ -63,8 +58,9 @@ public abstract class BaseStreamWindow implements StreamWindow {
 
     @Override
     public void register(PartitionedEventCollector collector) {
-        if(this.collector!=null)
+        if (this.collector != null) {
             throw new IllegalArgumentException("Duplicated collector error");
+        }
         this.collector = collector;
     }
 
@@ -78,7 +74,7 @@ public abstract class BaseStreamWindow implements StreamWindow {
     }
 
     @Override
-    public long rejectTime(){
+    public long rejectTime() {
         return this.lastFlushedStreamTime.get();
     }
 
@@ -93,7 +89,7 @@ public abstract class BaseStreamWindow implements StreamWindow {
 
     public boolean accept(final long eventTime) {
         return !expired() && eventTime >= startTime && eventTime < endTime
-                && eventTime >= lastFlushedStreamTime.get(); // dropped
+            && eventTime >= lastFlushedStreamTime.get(); // dropped
     }
 
     public boolean expired() {
@@ -106,35 +102,38 @@ public abstract class BaseStreamWindow implements StreamWindow {
     }
 
     /**
-     *
-     *
      * Expire when
      * 1) If stream time >= endTime + marginTime, then flush and expire
      * 2) If systemTime - flushedTime > endTime - startTime + marginTime && streamTime >= endTime, then flush and expire.
      * 3) If systemTime - flushedTime > endTime - startTime + marginTime && streamTime < endTime, then flush but not expire.
      * 4) else do nothing
      *
-     *  @param clock stream time clock
-     *  @param globalSystemTime system time clock
+     * @param clock            stream time clock
+     * @param globalSystemTime system time clock
      */
     @Override
-    public synchronized void onTick(StreamTimeClock clock,long globalSystemTime) {
-        if(!expired()) {
-            if(clock.getTime() >= endTime + margin){
-                LOG.info("Expiring {} at stream time:{}, latency:{}, window: {}",clock.getStreamId(),DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()),globalSystemTime - lastFlushedSystemTime.get(),this);
+    public synchronized void onTick(StreamTimeClock clock, long globalSystemTime) {
+        if (!expired()) {
+            if (clock.getTime() >= endTime + margin) {
+                LOG.info("Expiring {} at stream time:{}, latency:{}, window: {}", clock.getStreamId(),
+                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
                 lastFlushedStreamTime.set(clock.getTime());
                 lastFlushedSystemTime.set(globalSystemTime);
                 flush();
                 expired.set(true);
-            } else if(globalSystemTime - lastFlushedSystemTime.get() >=  endTime + margin - startTime && size() > 0){
-                LOG.info("Flushing {} at system time: {}, stream time: {}, latency: {}, window: {}",clock.getStreamId(),DateTimeUtil.millisecondsToHumanDateWithMilliseconds(globalSystemTime),DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()),globalSystemTime - lastFlushedSystemTime.get(),this);
+            } else if (globalSystemTime - lastFlushedSystemTime.get() >= endTime + margin - startTime && size() > 0) {
+                LOG.info("Flushing {} at system time: {}, stream time: {}, latency: {}, window: {}", clock.getStreamId(),
+                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(globalSystemTime),
+                    DateTimeUtil.millisecondsToHumanDateWithMilliseconds(clock.getTime()), globalSystemTime - lastFlushedSystemTime.get(), this);
                 lastFlushedStreamTime.set(clock.getTime());
                 lastFlushedSystemTime.set(globalSystemTime);
                 flush();
-                if(lastFlushedStreamTime.get()>=this.endTime) expired.set(true);
+                if (lastFlushedStreamTime.get() >= this.endTime) {
+                    expired.set(true);
+                }
             }
         } else {
-            LOG.warn("Window has already expired, should not tick: {}",this.toString());
+            LOG.warn("Window has already expired, should not tick: {}", this.toString());
         }
     }
 
@@ -150,7 +149,7 @@ public abstract class BaseStreamWindow implements StreamWindow {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj !=null && obj instanceof BaseStreamWindow) {
+        if (obj != null && obj instanceof BaseStreamWindow) {
             BaseStreamWindow another = (BaseStreamWindow) obj;
             return another.startTime == this.startTime && another.endTime == this.endTime && another.margin == this.margin;
         }
@@ -158,26 +157,27 @@ public abstract class BaseStreamWindow implements StreamWindow {
     }
 
     @Override
-    public void flush(){
-        if(this.collector == null) throw new NullPointerException("Collector is not given before window flush");
+    public void flush() {
+        if (this.collector == null) {
+            throw new NullPointerException("Collector is not given before window flush");
+        }
         this.flush(collector);
     }
 
     /**
-     *
-     * @param collector
-     * @return max timestamp
+     * @param collector PartitionedEventCollector.
+     * @return max timestamp.
      */
     protected abstract void flush(PartitionedEventCollector collector);
 
     @Override
     public String toString() {
         return String.format("StreamWindow[period=[%s,%s), margin=%s ms, size=%s, reject=%s]",
-                DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.startTime),
-                DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.endTime),
-                this.margin,
-                size(),
-                this.rejectTime() == 0 ? DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.startTime): DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.rejectTime())
-                );
+            DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.startTime),
+            DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.endTime),
+            this.margin,
+            size(),
+            this.rejectTime() == 0 ? DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.startTime) : DateTimeUtil.millisecondsToHumanDateWithMilliseconds(this.rejectTime())
+        );
     }
 }

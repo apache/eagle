@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.alert.engine.absence;
 
-import org.apache.eagle.alert.engine.evaluator.absence.AbsenceDailyRule;
 import org.apache.eagle.alert.engine.evaluator.absence.AbsenceAlertDriver;
+import org.apache.eagle.alert.engine.evaluator.absence.AbsenceDailyRule;
 import org.apache.eagle.alert.engine.evaluator.absence.AbsenceWindowGenerator;
 import org.junit.Test;
 
@@ -33,11 +33,11 @@ import java.util.TimeZone;
  */
 public class TestAbsenceDriver {
     @Test
-    public void testAbsence() throws Exception{
+    public void testAbsence() throws Exception {
         // from 2PM to 3PM each day
         AbsenceDailyRule rule = new AbsenceDailyRule();
-        rule.startOffset = 14*3600*1000;
-        rule.endOffset = 15*3600*1000;
+        rule.startOffset = 14 * 3600 * 1000;
+        rule.endOffset = 15 * 3600 * 1000;
         AbsenceWindowGenerator generator = new AbsenceWindowGenerator(rule);
         List<Object> expectAttrs = Arrays.asList("host1");
         AbsenceAlertDriver driver = new AbsenceAlertDriver(expectAttrs, generator);
@@ -52,23 +52,23 @@ public class TestAbsenceDriver {
         // first event
         driver.process(Arrays.asList("host2"), baseOccurTime);
         // event after 1 hour
-        driver.process(Arrays.asList("host2"), baseOccurTime + 3600*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 3600 * 1000);
         // event after 2 hour
-        driver.process(Arrays.asList("host2"), baseOccurTime + 2*3600*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 2 * 3600 * 1000);
         // event after 3 hour, enter this window
-        driver.process(Arrays.asList("host2"), baseOccurTime + 3*3600*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 3 * 3600 * 1000);
         // event after 3.5 hour, still in this window
-        driver.process(Arrays.asList("host2"), baseOccurTime + 3*3600*1000 + 1800*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 3 * 3600 * 1000 + 1800 * 1000);
         // event after 4 hour, exit this window
-        driver.process(Arrays.asList("host2"), baseOccurTime + 4*3600*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 4 * 3600 * 1000);
     }
 
     @Test
-    public void testOccurrence() throws Exception{
+    public void testOccurrence() throws Exception {
         // from 2PM to 3PM each day
         AbsenceDailyRule rule = new AbsenceDailyRule();
-        rule.startOffset = 14*3600*1000;
-        rule.endOffset = 15*3600*1000;
+        rule.startOffset = 14 * 3600 * 1000;
+        rule.endOffset = 15 * 3600 * 1000;
         AbsenceWindowGenerator generator = new AbsenceWindowGenerator(rule);
         List<Object> expectAttrs = Arrays.asList("host1");
         AbsenceAlertDriver driver = new AbsenceAlertDriver(expectAttrs, generator);
@@ -83,14 +83,14 @@ public class TestAbsenceDriver {
         // first event
         driver.process(Arrays.asList("host2"), baseOccurTime);
         // event after 1 hour
-        driver.process(Arrays.asList("host2"), baseOccurTime + 3600*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 3600 * 1000);
         // event after 2 hour
-        driver.process(Arrays.asList("host2"), baseOccurTime + 2*3600*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 2 * 3600 * 1000);
         // event after 3 hour, enter this window
-        driver.process(Arrays.asList("host2"), baseOccurTime + 3*3600*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 3 * 3600 * 1000);
         // event after 3.5 hour, still in this window
-        driver.process(Arrays.asList("host1"), baseOccurTime + 3*3600*1000 + 1800*1000);
+        driver.process(Arrays.asList("host1"), baseOccurTime + 3 * 3600 * 1000 + 1800 * 1000);
         // event after 4 hour, exit this window
-        driver.process(Arrays.asList("host2"), baseOccurTime + 4*3600*1000);
+        driver.process(Arrays.asList("host2"), baseOccurTime + 4 * 3600 * 1000);
     }
 }

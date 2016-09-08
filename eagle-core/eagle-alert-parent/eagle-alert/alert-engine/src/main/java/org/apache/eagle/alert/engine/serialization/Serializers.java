@@ -16,49 +16,42 @@
  */
 package org.apache.eagle.alert.engine.serialization;
 
+import org.apache.eagle.alert.engine.coordinator.StreamColumn;
+import org.apache.eagle.alert.engine.serialization.impl.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
-import org.apache.eagle.alert.engine.serialization.impl.BooleanSerializer;
-import org.apache.eagle.alert.engine.serialization.impl.DoubleSerializer;
-import org.apache.eagle.alert.engine.serialization.impl.FloatSerializer;
-import org.apache.eagle.alert.engine.serialization.impl.IntegerSerializer;
-import org.apache.eagle.alert.engine.serialization.impl.JavaObjectSerializer;
-import org.apache.eagle.alert.engine.serialization.impl.LongSerializer;
-import org.apache.eagle.alert.engine.serialization.impl.PartitionedEventSerializerImpl;
-import org.apache.eagle.alert.engine.serialization.impl.StringSerializer;
-
 public class Serializers {
-    private final static Map<StreamColumn.Type,Serializer<?>> COLUMN_TYPE_SER_MAPPING = new HashMap<>();
+    private static final Map<StreamColumn.Type, Serializer<?>> COLUMN_TYPE_SER_MAPPING = new HashMap<>();
 
-    public static <T> void register(StreamColumn.Type type,Serializer<T> serializer){
-        if(COLUMN_TYPE_SER_MAPPING.containsKey(type)){
-            throw new IllegalArgumentException("Duplicated column type: "+type);
+    public static <T> void register(StreamColumn.Type type, Serializer<T> serializer) {
+        if (COLUMN_TYPE_SER_MAPPING.containsKey(type)) {
+            throw new IllegalArgumentException("Duplicated column type: " + type);
         }
-        COLUMN_TYPE_SER_MAPPING.put(type,serializer);
+        COLUMN_TYPE_SER_MAPPING.put(type, serializer);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Serializer<T> getColumnSerializer(StreamColumn.Type type){
-        if(COLUMN_TYPE_SER_MAPPING.containsKey(type)){
+    public static <T> Serializer<T> getColumnSerializer(StreamColumn.Type type) {
+        if (COLUMN_TYPE_SER_MAPPING.containsKey(type)) {
             return (Serializer<T>) COLUMN_TYPE_SER_MAPPING.get(type);
-        }else{
-            throw new IllegalArgumentException("Serializer of type: "+type+" not found");
+        } else {
+            throw new IllegalArgumentException("Serializer of type: " + type + " not found");
         }
     }
 
-    public static PartitionedEventSerializer newPartitionedEventSerializer(SerializationMetadataProvider metadataProvider){
+    public static PartitionedEventSerializer newPartitionedEventSerializer(SerializationMetadataProvider metadataProvider) {
         return new PartitionedEventSerializerImpl(metadataProvider);
     }
 
     static {
-        register(StreamColumn.Type.STRING,new StringSerializer());
-        register(StreamColumn.Type.INT,new IntegerSerializer());
-        register(StreamColumn.Type.LONG,new LongSerializer());
-        register(StreamColumn.Type.FLOAT,new FloatSerializer());
-        register(StreamColumn.Type.DOUBLE,new DoubleSerializer());
-        register(StreamColumn.Type.BOOL,new BooleanSerializer());
-        register(StreamColumn.Type.OBJECT,new JavaObjectSerializer());
+        register(StreamColumn.Type.STRING, new StringSerializer());
+        register(StreamColumn.Type.INT, new IntegerSerializer());
+        register(StreamColumn.Type.LONG, new LongSerializer());
+        register(StreamColumn.Type.FLOAT, new FloatSerializer());
+        register(StreamColumn.Type.DOUBLE, new DoubleSerializer());
+        register(StreamColumn.Type.BOOL, new BooleanSerializer());
+        register(StreamColumn.Type.OBJECT, new JavaObjectSerializer());
     }
 }

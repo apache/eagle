@@ -19,21 +19,21 @@
 
 package org.apache.eagle.alert.engine.spout;
 
-import java.util.Map;
-
 import backtype.storm.spout.Scheme;
+
+import java.util.Map;
 
 
 /**
  * All Scheme implementations should have the following conditions
  * 1) implement Scheme interface
- * 2) has one constructor with topic name as parameter
+ * 2) has one constructor with topic name as parameter.
  */
 public class SchemeBuilder {
 
     @SuppressWarnings("rawtypes")
-    public static Scheme buildFromClsName(String clsName, String topic, Map conf) throws Exception{
+    public static Scheme buildFromClsName(String clsName, String topic, Map conf) throws Exception {
         Object o = Class.forName(clsName).getConstructor(String.class, Map.class).newInstance(topic, conf);
-        return (Scheme)o;
+        return (Scheme) o;
     }
 }

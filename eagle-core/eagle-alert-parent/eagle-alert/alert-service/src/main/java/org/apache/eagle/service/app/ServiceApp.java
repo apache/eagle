@@ -16,28 +16,24 @@
  */
 package org.apache.eagle.service.app;
 
+import org.apache.eagle.alert.coordinator.CoordinatorListener;
+import org.apache.eagle.alert.coordinator.resource.CoordinatorResource;
+import org.apache.eagle.alert.resource.SimpleCORSFiler;
+import org.apache.eagle.service.metadata.resource.MetadataResource;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.typesafe.config.ConfigFactory;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.EnumSet;
-
 import javax.servlet.DispatcherType;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.eagle.alert.coordinator.CoordinatorListener;
-import org.apache.eagle.alert.coordinator.resource.CoordinatorResource;
-import org.apache.eagle.alert.resource.SimpleCORSFiler;
-import org.apache.eagle.service.metadata.resource.MetadataResource;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.typesafe.config.ConfigFactory;
-
 /**
- * @since Jun 27, 2016
- *
+ * @since Jun 27, 2016.
  */
 public class ServiceApp extends Application<AlertDropWizardConfiguration> {
 
@@ -76,12 +72,12 @@ public class ServiceApp extends Application<AlertDropWizardConfiguration> {
         swaggerConfig.setVersion("v1.2");
         swaggerConfig.setBasePath("/rest");
         swaggerConfig
-                .setResourcePackage("org.apache.eagle.alert.coordinator.resource,org.apache.eagle.service.metadata.resource");
+            .setResourcePackage("org.apache.eagle.alert.coordinator.resource,org.apache.eagle.service.metadata.resource");
         swaggerConfig.setScan(true);
 
         // simple CORS filter
         environment.servlets().addFilter("corsFilter", new SimpleCORSFiler())
-                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+            .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
         // context listener
         environment.servlets().addServletListeners(new CoordinatorListener());

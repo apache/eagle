@@ -30,8 +30,8 @@ public class TopologyMgmtResourceHelper {
     private static final Logger LOG = LoggerFactory.getLogger(TopologyMgmtResourceHelper.class);
 
     public static <T> Optional<T> findById(List<T> clusters, String id) {
-        Optional<T> OptionValue = clusters.stream().filter(o -> getName(o).equalsIgnoreCase(id)).findFirst();
-        return OptionValue;
+        Optional<T> pptionValue = clusters.stream().filter(o -> getName(o).equalsIgnoreCase(id)).findFirst();
+        return pptionValue;
     }
 
     public static <T> String getName(T t) {
@@ -39,10 +39,10 @@ public class TopologyMgmtResourceHelper {
             Method m = t.getClass().getMethod("getName");
             return (String) m.invoke(t);
         } catch (NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException
-                | IllegalArgumentException e) {
+            | IllegalArgumentException e) {
             LOG.error(" getName not found on given class :" + t.getClass().getName());
         }
         throw new RuntimeException(String.format("no getName() found on target class %s for matching", t.getClass()
-                .getName()));
+            .getName()));
     }
 }

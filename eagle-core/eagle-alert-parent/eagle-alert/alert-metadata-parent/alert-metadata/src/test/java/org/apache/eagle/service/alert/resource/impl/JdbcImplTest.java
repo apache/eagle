@@ -18,10 +18,8 @@
 
 package org.apache.eagle.service.alert.resource.impl;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -33,16 +31,13 @@ import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.JdbcMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.resource.OpResult;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 public class JdbcImplTest {
     private static Logger LOG = LoggerFactory.getLogger(JdbcImplTest.class);
@@ -69,7 +64,8 @@ public class JdbcImplTest {
 
     private String TOPO_NAME = "topoName";
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void test_apis() {
         // publishment
         {
@@ -155,7 +151,8 @@ public class JdbcImplTest {
         Assert.assertEquals(state.getVersion(), versionId);
     }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void test_readCurrentState() {
         test_addstate();
         ScheduleState state = dao.getScheduleState();

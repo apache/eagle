@@ -18,21 +18,20 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
+import com.typesafe.config.Config;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class AlertKafkaPublisher extends AbstractPublishPlugin {
 
@@ -57,7 +56,7 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public void onAlert(AlertStreamEvent event) throws Exception {
         if (producer == null) {
@@ -65,7 +64,7 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             return;
         }
         event = dedup(event);
-        if(event == null) {
+        if (event == null) {
             return;
         }
         PublishStatus status = new PublishStatus();
@@ -86,7 +85,7 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             status.successful = false;
             status.errorMessage = String.format("Failed to send message to %s, due to:%s", brokerList, e);
             LOG.error(status.errorMessage, e);
-        } catch (Exception ex ) {
+        } catch (Exception ex) {
             LOG.error("fail writing alert to Kafka bus", ex);
             status.successful = false;
             status.errorMessage = ex.getMessage();

@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.alert.engine.utils;
 
-import java.io.IOException;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class CompressionUtilsTest {
     private final static Logger LOG = LoggerFactory.getLogger(CompressionUtilsTest.class);
@@ -33,11 +33,11 @@ public class CompressionUtilsTest {
         byte[] compressed = CompressionUtils.compress(original);
         byte[] decompressed = CompressionUtils.decompress(compressed);
 
-        LOG.info("original size: {}",original.length);
-        LOG.info("compressed size: {}",compressed.length);
-        LOG.info("decompressed size: {}",decompressed.length);
+        LOG.info("original size: {}", original.length);
+        LOG.info("compressed size: {}", compressed.length);
+        LOG.info("decompressed size: {}", decompressed.length);
 
         String decompressedValue = new String(decompressed);
-        Assert.assertEquals(value,decompressedValue);
+        Assert.assertEquals(value, decompressedValue);
     }
 }

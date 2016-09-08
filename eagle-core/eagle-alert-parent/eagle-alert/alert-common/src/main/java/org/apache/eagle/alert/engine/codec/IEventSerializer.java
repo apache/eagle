@@ -19,8 +19,7 @@ package org.apache.eagle.alert.engine.codec;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
 /**
- * @since Jun 3, 2016
- *
+ * @since Jun 3, 2016.
  */
 public interface IEventSerializer {
     Object serialize(AlertStreamEvent event);

@@ -16,19 +16,16 @@
  */
 package org.apache.eagle.alert.engine.runner;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import backtype.storm.metric.api.MultiCountMetric;
+import backtype.storm.task.GeneralTopologyContext;
+import backtype.storm.task.IOutputCollector;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.TupleImpl;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
 import org.apache.eagle.alert.coordination.model.RouterSpec;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
@@ -40,7 +37,6 @@ import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.coordinator.impl.AbstractMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.apache.eagle.alert.engine.router.impl.StreamRouterImpl;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.alert.utils.StreamIdConversion;
 import org.joda.time.Period;
@@ -49,43 +45,39 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.metric.api.MultiCountMetric;
-import backtype.storm.task.GeneralTopologyContext;
-import backtype.storm.task.IOutputCollector;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.TupleImpl;
+import java.io.IOException;
+import java.util.*;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestStreamRouterBolt {
     private final static Logger LOG = LoggerFactory.getLogger(TestStreamRouterBolt.class);
 
     /**
      * Mocked 5 Events
-     *
+     * <p>
      * 1. Sent in random order:
      * "value1","value2","value3","value4","value5"
-     *
+     * <p>
      * 2. Received correct time order and value5 is thrown because too late: "value2","value1","value3","value4"
      *
      * @throws Exception
      */
     @SuppressWarnings("rawtypes")
     @Test
-    public void testRouterWithSortAndRouteSpec() throws Exception{
+    public void testRouterWithSortAndRouteSpec() throws Exception {
         Config config = ConfigFactory.load();
         MockChangeService mockChangeService = new MockChangeService();
         StreamRouterBolt routerBolt = new StreamRouterBolt("routerBolt1", config, mockChangeService);
 
-        final Map<String,List<PartitionedEvent>> streamCollected = new HashMap<>();
+        final Map<String, List<PartitionedEvent>> streamCollected = new HashMap<>();
         final List<PartitionedEvent> orderCollected = new ArrayList<>();
 
-        OutputCollector collector = new OutputCollector(new IOutputCollector(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             int count = 0;
+
             @Override
             public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
                 PartitionedEvent event;
@@ -94,27 +86,37 @@ public class TestStreamRouterBolt {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                if(count == 0) {
+                if (count == 0) {
                     count++;
                 }
                 LOG.info(String.format("Collector received: [streamId=[%s], tuple=[%s] ", streamId, tuple));
-                if(!streamCollected.containsKey(streamId)){
-                    streamCollected.put(streamId,new ArrayList<>());
+                if (!streamCollected.containsKey(streamId)) {
+                    streamCollected.put(streamId, new ArrayList<>());
                 }
                 streamCollected.get(streamId).add(event);
                 orderCollected.add(event);
                 return null;
             }
+
             @Override
-            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {            }
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+            }
+
             @Override
-            public void ack(Tuple input) {            }
+            public void ack(Tuple input) {
+            }
+
             @Override
-            public void fail(Tuple input) {            }
+            public void fail(Tuple input) {
+            }
+
             @SuppressWarnings("unused")
-            public void resetTimeout(Tuple input) {            }
+            public void resetTimeout(Tuple input) {
+            }
+
             @Override
-            public void reportError(Throwable error) {            }
+            public void reportError(Throwable error) {
+            }
         });
 
         Map stormConf = new HashMap<>();
@@ -144,7 +146,7 @@ public class TestStreamRouterBolt {
         routerSpec.setStreamId(streamId);
         PolicyWorkerQueue queue = new PolicyWorkerQueue();
         queue.setPartition(sp);
-        queue.setWorkers(Arrays.asList(new WorkSlot("testTopology","alertBolt1"), new WorkSlot("testTopology","alertBolt2")));
+        queue.setWorkers(Arrays.asList(new WorkSlot("testTopology", "alertBolt1"), new WorkSlot("testTopology", "alertBolt2")));
         routerSpec.setTargetQueue(Collections.singletonList(queue));
         boltSpec.addRouterSpec(routerSpec);
         boltSpec.setVersion("version1");
@@ -178,8 +180,8 @@ public class TestStreamRouterBolt {
 
         // construct event with "value1"
         StreamEvent event = new StreamEvent();
-        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:01:30")*1000);
-        Object[] data = new Object[]{"value1"};
+        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:01:30") * 1000);
+        Object[] data = new Object[] {"value1"};
         event.setData(data);
         event.setStreamId(streamId);
         PartitionedEvent pEvent = new PartitionedEvent();
@@ -190,8 +192,8 @@ public class TestStreamRouterBolt {
 
         // construct another event with "value2"
         event = new StreamEvent();
-        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:01:10")*1000);
-        data = new Object[]{"value2"};
+        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:01:10") * 1000);
+        data = new Object[] {"value2"};
         event.setData(data);
         event.setStreamId(streamId);
         pEvent = new PartitionedEvent();
@@ -202,8 +204,8 @@ public class TestStreamRouterBolt {
 
         // construct another event with "value3"
         event = new StreamEvent();
-        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:01:40")*1000);
-        data = new Object[]{"value3"};
+        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:01:40") * 1000);
+        data = new Object[] {"value3"};
         event.setData(data);
         event.setStreamId(streamId);
         pEvent = new PartitionedEvent();
@@ -214,8 +216,8 @@ public class TestStreamRouterBolt {
 
         // construct another event with "value4"
         event = new StreamEvent();
-        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:02:10")*1000);
-        data = new Object[]{"value4"};
+        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:02:10") * 1000);
+        data = new Object[] {"value4"};
         event.setData(data);
         event.setStreamId(streamId);
         pEvent = new PartitionedEvent();
@@ -226,8 +228,8 @@ public class TestStreamRouterBolt {
 
         // construct another event with "value5", which will be thrown because two late
         event = new StreamEvent();
-        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:00:10")*1000);
-        data = new Object[]{"value5"};
+        event.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:00:10") * 1000);
+        data = new Object[] {"value5"};
         event.setData(data);
         event.setStreamId(streamId);
         pEvent = new PartitionedEvent();
@@ -236,14 +238,14 @@ public class TestStreamRouterBolt {
         input = new TupleImpl(context, Collections.singletonList(pEvent), taskId, "default");
         routerBolt.execute(input);
 
-        Assert.assertEquals("Should finally collect two streams",2,streamCollected.size());
-        Assert.assertTrue("Should collect stream stream_routerBolt_to_alertBolt1",streamCollected.keySet().contains(
-                String.format(StreamIdConversion.generateStreamIdBetween(routerBolt.getBoltId(), "alertBolt1"))));
-        Assert.assertTrue("Should collect stream stream_routerBolt_to_alertBolt2",streamCollected.keySet().contains(
-                String.format(StreamIdConversion.generateStreamIdBetween(routerBolt.getBoltId(), "alertBolt2"))));
+        Assert.assertEquals("Should finally collect two streams", 2, streamCollected.size());
+        Assert.assertTrue("Should collect stream stream_routerBolt_to_alertBolt1", streamCollected.keySet().contains(
+            String.format(StreamIdConversion.generateStreamIdBetween(routerBolt.getBoltId(), "alertBolt1"))));
+        Assert.assertTrue("Should collect stream stream_routerBolt_to_alertBolt2", streamCollected.keySet().contains(
+            String.format(StreamIdConversion.generateStreamIdBetween(routerBolt.getBoltId(), "alertBolt2"))));
 
-        Assert.assertEquals("Should finally collect 3 events",3,orderCollected.size());
-        Assert.assertArrayEquals("Should sort 3 events in ASC order",new String[]{"value2","value1","value3"},orderCollected.stream().map((d)->d.getData()[0]).toArray());
+        Assert.assertEquals("Should finally collect 3 events", 3, orderCollected.size());
+        Assert.assertArrayEquals("Should sort 3 events in ASC order", new String[] {"value2", "value1", "value3"}, orderCollected.stream().map((d) -> d.getData()[0]).toArray());
 
         // The first 3 events are ticked automatically by window
 
@@ -252,14 +254,14 @@ public class TestStreamRouterBolt {
         // Close will flush all events in memory, so will receive the last event which is still in memory as window is not expired according to clock
         // The 5th event will be thrown because too late and out of margin
 
-        Assert.assertEquals("Should finally collect two streams",2,streamCollected.size());
-        Assert.assertEquals("Should finally collect 3 events",4,orderCollected.size());
-        Assert.assertArrayEquals("Should sort 4 events in ASC-ordered timestamp",new String[]{"value2","value1","value3","value4"},orderCollected.stream().map((d)->d.getData()[0]).toArray());
+        Assert.assertEquals("Should finally collect two streams", 2, streamCollected.size());
+        Assert.assertEquals("Should finally collect 3 events", 4, orderCollected.size());
+        Assert.assertArrayEquals("Should sort 4 events in ASC-ordered timestamp", new String[] {"value2", "value1", "value3", "value4"}, orderCollected.stream().map((d) -> d.getData()[0]).toArray());
 
     }
 
     @SuppressWarnings("serial")
-    public static class MockChangeService extends AbstractMetadataChangeNotifyService{
+    public static class MockChangeService extends AbstractMetadataChangeNotifyService {
         private final static Logger LOG = LoggerFactory.getLogger(MockChangeService.class);
 
         @Override

@@ -16,20 +16,19 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
-import java.io.Serializable;
-import java.util.*;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * StreamPartition defines how a data stream is partitioned and sorted
  * streamId is used for distinguishing different streams which are spawned from the same data source
  * type defines how to partition data among slots within one slotqueue
  * columns are fields based on which stream is grouped
- * sortSpec defines how data is sorted
+ * sortSpec defines how data is sorted.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamPartition implements Serializable {
@@ -52,14 +51,15 @@ public class StreamPartition implements Serializable {
 
     @Override
     public boolean equals(Object other) {
-        if (other == this)
+        if (other == this) {
             return true;
+        }
         if (!(other instanceof StreamPartition)) {
             return false;
         }
         StreamPartition sp = (StreamPartition) other;
         return Objects.equals(streamId, sp.streamId) && Objects.equals(type, sp.type)
-                && CollectionUtils.isEqualCollection(columns, sp.columns) && Objects.equals(sortSpec, sp.sortSpec);
+            && CollectionUtils.isEqualCollection(columns, sp.columns) && Objects.equals(sortSpec, sp.sortSpec);
     }
 
     @Override
@@ -71,46 +71,52 @@ public class StreamPartition implements Serializable {
         this.type = type;
     }
 
-    public Type getType(){
+    public Type getType() {
         return this.type;
     }
 
-    public enum Type{
-        GLOBAL("GLOBAL",0), GROUPBY("GROUPBY",1), SHUFFLE("SHUFFLE",2);
+    public enum Type {
+        GLOBAL("GLOBAL", 0), GROUPBY("GROUPBY", 1), SHUFFLE("SHUFFLE", 2);
         private final String name;
         private final int index;
-        Type(String name, int index){
+
+        Type(String name, int index) {
             this.name = name;
             this.index = index;
         }
+
         @Override
         public String toString() {
             return this.name;
         }
-        public static Type locate(String type){
+
+        public static Type locate(String type) {
             Type _type = _NAME_TYPE.get(type.toUpperCase());
-            if(_type == null)
-                throw new IllegalStateException("Illegal type name: "+type);
+            if (_type == null) {
+                throw new IllegalStateException("Illegal type name: " + type);
+            }
             return _type;
         }
 
-        public static Type locate(int index){
+        public static Type locate(int index) {
             Type _type = _INDEX_TYPE.get(index);
-            if(_type == null)
-                throw new IllegalStateException("Illegal type index: "+index);
+            if (_type == null) {
+                throw new IllegalStateException("Illegal type index: " + index);
+            }
             return _type;
         }
 
-        private static final Map<String,Type> _NAME_TYPE = new HashMap<>();
-        private static final Map<Integer,Type> _INDEX_TYPE = new TreeMap<>();
-        static {
-            _NAME_TYPE.put(GLOBAL.name,GLOBAL);
-            _NAME_TYPE.put(GROUPBY.name,GROUPBY);
-            _NAME_TYPE.put(SHUFFLE.name,SHUFFLE);
+        private static final Map<String, Type> _NAME_TYPE = new HashMap<>();
+        private static final Map<Integer, Type> _INDEX_TYPE = new TreeMap<>();
 
-            _INDEX_TYPE.put(GLOBAL.index,GLOBAL);
-            _INDEX_TYPE.put(GROUPBY.index,GLOBAL);
-            _INDEX_TYPE.put(SHUFFLE.index,GLOBAL);
+        static {
+            _NAME_TYPE.put(GLOBAL.name, GLOBAL);
+            _NAME_TYPE.put(GROUPBY.name, GROUPBY);
+            _NAME_TYPE.put(SHUFFLE.name, SHUFFLE);
+
+            _INDEX_TYPE.put(GLOBAL.index, GLOBAL);
+            _INDEX_TYPE.put(GROUPBY.index, GLOBAL);
+            _INDEX_TYPE.put(SHUFFLE.index, GLOBAL);
         }
     }
 
@@ -140,6 +146,6 @@ public class StreamPartition implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("StreamPartition[streamId=%s,type=%s,columns=[%s],sortSpec=[%s]]",this.getStreamId(),this.getType(), StringUtils.join(this.getColumns(),","), sortSpec);
+        return String.format("StreamPartition[streamId=%s,type=%s,columns=[%s],sortSpec=[%s]]", this.getStreamId(), this.getType(), StringUtils.join(this.getColumns(), ","), sortSpec);
     }
 }

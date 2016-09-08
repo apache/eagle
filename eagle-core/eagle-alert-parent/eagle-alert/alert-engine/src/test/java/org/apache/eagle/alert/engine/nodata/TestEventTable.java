@@ -28,13 +28,13 @@ import org.wso2.siddhi.core.util.EventPrinter;
  */
 public class TestEventTable {
     @Test
-    public void test() throws Exception{
+    public void test() throws Exception {
         ExecutionPlanRuntime runtime = new SiddhiManager().createExecutionPlanRuntime(
-                        "define stream expectStream (key string, src string);"+
-                                "define stream appearStream (key string, src string);"+
-                                "define table expectTable (key string, src string);"+
-                        "from expectStream insert into expectTable;" +
-                                "from appearStream[(expectTable.key==key) in expectTable] insert into outputStream;"
+            "define stream expectStream (key string, src string);" +
+                "define stream appearStream (key string, src string);" +
+                "define table expectTable (key string, src string);" +
+                "from expectStream insert into expectTable;" +
+                "from appearStream[(expectTable.key==key) in expectTable] insert into outputStream;"
         );
 
         runtime.addCallback("outputStream", new StreamCallback() {
@@ -45,9 +45,9 @@ public class TestEventTable {
         });
 
         runtime.start();
-        runtime.getInputHandler("expectStream").send(System.currentTimeMillis(), new Object[]{"host1","expectStream"});
+        runtime.getInputHandler("expectStream").send(System.currentTimeMillis(), new Object[] {"host1", "expectStream"});
         Thread.sleep(2000);
-        runtime.getInputHandler("appearStream").send(System.currentTimeMillis(), new Object[]{"host2","expectStream"});
+        runtime.getInputHandler("appearStream").send(System.currentTimeMillis(), new Object[] {"host2", "expectStream"});
         Thread.sleep(2000);
     }
 }
