@@ -78,6 +78,7 @@ logs/
 
 *.cache-tests
 **/application-local.conf
+**/application-debug.conf
 
 *.orig
 **/*.pyc
