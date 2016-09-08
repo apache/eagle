@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.alert.coordinator;
 
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -28,8 +26,10 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
+import java.util.Map;
+
 /**
- * @since Mar 28, 2016
+ * @since Mar 28, 2016.
  */
 public interface IScheduleContext {
 

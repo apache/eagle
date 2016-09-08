@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.alert.coordinator.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
@@ -32,8 +28,12 @@ import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * @since Apr 27, 2016
+ * @since Apr 27, 2016.
  */
 public class WorkQueueBuilder {
 

@@ -17,13 +17,6 @@
 package org.apache.eagle.alert.coordinator.impl.strategies;
 
 import static org.apache.eagle.alert.coordinator.CoordinatorConstants.CONFIG_ITEM_TOPOLOGY_LOAD_UPBOUND;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.coordination.model.internal.StreamGroup;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
@@ -33,19 +26,20 @@ import org.apache.eagle.alert.coordinator.TopologyMgmtService;
 import org.apache.eagle.alert.coordinator.TopologyMgmtService.TopologyMeta;
 import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.*;
 
 /**
  * A simple strategy that only find the bolts in the same topology as the
  * required work slots.
- * <p>
- * Invariant:<br/>
+ *
+ * <p>Invariant:<br/>
  * One slot queue only on the one topology.<br/>
- * One topology doesn't contains two same partition slot queues.
+ * One topology doesn't contains two same partition slot queues.</p>
  *
  * @since Apr 27, 2016
  */
@@ -67,12 +61,12 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
         this.mgmtService = mgmtService;
 
         Config config = ConfigFactory.load().getConfig(CoordinatorConstants.CONFIG_ITEM_COORDINATOR);
-//        numOfPoliciesBoundPerBolt = config.getInt(CoordinatorConstants.POLICIES_PER_BOLT);
+        // numOfPoliciesBoundPerBolt = config.getInt(CoordinatorConstants.POLICIES_PER_BOLT);
         topoLoadUpbound = config.getDouble(CONFIG_ITEM_TOPOLOGY_LOAD_UPBOUND);
     }
 
     /**
-     * @param isDedicated - not used yet!
+     * @param isDedicated - not used yet!.
      */
     @Override
     public List<WorkSlot> reserveWorkSlots(int size, boolean isDedicated, Map<String, Object> properties) {
@@ -137,11 +131,11 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
     }
 
     private boolean isTopologyAvailable(TopologyUsage u) {
-//        for (MonitoredStream stream : u.getMonitoredStream()) {
-//            if (partition.equals(stream.getStreamParitition())) {
-//                return false;
-//            }
-//        }
+        //        for (MonitoredStream stream : u.getMonitoredStream()) {
+        //            if (partition.equals(stream.getStreamParitition())) {
+        //                return false;
+        //            }
+        //        }
         if (u == null || u.getLoad() > topoLoadUpbound) {
             return false;
         }
@@ -156,7 +150,7 @@ public class SameTopologySlotStrategy implements IWorkSlotStrategy {
         }
         // actually it's now 0;
         return true;
-//        return alertUsage.getPolicies().size() < numOfPoliciesBoundPerBolt;
+        //  return alertUsage.getPolicies().size() < numOfPoliciesBoundPerBolt;
     }
 
 }

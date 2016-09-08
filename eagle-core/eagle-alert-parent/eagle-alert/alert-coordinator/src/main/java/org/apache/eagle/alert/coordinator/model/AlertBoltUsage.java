@@ -16,15 +16,14 @@
  */
 package org.apache.eagle.alert.coordinator.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.eagle.alert.coordination.model.internal.StreamGroup;
 import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @since Mar 28, 2016
+ * @since Mar 28, 2016.
  */
 public class AlertBoltUsage {
 
@@ -55,9 +54,9 @@ public class AlertBoltUsage {
     public void addPolicies(PolicyDefinition pd) {
         policies.add(pd.getName());
         // add first partition
-//        for (StreamPartition par : pd.getPartitionSpec()) {
-//            partitions.add(par);
-//        }
+        //        for (StreamPartition par : pd.getPartitionSpec()) {
+        //            partitions.add(par);
+        //        }
     }
 
     public double getLoad() {

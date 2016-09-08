@@ -16,15 +16,6 @@
  */
 package org.apache.eagle.alert.coordinator;
 
-import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.eagle.alert.config.ConfigBusProducer;
 import org.apache.eagle.alert.config.ConfigValue;
 import org.apache.eagle.alert.config.ZKConfig;
@@ -37,32 +28,43 @@ import org.apache.eagle.alert.coordinator.trigger.PolicyChangeListener;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Stopwatch;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TODO: To simply avoid concurrent call of schdule, make the schedule as synchronized. This is not safe when multiple
  * instance, consider a distributed lock for prevent multiple schedule happen concurrently.
  *
- * @since Mar 24, 2016 Coordinator is a standalone java application, which listens to policy changes and use schedule
+ * <p>Coordinator is a standalone java application, which listens to policy changes and use schedule
  * algorithm to distribute policies 1) reacting to shutdown events 2) start non-daemon thread to pull policies
- * and figure out if polices are changed
+ * and figure out if polices are changed</p>
+ * 
+ * @since Mar 24, 2016 
  */
 public class Coordinator {
 
     private static final Logger LOG = LoggerFactory.getLogger(Coordinator.class);
 
     private static final String COORDINATOR = "coordinator";
+    
     /**
-     * {@link ZKMetadataChangeNotifyService}
      * /alert/{topologyName}/spout
      * /router
      * /alert
      * /publisher
+     * .
      */
     private static final String ZK_ALERT_CONFIG_SPOUT = "{0}/spout";
     private static final String ZK_ALERT_CONFIG_ROUTER = "{0}/router";
@@ -70,16 +72,16 @@ public class Coordinator {
     private static final String ZK_ALERT_CONFIG_PUBLISHER = "{0}/publisher";
 
 
-    private final static String METADATA_SERVICE_HOST = "metadataService.host";
-    private final static String METADATA_SERVICE_PORT = "metadataService.port";
-    private final static String METADATA_SERVICE_CONTEXT = "metadataService.context";
-    private final static String DYNAMIC_POLICY_LOADER_INIT_MILLS = "metadataDynamicCheck.initDelayMillis";
-    private final static String DYNAMIC_POLICY_LOADER_DELAY_MILLS = "metadataDynamicCheck.delayMillis";
+    private static final String METADATA_SERVICE_HOST = "metadataService.host";
+    private static final String METADATA_SERVICE_PORT = "metadataService.port";
+    private static final String METADATA_SERVICE_CONTEXT = "metadataService.context";
+    private static final String DYNAMIC_POLICY_LOADER_INIT_MILLS = "metadataDynamicCheck.initDelayMillis";
+    private static final String DYNAMIC_POLICY_LOADER_DELAY_MILLS = "metadataDynamicCheck.delayMillis";
 
-    private final static String GREEDY_SCHEDULER_ZK_PATH = "/alert/greedy/leader";
-    private final static String POLICY_SCHEDULER_ZK_PATH = "/alert/policy/leader";
-    private final static int ACQUIRE_LOCK_WAIT_INTERVAL_MS = 2000;
-    private final static int ACQUIRE_LOCK_MAX_RETRIES_TIMES = 90; //about 9 minutes
+    private static final String GREEDY_SCHEDULER_ZK_PATH = "/alert/greedy/leader";
+    private static final String POLICY_SCHEDULER_ZK_PATH = "/alert/policy/leader";
+    private static final int ACQUIRE_LOCK_WAIT_INTERVAL_MS = 2000;
+    private static final int ACQUIRE_LOCK_MAX_RETRIES_TIMES = 90; //about 9 minutes
 
     private volatile ScheduleState currentState = null;
     private final ConfigBusProducer producer;
@@ -122,6 +124,7 @@ public class Coordinator {
                 try {
                     Thread.sleep(ACQUIRE_LOCK_WAIT_INTERVAL_MS);
                 } catch (InterruptedException e) {
+                    // ignored
                 }
                 continue;
             }
@@ -188,7 +191,7 @@ public class Coordinator {
     }
 
     /**
-     * shutdown background threads and release various resources
+     * shutdown background threads and release various resources.
      */
     private static class CoordinatorShutdownHook implements Runnable {
         private static final Logger LOG = LoggerFactory.getLogger(CoordinatorShutdownHook.class);
@@ -216,7 +219,7 @@ public class Coordinator {
     }
 
     private static class PolicyChangeHandler implements PolicyChangeListener {
-        private final static Logger LOG = LoggerFactory.getLogger(PolicyChangeHandler.class);
+        private static final Logger LOG = LoggerFactory.getLogger(PolicyChangeHandler.class);
         private Config config;
         private IMetadataServiceClient client;
 

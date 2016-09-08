@@ -16,27 +16,17 @@
  */
 package org.apache.eagle.alert.coordinator.provider;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.Publishment;
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
+import com.typesafe.config.Config;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.*;
 
 public class NodataMetadataGenerator {
 
@@ -86,7 +76,7 @@ public class NodataMetadataGenerator {
                 }
             }
             if (columnWithNodataExpression != null) {
-                String streamName = streamDefinition.getStreamId();
+                final String streamName = streamDefinition.getStreamId();
 
                 // create nodata alert aggr stream
                 if (streamDefinitionsMap.containsKey(NODATA_ALERT_AGGR_STREAM)) {
@@ -244,15 +234,15 @@ public class NodataMetadataGenerator {
 
     private PolicyDefinition buildAggregationPolicy(String policyName, String columnName,
                                                     long windowPeriodInSeconds) {
-        PolicyDefinition pd = new PolicyDefinition();
+        final PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
-        String SiddhiQL = String.format(
+        String siddhiQL = String.format(
             "from %s#window.timeBatch(%s sec) select eagle:collectWithDistinct(%s) as hosts, "
                 + "originalStreamName as streamName group by originalStreamName insert into %s",
             NODATA_ALERT_AGGR_STREAM, windowPeriodInSeconds * 2,
             columnName, NODATA_ALERT_AGGR_OUTPUT_STREAM);
-        LOG.info("Generated SiddhiQL {} for stream: {}", SiddhiQL, NODATA_ALERT_AGGR_STREAM);
-        def.setValue(SiddhiQL);
+        LOG.info("Generated SiddhiQL {} for stream: {}", siddhiQL, NODATA_ALERT_AGGR_STREAM);
+        def.setValue(siddhiQL);
         def.setType(NODATA_ALERT_AGGR_OUTPUT_POLICY_TYPE);
         pd.setDefinition(def);
         pd.setInputStreams(Arrays.asList(NODATA_ALERT_AGGR_STREAM));
@@ -304,7 +294,7 @@ public class NodataMetadataGenerator {
     }
 
     private StreamDefinition buildAggregationStream() {
-        StreamDefinition sd = new StreamDefinition();
+        final StreamDefinition sd = new StreamDefinition();
         StreamColumn tsColumn = new StreamColumn();
         tsColumn.setName("timestamp");
         tsColumn.setType(StreamColumn.Type.LONG);
@@ -325,7 +315,7 @@ public class NodataMetadataGenerator {
     }
 
     private StreamDefinition buildAggregationOutputStream() {
-        StreamDefinition sd = new StreamDefinition();
+        final StreamDefinition sd = new StreamDefinition();
         StreamColumn hostColumn = new StreamColumn();
         hostColumn.setName("hosts");
         hostColumn.setType(StreamColumn.Type.STRING);

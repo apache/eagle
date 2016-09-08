@@ -16,22 +16,7 @@
  */
 package org.apache.eagle.alert.coordinator.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
-import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
-import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
-import org.apache.eagle.alert.coordination.model.PublishSpec;
-import org.apache.eagle.alert.coordination.model.RouterSpec;
-import org.apache.eagle.alert.coordination.model.ScheduleState;
-import org.apache.eagle.alert.coordination.model.SpoutSpec;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionStrategy;
-import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
-import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
+import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
@@ -46,12 +31,18 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * @since Apr 26, 2016
  * Given current policy placement, figure out monitor metadata
- * <p>
- * TODO: refactor to eliminate the duplicate of stupid if-notInMap-then-create....
- * FIXME: too many duplicated code logic : check null; add list to map; add to list..
+ *
+ * <p>TODO: refactor to eliminate the duplicate of stupid if-notInMap-then-create....
+ * FIXME: too many duplicated code logic : check null; add list to map; add to list..</p>
+ *
+ * @since Apr 26, 2016
  */
 public class MonitorMetadataGenerator {
 
@@ -127,7 +118,7 @@ public class MonitorMetadataGenerator {
     }
 
     /**
-     * FIXME: add auto-increment version number?
+     * FIXME: add auto-increment version number?.
      */
     private String generateVersion() {
         return "spec_version_" + System.currentTimeMillis();
@@ -245,9 +236,7 @@ public class MonitorMetadataGenerator {
 
     /**
      * Work queue not a root level object, thus we need to build a map from
-     * MonitoredStream for later quick lookup
-     *
-     * @return
+     * MonitoredStream for later quick lookup.
      */
     private Map<String, StreamWorkSlotQueue> buildQueueMap() {
         Map<String, StreamWorkSlotQueue> queueMap = new HashMap<String, StreamWorkSlotQueue>();

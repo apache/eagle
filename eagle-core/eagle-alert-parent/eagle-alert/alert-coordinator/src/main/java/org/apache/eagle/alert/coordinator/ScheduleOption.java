@@ -18,8 +18,7 @@ package org.apache.eagle.alert.coordinator;
 
 /**
  * A runtime option for one schedule processing.
- * <p>
- * Could used for configuration override.
+ * <p>Could used for configuration override.</p>
  *
  * @since Apr 19, 2016
  */

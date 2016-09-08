@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.coordinator.model;
 
+import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,10 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
-
 /**
- * @since Mar 27, 2016
+ * @since Mar 27, 2016.
  */
 public class TopologyUsage {
     // topo info

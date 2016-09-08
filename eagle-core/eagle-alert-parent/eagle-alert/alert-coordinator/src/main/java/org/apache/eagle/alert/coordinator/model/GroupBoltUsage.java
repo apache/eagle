@@ -16,9 +16,8 @@
  */
 package org.apache.eagle.alert.coordinator.model;
 
-
 /**
- * @since Mar 28, 2016
+ * @since Mar 28, 2016.
  */
 public class GroupBoltUsage {
 
@@ -29,10 +28,10 @@ public class GroupBoltUsage {
         this.boltId = boltId;
     }
 
-//    private final Set<String> streams = new HashSet<String>();
-//    private final Map<String, StreamFilter> filters = new HashMap<String, StreamFilter>();
+    //    private final Set<String> streams = new HashSet<String>();
+    //    private final Map<String, StreamFilter> filters = new HashMap<String, StreamFilter>();
 
-//    private final Map<String, List<StreamPartition>> groupByMeta;
+    //    private final Map<String, List<StreamPartition>> groupByMeta;
 
     public double getLoad() {
         return load;
@@ -42,18 +41,18 @@ public class GroupBoltUsage {
         this.load = load;
     }
 
-//    public Set<String> getStreams() {
-//        return streams;
-//    }
-//
-//
-//    public Map<String, StreamFilter> getFilters() {
-//        return filters;
-//    }
+    //    public Set<String> getStreams() {
+    //        return streams;
+    //    }
+    //
+    //
+    //    public Map<String, StreamFilter> getFilters() {
+    //        return filters;
+    //    }
 
-//    public Map<String, List<StreamPartition>> getGroupByMeta() {
-//        return groupByMeta;
-//    }
+    //    public Map<String, List<StreamPartition>> getGroupByMeta() {
+    //        return groupByMeta;
+    //    }
 
     public String getBoltId() {
         return boltId;
