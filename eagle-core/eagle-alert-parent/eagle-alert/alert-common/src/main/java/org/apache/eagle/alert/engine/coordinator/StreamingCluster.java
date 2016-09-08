@@ -16,13 +16,11 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
- * @since Apr 5, 2016
- *
+ * @since Apr 5, 2016.
  */
 public class StreamingCluster {
     public static enum StreamingType {
@@ -38,7 +36,7 @@ public class StreamingCluster {
     @JsonProperty
     private String description;
     /**
-     * key - nimbus for storm
+     * key - nimbus for storm.
      */
     @JsonProperty
     private Map<String, String> deployments;

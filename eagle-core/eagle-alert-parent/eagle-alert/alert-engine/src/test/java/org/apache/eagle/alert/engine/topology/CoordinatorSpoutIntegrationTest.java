@@ -19,9 +19,15 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.io.Serializable;
-import java.util.HashMap;
-
+import backtype.storm.LocalCluster;
+import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.BoltDeclarer;
+import backtype.storm.topology.SpoutDeclarer;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
+import backtype.storm.utils.Utils;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.spout.CorrelationSpout;
 import org.apache.eagle.alert.engine.spout.CreateTopicUtils;
 import org.apache.eagle.alert.utils.AlertConstants;
@@ -33,26 +39,19 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.LocalCluster;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.BoltDeclarer;
-import backtype.storm.topology.SpoutDeclarer;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
-import backtype.storm.utils.Utils;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.io.Serializable;
+import java.util.HashMap;
 
 /**
  * Since 4/28/16.
  */
-@SuppressWarnings({"serial", "unused", "rawtypes"})
+@SuppressWarnings( {"serial", "unused", "rawtypes"})
 public class CoordinatorSpoutIntegrationTest implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(CoordinatorSpoutIntegrationTest.class);
+
     @Ignore  // this test need zookeeper
     @Test
-    public void testConfigNotify() throws Exception{
+    public void testConfigNotify() throws Exception {
         final String topoId = "myTopology";
         int numGroupbyBolts = 2;
         int numTotalGroupbyBolts = 3;
@@ -77,14 +76,14 @@ public class CoordinatorSpoutIntegrationTest implements Serializable {
         int numBolts = config.getInt("correlation.numGroupbyBolts");
         String spoutId = "correlation-spout";
         CorrelationSpout spout = new CorrelationSpout(config, topoId,
-                new MockMetadataChangeNotifyService(topoId, spoutId), numBolts);
+            new MockMetadataChangeNotifyService(topoId, spoutId), numBolts);
         SpoutDeclarer declarer = topoBuilder.setSpout(spoutId, spout);
         declarer.setNumTasks(2);
         for (int i = 0; i < numBolts; i++) {
             TestBolt bolt = new TestBolt();
             BoltDeclarer boltDecl = topoBuilder.setBolt("engineBolt" + i, bolt);
             boltDecl.fieldsGrouping(spoutId,
-                    StreamIdConversion.generateStreamIdBetween(AlertConstants.DEFAULT_SPOUT_NAME, AlertConstants.DEFAULT_ROUTERBOLT_NAME+i), new Fields());
+                StreamIdConversion.generateStreamIdBetween(AlertConstants.DEFAULT_SPOUT_NAME, AlertConstants.DEFAULT_ROUTERBOLT_NAME + i), new Fields());
         }
 
         String topoName = config.getString("correlation.topologyName");

@@ -16,43 +16,42 @@
  */
 package org.apache.eagle.alert.metric.sink;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.codahale.metrics.MetricRegistry;
+import com.typesafe.config.Config;
 import org.elasticsearch.metrics.ElasticsearchReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.MetricRegistry;
-import com.typesafe.config.Config;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ElasticSearchSink implements MetricSink {
     private ElasticsearchReporter reporter = null;
-    private final static Logger LOG = LoggerFactory.getLogger(ElasticSearchSink.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchSink.class);
 
     @Override
     public void prepare(Config config, MetricRegistry registry) {
         LOG.debug("Preparing elasticsearch-sink");
         try {
             ElasticsearchReporter.Builder builder = ElasticsearchReporter.forRegistry(registry);
-            if(config.hasPath("hosts")){
+            if (config.hasPath("hosts")) {
                 List<String> hosts = config.getStringList("hosts");
                 builder.hosts(hosts.toArray(new String[hosts.size()]));
             }
-            if(config.hasPath("index")){
+            if (config.hasPath("index")) {
                 builder.index(config.getString("index"));
             }
             builder.indexDateFormat("yyyy-MM-dd");
-            builder.timestampFieldname(config.hasPath("timestampField")?config.getString("timestampField"):"@timestamp");
+            builder.timestampFieldname(config.hasPath("timestampField") ? config.getString("timestampField") : "@timestamp");
 
-            if(config.hasPath("tags")) {
+            if (config.hasPath("tags")) {
                 builder.additionalFields(config.getConfig("tags").root().unwrapped());
             }
 
             reporter = builder.build();
         } catch (IOException e) {
-            LOG.error(e.getMessage(),e);
+            LOG.error(e.getMessage(), e);
         }
     }
 

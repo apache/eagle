@@ -19,18 +19,16 @@ package org.apache.eagle.alert.coordinator;
 import static org.apache.eagle.alert.coordinator.CoordinatorConstants.CONFIG_ITEM_COORDINATOR;
 import static org.apache.eagle.alert.coordinator.CoordinatorConstants.NUM_OF_ALERT_BOLTS_PER_TOPOLOGY;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * @since Mar 29, 2016
- *
+ * @since Mar 29, 2016.
  */
 public class TopologyMgmtService {
 
@@ -61,21 +59,19 @@ public class TopologyMgmtService {
         boltParallelism = config.getInt(CoordinatorConstants.BOLT_PARALLELISM);
         numberOfBoltsPerTopology = config.getInt(NUM_OF_ALERT_BOLTS_PER_TOPOLOGY);
     }
-    
+
     public int getNumberOfAlertBoltsInTopology() {
         return numberOfBoltsPerTopology;
     }
 
     /**
-     * TODO: call topology mgmt API to create a topology
-     * 
-     * @return
+     * TODO: call topology mgmt API to create a topology.
      */
     public TopologyMeta creatTopology() {
         // TODO
         throw new UnsupportedOperationException("not supported yet!");
     }
-    
+
     public List<TopologyMeta> listTopologies() {
         // TODO
         return Collections.emptyList();

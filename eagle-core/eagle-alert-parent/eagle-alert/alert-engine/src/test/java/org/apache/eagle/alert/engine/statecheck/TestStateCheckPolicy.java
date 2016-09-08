@@ -106,7 +106,7 @@ public class TestStateCheckPolicy {
             mapdata.put("value", 1000.0 + i * 1000.0);
             mapdata.put("colo", "phx");
 
-            StreamEvent event = StreamEvent.Builder().timestamep(time).attributes(mapdata, definition).build();
+            StreamEvent event = StreamEvent.builder().timestamep(time).attributes(mapdata, definition).build();
             PartitionedEvent pEvent = new PartitionedEvent(event, policyDefinition.getPartitionSpec().get(0), 1);
 
             GeneralTopologyContext mock = Mockito.mock(GeneralTopologyContext.class);
@@ -122,12 +122,13 @@ public class TestStateCheckPolicy {
     @NotNull
     private Map<String, StreamDefinition> createStreamMap() throws Exception {
         List<StreamDefinition> streams = mapper.readValue(TestStateCheckPolicy.class.getResourceAsStream("/statecheck/streamdefinitions.json"),
-                new TypeReference<List<StreamDefinition>>() {
-                });
+            new TypeReference<List<StreamDefinition>>() {
+            });
         return streams.stream().collect(Collectors.toMap(StreamDefinition::getStreamId, item -> item));
     }
 
     private static ObjectMapper mapper = new ObjectMapper();
+
     static {
         mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -139,8 +140,8 @@ public class TestStateCheckPolicy {
         spec.setTopologyName("testTopology");
 
         List<PolicyDefinition> policies = mapper.readValue(TestStateCheckPolicy.class.getResourceAsStream("/statecheck/policies.json"),
-                new TypeReference<List<PolicyDefinition>>() {
-                });
+            new TypeReference<List<PolicyDefinition>>() {
+            });
         Assert.assertTrue(policies.size() > 0);
         spec.addBoltPolicy("alertBolt1", policies.get(0).getName());
         spec.getBoltPoliciesMap().put("alertBolt1", new ArrayList<>(policies));

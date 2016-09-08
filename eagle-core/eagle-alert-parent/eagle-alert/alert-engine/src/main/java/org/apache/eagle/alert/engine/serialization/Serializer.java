@@ -21,6 +21,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public interface Serializer<V> {
-    void serialize(V value,DataOutput dataOutput) throws IOException;
+    void serialize(V value, DataOutput dataOutput) throws IOException;
+
     V deserialize(DataInput dataInput) throws IOException;
 }

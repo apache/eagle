@@ -21,8 +21,7 @@ import io.dropwizard.Configuration;
 import javax.validation.Valid;
 
 /**
- * @since Jun 27, 2016
- *
+ * @since Jun 27, 2016.
  */
 public class AlertDropWizardConfiguration extends Configuration {
 

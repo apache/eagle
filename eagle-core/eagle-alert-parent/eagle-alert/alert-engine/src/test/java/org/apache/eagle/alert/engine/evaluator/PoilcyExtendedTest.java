@@ -36,7 +36,7 @@ public class PoilcyExtendedTest {
     @Test
     public void test() throws Exception {
         ArrayNode arrayNode = (ArrayNode)
-                mapper.readTree(PoilcyExtendedTest.class.getResourceAsStream("/extend_policy.json"));
+            mapper.readTree(PoilcyExtendedTest.class.getResourceAsStream("/extend_policy.json"));
         Assert.assertEquals(1, arrayNode.size());
         for (JsonNode node : arrayNode) {
             PolicyDefinition definition = mapper.readValue(node, PolicyDefinition.class);

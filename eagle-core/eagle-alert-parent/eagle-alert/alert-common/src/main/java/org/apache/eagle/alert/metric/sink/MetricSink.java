@@ -16,15 +16,16 @@
  */
 package org.apache.eagle.alert.metric.sink;
 
-
-import java.util.concurrent.TimeUnit;
-
 import com.codahale.metrics.MetricRegistry;
 import com.typesafe.config.Config;
+import java.util.concurrent.TimeUnit;
 
 public interface MetricSink {
     void prepare(Config config, MetricRegistry registry);
-    void start(long period,TimeUnit unit);
+
+    void start(long period, TimeUnit unit);
+
     void stop();
+
     void report();
 }

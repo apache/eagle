@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.alert.engine.evaluator.nodata;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -25,6 +24,7 @@ import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,56 +39,54 @@ import java.util.*;
  * 2. timestamp field: timestamp column
  * 3. wiri safe time window: how long window is good for full set of wiri
  * 4. wisb: full set
- *
  * No data policy definition should include
  * fixed fields and dynamic fields
  * fixed fields are leading fields : windowPeriod, type, numOfFields, f1_name, f2_name
  * dynamic fields depend on wisb type.
- *
  * policy would be like:
  * {
- "name": "noDataAlertPolicy",
- "description": "noDataAlertPolicy",
- "inputStreams": [
- "noDataAlertStream"
- ],
- "outputStreams": [
- "noDataAlertStream_out"
- ],
- "definition": {
- "type": "nodataalert",
- "value": "PT1M,plain,1,host,host1,host2"   // or "value": "PT1M,dynamic,1,host"
- },
- "partitionSpec": [
- {
- "streamId": "noDataAlertStream",
- "type": "GROUPBY"
- }
- ],
- "parallelismHint": 2
- }
-     "name": "noDataAlertPolicy",
-     "description": "noDataAlertPolicy",
-     "inputStreams": [
-        "noDataAlertStream"
-     ],
-     "outputStreams": [
-        "noDataAlertStream_out"
-     ],
-     "definition": {
-        "type": "nodataalert",
-        "value": "PT1M,plain,1,host,host1,host2"   // or "value": "PT1M,dynamic,1,host"
-     },
-     "partitionSpec": [
-     {
-        "streamId": "noDataAlertStream",
-        "type": "GROUPBY"
-     }
-     ],
-     "parallelismHint": 2
-   }
+ * "name": "noDataAlertPolicy",
+ * "description": "noDataAlertPolicy",
+ * "inputStreams": [
+ * "noDataAlertStream"
+ * ],
+ * "outputStreams": [
+ * "noDataAlertStream_out"
+ * ],
+ * "definition": {
+ * "type": "nodataalert",
+ * "value": "PT1M,plain,1,host,host1,host2"   // or "value": "PT1M,dynamic,1,host"
+ * },
+ * "partitionSpec": [
+ * {
+ * "streamId": "noDataAlertStream",
+ * "type": "GROUPBY"
+ * }
+ * ],
+ * "parallelismHint": 2
+ * }
+ * "name": "noDataAlertPolicy",
+ * "description": "noDataAlertPolicy",
+ * "inputStreams": [
+ * "noDataAlertStream"
+ * ],
+ * "outputStreams": [
+ * "noDataAlertStream_out"
+ * ],
+ * "definition": {
+ * "type": "nodataalert",
+ * "value": "PT1M,plain,1,host,host1,host2"   // or "value": "PT1M,dynamic,1,host"
+ * },
+ * "partitionSpec": [
+ * {
+ * "streamId": "noDataAlertStream",
+ * "type": "GROUPBY"
+ * }
+ * ],
+ * "parallelismHint": 2
+ * }
  */
-public class NoDataPolicyHandler implements PolicyStreamHandler{
+public class NoDataPolicyHandler implements PolicyStreamHandler {
     private static final Logger LOG = LoggerFactory.getLogger(NoDataPolicyHandler.class);
     private Map<String, StreamDefinition> sds;
 
@@ -103,9 +101,10 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
     private volatile NoDataWisbType wisbType;
     private volatile DistinctValuesInTimeWindow distinctWindow;
 
-    public NoDataPolicyHandler(Map<String, StreamDefinition> sds){
+    public NoDataPolicyHandler(Map<String, StreamDefinition> sds) {
         this.sds = sds;
     }
+
     @Override
     public void prepare(Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception {
         this.collector = collector;
@@ -113,11 +112,13 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
         this.policyDef = context.getPolicyDefinition();
         List<String> inputStreams = policyDef.getInputStreams();
         // validate inputStreams has to contain only one stream
-        if(inputStreams.size() != 1)
+        if (inputStreams.size() != 1) {
             throw new IllegalArgumentException("policy inputStream size has to be 1 for no data alert");
+        }
         // validate outputStream has to contain only one stream
-        if(policyDef.getOutputStreams().size() != 1)
+        if (policyDef.getOutputStreams().size() != 1) {
             throw new IllegalArgumentException("policy outputStream size has to be 1 for no data alert");
+        }
 
         String is = inputStreams.get(0);
         StreamDefinition sd = sds.get(is);
@@ -129,23 +130,23 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
         distinctWindow = new DistinctValuesInTimeWindow(windowPeriod);
         this.wisbType = NoDataWisbType.valueOf(segments[1]);
         // for provided wisb values, need to parse, for dynamic wisb values, it is computed through a window
-        if(wisbType == NoDataWisbType.provided) {
+        if (wisbType == NoDataWisbType.provided) {
             wisbValues = new NoDataWisbProvidedParser().parse(segments);
         }
         // populate wisb field names
         int numOfFields = Integer.parseInt(segments[2]);
-        for(int i = 3; i < 3+numOfFields; i++){
+        for (int i = 3; i < 3 + numOfFields; i++) {
             String fn = segments[i];
             wisbFieldIndices.add(sd.getColumnIndex(fn));
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings( {"rawtypes", "unchecked"})
     @Override
     public void send(StreamEvent event) throws Exception {
         Object[] data = event.getData();
         List<Object> columnValues = new ArrayList<>();
-        for(int i=0; i<wisbFieldIndices.size(); i++){
+        for (int i = 0; i < wisbFieldIndices.size(); i++) {
             Object o = data[wisbFieldIndices.get(i)];
             // convert value to string
             columnValues.add(o.toString());
@@ -155,18 +156,18 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
 
         LOG.debug("window slided: {}, with wiri: {}", distinctWindow.windowSlided(), distinctWindow.distinctValues());
 
-        if(distinctWindow.windowSlided()) {
+        if (distinctWindow.windowSlided()) {
             compareAndEmit(wisbValues, wiriValues, event);
         }
 
-        if(wisbType == NoDataWisbType.dynamic) {
+        if (wisbType == NoDataWisbType.dynamic) {
             // deep copy
             wisbValues = new HashSet<>(wiriValues);
         }
     }
 
     @SuppressWarnings("rawtypes")
-    private void compareAndEmit(Set wisb, Set wiri, StreamEvent event){
+    private void compareAndEmit(Set wisb, Set wiri, StreamEvent event) {
         // compare with wisbValues if wisbValues are already there for dynamic type
         Collection noDataValues = CollectionUtils.subtract(wisb, wiri);
         LOG.debug("nodatavalues:" + noDataValues + ", wisb: " + wisb + ", wiri: " + wiri);
@@ -177,9 +178,9 @@ public class NoDataPolicyHandler implements PolicyStreamHandler{
         }
     }
 
-    private AlertStreamEvent createAlertEvent(long timestamp, Object[] triggerEvent){
+    private AlertStreamEvent createAlertEvent(long timestamp, Object[] triggerEvent) {
         String is = policyDef.getInputStreams().get(0);
-        StreamDefinition sd = sds.get(is);
+        final StreamDefinition sd = sds.get(is);
 
         AlertStreamEvent event = new AlertStreamEvent();
         event.setTimestamp(timestamp);

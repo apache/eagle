@@ -17,10 +17,9 @@
 package org.apache.eagle.alert.coordination.model.internal;
 
 /**
- * monitor metadata
- * 
- * @since Apr 27, 2016
+ * monitor metadata.
  *
+ * @since Apr 27, 2016
  */
 public class PolicyAssignment {
 

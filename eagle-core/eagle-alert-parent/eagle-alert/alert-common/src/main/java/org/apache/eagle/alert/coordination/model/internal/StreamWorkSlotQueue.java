@@ -16,22 +16,20 @@
  */
 package org.apache.eagle.alert.coordination.model.internal;
 
+import org.apache.eagle.alert.coordination.model.WorkSlot;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.eagle.alert.coordination.model.WorkSlot;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * A work queue for given one monitored stream.
- * 
- * Analog to storm's "tasks for given bolt".
- * 
- * @since Apr 27, 2016
  *
+ * <p>Analog to storm's "tasks for given bolt".
+ *
+ * @since Apr 27, 2016
  */
 public class StreamWorkSlotQueue {
     private String queueId;
@@ -40,15 +38,15 @@ public class StreamWorkSlotQueue {
     private boolean dedicated;
     // some dedicated option, like dedicated userId/tenantId/policyId.
     private Map<String, Object> dedicateOption;
-    
+
     private int numberOfGroupBolts;
-    private Map<String, Integer> topoGroupStartIndex = new HashMap<String, Integer>(); 
+    private Map<String, Integer> topoGroupStartIndex = new HashMap<String, Integer>();
 
     public StreamWorkSlotQueue() {
     }
-    
+
     public StreamWorkSlotQueue(StreamGroup par, boolean isDedicated, Map<String, Object> options,
-            List<WorkSlot> slots) {
+                               List<WorkSlot> slots) {
         this.queueId = par.getStreamId() + System.currentTimeMillis();// simply generate a queue
         this.dedicated = isDedicated;
         dedicateOption = new HashMap<String, Object>();
@@ -81,11 +79,11 @@ public class StreamWorkSlotQueue {
         return workingSlots.size();
     }
 
-//    @org.codehaus.jackson.annotate.JsonIgnore
-//    @JsonIgnore
-//    public void placePolicy(PolicyDefinition pd) {
-//        policies.add(pd.getName());
-//    }
+    //    @org.codehaus.jackson.annotate.JsonIgnore
+    //    @JsonIgnore
+    //    public void placePolicy(PolicyDefinition pd) {
+    //        policies.add(pd.getName());
+    //    }
 
     public int getNumberOfGroupBolts() {
         return numberOfGroupBolts;

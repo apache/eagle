@@ -1,6 +1,4 @@
-package org.apache.eagle.alert.utils;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,21 +14,20 @@ package org.apache.eagle.alert.utils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.utils;
+
 public class StreamIdConversion {
-    public final static String STREAM_ID_TEMPLATE = "stream_%s_to_%s";
-    public final static String STREAM_ID_NUM_TEMPLATE = "stream_%s";
-    public static String generateStreamIdBetween(String sourceId, String targetId){
-        return String.format(STREAM_ID_TEMPLATE,sourceId,targetId);
+    public static final String STREAM_ID_TEMPLATE = "stream_%s_to_%s";
+    public static final String STREAM_ID_NUM_TEMPLATE = "stream_%s";
+
+    public static String generateStreamIdBetween(String sourceId, String targetId) {
+        return String.format(STREAM_ID_TEMPLATE, sourceId, targetId);
     }
 
     /**
-     * Hard-coded stream format in stream_${partitionNum}
-     *
-     *
-     * @param partitionNum
-     * @return
+     * Hard-coded stream format in stream_${partitionNum}.
      */
-    public static String generateStreamIdByPartition(int partitionNum){
-        return String.format(STREAM_ID_NUM_TEMPLATE,partitionNum);
+    public static String generateStreamIdByPartition(int partitionNum) {
+        return String.format(STREAM_ID_NUM_TEMPLATE, partitionNum);
     }
 }

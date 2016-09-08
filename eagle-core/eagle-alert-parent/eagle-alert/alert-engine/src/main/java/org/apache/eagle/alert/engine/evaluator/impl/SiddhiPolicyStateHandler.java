@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class SiddhiPolicyStateHandler extends SiddhiPolicyHandler {
 
-    private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyStateHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SiddhiPolicyStateHandler.class);
 
     public SiddhiPolicyStateHandler(Map<String, StreamDefinition> sds, int index) {
         super(sds, index);
@@ -40,12 +40,14 @@ public class SiddhiPolicyStateHandler extends SiddhiPolicyHandler {
     protected String generateExecutionPlan(PolicyDefinition policyDefinition, Map<String, StreamDefinition> sds) throws StreamDefinitionNotFoundException {
         StringBuilder builder = new StringBuilder();
         PolicyDefinition.Definition stateDefiniton = policyDefinition.getStateDefinition();
-        for(String inputStream : stateDefiniton.getInputStreams()) { // the state stream follow the output stream of the policy definition
+        for (String inputStream : stateDefiniton.getInputStreams()) { // the state stream follow the output stream of the policy definition
             builder.append(SiddhiDefinitionAdapter.buildStreamDefinition(sds.get(inputStream)));
             builder.append("\n");
         }
         builder.append(stateDefiniton.value);
-        if(LOG.isDebugEnabled()) LOG.debug("Generated siddhi state execution plan: {} from definiton: {}", builder.toString(), stateDefiniton);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Generated siddhi state execution plan: {} from definiton: {}", builder.toString(), stateDefiniton);
+        }
         return builder.toString();
     }
 

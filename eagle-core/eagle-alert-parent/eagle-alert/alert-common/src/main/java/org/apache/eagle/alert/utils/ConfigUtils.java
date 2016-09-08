@@ -1,10 +1,4 @@
-package org.apache.eagle.alert.utils;
-
-import java.util.Properties;
-
-import com.typesafe.config.Config;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,12 +14,19 @@ import com.typesafe.config.Config;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.utils;
+
+import com.typesafe.config.Config;
+import java.util.Properties;
+
 public class ConfigUtils {
 
     @SuppressWarnings("serial")
-    public static Properties toProperties(Config config){
-        return new Properties(){{
-            putAll(config.root().unwrapped());
-        }};
+    public static Properties toProperties(Config config) {
+        return new Properties() {
+            {
+                putAll(config.root().unwrapped());
+            }
+        };
     }
 }

@@ -1,10 +1,4 @@
-package org.apache.eagle.alert.metric.source;
-
-import com.codahale.metrics.JvmAttributeGaugeSet;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,11 +14,17 @@ import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class JVMMetricSource implements MetricSource{
+package org.apache.eagle.alert.metric.source;
+
+import com.codahale.metrics.JvmAttributeGaugeSet;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
+
+public class JVMMetricSource implements MetricSource {
 
     private MetricRegistry registry = new MetricRegistry();
 
-    public JVMMetricSource(){
+    public JVMMetricSource() {
         registry.registerAll(new JvmAttributeGaugeSet());
         registry.registerAll(new MemoryUsageGaugeSet());
     }

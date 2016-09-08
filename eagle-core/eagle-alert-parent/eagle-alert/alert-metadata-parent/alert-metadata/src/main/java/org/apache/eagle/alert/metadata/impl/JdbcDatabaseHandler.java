@@ -18,12 +18,12 @@
 
 package org.apache.eagle.alert.metadata.impl;
 
+import org.apache.eagle.alert.metadata.MetadataUtils;
+import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.metadata.MetadataUtils;
-import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +38,12 @@ public class JdbcDatabaseHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(JdbcDatabaseHandler.class);
 
-    private final String INSERT_STATEMENT = "INSERT INTO %s VALUES (?, ?)";
-    private final String DELETE_STATEMENT = "DELETE FROM %s WHERE id=?";
-    private final String UPDATE_STATEMENT = "UPDATE %s set value=? WHERE id=?";
-    private final String QUERY_ALL_STATEMENT = "SELECT value FROM %s";
-    private final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=?";
-    private final String QUERY_ORDERBY_STATEMENT = "SELECT value FROM %s ORDER BY id %s";
+    private static final String INSERT_STATEMENT = "INSERT INTO %s VALUES (?, ?)";
+    private static final String DELETE_STATEMENT = "DELETE FROM %s WHERE id=?";
+    private static final String UPDATE_STATEMENT = "UPDATE %s set value=? WHERE id=?";
+    private static final String QUERY_ALL_STATEMENT = "SELECT value FROM %s";
+    private static final String QUERY_CONDITION_STATEMENT = "SELECT value FROM %s WHERE id=?";
+    private static final String QUERY_ORDERBY_STATEMENT = "SELECT value FROM %s ORDER BY id %s";
 
     private Map<String, String> tblNameMap = new HashMap<>();
 
@@ -98,19 +98,19 @@ public class JdbcDatabaseHandler {
             LOG.info("update {} entities", status);
             connection.commit();
         } catch (SQLException e) {
-            LOG.error(e.getMessage(),e.getCause());
-            if(e.getMessage().toLowerCase().contains("duplicate")){
+            LOG.error(e.getMessage(), e.getCause());
+            if (e.getMessage().toLowerCase().contains("duplicate")) {
                 LOG.info("Detected duplicated entity");
                 try {
                     connection.rollback(savepoint);
                     update(tb, key, value);
                 } catch (SQLException e1) {
                     //e1.printStackTrace();
-                    LOG.warn("Rollback failed",e1);
+                    LOG.warn("Rollback failed", e1);
                 }
             }
         } catch (JsonProcessingException e) {
-            LOG.error("Got JsonProcessingException: {}",e.getMessage(),e.getCause());
+            LOG.error("Got JsonProcessingException: {}", e.getMessage(), e.getCause());
             result.code = OpResult.FAILURE;
             result.message = e.getMessage();
         } finally {
@@ -118,7 +118,7 @@ public class JdbcDatabaseHandler {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    LOG.error("Failed to close statement: {}",e.getMessage(),e.getCause());
+                    LOG.error("Failed to close statement: {}", e.getMessage(), e.getCause());
                 }
             }
         }
@@ -157,7 +157,7 @@ public class JdbcDatabaseHandler {
             ResultSet rs = statement.executeQuery(String.format(QUERY_ALL_STATEMENT, tb));
             while (rs.next()) {
                 //String key = rs.getString(1);
-                String json= rs.getString(1);
+                String json = rs.getString(1);
                 try {
                     T obj = mapper.readValue(json, clz);
                     result.add(obj);
@@ -183,7 +183,7 @@ public class JdbcDatabaseHandler {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 //String key = rs.getString(1);
-                String json= rs.getString(1);
+                String json = rs.getString(1);
                 try {
                     T obj = mapper.readValue(json, clz);
                     result.add(obj);
@@ -219,7 +219,7 @@ public class JdbcDatabaseHandler {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 //String key = rs.getString(1);
-                String json= rs.getString(1);
+                String json = rs.getString(1);
                 try {
                     T obj = mapper.readValue(json, clz);
                     result.add(obj);

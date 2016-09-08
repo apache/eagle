@@ -16,22 +16,7 @@
  */
 package org.apache.eagle.alert.coordinator.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
-import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
-import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
-import org.apache.eagle.alert.coordination.model.PublishSpec;
-import org.apache.eagle.alert.coordination.model.RouterSpec;
-import org.apache.eagle.alert.coordination.model.ScheduleState;
-import org.apache.eagle.alert.coordination.model.SpoutSpec;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionStrategy;
-import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
-import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
+import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
@@ -46,12 +31,18 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * @since Apr 26, 2016
  * Given current policy placement, figure out monitor metadata
- * 
- * TODO: refactor to eliminate the duplicate of stupid if-notInMap-then-create....
- * FIXME: too many duplicated code logic : check null; add list to map; add to list.. 
+ *
+ * <p>TODO: refactor to eliminate the duplicate of stupid if-notInMap-then-create....
+ * FIXME: too many duplicated code logic : check null; add list to map; add to list..</p>
+ *
+ * @since Apr 26, 2016
  */
 public class MonitorMetadataGenerator {
 
@@ -76,15 +67,15 @@ public class MonitorMetadataGenerator {
         Map<String, PublishSpec> publishSpecsMap = generatePublishMetadata();
 
         String uniqueVersion = generateVersion();
-        ScheduleState status = new ScheduleState(uniqueVersion, 
-                topoSpoutSpecsMap, 
-                groupSpecsMap, 
-                alertSpecsMap,
-                publishSpecsMap, 
-                context.getPolicyAssignments().values(), 
-                context.getMonitoredStreams().values(),
-                context.getPolicies().values(),
-                context.getStreamSchemas().values());
+        ScheduleState status = new ScheduleState(uniqueVersion,
+            topoSpoutSpecsMap,
+            groupSpecsMap,
+            alertSpecsMap,
+            publishSpecsMap,
+            context.getPolicyAssignments().values(),
+            context.getMonitoredStreams().values(),
+            context.getPolicies().values(),
+            context.getStreamSchemas().values());
         return status;
     }
 
@@ -127,7 +118,7 @@ public class MonitorMetadataGenerator {
     }
 
     /**
-     * FIXME: add auto-increment version number?
+     * FIXME: add auto-increment version number?.
      */
     private String generateVersion() {
         return "spec_version_" + System.currentTimeMillis();
@@ -159,7 +150,7 @@ public class MonitorMetadataGenerator {
                 spec = new RouterSpec(u.getTopoName());
                 groupSpecsMap.put(u.getTopoName(), spec);
             }
-            
+
             for (MonitoredStream ms : u.getMonitoredStream()) {
                 // mutiple stream on the same policy group : for correlation group case:
                 for (StreamPartition partiton : ms.getStreamGroup().getStreamPartitions()) {
@@ -184,7 +175,7 @@ public class MonitorMetadataGenerator {
 
     private Map<String, SpoutSpec> generateSpoutMonitorMetadata() {
         Map<String, StreamWorkSlotQueue> queueMap = buildQueueMap();
-        
+
         Map<String, SpoutSpec> topoSpoutSpecsMap = new HashMap<String, SpoutSpec>();
         // streamName -> StreamDefinition
         Map<String, StreamDefinition> streamSchemaMap = context.getStreamSchemas();
@@ -207,7 +198,7 @@ public class MonitorMetadataGenerator {
             Map<String, List<StreamRepartitionMetadata>> streamsMap = new HashMap<String, List<StreamRepartitionMetadata>>();
             for (String policyName : usage.getPolicies()) {
                 PolicyDefinition def = context.getPolicies().get(policyName);
-                
+
                 PolicyAssignment assignment = context.getPolicyAssignments().get(policyName);
                 if (assignment == null) {
                     LOG.error(" can not find assignment for policy {} ! ", policyName);
@@ -245,9 +236,7 @@ public class MonitorMetadataGenerator {
 
     /**
      * Work queue not a root level object, thus we need to build a map from
-     * MonitoredStream for later quick lookup
-     * 
-     * @return
+     * MonitoredStream for later quick lookup.
      */
     private Map<String, StreamWorkSlotQueue> buildQueueMap() {
         Map<String, StreamWorkSlotQueue> queueMap = new HashMap<String, StreamWorkSlotQueue>();
@@ -260,7 +249,7 @@ public class MonitorMetadataGenerator {
     }
 
     private void addGroupingStrategy(Map<String, List<StreamRepartitionMetadata>> streamsMap, String stream,
-            StreamDefinition schema, String topicName, String datasourceName, StreamRepartitionStrategy gs) {
+                                     StreamDefinition schema, String topicName, String datasourceName, StreamRepartitionStrategy gs) {
         List<StreamRepartitionMetadata> dsStreamMeta;
         if (streamsMap.containsKey(topicName)) {
             dsStreamMeta = streamsMap.get(topicName);

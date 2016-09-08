@@ -16,18 +16,18 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
-import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * This is actually a data source schema.
- * 
- * @since Apr 5, 2016
  *
+ * @since Apr 5, 2016
  */
-public class StreamDefinition implements Serializable{
+public class StreamDefinition implements Serializable {
     private static final long serialVersionUID = 2352202882328931825L;
     private String streamId;
     private String dataSource;
@@ -37,14 +37,14 @@ public class StreamDefinition implements Serializable{
 
     private List<StreamColumn> columns = new ArrayList<>();
 
-    public String toString(){
+    public String toString() {
         return String.format("StreamDefinition[streamId=%s, dataSource=%s, description=%s, validate=%s, timeseries=%s, columns=%s",
-                streamId,
-                dataSource,
-                description,
-                validate,
-                timeseries,
-                columns);
+            streamId,
+            dataSource,
+            description,
+            validate,
+            timeseries,
+            columns);
     }
 
     public String getStreamId() {
@@ -79,7 +79,7 @@ public class StreamDefinition implements Serializable{
         this.timeseries = timeseries;
     }
 
-    @XmlElementWrapper(name="columns")
+    @XmlElementWrapper(name = "columns")
     @XmlElement(name = "column")
     public List<StreamColumn> getColumns() {
         return columns;
@@ -97,10 +97,12 @@ public class StreamDefinition implements Serializable{
         this.dataSource = dataSource;
     }
 
-    public int getColumnIndex(String column){
-        int i=0;
-        for(StreamColumn col:this.getColumns()){
-            if(col.getName().equals(column)) return i;
+    public int getColumnIndex(String column) {
+        int i = 0;
+        for (StreamColumn col : this.getColumns()) {
+            if (col.getName().equals(column)) {
+                return i;
+            }
             i++;
         }
         return -1;

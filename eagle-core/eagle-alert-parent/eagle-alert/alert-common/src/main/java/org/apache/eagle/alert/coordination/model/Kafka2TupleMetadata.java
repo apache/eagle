@@ -16,15 +16,13 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import com.google.common.base.Objects;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.Map;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import com.google.common.base.Objects;
-
 /**
+ * This metadata model controls how to convert kafka topic into tuple stream.
  * @since Apr 5, 2016
- * this metadata model controls how to convert kafka topic into tuple stream
  */
 public class Kafka2TupleMetadata {
     private String type;
@@ -78,6 +76,7 @@ public class Kafka2TupleMetadata {
     public String getTopic() {
         return this.topic;
     }
+
     public String getSchemeCls() {
         return this.schemeCls;
     }

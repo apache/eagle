@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
 /**
  * Since 5/2/16.
  */
-@SuppressWarnings({"rawtypes", "unused"})
+@SuppressWarnings( {"rawtypes", "unused"})
 public class TestAlertBolt {
 
     public static final String TEST_STREAM = "test-stream";
@@ -66,22 +66,20 @@ public class TestAlertBolt {
     /**
      * Following knowledge is guaranteed in
      *
+     * @throws Exception Add test case: 2 alerts should be generated even if they are very close to each other in timestamp
      * @see org.apache.eagle.alert.engine.runner.AlertBolt#execute{
-     *    if(!routedStreamEvent.getRoute().getTargetComponentId().equals(this.policyGroupEvaluator.getName())){
-     *      throw new IllegalStateException("Got event targeted to "+ routedStreamEvent.getRoute().getTargetComponentId()+" in "+this.policyGroupEvaluator.getName());
-     *    }
+     * if(!routedStreamEvent.getRoute().getTargetComponentId().equals(this.policyGroupEvaluator.getName())){
+     * throw new IllegalStateException("Got event targeted to "+ routedStreamEvent.getRoute().getTargetComponentId()+" in "+this.policyGroupEvaluator.getName());
      * }
-     *
-     * @throws Exception
-     *
-     * Add test case: 2 alerts should be generated even if they are very close to each other in timestamp
+     * }
      */
     @Test
-    public void testAlertBolt() throws Exception{
+    public void testAlertBolt() throws Exception {
         final AtomicInteger alertCount = new AtomicInteger();
         final Semaphore mutex = new Semaphore(0);
-        OutputCollector collector = new OutputCollector(new IOutputCollector(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             int count = 0;
+
             @Override
             public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
                 alertCount.incrementAndGet();
@@ -91,14 +89,22 @@ public class TestAlertBolt {
                 System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", streamId, tuple));
                 return null;
             }
+
             @Override
-            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {            }
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+            }
+
             @Override
-            public void ack(Tuple input) {            }
+            public void ack(Tuple input) {
+            }
+
             @Override
-            public void fail(Tuple input) {            }
+            public void fail(Tuple input) {
+            }
+
             @Override
-            public void reportError(Throwable error) {            }
+            public void reportError(Throwable error) {
+            }
         });
         AlertBolt bolt = createAlertBolt(collector);
 
@@ -143,27 +149,27 @@ public class TestAlertBolt {
 
         // construct event with "value1"
         StreamEvent event1 = new StreamEvent();
-        event1.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:00:00")*1000);
+        event1.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:00:00") * 1000);
         event1.setMetaVersion("version1");
-        Object[] data = new Object[]{"value1"};
+        Object[] data = new Object[] {"value1"};
         event1.setData(data);
         event1.setStreamId(streamId);
-        PartitionedEvent partitionedEvent1 = new PartitionedEvent(event1, sp,1001);
+        PartitionedEvent partitionedEvent1 = new PartitionedEvent(event1, sp, 1001);
 
         // construct another event with "value1"
         StreamEvent event2 = new StreamEvent();
-        event2.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:00:00")*1000);
+        event2.setTimestamp(DateTimeUtil.humanDateToSeconds("2016-01-01 00:00:00") * 1000);
         event2.setMetaVersion("version1");
-        data = new Object[]{"value2"};
+        data = new Object[] {"value2"};
         event2.setData(data);
         event2.setStreamId(streamId);
-        PartitionedEvent partitionedEvent2 = new PartitionedEvent(event2, sp,1001);
+        PartitionedEvent partitionedEvent2 = new PartitionedEvent(event2, sp, 1001);
 
         Tuple input = new TupleImpl(context, Collections.singletonList(partitionedEvent1), taskId, "default");
         Tuple input2 = new TupleImpl(context, Collections.singletonList(partitionedEvent2), taskId, "default");
         bolt.execute(input);
         bolt.execute(input2);
-        Assert.assertTrue("Timeout to acquire mutex in 5s",mutex.tryAcquire(2, 5, TimeUnit.SECONDS));
+        Assert.assertTrue("Timeout to acquire mutex in 5s", mutex.tryAcquire(2, 5, TimeUnit.SECONDS));
         Assert.assertEquals(2, alertCount.get());
         bolt.cleanup();
     }
@@ -183,8 +189,9 @@ public class TestAlertBolt {
     @Test
     public void testMetadataMismatch() throws Exception {
         AtomicInteger failedCount = new AtomicInteger();
-        OutputCollector collector = new OutputCollector(new IOutputCollector(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             int count = 0;
+
             @Override
             public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
                 Assert.assertEquals("testAlertStream", tuple.get(0));
@@ -192,14 +199,23 @@ public class TestAlertBolt {
                 System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", streamId, tuple));
                 return null;
             }
+
             @Override
-            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {            }
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+            }
+
             @Override
-            public void ack(Tuple input) {            }
+            public void ack(Tuple input) {
+            }
+
             @Override
-            public void fail(Tuple input) {      failedCount.incrementAndGet();      }
+            public void fail(Tuple input) {
+                failedCount.incrementAndGet();
+            }
+
             @Override
-            public void reportError(Throwable error) {            }
+            public void reportError(Throwable error) {
+            }
         });
         AlertBolt bolt = createAlertBolt(collector);
 
@@ -267,8 +283,9 @@ public class TestAlertBolt {
     @Test
     public void testMetaversionConflict() throws Exception {
         AtomicInteger failedCount = new AtomicInteger();
-        OutputCollector collector = new OutputCollector(new IOutputCollector(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             int count = 0;
+
             @Override
             public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
                 Assert.assertEquals("testAlertStream", tuple.get(0));
@@ -276,14 +293,23 @@ public class TestAlertBolt {
                 System.out.println(String.format("collector received: [streamId=[%s], tuple=[%s] ", streamId, tuple));
                 return null;
             }
+
             @Override
-            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {            }
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+            }
+
             @Override
-            public void ack(Tuple input) {            }
+            public void ack(Tuple input) {
+            }
+
             @Override
-            public void fail(Tuple input) {      failedCount.incrementAndGet();      }
+            public void fail(Tuple input) {
+                failedCount.incrementAndGet();
+            }
+
             @Override
-            public void reportError(Throwable error) {            }
+            public void reportError(Throwable error) {
+            }
         });
         AlertBolt bolt = createAlertBolt(collector);
 
@@ -374,21 +400,25 @@ public class TestAlertBolt {
             }
 
             @Override
-            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {}
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+            }
 
             @Override
-            public void ack(Tuple input) {}
+            public void ack(Tuple input) {
+            }
 
             @Override
-            public void fail(Tuple input) {}
+            public void fail(Tuple input) {
+            }
 
             @Override
-            public void reportError(Throwable error) {}
+            public void reportError(Throwable error) {
+            }
         });
         AlertBolt bolt = createAlertBolt(collector);
 
         boltSpecs.getBoltPoliciesMap().put(bolt.getBoltId(), Arrays.asList(def));
-        boltSpecs.setVersion("spec_"+System.currentTimeMillis());
+        boltSpecs.setVersion("spec_" + System.currentTimeMillis());
         // stream def map
         Map<String, StreamDefinition> sds = new HashMap();
         StreamDefinition sdTest = new StreamDefinition();

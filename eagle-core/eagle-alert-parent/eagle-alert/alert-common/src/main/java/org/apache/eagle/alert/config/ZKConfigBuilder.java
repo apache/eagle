@@ -25,7 +25,7 @@ import com.typesafe.config.Config;
  * Since 4/28/16.
  */
 public class ZKConfigBuilder {
-    public static ZKConfig getZKConfig(Config config){
+    public static ZKConfig getZKConfig(Config config) {
         ZKConfig zkConfig = new ZKConfig();
         zkConfig.zkQuorum = config.getString("zkConfig.zkQuorum");
         zkConfig.zkRoot = config.getString("zkConfig.zkRoot");
