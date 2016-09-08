@@ -18,6 +18,13 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
@@ -63,19 +70,21 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             LOG.warn("KafkaProducer is null due to the incorrect configurations");
             return;
         }
-        event = dedup(event);
-        if (event == null) {
+        List<AlertStreamEvent> outputEvents = dedup(event);
+        if(outputEvents == null) {
             return;
         }
         PublishStatus status = new PublishStatus();
         try {
-            ProducerRecord record = createRecord(event, topic);
-            if (record == null) {
-                LOG.error(" Alert serialize return null, ignored message! ");
-                return;
+            for (AlertStreamEvent outputEvent : outputEvents) {
+            	ProducerRecord record = createRecord(outputEvent, topic);
+                if (record == null) {
+                    LOG.error(" Alert serialize return null, ignored message! ");
+                    return;
+                }
+                Future<?> future = producer.send(record);
+                future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             }
-            Future<?> future = producer.send(record);
-            future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             status.successful = true;
             status.errorMessage = "";
             if (LOG.isDebugEnabled()) {

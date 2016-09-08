@@ -21,6 +21,7 @@
 package org.apache.eagle.alert.engine.publisher.impl;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.storm.guava.base.Joiner;
 
 import java.util.HashMap;
 
@@ -66,9 +67,15 @@ public class EventUniq {
     public int hashCode() {
         HashCodeBuilder builder = new HashCodeBuilder().append(streamId).append(policyId);
 
-        if (customFieldValues != null) {
-            builder.append(customFieldValues);
-        }
-        return builder.build();
-    }
+		if (customFieldValues != null){
+			builder.append(customFieldValues);
+		}
+		return builder.build();
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("EventUniq[streamId: %s, policyId: %s, timestamp: %s, customFieldValues: %s]", 
+				streamId, policyId, timestamp, Joiner.on(",").withKeyValueSeparator(">").join(customFieldValues));
+	}
 }
