@@ -16,19 +16,17 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import backtype.storm.utils.Utils;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.UnitTopologyMain;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import backtype.storm.utils.Utils;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Since 6/29/16.
@@ -51,8 +49,9 @@ public class Integration4NoDataAlert {
             kafka.shutdown();
         }
     }
+
     @Test
-    public void testTriggerNoData() throws Exception{
+    public void testTriggerNoData() throws Exception {
         System.setProperty("config.resource", "/nodata/application-nodata.conf");
         ConfigFactory.invalidateCaches();
         Config config = ConfigFactory.load();
@@ -71,9 +70,10 @@ public class Integration4NoDataAlert {
         });
 
         // wait 20 seconds for topology to bring up
-        try{
+        try {
             Thread.sleep(20000);
-        }catch(Exception ex){}
+        } catch (Exception ex) {
+        }
 
         // send mock data
         executors.submit(() -> {

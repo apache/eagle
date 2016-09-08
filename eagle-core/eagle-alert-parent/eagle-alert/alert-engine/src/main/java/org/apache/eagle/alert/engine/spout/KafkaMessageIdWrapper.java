@@ -26,13 +26,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class KafkaMessageIdWrapper {
     public Object id;
-    public KafkaMessageIdWrapper(Object o){
+
+    public KafkaMessageIdWrapper(Object o) {
         this.id = o;
     }
-    public String topic;
-    private final static ObjectMapper objectMapper = new ObjectMapper();
 
-    public String toString(){
+    public String topic;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public String toString() {
         try {
             return String.format("KafkaMessageIdWrapper[topic=%s, id=%s]", topic, objectMapper.writeValueAsString(id));
         } catch (JsonProcessingException e) {

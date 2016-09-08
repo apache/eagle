@@ -16,10 +16,11 @@
  */
 package org.apache.eagle.alert.engine.sorter;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
-
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.eagle.alert.engine.mock.MockSampleMetadataFactory;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
@@ -31,115 +32,120 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ScheduledReporter;
-import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
-import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 @Ignore("Ignore automatic heavy benchmark test")
 public class StreamWindowBenchmarkTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(StreamWindowBenchmarkTest.class);
+
     public void sendDESCOrderedEventsToWindow(StreamWindow window, StreamWindowRepository.StorageType storageType, int num) {
-        LOGGER.info("Sending {} events to {} ({})",num,window.getClass().getSimpleName(),storageType);
+        LOGGER.info("Sending {} events to {} ({})", num, window.getClass().getSimpleName(), storageType);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        int i=0;
-        while(i<num) {
-            PartitionedEvent event = MockSampleMetadataFactory.createPartitionedEventGroupedByName("sampleStream_1",(window.startTime()+i));
+        int i = 0;
+        while (i < num) {
+            PartitionedEvent event = MockSampleMetadataFactory.createPartitionedEventGroupedByName("sampleStream_1", (window.startTime() + i));
             window.add(event);
             i++;
         }
         stopWatch.stop();
-        performanceReport.put(num+"\tInsertTime\t"+storageType,stopWatch.getTime());
-        LOGGER.info("Inserted {} events in {} ms",num,stopWatch.getTime());
+        performanceReport.put(num + "\tInsertTime\t" + storageType, stopWatch.getTime());
+        LOGGER.info("Inserted {} events in {} ms", num, stopWatch.getTime());
         stopWatch.reset();
         stopWatch.start();
         window.flush();
         stopWatch.stop();
-        performanceReport.put(num+"\tReadTime\t"+storageType,stopWatch.getTime());
+        performanceReport.put(num + "\tReadTime\t" + storageType, stopWatch.getTime());
     }
 
     private ScheduledReporter metricReporter;
-    private Map<String,Long> performanceReport;
+    private Map<String, Long> performanceReport;
+
     @Before
-    public void setUp(){
+    public void setUp() {
         final MetricRegistry metrics = new MetricRegistry();
         metrics.registerAll(new MemoryUsageGaugeSet());
         metrics.registerAll(new GarbageCollectorMetricSet());
         metricReporter = ConsoleReporter.forRegistry(metrics)
-                .filter((name, metric) -> name.matches("(.*heap|total).(usage|used)"))
+            .filter((name, metric) -> name.matches("(.*heap|total).(usage|used)"))
 //                .withLoggingLevel(Slf4jReporter.LoggingLevel.DEBUG)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build();
-        metricReporter.start(60,TimeUnit.SECONDS);
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .build();
+        metricReporter.start(60, TimeUnit.SECONDS);
         performanceReport = new TreeMap<>();
     }
 
     @After
-    public void after(){
+    public void after() {
         StringBuilder sb = new StringBuilder();
-        for(Map.Entry<String,Long> entry:performanceReport.entrySet()){
-            sb.append(String.format("%-40s\t%s\n",entry.getKey(),entry.getValue()));
+        for (Map.Entry<String, Long> entry : performanceReport.entrySet()) {
+            sb.append(String.format("%-40s\t%s\n", entry.getKey(), entry.getValue()));
         }
-        LOGGER.info("\n===== Benchmark Result Report =====\n\n{}",sb.toString());
+        LOGGER.info("\n===== Benchmark Result Report =====\n\n{}", sb.toString());
     }
 
     private final long start = DateTimeUtil.humanDateToMillisecondsWithoutException("2016-05-04 00:00:00,000");
     private final long stop = DateTimeUtil.humanDateToMillisecondsWithoutException("2016-05-05 00:00:00,000");
-    private final long margin = (stop - start)/3;
+    private final long margin = (stop - start) / 3;
 
-    private void benchmarkTest(StreamWindow window, StreamWindowRepository.StorageType storageType){
+    private void benchmarkTest(StreamWindow window, StreamWindowRepository.StorageType storageType) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        LOGGER.info("\n===== Benchmark Test for {} ({}) =====",window.getClass().getSimpleName(),storageType);
+        LOGGER.info("\n===== Benchmark Test for {} ({}) =====", window.getClass().getSimpleName(), storageType);
         metricReporter.report();
-        sendDESCOrderedEventsToWindow(window,storageType,1000);
+        sendDESCOrderedEventsToWindow(window, storageType, 1000);
         metricReporter.report();
-        sendDESCOrderedEventsToWindow(window,storageType,10000);
+        sendDESCOrderedEventsToWindow(window, storageType, 10000);
         metricReporter.report();
-        sendDESCOrderedEventsToWindow(window,storageType,100000);
+        sendDESCOrderedEventsToWindow(window, storageType, 100000);
         metricReporter.report();
-        sendDESCOrderedEventsToWindow(window,storageType,1000000);
+        sendDESCOrderedEventsToWindow(window, storageType, 1000000);
         metricReporter.report();
         stopWatch.stop();
-        LOGGER.info("\n===== Finished in total {} ms =====\n",stopWatch.getTime());
+        LOGGER.info("\n===== Finished in total {} ms =====\n", stopWatch.getTime());
     }
 
-    @Test @Ignore
-    public void testStreamWindowBenchmarkMain(){
+    @Test
+    @Ignore
+    public void testStreamWindowBenchmarkMain() {
         testStreamSortedWindowOnHeap();
         testStreamSortedWindowInSerializedMemory();
         testStreamSortedWindowOffHeap();
         testStreamSortedWindowFile();
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testStreamSortedWindowOnHeap() {
-        StreamWindow window = StreamWindowRepository.getSingletonInstance().createWindow(start,stop,margin,StreamWindowRepository.StorageType.ONHEAP);
-        benchmarkTest(window,StreamWindowRepository.StorageType.ONHEAP);
+        StreamWindow window = StreamWindowRepository.getSingletonInstance().createWindow(start, stop, margin, StreamWindowRepository.StorageType.ONHEAP);
+        benchmarkTest(window, StreamWindowRepository.StorageType.ONHEAP);
         window.close();
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testStreamSortedWindowInSerializedMemory() {
-        StreamWindow window = StreamWindowRepository.getSingletonInstance().createWindow(start,stop,margin,StreamWindowRepository.StorageType.MEMORY);
-        benchmarkTest(window,StreamWindowRepository.StorageType.MEMORY);
+        StreamWindow window = StreamWindowRepository.getSingletonInstance().createWindow(start, stop, margin, StreamWindowRepository.StorageType.MEMORY);
+        benchmarkTest(window, StreamWindowRepository.StorageType.MEMORY);
         window.close();
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testStreamSortedWindowOffHeap() {
-        StreamWindow window = StreamWindowRepository.getSingletonInstance().createWindow(start,stop,margin,StreamWindowRepository.StorageType.DIRECT_MEMORY);
-        benchmarkTest(window,StreamWindowRepository.StorageType.DIRECT_MEMORY);
+        StreamWindow window = StreamWindowRepository.getSingletonInstance().createWindow(start, stop, margin, StreamWindowRepository.StorageType.DIRECT_MEMORY);
+        benchmarkTest(window, StreamWindowRepository.StorageType.DIRECT_MEMORY);
         window.close();
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testStreamSortedWindowFile() {
-        StreamWindow window = StreamWindowRepository.getSingletonInstance().createWindow(start,stop,margin,StreamWindowRepository.StorageType.FILE_RAF);
-        benchmarkTest(window,StreamWindowRepository.StorageType.FILE_RAF);
+        StreamWindow window = StreamWindowRepository.getSingletonInstance().createWindow(start, stop, margin, StreamWindowRepository.StorageType.FILE_RAF);
+        benchmarkTest(window, StreamWindowRepository.StorageType.FILE_RAF);
         window.close();
     }
 }

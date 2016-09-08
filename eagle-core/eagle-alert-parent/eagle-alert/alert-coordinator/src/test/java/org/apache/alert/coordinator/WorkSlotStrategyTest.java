@@ -38,9 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
  * @since Apr 27, 2016
- *
  */
 public class WorkSlotStrategyTest {
 
@@ -54,7 +52,7 @@ public class WorkSlotStrategyTest {
         partition.setType(StreamPartition.Type.GLOBAL);
         partition.setStreamId("s1");
         partition.setColumns(Arrays.asList("f1", "f2"));
-        
+
         StreamGroup group = new StreamGroup();
         group.addStreamPartition(partition);
 
@@ -148,7 +146,7 @@ public class WorkSlotStrategyTest {
             Assert.assertEquals(5, queue.getWorkingSlots().size());
             Assert.assertEquals(2, context.getTopologies().size());
             Assert.assertEquals(2, context.getTopologyUsages().size());
-            
+
             String topo2 = queue.getWorkingSlots().get(0).getTopologyName();
             String bolt2 = queue.getWorkingSlots().get(0).getBoltId();
             for (WorkSlot ws : queue.getWorkingSlots()) {

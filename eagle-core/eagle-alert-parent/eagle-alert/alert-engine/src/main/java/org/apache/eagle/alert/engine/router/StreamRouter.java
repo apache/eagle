@@ -1,12 +1,4 @@
-package org.apache.eagle.alert.engine.router;
-
-import java.io.Serializable;
-
-import org.apache.eagle.alert.engine.PartitionedEventCollector;
-import org.apache.eagle.alert.engine.StreamContext;
-import org.apache.eagle.alert.engine.model.PartitionedEvent;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -22,9 +14,20 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.engine.router;
+
+import org.apache.eagle.alert.engine.PartitionedEventCollector;
+import org.apache.eagle.alert.engine.StreamContext;
+import org.apache.eagle.alert.engine.model.PartitionedEvent;
+
+import java.io.Serializable;
+
 public interface StreamRouter extends StreamSortSpecListener, Serializable {
     void prepare(StreamContext context, PartitionedEventCollector outputCollector);
+
     void nextEvent(PartitionedEvent event);
+
     String getName();
+
     void close();
 }

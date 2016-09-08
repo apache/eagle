@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.alert.engine.nodata;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
@@ -33,6 +29,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Since 6/29/16.
  */
@@ -42,13 +42,13 @@ public class TestNoDataPolicyHandler {
     private static final String outputStream = "testOutputStream";
 
     @Test
-    public void test() throws Exception{
+    public void test() throws Exception {
         test(buildPolicyDef_provided());
         test(buildPolicyDef_dynamic());
     }
 
     @SuppressWarnings("unchecked")
-    public void test(PolicyDefinition pd) throws Exception{
+    public void test(PolicyDefinition pd) throws Exception {
         Map<String, StreamDefinition> sds = new HashMap<>();
         StreamDefinition sd = buildStreamDef();
         sds.put("testInputStream", sd);
@@ -71,17 +71,17 @@ public class TestNoDataPolicyHandler {
     }
 
     @SuppressWarnings("rawtypes")
-    private static class TestCollector implements Collector{
+    private static class TestCollector implements Collector {
         @Override
         public void emit(Object o) {
-            AlertStreamEvent e = (AlertStreamEvent)o;
+            AlertStreamEvent e = (AlertStreamEvent) o;
             Object[] data = e.getData();
             Assert.assertEquals("host2", data[1]);
             LOG.info(e.toString());
         }
     }
 
-    private PolicyDefinition buildPolicyDef_provided(){
+    private PolicyDefinition buildPolicyDef_provided() {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
         def.setValue("PT1M,provided,1,host,host1,host2");
@@ -93,7 +93,7 @@ public class TestNoDataPolicyHandler {
         return pd;
     }
 
-    private PolicyDefinition buildPolicyDef_dynamic(){
+    private PolicyDefinition buildPolicyDef_dynamic() {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
         def.setValue("PT1M,dynamic,1,host");
@@ -104,7 +104,8 @@ public class TestNoDataPolicyHandler {
         pd.setName("nodataalert-test");
         return pd;
     }
-    private StreamDefinition buildStreamDef(){
+
+    private StreamDefinition buildStreamDef() {
         StreamDefinition sd = new StreamDefinition();
         StreamColumn tsColumn = new StreamColumn();
         tsColumn.setName("timestamp");
@@ -124,9 +125,9 @@ public class TestNoDataPolicyHandler {
         return sd;
     }
 
-    private StreamEvent buildStreamEvt(long ts, String host, double value){
+    private StreamEvent buildStreamEvt(long ts, String host, double value) {
         StreamEvent e = new StreamEvent();
-        e.setData(new Object[]{ts, host, value});
+        e.setData(new Object[] {ts, host, value});
         e.setStreamId(inputStream);
         e.setTimestamp(ts);
         return e;

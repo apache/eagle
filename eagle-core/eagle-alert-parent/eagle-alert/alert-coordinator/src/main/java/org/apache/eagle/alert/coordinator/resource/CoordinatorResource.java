@@ -16,24 +16,24 @@
  */
 package org.apache.eagle.alert.coordinator.resource;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordinator.Coordinator;
 import org.apache.eagle.alert.coordinator.ScheduleOption;
 import org.apache.eagle.alert.utils.JsonUtils;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
 /**
  * This is to provide API access even we don't have ZK as intermediate access.
  * FIXME : more elogant status code
- * 
+ *
  * @since Mar 24, 2016 <br/>
  */
 @Path("/coordinator")
-@Produces({ "application/json" })
+@Produces( {"application/json"})
 public class CoordinatorResource {
 
     // sprint config here?
@@ -65,7 +65,7 @@ public class CoordinatorResource {
     public void disablePeriodicallyBuild() {
         alertCoordinator.disablePeriodicallyBuild();
     }
-    
+
     @SuppressWarnings("static-access")
     @GET
     @Path("/periodicForceBuildState")
@@ -74,9 +74,7 @@ public class CoordinatorResource {
     }
 
     /**
-     * Manually update the topology usages, for administration
-     * 
-     * @return
+     * Manually update the topology usages, for administration.
      */
     @POST
     @Path("/refreshUsages")

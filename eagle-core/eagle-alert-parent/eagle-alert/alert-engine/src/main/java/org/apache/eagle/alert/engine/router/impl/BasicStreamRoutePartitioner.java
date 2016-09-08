@@ -16,17 +16,17 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.router.StreamRoute;
 import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
     private final List<String> outputComponentIds;
@@ -41,7 +41,7 @@ public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
 
     @Override
     public List<StreamRoute> partition(StreamEvent event) {
-        switch (this.streamPartition.getType()){
+        switch (this.streamPartition.getType()) {
             case GLOBAL:
                 return routeToAll(event);
             case GROUPBY:
@@ -52,19 +52,19 @@ public class BasicStreamRoutePartitioner implements StreamRoutePartitioner {
     }
 
     protected List<StreamRoute> routeByGroupByKey(StreamEvent event) {
-        int partitionKey = new HashCodeBuilder().append(event.getData(streamDefinition,this.streamPartition.getColumns())).build();
+        int partitionKey = new HashCodeBuilder().append(event.getData(streamDefinition, this.streamPartition.getColumns())).build();
         String selectedOutputStream = outputComponentIds.get(Math.abs(partitionKey) % this.outputComponentIds.size());
         return Collections.singletonList(new StreamRoute(selectedOutputStream, partitionKey, StreamPartition.Type.GROUPBY));
     }
 
     protected List<StreamRoute> routeByShuffle(StreamEvent event) {
         long random = System.currentTimeMillis();
-        int hash = Math.abs((int)random);
-        return Arrays.asList(new StreamRoute(outputComponentIds.get(hash % outputComponentIds.size()),-1,StreamPartition.Type.SHUFFLE));
+        int hash = Math.abs((int) random);
+        return Arrays.asList(new StreamRoute(outputComponentIds.get(hash % outputComponentIds.size()), -1, StreamPartition.Type.SHUFFLE));
     }
 
     protected List<StreamRoute> routeToAll(StreamEvent event) {
-        if(_globalRoutingKeys!=null) {
+        if (_globalRoutingKeys != null) {
             _globalRoutingKeys = new ArrayList<>();
             for (String targetId : outputComponentIds) {
                 _globalRoutingKeys.add(new StreamRoute(targetId, -1, StreamPartition.Type.GLOBAL));

@@ -1,10 +1,4 @@
-package org.apache.eagle.alert.engine.evaluator;
-
-import backtype.storm.metric.api.MultiCountMetric;
-import com.typesafe.config.Config;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,6 +14,13 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.apache.eagle.alert.engine.evaluator;
+
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import backtype.storm.metric.api.MultiCountMetric;
+import com.typesafe.config.Config;
+
 public class PolicyHandlerContext {
     private PolicyDefinition policyDefinition;
     private PolicyGroupEvaluator policyEvaluator;

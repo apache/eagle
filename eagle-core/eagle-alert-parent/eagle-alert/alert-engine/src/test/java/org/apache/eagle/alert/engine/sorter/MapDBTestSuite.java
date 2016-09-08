@@ -25,19 +25,19 @@ import org.mapdb.Serializer;
 
 public class MapDBTestSuite {
     @Test
-    public void testOnHeapDB(){
+    public void testOnHeapDB() {
         DB db = DBMaker.heapDB().make();
-        BTreeMap<Long,String> map = db.treeMap("btree").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).create();
-        Assert.assertFalse(map.putIfAbsentBoolean(1L,"val_1"));
-        Assert.assertTrue(map.putIfAbsentBoolean(1L,"val_2"));
-        Assert.assertTrue(map.putIfAbsentBoolean(1L,"val_3"));
-        Assert.assertFalse(map.putIfAbsentBoolean(2L,"val_4"));
+        BTreeMap<Long, String> map = db.treeMap("btree").keySerializer(Serializer.LONG).valueSerializer(Serializer.STRING).create();
+        Assert.assertFalse(map.putIfAbsentBoolean(1L, "val_1"));
+        Assert.assertTrue(map.putIfAbsentBoolean(1L, "val_2"));
+        Assert.assertTrue(map.putIfAbsentBoolean(1L, "val_3"));
+        Assert.assertFalse(map.putIfAbsentBoolean(2L, "val_4"));
 
-        Assert.assertEquals("val_1",map.get(1L));
-        Assert.assertEquals("val_4",map.get(2L));
+        Assert.assertEquals("val_1", map.get(1L));
+        Assert.assertEquals("val_4", map.get(2L));
 
-        Assert.assertTrue(map.replace(2L,"val_4","val_5"));
-        Assert.assertEquals("val_5",map.get(2L));
+        Assert.assertTrue(map.replace(2L, "val_4", "val_5"));
+        Assert.assertEquals("val_5", map.get(2L));
 
         map.close();
         db.close();

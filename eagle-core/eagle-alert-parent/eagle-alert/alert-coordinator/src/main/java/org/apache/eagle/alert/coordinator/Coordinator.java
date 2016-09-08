@@ -16,15 +16,6 @@
  */
 package org.apache.eagle.alert.coordinator;
 
-import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.eagle.alert.config.ConfigBusProducer;
 import org.apache.eagle.alert.config.ConfigValue;
 import org.apache.eagle.alert.config.ZKConfig;
@@ -37,32 +28,43 @@ import org.apache.eagle.alert.coordinator.trigger.PolicyChangeListener;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Stopwatch;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TODO: To simply avoid concurrent call of schdule, make the schedule as synchronized. This is not safe when multiple
  * instance, consider a distributed lock for prevent multiple schedule happen concurrently.
+ *
+ * <p>Coordinator is a standalone java application, which listens to policy changes and use schedule
+ * algorithm to distribute policies 1) reacting to shutdown events 2) start non-daemon thread to pull policies
+ * and figure out if polices are changed</p>
  * 
- * @since Mar 24, 2016 Coordinator is a standalone java application, which listens to policy changes and use schedule
- *        algorithm to distribute policies 1) reacting to shutdown events 2) start non-daemon thread to pull policies
- *        and figure out if polices are changed
+ * @since Mar 24, 2016 
  */
 public class Coordinator {
 
     private static final Logger LOG = LoggerFactory.getLogger(Coordinator.class);
 
     private static final String COORDINATOR = "coordinator";
+    
     /**
-     * {@link ZKMetadataChangeNotifyService}
-     *  /alert/{topologyName}/spout
-     *                  /router
-     *                  /alert
-     *                  /publisher
+     * /alert/{topologyName}/spout
+     * /router
+     * /alert
+     * /publisher
+     * .
      */
     private static final String ZK_ALERT_CONFIG_SPOUT = "{0}/spout";
     private static final String ZK_ALERT_CONFIG_ROUTER = "{0}/router";
@@ -70,16 +72,16 @@ public class Coordinator {
     private static final String ZK_ALERT_CONFIG_PUBLISHER = "{0}/publisher";
 
 
-    private final static String METADATA_SERVICE_HOST = "metadataService.host";
-    private final static String METADATA_SERVICE_PORT = "metadataService.port";
-    private final static String METADATA_SERVICE_CONTEXT = "metadataService.context";
-    private final static String DYNAMIC_POLICY_LOADER_INIT_MILLS = "metadataDynamicCheck.initDelayMillis";
-    private final static String DYNAMIC_POLICY_LOADER_DELAY_MILLS = "metadataDynamicCheck.delayMillis";
-    
-    private final static String GREEDY_SCHEDULER_ZK_PATH = "/alert/greedy/leader";
-    private final static String POLICY_SCHEDULER_ZK_PATH = "/alert/policy/leader";
-    private final static int ACQUIRE_LOCK_WAIT_INTERVAL_MS = 2000;
-    private final static int ACQUIRE_LOCK_MAX_RETRIES_TIMES = 90; //about 9 minutes
+    private static final String METADATA_SERVICE_HOST = "metadataService.host";
+    private static final String METADATA_SERVICE_PORT = "metadataService.port";
+    private static final String METADATA_SERVICE_CONTEXT = "metadataService.context";
+    private static final String DYNAMIC_POLICY_LOADER_INIT_MILLS = "metadataDynamicCheck.initDelayMillis";
+    private static final String DYNAMIC_POLICY_LOADER_DELAY_MILLS = "metadataDynamicCheck.delayMillis";
+
+    private static final String GREEDY_SCHEDULER_ZK_PATH = "/alert/greedy/leader";
+    private static final String POLICY_SCHEDULER_ZK_PATH = "/alert/policy/leader";
+    private static final int ACQUIRE_LOCK_WAIT_INTERVAL_MS = 2000;
+    private static final int ACQUIRE_LOCK_MAX_RETRIES_TIMES = 90; //about 9 minutes
 
     private volatile ScheduleState currentState = null;
     private final ConfigBusProducer producer;
@@ -103,58 +105,60 @@ public class Coordinator {
     }
 
     public synchronized ScheduleState schedule(ScheduleOption option) {
-    	ScheduleZkState scheduleZkState = new ScheduleZkState();
-    	ExclusiveExecutor.Runnable exclusiveRunnable = new ExclusiveExecutor.Runnable() {
-			@Override
-			public void run() throws Exception {
-				scheduleZkState.scheduleAcquired = true;
-				
-				while (!scheduleZkState.scheduleCompleted) {
-					Thread.sleep(ACQUIRE_LOCK_WAIT_INTERVAL_MS);
-				}
-			}
-    	};
-    	ExclusiveExecutor.execute(GREEDY_SCHEDULER_ZK_PATH, exclusiveRunnable);
-    	int waitMaxTimes = 0;
-    	while (waitMaxTimes < ACQUIRE_LOCK_MAX_RETRIES_TIMES) { //about 3 minutes waiting
-    		if (!scheduleZkState.scheduleAcquired) {
-    			waitMaxTimes ++;
-    			try {
-					Thread.sleep(ACQUIRE_LOCK_WAIT_INTERVAL_MS);
-				} catch (InterruptedException e) {}
-    			continue;
-    		}
-    		
-    		ScheduleState state = null;
-    		try {
-    			Stopwatch watch = Stopwatch.createStarted();
-    	        IScheduleContext context = new ScheduleContextBuilder(config, client).buildContext();
-    	        TopologyMgmtService mgmtService = new TopologyMgmtService();
-    	        IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
-    	
-    	        scheduler.init(context, mgmtService);
-    	        state = scheduler.schedule(option);
-    	        
-    	        long scheduleTime = watch.elapsed(TimeUnit.MILLISECONDS);
-    	        state.setScheduleTimeMillis((int) scheduleTime);// hardcode to integer
-    	        watch.reset();
-    	        watch.start();
-    	
-    	        // persist & notify
-    	        postSchedule(client, state, producer);
-    	
-    	        watch.stop();
-    	        long postTime = watch.elapsed(TimeUnit.MILLISECONDS);
-    	        LOG.info("Schedule result, schedule time {} ms, post schedule time {} ms !", scheduleTime, postTime);
-    	
-    	        currentState = state;
-    		} finally {
-    			//schedule completed
-    			scheduleZkState.scheduleCompleted = true;
-    		}
-	        return state;
-    	}
-    	throw new LockWebApplicationException("Acquire scheduler lock failed, please retry later");
+        ScheduleZkState scheduleZkState = new ScheduleZkState();
+        ExclusiveExecutor.Runnable exclusiveRunnable = new ExclusiveExecutor.Runnable() {
+            @Override
+            public void run() throws Exception {
+                scheduleZkState.scheduleAcquired = true;
+
+                while (!scheduleZkState.scheduleCompleted) {
+                    Thread.sleep(ACQUIRE_LOCK_WAIT_INTERVAL_MS);
+                }
+            }
+        };
+        ExclusiveExecutor.execute(GREEDY_SCHEDULER_ZK_PATH, exclusiveRunnable);
+        int waitMaxTimes = 0;
+        while (waitMaxTimes < ACQUIRE_LOCK_MAX_RETRIES_TIMES) { //about 3 minutes waiting
+            if (!scheduleZkState.scheduleAcquired) {
+                waitMaxTimes++;
+                try {
+                    Thread.sleep(ACQUIRE_LOCK_WAIT_INTERVAL_MS);
+                } catch (InterruptedException e) {
+                    // ignored
+                }
+                continue;
+            }
+
+            ScheduleState state = null;
+            try {
+                Stopwatch watch = Stopwatch.createStarted();
+                IScheduleContext context = new ScheduleContextBuilder(config, client).buildContext();
+                TopologyMgmtService mgmtService = new TopologyMgmtService();
+                IPolicyScheduler scheduler = PolicySchedulerFactory.createScheduler();
+
+                scheduler.init(context, mgmtService);
+                state = scheduler.schedule(option);
+
+                long scheduleTime = watch.elapsed(TimeUnit.MILLISECONDS);
+                state.setScheduleTimeMillis((int) scheduleTime);// hardcode to integer
+                watch.reset();
+                watch.start();
+
+                // persist & notify
+                postSchedule(client, state, producer);
+
+                watch.stop();
+                long postTime = watch.elapsed(TimeUnit.MILLISECONDS);
+                LOG.info("Schedule result, schedule time {} ms, post schedule time {} ms !", scheduleTime, postTime);
+
+                currentState = state;
+            } finally {
+                //schedule completed
+                scheduleZkState.scheduleCompleted = true;
+            }
+            return state;
+        }
+        throw new LockWebApplicationException("Acquire scheduler lock failed, please retry later");
     }
 
     public static void postSchedule(IMetadataServiceClient client, ScheduleState state, ConfigBusProducer producer) {
@@ -187,7 +191,7 @@ public class Coordinator {
     }
 
     /**
-     * shutdown background threads and release various resources
+     * shutdown background threads and release various resources.
      */
     private static class CoordinatorShutdownHook implements Runnable {
         private static final Logger LOG = LoggerFactory.getLogger(CoordinatorShutdownHook.class);
@@ -215,7 +219,7 @@ public class Coordinator {
     }
 
     private static class PolicyChangeHandler implements PolicyChangeListener {
-        private final static Logger LOG = LoggerFactory.getLogger(PolicyChangeHandler.class);
+        private static final Logger LOG = LoggerFactory.getLogger(PolicyChangeHandler.class);
         private Config config;
         private IMetadataServiceClient client;
 
@@ -226,11 +230,11 @@ public class Coordinator {
 
         @Override
         public void onPolicyChange(List<PolicyDefinition> allPolicies, Collection<String> addedPolicies,
-                Collection<String> removedPolicies, Collection<String> modifiedPolicies) {
+                                   Collection<String> removedPolicies, Collection<String> modifiedPolicies) {
             LOG.info("policy changed ... ");
             LOG.info("allPolicies: " + allPolicies + ", addedPolicies: " + addedPolicies + ", removedPolicies: "
-                    + removedPolicies + ", modifiedPolicies: " + modifiedPolicies);
-            
+                + removedPolicies + ", modifiedPolicies: " + modifiedPolicies);
+
             CoordinatorTrigger trigger = new CoordinatorTrigger(config, client);
             trigger.run();
 
@@ -239,48 +243,48 @@ public class Coordinator {
 
     public static void main(String[] args) throws Exception {
         startSchedule();
-        
+
         Thread.currentThread().join();
     }
 
     public static void startSchedule() {
-    	ExclusiveExecutor.execute(POLICY_SCHEDULER_ZK_PATH, new ExclusiveExecutor.Runnable() {
-			
-			@Override
-			public void run() throws Exception {
-		        Config config = ConfigFactory.load().getConfig(COORDINATOR);
-		        // build dynamic policy loader
-		        String host = config.getString(METADATA_SERVICE_HOST);
-		        int port = config.getInt(METADATA_SERVICE_PORT);
-		        String context = config.getString(METADATA_SERVICE_CONTEXT);
-		        IMetadataServiceClient client = new MetadataServiceClientImpl(host, port, context);
-		        DynamicPolicyLoader loader = new DynamicPolicyLoader(client);
-		        loader.addPolicyChangeListener(new PolicyChangeHandler(config, client));
+        ExclusiveExecutor.execute(POLICY_SCHEDULER_ZK_PATH, new ExclusiveExecutor.Runnable() {
 
-		        // schedule dynamic policy loader
-		        long initDelayMillis = config.getLong(DYNAMIC_POLICY_LOADER_INIT_MILLS);
-		        long delayMillis = config.getLong(DYNAMIC_POLICY_LOADER_DELAY_MILLS);
-		        ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(2, new ThreadFactory() {
-		            @Override
-		            public Thread newThread(Runnable r) {
-		                Thread t = new Thread(r);
-		                t.setDaemon(true);
-		                return t;
-		            }
-		        });
-		        scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
-		        
-		        // 
-		        scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_DELAY,
-		                CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_INTERVAL, TimeUnit.MILLISECONDS);
-		        
-		        Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
-		        LOG.info("Eagle Coordinator started ...");
-                
+            @Override
+            public void run() throws Exception {
+                Config config = ConfigFactory.load().getConfig(COORDINATOR);
+                // build dynamic policy loader
+                String host = config.getString(METADATA_SERVICE_HOST);
+                int port = config.getInt(METADATA_SERVICE_PORT);
+                String context = config.getString(METADATA_SERVICE_CONTEXT);
+                IMetadataServiceClient client = new MetadataServiceClientImpl(host, port, context);
+                DynamicPolicyLoader loader = new DynamicPolicyLoader(client);
+                loader.addPolicyChangeListener(new PolicyChangeHandler(config, client));
+
+                // schedule dynamic policy loader
+                long initDelayMillis = config.getLong(DYNAMIC_POLICY_LOADER_INIT_MILLS);
+                long delayMillis = config.getLong(DYNAMIC_POLICY_LOADER_DELAY_MILLS);
+                ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(2, new ThreadFactory() {
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        Thread t = new Thread(r);
+                        t.setDaemon(true);
+                        return t;
+                    }
+                });
+                scheduleSrv.scheduleAtFixedRate(loader, initDelayMillis, delayMillis, TimeUnit.MILLISECONDS);
+
+                //
+                scheduleSrv.scheduleAtFixedRate(new CoordinatorTrigger(config, client), CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_DELAY,
+                    CoordinatorTrigger.INIT_PERIODICALLY_TRIGGER_INTERVAL, TimeUnit.MILLISECONDS);
+
+                Runtime.getRuntime().addShutdownHook(new Thread(new CoordinatorShutdownHook(scheduleSrv)));
+                LOG.info("Eagle Coordinator started ...");
+
                 Thread.currentThread().join();
-			}
-			
-		});
+            }
+
+        });
     }
 
     public void enforcePeriodicallyBuild() {
@@ -294,10 +298,10 @@ public class Coordinator {
     public static boolean isPeriodicallyForceBuildEnable() {
         return forcePeriodicallyBuild.get();
     }
-    
+
     public static class ScheduleZkState {
-    	volatile boolean scheduleAcquired = false;
+        volatile boolean scheduleAcquired = false;
         volatile boolean scheduleCompleted = false;
     }
-    
+
 }

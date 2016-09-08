@@ -19,12 +19,7 @@ package org.apache.eagle.alert.engine.utils;
 import org.xerial.snappy.SnappyInputStream;
 import org.xerial.snappy.SnappyOutputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 
 
 /**
@@ -46,8 +41,8 @@ public class SerializableUtils {
             return buffer.toByteArray();
         } catch (IOException exn) {
             throw new IllegalArgumentException(
-                    "unable to serialize " + value,
-                    exn);
+                "unable to serialize " + value,
+                exn);
         }
     }
 
@@ -84,8 +79,8 @@ public class SerializableUtils {
             }
         } catch (IOException | ClassNotFoundException exn) {
             throw new IllegalArgumentException(
-                    "unable to deserialize " + description,
-                    exn);
+                "unable to deserialize " + description,
+                exn);
         }
     }
 
@@ -101,27 +96,27 @@ public class SerializableUtils {
                                                             String description) {
         try {
             try (ObjectInputStream ois = new ObjectInputStream(
-                    new SnappyInputStream(new ByteArrayInputStream(encodedValue)))) {
+                new SnappyInputStream(new ByteArrayInputStream(encodedValue)))) {
                 return ois.readObject();
             }
         } catch (IOException | ClassNotFoundException exn) {
             throw new IllegalArgumentException(
-                    "unable to deserialize " + description,
-                    exn);
+                "unable to deserialize " + description,
+                exn);
         }
     }
 
     public static <T extends Serializable> T ensureSerializable(T value) {
         @SuppressWarnings("unchecked")
         T copy = (T) deserializeFromCompressedByteArray(serializeToCompressedByteArray(value),
-                value.toString());
+            value.toString());
         return copy;
     }
 
     public static <T extends Serializable> T clone(T value) {
         @SuppressWarnings("unchecked")
         T copy = (T) deserializeFromCompressedByteArray(serializeToCompressedByteArray(value),
-                value.toString());
+            value.toString());
         return copy;
     }
 }

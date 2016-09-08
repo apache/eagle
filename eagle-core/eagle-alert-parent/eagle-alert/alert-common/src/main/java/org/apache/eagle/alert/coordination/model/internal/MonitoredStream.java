@@ -16,22 +16,19 @@
  */
 package org.apache.eagle.alert.coordination.model.internal;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 /**
  * A monitored stream is the unique data set in the system.
- * 
- * It's a combination of stream and the specific grp-by on it.
- * 
- * For correlation stream, it means multiple stream for a given monitored stream.
- * 
- * 
- * @since Apr 27, 2016
  *
+ * <p>It's a combination of stream and the specific grp-by on it.
+ *
+ * <p>For correlation stream, it means multiple stream for a given monitored stream.
+ *
+ * @since Apr 27, 2016
  */
 public class MonitoredStream {
 
@@ -40,7 +37,7 @@ public class MonitoredStream {
     // the stream group that this monitored stream stands for
     private StreamGroup streamGroup = new StreamGroup();
     private List<StreamWorkSlotQueue> queues = new ArrayList<StreamWorkSlotQueue>();
-    
+
     public MonitoredStream() {
     }
 

@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.alert.engine.utils;
 
-import java.text.ParseException;
-
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.text.ParseException;
 
 public class TimePeriodUtilsTest {
     @Test
@@ -48,44 +48,44 @@ public class TimePeriodUtilsTest {
 
         Period period = new Period("PT15m");
         Seconds seconds = period.toStandardSeconds();
-        Assert.assertEquals(15*60,seconds.getSeconds());
+        Assert.assertEquals(15 * 60, seconds.getSeconds());
 
         long time = DateTimeUtil.humanDateToSeconds("2015-07-01 13:56:12");
         long expect = DateTimeUtil.humanDateToSeconds("2015-07-01 13:45:00");
-        long result = TimePeriodUtils.formatSecondsByPeriod(time,seconds);
-        Assert.assertEquals(expect,result);
+        long result = TimePeriodUtils.formatSecondsByPeriod(time, seconds);
+        Assert.assertEquals(expect, result);
 
         time = DateTimeUtil.humanDateToSeconds("2015-07-01 03:14:59");
         expect = DateTimeUtil.humanDateToSeconds("2015-07-01 03:00:00");
         result = TimePeriodUtils.formatSecondsByPeriod(time, seconds);
-        Assert.assertEquals(expect,result);
+        Assert.assertEquals(expect, result);
 
         time = DateTimeUtil.humanDateToSeconds("2015-07-01 03:14:59");
         expect = DateTimeUtil.humanDateToSeconds("2015-07-01 03:00:00");
         result = TimePeriodUtils.formatSecondsByPeriod(time, seconds);
-        Assert.assertEquals(expect,result);
+        Assert.assertEquals(expect, result);
     }
 
     @Test
-     public void testFormatSecondsByPeriod1H() throws ParseException {
+    public void testFormatSecondsByPeriod1H() throws ParseException {
 
         Period period = new Period("PT1h");
         Seconds seconds = period.toStandardSeconds();
-        Assert.assertEquals(60*60,seconds.getSeconds());
+        Assert.assertEquals(60 * 60, seconds.getSeconds());
 
         long time = DateTimeUtil.humanDateToSeconds("2015-07-01 13:56:12");
         long expect = DateTimeUtil.humanDateToSeconds("2015-07-01 13:00:00");
-        long result = TimePeriodUtils.formatSecondsByPeriod(time,seconds);
-        Assert.assertEquals(expect,result);
+        long result = TimePeriodUtils.formatSecondsByPeriod(time, seconds);
+        Assert.assertEquals(expect, result);
 
         time = DateTimeUtil.humanDateToSeconds("2015-07-01 03:14:59");
         expect = DateTimeUtil.humanDateToSeconds("2015-07-01 03:00:00");
         result = TimePeriodUtils.formatSecondsByPeriod(time, seconds);
-        Assert.assertEquals(expect,result);
+        Assert.assertEquals(expect, result);
 
         time = DateTimeUtil.humanDateToSeconds("2015-07-01 03:30:59");
         expect = DateTimeUtil.humanDateToSeconds("2015-07-01 03:00:00");
         result = TimePeriodUtils.formatSecondsByPeriod(time, seconds);
-        Assert.assertEquals(expect,result);
+        Assert.assertEquals(expect, result);
     }
 }

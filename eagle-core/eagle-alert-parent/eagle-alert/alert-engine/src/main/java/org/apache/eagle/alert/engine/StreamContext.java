@@ -1,7 +1,6 @@
 package org.apache.eagle.alert.engine;
 
 import backtype.storm.metric.api.MultiCountMetric;
-
 import com.typesafe.config.Config;
 
 /**

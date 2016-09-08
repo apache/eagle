@@ -18,11 +18,6 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;
 import org.apache.eagle.alert.coordination.model.StreamRepartitionStrategy;
@@ -34,17 +29,21 @@ import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.utils.StreamIdConversion;
+import backtype.storm.spout.ISpoutOutputCollector;
+import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.spout.ISpoutOutputCollector;
-import backtype.storm.spout.SpoutOutputCollector;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * intercept the message sent from within KafkaSpout and select downstream bolts based on meta-data
- * This is topic based. each topic will have one SpoutOutputCollectorWrapper
+ * This is topic based. each topic will have one SpoutOutputCollectorWrapper.
  */
-public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements ISpoutSpecLCM,SerializationMetadataProvider {
+public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements ISpoutSpecLCM, SerializationMetadataProvider {
     private static final Logger LOG = LoggerFactory.getLogger(SpoutOutputCollectorWrapper.class);
 
     private final ISpoutOutputCollector delegate;
@@ -58,9 +57,9 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
     private volatile Map<String, StreamDefinition> sds;
 
     /**
-     * @param delegate   actual SpoutOutputCollector to send data to following bolts
-     * @param topic      topic for this KafkaSpout to handle
-     * @param numGroupbyBolts bolts following this spout
+     * @param delegate        actual SpoutOutputCollector to send data to following bolts
+     * @param topic           topic for this KafkaSpout to handle
+     * @param numGroupbyBolts bolts following this spout.
      * @param serializer
      */
     public SpoutOutputCollectorWrapper(CorrelationSpout spout,
@@ -83,31 +82,31 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
     /**
      * How to assert that numTotalGroupbyBolts >= numOfRouterBolts, otherwise
      * there is runtime issue by default, tuple includes 2 fields field 1: topic
-     * name field 2: map of key/value
+     * name field 2: map of key/value.
      */
     @SuppressWarnings("rawtypes")
     @Override
     public List<Integer> emit(List<Object> tuple, Object messageId) {
         if (!sanityCheck()) {
             LOG.error(
-                    "spout collector for topic {} see monitored metadata invalid, is this data source removed! Trigger message id {} ",
-                    topic, messageId);
+                "spout collector for topic {} see monitored metadata invalid, is this data source removed! Trigger message id {} ",
+                topic, messageId);
             return null;
         }
 
         KafkaMessageIdWrapper newMessageId = new KafkaMessageIdWrapper(messageId);
         newMessageId.topic = topic;
         /**
-            phase 1: tuple to stream converter
-            if this topic multiplexes multiple streams, then retrieve the individual streams
-        */
+         phase 1: tuple to stream converter
+         if this topic multiplexes multiple streams, then retrieve the individual streams.
+         */
         List<Object> convertedTuple = converter.convert(tuple);
-        if(convertedTuple == null) {
+        if (convertedTuple == null) {
             LOG.warn("source data {} can't be converted to a stream, ignore this message", tuple);
             spout.ack(newMessageId);
             return null;
         }
-        Map m = (Map)convertedTuple.get(3);
+        Map m = (Map) convertedTuple.get(3);
         Object streamId = convertedTuple.get(1);
 
         StreamDefinition sd = sds.get(streamId);
@@ -117,24 +116,24 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
             return null;
         }
 
-        StreamEvent event = convertToStreamEventByStreamDefinition((Long)convertedTuple.get(2), m, sds.get(streamId));
+        StreamEvent event = convertToStreamEventByStreamDefinition((Long) convertedTuple.get(2), m, sds.get(streamId));
         /*
             phase 2: stream repartition
         */
-        for(StreamRepartitionMetadata md : streamRepartitionMetadataList) {
+        for (StreamRepartitionMetadata md : streamRepartitionMetadataList) {
             // one stream may have multiple group-by strategies, each strategy is for a specific group-by
-            for(StreamRepartitionStrategy groupingStrategy : md.groupingStrategies){
+            for (StreamRepartitionStrategy groupingStrategy : md.groupingStrategies) {
                 int hash = 0;
-                if(groupingStrategy.getPartition().getType().equals(StreamPartition.Type.GROUPBY)) {
+                if (groupingStrategy.getPartition().getType().equals(StreamPartition.Type.GROUPBY)) {
                     hash = getRoutingHashByGroupingStrategy(m, groupingStrategy);
-                }else if(groupingStrategy.getPartition().getType().equals(StreamPartition.Type.SHUFFLE)){
-                    hash = Math.abs((int)System.currentTimeMillis());
+                } else if (groupingStrategy.getPartition().getType().equals(StreamPartition.Type.SHUFFLE)) {
+                    hash = Math.abs((int) System.currentTimeMillis());
                 }
                 int mod = hash % groupingStrategy.numTotalParticipatingRouterBolts;
                 // filter out message
                 if (mod >= groupingStrategy.startSequence && mod < groupingStrategy.startSequence + numOfRouterBolts) {
                     // framework takes care of field grouping instead of using storm internal field grouping
-                    String sid = StreamIdConversion.generateStreamIdBetween(spout.getSpoutName(), spout.getRouteBoltName()+ (hash % numOfRouterBolts));
+                    String sid = StreamIdConversion.generateStreamIdBetween(spout.getSpoutName(), spout.getRouteBoltName() + (hash % numOfRouterBolts));
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Emitted tuple: {} with message Id: {}, with topic {}, to streamId {}", convertedTuple, messageId, topic, sid);
                     }
@@ -154,9 +153,9 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
                     // ******* short-cut ack ********
                     // we should simply ack those messages which are not processed in this topology because KafkaSpout implementation requires _pending is empty
                     // before moving to next offsets.
-                    if(LOG.isDebugEnabled()){
+                    if (LOG.isDebugEnabled()) {
                         LOG.debug("Message filtered with mod {} not within range {} and {} for message {}", mod, groupingStrategy.startSequence,
-                                groupingStrategy.startSequence+ numOfRouterBolts, tuple);
+                            groupingStrategy.startSequence + numOfRouterBolts, tuple);
                     }
                     spout.ack(newMessageId);
                 }
@@ -167,11 +166,11 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
     }
 
     @SuppressWarnings("rawtypes")
-    private int getRoutingHashByGroupingStrategy(Map data, StreamRepartitionStrategy gs){
+    private int getRoutingHashByGroupingStrategy(Map data, StreamRepartitionStrategy gs) {
         // calculate hash value for values from group-by fields
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
-        for(String groupingField : gs.partition.getColumns()) {
-            if(data.get(groupingField) != null){
+        for (String groupingField : gs.partition.getColumns()) {
+            if (data.get(groupingField) != null) {
                 hashCodeBuilder.append(data.get(groupingField));
             } else {
                 LOG.warn("Required GroupBy fields {} not found: {}", gs.partition.getColumns(), data);
@@ -195,13 +194,14 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
         return isOk;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private StreamEvent convertToStreamEventByStreamDefinition(long timestamp, Map m, StreamDefinition sd){
-        return StreamEvent.Builder().timestamep(timestamp).attributes(m,sd).build();
+    @SuppressWarnings( {"rawtypes", "unchecked"})
+    private StreamEvent convertToStreamEventByStreamDefinition(long timestamp, Map m, StreamDefinition sd) {
+        return StreamEvent.builder().timestamep(timestamp).attributes(m, sd).build();
     }
 
     /**
-     * SpoutSpec may be changed, this class will respond to changes on tuple2StreamMetadataMap and streamRepartitionMetadataMap
+     * SpoutSpec may be changed, this class will respond to changes on tuple2StreamMetadataMap and streamRepartitionMetadataMap.
+     *
      * @param spoutSpec
      * @param sds
      */

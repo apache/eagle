@@ -31,16 +31,16 @@ public class ContainsIgnoreCaseExtension extends FunctionExecutor {
     @Override
     protected void init(ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         if (attributeExpressionExecutors.length != 2) {
-            throw new ExecutionPlanValidationException("Invalid no of arguments passed to str:containsIgnoreCase() function, required 2, " +
-                    "but found " + attributeExpressionExecutors.length);
+            throw new ExecutionPlanValidationException("Invalid no of arguments passed to str:containsIgnoreCase() function, required 2, "
+                + "but found " + attributeExpressionExecutors.length);
         }
         if (attributeExpressionExecutors[0].getReturnType() != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the first argument of str:containsIgnoreCase() function, " +
-                    "required "+ Attribute.Type.STRING+", but found "+attributeExpressionExecutors[0].getReturnType().toString());
+            throw new ExecutionPlanValidationException("Invalid parameter type found for the first argument of str:containsIgnoreCase() function, "
+                + "required " + Attribute.Type.STRING + ", but found " + attributeExpressionExecutors[0].getReturnType().toString());
         }
         if (attributeExpressionExecutors[1].getReturnType() != Attribute.Type.STRING) {
-            throw new ExecutionPlanValidationException("Invalid parameter type found for the second argument of str:containsIgnoreCase() function, " +
-                    "required "+ Attribute.Type.STRING+", but found "+attributeExpressionExecutors[1].getReturnType().toString());
+            throw new ExecutionPlanValidationException("Invalid parameter type found for the second argument of str:containsIgnoreCase() function, "
+                + "required " + Attribute.Type.STRING + ", but found " + attributeExpressionExecutors[1].getReturnType().toString());
         }
     }
 
@@ -52,8 +52,8 @@ public class ContainsIgnoreCaseExtension extends FunctionExecutor {
         if (data[1] == null) {
             throw new ExecutionPlanRuntimeException("Invalid input given to str:containsIgnoreCase() function. Second argument cannot be null");
         }
-        String str1 = (String)data[0];
-        String str2 = (String)data[1];
+        String str1 = (String) data[0];
+        String str2 = (String) data[1];
         return str1.toUpperCase().contains(str2.toUpperCase());
     }
 
@@ -79,7 +79,7 @@ public class ContainsIgnoreCaseExtension extends FunctionExecutor {
 
     @Override
     public Object[] currentState() {
-        return new Object[]{};
+        return new Object[] {};
     }
 
     @Override

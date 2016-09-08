@@ -46,7 +46,6 @@ import java.util.*;
 
 /**
  * @since May 1, 2016
- *
  */
 public class MongoImplTest {
     private static Logger LOG = LoggerFactory.getLogger(MongoImplTest.class);
@@ -59,7 +58,7 @@ public class MongoImplTest {
         try {
             MongodStarter starter = MongodStarter.getDefaultInstance();
             mongodExe = starter.prepare(new MongodConfigBuilder().version(Version.V3_2_1)
-                    .net(new Net(27017, Network.localhostIsIPv6())).build());
+                .net(new Net(27017, Network.localhostIsIPv6())).build());
             mongod = mongodExe.start();
         } catch (Exception e) {
             LOG.error("start embed mongod failed, assume some external mongo running. continue run test!", e);
@@ -82,16 +81,14 @@ public class MongoImplTest {
         if (mongod != null) {
             try {
                 mongod.stop();
-            }
-            catch (IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 // catch this exception for the unstable stopping mongodb
                 // reason: the exception is usually thrown out with below message format when stop() returns null value,
                 //         but actually this should have been captured in ProcessControl.stopOrDestroyProcess() by destroying
                 //         the process ultimately
                 if (e.getMessage() != null && e.getMessage().matches("^Couldn't kill.*process!.*")) {
                     // if matches, do nothing, just ignore the exception
-                }
-                else {
+                } else {
                     LOG.warn(String.format("Ignored error for stopping mongod process, see stack trace: %s", ExceptionUtils.getStackTrace(e)));
                 }
             }
@@ -193,7 +190,7 @@ public class MongoImplTest {
             state.setCode(201);
             result = dao.addScheduleState(state);
             Assert.assertEquals(200, result.code);
-            
+
             ScheduleState getState = dao.getScheduleState();
             Assert.assertEquals(201, getState.getCode());
         }
@@ -274,10 +271,10 @@ public class MongoImplTest {
 
         // Assignments
         Collection<PolicyAssignment> assignments = new ArrayList<>();
-        assignments.add(new PolicyAssignment("syslog_regex", "SG[syslog_stream-]"+timestamp));
+        assignments.add(new PolicyAssignment("syslog_regex", "SG[syslog_stream-]" + timestamp));
 
         ScheduleState state = new ScheduleState(version, spoutSpecsMap, groupSpecsMap, alertSpecsMap, pubMap,
-                assignments, monitoredStreams, policySnapshots, streams);
+            assignments, monitoredStreams, policySnapshots, streams);
 
         OpResult result = dao.addScheduleState(state);
         Assert.assertEquals(200, result.code);

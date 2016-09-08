@@ -62,7 +62,7 @@ public class CompositePolicyHandler implements PolicyStreamHandler {
 
     @Override
     public void send(StreamEvent event) throws Exception {
-//        policyHandler.send(event);
+        // policyHandler.send(event);
         send(event, 0);
     }
 
@@ -71,8 +71,9 @@ public class CompositePolicyHandler implements PolicyStreamHandler {
         if (handlers.size() > idx) {
             handlers.get(idx).send(event);
         } else if (event instanceof AlertStreamEvent) {
-            if (LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Emit new alert event: {}", event);
+            }
             collector.emit((AlertStreamEvent) event); // for alert stream events, emit if no handler found.
         } else {
             // nothing found. LOG, and throw exception

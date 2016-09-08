@@ -1,12 +1,12 @@
 package org.apache.eagle.alert.engine.mock;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -28,7 +28,8 @@ public class MockPartitionedCollector implements PartitionedEventCollector {
     @SuppressWarnings("unused")
     private final static Logger LOG = LoggerFactory.getLogger(MockPartitionedCollector.class);
     private List<PartitionedEvent> cache;
-    public MockPartitionedCollector(){
+
+    public MockPartitionedCollector() {
         cache = new LinkedList<>();
     }
 
@@ -36,15 +37,15 @@ public class MockPartitionedCollector implements PartitionedEventCollector {
         cache.add(event);
     }
 
-    public void clear(){
+    public void clear() {
         cache.clear();
     }
 
-    public List<PartitionedEvent> get(){
+    public List<PartitionedEvent> get() {
         return cache;
     }
 
-    public int size(){
+    public int size() {
         return cache.size();
     }
 

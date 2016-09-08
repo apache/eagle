@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.alert.app;import backtype.storm.generated.StormTopology;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+package org.apache.eagle.alert.app;
+
 import org.apache.eagle.alert.engine.UnitTopologyMain;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import backtype.storm.generated.StormTopology;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
  * since 8/25/16.
@@ -31,7 +33,7 @@ public class AlertUnitTopologyApp extends StormApplication {
         return UnitTopologyMain.createTopology(config);
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Config config = ConfigFactory.load();
         AlertUnitTopologyApp app = new AlertUnitTopologyApp();
         app.run(config);

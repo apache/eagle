@@ -18,14 +18,6 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
@@ -37,33 +29,30 @@ import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider
 import org.apache.eagle.alert.engine.serialization.Serializers;
 import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.alert.utils.StreamIdConversion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import storm.kafka.BrokerHosts;
-import storm.kafka.KafkaSpoutMetric;
-import storm.kafka.KafkaSpoutWrapper;
-import storm.kafka.SpoutConfig;
-import storm.kafka.ZkHosts;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-
 import com.typesafe.config.Config;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import storm.kafka.*;
+
+import java.text.MessageFormat;
+import java.util.*;
 
 /**
  * wrap KafkaSpout to provide parallel processing of messages for multiple Kafka topics
  *
- * 1. onNewConfig() is interface for outside to update new metadata. Upon new metadata, this class will calculate if there is any new topic, removed topic or
- *    updated topic
- *
+ * <p>1. onNewConfig() is interface for outside to update new metadata. Upon new metadata, this class will calculate if there is any new topic, removed topic or
+ * updated topic</p>
  */
-public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener,SerializationMetadataProvider {
+public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener, SerializationMetadataProvider {
     private static final long serialVersionUID = -5280723341236671580L;
-    private static final Logger LOG  = LoggerFactory.getLogger(CorrelationSpout.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CorrelationSpout.class);
 
     public static final String DEFAULT_STORM_KAFKA_TRANSACTION_ZK_ROOT = "/consumers";
     public static final String DEFAULT_STORM_KAFKA_TRANSACTION_ZK_RELATIVE_PATH = "/eagle_consumer";
@@ -91,24 +80,25 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     private volatile Map<String, StreamDefinition> sds;
 
     /**
-     * FIXME one single changeNotifyService may have issues as possibly multiple spout tasks will register themselves and initialize service
+     * FIXME one single changeNotifyService may have issues as possibly multiple spout tasks will register themselves and initialize service.
+     *
      * @param config
      * @param topologyId
      * @param changeNotifyService
      * @param numOfRouterBolts
      */
-    public CorrelationSpout(Config config, String topologyId, IMetadataChangeNotifyService changeNotifyService, int numOfRouterBolts){
+    public CorrelationSpout(Config config, String topologyId, IMetadataChangeNotifyService changeNotifyService, int numOfRouterBolts) {
         this(config, topologyId, changeNotifyService, numOfRouterBolts, AlertConstants.DEFAULT_SPOUT_NAME, AlertConstants.DEFAULT_ROUTERBOLT_NAME);
     }
+
     /**
-     *
      * @param config
-     * @param topologyId used for distinguishing kafka offset for different topologies
+     * @param topologyId       used for distinguishing kafka offset for different topologies
      * @param numOfRouterBolts used for generating streamId and routing
-     * @param spoutName used for generating streamId between spout and router bolt
-     * @param routerBoltName used for generating streamId between spout and router bolt
+     * @param spoutName        used for generating streamId between spout and router bolt
+     * @param routerBoltName   used for generating streamId between spout and router bolt.
      */
-    public CorrelationSpout(Config config, String topologyId, IMetadataChangeNotifyService changeNotifyService, int numOfRouterBolts, String spoutName, String routerBoltName){
+    public CorrelationSpout(Config config, String topologyId, IMetadataChangeNotifyService changeNotifyService, int numOfRouterBolts, String spoutName, String routerBoltName) {
         this.config = config;
         this.topologyId = topologyId;
         this.changeNotifyService = changeNotifyService;
@@ -117,16 +107,17 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         this.routeBoltName = routerBoltName;
     }
 
-    public String getSpoutName(){
+    public String getSpoutName() {
         return spoutName;
     }
 
-    public String getRouteBoltName(){
+    public String getRouteBoltName() {
         return routeBoltName;
     }
 
     /**
-     * the only output field is for StreamEvent
+     * the only output field is for StreamEvent.
+     *
      * @param declarer
      */
     @Override
@@ -141,7 +132,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     @SuppressWarnings("rawtypes")
     @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
-        if(LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug("open method invoked");
         }
         this.conf = conf;
@@ -165,9 +156,9 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     @Override
     public void onSpoutSpecChange(SpoutSpec spec, Map<String, StreamDefinition> sds) {
         LOG.info("new metadata is updated " + spec);
-        try{
+        try {
             onReload(spec, sds);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error("error applying new SpoutSpec", ex);
         }
     }
@@ -181,7 +172,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
 
     /**
      * find the correct wrapper to do ack that means msgId should be mapped to
-     * wrapper
+     * wrapper.
      *
      * @param msgId
      */
@@ -217,7 +208,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
             wrapper.close();
         }
     }
-    
+
     private List<String> getTopics(SpoutSpec spoutSpec) {
         List<String> meta = new ArrayList<String>();
         for (Kafka2TupleMetadata entry : spoutSpec.getKafka2TupleMetadataMap().values()) {
@@ -246,7 +237,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         // copy and swap
         Map<String, KafkaSpoutWrapper> newKafkaSpoutList = new HashMap<>(this.kafkaSpoutList);
         // iterate new topics and then create KafkaSpout
-        for(String topic : newTopics){
+        for (String topic : newTopics) {
             KafkaSpoutWrapper wrapper = newKafkaSpoutList.get(topic);
             if (wrapper != null) {
                 LOG.warn(MessageFormat.format("try to create new topic {0}, but found in the active spout list, this may indicate some inconsistency", topic));
@@ -256,7 +247,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
             newKafkaSpoutList.put(topic, newWrapper);
         }
         // iterate remove topics and then close KafkaSpout
-        for(String topic : removeTopics){
+        for (String topic : removeTopics) {
             KafkaSpoutWrapper wrapper = newKafkaSpoutList.get(topic);
             if (wrapper == null) {
                 LOG.warn(MessageFormat.format("try to remove topic {0}, but not found in the active spout list, this may indicate some inconsistency", topic));
@@ -267,7 +258,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         }
 
         // iterate update topic and then update metadata
-        for(String topic : updateTopics){
+        for (String topic : updateTopics) {
             KafkaSpoutWrapper spoutWrapper = newKafkaSpoutList.get(topic);
             if (spoutWrapper == null) {
                 LOG.warn(MessageFormat.format("try to update topic {0}, but not found in the active spout list, this may indicate some inconsistency", topic));
@@ -291,7 +282,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
      * Note2: put topologyId as part of zkState because one topic by design can be consumed by multiple topologies so one topology needs to know
      * processed offset for itself
      *
-     * TODO: Should avoid use Config.get in deep calling stack, should generate config bean as early as possible
+     * <p>TODO: Should avoid use Config.get in deep calling stack, should generate config bean as early as possible
      *
      * @param conf
      * @param context
@@ -302,7 +293,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
      */
     @SuppressWarnings("rawtypes")
     protected KafkaSpoutWrapper createKafkaSpout(Map conf, TopologyContext context, SpoutOutputCollector collector, final String topic,
-                                                 String schemeClsName, SpoutSpec spoutSpec, Map<String, StreamDefinition> sds) throws Exception{
+                                                 String schemeClsName, SpoutSpec spoutSpec, Map<String, StreamDefinition> sds) throws Exception {
         String kafkaBrokerZkQuorum = config.getString("spout.kafkaBrokerZkQuorum");
         BrokerHosts hosts = null;
         if (config.hasPath("spout.kafkaBrokerZkBasePath")) {
@@ -311,22 +302,22 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
             hosts = new ZkHosts(kafkaBrokerZkQuorum);
         }
         String transactionZkRoot = DEFAULT_STORM_KAFKA_TRANSACTION_ZK_ROOT;
-        if(config.hasPath("spout.stormKafkaTransactionZkPath")) {
+        if (config.hasPath("spout.stormKafkaTransactionZkPath")) {
             transactionZkRoot = config.getString("spout.stormKafkaTransactionZkPath");
         }
         // write partition offset etc. into zkRoot+id, see PartitionManager.committedPath
         String zkStateTransactionRelPath = DEFAULT_STORM_KAFKA_TRANSACTION_ZK_RELATIVE_PATH;
-        if(config.hasPath("spout.stormKafkaEagleConsumer")){
+        if (config.hasPath("spout.stormKafkaEagleConsumer")) {
             zkStateTransactionRelPath = config.getString("spout.stormKafkaEagleConsumer");
         }
         SpoutConfig spoutConfig = new SpoutConfig(hosts, topic, transactionZkRoot, zkStateTransactionRelPath + "/" + topic + "/" + topologyId);
         // transaction zkServers
         boolean stormKafkaUseSameZkQuorumWithKafkaBroker = config.getBoolean("spout.stormKafkaUseSameZkQuorumWithKafkaBroker");
-        if(stormKafkaUseSameZkQuorumWithKafkaBroker){
+        if (stormKafkaUseSameZkQuorumWithKafkaBroker) {
             ZkServerPortUtils utils = new ZkServerPortUtils(kafkaBrokerZkQuorum);
             spoutConfig.zkServers = utils.getZkHosts();
             spoutConfig.zkPort = utils.getZkPort();
-        }else{
+        } else {
             ZkServerPortUtils utils = new ZkServerPortUtils(config.getString("spout.stormKafkaTransactionZkQuorum"));
             spoutConfig.zkServers = utils.getZkHosts();
             spoutConfig.zkPort = utils.getZkPort();
@@ -342,9 +333,9 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
 
         spoutConfig.scheme = new SchemeAsMultiScheme(SchemeBuilder.buildFromClsName(schemeClsName, topic, conf));
         KafkaSpoutWrapper wrapper = new KafkaSpoutWrapper(spoutConfig, kafkaSpoutMetric);
-        SpoutOutputCollectorWrapper collectorWrapper = new SpoutOutputCollectorWrapper(this, collector, topic, spoutSpec, numOfRouterBolts, sds,this.serializer);
+        SpoutOutputCollectorWrapper collectorWrapper = new SpoutOutputCollectorWrapper(this, collector, topic, spoutSpec, numOfRouterBolts, sds, this.serializer);
         wrapper.open(conf, context, collectorWrapper);
-        
+
         if (LOG.isInfoEnabled()) {
             LOG.info("create and open kafka wrapper: topic {}, scheme class{} ", topic, schemeClsName);
         }
@@ -359,10 +350,11 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     /**
      * utility to get list of zkServers and zkPort.(It is assumed that zkPort is same for all zkServers as storm-kafka library requires this though it is not efficient)
      */
-    private static class ZkServerPortUtils{
+    private static class ZkServerPortUtils {
         private List<String> zkHosts = new ArrayList<>();
         private Integer zkPort;
-        public ZkServerPortUtils(String zkQuorum){
+
+        public ZkServerPortUtils(String zkQuorum) {
             String[] zkConnections = zkQuorum.split(",");
             for (String zkConnection : zkConnections) {
                 zkHosts.add(zkConnection.split(":")[0]);
@@ -370,16 +362,16 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
             zkPort = Integer.valueOf(zkConnections[0].split(":")[1]);
         }
 
-        public List<String> getZkHosts(){
+        public List<String> getZkHosts() {
             return zkHosts;
         }
 
-        public Integer getZkPort(){
+        public Integer getZkPort() {
             return zkPort;
         }
     }
 
-    protected void removeKafkaSpout(KafkaSpoutWrapper wrapper){
+    protected void removeKafkaSpout(KafkaSpoutWrapper wrapper) {
         try {
             wrapper.close();
         } catch (Exception e) {

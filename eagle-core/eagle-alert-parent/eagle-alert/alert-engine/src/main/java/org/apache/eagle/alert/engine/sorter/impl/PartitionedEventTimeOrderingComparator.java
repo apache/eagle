@@ -16,31 +16,31 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
+import org.apache.eagle.alert.engine.model.PartitionedEvent;
+
 import java.util.Comparator;
 import java.util.Objects;
 
-import org.apache.eagle.alert.engine.model.PartitionedEvent;
-
 /**
- * TODO: Stable sorting algorithm for better performance to avoid event resorting with same timestamp?
+ * TODO: Stable sorting algorithm for better performance to avoid event resorting with same timestamp?.
  */
 public class PartitionedEventTimeOrderingComparator implements Comparator<PartitionedEvent> {
     public static final PartitionedEventTimeOrderingComparator INSTANCE = new PartitionedEventTimeOrderingComparator();
 
     @Override
     public int compare(PartitionedEvent o1, PartitionedEvent o2) {
-        if(Objects.equals(o1,o2)){
+        if (Objects.equals(o1, o2)) {
             return 0;
-        }else {
-            if(o1 == null && o2 == null){
+        } else {
+            if (o1 == null && o2 == null) {
                 return 0;
-            }else if(o1 != null && o2 == null){
+            } else if (o1 != null && o2 == null) {
                 return 1;
-            }else if(o1 == null){
+            } else if (o1 == null) {
                 return -1;
             }
             // Unstable Sorting Algorithm
-            if(o1.getTimestamp() <= o2.getTimestamp()){
+            if (o1.getTimestamp() <= o2.getTimestamp()) {
                 return -1;
             } else {
                 return 1;

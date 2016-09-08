@@ -1,24 +1,26 @@
 [
-	{
-		"name": "absenceAlertPolicy",
-		"description": "absenceAlertPolicy",
-		"inputStreams": [
-			"absenceAlertStream"
-		],
-		"outputStreams": [
-			"absenceAlertStream_out"
-		],
-		"definition": {
-			"type": "absencealert",
-			"value": "1,jobID,job1,daily_rule,14:00:00,15:00:00"
-		},
-		"partitionSpec": [
-			{
-				"streamId": "absenceAlertStream",
-				"type": "GROUPBY",
-				"columns" : ["jobID"]
-			}
-		],
-		"parallelismHint": 2
-	}
+  {
+    "name": "absenceAlertPolicy",
+    "description": "absenceAlertPolicy",
+    "inputStreams": [
+      "absenceAlertStream"
+    ],
+    "outputStreams": [
+      "absenceAlertStream_out"
+    ],
+    "definition": {
+      "type": "absencealert",
+      "value": "1,jobID,job1,daily_rule,14:00:00,15:00:00"
+    },
+    "partitionSpec": [
+      {
+        "streamId": "absenceAlertStream",
+        "type": "GROUPBY",
+        "columns": [
+          "jobID"
+        ]
+      }
+    ],
+    "parallelismHint": 2
+  }
 ]

@@ -1,10 +1,4 @@
-package org.apache.eagle.alert.engine.evaluator;
-
-import org.apache.eagle.alert.engine.Collector;
-import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-import org.apache.eagle.alert.engine.model.StreamEvent;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,8 +14,16 @@ import org.apache.eagle.alert.engine.model.StreamEvent;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.engine.evaluator;
+
+import org.apache.eagle.alert.engine.Collector;
+import org.apache.eagle.alert.engine.model.AlertStreamEvent;
+import org.apache.eagle.alert.engine.model.StreamEvent;
+
 public interface PolicyStreamHandler {
     void prepare(Collector<AlertStreamEvent> collector, PolicyHandlerContext context) throws Exception;
+
     void send(StreamEvent event) throws Exception;
+
     void close() throws Exception;
 }

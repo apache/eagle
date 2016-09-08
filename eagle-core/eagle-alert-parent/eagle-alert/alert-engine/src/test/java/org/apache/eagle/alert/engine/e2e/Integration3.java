@@ -16,23 +16,20 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import backtype.storm.utils.Utils;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.UnitTopologyMain;
 import org.apache.eagle.alert.utils.KafkaEmbedded;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import backtype.storm.utils.Utils;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @since May 10, 2016
- *
  */
 public class Integration3 {
 
@@ -56,12 +53,12 @@ public class Integration3 {
      * Assumption:
      * <p>
      * start metadata service 8080 /rest
-     * 
+     * <p>
      * <pre>
      * user@kafka-host:~$ $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic syslog_events
      * </pre>
      * <p>
-     * 
+     *
      * @throws InterruptedException
      */
     @Test

@@ -18,29 +18,29 @@
  */
 package storm.kafka;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.spout.ISpoutSpecLCM;
 import org.apache.eagle.alert.engine.spout.SpoutOutputCollectorWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import backtype.storm.Config;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * NOTE!!!!! This class copy/paste some code from storm.kafka.KafkaSpout to make sure it can support one process to hold multiple
  * KafkaSpout
  *
- * this collectorWrapper provides the following capabilities:
+ * <p>this collectorWrapper provides the following capabilities:
  * 1. inject customized collector collectorWrapper, so framework can control traffic routing
  * 2. listen to topic to stream metadata change and pass that to customized collector collectorWrapper
- * 3. return current streams for this topic
+ * 3. return current streams for this topic</p>
  */
 public class KafkaSpoutWrapper extends KafkaSpout implements ISpoutSpecLCM {
     private static final long serialVersionUID = 5507693757424351306L;
@@ -55,7 +55,7 @@ public class KafkaSpoutWrapper extends KafkaSpout implements ISpoutSpecLCM {
 
     private SpoutOutputCollectorWrapper collectorWrapper;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public void open(Map conf, final TopologyContext context, final SpoutOutputCollector collector) {
         String topologyInstanceId = context.getStormId();
@@ -95,16 +95,16 @@ public class KafkaSpoutWrapper extends KafkaSpout implements ISpoutSpecLCM {
         metricContext._spoutConfig = _spoutConfig;
         kafkaSpoutMetric.addTopic(_spoutConfig.topic, metricContext);
 
-        this.collectorWrapper = (SpoutOutputCollectorWrapper)collector;
+        this.collectorWrapper = (SpoutOutputCollectorWrapper) collector;
     }
 
     @Override
-    public void update(SpoutSpec metadata, Map<String, StreamDefinition> sds){
+    public void update(SpoutSpec metadata, Map<String, StreamDefinition> sds) {
         collectorWrapper.update(metadata, sds);
     }
 
     @Override
-    public void close(){
+    public void close() {
         super.close();
         kafkaSpoutMetric.removeTopic(_spoutConfig.topic);
     }

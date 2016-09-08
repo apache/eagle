@@ -18,10 +18,6 @@
  */
 package org.apache.eagle.alert.engine.siddhi.extension;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +27,12 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 /**
  * @since Apr 1, 2016
- *
  */
 public class AttributeCollectAggregatorTest {
 
@@ -85,59 +84,59 @@ public class AttributeCollectAggregatorTest {
         Event e = null;
         long base = System.currentTimeMillis();
         {
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "nova" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "nova"});
             base += 100;
             events.add(e);
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "nova" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "nova"});
             base += 100;
             events.add(e);
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "nova" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "nova"});
             base += 100;
             events.add(e);
         }
 
         {
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "neutron" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "neutron"});
             base += 100;
             events.add(e);
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "neutron" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "neutron"});
             base += 100;
             events.add(e);
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "neutron" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "neutron"});
             base += 100;
             events.add(e);
         }
 
         base += 10000;
         {
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "nova1" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "nova1"});
             base += 100;
             events.add(e);
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "nova1" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "nova1"});
             base += 100;
             events.add(e);
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "nova1" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "nova1"});
             base += 100;
             events.add(e);
         }
 
         {
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "neutron2" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "neutron2"});
             base += 100;
             events.add(e);
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "neutron2" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "neutron2"});
             base += 100;
             events.add(e);
-            e = new Event(base, new Object[] { base, "host" + r.nextInt(), "neutron2" });
+            e = new Event(base, new Object[] {base, "host" + r.nextInt(), "neutron2"});
             base += 100;
             events.add(e);
         }
         base += 10000;
-        e = new Event(base, new Object[] { base, "host" + r.nextInt(), "mq" });
+        e = new Event(base, new Object[] {base, "host" + r.nextInt(), "mq"});
 
         return events.toArray(new Event[0]);
     }
-    
+
     @Test
     public void testQuery() {
         String ql = "define stream perfmon_input_stream_cpu ( host string,timestamp long,metric string,pool string,value double,colo string );";

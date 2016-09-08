@@ -1,17 +1,17 @@
 [
-	{
-		"name": "noDataAlertDataSource",
-		"type": "KAFKA",
-		"properties": {},
-		"topic": "noDataAlertTopic",
-		"schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
-		"codec": {
-			"streamNameSelectorProp": {
-				"userProvidedStreamName": "noDataAlertStream"
-			},
-			"streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
-			"timestampColumn": "timestamp",
-			"timestampFormat": ""
-		}
-	}
+  {
+    "name": "noDataAlertDataSource",
+    "type": "KAFKA",
+    "properties": {},
+    "topic": "noDataAlertTopic",
+    "schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
+    "codec": {
+      "streamNameSelectorProp": {
+        "userProvidedStreamName": "noDataAlertStream"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": ""
+    }
+  }
 ]
