@@ -17,13 +17,13 @@
 
 package org.apache.eagle.jpm.spark.history;
 
+import org.apache.eagle.app.StormApplication;
+import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.jpm.spark.history.storm.SparkHistoryJobParseBolt;
+import org.apache.eagle.jpm.spark.history.storm.SparkHistoryJobSpout;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
-import org.apache.eagle.app.StormApplication;
-import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.jpm.spark.history.storm.SparkHistoryJobSpout;
-import org.apache.eagle.jpm.spark.history.storm.SparkHistoryJobParseBolt;
 
 public class SparkHistoryJobApp extends StormApplication {
     @Override
