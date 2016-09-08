@@ -33,6 +33,10 @@
         <module>alert-service</module>
     </modules>
 
+	<properties>
+		<embed.mongo.version>1.50.5</embed.mongo.version>
+	</properties>
+	
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -291,6 +295,17 @@
                 <artifactId>commons-cli</artifactId>
                 <version>${common.cli.version}</version>
             </dependency>
+            <dependency>
+            	<groupId>org.mongodb</groupId>
+	            <artifactId>mongo-java-driver</artifactId>
+	            <version>${mongodb.version}</version>
+	        </dependency>
+			<dependency>
+	 			<groupId>de.flapdoodle.embed</groupId>
+	 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+	 			<version>${embed.mongo.version}</version>
+	 			<scope>test</scope>
+	 		</dependency>
         </dependencies>
     </dependencyManagement>
 
