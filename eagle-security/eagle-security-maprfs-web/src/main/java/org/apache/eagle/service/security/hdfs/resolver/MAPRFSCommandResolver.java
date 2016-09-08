@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.service.security.hdfs.resolver;
 
+import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.service.alert.resolver.AttributeResolvable;
 import org.apache.eagle.service.alert.resolver.AttributeResolveException;
 import org.apache.eagle.service.alert.resolver.BadAttributeResolveRequestException;
@@ -40,6 +42,10 @@ public class MAPRFSCommandResolver implements AttributeResolvable<GenericAttribu
     private final static String MAPRFS_CMD_RESOLVE_FORMAT_HINT = String.format("maprfs command must be in {%s}", StringUtils.join(cmdStrs, ","));
 
     private final static List<String> commands = Arrays.asList(cmdStrs);
+
+    public MAPRFSCommandResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+
+    }
 
     public List<String> resolve(GenericAttributeResolveRequest request) throws AttributeResolveException {
         String query = request.getQuery().trim();

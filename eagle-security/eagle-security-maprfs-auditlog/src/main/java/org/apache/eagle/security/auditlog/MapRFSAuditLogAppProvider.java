@@ -14,17 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.service.security.hdfs.rest;
 
-import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+package org.apache.eagle.security.auditlog;
 
-public class HttpRequestTest {
-    @Test
-    public void TestExecuteGet() throws Exception {
-        String restUrl = "https://sandbox.mapr.com:8443/rest/volume/list";
-        JSONObject res = HttpRequest.executeGet(restUrl,"username", "password");
-        Assert.assertEquals("OK",res.getString("status"));
+
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
+
+public class MapRFSAuditLogAppProvider extends AbstractApplicationProvider<MapRFSAuditLogApplication> {
+    @Override
+    public MapRFSAuditLogApplication getApplication() {
+        return new MapRFSAuditLogApplication();
     }
 }
+
