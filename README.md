@@ -32,8 +32,7 @@ For more details, please visit [https://eagle.incubator.apache.org](https://eagl
 ### Branches
 | name | status | version | description |
 | :---:| :---: | :---: | :--- |
-| **master** | [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-main)](https://builds.apache.org/job/incubator-eagle-main/) | 0.5.0-incubating-SNAPSHOT | Code base branch for continuous development. |
-| **develop** | [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-develop)](https://builds.apache.org/job/incubator-eagle-develop/) | 0.5.0-incubating-SNAPSHOT | Retired on Sep 07, 2016. Will be kept for days, but referencing is deprecated. |
+| **master** | [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-main)](https://builds.apache.org/job/incubator-eagle-main/) | 0.5.0-incubating-SNAPSHOT | Branch for continuous development. |
 
 ### Latest Release
 
