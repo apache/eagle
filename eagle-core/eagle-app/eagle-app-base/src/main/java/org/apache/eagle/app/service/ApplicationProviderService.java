@@ -19,13 +19,14 @@ package org.apache.eagle.app.service;
 
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.spi.ApplicationProvider;
-import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.metadata.service.ApplicationDescService;
 
 import java.util.Collection;
 
 public interface ApplicationProviderService extends ApplicationDescService {
     void reload();
+
     Collection<ApplicationProvider> getProviders();
+
     <T extends Application> ApplicationProvider<T> getApplicationProviderByType(String type);
 }

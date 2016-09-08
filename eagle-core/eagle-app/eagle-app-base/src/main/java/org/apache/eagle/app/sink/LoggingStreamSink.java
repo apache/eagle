@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 public class LoggingStreamSink extends StormStreamSink<DefaultStreamSinkConfig> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
 
     @Override
     public void onInstall() {
@@ -38,10 +38,10 @@ public class LoggingStreamSink extends StormStreamSink<DefaultStreamSinkConfig> 
 
     @Override
     protected void execute(Object key, Map event, BasicOutputCollector collector) {
-        LOGGER.info("Receiving {}",event);
+        LOGGER.info("Receiving {}", event);
     }
 
-    public static class Provider implements StreamSinkProvider<LoggingStreamSink,DefaultStreamSinkConfig> {
+    public static class Provider implements StreamSinkProvider<LoggingStreamSink, DefaultStreamSinkConfig> {
         @Override
         public DefaultStreamSinkConfig getSinkConfig(String streamId, Config config) {
             return new DefaultStreamSinkConfig(LoggingStreamSink.class);
