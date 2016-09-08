@@ -23,16 +23,16 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.List;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Queues {
-	public List<Queue> getQueue() {
-		return queue;
-	}
+    public List<Queue> getQueue() {
+        return queue;
+    }
 
-	public void setQueue(List<Queue> queue) {
-		this.queue = queue;
-	}
+    public void setQueue(List<Queue> queue) {
+        this.queue = queue;
+    }
 
-	private List<Queue> queue;
+    private List<Queue> queue;
 }

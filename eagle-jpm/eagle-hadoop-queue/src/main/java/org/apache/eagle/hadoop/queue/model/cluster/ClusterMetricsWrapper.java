@@ -16,22 +16,22 @@
  *
  */
 
-package org.apache.eagle.hadoop.queue.model.clusterMetrics;
+package org.apache.eagle.hadoop.queue.model.cluster;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClusterMetricsWrapper {
-	public ClusterMetrics getClusterMetrics() {
-		return clusterMetrics;
-	}
+    public ClusterMetrics getClusterMetrics() {
+        return clusterMetrics;
+    }
 
-	public void setClusterMetrics(ClusterMetrics clusterMetrics) {
-		this.clusterMetrics = clusterMetrics;
-	}
+    public void setClusterMetrics(ClusterMetrics clusterMetrics) {
+        this.clusterMetrics = clusterMetrics;
+    }
 
-	private ClusterMetrics clusterMetrics;
+    private ClusterMetrics clusterMetrics;
 
 }

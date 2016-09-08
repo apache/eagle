@@ -19,7 +19,7 @@ package org.apache.eagle.hadoop.queue.common;
 
 public class HadoopClusterConstants {
 
-    public enum AggregateFunc{
+    public enum AggregateFunc {
         MAX, AVG
     }
 
@@ -31,31 +31,31 @@ public class HadoopClusterConstants {
         CLUSTER_METRIC, RUNNING_APPS, SCHEDULER
     }
 
-    public static class MetricName{
+    public static class MetricName {
 
         // Metrics from running apps
-        public final static String HADOOP_APPS_ALLOCATED_MB = "hadoop.%s.allocatedmb";
-        public final static String HADOOP_APPS_ALLOCATED_VCORES = "hadoop.%s.allocatedvcores";
-        public final static String HADOOP_APPS_RUNNING_CONTAINERS = "hadoop.%s.runningcontainers";
+        public static final String HADOOP_APPS_ALLOCATED_MB = "hadoop.%s.allocatedmb";
+        public static final String HADOOP_APPS_ALLOCATED_VCORES = "hadoop.%s.allocatedvcores";
+        public static final String HADOOP_APPS_RUNNING_CONTAINERS = "hadoop.%s.runningcontainers";
 
         // metrics from cluster metrics
-        public final static String HADOOP_CLUSTER_NUMPENDING_JOBS = "hadoop.cluster.numpendingjobs";
-        public final static String HADOOP_CLUSTER_ALLOCATED_MEMORY = "hadoop.cluster.allocatedmemory";
-        public final static String HADOOP_CLUSTER_TOTAL_MEMORY = "hadoop.cluster.totalmemory";
-        public final static String HADOOP_CLUSTER_AVAILABLE_MEMORY = "hadoop.cluster.availablememory";
-        public final static String HADOOP_CLUSTER_RESERVED_MEMORY = "hadoop.cluster.reservedmemory";
+        public static final String HADOOP_CLUSTER_NUMPENDING_JOBS = "hadoop.cluster.numpendingjobs";
+        public static final String HADOOP_CLUSTER_ALLOCATED_MEMORY = "hadoop.cluster.allocatedmemory";
+        public static final String HADOOP_CLUSTER_TOTAL_MEMORY = "hadoop.cluster.totalmemory";
+        public static final String HADOOP_CLUSTER_AVAILABLE_MEMORY = "hadoop.cluster.availablememory";
+        public static final String HADOOP_CLUSTER_RESERVED_MEMORY = "hadoop.cluster.reservedmemory";
 
         // metrics from scheduler info
-        public final static String HADOOP_CLUSTER_CAPACITY = "hadoop.cluster.capacity";
-        public final static String HADOOP_CLUSTER_USED_CAPACITY = "hadoop.cluster.usedcapacity";
+        public static final String HADOOP_CLUSTER_CAPACITY = "hadoop.cluster.capacity";
+        public static final String HADOOP_CLUSTER_USED_CAPACITY = "hadoop.cluster.usedcapacity";
 
-        public final static String HADOOP_QUEUE_NUMPENDING_JOBS = "hadoop.queue.numpendingjobs";
-        public final static String HADOOP_QUEUE_USED_CAPACITY = "hadoop.queue.usedcapacity";
-        public final static String HADOOP_QUEUE_USED_CAPACITY_RATIO = "hadoop.queue.usedcapacityratio";
+        public static final String HADOOP_QUEUE_NUMPENDING_JOBS = "hadoop.queue.numpendingjobs";
+        public static final String HADOOP_QUEUE_USED_CAPACITY = "hadoop.queue.usedcapacity";
+        public static final String HADOOP_QUEUE_USED_CAPACITY_RATIO = "hadoop.queue.usedcapacityratio";
 
-        public final static String HADOOP_USER_NUMPENDING_JOBS = "hadoop.user.numpendingjobs";
-        public final static String HADOOP_USER_USED_MEMORY = "hadoop.user.usedmemory";
-        public final static String HADOOP_USER_USED_MEMORY_RATIO = "hadoop.user.usedmemoryratio";
+        public static final String HADOOP_USER_NUMPENDING_JOBS = "hadoop.user.numpendingjobs";
+        public static final String HADOOP_USER_USED_MEMORY = "hadoop.user.usedmemory";
+        public static final String HADOOP_USER_USED_MEMORY_RATIO = "hadoop.user.usedmemoryratio";
 
     }
 

@@ -20,17 +20,17 @@ package org.apache.eagle.hadoop.queue.exceptions;
 
 public class HadoopQueueFetcherException extends Exception {
 
-	private static final long serialVersionUID = -2425311876734366496L;
+    private static final long serialVersionUID = -2425311876734366496L;
 
-	/**
-	 * Default constructor of FeederException
-	 */
+    /**
+     * Default constructor of FeederException.
+     */
     public HadoopQueueFetcherException() {
         super();
     }
 
     /**
-     * Constructor of FeederException
+     * Constructor of FeederException.
      *
      * @param message error message
      */
@@ -39,18 +39,17 @@ public class HadoopQueueFetcherException extends Exception {
     }
 
     /**
-     * Constructor of FeederException
+     * Constructor of FeederException.
      *
      * @param message error message
-     * @param cause the cause of the exception
-     *
+     * @param cause   the cause of the exception
      */
     public HadoopQueueFetcherException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Constructor of FeederException
+     * Constructor of FeederException.
      *
      * @param cause the cause of the exception
      */

@@ -18,9 +18,9 @@
 
 package org.apache.eagle.hadoop.queue.common;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
+import com.typesafe.config.Config;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
