@@ -16,27 +16,37 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.service.jpm;
+package org.apache.eagle.service.jpm.count;
 
 import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.jobcounter.JobCounters;
+import org.apache.eagle.service.jpm.MRJobTaskCountResponse;
+import org.apache.eagle.service.jpm.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class TestTaskCountPerJobHelper {
-    TaskCountByDurationHelper helper = new TaskCountByDurationHelper();
+public class TestMRTaskCountImpl {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TestMRTaskCountImpl.class);
+    MRTaskCountImpl helper = new MRTaskCountImpl();
 
     @Test
     public void test() {
         String timeList = " 0, 10,20,40 ";
-        List<Long> times = helper.parseTimeList(timeList);
+        List<Long> times = ResourceUtils.parseDistributionList(timeList);
         Assert.assertTrue(times.size() == 4);
 
         long val = 25 * 1000;
-        int index = helper.getPosition(times, val);
+        int index = ResourceUtils.getDistributionPosition(times, val);
         Assert.assertTrue(index == 2);
     }
 
@@ -70,12 +80,12 @@ public class TestTaskCountPerJobHelper {
         List<MRJobTaskCountResponse.UnitTaskCount> finishedTaskCount = new ArrayList<>();
 
         String timeList = " 0, 10,20,40 ";
-        List<Long> times = helper.parseTimeList(timeList);
+        List<Long> times = ResourceUtils.parseDistributionList(timeList);
 
-        helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new TaskCountByDurationHelper.RunningTaskComparator());
+        helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new MRTaskCountImpl.RunningTaskComparator());
 
         for (TaskExecutionAPIEntity o : tasks) {
-            int index = helper.getPosition(times, o.getDuration());
+            int index = ResourceUtils.getDistributionPosition(times, o.getDuration());
             if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
                 MRJobTaskCountResponse.UnitTaskCount counter = runningTaskCount.get(index);
                 counter.taskCount++;
@@ -87,10 +97,32 @@ public class TestTaskCountPerJobHelper {
             }
         }
         int top = 2;
-        if (top > 0)  {
-            helper.getTopTasks(runningTaskCount, top);
-        }
+        helper.getTopTasks(runningTaskCount, top);
         Assert.assertTrue(runningTaskCount.get(1).taskCount == 3);
         Assert.assertTrue(runningTaskCount.get(1).topEntities.size() == 2);
     }
+
+    @Test
+    public void testCounterParametersParser() {
+        String paramString = "HDFS_BYTES_READ:[0,20.0,40], MAP_OUTPUT_BYTES:[20, 40], REDUCE_INPUT_RECORDS: [0, 199], REDUCE_OUTPUT_RECORDS: [3,10]";
+        String patternString = "(\\w+):\\s*\\[([\\d,\\.\\s]+)\\]";
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(paramString);
+        List<String> expectedResults = new ArrayList<>(Arrays.asList("HDFS_BYTES_READ", "0,20.0,40", "MAP_OUTPUT_BYTES", "20, 40", "REDUCE_INPUT_RECORDS", "0, 199", "REDUCE_OUTPUT_RECORDS", "3,10"));
+        int i = 0;
+        while (matcher.find()) {
+            LOG.info(matcher.group(0));
+            LOG.info(matcher.group(1));
+            LOG.info(matcher.group(2));
+            Assert.assertTrue(matcher.group(1).equals(expectedResults.get(i++)));
+            Assert.assertTrue(matcher.group(2).equals(expectedResults.get(i++)));
+        }
+    }
+
+    @Test
+    public void testGetCounterName() {
+        JobCounters.CounterName counterName = JobCounters.CounterName.valueOf("HDFS_BYTES_READ");
+        Assert.assertTrue(counterName.equals(JobCounters.CounterName.HDFS_BYTES_READ));
+    }
+
 }

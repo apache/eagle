@@ -16,9 +16,10 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.service.jpm;
+package org.apache.eagle.service.jpm.count;
 
 import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.service.jpm.MRJobTaskCountResponse;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,10 +29,11 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestJobCountPerBucketHelper {
-    MRJobCountHelper helper = new MRJobCountHelper();
+public class TestMRJobCountImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestJobCountPerBucketHelper.class);
+    MRJobCountImpl helper = new MRJobCountImpl();
+
+    private static final Logger LOG = LoggerFactory.getLogger(TestMRJobCountImpl.class);
 
     @Test
     public void test() throws ParseException {

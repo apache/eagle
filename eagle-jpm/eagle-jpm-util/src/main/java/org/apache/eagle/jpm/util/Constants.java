@@ -96,6 +96,10 @@ public class Constants {
         COMPLETE_MR_JOB
     }
 
+    public static enum SuggestionType {
+        MapDataSkew, ReduceDataSkew, MapSpill, MapGC, ReduceGC;
+    }
+
     public static final String TASK_RUNNING = "RUNNING";
     public static final String TASK_FINISHED = "FINISHED";
 
