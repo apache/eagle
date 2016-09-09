@@ -34,6 +34,8 @@ public class Publishment {
     private List<String> policyIds;
     private String dedupIntervalMin;
     private List<String> dedupFields;
+    private String dedupStateField;
+    private String dedupStateCloseValue;
     private Map<String, String> properties;
     // the class name to extend the IEventSerializer interface
     private String serializer;
@@ -44,6 +46,22 @@ public class Publishment {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDedupStateField() {
+        return dedupStateField;
+    }
+
+    public void setDedupStateField(String dedupStateField) {
+        this.dedupStateField = dedupStateField;
+    }
+
+    public String getDedupStateCloseValue() {
+        return dedupStateCloseValue;
+    }
+
+    public void setDedupStateCloseValue(String dedupStateCloseValue) {
+        this.dedupStateCloseValue = dedupStateCloseValue;
     }
 
     public String getSerializer() {

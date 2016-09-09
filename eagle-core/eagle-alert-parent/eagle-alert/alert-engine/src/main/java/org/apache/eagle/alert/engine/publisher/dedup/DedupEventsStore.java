@@ -14,25 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.alert.engine.serialization.impl;
+package org.apache.eagle.alert.engine.publisher.dedup;
 
-import org.apache.eagle.alert.engine.serialization.Serializer;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 
-public class LongSerializer implements Serializer<Object> {
-    @Override
-    public void serialize(Object value, DataOutput dataOutput) throws IOException {
-        if (value instanceof Integer) {
-            value = ((Integer) value).longValue();
-        }
-        dataOutput.writeLong((long) value);
-    }
+public interface DedupEventsStore {
 
-    @Override
-    public Long deserialize(DataInput dataInput) throws IOException {
-        return dataInput.readLong();
-    }
+    public Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> getEvents();
+
+    public void add(EventUniq eventEniq, ConcurrentLinkedDeque<DedupValue> dedupStateValues);
+
+    public void remove(EventUniq eventEniq);
+
 }

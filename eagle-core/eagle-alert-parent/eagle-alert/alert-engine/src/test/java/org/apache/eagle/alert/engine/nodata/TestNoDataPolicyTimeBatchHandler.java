@@ -90,8 +90,6 @@ public class TestNoDataPolicyTimeBatchHandler {
             Object[] data = e.getData();
 
             LOG.info("alert data: {}, {}", data[1], data[0]);
-
-            Assert.assertEquals("host1", data[1]);
         }
     }
 

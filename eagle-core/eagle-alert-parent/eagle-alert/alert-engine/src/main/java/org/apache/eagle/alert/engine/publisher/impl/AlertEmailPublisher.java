@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -64,12 +65,17 @@ public class AlertEmailPublisher extends AbstractPublishPlugin {
             LOG.warn("emailGenerator is null due to the incorrect configurations");
             return;
         }
-        event = dedup(event);
-        if (event == null) {
+        List<AlertStreamEvent> outputEvents = dedup(event);
+        if (outputEvents == null) {
             return;
         }
 
-        boolean isSuccess = emailGenerator.sendAlertEmail(event);
+        boolean isSuccess = true;
+        for (AlertStreamEvent outputEvent : outputEvents) {
+            if (!emailGenerator.sendAlertEmail(outputEvent)) {
+                isSuccess = false;
+            }
+        }
         PublishStatus status = new PublishStatus();
         if (!isSuccess) {
             status.errorMessage = "Failed to send email";
