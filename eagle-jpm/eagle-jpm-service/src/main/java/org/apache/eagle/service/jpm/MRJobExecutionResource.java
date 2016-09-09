@@ -276,7 +276,7 @@ public class MRJobExecutionResource {
         String searchEndTime = endTime;
         try {
             startTimeInMills = DateTimeUtil.humanDateToSeconds(startTime) * DateTimeUtil.ONESECOND;
-            searchStartTime = helper.moveTimeforwardOneDay(searchStartTime);
+            searchStartTime = helper.moveTimeForwardOneDay(searchStartTime);
         } catch (Exception e) {
             response.errMessage = e.getMessage();
             return response;
@@ -285,15 +285,23 @@ public class MRJobExecutionResource {
         GenericServiceAPIResponseEntity<JobExecutionAPIEntity> historyRes =
             resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
         if (!historyRes.isSuccess() || historyRes.getObj() == null) {
-            response.errMessage = String.format("Catch an exception: %s with query=%s", historyRes.getException(), query);
+            response.errMessage = String.format("Catch an exception during fetch history jobs: %s with query=%s", historyRes.getException(), query);
+            return response;
+        }
+        query = String.format("%s[@site=\"%s\"]{@startTime,@endTime,@jobType}", Constants.JPA_RUNNING_JOB_EXECUTION_SERVICE_NAME, site);
+        GenericServiceAPIResponseEntity<org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity> runningRes =
+            resource.search(query, searchStartTime, searchEndTime, Integer.MAX_VALUE, null, false, true, 0L, 0, true, 0, null, false);
+        if (!runningRes.isSuccess() || runningRes.getObj() == null) {
+            response.errMessage = String.format("Catch an exception during fetch running jobs: %s with query=%s", runningRes.getException(), query);
             return response;
         }
 
         try {
             long startTimeInSecs = DateTimeUtil.humanDateToSeconds(startTime);
             long endTimeInSecs = DateTimeUtil.humanDateToSeconds(endTime);
-            return helper.getRunningJobCount(historyRes.getObj(), startTimeInSecs, endTimeInSecs, intervalInSecs);
+            return helper.getRunningJobCount(historyRes.getObj(), runningRes.getObj(), startTimeInSecs, endTimeInSecs, intervalInSecs);
         } catch (Exception e) {
+            e.printStackTrace();
             response.errMessage = e.getMessage();
             return response;
         }
@@ -344,7 +352,7 @@ public class MRJobExecutionResource {
         String searchEndTime = timePoint;
         try {
             timePointsInMills = DateTimeUtil.humanDateToSeconds(timePoint) * DateTimeUtil.ONESECOND;
-            searchStartTime = helper.moveTimeforwardOneDay(searchStartTime);
+            searchStartTime = helper.moveTimeForwardOneDay(searchStartTime);
         } catch (ParseException e) {
             response.setException(e);
             response.setSuccess(false);

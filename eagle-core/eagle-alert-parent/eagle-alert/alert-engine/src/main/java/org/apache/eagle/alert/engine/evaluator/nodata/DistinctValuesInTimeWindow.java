@@ -16,70 +16,69 @@
  */
 package org.apache.eagle.alert.engine.evaluator.nodata;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import java.util.*;
 
 /**
  * Since 6/28/16.
  * to get distinct values within a specified time window
  * valueMaxTimeMap : each distinct value is associated with max timestamp it ever had
  * timeSortedMap : map sorted by timestamp first and then value
- * With the above 2 data structure, we can get distinct values in LOG(N)
+ * With the above 2 data structure, we can get distinct values in LOG(N).
  */
 public class DistinctValuesInTimeWindow {
-    public static class ValueAndTime{
+    public static class ValueAndTime {
         Object value;
         long timestamp;
-        public ValueAndTime(Object value, long timestamp){
+
+        public ValueAndTime(Object value, long timestamp) {
             this.value = value;
             this.timestamp = timestamp;
         }
 
-        public String toString(){
+        public String toString() {
             return "[" + value + "," + timestamp + "]";
         }
 
-        public int hashCode(){
+        public int hashCode() {
             return new HashCodeBuilder().append(value).append(timestamp).toHashCode();
         }
 
-        public boolean equals(Object that){
-            if(!(that instanceof ValueAndTime))
+        public boolean equals(Object that) {
+            if (!(that instanceof ValueAndTime)) {
                 return false;
-            ValueAndTime another = (ValueAndTime)that;
+            }
+            ValueAndTime another = (ValueAndTime) that;
             return another.timestamp == this.timestamp && another.value.equals(this.value);
         }
     }
 
-    public static class ValueAndTimeComparator implements Comparator<ValueAndTime>{
+    public static class ValueAndTimeComparator implements Comparator<ValueAndTime> {
         @Override
         public int compare(ValueAndTime o1, ValueAndTime o2) {
-            if(o1.timestamp != o2.timestamp)
+            if (o1.timestamp != o2.timestamp) {
                 return (o1.timestamp > o2.timestamp) ? 1 : -1;
-            if(o1.value.equals(o2.value))
+            }
+            if (o1.value.equals(o2.value)) {
                 return 0;
-            else {
+            } else {
                 // this is not strictly correct, but I don't want to write too many comparators here :-)
-                if(o1.hashCode() > o2.hashCode())
+                if (o1.hashCode() > o2.hashCode()) {
                     return 1;
-                else
+                } else {
                     return -1;
+                }
             }
         }
     }
 
     /**
-     * map from value to max timestamp for this value
+     * map from value to max timestamp for this value.
      */
     private Map<Object, Long> valueMaxTimeMap = new HashMap<>();
     /**
-     * map sorted by time(max timestamp for the value) and then value
+     * map sorted by time(max timestamp for the value) and then value.
      */
     private SortedMap<ValueAndTime, ValueAndTime> timeSortedMap = new TreeMap<>(new ValueAndTimeComparator());
     private long maxTimestamp = 0L;
@@ -87,20 +86,20 @@ public class DistinctValuesInTimeWindow {
     private boolean windowSlided;
 
     /**
-     * @param window - milliseconds
+     * @param window - milliseconds.
      */
-    public DistinctValuesInTimeWindow(long window){
+    public DistinctValuesInTimeWindow(long window) {
         this.window = window;
     }
 
-    public void send(Object value, long timestamp){
+    public void send(Object value, long timestamp) {
         ValueAndTime vt = new ValueAndTime(value, timestamp);
 
         // todo think of time out of order
-        if(valueMaxTimeMap.containsKey(value)){
+        if (valueMaxTimeMap.containsKey(value)) {
             // remove that entry with old timestamp in timeSortedMap
             long oldTime = valueMaxTimeMap.get(value);
-            if(oldTime >= timestamp){
+            if (oldTime >= timestamp) {
                 // no any effect as the new timestamp is equal or even less than old timestamp
                 return;
             }
@@ -117,25 +116,25 @@ public class DistinctValuesInTimeWindow {
 
         // check if some values should be evicted because of time window
         Iterator<Map.Entry<ValueAndTime, ValueAndTime>> it = timeSortedMap.entrySet().iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             Map.Entry<ValueAndTime, ValueAndTime> entry = it.next();
-            if(entry.getKey().timestamp < maxTimestamp - window){
+            if (entry.getKey().timestamp < maxTimestamp - window) {
                 // should remove the entry in valueMaxTimeMap and timeSortedMap
                 valueMaxTimeMap.remove(entry.getKey().value);
                 windowSlided = true;
 
                 it.remove();
-            }else {
+            } else {
                 break;
             }
         }
     }
 
-    public Map<Object, Long> distinctValues(){
+    public Map<Object, Long> distinctValues() {
         return valueMaxTimeMap;
     }
 
-    public boolean windowSlided(){
+    public boolean windowSlided() {
         return windowSlided;
     }
 }

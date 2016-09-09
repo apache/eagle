@@ -67,18 +67,18 @@ public class TestHBaseStatement extends TestHBaseBase {
             {
                 put("cluster", "test");
                 put("datacenter", "test");
-                put("name","unit.test.name");
+                put("name", "unit.test.name");
             }
         });
 
         entities.add(entity);
 
-        CreateStatement createStatement = new CreateStatement(entities,"TestTimeSeriesAPIEntity");
+        CreateStatement createStatement = new CreateStatement(entities, "TestTimeSeriesAPIEntity");
         ModifyResult resultSet = createStatement.execute(DataStorageManager.newDataStorage("hbase"));
 
         Assert.assertEquals(1, resultSet.getIdentifiers().size());
 
-        createStatement = new CreateStatement(entities,"TestTimeSeriesAPIEntity");
+        createStatement = new CreateStatement(entities, "TestTimeSeriesAPIEntity");
         resultSet = createStatement.execute(DataStorageManager.newDataStorage("hbase"));
 
         Assert.assertEquals(1, resultSet.getIdentifiers().size());

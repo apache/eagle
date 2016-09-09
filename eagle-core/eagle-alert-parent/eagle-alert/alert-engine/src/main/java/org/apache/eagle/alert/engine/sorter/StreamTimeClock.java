@@ -17,29 +17,26 @@
 package org.apache.eagle.alert.engine.sorter;
 
 /**
- * The time clock per stream
- *
- * Should be thread-safe between getTime and moveForward
- *
- * By default, we currently simple support event timestamp now
+ * The time clock per stream should be thread-safe between getTime and moveForward.
+ * By default, we currently simple support event timestamp now.
  */
 public interface StreamTimeClock {
     /**
-     * Get stream id
+     * Get stream id.
      *
      * @return stream id
      */
     String getStreamId();
 
     /**
-     * Get current time
+     * Get current time.
      *
      * @return current timestamp value
      */
     long getTime();
 
     /**
-     * @param timestamp move forward current time to given timestamp
+     * @param timestamp move forward current time to given timestamp.
      */
     void moveForward(long timestamp);
 }

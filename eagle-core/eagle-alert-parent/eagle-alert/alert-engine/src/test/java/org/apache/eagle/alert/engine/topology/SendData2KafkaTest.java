@@ -18,6 +18,12 @@
  */
 package org.apache.eagle.alert.engine.topology;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -27,22 +33,14 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.Ignore;
-import org.junit.Test;
-
 /**
  * Created on 3/12/16.
  */
-@SuppressWarnings({"serial", "unchecked", "rawtypes", "resource"})
-public class SendData2KafkaTest implements Serializable{
+@SuppressWarnings( {"serial", "unchecked", "rawtypes", "resource"})
+public class SendData2KafkaTest implements Serializable {
     /**
-     *
      * {"timestamp": 10000, "metric": "esErrorLogEvent", "instanceUuid": "vm-InstanceId1", "host":"test-host1", "type":"nova", "stack":"NullPointException-..........."}
-     {"timestamp": 10000, "metric": "instanceFailureLogEvent", "instanceUuid": "vm-InstanceId1", "message":"instance boot failure for user liasu!"}
-     *
+     * {"timestamp": 10000, "metric": "instanceFailureLogEvent", "instanceUuid": "vm-InstanceId1", "message":"instance boot failure for user liasu!"}
      */
     @Test
     @Ignore

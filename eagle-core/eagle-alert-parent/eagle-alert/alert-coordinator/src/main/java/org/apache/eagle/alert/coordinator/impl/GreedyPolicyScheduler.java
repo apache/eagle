@@ -16,24 +16,10 @@
  */
 package org.apache.eagle.alert.coordinator.impl;
 
-import static org.apache.eagle.alert.coordinator.CoordinatorConstants.CONFIG_ITEM_BOLT_LOAD_UPBOUND;
-import static org.apache.eagle.alert.coordinator.CoordinatorConstants.CONFIG_ITEM_COORDINATOR;
-import static org.apache.eagle.alert.coordinator.CoordinatorConstants.POLICIES_PER_BOLT;
-import static org.apache.eagle.alert.coordinator.CoordinatorConstants.POLICY_DEFAULT_PARALLELISM;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import static org.apache.eagle.alert.coordinator.CoordinatorConstants.*;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
-import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
-import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
-import org.apache.eagle.alert.coordination.model.internal.StreamGroup;
-import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
-import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.coordination.model.internal.*;
 import org.apache.eagle.alert.coordinator.IPolicyScheduler;
 import org.apache.eagle.alert.coordinator.IScheduleContext;
 import org.apache.eagle.alert.coordinator.ScheduleOption;
@@ -44,31 +30,31 @@ import org.apache.eagle.alert.coordinator.provider.InMemScheduleConext;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.utils.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * A simple greedy assigner. <br/>
- * A greedy assigner simply loop the policies, find the most suitable topology
+ *
+ * <p>A greedy assigner simply loop the policies, find the most suitable topology
  * to locate the policy first, then assign the topics to corresponding
- * spouts/group-by bolts.
- * 
- * <br/>
- * For each given policy, the greedy steps are
+ * spouts/group-by bolts.</p>
+ *
+ * <p>For each given policy, the greedy steps are</p>
+ *
  * <ul>
  * <li>1. Find the same topology that already serve the policy without exceed the load</li>
  * <li>2. Find the topology that already take the source traffic without exceed the load</li>
  * <li>3. Find the topology that available to place source topic without exceed the load</li>
  * <li>4. Create a new topology and locate the policy</li>
  * <li>Route table generated after all policies assigned</li>
- * <ul>
- * <br/>
- * 
+ * </ul>
  * @since Mar 24, 2016
- *
  */
 public class GreedyPolicyScheduler implements IPolicyScheduler {
 
@@ -111,8 +97,8 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
          * Answer: two possible place: a global route table will be generated, those target not in current topology tuples will be dropped. This make the partition for tuple to alert
          * <li>How to support add topology on demand by evaluate the available topology bandwidth(need topology level load)?</li>
          * Answer: Use configured topology load up-bound, when topology load is available, will adopt
-         * <ul>
-         * <pre>
+         * </ul>
+         * </pre>
          */
         List<ScheduleResult> results = new ArrayList<ScheduleResult>();
         Map<String, PolicyAssignment> newAssignments = new HashMap<String, PolicyAssignment>();
@@ -152,13 +138,13 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
     }
 
     private ScheduleState generateMonitorMetadata(List<WorkItem> expandworkSets,
-            Map<String, PolicyAssignment> newAssignments) {
+                                                  Map<String, PolicyAssignment> newAssignments) {
         MonitorMetadataGenerator generator = new MonitorMetadataGenerator(context);
         return generator.generate(expandworkSets);
     }
 
     private void placePolicy(PolicyDefinition def, AlertBoltUsage alertBoltUsage, Topology targetTopology,
-            TopologyUsage usage) {
+                             TopologyUsage usage) {
         String policyName = def.getName();
 
         // topology usage update
@@ -169,26 +155,26 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
 
         // update source topics
         updateDataSource(usage, def);
-        
+
         // update group-by
         updateGrouping(usage, def);
     }
 
     private void updateGrouping(TopologyUsage usage, PolicyDefinition def) {
         // groupByMeta is removed since groupspec generate doesnt need it now. 
-//        List<StreamPartition> policyPartitionSpec = def.getPartitionSpec();
-//        Map<String, List<StreamPartition>> groupByMeta = usage.getGroupByMeta();
-//        for (StreamPartition par : policyPartitionSpec) {
-//            List<StreamPartition> partitions = groupByMeta.get(par.getStreamId());
-//            if (partitions == null) {
-//                partitions = new ArrayList<StreamPartition>();
-//                // de-dup of the partition on the list?
-//                groupByMeta.put(par.getStreamId(), partitions);
-//            }
-//            if (!partitions.contains(par)) {
-//                partitions.add(par);
-//            }
-//        }
+        //        List<StreamPartition> policyPartitionSpec = def.getPartitionSpec();
+        //        Map<String, List<StreamPartition>> groupByMeta = usage.getGroupByMeta();
+        //        for (StreamPartition par : policyPartitionSpec) {
+        //            List<StreamPartition> partitions = groupByMeta.get(par.getStreamId());
+        //            if (partitions == null) {
+        //                partitions = new ArrayList<StreamPartition>();
+        //                // de-dup of the partition on the list?
+        //                groupByMeta.put(par.getStreamId(), partitions);
+        //            }
+        //            if (!partitions.contains(par)) {
+        //                partitions.add(par);
+        //            }
+        //        }
     }
 
     private void updateDataSource(TopologyUsage usage, PolicyDefinition def) {
@@ -216,13 +202,13 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
      * <li>3. Find the topology that available to place source topic</li>
      * <li>4. Create a new topology and locate the policy</li>
      * <li>Route table generated after all policies assigned</li>
-     * <ul>
+     * </ul>
      * <br/>
-     * 
+     *
      * @param newAssignments
      */
     private ScheduleResult schedulePolicy(WorkItem item, Map<String, PolicyAssignment> newAssignments) {
-        LOG.info(" schedule for {}", item );
+        LOG.info(" schedule for {}", item);
 
         String policyName = item.def.getName();
         StreamGroup policyStreamPartition = new StreamGroup();
@@ -260,14 +246,14 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
     }
 
     private void placePolicyToQueue(PolicyDefinition def, StreamWorkSlotQueue queue,
-            Map<String, PolicyAssignment> newAssignments) {
+                                    Map<String, PolicyAssignment> newAssignments) {
         for (WorkSlot slot : queue.getWorkingSlots()) {
             Topology targetTopology = context.getTopologies().get(slot.getTopologyName());
             TopologyUsage usage = context.getTopologyUsages().get(slot.getTopologyName());
             AlertBoltUsage alertBoltUsage = usage.getAlertBoltUsage(slot.getBoltId());
             placePolicy(def, alertBoltUsage, targetTopology, usage);
         }
-//        queue.placePolicy(def);
+        // queue.placePolicy(def);
         PolicyAssignment assignment = new PolicyAssignment(def.getName(), queue.getQueueId());
         context.getPolicyAssignments().put(def.getName(), assignment);
         newAssignments.put(def.getName(), assignment);
@@ -286,22 +272,19 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
             WorkQueueBuilder builder = new WorkQueueBuilder(context, mgmtService);
             // TODO : get the properties from policy definiton
             targetQueue = builder.createQueue(targetdStream, false, getQueueSize(def.getParallelismHint()),
-                    new HashMap<String, Object>());
+                new HashMap<String, Object>());
         }
         return targetQueue;
     }
 
     /**
-     * Some strategy to generate correct size in Startegy of queue builder
-     * 
-     * @param hint
-     * @return
+     * Some strategy to generate correct size in Startegy of queue builder.
      */
     private int getQueueSize(int hint) {
-    	if (hint == 0) {
-    		// some policies require single bolt to execute
-    		return 1;
-    	}
+        if (hint == 0) {
+            // some policies require single bolt to execute
+            return 1;
+        }
         return initialQueueSize * ((hint + initialQueueSize - 1) / initialQueueSize);
     }
 
@@ -323,7 +306,7 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
     private boolean isBoltAvailable(AlertBoltUsage boltUsage, PolicyDefinition def) {
         // overload or over policy # or already contains
         if (boltUsage == null || boltUsage.getLoad() > boltLoadUpbound
-                || boltUsage.getPolicies().size() > policiesPerBolt || boltUsage.getPolicies().contains(def.getName())) {
+            || boltUsage.getPolicies().size() > policiesPerBolt || boltUsage.getPolicies().contains(def.getName())) {
             return false;
         }
         return true;
@@ -333,7 +316,7 @@ public class GreedyPolicyScheduler implements IPolicyScheduler {
         this.context = new InMemScheduleConext(context);
         this.mgmtService = mgmtService;
     }
-    
+
     public IScheduleContext getContext() {
         return context;
     }

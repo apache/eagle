@@ -16,19 +16,17 @@
  */
 package org.apache.eagle.service.alert.resource.impl;
 
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.impl.InMemMetadataDaoImpl;
 import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
-import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.ConfigFactory;
-
 /**
  * @since May 1, 2016
- *
  */
 public class InMemoryTest {
 
@@ -36,11 +34,11 @@ public class InMemoryTest {
 
     @Test
     public void test_AddPolicy() {
-        
+
         LoggerFactory.getLogger(InMemoryTest.class);
-        
+
         MetadataDaoFactory.getInstance().getMetadataDao();
-        
+
         PolicyDefinition pd = new PolicyDefinition();
         pd.setName("pd1");
         dao.addPolicy(pd);

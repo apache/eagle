@@ -20,9 +20,9 @@ import org.apache.eagle.metadata.model.StreamSinkConfig;
 
 public class DefaultStreamSinkConfig implements StreamSinkConfig {
     private final Class<?> streamPersistClass;
-    private final static String NONE_STORAGE_TYPE = "NONE";
+    private static final String NONE_STORAGE_TYPE = "NONE";
 
-    public DefaultStreamSinkConfig(Class<?> streamPersistClass){
+    public DefaultStreamSinkConfig(Class<?> streamPersistClass) {
         this.streamPersistClass = streamPersistClass;
     }
 

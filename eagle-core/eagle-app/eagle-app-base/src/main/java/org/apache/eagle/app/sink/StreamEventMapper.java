@@ -16,15 +16,17 @@
  */
 package org.apache.eagle.app.sink;
 
-import backtype.storm.tuple.Tuple;
 import org.apache.eagle.alert.engine.model.StreamEvent;
+import backtype.storm.tuple.Tuple;
 
 import java.io.Serializable;
 import java.util.List;
 
 @FunctionalInterface
-public interface StreamEventMapper extends Serializable{
+public interface StreamEventMapper extends Serializable {
     /**
+     * Map from storm tuple to Stream Event.
+     *
      * @param tuple
      * @return
      * @throws Exception

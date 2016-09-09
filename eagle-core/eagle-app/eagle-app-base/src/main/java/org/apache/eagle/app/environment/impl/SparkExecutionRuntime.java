@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.app.environment.impl;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
+import com.typesafe.config.Config;
 
 public class SparkExecutionRuntime implements ExecutionRuntime<SparkEnvironment,Object> {
     @Override

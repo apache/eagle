@@ -16,15 +16,13 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 public class StreamColumn implements Serializable {
     private static final long serialVersionUID = -5457861313624389106L;
@@ -36,19 +34,19 @@ public class StreamColumn implements Serializable {
     private String nodataExpression;
 
     public String toString() {
-        return String.format("StreamColumn=name[%s], type=[%s], defaultValue=[%s], required=[%s], nodataExpression=[%s]", 
-        		name, type, defaultValue, required, nodataExpression);
+        return String.format("StreamColumn=name[%s], type=[%s], defaultValue=[%s], required=[%s], nodataExpression=[%s]",
+            name, type, defaultValue, required, nodataExpression);
     }
 
     public String getNodataExpression() {
-		return nodataExpression;
-	}
+        return nodataExpression;
+    }
 
-	public void setNodataExpression(String nodataExpression) {
-		this.nodataExpression = nodataExpression;
-	}
+    public void setNodataExpression(String nodataExpression) {
+        this.nodataExpression = nodataExpression;
+    }
 
-	public String getName() {
+    public String getName() {
         return name;
     }
 
@@ -71,7 +69,7 @@ public class StreamColumn implements Serializable {
     }
 
     private void ensureDefaultValueType() {
-        if(this.getDefaultValue()!=null && (this.getDefaultValue() instanceof String) && this.getType() != Type.STRING){
+        if (this.getDefaultValue() != null && (this.getDefaultValue() instanceof String) && this.getType() != Type.STRING) {
             switch (this.getType()) {
                 case INT:
                     this.setDefaultValue(Integer.valueOf((String) this.getDefaultValue()));
@@ -90,11 +88,13 @@ public class StreamColumn implements Serializable {
                     break;
                 case OBJECT:
                     try {
-                        this.setDefaultValue(new ObjectMapper().readValue((String) this.getDefaultValue(),HashMap.class));
+                        this.setDefaultValue(new ObjectMapper().readValue((String) this.getDefaultValue(), HashMap.class));
                     } catch (IOException e) {
                         throw new IllegalArgumentException(e);
                     }
                     break;
+                default:
+                    throw new IllegalArgumentException("Illegal type: " + this.getType());
             }
         }
     }
@@ -134,7 +134,6 @@ public class StreamColumn implements Serializable {
             return name;
         }
 
-        @org.codehaus.jackson.annotate.JsonCreator
         @com.fasterxml.jackson.annotation.JsonCreator
         public static Type getEnumFromValue(String value) {
             for (Type testEnum : values()) {
@@ -146,7 +145,7 @@ public class StreamColumn implements Serializable {
         }
     }
 
-    public static class StreamColumnTypeAdapter extends XmlAdapter<String,Type>{
+    public static class StreamColumnTypeAdapter extends XmlAdapter<String, Type> {
 
         @Override
         public Type unmarshal(String v) throws Exception {
@@ -159,7 +158,7 @@ public class StreamColumn implements Serializable {
         }
     }
 
-    public static class DefaultValueAdapter extends XmlAdapter<String,Object>{
+    public static class DefaultValueAdapter extends XmlAdapter<String, Object> {
         @Override
         public Object unmarshal(String v) throws Exception {
             return v;

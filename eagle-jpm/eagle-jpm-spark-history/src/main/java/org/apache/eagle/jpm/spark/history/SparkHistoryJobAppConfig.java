@@ -20,13 +20,12 @@
 package org.apache.eagle.jpm.spark.history;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 import java.io.Serializable;
 
 public class SparkHistoryJobAppConfig implements Serializable {
-    final static String SPARK_HISTORY_JOB_FETCH_SPOUT_NAME = "sparkHistoryJobFetchSpout";
-    final static String SPARK_HISTORY_JOB_PARSE_BOLT_NAME = "sparkHistoryJobParseBolt";
+    static final String SPARK_HISTORY_JOB_FETCH_SPOUT_NAME = "sparkHistoryJobFetchSpout";
+    static final String SPARK_HISTORY_JOB_PARSE_BOLT_NAME = "sparkHistoryJobParseBolt";
 
     public ZKStateConfig zkStateConfig;
     public JobHistoryEndpointConfig jobHistoryConfig;
@@ -82,8 +81,6 @@ public class SparkHistoryJobAppConfig implements Serializable {
         this.eagleInfo.host = config.getString("eagleProps.eagle.service.host");
         this.eagleInfo.port = config.getInt("eagleProps.eagle.service.port");
 
-        this.stormConfig.topologyName = config.getString("storm.name");
-        this.stormConfig.workerNo = config.getInt("storm.worker.num");
         this.stormConfig.timeoutSec = config.getInt("storm.messageTimeoutSec");
         this.stormConfig.spoutPending = config.getInt("storm.pendingSpout");
         this.stormConfig.spoutCrawlInterval = config.getInt("storm.spoutCrawlInterval");
@@ -117,9 +114,7 @@ public class SparkHistoryJobAppConfig implements Serializable {
     }
 
     public static class StormConfig implements Serializable {
-        public int workerNo;
         public int timeoutSec;
-        public String topologyName;
         public int spoutPending;
         public int spoutCrawlInterval;
     }

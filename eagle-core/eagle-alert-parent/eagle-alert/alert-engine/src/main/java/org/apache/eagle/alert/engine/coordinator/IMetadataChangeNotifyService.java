@@ -16,35 +16,31 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
-import java.io.Closeable;
-import java.io.Serializable;
-
 import org.apache.eagle.alert.engine.publisher.AlertPublishSpecListener;
 import org.apache.eagle.alert.engine.router.AlertBoltSpecListener;
 import org.apache.eagle.alert.engine.router.SpoutSpecListener;
 import org.apache.eagle.alert.engine.router.StreamRouterBoltSpecListener;
-
 import com.typesafe.config.Config;
+
+import java.io.Closeable;
+import java.io.Serializable;
 
 /**
  * IMetadataChangeNotifyService defines the following features
  * 1) initialization
  * 2) register metadata change listener
  *
- * In distributed environment for example storm platform,
+ * <p>In distributed environment for example storm platform,
  * subclass implementing this interface should have the following lifecycle
  * 1. object is created in client machine
  * 2. object is serialized and transferred to other machine
  * 3. object is created through deserialization
  * 4. invoke init() method to do initialization
  * 5. invoke various registerListener to get notified of config change
- * 6. invoke close() to release system resource
+ * 6. invoke close() to release system resource</p>
  */
-public interface IMetadataChangeNotifyService extends Closeable,Serializable {
-    /**
-     *
-     * @param config
-     */
+public interface IMetadataChangeNotifyService extends Closeable, Serializable {
+
     void init(Config config, MetadataType type);
 
     void registerListener(SpoutSpecListener listener);

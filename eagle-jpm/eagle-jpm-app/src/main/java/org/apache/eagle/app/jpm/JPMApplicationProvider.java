@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,7 +19,7 @@ package org.apache.eagle.app.jpm;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
 /**
- * Define application provider pragmatically
+ * Define application provider pragmatically.
  */
 public class JPMApplicationProvider extends AbstractApplicationProvider<JPMApplication> {
     @Override

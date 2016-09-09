@@ -19,8 +19,7 @@ package org.apache.eagle.alert.coordinator;
 import org.apache.eagle.alert.coordinator.impl.GreedyPolicyScheduler;
 
 /**
- * @since Mar 24, 2016
- *
+ * @since Mar 24, 2016.
  */
 public class PolicySchedulerFactory {
 

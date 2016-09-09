@@ -40,8 +40,11 @@ public class TestJobCountPerBucketHelper {
         String timeString2 = DateTimeUtil.secondsToHumanDate(timestamp);
         Assert.assertTrue(timeString2.equals(timeString));
 
-        String timeString3 = helper.moveTimeforwardOneDay(timeString);
+        String timeString3 = helper.moveTimeForwardOneDay(timeString);
         Assert.assertTrue(timeString3.equals("2016-08-21 20:13:00"));
+
+        String timeString4 = helper.moveTimeForwardOneDay(timeString3);
+        Assert.assertTrue(timeString4.equals("2016-08-20 20:13:00"));
     }
 
     @Test
@@ -53,7 +56,7 @@ public class TestJobCountPerBucketHelper {
         /*for (MRJobTaskCountResponse.UnitJobCount jobCount : jobCounts) {
             LOG.info(DateTimeUtil.secondsToHumanDate(jobCount.timeBucket));
         }*/
-        Assert.assertTrue(DateTimeUtil.secondsToHumanDate(jobCounts.get(1).timeBucket).equals("2016-08-22 20:15:00"));
+        Assert.assertTrue(DateTimeUtil.millisecondsToHumanDateWithSeconds(jobCounts.get(1).timeBucket).equals("2016-08-22 20:15:00"));
     }
 
     @Test

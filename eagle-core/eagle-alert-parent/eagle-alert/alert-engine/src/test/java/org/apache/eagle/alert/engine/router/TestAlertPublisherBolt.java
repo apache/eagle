@@ -66,13 +66,13 @@ public class TestAlertPublisherBolt {
         publisher.nextEvent(event1);
     }
 
-    private AlertStreamEvent create(String streamId){
+    private AlertStreamEvent create(String streamId) {
         AlertStreamEvent alert = new AlertStreamEvent();
         PolicyDefinition policy = new PolicyDefinition();
         policy.setName("policy1");
-        alert.setPolicy(policy);
+        alert.setPolicyId(policy.getName());
         alert.setCreatedTime(System.currentTimeMillis());
-        alert.setData(new Object[]{"field_1", 2, "field_3"});
+        alert.setData(new Object[] {"field_1", 2, "field_3"});
         alert.setStreamId(streamId);
         alert.setCreatedBy(this.toString());
         return alert;
@@ -165,13 +165,13 @@ public class TestAlertPublisherBolt {
         return l;
     }
 
-    private AlertStreamEvent createWithStreamDef(String hostname, String appName){
+    private AlertStreamEvent createWithStreamDef(String hostname, String appName) {
         AlertStreamEvent alert = new AlertStreamEvent();
         PolicyDefinition policy = new PolicyDefinition();
         policy.setName("perfmon_cpu_host_check");
-        alert.setPolicy(policy);
+        alert.setPolicyId(policy.getName());
         alert.setCreatedTime(System.currentTimeMillis());
-        alert.setData(new Object[]{appName, hostname});
+        alert.setData(new Object[] {appName, hostname});
         alert.setStreamId("testAlertStream");
         alert.setCreatedBy(this.toString());
 

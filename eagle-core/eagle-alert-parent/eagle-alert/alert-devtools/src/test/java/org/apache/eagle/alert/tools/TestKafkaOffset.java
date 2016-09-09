@@ -43,17 +43,17 @@ public class TestKafkaOffset {
         String topic = "testTopic1";
         String topology = "alertUnitTopology_1";
 
-        while(true) {
+        while (true) {
             KafkaConsumerOffsetFetcher consumerOffsetFetcher = new KafkaConsumerOffsetFetcher(zkConfig, topic, topology);
             String kafkaBrokerList = config.getString("dataSourceConfig.kafkaBrokerList");
             KafkaLatestOffsetFetcher latestOffsetFetcher = new KafkaLatestOffsetFetcher(kafkaBrokerList);
 
             Map<String, Long> consumedOffset = consumerOffsetFetcher.fetch();
-            if(consumedOffset.size() == 0){
+            if (consumedOffset.size() == 0) {
                 System.out.println("no any consumer offset found for this topic " + topic);
             }
             Map<Integer, Long> latestOffset = latestOffsetFetcher.fetch(topic, consumedOffset.size());
-            if(latestOffset.size() == 0){
+            if (latestOffset.size() == 0) {
                 System.out.println("no any latest offset found for this topic " + topic);
             }
             for (Map.Entry<String, Long> entry : consumedOffset.entrySet()) {
@@ -61,7 +61,7 @@ public class TestKafkaOffset {
                 Integer partitionNumber = Integer.valueOf(partition.split("_")[1]);
                 Long lag = latestOffset.get(partitionNumber) - entry.getValue();
                 System.out.println(String.format("parition %s, total: %d, consumed: %d, lag: %d",
-                        partition, latestOffset.get(partitionNumber), entry.getValue(), lag));
+                    partition, latestOffset.get(partitionNumber), entry.getValue(), lag));
             }
             Thread.sleep(10000);
         }

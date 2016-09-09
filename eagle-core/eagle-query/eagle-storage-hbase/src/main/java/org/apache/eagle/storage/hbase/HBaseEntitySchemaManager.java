@@ -40,9 +40,10 @@ public class HBaseEntitySchemaManager {
     private static HBaseEntitySchemaManager instance;
     private volatile HBaseAdmin admin;
 
-    private final int DEFAULT_MAX_VERSIONS = 1;
+    private static final int DEFAULT_MAX_VERSIONS = 1;
 
-    private HBaseEntitySchemaManager() {}
+    private HBaseEntitySchemaManager() {
+    }
 
     public static HBaseEntitySchemaManager getInstance() {
         if (instance == null) {

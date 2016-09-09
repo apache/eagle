@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.service.generic;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.google.inject.Singleton;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ser.FilterProvider;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;

@@ -16,24 +16,13 @@
  */
 package org.apache.eagle.alert.engine.serialization;
 
-import java.io.IOException;
-
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 
+import java.io.IOException;
+
 public interface PartitionedEventSerializer {
-    /**
-     *
-     * @param entity
-     * @return
-     * @throws IOException
-     */
+
     byte[] serialize(PartitionedEvent entity) throws IOException;
 
-    /**
-     *
-     * @param bytes
-     * @return
-     * @throws IOException
-     */
     PartitionedEvent deserialize(byte[] bytes) throws IOException;
 }

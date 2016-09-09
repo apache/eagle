@@ -16,6 +16,12 @@
  */
 package org.apache.eagle.server;
 
+import org.apache.eagle.alert.coordinator.CoordinatorListener;
+import org.apache.eagle.alert.resource.SimpleCORSFiler;
+import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
+import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.server.module.GuideBundleLoader;
+
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -23,18 +29,15 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
-import org.apache.eagle.alert.coordinator.CoordinatorListener;
-import org.apache.eagle.alert.resource.SimpleCORSFiler;
-import org.apache.eagle.server.module.GuideBundleLoader;
 
-import javax.servlet.DispatcherType;
 import java.util.EnumSet;
+import javax.servlet.DispatcherType;
 
 class ServerApplication extends Application<ServerConfig> {
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
         bootstrap.addBundle(GuideBundleLoader.load());
-        bootstrap.addBundle(new AssetsBundle("/assets","/","index.html","/"));
+        bootstrap.addBundle(new AssetsBundle("/assets", "/", "index.html", "/"));
     }
 
     @Override
@@ -47,6 +50,8 @@ class ServerApplication extends Application<ServerConfig> {
         environment.getApplicationContext().setContextPath(ServerConfig.getContextPath());
         environment.jersey().register(RESTExceptionMapper.class);
         environment.jersey().setUrlPattern(ServerConfig.getApiBasePath());
+        environment.getObjectMapper().setFilters(TaggedLogAPIEntity.getFilterProvider());
+        environment.getObjectMapper().registerModule(new EntityJsonModule());
 
         // Automatically scan all REST resources
         new PackagesResourceConfig(ServerConfig.getResourcePackage()).getClasses().forEach(environment.jersey()::register);
@@ -65,7 +70,7 @@ class ServerApplication extends Application<ServerConfig> {
 
         // Simple CORS filter
         environment.servlets().addFilter(SimpleCORSFiler.class.getName(), new SimpleCORSFiler())
-                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+            .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
         // context listener
         environment.servlets().addServletListeners(new CoordinatorListener());

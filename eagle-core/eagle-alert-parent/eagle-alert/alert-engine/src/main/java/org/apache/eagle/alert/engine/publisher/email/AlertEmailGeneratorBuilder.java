@@ -22,38 +22,46 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class AlertEmailGeneratorBuilder {
     private AlertEmailGenerator generator;
-    private AlertEmailGeneratorBuilder(){
+
+    private AlertEmailGeneratorBuilder() {
         generator = new AlertEmailGenerator();
     }
-    public static AlertEmailGeneratorBuilder newBuilder(){
+
+    public static AlertEmailGeneratorBuilder newBuilder() {
         return new AlertEmailGeneratorBuilder();
     }
-    public AlertEmailGeneratorBuilder withSubject(String subject){
+
+    public AlertEmailGeneratorBuilder withSubject(String subject) {
         generator.setSubject(subject);
         return this;
     }
-    public AlertEmailGeneratorBuilder withSender(String sender){
+
+    public AlertEmailGeneratorBuilder withSender(String sender) {
         generator.setSender(sender);
         return this;
     }
-    public AlertEmailGeneratorBuilder withRecipients(String recipients){
+
+    public AlertEmailGeneratorBuilder withRecipients(String recipients) {
         generator.setRecipients(recipients);
         return this;
     }
-    public AlertEmailGeneratorBuilder withTplFile(String tplFile){
+
+    public AlertEmailGeneratorBuilder withTplFile(String tplFile) {
         generator.setTplFile(tplFile);
         return this;
     }
+
     public AlertEmailGeneratorBuilder withMailProps(Map<String, String> mailProps) {
         generator.setProperties(mailProps);
         return this;
     }
+
     public AlertEmailGeneratorBuilder withExecutorPool(ThreadPoolExecutor threadPoolExecutor) {
         generator.setExecutorPool(threadPoolExecutor);
         return this;
     }
 
-    public AlertEmailGenerator build(){
+    public AlertEmailGenerator build() {
         return this.generator;
     }
 }

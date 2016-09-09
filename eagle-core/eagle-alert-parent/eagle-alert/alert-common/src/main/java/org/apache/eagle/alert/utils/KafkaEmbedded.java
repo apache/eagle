@@ -16,14 +16,12 @@
  */
 package org.apache.eagle.alert.utils;
 
-import java.io.File;
-import java.util.Properties;
-
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.curator.test.InstanceSpec;
+import java.io.File;
+import java.util.Properties;
 
 public class KafkaEmbedded {
 
@@ -54,8 +52,8 @@ public class KafkaEmbedded {
         }
     }
 
-    public KafkaEmbedded(String kafka_url, String zk_url) {
-        this(extractKafkaPort(kafka_url), extractKafkaPort(zk_url));
+    public KafkaEmbedded(String kafkaUrl, String zkUrl) {
+        this(extractKafkaPort(kafkaUrl), extractKafkaPort(zkUrl));
 
     }
 

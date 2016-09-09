@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @since Jul 9, 2016
- *
+ * @since Jul 9, 2016.
  */
 public class JsonEventSerializer implements IEventSerializer {
 

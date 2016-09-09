@@ -16,28 +16,21 @@
  */
 package org.apache.eagle.alert.coordinator.trigger;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.eagle.alert.config.ConfigBusProducer;
 import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
-import org.apache.eagle.alert.coordinator.Coordinator;
-import org.apache.eagle.alert.coordinator.IPolicyScheduler;
-import org.apache.eagle.alert.coordinator.IScheduleContext;
-import org.apache.eagle.alert.coordinator.PolicySchedulerFactory;
-import org.apache.eagle.alert.coordinator.ScheduleOption;
-import org.apache.eagle.alert.coordinator.TopologyMgmtService;
+import org.apache.eagle.alert.coordinator.*;
 import org.apache.eagle.alert.coordinator.provider.ScheduleContextBuilder;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
+import com.google.common.base.Stopwatch;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Stopwatch;
-import com.typesafe.config.Config;
+import java.util.concurrent.TimeUnit;
 
 /**
- * @since Jun 27, 2016
- *
+ * @since Jun 27, 2016.
  */
 public class CoordinatorTrigger implements Runnable {
     // TODO : support configurable in coordiantor
@@ -77,7 +70,7 @@ public class CoordinatorTrigger implements Runnable {
 
                 watch.stop();
                 LOG.info("CoordinatorTrigger ended, used time {} sm.", watch.elapsed(TimeUnit.MILLISECONDS));
-            }  else {
+            } else {
                 LOG.info("CoordinatorTrigger found isPeriodicallyForceBuildEnable = false, skipped build");
             }
         } catch (Exception e) {

@@ -21,42 +21,43 @@ import com.typesafe.config.ConfigFactory;
 import io.dropwizard.Configuration;
 
 public class ServerConfig extends Configuration {
-    private final static String SERVER_NAME = "Apache Eagle";
-    private final static String SERVER_VERSION = "0.5.0-incubating";
-    private final static String API_BASE_PATH = "/rest/*";
-    private final static String CONTEXT_PATH="/";
-    private final static String RESOURCE_PACKAGE = "org.apache.eagle";
-    private final static String LICENSE = "Apache License (Version 2.0)";
-    private final static String LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0";
+    private static final String SERVER_NAME = "Apache Eagle";
+    private static final String SERVER_VERSION = "0.5.0-incubating";
+    private static final String API_BASE_PATH = "/rest/*";
+    private static final String CONTEXT_PATH = "/";
+    private static final String RESOURCE_PACKAGE = "org.apache.eagle";
+    private static final String LICENSE = "Apache License (Version 2.0)";
+    private static final String LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0";
 
-    public Config getConfig(){
+    public Config getConfig() {
         return ConfigFactory.load();
     }
 
-    static String getServerName(){
+    static String getServerName() {
         return SERVER_NAME;
     }
 
-    static String getServerVersion(){
+    static String getServerVersion() {
         return SERVER_VERSION;
     }
 
-    static String getApiBasePath(){
+    static String getApiBasePath() {
         return API_BASE_PATH;
     }
-    static String getResourcePackage(){
+
+    static String getResourcePackage() {
         return RESOURCE_PACKAGE;
     }
 
-    static String getContextPath(){
+    static String getContextPath() {
         return CONTEXT_PATH;
     }
 
-    public static String getLicense(){
+    public static String getLicense() {
         return LICENSE;
     }
 
-    static String getLicenseUrl(){
+    static String getLicenseUrl() {
         return LICENSE_URL;
     }
 }

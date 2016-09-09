@@ -17,12 +17,12 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * The producer is thread safe and sharing a single producer instance across threads will generally be faster than
@@ -33,16 +33,16 @@ public class KafkaProducerManager {
 
     private static final String STRING_SERIALIZER = "org.apache.kafka.common.serialization.StringSerializer";
     private static final String STRING_DESERIALIZER = "org.apache.kafka.common.serialization.StringDeserializer";
-    
+
     private static final String VALUE_DESERIALIZER = "value.deserializer";
     private static final String VALUE_DESERIALIZER_UNDERSCORE = "value_deserializer";
-    
+
     private static final String VALUE_SERIALIZER = "value.serializer";
     private static final String VALUE_SERIALIZER_UNDERSCORE = "value_serializer";
-    
+
     private static final String KEY_DESERIALIZER = "key.deserializer";
     private static final String KEY_DESERIALIZER_UNDERSCORE = "key_deserializer";
-    
+
     private static final String KEY_SERIALIZER = "key.serializer";
     private static final String KEY_SERIALIZER_UNDERSCORE = "key_serializer";
 
@@ -73,7 +73,7 @@ public class KafkaProducerManager {
             configMap.put(VALUE_SERIALIZER, STRING_SERIALIZER);
         }
         configMap.put("request.required.acks", "1");
-        
+
         // value deserializer
         if (kafkaConfig.containsKey(VALUE_DESERIALIZER_UNDERSCORE)) {
             configMap.put(VALUE_DESERIALIZER, kafkaConfig.get(VALUE_DESERIALIZER_UNDERSCORE));

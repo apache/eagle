@@ -19,7 +19,7 @@ package org.apache.eagle.alert.engine;
 @FunctionalInterface
 public interface Collector<T> {
     /**
-     * Must make sure thread-safe
+     * Must make sure thread-safe.
      *
      * @param t
      */

@@ -16,12 +16,15 @@
  */
 package org.apache.eagle.query.aggregate.raw;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.io.ByteWritable;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
@@ -90,8 +93,6 @@ public class GroupbyKey implements Writable {
 			return false;
 		}
 		GroupbyKey that = (GroupbyKey)obj;
-//		ListIterator<byte[]> e1 = this.value.listIterator();
-//		ListIterator<byte[]> e2 = that.value.listIterator();
 		ListIterator<BytesWritable> e1 = this.value.listIterator();
 		ListIterator<BytesWritable> e2 = that.value.listIterator();
 		while(e1.hasNext() && e2.hasNext()){
@@ -99,6 +100,16 @@ public class GroupbyKey implements Writable {
 				return false;
 		}
 		return !(e1.hasNext() || e2.hasNext());
+	}
+
+	@Override
+	public String toString() {
+		List<String> items = new ArrayList<>(this.value.size());
+		ListIterator<BytesWritable> iterator = this.value.listIterator();
+		while(iterator.hasNext()){
+			items.add(iterator.next().toString());
+		}
+		return String.format("%s(%s)",this.getClass().getSimpleName(),StringUtils.join(items,","));
 	}
 
 	@Override

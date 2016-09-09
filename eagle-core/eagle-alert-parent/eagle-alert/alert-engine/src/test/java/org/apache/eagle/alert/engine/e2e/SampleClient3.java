@@ -16,26 +16,23 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import java.util.Properties;
-
-import org.apache.kafka.clients.producer.KafkaProducer;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.kafka.clients.producer.KafkaProducer;
+
+import java.util.Properties;
 
 /**
  * @since Jun 12, 2016
- *
  */
 public class SampleClient3 {
-    
-    
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     public static void main(String[] args) throws Exception {
         System.setProperty("config.resource", "/e2e/application-e2e.conf");
         ConfigFactory.invalidateCaches();
-        
+
         Config config = ConfigFactory.load();
         KafkaProducer producer = createByteProceduer(config);
 
@@ -52,7 +49,7 @@ public class SampleClient3 {
 //        }
     }
 
-//    private static SherlockEvent createEvent(TimeSeriesDataSchemaManager manager) throws Exception {
+    //    private static SherlockEvent createEvent(TimeSeriesDataSchemaManager manager) throws Exception {
 //
 //        SherlockEventBuilder builder = SherlockEvent.newBuilder();
 //        builder.setEpochMillis(System.currentTimeMillis());

@@ -29,9 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * A simple allow all CORS filter that works with swagger UI. Tomcat CORS filter
  * doesn't support Origin: null case which is the swagger UI request.
- * 
- * @since Apr 15, 2016
  *
+ * @since Apr 15, 2016
  */
 public class SimpleCORSFiler implements Filter {
 
@@ -42,13 +41,13 @@ public class SimpleCORSFiler implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse res, FilterChain chain) throws IOException,
-            ServletException {
+        ServletException {
         HttpServletResponse response = (HttpServletResponse) res;
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "HEAD, POST, GET, OPTIONS, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers",
-                "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+            "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
         chain.doFilter(request, response);
     }
 

@@ -37,67 +37,67 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 public class NodataMetadataGeneratorTest {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(NodataMetadataGeneratorTest.class);
 
-	Config config = ConfigFactory.load().getConfig("coordinator");
-	private NodataMetadataGenerator generator;
-	
-	@Before
-	public void setup() {
-		generator = new NodataMetadataGenerator();
-	}
-	
-	@Test
-	public void testNormal() throws Exception {
-		StreamDefinition sd = createStreamDefinitionWithNodataAlert();
-		Map<String, StreamDefinition> streamDefinitionsMap = new HashMap<String, StreamDefinition>();
-		streamDefinitionsMap.put(sd.getStreamId(), sd);
-		
-		Map<String, Kafka2TupleMetadata> kafkaSources = new HashMap<String, Kafka2TupleMetadata>();
-		Map<String, PolicyDefinition> policies = new HashMap<String, PolicyDefinition>();
-		Map<String, Publishment> publishments = new HashMap<String, Publishment>();
-		
-		generator.execute(config, streamDefinitionsMap, kafkaSources, policies, publishments);
-		
-		Assert.assertEquals(2, kafkaSources.size());
-		
-		kafkaSources.forEach((key, value) -> {
-			LOG.info("KafkaSources > {}: {}", key, ToStringBuilder.reflectionToString(value));
-		});
-		
-		Assert.assertEquals(2, policies.size());
-		
-		policies.forEach((key, value) -> {
-			LOG.info("Policies > {}: {}", key, ToStringBuilder.reflectionToString(value));
-		});
-		
-		Assert.assertEquals(4, publishments.size());
-		
-		publishments.forEach((key, value) -> {
-			LOG.info("Publishments > {}: {}", key, ToStringBuilder.reflectionToString(value));
-		});
-	}
-	
-	private StreamDefinition createStreamDefinitionWithNodataAlert() {
-		StreamDefinition sd = new StreamDefinition();
-		StreamColumn tsColumn = new StreamColumn();
-		tsColumn.setName("timestamp");
-		tsColumn.setType(StreamColumn.Type.LONG);
+    private static final Logger LOG = LoggerFactory.getLogger(NodataMetadataGeneratorTest.class);
 
-		StreamColumn hostColumn = new StreamColumn();
-		hostColumn.setName("host");
-		hostColumn.setType(StreamColumn.Type.STRING);
-		hostColumn.setNodataExpression("PT1M,dynamic,1,host");
+    Config config = ConfigFactory.load().getConfig("coordinator");
+    private NodataMetadataGenerator generator;
 
-		StreamColumn valueColumn = new StreamColumn();
-		valueColumn.setName("value");
-		valueColumn.setType(StreamColumn.Type.DOUBLE);
+    @Before
+    public void setup() {
+        generator = new NodataMetadataGenerator();
+    }
 
-		sd.setColumns(Arrays.asList(tsColumn, hostColumn, valueColumn));
-		sd.setDataSource("testDataSource");
-		sd.setStreamId("testStreamId");
-		return sd;
-	}
-	
+    @Test
+    public void testNormal() throws Exception {
+        StreamDefinition sd = createStreamDefinitionWithNodataAlert();
+        Map<String, StreamDefinition> streamDefinitionsMap = new HashMap<String, StreamDefinition>();
+        streamDefinitionsMap.put(sd.getStreamId(), sd);
+
+        Map<String, Kafka2TupleMetadata> kafkaSources = new HashMap<String, Kafka2TupleMetadata>();
+        Map<String, PolicyDefinition> policies = new HashMap<String, PolicyDefinition>();
+        Map<String, Publishment> publishments = new HashMap<String, Publishment>();
+
+        generator.execute(config, streamDefinitionsMap, kafkaSources, policies, publishments);
+
+        Assert.assertEquals(2, kafkaSources.size());
+
+        kafkaSources.forEach((key, value) -> {
+            LOG.info("KafkaSources > {}: {}", key, ToStringBuilder.reflectionToString(value));
+        });
+
+        Assert.assertEquals(2, policies.size());
+
+        policies.forEach((key, value) -> {
+            LOG.info("Policies > {}: {}", key, ToStringBuilder.reflectionToString(value));
+        });
+
+        Assert.assertEquals(4, publishments.size());
+
+        publishments.forEach((key, value) -> {
+            LOG.info("Publishments > {}: {}", key, ToStringBuilder.reflectionToString(value));
+        });
+    }
+
+    private StreamDefinition createStreamDefinitionWithNodataAlert() {
+        StreamDefinition sd = new StreamDefinition();
+        StreamColumn tsColumn = new StreamColumn();
+        tsColumn.setName("timestamp");
+        tsColumn.setType(StreamColumn.Type.LONG);
+
+        StreamColumn hostColumn = new StreamColumn();
+        hostColumn.setName("host");
+        hostColumn.setType(StreamColumn.Type.STRING);
+        hostColumn.setNodataExpression("PT1M,dynamic,1,host");
+
+        StreamColumn valueColumn = new StreamColumn();
+        valueColumn.setName("value");
+        valueColumn.setType(StreamColumn.Type.DOUBLE);
+
+        sd.setColumns(Arrays.asList(tsColumn, hostColumn, valueColumn));
+        sd.setDataSource("testDataSource");
+        sd.setStreamId("testStreamId");
+        return sd;
+    }
+
 }

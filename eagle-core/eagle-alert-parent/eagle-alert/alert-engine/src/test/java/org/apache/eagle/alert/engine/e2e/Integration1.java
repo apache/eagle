@@ -44,9 +44,8 @@ import java.util.concurrent.ThreadFactory;
 
 /**
  * Case of simple
- * 
- * @since May 8, 2016
  *
+ * @since May 8, 2016
  */
 public class Integration1 {
     private static final String SIMPLE_CONFIG = "/simple/application-integration.conf";
@@ -61,7 +60,7 @@ public class Integration1 {
 
     private String[] args;
     private ExecutorService executors = Executors.newFixedThreadPool(5, new ThreadFactory() {
-        
+
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
@@ -98,7 +97,7 @@ public class Integration1 {
      * Create topic
      * liasu@xxx:~$ $KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic perfmon_metrics
      * <p>
-     * 
+     *
      * @throws InterruptedException
      */
     @Test
@@ -112,12 +111,12 @@ public class Integration1 {
         System.out.println("loading metadatas done!");
 
         if (args == null) {
-            args = new String[] { "-c", "simple/application-integration.conf" };
+            args = new String[] {"-c", "simple/application-integration.conf"};
         }
 
         executors.submit(() -> SampleClient1.main(args));
 
-        executors.submit(() -> { 
+        executors.submit(() -> {
             try {
                 UnitTopologyMain.main(args);
             } catch (Exception e) {
@@ -190,7 +189,7 @@ public class Integration1 {
      * ],"pubBoltId":"xxx-pubBolt","spoutParallelism":1,"groupParallelism":1,
      * "alertParallelism":1}
      * <p>
-     * 
+     *
      * @throws Exception
      */
     @Ignore
@@ -199,7 +198,7 @@ public class Integration1 {
         {
             JavaType type = CollectionType.construct(List.class, SimpleType.construct(Topology.class));
             List<Topology> l = om.readValue(Integration1.class.getResourceAsStream("/simple/topologies.json"),
-                    type);
+                type);
             Topology t = (Topology) l.get(0);
 
             Assert.assertEquals(4, t.getGroupNodeIds().size());
@@ -213,7 +212,7 @@ public class Integration1 {
             Publishment p = l.get(0);
             Assert.assertEquals("KAFKA", p.getType());
         }
-        
+
         checkAll("/simple/");
         checkAll("/correlation/");
     }

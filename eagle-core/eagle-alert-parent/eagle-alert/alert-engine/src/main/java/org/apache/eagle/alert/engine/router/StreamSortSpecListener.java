@@ -1,11 +1,4 @@
-package org.apache.eagle.alert.engine.router;
-
-import java.util.Map;
-
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -21,6 +14,13 @@ import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.engine.router;
+
+import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
+
+import java.util.Map;
+
 public interface StreamSortSpecListener {
     void onStreamSortSpecChange(Map<StreamPartition, StreamSortSpec> added,
                                 Map<StreamPartition, StreamSortSpec> removed,

@@ -16,6 +16,16 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
+import org.apache.eagle.alert.coordination.model.*;
+import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
+import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
+import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
+import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.alert.metadata.MetadataUtils;
+import org.apache.eagle.alert.metadata.resource.Models;
+import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
@@ -30,16 +40,6 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.typesafe.config.Config;
-import org.apache.eagle.alert.coordination.model.*;
-import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
-import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
-import org.apache.eagle.alert.coordination.model.internal.ScheduleStateBase;
-import org.apache.eagle.alert.coordination.model.internal.Topology;
-import org.apache.eagle.alert.engine.coordinator.*;
-import org.apache.eagle.alert.metadata.IMetadataDao;
-import org.apache.eagle.alert.metadata.MetadataUtils;
-import org.apache.eagle.alert.metadata.resource.Models;
-import org.apache.eagle.alert.metadata.resource.OpResult;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
 import org.bson.BsonString;
@@ -54,14 +54,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @since Apr 11, 2016
- *
+ * @since Apr 11, 2016.
  */
 public class MongoMetadataDaoImpl implements IMetadataDao {
 
     private static final String DB_NAME = "ump_alert_metadata";
     private static final Logger LOG = LoggerFactory.getLogger(MongoMetadataDaoImpl.class);
     private static final ObjectMapper mapper = new ObjectMapper();
+
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -135,18 +135,18 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
         spoutSpecs = db.getCollection("spoutSpecs");
         {
-            IndexOptions io_internal = new IndexOptions().background(true).unique(true).name("topologyIdIndex");
-            BsonDocument doc_internal = new BsonDocument();
-            doc_internal.append("topologyId", new BsonInt32(1));
-            spoutSpecs.createIndex(doc_internal, io_internal);
+            IndexOptions ioInternal = new IndexOptions().background(true).unique(true).name("topologyIdIndex");
+            BsonDocument docInternal = new BsonDocument();
+            docInternal.append("topologyId", new BsonInt32(1));
+            spoutSpecs.createIndex(docInternal, ioInternal);
         }
 
         alertSpecs = db.getCollection("alertSpecs");
         {
-            IndexOptions io_internal = new IndexOptions().background(true).unique(true).name("topologyNameIndex");
-            BsonDocument doc_internal = new BsonDocument();
-            doc_internal.append("topologyName", new BsonInt32(1));
-            alertSpecs.createIndex(doc_internal, io_internal);
+            IndexOptions ioInternal = new IndexOptions().background(true).unique(true).name("topologyNameIndex");
+            BsonDocument docInternal = new BsonDocument();
+            docInternal.append("topologyName", new BsonInt32(1));
+            alertSpecs.createIndex(docInternal, ioInternal);
         }
 
         groupSpecs = db.getCollection("groupSpecs");
@@ -173,22 +173,6 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return list(cluster, StreamingCluster.class);
     }
 
-    private <T> List<T> list(MongoCollection<Document> collection, Class<T> clz) {
-        List<T> result = new LinkedList<T>();
-        collection.find().map(new Function<Document, T>() {
-            @Override
-            public T apply(Document t) {
-                String json = t.toJson();
-                try {
-                    return mapper.readValue(json, clz);
-                } catch (IOException e) {
-                    LOG.error("deserialize config item failed!", e);
-                }
-                return null;
-            }
-        }).into(result);
-        return result;
-    }
 
     private <T> OpResult addOrReplace(MongoCollection<Document> collection, T t) {
         BsonDocument filter = new BsonDocument();
@@ -350,7 +334,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             }
         }).first();
 
-        if (state != null){
+        if (state != null) {
             // based on version, to add content from collections of spoutSpecs/alertSpecs/etc..
             state = addDetailForScheduleState(state, versionId);
         }
@@ -358,10 +342,9 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return state;
     }
 
-    /***
+    /**
      * get the basic ScheduleState, and then based on the version to get all sub-part(spoutSpecs/alertSpecs/etc)
      * to form a completed ScheduleState.
-     *
      * @return the latest ScheduleState
      */
     @Override
@@ -381,7 +364,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             }
         }).first();
 
-        if (state != null){
+        if (state != null) {
             String version = state.getVersion();
             // based on version, to add content from collections of spoutSpecs/alertSpecs/etc..
             state = addDetailForScheduleState(state, version);
@@ -390,55 +373,55 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return state;
     }
 
-    private ScheduleState addDetailForScheduleState(ScheduleState state, String version){
+    private ScheduleState addDetailForScheduleState(ScheduleState state, String version) {
         Map<String, SpoutSpec> spoutMaps = maps(spoutSpecs, SpoutSpec.class, version);
-        if (spoutMaps.size() !=0){
+        if (spoutMaps.size() != 0) {
             state.setSpoutSpecs(spoutMaps);
         }
 
         Map<String, AlertBoltSpec> alertMaps = maps(alertSpecs, AlertBoltSpec.class, version);
-        if (alertMaps.size() !=0){
+        if (alertMaps.size() != 0) {
             state.setAlertSpecs(alertMaps);
         }
 
         Map<String, RouterSpec> groupMaps = maps(groupSpecs, RouterSpec.class, version);
-        if (groupMaps.size() !=0){
+        if (groupMaps.size() != 0) {
             state.setGroupSpecs(groupMaps);
         }
 
         Map<String, PublishSpec> publishMaps = maps(publishSpecs, PublishSpec.class, version);
-        if (publishMaps.size() !=0){
+        if (publishMaps.size() != 0) {
             state.setPublishSpecs(publishMaps);
         }
 
         List<VersionedPolicyDefinition> policyLists = list(policySnapshots, VersionedPolicyDefinition.class, version);
-        if (policyLists.size() !=0){
+        if (policyLists.size() != 0) {
             state.setPolicySnapshots(policyLists);
         }
 
         List<VersionedStreamDefinition> streamLists = list(streamSnapshots, VersionedStreamDefinition.class, version);
-        if (streamLists.size() !=0){
+        if (streamLists.size() != 0) {
             state.setStreamSnapshots(streamLists);
         }
 
         List<MonitoredStream> monitorLists = list(monitoredStreams, MonitoredStream.class, version);
-        if (monitorLists.size() !=0){
+        if (monitorLists.size() != 0) {
             state.setMonitoredStreams(monitorLists);
         }
 
         List<PolicyAssignment> assignmentLists = list(assignments, PolicyAssignment.class, version);
-        if (assignmentLists.size() !=0){
+        if (assignmentLists.size() != 0) {
             state.setAssignments(assignmentLists);
         }
         return state;
     }
 
-    private <T> Map<String, T> maps(MongoCollection<Document> collection, Class<T> clz, String version){
+    private <T> Map<String, T> maps(MongoCollection<Document> collection, Class<T> clz, String version) {
         BsonDocument doc = new BsonDocument();
         doc.append("version", new BsonString(version));
 
         Map<String, T> maps = new HashMap<String, T>();
-        String mapKey = (clz == SpoutSpec.class)? "topologyId" : "topologyName";
+        String mapKey = (clz == SpoutSpec.class) ? "topologyId" : "topologyName";
         collection.find(doc).forEach(new Block<Document>() {
             @Override
             public void apply(Document document) {
@@ -454,7 +437,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return maps;
     }
 
-    private <T> List<T> list(MongoCollection<Document> collection, Class<T> clz, String version){
+    private <T> List<T> list(MongoCollection<Document> collection, Class<T> clz, String version) {
         BsonDocument doc = new BsonDocument();
         doc.append("version", new BsonString(version));
 
@@ -474,7 +457,24 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         return result;
     }
 
-    /***
+    private <T> List<T> list(MongoCollection<Document> collection, Class<T> clz) {
+        List<T> result = new LinkedList<T>();
+        collection.find().map(new Function<Document, T>() {
+            @Override
+            public T apply(Document t) {
+                String json = t.toJson();
+                try {
+                    return mapper.readValue(json, clz);
+                } catch (IOException e) {
+                    LOG.error("deserialize config item failed!", e);
+                }
+                return null;
+            }
+        }).into(result);
+        return result;
+    }
+
+    /**
      * write ScheduleState to several collections. basic info writes to ScheduleState, other writes to collections
      * named by spoutSpecs/alertSpecs/etc.
      *
@@ -485,45 +485,45 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     public OpResult addScheduleState(ScheduleState state) {
         OpResult result = new OpResult();
         try {
-            for (String key: state.getSpoutSpecs().keySet()){
+            for (String key : state.getSpoutSpecs().keySet()) {
                 SpoutSpec spoutSpec = state.getSpoutSpecs().get(key);
                 addOne(spoutSpecs, spoutSpec);
             }
 
-            for (String key: state.getAlertSpecs().keySet()){
+            for (String key : state.getAlertSpecs().keySet()) {
                 AlertBoltSpec alertBoltSpec = state.getAlertSpecs().get(key);
                 addOne(alertSpecs, alertBoltSpec);
             }
 
-            for (String key: state.getGroupSpecs().keySet()){
+            for (String key : state.getGroupSpecs().keySet()) {
                 RouterSpec groupSpec = state.getGroupSpecs().get(key);
                 addOne(groupSpecs, groupSpec);
             }
 
-            for (String key: state.getPublishSpecs().keySet()){
+            for (String key : state.getPublishSpecs().keySet()) {
                 PublishSpec publishSpec = state.getPublishSpecs().get(key);
                 addOne(publishSpecs, publishSpec);
             }
 
-            for (VersionedPolicyDefinition policySnapshot: state.getPolicySnapshots()){
+            for (VersionedPolicyDefinition policySnapshot : state.getPolicySnapshots()) {
                 addOne(policySnapshots, policySnapshot);
             }
 
-            for (VersionedStreamDefinition streamSnapshot: state.getStreamSnapshots()){
+            for (VersionedStreamDefinition streamSnapshot : state.getStreamSnapshots()) {
                 addOne(streamSnapshots, streamSnapshot);
             }
 
-            for (MonitoredStream monitoredStream: state.getMonitoredStreams()){
+            for (MonitoredStream monitoredStream : state.getMonitoredStreams()) {
                 addOne(monitoredStreams, monitoredStream);
             }
 
-            for (PolicyAssignment assignment: state.getAssignments()){
+            for (PolicyAssignment assignment : state.getAssignments()) {
                 addOne(assignments, assignment);
             }
 
             ScheduleStateBase stateBase = new ScheduleStateBase(
-                    state.getVersion(), state.getGenerateTime(), state.getCode(),
-                    state.getMessage(), state.getScheduleTimeMillis());
+                state.getVersion(), state.getGenerateTime(), state.getCode(),
+                state.getMessage(), state.getScheduleTimeMillis());
 
             addOne(scheduleStates, stateBase);
 

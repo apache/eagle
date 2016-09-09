@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
-import java.io.IOException;
-
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
@@ -30,8 +28,10 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 public class StreamSortWindowHandlerImpl implements StreamSortHandler {
-    private final static Logger LOG = LoggerFactory.getLogger(StreamSortWindowHandlerImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamSortWindowHandlerImpl.class);
     private StreamWindowManager windowManager;
     private StreamSortSpec streamSortSpecSpec;
     private PartitionedEventCollector outputCollector;
@@ -39,17 +39,17 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
 
     public void prepare(String streamId, StreamSortSpec streamSortSpecSpec, PartitionedEventCollector outputCollector) {
         this.windowManager = new StreamWindowManagerImpl(
-                Period.parse(streamSortSpecSpec.getWindowPeriod()),
-                streamSortSpecSpec.getWindowMargin(),
-                PartitionedEventTimeOrderingComparator.INSTANCE,
-                outputCollector);
+            Period.parse(streamSortSpecSpec.getWindowPeriod()),
+            streamSortSpecSpec.getWindowMargin(),
+            PartitionedEventTimeOrderingComparator.INSTANCE,
+            outputCollector);
         this.streamSortSpecSpec = streamSortSpecSpec;
         this.streamId = streamId;
         this.outputCollector = outputCollector;
     }
 
     /**
-     * Entry point to manage window lifecycle
+     * Entry point to manage window lifecycle.
      *
      * @param event StreamEvent
      */
@@ -57,7 +57,7 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
         final long eventTime = event.getEvent().getTimestamp();
         boolean handled = false;
 
-        synchronized (this.windowManager){
+        synchronized (this.windowManager) {
             for (StreamWindow window : this.windowManager.getWindows()) {
                 if (window.alive() && window.add(event)) {
                     handled = true;
@@ -75,8 +75,8 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
             }
         }
 
-        if(!handled){
-            if(LOG.isDebugEnabled()) {
+        if (!handled) {
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Drop expired event {}", event);
             }
             outputCollector.drop(event);
@@ -84,7 +84,7 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
     }
 
     @Override
-    public void onTick(StreamTimeClock clock,long globalSystemTime) {
+    public void onTick(StreamTimeClock clock, long globalSystemTime) {
         windowManager.onTick(clock, globalSystemTime);
     }
 
@@ -93,7 +93,7 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
         try {
             windowManager.close();
         } catch (IOException e) {
-            LOG.error("Got exception while closing window manager",e);
+            LOG.error("Got exception while closing window manager", e);
         }
     }
 
@@ -103,10 +103,10 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
     }
 
     @Override
-    public int hashCode(){
-        if(streamSortSpecSpec == null){
+    public int hashCode() {
+        if (streamSortSpecSpec == null) {
             throw new NullPointerException("streamSortSpec is null");
-        }else{
+        } else {
             return streamSortSpecSpec.hashCode();
         }
     }

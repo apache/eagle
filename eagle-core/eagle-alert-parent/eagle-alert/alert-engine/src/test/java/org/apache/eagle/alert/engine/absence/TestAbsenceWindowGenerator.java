@@ -32,11 +32,11 @@ import java.util.TimeZone;
  */
 public class TestAbsenceWindowGenerator {
     @Test
-    public void testWindowInToday() throws Exception{
+    public void testWindowInToday() throws Exception {
         AbsenceDailyRule rule = new AbsenceDailyRule();
         // from 2PM to 3PM each day
-        rule.startOffset = 14*3600*1000;
-        rule.endOffset = 15*3600*1000;
+        rule.startOffset = 14 * 3600 * 1000;
+        rule.endOffset = 15 * 3600 * 1000;
         AbsenceWindowGenerator generator = new AbsenceWindowGenerator(rule);
 
         // get current time
@@ -51,15 +51,15 @@ public class TestAbsenceWindowGenerator {
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         d = df.parse(currDate);
         AbsenceWindow window = generator.nextWindow(d.getTime());
-        Assert.assertEquals(startTimeOfDay+rule.startOffset, window.startTime);
+        Assert.assertEquals(startTimeOfDay + rule.startOffset, window.startTime);
     }
 
     @Test
-    public void testWindowInTomorrow() throws Exception{
+    public void testWindowInTomorrow() throws Exception {
         AbsenceDailyRule rule = new AbsenceDailyRule();
         // from 2PM to 3PM each day
-        rule.startOffset = 14*3600*1000;
-        rule.endOffset = 15*3600*1000;
+        rule.startOffset = 14 * 3600 * 1000;
+        rule.endOffset = 15 * 3600 * 1000;
         AbsenceWindowGenerator generator = new AbsenceWindowGenerator(rule);
 
         // get current time
@@ -75,6 +75,6 @@ public class TestAbsenceWindowGenerator {
         d = df.parse(currDate);
         AbsenceWindow window = generator.nextWindow(d.getTime());
         // this needs adjustment for one day
-        Assert.assertEquals(startTimeOfDay+rule.startOffset + AbsenceDailyRule.DAY_MILLI_SECONDS, window.startTime);
+        Assert.assertEquals(startTimeOfDay + rule.startOffset + AbsenceDailyRule.DAY_MILLI_SECONDS, window.startTime);
     }
 }

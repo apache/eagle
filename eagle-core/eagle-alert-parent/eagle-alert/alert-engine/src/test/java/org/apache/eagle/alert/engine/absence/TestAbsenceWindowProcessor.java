@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class TestAbsenceWindowProcessor {
     @Test
-    public void testDataMissing(){
+    public void testDataMissing() {
         List<Object> expectedHosts = Arrays.asList("host1");
         AbsenceWindow window = new AbsenceWindow();
         window.startTime = 100L;
@@ -48,7 +48,7 @@ public class TestAbsenceWindowProcessor {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testDataExists(){
+    public void testDataExists() {
         List<Object> expectedHosts = Arrays.asList("host1");
         AbsenceWindow window = new AbsenceWindow();
         window.startTime = 100L;

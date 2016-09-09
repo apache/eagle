@@ -19,13 +19,6 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.spout.SpoutOutputCollector;
@@ -37,30 +30,36 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
  * Since 4/29/16.
  */
-@SuppressWarnings({"serial", "rawtypes", "unused"})
+@SuppressWarnings( {"serial", "rawtypes", "unused"})
 public class TestStormStreamIdRouting {
     @Ignore
     @Test
-    public void testRoutingByStreamId() throws Exception{
+    public void testRoutingByStreamId() throws Exception {
         Config conf = new Config();
         conf.setNumWorkers(2); // use two worker processes
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         topologyBuilder.setSpout("blue-spout", new BlueSpout()); // parallelism hint
 
         topologyBuilder.setBolt("green-bolt-1", new GreenBolt(1))
-                .shuffleGrouping("blue-spout", "green-bolt-stream-1");
+            .shuffleGrouping("blue-spout", "green-bolt-stream-1");
         topologyBuilder.setBolt("green-bolt-2", new GreenBolt(2))
-                .shuffleGrouping("blue-spout", "green-bolt-stream-2");
+            .shuffleGrouping("blue-spout", "green-bolt-stream-2");
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("mytopology", new HashMap(), topologyBuilder.createTopology());
 
-        while(true) {
+        while (true) {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
@@ -72,8 +71,10 @@ public class TestStormStreamIdRouting {
     private static class BlueSpout extends BaseRichSpout {
         int count = 0;
         private SpoutOutputCollector collector;
-        public BlueSpout(){
+
+        public BlueSpout() {
         }
+
         @Override
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
             declarer.declareStream("green-bolt-stream-1", new Fields("a"));
@@ -87,16 +88,16 @@ public class TestStormStreamIdRouting {
 
         @Override
         public void nextTuple() {
-            if(count % 2 == 0) {
+            if (count % 2 == 0) {
                 this.collector.emit("green-bolt-stream-1", Arrays.asList("testdata" + count));
                 count++;
-            }else{
+            } else {
                 this.collector.emit("green-bolt-stream-2", Arrays.asList("testdata" + count));
                 count++;
             }
-            try{
+            try {
                 Thread.sleep(10000);
-            }catch(Exception ex){
+            } catch (Exception ex) {
 
             }
         }
@@ -104,9 +105,11 @@ public class TestStormStreamIdRouting {
 
     private static class GreenBolt extends BaseRichBolt {
         private int id;
-        public GreenBolt(int id){
+
+        public GreenBolt(int id) {
             this.id = id;
         }
+
         @Override
         public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         }
@@ -122,7 +125,7 @@ public class TestStormStreamIdRouting {
         }
     }
 
-    private static class YellowBolt extends BaseRichBolt{
+    private static class YellowBolt extends BaseRichBolt {
         @Override
         public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         }

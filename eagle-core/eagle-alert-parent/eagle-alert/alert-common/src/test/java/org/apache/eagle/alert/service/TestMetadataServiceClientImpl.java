@@ -19,18 +19,18 @@
 
 package org.apache.eagle.alert.service;
 
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.List;
 
 public class TestMetadataServiceClientImpl {
     @SuppressWarnings("resource")
     @Ignore
     @Test
-    public void test() throws Exception{
+    public void test() throws Exception {
         MetadataServiceClientImpl impl = new MetadataServiceClientImpl("localhost", 58080, "/api/metadata/policies");
         List<PolicyDefinition> policies = impl.listPolicies();
         ObjectMapper mapper = new ObjectMapper();

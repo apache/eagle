@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import backtype.storm.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
@@ -35,6 +34,7 @@ public class SampleClient5AbsenceAlert {
     private static final Logger LOG = LoggerFactory.getLogger(SampleClient5AbsenceAlert.class);
     private static long currentTimestamp = 1467240000000L;
     private static long interval = 3000L;
+
     public static void main(String[] args) throws Exception {
         System.setProperty("config.resource", "/absence/application-absence.conf");
         ConfigFactory.invalidateCaches();
@@ -50,7 +50,7 @@ public class SampleClient5AbsenceAlert {
         producer.send(record);
     }
 
-    private static class AbsenceEvent{
+    private static class AbsenceEvent {
         @JsonProperty
         long timestamp;
         @JsonProperty
@@ -58,20 +58,20 @@ public class SampleClient5AbsenceAlert {
         @JsonProperty
         String status;
 
-        public String toString(){
+        public String toString() {
             return "timestamp=" + timestamp + ",jobID=" + jobID + ",status=" + status;
         }
     }
 
-    private static String createEvent(String jobID) throws Exception{
+    private static String createEvent(String jobID) throws Exception {
         AbsenceEvent e = new AbsenceEvent();
         long expectTS = currentTimestamp + interval;
         // adjust back 1 second random
-        long adjust = Math.round(2*Math.random());
-        e.timestamp = expectTS-adjust;
+        long adjust = Math.round(2 * Math.random());
+        e.timestamp = expectTS - adjust;
         e.jobID = jobID;
         e.status = "running";
-        LOG.info("sending event {} ",  e);
+        LOG.info("sending event {} ", e);
         ObjectMapper mapper = new ObjectMapper();
         String value = mapper.writeValueAsString(e);
         return value;

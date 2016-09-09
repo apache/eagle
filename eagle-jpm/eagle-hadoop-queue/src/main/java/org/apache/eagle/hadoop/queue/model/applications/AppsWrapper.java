@@ -21,16 +21,16 @@ package org.apache.eagle.hadoop.queue.model.applications;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AppsWrapper {
-	private Apps apps;
+    private Apps apps;
 
-	public Apps getApps() {
-		return apps;
-	}
+    public Apps getApps() {
+        return apps;
+    }
 
-	public void setApps(Apps apps) {
-		this.apps = apps;
-	}
+    public void setApps(Apps apps) {
+        this.apps = apps;
+    }
 }

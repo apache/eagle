@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.alert.coordinator.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.WorkSlot;
 import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
@@ -32,9 +28,12 @@ import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * @since Apr 27, 2016
- *
+ * @since Apr 27, 2016.
  */
 public class WorkQueueBuilder {
 
@@ -49,7 +48,7 @@ public class WorkQueueBuilder {
     }
 
     public StreamWorkSlotQueue createQueue(MonitoredStream stream, boolean isDedicated, int size,
-            Map<String, Object> properties) {
+                                           Map<String, Object> properties) {
         // FIXME: make extensible and configurable
         IWorkSlotStrategy strategy = new SameTopologySlotStrategy(context, stream.getStreamGroup(), mgmtService);
         List<WorkSlot> slots = strategy.reserveWorkSlots(size, isDedicated, properties);
@@ -58,7 +57,7 @@ public class WorkQueueBuilder {
             return null;
         }
         StreamWorkSlotQueue queue = new StreamWorkSlotQueue(stream.getStreamGroup(), isDedicated, properties,
-                slots);
+            slots);
         calculateGroupIndexAndCount(queue);
         assignQueueSlots(stream, queue);// build reverse reference
         stream.addQueues(queue);
