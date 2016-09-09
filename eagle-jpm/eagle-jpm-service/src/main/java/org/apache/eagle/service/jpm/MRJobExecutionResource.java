@@ -40,11 +40,14 @@ import javax.ws.rs.core.MediaType;
 
 @Path("mrJobs")
 public class MRJobExecutionResource {
-    GenericEntityServiceResource resource = new GenericEntityServiceResource();
+
+    private static final Logger LOG = LoggerFactory.getLogger(MRJobExecutionResource.class);
+
     public static final String ELAPSEDMS = "elapsedms";
     public static final String TOTAL_RESULTS = "totalResults";
+
     private final MRJobCountImpl helper = new MRJobCountImpl();
-    private static final Logger LOG = LoggerFactory.getLogger(MRJobExecutionResource.class);
+    private GenericEntityServiceResource resource = new GenericEntityServiceResource();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -298,14 +301,14 @@ public class MRJobExecutionResource {
         return metricQueryFunc.apply(query, timeDuration.get(0), timeDuration.get(1), intervalmin, top, metricName);
     }
 
-    Function6<String, String, String, Long, Integer, String, Object> queryMetricEntitiesFunc
+    private Function6<String, String, String, Long, Integer, String, Object> queryMetricEntitiesFunc
         = (query, startTime, endTime, intervalmin, top, metricName) -> {
             GenericEntityServiceResource resource = new GenericEntityServiceResource();
             return resource.search(query, startTime, endTime, Integer.MAX_VALUE, null,
             false, true, intervalmin, top, true, 0, metricName, false);
         };
 
-    Function6<String, String, String, Long, Integer, String, Object> queryMetricListFunc
+    private Function6<String, String, String, Long, Integer, String, Object> queryMetricListFunc
         = (query, startTime, endTime, intervalmin, top, metricName) -> {
             ListQueryResource resource = new ListQueryResource();
             return resource.listQuery(query, startTime, endTime, Integer.MAX_VALUE, null,
