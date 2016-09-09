@@ -24,19 +24,19 @@ import java.util.Set;
 /**
  * Since 6/29/16.
  */
-public class NoDataWisbProvidedParser implements NoDataWisbParser{
-    @Override
+public class NoDataWisbProvidedParser implements NoDataWisbParser {
     /**
-     * policy value consists of "windowPeriod, type, numOfFields, f1_name, f2_name, f1_value, f2_value, f1_value, f2_value"
+     * policy value consists of "windowPeriod, type, numOfFields, f1_name, f2_name, f1_value, f2_value, f1_value, f2_value".
      */
+    @Override
     public Set<List<String>> parse(String[] args) {
         int numOfFields = Integer.parseInt(args[2]);
         Set<List<String>> wisbValues = new HashSet<>();
         int i = 3 + numOfFields;
-        while(i<args.length){
+        while (i < args.length) {
             List<String> fields = new ArrayList<>();
-            for(int j=0; j<numOfFields; j++){
-                fields.add(args[i+j]);
+            for (int j = 0; j < numOfFields; j++) {
+                fields.add(args[i + j]);
             }
             wisbValues.add(fields);
             i += numOfFields;

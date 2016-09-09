@@ -16,7 +16,6 @@
  */
 package org.apache.eagle.app.spi;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
@@ -25,11 +24,12 @@ import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationDocs;
 import org.apache.eagle.metadata.model.Configuration;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBException;
 import java.util.List;
+import javax.xml.bind.JAXBException;
 
 /**
  * Default metadata path is:  /META-INF/providers/${ApplicationProviderClassName}.xml
@@ -37,20 +37,20 @@ import java.util.List;
  * @param <T>
  */
 public abstract class AbstractApplicationProvider<T extends Application> implements ApplicationProvider<T> {
-    private final static Logger LOG = LoggerFactory.getLogger(AbstractApplicationProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractApplicationProvider.class);
     private final ApplicationDesc applicationDesc;
 
-    private final static String METADATA_RESOURCE_PATH="/META-INF/providers/%s.xml";
+    private static final String METADATA_RESOURCE_PATH = "/META-INF/providers/%s.xml";
 
     /**
      * Default metadata path is:  /META-INF/providers/${ApplicationProviderClassName}.xml
      *
-     * You are not recommended to override this method except you could make sure the path is universal unique
+     * <p>You are not recommended to override this method except you could make sure the path is universal unique</p>
      *
      * @return metadata file path
      */
-    protected final String getMetadata(){
-        return String.format(METADATA_RESOURCE_PATH,this.getClass().getName());
+    protected final String getMetadata() {
+        return String.format(METADATA_RESOURCE_PATH, this.getClass().getName());
     }
 
     protected AbstractApplicationProvider() {
@@ -64,7 +64,7 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
         setDocs(descWrapperConfig.getDocs());
         try {
             if (descWrapperConfig.getAppClass() != null) {
-//                setAppClass((Class<T>) Class.forName(descWrapperConfig.getAppClass()));
+                // setAppClass((Class<T>) Class.forName(descWrapperConfig.getAppClass()));
                 setAppClass((Class<T>) Class.forName(descWrapperConfig.getAppClass(), true, this.getClass().getClassLoader()));
                 if (!Application.class.isAssignableFrom(applicationDesc.getAppClass())) {
                     throw new IllegalStateException(descWrapperConfig.getAppClass() + " is not sub-class of " + Application.class.getCanonicalName());
@@ -107,16 +107,16 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
         try {
             applicationDesc.setConfiguration(Configuration.fromResource(resourceName));
         } catch (JAXBException e) {
-            LOG.error("Failed to load configuration template from "+resourceName,e);
-            throw new RuntimeException("Failed to load configuration template from "+resourceName,e);
+            LOG.error("Failed to load configuration template from " + resourceName, e);
+            throw new RuntimeException("Failed to load configuration template from " + resourceName, e);
         }
     }
 
     @Override
     public String toString() {
         return String.format(
-                "%s[name=%s, type=%s, version=%s, viewPath=%s, appClass=%s, configuration= %s properties]", getClass().getSimpleName(),
-                applicationDesc.getName(),applicationDesc.getType(),applicationDesc.getVersion(), applicationDesc.getViewPath(), applicationDesc.getAppClass(), applicationDesc.getConfiguration().size()
+            "%s[name=%s, type=%s, version=%s, viewPath=%s, appClass=%s, configuration= %s properties]", getClass().getSimpleName(),
+            applicationDesc.getName(), applicationDesc.getType(), applicationDesc.getVersion(), applicationDesc.getViewPath(), applicationDesc.getAppClass(), applicationDesc.getConfiguration().size()
         );
     }
 
@@ -140,6 +140,6 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
 
     @Override
     public void register(ModuleRegistry registry) {
-        LOG.debug("Registering modules {}",this.getClass().getName());
+        LOG.debug("Registering modules {}", this.getClass().getName());
     }
 }

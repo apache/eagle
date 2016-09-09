@@ -19,13 +19,11 @@ package org.apache.eagle.alert.coordination.model;
 import java.util.Map;
 
 /**
- * This metadata controls how to figure out stream name from incoming tuple
+ * This metadata controls how to figure out stream name from incoming tuple.
  */
 public interface StreamNameSelector {
     /**
-     * field name to value mapping
-     * @param tuple
-     * @return
+     * field name to value mapping.
      */
     String getStreamName(Map<String, Object> tuple);
 }

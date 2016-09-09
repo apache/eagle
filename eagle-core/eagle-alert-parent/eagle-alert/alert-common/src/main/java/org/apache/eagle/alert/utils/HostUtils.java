@@ -26,7 +26,7 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 /**
- * http://stackoverflow.com/questions/7348711/recommended-way-to-get-hostname-in-java
+ * http://stackoverflow.com/questions/7348711/recommended-way-to-get-hostname-in-java.
  */
 public class HostUtils {
     private static final Logger logger = LoggerFactory

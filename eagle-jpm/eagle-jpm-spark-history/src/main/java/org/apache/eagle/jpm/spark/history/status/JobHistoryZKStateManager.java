@@ -19,8 +19,8 @@
 
 package org.apache.eagle.jpm.spark.history.status;
 
-import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
+import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.transaction.CuratorTransactionBridge;
@@ -35,9 +35,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class JobHistoryZKStateManager {
-    private final static Logger LOG = LoggerFactory.getLogger(JobHistoryZKStateManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobHistoryZKStateManager.class);
 
-    private final static String START_TIMESTAMP = "lastAppTime";
+    private static final String START_TIMESTAMP = "lastAppTime";
     private String zkRoot;
     private CuratorFramework curator;
 

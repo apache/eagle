@@ -1,12 +1,4 @@
-package org.apache.eagle.alert.config;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements. See the NOTICE file distributed with this
  * work for additional information regarding copyright ownership. The ASF
@@ -22,6 +14,14 @@ import org.junit.Test;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+package org.apache.eagle.alert.config;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 public class TestConfigBus {
 
     @Ignore

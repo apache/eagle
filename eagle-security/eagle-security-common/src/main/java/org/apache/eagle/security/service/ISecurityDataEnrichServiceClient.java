@@ -31,6 +31,8 @@ public interface ISecurityDataEnrichServiceClient extends Closeable, Serializabl
     OpResult addHBaseSensitivity(Collection<HBaseSensitivityEntity> h);
     Collection<HdfsSensitivityEntity> listHdfsSensitivities();
     OpResult addHdfsSensitivity(Collection<HdfsSensitivityEntity> h);
+    Collection<OozieSensitivityEntity> listOozieSensitivities();
+    OpResult addOozieSensitivity(Collection<OozieSensitivityEntity> h);
     Collection<IPZoneEntity> listIPZones();
     OpResult addIPZone(Collection<IPZoneEntity> h);
     Collection<HiveSensitivityEntity> listHiveSensitivities();

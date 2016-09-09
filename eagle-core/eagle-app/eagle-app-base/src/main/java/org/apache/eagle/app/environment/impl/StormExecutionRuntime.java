@@ -16,22 +16,24 @@
  */
 package org.apache.eagle.app.environment.impl;
 
+import org.apache.eagle.app.Application;
+import org.apache.eagle.app.environment.ExecutionRuntime;
+import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
+import org.apache.eagle.app.utils.DynamicJarPathFinder;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.*;
 import backtype.storm.utils.NimbusClient;
 import com.google.common.base.Preconditions;
-import org.apache.eagle.app.Application;
-import org.apache.eagle.app.environment.ExecutionRuntime;
-import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
-import org.apache.eagle.app.utils.DynamicJarPathFinder;
-import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.thrift7.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Int;
 import storm.trident.spout.RichSpoutBatchExecutor;
+
+import java.util.Objects;
 
 public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,StormTopology> {
     private static final Logger LOG = LoggerFactory.getLogger(StormExecutionRuntime.class);
@@ -62,7 +64,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     private static final String STORM_NIMBUS_THRIFT_CONF_PATH = "application.storm.nimbusThriftPort";
     private static final String WORKERS = "workers";
 
-    public backtype.storm.Config getStormConfig() {
+    private backtype.storm.Config getStormConfig() {
         backtype.storm.Config conf = new backtype.storm.Config();
         conf.put(RichSpoutBatchExecutor.MAX_BATCH_SIZE_CONF, Int.box(64 * 1024));
         conf.put(backtype.storm.Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, Int.box(8));
@@ -129,7 +131,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     public void stop(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         String appId = config.getString("appId");
         LOG.info("Stopping topology {} ..." + appId);
-        if (config.getString("mode") == ApplicationEntity.Mode.CLUSTER.name()) {
+        if (Objects.equals(config.getString("mode"), ApplicationEntity.Mode.CLUSTER.name())) {
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig()).getClient();
             try {
                 stormClient.killTopology(appId);

@@ -44,61 +44,59 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.eagle.service.security.hdfs.HDFSFileSystem;
 
-
 /**
  * REST Web Service to browse files and Paths in HDFS
  */
 @Path(HDFSResourceConstants.HDFS_RESOURCE)
 public class HDFSResourceWebResource {
-	private static Logger LOG = LoggerFactory.getLogger(HDFSResourceWebResource.class);
-	final public static String HDFS_APPLICATION = "HdfsAuditLogApplication";
-	private ApplicationEntityService entityService;
-	private ISecurityMetadataDAO dao;
+    private static Logger LOG = LoggerFactory.getLogger(HDFSResourceWebResource.class);
+    final public static String HDFS_APPLICATION = "HdfsAuditLogApplication";
+    private ApplicationEntityService entityService;
+    private ISecurityMetadataDAO dao;
 
-	@Inject
-	public HDFSResourceWebResource(ApplicationEntityService entityService, Config eagleServerConfig){
-		this.entityService = entityService;
-		dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
-	}
+    @Inject
+    public HDFSResourceWebResource(ApplicationEntityService entityService, Config eagleServerConfig) {
+        this.entityService = entityService;
+        dao = MetadataDaoFactory.getMetadataDAO(eagleServerConfig);
+    }
 
-	@GET
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public HDFSResourceWebResponse  getHDFSResource( @QueryParam("site") String site , @QueryParam("path") String filePath )
-	{
-		LOG.info("Starting HDFS Resource Browsing.  Query Parameters ==> Site :"+site+"  Path : "+filePath );
-		HDFSResourceWebResponse response = new HDFSResourceWebResponse();
-		HDFSResourceWebRequestValidator validator = new HDFSResourceWebRequestValidator();
-		List<FileStatusEntity> result = new ArrayList<>();
-		List<FileStatus> fileStatuses = null;
-		try {
-			validator.validate(site, filePath); // First Step would be validating Request
-			Map<String, Object> config = getAppConfig(site, HDFS_APPLICATION);
-			Configuration conf = convert(config);
-			HDFSFileSystem fileSystem = new HDFSFileSystem(conf);
-			fileStatuses = fileSystem.browse(filePath);
-			// Join with File Sensitivity Info
-			HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner(dao);
-			result = joiner.joinFileSensitivity(site, fileStatuses);
-			LOG.info("Successfully browsed files in HDFS .");
-		} catch( Exception ex ) {
-			response.setException(EagleExceptionWrapper.wrap(ex));
-			LOG.error(" Exception When browsing Files for the HDFS Path  :"+filePath+"  " , ex);
-		}
-		response.setObj(result);
-		return response;
-	}
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public HDFSResourceWebResponse getHDFSResource(@QueryParam("site") String site, @QueryParam("path") String filePath) {
+        LOG.info("Starting HDFS Resource Browsing.  Query Parameters ==> Site :" + site + "  Path : " + filePath);
+        HDFSResourceWebResponse response = new HDFSResourceWebResponse();
+        HDFSResourceWebRequestValidator validator = new HDFSResourceWebRequestValidator();
+        List<FileStatusEntity> result = new ArrayList<>();
+        List<FileStatus> fileStatuses = null;
+        try {
+            validator.validate(site, filePath); // First Step would be validating Request
+            Map<String, Object> config = getAppConfig(site, HDFS_APPLICATION);
+            Configuration conf = convert(config);
+            HDFSFileSystem fileSystem = new HDFSFileSystem(conf);
+            fileStatuses = fileSystem.browse(filePath);
+            // Join with File Sensitivity Info
+            HDFSResourceSensitivityDataJoiner joiner = new HDFSResourceSensitivityDataJoiner(dao);
+            result = joiner.joinFileSensitivity(site, fileStatuses);
+            LOG.info("Successfully browsed files in HDFS .");
+        } catch (Exception ex) {
+            response.setException(EagleExceptionWrapper.wrap(ex));
+            LOG.error(" Exception When browsing Files for the HDFS Path  :" + filePath + "  ", ex);
+        }
+        response.setObj(result);
+        return response;
+    }
 
-	private Map<String, Object> getAppConfig(String site, String appType){
-		ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
-		return entity.getConfiguration();
-	}
+    private Map<String, Object> getAppConfig(String site, String appType) {
+        ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
+        return entity.getConfiguration();
+    }
 
-	private Configuration convert(Map<String, Object> originalConfig) throws Exception {
-		Configuration config = new Configuration();
-		for (Map.Entry<String, Object> entry : originalConfig.entrySet()) {
-			config.set(entry.getKey().toString(), entry.getValue().toString());
-		}
-		return config;
-	}
+    private Configuration convert(Map<String, Object> originalConfig) throws Exception {
+        Configuration config = new Configuration();
+        for (Map.Entry<String, Object> entry : originalConfig.entrySet()) {
+            config.set(entry.getKey().toString(), entry.getValue().toString());
+        }
+        return config;
+    }
 }

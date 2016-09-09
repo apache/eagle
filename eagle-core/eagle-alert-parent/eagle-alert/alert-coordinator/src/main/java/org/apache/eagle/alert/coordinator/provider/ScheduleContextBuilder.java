@@ -16,24 +16,10 @@
  */
 package org.apache.eagle.alert.coordinator.provider;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
-import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
-import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
-import org.apache.eagle.alert.coordination.model.internal.StreamGroup;
-import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
-import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.coordination.model.internal.*;
 import org.apache.eagle.alert.coordinator.IScheduleContext;
 import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.GroupBoltUsage;
@@ -44,17 +30,18 @@ import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * FIXME: this class focus on correctness, not the efficiency now. There might
  * be problem when metadata size grows too big.
- * 
- * @since May 3, 2016
  *
+ * @since May 3, 2016
  */
 public class ScheduleContextBuilder {
 
@@ -74,18 +61,18 @@ public class ScheduleContextBuilder {
     private Map<String, TopologyUsage> usages;
 
     public ScheduleContextBuilder(Config config) {
-    	this.config = config;
+        this.config = config;
         client = new MetadataServiceClientImpl(config);
     }
 
     public ScheduleContextBuilder(Config config, IMetadataServiceClient client) {
-    	this.config = config;
+        this.config = config;
         this.client = client;
     }
 
     /**
      * Built a shcedule context for metadata client service.
-     * 
+     *
      * @return
      */
     public IScheduleContext buildContext() {
@@ -93,13 +80,13 @@ public class ScheduleContextBuilder {
         kafkaSources = listToMap(client.listDataSources());
         // filter out disabled policies
         List<PolicyDefinition> enabledPolicies = client.listPolicies().stream().filter(
-        		(t) -> t.getPolicyStatus() != PolicyStatus.DISABLED).collect(Collectors.toList());
+            (t) -> t.getPolicyStatus() != PolicyStatus.DISABLED).collect(Collectors.toList());
         policies = listToMap(enabledPolicies);
         publishments = listToMap(client.listPublishment());
         streamDefinitions = listToMap(client.listStreams());
         // generate data sources, policies, publishments for nodata alert
         new NodataMetadataGenerator().execute(config, streamDefinitions, kafkaSources, policies, publishments);
-        
+
         // TODO: See ScheduleState comments on how to improve the storage
         ScheduleState state = client.getVersionedSpec();
 
@@ -118,9 +105,9 @@ public class ScheduleContextBuilder {
 
         // copy to shedule context now
         return new InMemScheduleConext(topologies, assignments, kafkaSources, policies, publishments,
-                streamDefinitions, monitoredStreamMap, usages);
+            streamDefinitions, monitoredStreamMap, usages);
     }
-    
+
     /**
      * 1.
      * <pre>
@@ -133,12 +120,13 @@ public class ScheduleContextBuilder {
      * <pre>
      * if monitored stream's queue's is on non-existing topology, remove it.
      * </pre>
+     *
      * @param monitoredStreams
      * @return
      */
     private List<MonitoredStream> detectMonitoredStreams(List<MonitoredStream> monitoredStreams) {
         List<MonitoredStream> result = new ArrayList<MonitoredStream>(monitoredStreams);
-        
+
         // clear deprecated streams
         clearMonitoredStreams(monitoredStreams);
 
@@ -159,8 +147,8 @@ public class ScheduleContextBuilder {
             StreamGroup group = queue2StreamGroup.get(assignment.getQueueId());
             if (group == null || !Objects.equals(group.getStreamPartitions(), def.getPartitionSpec())) {
                 LOG.warn(" policy assgiment {} 's policy group {} is different to the monitored stream's partition group {}, "
-                                + "this indicates a policy stream partition spec change, the assignment would be removed! ",
-                        assignment, def.getPartitionSpec(), group == null ? "'not found'" :group.getStreamPartitions());
+                        + "this indicates a policy stream partition spec change, the assignment would be removed! ",
+                    assignment, def.getPartitionSpec(), group == null ? "'not found'" : group.getStreamPartitions());
                 toRemove.add(assignment.getPolicyName());
             } else {
                 usedGroups.add(group);
@@ -174,9 +162,9 @@ public class ScheduleContextBuilder {
             boolean used = usedGroups.contains(t.getStreamGroup());
             if (!used) {
                 LOG.warn("monitor stream with stream group {} is not referenced, "
-                        + "this monitored stream and its worker queu will be removed", t.getStreamGroup());
+                    + "this monitored stream and its worker queu will be removed", t.getStreamGroup());
             }
-            return !used; 
+            return !used;
         });
 
         return result;
@@ -194,7 +182,7 @@ public class ScheduleContextBuilder {
                 for (WorkSlot ws : queue.getWorkingSlots()) {
                     // check if topology available or bolt available
                     if (!topologies.containsKey(ws.topologyName)
-                            || !topologies.get(ws.topologyName).getAlertBoltIds().contains(ws.boltId)) {
+                        || !topologies.get(ws.topologyName).getAlertBoltIds().contains(ws.boltId)) {
                         deprecated = true;
                         break;
                     }
@@ -230,7 +218,7 @@ public class ScheduleContextBuilder {
             } else {
                 StreamWorkSlotQueue queue = queueMap.get(assignment.getQueueId());
                 if (queue == null
-                        || policies.get(assignment.getPolicyName()).getParallelismHint() > queue.getQueueSize()) {
+                    || policies.get(assignment.getPolicyName()).getParallelismHint() > queue.getQueueSize()) {
                     // queue not found or policy has hint bigger than queue (possible a poilcy update)
                     LOG.info("Policy assignment {} 's policy doesnt match queue: {}!", assignment, queue);
                     paIt.remove();
@@ -286,7 +274,7 @@ public class ScheduleContextBuilder {
         Map<String, StreamWorkSlotQueue> queueMap = new HashMap<String, StreamWorkSlotQueue>();
 
         preBuildQueue2TopoMap(topo2MonitorStream, topo2Policies, bolt2Policies, bolt2Partition, bolt2QueueIds, queueMap);
-        
+
         for (Topology t : topologies.values()) {
             TopologyUsage u = new TopologyUsage(t.getName());
             // add group/bolt usages
@@ -323,8 +311,8 @@ public class ScheduleContextBuilder {
     }
 
     private void addBoltUsageInfo(Map<String, Set<String>> bolt2Policies,
-            Map<String, Set<StreamGroup>> bolt2Partition, Map<String, Set<String>> bolt2QueueIds, String uniqueAlertBolt,
-            AlertBoltUsage alertUsage, Map<String, StreamWorkSlotQueue> queueMap) {
+                                  Map<String, Set<StreamGroup>> bolt2Partition, Map<String, Set<String>> bolt2QueueIds, String uniqueAlertBolt,
+                                  AlertBoltUsage alertUsage, Map<String, StreamWorkSlotQueue> queueMap) {
         //
         if (bolt2Policies.containsKey(uniqueAlertBolt)) {
             alertUsage.getPolicies().addAll(bolt2Policies.get(uniqueAlertBolt));
@@ -371,15 +359,15 @@ public class ScheduleContextBuilder {
     }
 
     private void preBuildQueue2TopoMap(
-            Map<String, Set<MonitoredStream>> topo2MonitorStream,
-            Map<String, Set<String>> topo2Policies, 
-            Map<String, Set<String>> bolt2Policies, 
-            Map<String, Set<StreamGroup>> bolt2Partition, 
-            Map<String, Set<String>> bolt2QueueIds,
-            Map<String, StreamWorkSlotQueue> queueMap) {
+        Map<String, Set<MonitoredStream>> topo2MonitorStream,
+        Map<String, Set<String>> topo2Policies,
+        Map<String, Set<String>> bolt2Policies,
+        Map<String, Set<StreamGroup>> bolt2Partition,
+        Map<String, Set<String>> bolt2QueueIds,
+        Map<String, StreamWorkSlotQueue> queueMap) {
         // pre-build structure
         // why don't reuse the queue.getPolicies
-        Map<String, Set<String>> queue2Policies= new HashMap<String, Set<String>>();
+        Map<String, Set<String>> queue2Policies = new HashMap<String, Set<String>>();
         for (PolicyAssignment pa : assignments.values()) {
             if (!queue2Policies.containsKey(pa.getQueueId())) {
                 queue2Policies.put(pa.getQueueId(), new HashSet<String>());
@@ -391,32 +379,32 @@ public class ScheduleContextBuilder {
             for (StreamWorkSlotQueue q : stream.getQueues()) {
                 queueMap.put(q.getQueueId(), q);
                 Set<String> policiesOnQ = queue2Policies.containsKey(q.getQueueId()) ? queue2Policies.get(q.getQueueId()) : new HashSet<String>();
-                
+
                 for (WorkSlot slot : q.getWorkingSlots()) {
                     // topo2monitoredstream
                     if (!topo2MonitorStream.containsKey(slot.getTopologyName())) {
                         topo2MonitorStream.put(slot.getTopologyName(), new HashSet<MonitoredStream>());
                     }
                     topo2MonitorStream.get(slot.getTopologyName()).add(stream);
-                    
+
                     // topo2policy
                     if (!topo2Policies.containsKey(slot.getTopologyName())) {
                         topo2Policies.put(slot.getTopologyName(), new HashSet<String>());
                     }
                     topo2Policies.get(slot.getTopologyName()).addAll(policiesOnQ);
-                    
+
                     // bolt2Policy
                     if (!bolt2Policies.containsKey(getUniqueBoltId(slot))) {
                         bolt2Policies.put(getUniqueBoltId(slot), new HashSet<String>());
                     }
                     bolt2Policies.get(getUniqueBoltId(slot)).addAll(policiesOnQ);
-                    
+
                     // bolt2Queue
                     if (!bolt2QueueIds.containsKey(getUniqueBoltId(slot))) {
                         bolt2QueueIds.put(getUniqueBoltId(slot), new HashSet<String>());
                     }
                     bolt2QueueIds.get(getUniqueBoltId(slot)).add(q.getQueueId());
-                    
+
                     // bolt2Partition
                     if (!bolt2Partition.containsKey(getUniqueBoltId(slot))) {
                         bolt2Partition.put(getUniqueBoltId(slot), new HashSet<StreamGroup>());

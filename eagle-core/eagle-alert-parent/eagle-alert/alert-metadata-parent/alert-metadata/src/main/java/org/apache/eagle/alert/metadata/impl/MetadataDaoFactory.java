@@ -16,18 +16,16 @@
  */
 package org.apache.eagle.alert.metadata.impl;
 
-import java.lang.reflect.Constructor;
-
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.lang.reflect.Constructor;
 
 /**
- * @since Apr 12, 2016
- *
+ * @since Apr 12, 2016.
  */
 public class MetadataDaoFactory {
 

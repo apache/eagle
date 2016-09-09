@@ -146,6 +146,18 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Oozie  Auditlog monitoring -->
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-oozie-auditlog</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-oozie-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- hdfs audit log monitoring -->
         <dependency>
             <groupId>org.apache.eagle</groupId>

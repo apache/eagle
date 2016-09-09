@@ -19,8 +19,8 @@ package org.apache.eagle.server;
 public class ServerMain {
     public static void main(String[] args) {
         System.out.println(
-            "Welcome to Apache Eagle (Incubating)\n"+
-            "---------------"
+            "Welcome to Apache Eagle (Incubating)\n"
+                + "---------------"
         );
         System.out.println(
             "Starting Eagle Server ..."
@@ -28,7 +28,7 @@ public class ServerMain {
         try {
             new ServerApplication().run(args);
         } catch (Exception e) {
-            System.err.println("Got exception: "+e.getMessage());
+            System.err.println("Got exception: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }

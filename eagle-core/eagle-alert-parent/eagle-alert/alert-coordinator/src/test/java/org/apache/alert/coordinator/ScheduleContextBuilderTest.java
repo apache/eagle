@@ -54,12 +54,11 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since May 5, 2016
- *
  */
 public class ScheduleContextBuilderTest {
 
-	Config config = ConfigFactory.load().getConfig("coordinator");
-	
+    Config config = ConfigFactory.load().getConfig("coordinator");
+
     @Test
     public void test() {
         InMemMetadataServiceClient client = getSampleMetadataService();
@@ -78,7 +77,7 @@ public class ScheduleContextBuilderTest {
         String alertBolt2 = TOPO1 + "-alert-" + "2";
         for (AlertBoltUsage u : usages.get(TOPO1).getAlertUsages().values()) {
             if (u.getBoltId().equals(alertBolt0) || u.getBoltId().equals(alertBolt1)
-                    || u.getBoltId().equals(alertBolt2)) {
+                || u.getBoltId().equals(alertBolt2)) {
                 Assert.assertEquals(1, u.getPolicies().size());
                 Assert.assertTrue(u.getPolicies().contains(TEST_POLICY_1));
                 Assert.assertEquals(1, u.getPartitions().size());
@@ -195,51 +194,51 @@ public class ScheduleContextBuilderTest {
         // just to make sure queueNew is present
         Assert.assertEquals(queue.getQueueId(), queueNew.getQueueId());
     }
-    
+
     @Test
     public void test_stream_noalert_policies_generation() throws Exception {
-    	InMemMetadataServiceClient client = getSampleMetadataServiceWithNodataAlert();
-    	
+        InMemMetadataServiceClient client = getSampleMetadataServiceWithNodataAlert();
+
         ScheduleContextBuilder builder = new ScheduleContextBuilder(config, client);
         IScheduleContext context = builder.buildContext();
-        
+
         PolicyDefinition policyDefinition = null;
         PolicyDefinition aggrPolicyDefinition = null;
         for (Entry<String, PolicyDefinition> entry : context.getPolicies().entrySet()) {
-        	if (entry.getKey().endsWith("_nodata_alert")) {
-        		policyDefinition = entry.getValue();
-        		continue;
-        	}
-        	if (entry.getKey().endsWith("_aggregation_stream_policy")) {
-        		aggrPolicyDefinition = entry.getValue();
-        		continue;
-        	}
+            if (entry.getKey().endsWith("_nodata_alert")) {
+                policyDefinition = entry.getValue();
+                continue;
+            }
+            if (entry.getKey().endsWith("_aggregation_stream_policy")) {
+                aggrPolicyDefinition = entry.getValue();
+                continue;
+            }
         }
         Assert.assertEquals(3, context.getPolicies().size());
-        
+
         Assert.assertNotNull(policyDefinition);
         Assert.assertEquals("nodataalert", policyDefinition.getDefinition().getType());
         Assert.assertEquals("PT5S,dynamic,1," + COL1, policyDefinition.getDefinition().getValue());
-        
+
         Assert.assertNotNull(aggrPolicyDefinition);
         Assert.assertEquals("siddhi", aggrPolicyDefinition.getDefinition().getType());
-        
+
         Kafka2TupleMetadata datasource = null;
         for (Entry<String, Kafka2TupleMetadata> entry : context.getDataSourceMetadata().entrySet()) {
-        	if ("nodata_alert_aggregation_ds".equals(entry.getKey())) {
-        		datasource = entry.getValue();
-        		break;
-        	}
+            if ("nodata_alert_aggregation_ds".equals(entry.getKey())) {
+                datasource = entry.getValue();
+                break;
+            }
         }
         Assert.assertNotNull(datasource);
-        
+
         String publishmentName = policyDefinition.getName() + "_publish";
         Publishment publishment = null;
         for (Entry<String, Publishment> entry : context.getPublishments().entrySet()) {
-        	if (publishmentName.equals(entry.getKey())) {
-        		publishment = entry.getValue();
-        		break;
-        	}
+            if (publishmentName.equals(entry.getKey())) {
+                publishment = entry.getValue();
+                break;
+            }
         }
         Assert.assertNotNull(publishment);
     }
@@ -280,7 +279,7 @@ public class ScheduleContextBuilderTest {
         client.addScheduleState(createScheduleState());
         return client;
     }
-    
+
     public static InMemMetadataServiceClient getSampleMetadataServiceWithNodataAlert() {
         InMemMetadataServiceClient client = new InMemMetadataServiceClient();
         client.addTopology(createSampleTopology());
@@ -291,7 +290,7 @@ public class ScheduleContextBuilderTest {
         client.addScheduleState(createScheduleState());
         return client;
     }
-    
+
     private static StreamDefinition createStreamDefinitionWithNodataAlert() {
         StreamDefinition def = new StreamDefinition();
         def.setStreamId(TEST_STREAM_DEF_1);

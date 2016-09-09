@@ -55,7 +55,7 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setTaskStatus(String taskStatus) {
         this.taskStatus = taskStatus;
-        _pcs.firePropertyChange("taskStatus", null, null);
+        pcs.firePropertyChange("taskStatus", null, null);
     }
 
     public long getStartTime() {
@@ -64,7 +64,7 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
-        _pcs.firePropertyChange("startTime", null, null);
+        pcs.firePropertyChange("startTime", null, null);
     }
 
     public long getEndTime() {
@@ -73,7 +73,7 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setEndTime(long endTime) {
         this.endTime = endTime;
-        _pcs.firePropertyChange("endTime", null, null);
+        pcs.firePropertyChange("endTime", null, null);
     }
 
     public long getDuration() {
@@ -82,7 +82,7 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setDuration(long duration) {
         this.duration = duration;
-        _pcs.firePropertyChange("duration", null, null);
+        pcs.firePropertyChange("duration", null, null);
     }
 
     public String getError() {
@@ -91,7 +91,7 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setError(String error) {
         this.error = error;
-        _pcs.firePropertyChange("error", null, null);
+        pcs.firePropertyChange("error", null, null);
     }
 
     public JobCounters getJobCounters() {
@@ -100,7 +100,7 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setJobCounters(JobCounters jobCounters) {
         this.jobCounters = jobCounters;
-        _pcs.firePropertyChange("jobCounters", null, null);
+        pcs.firePropertyChange("jobCounters", null, null);
     }
 
     public String getTaskAttemptID() {
@@ -109,6 +109,6 @@ public class TaskAttemptExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setTaskAttemptID(String taskAttemptID) {
         this.taskAttemptID = taskAttemptID;
-        _pcs.firePropertyChange("taskAttemptID", null, null);
+        pcs.firePropertyChange("taskAttemptID", null, null);
     }
 }

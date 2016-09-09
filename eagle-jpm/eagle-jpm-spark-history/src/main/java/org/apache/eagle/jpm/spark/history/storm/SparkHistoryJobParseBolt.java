@@ -19,16 +19,17 @@
 
 package org.apache.eagle.jpm.spark.history.storm;
 
+import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.eagle.jpm.spark.history.crawl.JHFInputStreamReader;
 import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.eagle.jpm.spark.history.crawl.SparkFilesystemInputStreamReaderImpl;
-import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
 import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.SparkHistoryServerResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.model.SparkApplication;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -163,11 +164,11 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
 
                 // For Yarn version >= 2.7,
                 // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
-//                String attemptIdFormatted = String.format("%06d", attemptId);
-//
-//                // remove "application_" to get the number part of appID.
-//                String sparkAppIdNum = appId.substring(12);
-//                String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+                // String attemptIdFormatted = String.format("%06d", attemptId);
+                //
+                // // remove "application_" to get the number part of appID.
+                // String sparkAppIdNum = appId.substring(12);
+                // String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
 
                 String appAttemptLogName = this.getAppAttemptLogName(appId, attemptIdString);
                 LOG.info("Attempt ID: {}, App Attempt Log: {}", attemptIdString, appAttemptLogName);

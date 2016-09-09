@@ -19,12 +19,11 @@
 
 package org.apache.eagle.alert.engine.topology;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 /**
  * Since 5/4/16.
@@ -32,23 +31,23 @@ import com.typesafe.config.ConfigFactory;
 public class TestUnitTopologyMain {
     @Ignore
     @Test
-    public void testTopologyRun(){
+    public void testTopologyRun() {
         testTopologyRun("/application-test.conf");
     }
 
-    public void testTopologyRun(String configResourceName){
+    public void testTopologyRun(String configResourceName) {
         ConfigFactory.invalidateCaches();
         System.setProperty("config.resource", configResourceName);
-        System.out.print("Set config.resource = "+configResourceName);
+        System.out.print("Set config.resource = " + configResourceName);
         Config config = ConfigFactory.load();
         String topologyId = config.getString("topology.name");
         MockMetadataChangeNotifyService changeNotifyService =
-                new MockMetadataChangeNotifyService(topologyId,"alertEngineSpout");
-        new UnitTopologyRunner(changeNotifyService).run(topologyId,config);
+            new MockMetadataChangeNotifyService(topologyId, "alertEngineSpout");
+        new UnitTopologyRunner(changeNotifyService).run(topologyId, config);
     }
 
-    public static void main(String[] args){
-        if(args.length>0) {
+    public static void main(String[] args) {
+        if (args.length > 0) {
             new TestUnitTopologyMain().testTopologyRun(args[0]);
         } else {
             new TestUnitTopologyMain().testTopologyRun();

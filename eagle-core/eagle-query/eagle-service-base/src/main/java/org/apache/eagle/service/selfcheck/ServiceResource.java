@@ -33,32 +33,33 @@ import com.sun.jersey.api.json.JSONWithPadding;
 
 @Path("services")
 public class ServiceResource {
-	private static final Logger LOG = LoggerFactory.getLogger(ServiceResource.class);
-	
-	@GET
-	@Produces({"application/json", "application/xml"})
-	public Map<String, EntityDefinition> getServiceDefinitions(){
-		Map<String, EntityDefinition> result = null;
-		try{
-			 result = EntityDefinitionManager.entities();
-		}catch(Exception ex){
-			LOG.error("Error in getting entity definitions", ex);
-		}
-		
-		return result;
-	}
-	
-	@GET
-	@Path("/jsonp")
-	@Produces({"application/x-javascript", "application/json", "application/xml"})
-	public JSONWithPadding getServiceDefinitionsWithJsonp(@QueryParam("callback") String callback){
-		Map<String, EntityDefinition> result = null;
-		try{
-			 result = EntityDefinitionManager.entities();
-		}catch(Exception ex){
-			LOG.error("Error in getting entity definitions", ex);
-		}
-		
-		return new JSONWithPadding(new GenericEntity<Map<String, EntityDefinition>>(result){}, callback);
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceResource.class);
+
+    @GET
+    @Produces({"application/json", "application/xml"})
+    public Map<String, EntityDefinition> getServiceDefinitions() {
+        Map<String, EntityDefinition> result = null;
+        try {
+            result = EntityDefinitionManager.entities();
+        } catch (Exception ex) {
+            LOG.error("Error in getting entity definitions", ex);
+        }
+
+        return result;
+    }
+
+    @GET
+    @Path("/jsonp")
+    @Produces({"application/x-javascript", "application/json", "application/xml"})
+    public JSONWithPadding getServiceDefinitionsWithJsonp(@QueryParam("callback") String callback) {
+        Map<String, EntityDefinition> result = null;
+        try {
+            result = EntityDefinitionManager.entities();
+        } catch (Exception ex) {
+            LOG.error("Error in getting entity definitions", ex);
+        }
+
+        return new JSONWithPadding(new GenericEntity<Map<String, EntityDefinition>>(result) {
+        }, callback);
+    }
 }

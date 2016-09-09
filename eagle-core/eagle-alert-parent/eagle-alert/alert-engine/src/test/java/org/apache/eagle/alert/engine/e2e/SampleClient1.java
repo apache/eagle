@@ -16,9 +16,9 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicLong;
-
+import backtype.storm.utils.Utils;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.alert.utils.JsonUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -26,14 +26,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.utils.Utils;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @since May 9, 2016
- *
  */
 public class SampleClient1 {
     @SuppressWarnings("unused")
@@ -42,7 +39,7 @@ public class SampleClient1 {
     private static final String PERFMON_CPU_STREAM = "perfmon_cpu_stream";
     private static final String PERFMON_MEM_STREAM = "perfmon_mem_stream";
 
-//    private static int hostIndx = 1;
+    //    private static int hostIndx = 1;
     private static String hostTemp = "host-000%d.datacenter.corp.com";
 
     /**
@@ -88,7 +85,7 @@ public class SampleClient1 {
         Pair<Long, String> pair = createEntity(base, stream, hostIndex);
         base = pair.getKey();
         ProducerRecord<String, String> record = new ProducerRecord<String, String>("perfmon_metrics",
-                pair.getRight());
+            pair.getRight());
         proceduer.send(record);
         return base;
     }

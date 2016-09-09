@@ -18,10 +18,10 @@
 
 package org.apache.eagle.alert.engine.coordinator;
 
-import java.util.Objects;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PublishmentType {
@@ -39,17 +39,19 @@ public class PublishmentType {
         this.type = type;
     }
 
-    public String getClassName(){
+    public String getClassName() {
         return className;
     }
-    public void setClassName(String className){
+
+    public void setClassName(String className) {
         this.className = className;
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return description;
     }
-    public void setDescription(String description){
+
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -65,10 +67,10 @@ public class PublishmentType {
     public boolean equals(Object obj) {
         if (obj instanceof PublishmentType) {
             PublishmentType p = (PublishmentType) obj;
-            return (Objects.equals(className, p.getClassName()) &&
-                    Objects.equals(type, p.type) && 
-                    Objects.equals(description, p.getDescription()) &&
-                    Objects.equals(fields, p.getFields()));
+            return (Objects.equals(className, p.getClassName())
+                && Objects.equals(type, p.type)
+                && Objects.equals(description, p.getDescription())
+                && Objects.equals(fields, p.getFields()));
         }
         return false;
     }
@@ -76,10 +78,10 @@ public class PublishmentType {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(className)
-                .append(type)
-                .append(description)
-                .append(fields)
-                .build();
+            .append(className)
+            .append(type)
+            .append(description)
+            .append(fields)
+            .build();
     }
 }

@@ -17,206 +17,206 @@
  */
 
 /**
- * 
+ *
  */
 package org.apache.eagle.hadoop.queue.model.applications;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-/*
- *	App model for Yarn Resource http://<rm http address:port>/ws/v1/cluster/apps
+/**
+ * App model for Yarn Resource http://[rm http address:port]/ws/v1/cluster/apps.
  */
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class App {
-	private String id;
-	private String user;
-	private String name;
-	private String queue;
-	private String state;
-	private String finalStatus;
-	private double progress;
-	private String trackingUI;
-	private String trackingUrl;
-	private String diagnostics;
-	private long clusterId;
-	private String applicationType;
-	private String applicationTags;
-	private long startedTime;
-	private long finishedTime;
-	private long elapsedTime;
-	private String amContainerLogs;
-	private String amHostHttpAddress;
-	private int allocatedMB;
-	private int allocatedVCores;
-	private int runningContainers;
+    private String id;
+    private String user;
+    private String name;
+    private String queue;
+    private String state;
+    private String finalStatus;
+    private double progress;
+    private String trackingUI;
+    private String trackingUrl;
+    private String diagnostics;
+    private long clusterId;
+    private String applicationType;
+    private String applicationTags;
+    private long startedTime;
+    private long finishedTime;
+    private long elapsedTime;
+    private String amContainerLogs;
+    private String amHostHttpAddress;
+    private int allocatedMB;
+    private int allocatedVCores;
+    private int runningContainers;
 
-	public String getId() {
-		return id;
-	}
-	
-	public void setId(String id) {
-		this.id = id;
-	}
-	
-	public String getUser() {
-		return user;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setUser(String user) {
-		this.user = user;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getUser() {
+        return user;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setUser(String user) {
+        this.user = user;
+    }
 
-	public String getQueue() {
-		return queue;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setQueue(String queue) {
-		this.queue = queue;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getState() {
-		return state;
-	}
+    public String getQueue() {
+        return queue;
+    }
 
-	public void setState(String state) {
-		this.state = state;
-	}
+    public void setQueue(String queue) {
+        this.queue = queue;
+    }
 
-	public String getFinalStatus() {
-		return finalStatus;
-	}
+    public String getState() {
+        return state;
+    }
 
-	public void setFinalStatus(String finalStatus) {
-		this.finalStatus = finalStatus;
-	}
+    public void setState(String state) {
+        this.state = state;
+    }
 
-	public double getProgress() {
-		return progress;
-	}
+    public String getFinalStatus() {
+        return finalStatus;
+    }
 
-	public void setProgress(double progress) {
-		this.progress = progress;
-	}
+    public void setFinalStatus(String finalStatus) {
+        this.finalStatus = finalStatus;
+    }
 
-	public String getTrackingUI() {
-		return trackingUI;
-	}
+    public double getProgress() {
+        return progress;
+    }
 
-	public void setTrackingUI(String trackingUI) {
-		this.trackingUI = trackingUI;
-	}
+    public void setProgress(double progress) {
+        this.progress = progress;
+    }
 
-	public String getTrackingUrl() {
-		return trackingUrl;
-	}
+    public String getTrackingUI() {
+        return trackingUI;
+    }
 
-	public void setTrackingUrl(String trackingUrl) {
-		this.trackingUrl = trackingUrl;
-	}
+    public void setTrackingUI(String trackingUI) {
+        this.trackingUI = trackingUI;
+    }
 
-	public String getDiagnostics() {
-		return diagnostics;
-	}
+    public String getTrackingUrl() {
+        return trackingUrl;
+    }
 
-	public void setDiagnostics(String diagnostics) {
-		this.diagnostics = diagnostics;
-	}
+    public void setTrackingUrl(String trackingUrl) {
+        this.trackingUrl = trackingUrl;
+    }
 
-	public long getClusterId() {
-		return clusterId;
-	}
+    public String getDiagnostics() {
+        return diagnostics;
+    }
 
-	public void setClusterId(long clusterId) {
-		this.clusterId = clusterId;
-	}
+    public void setDiagnostics(String diagnostics) {
+        this.diagnostics = diagnostics;
+    }
 
-	public long getStartedTime() {
-		return startedTime;
-	}
+    public long getClusterId() {
+        return clusterId;
+    }
 
-	public void setStartedTime(long startedTime) {
-		this.startedTime = startedTime;
-	}
+    public void setClusterId(long clusterId) {
+        this.clusterId = clusterId;
+    }
 
-	public long getFinishedTime() {
-		return finishedTime;
-	}
+    public long getStartedTime() {
+        return startedTime;
+    }
 
-	public void setFinishedTime(long finishedTime) {
-		this.finishedTime = finishedTime;
-	}
+    public void setStartedTime(long startedTime) {
+        this.startedTime = startedTime;
+    }
 
-	public long getElapsedTime() {
-		return elapsedTime;
-	}
+    public long getFinishedTime() {
+        return finishedTime;
+    }
 
-	public void setElapsedTime(long elapsedTime) {
-		this.elapsedTime = elapsedTime;
-	}
-	
-	public String getApplicationType() {
-		return applicationType;
-	}
+    public void setFinishedTime(long finishedTime) {
+        this.finishedTime = finishedTime;
+    }
 
-	public void setApplicationType(String applicationType) {
-		this.applicationType = applicationType;
-	}
+    public long getElapsedTime() {
+        return elapsedTime;
+    }
 
-	public String getApplicationTags() {
-		return applicationTags;
-	}
+    public void setElapsedTime(long elapsedTime) {
+        this.elapsedTime = elapsedTime;
+    }
 
-	public void setApplicationTags(String applicationTags) {
-		this.applicationTags = applicationTags;
-	}
+    public String getApplicationType() {
+        return applicationType;
+    }
 
-	public String getAmContainerLogs() {
-		return amContainerLogs;
-	}
+    public void setApplicationType(String applicationType) {
+        this.applicationType = applicationType;
+    }
 
-	public void setAmContainerLogs(String amContainerLogs) {
-		this.amContainerLogs = amContainerLogs;
-	}
+    public String getApplicationTags() {
+        return applicationTags;
+    }
 
-	public String getAmHostHttpAddress() {
-		return amHostHttpAddress;
-	}
+    public void setApplicationTags(String applicationTags) {
+        this.applicationTags = applicationTags;
+    }
 
-	public void setAmHostHttpAddress(String amHostHttpAddress) {
-		this.amHostHttpAddress = amHostHttpAddress;
-	}
+    public String getAmContainerLogs() {
+        return amContainerLogs;
+    }
 
-	public int getAllocatedMB() {
-		return allocatedMB;
-	}
+    public void setAmContainerLogs(String amContainerLogs) {
+        this.amContainerLogs = amContainerLogs;
+    }
 
-	public void setAllocatedMB(int allocatedMB) {
-		this.allocatedMB = allocatedMB;
-	}
+    public String getAmHostHttpAddress() {
+        return amHostHttpAddress;
+    }
 
-	public int getAllocatedVCores() {
-		return allocatedVCores;
-	}
+    public void setAmHostHttpAddress(String amHostHttpAddress) {
+        this.amHostHttpAddress = amHostHttpAddress;
+    }
 
-	public void setAllocatedVCores(int allocatedVCores) {
-		this.allocatedVCores = allocatedVCores;
-	}
-	
-	public int getRunningContainers() {
-		return runningContainers;
-	}
+    public int getAllocatedMB() {
+        return allocatedMB;
+    }
 
-	public void setRunningContainers(int runningContainers) {
-		this.runningContainers = runningContainers;
-	}
+    public void setAllocatedMB(int allocatedMB) {
+        this.allocatedMB = allocatedMB;
+    }
+
+    public int getAllocatedVCores() {
+        return allocatedVCores;
+    }
+
+    public void setAllocatedVCores(int allocatedVCores) {
+        this.allocatedVCores = allocatedVCores;
+    }
+
+    public int getRunningContainers() {
+        return runningContainers;
+    }
+
+    public void setRunningContainers(int runningContainers) {
+        this.runningContainers = runningContainers;
+    }
 }

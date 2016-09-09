@@ -44,7 +44,7 @@ public class JHFMRVer2Parser implements JHFParserBase {
     public void parse(InputStream is) throws Exception {
         int eventCtr = 0;
         try {
-            long start = System.currentTimeMillis();
+            final long start = System.currentTimeMillis();
             DataInputStream in = new DataInputStream(is);
             String version = in.readLine();
             if (!"Avro-Json".equals(version)) {

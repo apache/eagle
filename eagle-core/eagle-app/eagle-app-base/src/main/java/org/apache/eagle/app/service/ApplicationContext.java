@@ -16,9 +16,6 @@
  */
 package org.apache.eagle.app.service;
 
-import com.google.common.base.Preconditions;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -33,18 +30,23 @@ import org.apache.eagle.app.sink.KafkaStreamSinkConfig;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
+import com.google.common.base.Preconditions;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
  * Managed Application Interface: org.apache.eagle.app.service.ApplicationContext
- *
  * <ul>
- *     <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
- *     <li>Application Processing Logic (Execution): org.apache.eagle.app.Application</li>
- *     <li>Application Lifecycle Listener (Installation): org.apache.eagle.app.ApplicationLifecycle</li>
+ * <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
+ * <li>Application Processing Logic (Execution): org.apache.eagle.app.Application</li>
+ * <li>Application Lifecycle Listener (Installation): org.apache.eagle.app.ApplicationLifecycle</li>
  * </ul>
  */
 public class ApplicationContext implements Serializable, ApplicationLifecycle {
@@ -55,17 +57,17 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
     private final IMetadataDao alertMetadataService;
 
     /**
-     * @param metadata ApplicationEntity
-     * @param application Application
+     * @param metadata    ApplicationEntity.
+     * @param application Application.
      */
-    public ApplicationContext(Application application, ApplicationEntity metadata, Config envConfig, IMetadataDao alertMetadataService){
-        Preconditions.checkNotNull(application,"Application is null");
-        Preconditions.checkNotNull(metadata,"ApplicationEntity is null");
+    public ApplicationContext(Application application, ApplicationEntity metadata, Config envConfig, IMetadataDao alertMetadataService) {
+        Preconditions.checkNotNull(application, "Application is null");
+        Preconditions.checkNotNull(metadata, "ApplicationEntity is null");
         this.application = application;
         this.metadata = metadata;
-        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(),envConfig);
-        Map<String,Object> executionConfig = metadata.getConfiguration();
-        if(executionConfig == null) {
+        this.runtime = ExecutionRuntimeManager.getInstance().getRuntime(application.getEnvironmentType(), envConfig);
+        Map<String, Object> executionConfig = metadata.getConfiguration();
+        if (executionConfig == null) {
             executionConfig = Collections.emptyMap();
         }
 
@@ -80,7 +82,7 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
 
     @Override
     public void onInstall() {
-        if(metadata.getDescriptor().getStreams()!=null) {
+        if (metadata.getDescriptor().getStreams() != null) {
             List<StreamDesc> streamDescCollection = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
                 StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(streamDefinition.getStreamId(), this.config);
                 StreamDesc streamDesc = new StreamDesc();
@@ -92,7 +94,7 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
             metadata.setStreams(streamDescCollection);
 
             // iterate each stream descriptor and create alert datasource for each
-            for(StreamDesc streamDesc : streamDescCollection) {
+            for (StreamDesc streamDesc : streamDescCollection) {
                 // only take care of Kafka sink
                 if (streamDesc.getSink() instanceof KafkaStreamSinkConfig) {
                     KafkaStreamSinkConfig kafkaCfg = (KafkaStreamSinkConfig) streamDesc.getSink();
@@ -121,10 +123,11 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
     @Override
     public void onUninstall() {
         // we should remove alert data source and stream definition while we do uninstall
-        if(metadata.getStreams() == null)
+        if (metadata.getStreams() == null) {
             return;
+        }
         // iterate each stream descriptor and create alert datasource for each
-        for(StreamDesc streamDesc : metadata.getStreams()) {
+        for (StreamDesc streamDesc : metadata.getStreams()) {
             alertMetadataService.removeDataSource(metadata.getAppId());
             alertMetadataService.removeStream(streamDesc.getStreamId());
         }
@@ -132,12 +135,12 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
 
     @Override
     public void onStart() {
-        this.runtime.start(this.application,this.config);
+        this.runtime.start(this.application, this.config);
     }
 
     @Override
     public void onStop() {
-        this.runtime.stop(this.application,this.config);
+        this.runtime.stop(this.application, this.config);
     }
 
     public ApplicationEntity getMetadata() {

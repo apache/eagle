@@ -35,7 +35,7 @@ public class TestTopologyMgmtService extends TopologyMgmtService {
     private int routerNumber;
     private int i = 0;
     private String namePrefix = "Topology";
-    
+
     // a config used to check if createTopology is enabled. FIXME: another class of mgmt service might be better
     private boolean enableCreateTopology = false;
 

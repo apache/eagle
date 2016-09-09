@@ -16,23 +16,23 @@
  */
 package org.apache.eagle.app.spi;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
-import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.common.module.ModuleRegistry;
+import org.apache.eagle.metadata.model.ApplicationDesc;
+import com.typesafe.config.Config;
 
 public interface ApplicationProvider<T extends Application> {
 
     void prepare(ApplicationProviderConfig providerConfig,Config envConfig);
 
     /**
-     * @return application descriptor
+     * @return application descriptor.
      */
     ApplicationDesc getApplicationDesc();
 
     /**
-     * @return application instance
+     * @return application instance.
      */
     T getApplication();
 

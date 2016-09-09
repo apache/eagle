@@ -16,36 +16,36 @@
  */
 package org.apache.eagle.service.alert.resolver;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
+import com.typesafe.config.Config;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
-* @since 6/16/15
-*/
+ * @since 6/16/15.
+ */
 public final class AttributeResolverFactory {
-    private final static Map<String,AttributeResolvable> fieldResolvableCache = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<String, AttributeResolvable> fieldResolvableCache = Collections.synchronizedMap(new HashMap<>());
+
     public static AttributeResolvable getAttributeResolver(String fieldResolverName,
                                                            ApplicationEntityService entityService,
                                                            Config eagleServerConfig) throws AttributeResolveException {
         AttributeResolvable instance;
-        if(fieldResolvableCache.containsKey(fieldResolverName)){
+        if (fieldResolvableCache.containsKey(fieldResolverName)) {
             instance = fieldResolvableCache.get(fieldResolverName);
         } else {
             try {
-                instance = (AttributeResolvable) Class.forName(fieldResolverName).
-                        getConstructor(ApplicationEntityService.class, Config.class).
-                        newInstance(entityService, eagleServerConfig);
+                instance = (AttributeResolvable) Class.forName(fieldResolverName)
+                    .getConstructor(ApplicationEntityService.class, Config.class)
+                    .newInstance(entityService, eagleServerConfig);
                 fieldResolvableCache.put(fieldResolverName, instance);
             } catch (ClassNotFoundException e) {
-                throw new AttributeResolveException("Attribute Resolver in type of "+fieldResolverName+" is not found",e);
+                throw new AttributeResolveException("Attribute Resolver in type of " + fieldResolverName + " is not found", e);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new AttributeResolveException(e);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 throw new AttributeResolveException(ex);
             }
         }

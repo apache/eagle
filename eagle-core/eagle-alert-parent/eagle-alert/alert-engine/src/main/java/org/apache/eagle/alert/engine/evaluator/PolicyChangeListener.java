@@ -1,12 +1,4 @@
-package org.apache.eagle.alert.engine.evaluator;
-
-import java.util.List;
-import java.util.Map;
-
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -22,6 +14,14 @@ import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.engine.evaluator;
+
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+
+import java.util.List;
+import java.util.Map;
+
 public interface PolicyChangeListener {
     void onPolicyChange(List<PolicyDefinition> added,
                         List<PolicyDefinition> removed,

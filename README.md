@@ -32,8 +32,7 @@ For more details, please visit [https://eagle.incubator.apache.org](https://eagl
 ### Branches
 | name | status | version | description |
 | :---:| :---: | :---: | :--- |
-| **master** | [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-main)](https://builds.apache.org/job/incubator-eagle-main/) | 0.4.0-incubating | stable code base aligned with latest release |
-| **develop** | [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-develop)](https://builds.apache.org/job/incubator-eagle-develop/) | 0.5.0-incubating-SNAPSHOT | code base for continuous development |
+| **master** | [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-main)](https://builds.apache.org/job/incubator-eagle-main/) | 0.5.0-incubating-SNAPSHOT | Branch for continuous development. |
 
 ### Latest Release
 
@@ -56,7 +55,7 @@ After successfully building, you will find eagle binary tarball under _eagle-ass
 
 ## Eagle Quick Start in IDE (Intellij)
 ### prepare
-Please have HDP sandbox ready, where you can have zookeeper, hadoop, hbase, hive ready  
+Please have HDP sandbox ready, where you can have zookeeper, hadoop, hbase, hive ready.
 
 ### Run Eagle Web Service
 Go to project eagle-webservice, run it as web application.

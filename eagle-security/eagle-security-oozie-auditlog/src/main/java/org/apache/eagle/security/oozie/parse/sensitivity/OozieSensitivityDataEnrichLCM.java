@@ -35,7 +35,7 @@ public class OozieSensitivityDataEnrichLCM extends AbstractDataEnrichLCM {
 
     @Override
     protected Collection loadFromService(ISecurityDataEnrichServiceClient client) {
-        return null;
+        return client.listOozieSensitivities();
     }
 
     @Override

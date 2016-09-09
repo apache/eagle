@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.mr.history.metrics;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.parser.EagleJobStatus;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
@@ -26,6 +25,7 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,7 @@ public class JobCountMetricsGenerator {
 
     public void flush(String date, int year, int month, int day) throws Exception {
         List<Pair<String, String>> jobs = JobHistoryZKStateManager.instance().getProcessedJobs(date);
-        int total = jobs.size();
+        final int total = jobs.size();
         int fail = 0;
         for (Pair<String, String> job : jobs) {
             if (!job.getRight().equals(EagleJobStatus.SUCCEEDED.toString())) {
@@ -50,7 +50,7 @@ public class JobCountMetricsGenerator {
             }
         }
 
-        IEagleServiceClient client = new EagleServiceClientImpl(
+        final IEagleServiceClient client = new EagleServiceClientImpl(
             MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
             MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
             MRHistoryJobConfig.get().getEagleServiceConfig().username,
@@ -62,7 +62,7 @@ public class JobCountMetricsGenerator {
         GenericMetricEntity metricEntity = new GenericMetricEntity();
         metricEntity.setTimestamp(cal.getTimeInMillis());
         metricEntity.setPrefix(Constants.JOB_COUNT_PER_DAY);
-        metricEntity.setValue(new double[]{total, fail});
+        metricEntity.setValue(new double[] {total, fail});
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {

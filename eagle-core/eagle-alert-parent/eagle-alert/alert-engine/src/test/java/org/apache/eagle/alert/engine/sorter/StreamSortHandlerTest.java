@@ -16,14 +16,12 @@
  */
 package org.apache.eagle.alert.engine.sorter;
 
-import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.Slf4jReporter;
+import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.eagle.alert.engine.mock.MockPartitionedCollector;
 import org.apache.eagle.alert.engine.mock.MockSampleMetadataFactory;
@@ -38,12 +36,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ScheduledReporter;
-import com.codahale.metrics.Slf4jReporter;
-import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
-import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
-import com.google.common.collect.Ordering;
+import java.lang.management.ManagementFactory;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+PrintGCTaskTimeStamps -XX:+PrintGCDetails -verbose:gc
@@ -56,23 +51,24 @@ public class StreamSortHandlerTest {
     }
 
     private ScheduledReporter metricReporter;
+
     @Before
-    public void setUp(){
+    public void setUp() {
         final MetricRegistry metrics = new MetricRegistry();
         metrics.registerAll(new MemoryUsageGaugeSet());
         metrics.registerAll(new GarbageCollectorMetricSet());
         metricReporter = Slf4jReporter.forRegistry(metrics)
-                .filter((name, metric) -> name.matches("(.*heap|pools.PS.*).usage"))
-                .withLoggingLevel(Slf4jReporter.LoggingLevel.DEBUG)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build();
-        metricReporter.start(60,TimeUnit.SECONDS);
+            .filter((name, metric) -> name.matches("(.*heap|pools.PS.*).usage"))
+            .withLoggingLevel(Slf4jReporter.LoggingLevel.DEBUG)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .build();
+        metricReporter.start(60, TimeUnit.SECONDS);
     }
 
     /**
      * Used to debug window bucket lifecycle
-     *
+     * <p>
      * Window period: PT1s, margin: 5s
      *
      * @throws InterruptedException
@@ -83,18 +79,18 @@ public class StreamSortHandlerTest {
         StreamTimeClockInLocalMemory timeClock = new StreamTimeClockInLocalMemory("sampleStream_1");
         Ordering<PartitionedEvent> timeOrdering = Ordering.from(PartitionedEventTimeOrderingComparator.INSTANCE);
         StreamSortWindowHandlerImpl sortHandler = new StreamSortWindowHandlerImpl();
-        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT1m",5000),mockCollector);
+        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT1m", 5000), mockCollector);
         List<PartitionedEvent> unsortedList = new LinkedList<>();
 
         int i = 0;
-        while(i<1000) {
+        while (i < 1000) {
             PartitionedEvent event = MockSampleMetadataFactory.createRandomOutOfTimeOrderEventGroupedByName("sampleStream_1");
             sortHandler.nextEvent(event);
             unsortedList.add(event);
-            if(event.getTimestamp()>timeClock.getTime()) {
+            if (event.getTimestamp() > timeClock.getTime()) {
                 timeClock.moveForward(event.getTimestamp());
             }
-            sortHandler.onTick(timeClock,System.currentTimeMillis());
+            sortHandler.onTick(timeClock, System.currentTimeMillis());
             i++;
         }
         sortHandler.close();
@@ -114,24 +110,24 @@ public class StreamSortHandlerTest {
         StreamTimeClockInLocalMemory timeClock = new StreamTimeClockInLocalMemory("sampleStream_1");
         Ordering<PartitionedEvent> timeOrdering = Ordering.from(PartitionedEventTimeOrderingComparator.INSTANCE);
         StreamSortWindowHandlerImpl sortHandler = new StreamSortWindowHandlerImpl();
-        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT1h",5000),mockCollector);
+        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT1h", 5000), mockCollector);
         List<PartitionedEvent> sortedList = new LinkedList<>();
 
         int i = 0;
-        while(i<1000000) {
-            PartitionedEvent event = MockSampleMetadataFactory.createRandomPartitionedEvent("sampleStream_1",System.currentTimeMillis()+i);
+        while (i < 1000000) {
+            PartitionedEvent event = MockSampleMetadataFactory.createRandomPartitionedEvent("sampleStream_1", System.currentTimeMillis() + i);
             sortHandler.nextEvent(event);
             sortedList.add(event);
-            if(event.getTimestamp()>timeClock.getTime()) {
+            if (event.getTimestamp() > timeClock.getTime()) {
                 timeClock.moveForward(event.getTimestamp());
             }
-            sortHandler.onTick(timeClock,System.currentTimeMillis());
+            sortHandler.onTick(timeClock, System.currentTimeMillis());
             i++;
         }
         sortHandler.close();
         Assert.assertTrue(timeOrdering.isOrdered(sortedList));
         Assert.assertTrue(timeOrdering.isOrdered(mockCollector.get()));
-        Assert.assertEquals(1000000,mockCollector.get().size());
+        Assert.assertEquals(1000000, mockCollector.get().size());
     }
 
     /**
@@ -159,33 +155,33 @@ public class StreamSortHandlerTest {
         StreamTimeClockInLocalMemory timeClock = new StreamTimeClockInLocalMemory("sampleStream_1");
         Ordering<PartitionedEvent> timeOrdering = Ordering.from(PartitionedEventTimeOrderingComparator.INSTANCE);
         StreamSortWindowHandlerImpl sortHandler = new StreamSortWindowHandlerImpl();
-        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT1h",5000),mockCollector);
+        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT1h", 5000), mockCollector);
         List<PartitionedEvent> unsortedList = new LinkedList<>();
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         int i = 0;
-        while(i<count) {
+        while (i < count) {
             PartitionedEvent event = MockSampleMetadataFactory.createRandomOutOfTimeOrderEventGroupedByName("sampleStream_1");
             sortHandler.nextEvent(event);
             unsortedList.add(event);
-            if(event.getEvent().getTimestamp()>timeClock.getTime()) {
+            if (event.getEvent().getTimestamp() > timeClock.getTime()) {
                 timeClock.moveForward(event.getEvent().getTimestamp());
             }
-            sortHandler.onTick(timeClock,System.currentTimeMillis());
+            sortHandler.onTick(timeClock, System.currentTimeMillis());
             i++;
         }
         stopWatch.stop();
-        LOG.info("Produced {} events in {} ms",count,stopWatch.getTime());
+        LOG.info("Produced {} events in {} ms", count, stopWatch.getTime());
         sortHandler.close();
         Assert.assertFalse(timeOrdering.isOrdered(unsortedList));
         Assert.assertTrue(timeOrdering.isOrdered(mockCollector.get()));
-        Assert.assertTrue(mockCollector.get().size()>=0);
+        Assert.assertTrue(mockCollector.get().size() >= 0);
     }
 
     /**
      * Used to debug window bucket lifecycle
-     *
+     * <p>
      * Window period: PT1h, margin: 5s
      *
      * @throws InterruptedException
@@ -196,29 +192,29 @@ public class StreamSortHandlerTest {
         StreamTimeClockInLocalMemory timeClock = new StreamTimeClockInLocalMemory("sampleStream_1");
         Ordering<PartitionedEvent> timeOrdering = Ordering.from(PartitionedEventTimeOrderingComparator.INSTANCE);
         StreamSortWindowHandlerImpl sortHandler = new StreamSortWindowHandlerImpl();
-        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT1h",5000),mockCollector);
+        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT1h", 5000), mockCollector);
         List<PartitionedEvent> sortedList = new LinkedList<>();
 
         int i = 0;
-        while(i<1000000) {
-            PartitionedEvent event = MockSampleMetadataFactory.createRandomPartitionedEvent("sampleStream_1",System.currentTimeMillis()+i);
+        while (i < 1000000) {
+            PartitionedEvent event = MockSampleMetadataFactory.createRandomPartitionedEvent("sampleStream_1", System.currentTimeMillis() + i);
             sortHandler.nextEvent(event);
             sortedList.add(event);
-            if(event.getTimestamp()>timeClock.getTime()) {
+            if (event.getTimestamp() > timeClock.getTime()) {
                 timeClock.moveForward(event.getTimestamp());
             }
-            sortHandler.onTick(timeClock,System.currentTimeMillis());
+            sortHandler.onTick(timeClock, System.currentTimeMillis());
             i++;
         }
         sortHandler.close();
         Assert.assertTrue(timeOrdering.isOrdered(sortedList));
         Assert.assertTrue(timeOrdering.isOrdered(mockCollector.get()));
-        Assert.assertEquals(1000000,mockCollector.get().size());
+        Assert.assertEquals(1000000, mockCollector.get().size());
     }
 
     /**
      * Used to debug window bucket lifecycle
-     *
+     * <p>
      * Window period: PT1h, margin: 5s
      *
      * @throws InterruptedException
@@ -229,26 +225,26 @@ public class StreamSortHandlerTest {
         StreamTimeClockInLocalMemory timeClock = new StreamTimeClockInLocalMemory("sampleStream_1");
         Ordering<PartitionedEvent> timeOrdering = Ordering.from(PartitionedEventTimeOrderingComparator.INSTANCE);
         StreamSortWindowHandlerImpl sortHandler = new StreamSortWindowHandlerImpl();
-        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT10s",1000),mockCollector);
+        sortHandler.prepare("sampleStream_1", MockSampleMetadataFactory.createSampleStreamSortSpec("sampleStream_1", "PT10s", 1000), mockCollector);
         List<PartitionedEvent> sortedList = new LinkedList<>();
 
         PartitionedEvent event = MockSampleMetadataFactory.createRandomSortedEventGroupedByName("sampleStream_1");
         sortHandler.nextEvent(event);
         sortedList.add(event);
         timeClock.moveForward(event.getTimestamp());
-        sortHandler.onTick(timeClock,System.currentTimeMillis());
+        sortHandler.onTick(timeClock, System.currentTimeMillis());
 
         // Triggered to become expired by System time
-        sortHandler.onTick(timeClock,System.currentTimeMillis()+10*1000+1000L + 1);
+        sortHandler.onTick(timeClock, System.currentTimeMillis() + 10 * 1000 + 1000L + 1);
 
         Assert.assertTrue(timeOrdering.isOrdered(sortedList));
         Assert.assertTrue(timeOrdering.isOrdered(mockCollector.get()));
-        Assert.assertEquals(1,mockCollector.get().size());
+        Assert.assertEquals(1, mockCollector.get().size());
 
         sortHandler.close();
     }
 
-//    @Test
+    //    @Test
     public void testWithTimerLock() throws InterruptedException {
         Timer timer = new Timer();
         List<Long> collected = new ArrayList<>();
@@ -265,6 +261,6 @@ public class StreamSortHandlerTest {
                     }
                 }
             }
-        },0,100);
+        }, 0, 100);
     }
 }

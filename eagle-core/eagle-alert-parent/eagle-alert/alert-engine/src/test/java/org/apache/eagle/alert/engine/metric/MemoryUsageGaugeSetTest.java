@@ -1,15 +1,14 @@
 package org.apache.eagle.alert.engine.metric;
 
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -36,9 +35,9 @@ public class MemoryUsageGaugeSetTest {
         LOG.info("Starting testJVMMetrics");
         final MetricRegistry metrics = new MetricRegistry();
         ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build();
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .build();
         metrics.registerAll(new MemoryUsageGaugeSet());
         metrics.register("sample", (Gauge<Double>) () -> 0.1234);
         reporter.start(1, TimeUnit.SECONDS);

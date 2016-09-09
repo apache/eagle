@@ -16,39 +16,39 @@
  */
 package org.apache.eagle.app.sink;
 
-import backtype.storm.tuple.Tuple;
 import org.apache.eagle.alert.engine.model.StreamEvent;
+import backtype.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
 
-public class FlattenEventMapper  implements StreamEventMapper{
+public class FlattenEventMapper implements StreamEventMapper {
     private final String streamId;
-    private final static String TIMESTAMP_FIELD = "timestamp";
-    private final static Logger LOGGER = LoggerFactory.getLogger(FlattenEventMapper.class);
+    private static final String TIMESTAMP_FIELD = "timestamp";
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlattenEventMapper.class);
 
-    public FlattenEventMapper(String streamId){
+    public FlattenEventMapper(String streamId) {
         this.streamId = streamId;
     }
 
     @Override
     public List<StreamEvent> map(Tuple tuple) throws Exception {
         long timestamp;
-        if(tuple.getFields().contains(TIMESTAMP_FIELD)) {
+        if (tuple.getFields().contains(TIMESTAMP_FIELD)) {
             try {
                 timestamp = tuple.getLongByField("timestamp");
             } catch (Exception ex) {
                 // if timestamp is not null
-                LOGGER.error(ex.getMessage(),ex);
+                LOGGER.error(ex.getMessage(), ex);
                 timestamp = 0;
             }
         } else {
             timestamp = System.currentTimeMillis();
         }
         Object[] values = new Object[tuple.getFields().size()];
-        for(int i=0;i<tuple.getFields().size();i++){
+        for (int i = 0; i < tuple.getFields().size(); i++) {
             values[i] = tuple.getValue(i);
         }
         StreamEvent event = new StreamEvent();

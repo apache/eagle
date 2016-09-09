@@ -21,28 +21,28 @@ package org.apache.eagle.hadoop.queue.model.scheduler;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResourcesUsed {
 
-	private long memory;
+    private long memory;
 
-	private long vCores;
+    private long vCores;
 
-	public long getvCores() {
-		return vCores;
-	}
+    public long getvCores() {
+        return vCores;
+    }
 
-	public void setvCores(long vCores) {
-		this.vCores = vCores;
-	}
+    public void setvCores(long vCores) {
+        this.vCores = vCores;
+    }
 
-	public long getMemory() {
-		return memory;
-	}
+    public long getMemory() {
+        return memory;
+    }
 
-	public void setMemory(long memory) {
-		this.memory = memory;
-	}
+    public void setMemory(long memory) {
+        this.memory = memory;
+    }
 
 }

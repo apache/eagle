@@ -116,7 +116,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setCurrentState(String currentState) {
         this.currentState = currentState;
-        _pcs.firePropertyChange("currentState", null, null);
+        pcs.firePropertyChange("currentState", null, null);
     }
 
     public long getStartTime() {
@@ -125,7 +125,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
-        _pcs.firePropertyChange("startTime", null, null);
+        pcs.firePropertyChange("startTime", null, null);
     }
 
     public long getEndTime() {
@@ -134,7 +134,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setEndTime(long endTime) {
         this.endTime = endTime;
-        _pcs.firePropertyChange("endTime", null, null);
+        pcs.firePropertyChange("endTime", null, null);
     }
 
     public int getNumTotalMaps() {
@@ -143,7 +143,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setNumTotalMaps(int numTotalMaps) {
         this.numTotalMaps = numTotalMaps;
-        _pcs.firePropertyChange("numTotalMaps", null, null);
+        pcs.firePropertyChange("numTotalMaps", null, null);
     }
 
     public int getNumFailedMaps() {
@@ -152,7 +152,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setNumFailedMaps(int numFailedMaps) {
         this.numFailedMaps = numFailedMaps;
-        _pcs.firePropertyChange("numFailedMaps", null, null);
+        pcs.firePropertyChange("numFailedMaps", null, null);
     }
 
     public int getNumFinishedMaps() {
@@ -161,7 +161,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setNumFinishedMaps(int numFinishedMaps) {
         this.numFinishedMaps = numFinishedMaps;
-        _pcs.firePropertyChange("numFinishedMaps", null, null);
+        pcs.firePropertyChange("numFinishedMaps", null, null);
     }
 
     public int getNumTotalReduces() {
@@ -170,7 +170,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setNumTotalReduces(int numTotalReduces) {
         this.numTotalReduces = numTotalReduces;
-        _pcs.firePropertyChange("numTotalReduces", null, null);
+        pcs.firePropertyChange("numTotalReduces", null, null);
     }
 
     public int getNumFailedReduces() {
@@ -179,7 +179,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setNumFailedReduces(int numFailedReduces) {
         this.numFailedReduces = numFailedReduces;
-        _pcs.firePropertyChange("numFailedReduces", null, null);
+        pcs.firePropertyChange("numFailedReduces", null, null);
     }
 
     public int getNumFinishedReduces() {
@@ -188,7 +188,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setNumFinishedReduces(int numFinishedReduces) {
         this.numFinishedReduces = numFinishedReduces;
-        _pcs.firePropertyChange("numFinishedReduces", null, null);
+        pcs.firePropertyChange("numFinishedReduces", null, null);
     }
 
     public JobCounters getJobCounters() {
@@ -197,7 +197,7 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
 
     public void setJobCounters(JobCounters jobCounters) {
         this.jobCounters = jobCounters;
-        _pcs.firePropertyChange("jobCounters", null, null);
+        pcs.firePropertyChange("jobCounters", null, null);
     }
 
     public int getDataLocalMaps() {

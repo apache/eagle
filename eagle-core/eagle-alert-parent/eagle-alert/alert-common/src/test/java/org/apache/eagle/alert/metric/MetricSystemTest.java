@@ -1,19 +1,4 @@
-package org.apache.eagle.alert.metric;
-
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.JvmAttributeGaugeSet;
-import com.codahale.metrics.MetricRegistry;
-import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.alert.metric.sink.KafkaSink;
-import org.apache.eagle.alert.metric.source.JVMMetricSource;
-import org.apache.eagle.alert.metric.source.MetricSource;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -29,18 +14,35 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.metric;
+
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.JvmAttributeGaugeSet;
+import com.codahale.metrics.MetricRegistry;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.alert.metric.sink.KafkaSink;
+import org.apache.eagle.alert.metric.source.JVMMetricSource;
+import org.apache.eagle.alert.metric.source.MetricSource;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class MetricSystemTest {
-    @Test @Ignore
-    public void testKafkaSink(){
+    @Test
+    @Ignore
+    public void testKafkaSink() {
         KafkaSink sink = new KafkaSink();
         MetricRegistry registry = new MetricRegistry();
         registry.registerAll(new JvmAttributeGaugeSet());
-        sink.prepare(ConfigFactory.load().getConfig("metric.sink.kafka"),registry);
+        sink.prepare(ConfigFactory.load().getConfig("metric.sink.kafka"), registry);
         sink.report();
         sink.stop();
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testMetricSystem() throws InterruptedException {
         MetricSystem system = MetricSystem.load(ConfigFactory.load());
         system.register(new JVMMetricSource());
@@ -50,8 +52,9 @@ public class MetricSystemTest {
         system.stop();
     }
 
-    @Test @Ignore
-    public void testMetaConflict(){
+    @Test
+    @Ignore
+    public void testMetaConflict() {
         MetricSystem system = MetricSystem.load(ConfigFactory.load());
         system.register(new MetaConflictMetricSource());
         system.start();
@@ -62,7 +65,7 @@ public class MetricSystemTest {
     private class MetaConflictMetricSource implements MetricSource {
         private MetricRegistry registry = new MetricRegistry();
 
-        public MetaConflictMetricSource(){
+        public MetaConflictMetricSource() {
             registry.register("meta.conflict", (Gauge<String>) () -> "meta conflict happening!");
         }
 
@@ -81,15 +84,17 @@ public class MetricSystemTest {
     private class SampleMetricSource implements MetricSource {
         private MetricRegistry registry = new MetricRegistry();
 
-        public SampleMetricSource(){
+        public SampleMetricSource() {
             registry.register("sample.long", (Gauge<Long>) System::currentTimeMillis);
-            registry.register("sample.map", (Gauge<Map<String, Object>>) () -> new HashMap<String, Object>(){
+            registry.register("sample.map", (Gauge<Map<String, Object>>) () -> new HashMap<String, Object>() {
                 private static final long serialVersionUID = 3948508906655117683L;
+
                 {
-                    put("int",1234);
-                    put("str","text");
-                    put("bool",true);
-                }});
+                    put("int", 1234);
+                    put("str", "text");
+                    put("bool", true);
+                }
+            });
         }
 
         @Override

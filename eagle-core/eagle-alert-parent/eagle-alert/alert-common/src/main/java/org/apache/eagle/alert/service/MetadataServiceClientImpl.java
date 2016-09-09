@@ -19,12 +19,6 @@
 
 package org.apache.eagle.alert.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
@@ -33,10 +27,8 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamingCluster;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -45,6 +37,13 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.typesafe.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
 
 public class MetadataServiceClientImpl implements IMetadataServiceClient {
     private static final long serialVersionUID = 3003976065082684128L;
@@ -82,7 +81,7 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
 
     public MetadataServiceClientImpl(Config config) {
         this(config.getString(EAGLE_CORRELATION_SERVICE_HOST), config.getInt(EAGLE_CORRELATION_SERVICE_PORT), config
-                .getString(EAGLE_CORRELATION_CONTEXT));
+            .getString(EAGLE_CORRELATION_CONTEXT));
         basePath = buildBasePath();
     }
 
@@ -163,27 +162,27 @@ public class MetadataServiceClientImpl implements IMetadataServiceClient {
         return listOne(METADATA_SCHEDULESTATES_PATH + "/" + version, ScheduleState.class);
     }
 
+    @Override
+    public ScheduleState getVersionedSpec() {
+        return listOne(METADATA_SCHEDULESTATES_PATH, ScheduleState.class);
+    }
+
     private <T> T listOne(String path, Class<T> tClz) {
         LOG.info("query URL {}", basePath + path);
         WebResource r = client.resource(basePath + path);
 
         ClientResponse resp = r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON)
-                .get(ClientResponse.class);
+            .get(ClientResponse.class);
         if (resp.getStatus() < 300) {
             try {
                 return resp.getEntity(tClz);
             } catch (Exception e) {
                 LOG.warn(" list one entity failed, ignored and continute, path {}, message {}!", path, e.getMessage());
             }
-        }else{
+        } else {
             LOG.warn("fail querying metadata service {} with http status {}", basePath + path, resp.getStatus());
         }
         return null;
-    }
-
-    @Override
-    public ScheduleState getVersionedSpec() {
-        return listOne(METADATA_SCHEDULESTATES_PATH, ScheduleState.class);
     }
 
     @Override

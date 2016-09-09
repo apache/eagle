@@ -38,7 +38,7 @@ public class JobNameNormalization {
      * source string is regular expression, for example ^(.*)[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}$
      * target string is parameterized string, for example $1, $2
      */
-    private List<JobNameNormalizationRule> _rules = new ArrayList<JobNameNormalizationRule>();
+    private List<JobNameNormalizationRule> rules = new ArrayList<JobNameNormalizationRule>();
 
     private enum NormalizationOp {
         REPLACE("=>");
@@ -97,7 +97,7 @@ public class JobNameNormalization {
             r.pattern = Pattern.compile(elements[0].trim());
             r.op = op;
             r.target = elements[1].trim();
-            _rules.add(r);
+            rules.add(r);
             break;  //once one Op is matched, exit
         }
 
@@ -106,7 +106,7 @@ public class JobNameNormalization {
     public String normalize(String jobName) {
         String normalizedJobName = jobName;
         // go through each rules and do actions
-        for (JobNameNormalizationRule rule : _rules) {
+        for (JobNameNormalizationRule rule : rules) {
             Pattern p = rule.pattern;
             Matcher m = p.matcher(jobName);
             if (m.find()) {

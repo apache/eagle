@@ -41,91 +41,89 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 /**
- * 
  * @author xiancli
- *
  */
 public class TestServiceAppWithZk {
 
-	ZookeeperEmbedded zkEmbed;
+    ZookeeperEmbedded zkEmbed;
 
-	PrintStream oldStream;
-	PrintStream newStream;
-	ByteArrayOutputStream newStreamOutput;
+    PrintStream oldStream;
+    PrintStream newStream;
+    ByteArrayOutputStream newStreamOutput;
 
-	@Before
-	public void setUp() throws Exception {
-		// Create a stream to hold the output
-		newStreamOutput = new ByteArrayOutputStream();
-		newStream = new PrintStream(newStreamOutput);
-		// IMPORTANT: Save the old System.out!
-		oldStream = System.out;
-		// Tell Java to use your special stream
-		System.setOut(newStream);
+    @Before
+    public void setUp() throws Exception {
+        // Create a stream to hold the output
+        newStreamOutput = new ByteArrayOutputStream();
+        newStream = new PrintStream(newStreamOutput);
+        // IMPORTANT: Save the old System.out!
+        oldStream = System.out;
+        // Tell Java to use your special stream
+        System.setOut(newStream);
 
-		zkEmbed = new ZookeeperEmbedded(2181);
-		zkEmbed.start();
+        zkEmbed = new ZookeeperEmbedded(2181);
+        zkEmbed.start();
 
-		Thread.sleep(2000);
+        Thread.sleep(2000);
 
-		new ServiceApp().run(new String[] { "server" });
-	}
+        new ServiceApp().run(new String[] {"server"});
+    }
 
-	@After
-	public void tearDown() throws Exception {
-		zkEmbed.shutdown();
-	}
+    @After
+    public void tearDown() throws Exception {
+        zkEmbed.shutdown();
+    }
 
-	@Test
-	public void testMain() throws Exception {
-		try {
-			Thread.sleep(15000);
-		} catch (InterruptedException e1) {
-		}
+    @Test
+    public void testMain() throws Exception {
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e1) {
+        }
 
-		// Put things back
-		System.out.flush();
-		System.setOut(oldStream);
+        // Put things back
+        System.out.flush();
+        System.setOut(oldStream);
 
-		BufferedReader br = new BufferedReader(new StringReader(newStreamOutput.toString()));
-		List<String> logs = new ArrayList<String>();
-		String line = null;
-		while ((line = br.readLine()) != null) {
-			logs.add(line);
-		}
+        BufferedReader br = new BufferedReader(new StringReader(newStreamOutput.toString()));
+        List<String> logs = new ArrayList<String>();
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            logs.add(line);
+        }
 
-		System.out.println(Joiner.on("\n").join(logs));
+        System.out.println(Joiner.on("\n").join(logs));
 
-		Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("this is leader node right now..")));
-		Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("start coordinator background tasks..")));
+        Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("this is leader node right now..")));
+        Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("start coordinator background tasks..")));
 
-		Config config = ConfigFactory.load().getConfig("coordinator");
-		// build dynamic policy loader
-		String host = config.getString("metadataService.host");
-		int port = config.getInt("metadataService.port");
-		String context = config.getString("metadataService.context");
-		IMetadataServiceClient client = new MetadataServiceClientImpl(host, port, context);
+        Config config = ConfigFactory.load().getConfig("coordinator");
+        // build dynamic policy loader
+        String host = config.getString("metadataService.host");
+        int port = config.getInt("metadataService.port");
+        String context = config.getString("metadataService.context");
+        IMetadataServiceClient client = new MetadataServiceClientImpl(host, port, context);
 
-		List<PolicyDefinition> policies = client.listPolicies();
+        List<PolicyDefinition> policies = client.listPolicies();
 
-		Assert.assertEquals(0, policies.size());
+        Assert.assertEquals(0, policies.size());
 
-		PolicyDefinition def = new PolicyDefinition();
-		def.setName("test-policy-1");
-		def.setInputStreams(Arrays.asList("testStreamDef"));
-		def.setOutputStreams(Arrays.asList("test-datasource-1"));
-		def.setParallelismHint(5);
-		def.setDefinition(new Definition());
-		client.addPolicy(def);
+        PolicyDefinition def = new PolicyDefinition();
+        def.setName("test-policy-1");
+        def.setInputStreams(Arrays.asList("testStreamDef"));
+        def.setOutputStreams(Arrays.asList("test-datasource-1"));
+        def.setParallelismHint(5);
+        def.setDefinition(new Definition());
+        client.addPolicy(def);
 
-		policies = client.listPolicies();
+        policies = client.listPolicies();
 
-		Assert.assertEquals(1, policies.size());
+        Assert.assertEquals(1, policies.size());
 
-		try {
-			client.close();
-		} catch (IOException e) {
-		}
-	}
+        try {
+            client.close();
+        } catch (IOException e) {
+        }
+    }
 
 }

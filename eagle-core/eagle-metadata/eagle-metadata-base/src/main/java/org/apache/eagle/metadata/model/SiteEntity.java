@@ -27,7 +27,15 @@ public class SiteEntity extends PersistenceEntity {
     private String siteId;
     private String siteName;
     private String description;
-    private Map<String,String> context;
+    private Map<String, String> context;
+
+    public SiteEntity() {
+    }
+
+    public SiteEntity(String uuid, String siteId) {
+        super.setUuid(uuid);
+        this.siteId = siteId;
+    }
 
     public String getDescription() {
         return description;
@@ -39,7 +47,7 @@ public class SiteEntity extends PersistenceEntity {
 
     @Override
     public String toString() {
-        return String.format("SiteEntity[siteId = %s, siteName =%s, description = %s, uuid = %s]",getSiteId(),getSiteName(),getDescription(),getUuid());
+        return String.format("SiteEntity[siteId = %s, siteName =%s, description = %s, uuid = %s]", getSiteId(), getSiteName(), getDescription(), getUuid());
     }
 
     public String getSiteId() {

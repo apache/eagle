@@ -43,7 +43,7 @@ public class TaskFailureCountAPIEntity extends JobBaseAPIEntity {
 
     public void setTaskStatus(String taskStatus) {
         this.taskStatus = taskStatus;
-        _pcs.firePropertyChange("taskStatus", null, null);
+        pcs.firePropertyChange("taskStatus", null, null);
     }
 
     public String getError() {
@@ -52,7 +52,7 @@ public class TaskFailureCountAPIEntity extends JobBaseAPIEntity {
 
     public void setError(String error) {
         this.error = error;
-        _pcs.firePropertyChange("error", null, null);
+        pcs.firePropertyChange("error", null, null);
     }
 
     public int getFailureCount() {
@@ -61,6 +61,6 @@ public class TaskFailureCountAPIEntity extends JobBaseAPIEntity {
 
     public void setFailureCount(int failureCount) {
         this.failureCount = failureCount;
-        _pcs.firePropertyChange("failureCount", null, null);
+        pcs.firePropertyChange("failureCount", null, null);
     }
 }

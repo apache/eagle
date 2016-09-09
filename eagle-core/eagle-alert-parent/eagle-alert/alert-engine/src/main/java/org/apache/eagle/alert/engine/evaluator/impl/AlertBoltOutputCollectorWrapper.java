@@ -16,20 +16,19 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
-import java.util.Arrays;
-
 import org.apache.eagle.alert.engine.AlertStreamCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
-
 import backtype.storm.task.OutputCollector;
+
+import java.util.Arrays;
 
 public class AlertBoltOutputCollectorWrapper implements AlertStreamCollector {
     private final OutputCollector delegate;
     private final Object outputLock;
     private final StreamContext streamContext;
 
-    public AlertBoltOutputCollectorWrapper(OutputCollector outputCollector, Object outputLock, StreamContext streamContext){
+    public AlertBoltOutputCollectorWrapper(OutputCollector outputCollector, Object outputLock, StreamContext streamContext) {
         this.delegate = outputCollector;
         this.outputLock = outputLock;
         this.streamContext = streamContext;

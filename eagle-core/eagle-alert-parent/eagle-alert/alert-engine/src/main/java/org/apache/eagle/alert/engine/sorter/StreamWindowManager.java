@@ -21,43 +21,38 @@ import java.util.Collection;
 
 /**
  * TODO: Reuse existing expired window to avoid recreating new windows again and again
- *
- * Single stream window manager
+ * <p>Single stream window manager.</p>
  */
 public interface StreamWindowManager extends StreamTimeClockListener, Closeable {
 
     /**
-     * @param initialTime
-     * @return
+     * addNewWindow.
      */
     StreamWindow addNewWindow(long initialTime);
 
     /**
-     * @param window
+     * removeWindow.
      */
     void removeWindow(StreamWindow window);
 
     /**
-     * @param window
-     * @return
+     * hasWindow.
+     *
+     * @return if has window
      */
     boolean hasWindow(StreamWindow window);
 
     /**
-     * @param timestamp time
-     * @return whether window exists for time
+     * @param timestamp time.
+     * @return whether window exists for time.
      */
     boolean hasWindowFor(long timestamp);
 
     /**
-     * @return Internal collection for performance optimization
+     * @return Internal collection for performance optimization.
      */
     Collection<StreamWindow> getWindows();
 
-    /**
-     * @param timestamp
-     * @return
-     */
     StreamWindow getWindowFor(long timestamp);
 
     boolean reject(long timestamp);

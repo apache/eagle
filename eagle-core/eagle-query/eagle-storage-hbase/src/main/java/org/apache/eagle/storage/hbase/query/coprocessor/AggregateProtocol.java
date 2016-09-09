@@ -29,35 +29,32 @@ import java.util.List;
  */
 public interface AggregateProtocol {
 
-	/**
-	 *
-	 *
-	 * @param entityDefinition
-	 * @param scan
-	 * @param groupbyFields
-	 * @param aggregateFuncTypes
-	 * @param aggregatedFields
-	 * @return AggregateResult
-	 * @throws java.io.IOException
-	 */
-	AggregateResult aggregate(EntityDefinition entityDefinition,
+    /**
+     * @param entityDefinition
+     * @param scan
+     * @param groupbyFields
+     * @param aggregateFuncTypes
+     * @param aggregatedFields
+     * @return AggregateResult
+     * @throws java.io.IOException
+     */
+    AggregateResult aggregate(EntityDefinition entityDefinition,
                               Scan scan,
                               List<String> groupbyFields,
                               List<byte[]> aggregateFuncTypes,
                               List<String> aggregatedFields) throws IOException;
 
-	/**
-	 *
-	 * @param entityDefinition
-	 * @param scan
-	 * @param groupbyFields
-	 * @param aggregateFuncTypes
-	 * @param aggregatedFields
-	 * @param intervalMin
-	 * @return AggregateResult
-	 * @throws java.io.IOException
-	 */
-	AggregateResult aggregate(EntityDefinition entityDefinition,
+    /**
+     * @param entityDefinition
+     * @param scan
+     * @param groupbyFields
+     * @param aggregateFuncTypes
+     * @param aggregatedFields
+     * @param intervalMin
+     * @return AggregateResult
+     * @throws java.io.IOException
+     */
+    AggregateResult aggregate(EntityDefinition entityDefinition,
                               Scan scan,
                               List<String> groupbyFields,
                               List<byte[]> aggregateFuncTypes,

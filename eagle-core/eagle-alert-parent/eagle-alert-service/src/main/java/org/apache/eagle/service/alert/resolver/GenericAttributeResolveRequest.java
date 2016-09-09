@@ -20,16 +20,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * @since 6/16/15
+ * @since 6/16/15.
  */
 public class GenericAttributeResolveRequest {
     /**
-     * @param query whatever is in input box of attribute
-     * @param site which site this policy belongs to
+     * @param query whatever is in input box of attribute.
+     * @param site  which site this policy belongs to.
      */
     @JsonCreator
-    public GenericAttributeResolveRequest(@JsonProperty("query") String query, @JsonProperty("site") String site){
-        this.query  = query;
+    public GenericAttributeResolveRequest(@JsonProperty("query") String query, @JsonProperty("site") String site) {
+        this.query = query;
         this.site = site;
     }
 

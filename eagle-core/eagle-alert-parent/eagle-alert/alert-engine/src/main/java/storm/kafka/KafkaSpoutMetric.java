@@ -16,39 +16,34 @@
  */
 package storm.kafka;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import backtype.storm.metric.api.IMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.metric.api.IMetric;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Since 5/18/16.
  * The original storm.kafka.KafkaSpout has some issues like the following
  * 1) can only support one single topic
- * 2) can only be initialized at open(), can't dynamically support another topic
+ * 2) can only be initialized at open(), can't dynamically support another topic.
  */
 public class KafkaSpoutMetric implements IMetric {
     @SuppressWarnings("unused")
-    private final static Logger LOG = LoggerFactory.getLogger(KafkaSpoutMetric.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaSpoutMetric.class);
     private Map<String, KafkaSpoutMetricContext> metricContextMap = new ConcurrentHashMap<>();
     private Map<String, KafkaUtils.KafkaOffsetMetric> offsetMetricMap = new ConcurrentHashMap<>();
 
     public static class KafkaSpoutMetricContext {
-        SpoutConfig _spoutConfig;
-        DynamicPartitionConnections _connections;
-        PartitionCoordinator _coordinator;
+        SpoutConfig spoutConfig;
+        DynamicPartitionConnections connections;
+        PartitionCoordinator coordinator;
     }
 
     public void addTopic(String topic, KafkaSpoutMetricContext context) {
         // construct KafkaOffsetMetric
-        KafkaUtils.KafkaOffsetMetric kafkaOffsetMetric = new KafkaUtils.KafkaOffsetMetric(context._spoutConfig.topic, context._connections);
+        KafkaUtils.KafkaOffsetMetric kafkaOffsetMetric = new KafkaUtils.KafkaOffsetMetric(context.spoutConfig.topic, context.connections);
         metricContextMap.put(topic, context);
         offsetMetricMap.put(topic, kafkaOffsetMetric);
     }
@@ -58,13 +53,13 @@ public class KafkaSpoutMetric implements IMetric {
         offsetMetricMap.remove(topic);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public Object getValueAndReset() {
         HashMap spoutMetric = new HashMap();
         for (Map.Entry<String, KafkaSpoutMetricContext> entry : metricContextMap.entrySet()) {
             // construct offset metric
-            List<PartitionManager> pms = entry.getValue()._coordinator.getMyManagedPartitions();
+            List<PartitionManager> pms = entry.getValue().coordinator.getMyManagedPartitions();
             Set<Partition> latestPartitions = new HashSet();
             for (PartitionManager pm : pms) {
                 latestPartitions.add(pm.getPartition());
@@ -76,16 +71,16 @@ public class KafkaSpoutMetric implements IMetric {
                 offsetMetric.setLatestEmittedOffset(pm.getPartition(), pm.lastCompletedOffset());
             }
             Object o = offsetMetric.getValueAndReset();
-            if(o != null) {
+            if (o != null) {
                 ((HashMap) o).forEach(
-                        (k, v) -> spoutMetric.put(k + "_" + entry.getKey(), v)
+                    (k, v) -> spoutMetric.put(k + "_" + entry.getKey(), v)
                 );
             }
 
             // construct partition metric
             for (PartitionManager pm : pms) {
                 pm.getMetricsDataMap().forEach(
-                        (k, v) -> spoutMetric.put(k + "_" + entry.getKey(), v)
+                    (k, v) -> spoutMetric.put(k + "_" + entry.getKey(), v)
                 );
             }
         }

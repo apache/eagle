@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,18 +16,18 @@
  */
 package org.apache.eagle.app.module;
 
+import org.apache.eagle.app.service.ApplicationManagementService;
+import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.service.impl.ApplicationManagementServiceImpl;
+import org.apache.eagle.metadata.service.ApplicationDescService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.util.Providers;
-import org.apache.eagle.app.service.ApplicationManagementService;
-import org.apache.eagle.app.service.impl.ApplicationManagementServiceImpl;
-import org.apache.eagle.app.service.ApplicationProviderService;
-import org.apache.eagle.metadata.service.ApplicationDescService;
-
 
 public class ApplicationGuiceModule extends AbstractModule {
     private ApplicationProviderService appProviderInst;
-    public ApplicationGuiceModule(ApplicationProviderService appProviderInst){
+
+    public ApplicationGuiceModule(ApplicationProviderService appProviderInst) {
         this.appProviderInst = appProviderInst;
     }
 

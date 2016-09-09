@@ -17,27 +17,19 @@
 package org.apache.eagle.app.test;
 
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.eagle.common.module.CommonGuiceModule;
-import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
-import org.junit.After;
 import org.junit.Before;
-
-import javax.sql.DataSource;
-import java.sql.SQLException;
 
 public class ApplicationTestBase {
     private Injector injector;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         injector = Guice.createInjector(new ApplicationTestGuiceModule());
         injector.injectMembers(this);
     }
 
-    public Injector injector(){
+    public Injector injector() {
         return injector;
     }
 }

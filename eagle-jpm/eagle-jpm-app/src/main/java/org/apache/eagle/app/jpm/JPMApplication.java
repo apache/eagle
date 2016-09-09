@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class JPMApplication extends StormApplication {
+
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyBuilder builder = new TopologyBuilder();
@@ -43,6 +44,7 @@ public class JPMApplication extends StormApplication {
 
     private class RandomEventSpout extends BaseRichSpout {
         private SpoutOutputCollector collector;
+
         @Override
         public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
             collector = spoutOutputCollector;

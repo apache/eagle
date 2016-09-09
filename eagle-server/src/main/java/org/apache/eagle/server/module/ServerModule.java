@@ -16,15 +16,16 @@
  */
 package org.apache.eagle.server.module;
 
-import com.google.inject.AbstractModule;
 import org.apache.eagle.app.module.ApplicationGuiceModule;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.common.module.CommonGuiceModule;
 import org.apache.eagle.metadata.persistence.MetadataStoreModuleFactory;
+import com.google.inject.AbstractModule;
 
 public class ServerModule extends AbstractModule {
     private ApplicationProviderService appProviderInst;
-    public ServerModule(ApplicationProviderService appProviderInst){
+
+    public ServerModule(ApplicationProviderService appProviderInst) {
         this.appProviderInst = appProviderInst;
     }
 

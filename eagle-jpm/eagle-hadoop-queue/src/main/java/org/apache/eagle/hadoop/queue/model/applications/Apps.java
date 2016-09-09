@@ -17,7 +17,7 @@
  */
 
 /**
- * 
+ *
  */
 package org.apache.eagle.hadoop.queue.model.applications;
 
@@ -26,16 +26,16 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.List;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Apps {
-	private List<App> app;
+    private List<App> app;
 
-	public List<App> getApp() {
-		return app;
-	}
+    public List<App> getApp() {
+        return app;
+    }
 
-	public void setApp(List<App> app) {
-		this.app = app;
-	}
+    public void setApp(List<App> app) {
+        this.app = app;
+    }
 }

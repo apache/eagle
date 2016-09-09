@@ -17,23 +17,17 @@
 package org.apache.eagle.app;
 
 /**
- * Usage: java org.apache.eagle.app.ApplicationCLI [APPLICATION_CLASS] [APPLICATION_OPTIONS: -D Key=Value]
+ * Usage: java org.apache.eagle.app.ApplicationCLI [APPLICATION_CLASS] [APPLICATION_OPTIONS: -D Key=Value].
  */
 public class ApplicationCLI {
-    /**
-     * @param args
-     * @throws ClassNotFoundException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     */
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if(args.length < 1){
-            System.err.println("Usage: java "+ApplicationCLI.class.getName()+" [APPLICATION_CLASS] [APPLICATION_OPTIONS: -D Key=Value]");
+        if (args.length < 1) {
+            System.err.println("Usage: java " + ApplicationCLI.class.getName() + " [APPLICATION_CLASS] [APPLICATION_OPTIONS: -D Key=Value]");
             System.exit(1);
         } else {
             String appClassName = args[0];
             Class<? extends ApplicationTool> appClass = (Class<? extends ApplicationTool>) Class.forName(appClassName);
-            String[] appArgs = new String[args.length-1];
+            String[] appArgs = new String[args.length - 1];
             System.arraycopy(args, 1, appArgs, 0, args.length - 1);
             appClass.newInstance().run(appArgs);
         }
