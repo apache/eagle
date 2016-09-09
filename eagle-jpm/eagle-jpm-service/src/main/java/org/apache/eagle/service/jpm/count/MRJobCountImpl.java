@@ -83,7 +83,7 @@ public class MRJobCountImpl {
             jobCounts.add(new UnitJobCount(times.get(i)));
         }
         for (JobExecutionAPIEntity job : jobDurations) {
-            int jobIndex = ResourceUtils.getDistributionPosition(times, job.getDurationTime());
+            int jobIndex = ResourceUtils.getDistributionPosition(times, job.getDurationTime() / DateTimeUtil.ONESECOND);
             UnitJobCount counter = jobCounts.get(jobIndex);
             String jobType = job.getTags().get(MRJobTagName.JOB_TYPE.toString());
             jobTypes.add(jobType);

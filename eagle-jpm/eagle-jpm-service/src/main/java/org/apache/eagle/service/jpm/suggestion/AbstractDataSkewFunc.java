@@ -29,7 +29,7 @@ import org.apache.eagle.service.jpm.ResourceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract public class AbstractDataSkewFunc implements SuggestionFunc {
+public abstract class AbstractDataSkewFunc implements SuggestionFunc {
 
     private JobCounters.CounterName counterName;
     private Constants.SuggestionType suggestType;

@@ -18,6 +18,7 @@
 
 package org.apache.eagle.service.jpm.count;
 
+import org.apache.eagle.common.DateTimeUtil;
 import org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
@@ -45,7 +46,7 @@ public class TestMRTaskCountImpl {
         List<Long> times = ResourceUtils.parseDistributionList(timeList);
         Assert.assertTrue(times.size() == 4);
 
-        long val = 25 * 1000;
+        long val = 25;
         int index = ResourceUtils.getDistributionPosition(times, val);
         Assert.assertTrue(index == 2);
     }
@@ -85,7 +86,7 @@ public class TestMRTaskCountImpl {
         helper.initTaskCountList(runningTaskCount, finishedTaskCount, times, new MRTaskCountImpl.RunningTaskComparator());
 
         for (TaskExecutionAPIEntity o : tasks) {
-            int index = ResourceUtils.getDistributionPosition(times, o.getDuration());
+            int index = ResourceUtils.getDistributionPosition(times, o.getDuration() / DateTimeUtil.ONESECOND);
             if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
                 MRJobTaskCountResponse.UnitTaskCount counter = runningTaskCount.get(index);
                 counter.taskCount++;

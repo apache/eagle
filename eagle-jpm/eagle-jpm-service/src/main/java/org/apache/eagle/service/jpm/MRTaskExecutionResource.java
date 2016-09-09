@@ -66,7 +66,7 @@ public class MRTaskExecutionResource {
         if (historyRes.isSuccess() && historyRes.getObj() != null && historyRes.getObj().size() > 0) {
             taskCountImpl.initTaskCountList(runningTaskCount, finishedTaskCount, times, new MRTaskCountImpl.HistoryTaskComparator());
             for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity o : historyRes.getObj()) {
-                int index = ResourceUtils.getDistributionPosition(times, o.getDuration());
+                int index = ResourceUtils.getDistributionPosition(times, o.getDuration() / DateTimeUtil.ONESECOND);
                 MRJobTaskCountResponse.UnitTaskCount counter = finishedTaskCount.get(index);
                 taskCountImpl.countTask(counter, o.getTags().get(TASK_TYPE.toString()));
                 counter.entities.add(o);
@@ -78,7 +78,7 @@ public class MRTaskExecutionResource {
             if (runningRes.isSuccess() && runningRes.getObj() != null) {
                 taskCountImpl.initTaskCountList(runningTaskCount, finishedTaskCount, times, new MRTaskCountImpl.RunningTaskComparator());
                 for (org.apache.eagle.jpm.mr.runningentity.TaskExecutionAPIEntity o : runningRes.getObj()) {
-                    int index = ResourceUtils.getDistributionPosition(times, o.getDuration());
+                    int index = ResourceUtils.getDistributionPosition(times, o.getDuration() / DateTimeUtil.ONESECOND);
                     if (o.getTaskStatus().equalsIgnoreCase(Constants.TaskState.RUNNING.toString())) {
                         MRJobTaskCountResponse.UnitTaskCount counter = runningTaskCount.get(index);
                         taskCountImpl.countTask(counter, o.getTags().get(TASK_TYPE.toString()));

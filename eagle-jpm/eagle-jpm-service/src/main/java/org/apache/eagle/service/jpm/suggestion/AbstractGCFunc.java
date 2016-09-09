@@ -31,7 +31,7 @@ import org.apache.eagle.service.jpm.ResourceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract public class AbstractGCFunc implements SuggestionFunc {
+public abstract class AbstractGCFunc implements SuggestionFunc {
 
     private static final String GC_RATIO_NAME_FORMAT = "gcRatio: %s / %s";
 
@@ -44,7 +44,7 @@ abstract public class AbstractGCFunc implements SuggestionFunc {
         this.suggestionType = suggestionType;
     }
 
-    abstract protected TaskGroup getTasks(TaskGroupResponse tasks);
+    protected abstract TaskGroup getTasks(TaskGroupResponse tasks);
 
     @Override
     public JobSuggestionResponse apply(TaskGroupResponse data) {

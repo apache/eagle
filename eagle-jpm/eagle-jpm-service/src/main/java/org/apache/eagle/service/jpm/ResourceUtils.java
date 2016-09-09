@@ -68,10 +68,9 @@ public class ResourceUtils {
         return times;
     }
 
-    public static int getDistributionPosition(List<Long> rangeList, Long duration) {
-        duration = duration / 1000;
+    public static int getDistributionPosition(List<Long> rangeList, Long value) {
         for (int i = 1; i < rangeList.size(); i++) {
-            if (duration < rangeList.get(i)) {
+            if (value < rangeList.get(i)) {
                 return i - 1;
             }
         }
