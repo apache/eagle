@@ -135,6 +135,12 @@ var app = {};
 					controller: "integrationSiteCtrl",
 					resolve: routeResolve({ application: false })
 				})
+				.state('integration.applicationList', {
+					url: "applicationList",
+					templateUrl: "partials/integration/applicationList.html?_=" + window._TRS(),
+					controller: "integrationApplicationListCtrl",
+					resolve: routeResolve({ application: false })
+				})
 				.state('integration.streamList', {
 					url: "streamList",
 					templateUrl: "partials/integration/streamList.html?_=" + window._TRS(),

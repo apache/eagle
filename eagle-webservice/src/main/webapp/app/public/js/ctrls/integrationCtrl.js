@@ -186,6 +186,19 @@
 	});
 
 	// ======================================================================================
+	// =                                     Application                                    =
+	// ======================================================================================
+	eagleControllers.controller('integrationApplicationListCtrl', function ($sce, $scope, $wrapState, PageConfig, Application) {
+		$scope.showAppDetail = function(application) {
+			var docs = application.docs || {install: "", uninstall: ""};
+			$scope.application = application;
+			$scope.installHTML = $sce.trustAsHtml(docs.install);
+			$scope.uninstallHTML = $sce.trustAsHtml(docs.uninstall);
+			$("#appMDL").modal();
+		};
+	});
+
+	// ======================================================================================
 	// =                                       Stream                                       =
 	// ======================================================================================
 	eagleControllers.controller('integrationStreamListCtrl', function ($scope, $wrapState, PageConfig, Application) {
