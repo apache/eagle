@@ -15,12 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# set EAGLE_HOME
+# EAGLE Environment Variables
 export EAGLE_HOME=$(dirname $0)/..
-
 export EAGLE_CLASSPATH=$EAGLE_HOME/conf
 
+# System Environment Variables
+export OS_TYPE="linux"
+export CLASSPATH_DELIMITER=":"
+
+case `which uname >/dev/null && uname -s` in
+    CYGWIN_NT-*)
+        OS_TYPE="windows"
+        CLASSPATH_DELIMITER=";"
+        ;;
+    Linux)
+        OS_TYPE="linux"
+        ;;
+   *)
+        OS_TYPE="unknown"
+        ;;
+esac
+
 # Add eagle shared library jars
-for file in `ls $EAGLE_HOME/lib`; do
-	EAGLE_CLASSPATH=$EAGLE_CLASSPATH:$EAGLE_HOME/lib/$file
+for file in `ls ${EAGLE_HOME}/lib`; do
+	EAGLE_CLASSPATH=${EAGLE_CLASSPATH}${CLASSPATH_DELIMITER}${EAGLE_HOME}/lib/$file
 done
