@@ -81,13 +81,14 @@
 
         <!-- copy dependent jars into /lib -->
         <fileSet>
-            <directory>${project.build.directory}/lib</directory>
+            <directory>${project.build.directory}/dependencies</directory>
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>dropwizard-*.jar</include>
                 <include>storm-core-*.jar</include>
                 <include>slf4j-api-*.jar</include>
                 <include>jersey-*.jar</include>
+                <include>eagle-storage-hbase-*.jar</include>
             </includes>
         </fileSet>
     </fileSets>
