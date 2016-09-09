@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 server:
   applicationConnectors:
     - type: http
@@ -19,3 +20,15 @@ server:
   adminConnectors:
     - type: http
       port: 9091
+
+logging:
+  level: INFO
+  appenders:
+    - type: file
+      currentLogFilename: log/eagle-server.log
+      threshold: ALL
+      archive: true
+      archivedLogFilenamePattern: log/eagle-server-%d.log
+      archivedFileCount: 5
+      timeZone: UTC
+      logFormat: # TODO
