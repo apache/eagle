@@ -18,11 +18,11 @@
 
 package org.apache.eagle.jpm.aggregation.state;
 
+import org.apache.eagle.jpm.aggregation.AggregationConfig;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
-import org.apache.eagle.jpm.aggregation.AggregationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,6 +18,10 @@
 
 package org.apache.eagle.jpm.aggregation.storm;
 
+import org.apache.eagle.jpm.aggregation.AggregationConfig;
+import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
+import org.apache.eagle.jpm.aggregation.state.AggregationTimeManager;
+import org.apache.eagle.jpm.util.Utils;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -25,10 +29,6 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.aggregation.AggregationConfig;
-import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
-import org.apache.eagle.jpm.aggregation.state.AggregationTimeManager;
-import org.apache.eagle.jpm.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

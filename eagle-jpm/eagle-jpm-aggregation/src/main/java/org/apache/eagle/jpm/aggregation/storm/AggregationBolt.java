@@ -18,14 +18,14 @@
 
 package org.apache.eagle.jpm.aggregation.storm;
 
+import org.apache.eagle.jpm.aggregation.AggregationConfig;
+import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
-import org.apache.eagle.jpm.aggregation.AggregationConfig;
-import org.apache.eagle.jpm.aggregation.common.MetricsAggregateContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

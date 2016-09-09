@@ -17,15 +17,14 @@
 
 package org.apache.eagle.jpm.aggregation;
 
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
-import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import org.apache.eagle.jpm.aggregation.mr.MRMetricsAggregateContainer;
 import org.apache.eagle.jpm.aggregation.storm.AggregationBolt;
 import org.apache.eagle.jpm.aggregation.storm.AggregationSpout;
+import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.TopologyBuilder;
+import com.typesafe.config.Config;
 
 import java.util.*;
 

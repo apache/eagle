@@ -20,5 +20,6 @@ package org.apache.eagle.jpm.aggregation.common;
 
 public interface MetricsAggregateContainer {
     long fetchLatestJobProcessTime();
+
     boolean aggregate(long startTime, long endTime);
 }
