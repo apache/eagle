@@ -22,6 +22,8 @@
 	 */
 	register(function (jpmApp) {
 		jpmApp.controller("overviewCtrl", function ($q, $wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
+			var cache = {};
+
 			$scope.site = $wrapState.param.siteId;
 
 			PageConfig.title = "Overview";
@@ -49,11 +51,16 @@
 				function getTopList(metric, aggregation, scopeVariable) {
 					var deferred = $q.defer();
 
+					metric = common.template(metric, {
+						type: $scope.type.toLocaleLowerCase()
+					});
+
 					if(scopeVariable) {
 						$scope[scopeVariable] = [];
+						$scope[scopeVariable]._done = false;
 					}
 
-					JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "sum(value) desc", false, startTime, endTime, 10)
+					var aggPromise = cache[metric] = cache[metric] || JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "sum(value) desc", false, startTime, endTime, 10)
 						._promise
 						.then(function (list) {
 							// Get name list
@@ -73,13 +80,18 @@
 								});
 							});
 
-							$q.all(promiseList).then(function (series) {
-								if(scopeVariable) {
-									$scope[scopeVariable] = series;
-								}
+							return $q.all(promiseList).then(function (series) {
 								deferred.resolve(series);
+								return series;
 							});
 						});
+
+					aggPromise.then(function (series) {
+						if(scopeVariable) {
+							$scope[scopeVariable] = series;
+							$scope[scopeVariable]._done = true;
+						}
+					});
 
 					return deferred.promise;
 				}
@@ -88,18 +100,21 @@
 				var endTime = Time.endTime();
 				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
 
-				console.log("refresh!!!");
-
-				getTopList("hadoop.job.history.minute.cpu_milliseconds", "jobId", "cpuUsageSeries");
-				getTopList("hadoop.job.history.minute.hdfs_bytes_read", "jobId", "hdfsBtyesReadSeries");
-				getTopList("hadoop.job.history.minute.hdfs_bytes_written", "jobId", "hdfsBtyesWrittenSeries");
-				getTopList("hadoop.job.history.minute.hdfs_read_ops", "jobId", "hdfsReadOpsSeries");
-				getTopList("hadoop.job.history.minute.hdfs_write_ops", "jobId", "hdfsWriteOpsSeries");
-				getTopList("hadoop.job.history.minute.file_bytes_read", "jobId", "fileBytesReadSeries");
-				getTopList("hadoop.job.history.minute.file_bytes_written", "jobId", "fileBytesWrittenSeries");
+				getTopList("hadoop.${type}.history.minute.cpu_milliseconds", "jobId", "cpuUsageSeries");
+				getTopList("hadoop.${type}.history.minute.physical_memory_bytes", "jobId", "physicalMemorySeries");
+				getTopList("hadoop.${type}.history.minute.virtual_memory_bytes", "jobId", "virtualMemorySeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_bytes_read", "jobId", "hdfsBtyesReadSeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_bytes_written", "jobId", "hdfsBtyesWrittenSeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_read_ops", "jobId", "hdfsReadOpsSeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_write_ops", "jobId", "hdfsWriteOpsSeries");
+				getTopList("hadoop.${type}.history.minute.file_bytes_read", "jobId", "fileBytesReadSeries");
+				getTopList("hadoop.${type}.history.minute.file_bytes_written", "jobId", "fileBytesWrittenSeries");
 			};
 
-			Time.onReload($scope.refresh, $scope);
+			Time.onReload(function () {
+				cache = {};
+				$scope.refresh();
+			}, $scope);
 			$scope.refresh();
 		});
 	});

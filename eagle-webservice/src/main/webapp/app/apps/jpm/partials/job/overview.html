@@ -18,11 +18,11 @@
 
 <style>
 	.jpm-chart,
-	.jpm-chart-container {
+	.jpm-chart-containerL {
 		position: relative;
 	}
 
-	.jpm-chart-container {
+	.jpm-chart-containerL {
 		height: 350px;
 	}
 
@@ -55,6 +55,9 @@
 	<label class="radio-inline">
 		<input type="radio" ng-checked="type === 'user'" ng-click="switchType('user')"> By User
 	</label>
+	<label class="radio-inline">
+		<input type="radio" ng-checked="type === 'jobType'" ng-click="switchType('jobType')"> By Job Type
+	</label>
 </div>
 
 
@@ -64,30 +67,48 @@
 		<li><a href="#hdfsOPs" data-toggle="tab">HDFS IO OPs</a></li>
 		<li><a href="#diskIO" data-toggle="tab">Disk IO</a></li>
 		<li><a href="#cpu" data-toggle="tab">CPU Usage</a></li>
+		<li><a href="#memory" data-toggle="tab">Memory Usage</a></li>
 	</ul>
 	<div class="tab-content keepContent">
 		<div class="tab-pane" id="cpu">
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top CPU Usage</h3>
-				<div chart class="jpm-chart-container" series="cpuUsageSeries" option="commonOption"></div>
-				<div ng-if="(cpuUsageSeries || []).length === 0" class="overlay">
+				<div chart class="jpm-chart-containerL" series="cpuUsageSeries" option="commonOption"></div>
+				<div ng-if="!cpuUsageSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 		</div>
+		<div class="tab-pane" id="memory">
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top Physical Memory Usage</h3>
+				<div chart class="jpm-chart-containerL" series="physicalMemorySeries" option="commonOption"></div>
+				<div ng-if="!physicalMemorySeries._done" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+			<div class="jpm-chart overlay-wrapper">
+				<h3 class="text-center">Top Virtual Memory Usage</h3>
+				<div chart class="jpm-chart-containerL" series="virtualMemorySeries" option="commonOption"></div>
+				<div ng-if="!virtualMemorySeries._done" class="overlay">
+					<i class="fa fa-refresh fa-spin"></i>
+				</div>
+			</div>
+		</div>
+
 		<div class="tab-pane active" id="hdfsBytes">
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top HDFS Bytes Read</h3>
-				<div chart class="jpm-chart-container" series="hdfsBtyesReadSeries" option="commonOption"></div>
-				<div ng-if="(hdfsBtyesReadSeries || []).length === 0" class="overlay">
+				<div chart class="jpm-chart-containerL" series="hdfsBtyesReadSeries" option="commonOption"></div>
+				<div ng-if="!hdfsBtyesReadSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top HDFS Bytes Written</h3>
-				<div chart class="jpm-chart-container" series="hdfsBtyesWrittenSeries" option="commonOption"></div>
-				<div ng-if="(hdfsBtyesWrittenSeries || []).length === 0" class="overlay">
+				<div chart class="jpm-chart-containerL" series="hdfsBtyesWrittenSeries" option="commonOption"></div>
+				<div ng-if="!hdfsBtyesWrittenSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
@@ -95,16 +116,16 @@
 		<div class="tab-pane" id="hdfsOPs">
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top HDFS Read OPs</h3>
-				<div chart class="jpm-chart-container" series="hdfsReadOpsSeries" option="commonOption"></div>
-				<div ng-if="(hdfsReadOpsSeries || []).length === 0" class="overlay">
+				<div chart class="jpm-chart-containerL" series="hdfsReadOpsSeries" option="commonOption"></div>
+				<div ng-if="!hdfsReadOpsSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top HDFS Write OPs</h3>
-				<div chart class="jpm-chart-container" series="hdfsWriteOpsSeries" option="commonOption"></div>
-				<div ng-if="(hdfsWriteOpsSeries || []).length === 0" class="overlay">
+				<div chart class="jpm-chart-containerL" series="hdfsWriteOpsSeries" option="commonOption"></div>
+				<div ng-if="!hdfsWriteOpsSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
@@ -112,16 +133,16 @@
 		<div class="tab-pane" id="diskIO">
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top File Bytes Read</h3>
-				<div chart class="jpm-chart-container" series="fileBytesReadSeries" option="commonOption"></div>
-				<div ng-if="(fileBytesReadSeries || []).length === 0" class="overlay">
+				<div chart class="jpm-chart-containerL" series="fileBytesReadSeries" option="commonOption"></div>
+				<div ng-if="!fileBytesReadSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 
 			<div class="jpm-chart overlay-wrapper">
 				<h3 class="text-center">Top File Bytes Written</h3>
-				<div chart class="jpm-chart-container" series="fileBytesWrittenSeries" option="commonOption"></div>
-				<div ng-if="(fileBytesWrittenSeries || []).length === 0" class="overlay">
+				<div chart class="jpm-chart-containerL" series="fileBytesWrittenSeries" option="commonOption"></div>
+				<div ng-if="!fileBytesWrittenSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
