@@ -331,22 +331,28 @@
 		 * Convert Entity list data to Chart supported series
 		 * @param name
 		 * @param metrics
-		 * @param rawData
+		 * @param {{}|boolean?} rawData
+		 * @param {{}?} option
 		 * @return {{name: *, symbol: string, type: string, data: *}}
 		 */
-		JPM.metricsToSeries = function(name, metrics, rawData) {
+		JPM.metricsToSeries = function(name, metrics, rawData, option) {
+			if(arguments.length === 3 && typeof rawData === "object") {
+				option = rawData;
+				rawData = false;
+			}
+
 			var data = $.map(metrics, function (metric) {
 				return rawData ? metric.value[0] : {
 					x: metric.timestamp,
 					y: metric.value[0]
 				};
 			});
-			return {
+			return $.extend({
 				name: name,
 				symbol: 'none',
 				type: "line",
 				data: data
-			};
+			}, option || {});
 		};
 
 		JPM.metricsToInterval = function (metricList, interval) {

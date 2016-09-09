@@ -23,26 +23,27 @@
 	register(function (jpmApp) {
 		var JOB_STATES = ["NEW", "NEW_SAVING", "SUBMITTED", "ACCEPTED", "RUNNING", "FINISHED", "SUCCEEDED", "FAILED", "KILLED"];
 
-		jpmApp.controller("listCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
-
-			/*function verifyTime(str, format) {
-				var date = Time(str);
-				if(str === Time.format(date, format)) {
-					return date;
-				}
-			}*/
-
+		jpmApp.controller("listCtrl", function ($wrapState, $element, $scope, $q, PageConfig, Time, Entity, JPM) {
 			// Initialization
 			PageConfig.title = "YARN Jobs";
-			PageConfig.subTitle = "list";
 			$scope.getStateClass = JPM.getStateClass;
 			$scope.tableScope = {};
 
-			//$scope.startTimeInput = Time.format(startTime);
-			//$scope.endTimeInput = Time.format(endTime);
-
 			$scope.site = $wrapState.param.siteId;
 			$scope.searchPathList = [["tags", "jobId"], ["tags", "user"], ["tags", "queue"], ["currentState"]];
+
+			function getCommonOption(left) {
+				return {
+					grid: {
+						left: left,
+						bottom: 20,
+						containLabel: false
+					}
+				};
+			};
+
+			$scope.chartLeftOption = getCommonOption(45);
+			$scope.chartRightOption = getCommonOption(80);
 
 			$scope.fillSearch = function (key) {
 				$("#jobList").find(".search-box input").val(key).trigger('input');
@@ -178,28 +179,53 @@
 				JPM.aggMetricsToEntities(
 					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.runningcontainers", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
 				)._promise.then(function (list) {
-					$scope.runningContainersSeries = [JPM.metricsToSeries("Running Containers", list)];
-				});
-
-				// ==================== AllocatedMB Trend ====================
-				JPM.aggMetricsToEntities(
-					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedmb", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
-				)._promise.then(function (list) {
-					$scope.allocatedMBSeries = [JPM.metricsToSeries("Allocated MB", list)];
-				});
-
-				// ==================== AllocatedMB Trend ====================
-				JPM.aggMetricsToEntities(
-					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedmb", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
-				)._promise.then(function (list) {
-					$scope.allocatedMBSeries = [JPM.metricsToSeries("Allocated MB", list)];
+					$scope.runningContainersSeries = [JPM.metricsToSeries("Running Containers", list, {areaStyle: {normal: {}}})];
 				});
 
 				// ================= Allocated vCores Trend ==================
 				JPM.aggMetricsToEntities(
 					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedvcores", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
 				)._promise.then(function (list) {
-					$scope.allocatedvcoresSeries = [JPM.metricsToSeries("Allocated vCores", list)];
+					$scope.allocatedvcoresSeries = [JPM.metricsToSeries("Allocated vCores", list, {areaStyle: {normal: {}}})];
+				});
+
+				// ==================== AllocatedMB Trend ====================
+				var allocatedMBEntities = JPM.aggMetricsToEntities(
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedmb", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
+				);
+
+				var totalMemoryEntities = JPM.aggMetricsToEntities(
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.totalmemory", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
+				);
+
+				$q.all([allocatedMBEntities._promise, totalMemoryEntities._promise]).then(function (args) {
+					var allocatedMBList = args[0];
+					var totalMemoryList = args[1];
+
+					var mergedList = $.map(allocatedMBList, function (obj, index) {
+						var value = obj.value[0] / totalMemoryList[index].value[0] * 100 || 0;
+						return $.extend({}, obj, {
+							value: [value]
+						});
+					});
+
+					$scope.allocatedMBSeries = [JPM.metricsToSeries("Allocated GB", mergedList, {areaStyle: {normal: {}}})];
+					$scope.allocatedMBOption = $.extend({}, $scope.chartRightOption, {
+						yAxis: [{
+							axisLabel: {
+								formatter: "{value}%"
+							}
+						}],
+						tooltip: {
+							formatter: function (points) {
+								var point = points[0];
+								var index = point.dataIndex;
+								return point.name + "<br/>" +
+									'<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+									point.seriesName + ": " + common.number.format(allocatedMBList[index].value[0] / 1024, 2);
+							}
+						}
+					});
 				});
 			};
 

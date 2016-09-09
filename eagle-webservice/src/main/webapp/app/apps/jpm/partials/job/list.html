@@ -34,10 +34,12 @@
 		text-decoration: underline;
 	}
 
-	.jpm-chart,
+	.jpm-chart h3 {
+		margin-top: 10px;
+	}
+
 	.jpm-chart-container {
 		height: 300px;
-		position: relative;
 	}
 
 	.jpm-chart {
@@ -105,29 +107,35 @@
 <div class="box box-primary">
 	<div class="box-header with-border">
 		<h3 class="box-title">
-			Running Job Trend
+			Running Metrics
 		</h3>
 	</div>
-	<div class="box-body">
-		<div class="row">
+	<div class="box-body no-padding">
+		<div class="row border-split">
 			<div class="col-sm-12 col-md-6">
 				<div class="jpm-chart">
-					<div chart class="jpm-chart-container" series="runningTrendSeries"></div>
+					<h3 class="text-center">Number of Running Jobs</h3>
+					<div chart class="jpm-chart-container" series="runningTrendSeries" option="chartLeftOption"></div>
 				</div>
 			</div>
 			<div class="col-sm-12 col-md-6">
 				<div class="jpm-chart">
-					<div chart class="jpm-chart-container" series="runningContainersSeries"></div>
+					<h3 class="text-center">Running Containers</h3>
+					<div chart class="jpm-chart-container" series="runningContainersSeries" option="chartRightOption"></div>
+				</div>
+			</div>
+		</div>
+		<div class="row border-split">
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<h3 class="text-center">Allocated vCores</h3>
+					<div chart class="jpm-chart-container" series="allocatedvcoresSeries" option="chartLeftOption"></div>
 				</div>
 			</div>
 			<div class="col-sm-12 col-md-6">
 				<div class="jpm-chart">
-					<div chart class="jpm-chart-container" series="allocatedMBSeries"></div>
-				</div>
-			</div>
-			<div class="col-sm-12 col-md-6">
-				<div class="jpm-chart">
-					<div chart class="jpm-chart-container" series="allocatedvcoresSeries"></div>
+					<h3 class="text-center">Allocated Memory (GB)</h3>
+					<div chart class="jpm-chart-container" series="allocatedMBSeries" option="allocatedMBOption"></div>
 				</div>
 			</div>
 		</div>

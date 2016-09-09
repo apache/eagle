@@ -64,8 +64,14 @@
 
 					var seriesList = $.map($scope.series || [], function (series, id) {
 						if(id === 0 && !$scope.category) {
+							var preDate = -1;
 							categoryList = $.map(series.data, function (point) {
-								return Time.format(point.x, "YY/MM/DD HH:mm");
+								var time = Time(point.x);
+								if(preDate !== time.date()) {
+									preDate = time.date();
+									return Time.format(point.x, "YY/MM/DD HH:mm");
+								}
+								return Time.format(point.x, "HH:mm");
 							});
 						}
 
@@ -88,6 +94,8 @@
 					}
 
 					var option = {
+						color: [ "#0073b7", "#dd4b39", "#00a65a", "#f39c12", "#605ca8", "#001F3F", "#39CCCC", "#D81B60", "#3c8dbc", "#f56954", "#00c0ef", "#3D9970", "#FF851B"  , "#01FF70", "#F012BE"],
+						//color: ['#4285f4', '#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'],
 						title: [{text: $scope.title}],
 						tooltip: {trigger: 'axis'},
 						legend: [{
