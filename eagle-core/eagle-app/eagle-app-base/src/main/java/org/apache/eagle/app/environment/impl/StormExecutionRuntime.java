@@ -60,6 +60,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     private final static String STORM_NIMBUS_HOST_DEFAULT = "localhost";
     private final static Integer STORM_NIMBUS_THRIFT_DEFAULT = 6627;
     private final static String STORM_NIMBUS_THRIFT_CONF_PATH = "application.storm.nimbusThriftPort";
+    public static final String TOPOLOGY_MESSAGE_TIMEOUT_SECS = "topology.message.timeout.secs";
     private static final String WORKERS = "workers";
 
     public backtype.storm.Config getStormConfig(){
@@ -89,6 +90,10 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         conf.put(Config.STORM_THRIFT_TRANSPORT_PLUGIN, "backtype.storm.security.auth.SimpleTransportPlugin");
         if (environment.config().hasPath(WORKERS)) {
             conf.setNumWorkers(environment.config().getInt(WORKERS));
+        }
+
+        if (environment.config().hasPath(TOPOLOGY_MESSAGE_TIMEOUT_SECS)) {
+            conf.put(TOPOLOGY_MESSAGE_TIMEOUT_SECS, environment.config().getInt(TOPOLOGY_MESSAGE_TIMEOUT_SECS));
         }
         return conf;
     }

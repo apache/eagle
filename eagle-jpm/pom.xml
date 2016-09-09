@@ -42,6 +42,7 @@
         <module>eagle-jpm-mr-running</module>
         <module>eagle-jpm-app</module>
         <module>eagle-jpm-service</module>
+        <module>eagle-jpm-aggregation</module>
     </modules>
 
     <dependencies>
