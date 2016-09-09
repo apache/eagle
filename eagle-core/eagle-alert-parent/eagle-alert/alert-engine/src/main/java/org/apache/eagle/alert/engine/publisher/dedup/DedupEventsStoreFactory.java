@@ -26,7 +26,16 @@ public class DedupEventsStoreFactory {
 
     ;
 
+    private static DedupEventsStore customizedStore;
+
+    public static void customizeStore(DedupEventsStore store) {
+        customizedStore = store;
+    }
+
     public static DedupEventsStore getStore(DedupEventsStoreType type, Config config) {
+        if (customizedStore != null) {
+            return customizedStore;
+        }
         DedupEventsStore accessor = null;
         switch (type) {
             case Mongo:

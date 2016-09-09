@@ -16,6 +16,8 @@
       "smtp.port": "25"
     },
     "dedupIntervalMin": "PT1M",
+    "dedupStateField": "state",
+  	"dedupStateCloseValue": "CLOSE",
     "serializer": "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
   }
 ]

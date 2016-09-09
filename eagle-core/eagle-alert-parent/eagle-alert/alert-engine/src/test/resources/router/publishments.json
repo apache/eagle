@@ -19,6 +19,8 @@
     "dedupFields": [
       "appname"
     ],
+    "dedupStateField": "state",
+  	"dedupStateCloseValue": "CLOSE",
     "serializer": "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
   }
 ]
