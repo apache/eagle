@@ -177,11 +177,16 @@ public class MRTaskExecutionResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("historyTaskCount")
-    public MRJobTaskCountResponse.HistoryTaskCountResponse getTaskCounterInTimeline(@QueryParam("site") String site,
+    public MRJobTaskCountResponse.HistoryTaskCountResponse getTaskCountInMinute(@QueryParam("site") String site,
                                                                                    @QueryParam("jobId") String jobId,
                                                                                    @QueryParam("jobStartTime") String jobStartTime,
                                                                                    @QueryParam("jobEndTime") String jobEndTime) {
         MRJobTaskCountResponse.HistoryTaskCountResponse result = new MRJobTaskCountResponse.HistoryTaskCountResponse();
+        if (jobId == null || site == null || jobStartTime == null || jobEndTime == null) {
+            result.errMessage = "IllegalArgumentException: jobId, or site, or jobStartTime, or jobEndTime is null";
+            return result;
+        }
+
         String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{@startTime,@endTime,@taskType}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId);
         GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> response = ResourceUtils.getQueryResult(query, jobStartTime, jobEndTime);
         if (!response.isSuccess() || response.getObj() == null) {
@@ -202,7 +207,7 @@ public class MRTaskExecutionResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("taskDistribution/{counterName}")
-    public MRTaskExecutionResponse.TaskDistributionResponse getTaskDistributionByCounter(@QueryParam("site") String site,
+    public MRTaskExecutionResponse.TaskDistributionResponse getTaskDistributionByCounterName(@QueryParam("site") String site,
                                                                               @QueryParam("jobId") String jobId,
                                                                               @QueryParam("jobStartTime") String jobStartTime,
                                                                               @QueryParam("jobEndTime") String jobEndTime,
