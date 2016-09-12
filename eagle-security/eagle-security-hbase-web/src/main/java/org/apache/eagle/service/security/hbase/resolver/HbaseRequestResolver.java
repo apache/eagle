@@ -18,6 +18,8 @@
 package org.apache.eagle.service.security.hbase.resolver;
 
 
+import com.typesafe.config.Config;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.security.resolver.AbstractCommandResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,11 @@ import java.util.List;
 
 public class HbaseRequestResolver extends AbstractCommandResolver {
     private final static Logger LOG = LoggerFactory.getLogger(HbaseRequestResolver.class);
+
+    public HbaseRequestResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+
+    }
+
     private final String [] master = {"createTable", "modifyTable", "deleteTable", "truncateTable", "addColumn", "modifyColumn",
                                         "deleteColumn", "enableTable", "disableTable", "disableAclTable", "move", "assign", "unassign",
                                         "regionOffline", "balance", "balanceSwitch", "shutdown", "stopMaster", "snapshot",

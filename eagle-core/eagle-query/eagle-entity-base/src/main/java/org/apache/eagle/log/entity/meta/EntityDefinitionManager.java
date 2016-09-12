@@ -16,12 +16,6 @@
  */
 package org.apache.eagle.log.entity.meta;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.eagle.common.config.EagleConfigFactory;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.repo.EntityRepositoryScanner;
@@ -30,6 +24,12 @@ import org.mockito.cglib.core.NamingPolicy;
 import org.mockito.cglib.core.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * static initialization of all registered entities. As of now, dynamic registration is not supported
@@ -365,11 +365,12 @@ public class EntityDefinitionManager {
 			q.setQualifierName(column.value());
 			EntitySerDeser<?> serDeser = _serDeserMap.get(fldCls); 
 			if(serDeser == null){
-				throw new IllegalArgumentException(fldCls.getName() + " in field " + f.getName() + 
-						" of entity " + cls.getSimpleName() + " has no serializer associated ");
-			} else {
-				q.setSerDeser((EntitySerDeser<Object>)serDeser);
+//				throw new IllegalArgumentException(fldCls.getName() + " in field " + f.getName() +
+//						" of entity " + cls.getSimpleName() + " has no serializer associated ");
+				serDeser = DefaultJavaObjctSerDeser.INSTANCE;
 			}
+
+			q.setSerDeser((EntitySerDeser<Object>)serDeser);
 			ed.getQualifierNameMap().put(q.getQualifierName(), q);
 			ed.getDisplayNameMap().put(q.getDisplayName(), q);
 			// TODO: should refine rules, consider fields like "hCol", getter method should be gethCol() according to org.apache.commons.beanutils.PropertyUtils

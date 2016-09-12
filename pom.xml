@@ -15,22 +15,24 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>14</version>
-    </parent>
+    </parent> 
     <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-parent</artifactId>
-    <version>0.3.0-incubating</version>
+    <version>0.5.0-incubating-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Eagle Parent</name>
     <url>https://eagle.incubator.apache.org</url>
     <inceptionYear>2015</inceptionYear>
     <description>
-        Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize attacks, malicious activities in Hadoop and take actions in real time.
+        Apache Eagle is an open source monitoring solution to instantly identify access to sensitive data, recognize
+        attacks, malicious activities in Hadoop and take actions in real time.
     </description>
     <organization>
         <name>Apache Software Foundation</name>
@@ -123,23 +125,25 @@
             <organizationUrl>https://eagle.incubator.apache.org</organizationUrl>
         </developer>
     </developers>
-
     <modules>
         <module>eagle-core</module>
-        <module>eagle-webservice</module>
+        <!--<module>eagle-webservice</module>-->
         <module>eagle-security</module>
         <module>eagle-external</module>
-        <module>eagle-assembly</module>
+        <!--<module>eagle-assembly</module>-->
         <module>eagle-topology-assembly</module>
         <module>eagle-examples</module>
         <module>eagle-gc</module>
         <module>eagle-hadoop-metric</module>
+        <module>eagle-server</module>
+        <module>eagle-jpm</module>
+        <module>eagle-server-assembly</module>
     </modules>
     <properties>
         <!-- General Properties -->
-        <java.version>1.7</java.version>
-        <scala.version>2.10</scala.version>
-        <scala-lang.version>2.10.4</scala-lang.version>
+        <java.version>1.8</java.version>
+        <scala.version>2.11</scala.version>
+        <scala-lang.version>2.11.8</scala-lang.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -148,32 +152,40 @@
         <maven-model.version>4.0.0</maven-model.version>
         <maven-release.version>2.5.1</maven-release.version>
         <maven-assembly.version>2.5.5</maven-assembly.version>
-        <maven-source.version>2.2</maven-source.version>
-        <maven-compiler.version>2.0.2</maven-compiler.version>
-        <maven-dependency.version>2.1</maven-dependency.version>
+        <maven-source.version>3.0.0</maven-source.version>
+        <maven-compiler.version>3.5.1</maven-compiler.version>
+        <maven-dependency.version>2.10</maven-dependency.version>
         <maven-license.version>2.6</maven-license.version>
         <maven-surefire.version>2.6</maven-surefire.version>
         <maven-jar.version>2.6</maven-jar.version>
-        <maven-scala.version>2.15.0</maven-scala.version>
+        <maven-scala.version>2.15.2</maven-scala.version>
         <maven-scalatest.version>1.0</maven-scalatest.version>
         <maven-tomcat7.version>2.2</maven-tomcat7.version>
         <maven-apache-rat.version>0.11</maven-apache-rat.version>
         <maven-failsafe.version>2.6</maven-failsafe.version>
+        <maven-checkstyle.version>2.17</maven-checkstyle.version>
+        <checkstyle.version>7.1</checkstyle.version>
 
         <!-- Environment Versions-->
         <hadoop.version>2.6.0.2.2.5.1-3</hadoop.version>
         <hbase.version>0.98.4.2.2.5.1-3-hadoop2</hbase.version>
         <hive.version>1.2.1</hive.version>
+
+        <mapr-hive.version>1.2.0-mapr-1510</mapr-hive.version>
+        <mapr-hadoop.version>2.7.0-mapr-1506</mapr-hadoop.version>
+        <maprfs.version>5.1.0-mapr</maprfs.version>
+        <mapr-hbase.version>0.98.9-mapr-1503</mapr-hbase.version>
+
         <spark.core.version>1.4.0</spark.core.version>
 
         <!--  Client -->
         <kafka-client.version>0.9.0.0</kafka-client.version>
-
         <!-- Reflection -->
         <reflections.version>0.9.8</reflections.version>
 
         <!-- Common Versions -->
         <commons-cli.version>1.2</commons-cli.version>
+        <commons-xml.version>1.4.01</commons-xml.version>
         <commons-lang.version>2.6</commons-lang.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <commons-math3.version>3.5</commons-math3.version>
@@ -182,7 +194,10 @@
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <commons-beanutils.version>1.8.0</commons-beanutils.version>
         <commons-collections4.version>4.0</commons-collections4.version>
+        <commons-collections.version>3.2.1</commons-collections.version>
         <commons-io.version>2.4</commons-io.version>
+        <guice.version>3.0</guice.version>
+        <httpclient.version>4.5.2</httpclient.version>
 
         <!-- Configuration -->
         <archaius.version>0.6.1</archaius.version>
@@ -190,8 +205,8 @@
 
         <!-- Serialization -->
         <gson.version>2.2.2</gson.version>
-        <guava.version>14.0.1</guava.version>
-        <fasterxml-jackson.version>2.2.3</fasterxml-jackson.version>
+        <guava.version>15.0</guava.version>
+        <fasterxml-jackson.version>2.5.4</fasterxml-jackson.version>
         <codehaus-jackson.version>1.9.13</codehaus-jackson.version>
         <jsoup.version>1.7.3</jsoup.version>
         <io.netty.version>3.6.7.Final</io.netty.version>
@@ -203,23 +218,38 @@
         <joda-convert.version>1.7</joda-convert.version>
         <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.7.5</slf4j.version>
+        <slf4j-log4j12.version>1.7.5</slf4j-log4j12.version>
         <log4j-over-slf4j.version>1.7.2</log4j-over-slf4j.version>
+        <logback.version>1.1.7</logback.version>
+
         <quartz.version>2.2.1</quartz.version>
         <scopt.version>3.3.0</scopt.version>
         <akka.actor.version>2.3.14</akka.actor.version>
         <reflections.version>0.9.10</reflections.version>
+        <metrics.version>3.1.0</metrics.version>
+        <mapdb.version>3.0.0-M6</mapdb.version>
+        <asm.version>5.0</asm.version>
 
         <!-- Streaming -->
-        <kafka.version>0.8.1.2.2.0.0-2041</kafka.version>
+        <!--<kafka.version>0.10.0.0</kafka.version>-->
+        <kafka.version>0.8.2.2</kafka.version>
         <kafka-clients.version>0.8.2.0</kafka-clients.version>
+        <kafka.artifact.id>kafka_2.11</kafka.artifact.id>
         <jgrapht.version>0.9.0</jgrapht.version>
-        <storm-kafka.version>0.9.3.2.2.0.0-2041</storm-kafka.version>
+        <storm-kafka.version>0.10.0</storm-kafka.version>
         <storm.version>0.9.3</storm.version>
+
+        <mapr-kafka.version>0.9.0.0-mapr-1607</mapr-kafka.version>
+        <mapr-kafka-clients.version>0.8.3-mapr-1509</mapr-kafka-clients.version>
+        <mapr-storm-kafka.version>0.9.3</mapr-storm-kafka.version>
+        <mapr-storm.version>0.9.3-mapr-1509</mapr-storm.version>
+
         <curator.version>2.8.0</curator.version>
+        <curator.test.version>2.5.0</curator.test.version>
+        <zkclient.version>0.3</zkclient.version>
 
         <!-- Query -->
         <tomcat.version>7.0.42</tomcat.version>
-        <protobuf-java.version>2.6.1</protobuf-java.version>
         <antlr4.version>4.5</antlr4.version>
         <groovy.version>2.3.4</groovy.version>
         <parsii.version>1.3</parsii.version>
@@ -230,16 +260,16 @@
         <mysql-connector-java.version>5.1.34</mysql-connector-java.version>
         <ddlutils.version>1.0</ddlutils.version>
         <torque.version>4.0</torque.version>
-        <!--<derby.version>10.1.3.1</derby.version>-->
+        <derby.version>10.1.3.1</derby.version>
         <derby.version>10.10.2.0</derby.version>
 
         <!-- REST Service-->
-        <jersey.version>1.8</jersey.version>
+        <jersey.version>1.19.1</jersey.version>
         <jaxb-api.version>2.1</jaxb-api.version>
         <jaxb-impl.version>2.2.6</jaxb-impl.version>
         <stax-api.version>1.0.1</stax-api.version>
         <org.mortbay.jetty.version>6.1.26</org.mortbay.jetty.version>
-                
+
         <!-- servlet  -->
         <servlet-api.version>2.5</servlet-api.version>
 
@@ -248,14 +278,13 @@
         <javax.mail.version>1.4</javax.mail.version>
         <extcos4.version>0.4b</extcos4.version>
         <extcos3.version>0.3b</extcos3.version>
-        <siddhi.version>3.0.5</siddhi.version>
+        <siddhi.version>3.1.1</siddhi.version>
 
         <!-- Testing -->
-        <unit.test.version>4.10</unit.test.version>
+        <junit.version>4.12</junit.version>
         <junit-benchmarks.version>0.7.0</junit-benchmarks.version>
-        <h2.version>1.3.172</h2.version>
+        <h2.version>1.4.192</h2.version>
         <scalatest.version>2.2.4</scalatest.version>
-        <scala-reflect.version>2.10.0</scala-reflect.version>
         <mockito.version>1.8.1-rc1</mockito.version>
         <tomcat.embed.version>7.0.55</tomcat.embed.version>
 
@@ -265,6 +294,19 @@
         <!-- sprint security -->
         <spring.framework.version>3.1.2.RELEASE</spring.framework.version>
 
+        <jetty.version>9.2.3.v20140905</jetty.version>
+        <tomcat-embed.version>7.0.55</tomcat-embed.version>
+        <swagger.version>1.5.8</swagger.version>
+        <mongodb.version>3.2.2</mongodb.version>
+        <mockito.version>1.10.19</mockito.version>
+        <joda.version>2.2</joda.version>
+        <metrics-elasticsearch-reporter.version>2.2.0</metrics-elasticsearch-reporter.version>
+
+        <common.cli.version>1.3.1</common.cli.version>
+
+        <!-- dropwizard -->
+        <dropwizard.version>0.7.1</dropwizard.version>
+        <dropwizard-guice.version>0.7.0.2</dropwizard-guice.version>
     </properties>
 
     <dependencyManagement>
@@ -274,6 +316,11 @@
                 <groupId>commons-cli</groupId>
                 <artifactId>commons-cli</artifactId>
                 <version>${commons-cli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>${commons-xml.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
@@ -328,7 +375,43 @@
             <dependency>
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-reflect</artifactId>
-                <version>${scala-reflect.version}</version>
+                <version>${scala-lang.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.scala-lang</groupId>
+                        <artifactId>scala-library</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala-lang.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-all</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-servlet</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mapr.hadoop</groupId>
+                <artifactId>maprfs</artifactId>
+                <version>${maprfs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
             </dependency>
 
             <!-- Configuration -->
@@ -348,7 +431,7 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
-                <scope>compile</scope>
+                <!--<scope>compile</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -387,7 +470,6 @@
                 <artifactId>scopt_${scala.version}</artifactId>
                 <version>${scopt.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
@@ -420,14 +502,14 @@
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>${codehaus-jackson.version}</version>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <version>${fasterxml-jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>${codehaus-jackson.version}</version>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-base</artifactId>
+                <version>${fasterxml-jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.protobuf</groupId>
@@ -439,16 +521,16 @@
                 <artifactId>json</artifactId>
                 <version>${org.json.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-jaxrs</artifactId>
-                <version>${codehaus-jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-xc</artifactId>
-                <version>${codehaus-jackson.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.codehaus.jackson</groupId>-->
+                <!--<artifactId>jackson-jaxrs</artifactId>-->
+                <!--<version>${codehaus-jackson.version}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.codehaus.jackson</groupId>-->
+                <!--<artifactId>jackson-xc</artifactId>-->
+                <!--<version>${codehaus-jackson.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
@@ -487,25 +569,6 @@
                 <groupId>org.apache.storm</groupId>
                 <artifactId>storm-core</artifactId>
                 <version>${storm.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>log4j-over-slf4j</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.storm</groupId>
-                <artifactId>storm-kafka</artifactId>
-                <version>${storm-kafka.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>ch.qos.logback</groupId>
@@ -655,7 +718,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>${unit.test.version}</version>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -668,7 +731,6 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.scalatest</groupId>
@@ -743,6 +805,62 @@
                 <artifactId>ejml</artifactId>
                 <version>${ejml.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-core</artifactId>
+                <version>${dropwizard.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-jersey</artifactId>
+                <version>${dropwizard.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-servlets</artifactId>
+                <version>${dropwizard.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-assets</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hubspot.dropwizard</groupId>
+                <artifactId>dropwizard-guice</artifactId>
+                <version>${dropwizard-guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-jersey-jaxrs</artifactId>
+                <version>${swagger.version}</version>
+                <scope>compile</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <profiles>
@@ -751,6 +869,27 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <repositories>
+                <repository>
+                    <id>HDP Release Repository</id>
+                    <url>http://repo.hortonworks.com/content/repositories/releases/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                </repository>
+                <repository>
+                    <id>HDP Central Repository</id>
+                    <url>http://repo.hortonworks.com/content/repositories/central/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                        <checksumPolicy>warn</checksumPolicy>
+                    </releases>
+                    <name>HDP Central</name>
+                    <layout>default</layout>
+                </repository>
+            </repositories>
             <dependencyManagement>
                 <dependencies>
                     <dependency>
@@ -758,7 +897,6 @@
                         <artifactId>hadoop-common</artifactId>
                         <version>${hadoop.version}</version>
                     </dependency>
-
                     <dependency>
                         <groupId>org.apache.hbase</groupId>
                         <artifactId>hbase-client</artifactId>
@@ -798,6 +936,115 @@
                         <groupId>org.apache.hive</groupId>
                         <artifactId>hive-jdbc</artifactId>
                         <version>${hive.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.kafka</groupId>
+                        <artifactId>kafka_${scala.version}</artifactId>
+                        <version>${kafka.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.storm</groupId>
+                        <artifactId>storm-kafka</artifactId>
+                        <version>${storm-kafka.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>ch.qos.logback</groupId>
+                                <artifactId>logback-classic</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>log4j</groupId>
+                                <artifactId>log4j</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>log4j-over-slf4j</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+
+
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+
+        <profile>
+            <id>mapr</id>
+            <!--<activation>-->
+            <!--<activeByDefault>true</activeByDefault>-->
+            <!--</activation>-->
+            <repositories>
+                <repository>
+                    <id>mapr-releases</id>
+                    <url>http://repository.mapr.com/maven/</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-common</artifactId>
+                        <version>${mapr-hadoop.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hbase</groupId>
+                        <artifactId>hbase-client</artifactId>
+                        <version>${mapr-hbase.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-client</artifactId>
+                        <version>${mapr-hadoop.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-auth</artifactId>
+                        <version>${mapr-hadoop.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hbase</groupId>
+                        <artifactId>hbase-server</artifactId>
+                        <version>${mapr-hbase.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hbase</groupId>
+                        <artifactId>hbase-testing-util</artifactId>
+                        <version>${mapr-hbase.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hive</groupId>
+                        <artifactId>hive-exec</artifactId>
+                        <version>${mapr-hive.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.hive</groupId>
+                        <artifactId>hive-jdbc</artifactId>
+                        <version>${mapr-hive.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.storm</groupId>
+                        <artifactId>storm-kafka</artifactId>
+                        <version>${mapr-storm-kafka.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>ch.qos.logback</groupId>
+                                <artifactId>logback-classic</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>log4j</groupId>
+                                <artifactId>log4j</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>log4j-over-slf4j</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -884,6 +1131,40 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <!-- Checkstyle -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle.version}</version>
+                <configuration>
+                    <configLocation>eagle-dev/checkstyle.xml</configLocation>
+                    <suppressionsLocation>eagle-dev/checkstyle-suppressions.xml</suppressionsLocation>
+                    <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                    <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>false</consoleOutput>
+                    <failOnViolation>false</failOnViolation>
+                    <failsOnError>false</failsOnError>
+                    <violationSeverity>warning</violationSeverity>
+                    <excludes>**/generated/**/*</excludes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>checkstyle</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
@@ -910,7 +1191,7 @@
                                 <exclude>**/.classpath</exclude>
                                 <exclude>**/.settings/**</exclude>
                                 <exclude>**/.project</exclude>
-                                <exclude>**/.metadata/</exclude>
+                                <exclude>**/.descriptor/</exclude>
                                 <!-- Maven working directory -->
                                 <exclude>**/target/**</exclude>
                                 <!-- Patch files which can be lying around -->
@@ -921,6 +1202,8 @@
                                 <!-- README and test data with exact format -->
                                 <exclude>README*</exclude>
                                 <exclude>**/*.log</exclude>
+                                <exclude>**/*.out</exclude>
+                                <exclude>**/*.db</exclude>
                                 <exclude>**/eagle.log*</exclude>
                                 <exclude>**/velocity.log*</exclude>
                                 <!-- all json files should be excluded -->
@@ -948,34 +1231,22 @@
 
                                 <!-- TODO: fix it -->
                                 <exclude>**/webapp/**</exclude>
-
+                                <exclude>**/*.pid</exclude>
                             </excludes>
-                         </configuration>
-                     </execution>
-                 </executions>
-             </plugin>
-         </plugins>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
     <repositories>
-        <repository>
-            <id>HDP Release Repository</id>
-            <url>http://repo.hortonworks.com/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-        </repository>
-        <repository>
-            <id>HDP Central Repository</id>
-            <url>http://repo.hortonworks.com/content/repositories/central/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-            <name>HDP Central</name>
-            <layout>default</layout>
-        </repository>
         <repository>
             <id>Maven Repo1 Repository</id>
             <url>http://repo1.maven.org/maven2</url>
@@ -990,6 +1261,16 @@
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>mapr-releases</id>
+            <url>http://repository.mapr.com/maven/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
             </releases>
         </repository>
         <repository>
@@ -1008,6 +1289,18 @@
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
             </releases>
+        </repository>
+        <repository>
+            <id>HDP Release Repository</id>
+            <url>http://repo.hortonworks.com/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>HDP Central Repository</id>
+            <url>http://repo.hortonworks.com/content/repositories/central/</url>
+        </repository>
+        <repository>
+            <id>WSO2 Public</id>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public</url>
         </repository>
     </repositories>
     <pluginRepositories>

@@ -33,11 +33,14 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
 
 echo ""
 echo "Importing applications for sample site ..."
-curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hdfsAuditLog"}, "enabled": true, "config" : "web.fs.defaultFS: \"hdfs://sandbox.hortonworks.com:8020\""}]'
 
-curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hbaseSecurityLog"}, "enabled": true, "config" : "web.hbase.zookeeper.property.clientPort: \"2181\", web.hbase.zookeeper.quorum: \"localhost\""}]'
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hdfsAuditLog"}, "enabled": true, "config" : "classification.fs.defaultFS=hdfs://sandbox.hortonworks.com:8020"}]'
 
-curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hiveQueryLog"}, "enabled": true, "config":"web.accessType:\"metastoredb_jdbc\",web.password:\"hive\",web.user:\"hive\",web.jdbcDriverClassName:\"com.mysql.jdbc.Driver\",web.jdbcUrl:\"jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true\""}]'
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hbaseSecurityLog"}, "enabled": true, "config" : "classification.hbase.zookeeper.property.clientPort=2181\nclassification.hbase.zookeeper.quorum=sandbox.hortonworks.com"}]'
+
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"hiveQueryLog"}, "enabled": true, "config":"classification.accessType=metastoredb_jdbc\nclassification.password=hive\nclassification.user=hive\nclassification.jdbcDriverClassName=com.mysql.jdbc.Driver\nclassification.jdbcUrl=jdbc:mysql://sandbox.hortonworks.com/hive?createDatabaseIfNotExist=true"}]'
+
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=SiteApplicationService" -d '[{"prefix":"eagleSiteApplication","tags":{"site" : "sandbox", "application":"oozieAuditLog"}, "enabled": true, "config" : "classification.accessType=oozie_api\nclassification.oozieUrl=http://localhost:11000/oozie\nclassification.filter=status=RUNNING\nclassification.authType=SIMPLE"}]'
 
 echo ""
 echo "Importing application definitions ..."
@@ -46,6 +49,8 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
 curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=ApplicationDescService" -d '[{"prefix":"eagleApplicationDesc","tags":{"application":"hbaseSecurityLog"},"description":"HBASE audit log security check application","alias":"HBASE","groupName":"DAM","features":["common","classification","userProfile","metadata"],"config":"{\n\t\"view\": {\n\t\t\"prefix\": \"hbaseResourceSensitivity\",\n\t\t\"service\": \"HbaseResourceSensitivityService\",\n\t\t\"keys\": [\n\t\t\t\"hbaseResource\",\n\t\t\t\"sensitivityType\"\n\t\t],\n\t\t\"type\": \"table\",\n\t\t\"api\": {\n\t\t\t\"database\": \"hbaseResource/namespaces\",\n\t\t\t\"table\": \"hbaseResource/tables\",\n\t\t\t\"column\": \"hbaseResource/columns\"\n\t\t},\n\t\t\"mapping\": {\n\t\t\t\"database\": \"namespace\",\n\t\t\t\"table\": \"table\",\n\t\t\t\"column\": \"columnFamily\"\n\t\t}\n\t}\n}"}]'
 
 curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=ApplicationDescService" -d '[{"prefix":"eagleApplicationDesc","tags":{"application":"hiveQueryLog"},"description":"Hive query log security check application","alias":"HIVE","groupName":"DAM","features":["common","classification","userProfile","metadata"], "config":"{\n\t\"view\": {\n\t\t\"prefix\": \"hiveResourceSensitivity\",\n\t\t\"service\": \"HiveResourceSensitivityService\",\n\t\t\"keys\": [\n\t\t\t\"hiveResource\",\n\t\t\t\"sensitivityType\"\n\t\t],\n\t\t\"type\": \"table\",\n\t\t\"api\": {\n\t\t\t\"database\": \"hiveResource/databases\",\n\t\t\t\"table\": \"hiveResource/tables\",\n\t\t\t\"column\": \"hiveResource/columns\"\n\t\t},\n\t\t\"mapping\": {\n\t\t\t\"database\": \"database\",\n\t\t\t\"table\": \"table\",\n\t\t\t\"column\": \"column\"\n\t\t}\n\t}\n}"}]'
+
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=ApplicationDescService" -d '[{"prefix":"eagleApplicationDesc","tags":{"application":"oozieAuditLog"},"description":"Oozie audit log security check application","alias":"OOZIE","groupName":"DAM","features":["common","classification","metadata"],"config":"{\n\t\"view\": {\n\t\t\"prefix\": \"oozieResourceSensitivity\",\n\t\t\"service\": \"OozieResourceSensitivityService\",\n\t\t\"keys\": [\n\t\t\t\"oozieResource\",\n\t\t\t\"sensitivityType\"\n\t\t],\n\t\t\"type\": \"job\",\n\t\t\"api\": \"oozieResource/coordinators\"\n\t}\n}"}]'
 
 echo ""
 echo "Importing feature definitions ..."
@@ -58,6 +63,8 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
 curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"metadata"},"description":"Stream metadata viewer","version":"v0.3.0"}]'
 
 curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"metrics"},"description":"Metrics dashboard","version":"v0.3.0"}]'
+
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=FeatureDescService" -d '[{"prefix":"eagleFeatureDesc","tags":{"feature":"topology"},"description":"Application topology management feature","version":"v0.4.0"}]'
 
 
 ## AlertStreamService: alert streams generated from data source
@@ -138,6 +145,26 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H "Conten
      -d '[ { "prefix": "alertStream", "tags": { "streamName": "userActivity", "site":"sandbox", "application":"userProfile" }, "alertExecutorIdList": [ "userProfileAnomalyDetectionExecutor" ] } ]'
 
 #####################################################################
+#            Import stream metadata for OOZIE
+#####################################################################
+
+## AlertStreamService: alert streams generated from data source
+echo ""
+echo "Importing AlertStreamService for OOZIE... "
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamService" -d '[{"prefix":"alertStream","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream"},"description":"alert event stream from oozie audit log"}]'
+
+## AlertExecutorService: what alert streams are consumed by alert executor
+echo ""
+echo "Importing AlertExecutorService for OOZIE... "
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertExecutorService" -d '[{"prefix":"alertExecutor","tags":{"application":"oozieAuditLog","alertExecutorId":"oozieAuditLogAlertExecutor","streamName":"oozieSecurityLogEventStream"},"description":"alert executor for oozie audit log event stream"}]'
+
+## AlertStreamSchemaServiceService: schema for event from alert stream
+echo ""
+echo "Importing AlertStreamSchemaService for OOZIE... "
+curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Content-Type:application/json' "http://${EAGLE_SERVICE_HOST}:${EAGLE_SERVICE_PORT}/eagle-service/rest/entities?serviceName=AlertStreamSchemaService" -d '[{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"errorcode"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"httpcode"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"log level such as INFO,DEBUG","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"level"}},{"prefix":"alertStreamSchema","category":"","attrType":"long","attrDescription":"milliseconds of the datetime","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"timestamp"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"ip"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"user"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"app"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"group"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"such as start kill suspend resume","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"operation"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"jobId"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"status"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"errormessage"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"sensitivityType"}},{"prefix":"alertStreamSchema","category":"","attrType":"string","attrDescription":"","attrValueResolver":"","tags":{"application":"oozieAuditLog","streamName":"oozieSecurityLogEventStream","attrName":"parameter"}}]'
+
+
+#####################################################################
 #     Import notification plugin configuration into Eagle Service   #
 #####################################################################
 
@@ -156,7 +183,7 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
        "className": "org.apache.eagle.notification.plugin.AlertEmailPlugin",
        "description": "send alert to email",
        "enabled":true,
-       "fields": "[{\"name\":\"sender\"},{\"name\":\"recipients\"},{\"name\":\"subject\"}]"
+       "fields": [{"name":"sender"},{"name":"recipients"},{"name":"subject"}]
      },
      {
        "prefix": "alertNotifications",
@@ -166,7 +193,7 @@ curl -silent -u ${EAGLE_SERVICE_USER}:${EAGLE_SERVICE_PASSWD} -X POST -H 'Conten
        "className": "org.apache.eagle.notification.plugin.AlertKafkaPlugin",
        "description": "send alert to kafka bus",
        "enabled":true,
-       "fields": "[{\"name\":\"kafka_broker\",\"value\":\"sandbox.hortonworks.com:6667\"},{\"name\":\"topic\"}]"
+       "fields": [{"name":"kafka_broker","value":"sandbox.hortonworks.com:6667"},{"name":"topic"}]
      },
      {
        "prefix": "alertNotifications",

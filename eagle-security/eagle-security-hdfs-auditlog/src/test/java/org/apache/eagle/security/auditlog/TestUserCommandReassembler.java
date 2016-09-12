@@ -19,12 +19,14 @@
 
 package org.apache.eagle.security.auditlog;
 
+import backtype.storm.task.IOutputCollector;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.tuple.Tuple;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import junit.framework.Assert;
-import org.apache.eagle.datastream.Collector;
+import org.apache.eagle.security.hdfs.HDFSAuditLogObject;
+import org.apache.eagle.security.hdfs.HDFSAuditLogParser;
 import org.junit.Test;
-import scala.Tuple2;
 
 import java.util.*;
 
@@ -32,9 +34,18 @@ import java.util.*;
  * Created by yonzhang on 11/24/15.
  */
 public class TestUserCommandReassembler {
-    private Map<String, Object> parseEvent(String log){
-        HdfsAuditLogKafkaDeserializer deserializer = new HdfsAuditLogKafkaDeserializer(null);
-        return (Map<String, Object>)deserializer.deserialize(log.getBytes());
+    private Map parseEvent(String log) throws Exception{
+        HDFSAuditLogParser deserializer = new HDFSAuditLogParser();
+        HDFSAuditLogObject entity = deserializer.parse(log);
+        Map<String, Object> map = new TreeMap<String, Object>();
+        map.put("src", entity.src);
+        map.put("dst", entity.dst);
+        map.put("host", entity.host);
+        map.put("timestamp", entity.timestamp);
+        map.put("allowed", entity.allowed);
+        map.put("user", entity.user);
+        map.put("cmd", entity.cmd);
+        return map;
     }
 
     /**
@@ -51,13 +62,32 @@ public class TestUserCommandReassembler {
         assembler.prepareConfig(config);
         assembler.init();
 
-        Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             @Override
-            public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");Assert.assertEquals("user:appendToFile", cmd);
-                System.out.println("assert passed!!!");
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                return null;
             }
-        };
+
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+
+            }
+
+            @Override
+            public void ack(Tuple input) {
+
+            }
+
+            @Override
+            public void fail(Tuple input) {
+
+            }
+
+            @Override
+            public void reportError(Throwable error) {
+
+            }
+        });
         assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);
@@ -80,14 +110,32 @@ public class TestUserCommandReassembler {
         assembler.prepareConfig(config);
         assembler.init();
 
-        Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             @Override
-            public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");
-                Assert.assertEquals("user:read", cmd);
-                System.out.println("assert passed!!!");
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                return null;
             }
-        };
+
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+
+            }
+
+            @Override
+            public void ack(Tuple input) {
+
+            }
+
+            @Override
+            public void fail(Tuple input) {
+
+            }
+
+            @Override
+            public void reportError(Throwable error) {
+
+            }
+        });
         assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
@@ -117,15 +165,32 @@ public class TestUserCommandReassembler {
         assembler.prepareConfig(config);
         assembler.init();
 
-        Collector<Tuple2<String, Map>> collector = new Collector<Tuple2<String, Map>>(){
+        OutputCollector collector = new OutputCollector(new IOutputCollector() {
             @Override
-            public void collect(Tuple2<String, Map> stringMapTuple2) {
-                String cmd = (String)stringMapTuple2._2().get("cmd");
-                Assert.assertEquals("user:copyFromLocal", cmd);
-                //Assert.assertEquals("user:appendToFile", cmd);
-                System.out.println("assert passed!!!");
+            public List<Integer> emit(String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+                return null;
             }
-        };
+
+            @Override
+            public void emitDirect(int taskId, String streamId, Collection<Tuple> anchors, List<Object> tuple) {
+
+            }
+
+            @Override
+            public void ack(Tuple input) {
+
+            }
+
+            @Override
+            public void fail(Tuple input) {
+
+            }
+
+            @Override
+            public void reportError(Throwable error) {
+
+            }
+        });
         assembler.flatMap(Arrays.asList("user1", parseEvent(e1)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e2)), collector);
         assembler.flatMap(Arrays.asList("user1", parseEvent(e3)), collector);

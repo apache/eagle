@@ -1,0 +1,92 @@
+[
+  {
+    "streamId": "esStream",
+    "dataSource": "eslog_datasource",
+    "description": "the data stream for es log of different modules",
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "instanceUuid",
+        "type": "string",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "defaultValue": 0,
+        "required": true
+      },
+      {
+        "name": "logLevel",
+        "type": "string",
+        "defaultValue": "ERROR",
+        "required": true
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "reqId",
+        "type": "string",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "host",
+        "type": "string",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "component",
+        "type": "string",
+        "defaultValue": "nova",
+        "required": true
+      }
+    ]
+  },
+  {
+    "streamId": "ifStream",
+    "dataSource": "bootfailure_datasource",
+    "description": "the data stream for boot failure(instance fault)",
+    "validate": false,
+    "timeseries": false,
+    "columns": [
+      {
+        "name": "instanceUuid",
+        "type": "string",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "timestamp",
+        "type": "long",
+        "defaultValue": 0,
+        "required": true
+      },
+      {
+        "name": "reqId",
+        "type": "string",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "defaultValue": "",
+        "required": true
+      },
+      {
+        "name": "host",
+        "type": "string",
+        "defaultValue": "",
+        "required": true
+      }
+    ]
+  }
+]

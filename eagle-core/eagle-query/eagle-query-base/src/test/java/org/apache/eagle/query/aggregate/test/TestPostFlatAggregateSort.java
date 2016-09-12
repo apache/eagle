@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.eagle.query.aggregate.timeseries.PostFlatAggregateSort;
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.eagle.query.aggregate.timeseries.SortOption;

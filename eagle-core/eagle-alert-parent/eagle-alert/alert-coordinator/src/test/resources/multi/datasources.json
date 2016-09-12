@@ -1,0 +1,19 @@
+[
+  {
+    "name": "network_syslog_datasource",
+    "type": "KAFKA",
+    "properties": {
+    },
+    "topic": "logoutput",
+    "schemeCls": "org.apache.eagle.alert.engine.extension.SherlockEventScheme",
+    "codec": {
+      "streamNameSelectorProp": {
+        "fieldNamesToInferStreamName": "namespace",
+        "streamNameFormat": "stream_%s"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn": null,
+      "timestampFormat": ""
+    }
+  }
+]

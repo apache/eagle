@@ -1,0 +1,45 @@
+{
+  "streamId": "perfmon_cpu_stream",
+  "dataSource": "perfmon_datasource",
+  "description": "the data stream for perfmon cpu metrics",
+  "validate": false,
+  "timeseries": false,
+  "columns": [
+    {
+      "name": "host",
+      "type": "string",
+      "defaultValue": "",
+      "required": true
+    },
+    {
+      "name": "timestamp",
+      "type": "long",
+      "defaultValue": 0,
+      "required": true
+    },
+    {
+      "name": "floatField",
+      "type": "float",
+      "defaultValue": "1.2",
+      "required": true
+    },
+    {
+      "name": "intField",
+      "type": "int",
+      "defaultValue": "3",
+      "required": true
+    },
+    {
+      "name": "value",
+      "type": "double",
+      "defaultValue": 0.0,
+      "required": true
+    },
+    {
+      "name": "boolField",
+      "type": "bool",
+      "defaultValue": true,
+      "required": true
+    }
+  ]
+}

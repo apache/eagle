@@ -23,10 +23,6 @@ import org.apache.eagle.log.entity.repo.EntityRepository;
 
 public class SecurityEntityRepository extends EntityRepository {
     public SecurityEntityRepository() {
-        entitySet.add(HbaseResourceSensitivityAPIEntity.class);
-        entitySet.add(FileSensitivityAPIEntity.class);
-        entitySet.add(IPZoneEntity.class);
         entitySet.add(HdfsUserCommandPatternEntity.class);
-        entitySet.add(HiveResourceSensitivityAPIEntity.class);
     }
 }

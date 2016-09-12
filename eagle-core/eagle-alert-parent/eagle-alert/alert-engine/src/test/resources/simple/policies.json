@@ -1,0 +1,81 @@
+[
+  {
+    "name": "perfmon_cpu_host_check",
+    "description": "policy to check host perfmon_cpu",
+    "inputStreams": [
+      "perfmon_cpu_stream"
+    ],
+    "outputStreams": [
+      "perfmon_cpu_check_output"
+    ],
+    "definition": {
+      "type": "siddhi",
+      "value": "from perfmon_cpu_stream[value > 90.0] select * group by host insert into perfmon_cpu_check_output;"
+    },
+    "partitionSpec": [
+      {
+        "streamId": "perfmon_cpu_stream",
+        "type": "GROUPBY",
+        "columns": [
+          "host"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT1M"
+        }
+      }
+    ]
+  },
+  {
+    "name": "perfmon_cpu_pool_check",
+    "description": "policy to check pool perfmon_cpu",
+    "inputStreams": [
+      "perfmon_cpu_stream"
+    ],
+    "outputStreams": [
+      "perfmon_cpu_check_output"
+    ],
+    "definition": {
+      "type": "siddhi",
+      "value": "from perfmon_cpu_stream[value > 75.0] select * group by pool insert into perfmon_cpu_check_output;"
+    },
+    "partitionSpec": [
+      {
+        "streamId": "perfmon_cpu_stream",
+        "type": "GROUPBY",
+        "columns": [
+          "pool"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT1M"
+        }
+      }
+    ]
+  },
+  {
+    "name": "perfmon_cpu_pool_check_2",
+    "description": "policy to check pool perfmon_cpu",
+    "inputStreams": [
+      "perfmon_cpu_stream"
+    ],
+    "outputStreams": [
+      "perfmon_cpu_check_output_2"
+    ],
+    "definition": {
+      "type": "siddhi",
+      "value": "from perfmon_cpu_stream[value > 90.0] select * group by pool insert into perfmon_cpu_check_output_2;"
+    },
+    "partitionSpec": [
+      {
+        "streamId": "perfmon_cpu_stream",
+        "type": "GROUPBY",
+        "columns": [
+          "pool"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT1M"
+        }
+      }
+    ],
+    "policyStatus": "DISABLED"
+  }
+]

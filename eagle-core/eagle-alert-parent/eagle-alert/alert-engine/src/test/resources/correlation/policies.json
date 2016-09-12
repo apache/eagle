@@ -1,0 +1,39 @@
+[
+  {
+    "name": "logStreamJoinBootFailure",
+    "description": "policy to check host perfmon_cpu",
+    "inputStreams": [
+      "esStream",
+      "ifStream"
+    ],
+    "outputStreams": [
+      "log_stream_join_output"
+    ],
+    "definition": {
+      "type": "siddhi",
+      "value": " from esStream#window.externalTime(timestamp, 20 min) as a join ifStream#window.externalTime(timestamp, 5 min) as b on a.instanceUuid == b.instanceUuid select logLevel, a.host as aHost, a.component, a.message as logMessage, b.message as failMessage, a.timestamp as t1, b.timestamp as t2, b.host as bHost, count(1) as errorCount insert into log_stream_join_output;  "
+    },
+    "partitionSpec": [
+      {
+        "streamId": "esStream",
+        "type": "GROUPBY",
+        "columns": [
+          "instanceUuid"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT1M"
+        }
+      },
+      {
+        "streamId": "ifStream",
+        "type": "GROUPBY",
+        "columns": [
+          "instanceUuid"
+        ],
+        "sortSpec": {
+          "windowPeriod": "PT1M"
+        }
+      }
+    ]
+  }
+]

@@ -26,6 +26,7 @@ import org.apache.eagle.log.entity.old.GenericDeleter;
 import org.apache.eagle.log.entity.test.TestLogAPIEntity;
 import org.apache.eagle.service.hbase.TestHBaseBase;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Ignore
 public class TestTestLogAPIEntity extends TestHBaseBase {
 
 	@Test 

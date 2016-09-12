@@ -1,0 +1,33 @@
+[
+  {
+    "name":"jmxStreamOutput_email",
+    "type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
+    "policyIds": [
+      "perfmon_cpu_host_check", "perfmon_cpu_pool_check"
+    ],
+    "properties": {
+      "subject":"Hadoop Jmx Metrics Alert",
+      "template":"",
+      "sender": "sender@corp.com",
+      "recipients": "services@corp.com",
+      "smtp.server":"smtp.mailhost.com",
+      "connection": "plaintext",
+      "smtp.port": "25"
+    },
+    "dedupIntervalMin" : "PT1M",
+    "serializer" : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
+  },
+  {
+    "type": "org.apache.eagle.alert.engine.publisher.impl.AlertKafkaPublisher",
+    "name":"jmxStreamOutput_kafka",
+    "policyIds": [
+      "perfmon_cpu_host_check"
+    ],
+    "dedupIntervalMin": "PT1M",
+    "properties":{
+      "kafka_broker":"localhost:9092",
+      "topic":"jmx_alerts"
+    },
+    "serializer" : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
+  }
+]

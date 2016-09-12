@@ -1,0 +1,17 @@
+2015-04-24 12:49:16,145 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/tmp	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:16,192 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/user/ambari-qa	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:20,518 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/tmp	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:20,570 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/user/ambari-qa	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:20,587 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:20,664 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=mkdirs	src=/tmp	dst=null	perm=hdfs:hdfs:rwxr-xr-x	proto=rpc
+2015-04-24 12:49:20,677 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/user	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:20,686 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=mkdirs	src=/user/ambari-qa	dst=null	perm=hdfs:hdfs:rwxr-xr-x	proto=rpc
+2015-04-24 12:49:24,828 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/tmp	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:24,915 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=setPermission	src=/tmp	dst=null	perm=hdfs:hdfs:rwxrwxrwx	proto=rpc
+2015-04-24 12:49:29,375 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/user/ambari-qa	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:29,453 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=setPermission	src=/user/ambari-qa	dst=null	perm=hdfs:hdfs:rwxrwx---	proto=rpc
+2015-04-24 12:49:33,542 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/tmp	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:37,844 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/user/ambari-qa	dst=null	perm=null	proto=rpc
+2015-04-24 12:49:37,929 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=setOwner	src=/user/ambari-qa	dst=null	perm=ambari-qa:hdfs:rwxrwx---	proto=rpc
+2015-04-24 12:51:31,798 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/apps/hbase/data	dst=null	perm=null	proto=rpc
+2015-04-24 12:51:31,863 INFO FSNamesystem.audit: allowed=true	ugi=hdfs (auth:SIMPLE)	ip=/10.0.2.15	cmd=getfileinfo	src=/apps/hbase/staging	dst=null	perm=null	proto=rpc

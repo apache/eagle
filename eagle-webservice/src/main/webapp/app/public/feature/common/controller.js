@@ -551,8 +551,10 @@
 							conditions: {},
 							notification: [],
 							dedupe: {
-								alertDedupIntervalMin: 10
+								alertDedupIntervalMin: 10,
+								fields: []
 							},
+							_dedupTags: {},
 							policy: {},
 							window: "externalTime",
 							group: "",
@@ -627,7 +629,11 @@
 
 						// === Revert inner data ===
 						// >> De-dupe
+						$scope.policy.__._dedupTags = {};
 						$scope.policy.__.dedupe = common.parseJSON($scope.policy.dedupeDef, {});
+						$.each($scope.policy.__.dedupe.fields || [], function (i, field) {
+							$scope.policy.__._dedupTags[field] = true;
+						});
 
 						// >> Notification
 						$scope.policy.__.notification = common.parseJSON($scope.policy.notificationDef, []);
@@ -872,12 +878,61 @@
 					}
 				};
 			};
+
+			//for maprfs, if key is status or volume or src/dst, convert these names to id.
+			$scope.convertToID = function(_condList, key, op, name,  type, site){
+				if(key == "dst" || key == "src") {
+					Entities.maprfsNameToID("fNameResolver", name, site)._promise.then(
+						function(response){
+							console.log("success");
+							console.log(response);
+							_condList.push($scope._CondUnit(key, op, response.data, type));
+						},
+						function(error, status){
+							console.log("error: " + status);
+						}
+					);
+				}
+				else if (key == "status"){
+					Entities.maprfsNameToID("sNameResolver", name, site)._promise.then(
+						function(response){
+							console.log("success");
+							console.log(response);
+							_condList.push($scope._CondUnit(key, op, response.data, type));
+						},
+						function(error, status){
+							console.log("error: " + status);
+						}
+					);
+				}
+				else if (key == "volume") {
+					Entities.maprfsNameToID("vNameResolver", name, site)._promise.then(
+						function(response){
+							console.log("success");
+							console.log(response);
+							_condList.push($scope._CondUnit(key, op, response.data, type));
+						},
+						function(error, status){
+							console.log("error: " + status);
+						}
+					);
+				}
+			};
+
 			// Add condition for policy
 			$scope.addCondition = function(key, op, value, type) {
 				if(value === "" || value === undefined) return false;
 
 				var _condList = $scope.policy.__.conditions[key] = $scope.policy.__.conditions[key] || [];
 				_condList.push($scope._CondUnit(key, op, value, type));
+
+				//if it is mapr application, covert human readable name to ids
+				if(Application.current().tags.application == "maprFSAuditLog")  {
+					if ( key == "dst" || key == "src" || key == "volume" || key == "status")  {
+						$scope.convertToID(_condList, key, op, value , type, Site.current().tags.site);
+					}
+				}
+
 				return true;
 			};
 			// Convert condition list to description string
@@ -953,6 +1008,9 @@
 				$scope.lock = true;
 
 				// dedupeDef
+				$scope.policy.__.dedupe.fields = $.map($scope.policy.__._dedupTags, function (value, key) {
+					if(value) return key;
+				});
 				$scope.policy.dedupeDef = JSON.stringify($scope.policy.__.dedupe);
 
 				// notificationDef
@@ -961,7 +1019,6 @@
 				$scope.policy.notificationDef = JSON.stringify($scope.policy.__.notification);
 
 				// policyDef
-				$scope.policy.__._dedupTags = $scope.policy.__._dedupTags || {};
 				$scope.policy.__.policy = {
 					expression: $scope.toQuery(),
 					type: "siddhiCEPEngine"

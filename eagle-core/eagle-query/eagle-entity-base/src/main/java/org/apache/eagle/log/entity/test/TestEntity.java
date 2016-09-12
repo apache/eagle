@@ -56,7 +56,7 @@ public class TestEntity extends TaggedLogAPIEntity {
 
 	public void setNumClusters(Long numClusters) {
 		this.numClusters = numClusters;
-		_pcs.firePropertyChange("numClusters", null, null);
+		pcs.firePropertyChange("numClusters", null, null);
 	}
 
 	public int getNumHosts() {
@@ -65,7 +65,7 @@ public class TestEntity extends TaggedLogAPIEntity {
 
 	public void setNumHosts(int numHosts) {
 		this.numHosts = numHosts;
-		_pcs.firePropertyChange("numHosts", null, null);
+		pcs.firePropertyChange("numHosts", null, null);
 	}
 
 	public long getCount() {
@@ -74,7 +74,7 @@ public class TestEntity extends TaggedLogAPIEntity {
 
 	public void setCount(long count) {
 		this.count = count;
-		_pcs.firePropertyChange("count", null, null);
+		pcs.firePropertyChange("count", null, null);
 	}
 
 	public String getRemediationID() {
@@ -83,7 +83,7 @@ public class TestEntity extends TaggedLogAPIEntity {
 
 	public void setRemediationID(String remediationID) {
 		this.remediationID = remediationID;
-		_pcs.firePropertyChange("remediationID", null, null);
+		pcs.firePropertyChange("remediationID", null, null);
 	}
 
 	public String getRemediationStatus() {
@@ -92,7 +92,7 @@ public class TestEntity extends TaggedLogAPIEntity {
 
 	public void setRemediationStatus(String remediationStatus) {
 		this.remediationStatus = remediationStatus;
-		_pcs.firePropertyChange("remediationStatus", null, null);
+		pcs.firePropertyChange("remediationStatus", null, null);
 	}
 	
 	public String toString(){

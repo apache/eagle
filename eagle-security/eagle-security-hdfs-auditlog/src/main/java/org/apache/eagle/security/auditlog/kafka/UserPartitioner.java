@@ -17,17 +17,17 @@
 package org.apache.eagle.security.auditlog.kafka;
 
 import kafka.utils.VerifiableProperties;
-import kafka.utils.Utils;
 
-public class UserPartitioner implements kafka.producer.Partitioner{
-	private VerifiableProperties prop;
-	public UserPartitioner(VerifiableProperties prop){
-		this.prop = prop;
-	}
+public class UserPartitioner implements kafka.producer.Partitioner {
+    private VerifiableProperties prop;
 
-	@Override
-	public int partition(Object arg0, int arg1) {
-		String user = (String)arg0;
-		return  Utils.abs(user.hashCode()) % arg1;
-	}
+    public UserPartitioner(VerifiableProperties prop) {
+        this.prop = prop;
+    }
+
+    @Override
+    public int partition(Object arg0, int arg1) {
+        String user = (String) arg0;
+        return Math.abs(user.hashCode()) % arg1;
+    }
 }

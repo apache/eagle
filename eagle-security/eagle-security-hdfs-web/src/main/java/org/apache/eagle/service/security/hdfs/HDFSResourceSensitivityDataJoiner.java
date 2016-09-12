@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
 import org.apache.hadoop.fs.FileStatus;
 
 import org.apache.eagle.security.entity.FileStatusEntity;
@@ -38,8 +39,11 @@ import org.slf4j.LoggerFactory;
  * the same will be displayed in RED in UI
  */
 public class HDFSResourceSensitivityDataJoiner {
-
 	private final static Logger LOG = LoggerFactory.getLogger(HDFSResourceSensitivityDataJoiner.class);
+	private ISecurityMetadataDAO dao;
+	public HDFSResourceSensitivityDataJoiner(ISecurityMetadataDAO dao){
+		this.dao = dao;
+	}
 	/**
 	 * Checks if the file Path comes under Sensitivity Category if yes append the Sensitivity Type at the End
 	 * @param site
@@ -49,7 +53,7 @@ public class HDFSResourceSensitivityDataJoiner {
 	
 	public List<FileStatusEntity>  joinFileSensitivity( String site , List<FileStatus> fileStatuses ) {		
         List<FileStatusEntity> result = new ArrayList<>();
-        HDFSResourceSensitivityService sensitivityService = new HDFSResourceSensitivityService();
+        HDFSResourceSensitivityService sensitivityService = new HDFSResourceSensitivityService(dao);
         Map<String, String>  sensitivityMap = sensitivityService.getFileSensitivityMapBySite(site);
         LOG.info("Joining Resource with Sensitivity data ..");
 		for( FileStatus fileStatus : fileStatuses ) {

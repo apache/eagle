@@ -85,7 +85,63 @@
 			});
 		};
 	});
+     // =============================================================
+    	// =                    Sensitivity - Job                   =
+    	// =============================================================
+    	feature.controller('sensitivityViewJob', function(Site, $scope, $wrapState, Entities) {
+    		$scope.items = [];
 
+    		// Mark sensitivity
+    		$scope._oriItem = {};
+    		$scope._markItem = {};
+
+    		// ======================= View =======================
+    		// Item
+    		$scope.updateItems = function() {
+    			$scope.items = Entities.query($scope.viewConfig.api, {site: Site.current().tags.site});
+    		};
+
+
+    		$scope.updateItems();
+
+    		// =================== Sensitivity ===================
+    		$scope.markSensitivity = function(item) {
+    			$scope._oriItem = item;
+    			$scope._markItem = {
+    				prefix: $scope.viewConfig.prefix,
+    				tags: {
+    					site: Site.current().tags.site
+    				},
+    				sensitivityType: ""
+    			};
+
+    			$scope._markItem.tags[$scope.viewConfig.keys[0]] = item.jobId;
+    			$("#sensitivityMDL").modal();
+    		};
+    		$scope.confirmUpateSensitivity = function() {
+    			$scope._oriItem.sensitiveType = $scope._markItem.sensitivityType;
+    			Entities.updateEntity($scope.viewConfig.service, $scope._markItem, {timestamp: false})._promise.success(function(data) {
+    				Entities.dialog(data);
+    			});
+    			$("#sensitivityMDL").modal('hide');
+    		};
+    		$scope.unmarkSensitivity = function(item) {
+    			$.dialog({
+    				title: "Unmark Confirm",
+    				content: "Do you want to remove the sensitivity mark on '" + item.jobId + "'?",
+    				confirm: true
+    			}, function(ret) {
+    				if(!ret) return;
+
+    				var _cond = {site: Site.current().tags.site};
+    				_cond[$scope.viewConfig.keys[0]] = item.jobId;
+    				Entities.deleteEntities($scope.viewConfig.service, _cond);
+
+    				item.sensitiveType = null;
+    				$scope.$apply();
+    			});
+    		};
+    	});
 	// =============================================================
 	// =                    Sensitivity - Folder                   =
 	// =============================================================

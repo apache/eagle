@@ -40,10 +40,13 @@
 			userProfile: 'rest/authentication',
 			logout: 'logout',
 
+			maprNameResolver: '../rest/maprNameResolver',
+
 			DELETE_HOOK: {
 				FeatureDescService: 'rest/module/feature?feature=${feature}',
 				ApplicationDescService: 'rest/module/application?application=${application}',
-				SiteDescService: 'rest/module/site?site=${site}'
+				SiteDescService: 'rest/module/site?site=${site}',
+				TopologyDescriptionService: 'rest/app/topology?topology=${topology}'
 			},
 			UPDATE_HOOK: {
 				SiteDescService: 'rest/module/siteApplication'
@@ -55,12 +58,28 @@
 	// =                                   URLs                                   =
 	// ============================================================================
 	app.getURL = function(name, kvs) {
-		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
 		var _path = app.config.urls[name];
 		if(!_path) throw "URL:'" + name + "' not exist!";
-		var _url = (_host ? _host + "/" : '') + _path;
+		var _url = app.packageURL(_path);
 		if(kvs !== undefined) {
 			_url = common.template(_url, kvs);
+		}
+		return _url;
+	};
+
+	app.getMapRNameResolverURL = function(name,value, site) {
+		var key = "maprNameResolver";
+		var _path = app.config.urls[key];
+		if(!_path) throw "URL:'" + name + "' not exist!";
+		var _url = _path;
+		if(name == "fNameResolver") {
+			_url +=  "/" + name + "?fName=" + value + "&site=" + site;
+		} else if(name == "sNameResolver") {
+			_url +=  "/" + name + "?sName=" + value + "&site=" + site;
+		} else if (name == "vNameResolver") {
+			_url += "/" + name + "?vName=" + value + "&site=" + site;
+		} else{
+			throw "resolver:'" + name + "' not exist!";
 		}
 		return _url;
 	};
@@ -69,9 +88,7 @@
 		var _path = app.config.urls[hookType][serviceName];
 		if(!_path) return null;
 
-		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
-		var _url = (_host ? _host + "/" : '') + _path;
-		return _url;
+		return app.packageURL(_path);
 	}
 
 	/***
@@ -88,6 +105,11 @@
 	 */
 	app.getUpdateURL = function(serviceName) {
 		return getHookURL('UPDATE_HOOK', serviceName);
+	};
+
+	app.packageURL = function (path) {
+		var _host = localStorage.getItem("HOST") || app.config.urls.HOST;
+		return (_host ? _host + "/" : '') + path;
 	};
 
 	app._Host = function(host) {

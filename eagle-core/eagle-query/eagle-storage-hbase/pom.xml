@@ -16,14 +16,13 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>eagle-query-parent</artifactId>
         <groupId>org.apache.eagle</groupId>
-        <version>0.3.0-incubating</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>0.5.0-incubating-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -31,11 +30,11 @@
 
     <dependencies>
         <!-- added for jira EAGLE-47 -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core</artifactId>
-			<version>${spring.framework.version}</version>
-		</dependency> 
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-audit-base</artifactId>
@@ -46,7 +45,7 @@
             <artifactId>eagle-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-storage-base</artifactId>

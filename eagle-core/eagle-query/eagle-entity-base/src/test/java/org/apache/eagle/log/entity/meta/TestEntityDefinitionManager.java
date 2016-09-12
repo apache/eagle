@@ -18,7 +18,7 @@ package org.apache.eagle.log.entity.meta;
 
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.log.entity.test.TestLogAPIEntity;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestEntityDefinitionManager {

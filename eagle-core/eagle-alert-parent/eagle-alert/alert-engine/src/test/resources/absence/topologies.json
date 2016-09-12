@@ -1,0 +1,31 @@
+[
+  {
+    "name": "alertUnitTopology_1",
+    "numOfSpout": 1,
+    "numOfAlertBolt": 10,
+    "numOfGroupBolt": 4,
+    "spoutId": "alertEngineSpout",
+    "groupNodeIds": [
+      "streamRouterBolt0",
+      "streamRouterBolt1",
+      "streamRouterBolt2",
+      "streamRouterBolt3"
+    ],
+    "alertBoltIds": [
+      "alertBolt0",
+      "alertBolt1",
+      "alertBolt2",
+      "alertBolt3",
+      "alertBolt4",
+      "alertBolt5",
+      "alertBolt6",
+      "alertBolt7",
+      "alertBolt8",
+      "alertBolt9"
+    ],
+    "pubBoltId": "alertPublishBolt",
+    "spoutParallelism": 1,
+    "groupParallelism": 1,
+    "alertParallelism": 1
+  }
+]

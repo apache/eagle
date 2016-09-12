@@ -32,18 +32,18 @@ public class HDFSChildSensitivityTypeTest {
 		List<String> directoryList = new ArrayList<>();
 		directoryList.add("/usr");
 		directoryList.add("/usr/data");
-		directoryList.add("/usr/custdata");	
+		directoryList.add("/usr/custdata");
 		 Map<String, String>  sensitivityMap = new HashMap<String, String>();
 		 sensitivityMap.put("/usr/data", "EMAIL");
 		 sensitivityMap.put("/usr/data/lib", "EMAIL");
 		 sensitivityMap.put("/usr/custdata", "PHONE_NUMBER");
-		 HDFSResourceSensitivityDataJoiner joiner  = new HDFSResourceSensitivityDataJoiner();
+		 HDFSResourceSensitivityDataJoiner joiner  = new HDFSResourceSensitivityDataJoiner(null);
 		// HDFSFileSystem fileSystem = new HDFSFileSystem("hdfs://127.0.0.1:9000");
 		// joiner.joinFileSensitivity("cluster1-dc1", fileSystem.browse("/usr"));
 		 Set<String> types = joiner.getChildSensitivityTypes("/usr/data/", sensitivityMap);
 		 System.out.println(types);
-		
+
 		///apps/hive/warehouse/xademo.db/customer_details
-		
+
 	}
 }

@@ -18,29 +18,33 @@
   ~  */
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-		<groupId>org.apache.eagle</groupId>
-		<artifactId>eagle-parent</artifactId>
-		<version>0.3.0-incubating</version>
-      <relativePath>../pom.xml</relativePath>
-  </parent>
-  <artifactId>eagle-security-parent</artifactId>
-  <name>eagle-security-parent</name>
-  <description>eagle security data activity monitoring project</description>
-  <packaging>pom</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.eagle</groupId>
+        <artifactId>eagle-parent</artifactId>
+        <version>0.5.0-incubating-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>eagle-security-parent</artifactId>
+    <name>eagle-security-parent</name>
+    <description>eagle security data activity monitoring project</description>
+    <packaging>pom</packaging>
 
-  <modules>
-    <module>eagle-security-common</module>
-	<module>eagle-security-hdfs-auditlog</module>
-    <module>eagle-security-userprofile</module>
-    <module>eagle-security-hive</module>
-    <module>eagle-security-hive-web</module>
-    <module>eagle-security-hdfs-web</module>
-    <module>eagle-security-hdfs-securitylog</module>
-    <module>eagle-security-hbase-securitylog</module>
-    <module>eagle-security-hbase-web</module>
-	<module>eagle-metric-collection</module>
-  </modules>
+    <modules>
+        <module>eagle-security-common</module>
+        <module>eagle-security-hdfs-auditlog</module>
+        <module>eagle-security-maprfs-auditlog</module>
+        <module>eagle-security-hive</module>
+        <module>eagle-security-hive-web</module>
+        <module>eagle-security-hdfs-web</module>
+        <module>eagle-security-maprfs-web</module>
+        <module>eagle-security-hdfs-authlog</module>
+        <module>eagle-security-hbase-auditlog</module>
+        <module>eagle-security-hbase-web</module>
+        <module>eagle-metric-collection</module>
+        <module>eagle-security-oozie-auditlog</module>
+        <module>eagle-security-oozie-web</module>
+    </modules>
 </project>

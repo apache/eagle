@@ -16,88 +16,77 @@
  */
 package org.apache.eagle.service.security.hdfs;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
-import org.apache.eagle.log.entity.ListQueryAPIResponseEntity;
-import org.apache.eagle.service.generic.GenericEntityServiceResource;
-import org.apache.eagle.service.generic.ListQueryResource;
-import org.apache.eagle.security.entity.FileSensitivityAPIEntity;
+import org.apache.eagle.security.service.HdfsSensitivityEntity;
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class Queries HDFS file Sensitivity type 
+ * This class Queries HDFS file Sensitivity type
  */
 public class HDFSResourceSensitivityService {
-	private static Logger LOG = LoggerFactory.getLogger(HDFSResourceSensitivityService.class);
+    private static Logger LOG = LoggerFactory.getLogger(HDFSResourceSensitivityService.class);
+    private ISecurityMetadataDAO dao;
+    public HDFSResourceSensitivityService(ISecurityMetadataDAO dao){
+        this.dao = dao;
+    }
 
-	/**
-	 * Returns all File Sensitivity Entries 
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public Map<String, Map<String, String>>  getAllFileSensitivityMap()
-	{
-		  GenericEntityServiceResource resource = new GenericEntityServiceResource();
-		  GenericServiceAPIResponseEntity ret = resource.search("FileSensitivityService[]{*}", null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null, false);
-	      List<FileSensitivityAPIEntity> list = (List<FileSensitivityAPIEntity>) ret.getObj();
-	      if( list == null )
-	        	return Collections.emptyMap();
-	      Map<String, Map<String, String>> fileSensitivityMap = new HashMap <String, Map<String, String>> ();
-	      Map<String, String>  filedirMap = null;
-	      for ( FileSensitivityAPIEntity fileSensitivityObj : list )
-	      {
-	    	  String siteId = fileSensitivityObj.getTags().get("site");
-			  if(fileSensitivityObj.getTags().containsKey("filedir")) {
-				  filedirMap = fileSensitivityMap.get(siteId);
-				  if(!fileSensitivityMap.containsKey(siteId))
-					  filedirMap = new HashMap <String, String> ();
-				  filedirMap.put(fileSensitivityObj.getTags().get("filedir"), fileSensitivityObj.getSensitivityType());
-				  fileSensitivityMap.put(siteId, filedirMap);
-			  }
-	      }		  
-		return fileSensitivityMap;
-	}
-	
-	/**
-	 * Returns File Sensitivity Info for a Specific SITE Id
-	 * @param site
-	 * @return fileSensitivityMap
-	 */
-	@SuppressWarnings("unchecked")
-	public Map<String, String> getFileSensitivityMapBySite ( String site )
-	{
-		GenericEntityServiceResource resource = new GenericEntityServiceResource();
-		GenericServiceAPIResponseEntity ret = resource.search(String.format("FileSensitivityService[@site=\"%s\"]{*}", site ), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null, false);
-	    List<FileSensitivityAPIEntity> list = (List<FileSensitivityAPIEntity>) ret.getObj();
-	    if( list == null )
-        	return Collections.emptyMap();
-	    Map<String, String>  fileSensitivityMap = new HashMap <String, String> ();	
-	    for ( FileSensitivityAPIEntity fileSensitivityObj : list ) {
-			if (fileSensitivityObj.getTags().containsKey("filedir")) {
-				fileSensitivityMap.put(fileSensitivityObj.getTags().get("filedir"), fileSensitivityObj.getSensitivityType());
-			}
-		}
-	    return fileSensitivityMap;
-	}
-		
-	/**
-	 * Returns File Sensitivity Info for a Specific  and Passed Path
-	 * @param site
-	 * @return fileSensitivityMap
-	 */
-	@SuppressWarnings("unchecked")
-	public List<FileSensitivityAPIEntity>  filterSensitivity ( String site , String resourceFilter )
-	{
-		GenericEntityServiceResource resource = new GenericEntityServiceResource();
-		GenericServiceAPIResponseEntity ret = resource.search(String.format("FileSensitivityService[@site=\"%s\"]{@filedir="+resourceFilter+".*}", site ), null, null, Integer.MAX_VALUE, null, false, false, 0L, 0, false,0, null, false);
-	    List<FileSensitivityAPIEntity> list = (List<FileSensitivityAPIEntity>) ret.getObj();
-	    if( list == null )
-        	return Collections.emptyList();	    
-	    return list;
-	}	
+    /**
+     * Returns all File Sensitivity Entries
+     * @return
+     */
+    public Map<String, Map<String, String>>  getAllFileSensitivityMap()
+    {
+        Collection<HdfsSensitivityEntity> list = dao.listHdfsSensitivities();
+        if( list == null )
+            return Collections.emptyMap();
+        Map<String, Map<String, String>> fileSensitivityMap = new HashMap <> ();
+        Map<String, String>  filedirMap = null;
+        for (HdfsSensitivityEntity fileSensitivityObj : list )
+        {
+            String siteId = fileSensitivityObj.getSite();
+            if(fileSensitivityObj.getFiledir() != null) {
+                filedirMap = fileSensitivityMap.get(siteId);
+                if(!fileSensitivityMap.containsKey(siteId))
+                    filedirMap = new HashMap <String, String> ();
+                filedirMap.put(fileSensitivityObj.getFiledir(), fileSensitivityObj.getSensitivityType());
+                fileSensitivityMap.put(siteId, filedirMap);
+            }
+        }
+        return fileSensitivityMap;
+    }
+
+    /**
+     * Returns File Sensitivity Info for a Specific SITE Id
+     * @param site
+     * @return fileSensitivityMap
+     */
+    public Map<String, String> getFileSensitivityMapBySite ( String site )
+    {
+        Collection<HdfsSensitivityEntity> list = dao.listHdfsSensitivities();
+        if( list == null )
+            return Collections.emptyMap();
+        Map<String, String>  fileSensitivityMap = new HashMap <String, String> ();
+        for ( HdfsSensitivityEntity fileSensitivityObj : list ) {
+            if (fileSensitivityObj.getFiledir() != null) {
+                fileSensitivityMap.put(fileSensitivityObj.getFiledir(), fileSensitivityObj.getSensitivityType());
+            }
+        }
+        return fileSensitivityMap;
+    }
+
+    /**
+     * Returns File Sensitivity Info for a Specific  and Passed Path
+     * @param site
+     * @return fileSensitivityMap
+     */
+    public Collection<HdfsSensitivityEntity>  filterSensitivity ( String site , String resourceFilter )
+    {
+        Collection<HdfsSensitivityEntity> list = dao.listHdfsSensitivities();
+        if( list == null )
+            return Collections.emptyList();
+        return list;
+    }
 }

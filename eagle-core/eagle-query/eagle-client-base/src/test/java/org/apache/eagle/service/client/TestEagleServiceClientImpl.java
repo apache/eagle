@@ -21,29 +21,19 @@ import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.apache.eagle.log.entity.test.TestTimeSeriesAPIEntity;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.eagle.service.client.impl.ConcurrentSender;
-import junit.framework.Assert;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+@Ignore("Depends on eagle server, should be used for integration test")
 public class TestEagleServiceClientImpl extends ClientTestBase {
 
-    IEagleServiceClient client = new EagleServiceClientImpl("localhost",38080);
+    private IEagleServiceClient client = new EagleServiceClientImpl("localhost",5050);
 
-    //@Before
-    public void setUp() {
-        hbase.createTable("unittest", "f");
-    }
-
-    //After
-    public void cleanUp() {
-        hbase.deleteTable("unittest");
-    }
-
-    //@Test
+    @Test
     public void testCreateAndSearch() throws IOException, EagleServiceClientException, IllegalAccessException, InstantiationException {
         List<TestTimeSeriesAPIEntity> entities = new ArrayList<TestTimeSeriesAPIEntity>();
 
@@ -101,7 +91,7 @@ public class TestEagleServiceClientImpl extends ClientTestBase {
         return entity;
     }
 
-    //@Test
+    @Test
     public void testUpdate() throws IOException, EagleServiceClientException, IllegalAccessException, InstantiationException {
         List<TestTimeSeriesAPIEntity> entities = new ArrayList<TestTimeSeriesAPIEntity>();
         for(int i=0;i<100;i++){
@@ -139,7 +129,7 @@ public class TestEagleServiceClientImpl extends ClientTestBase {
         assert response.getObj().size() > 0;
     }
 
-    //@Test
+    @Test
     public void testDelete() throws IOException, EagleServiceClientException {
         List<TestTimeSeriesAPIEntity> entities = new ArrayList<TestTimeSeriesAPIEntity>();
         for(int i=0;i<100;i++){
@@ -185,7 +175,7 @@ public class TestEagleServiceClientImpl extends ClientTestBase {
         assert response.isSuccess();
     }
 
-    //@Test
+    @Test
     public void testMetricsSender() throws IOException, EagleServiceClientException {
         List<GenericMetricEntity> entities = new ArrayList<GenericMetricEntity>();
 
@@ -238,13 +228,13 @@ public class TestEagleServiceClientImpl extends ClientTestBase {
                 .pageSize(1000)
                 .send();
         List<Map> aggResult = metricAggResponse.getObj();
-        assert aggResult != null;
-        assert metricAggResponse.isSuccess();
-
+        Assert.assertNotNull(aggResult);
+        Assert.assertTrue(metricAggResponse.isSuccess());
+        Assert.assertTrue(aggResult.size() > 0);
         client.close();
     }
 
-    //@Test
+    @Test
     public void testBatchSender() throws IOException, EagleServiceClientException {
         client.batch(2)
                 .send(newEntity())
@@ -253,7 +243,7 @@ public class TestEagleServiceClientImpl extends ClientTestBase {
         client.close();
     }
 
-    //@Test
+    @Test
     public void testAsyncSender() throws IOException, EagleServiceClientException, ExecutionException, InterruptedException {
         EagleServiceAsyncClient asyncClient = client.async();
 
@@ -281,7 +271,7 @@ public class TestEagleServiceClientImpl extends ClientTestBase {
         client.close();
     }
 
-    //@Test
+    @Test
     public void testParallelSender() throws IOException, EagleServiceClientException, InterruptedException {
         // Case #1:
         ConcurrentSender concurrentSender = client
@@ -310,9 +300,8 @@ public class TestEagleServiceClientImpl extends ClientTestBase {
         client.close();
     }
 
-    //@Test
+    @Test
     public void testSearch() throws EagleServiceClientException, IOException {
-        hbase.createTable("eagle_metric", "f");
 
         GenericServiceAPIResponseEntity<TestTimeSeriesAPIEntity> response =
                 client.search("TestTimeSeriesAPIEntity[]{*}").startTime(0).endTime(System.currentTimeMillis()+1000).pageSize(1000).send();
@@ -328,7 +317,6 @@ public class TestEagleServiceClientImpl extends ClientTestBase {
                 client.search("GenericMetricService[@cluster = \"cluster4ut\" AND @datacenter = \"datacenter4ut\"]{*}").metricName("unit.test.metrics").startTime(0).endTime(System.currentTimeMillis()+1000).pageSize(1000).send();
 
         Assert.assertTrue(response3.isSuccess());
-        hbase.deleteTable("eagle_metric");
     }
 
     @Test

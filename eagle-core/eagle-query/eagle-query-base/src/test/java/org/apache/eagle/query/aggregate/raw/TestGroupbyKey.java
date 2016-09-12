@@ -16,8 +16,7 @@
  */
 package org.apache.eagle.query.aggregate.raw;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestGroupbyKey {

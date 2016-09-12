@@ -17,45 +17,63 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.apache.eagle</groupId>
-		<artifactId>eagle-query-parent</artifactId>
-		<version>0.3.0-incubating</version>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.eagle</groupId>
+        <artifactId>eagle-query-parent</artifactId>
+        <version>0.5.0-incubating-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
-	</parent>
+    </parent>
 
-	<artifactId>eagle-entity-base</artifactId>
-	<packaging>jar</packaging>
-	<name>eagle-entity-base</name>
+    <artifactId>eagle-entity-base</artifactId>
+    <packaging>jar</packaging>
+    <name>eagle-entity-base</name>
 
-	<dependencies>
-		<!-- put extcos dependency at the top for using asm 4.0 jar !-->
-		<dependency>
-			<groupId>net.sf.extcos</groupId>
-			<artifactId>extcos</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-common</artifactId>
+    <dependencies>
+        <!-- put extcos dependency at the top for using asm 4.0 jar !-->
+        <dependency>
+            <groupId>net.sf.extcos</groupId>
+            <artifactId>extcos</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-common</artifactId>
             <version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.eagle</groupId>
-			<artifactId>eagle-antlr</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-antlr</artifactId>
             <version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hbase</groupId>
-			<artifactId>hbase-client</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>asm</groupId>
-					<artifactId>asm</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-embed-hbase</artifactId>
@@ -69,17 +87,17 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.scireum</groupId>
-			<artifactId>parsii</artifactId>
-		</dependency>
-		<dependency>
-		  <groupId>org.mockito</groupId>
-		  <artifactId>mockito-all</artifactId>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.scireum</groupId>
+            <artifactId>parsii</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+        </dependency>
+    </dependencies>
 </project>

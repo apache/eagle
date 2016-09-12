@@ -1,0 +1,36 @@
+[
+  {
+    "name": "eslog_datasource",
+    "type": "KAFKA",
+    "properties": {
+    },
+    "topic": "eslogs",
+    "schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
+    "codec": {
+      "streamNameSelectorProp": {
+        "userProvidedStreamName": "esStream",
+        "streamNameFormat": "%s"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": ""
+    }
+  },
+  {
+    "name": "bootfailure_datasource",
+    "type": "KAFKA",
+    "properties": {
+    },
+    "topic": "bootfailures",
+    "schemeCls": "org.apache.eagle.alert.engine.scheme.JsonScheme",
+    "codec": {
+      "streamNameSelectorProp": {
+        "userProvidedStreamName": "ifStream",
+        "streamNameFormat": "%s"
+      },
+      "streamNameSelectorCls": "org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn": "timestamp",
+      "timestampFormat": ""
+    }
+  }
+]

@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -439,7 +440,7 @@ public class GenericEntityServiceResource {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("data storage is null");
             }
-            
+
             QueryResult<?> result = queryStatement.execute(dataStorage);
             if(result.isSuccess()){
                 meta.put(FIRST_TIMESTAMP, result.getFirstTimestamp());
@@ -456,6 +457,10 @@ public class GenericEntityServiceResource {
         } catch (Exception e) {
             response.setException(e);
             LOG.error(e.getMessage(),e);
+            throw new WebApplicationException(e,
+                    Response.status(Response.Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON_TYPE)
+                    .entity(response).build());
         }finally {
             stopWatch.stop();
         }
@@ -543,7 +548,7 @@ public class GenericEntityServiceResource {
                 LOG.error("Data storage is null");
                 throw new IllegalDataStorageException("Data storage is null");
             }
-            
+
             DeleteStatement deleteStatement = new DeleteStatement(rawQuery);
             ModifyResult<String> deleteResult = deleteStatement.execute(dataStorage);
             if(deleteResult.isSuccess()){

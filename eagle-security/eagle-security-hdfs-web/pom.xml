@@ -16,50 +16,50 @@
   ~ limitations under the License.
   -->
 
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.apache.eagle</groupId>
-    <artifactId>eagle-security-parent</artifactId>
-    <version>0.3.0-incubating</version>
-  </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.eagle</groupId>
+        <artifactId>eagle-security-parent</artifactId>
+        <version>0.5.0-incubating-SNAPSHOT</version>
+    </parent>
 
-  <artifactId>eagle-security-hdfs-web</artifactId>
-  <name>eagle-security-hdfs-web</name>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-      <dependency>
-          <groupId>org.apache.eagle</groupId>
-          <artifactId>eagle-entity-base</artifactId>
-          <version>${project.version}</version>
-          <exclusions>
-              <exclusion>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>log4j-over-slf4j</artifactId>
-              </exclusion>
-          </exclusions>
-      </dependency>
-      <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-server</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.eagle</groupId>
-          <artifactId>eagle-service-base</artifactId>
-          <version>${project.version}</version>
-          <exclusions>
-              <exclusion>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>log4j-over-slf4j</artifactId>
-              </exclusion>
-          </exclusions>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.eagle</groupId>
-          <artifactId>eagle-security-common</artifactId>
-          <version>${project.version}</version>
-      </dependency>
-  </dependencies>
+    <artifactId>eagle-security-hdfs-web</artifactId>
+    <name>eagle-security-hdfs-web</name>
+    <url>http://maven.apache.org</url>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-entity-base</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-service-base</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.eagle</groupId>
+            <artifactId>eagle-security-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
 
