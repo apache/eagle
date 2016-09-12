@@ -96,7 +96,7 @@
 			connectedMainPortalList = defaultPortalList.concat(adminPortalList);
 			var siteList = $.map(Site.list, function (site) {
 				return {
-					name: site.siteName,
+					name: site.siteName || site.siteId,
 					path: "#/site/" + site.siteId
 				};
 			});

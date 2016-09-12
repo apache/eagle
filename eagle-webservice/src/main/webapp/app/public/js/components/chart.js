@@ -66,7 +66,7 @@
 						if(id === 0 && !$scope.category) {
 							var preDate = -1;
 							categoryList = $.map(series.data, function (point) {
-								var time = Time(point.x);
+								var time = new Time(point.x);
 								if(preDate !== time.date()) {
 									preDate = time.date();
 									return Time.format(point.x, "YY/MM/DD HH:mm");

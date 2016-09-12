@@ -410,6 +410,7 @@
 		return JPM;
 	});
 
+	jpmApp.requireCSS("style/index.css");
 	jpmApp.require("ctrl/overviewCtrl.js");
 	jpmApp.require("ctrl/statisticCtrl.js");
 	jpmApp.require("ctrl/listCtrl.js");

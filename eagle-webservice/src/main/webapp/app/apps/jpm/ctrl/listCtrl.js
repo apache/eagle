@@ -40,7 +40,7 @@
 						containLabel: false
 					}
 				};
-			};
+			}
 
 			$scope.chartLeftOption = getCommonOption(45);
 			$scope.chartRightOption = getCommonOption(80);

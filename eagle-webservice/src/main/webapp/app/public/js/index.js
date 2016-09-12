@@ -134,6 +134,18 @@
 		}, 0);
 	};
 
+	Module.prototype.requireCSS = function (styleURL) {
+		console.log("啊啊啊啊啊！！！！！");
+		var _this = this;
+		setTimeout(function () {
+			$("<link/>", {
+				rel: "stylesheet",
+				type: "text/css",
+				href: _this.baseURL + "/" + styleURL
+			}).appendTo("head");
+		}, 0);
+	};
+
 	Module.prototype.requireCheck = function () {
 		if(this.requireRest === 0) {
 			this.requireDeferred.resolve();

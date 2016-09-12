@@ -82,6 +82,9 @@
 			$mdl = $(TMPL_FIELDS).appendTo('body');
 			$compile($mdl)($scope);
 			$mdl.modal();
+			setTimeout(function () {
+				$mdl.find("input, select").filter(':visible:first:enabled').focus();
+			}, 500);
 
 			$mdl.on("hide.bs.modal", function() {
 				_deferred.reject();

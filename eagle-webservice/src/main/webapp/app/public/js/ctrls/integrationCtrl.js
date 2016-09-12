@@ -51,8 +51,8 @@
 		$scope.newSite = function () {
 			UI.createConfirm("Site", {}, [
 				{field: "siteId", name: "Site Id"},
-				{field: "siteName", name: "Display Name"},
-				{field: "description", name: "Description", type: "blob", rows: 5}
+				{field: "siteName", name: "Display Name", optional: true},
+				{field: "description", name: "Description", optional: true, type: "blob", rows: 5}
 			])(function (entity, closeFunc, unlock) {
 				Entity.create("sites", entity)._then(function () {
 					Site.reload();
