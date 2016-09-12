@@ -64,7 +64,7 @@ public class AggregationSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         Utils.sleep(5);
-        LOG.info("start to run");
+        LOG.debug("start to run");
         try {
             //0, check processStartTime size
             if (this.processStartTime.size() > 0) {
@@ -104,7 +104,7 @@ public class AggregationSpout extends BaseRichSpout {
     public void ack(Object messageId) {
         //remove from processStartTime, if size == 0, then update lastUpdateTime
         Long startTime = (Long)messageId;
-        LOG.info("succeed startTime {}", startTime);
+        LOG.debug("succeed startTime {}", startTime);
 
         this.processStartTime.remove(startTime);
         if (this.processStartTime.size() == 0) {
@@ -123,7 +123,7 @@ public class AggregationSpout extends BaseRichSpout {
     @Override
     public void fail(Object messageId) {
         Long startTime = (Long)messageId;
-        LOG.info("failed startTime {}", startTime);
+        LOG.warn("failed startTime {}", startTime);
         this.collector.emit(new Values(startTime), startTime);
     }
 
