@@ -177,26 +177,26 @@
 
 				// ================= Running Container Trend =================
 				JPM.aggMetricsToEntities(
-					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.runningcontainers", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
-				)._promise.then(function (list) {
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.runningcontainers", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime),
+					true)._promise.then(function (list) {
 					$scope.runningContainersSeries = [JPM.metricsToSeries("Running Containers", list, {areaStyle: {normal: {}}})];
 				});
 
 				// ================= Allocated vCores Trend ==================
 				JPM.aggMetricsToEntities(
-					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedvcores", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
-				)._promise.then(function (list) {
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedvcores", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime),
+					true)._promise.then(function (list) {
 					$scope.allocatedvcoresSeries = [JPM.metricsToSeries("Allocated vCores", list, {areaStyle: {normal: {}}})];
 				});
 
 				// ==================== AllocatedMB Trend ====================
 				var allocatedMBEntities = JPM.aggMetricsToEntities(
-					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedmb", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
-				);
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.allocatedmb", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime),
+					true);
 
 				var totalMemoryEntities = JPM.aggMetricsToEntities(
-					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.totalmemory", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime)
-				);
+					JPM.aggMetrics({site: $scope.site}, "hadoop.cluster.totalmemory", ["site"], "max(value)", intervalMin, trendStartTime, trendEndTime),
+					true);
 
 				$q.all([allocatedMBEntities._promise, totalMemoryEntities._promise]).then(function (args) {
 					var allocatedMBList = args[0];

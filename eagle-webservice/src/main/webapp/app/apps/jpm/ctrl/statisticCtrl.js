@@ -32,6 +32,39 @@
 				$scope.type = type;
 				$scope.refresh();
 			};
+
+			$scope.commonChartOption = {
+				grid: {
+					top: 60
+				}
+			};
+
+			$scope.refresh = function () {
+				var endTime = Time("day");
+				var startTime = endTime.clone().subtract(2, "hour");
+				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
+
+				JPM.aggMetricsToEntities(
+					JPM.groups("JobExecutionService", {site: $scope.site}, ["user"], "count desc", intervalMin, startTime, endTime, 10, 1000000)
+				)._promise.then(function (list) {
+					$scope.topUserJobCountSeries = $.map(list, function (subList) {
+						return JPM.metricsToSeries(subList[0].tags.user, subList);
+					});
+					$scope.topUserJobCountSeries._done = true;
+				});
+
+				JPM.aggMetricsToEntities(
+					JPM.groups("JobExecutionService", {site: $scope.site}, ["jobType"], "count desc", intervalMin, startTime, endTime, 10, 1000000)
+				)._promise.then(function (list) {
+					$scope.topTypeJobCountSeries = $.map(list, function (subList) {
+						return JPM.metricsToSeries(subList[0].tags.jobType, subList);
+					});
+					$scope.topTypeJobCountSeries._done = true;
+				});
+			};
+
+			Time.onReload($scope.refresh, $scope);
+			$scope.refresh();
 		});
 	});
 })();

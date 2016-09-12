@@ -80,8 +80,8 @@
 								cond[aggregation] = name;
 
 								return JPM.aggMetricsToEntities(
-									JPM.aggMetrics(cond, metric, ["site"], "max(value)", intervalMin, startTime, endTime)
-								)._promise.then(function (list) {
+									JPM.aggMetrics(cond, metric, ["site"], "max(value)", intervalMin, startTime, endTime),
+									true)._promise.then(function (list) {
 									return $.extend({
 										stack: "job",
 										areaStyle: {normal: {}}

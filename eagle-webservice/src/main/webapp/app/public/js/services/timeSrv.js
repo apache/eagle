@@ -171,7 +171,7 @@
 		$Time.diffInterval = function (from, to) {
 			var timeDiff = $Time.diff(from, to);
 			if(timeDiff <= 1000 * 60 * 60 * 6) {
-				return 1000 * 60 * 2;
+				return 1000 * 60 * 5;
 			} else if(timeDiff <= 1000 * 60 * 60 * 24) {
 				return 1000 * 60 * 15;
 			} else if(timeDiff <= 1000 * 60 * 60 * 24 * 7) {

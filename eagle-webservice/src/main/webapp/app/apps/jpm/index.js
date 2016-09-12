@@ -38,7 +38,7 @@
 		url: "/jpm/statistic?startTime&endTime",
 		site: true,
 		templateUrl: "partials/job/statistic.html",
-		controller: "statisticCtrl"
+		controller: "statisticCtrl",
 	}).route("jpmDetail", {
 		url: "/jpm/detail/:jobId",
 		site: true,
@@ -71,10 +71,11 @@
 
 		// TODO: timestamp support
 		JPM.QUERY_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_GROUPS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_GROUPS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_GROUPS_INTERVAL = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		JPM.QUERY_METRICS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_METRICS_AGG = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_METRICS_INTERVAL = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=GenericMetricService[${condition}]<${groups}>{${field}}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
+		JPM.QUERY_METRICS_INTERVAL = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/list?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		JPM.QUERY_MR_JOBS = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/search';
 		JPM.QUERY_JOB_LIST = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
 		JPM.QUERY_TASK_STATISTIC = 'http://phxapdes0005.stratus.phx.ebay.com:8080/eagle-service/rest/mrJobs/${jobId}/taskCountsByDuration?site=${site}&timelineInSecs=${times}&top=${top}';
@@ -131,27 +132,50 @@
 		 * Fetch eagle query list
 		 * @param query
 		 * @param condition
-		 * @param startTime
-		 * @param endTime
 		 * @param {[]?} groups
 		 * @param {string} field
+		 * @param {number|null} intervalMin
+		 * @param startTime
+		 * @param endTime
+		 * @param {(number|null)?} top
 		 * @param {number?} limit
 		 * @return {[]}
 		 */
-		JPM.groups = function (query, condition, startTime, endTime, groups, field, limit) {
+		JPM.groups = function (query, condition, groups, field, intervalMin, startTime, endTime, top, limit) {
+			var fields = field.split(/,/);
+			var orderId = -1;
+			var fieldStr = $.map(fields, function (field, index) {
+				var matches = field.match(/^([^\s]*)(\s+.*)?$/);
+				if(matches[2]) {
+					orderId = index;
+				}
+				return matches[1];
+			}).join(", ");
+
 			var config = {
 				query: query,
 				condition: JPM.condition(condition),
 				startTime: Time.format(startTime),
 				endTime: Time.format(endTime),
-				groups: $.map(groups, function (group) {
-					return "@" + group;
-				}).join(","),
-				fields: field,
-				limit: limit || 10000
+				groups: toFields(groups),
+				field: fieldStr,
+				order: orderId === -1 ? "" : ".{" + fields[orderId] + "}",
+				top: top ? "&top=" + top : "",
+				intervalMin: intervalMin,
+				limit: limit || 100000
 			};
 
-			return wrapList(JPM.get(common.template(JPM.QUERY_GROUPS, config)));
+			var metrics_url = common.template(intervalMin ? JPM.QUERY_GROUPS_INTERVAL : JPM.QUERY_GROUPS, config);
+			var _list = wrapList(JPM.get(metrics_url));
+			_list._aggInfo = {
+				groups: groups,
+				startTime: Time(startTime).valueOf(),
+				interval: intervalMin * 60 * 1000
+			};
+			_list._promise.then(function () {
+				if(top) _list.reverse();
+			});
+			return _list;
 		};
 
 		/**
@@ -275,7 +299,7 @@
 			return _list;
 		};
 
-		JPM.aggMetricsToEntities = function (list) {
+		JPM.aggMetricsToEntities = function (list, flatten) {
 			var _list = [];
 			_list.done = false;
 			_list._promise = list._promise.then(function () {
@@ -288,13 +312,19 @@
 						tags[group] = obj.key[j];
 					});
 
-					$.each(obj.value[0], function (index, value) {
-						_list.push({
+					var _subList = $.map(obj.value[0], function (value, index) {
+						return {
 							timestamp: _startTime + index * _interval,
 							value: [value],
 							tags: tags
-						});
+						};
 					});
+
+					if(flatten) {
+						_list.push.apply(_list, _subList);
+					} else {
+						_list.push(_subList);
+					}
 				});
 				_list.done = true;
 				return _list;

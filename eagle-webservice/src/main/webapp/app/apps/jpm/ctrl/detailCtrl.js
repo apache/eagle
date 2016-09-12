@@ -161,7 +161,7 @@
 				// Dashboard 4: Running task
 				nodeTaskCountList = JPM.groups(
 					$scope.isRunning ? "RunningTaskExecutionService" : "TaskExecutionService",
-					jobCond, startTime, endTime, ["hostname"], "count", 1000000);
+					jobCond, ["hostname"], "count", null, startTime, endTime, null, 1000000);
 				nodeTaskCountList._promise.then(function () {
 					var nodeTaskCountMap = [];
 
