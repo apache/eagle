@@ -67,6 +67,10 @@ public class MRTaskExecutionResponse {
     public static class TaskDistributionResponse extends MRTaskExecutionResponse {
         public String counterName;
         public List<CountUnit> taskBuckets;
+
+        public TaskDistributionResponse() {
+            taskBuckets = new ArrayList<>();
+        }
     }
 
     public static class CountUnit {

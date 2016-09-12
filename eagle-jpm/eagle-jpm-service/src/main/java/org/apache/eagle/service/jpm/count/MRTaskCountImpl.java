@@ -87,12 +87,14 @@ public class MRTaskCountImpl {
     public MRJobTaskCountResponse.HistoryTaskCountResponse countHistoryTask(List<org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity> tasks, long startTimeInMin, long endTimeInMin) {
         List<MRJobTaskCountResponse.UnitTaskCount> taskCounts = new ArrayList<>();
         for (long i = startTimeInMin; i <= endTimeInMin; i++) {
-            taskCounts.add(new MRJobTaskCountResponse.UnitTaskCount(startTimeInMin * DateTimeUtil.ONEMINUTE, null));
+            taskCounts.add(new MRJobTaskCountResponse.UnitTaskCount(i * DateTimeUtil.ONEMINUTE, null));
         }
         for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity task : tasks) {
             String taskType = task.getTags().get(MRJobTagName.TASK_TYPE.toString());
-            int relativeStartTime = (int) (task.getStartTime() / DateTimeUtil.ONEMINUTE - startTimeInMin);
-            int relativeEndTime = (int) (task.getEndTime() / DateTimeUtil.ONEMINUTE - startTimeInMin);
+            long taskStarTimeMin = task.getStartTime() / DateTimeUtil.ONEMINUTE;
+            long taskEndTimeMin = task.getEndTime() / DateTimeUtil.ONEMINUTE;
+            int relativeStartTime = (int) (taskStarTimeMin - startTimeInMin);
+            int relativeEndTime = (int) (taskEndTimeMin - startTimeInMin);
             for (int i = relativeStartTime; i <= relativeEndTime; i++) {
                 countTask(taskCounts.get(i), taskType);
             }
@@ -111,7 +113,7 @@ public class MRTaskCountImpl {
         }
         JobCounters.CounterName jobCounterName = JobCounters.CounterName.valueOf(counterName.toUpperCase());
         for (org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity task : tasks) {
-            Long counterValue = task.getJobCounters().getCounterValue(jobCounterName) / FileUtils.ONE_MB;
+            Long counterValue = task.getJobCounters().getCounterValue(jobCounterName);
             int pos = ResourceUtils.getDistributionPosition(distRangeList, counterValue);
             response.taskBuckets.get(pos).countVal++;
         }
