@@ -34,7 +34,7 @@ public class TopologyCheckAppConfig implements Serializable {
     public HdfsConfig hdfsConfig;
     public MRConfig mrConfig;
     public EagleInfo eagleInfo;
-    public List<String> topologyTypes;
+    public List<TopologyConstants.TopologyType> topologyTypes;
 
     public Config config;
 
@@ -71,7 +71,7 @@ public class TopologyCheckAppConfig implements Serializable {
 
 
         if (config.hasPath("dataSourceConfig.hbase")) {
-            topologyTypes.add(TopologyConstants.TopologyType.HBASE.toString());
+            topologyTypes.add(TopologyConstants.TopologyType.HBASE);
             hBaseConfig = new HBaseConfig();
             hBaseConfig.keytab = config.getString("dataSourceConfig.hbase.keytab");
             hBaseConfig.principal = config.getString("dataSourceConfig.hbase.principal");
@@ -83,13 +83,13 @@ public class TopologyCheckAppConfig implements Serializable {
         }
 
         if (config.hasPath("dataSourceConfig.mr")) {
-            topologyTypes.add(TopologyConstants.TopologyType.MR.toString());
+            topologyTypes.add(TopologyConstants.TopologyType.MR);
             mrConfig = new MRConfig();
             mrConfig.rmUrls =  config.getString("dataSourceConfig.yarn.rmUrl").split(",\\s*");
         }
 
         if (config.hasPath("dataSourceConfig.hdfs")) {
-            topologyTypes.add(TopologyConstants.TopologyType.HDFS.toString());
+            topologyTypes.add(TopologyConstants.TopologyType.HDFS);
             hdfsConfig = new HdfsConfig();
             hdfsConfig.namenodeUrls = config.getString("dataSourceConfig.hdfs.namenodeUrl").split(",\\s*");
         }

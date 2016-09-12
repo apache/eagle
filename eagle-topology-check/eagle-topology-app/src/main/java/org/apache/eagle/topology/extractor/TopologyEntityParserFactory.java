@@ -60,7 +60,7 @@ public class TopologyEntityParserFactory {
         for (String configuredTopologyType : config.topologyTypes) {
             if (parserClazzMap.containsKey(configuredTopologyType)) {
                 try {
-                    TopologyEntityParser parser = parserClazzMap.get(configuredTopologyType).getConstructor(String.class, Config.class).newInstance(config.topologyConfig.site, config.config);
+                    TopologyEntityParser parser = parserClazzMap.get(configuredTopologyType).getConstructor(String.class, Config.class).newInstance(config.dataExtractorConfig.site, config.config);
                     parserCache.put(configuredTopologyType, parser);
                 } catch (InstantiationException e) {
                     e.printStackTrace();
