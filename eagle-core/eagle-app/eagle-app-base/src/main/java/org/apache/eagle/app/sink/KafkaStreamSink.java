@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
-    private final static Logger LOG = LoggerFactory.getLogger(KafkaStreamSink.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaStreamSink.class);
     private String topicId;
     private Producer producer;
     private KafkaStreamSinkConfig config;
@@ -54,11 +54,11 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     }
 
     @Override
-    protected void execute(Object key, Map event,BasicOutputCollector collector) {
+    protected void execute(Object key, Map event, BasicOutputCollector collector) {
         try {
             String output = new ObjectMapper().writeValueAsString(event);
             producer.send(new KeyedMessage(this.topicId, key, output));
-        }catch(Exception ex){
+        } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             collector.reportError(ex);
         }
@@ -69,17 +69,17 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
         ensureTopicCreated();
     }
 
-    private void ensureTopicCreated(){
-        LOG.info("TODO: ensure kafka topic {} created",this.topicId);
+    private void ensureTopicCreated() {
+        LOG.info("TODO: ensure kafka topic {} created", this.topicId);
     }
 
-    private void ensureTopicDeleted(){
-        LOG.info("TODO: ensure kafka topic {} deleted",this.topicId);
+    private void ensureTopicDeleted() {
+        LOG.info("TODO: ensure kafka topic {} deleted", this.topicId);
     }
 
     @Override
     public void cleanup() {
-        if(this.producer != null){
+        if (this.producer != null) {
             this.producer.close();
         }
     }
@@ -89,7 +89,7 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
         ensureTopicDeleted();
     }
 
-    public static class Provider implements StreamSinkProvider<KafkaStreamSink,KafkaStreamSinkConfig> {
+    public static class Provider implements StreamSinkProvider<KafkaStreamSink, KafkaStreamSinkConfig> {
         @Override
         public KafkaStreamSinkConfig getSinkConfig(String streamId, Config config) {
             KafkaStreamSinkConfig desc = new KafkaStreamSinkConfig();

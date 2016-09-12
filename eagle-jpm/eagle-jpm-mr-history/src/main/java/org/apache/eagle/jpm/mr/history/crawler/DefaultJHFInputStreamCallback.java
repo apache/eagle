@@ -33,20 +33,17 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
 
 
     private JobHistoryContentFilter filter;
-    private MRHistoryJobConfig configManager;
 
-    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, MRHistoryJobConfig configManager, EagleOutputCollector eagleCollector) {
+    public DefaultJHFInputStreamCallback(JobHistoryContentFilter filter, EagleOutputCollector eagleCollector) {
         this.filter = filter;
-        this.configManager = configManager;
     }
 
     @Override
     public void onInputStream(InputStream jobFileInputStream, org.apache.hadoop.conf.Configuration conf) throws Exception {
-        final MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig = configManager.getJobExtractorConfig();
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", jobExtractorConfig.site);
+                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
             }
         };
 
@@ -55,9 +52,7 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
             jobFileInputStream.close();
         } else {
             //get parser and parse, do not need to emit data now
-            JHFParserBase parser = JHFParserFactory.getParser(configManager,
-                    baseTags,
-                    conf, filter);
+            JHFParserBase parser = JHFParserFactory.getParser(baseTags, conf, filter);
             parser.parse(jobFileInputStream);
             jobFileInputStream.close();
         }

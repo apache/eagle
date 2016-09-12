@@ -36,82 +36,82 @@ import com.google.common.base.Joiner;
 @Ignore
 public class TestExclusiveExecutor {
 
-	ZookeeperEmbedded zkEmbed;
+    ZookeeperEmbedded zkEmbed;
 
-	@Before
-	public void setUp() throws Exception {
-		zkEmbed = new ZookeeperEmbedded(2181);
-		zkEmbed.start();
+    @Before
+    public void setUp() throws Exception {
+        zkEmbed = new ZookeeperEmbedded(2181);
+        zkEmbed.start();
 
-		Thread.sleep(2000);
-	}
+        Thread.sleep(2000);
+    }
 
-	@After
-	public void tearDown() throws Exception {
-		zkEmbed.shutdown();
-	}
+    @After
+    public void tearDown() throws Exception {
+        zkEmbed.shutdown();
+    }
 
-	@Test
-	public void testConcurrency() throws Exception {
-		ByteArrayOutputStream newStreamOutput = new ByteArrayOutputStream();
-		PrintStream newStream = new PrintStream(newStreamOutput);
-		PrintStream oldStream = System.out;
+    @Test
+    public void testConcurrency() throws Exception {
+        ByteArrayOutputStream newStreamOutput = new ByteArrayOutputStream();
+        PrintStream newStream = new PrintStream(newStreamOutput);
+        PrintStream oldStream = System.out;
 
-		System.setOut(newStream);
+        System.setOut(newStream);
 
-		ExclusiveExecutor.Runnable runnableOne = new ExclusiveExecutor.Runnable() {
+        ExclusiveExecutor.Runnable runnableOne = new ExclusiveExecutor.Runnable() {
 
-			@Override
-			public void run() throws Exception {
-				System.out.println("this is thread one");
-			}
+            @Override
+            public void run() throws Exception {
+                System.out.println("this is thread one");
+            }
 
-		};
+        };
 
-		new Thread(new Runnable() {
+        new Thread(new Runnable() {
 
-			@Override
-			public void run() {
-				ExclusiveExecutor.execute("/alert/test/leader", runnableOne);
-			}
+            @Override
+            public void run() {
+                ExclusiveExecutor.execute("/alert/test/leader", runnableOne);
+            }
 
-		}).start();
+        }).start();
 
-		ExclusiveExecutor.Runnable runnableTwo = new ExclusiveExecutor.Runnable() {
+        ExclusiveExecutor.Runnable runnableTwo = new ExclusiveExecutor.Runnable() {
 
-			@Override
-			public void run() throws Exception {
-				System.out.println("this is thread two");
-			}
+            @Override
+            public void run() throws Exception {
+                System.out.println("this is thread two");
+            }
 
-		};
-		new Thread(new Runnable() {
+        };
+        new Thread(new Runnable() {
 
-			@Override
-			public void run() {
-				ExclusiveExecutor.execute("/alert/test/leader", runnableTwo);
-			}
+            @Override
+            public void run() {
+                ExclusiveExecutor.execute("/alert/test/leader", runnableTwo);
+            }
 
-		}).start();
+        }).start();
 
-		Thread.sleep(2000);
+        Thread.sleep(2000);
 
-		System.out.flush();
-		BufferedReader br = new BufferedReader(new StringReader(newStreamOutput.toString()));
-		List<String> logs = new ArrayList<String>();
-		String line = null;
-		while ((line = br.readLine()) != null) {
-			logs.add(line);
-		}
+        System.out.flush();
+        BufferedReader br = new BufferedReader(new StringReader(newStreamOutput.toString()));
+        List<String> logs = new ArrayList<String>();
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            logs.add(line);
+        }
 
-		System.setOut(oldStream);
-		System.out.println("Cached logs: " + Joiner.on("\n").join(logs));
+        System.setOut(oldStream);
+        System.out.println("Cached logs: " + Joiner.on("\n").join(logs));
 
-		Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("this is thread one")));
-		Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("this is thread two")));
+        Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("this is thread one")));
+        Assert.assertTrue(logs.stream().anyMatch((log) -> log.contains("this is thread two")));
 
-		Assert.assertTrue(runnableOne.isCompleted());
-		Assert.assertTrue(runnableTwo.isCompleted());
-	}
+        Assert.assertTrue(runnableOne.isCompleted());
+        Assert.assertTrue(runnableTwo.isCompleted());
+    }
 
 }

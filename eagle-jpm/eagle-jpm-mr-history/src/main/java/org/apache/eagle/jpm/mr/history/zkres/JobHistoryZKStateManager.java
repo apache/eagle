@@ -18,9 +18,9 @@
 
 package org.apache.eagle.jpm.mr.history.zkres;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig.ZKStateConfig;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
@@ -37,7 +37,7 @@ import java.util.List;
 public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public static final Logger LOG = LoggerFactory.getLogger(JobHistoryZKStateManager.class);
     private String zkRoot;
-    private CuratorFramework _curator;
+    private CuratorFramework curator;
     public static final String ZNODE_LOCK_FOR_ENSURE_JOB_PARTITIONS = "lockForEnsureJobPartitions";
     public static final String ZNODE_FORCE_START_FROM = "forceStartFrom";
     public static final String ZNODE_PARTITIONS = "partitions";
@@ -66,23 +66,23 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         this.zkRoot = config.zkRoot;
 
         try {
-            _curator = newCurator(config);
-            _curator.start();
+            curator = newCurator(config);
+            curator.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public void close() {
-        _curator.close();
-        _curator = null;
+        curator.close();
+        curator = null;
     }
 
     private String readForceStartFrom() {
         String path = zkRoot + "/" + ZNODE_FORCE_START_FROM;
         try {
-            if (_curator.checkExists().forPath(path) != null) {
-                return new String(_curator.getData().forPath(path), "UTF-8");
+            if (curator.checkExists().forPath(path) != null) {
+                return new String(curator.getData().forPath(path), "UTF-8");
             }
         } catch (Exception ex) {
             LOG.error("fail reading forceStartFrom znode", ex);
@@ -93,8 +93,8 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     private void deleteForceStartFrom() {
         String path = zkRoot + "/" + ZNODE_FORCE_START_FROM;
         try {
-            if (_curator.checkExists().forPath(path) != null) {
-                _curator.delete().forPath(path);
+            if (curator.checkExists().forPath(path) != null) {
+                curator.delete().forPath(path);
             }
         } catch (Exception ex) {
             LOG.error("fail reading forceStartFrom znode", ex);
@@ -139,7 +139,7 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public void ensureJobPartitions(int numTotalPartitions) {
         // lock before rebuild job partitions
         String lockForEnsureJobPartitions = zkRoot + "/" + ZNODE_LOCK_FOR_ENSURE_JOB_PARTITIONS;
-        InterProcessMutex lock = new InterProcessMutex(_curator, lockForEnsureJobPartitions);
+        InterProcessMutex lock = new InterProcessMutex(curator, lockForEnsureJobPartitions);
         String path = zkRoot + "/" + ZNODE_PARTITIONS;
         try {
             lock.acquire();
@@ -153,10 +153,10 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
                     throw new IllegalStateException();
                 }
             } else {
-                boolean pathExists = _curator.checkExists().forPath(path) == null ? false : true;
+                boolean pathExists = curator.checkExists().forPath(path) == null ? false : true;
                 boolean structureChanged = true;
                 if (pathExists) {
-                    int currentCount = _curator.getChildren().forPath(path).size();
+                    int currentCount = curator.getChildren().forPath(path).size();
                     if (numTotalPartitions == currentCount) {
                         structureChanged = false;
                         LOG.info("znode partitions structure is unchanged");
@@ -169,9 +169,9 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
                 }
 
                 if (pathExists) {
-                    List<String> partitions = _curator.getChildren().forPath(path);
+                    List<String> partitions = curator.getChildren().forPath(path);
                     for (String partition : partitions) {
-                        String date = new String(_curator.getData().forPath(path + "/" + partition), "UTF-8");
+                        String date = new String(curator.getData().forPath(path + "/" + partition), "UTF-8");
                         int tmp = Integer.valueOf(date);
                         if (tmp < minDate) {
                             minDate = tmp;
@@ -202,12 +202,12 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         LOG.info("rebuild job partitions with numTotalPartitions " + numTotalPartitions + " with starting date " + startingDate);
         String path = zkRoot + "/" + ZNODE_PARTITIONS;
         // truncate all existing partitions
-        if (_curator.checkExists().forPath(path) != null) {
-            _curator.delete().deletingChildrenIfNeeded().forPath(path);
+        if (curator.checkExists().forPath(path) != null) {
+            curator.delete().deletingChildrenIfNeeded().forPath(path);
         }
 
         for (int i = 0; i < numTotalPartitions; i++) {
-            _curator.create()
+            curator.create()
                 .creatingParentsIfNeeded()
                 .withMode(CreateMode.PERSISTENT)
                 .forPath(path + "/" + i, startingDate.getBytes("UTF-8"));
@@ -218,8 +218,8 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public String readProcessedDate(int partitionId) {
         String path = zkRoot + "/" + ZNODE_PARTITIONS + "/" + partitionId;
         try {
-            if (_curator.checkExists().forPath(path) != null) {
-                return new String(_curator.getData().forPath(path), "UTF-8");
+            if (curator.checkExists().forPath(path) != null) {
+                return new String(curator.getData().forPath(path), "UTF-8");
             } else {
                 return null;
             }
@@ -233,13 +233,13 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public void updateProcessedDate(int partitionId, String date) {
         String path = zkRoot + "/" + ZNODE_PARTITIONS + "/" + partitionId;
         try {
-            if (_curator.checkExists().forPath(path) == null) {
-                _curator.create()
+            if (curator.checkExists().forPath(path) == null) {
+                curator.create()
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.PERSISTENT)
                     .forPath(path, date.getBytes("UTF-8"));
             } else {
-                _curator.setData().forPath(path, date.getBytes("UTF-8"));
+                curator.setData().forPath(path, date.getBytes("UTF-8"));
             }
         } catch (Exception e) {
             LOG.error("fail update processed date", e);
@@ -251,13 +251,13 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public void addProcessedJob(String date, String jobId) {
         String path = zkRoot + "/" + ZNODE_JOBS + "/" + date + "/" + jobId;
         try {
-            if (_curator.checkExists().forPath(path) == null) {
-                _curator.create()
+            if (curator.checkExists().forPath(path) == null) {
+                curator.create()
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.PERSISTENT)
                     .forPath(path);
             } else {
-                _curator.setData().forPath(path);
+                curator.setData().forPath(path);
             }
         } catch (Exception e) {
             LOG.error("fail adding processed jobs", e);
@@ -270,17 +270,17 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         LOG.info("trying to truncate all data for day " + date);
         // we need lock before we do truncate
         String path = zkRoot + "/" + ZNODE_JOBS + "/" + date;
-        InterProcessMutex lock = new InterProcessMutex(_curator, path);
+        InterProcessMutex lock = new InterProcessMutex(curator, path);
         try {
             lock.acquire();
-            if (_curator.checkExists().forPath(path) != null) {
-                _curator.delete().deletingChildrenIfNeeded().forPath(path);
+            if (curator.checkExists().forPath(path) != null) {
+                curator.delete().deletingChildrenIfNeeded().forPath(path);
                 LOG.info("really truncated all data for day " + date);
             }
 
             String jobIdPath = zkRoot + "/" + ZNODE_JOB_IDS + "/" + date;
-            if (_curator.checkExists().forPath(jobIdPath) != null) {
-                _curator.delete().deletingChildrenIfNeeded().forPath(jobIdPath);
+            if (curator.checkExists().forPath(jobIdPath) != null) {
+                curator.delete().deletingChildrenIfNeeded().forPath(jobIdPath);
                 LOG.info("really truncated all jobIds for day " + date);
             }
         } catch (Exception e) {
@@ -300,8 +300,8 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public List<String> readProcessedJobs(String date) {
         String path = zkRoot + "/" + ZNODE_JOBS + "/" + date;
         try {
-            if (_curator.checkExists().forPath(path) != null) {
-                return _curator.getChildren().forPath(path);
+            if (curator.checkExists().forPath(path) != null) {
+                return curator.getChildren().forPath(path);
             } else {
                 return null;
             }
@@ -315,8 +315,8 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public void truncateEverything() {
         String path = zkRoot;
         try {
-            if (_curator.checkExists().forPath(path) != null) {
-                _curator.delete().deletingChildrenIfNeeded().forPath(path);
+            if (curator.checkExists().forPath(path) != null) {
+                curator.delete().deletingChildrenIfNeeded().forPath(path);
             }
         } catch (Exception ex) {
             LOG.error("fail truncating verything", ex);
@@ -328,14 +328,14 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public long readProcessedTimeStamp(int partitionId) {
         String path = zkRoot + "/" + ZNODE_PARTITIONS + "/" + partitionId + "/" + ZNODE_TIMESTAMPS;
         try {
-            if (_curator.checkExists().forPath(path) == null) {
-                _curator.create()
+            if (curator.checkExists().forPath(path) == null) {
+                curator.create()
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.PERSISTENT)
                     .forPath(path);
                 return 0L;
             } else {
-                return Long.parseLong(new String(_curator.getData().forPath(path), "UTF-8"));
+                return Long.parseLong(new String(curator.getData().forPath(path), "UTF-8"));
             }
         } catch (Exception e) {
             LOG.error("fail to read timeStamp for partition " + partitionId, e);
@@ -347,14 +347,14 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public void updateProcessedTimeStamp(int partitionId, long timeStamp) {
         String path = zkRoot + "/" + ZNODE_PARTITIONS + "/" + partitionId + "/" + ZNODE_TIMESTAMPS;
         try {
-            if (_curator.checkExists().forPath(path) == null) {
-                _curator.create()
+            if (curator.checkExists().forPath(path) == null) {
+                curator.create()
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.PERSISTENT)
                     .forPath(path);
             }
 
-            _curator.setData().forPath(path, (timeStamp + "").getBytes("UTF-8"));
+            curator.setData().forPath(path, (timeStamp + "").getBytes("UTF-8"));
         } catch (Exception e) {
             LOG.error("fail to update timeStamp for partition " + partitionId, e);
             throw new RuntimeException(e);
@@ -366,11 +366,11 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
         List<Pair<String, String>> result = new ArrayList<>();
         String path = zkRoot + "/" + ZNODE_JOB_IDS + "/" + date;
         try {
-            if (_curator.checkExists().forPath(path) != null) {
-                List<String> jobs = _curator.getChildren().forPath(path);
+            if (curator.checkExists().forPath(path) != null) {
+                List<String> jobs = curator.getChildren().forPath(path);
                 for (String job : jobs) {
                     String jobPath = path + "/" + job;
-                    String status = new String(_curator.getData().forPath(jobPath), "UTF-8");
+                    String status = new String(curator.getData().forPath(jobPath), "UTF-8");
                     result.add(Pair.of(job, status));
                 }
             }
@@ -385,13 +385,13 @@ public class JobHistoryZKStateManager implements JobHistoryZKStateLCM {
     public void updateProcessedJob(String date, String jobId, String status) {
         String path = zkRoot + "/" + ZNODE_JOB_IDS + "/" + date + "/" + jobId;
         try {
-            if (_curator.checkExists().forPath(path) == null) {
-                _curator.create()
+            if (curator.checkExists().forPath(path) == null) {
+                curator.create()
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.PERSISTENT)
                     .forPath(path);
             }
-            _curator.setData().forPath(path, status.getBytes("UTF-8"));
+            curator.setData().forPath(path, status.getBytes("UTF-8"));
         } catch (Exception e) {
             LOG.error("fail adding processed jobs", e);
             throw new RuntimeException(e);

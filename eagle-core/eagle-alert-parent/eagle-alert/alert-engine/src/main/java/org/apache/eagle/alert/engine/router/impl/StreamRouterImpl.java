@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
@@ -33,23 +29,27 @@ import org.apache.eagle.alert.engine.sorter.impl.StreamTimeClockManagerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 public class StreamRouterImpl implements StreamRouter {
     private static final long serialVersionUID = -4640125063690900014L;
-    private final static Logger LOG = LoggerFactory.getLogger(StreamRouterImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamRouterImpl.class);
     private final String name;
-    private volatile Map<StreamPartition,StreamSortHandler> streamSortHandlers;
+    private volatile Map<StreamPartition, StreamSortHandler> streamSortHandlers;
     private PartitionedEventCollector outputCollector;
     private StreamTimeClockManager streamTimeClockManager;
     private StreamContext context;
 
     /**
-     * @param name This name should be formed by topologyId + router id, which is built by topology builder
+     * @param name This name should be formed by topologyId + router id, which is built by topology builder.
      */
-    public StreamRouterImpl(String name){
+    public StreamRouterImpl(String name) {
         this.name = name;
     }
 
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
@@ -67,32 +67,34 @@ public class StreamRouterImpl implements StreamRouter {
     }
 
     /**
-     * TODO: Potential improvement: if StreamSortHandler is expensive, we can use DISRUPTOR to buffer
+     * TODO: Potential improvement: if StreamSortHandler is expensive, we can use DISRUPTOR to buffer.
      *
      * @param event StreamEvent
      */
     public void nextEvent(PartitionedEvent event) {
         this.context.counter().scope("receive_count").incr();
-        if(!dispatchToSortHandler(event)) {
+        if (!dispatchToSortHandler(event)) {
             this.context.counter().scope("direct_count").incr();
             // Pass through directly if no need to sort
             outputCollector.emit(event);
         }
         this.context.counter().scope("sort_count").incr();
         // Update stream clock time if moving forward and trigger all tick listeners
-        streamTimeClockManager.onTimeUpdate(event.getStreamId(),event.getTimestamp());
+        streamTimeClockManager.onTimeUpdate(event.getStreamId(), event.getTimestamp());
     }
 
     /**
-     * @param event input event
-     * @return whether sorted
+     * @param event input event.
+     * @return whether sorted.
      */
-    private boolean dispatchToSortHandler(PartitionedEvent event){
-        if(event.getTimestamp() <= 0) return false;
+    private boolean dispatchToSortHandler(PartitionedEvent event) {
+        if (event.getTimestamp() <= 0) {
+            return false;
+        }
 
         StreamSortHandler sortHandler = streamSortHandlers.get(event.getPartition());
-        if(sortHandler == null){
-            if(event.isSortRequired()) {
+        if (sortHandler == null) {
+            if (event.isSortRequired()) {
                 LOG.warn("Stream sort handler required has not been loaded so emmit directly: {}", event);
                 this.context.counter().scope("miss_sort_count").incr();
             }
@@ -105,8 +107,8 @@ public class StreamRouterImpl implements StreamRouter {
 
     @Override
     public void onStreamSortSpecChange(Map<StreamPartition, StreamSortSpec> added,
-            Map<StreamPartition, StreamSortSpec> removed,
-            Map<StreamPartition, StreamSortSpec> changed) {
+                                       Map<StreamPartition, StreamSortSpec> removed,
+                                       Map<StreamPartition, StreamSortSpec> changed) {
         synchronized (streamTimeClockManager) {
             Map<StreamPartition, StreamSortHandler> copy = new HashMap<>(this.streamSortHandlers);
             // add new StreamSortSpec
@@ -117,7 +119,7 @@ public class StreamRouterImpl implements StreamRouter {
                         LOG.error("Metadata calculation error: Duplicated StreamSortSpec " + spec);
                     } else {
                         StreamSortHandler handler = new StreamSortWindowHandlerImpl();
-                        handler.prepare(tmp.getStreamId(),spec.getValue(), this.outputCollector);
+                        handler.prepare(tmp.getStreamId(), spec.getValue(), this.outputCollector);
                         copy.put(tmp, handler);
                         streamTimeClockManager.registerListener(streamTimeClockManager.createStreamTimeClock(tmp.getStreamId()), handler);
                     }

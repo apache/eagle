@@ -16,8 +16,6 @@
  */
 package org.apache.eagle.app.test;
 
-import com.google.inject.Inject;
-import com.typesafe.config.Config;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
@@ -26,6 +24,8 @@ import org.apache.eagle.app.utils.DynamicJarPathFinder;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
 import org.junit.Assert;
 
 import java.util.HashMap;
@@ -38,10 +38,21 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
     private final ApplicationResource applicationResource;
 
     @Inject
-    public ApplicationSimulatorImpl(Config config, SiteResource siteResource, ApplicationResource applicationResource){
+    public ApplicationSimulatorImpl(Config config, SiteResource siteResource, ApplicationResource applicationResource) {
         this.config = config;
         this.siteResource = siteResource;
         this.applicationResource = applicationResource;
+    }
+
+    private static final AtomicInteger incr = new AtomicInteger();
+
+    private SiteEntity getUniqueSite() {
+        // Create local site
+        SiteEntity siteEntity = new SiteEntity();
+        siteEntity.setSiteId("SIMULATED_SITE_" + incr.incrementAndGet());
+        siteEntity.setSiteName(siteEntity.getSiteId());
+        siteEntity.setDescription("Automatically generated unique simulation site " + siteEntity.getSiteId() + " (simulator: " + this + ")");
+        return siteEntity;
     }
 
     @Override
@@ -54,24 +65,13 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
         SiteEntity siteEntity = getUniqueSite();
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
-        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation(siteEntity.getSiteId(),appType, ApplicationEntity.Mode.LOCAL);
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation(siteEntity.getSiteId(), appType, ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(appConfig);
         // Install application
         ApplicationEntity applicationEntity =
-                applicationResource.installApplication(installOperation).getData();
+            applicationResource.installApplication(installOperation).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
-    }
-
-    private final static AtomicInteger incr = new AtomicInteger();
-
-    private SiteEntity getUniqueSite(){
-        // Create local site
-        SiteEntity siteEntity = new SiteEntity();
-        siteEntity.setSiteId("SIMULATED_SITE_"+incr.incrementAndGet());
-        siteEntity.setSiteName(siteEntity.getSiteId());
-        siteEntity.setDescription("Automatically generated unique simulation site "+siteEntity.getSiteId()+" (simulator: "+this+")");
-        return siteEntity;
     }
 
     @Override
@@ -83,10 +83,10 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
     public void start(Class<? extends ApplicationProvider> appProviderClass, Map<String, Object> appConfig) {
         try {
             ApplicationProvider applicationProvider = appProviderClass.newInstance();
-            applicationProvider.prepare(new ApplicationProviderConfig(DynamicJarPathFinder.findPath(appProviderClass),appProviderClass),config);
-            start(applicationProvider.getApplicationDesc().getType(),appConfig);
+            applicationProvider.prepare(new ApplicationProviderConfig(DynamicJarPathFinder.findPath(appProviderClass), appProviderClass), config);
+            start(applicationProvider.getApplicationDesc().getType(), appConfig);
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new IllegalStateException(e.getMessage(),e);
+            throw new IllegalStateException(e.getMessage(), e);
         }
     }
 }

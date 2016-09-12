@@ -16,17 +16,14 @@
  */
 package org.apache.eagle.alert.coordinator.impl;
 
-import java.util.List;
-
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import java.util.List;
 
 /**
- * Schedule result for one policy
- * 
- * 
- * @since Apr 26, 2016
+ * Schedule result for one policy.
  *
+ * @since Apr 26, 2016
  */
 public class ScheduleResult {
     int code;

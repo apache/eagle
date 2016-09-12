@@ -17,28 +17,28 @@
 package org.apache.eagle.query.parser;
 
 public enum TokenType {
-	EXP, NUMBER, STRING, LIST, NULL,ID;
+    EXP, NUMBER, STRING, LIST, NULL, ID;
 
-	public static TokenType locate(String tokenText){
-		String _value = tokenText.trim();
-		if (TokenConstant.EXP_PATTERN.matcher(_value).matches()) {
-			// e.q. "value" with EXP{...}
-			return EXP;
-		}else if(TokenConstant.STRING_PATTERN.matcher(_value).matches()){
-			// e.q. "value" with quotes
-			return STRING;
-		}else if(TokenConstant.ARRAY_PATTERN.matcher(_value).matches()){
-			// e.q. (item1,item2,..)
-			return LIST;
-		}else if(TokenConstant.NUMBER_PATTERN.matcher(_value).matches()){
-			// e.q. 1.32 without quotes
-			return NUMBER;
-		}else if(TokenConstant.NULL_PATTERN.matcher(_value).matches()){
-			// e.q. null or NULL without quotes
-			return NULL;
-		} else if(TokenConstant.ID_PATTERN.matcher(_value).matches()){
-			return ID;
-		}
-		throw new IllegalArgumentException("Can't locate type of value text: "+tokenText);
-	}
+    public static TokenType locate(String tokenText) {
+        String _value = tokenText.trim();
+        if (TokenConstant.EXP_PATTERN.matcher(_value).matches()) {
+            // e.q. "value" with EXP{...}
+            return EXP;
+        } else if (TokenConstant.STRING_PATTERN.matcher(_value).matches()) {
+            // e.q. "value" with quotes
+            return STRING;
+        } else if (TokenConstant.ARRAY_PATTERN.matcher(_value).matches()) {
+            // e.q. (item1,item2,..)
+            return LIST;
+        } else if (TokenConstant.NUMBER_PATTERN.matcher(_value).matches()) {
+            // e.q. 1.32 without quotes
+            return NUMBER;
+        } else if (TokenConstant.NULL_PATTERN.matcher(_value).matches()) {
+            // e.q. null or NULL without quotes
+            return NULL;
+        } else if (TokenConstant.ID_PATTERN.matcher(_value).matches()) {
+            return ID;
+        }
+        throw new IllegalArgumentException("Can't locate type of value text: " + tokenText);
+    }
 }

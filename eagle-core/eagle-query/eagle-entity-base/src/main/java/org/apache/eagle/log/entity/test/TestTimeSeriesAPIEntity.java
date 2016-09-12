@@ -50,48 +50,48 @@ public class TestTimeSeriesAPIEntity extends TaggedLogAPIEntity {
 	}
 	public void setField1(int field1) {
 		this.field1 = field1;
-		_pcs.firePropertyChange("field1", null, null);
+		pcs.firePropertyChange("field1", null, null);
 	}
 	public Integer getField2() {
 		return field2;
 	}
 	public void setField2(Integer field2) {
 		this.field2 = field2;
-		_pcs.firePropertyChange("field2", null, null);
+		pcs.firePropertyChange("field2", null, null);
 	}
 	public long getField3() {
 		return field3;
 	}
 	public void setField3(long field3) {
 		this.field3 = field3;
-		_pcs.firePropertyChange("field3", null, null);
+		pcs.firePropertyChange("field3", null, null);
 	}
 	public Long getField4() {
 		return field4;
 	}
 	public void setField4(Long field4) {
 		this.field4 = field4;
-		_pcs.firePropertyChange("field4", null, null);
+		pcs.firePropertyChange("field4", null, null);
 	}
 	public double getField5() {
 		return field5;
 	}
 	public void setField5(double field5) {
 		this.field5 = field5;
-		_pcs.firePropertyChange("field5", null, null);
+		pcs.firePropertyChange("field5", null, null);
 	}
 	public Double getField6() {
 		return field6;
 	}
 	public void setField6(Double field6) {
 		this.field6 = field6;
-		_pcs.firePropertyChange("field6", null, null);
+		pcs.firePropertyChange("field6", null, null);
 	}
 	public String getField7() {
 		return field7;
 	}
 	public void setField7(String field7) {
 		this.field7 = field7;
-		_pcs.firePropertyChange("field7", null, null);
+		pcs.firePropertyChange("field7", null, null);
 	}
 }

@@ -15,10 +15,15 @@
  * limitations under the License.
  */
 package org.apache.eagle.service.security.hdfs.rest;
+import com.google.inject.Inject;
 import com.mapr.fs.clicommands.MapRCliCommands;
 import com.typesafe.config.Config;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.security.resolver.MetadataAccessConfigRepo;
+import org.apache.eagle.security.service.ISecurityMetadataDAO;
+import org.apache.eagle.security.service.MetadataDaoFactory;
 import org.apache.eagle.service.security.hdfs.MAPRFSResourceConstants;
 import org.apache.eagle.service.security.hdfs.resolver.MAPRStatusCodeResolver;
 import org.apache.hadoop.conf.Configuration;
@@ -30,8 +35,11 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.PrintStream;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.apache.eagle.service.security.hdfs.MAPRFSResourceConstants.MAPRFS_APPLICATION;
 
 
 @Path(MAPRFSResourceConstants.MAPRFS_NAME_RESOLVER)
@@ -63,7 +71,12 @@ public class MapRNameResolver {
 
     private MapRCliCommands mprcmd;
 
+    private ApplicationEntityService entityService;
 
+    @Inject
+    public MapRNameResolver(ApplicationEntityService entityService, Config eagleServerConfig){
+        this.entityService = entityService;
+    }
     /**
      * rest api : convert file/folder name to id
      * @param fName file/folder name
@@ -76,10 +89,9 @@ public class MapRNameResolver {
     public String getFid(@QueryParam("fName") String fName, @QueryParam("site") String site) {
         String ans = "FID NOT FOUND";
         try{
-            MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
-            Config typeSafeConfig= repo.getConfig(MAPRFSResourceConstants.MAPRFS_APPLICATION, site);
+            Map<String, Object> config = getAppConfig(site, MAPRFS_APPLICATION);
             String defaultFS;
-            defaultFS = typeSafeConfig.getString("fs.defaultFS");
+            defaultFS = (String) config.get("fs.defaultFS");
             Configuration conf = new Configuration();
             conf.set("fs.defaultFS",defaultFS);
             mprcmd = new MapRCliCommands(conf);
@@ -130,14 +142,13 @@ public class MapRNameResolver {
         String ans= "VOLUME ID NOT FOUDN";
         try{
             // call mapr rest api to get corresponding id;
-            MetadataAccessConfigRepo repo = new MetadataAccessConfigRepo();
-            Config typeSafeConfig= repo.getConfig(MAPRFSResourceConstants.MAPRFS_APPLICATION, site);
+            Map<String, Object> config = getAppConfig(site, MAPRFS_APPLICATION);
             String username;
             String password;
-            username = typeSafeConfig.getString(MAPRFSResourceConstants.MAPRFS_USERNAME);
-            password = typeSafeConfig.getString(MAPRFSResourceConstants.MAPRFS_PASSWORD);
+            username = (String) config.get(MAPRFSResourceConstants.MAPRFS_USERNAME);
+            password = (String) config.get(MAPRFSResourceConstants.MAPRFS_PASSWORD);
             // call
-            String restUrl = typeSafeConfig.getString(MAPRFSResourceConstants.MAPRFS_WEBUI_HTTPS) + MAPRFSResourceConstants.MAPRFS_VOLUME_INFO + "?name=" + vName;
+            String restUrl = (String) config.get(MAPRFSResourceConstants.MAPRFS_WEBUI_HTTPS) + MAPRFSResourceConstants.MAPRFS_VOLUME_INFO + "?name=" + vName;
 
             JSONObject response = HttpRequest.executeGet(restUrl,username,password);
             ans = extractVolumeId(response);
@@ -175,6 +186,10 @@ public class MapRNameResolver {
     }
 
 
+    private Map<String, Object> getAppConfig(String site, String appType){
+        ApplicationEntity entity = entityService.getBySiteIdAndAppType(site, appType);
+        return entity.getConfiguration();
+    }
 
 
 

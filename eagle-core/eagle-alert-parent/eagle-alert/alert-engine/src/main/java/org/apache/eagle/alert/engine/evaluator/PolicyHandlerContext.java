@@ -1,10 +1,4 @@
-package org.apache.eagle.alert.engine.evaluator;
-
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-
-import backtype.storm.metric.api.MultiCountMetric;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,11 +14,19 @@ import backtype.storm.metric.api.MultiCountMetric;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.apache.eagle.alert.engine.evaluator;
+
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import backtype.storm.metric.api.MultiCountMetric;
+import com.typesafe.config.Config;
+
 public class PolicyHandlerContext {
     private PolicyDefinition policyDefinition;
     private PolicyGroupEvaluator policyEvaluator;
     private MultiCountMetric policyCounter;
     private String policyEvaluatorId;
+    private Config config;
 
     public PolicyDefinition getPolicyDefinition() {
         return policyDefinition;
@@ -56,5 +58,13 @@ public class PolicyHandlerContext {
 
     public void setPolicyEvaluatorId(String policyEvaluatorId) {
         this.policyEvaluatorId = policyEvaluatorId;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
     }
 }

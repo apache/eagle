@@ -1,8 +1,4 @@
-package org.apache.eagle.alert.metric.source;
-
-import com.codahale.metrics.MetricRegistry;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,11 +14,15 @@ import com.codahale.metrics.MetricRegistry;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.alert.metric.source;
+
+import com.codahale.metrics.MetricRegistry;
+
 public class MetricSourceWrapper implements MetricSource {
     private final MetricRegistry registry;
     private final String name;
 
-    public MetricSourceWrapper(String name, MetricRegistry registry){
+    public MetricSourceWrapper(String name, MetricRegistry registry) {
         this.name = name;
         this.registry = registry;
     }

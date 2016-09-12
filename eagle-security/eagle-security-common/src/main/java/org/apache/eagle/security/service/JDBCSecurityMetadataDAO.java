@@ -51,6 +51,9 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
     private final String HIVE_QUERY_ALL_STATEMENT = "SELECT site, hive_resource, sensitivity_type FROM hive_sensitivity_entity";
     private final String HIVE_INSERT_STATEMENT = "INSERT INTO hive_sensitivity_entity (site, hive_resource, sensitivity_type) VALUES (?, ?, ?)";
 
+    private final String OOZIE_QUERY_ALL_STATEMENT = "SELECT jobid, name, sensitivity_type FROM oozie_sensitivity_entity";
+    private final String OOZIE_INSERT_STATEMENT = "INSERT INTO oozie_sensitivity_entity (site, filedir, sensitivity_type) VALUES (?, ?, ?)";
+
     // get connection url from config
     public JDBCSecurityMetadataDAO(Config config){
         this.config = config;
@@ -162,6 +165,35 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
             try {
                 statement.setString(1, e.getSite());
                 statement.setString(2, e.getFiledir());
+                statement.setString(3, e.getSensitivityType());
+            }catch(Exception ex){
+                throw new IllegalStateException(ex);
+            }
+            return statement;
+        });
+    }
+
+
+    @Override
+    public Collection<OozieSensitivityEntity> listOozieSensitivities() {
+        return listEntities(OOZIE_QUERY_ALL_STATEMENT, rs -> {
+            try {
+                OozieSensitivityEntity entity = new OozieSensitivityEntity();
+                entity.setJobId(rs.getString(1));
+                entity.setName(rs.getString(2));
+                entity.setSensitivityType(rs.getString(3));
+                return entity;
+            }catch(Exception ex){ throw new IllegalStateException(ex);}
+        });
+    }
+
+    @Override
+    public OpResult addOozieSensitivity(Collection<OozieSensitivityEntity> h) {
+        return addEntities(OOZIE_INSERT_STATEMENT, h, (entity, statement) -> {
+            OozieSensitivityEntity e = (OozieSensitivityEntity)entity;
+            try {
+                statement.setString(1, e.getJobId());
+                statement.setString(2, e.getName());
                 statement.setString(3, e.getSensitivityType());
             }catch(Exception ex){
                 throw new IllegalStateException(ex);

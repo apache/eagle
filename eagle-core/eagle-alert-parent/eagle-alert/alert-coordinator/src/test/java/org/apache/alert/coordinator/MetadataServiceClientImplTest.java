@@ -30,7 +30,6 @@ import com.typesafe.config.ConfigFactory;
 
 /**
  * @since May 9, 2016
- *
  */
 public class MetadataServiceClientImplTest {
 

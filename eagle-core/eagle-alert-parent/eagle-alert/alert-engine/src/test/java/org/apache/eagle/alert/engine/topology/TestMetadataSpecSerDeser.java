@@ -19,30 +19,8 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
-import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
-import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
-import org.apache.eagle.alert.coordination.model.RouterSpec;
-import org.apache.eagle.alert.coordination.model.SpoutSpec;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionStrategy;
-import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
-import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
-import org.apache.eagle.alert.coordination.model.WorkSlot;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
+import org.apache.eagle.alert.coordination.model.*;
+import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandlers;
 import org.apache.eagle.alert.engine.utils.MetadataSerDeser;
 import org.codehaus.jackson.type.TypeReference;
@@ -50,19 +28,21 @@ import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.*;
+
 /**
  * Since 5/6/16.
  */
 public class TestMetadataSpecSerDeser {
-    private String getStreamNameByTopic(String topic){
+    private String getStreamNameByTopic(String topic) {
         return topic + "Stream";
     }
 
     @Test
-    public void testStreamDefinitions(){
+    public void testStreamDefinitions() {
         Map<String, StreamDefinition> sds = new HashMap<>();
         List<String> topics = Arrays.asList("testTopic3", "testTopic4", "testTopic5");
-        for(String topic : topics) {
+        for (String topic : topics) {
             String streamId = getStreamNameByTopic(topic);
             if (topic.equals("testTopic3") || topic.equals("testTopic4")) {
                 StreamDefinition schema = new StreamDefinition();
@@ -72,7 +52,7 @@ public class TestMetadataSpecSerDeser {
                 column.setType(StreamColumn.Type.STRING);
                 schema.setColumns(Collections.singletonList(column));
                 sds.put(schema.getStreamId(), schema);
-            }else if(topic.equals("testTopic5")){
+            } else if (topic.equals("testTopic5")) {
                 StreamDefinition schema = new StreamDefinition();
                 schema.setStreamId(streamId);
                 StreamColumn column = new StreamColumn();
@@ -86,26 +66,27 @@ public class TestMetadataSpecSerDeser {
         String json = MetadataSerDeser.serialize(sds);
         System.out.println(json);
 
-        Map<String, StreamDefinition> deserializedSpec = MetadataSerDeser.deserialize(json, new TypeReference<Map<String, StreamDefinition>>(){});
+        Map<String, StreamDefinition> deserializedSpec = MetadataSerDeser.deserialize(json, new TypeReference<Map<String, StreamDefinition>>() {
+        });
         Assert.assertEquals(3, deserializedSpec.size());
     }
 
     @SuppressWarnings("unused")
     @Test
-    public void testSpoutSpec(){
+    public void testSpoutSpec() {
         String topologyName = "testTopology";
         String spoutId = "alertEngineSpout";
         List<String> plainStringTopics = Arrays.asList("testTopic3", "testTopic4");
         List<String> jsonStringTopics = Arrays.asList("testTopic5");
         Map<String, Kafka2TupleMetadata> kafka2TupleMetadataMap = new HashMap<>();
-        for(String topic : plainStringTopics) {
+        for (String topic : plainStringTopics) {
             Kafka2TupleMetadata kafka2TupleMetadata = new Kafka2TupleMetadata();
             kafka2TupleMetadata.setName(topic);
             kafka2TupleMetadata.setTopic(topic);
             kafka2TupleMetadata.setSchemeCls("org.apache.eagle.alert.engine.scheme.PlainStringScheme");
             kafka2TupleMetadataMap.put(topic, kafka2TupleMetadata);
         }
-        for(String topic : jsonStringTopics){
+        for (String topic : jsonStringTopics) {
             Kafka2TupleMetadata kafka2TupleMetadata = new Kafka2TupleMetadata();
             kafka2TupleMetadata.setName(topic);
             kafka2TupleMetadata.setTopic(topic);
@@ -115,7 +96,7 @@ public class TestMetadataSpecSerDeser {
 
         // construct Tuple2StreamMetadata
         Map<String, Tuple2StreamMetadata> tuple2StreamMetadataMap = new HashMap<>();
-        for(String topic : plainStringTopics) {
+        for (String topic : plainStringTopics) {
             String streamId = getStreamNameByTopic(topic);
             Tuple2StreamMetadata tuple2StreamMetadata = new Tuple2StreamMetadata();
             Set<String> activeStreamNames = new HashSet<>();
@@ -128,7 +109,7 @@ public class TestMetadataSpecSerDeser {
             tuple2StreamMetadataMap.put(topic, tuple2StreamMetadata);
         }
 
-        for(String topic : jsonStringTopics) {
+        for (String topic : jsonStringTopics) {
             String streamId = getStreamNameByTopic(topic);
             Tuple2StreamMetadata tuple2StreamMetadata = new Tuple2StreamMetadata();
             Set<String> activeStreamNames = new HashSet<>();
@@ -143,7 +124,7 @@ public class TestMetadataSpecSerDeser {
 
         // construct StreamRepartitionMetadata
         Map<String, List<StreamRepartitionMetadata>> streamRepartitionMetadataMap = new HashMap<>();
-        for(String topic : plainStringTopics) {
+        for (String topic : plainStringTopics) {
             String streamId = getStreamNameByTopic(topic);
             StreamRepartitionMetadata streamRepartitionMetadata = new StreamRepartitionMetadata(topic, "defaultStringStream");
             StreamRepartitionStrategy gs = new StreamRepartitionStrategy();
@@ -164,7 +145,7 @@ public class TestMetadataSpecSerDeser {
             streamRepartitionMetadataMap.put(topic, Arrays.asList(streamRepartitionMetadata));
         }
 
-        for(String topic : jsonStringTopics) {
+        for (String topic : jsonStringTopics) {
             String streamId = getStreamNameByTopic(topic);
             StreamRepartitionMetadata streamRepartitionMetadata = new StreamRepartitionMetadata(topic, "defaultStringStream");
             StreamRepartitionStrategy gs = new StreamRepartitionStrategy();
@@ -195,10 +176,10 @@ public class TestMetadataSpecSerDeser {
     }
 
     @Test
-    public void testRouterBoltSpec(){
+    public void testRouterBoltSpec() {
         List<String> topics = Arrays.asList("testTopic3", "testTopic4", "testTopic5");
         RouterSpec boltSpec = new RouterSpec();
-        for(String topic : topics) {
+        for (String topic : topics) {
             String streamId = getStreamNameByTopic(topic);
             // StreamPartition, groupby col1 for stream cpuUsageStream
             StreamPartition sp = new StreamPartition();
@@ -229,11 +210,11 @@ public class TestMetadataSpecSerDeser {
     }
 
     @Test
-    public void testAlertBoltSpec(){
+    public void testAlertBoltSpec() {
         String topologyName = "testTopology";
         AlertBoltSpec spec = new AlertBoltSpec();
         List<String> topics = Arrays.asList("testTopic3", "testTopic4", "testTopic5");
-        for(String topic : topics) {
+        for (String topic : topics) {
             String streamId = getStreamNameByTopic(topic);
 
             // construct StreamPartition

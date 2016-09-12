@@ -29,25 +29,22 @@ import java.io.IOException;
 import java.util.BitSet;
 
 /**
+ * StreamEventSerializer.
+ *
  * @see StreamEvent
  */
 public class StreamEventSerializer implements Serializer<StreamEvent> {
     private final SerializationMetadataProvider serializationMetadataProvider;
 
-    public StreamEventSerializer(SerializationMetadataProvider serializationMetadataProvider){
+    public StreamEventSerializer(SerializationMetadataProvider serializationMetadataProvider) {
         this.serializationMetadataProvider = serializationMetadataProvider;
     }
 
-    /**
-     *
-     * @param objects
-     * @return
-     */
-    private BitSet isNullBitSet(Object[] objects){
+    private BitSet isNullBitSet(Object[] objects) {
         BitSet bitSet = new BitSet();
         int i = 0;
-        for(Object obj:objects){
-            bitSet.set(i,obj == null);
+        for (Object obj : objects) {
+            bitSet.set(i, obj == null);
             i++;
         }
         return bitSet;
@@ -58,28 +55,30 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
         // Bryant: here "metaVersion/streamId" writes to dataOutputUTF
         String metaVersion = event.getMetaVersion();
         String streamId = event.getStreamId();
-        String metaVersion_streamId = String.format("%s/%s", metaVersion, streamId);
+        String metaVersionStreamId = String.format("%s/%s", metaVersion, streamId);
 
-        dataOutput.writeUTF(metaVersion_streamId);
+        dataOutput.writeUTF(metaVersionStreamId);
         dataOutput.writeLong(event.getTimestamp());
-        if(event.getData() == null || event.getData().length == 0){
+        if (event.getData() == null || event.getData().length == 0) {
             dataOutput.writeInt(0);
-        }else{
+        } else {
             BitSet isNullIndex = isNullBitSet(event.getData());
             byte[] isNullBytes = isNullIndex.toByteArray();
             dataOutput.writeInt(isNullBytes.length);
             dataOutput.write(isNullBytes);
-            int i =0;
+            int i = 0;
             StreamDefinition definition = serializationMetadataProvider.getStreamDefinition(event.getStreamId());
-            if(definition == null) throw new IOException("StreamDefinition not found: "+event.getStreamId());
-            if(event.getData().length != definition.getColumns().size()){
-                throw new IOException("Event :"+event+" doesn't match with schema: "+definition);
+            if (definition == null) {
+                throw new IOException("StreamDefinition not found: " + event.getStreamId());
             }
-            for(StreamColumn column:definition.getColumns()){
-                if(!isNullIndex.get(i)) {
-                    Serializers.getColumnSerializer(column.getType()).serialize(event.getData()[i],dataOutput);
+            if (event.getData().length != definition.getColumns().size()) {
+                throw new IOException("Event :" + event + " doesn't match with schema: " + definition);
+            }
+            for (StreamColumn column : definition.getColumns()) {
+                if (!isNullIndex.get(i)) {
+                    Serializers.getColumnSerializer(column.getType()).serialize(event.getData()[i], dataOutput);
                 }
-                i ++;
+                i++;
             }
         }
     }
@@ -87,9 +86,9 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
     @Override
     public StreamEvent deserialize(DataInput dataInput) throws IOException {
         StreamEvent event = new StreamEvent();
-        String metaVersion_streamId = dataInput.readUTF();
-        String streamId = metaVersion_streamId.split("/")[1];
-        String metaVersion = metaVersion_streamId.split("/")[0];
+        String metaVersionStreamId = dataInput.readUTF();
+        String streamId = metaVersionStreamId.split("/")[1];
+        String metaVersion = metaVersionStreamId.split("/")[0];
         event.setStreamId(streamId);
         event.setMetaVersion(metaVersion);
 
@@ -101,11 +100,11 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
         BitSet isNullIndex = BitSet.valueOf(isNullBytes);
         Object[] attributes = new Object[definition.getColumns().size()];
         int i = 0;
-        for(StreamColumn column:definition.getColumns()){
-            if(!isNullIndex.get(i)) {
+        for (StreamColumn column : definition.getColumns()) {
+            if (!isNullIndex.get(i)) {
                 attributes[i] = Serializers.getColumnSerializer(column.getType()).deserialize(dataInput);
             }
-            i ++;
+            i++;
         }
         event.setData(attributes);
         return event;

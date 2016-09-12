@@ -16,35 +16,44 @@
  */
 package org.apache.eagle.app.environment;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
+import com.typesafe.config.Config;
 
 /**
- * Execution Runtime Adapter
+ * Execution Runtime Adapter.
  */
-public interface ExecutionRuntime<Env extends Environment, Proc> {
+public interface ExecutionRuntime<E extends Environment, P> {
+
     /**
-     * @param environment
+     * Prepare runtime.
+     *
+     * @param environment environment context
      */
-    void prepare(Env environment);
+    void prepare(E environment);
 
-    Env environment();
+    E environment();
 
     /**
+     * Start application process.
+     *
      * @param executor
      * @param config
      */
-    void start(Application<Env, Proc> executor, Config config);
+    void start(Application<E, P> executor, Config config);
 
     /**
+     * Stop application process.
+     *
      * @param executor
      * @param config
      */
-    void stop(Application<Env, Proc> executor, Config config);
+    void stop(Application<E, P> executor, Config config);
 
     /**
+     * Check application process status.
+     *
      * @param executor
      * @param config
      */
-    void status(Application<Env, Proc> executor, Config config);
+    void status(Application<E, P> executor, Config config);
 }

@@ -18,10 +18,11 @@ package org.apache.eagle.alert.engine.sorter;
 
 public interface StreamTimeClockListener {
     /**
-     * @see StreamWindow
+     * StreamTimeClockListener onTick callback.
      *
      * @param streamTime
      * @param globalSystemTime
+     * @see StreamWindow
      */
     void onTick(StreamTimeClock streamTime, long globalSystemTime);
 }

@@ -18,11 +18,11 @@
 
 package org.apache.eagle.hadoop.queue.crawler;
 
-import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
 import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
-import org.apache.eagle.hadoop.queue.model.clusterMetrics.ClusterMetrics;
-import org.apache.eagle.hadoop.queue.model.clusterMetrics.ClusterMetricsWrapper;
+import org.apache.eagle.hadoop.queue.model.cluster.ClusterMetrics;
+import org.apache.eagle.hadoop.queue.model.cluster.ClusterMetricsWrapper;
+import backtype.storm.spout.SpoutOutputCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,36 +30,36 @@ import java.io.IOException;
 
 public class ClusterMetricsCrawler implements Runnable {
 
-	private final static Logger logger = LoggerFactory.getLogger(ClusterMetricsCrawler.class);
-	private ClusterMetricsParseListener listener;
-	private String urlString;
+    private static final Logger logger = LoggerFactory.getLogger(ClusterMetricsCrawler.class);
+    private ClusterMetricsParseListener listener;
+    private String urlString;
 
-	public ClusterMetricsCrawler(String site, String urlBase, SpoutOutputCollector collector) {
-		listener = new ClusterMetricsParseListener(site, collector);
-		urlString = YarnClusterResourceURLBuilder.buildClusterMetricsURL(urlBase);
-	}
+    public ClusterMetricsCrawler(String site, String urlBase, SpoutOutputCollector collector) {
+        listener = new ClusterMetricsParseListener(site, collector);
+        urlString = YarnClusterResourceURLBuilder.buildClusterMetricsURL(urlBase);
+    }
 
-	@Override
-	public void run() {
-		try {
-			logger.info("Start to crawl cluster metrics from " + this.urlString);
-			ClusterMetricsWrapper metricsWrapper = (ClusterMetricsWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(urlString, ClusterMetricsWrapper.class);
-			ClusterMetrics metrics = metricsWrapper.getClusterMetrics();
-			if(metrics == null) {
-				logger.error("Failed to crawl cluster metrics");
-			} else {
-				long currentTimestamp = System.currentTimeMillis();
-				listener.onMetric(metrics, currentTimestamp);
-			}
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-			if(logger.isDebugEnabled()) {
-				logger.trace(e.getMessage(), e);
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			listener.flush();
-		}
-	}
+    @Override
+    public void run() {
+        try {
+            logger.info("Start to crawl cluster metrics from " + this.urlString);
+            ClusterMetricsWrapper metricsWrapper = (ClusterMetricsWrapper) HadoopYarnResourceUtils.getObjectFromStreamWithGzip(urlString, ClusterMetricsWrapper.class);
+            ClusterMetrics metrics = metricsWrapper.getClusterMetrics();
+            if (metrics == null) {
+                logger.error("Failed to crawl cluster metrics");
+            } else {
+                long currentTimestamp = System.currentTimeMillis();
+                listener.onMetric(metrics, currentTimestamp);
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            if (logger.isDebugEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            listener.flush();
+        }
+    }
 }

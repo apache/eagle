@@ -16,19 +16,20 @@
  */
 package org.apache.eagle.alert.engine.mock;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class MockStreamCollector implements Collector<AlertStreamEvent> {
     @SuppressWarnings("unused")
     private final static Logger LOG = LoggerFactory.getLogger(MockStreamCollector.class);
     private List<AlertStreamEvent> cache;
-    public MockStreamCollector(){
+
+    public MockStreamCollector() {
         cache = new LinkedList<>();
     }
 
@@ -37,15 +38,15 @@ public class MockStreamCollector implements Collector<AlertStreamEvent> {
         // LOG.info("PartitionedEventCollector received: {}",event);
     }
 
-    public void clear(){
+    public void clear() {
         cache.clear();
     }
 
-    public List<AlertStreamEvent> get(){
+    public List<AlertStreamEvent> get() {
         return cache;
     }
 
-    public int size(){
+    public int size() {
         return cache.size();
     }
 }

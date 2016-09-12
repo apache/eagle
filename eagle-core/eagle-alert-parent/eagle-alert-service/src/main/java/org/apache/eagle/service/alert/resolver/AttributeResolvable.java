@@ -21,24 +21,24 @@ import java.util.List;
 /**
  * @param <R>
  * @param <V>
- * @since 6/16/15
+ * @since 6/16/15.
  */
 public interface AttributeResolvable<R extends GenericAttributeResolveRequest, V> {
     /**
-     * @param request request type
+     * @param request request type.
      * @return List&lt;V&gt;
      * @throws AttributeResolveException
      */
     List<V> resolve(R request) throws AttributeResolveException;
 
     /**
-     * validate request
+     * validate request.
      * @throws BadAttributeResolveRequestException
      */
     void validateRequest(R request) throws BadAttributeResolveRequestException;
 
     /**
-     * @return Class&lt;R&gt;
+     * @return Class&lt;R&gt;.
      */
     Class<R> getRequestClass();
 }

@@ -107,7 +107,7 @@ public class RMResourceFetcher implements ResourceFetcher<AppInfo> {
 
     private String getMRFinishedJobURL(String lastFinishedTime) {
         String url = URLUtil.removeTrailingSlash(selector.getSelectedUrl());
-        return url + "/" + "Constants.V2_APPS_URL"
+        return url + "/" + Constants.V2_APPS_URL
                 + "?applicationTypes=MAPREDUCE&state=FINISHED&finishedTimeBegin="
                 + lastFinishedTime + "&" + Constants.ANONYMOUS_PARAMETER;
     }

@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.app;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.Environment;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
+import com.typesafe.config.Config;
 
-public abstract class AbstractApplication<Env extends Environment,Proc> implements Application<Env,Proc>, ApplicationTool {
+public abstract class AbstractApplication<E extends Environment, P> implements Application<E, P>, ApplicationTool {
     @Override
     public void run(Config config) {
-        ExecutionRuntimeManager.getInstance().getRuntime(getEnvironmentType(),config).start(this,config);
+        ExecutionRuntimeManager.getInstance().getRuntime(getEnvironmentType(), config).start(this, config);
     }
 }

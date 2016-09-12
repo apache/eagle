@@ -18,13 +18,6 @@
  */
 package org.apache.eagle.alert.engine.router.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
@@ -40,36 +33,35 @@ import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
 import org.apache.eagle.alert.engine.router.StreamRouteSpecListener;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 import org.apache.eagle.alert.utils.StreamIdConversion;
+import backtype.storm.task.OutputCollector;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.task.OutputCollector;
-
-import com.google.common.collect.Lists;
+import java.util.*;
 
 /**
  * After sorting, one stream's message will be routed based on its StreamPartition
- * One stream may have multiple StreamPartitions based on how this stream is grouped by
- *
+ * One stream may have multiple StreamPartitions based on how this stream is grouped by.
  * TODO: Add metric statistics
  */
 public class StreamRouterBoltOutputCollector implements PartitionedEventCollector, StreamRouteSpecListener {
-    private final static Logger LOG = LoggerFactory.getLogger(StreamRouterBoltOutputCollector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamRouterBoltOutputCollector.class);
     private final OutputCollector outputCollector;
     private final Object outputLock = new Object();
-//    private final List<String> outputStreamIds;
+    //    private final List<String> outputStreamIds;
     private final StreamContext streamContext;
     private final PartitionedEventSerializer serializer;
-    private volatile Map<StreamPartition,StreamRouterSpec> routeSpecMap;
+    private volatile Map<StreamPartition, StreamRouterSpec> routeSpecMap;
     private volatile Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap;
     private final String sourceId;
 
-    public StreamRouterBoltOutputCollector(String sourceId, OutputCollector outputCollector, List<String> outputStreamIds, StreamContext streamContext, PartitionedEventSerializer serializer){
+    public StreamRouterBoltOutputCollector(String sourceId, OutputCollector outputCollector, List<String> outputStreamIds, StreamContext streamContext, PartitionedEventSerializer serializer) {
         this.sourceId = sourceId;
         this.outputCollector = outputCollector;
         this.routeSpecMap = new HashMap<>();
         this.routePartitionerMap = new HashMap<>();
-//        this.outputStreamIds = outputStreamIds;
+        // this.outputStreamIds = outputStreamIds;
         this.streamContext = streamContext;
         this.serializer = serializer;
     }
@@ -114,7 +106,7 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("Emitted to stream {} with message {}", targetStreamId, emittedEvent);
                             }
-                            if(this.serializer == null) {
+                            if (this.serializer == null) {
                                 outputCollector.emit(targetStreamId, event.getAnchor(), Collections.singletonList(emittedEvent));
                             } else {
                                 outputCollector.emit(targetStreamId, event.getAnchor(), Collections.singletonList(serializer.serialize(emittedEvent)));
@@ -129,8 +121,8 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
                 }
                 outputCollector.ack(event.getAnchor());
             }
-        } catch (Exception ex){
-            LOG.error(ex.getMessage(),ex);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
             synchronized (outputLock) {
                 this.streamContext.counter().scope("fail_count").incr();
                 this.outputCollector.fail(event.getAnchor());
@@ -142,33 +134,33 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
     public void onStreamRouterSpecChange(Collection<StreamRouterSpec> added,
                                          Collection<StreamRouterSpec> removed,
                                          Collection<StreamRouterSpec> modified,
-                                         Map<String, StreamDefinition> sds){
-        Map<StreamPartition,StreamRouterSpec> copyRouteSpecMap = new HashMap<>(routeSpecMap);
+                                         Map<String, StreamDefinition> sds) {
+        Map<StreamPartition, StreamRouterSpec> copyRouteSpecMap = new HashMap<>(routeSpecMap);
         Map<StreamPartition, List<StreamRoutePartitioner>> copyRoutePartitionerMap = new HashMap<>(routePartitionerMap);
 
         // added StreamRouterSpec i.e. there is a new StreamPartition
-        for(StreamRouterSpec spec : added){
-            if(copyRouteSpecMap.containsKey(spec.getPartition())){
+        for (StreamRouterSpec spec : added) {
+            if (copyRouteSpecMap.containsKey(spec.getPartition())) {
                 LOG.error("Metadata calculation error: add existing StreamRouterSpec " + spec);
-            }else{
+            } else {
                 inplaceAdd(copyRouteSpecMap, copyRoutePartitionerMap, spec, sds);
             }
         }
 
         // removed StreamRouterSpec i.e. there is a deleted StreamPartition
-        for(StreamRouterSpec spec : removed){
-            if(!copyRouteSpecMap.containsKey(spec.getPartition())){
+        for (StreamRouterSpec spec : removed) {
+            if (!copyRouteSpecMap.containsKey(spec.getPartition())) {
                 LOG.error("Metadata calculation error: remove non-existing StreamRouterSpec " + spec);
-            }else{
+            } else {
                 inplaceRemove(copyRouteSpecMap, copyRoutePartitionerMap, spec);
             }
         }
 
         // modified StreamRouterSpec, i.e. there is modified StreamPartition, for example WorkSlotQueue assignment is changed
-        for(StreamRouterSpec spec : modified){
-            if(!copyRouteSpecMap.containsKey(spec.getPartition())){
+        for (StreamRouterSpec spec : modified) {
+            if (!copyRouteSpecMap.containsKey(spec.getPartition())) {
                 LOG.error("Metadata calculation error: modify nonexisting StreamRouterSpec " + spec);
-            }else{
+            } else {
                 inplaceRemove(copyRouteSpecMap, copyRoutePartitionerMap, spec);
                 inplaceAdd(copyRouteSpecMap, copyRoutePartitionerMap, spec, sds);
             }
@@ -179,34 +171,34 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
         routePartitionerMap = copyRoutePartitionerMap;
     }
 
-    private void inplaceRemove(Map<StreamPartition,StreamRouterSpec> routeSpecMap,
+    private void inplaceRemove(Map<StreamPartition, StreamRouterSpec> routeSpecMap,
                                Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap,
-                               StreamRouterSpec toBeRemoved){
+                               StreamRouterSpec toBeRemoved) {
         routeSpecMap.remove(toBeRemoved.getPartition());
         routePartitionerMap.remove(toBeRemoved.getPartition());
     }
 
-    private void inplaceAdd(Map<StreamPartition,StreamRouterSpec> routeSpecMap,
+    private void inplaceAdd(Map<StreamPartition, StreamRouterSpec> routeSpecMap,
                             Map<StreamPartition, List<StreamRoutePartitioner>> routePartitionerMap,
-                            StreamRouterSpec toBeAdded, Map<String, StreamDefinition> sds){
+                            StreamRouterSpec toBeAdded, Map<String, StreamDefinition> sds) {
         routeSpecMap.put(toBeAdded.getPartition(), toBeAdded);
         try {
             List<StreamRoutePartitioner> routePartitioners = calculatePartitioner(toBeAdded, sds);
             routePartitionerMap.put(toBeAdded.getPartition(), routePartitioners);
-        }catch(Exception e){
-            LOG.error("ignore this failure StreamRouterSpec " + toBeAdded + ", with error" + e.getMessage(),e);
+        } catch (Exception e) {
+            LOG.error("ignore this failure StreamRouterSpec " + toBeAdded + ", with error" + e.getMessage(), e);
             routeSpecMap.remove(toBeAdded.getPartition());
             routePartitionerMap.remove(toBeAdded.getPartition());
         }
     }
 
-    private List<StreamRoutePartitioner> calculatePartitioner(StreamRouterSpec streamRouterSpec, Map<String, StreamDefinition> sds) throws Exception{
+    private List<StreamRoutePartitioner> calculatePartitioner(StreamRouterSpec streamRouterSpec, Map<String, StreamDefinition> sds) throws Exception {
         List<StreamRoutePartitioner> routePartitioners = new ArrayList<>();
         for (PolicyWorkerQueue pwq : streamRouterSpec.getTargetQueue()) {
             routePartitioners.add(StreamRoutePartitionFactory.createRoutePartitioner(
-                    Lists.transform(pwq.getWorkers(), WorkSlot::getBoltId),
-                    sds.get(streamRouterSpec.getPartition().getStreamId()),
-                    streamRouterSpec.getPartition()));
+                Lists.transform(pwq.getWorkers(), WorkSlot::getBoltId),
+                sds.get(streamRouterSpec.getPartition().getStreamId()),
+                streamRouterSpec.getPartition()));
         }
         return routePartitioners;
     }
@@ -217,8 +209,8 @@ public class StreamRouterBoltOutputCollector implements PartitionedEventCollecto
             this.streamContext.counter().scope("drop_count").incr();
             if (event.getAnchor() != null) {
                 this.outputCollector.ack(event.getAnchor());
-            }else{
-                throw new IllegalStateException(event.toString()+" was not acked as anchor is null");
+            } else {
+                throw new IllegalStateException(event.toString() + " was not acked as anchor is null");
             }
         }
     }

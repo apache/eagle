@@ -46,6 +46,9 @@ public class SecurityDataEnrichServiceClientImpl implements ISecurityDataEnrichS
     private static final String METADATA_LIST_HDFS_SENSITIVITY_PATH = "/metadata/security/hdfsSensitivity";
     private static final String METADATA_ADD_HDFS_SENSITIVITY_PATH = "/metadata/security/hdfsSensitivity";
 
+    private static final String METADATA_LIST_OOZIE_SENSITIVITY_PATH = "/metadata/security/oozieSensitivity";
+    private static final String METADATA_ADD_OOZIE_SENSITIVITY_PATH = "/metadata/security/oozieSensitivity";
+
     private static final String METADATA_LIST_HIVE_SENSITIVITY_PATH = "/metadata/security/hiveSensitivity";
     private static final String METADATA_ADD_HIVE_SENSITIVITY_PATH = "/metadata/security/hiveSensitivity";
 
@@ -128,6 +131,20 @@ public class SecurityDataEnrichServiceClientImpl implements ISecurityDataEnrichS
     @Override
     public OpResult addHdfsSensitivity(Collection<HdfsSensitivityEntity> h) {
         WebResource r = client.resource(basePath + METADATA_ADD_HDFS_SENSITIVITY_PATH);
+        r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(h);
+        return new OpResult();
+    }
+
+
+    @Override
+    public Collection<OozieSensitivityEntity> listOozieSensitivities() {
+        return list(METADATA_LIST_OOZIE_SENSITIVITY_PATH, new GenericType<List<OozieSensitivityEntity>>() {
+        });
+    }
+
+    @Override
+    public OpResult addOozieSensitivity(Collection<OozieSensitivityEntity> h) {
+        WebResource r = client.resource(basePath + METADATA_ADD_OOZIE_SENSITIVITY_PATH);
         r.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON).post(h);
         return new OpResult();
     }

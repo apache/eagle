@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.mr.history.metrics;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.parser.EagleJobStatus;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
@@ -26,6 +25,7 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,21 +34,15 @@ import java.util.*;
 public class JobCountMetricsGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(JobCountMetricsGenerator.class);
 
-    private MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig;
-    private MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig;
     private TimeZone timeZone;
 
-    public JobCountMetricsGenerator(MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig,
-                                    MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig,
-                                    TimeZone timeZone) {
-        this.eagleServiceConfig = eagleServiceConfig;
-        this.jobExtractorConfig = jobExtractorConfig;
+    public JobCountMetricsGenerator(TimeZone timeZone) {
         this.timeZone = timeZone;
     }
 
     public void flush(String date, int year, int month, int day) throws Exception {
         List<Pair<String, String>> jobs = JobHistoryZKStateManager.instance().getProcessedJobs(date);
-        int total = jobs.size();
+        final int total = jobs.size();
         int fail = 0;
         for (Pair<String, String> job : jobs) {
             if (!job.getRight().equals(EagleJobStatus.SUCCEEDED.toString())) {
@@ -56,11 +50,11 @@ public class JobCountMetricsGenerator {
             }
         }
 
-        IEagleServiceClient client = new EagleServiceClientImpl(
-            eagleServiceConfig.eagleServiceHost,
-            eagleServiceConfig.eagleServicePort,
-            eagleServiceConfig.username,
-            eagleServiceConfig.password);
+        final IEagleServiceClient client = new EagleServiceClientImpl(
+            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
+            MRHistoryJobConfig.get().getEagleServiceConfig().eagleServicePort,
+            MRHistoryJobConfig.get().getEagleServiceConfig().username,
+            MRHistoryJobConfig.get().getEagleServiceConfig().password);
 
 
         GregorianCalendar cal = new GregorianCalendar(year, month, day);
@@ -68,11 +62,11 @@ public class JobCountMetricsGenerator {
         GenericMetricEntity metricEntity = new GenericMetricEntity();
         metricEntity.setTimestamp(cal.getTimeInMillis());
         metricEntity.setPrefix(Constants.JOB_COUNT_PER_DAY);
-        metricEntity.setValue(new double[]{total, fail});
+        metricEntity.setValue(new double[] {total, fail});
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", jobExtractorConfig.site);
+                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
             }
         };
         metricEntity.setTags(baseTags);

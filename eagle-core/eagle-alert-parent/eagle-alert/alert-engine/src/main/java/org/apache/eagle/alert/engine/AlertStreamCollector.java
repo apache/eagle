@@ -20,8 +20,9 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
  */
 public interface AlertStreamCollector extends Collector<AlertStreamEvent> {
     /**
-     * No need to be thread-safe, but should be called on in synchronous like in Storm bolt execute method
+     * No need to be thread-safe, but should be called on in synchronous like in Storm bolt execute method.
      */
     void flush();
+
     void close();
 }

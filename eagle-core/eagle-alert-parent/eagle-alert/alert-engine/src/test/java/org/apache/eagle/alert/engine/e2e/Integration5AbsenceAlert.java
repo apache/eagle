@@ -49,8 +49,9 @@ public class Integration5AbsenceAlert {
             kafka.shutdown();
         }
     }
+
     @Test
-    public void testTriggerAbsenceAlert() throws Exception{
+    public void testTriggerAbsenceAlert() throws Exception {
         System.setProperty("config.resource", "/absence/application-absence.conf");
         ConfigFactory.invalidateCaches();
         Config config = ConfigFactory.load();
@@ -69,9 +70,10 @@ public class Integration5AbsenceAlert {
         });
 
         // wait 20 seconds for topology to bring up
-        try{
+        try {
             Thread.sleep(20000);
-        }catch(Exception ex){}
+        } catch (Exception ex) {
+        }
 
         // send mock data
         executors.submit(() -> {

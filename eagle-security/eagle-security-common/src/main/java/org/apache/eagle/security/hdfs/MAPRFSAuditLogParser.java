@@ -31,37 +31,41 @@ public final class MAPRFSAuditLogParser {
     public MAPRFSAuditLogParser(){
     }
 
-    public MAPRFSAuditLogObject parse(String log) throws JSONException, ParseException {
+    public MAPRFSAuditLogObject parse(String log) throws JSONException {
         JSONObject jsonObject = new JSONObject(log);
-        String timestamp = jsonObject.getJSONObject("timestamp").getString("$date");
-        String cmd = jsonObject.getString("operation");
-        String user = jsonObject.getString("uid");
-        String ip = jsonObject.getString("ipAddress");
-        String status = jsonObject.getString("status");
-        String volumeID = jsonObject.getString("volumeId");
-        String src;
-        String dst;
-        if(jsonObject.has("srcFid")){
-            src = jsonObject.getString("srcFid");
-        }else{
-            src = "null";
-        }
-
-        if(jsonObject.has("dstFid")){
-            dst = jsonObject.getString("dstFid");
-        }else{
-            dst = "null";
-        }
-
         MAPRFSAuditLogObject entity = new MAPRFSAuditLogObject();
-        entity.user = user;
-        entity.cmd = cmd;
-        entity.src = src;
-        entity.dst = dst;
-        entity.host = ip;
-        entity.status = status;
-        entity.volume = volumeID;
-        entity.timestamp = DateTimeUtil.maprhumanDateToMilliseconds(timestamp);
-        return entity;
+        try{
+            String timestamp = jsonObject.getJSONObject("timestamp").getString("$date");
+            String cmd = jsonObject.getString("operation");
+            String user = jsonObject.getString("uid");
+            String ip = jsonObject.getString("ipAddress");
+            String status = jsonObject.getString("status");
+            String volumeID = jsonObject.getString("volumeId");
+            String src;
+            String dst;
+            if(jsonObject.has("srcFid")){
+                src = jsonObject.getString("srcFid");
+            }else{
+                src = "null";
+            }
+
+            if(jsonObject.has("dstFid")){
+                dst = jsonObject.getString("dstFid");
+            }else{
+                dst = "null";
+            }
+            entity.user = user;
+            entity.cmd = cmd;
+            entity.src = src;
+            entity.dst = dst;
+            entity.host = ip;
+            entity.status = status;
+            entity.volume = volumeID;
+            entity.timestamp = DateTimeUtil.maprhumanDateToMilliseconds(timestamp);
+        } catch (Exception e){
+            LOG.error("Failed to parse mapr audit log message", e);
+        } finally {
+            return entity;
+        }
     }
 }

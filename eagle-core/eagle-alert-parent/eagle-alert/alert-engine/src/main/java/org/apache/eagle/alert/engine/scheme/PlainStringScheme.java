@@ -19,21 +19,20 @@
 
 package org.apache.eagle.alert.engine.scheme;
 
+import backtype.storm.spout.Scheme;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import backtype.storm.spout.Scheme;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
-
 /**
- * used for parsing plain string
+ * used for parsing plain string.
  */
 public class PlainStringScheme implements Scheme {
     private static final long serialVersionUID = 5969724968671646310L;
@@ -42,7 +41,7 @@ public class PlainStringScheme implements Scheme {
     private String topic;
 
     @SuppressWarnings("rawtypes")
-    public PlainStringScheme(String topic, Map conf){
+    public PlainStringScheme(String topic, Map conf) {
         this.topic = topic;
     }
 
@@ -57,7 +56,7 @@ public class PlainStringScheme implements Scheme {
         return new Fields(STRING_SCHEME_KEY);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public List<Object> deserialize(byte[] ser) {
         Map m = new HashMap<>();

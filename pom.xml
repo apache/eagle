@@ -22,7 +22,7 @@
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>14</version>
-    </parent>
+    </parent> 
     <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-parent</artifactId>
     <version>0.5.0-incubating-SNAPSHOT</version>
@@ -251,7 +251,6 @@
 
         <!-- Query -->
         <tomcat.version>7.0.42</tomcat.version>
-        <protobuf-java.version>2.6.1</protobuf-java.version>
         <antlr4.version>4.5</antlr4.version>
         <groovy.version>2.3.4</groovy.version>
         <parsii.version>1.3</parsii.version>
@@ -262,7 +261,7 @@
         <mysql-connector-java.version>5.1.34</mysql-connector-java.version>
         <ddlutils.version>1.0</ddlutils.version>
         <torque.version>4.0</torque.version>
-        <!--<derby.version>10.1.3.1</derby.version>-->
+        <derby.version>10.1.3.1</derby.version>
         <derby.version>10.10.2.0</derby.version>
 
         <!-- REST Service-->
@@ -504,14 +503,14 @@
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>${codehaus-jackson.version}</version>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <version>${fasterxml-jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>${codehaus-jackson.version}</version>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-base</artifactId>
+                <version>${fasterxml-jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.protobuf</groupId>
@@ -523,16 +522,16 @@
                 <artifactId>json</artifactId>
                 <version>${org.json.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-jaxrs</artifactId>
-                <version>${codehaus-jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-xc</artifactId>
-                <version>${codehaus-jackson.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.codehaus.jackson</groupId>-->
+                <!--<artifactId>jackson-jaxrs</artifactId>-->
+                <!--<version>${codehaus-jackson.version}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.codehaus.jackson</groupId>-->
+                <!--<artifactId>jackson-xc</artifactId>-->
+                <!--<version>${codehaus-jackson.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
@@ -1238,6 +1237,13 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
             </plugin>
         </plugins>
     </build>

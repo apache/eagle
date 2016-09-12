@@ -18,6 +18,9 @@
 
 package org.apache.eagle.hadoop.queue;
 
+import org.apache.eagle.common.config.ConfigOptionParser;
+import org.apache.eagle.hadoop.queue.storm.HadoopQueueMetricPersistBolt;
+import org.apache.eagle.hadoop.queue.storm.HadoopQueueRunningSpout;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
@@ -26,22 +29,19 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
-import org.apache.eagle.common.config.ConfigOptionParser;
-import org.apache.eagle.hadoop.queue.storm.HadoopQueueMetricPersistBolt;
-import org.apache.eagle.hadoop.queue.storm.HadoopQueueRunningSpout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HadoopQueueRunningMain {
 
-    public final static String PARSER_TASK_NUM = "topology.numOfParserTasks";
-    public final static String TOTAL_WORKER_NUM = "topology.numOfTotalWorkers";
-    public final static String TOPOLOGY_NAME = "topology.name";
-    public final static String LOCAL_MODE = "topology.localMode";
+    public static final String PARSER_TASK_NUM = "topology.numOfParserTasks";
+    public static final String TOTAL_WORKER_NUM = "topology.numOfTotalWorkers";
+    public static final String TOPOLOGY_NAME = "topology.name";
+    public static final String LOCAL_MODE = "topology.localMode";
 
     private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueRunningMain.class);
 
-    public static void main(String [] args) {
+    public static void main(String[] args) {
         //System.setProperty("config.resource", "/application.conf");
         //Config config = ConfigFactory.load();
         Config config = null;

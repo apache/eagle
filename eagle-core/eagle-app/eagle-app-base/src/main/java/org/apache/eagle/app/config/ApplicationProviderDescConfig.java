@@ -18,17 +18,16 @@ package org.apache.eagle.app.config;
 
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
 import org.apache.eagle.metadata.model.ApplicationDocs;
 import org.apache.eagle.metadata.model.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
-import java.io.InputStream;
-import java.util.List;
 
 @XmlRootElement(name = "application")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -42,7 +41,7 @@ public class ApplicationProviderDescConfig {
     private Configuration configuration;
     private ApplicationDocs docs;
 
-    @XmlElementWrapper(name="streams")
+    @XmlElementWrapper(name = "streams")
     @XmlElement(name = "stream")
     private List<StreamDefinition> streams;
 
@@ -93,7 +92,7 @@ public class ApplicationProviderDescConfig {
     @Override
     public String toString() {
         return String.format("ApplicationDesc [type=%s, name=%s, version=%s, appClass=%s, viewPath=%s, configuration= %s properties, description=%s",
-                getType(),getName(),getVersion(),getAppClass(), getViewPath(), getConfiguration() == null ? 0: getConfiguration().size(),getDescription());
+            getType(), getName(), getVersion(), getAppClass(), getViewPath(), getConfiguration() == null ? 0 : getConfiguration().size(), getDescription());
     }
 
     public void setConfiguration(Configuration configuration) {
@@ -109,25 +108,25 @@ public class ApplicationProviderDescConfig {
         this.streams = streams;
     }
 
-    private final static Logger LOG = LoggerFactory.getLogger(ApplicationProviderDescConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationProviderDescConfig.class);
 
-    public static ApplicationProviderDescConfig loadFromXML(Class<?> classLoader, String configXmlFile){
+    public static ApplicationProviderDescConfig loadFromXML(Class<?> classLoader, String configXmlFile) {
         try {
             JAXBContext jc = JAXBContext.newInstance(ApplicationProviderDescConfig.class);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
-//            InputStream is = ApplicationProviderDescConfig.class.getResourceAsStream(configXmlFile);
+            // InputStream is = ApplicationProviderDescConfig.class.getResourceAsStream(configXmlFile);
             InputStream is = classLoader.getResourceAsStream(configXmlFile);
-            if(is == null){
-                is = ApplicationProviderDescConfig.class.getResourceAsStream("/"+configXmlFile);
+            if (is == null) {
+                is = ApplicationProviderDescConfig.class.getResourceAsStream("/" + configXmlFile);
             }
-            if(is == null){
-                LOG.error("Application descriptor configuration {} is not found",configXmlFile);
-                throw new IllegalStateException("Application descriptor configuration "+configXmlFile+" is not found");
+            if (is == null) {
+                LOG.error("Application descriptor configuration {} is not found", configXmlFile);
+                throw new IllegalStateException("Application descriptor configuration " + configXmlFile + " is not found");
             }
             return (ApplicationProviderDescConfig) unmarshaller.unmarshal(is);
-        }catch (Exception ex){
-            LOG.error("Failed to load application descriptor configuration: {}",configXmlFile,ex);
-            throw new RuntimeException("Failed to load application descriptor configuration: "+configXmlFile,ex);
+        } catch (Exception ex) {
+            LOG.error("Failed to load application descriptor configuration: {}", configXmlFile, ex);
+            throw new RuntimeException("Failed to load application descriptor configuration: " + configXmlFile, ex);
         }
     }
 

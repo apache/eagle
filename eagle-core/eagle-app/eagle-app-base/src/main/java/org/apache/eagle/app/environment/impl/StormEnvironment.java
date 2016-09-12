@@ -16,12 +16,12 @@
  */
 package org.apache.eagle.app.environment.impl;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.environment.AbstractEnvironment;
 import org.apache.eagle.app.sink.StormStreamSink;
+import com.typesafe.config.Config;
 
 /**
- * Storm Execution Environment Context
+ * Storm Execution Environment Context.
  */
 public class StormEnvironment extends AbstractEnvironment {
     public StormEnvironment(Config envConfig) {

@@ -16,22 +16,22 @@
  */
 package org.apache.eagle.app.module;
 
-import com.google.inject.Guice;
-import com.google.inject.Module;
-import com.google.inject.Stage;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.common.module.ModuleRegistryImpl;
+import com.google.inject.Guice;
+import com.google.inject.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ApplicationExtensionLoader {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ApplicationExtensionLoader.class);
-    public static ModuleRegistry load(Module ... context){
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationExtensionLoader.class);
+
+    public static ModuleRegistry load(Module... context) {
         LOGGER.warn("Loading application extension modules");
         ModuleRegistry registry = new ModuleRegistryImpl();
-        Guice.createInjector(context).getInstance(ApplicationProviderService.class).getProviders().forEach((provider)->{
-            LOGGER.warn("Registering modules from {}",provider);
+        Guice.createInjector(context).getInstance(ApplicationProviderService.class).getProviders().forEach((provider) -> {
+            LOGGER.warn("Registering modules from {}", provider);
             provider.register(registry);
         });
         return registry;

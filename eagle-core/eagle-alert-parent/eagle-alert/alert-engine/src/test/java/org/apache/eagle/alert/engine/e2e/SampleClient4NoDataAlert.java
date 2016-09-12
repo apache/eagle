@@ -16,30 +16,29 @@
  */
 package org.apache.eagle.alert.engine.e2e;
 
-import java.util.Properties;
-
+import backtype.storm.utils.Utils;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.utils.Utils;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.Properties;
 
 /**
  * Since 6/29/16.
  */
-@SuppressWarnings({ "rawtypes", "unchecked"})
+@SuppressWarnings( {"rawtypes", "unchecked"})
 public class SampleClient4NoDataAlert {
     private static final Logger LOG = LoggerFactory.getLogger(SampleClient4NoDataAlert.class);
     private static long currentTimestamp = 1467240000000L;
     private static long interval = 3000L;
     private static volatile boolean host1Muted = false;
     private static volatile boolean host2Muted = false;
+
     public static void main(String[] args) throws Exception {
         System.setProperty("config.resource", "/nodata/application-nodata.conf");
         ConfigFactory.invalidateCaches();
@@ -49,12 +48,12 @@ public class SampleClient4NoDataAlert {
         ProducerRecord record = null;
         Thread x = new MuteThread();
         x.start();
-        while(true) {
-            if(!host1Muted) {
+        while (true) {
+            if (!host1Muted) {
                 record = new ProducerRecord("noDataAlertTopic", createEvent("host1"));
                 producer.send(record);
             }
-            if(!host2Muted) {
+            if (!host2Muted) {
                 record = new ProducerRecord("noDataAlertTopic", createEvent("host2"));
                 producer.send(record);
             }
@@ -65,9 +64,9 @@ public class SampleClient4NoDataAlert {
         }
     }
 
-    private static class MuteThread extends Thread{
+    private static class MuteThread extends Thread {
         @Override
-        public void run(){
+        public void run() {
             try {
                 // sleep 10 seconds
                 Thread.sleep(10000);
@@ -89,13 +88,13 @@ public class SampleClient4NoDataAlert {
                 Thread.sleep(70000);
                 LOG.info("unmute host2");
                 host2Muted = false;
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
     }
 
-    private static class NoDataEvent{
+    private static class NoDataEvent {
         @JsonProperty
         long timestamp;
         @JsonProperty
@@ -103,20 +102,20 @@ public class SampleClient4NoDataAlert {
         @JsonProperty
         double value;
 
-        public String toString(){
+        public String toString() {
             return "timestamp=" + timestamp + ",host=" + host + ",value=" + value;
         }
     }
 
-    private static String createEvent(String host) throws Exception{
+    private static String createEvent(String host) throws Exception {
         NoDataEvent e = new NoDataEvent();
         long expectTS = currentTimestamp + interval;
         // adjust back 1 second random
-        long adjust = Math.round(2*Math.random());
-        e.timestamp = expectTS-adjust;
+        long adjust = Math.round(2 * Math.random());
+        e.timestamp = expectTS - adjust;
         e.host = host;
         e.value = 25.6;
-        LOG.info("sending event {} ",  e);
+        LOG.info("sending event {} ", e);
         ObjectMapper mapper = new ObjectMapper();
         String value = mapper.writeValueAsString(e);
         return value;

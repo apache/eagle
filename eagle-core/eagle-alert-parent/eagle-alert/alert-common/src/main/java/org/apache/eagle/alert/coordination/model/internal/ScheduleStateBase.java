@@ -17,12 +17,9 @@
 package org.apache.eagle.alert.coordination.model.internal;
 
 /**
- *
- * This is the Base part of ScheduleState, only contains version/generateTime/code/message/scheduleTimeMillis
- *
+ * This is the Base part of ScheduleState, only contains version/generateTime/code/message/scheduleTimeMillis.
  *
  * @since Aug 10, 2016
- *
  */
 public class ScheduleStateBase {
     private String version;
@@ -79,8 +76,6 @@ public class ScheduleStateBase {
     public void setMessage(String message) {
         this.message = message;
     }
-
-
 
 
 }

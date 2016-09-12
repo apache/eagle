@@ -16,6 +16,10 @@
  */
 package org.apache.eagle.alert.coordinator;
 
+import org.apache.eagle.alert.config.ZKConfig;
+import org.apache.eagle.alert.config.ZKConfigBuilder;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -25,94 +29,88 @@ import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
-import org.apache.eagle.alert.config.ZKConfig;
-import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
 public class ExclusiveExecutor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ExclusiveExecutor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExclusiveExecutor.class);
 
-	// private static final String PATH = "/alert/listener/leader";
-	private static final String COORDINATOR = "coordinator";
-	private static final int ZK_RETRYPOLICY_SLEEP_TIME_MS = 1000;
-	private static final int ZK_RETRYPOLICY_MAX_RETRIES = 3;
+    // private static final String PATH = "/alert/listener/leader";
+    private static final String COORDINATOR = "coordinator";
+    private static final int ZK_RETRYPOLICY_SLEEP_TIME_MS = 1000;
+    private static final int ZK_RETRYPOLICY_MAX_RETRIES = 3;
 
-	private static final CuratorFramework client;
+    private static final CuratorFramework client;
 
-	static {
-		Config config = ConfigFactory.load().getConfig(COORDINATOR);
-		RetryPolicy retryPolicy = new ExponentialBackoffRetry(ZK_RETRYPOLICY_SLEEP_TIME_MS, ZK_RETRYPOLICY_MAX_RETRIES);
-		ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
-		client = CuratorFrameworkFactory.newClient(zkConfig.zkQuorum, retryPolicy);
-		client.start();
-	}
+    static {
+        Config config = ConfigFactory.load().getConfig(COORDINATOR);
+        RetryPolicy retryPolicy = new ExponentialBackoffRetry(ZK_RETRYPOLICY_SLEEP_TIME_MS, ZK_RETRYPOLICY_MAX_RETRIES);
+        ZKConfig zkConfig = ZKConfigBuilder.getZKConfig(config);
+        client = CuratorFrameworkFactory.newClient(zkConfig.zkQuorum, retryPolicy);
+        client.start();
+    }
 
-	public static abstract class Runnable {
+    public abstract static class Runnable {
+        boolean completed = false;
+        LeaderSelector selector;
 
-		boolean completed = false;
-		LeaderSelector selector;
+        public abstract void run() throws Exception;
 
-		public abstract void run() throws Exception;
+        public void registerResources(LeaderSelector selector) {
+            this.selector = selector;
+        }
 
-		public void registerResources(LeaderSelector selector) {
-			this.selector = selector;
-		}
+        public void runElegantly() throws Exception {
+            this.run();
 
-		public void runElegantly() throws Exception {
-			this.run();
+            LOG.info("Close selector resources {}", this.selector);
+            CloseableUtils.closeQuietly(this.selector);
 
-			LOG.info("Close selector resources {}", this.selector);
-			CloseableUtils.closeQuietly(this.selector);
+            completed = true;
+        }
 
-			completed = true;
-		}
+        public boolean isCompleted() {
+            return completed;
+        }
 
-		public boolean isCompleted() {
-			return completed;
-		}
+    }
 
-	}
+    public static void execute(String path, final Runnable runnable) {
+        LeaderSelectorListener listener = new LeaderSelectorListenerAdapter() {
 
-	public static void execute(String path, final Runnable runnable) {
-		LeaderSelectorListener listener = new LeaderSelectorListenerAdapter() {
+            @Override
+            public void takeLeadership(CuratorFramework client) throws Exception {
+                // this callback will get called when you are the leader
+                // do whatever leader work you need to and only exit
+                // this method when you want to relinquish leadership
+                LOG.info("this is leader node right now..");
+                runnable.runElegantly();
+            }
 
-			@Override
-			public void takeLeadership(CuratorFramework client) throws Exception {
-				// this callback will get called when you are the leader
-				// do whatever leader work you need to and only exit
-				// this method when you want to relinquish leadership
-				LOG.info("this is leader node right now..");
-				runnable.runElegantly();
-			}
+            @Override
+            public void stateChanged(CuratorFramework client, ConnectionState newState) {
+                LOG.info(String.format("leader selector state change listener, new state: %s", newState.toString()));
+            }
 
-			@Override
-			public void stateChanged(CuratorFramework client, ConnectionState newState) {
-				LOG.info(String.format("leader selector state change listener, new state: %s", newState.toString()));
-			}
+        };
 
-		};
+        LeaderSelector selector = new LeaderSelector(client, path, listener);
+        selector.autoRequeue(); // not required, but this is behavior that you
+        // will probably expect
+        selector.start();
 
-		LeaderSelector selector = new LeaderSelector(client, path, listener);
-		selector.autoRequeue(); // not required, but this is behavior that you
-								// will probably expect
-		selector.start();
+        runnable.registerResources(selector);
 
-		runnable.registerResources(selector);
+        Runtime.getRuntime().addShutdownHook(new Thread(new java.lang.Runnable() {
 
-		Runtime.getRuntime().addShutdownHook(new Thread(new java.lang.Runnable() {
+            @Override
+            public void run() {
+                LOG.info("Close zk client resources {}", ExclusiveExecutor.client);
+                CloseableUtils.closeQuietly(ExclusiveExecutor.client);
+            }
 
-			@Override
-			public void run() {
-				LOG.info("Close zk client resources {}", ExclusiveExecutor.client);
-				CloseableUtils.closeQuietly(ExclusiveExecutor.client);
-			}
-
-		}));
-	}
+        }));
+    }
 
 }

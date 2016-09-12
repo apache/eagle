@@ -20,19 +20,15 @@
  */
 package org.apache.eagle.alert.engine.publisher.email;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class AlertEmailGenerator {
     private String tplFile;
@@ -43,9 +39,9 @@ public class AlertEmailGenerator {
 
     private ThreadPoolExecutor executorPool;
 
-    private final static Logger LOG = LoggerFactory.getLogger(AlertEmailGenerator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlertEmailGenerator.class);
 
-    private final static long MAX_TIMEOUT_MS =60000;
+    private static final long MAX_TIMEOUT_MS = 60000;
 
     public boolean sendAlertEmail(AlertStreamEvent entity) {
         return sendAlertEmail(entity, recipients, null);
@@ -64,11 +60,13 @@ public class AlertEmailGenerator {
         email.setSender(sender);
         email.setRecipients(recipients);
         email.setCc(cc);
-        
-        /** asynchronized email sending */
+
+        /** asynchronized email sending. */
         AlertEmailSender thread = new AlertEmailSender(email, properties);
 
-        if(this.executorPool == null) throw new IllegalStateException("Invoking thread executor pool but it's is not set yet");
+        if (this.executorPool == null) {
+            throw new IllegalStateException("Invoking thread executor pool but it's is not set yet");
+        }
 
         LOG.info("Sending email  in asynchronous to: " + recipients + ", cc: " + cc);
         Future<?> future = this.executorPool.submit(thread);
@@ -79,10 +77,10 @@ public class AlertEmailGenerator {
             //LOG.info(String.format("Successfully send email to %s", recipients));
         } catch (InterruptedException | ExecutionException e) {
             status = false;
-            LOG.error(String.format("Failed to send email to %s, due to:%s", recipients, e),e);
+            LOG.error(String.format("Failed to send email to %s, due to:%s", recipients, e), e);
         } catch (TimeoutException e) {
             status = false;
-            LOG.error(String.format("Failed to send email to %s due to timeout exception, max timeout: %s ms ", recipients, MAX_TIMEOUT_MS),e);
+            LOG.error(String.format("Failed to send email to %s due to timeout exception, max timeout: %s ms ", recipients, MAX_TIMEOUT_MS), e);
         }
         return status;
     }

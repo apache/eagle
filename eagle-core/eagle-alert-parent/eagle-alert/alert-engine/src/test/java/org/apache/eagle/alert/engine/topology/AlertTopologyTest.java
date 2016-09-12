@@ -19,10 +19,13 @@
 
 package org.apache.eagle.alert.engine.topology;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Properties;
-
+import backtype.storm.LocalCluster;
+import backtype.storm.topology.BoltDeclarer;
+import backtype.storm.topology.SpoutDeclarer;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.spout.CorrelationSpout;
 import org.apache.eagle.alert.engine.spout.CreateTopicUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -34,19 +37,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.LocalCluster;
-import backtype.storm.topology.BoltDeclarer;
-import backtype.storm.topology.SpoutDeclarer;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Properties;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
-@SuppressWarnings({"serial", "unused"})
-public class AlertTopologyTest implements Serializable{
+@SuppressWarnings( {"serial", "unused"})
+public class AlertTopologyTest implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(AlertTopologyTest.class);
     char[] alphabets = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+
     @Ignore
     @Test
     public void testMultipleTopics() throws Exception {
@@ -83,7 +82,7 @@ public class AlertTopologyTest implements Serializable{
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology(topoName, new HashMap<>(), topoBuilder.createTopology());
 
-        while(true) {
+        while (true) {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
@@ -92,10 +91,10 @@ public class AlertTopologyTest implements Serializable{
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings( {"rawtypes", "unchecked"})
     @Ignore
     @Test
-    public void generateRandomStringsToKafka(){
+    public void generateRandomStringsToKafka() {
         String topic = "testTopic3";
         int max = 1000;
         Properties configMap = new Properties();
@@ -104,33 +103,34 @@ public class AlertTopologyTest implements Serializable{
         configMap.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         configMap.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         configMap.put("request.required.acks", "1");
-        configMap.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
-        configMap.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+        configMap.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        configMap.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KafkaProducer<String, Object> producer = new KafkaProducer<>(configMap);
 
         int i = 0;
-        while(i++ < max) {
+        while (i++ < max) {
             String randomString = generateRandomString();
             System.out.println("sending string : " + randomString);
             ProducerRecord record = new ProducerRecord(topic, randomString);
             producer.send(record);
-            if(i % 10 == 0){
+            if (i % 10 == 0) {
                 try {
                     Thread.sleep(10);
-                }catch(Exception ex){
+                } catch (Exception ex) {
                 }
             }
         }
         producer.close();
     }
 
-    private String generateRandomString(){
+    private String generateRandomString() {
         long count = Math.round(Math.random() * 10);
-        if(count == 0)
+        if (count == 0) {
             count = 1;
+        }
         StringBuilder sb = new StringBuilder();
-        while(count-- > 0) {
-            int index = (int)(Math.floor(Math.random()*26));
+        while (count-- > 0) {
+            int index = (int) (Math.floor(Math.random() * 26));
             sb.append(alphabets[index]);
         }
         return sb.toString();

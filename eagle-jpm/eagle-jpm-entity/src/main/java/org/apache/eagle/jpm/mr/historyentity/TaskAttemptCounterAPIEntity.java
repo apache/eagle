@@ -43,7 +43,7 @@ public class TaskAttemptCounterAPIEntity extends JobBaseAPIEntity {
 
     public void setKilledCount(int killedCount) {
         this.killedCount = killedCount;
-        _pcs.firePropertyChange("killedCount", null, null);
+        pcs.firePropertyChange("killedCount", null, null);
     }
 
     public int getFailedCount() {
@@ -52,7 +52,7 @@ public class TaskAttemptCounterAPIEntity extends JobBaseAPIEntity {
 
     public void setFailedCount(int failedCount) {
         this.failedCount = failedCount;
-        _pcs.firePropertyChange("failedCount", null, null);
+        pcs.firePropertyChange("failedCount", null, null);
     }
 
     public int getTotalCount() {
@@ -61,6 +61,6 @@ public class TaskAttemptCounterAPIEntity extends JobBaseAPIEntity {
 
     public void setTotalCount(int totalCount) {
         this.totalCount = totalCount;
-        _pcs.firePropertyChange("totalCount", null, null);
+        pcs.firePropertyChange("totalCount", null, null);
     }
 }

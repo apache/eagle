@@ -20,8 +20,8 @@ package org.apache.eagle.jpm.mr.history.metrics;
 
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
-import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.jpm.util.metrics.AbstractMetricsCreationListener;
+import org.apache.eagle.log.entity.GenericMetricEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class JobExecutionMetricsCreationListener extends AbstractMetricsCreation
                 for (Map<String, Long> metricGroup : jobCounters.getCounters().values()) {
                     for (Map.Entry<String, Long> entry : metricGroup.entrySet()) {
                         String metricName = entry.getKey().toLowerCase();
-                        metrics.add(metricWrapper(timeStamp, "history." + metricName, new double[]{entry.getValue()}, tags));
+                        metrics.add(metricWrapper(timeStamp, metricName, new double[]{entry.getValue()}, tags));
                     }
                 }
             }
@@ -67,7 +67,7 @@ public class JobExecutionMetricsCreationListener extends AbstractMetricsCreation
 
     @Override
     public String buildMetricName(String field) {
-        return String.format(Constants.hadoopMetricFormat, Constants.JOB_LEVEL, field);
+        return String.format(Constants.HADOOP_HISTORY_TOTAL_METRIC_FORMAT, Constants.JOB_LEVEL, field);
     }
 
 

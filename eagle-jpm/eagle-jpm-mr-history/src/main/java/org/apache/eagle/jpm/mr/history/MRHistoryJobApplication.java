@@ -67,7 +67,7 @@ public class MRHistoryJobApplication extends StormApplication {
         }
         topologyBuilder.setSpout(
             spoutName,
-            new JobHistorySpout(filter, appConfig),
+            new JobHistorySpout(filter, config),
             parallelism
         ).setNumTasks(tasks);
         return topologyBuilder.createTopology();

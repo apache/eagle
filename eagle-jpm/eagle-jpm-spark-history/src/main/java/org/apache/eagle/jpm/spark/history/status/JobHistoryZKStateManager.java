@@ -19,8 +19,8 @@
 
 package org.apache.eagle.jpm.spark.history.status;
 
-import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
 import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
+import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.transaction.CuratorTransactionBridge;
@@ -35,9 +35,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class JobHistoryZKStateManager {
-    private final static Logger LOG = LoggerFactory.getLogger(JobHistoryZKStateManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobHistoryZKStateManager.class);
 
-    private final static String START_TIMESTAMP = "lastAppTime";
+    private static final String START_TIMESTAMP = "lastAppTime";
     private String zkRoot;
     private CuratorFramework curator;
 
@@ -233,10 +233,11 @@ public class JobHistoryZKStateManager {
                     curator.setData().forPath(path, status.toString().getBytes("UTF-8"));
                 }
             } else {
-                LOG.error("Failed to update for application with path: " + path);
+                LOG.warn("failed to update with status {} due to path {} not existing ", status, path);
+                //throw new RuntimeException("Failed to update for application with path: " + path);
             }
         } catch (Exception e) {
-            LOG.error("fail to update application status", e);
+            LOG.error("fail to update application status as {}", status, e);
             throw new RuntimeException(e);
         } finally {
             try {

@@ -16,24 +16,24 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
-
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.Period;
 
 import java.io.Serializable;
 
 /**
- * streamId is the key
+ * streamId is the key.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StreamSortSpec implements Serializable{
+public class StreamSortSpec implements Serializable {
     private static final long serialVersionUID = 3626506441441584937L;
-    private String windowPeriod="";
+    private String windowPeriod = "";
     private int windowMargin = 30 * 1000; // 30 seconds by default
 
-    public StreamSortSpec() {}
+    public StreamSortSpec() {
+    }
 
     public StreamSortSpec(StreamSortSpec spec) {
         this.windowPeriod = spec.windowPeriod;
@@ -45,14 +45,17 @@ public class StreamSortSpec implements Serializable{
     }
 
     public int getWindowPeriodMillis() {
-        if(windowPeriod!=null) {
+        if (windowPeriod != null) {
             return TimePeriodUtils.getMillisecondsOfPeriod(Period.parse(windowPeriod));
-        } else return 0;
+        } else {
+            return 0;
+        }
     }
 
     public void setWindowPeriod(String windowPeriod) {
         this.windowPeriod = windowPeriod;
     }
+
     public void setWindowPeriodMillis(int windowPeriodMillis) {
         this.windowPeriod = Period.millis(windowPeriodMillis).toString();
     }
@@ -71,30 +74,32 @@ public class StreamSortSpec implements Serializable{
     }
 
     @Override
-    public int hashCode(){
-        return new HashCodeBuilder().
-                append(windowPeriod).
-                append(windowMargin).toHashCode();
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(windowPeriod)
+            .append(windowMargin)
+            .toHashCode();
     }
 
     @Override
-    public boolean equals(Object that){
-        if(this == that)
+    public boolean equals(Object that) {
+        if (this == that) {
             return true;
-        if(!(that instanceof StreamSortSpec)){
+        }
+        if (!(that instanceof StreamSortSpec)) {
             return false;
         }
 
-        StreamSortSpec another = (StreamSortSpec)that;
-        return 
-                another.windowPeriod.equals(this.windowPeriod) &&
-                another.windowMargin == this.windowMargin;
+        StreamSortSpec another = (StreamSortSpec) that;
+        return
+            another.windowPeriod.equals(this.windowPeriod)
+                && another.windowMargin == this.windowMargin;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return String.format("StreamSortSpec[windowPeriod=%s,windowMargin=%d]",
-                this.getWindowPeriod(),
-                this.getWindowMargin());
+            this.getWindowPeriod(),
+            this.getWindowMargin());
     }
 }

@@ -34,12 +34,35 @@ public class ApplicationEntity extends PersistenceEntity {
 
     private ApplicationDesc descriptor;
 
-    private Map<String,Object> configuration = new HashMap<>();
-    private Map<String,String> context = new HashMap<>();
+    private Map<String, Object> configuration = new HashMap<>();
+    private Map<String, String> context = new HashMap<>();
     private List<StreamDesc> streams;
     private Mode mode = Mode.CLUSTER;
     private String jarPath;
     private Status status = Status.INITIALIZED;
+
+    public ApplicationEntity() {
+    }
+
+    public ApplicationEntity(String siteId, String appType) {
+        SiteEntity siteEntity = new SiteEntity("", siteId);
+        this.site = siteEntity;
+        ApplicationDesc applicationDesc = new ApplicationDesc();
+        applicationDesc.setType(appType);
+        this.descriptor = applicationDesc;
+        this.mode = null;
+        this.status = null;
+    }
+
+    public ApplicationEntity(SiteEntity site, ApplicationDesc descriptor, Mode mode, Status status, String uuid, String appId) {
+        this.site = site;
+        this.descriptor = descriptor;
+        this.mode = mode;
+        this.status = status;
+        this.setUuid(uuid);
+        this.appId = appId;
+    }
+
 
     public SiteEntity getSite() {
         return site;
@@ -76,10 +99,10 @@ public class ApplicationEntity extends PersistenceEntity {
     @Override
     public void ensureDefault() {
         super.ensureDefault();
-        if(this.appId == null){
+        if (this.appId == null) {
             this.appId = String.format("%s-%s", this.getDescriptor().getType(), this.getSite().getSiteId());
         }
-        if(this.status == null){
+        if (this.status == null) {
             this.status = Status.INITIALIZED;
         }
     }
@@ -124,7 +147,7 @@ public class ApplicationEntity extends PersistenceEntity {
         this.streams = streams;
     }
 
-    public static enum Status{
+    public static enum Status {
         INITIALIZED("INITIALIZED"),
         STARTING("STARTING"),
         RUNNING("RUNNING"),
@@ -132,7 +155,8 @@ public class ApplicationEntity extends PersistenceEntity {
         STOPPED("STOPPED");
 
         private final String status;
-        Status(String status){
+
+        Status(String status) {
             this.status = status;
         }
 
@@ -142,12 +166,12 @@ public class ApplicationEntity extends PersistenceEntity {
         }
     }
 
-    public static enum Mode{
+    public static enum Mode {
         LOCAL("LOCAL"),
         CLUSTER("CLUSTER");
         private final String name;
 
-        Mode(String name){
+        Mode(String name) {
             this.name = name;
         }
 

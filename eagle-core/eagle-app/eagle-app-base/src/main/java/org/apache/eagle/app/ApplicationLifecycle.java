@@ -18,22 +18,26 @@ package org.apache.eagle.app;
 
 public interface ApplicationLifecycle {
     /**
-     * on application installed
+     * on application installed.
      */
-    default void onInstall(){}
+    default void onInstall() {
+    }
 
     /**
-     * on application uninstalled
+     * on application uninstalled.
      */
-    default void onUninstall(){}
+    default void onUninstall() {
+    }
 
     /**
-     *
+     * onStart.
      */
-    default void onStart(){}
+    default void onStart() {
+    }
 
     /**
-     *
+     * onStop.
      */
-    default void onStop(){}
+    default void onStop() {
+    }
 }

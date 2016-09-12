@@ -18,8 +18,8 @@
 
 package org.apache.eagle.alert.engine.e2e;
 
-import java.util.List;
-
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
@@ -30,12 +30,12 @@ import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.List;
 
 public class MetadataServiceClientImpTest {
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void test() {
         System.out.println("loading metadatas...");
         try {

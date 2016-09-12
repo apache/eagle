@@ -16,10 +16,6 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.eagle.alert.engine.codec.IEventSerializer;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -27,9 +23,12 @@ import org.apache.eagle.alert.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * @since Jul 9, 2016
- *
+ * @since Jul 9, 2016.
  */
 public class JsonEventSerializer implements IEventSerializer {
 
@@ -59,8 +58,8 @@ public class JsonEventSerializer implements IEventSerializer {
         List<StreamColumn> columns = event.getSchema().getColumns();
         for (int i = 0; i < size; i++) {
             if (columns.size() < i) {
-                // redudant check to log inconsistency
-                LOG.error(" strema event data have different lenght compare to column definition! ");
+                // redundant check to log inconsistency
+                LOG.error(" stream event data have different lenght compare to column definition! ");
             } else {
                 jsonMap.put(columns.get(i).getName(), event.getData()[i]);
             }

@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.log;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.eagle.log.entity.GenericServiceAPIResponseEntity;
 import org.junit.Assert;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;

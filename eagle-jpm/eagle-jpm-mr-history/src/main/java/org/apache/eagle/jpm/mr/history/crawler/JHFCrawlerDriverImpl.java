@@ -20,15 +20,12 @@ package org.apache.eagle.jpm.mr.history.crawler;
 
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.metrics.JobCountMetricsGenerator;
-import org.apache.eagle.jpm.mr.history.parser.EagleJobStatus;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
-import org.apache.eagle.jpm.mr.historyentity.JobCountEntity;
 import org.apache.eagle.jpm.util.JobIdFilter;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.service.client.IEagleServiceClient;
-import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,12 +62,10 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private TimeZone timeZone;
     private JobCountMetricsGenerator jobCountMetricsGenerator;
 
-    public JHFCrawlerDriverImpl(MRHistoryJobConfig.EagleServiceConfig eagleServiceConfig,
-                                MRHistoryJobConfig.JobExtractorConfig jobExtractorConfig,
-                                MRHistoryJobConfig.ControlConfig controlConfig, JHFInputStreamCallback reader,
+    public JHFCrawlerDriverImpl(JHFInputStreamCallback reader,
                                 JobHistoryLCM historyLCM, JobIdFilter jobFilter, int partitionId) throws Exception {
-        this.zeroBasedMonth = controlConfig.zeroBasedMonth;
-        this.dryRun = controlConfig.dryRun;
+        this.zeroBasedMonth = MRHistoryJobConfig.get().getControlConfig().zeroBasedMonth;
+        this.dryRun = MRHistoryJobConfig.get().getControlConfig().dryRun;
         if (this.dryRun)  {
             LOG.info("this is a dry run");
         }
@@ -78,8 +73,8 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
         jhfLCM = historyLCM;//new JobHistoryDAOImpl(jobHistoryConfig);
         this.partitionId = partitionId;
         this.jobFilter = jobFilter;
-        timeZone = TimeZone.getTimeZone(controlConfig.timeZone);
-        jobCountMetricsGenerator = new JobCountMetricsGenerator(eagleServiceConfig, jobExtractorConfig, timeZone);
+        timeZone = TimeZone.getTimeZone(MRHistoryJobConfig.get().getControlConfig().timeZone);
+        jobCountMetricsGenerator = new JobCountMetricsGenerator(timeZone);
     }
 
     /**

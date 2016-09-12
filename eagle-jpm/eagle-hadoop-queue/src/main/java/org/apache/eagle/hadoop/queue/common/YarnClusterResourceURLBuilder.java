@@ -20,10 +20,10 @@ package org.apache.eagle.hadoop.queue.common;
 
 public class YarnClusterResourceURLBuilder {
 
-    private final static String CLUSTER_SCHEDULER_API_URL = "ws/v1/cluster/scheduler";
-    private final static String CLUSTER_METRICS_API_URL = "ws/v1/cluster/metrics";
-    private final static String CLUSTER_APPS_API_URL = "ws/v1/cluster/apps";
-    private final static String ANONYMOUS_PARAMETER = "anonymous=true";
+    private static final String CLUSTER_SCHEDULER_API_URL = "ws/v1/cluster/scheduler";
+    private static final String CLUSTER_METRICS_API_URL = "ws/v1/cluster/metrics";
+    private static final String CLUSTER_APPS_API_URL = "ws/v1/cluster/apps";
+    private static final String ANONYMOUS_PARAMETER = "anonymous=true";
 
     public static String buildSchedulerInfoURL(String urlBase) {
         return urlBase + CLUSTER_SCHEDULER_API_URL + "?" + ANONYMOUS_PARAMETER;

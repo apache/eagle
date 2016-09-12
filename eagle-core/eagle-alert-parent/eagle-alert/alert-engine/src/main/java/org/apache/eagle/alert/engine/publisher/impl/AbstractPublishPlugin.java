@@ -16,19 +16,19 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.codec.IEventSerializer;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
 import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * @since Jun 3, 2016
- *
+ * @since Jun 3, 2016.
  */
 public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
 
@@ -40,16 +40,19 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
     @SuppressWarnings("rawtypes")
     @Override
     public void init(Config config, Publishment publishment, Map conf) throws Exception {
-        this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(), publishment.getDedupFields());
+        this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(),
+            publishment.getDedupFields(), publishment.getDedupStateField(),
+            publishment.getDedupStateCloseValue(),
+            config);
         this.pubName = publishment.getName();
         String serializerClz = publishment.getSerializer();
         try {
             Object obj = Class.forName(serializerClz).getConstructor(Map.class).newInstance(conf);
             if (!(obj instanceof IEventSerializer)) {
                 throw new Exception(String.format("serializer %s of publishment %s is not subclass to %s!",
-                        publishment.getSerializer(),
-                        publishment.getName(),
-                        IEventSerializer.class.getName()));
+                    publishment.getSerializer(),
+                    publishment.getName(),
+                    IEventSerializer.class.getName()));
             }
             serializer = (IEventSerializer) obj;
         } catch (Exception e) {
@@ -64,7 +67,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
     }
 
     @Override
-    public AlertStreamEvent dedup(AlertStreamEvent event) {
+    public List<AlertStreamEvent> dedup(AlertStreamEvent event) {
         return deduplicator.dedup(event);
     }
 

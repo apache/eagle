@@ -17,6 +17,8 @@
  */
 package org.apache.eagle.alert.engine.publisher;
 
+import java.util.List;
+
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 
 /**
@@ -25,8 +27,8 @@ import org.apache.eagle.alert.engine.model.AlertStreamEvent;
  */
 public interface AlertDeduplicator {
 
-	AlertStreamEvent dedup(AlertStreamEvent event);
+    List<AlertStreamEvent> dedup(AlertStreamEvent event);
 
-	void setDedupIntervalMin(String intervalMin);
+    void setDedupIntervalMin(String intervalMin);
 
 }

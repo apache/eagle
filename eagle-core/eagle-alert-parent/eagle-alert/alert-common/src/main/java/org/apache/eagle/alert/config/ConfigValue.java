@@ -23,7 +23,7 @@ package org.apache.eagle.alert.config;
  * Config body contains actual data for one topic
  * this is serialized with json format into zookeeper
  * value can be versionId which is used for referencing outside data
- * or value can be actual config value
+ * or value can be actual config value.
  */
 public class ConfigValue {
     private boolean isValueVersionId;
@@ -45,7 +45,7 @@ public class ConfigValue {
         this.value = value;
     }
 
-    public String toString(){
+    public String toString() {
         return "isValueVersionId: " + isValueVersionId + ", value: " + value;
     }
 }

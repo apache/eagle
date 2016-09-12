@@ -19,19 +19,17 @@ package org.apache.eagle.app.jpm;
 import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
-import org.apache.eagle.app.test.AppJUnitRunner;
+import org.apache.eagle.app.test.ApplicationTestBase;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@RunWith(AppJUnitRunner.class)
-public class JPMApplicationTest {
+public class JPMApplicationTest extends ApplicationTestBase{
     @Inject
     private SiteResource siteResource;
     @Inject

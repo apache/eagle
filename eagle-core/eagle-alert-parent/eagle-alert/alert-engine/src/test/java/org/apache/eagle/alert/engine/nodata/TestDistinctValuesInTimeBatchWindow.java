@@ -16,11 +16,6 @@
  */
 package org.apache.eagle.alert.engine.nodata;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-
 import org.apache.eagle.alert.engine.evaluator.nodata.DistinctValuesInTimeBatchWindow;
 import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyTimeBatchHandler;
 import org.apache.eagle.alert.engine.model.StreamEvent;
@@ -28,62 +23,65 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.*;
+
 public class TestDistinctValuesInTimeBatchWindow {
 
-	private static final String inputStream = "testInputStream";
+    private static final String inputStream = "testInputStream";
 
-	private NoDataPolicyTimeBatchHandler handler;
+    private NoDataPolicyTimeBatchHandler handler;
 
-	@Before
-	public void setup() {
-		handler = mock(NoDataPolicyTimeBatchHandler.class);
-	}
+    @Before
+    public void setup() {
+        handler = mock(NoDataPolicyTimeBatchHandler.class);
+    }
 
-	@After
-	public void teardown() {
-	}
+    @After
+    public void teardown() {
+    }
 
-	@Test
-	public void testNormal() throws Exception {
-		// wisb is null since it is dynamic mode
-		DistinctValuesInTimeBatchWindow window = new DistinctValuesInTimeBatchWindow(handler, 5 * 1000, null);
+    @Test
+    public void testNormal() throws Exception {
+        // wisb is null since it is dynamic mode
+        DistinctValuesInTimeBatchWindow window = new DistinctValuesInTimeBatchWindow(handler, 5 * 1000, null);
 
-		long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
 
-		// handler.compareAndEmit(anyObject(), anyObject(), anyObject());
+        // handler.compareAndEmit(anyObject(), anyObject(), anyObject());
 
-		// event time
-		sendEventToWindow(window, now, "host1", 95.5);
+        // event time
+        sendEventToWindow(window, now, "host1", 95.5);
 
-		Thread.sleep(6000);
+        Thread.sleep(6000);
 
-		sendEventToWindow(window, now, "host1", 91.0);
-		sendEventToWindow(window, now, "host2", 95.5);
-		sendEventToWindow(window, now, "host2", 97.1);
+        sendEventToWindow(window, now, "host1", 91.0);
+        sendEventToWindow(window, now, "host2", 95.5);
+        sendEventToWindow(window, now, "host2", 97.1);
 
-		Thread.sleep(3000);
+        Thread.sleep(3000);
 
-		sendEventToWindow(window, now, "host1", 90.7);
+        sendEventToWindow(window, now, "host1", 90.7);
 
-		Thread.sleep(4000);
+        Thread.sleep(4000);
 
-		sendEventToWindow(window, now, "host1", 90.7);
-		
-		Thread.sleep(3000);
+        sendEventToWindow(window, now, "host1", 90.7);
 
-		verify(handler, times(3)).compareAndEmit(anyObject(), anyObject(), anyObject());
-	}
+        Thread.sleep(3000);
 
-	private void sendEventToWindow(DistinctValuesInTimeBatchWindow window, long ts, String host, double value) {
-		window.send(buildStreamEvent(ts, host, value), host, ts);
-	}
+        verify(handler, times(3)).compareAndEmit(anyObject(), anyObject(), anyObject());
+    }
 
-	private StreamEvent buildStreamEvent(long ts, String host, double value) {
-		StreamEvent e = new StreamEvent();
-		e.setData(new Object[] { ts, host, value });
-		e.setStreamId(inputStream);
-		e.setTimestamp(ts);
-		return e;
-	}
+    private void sendEventToWindow(DistinctValuesInTimeBatchWindow window, long ts, String host, double value) {
+        window.send(buildStreamEvent(ts, host, value), host, ts);
+    }
+
+    private StreamEvent buildStreamEvent(long ts, String host, double value) {
+        StreamEvent e = new StreamEvent();
+        e.setData(new Object[] {ts, host, value});
+        e.setStreamId(inputStream);
+        e.setTimestamp(ts);
+        return e;
+    }
 
 }

@@ -19,16 +19,17 @@
 
 package org.apache.eagle.jpm.spark.history.storm;
 
-import org.apache.eagle.jpm.spark.crawl.JHFInputStreamReader;
-import org.apache.eagle.jpm.spark.crawl.SparkApplicationInfo;
-import org.apache.eagle.jpm.spark.crawl.SparkFilesystemInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
+import org.apache.eagle.jpm.spark.history.crawl.JHFInputStreamReader;
+import org.apache.eagle.jpm.spark.history.crawl.SparkApplicationInfo;
+import org.apache.eagle.jpm.spark.history.crawl.SparkFilesystemInputStreamReaderImpl;
 import org.apache.eagle.jpm.spark.history.status.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.spark.history.status.ZKStateConstant;
 import org.apache.eagle.jpm.util.HDFSUtil;
 import org.apache.eagle.jpm.util.resourcefetch.ResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.SparkHistoryServerResourceFetcher;
 import org.apache.eagle.jpm.util.resourcefetch.model.SparkApplication;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -106,9 +107,12 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
             zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
             LOG.info("Successfully parse application {}", appId);
             collector.ack(tuple);
+        } catch (RuntimeException e) {
+            LOG.warn("fail to process application {} due to RuntimeException, ignore it", appId, e);
+            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
+            collector.ack(tuple);
         } catch (Exception e) {
-            LOG.error("Fail to process application {}", appId, e);
-            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FAILED);
+            LOG.error("Fail to process application {}, and retry", appId, e);
             collector.fail(tuple);
         }
     }
@@ -160,11 +164,11 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
 
                 // For Yarn version >= 2.7,
                 // log name: "application_1468625664674_0003_appattempt_1468625664674_0003_000001"
-//                String attemptIdFormatted = String.format("%06d", attemptId);
-//
-//                // remove "application_" to get the number part of appID.
-//                String sparkAppIdNum = appId.substring(12);
-//                String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
+                // String attemptIdFormatted = String.format("%06d", attemptId);
+                //
+                // // remove "application_" to get the number part of appID.
+                // String sparkAppIdNum = appId.substring(12);
+                // String attemptIdString = "appattempt_" + sparkAppIdNum + "_" + attemptIdFormatted;
 
                 String appAttemptLogName = this.getAppAttemptLogName(appId, attemptIdString);
                 LOG.info("Attempt ID: {}, App Attempt Log: {}", attemptIdString, appAttemptLogName);

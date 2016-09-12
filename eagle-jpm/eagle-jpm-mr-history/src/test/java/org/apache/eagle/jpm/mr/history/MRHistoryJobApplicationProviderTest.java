@@ -17,17 +17,16 @@
 package org.apache.eagle.jpm.mr.history;
 
 import com.google.inject.Inject;
-import org.apache.eagle.app.test.AppJUnitRunner;
 import org.apache.eagle.app.test.ApplicationSimulator;
+import org.apache.eagle.app.test.ApplicationTestBase;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith(AppJUnitRunner.class)
-public class MRHistoryJobApplicationProviderTest {
-    @Inject private ApplicationSimulator simulator;
+public class MRHistoryJobApplicationProviderTest extends ApplicationTestBase {
+    @Inject
+    private ApplicationSimulator simulator;
 
     @Test
-    public void testRunAsManagedApplicationWithSimulator(){
+    public void testRunAsManagedApplicationWithSimulator() {
         simulator.start(MRHistoryJobApplicationProvider.class);
     }
 }

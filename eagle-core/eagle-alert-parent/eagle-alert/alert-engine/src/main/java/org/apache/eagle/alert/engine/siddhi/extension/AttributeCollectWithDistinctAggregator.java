@@ -16,8 +16,7 @@
  */
 package org.apache.eagle.alert.engine.siddhi.extension;
 
-import java.util.LinkedList;
-
+import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
@@ -26,7 +25,7 @@ import org.wso2.siddhi.core.query.selector.attribute.aggregator.AttributeAggrega
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 
-import com.google.common.collect.ImmutableList;
+import java.util.LinkedList;
 
 public class AttributeCollectWithDistinctAggregator extends AttributeAggregator {
 
@@ -73,11 +72,11 @@ public class AttributeCollectWithDistinctAggregator extends AttributeAggregator 
 
     @Override
     public Object processAdd(Object arg0) {
-    	// AttributeAggregator.process is already synchronized
-    	if (value.contains(arg0)) {
-    		value.remove(arg0);
-    	}
-    	value.add(arg0);
+        // AttributeAggregator.process is already synchronized
+        if (value.contains(arg0)) {
+            value.remove(arg0);
+        }
+        value.add(arg0);
         if (LOG.isDebugEnabled()) {
             LOG.debug("processAdd: current values are : " + value);
         }
@@ -86,11 +85,11 @@ public class AttributeCollectWithDistinctAggregator extends AttributeAggregator 
 
     @Override
     public Object processAdd(Object[] arg0) {
-    	// AttributeAggregator.process is already synchronized
-    	if (value.contains(arg0)) {
-    		value.remove(arg0);
-    	}
-    	value.add(arg0);
+        // AttributeAggregator.process is already synchronized
+        if (value.contains(arg0)) {
+            value.remove(arg0);
+        }
+        value.add(arg0);
         if (LOG.isDebugEnabled()) {
             LOG.debug("processAdd: current values are : " + value);
         }
@@ -120,5 +119,5 @@ public class AttributeCollectWithDistinctAggregator extends AttributeAggregator 
         value.clear();
         return value;
     }
-    
+
 }

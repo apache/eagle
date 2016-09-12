@@ -1,20 +1,23 @@
 [
   {
-    "name":"test-stream-output",
-    "type":"org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
+    "name": "test-stream-output",
+    "type": "org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher",
     "policyIds": [
-      "perfmon_cpu_host_check", "perfmon_cpu_pool_check"
+      "perfmon_cpu_host_check",
+      "perfmon_cpu_pool_check"
     ],
     "properties": {
-      "subject":"Eagle Test Alert",
-      "template":"",
+      "subject": "Eagle Test Alert",
+      "template": "",
       "sender": "sender@corp.com",
       "recipients": "receiver@corp.com",
-      "smtp.server":"mailhost.com",
+      "smtp.server": "mailhost.com",
       "connection": "plaintext",
       "smtp.port": "25"
     },
-    "dedupIntervalMin" : "PT1M",
-    "serializer" : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
+    "dedupIntervalMin": "PT1M",
+    "dedupStateField": "state",
+  	"dedupStateCloseValue": "CLOSE",
+    "serializer": "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
   }
 ]

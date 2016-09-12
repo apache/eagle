@@ -23,7 +23,7 @@ import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
 import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
 import org.apache.eagle.hadoop.queue.model.applications.AppsWrapper;
-import org.apache.eagle.hadoop.queue.model.clusterMetrics.ClusterMetricsWrapper;
+import org.apache.eagle.hadoop.queue.model.cluster.ClusterMetricsWrapper;
 import org.apache.eagle.hadoop.queue.model.scheduler.SchedulerWrapper;
 import org.junit.Assert;
 import org.junit.Ignore;
