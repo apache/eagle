@@ -153,7 +153,7 @@ public class MRTaskExecutionResource {
                                                                              @QueryParam("longJob_id") String longDurationJobId) {
         List<MRTaskExecutionResponse.JobSuggestionResponse> result = new ArrayList<>();
         MRTaskExecutionResponse.TaskGroupResponse taskGroups = getTaskGroups(site, shortDurationJobId, longDurationJobId);
-        if (taskGroups.errMessage == null) {
+        if (taskGroups.errMessage != null) {
             LOG.error(taskGroups.errMessage);
             return result;
         }
@@ -215,7 +215,8 @@ public class MRTaskExecutionResource {
                                                                               @PathParam("counterName") String counterName,
                                                                               @QueryParam("distRange") String distRange) {
         MRTaskExecutionResponse.TaskDistributionResponse result = new MRTaskExecutionResponse.TaskDistributionResponse();
-        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\" AND @taskType=\"%s\"]{@jobCounter}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, jobId, Constants.TaskType.MAP.toString());
+        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\" AND @taskType=\"%s\"]{@jobCounters}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME,
+            site, jobId, Constants.TaskType.MAP.toString());
         GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> response = ResourceUtils.getQueryResult(query, jobStartTime, jobEndTime);
         if (!response.isSuccess() || response.getObj() == null) {
             result.errMessage = response.getException();
