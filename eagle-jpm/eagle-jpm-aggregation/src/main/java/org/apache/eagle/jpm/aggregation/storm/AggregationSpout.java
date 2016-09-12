@@ -64,7 +64,9 @@ public class AggregationSpout extends BaseRichSpout {
     @Override
     public void nextTuple() {
         Utils.sleep(5);
-        LOG.debug("start to run");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("start to run");
+        }
         try {
             //0, check processStartTime size
             if (this.processStartTime.size() > 0) {
@@ -104,7 +106,9 @@ public class AggregationSpout extends BaseRichSpout {
     public void ack(Object messageId) {
         //remove from processStartTime, if size == 0, then update lastUpdateTime
         Long startTime = (Long)messageId;
-        LOG.debug("succeed startTime {}", startTime);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("succeed startTime {}", startTime);
+        }
 
         this.processStartTime.remove(startTime);
         if (this.processStartTime.size() == 0) {
