@@ -16,25 +16,6 @@
   limitations under the License.
   -->
 
-<style>
-	.jpm-chart,
-	.jpm-chart-container {
-		height: 300px;
-		position: relative;
-	}
-
-	.jpm-chart {
-		margin-bottom: 15px;
-	}
-
-	.jpm-chart .overlay {
-		top: 0;
-		bottom: 0;
-		position: absolute;
-		width: 100%;
-	}
-</style>
-
 <div class="row flex">
 	<div class="col-sm-12 col-md-3">
 		<div class="box box-primary" style="height: 100%;">
@@ -277,8 +258,8 @@
 					<tr>
 						<td><span class="label label-{{getStateClass(item.currentState)}}">{{item.currentState}}</span></td>
 						<td class="text-no-break">
-							<span ng-if="item === fromJob">[From]</span>
-							<span ng-if="item === toJob">[To]</span>
+							<span ng-if="item.tags.jobId === fromJob.tags.jobId">[From]</span>
+							<span ng-if="item.tags.jobId === toJob.tags.jobId">[To]</span>
 							<a ng-click="compareJobSelect($event, item)">{{item.tags.jobId}}</a>
 							<a class="fa fa-link" ui-sref="jpmDetail({siteId: site, jobId: item.tags.jobId})" target="_blank"></a>
 						</td>

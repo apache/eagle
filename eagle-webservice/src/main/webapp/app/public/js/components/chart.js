@@ -64,13 +64,13 @@
 
 					var seriesList = $.map($scope.series || [], function (series, id) {
 						if(id === 0 && !$scope.category) {
-							var preDate = -1;
+							//var preDate = -1;
 							categoryList = $.map(series.data, function (point) {
-								var time = new Time(point.x);
-								if(preDate !== time.date()) {
+								/*ivar time = new Time(point.x);
+								f(preDate !== time.date()) {
 									preDate = time.date();
-									return Time.format(point.x, "YY/MM/DD HH:mm");
-								}
+									return Time.format(point.x, "MMM.D HH:mm");
+								}*/
 								return Time.format(point.x, "HH:mm");
 							});
 						}

@@ -16,38 +16,6 @@
   limitations under the License.
   -->
 
-<style>
-	.jpm-chart,
-	.jpm-chart-containerL {
-		position: relative;
-	}
-
-	.jpm-chart-containerL {
-		height: 350px;
-	}
-
-	.jpm-chart > h3 {
-		margin: 0 0 10px 0;
-	}
-	.jpm-chart {
-		padding-bottom: 15px;
-		margin-bottom: 15px;
-		border-bottom: 1px solid #f4f4f4;
-	}
-	.jpm-chart:last-child {
-		padding-bottom: 0;
-		margin-bottom: 0;
-		border-bottom: 0;
-	}
-
-	.jpm-chart .overlay {
-		top: 0;
-		bottom: 0;
-		position: absolute;
-		width: 100%;
-	}
-</style>
-
 <div class="form-group">
 	<label class="radio-inline">
 		<input type="radio" ng-checked="type === 'job'" ng-click="switchType('job')"> By Job
@@ -69,27 +37,27 @@
 		<li><a href="#cpu" data-toggle="tab">CPU Usage</a></li>
 		<li><a href="#memory" data-toggle="tab">Memory Usage</a></li>
 	</ul>
-	<div class="tab-content keepContent">
+	<div class="tab-content keepContent with-border">
 		<div class="tab-pane" id="cpu">
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top CPU Usage</h3>
-				<div chart class="jpm-chart-containerL" series="cpuUsageSeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="cpuUsageSeries" option="commonOption"></div>
 				<div ng-if="!cpuUsageSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 		</div>
 		<div class="tab-pane" id="memory">
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top Physical Memory Usage</h3>
-				<div chart class="jpm-chart-containerL" series="physicalMemorySeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="physicalMemorySeries" option="commonOption"></div>
 				<div ng-if="!physicalMemorySeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top Virtual Memory Usage</h3>
-				<div chart class="jpm-chart-containerL" series="virtualMemorySeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="virtualMemorySeries" option="commonOption"></div>
 				<div ng-if="!virtualMemorySeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
@@ -97,51 +65,51 @@
 		</div>
 
 		<div class="tab-pane active" id="hdfsBytes">
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top HDFS Bytes Read</h3>
-				<div chart class="jpm-chart-containerL" series="hdfsBtyesReadSeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="hdfsBtyesReadSeries" option="commonOption"></div>
 				<div ng-if="!hdfsBtyesReadSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top HDFS Bytes Written</h3>
-				<div chart class="jpm-chart-containerL" series="hdfsBtyesWrittenSeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="hdfsBtyesWrittenSeries" option="commonOption"></div>
 				<div ng-if="!hdfsBtyesWrittenSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 		</div>
 		<div class="tab-pane" id="hdfsOPs">
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top HDFS Read OPs</h3>
-				<div chart class="jpm-chart-containerL" series="hdfsReadOpsSeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="hdfsReadOpsSeries" option="commonOption"></div>
 				<div ng-if="!hdfsReadOpsSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top HDFS Write OPs</h3>
-				<div chart class="jpm-chart-containerL" series="hdfsWriteOpsSeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="hdfsWriteOpsSeries" option="commonOption"></div>
 				<div ng-if="!hdfsWriteOpsSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 		</div>
 		<div class="tab-pane" id="diskIO">
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top File Bytes Read</h3>
-				<div chart class="jpm-chart-containerL" series="fileBytesReadSeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="fileBytesReadSeries" option="commonOption"></div>
 				<div ng-if="!fileBytesReadSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>
 			</div>
 
-			<div class="jpm-chart overlay-wrapper">
+			<div class="jpm-chart chart-lg overlay-wrapper">
 				<h3 class="text-center">Top File Bytes Written</h3>
-				<div chart class="jpm-chart-containerL" series="fileBytesWrittenSeries" option="commonOption"></div>
+				<div chart class="jpm-chart-container" series="fileBytesWrittenSeries" option="commonOption"></div>
 				<div ng-if="!fileBytesWrittenSeries._done" class="overlay">
 					<i class="fa fa-refresh fa-spin"></i>
 				</div>

@@ -26,6 +26,7 @@
 		["seconds", "s", "s"]
 	];
 
+	var keepTime = false;
 	var serviceModule = angular.module('eagle.service');
 
 	serviceModule.service('Time', function($q, $wrapState) {
@@ -92,6 +93,12 @@
 		$Time.timeRange = function (startTimeValue, endTimeValue) {
 			startTime = $Time(startTimeValue);
 			endTime = $Time(endTimeValue);
+
+			keepTime = true;
+			$wrapState.go(".", $.extend({}, $wrapState.param, {
+				startTime: $Time.format(startTime),
+				endTime: $Time.format(endTime)
+			}), {notify: false});
 
 			$.each(reloadListenerList, function (i, listener) {
 				listener($Time);
@@ -201,6 +208,11 @@
 
 		var promiseLock = false;
 		$Time.getPromise = function (config, state, param) {
+			if(keepTime) {
+				keepTime = false;
+				return $q.when($Time);
+			}
+
 			if(config.time === true) {
 				$Time.pickerType = $Time.TIME_RANGE_PICKER;
 
@@ -214,6 +226,7 @@
 
 						setTimeout(function () {
 							promiseLock = true;
+							keepTime = true;
 							$wrapState.go(state.name, $.extend({}, param, {
 								startTime: $Time.format(startTime),
 								endTime: $Time.format(endTime)

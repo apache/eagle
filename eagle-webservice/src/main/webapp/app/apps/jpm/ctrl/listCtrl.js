@@ -214,7 +214,8 @@
 						yAxis: [{
 							axisLabel: {
 								formatter: "{value}%"
-							}
+							},
+							max: 100
 						}],
 						tooltip: {
 							formatter: function (points) {

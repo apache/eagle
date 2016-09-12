@@ -25,6 +25,13 @@
 			$scope.site = $wrapState.param.siteId;
 
 			PageConfig.title = "Job Statistic";
+
+			$scope.type = "daily";
+
+			$scope.switchType = function (type) {
+				$scope.type = type;
+				$scope.refresh();
+			};
 		});
 	});
 })();

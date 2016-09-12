@@ -135,7 +135,6 @@
 	};
 
 	Module.prototype.requireCSS = function (styleURL) {
-		console.log("啊啊啊啊啊！！！！！");
 		var _this = this;
 		setTimeout(function () {
 			$("<link/>", {

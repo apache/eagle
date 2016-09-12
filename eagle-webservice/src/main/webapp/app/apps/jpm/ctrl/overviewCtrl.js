@@ -23,6 +23,11 @@
 	register(function (jpmApp) {
 		jpmApp.controller("overviewCtrl", function ($q, $wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
 			var cache = {};
+			var aggregationMap = {
+				job: "jobId",
+				user: "user",
+				jobType: "jobType"
+			};
 
 			$scope.site = $wrapState.param.siteId;
 
@@ -48,7 +53,7 @@
 			// TODO: Optimize the chart count
 			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
 			$scope.refresh = function () {
-				function getTopList(metric, aggregation, scopeVariable) {
+				function getTopList(metric, scopeVariable) {
 					var deferred = $q.defer();
 
 					metric = common.template(metric, {
@@ -60,6 +65,7 @@
 						$scope[scopeVariable]._done = false;
 					}
 
+					var aggregation = aggregationMap[$scope.type];
 					var aggPromise = cache[metric] = cache[metric] || JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "sum(value) desc", false, startTime, endTime, 10)
 						._promise
 						.then(function (list) {
@@ -70,8 +76,11 @@
 						})
 						.then(function (list) {
 							var promiseList = $.map(list, function (name, i) {
+								var cond = {site: $scope.site};
+								cond[aggregation] = name;
+
 								return JPM.aggMetricsToEntities(
-									JPM.aggMetrics({site: $scope.site, jobId: name}, metric, ["site"], "max(value)", intervalMin, startTime, endTime)
+									JPM.aggMetrics(cond, metric, ["site"], "max(value)", intervalMin, startTime, endTime)
 								)._promise.then(function (list) {
 									return $.extend({
 										stack: "job",
@@ -100,15 +109,15 @@
 				var endTime = Time.endTime();
 				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
 
-				getTopList("hadoop.${type}.history.minute.cpu_milliseconds", "jobId", "cpuUsageSeries");
-				getTopList("hadoop.${type}.history.minute.physical_memory_bytes", "jobId", "physicalMemorySeries");
-				getTopList("hadoop.${type}.history.minute.virtual_memory_bytes", "jobId", "virtualMemorySeries");
-				getTopList("hadoop.${type}.history.minute.hdfs_bytes_read", "jobId", "hdfsBtyesReadSeries");
-				getTopList("hadoop.${type}.history.minute.hdfs_bytes_written", "jobId", "hdfsBtyesWrittenSeries");
-				getTopList("hadoop.${type}.history.minute.hdfs_read_ops", "jobId", "hdfsReadOpsSeries");
-				getTopList("hadoop.${type}.history.minute.hdfs_write_ops", "jobId", "hdfsWriteOpsSeries");
-				getTopList("hadoop.${type}.history.minute.file_bytes_read", "jobId", "fileBytesReadSeries");
-				getTopList("hadoop.${type}.history.minute.file_bytes_written", "jobId", "fileBytesWrittenSeries");
+				getTopList("hadoop.${type}.history.minute.cpu_milliseconds", "cpuUsageSeries");
+				getTopList("hadoop.${type}.history.minute.physical_memory_bytes", "physicalMemorySeries");
+				getTopList("hadoop.${type}.history.minute.virtual_memory_bytes", "virtualMemorySeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_bytes_read", "hdfsBtyesReadSeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_bytes_written", "hdfsBtyesWrittenSeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_read_ops", "hdfsReadOpsSeries");
+				getTopList("hadoop.${type}.history.minute.hdfs_write_ops", "hdfsWriteOpsSeries");
+				getTopList("hadoop.${type}.history.minute.file_bytes_read", "fileBytesReadSeries");
+				getTopList("hadoop.${type}.history.minute.file_bytes_written", "fileBytesWrittenSeries");
 			};
 
 			Time.onReload(function () {

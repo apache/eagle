@@ -16,4 +16,17 @@
   limitations under the License.
   -->
 
-YYY!
+<div class="form-group">
+	<label class="radio-inline">
+		<input type="radio" ng-checked="type === 'monthly'" ng-click="switchType('monthly')"> Monthly
+	</label>
+	<label class="radio-inline">
+		<input type="radio" ng-checked="type === 'weekly'" ng-click="switchType('weekly')"> Weekly
+	</label>
+	<label class="radio-inline">
+		<input type="radio" ng-checked="type === 'daily'" ng-click="switchType('daily')"> Daily
+	</label>
+	<label class="radio-inline">
+		<input type="radio" ng-checked="type === 'hourly'" ng-click="switchType('hourly')"> Hourly
+	</label>
+</div>
