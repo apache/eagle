@@ -163,6 +163,12 @@
 			.replace(/>/g, '&gt;');
 	};
 
+	common.string.capitalize = function (str) {
+		return (str + "").replace(/\b\w/g, function(match) {
+			return match.toUpperCase();
+		});
+	};
+
 	common.string.preFill = function (str, key, len) {
 		str = str + "";
 		len = len || 2;

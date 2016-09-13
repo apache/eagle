@@ -16,19 +16,6 @@
   limitations under the License.
   -->
 
-<div class="form-group">
-	<label class="radio-inline">
-		<input type="radio" ng-checked="type === 'job'" ng-click="switchType('job')"> By Job
-	</label>
-	<label class="radio-inline">
-		<input type="radio" ng-checked="type === 'user'" ng-click="switchType('user')"> By User
-	</label>
-	<label class="radio-inline">
-		<input type="radio" ng-checked="type === 'jobType'" ng-click="switchType('jobType')"> By Job Type
-	</label>
-</div>
-
-
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#hdfsBytes" data-toggle="tab">HDFS IO Bytes</a></li>
@@ -36,6 +23,11 @@
 		<li><a href="#diskIO" data-toggle="tab">Disk IO</a></li>
 		<li><a href="#cpu" data-toggle="tab">CPU Usage</a></li>
 		<li><a href="#memory" data-toggle="tab">Memory Usage</a></li>
+		<li class="pull-right">
+			<select class="form-control" ng-model="type" ng-change="typeChange()">
+				<option ng-repeat="(type, value) in aggregationMap track by $index" value="{{type}}">By {{common.string.capitalize(type)}}</option>
+			</select>
+		</li>
 	</ul>
 	<div class="tab-content keepContent with-border">
 		<div class="tab-pane" id="cpu">

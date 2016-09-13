@@ -21,9 +21,9 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
-		jpmApp.controller("overviewCtrl", function ($q, $wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
+		jpmApp.controller("overviewCtrl", function ($q, $wrapState, $element, $scope, $timeout, PageConfig, Time, Entity, JPM) {
 			var cache = {};
-			var aggregationMap = {
+			$scope.aggregationMap = {
 				job: "jobId",
 				user: "user",
 				jobType: "jobType"
@@ -35,11 +35,6 @@
 
 			$scope.type = "job";
 
-			$scope.switchType = function (type) {
-				$scope.type = type;
-				$scope.refresh();
-			};
-
 			$scope.commonOption = {
 				animation: false,
 				grid: {
@@ -50,9 +45,17 @@
 			// ======================================================================
 			// =                          Refresh Overview                          =
 			// ======================================================================
+			$scope.typeChange = function () {
+				$timeout($scope.refresh, 1);
+			};
+
 			// TODO: Optimize the chart count
 			// TODO: ECharts dynamic refresh series bug: https://github.com/ecomfe/echarts/issues/4033
 			$scope.refresh = function () {
+				var startTime = Time.startTime();
+				var endTime = Time.endTime();
+				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
+
 				function getTopList(metric, scopeVariable) {
 					var deferred = $q.defer();
 
@@ -65,35 +68,17 @@
 						$scope[scopeVariable]._done = false;
 					}
 
-					var aggregation = aggregationMap[$scope.type];
-					var aggPromise = cache[metric] = cache[metric] || JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "sum(value) desc", false, startTime, endTime, 10)
-						._promise
-						.then(function (list) {
-							// Get name list
-							return $.map(list, function (obj) {
-								return obj.key[0];
-							});
-						})
-						.then(function (list) {
-							var promiseList = $.map(list, function (name, i) {
-								var cond = {site: $scope.site};
-								cond[aggregation] = name;
+					var aggregation = $scope.aggregationMap[$scope.type];
 
-								return JPM.aggMetricsToEntities(
-									JPM.aggMetrics(cond, metric, ["site"], "max(value)", intervalMin, startTime, endTime),
-									true)._promise.then(function (list) {
-									return $.extend({
-										stack: "job",
-										areaStyle: {normal: {}}
-									}, JPM.metricsToSeries(name, list));
-								});
-							});
-
-							return $q.all(promiseList).then(function (series) {
-								deferred.resolve(series);
-								return series;
-							});
+					var aggPromise = cache[metric] = cache[metric] || JPM.aggMetricsToEntities(
+						JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "max(value), sum(value) desc", intervalMin, startTime, endTime, 10)
+					)._promise.then(function (list) {
+						var series = $.map(list, function (metrics) {
+							return JPM.metricsToSeries(metrics[0].tags[aggregation], metrics);
 						});
+						console.log("=>", series);
+						return series;
+					});
 
 					aggPromise.then(function (series) {
 						if(scopeVariable) {
@@ -104,10 +89,6 @@
 
 					return deferred.promise;
 				}
-
-				var startTime = Time.startTime();
-				var endTime = Time.endTime();
-				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
 
 				getTopList("hadoop.${type}.history.minute.cpu_milliseconds", "cpuUsageSeries");
 				getTopList("hadoop.${type}.history.minute.physical_memory_bytes", "physicalMemorySeries");

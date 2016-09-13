@@ -142,7 +142,7 @@
 		 * @return {[]}
 		 */
 		JPM.groups = function (query, condition, groups, field, intervalMin, startTime, endTime, top, limit) {
-			var fields = field.split(/,/);
+			var fields = field.split(/\s*,\s*/);
 			var orderId = -1;
 			var fieldStr = $.map(fields, function (field, index) {
 				var matches = field.match(/^([^\s]*)(\s+.*)?$/);
@@ -255,7 +255,7 @@
 		 * @param {string} metric
 		 * @param {[]} groups
 		 * @param {string} field
-		 * @param {number|boolean} intervalMin
+		 * @param {number|null|false} intervalMin
 		 * @param startTime
 		 * @param endTime
 		 * @param {number?} top
@@ -263,7 +263,7 @@
 		 * @return {[]}
 		 */
 		JPM.aggMetrics = function (condition, metric, groups, field, intervalMin, startTime, endTime, top, limit) {
-			var fields = field.split(/,/);
+			var fields = field.split(/\s*,\s*/);
 			var orderId = -1;
 			var fieldStr = $.map(fields, function (field, index) {
 				var matches = field.match(/^([^\s]*)(\s+.*)?$/);
