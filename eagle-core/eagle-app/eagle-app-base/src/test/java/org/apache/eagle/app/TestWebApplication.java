@@ -16,8 +16,12 @@
  */
 package org.apache.eagle.app;
 
+import org.junit.Ignore;
+
+@Ignore
 public class TestWebApplication {
     public static class Provider extends StaticWebApplicationProvider {
+
     }
 }
 
