@@ -43,14 +43,14 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
- * Managed Application Interface: org.apache.eagle.app.service.ApplicationContext
+ * Managed Application Interface: org.apache.eagle.app.service.ApplicationOperationContext
  * <ul>
  * <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
  * <li>Application Processing Logic (Execution): org.apache.eagle.app.Application</li>
  * <li>Application Lifecycle Listener (Installation): org.apache.eagle.app.ApplicationLifecycle</li>
  * </ul>
  */
-public class ApplicationContext implements Serializable, ApplicationLifecycle {
+public class ApplicationOperationContext implements Serializable, ApplicationLifecycle {
     private final Config config;
     private final Application application;
     private final ExecutionRuntime runtime;
@@ -61,7 +61,7 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
      * @param metadata    ApplicationEntity.
      * @param application Application.
      */
-    public ApplicationContext(Application application, ApplicationEntity metadata, Config envConfig, IMetadataDao alertMetadataService) {
+    public ApplicationOperationContext(Application application, ApplicationEntity metadata, Config envConfig, IMetadataDao alertMetadataService) {
         Preconditions.checkNotNull(application, "Application is null");
         Preconditions.checkNotNull(metadata, "ApplicationEntity is null");
         this.application = application;

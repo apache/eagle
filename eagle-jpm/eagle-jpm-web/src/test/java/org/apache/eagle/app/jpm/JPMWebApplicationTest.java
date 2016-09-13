@@ -25,6 +25,7 @@ import org.apache.eagle.metadata.resource.SiteResource;
 
 import com.google.inject.Inject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -33,9 +34,19 @@ import java.util.Map;
 public class JPMWebApplicationTest extends ApplicationTestBase {
     @Inject
     private SiteResource siteResource;
-    
+
     @Inject
     private ApplicationResource applicationResource;
+
+    private void installDependencies(){
+        ApplicationOperations.InstallOperation installDependency1 = new ApplicationOperations.InstallOperation("test_site", "MR_RUNNING_JOB_APP", ApplicationEntity.Mode.LOCAL);
+        installDependency1.setConfiguration(getConf());
+        applicationResource.installApplication(installDependency1).getData();
+
+        ApplicationOperations.InstallOperation installDependency2 = new ApplicationOperations.InstallOperation("test_site", "MR_HISTORY_JOB_APP", ApplicationEntity.Mode.LOCAL);
+        installDependency2.setConfiguration(getConf());
+        applicationResource.installApplication(installDependency2).getData();
+    }
 
     /**
      * register site
@@ -56,11 +67,14 @@ public class JPMWebApplicationTest extends ApplicationTestBase {
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
 
+        installDependencies();
+
         ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site", "JPM_WEB_APP", ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(getConf());
 
         // Install application
         ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
+
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
         // Stop application
