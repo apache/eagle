@@ -36,25 +36,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ExampleApplicationProviderTest extends ApplicationTestBase{
-    @Inject private SiteResource siteResource;
-    @Inject private ApplicationResource applicationResource;
-    @Inject private ApplicationSimulator simulator;
-    @Inject private ExampleResource exampleResource;
+public class ExampleApplicationProviderTest extends ApplicationTestBase {
+    @Inject
+    private SiteResource siteResource;
+    @Inject
+    private ApplicationResource applicationResource;
+    @Inject
+    private ApplicationSimulator simulator;
+    @Inject
+    private ExampleResource exampleResource;
 
     @Test
-    public void testApplicationProviderLoading(){
+    public void testApplicationProviderLoading() {
         Collection<ApplicationDesc> applicationDescs = applicationResource.getApplicationDescs().getData();
         Assert.assertNotNull(applicationDescs);
-        Assert.assertEquals(1,applicationDescs.size());
+        Assert.assertEquals(1, applicationDescs.size());
     }
 
     @Test
-    public void testApplicationExtensions(){
+    public void testApplicationExtensions() {
         List<ExampleEntity> entities = exampleResource.getEntities();
         Assert.assertNotNull(entities);
-        Assert.assertEquals(1,entities.size());
-        Assert.assertEquals(GlobalScope.class,exampleResource.getCommonServiceScope());
+        Assert.assertEquals(1, entities.size());
+        Assert.assertEquals(GlobalScope.class, exampleResource.getCommonServiceScope());
     }
 
     /**
@@ -76,7 +80,7 @@ public class ExampleApplicationProviderTest extends ApplicationTestBase{
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
 
-        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site","EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL);
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site", "EXAMPLE_APPLICATION", ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(getConf());
         // Install application
         ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
@@ -88,23 +92,23 @@ public class ExampleApplicationProviderTest extends ApplicationTestBase{
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         try {
             applicationResource.getApplicationEntityByUUID(applicationEntity.getUuid());
-            Assert.fail("Application instance (UUID: "+applicationEntity.getUuid()+") should have been uninstalled");
-        } catch (Exception ex){
+            Assert.fail("Application instance (UUID: " + applicationEntity.getUuid() + ") should have been uninstalled");
+        } catch (Exception ex) {
             // Expected exception
         }
     }
 
     @Test
-    public void testApplicationQuickRunWithAppType(){
+    public void testApplicationQuickRunWithAppType() {
         simulator.start("EXAMPLE_APPLICATION", getConf());
     }
 
     @Test
-    public void testApplicationQuickRunWithAppProvider() throws Exception{
+    public void testApplicationQuickRunWithAppProvider() throws Exception {
         simulator.start(ExampleApplicationProvider.class, getConf());
     }
 
-    private Map<String, Object> getConf(){
+    private Map<String, Object> getConf() {
         Map<String, Object> conf = new HashMap<>();
         conf.put("dataSinkConfig.topic", "testTopic");
         conf.put("dataSinkConfig.brokerList", "broker");

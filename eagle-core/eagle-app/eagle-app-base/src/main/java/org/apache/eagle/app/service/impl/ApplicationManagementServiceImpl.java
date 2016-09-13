@@ -16,6 +16,10 @@
  */
 package org.apache.eagle.app.service.impl;
 
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.app.service.ApplicationContext;
 import org.apache.eagle.app.service.ApplicationManagementService;
@@ -29,10 +33,6 @@ import org.apache.eagle.metadata.model.Property;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.service.SiteEntityService;
-import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,21 +81,25 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setJarPath(operation.getJarPath());
         applicationEntity.ensureDefault();
 
-        /**
-         *  calculate application config based on
-         *   1) default values in metadata.xml
-         *   2) user's config value override default configurations
-         *   3) some metadata, for example siteId, mode, appId in ApplicationContext
-         */
+        // Calculate application config based on:
+        //
+        //  1) default values in metadata.xml.
+        //  2) user's config value override default configurations.
+        //  3) fill runtime information, for example siteId, mode, appId in ApplicationContext.
+
         Map<String, Object> appConfig = new HashMap<>();
         ApplicationProvider provider = applicationProviderService.getApplicationProviderByType(operation.getAppType());
 
-        List<Property> propertyList = provider.getApplicationDesc().getConfiguration().getProperties();
-        for (Property p : propertyList) {
-            appConfig.put(p.getName(), p.getValue());
-        }
-        if (operation.getConfiguration() != null) {
-            appConfig.putAll(operation.getConfiguration());
+        ApplicationDesc applicationDesc = provider.getApplicationDesc();
+
+        if (applicationDesc.getConfiguration() != null) {
+            List<Property> propertyList = provider.getApplicationDesc().getConfiguration().getProperties();
+            for (Property p : propertyList) {
+                appConfig.put(p.getName(), p.getValue());
+            }
+            if (operation.getConfiguration() != null) {
+                appConfig.putAll(operation.getConfiguration());
+            }
         }
         applicationEntity.setConfiguration(appConfig);
         ApplicationContext applicationContext = new ApplicationContext(

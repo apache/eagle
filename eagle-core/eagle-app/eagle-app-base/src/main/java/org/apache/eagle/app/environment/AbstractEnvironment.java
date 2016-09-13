@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractEnvironment implements Environment {
+
     private final Config config;
     private final StreamSinkProvider sinkProvider;
     private static final String APPLICATIONS_SINK_TYPE_PROPS_KEY = "application.sink.provider";
@@ -59,7 +60,6 @@ public abstract class AbstractEnvironment implements Environment {
             .append(this.config()).build();
     }
 
-    @Override
     public StreamSinkProvider streamSink() {
         return sinkProvider;
     }

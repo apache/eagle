@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,34 +16,36 @@
  */
 package org.apache.eagle.app;
 
+import static org.junit.Assert.*;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.typesafe.config.ConfigFactory;
-import org.apache.eagle.app.module.ApplicationGuiceModule;
+import com.google.inject.Inject;
 import org.apache.eagle.app.service.ApplicationProviderService;
-import org.apache.eagle.app.service.impl.ApplicationProviderServiceImpl;
 import org.apache.eagle.app.spi.ApplicationProvider;
-import org.apache.eagle.common.module.CommonGuiceModule;
+import org.apache.eagle.app.test.ApplicationTestBase;
 import org.apache.eagle.metadata.model.ApplicationDesc;
-import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
-public class ApplicationProviderServiceTest {
+public class ApplicationProviderServiceTest extends ApplicationTestBase {
     private final static Logger LOGGER = LoggerFactory.getLogger(ApplicationProviderServiceTest.class);
-    private Injector injector = Guice.createInjector(new CommonGuiceModule(),new ApplicationGuiceModule(new ApplicationProviderServiceImpl(ConfigFactory.load())), new MemoryMetadataStore());
+
+    @Inject
+    private
+    ApplicationProviderService providerManager;
 
     @Test
-    public void testApplicationProviderManagerInit(){
-        ApplicationProviderService providerManager = injector.getInstance(ApplicationProviderService.class);
+    public void testApplicationProviderLoaderService(){
         Collection<ApplicationDesc> applicationDescs = providerManager.getApplicationDescs();
         Collection<ApplicationProvider> applicationProviders = providerManager.getProviders();
-
         applicationDescs.forEach((d)-> LOGGER.debug(d.toString()));
         applicationProviders.forEach((d)-> LOGGER.debug(d.toString()));
+        assertNull(providerManager.getApplicationDescByType("TEST_APPLICATION").getViewPath());
+        assertEquals("/apps/test_web_app",providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getViewPath());
+        assertNotNull(providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getDependencies());
+        assertEquals(1,providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getDependencies().size());
+        assertEquals("TEST_APPLICATION",providerManager.getApplicationDescByType("TEST_WEB_APPLICATION").getDependencies().get(0).getType());
     }
 }

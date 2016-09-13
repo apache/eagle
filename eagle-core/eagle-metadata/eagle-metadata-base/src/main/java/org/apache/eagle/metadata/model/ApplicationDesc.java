@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.metadata.model;
 
+import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
 import java.io.Serializable;
@@ -35,6 +36,7 @@ public class ApplicationDesc implements Serializable {
     private Configuration configuration;
     private List<StreamDefinition> streams;
     private ApplicationDocs docs;
+    private List<ApplicationDependency> dependencies;
 
     public String getDescription() {
         return description;
@@ -99,7 +101,7 @@ public class ApplicationDesc implements Serializable {
     @Override
     public String toString() {
         return String.format("ApplicationDesc [type=%s, name=%s, version=%s, appClass=%s, viewPath=%s, providerClass=%s, configuration= %s properties, description=%s",
-                    getType(),getName(),getVersion(),getAppClass(), getViewPath(),getProviderClass(), getConfiguration() == null ? 0: getConfiguration().size(),getDescription());
+            getType(), getName(), getVersion(), getAppClass(), getViewPath(), getProviderClass(), getConfiguration() == null ? 0 : getConfiguration().size(), getDescription());
     }
 
     public void setConfiguration(Configuration configuration) {
@@ -120,5 +122,13 @@ public class ApplicationDesc implements Serializable {
 
     public void setDocs(ApplicationDocs docs) {
         this.docs = docs;
+    }
+
+    public List<ApplicationDependency> getDependencies() {
+        return dependencies;
+    }
+
+    public void setDependencies(List<ApplicationDependency> dependencies) {
+        this.dependencies = dependencies;
     }
 }

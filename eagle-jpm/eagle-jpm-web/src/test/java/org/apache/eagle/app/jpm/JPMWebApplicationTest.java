@@ -29,7 +29,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JPMApplicationTest extends ApplicationTestBase{
+public class JPMWebApplicationTest extends ApplicationTestBase{
     @Inject
     private SiteResource siteResource;
     @Inject
@@ -54,7 +54,7 @@ public class JPMApplicationTest extends ApplicationTestBase{
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
 
-        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site","JPM_APP", ApplicationEntity.Mode.LOCAL);
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site","JPM_WEB_APP", ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(getConf());
 
         // Install application

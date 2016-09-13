@@ -16,15 +16,27 @@
  */
 package org.apache.eagle.app.spi;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.model.ApplicationDesc;
-import com.typesafe.config.Config;
 
+import java.lang.reflect.ParameterizedType;
+
+/**
+ * Application Service Provider Interface.
+ *
+ * @param <T> Application Type.
+ */
 public interface ApplicationProvider<T extends Application> {
 
-    void prepare(ApplicationProviderConfig providerConfig,Config envConfig);
+    /**
+     * Prepare Application Provider before loading.
+     */
+    default void prepare(ApplicationProviderConfig providerConfig, Config envConfig) {
+        // Do nothing by default.
+    }
 
     /**
      * @return application descriptor.
@@ -32,9 +44,30 @@ public interface ApplicationProvider<T extends Application> {
     ApplicationDesc getApplicationDesc();
 
     /**
+     * Get Application Instance Type, by default load from generic parameter automatically
+     *
+     * @return application class type if exists.
+     */
+    default Class<T> getApplicationClass() {
+        try {
+            String className = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0].getTypeName();
+            Class<?> clazz = Class.forName(className);
+            return (Class<T>) clazz;
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                "Unable to get generic application class, "
+                    + "reason: class is not parametrized with generic type, "
+                    + "please provide application class by overriding getApplicationClass()");
+        }
+    }
+
+    /**
      * @return application instance.
      */
     T getApplication();
 
+    /**
+     * Extend application modules like Web Resource, Metadata Store, etc.
+     */
     void register(ModuleRegistry registry);
 }

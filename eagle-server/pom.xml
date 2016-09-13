@@ -146,37 +146,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Oozie  Auditlog monitoring -->
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-security-oozie-auditlog</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-security-oozie-web</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- hdfs audit log monitoring -->
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-security-hdfs-auditlog</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-security-hdfs-web</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- GC log monitoring -->
-        <dependency>
-            <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-gc</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- Alert unit topology as an application -->
         <dependency>
             <groupId>org.apache.eagle</groupId>
@@ -184,6 +153,66 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+
+        <!-- =========================================================================================================
+             TODO: Decouple following specific application related dependencies into independent module: eagle-develop
+             ========================================================================================================= -->
+
+            <dependencies>
+                <!-- App: Oozie  Auditlog monitoring -->
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-security-oozie-auditlog</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-security-oozie-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <!-- App: hdfs audit log monitoring -->
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-security-hdfs-auditlog</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-security-hdfs-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <!-- App: GC log monitoring -->
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-gc</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <!--App: Job Performance Monitoring -->
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-jpm-web</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-jpm-mr-history</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-jpm-mr-running</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
     <build>
         <resources>
             <resource>

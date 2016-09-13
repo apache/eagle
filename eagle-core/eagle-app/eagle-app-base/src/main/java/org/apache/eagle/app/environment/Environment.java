@@ -25,7 +25,13 @@ import java.io.Serializable;
  * Execution Environment Context.
  */
 public interface Environment extends Serializable {
+
     Config config();
 
+    /**
+     * TODO Only useful for Storm/Spark Exeuctable Application instead of static web application.
+     *
+     * @return StreamSinkProvider.
+     */
     StreamSinkProvider streamSink();
 }
