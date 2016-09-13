@@ -22,17 +22,20 @@ import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationDescService;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Singleton
 public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityService {
 
     private final ApplicationDescService applicationDescService;
-    private final Map<String,ApplicationEntity> applicationEntityMap;
+    private final Map<String, ApplicationEntity> applicationEntityMap;
 
     @Inject
-    public ApplicationEntityServiceMemoryImpl(ApplicationDescService applicationDescService){
+    public ApplicationEntityServiceMemoryImpl(ApplicationDescService applicationDescService) {
         this.applicationDescService = applicationDescService;
         this.applicationEntityMap = new HashMap<>();
     }
@@ -44,19 +47,20 @@ public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityServ
 
     @Override
     public ApplicationEntity getByUUID(String uuid) {
-        if(applicationEntityMap.containsKey(uuid)) {
+        if (applicationEntityMap.containsKey(uuid)) {
             return applicationEntityMap.get(uuid);
         } else {
-            throw new IllegalArgumentException("Application (UUID: "+uuid+") is not found");
+            throw new IllegalArgumentException("Application (UUID: " + uuid + ") is not found");
         }
     }
 
     @Override
     public ApplicationEntity create(ApplicationEntity entity) {
         entity.ensureDefault();
-        if(getBySiteIdAndAppType(entity.getSite().getSiteId(),entity.getDescriptor().getType()) != null)
-            throw new IllegalArgumentException("Duplicated appId: "+entity.getAppId());
-        applicationEntityMap.put(entity.getUuid(),entity);
+        if (getBySiteIdAndAppType(entity.getSite().getSiteId(), entity.getDescriptor().getType()) != null) {
+            throw new IllegalArgumentException("Duplicated appId: " + entity.getAppId());
+        }
+        applicationEntityMap.put(entity.getUuid(), entity);
         return entity;
     }
 
@@ -67,10 +71,10 @@ public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityServ
 
     @Override
     public ApplicationEntity getBySiteIdAndAppType(String siteId, String appType) {
-        Optional<ApplicationEntity>  optional =
-                applicationEntityMap.values().stream()
-                        .filter((app) -> siteId.equals(app.getSite().getSiteId()) && appType.equals(app.getDescriptor().getType())).findAny();
-        if(optional.isPresent()){
+        Optional<ApplicationEntity> optional =
+            applicationEntityMap.values().stream()
+                .filter((app) -> siteId.equals(app.getSite().getSiteId()) && appType.equals(app.getDescriptor().getType())).findAny();
+        if (optional.isPresent()) {
             return optional.get();
         } else {
             return null;
@@ -79,23 +83,23 @@ public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityServ
 
     @Override
     public ApplicationEntity getByUUIDOrAppId(String uuid, String appId) {
-        if(uuid == null && appId == null)
+        if (uuid == null && appId == null) {
             throw new IllegalArgumentException("uuid and appId are both null");
-        else if(uuid !=null){
+        } else if (uuid != null) {
             return getByUUID(uuid);
-        }else {
+        } else {
             Optional<ApplicationEntity> applicationEntity = applicationEntityMap.values().stream().filter((app) -> appId.equals(app.getAppId())).findAny();
-            if(applicationEntity.isPresent()){
+            if (applicationEntity.isPresent()) {
                 return applicationEntity.get();
-            }else{
-                throw new IllegalArgumentException("Application with appId: "+appId+" not found");
+            } else {
+                throw new IllegalArgumentException("Application with appId: " + appId + " not found");
             }
         }
     }
 
     @Override
     public ApplicationEntity delete(ApplicationEntity applicationEntity) {
-        ApplicationEntity entity = getByUUIDOrAppId(applicationEntity.getUuid(),applicationEntity.getAppId());
+        ApplicationEntity entity = getByUUIDOrAppId(applicationEntity.getUuid(), applicationEntity.getAppId());
         return applicationEntityMap.remove(entity.getUuid());
     }
 }

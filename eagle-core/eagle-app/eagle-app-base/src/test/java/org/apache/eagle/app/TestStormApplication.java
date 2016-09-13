@@ -86,7 +86,7 @@ public class TestStormApplication extends StormApplication{
         Class<? extends ExtendedDao> getType();
     }
 
-    private class ExtendedDaoImpl implements ExtendedDao {
+    private static class ExtendedDaoImpl implements ExtendedDao {
         private final Config config;
 
         @Inject

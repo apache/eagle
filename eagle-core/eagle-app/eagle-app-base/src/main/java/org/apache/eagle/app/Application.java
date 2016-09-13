@@ -52,4 +52,6 @@ public interface Application<
      * @return application environment type
      */
     Class<? extends E> getEnvironmentType();
+
+    boolean isExecutable();
 }

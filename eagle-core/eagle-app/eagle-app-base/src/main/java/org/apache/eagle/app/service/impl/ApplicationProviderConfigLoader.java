@@ -31,6 +31,10 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
+/**
+ * @deprecated unstable implementation.
+ */
+@Deprecated
 public class ApplicationProviderConfigLoader extends ApplicationProviderLoader {
     public static final String DEFAULT_APPLICATIONS_CONFIG_FILE = "providers.xml";
     private static final String APPLICATIONS_CONFIG_PROPS_KEY = "application.provider.config";

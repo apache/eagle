@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.eagle.metadata.model;
 
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
@@ -24,15 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Site app management entity
+ * Site app management entity.
  */
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApplicationEntity extends PersistenceEntity {
     private String appId;
     private SiteEntity site;
-
     private ApplicationDesc descriptor;
+    private boolean executable = true;
 
     private Map<String, Object> configuration = new HashMap<>();
     private Map<String, String> context = new HashMap<>();
@@ -45,8 +45,7 @@ public class ApplicationEntity extends PersistenceEntity {
     }
 
     public ApplicationEntity(String siteId, String appType) {
-        SiteEntity siteEntity = new SiteEntity("", siteId);
-        this.site = siteEntity;
+        this.site = new SiteEntity("", siteId);
         ApplicationDesc applicationDesc = new ApplicationDesc();
         applicationDesc.setType(appType);
         this.descriptor = applicationDesc;
@@ -145,6 +144,14 @@ public class ApplicationEntity extends PersistenceEntity {
 
     public void setStreams(List<StreamDesc> streams) {
         this.streams = streams;
+    }
+
+    public boolean isExecutable() {
+        return executable;
+    }
+
+    public void setExecutable(boolean executable) {
+        this.executable = executable;
     }
 
     public static enum Status {
