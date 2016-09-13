@@ -44,6 +44,11 @@ public class StaticWebApplication implements Application<WebEnvironment, WebExec
         return WebEnvironment.class;
     }
 
+    @Override
+    public boolean isExecutable() {
+        return false;
+    }
+
     public String getWebViewPath() {
         return webViewPath;
     }

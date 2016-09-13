@@ -16,22 +16,24 @@
  */
 package org.apache.eagle.app.jpm;
 
-import com.google.inject.Inject;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.test.ApplicationTestBase;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
+
+import com.google.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class JPMWebApplicationTest extends ApplicationTestBase{
+public class JPMWebApplicationTest extends ApplicationTestBase {
     @Inject
     private SiteResource siteResource;
+    
     @Inject
     private ApplicationResource applicationResource;
 
@@ -54,7 +56,7 @@ public class JPMWebApplicationTest extends ApplicationTestBase{
         siteResource.createSite(siteEntity);
         Assert.assertNotNull(siteEntity.getUuid());
 
-        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site","JPM_WEB_APP", ApplicationEntity.Mode.LOCAL);
+        ApplicationOperations.InstallOperation installOperation = new ApplicationOperations.InstallOperation("test_site", "JPM_WEB_APP", ApplicationEntity.Mode.LOCAL);
         installOperation.setConfiguration(getConf());
 
         // Install application
@@ -67,13 +69,13 @@ public class JPMWebApplicationTest extends ApplicationTestBase{
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         try {
             applicationResource.getApplicationEntityByUUID(applicationEntity.getUuid());
-            Assert.fail("Application instance (UUID: "+applicationEntity.getUuid()+") should have been uninstalled");
-        } catch (Exception ex){
+            Assert.fail("Application instance (UUID: " + applicationEntity.getUuid() + ") should have been uninstalled");
+        } catch (Exception ex) {
             // Expected exception
         }
     }
 
-    private Map<String, Object> getConf(){
+    private Map<String, Object> getConf() {
         Map<String, Object> conf = new HashMap<>();
         conf.put("dataSinkConfig.topic", "testTopic");
         conf.put("dataSinkConfig.brokerList", "broker");

@@ -19,7 +19,7 @@ package org.apache.eagle.app;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
 import backtype.storm.generated.StormTopology;
 
-public abstract class StormApplication extends AbstractApplication<StormEnvironment, StormTopology> {
+public abstract class StormApplication extends ExecutableApplication<StormEnvironment, StormTopology> {
     @Override
     public Class<? extends StormEnvironment> getEnvironmentType() {
         return StormEnvironment.class;

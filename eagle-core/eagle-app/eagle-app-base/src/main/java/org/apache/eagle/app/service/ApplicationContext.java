@@ -24,6 +24,7 @@ import org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.ApplicationLifecycle;
+import org.apache.eagle.app.StaticWebApplication;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.sink.KafkaStreamSinkConfig;
@@ -82,6 +83,7 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
 
     @Override
     public void onInstall() {
+        metadata.setExecutable(application.isExecutable());
         if (metadata.getDescriptor().getStreams() != null) {
             List<StreamDesc> streamDescCollection = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
                 StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(streamDefinition.getStreamId(), this.config);
@@ -133,11 +135,13 @@ public class ApplicationContext implements Serializable, ApplicationLifecycle {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onStart() {
         this.runtime.start(this.application, this.config);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onStop() {
         this.runtime.stop(this.application, this.config);

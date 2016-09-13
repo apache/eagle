@@ -20,9 +20,14 @@ import org.apache.eagle.app.environment.Environment;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import com.typesafe.config.Config;
 
-public abstract class AbstractApplication<E extends Environment, P> implements Application<E, P>, ApplicationTool {
+public abstract class ExecutableApplication<E extends Environment, P> implements Application<E, P>, ApplicationTool {
     @Override
     public void run(Config config) {
         ExecutionRuntimeManager.getInstance().getRuntime(getEnvironmentType(), config).start(this, config);
+    }
+
+    @Override
+    public boolean isExecutable() {
+        return true;
     }
 }

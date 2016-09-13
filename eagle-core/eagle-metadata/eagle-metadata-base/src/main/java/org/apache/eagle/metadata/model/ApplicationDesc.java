@@ -16,14 +16,13 @@
  */
 package org.apache.eagle.metadata.model;
 
-import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * Static metadata provided by installed apps
+ * Static metadata provided by installed apps.
  */
 public class ApplicationDesc implements Serializable {
     private String type;
@@ -36,6 +35,7 @@ public class ApplicationDesc implements Serializable {
     private Configuration configuration;
     private List<StreamDefinition> streams;
     private ApplicationDocs docs;
+
     private List<ApplicationDependency> dependencies;
 
     public String getDescription() {
