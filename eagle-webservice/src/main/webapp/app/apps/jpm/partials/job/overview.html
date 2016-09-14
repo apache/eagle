@@ -30,80 +30,316 @@
 		</li>
 	</ul>
 	<div class="tab-content keepContent with-border">
-		<div class="tab-pane" id="cpu">
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top CPU Usage</h3>
-				<div chart class="jpm-chart-container" series="cpuUsageSeries" option="commonOption"></div>
-				<div ng-if="!cpuUsageSeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
-				</div>
-			</div>
-		</div>
-		<div class="tab-pane" id="memory">
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top Physical Memory Usage</h3>
-				<div chart class="jpm-chart-container" series="physicalMemorySeries" option="commonOption"></div>
-				<div ng-if="!physicalMemorySeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
-				</div>
-			</div>
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top Virtual Memory Usage</h3>
-				<div chart class="jpm-chart-container" series="virtualMemorySeries" option="commonOption"></div>
-				<div ng-if="!virtualMemorySeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
-				</div>
-			</div>
-		</div>
-
 		<div class="tab-pane active" id="hdfsBytes">
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top HDFS Bytes Read</h3>
-				<div chart class="jpm-chart-container" series="hdfsBtyesReadSeries" option="commonOption"></div>
-				<div ng-if="!hdfsBtyesReadSeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top HDFS Bytes Read</h3>
+						<div chart class="jpm-chart-container" series="hdfsBtyesReadSeries" option="commonOption"></div>
+						<div ng-if="!hdfsBtyesReadSeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in hdfsBtyesReadSeriesList track by $index">
+								<td class="text-break">
+									<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+										{{item.name}}
+									</a>
+									<span ng-if="type !== 'job'">{{item.name}}</span>
+								</td>
+								<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top HDFS Bytes Written</h3>
-				<div chart class="jpm-chart-container" series="hdfsBtyesWrittenSeries" option="commonOption"></div>
-				<div ng-if="!hdfsBtyesWrittenSeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
+			<hr/>
+
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top HDFS Bytes Written</h3>
+						<div chart class="jpm-chart-container" series="hdfsBtyesWrittenSeries"
+							 option="commonOption"></div>
+						<div ng-if="!hdfsBtyesWrittenSeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in hdfsBtyesWrittenSeriesList track by $index">
+							<td class="text-break">
+								<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+									{{item.name}}
+								</a>
+								<span ng-if="type !== 'job'">{{item.name}}</span>
+							</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+						</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>
 		<div class="tab-pane" id="hdfsOPs">
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top HDFS Read OPs</h3>
-				<div chart class="jpm-chart-container" series="hdfsReadOpsSeries" option="commonOption"></div>
-				<div ng-if="!hdfsReadOpsSeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top HDFS Read OPs</h3>
+						<div chart class="jpm-chart-container" series="hdfsReadOpsSeries" option="commonOption"></div>
+						<div ng-if="!hdfsReadOpsSeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in hdfsReadOpsSeriesList track by $index">
+							<td class="text-break">
+								<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+									{{item.name}}
+								</a>
+								<span ng-if="type !== 'job'">{{item.name}}</span>
+							</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+						</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top HDFS Write OPs</h3>
-				<div chart class="jpm-chart-container" series="hdfsWriteOpsSeries" option="commonOption"></div>
-				<div ng-if="!hdfsWriteOpsSeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
+			<hr/>
+
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top HDFS Write OPs</h3>
+						<div chart class="jpm-chart-container" series="hdfsWriteOpsSeries" option="commonOption"></div>
+						<div ng-if="!hdfsWriteOpsSeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in hdfsWriteOpsSeriesList track by $index">
+							<td class="text-break">
+								<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+									{{item.name}}
+								</a>
+								<span ng-if="type !== 'job'">{{item.name}}</span>
+							</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+						</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>
 		<div class="tab-pane" id="diskIO">
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top File Bytes Read</h3>
-				<div chart class="jpm-chart-container" series="fileBytesReadSeries" option="commonOption"></div>
-				<div ng-if="!fileBytesReadSeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top File Bytes Read</h3>
+						<div chart class="jpm-chart-container" series="fileBytesReadSeries" option="commonOption"></div>
+						<div ng-if="!fileBytesReadSeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in fileBytesReadSeriesList track by $index">
+							<td class="text-break">
+								<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+									{{item.name}}
+								</a>
+								<span ng-if="type !== 'job'">{{item.name}}</span>
+							</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+						</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 
-			<div class="jpm-chart chart-lg overlay-wrapper">
-				<h3 class="text-center">Top File Bytes Written</h3>
-				<div chart class="jpm-chart-container" series="fileBytesWrittenSeries" option="commonOption"></div>
-				<div ng-if="!fileBytesWrittenSeries._done" class="overlay">
-					<i class="fa fa-refresh fa-spin"></i>
+			<hr/>
+
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top File Bytes Written</h3>
+						<div chart class="jpm-chart-container" series="fileBytesWrittenSeries"
+							 option="commonOption"></div>
+						<div ng-if="!fileBytesWrittenSeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in fileBytesWrittenSeriesList track by $index">
+							<td class="text-break">
+								<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+									{{item.name}}
+								</a>
+								<span ng-if="type !== 'job'">{{item.name}}</span>
+							</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="cpu">
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top CPU Usage</h3>
+						<div chart class="jpm-chart-container" series="cpuUsageSeries" option="commonOption"></div>
+						<div ng-if="!cpuUsageSeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in cpuUsageSeriesList track by $index">
+							<td class="text-break">
+								<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+									{{item.name}}
+								</a>
+								<span ng-if="type !== 'job'">{{item.name}}</span>
+							</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" id="memory">
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top Physical Memory Usage</h3>
+						<div chart class="jpm-chart-container" series="physicalMemorySeries"
+							 option="commonOption"></div>
+						<div ng-if="!physicalMemorySeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in physicalMemorySeriesList track by $index">
+							<td class="text-break">
+								<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+									{{item.name}}
+								</a>
+								<span ng-if="type !== 'job'">{{item.name}}</span>
+							</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<hr/>
+
+			<div class="row">
+				<div class="col-sm-6 col-md-8 col-lg-9">
+					<div class="jpm-chart chart-lg overlay-wrapper">
+						<h3 class="text-center">Top Virtual Memory Usage</h3>
+						<div chart class="jpm-chart-container" series="virtualMemorySeries" option="commonOption"></div>
+						<div ng-if="!virtualMemorySeries._done" class="overlay">
+							<i class="fa fa-refresh fa-spin"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-md-4 col-lg-3">
+					<table class="table table-striped">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr ng-repeat="item in virtualMemorySeriesList track by $index">
+							<td class="text-break">
+								<a ui-sref="jpmDetail({siteId: site, jobId: item.name})" ng-if="type === 'job'" target="_blank">
+									{{item.name}}
+								</a>
+								<span ng-if="type !== 'job'">{{item.name}}</span>
+							</td>
+							<td title="{{item.total}}">{{common.number.abbr(item.total, true)}}</td>
+						</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>

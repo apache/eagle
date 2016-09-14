@@ -263,9 +263,9 @@
 		return common.number.toFixed(num, fixed).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	};
 
-	common.number.abbr = function (number, isByte, decPlaces) {
-		decPlaces = decPlaces || 2;
-		decPlaces = Math.pow(10, decPlaces);
+	common.number.abbr = function (number, isByte, digits) {
+		digits = digits || 2;
+		var decPlaces = Math.pow(10, digits);
 		var abbrev = isByte ? ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['K', 'M', 'B', 'T', 'Q'];
 		var base = isByte ? 1024 : 1000;
 		var sign = number < 0 ? -1 : 1;
@@ -285,7 +285,7 @@
 			}
 		}
 		unit = unit ? unit : "";
-		return number * sign + unit;
+		return (number * sign).toFixed(digits) + unit;
 	};
 
 	common.number.compare = function (num1, num2) {
@@ -301,5 +301,16 @@
 			if(start <= num && num < end) return i;
 		}
 		return rangList.length - 1;
+	};
+
+	common.number.sum = function (list, path) {
+		var total = 0;
+		$.each(list, function (i, obj) {
+			var value = common.getValueByPath(obj, path);
+			if(typeof value === "number" && !isNaN(value)) {
+				total += value;
+			}
+		});
+		return total;
 	};
 })();

@@ -37,9 +37,24 @@
 
 			$scope.commonOption = {
 				animation: false,
+				tooltip: {
+					formatter: function (points) {
+						return points[0].name + "<br/>" +
+								$.map(points, function (point) {
+									return '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + point.color + '"></span> ' +
+											point.seriesName + ": " +
+										common.number.format(point.value, true);
+								}).reverse().join("<br/>");
+					}
+				},
 				grid: {
-					top: 60
-				}
+					top: 70
+				},
+				yAxis: [{
+					axisLabel: {formatter: function (value) {
+						return common.number.abbr(value, true);
+					}}
+				}]
 			};
 
 			// ======================================================================
@@ -66,24 +81,38 @@
 					if(scopeVariable) {
 						$scope[scopeVariable] = [];
 						$scope[scopeVariable]._done = false;
+						$scope[scopeVariable + "List"] = [];
 					}
 
 					var aggregation = $scope.aggregationMap[$scope.type];
 
 					var aggPromise = cache[metric] = cache[metric] || JPM.aggMetricsToEntities(
-						JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "max(value), sum(value) desc", intervalMin, startTime, endTime, 10)
+						JPM.aggMetrics({site: $scope.site}, metric, [aggregation], "avg(value), sum(value) desc", intervalMin, startTime, endTime, 10)
 					)._promise.then(function (list) {
 						var series = $.map(list, function (metrics) {
-							return JPM.metricsToSeries(metrics[0].tags[aggregation], metrics);
+							return JPM.metricsToSeries(metrics[0].tags[aggregation], metrics, {
+								stack: "stack",
+								areaStyle: {normal: {}}
+							});
 						});
-						console.log("=>", series);
-						return series;
+
+						var topList = $.map(series, function (series) {
+							return {
+								name: series.name,
+								total: common.number.sum(series.data, "y") * intervalMin
+							};
+						}).sort(function (a, b) {
+							return b.total - a.total;
+						});
+
+						return [series, topList];
 					});
 
-					aggPromise.then(function (series) {
+					aggPromise.then(function (args) {
 						if(scopeVariable) {
-							$scope[scopeVariable] = series;
+							$scope[scopeVariable] = args[0];
 							$scope[scopeVariable]._done = true;
+							$scope[scopeVariable + "List"] = args[1];
 						}
 					});
 
