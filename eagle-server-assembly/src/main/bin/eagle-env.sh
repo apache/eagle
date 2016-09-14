@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+export EAGLE_SERVER_JMX_PORT=9999
+
 # EAGLE Environment Variables
 export EAGLE_HOME=$(dirname $0)/..
 export EAGLE_CLASSPATH=$EAGLE_HOME/conf
