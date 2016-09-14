@@ -303,6 +303,7 @@
         <metrics-elasticsearch-reporter.version>2.2.0</metrics-elasticsearch-reporter.version>
 
         <common.cli.version>1.3.1</common.cli.version>
+	    <ullink.slack.version>0.6.0</ullink.slack.version>
 
         <!-- dropwizard -->
         <dropwizard.version>0.7.1</dropwizard.version>
