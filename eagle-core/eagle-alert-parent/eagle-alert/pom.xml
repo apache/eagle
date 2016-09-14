@@ -306,6 +306,11 @@
 	 			<version>${embed.mongo.version}</version>
 	 			<scope>test</scope>
 	 		</dependency>
+            <dependency>
+                <groupId>com.ullink.slack</groupId>
+                <artifactId>simpleslackapi</artifactId>
+                <version>${ullink.slack.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
