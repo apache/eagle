@@ -37,7 +37,7 @@ public class TopologyExtractorFactory {
 
     private static Map<String, Constructor<? extends TopologyExtractorBase>> extractorMap = Collections.synchronizedMap(new HashMap<>());
 
-    private static void registerParser(String topologyType, Class<? extends TopologyExtractorBase> clazz) {
+    private static void registerTopologyExtractor(String topologyType, Class<? extends TopologyExtractorBase> clazz) {
         Constructor<? extends TopologyExtractorBase> constructor = null;
         try {
             constructor = clazz.getConstructor(TopologyCheckAppConfig.class);
@@ -64,8 +64,8 @@ public class TopologyExtractorFactory {
     }
 
     static {
-        registerParser(TopologyConstants.TopologyType.HBASE.name(), HbaseTopologyExtractor.class);
-        //registerParser(TopologyConstants.TopologyType.HDFS.name(), HdfsTopologyEntityParser.class);
-        //registerParser(TopologyConstants.TopologyType.MR.name(), MRTopologyEntityParser.class);
+        registerTopologyExtractor(TopologyConstants.TopologyType.HBASE.name(), HbaseTopologyExtractor.class);
+        //registerTopologyExtractor(TopologyConstants.TopologyType.HDFS.name(), HdfsTopologyEntityParser.class);
+        //registerTopologyExtractor(TopologyConstants.TopologyType.MR.name(), MRTopologyEntityParser.class);
     }
 }

@@ -32,7 +32,6 @@ public class HbaseTopologyExtractor implements TopologyExtractorBase {
 
     }
 
-
     @Override
     public void extract() {
 

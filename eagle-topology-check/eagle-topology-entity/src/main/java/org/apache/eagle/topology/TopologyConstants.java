@@ -47,9 +47,48 @@ public class TopologyConstants {
     public static final Pattern HTTP_HOST_MATCH_PATTERN_2 = Pattern.compile("^//(.+?):-?(\\d+)/");
     public static final Pattern LOCAL_HOST_MATCH_PATTERN = Pattern.compile("^///(.+?):-?(\\d+)/");
 
+    public static final String SITE_TAG = "site";
+    public static final String RACK_TAG = "rack";
+    public static final String HOSTNAME_TAG = "hostname";
+    public static final String CATEGORY_TAG = "category";
+    public static final String ROLE_TAG = "role";
+
+    public static final String NAME_NODE_ROLE = "namenode";
+    public static final String DATA_NODE_ROLE = "datanode";
+    public static final String RESOURCE_MANAGER_ROLE = "resourcemanager";
+    public static final String NODE_MANAGER_ROLE = "nodemanager";
+    public static final String REGIONSERVER_ROLE = "regionserver";
+    public static final String HMASTER_ROLE = "hmaster";
+
+    // Status definitions for namenode
+    public static final String NAME_NODE_ACTIVE_STATUS = "active";
+    public static final String NAME_NODE_STANDBY_STATUS = "standby";
+
+    // Status definitions for data node
+    public static final String DATA_NODE_LIVE_STATUS = "live";
+    public static final String DATA_NODE_DEAD_STATUS = "dead";
+    public static final String DATA_NODE_LIVE_DECOMMISSIONED_STATUS = "live_decommissioned";
+    public static final String DATA_NODE_DEAD_DECOMMISSIONED_STATUS = "dead_decommissioned";
+    public static final String DATA_NODE_DEAD_NOT_DECOMMISSIONED_STATUS = "dead_not_decommissioned";
+
+    // Status definitions for resource manager
+    public static final String RESOURCE_MANAGER_LIVE_STATUS = "live";
+
+    // Status definitions for node manager
+    public static final String NODE_MANAGER_LIVE_STATUS = "live";
+    public static final String NODE_MANAGER_EXCLUDED_STATUS = "excluded";
+    public static final String NODE_MANAGER_BLACKLISTED_STATUS = "blacklisted";
+
+    // Status definitions for hbase regionserver
+    public static final String REGIONSERVER_LIVE_STATUS = "live";
+    public static final String REGIONSERVER_DEAD_STATUS = "dead";
+
+    // Status definitions for hbase hmaster
+    public static final String HMASTER_ACTIVE_STATUS = "active";
+    public static final String HMASTER_STANDBY_STATUS = "standby";
+
 
     public enum HadoopVersion {
-        V1,
         V2
     }
 

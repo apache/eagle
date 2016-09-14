@@ -25,9 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import static org.apache.eagle.topology.TopologyConstants.*;
 
@@ -54,6 +52,18 @@ public class TopologyDataExtractor {
         for (TopologyExtractorBase topologyExtractor : extractors) {
             futures.add(executorService.submit(new DataFetchRunnableWrapper(topologyExtractor)));
         }
+        futures.forEach(future -> {
+            try {
+                future.get(MAX_WAIT_TIME, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                LOGGER.info("Caught an overtime exception with message" + e.getMessage());
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private List<TopologyExtractorBase> getExtractors() {
@@ -74,7 +84,7 @@ public class TopologyDataExtractor {
 
         @Override
         public void run() {
-
+            topologyExtractor.extract();
         }
     }
 
