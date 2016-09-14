@@ -698,7 +698,11 @@ public class JHFSparkEventReader {
         int port = conf.getInt("eagleProps.eagle.service.port");
         String userName = conf.getString("eagleProps.eagle.service.username");
         String pwd = conf.getString("eagleProps.eagle.service.password");
-        client = new EagleServiceClientImpl(host, port, userName, pwd);
+        String basePath = EagleServiceBaseClient.DEFAULT_BASE_PATH;
+        if (conf.hasPath("eagleProps.eagle.service.basePath")) {
+            basePath = conf.getString("eagleProps.eagle.service.basePath");
+        }
+        client = new EagleServiceClientImpl(host, port, basePath, userName, pwd);
         int timeout = conf.getInt("eagleProps.eagle.service.read.timeout");
         client.getJerseyClient().setReadTimeout(timeout * 1000);
 

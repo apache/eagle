@@ -16,17 +16,20 @@
  */
 package org.apache.eagle.app.service.impl;
 
-import org.apache.eagle.app.service.ApplicationProviderLoader;
-import org.apache.eagle.app.service.ApplicationProviderService;
-import org.apache.eagle.app.spi.ApplicationProvider;
-import org.apache.eagle.metadata.model.ApplicationDesc;
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
+import org.apache.eagle.app.service.ApplicationProviderLoader;
+import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.spi.ApplicationProvider;
+import org.apache.eagle.metadata.model.ApplicationDependency;
+import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +42,7 @@ public class ApplicationProviderServiceImpl implements ApplicationProviderServic
     private final Config config;
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationProviderServiceImpl.class);
     private final ApplicationProviderLoader appProviderLoader;
-    public static final String APP_PROVIDER_LOADER_CLASS_KEY = "application.provider.loader";
+    private static final String APP_PROVIDER_LOADER_CLASS_KEY = "application.provider.loader";
 
     @Inject
     public ApplicationProviderServiceImpl(Config config) {
@@ -67,6 +70,47 @@ public class ApplicationProviderServiceImpl implements ApplicationProviderServic
         LOG.warn("Loading application providers ...");
         appProviderLoader.load();
         LOG.warn("Loaded {} application providers", appProviderLoader.getProviders().size());
+        validate();
+    }
+
+    private void validate() {
+        for (ApplicationDesc applicationDesc : getApplicationDescs()) {
+            LOG.debug("Validating {}", applicationDesc.getType());
+
+            Preconditions.checkNotNull(applicationDesc.getType(), "type is null in " + applicationDesc);
+            Preconditions.checkNotNull(applicationDesc.getVersion(), "version is null in " + applicationDesc);
+            Preconditions.checkNotNull(applicationDesc.getName(), "name is null in " + applicationDesc);
+
+            // Validate Dependency
+            LOG.debug("Validating dependency of {}", applicationDesc.getType());
+            List<ApplicationDependency> dependencyList = applicationDesc.getDependencies();
+            if (dependencyList != null) {
+                for (ApplicationDependency dependency : dependencyList) {
+                    try {
+                        ApplicationDesc dependencyDesc = getApplicationDescByType(dependency.getType());
+                        if (dependencyDesc != null && dependency.getVersion() != null) {
+                            if (dependencyDesc.getVersion().equals(dependency.getVersion())) {
+                                LOG.debug("Loaded dependency {} -> {}", applicationDesc.getType(), dependency);
+                            } else {
+                                LOG.warn("Loaded dependency {} -> {}, but the version was mismatched, expected: {}, actual: {}",
+                                    applicationDesc.getType(), dependency, dependency.getVersion(), applicationDesc.getVersion());
+                            }
+                        } else {
+                            assert dependencyDesc != null;
+                            dependency.setVersion(dependencyDesc.getVersion());
+                        }
+                    } catch (IllegalArgumentException ex) {
+                        if (!dependency.isRequired()) {
+                            LOG.warn("Unable to load dependency {} -> {}", applicationDesc.getType(), dependency, ex);
+                        } else {
+                            LOG.error("Failed to load dependency {} -> {}", applicationDesc.getType(), dependency,ex);
+                            throw new IllegalStateException("Failed to load application providers due to dependency missing",ex);
+                        }
+                    }
+                }
+            }
+            LOG.info("Validated {} successfully", applicationDesc.getType());
+        }
     }
 
     public Collection<ApplicationProvider> getProviders() {
@@ -81,7 +125,6 @@ public class ApplicationProviderServiceImpl implements ApplicationProviderServic
         return appProviderLoader.getApplicationProviderByType(type);
     }
 
-    @Deprecated
     public ApplicationDesc getApplicationDescByType(String appType) {
         return appProviderLoader.getApplicationProviderByType(appType).getApplicationDesc();
     }

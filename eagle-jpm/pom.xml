@@ -40,8 +40,9 @@
         <module>eagle-hadoop-queue</module>
         <module>eagle-jpm-util</module>
         <module>eagle-jpm-mr-running</module>
-        <module>eagle-jpm-app</module>
+        <module>eagle-jpm-web</module>
         <module>eagle-jpm-service</module>
+        <module>eagle-jpm-aggregation</module>
     </modules>
 
     <dependencies>

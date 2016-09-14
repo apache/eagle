@@ -1,16 +1,4 @@
-package org.apache.eagle.app;
-
-import org.apache.eagle.app.config.ApplicationProviderDescConfig;
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import java.io.InputStream;
-
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -26,13 +14,17 @@ import java.io.InputStream;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.eagle.app;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import java.io.InputStream;
+
+
 public class ApplicationProviderDescConfigTest {
-    @Test
-    @Ignore
-    public void testApplicationDescWrapperConfigLoadFromXML(){
-        ApplicationProviderDescConfig config = ApplicationProviderDescConfig.loadFromXML(ApplicationProviderDescConfigTest.class, "TestApplicationMetadata.xml");
-        Assert.assertNotNull(config);
-    }
 
     @Test
     public void testStreamDefinitionLoadFromXML(){

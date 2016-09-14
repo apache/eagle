@@ -30,6 +30,9 @@ import java.net.URLClassLoader;
 import java.util.ServiceLoader;
 import java.util.function.Function;
 
+/**
+ * Load Application Provider with SPI, by default from current class loader.
+ */
 public class ApplicationProviderSPILoader extends ApplicationProviderLoader {
     private final String appProviderExtDir;
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationProviderSPILoader.class);

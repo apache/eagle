@@ -16,10 +16,7 @@
  */
 package org.apache.eagle.app.environment;
 
-import org.apache.eagle.app.environment.impl.SparkEnvironment;
-import org.apache.eagle.app.environment.impl.SparkExecutionRuntime;
-import org.apache.eagle.app.environment.impl.StormEnvironment;
-import org.apache.eagle.app.environment.impl.StormExecutionRuntime;
+import org.apache.eagle.app.environment.impl.*;
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
@@ -42,6 +39,7 @@ public class ExecutionRuntimeManager {
     static {
         getInstance().register(StormEnvironment.class, new StormExecutionRuntime.Provider());
         getInstance().register(SparkEnvironment.class, new SparkExecutionRuntime.Provider());
+        getInstance().register(WebEnvironment.class, new WebExecutionRuntime.Provider());
     }
 
     private final Map<Class<? extends Environment>, ExecutionRuntimeProvider> executionRuntimeProviders;

@@ -122,11 +122,13 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
         // Utils.sleep(3000);
         collector.emit(new Values(msgId), msgId);
         zkState.updateApplicationStatus((String)msgId, ZKStateConstant.AppStatus.FAILED);
+        LOG.warn("fail {}", msgId.toString());
     }
 
     @Override
     public void ack(Object msgId) {
         zkState.updateApplicationStatus((String)msgId, ZKStateConstant.AppStatus.FINISHED);
+        LOG.info("ack {}", msgId.toString());
     }
 
     @Override
