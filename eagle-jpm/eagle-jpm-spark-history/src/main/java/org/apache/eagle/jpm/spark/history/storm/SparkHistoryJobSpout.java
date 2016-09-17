@@ -107,7 +107,7 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
         try {
             Thread.sleep(seconds * 1000);
         } catch (InterruptedException e) {
-            LOG.warn("exception found {}", e);
+            LOG.warn("exception found", e);
         }
     }
 
