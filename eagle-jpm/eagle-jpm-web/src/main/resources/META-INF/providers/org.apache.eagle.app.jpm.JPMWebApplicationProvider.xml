@@ -40,4 +40,18 @@
             <!--<required>true</required>-->
         <!--</dependency>-->
     </dependencies>
+    <configuration>
+        <property>
+            <name>service.host</name>
+            <value>localhost</value>
+            <displayName>Eagle Service Host</displayName>
+            <description>Eagle Service Host, default: localhost</description>
+        </property>
+        <property>
+            <name>service.port</name>
+            <value>8080</value>
+            <displayName>Eagle Service Port</displayName>
+            <description>Eagle Service Port, default: 8080</description>
+        </property>
+    </configuration>
 </application>
