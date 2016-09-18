@@ -36,18 +36,18 @@ public class Configuration {
         return properties;
     }
 
-    public Property getProperty(String name){
-        for(Property property :properties){
-            if(property.getName().equals(name)){
+    public Property getProperty(String name) {
+        for (Property property : properties) {
+            if (property.getName().equals(name)) {
                 return property;
             }
         }
         return null;
     }
 
-    public boolean hasProperty(String name){
-        for(Property property :properties){
-            if(property.getName().equals(name)){
+    public boolean hasProperty(String name) {
+        for (Property property : properties) {
+            if (property.getName().equals(name)) {
                 return true;
             }
         }
@@ -61,12 +61,13 @@ public class Configuration {
     public static Configuration fromResource(String resourceName) throws JAXBException {
         return ConfigTemplateHelper.unmarshallFromResource(resourceName);
     }
+
     public static Configuration fromString(String xmlContent) throws JAXBException {
         return ConfigTemplateHelper.unmarshallFromXMLString(xmlContent);
     }
 
-    public int size(){
-        if(this.properties == null){
+    public int size() {
+        if (this.properties == null) {
             return 0;
         }
         return this.properties.size();

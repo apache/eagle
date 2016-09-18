@@ -46,12 +46,14 @@
             <value>localhost</value>
             <displayName>Eagle Service Host</displayName>
             <description>Eagle Service Host, default: localhost</description>
+            <required>true</required>
         </property>
         <property>
             <name>service.port</name>
             <value>8080</value>
             <displayName>Eagle Service Port</displayName>
             <description>Eagle Service Port, default: 8080</description>
+            <required>true</required>
         </property>
     </configuration>
 </application>
