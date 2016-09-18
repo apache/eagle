@@ -19,7 +19,7 @@
 package org.apache.eagle.service.jpm.suggestion;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.eagle.common.DateTimeUtil;
+import org.apache.eagle.jpm.mr.historyentity.TaskExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.service.jpm.MRTaskExecutionResponse;
@@ -33,18 +33,42 @@ import java.util.List;
 
 public abstract class AbstractGCFunc implements SuggestionFunc {
 
-    private static final String GC_RATIO_NAME_FORMAT = "gcRatio: %s / %s";
+    private static final String GC_RATIO_NAME_FORMAT = "gcRatio (%s / %s) deviation";
+    private static final String GC_SUGGESTION_FORMAT = "gcRatio deviation exceeds threshold %.2f, where the deviation is %.2f / %.2f";
 
-    private static final double GC_RATIO_THRESHOLD = 0.03d;
-    private static final long RUNTIME_IN_MIN_THRESHOLD = 12;
+    private static final double GC_RATIO_DEVIATION_THRESHOLD = 2;
 
     private Constants.SuggestionType suggestionType;
+    private double threshold;
 
     public AbstractGCFunc(Constants.SuggestionType suggestionType) {
         this.suggestionType = suggestionType;
+        this.threshold = GC_RATIO_DEVIATION_THRESHOLD;
+    }
+
+    public AbstractGCFunc(Constants.SuggestionType suggestionType, double threshold) {
+        this.suggestionType = suggestionType;
+        this.threshold = threshold > 0 ? threshold : GC_RATIO_DEVIATION_THRESHOLD;
     }
 
     protected abstract TaskGroup getTasks(TaskGroupResponse tasks);
+
+
+    private double getGcRatio(List<TaskExecutionAPIEntity> tasks) {
+        if (tasks.isEmpty()) {
+            return 0;
+        }
+        double[] gcMs = ResourceUtils.getCounterValues(tasks, JobCounters.CounterName.GC_MILLISECONDS);
+        double[] cpuMs = ResourceUtils.getCounterValues(tasks, JobCounters.CounterName.CPU_MILLISECONDS);
+
+        DescriptiveStatistics statistics = new DescriptiveStatistics();
+        double averageCpuMs = statistics.getMeanImpl().evaluate(cpuMs);
+        double averageGcMs = statistics.getMeanImpl().evaluate(gcMs);
+        if (averageCpuMs == 0) {
+            averageCpuMs = 1;
+        }
+        return averageGcMs / averageCpuMs;
+    }
 
     @Override
     public JobSuggestionResponse apply(TaskGroupResponse data) {
@@ -55,40 +79,26 @@ public abstract class AbstractGCFunc implements SuggestionFunc {
         if (taskGroup.longTasks.isEmpty()) {
             return response;
         }
-        double[] gcMs = ResourceUtils.getCounterValues(taskGroup.longTasks, JobCounters.CounterName.GC_MILLISECONDS);
-        double[] cpuMs = ResourceUtils.getCounterValues(taskGroup.longTasks, JobCounters.CounterName.CPU_MILLISECONDS);
-        List<Double> runtimeList = new ArrayList<>();
-        taskGroup.longTasks.forEach(o -> runtimeList.add(Double.valueOf(o.getDuration())));
-        double[] runtimeMs = ResourceUtils.toArray(runtimeList);
 
-        DescriptiveStatistics statistics = new DescriptiveStatistics();
-        long averageRuntimeMs = (long) statistics.getMeanImpl().evaluate(runtimeMs);
-        long averageCpuMs = (long) statistics.getMeanImpl().evaluate(cpuMs);
-        long averageGcMs = (long) statistics.getMeanImpl().evaluate(gcMs);
-
-        response.suggestionResults = getGCsuggest(averageCpuMs, averageGcMs, averageRuntimeMs);
-        response.suggestionResults.add(getRuntimeSuggest(averageRuntimeMs));
+        double smallerGcRatio = getGcRatio(taskGroup.shortTasks);
+        double largerGcRatio = getGcRatio(taskGroup.longTasks);
+        response.suggestionResults = getGCsuggest(smallerGcRatio, largerGcRatio);
         return response;
     }
 
-    private List<MRTaskExecutionResponse.SuggestionResult> getGCsuggest(long avgCpuMs, long avgGcMs, long avgRuntimeMs) {
-        List<MRTaskExecutionResponse.SuggestionResult> suggestionResults = new ArrayList<>();
-        double gcRatio = avgGcMs * 1d / avgCpuMs;
+    private List<MRTaskExecutionResponse.SuggestionResult> getGCsuggest(double smallerRatio, double largerRatio) {
+        if (smallerRatio <= 0) {
+            smallerRatio = 1;
+        }
+        double deviation = largerRatio / smallerRatio;
         String suggestName = String.format(GC_RATIO_NAME_FORMAT, JobCounters.CounterName.GC_MILLISECONDS.getName(), JobCounters.CounterName.CPU_MILLISECONDS.getName());
         String suggestion = null;
-        if (gcRatio > GC_RATIO_THRESHOLD) {
-            suggestion = "gcRatio exceeds threshold " + GC_RATIO_THRESHOLD;
+        if (deviation > threshold) {
+            suggestion = String.format(GC_SUGGESTION_FORMAT, threshold, largerRatio, smallerRatio);
         }
-        suggestionResults.add(new MRTaskExecutionResponse.SuggestionResult(suggestName, gcRatio, suggestion));
-        suggestionResults.add(getRuntimeSuggest(avgRuntimeMs));
+        List<MRTaskExecutionResponse.SuggestionResult> suggestionResults = new ArrayList<>();
+        suggestionResults.add(new MRTaskExecutionResponse.SuggestionResult(suggestName, deviation, suggestion));
         return suggestionResults;
     }
 
-    private MRTaskExecutionResponse.SuggestionResult getRuntimeSuggest(long avgRuntimeMs) {
-        String suggestion = null;
-        if (avgRuntimeMs > RUNTIME_IN_MIN_THRESHOLD * DateTimeUtil.ONEMINUTE) {
-            suggestion = String.format("average task duration exceeds threshold %d minutes", RUNTIME_IN_MIN_THRESHOLD);
-        }
-        return new MRTaskExecutionResponse.SuggestionResult("average task duration", avgRuntimeMs, suggestion);
-    }
 }

@@ -22,15 +22,18 @@ import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.service.jpm.MRTaskExecutionResponse;
 
-public class MapDataSkewFunc extends AbstractDataSkewFunc {
+public class ReduceInputFunc extends AbstractInputFunc {
 
-    public MapDataSkewFunc() {
-        super(JobCounters.CounterName.HDFS_BYTES_READ, Constants.SuggestionType.MapDataSkew);
+    public ReduceInputFunc() {
+        super(JobCounters.CounterName.REDUCE_SHUFFLE_BYTES, Constants.SuggestionType.ReduceInput);
+    }
+
+    public ReduceInputFunc(double threshold) {
+        super(JobCounters.CounterName.REDUCE_SHUFFLE_BYTES, Constants.SuggestionType.ReduceInput, threshold);
     }
 
     @Override
     protected MRTaskExecutionResponse.TaskGroup getTasks(MRTaskExecutionResponse.TaskGroupResponse tasks) {
-        return tasks.tasksGroupByType.get(Constants.TaskType.MAP.toString());
+        return tasks.tasksGroupByType.get(Constants.TaskType.REDUCE.toString());
     }
-
 }

@@ -59,19 +59,24 @@ public class TestDataSkewFunc {
 
     @Test
     public void testDataSkewFunc() {
+        MRTaskExecutionResponse.TaskGroupResponse response = new MRTaskExecutionResponse.TaskGroupResponse();
+        response.tasksGroupByType = new HashMap<>();
+        response.tasksGroupByType.put(Constants.TaskType.MAP.toString(), new MRTaskExecutionResponse.TaskGroup());
+        response.tasksGroupByType.put(Constants.TaskType.REDUCE.toString(), new MRTaskExecutionResponse.TaskGroup());
+
         List<TaskExecutionAPIEntity> tasks = new ArrayList<>();
         tasks.add(createTestTask(Constants.TaskType.MAP.toString(), 9480, 327, 12860L));
         tasks.add(createTestTask(Constants.TaskType.MAP.toString(), 27619, 379682, 379682));
         tasks.add(createTestTask(Constants.TaskType.REDUCE.toString(), 19699, 45, 908));
         tasks.add(createTestTask(Constants.TaskType.REDUCE.toString(), 35688, 45, 293797));
         tasks.add(createTestTask(Constants.TaskType.REDUCE.toString(), 31929, 45, 2062520));
-        MRTaskExecutionResponse.TaskGroupResponse taskGroup = resource.groupTasksByValue(tasks, 10000);
+        MRTaskExecutionResponse.TaskGroupResponse taskGroup = resource.groupTasksByValue(response, true, tasks, 10000);
 
         List<MRTaskExecutionResponse.JobSuggestionResponse> result = new ArrayList<>();
 
         List<SuggestionFunc> suggestionFuncs = new ArrayList<>();
-        suggestionFuncs.add(new MapDataSkewFunc());
-        suggestionFuncs.add(new ReduceDataSkewFunc());
+        suggestionFuncs.add(new MapInputFunc());
+        suggestionFuncs.add(new ReduceInputFunc());
         try {
             for (SuggestionFunc func : suggestionFuncs) {
                 result.add(func.apply(taskGroup));

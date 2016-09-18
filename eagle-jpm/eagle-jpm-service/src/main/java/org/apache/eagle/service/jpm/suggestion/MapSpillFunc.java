@@ -30,44 +30,61 @@ import java.util.List;
 
 public class MapSpillFunc implements SuggestionFunc {
 
-    private static final long SPILL_NORM_FACTOR = 10000;
-    private static final double SPILL_RATIO_THRESHOLD = 2.5d;
-    private static final double SPILL_RECORDS_THRESHOLD = 100;
-    private static final String SPILL_RATIO_NAME_FORMAT = "spillRatio: %s / %s";
+    private static final double SPILL_DEVIATION_THRESHOLD = 2;
 
-    private List<TaskExecutionAPIEntity> getTasks(TaskGroupResponse data) {
-        return data.tasksGroupByType.get(Constants.TaskType.MAP.toString()).longTasks;
+    private static final String SPILL_RATIO_NAME_FORMAT = "average %s deviation";
+    private static final String SPILL_SUGGESTION_FORMAT = "map spill deviation exceeds threshold %.2f, where the deviation is %.2f / %.2f";
+
+    private double threshold;
+
+    public MapSpillFunc() {
+        this.threshold = SPILL_DEVIATION_THRESHOLD;
+    }
+
+    public MapSpillFunc(double threshold) {
+        this.threshold = threshold > 0 ? threshold : SPILL_DEVIATION_THRESHOLD;
+    }
+
+    private MRTaskExecutionResponse.TaskGroup getTasks(TaskGroupResponse data) {
+        return data.tasksGroupByType.get(Constants.TaskType.MAP.toString());
+    }
+
+    private double getAverageSpillBytes(List<TaskExecutionAPIEntity> tasks) {
+        if (tasks.isEmpty()) {
+            return 0;
+        }
+        long totalSpillBytes = 0;
+        for (TaskExecutionAPIEntity task : tasks) {
+            totalSpillBytes += task.getJobCounters().getCounterValue(JobCounters.CounterName.SPLIT_RAW_BYTES);
+        }
+        return totalSpillBytes / tasks.size();
     }
 
     @Override
     public JobSuggestionResponse apply(TaskGroupResponse data) {
-        List<TaskExecutionAPIEntity> tasks = getTasks(data);
+        MRTaskExecutionResponse.TaskGroup tasks = getTasks(data);
 
-        long totalSpillRecords = 0;
-        long totalOutputRecords = 0;
-        double spillRatio = 0;
-        for (TaskExecutionAPIEntity task : tasks) {
-            totalSpillRecords += task.getJobCounters().getCounterValue(JobCounters.CounterName.SPILLED_RECORDS);
-            totalOutputRecords += task.getJobCounters().getCounterValue(JobCounters.CounterName.MAP_OUTPUT_RECORDS);
-        }
-
-        if (totalSpillRecords == 0) {
-            spillRatio = 0;
-        } else {
-            spillRatio = (double) totalSpillRecords / totalOutputRecords;
-        }
+        double smallerSpillBytes = getAverageSpillBytes(tasks.shortTasks);
+        double largerSpillBytes = getAverageSpillBytes(tasks.longTasks);
 
         JobSuggestionResponse response = new JobSuggestionResponse();
         response.suggestionType = Constants.SuggestionType.MapSpill.toString();
-        response.suggestionResults = getSpillSuggest(spillRatio);
-        response.suggestionResults.add(new MRTaskExecutionResponse.SuggestionResult("average spill records", totalSpillRecords / tasks.size()));
+        response.suggestionResults = getSpillSuggest(smallerSpillBytes, largerSpillBytes);
         return response;
     }
 
-    private List<MRTaskExecutionResponse.SuggestionResult> getSpillSuggest(double spillRatio) {
+    private List<MRTaskExecutionResponse.SuggestionResult> getSpillSuggest(double smallerSpillBytes, double largerSpillBytes) {
+        if (smallerSpillBytes == 0) {
+            smallerSpillBytes = 1;
+        }
+        double deviation = largerSpillBytes / smallerSpillBytes;
+        String suggestion = null;
+        if (deviation > threshold) {
+            suggestion = String.format(SPILL_SUGGESTION_FORMAT, threshold, largerSpillBytes, smallerSpillBytes);
+        }
         List<MRTaskExecutionResponse.SuggestionResult> suggestionResults = new ArrayList<>();
-        String suggestName = String.format(SPILL_RATIO_NAME_FORMAT, JobCounters.CounterName.SPILLED_RECORDS.getName(), JobCounters.CounterName.MAP_OUTPUT_RECORDS.getName());
-        suggestionResults.add(new MRTaskExecutionResponse.SuggestionResult(suggestName, spillRatio));
+        String suggestName = String.format(SPILL_RATIO_NAME_FORMAT, JobCounters.CounterName.SPLIT_RAW_BYTES.getName());
+        suggestionResults.add(new MRTaskExecutionResponse.SuggestionResult(suggestName, deviation, suggestion));
         return suggestionResults;
     }
 }

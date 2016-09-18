@@ -97,7 +97,7 @@ public class Constants {
     }
 
     public static enum SuggestionType {
-        MapDataSkew, ReduceDataSkew, MapSpill, MapGC, ReduceGC;
+        MapInput, ReduceInput, MapSpill, MapGC, ReduceGC;
     }
 
     public static final String TASK_RUNNING = "RUNNING";

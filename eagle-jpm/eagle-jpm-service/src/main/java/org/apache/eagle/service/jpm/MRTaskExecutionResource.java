@@ -105,40 +105,41 @@ public class MRTaskExecutionResource {
                                                                    @QueryParam("shortJob_id") String shortDurationJobId,
                                                                    @QueryParam("longJob_id") String longDurationJobId) {
         MRTaskExecutionResponse.TaskGroupResponse result = new MRTaskExecutionResponse.TaskGroupResponse();
-        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{@duration}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, shortDurationJobId);
-        GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> response = ResourceUtils.getQueryResult(query, null, null);
-        if (!response.isSuccess() || response.getObj() == null) {
-            result.errMessage = response.getException();
+        String query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, shortDurationJobId);
+        GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> smallResponse = ResourceUtils.getQueryResult(query, null, null);
+        if (!smallResponse.isSuccess() || smallResponse.getObj() == null) {
+            result.errMessage = smallResponse.getException();
             return result;
         }
         long longestDuration = 0;
-        for (TaskExecutionAPIEntity entity : response.getObj()) {
+        for (TaskExecutionAPIEntity entity : smallResponse.getObj()) {
             if (entity.getDuration() > longestDuration) {
                 longestDuration = entity.getDuration();
             }
         }
         query = String.format("%s[@site=\"%s\" AND @jobId=\"%s\"]{*}", Constants.JPA_TASK_EXECUTION_SERVICE_NAME, site, longDurationJobId);
-        response = ResourceUtils.getQueryResult(query, null, null);
-        if (!response.isSuccess() || response.getObj() == null) {
-            result.errMessage = response.getException();
+        GenericServiceAPIResponseEntity<TaskExecutionAPIEntity> largeResponse = ResourceUtils.getQueryResult(query, null, null);
+        if (!largeResponse.isSuccess() || largeResponse.getObj() == null) {
+            result.errMessage = largeResponse.getException();
             return result;
         }
-
-        return groupTasksByValue(response.getObj(), longestDuration);
-    }
-
-    public MRTaskExecutionResponse.TaskGroupResponse groupTasksByValue(List<TaskExecutionAPIEntity> tasks, long value) {
-        MRTaskExecutionResponse.TaskGroupResponse result = new MRTaskExecutionResponse.TaskGroupResponse();
         result.tasksGroupByType = new HashMap<>();
         result.tasksGroupByType.put(Constants.TaskType.MAP.toString(), new MRTaskExecutionResponse.TaskGroup());
         result.tasksGroupByType.put(Constants.TaskType.REDUCE.toString(), new MRTaskExecutionResponse.TaskGroup());
+        groupTasksByValue(result, false, largeResponse.getObj(), longestDuration);
+        groupTasksByValue(result, true, smallResponse.getObj(), longestDuration);
 
+        return result;
+    }
+
+    public MRTaskExecutionResponse.TaskGroupResponse groupTasksByValue(MRTaskExecutionResponse.TaskGroupResponse result, boolean keepShort, List<TaskExecutionAPIEntity> tasks, long value) {
         for (TaskExecutionAPIEntity entity : tasks) {
             String taskType = entity.getTags().get(MRJobTagName.TASK_TYPE.toString());
             MRTaskExecutionResponse.TaskGroup taskGroup = result.tasksGroupByType.get(taskType.toUpperCase());
-            if (entity.getDuration() < value) {
+            if (entity.getDuration() <= value && keepShort) {
                 taskGroup.shortTasks.add(entity);
-            } else {
+            }
+            if (entity.getDuration() > value) {
                 taskGroup.longTasks.add(entity);
             }
         }
@@ -150,7 +151,8 @@ public class MRTaskExecutionResource {
     @Path("taskSuggestion")
     public List<MRTaskExecutionResponse.JobSuggestionResponse> getSuggestion(@QueryParam("site") String site,
                                                                              @QueryParam("shortJob_id") String shortDurationJobId,
-                                                                             @QueryParam("longJob_id") String longDurationJobId) {
+                                                                             @QueryParam("longJob_id") String longDurationJobId,
+                                                                             @QueryParam("thresholdValue") long threshold) {
         List<MRTaskExecutionResponse.JobSuggestionResponse> result = new ArrayList<>();
         MRTaskExecutionResponse.TaskGroupResponse taskGroups = getTaskGroups(site, shortDurationJobId, longDurationJobId);
         if (taskGroups.errMessage != null) {
@@ -158,11 +160,11 @@ public class MRTaskExecutionResource {
             return result;
         }
         List<SuggestionFunc> suggestionFuncs = new ArrayList<>();
-        suggestionFuncs.add(new MapDataSkewFunc());
-        suggestionFuncs.add(new ReduceDataSkewFunc());
-        suggestionFuncs.add(new MapGCFunc());
-        suggestionFuncs.add(new ReduceGCFunc());
-        suggestionFuncs.add(new MapSpillFunc());
+        suggestionFuncs.add(new MapInputFunc(threshold));
+        suggestionFuncs.add(new ReduceInputFunc(threshold));
+        suggestionFuncs.add(new MapGCFunc(threshold));
+        suggestionFuncs.add(new ReduceGCFunc(threshold));
+        suggestionFuncs.add(new MapSpillFunc(threshold));
         try {
             for (SuggestionFunc func : suggestionFuncs) {
                 result.add(func.apply(taskGroups));
@@ -230,7 +232,6 @@ public class MRTaskExecutionResource {
             return result;
         }
     }
-
 
 
 }

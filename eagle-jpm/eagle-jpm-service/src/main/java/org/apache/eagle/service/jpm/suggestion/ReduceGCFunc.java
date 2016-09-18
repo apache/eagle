@@ -27,6 +27,10 @@ public class ReduceGCFunc extends AbstractGCFunc {
         super(Constants.SuggestionType.ReduceGC);
     }
 
+    public ReduceGCFunc(double threshold) {
+        super(Constants.SuggestionType.ReduceGC, threshold);
+    }
+
     @Override
     protected MRTaskExecutionResponse.TaskGroup getTasks(MRTaskExecutionResponse.TaskGroupResponse tasks) {
         return tasks.tasksGroupByType.get(Constants.TaskType.REDUCE.toString());

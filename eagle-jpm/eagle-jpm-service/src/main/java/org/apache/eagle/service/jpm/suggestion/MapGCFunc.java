@@ -27,6 +27,10 @@ public class MapGCFunc extends AbstractGCFunc {
         super(Constants.SuggestionType.MapGC);
     }
 
+    public MapGCFunc(double threshold) {
+        super(Constants.SuggestionType.MapGC, threshold);
+    }
+
     @Override
     protected MRTaskExecutionResponse.TaskGroup getTasks(MRTaskExecutionResponse.TaskGroupResponse tasks) {
         return tasks.tasksGroupByType.get(Constants.TaskType.MAP.toString());

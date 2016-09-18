@@ -29,20 +29,26 @@ import org.apache.eagle.service.jpm.ResourceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractDataSkewFunc implements SuggestionFunc {
+public abstract class AbstractInputFunc implements SuggestionFunc {
 
     private JobCounters.CounterName counterName;
     private Constants.SuggestionType suggestType;
-    private static final long DATA_SKEW_THRESHOLD = 8;
+    private double threshold;
+    private static final long DATA_SKEW_THRESHOLD = 2;
 
-    private static final String DEVIATION_SUGGEST_FORMAT = "%s deviation: |avg2 - avg1| / min(avg1, avg2)";
-    private static final String AVG1_SUGGEST_FORMAT = "avg1: sum(%s) / %d tasks";
-    private static final String AVG2_SUGGEST_FORMAT = "avg2: sum(%s) / %d tasks";
-    private static final String DATA_SKEW_SUGGESTION_FORMAT = "%s deviation exceeds threshold %d";
+    private static final String DEVIATION_SUGGEST_FORMAT = "average %s deviation";
+    private static final String DATA_SKEW_SUGGESTION_FORMAT = "%s deviation exceeds threshold %.2f, where the deviation is %.2f / %.2f";
 
-    public AbstractDataSkewFunc(JobCounters.CounterName counterName, Constants.SuggestionType type) {
+    public AbstractInputFunc(JobCounters.CounterName counterName, Constants.SuggestionType type) {
         this.counterName = counterName;
         this.suggestType = type;
+        this.threshold = DATA_SKEW_THRESHOLD;
+    }
+
+    public AbstractInputFunc(JobCounters.CounterName counterName, Constants.SuggestionType type, double threshold) {
+        this.counterName = counterName;
+        this.suggestType = type;
+        this.threshold = threshold > 0 ? threshold : DATA_SKEW_THRESHOLD;
     }
 
     protected abstract MRTaskExecutionResponse.TaskGroup getTasks(TaskGroupResponse tasks);
@@ -53,30 +59,25 @@ public abstract class AbstractDataSkewFunc implements SuggestionFunc {
         double[] smallerGroup = ResourceUtils.getCounterValues(taskGroup.shortTasks, counterName);
         double[] largerGroup = ResourceUtils.getCounterValues(taskGroup.longTasks, counterName);
         DescriptiveStatistics statistics = new DescriptiveStatistics();
-        long avgSmaller = (long) statistics.getMeanImpl().evaluate(smallerGroup);
-        long avgLarger = (long) statistics.getMeanImpl().evaluate(largerGroup);
+        double avgSmaller = statistics.getMeanImpl().evaluate(smallerGroup);
+        double avgLarger = statistics.getMeanImpl().evaluate(largerGroup);
 
-        long min = Math.min(avgSmaller, avgLarger);
-        long diff = Math.abs(avgLarger - avgSmaller);
-
-        List<MRTaskExecutionResponse.SuggestionResult> suggestionResults = getDeviationSuggest(min, diff);
-        suggestionResults.add(new MRTaskExecutionResponse.SuggestionResult(String.format(AVG1_SUGGEST_FORMAT, counterName.getName(), taskGroup.shortTasks.size()), avgSmaller));
-        suggestionResults.add(new MRTaskExecutionResponse.SuggestionResult(String.format(AVG2_SUGGEST_FORMAT, counterName.getName(), taskGroup.longTasks.size()), avgLarger));
+        List<MRTaskExecutionResponse.SuggestionResult> suggestionResults = getDeviationSuggest(avgSmaller, avgLarger);
         MRTaskExecutionResponse.JobSuggestionResponse response = new MRTaskExecutionResponse.JobSuggestionResponse();
         response.suggestionResults = suggestionResults;
         response.suggestionType = suggestType.toString();
         return response;
     }
 
-    private List<MRTaskExecutionResponse.SuggestionResult> getDeviationSuggest(long averageMin, long averageDiff) {
-        if (averageMin <= 0) {
-            averageMin = 1;
+    private List<MRTaskExecutionResponse.SuggestionResult> getDeviationSuggest(double avgSmaller, double avgLarger) {
+        if (avgSmaller <= 0) {
+            avgSmaller = 1;
         }
-        long deviation = averageDiff / averageMin;
+        double deviation = avgLarger / avgSmaller;
         String suggestName = String.format(DEVIATION_SUGGEST_FORMAT, counterName.getName());
         String suggestion = null;
-        if (deviation > DATA_SKEW_THRESHOLD) {
-            suggestion = String.format(DATA_SKEW_SUGGESTION_FORMAT, counterName.getName(), DATA_SKEW_THRESHOLD);
+        if (deviation > threshold) {
+            suggestion = String.format(DATA_SKEW_SUGGESTION_FORMAT, counterName.getName(), threshold, avgLarger, avgSmaller);
         }
         List<MRTaskExecutionResponse.SuggestionResult> suggestionResults = new ArrayList<>();
         suggestionResults.add(new MRTaskExecutionResponse.SuggestionResult(suggestName, deviation, suggestion));

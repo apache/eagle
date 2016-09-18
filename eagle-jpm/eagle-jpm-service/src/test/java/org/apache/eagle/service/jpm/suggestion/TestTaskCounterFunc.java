@@ -47,7 +47,7 @@ public class TestTaskCounterFunc {
         Map<String, Long> taskCounters = new HashMap<>();
         taskCounters.put(JobCounters.CounterName.GC_MILLISECONDS.getName(), gcMs);
         taskCounters.put(JobCounters.CounterName.CPU_MILLISECONDS.getName(), cpuMs);
-        taskCounters.put(JobCounters.CounterName.SPILLED_RECORDS.getName(), spillRecords);
+        taskCounters.put(JobCounters.CounterName.SPLIT_RAW_BYTES.getName(), spillRecords);
         taskCounters.put(JobCounters.CounterName.MAP_OUTPUT_RECORDS.getName(), mapOutput);
 
         counters.put(JobCounters.GroupName.MapReduceTaskCounter.getName(), taskCounters);
@@ -58,12 +58,16 @@ public class TestTaskCounterFunc {
 
     @Test
     public void testTaskGroupByValue() {
+        MRTaskExecutionResponse.TaskGroupResponse response = new MRTaskExecutionResponse.TaskGroupResponse();
+        response.tasksGroupByType = new HashMap<>();
+        response.tasksGroupByType.put(Constants.TaskType.MAP.toString(), new MRTaskExecutionResponse.TaskGroup());
+        response.tasksGroupByType.put(Constants.TaskType.REDUCE.toString(), new MRTaskExecutionResponse.TaskGroup());
+
         List<TaskExecutionAPIEntity> tasks = new ArrayList<>();
         tasks.add(createTestTask(Constants.TaskType.MAP.toString(), 2132259, 300L, 12860L, 0L, 2091930L));
         tasks.add(createTestTask(Constants.TaskType.MAP.toString(), 42071, 800, 21010L, 0L, 2092547L));
         tasks.add(createTestTask(Constants.TaskType.REDUCE.toString(), 19699, 300, 3320, 0L, 0L));
-        MRTaskExecutionResponse.TaskGroupResponse taskGroup = resource.groupTasksByValue(tasks, 30000);
-
+        MRTaskExecutionResponse.TaskGroupResponse taskGroup = resource.groupTasksByValue(response, true, tasks, 30000);
 
         List<MRTaskExecutionResponse.JobSuggestionResponse> result = new ArrayList<>();
 
