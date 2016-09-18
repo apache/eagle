@@ -21,7 +21,6 @@
     <name>Hbase Audit Log Monitoring Application</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.security.hbase.HBaseAuditLogApplication</appClass>
-    <viewPath>/apps/example</viewPath>
     <configuration>
         <property>
             <name>dataSourceConfig.topic</name>

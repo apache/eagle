@@ -39,7 +39,7 @@ public class HdfsAuditLogApplication extends AbstractHdfsAuditLogApplication {
         return "hdfs_audit_log_stream";
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Config config = ConfigFactory.load();
         HdfsAuditLogApplication app = new HdfsAuditLogApplication();
         app.run(config);
