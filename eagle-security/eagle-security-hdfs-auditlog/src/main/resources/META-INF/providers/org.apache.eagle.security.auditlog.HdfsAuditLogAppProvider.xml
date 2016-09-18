@@ -24,7 +24,6 @@
     <type>HdfsAuditLogApplication</type>
     <name>Hdfs Audit Log Monitoring Application</name>
     <version>0.5.0-incubating</version>
-    <viewPath>/apps/example</viewPath>
     <configuration>
         <!-- topology related configurations -->
         <property>
