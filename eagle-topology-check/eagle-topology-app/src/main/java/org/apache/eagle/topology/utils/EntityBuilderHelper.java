@@ -18,8 +18,11 @@
 
 package org.apache.eagle.topology.utils;
 
+import org.apache.eagle.log.entity.GenericMetricEntity;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 public class EntityBuilderHelper {
 
@@ -29,9 +32,28 @@ public class EntityBuilderHelper {
             InetAddress address = InetAddress.getByName(hostname);
             result = "rack" + (int)(address.getAddress()[2] & 0xff);
         } catch (UnknownHostException e) {
-//			final String errMsg = "Got an EagleServiceClientException when trying to refresh host/rack cache: " + e.getMessage();
-//			LOGGER.error(errMsg, e);
+            e.printStackTrace();
         }
         return result;
     }
+
+    public static String resolveHostByIp(String ip) {
+        InetAddress addr = null;
+        try {
+            addr = InetAddress.getByName(ip);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return addr.getHostName();
+    }
+
+    public static GenericMetricEntity metricWrapper(Long timestamp, String metricName, double value, Map<String, String> tags) {
+        GenericMetricEntity metricEntity = new GenericMetricEntity();
+        metricEntity.setTimestamp(timestamp);
+        metricEntity.setTags(tags);
+        metricEntity.setPrefix(metricName);
+        metricEntity.setValue(new double[]{value});
+        return metricEntity;
+    }
+
 }

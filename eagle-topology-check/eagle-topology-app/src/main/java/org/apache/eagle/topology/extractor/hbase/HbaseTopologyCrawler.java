@@ -20,14 +20,14 @@ package org.apache.eagle.topology.extractor.hbase;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
-import org.apache.eagle.topology.extractor.TopologyExtractorBase;
+import org.apache.eagle.topology.extractor.TopologyCrawler;
 
-public class HbaseTopologyExtractor implements TopologyExtractorBase {
+public class HbaseTopologyCrawler implements TopologyCrawler {
 
     private HbaseTopologyEntityParser parser;
     private SpoutOutputCollector outputCollector;
 
-    public HbaseTopologyExtractor(TopologyCheckAppConfig config) {
+    public HbaseTopologyCrawler(TopologyCheckAppConfig config) {
         this.parser = new HbaseTopologyEntityParser(config.dataExtractorConfig.site, config.hBaseConfig);
 
     }

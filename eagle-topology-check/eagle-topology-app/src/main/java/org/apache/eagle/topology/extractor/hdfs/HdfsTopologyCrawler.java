@@ -25,52 +25,37 @@ import org.apache.eagle.app.utils.ha.AbstractURLSelector;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyEntityParserResult;
-import org.apache.eagle.topology.extractor.TopologyExtractorBase;
+import org.apache.eagle.topology.entity.HdfsServiceTopologyAPIEntity;
+import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
+import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
-public class HdfsTopologyExtractor implements TopologyExtractorBase {
+public class HdfsTopologyCrawler implements TopologyCrawler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HdfsTopologyExtractor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HdfsTopologyCrawler.class);
 
     private HdfsTopologyEntityParser parser;
     private SpoutOutputCollector collector;
-    private AbstractURLSelector urlSelector;
 
-    public HdfsTopologyExtractor(TopologyCheckAppConfig config, SpoutOutputCollector collector) {
-        this.urlSelector = new HdfsTopologyUrlSelector(config.hdfsConfig.namenodeUrls, AppConstants.CompressionType.GZIP);
+    public HdfsTopologyCrawler(TopologyCheckAppConfig config, SpoutOutputCollector collector) {
         this.parser = new HdfsTopologyEntityParser(config.dataExtractorConfig.site, config.hdfsConfig);
         this.collector = collector;
     }
 
-    private void checkUrl() throws IOException {
-        if (!urlSelector.checkUrl()) {
-            urlSelector.reSelectUrl();
-        }
-    }
-
-    List<GenericMetricEntity> genericMetricEntityList(TopologyEntityParserResult entityParserResult) {
-        return null;
-    }
-
-
     @Override
     public void extract() {
-        try {
-            checkUrl();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         TopologyEntityParserResult result = parser.parse();
         if (result == null) {
             LOG.warn("No data fetched");
             return;
         }
-        List<GenericMetricEntity> metrics = genericMetricEntityList(result);
-        this.collector.emit(new Values(metrics));
+
+        //this.collector.emit(new Values(metrics));
 
     }
 }

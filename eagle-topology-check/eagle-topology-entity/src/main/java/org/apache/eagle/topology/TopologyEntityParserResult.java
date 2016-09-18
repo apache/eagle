@@ -18,15 +18,33 @@
 
 package org.apache.eagle.topology;
 
+import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TopologyEntityParserResult {
     private TopologyConstants.HadoopVersion version;
-    private final SortedMap<String, TopologyBaseAPIEntity> masterNodes = new TreeMap<String, TopologyBaseAPIEntity>();
-    private final SortedMap<String, TopologyBaseAPIEntity> slaveNodes = new TreeMap<String, TopologyBaseAPIEntity>();
+    private Map<String, List<TopologyBaseAPIEntity>> nodes = new HashMap<>();
+    private List<GenericMetricEntity> metrics = new ArrayList<>();
+
+    public List<GenericMetricEntity> getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(List<GenericMetricEntity> metrics) {
+        this.metrics = metrics;
+    }
+
+    public void setNodes(Map<String, List<TopologyBaseAPIEntity>> nodes) {
+        this.nodes = nodes;
+    }
+    public Map<String, List<TopologyBaseAPIEntity>> getNodes() {
+        return nodes;
+    }
 
     public TopologyConstants.HadoopVersion getVersion() {
         return version;
@@ -34,10 +52,8 @@ public class TopologyEntityParserResult {
     public void setVersion(TopologyConstants.HadoopVersion version) {
         this.version = version;
     }
-    public SortedMap<String, TopologyBaseAPIEntity> getMasterNodes() {
-        return masterNodes;
-    }
-    public SortedMap<String, TopologyBaseAPIEntity> getSlaveNodes() {
-        return slaveNodes;
-    }
+
+
+
+
 }

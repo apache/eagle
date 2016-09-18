@@ -20,7 +20,7 @@ package org.apache.eagle.topology.extractor;
 
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.extractor.hbase.HbaseTopologyExtractor;
+import org.apache.eagle.topology.extractor.hbase.HbaseTopologyCrawler;
 
 import org.slf4j.Logger;
 
@@ -35,10 +35,10 @@ public class TopologyExtractorFactory {
 
     private TopologyExtractorFactory() {}
 
-    private static Map<String, Constructor<? extends TopologyExtractorBase>> extractorMap = Collections.synchronizedMap(new HashMap<>());
+    private static Map<String, Constructor<? extends TopologyCrawler>> extractorMap = Collections.synchronizedMap(new HashMap<>());
 
-    private static void registerTopologyExtractor(String topologyType, Class<? extends TopologyExtractorBase> clazz) {
-        Constructor<? extends TopologyExtractorBase> constructor = null;
+    private static void registerTopologyExtractor(String topologyType, Class<? extends TopologyCrawler> clazz) {
+        Constructor<? extends TopologyCrawler> constructor = null;
         try {
             constructor = clazz.getConstructor(TopologyCheckAppConfig.class);
         } catch (NoSuchMethodException e) {
@@ -49,9 +49,9 @@ public class TopologyExtractorFactory {
         }
     }
 
-    public static TopologyExtractorBase create(TopologyConstants.TopologyType topologyType, TopologyCheckAppConfig config) {
+    public static TopologyCrawler create(TopologyConstants.TopologyType topologyType, TopologyCheckAppConfig config) {
         if (extractorMap.containsKey(topologyType.toString().toUpperCase())) {
-            Constructor<? extends TopologyExtractorBase> constructor = extractorMap.get(topologyType.name());
+            Constructor<? extends TopologyCrawler> constructor = extractorMap.get(topologyType.name());
             try {
                 return constructor.newInstance(config);
             } catch (Exception e) {
@@ -64,7 +64,7 @@ public class TopologyExtractorFactory {
     }
 
     static {
-        registerTopologyExtractor(TopologyConstants.TopologyType.HBASE.name(), HbaseTopologyExtractor.class);
+        registerTopologyExtractor(TopologyConstants.TopologyType.HBASE.name(), HbaseTopologyCrawler.class);
         //registerTopologyExtractor(TopologyConstants.TopologyType.HDFS.name(), HdfsTopologyEntityParser.class);
         //registerTopologyExtractor(TopologyConstants.TopologyType.MR.name(), MRTopologyEntityParser.class);
     }

@@ -37,7 +37,7 @@ public class TopologyDataExtractor {
     private static final String DEFAULT_SITE = "sandbox";
 
     private TopologyCheckAppConfig config;
-    private List<TopologyExtractorBase> extractors;
+    private List<TopologyCrawler> extractors;
     private SpoutOutputCollector collector;
     private ExecutorService executorService;
 
@@ -49,7 +49,7 @@ public class TopologyDataExtractor {
 
     public void crawl() {
         List<Future<?>> futures = new ArrayList<>();
-        for (TopologyExtractorBase topologyExtractor : extractors) {
+        for (TopologyCrawler topologyExtractor : extractors) {
             futures.add(executorService.submit(new DataFetchRunnableWrapper(topologyExtractor)));
         }
         futures.forEach(future -> {
@@ -66,8 +66,8 @@ public class TopologyDataExtractor {
         });
     }
 
-    private List<TopologyExtractorBase> getExtractors() {
-        List<TopologyExtractorBase> extractors = new ArrayList<>();
+    private List<TopologyCrawler> getExtractors() {
+        List<TopologyCrawler> extractors = new ArrayList<>();
         for (TopologyType type : config.topologyTypes) {
             extractors.add(TopologyExtractorFactory.create(type, config));
         }
@@ -76,9 +76,9 @@ public class TopologyDataExtractor {
 
     private static class DataFetchRunnableWrapper implements Runnable {
 
-        private TopologyExtractorBase topologyExtractor;
+        private TopologyCrawler topologyExtractor;
 
-        public DataFetchRunnableWrapper(TopologyExtractorBase topologyExtractor) {
+        public DataFetchRunnableWrapper(TopologyCrawler topologyExtractor) {
             this.topologyExtractor = topologyExtractor;
         }
 

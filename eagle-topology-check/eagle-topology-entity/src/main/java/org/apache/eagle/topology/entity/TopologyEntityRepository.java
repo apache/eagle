@@ -21,12 +21,12 @@ package org.apache.eagle.topology.entity;
 import org.apache.eagle.log.entity.repo.EntityRepository;
 
 public class TopologyEntityRepository extends EntityRepository {
-
-	public TopologyEntityRepository() {
-		entitySet.add(HBaseServiceTopologyAPIEntity.class);
-		entitySet.add(HdfsServiceEntity.class);
-		entitySet.add(HdfsServiceTopologyAPIEntity.class);
-		entitySet.add(MRServiceTopologyAPIEntity.class);
-		entitySet.add(NodeStatusAPIEntity.class);
-	}
+    public TopologyEntityRepository() {
+        entitySet.add(HBaseServiceTopologyAPIEntity.class);
+        entitySet.add(HdfsServiceEntity.class);
+        entitySet.add(HdfsServiceTopologyAPIEntity.class);
+        entitySet.add(MRServiceTopologyAPIEntity.class);
+        entitySet.add(NodeStatusAPIEntity.class);
+        entitySet.add(JournalNodeServiceAPIEntity.class);
+   }
 }

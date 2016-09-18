@@ -55,6 +55,7 @@ public class TopologyConstants {
 
     public static final String NAME_NODE_ROLE = "namenode";
     public static final String DATA_NODE_ROLE = "datanode";
+    public static final String JOURNAL_NODE_ROLE = "journalnode";
     public static final String RESOURCE_MANAGER_ROLE = "resourcemanager";
     public static final String NODE_MANAGER_ROLE = "nodemanager";
     public static final String REGIONSERVER_ROLE = "regionserver";

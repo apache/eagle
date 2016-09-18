@@ -57,11 +57,11 @@ public class TopologyEntityParserFactory {
 
     private void init(TopologyCheckAppConfig config) {
         parserMap = new HashMap<>();
-        for (String configuredTopologyType : config.topologyTypes) {
+        for (TopologyType configuredTopologyType : config.topologyTypes) {
             if (parserClazzMap.containsKey(configuredTopologyType)) {
                 try {
                     TopologyEntityParser parser = parserClazzMap.get(configuredTopologyType).getConstructor(String.class, Config.class).newInstance(config.dataExtractorConfig.site, config.config);
-                    parserCache.put(configuredTopologyType, parser);
+                    parserCache.put(configuredTopologyType.toString(), parser);
                 } catch (InstantiationException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {

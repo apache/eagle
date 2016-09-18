@@ -20,7 +20,7 @@ package org.apache.eagle.topology.extractor;
 
 
 
-public interface TopologyExtractorBase {
+public interface TopologyCrawler {
 
     void extract();
 }
