@@ -155,7 +155,13 @@
 				})._then(function () {
 					refreshApplications();
 					closeFunc();
-				}, unlock);
+				}, function (res) {
+					$.dialog({
+						title: "OPS",
+						content: res.data.message
+					});
+					unlock();
+				});
 			});
 		};
 
