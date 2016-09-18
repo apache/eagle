@@ -23,8 +23,10 @@
 	// =                                        Host                                        =
 	// ======================================================================================
 	var _host = "";
+	var _app = {};
 	if(localStorage) {
 		_host = localStorage.getItem("host") || "";
+		_app = common.parseJSON(localStorage.getItem("app") || "") || {};
 	}
 
 	window._host = function (host) {
@@ -35,6 +37,18 @@
 			}
 		}
 		return _host;
+	};
+
+	window._app = function (appName, viewPath) {
+		if(arguments.length) {
+			_app[appName] = {
+				viewPath: viewPath
+			};
+			if(localStorage) {
+				localStorage.setItem("app", JSON.stringify(_app));
+			}
+		}
+		return _app;
 	};
 
 	// ======================================================================================
@@ -234,9 +248,10 @@
 			 */
 			var promiseList = $.map(res.data || [], function (oriApp) {
 				var deferred = $.Deferred();
-				var url = oriApp.viewPath;
+				var viewPath = common.getValueByPath(_app, [oriApp.type, "viewPath"], oriApp.viewPath);
 
-				if(url) {
+				if(viewPath) {
+					var url = viewPath;
 					url = url.replace(/^[\\\/]/, "").replace(/[\\\/]$/, "");
 
 					$.getScript(url + "/index.js").then(function () {
@@ -251,13 +266,12 @@
 							deferred.resolve();
 						}
 					}, function () {
-						console.error("Load application failed:", oriApp.type);
+						console.error("Load application failed:", oriApp.type, viewPath);
 						deferred.resolve();
 					}).always(function () {
 						_lastRegisterApp = null;
 					});
 				} else {
-					console.error("Path not config:", oriApp.type);
 					deferred.resolve();
 				}
 
