@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
@@ -34,10 +33,8 @@ import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupEventsStore;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupEventsStoreFactory;
-import org.apache.eagle.alert.engine.publisher.dedup.DedupValue;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublishPluginsFactory;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
-import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 import org.apache.eagle.alert.engine.runner.AlertPublisherBolt;
 import org.apache.eagle.alert.engine.runner.MapComparator;
 import org.apache.eagle.alert.engine.utils.MetadataSerDeser;
@@ -217,7 +214,6 @@ public class TestAlertPublisherBolt {
         return alert;
     }
 
-	@SuppressWarnings("unchecked")
 	@Test
     public void testCustomFieldDedupEvent() throws Exception {
         List<Publishment> pubs = loadEntities("/router/publishments.json", Publishment.class);
@@ -241,7 +237,7 @@ public class TestAlertPublisherBolt {
 
         AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(pubs.get(0), null, null);
         AlertStreamEvent event1 = createWithStreamDef("host1", "testapp1", "OPEN");
-        AlertStreamEvent event2 = createWithStreamDef("host2", "testapp2", "OPEN");
+        AlertStreamEvent event2 = createWithStreamDef("host1", "testapp1", "OPEN");
 
         Assert.assertNotNull(plugin.dedup(event1));
         Assert.assertNull(plugin.dedup(event2));
