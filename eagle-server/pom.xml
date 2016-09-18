@@ -152,6 +152,9 @@
     <profiles>
         <profile>
             <id>dev</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
 
         <!-- =========================================================================================================
              TODO: Decouple following specific application related dependencies into independent module: eagle-develop

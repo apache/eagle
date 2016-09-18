@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Dropwizard Configuration:
+# http://www.dropwizard.io/0.7.1/docs/manual/configuration.html
+
 server:
   applicationConnectors:
     - type: http
@@ -20,6 +23,15 @@ server:
   adminConnectors:
     - type: http
       port: 9091
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: log/eagle-server-access.log
+        threshold: ALL
+        archive: true
+        archivedLogFilenamePattern: log/eagle-server-access-%d.log
+        archivedFileCount: 5
+        timeZone: UTC
 
 logging:
   level: INFO
@@ -31,4 +43,3 @@ logging:
       archivedLogFilenamePattern: log/eagle-server-%d.log
       archivedFileCount: 5
       timeZone: UTC
-      logFormat: # TODO

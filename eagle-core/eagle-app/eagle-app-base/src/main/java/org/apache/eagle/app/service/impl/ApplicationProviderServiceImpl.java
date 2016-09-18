@@ -117,7 +117,7 @@ public class ApplicationProviderServiceImpl implements ApplicationProviderServic
                             LOG.warn("Unable to load dependency {} -> {}", applicationDesc.getType(), dependency, ex);
                         } else {
                             LOG.error("Failed to load dependency {} -> {}", applicationDesc.getType(), dependency, ex);
-                            throw new IllegalStateException("Failed to load application providers due to dependency missing", ex);
+                            throw new IllegalStateException("Failed to load application providers due to dependency missing " + applicationDesc.getType() + " -> " + dependency, ex);
                         }
                     }
                 }

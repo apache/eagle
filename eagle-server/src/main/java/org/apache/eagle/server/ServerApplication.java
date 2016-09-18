@@ -20,7 +20,7 @@ import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
-import org.apache.eagle.server.module.GuideBundleLoader;
+import org.apache.eagle.server.module.GuiceBundleLoader;
 
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import io.dropwizard.Application;
@@ -36,7 +36,7 @@ import javax.servlet.DispatcherType;
 class ServerApplication extends Application<ServerConfig> {
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
-        bootstrap.addBundle(GuideBundleLoader.load());
+        bootstrap.addBundle(GuiceBundleLoader.load());
         bootstrap.addBundle(new AssetsBundle("/assets", "/", "index.html", "/"));
     }
 

@@ -17,12 +17,12 @@
 package org.apache.eagle.server;
 
 import com.hubspot.dropwizard.guice.GuiceBundle;
-import org.apache.eagle.server.module.GuideBundleLoader;
+import org.apache.eagle.server.module.GuiceBundleLoader;
 import org.junit.Test;
 
-public class GuideBundleLoaderTest {
+public class GuiceBundleLoaderTest {
     @Test
     public void testLoad() {
-        GuiceBundle<ServerConfig> bundle = GuideBundleLoader.load();
+        GuiceBundle<ServerConfig> bundle = GuiceBundleLoader.load();
     }
 }
