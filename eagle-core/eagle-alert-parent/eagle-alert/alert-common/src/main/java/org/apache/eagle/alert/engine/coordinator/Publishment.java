@@ -16,12 +16,13 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @since Apr 11, 2016.
@@ -35,7 +36,7 @@ public class Publishment {
     private String dedupIntervalMin;
     private List<String> dedupFields;
     private String dedupStateField;
-    private String dedupStateCloseValue;
+    private OverrideDeduplicatorSpec overrideDeduplicator;
     private Map<String, String> properties;
     // the class name to extend the IEventSerializer interface
     private String serializer;
@@ -56,12 +57,12 @@ public class Publishment {
         this.dedupStateField = dedupStateField;
     }
 
-    public String getDedupStateCloseValue() {
-        return dedupStateCloseValue;
+    public OverrideDeduplicatorSpec getOverrideDeduplicator() {
+        return overrideDeduplicator;
     }
 
-    public void setDedupStateCloseValue(String dedupStateCloseValue) {
-        this.dedupStateCloseValue = dedupStateCloseValue;
+    public void setOverrideDeduplicator(OverrideDeduplicatorSpec overrideDeduplicator) {
+        this.overrideDeduplicator = overrideDeduplicator;
     }
 
     public String getSerializer() {

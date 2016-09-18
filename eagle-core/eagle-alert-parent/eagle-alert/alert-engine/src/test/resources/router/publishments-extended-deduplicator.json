@@ -20,6 +20,12 @@
       "appname"
     ],
     "dedupStateField": "state",
+    "overrideDeduplicator": {
+  		"className": "org.apache.eagle.alert.engine.publisher.dedup.TestDeduplicator",
+  		"properties": {
+  			"docIdField": "docId"
+  		}
+  	},
     "serializer": "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
   }
 ]
