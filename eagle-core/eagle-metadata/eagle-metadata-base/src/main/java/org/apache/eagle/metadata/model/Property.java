@@ -21,6 +21,7 @@ public class Property {
     private String displayName;
     private String value;
     private String description;
+    private boolean required;
 
     public String getDescription() {
         return description;
@@ -52,5 +53,13 @@ public class Property {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 }
