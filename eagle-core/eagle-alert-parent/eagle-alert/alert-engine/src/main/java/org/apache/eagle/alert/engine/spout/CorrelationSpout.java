@@ -18,6 +18,16 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
+import backtype.storm.spout.MultiScheme;
+import backtype.storm.spout.Scheme;
+import backtype.storm.spout.SchemeAsMultiScheme;
+import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichSpout;
+import backtype.storm.tuple.Fields;
+import com.typesafe.config.Config;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
@@ -29,14 +39,6 @@ import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider
 import org.apache.eagle.alert.engine.serialization.Serializers;
 import org.apache.eagle.alert.utils.AlertConstants;
 import org.apache.eagle.alert.utils.StreamIdConversion;
-import backtype.storm.spout.SchemeAsMultiScheme;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
-import com.typesafe.config.Config;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import storm.kafka.*;
@@ -331,7 +333,7 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
             spoutConfig.startOffsetTime = config.getInt("spout.stormKafkaStartOffsetTime");
         }
 
-        spoutConfig.scheme = new SchemeAsMultiScheme(SchemeBuilder.buildFromClsName(schemeClsName, topic, conf));
+        spoutConfig.scheme = createMultiScheme(conf, topic, schemeClsName);
         KafkaSpoutWrapper wrapper = new KafkaSpoutWrapper(spoutConfig, kafkaSpoutMetric);
         SpoutOutputCollectorWrapper collectorWrapper = new SpoutOutputCollectorWrapper(this, collector, topic, spoutSpec, numOfRouterBolts, sds, this.serializer);
         wrapper.open(conf, context, collectorWrapper);
@@ -340,6 +342,15 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
             LOG.info("create and open kafka wrapper: topic {}, scheme class{} ", topic, schemeClsName);
         }
         return wrapper;
+    }
+
+    private MultiScheme createMultiScheme(Map conf, String topic, String schemeClsName) throws Exception {
+        Scheme scheme = SchemeBuilder.buildFromClsName(schemeClsName, topic, conf);
+        if (scheme instanceof MultiScheme) {
+            return (MultiScheme) scheme;
+        } else {
+            return new SchemeAsMultiScheme(scheme);
+        }
     }
 
     @Override
