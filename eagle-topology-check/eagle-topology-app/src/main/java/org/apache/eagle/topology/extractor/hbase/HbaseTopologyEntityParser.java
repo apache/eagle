@@ -22,10 +22,15 @@ import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.TopologyEntityParserResult;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
+import org.apache.hadoop.conf.Configuration;
 
 public class HbaseTopologyEntityParser implements TopologyEntityParser {
 
-    public  HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig) {}
+    private Configuration hBaseConfiguration;
+
+    public  HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig) {
+
+    }
 
     @Override
     public TopologyEntityParserResult parse() {

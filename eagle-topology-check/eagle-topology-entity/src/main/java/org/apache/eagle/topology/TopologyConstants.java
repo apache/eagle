@@ -43,9 +43,10 @@ public class TopologyConstants {
 
 
     public static final int DEFAULT_READ_TIMEOUT = 30 * 60 * 1000; // in milliseconds
-    public static final Pattern HTTP_HOST_MATCH_PATTERN = Pattern.compile("^https?://(.+?):-?(\\d+)/");
+    public static final Pattern HTTP_HOST_MATCH_PATTERN = Pattern.compile("^https?://(.+?):-?(\\d+)/?");
     public static final Pattern HTTP_HOST_MATCH_PATTERN_2 = Pattern.compile("^//(.+?):-?(\\d+)/");
     public static final Pattern LOCAL_HOST_MATCH_PATTERN = Pattern.compile("^///(.+?):-?(\\d+)/");
+
 
     public static final String SITE_TAG = "site";
     public static final String RACK_TAG = "rack";
@@ -73,12 +74,12 @@ public class TopologyConstants {
     public static final String DATA_NODE_DEAD_NOT_DECOMMISSIONED_STATUS = "dead_not_decommissioned";
 
     // Status definitions for resource manager
-    public static final String RESOURCE_MANAGER_LIVE_STATUS = "live";
+    public static final String RESOURCE_MANAGER_ACTIVE_STATUS = "active";
 
     // Status definitions for node manager
-    public static final String NODE_MANAGER_LIVE_STATUS = "live";
-    public static final String NODE_MANAGER_EXCLUDED_STATUS = "excluded";
-    public static final String NODE_MANAGER_BLACKLISTED_STATUS = "blacklisted";
+    public static final String NODE_MANAGER_RUNNING_STATUS = "running";
+    public static final String NODE_MANAGER_LOST_STATUS = "lost";
+    public static final String NODE_MANAGER_UNHEALTHY_STATUS = "unhealthy";
 
     // Status definitions for hbase regionserver
     public static final String REGIONSERVER_LIVE_STATUS = "live";
@@ -87,7 +88,6 @@ public class TopologyConstants {
     // Status definitions for hbase hmaster
     public static final String HMASTER_ACTIVE_STATUS = "active";
     public static final String HMASTER_STANDBY_STATUS = "standby";
-
 
     public enum HadoopVersion {
         V2

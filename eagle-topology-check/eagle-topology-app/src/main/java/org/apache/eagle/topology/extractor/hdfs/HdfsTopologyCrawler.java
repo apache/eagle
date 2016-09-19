@@ -19,21 +19,11 @@
 package org.apache.eagle.topology.extractor.hdfs;
 
 import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.tuple.Values;
-import org.apache.eagle.app.utils.AppConstants;
-import org.apache.eagle.app.utils.ha.AbstractURLSelector;
-import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyEntityParserResult;
-import org.apache.eagle.topology.entity.HdfsServiceTopologyAPIEntity;
-import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 public class HdfsTopologyCrawler implements TopologyCrawler {
 
