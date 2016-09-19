@@ -452,7 +452,7 @@ public class MRJobParser implements Runnable {
             Utils.closeInputStream(is);
         }
 
-        Set<String> needFetchAttemptTasks = calcFetchCounterAndAttemptTaskId(tasks);
+        Set<String> needFetchAttemptTasks = new HashSet<>();//calcFetchCounterAndAttemptTaskId(tasks);
         for (MRTask task : tasks) {
             if (this.finishedTaskIds.contains(task.getId()) && !needFetchAttemptTasks.contains(task.getId())) {
                 continue;
@@ -530,6 +530,7 @@ public class MRJobParser implements Runnable {
                     mrJobEntityMap.get(jobId).getTags().put(MRJobTagName.JOD_DEF_ID.toString(), value);
                 }
             }
+            mrJobEntityMap.get(jobId).getTags().put(MRJobTagName.JOB_TYPE.toString(), Utils.fetchJobType(config).toString());
             mrJobEntityMap.get(jobId).setJobConfig(config);
             mrJobConfigs.put(jobId, config);
 
