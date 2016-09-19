@@ -27,6 +27,12 @@
 
 		Application.list = [];
 
+		Application.find = function (type, site) {
+			return $.grep(Application.list, function (app) {
+				return app.descriptor.type === type && (site ? app.site.siteId === site : true);
+			});
+		};
+
 		// Load applications
 		Application.reload = function () {
 			Application.list = Entity.query('apps');

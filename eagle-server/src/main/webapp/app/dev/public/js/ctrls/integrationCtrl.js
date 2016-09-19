@@ -141,7 +141,8 @@
 					field: prop.name,
 					name: prop.displayName,
 					description: prop.description,
-					defaultValue: prop.value
+					defaultValue: prop.value,
+					optional: prop.required === false
 				};
 			});
 

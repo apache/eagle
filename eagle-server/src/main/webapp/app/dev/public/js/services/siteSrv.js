@@ -75,6 +75,10 @@
 			return common.array.find(siteId, Site.list, 'siteId');
 		};
 
+		Site.current = function () {
+			return Site.find($wrapState.param.siteId);
+		};
+
 		Site.getPromise = function (config) {
 			var siteList = Site.list;
 

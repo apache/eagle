@@ -126,7 +126,7 @@
 				var trendStartTimestamp = trendStartTime.valueOf();
 
 				// ==================== Running Job Trend ====================
-				JPM.get(JPM.QUERY_MR_JOB_COUNT, {
+				JPM.get(JPM.getQuery("MR_JOB_COUNT"), {
 					site: $scope.site,
 					intervalInSecs: interval / 1000,
 					durationBegin: Time.format(trendStartTime),
