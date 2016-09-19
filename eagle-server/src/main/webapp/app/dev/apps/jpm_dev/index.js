@@ -64,24 +64,21 @@
 	]}, true);
 
 	jpmApp.service("JPM", function ($q, $http, Time, Site, Application) {
-		// TODO: mock auth
-		var _hash = btoa('eagle:secret');
-
 		var JPM = {};
 
 		// TODO: timestamp support
-		JPM.QUERY_LIST = '${baseURL}/eagle-service/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_GROUPS = '${baseURL}/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_GROUPS_INTERVAL = '${baseURL}/eagle-service/rest/list?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
-		JPM.QUERY_METRICS = '${baseURL}/eagle-service/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_METRICS_AGG = '${baseURL}/eagle-service/rest/list?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_METRICS_INTERVAL = '${baseURL}/eagle-service/rest/list?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
-		JPM.QUERY_MR_JOBS = '${baseURL}/eagle-service/rest/mrJobs/search';
-		JPM.QUERY_JOB_LIST = '${baseURL}/eagle-service/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_TASK_STATISTIC = '${baseURL}/eagle-service/rest/mrJobs/${jobId}/taskCountsByDuration?site=${site}&timelineInSecs=${times}&top=${top}';
+		JPM.QUERY_LIST = '${baseURL}/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_GROUPS = '${baseURL}/rest/entities?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_GROUPS_INTERVAL = '${baseURL}/rest/entities?query=${query}[${condition}]<${groups}>{${field}}${order}${top}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
+		JPM.QUERY_METRICS = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]{*}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_METRICS_AGG = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
+		JPM.QUERY_MR_JOBS = '${baseURL}/rest/mrJobs/search';
+		JPM.QUERY_JOB_LIST = '${baseURL}/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_TASK_STATISTIC = '${baseURL}/rest/mrJobs/${jobId}/taskCountsByDuration?site=${site}&timelineInSecs=${times}&top=${top}';
 
-		JPM.QUERY_MR_JOB_COUNT = '${baseURL}/eagle-service/rest/mrJobs/runningJobCounts';
-		//JPM.QUERY_MR_JOB_METRIC_TOP = '${baseURL}eagle-service/rest/mrJobs/jobMetrics/list';
+		JPM.QUERY_MR_JOB_COUNT = '${baseURL}/rest/mrJobs/runningJobCounts';
+		//JPM.QUERY_MR_JOB_METRIC_TOP = '${baseURL}eagle-service/rest/mrJobs/jobMetrics/entities';
 
 		/**
 		 * Fetch query content with current site application configuration
@@ -136,15 +133,12 @@
 		}
 
 		JPM.get = function (url, params) {
-			$http.defaults.withCredentials = true;
 			var promise = $http({
 				url: url,
 				method: "GET",
-				params: params,
-				headers: {'Authorization': "Basic " + _hash}
+				params: params
 			});
 
-			$http.defaults.withCredentials = false;
 			return promise;
 		};
 
