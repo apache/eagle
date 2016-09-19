@@ -25,6 +25,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
+import org.apache.eagle.topology.TopologyConstants;
 
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class HdfsTopologyExtractorSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("entities", "metrics"));
+        declarer.declare(new Fields(TopologyConstants.FIELD_TOPOLOGY_TYPE, TopologyConstants.FIELD_TOPOLOGY_DATA));
     }
 
     @Override

@@ -19,7 +19,10 @@
 package org.apache.eagle.topology.extractor.hdfs;
 
 import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.tuple.Values;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
+import org.apache.eagle.topology.TopologyCheckMessageId;
+import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.TopologyEntityParserResult;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.slf4j.Logger;
@@ -39,13 +42,13 @@ public class HdfsTopologyCrawler implements TopologyCrawler {
 
     @Override
     public void extract() {
-        TopologyEntityParserResult result = parser.parse();
+        long updateTimestamp = System.currentTimeMillis();
+        TopologyEntityParserResult result = parser.parse(updateTimestamp);
         if (result == null) {
             LOG.warn("No data fetched");
             return;
         }
-
-        //this.collector.emit(new Values(metrics));
-
+        TopologyCheckMessageId messageId = new TopologyCheckMessageId(TopologyConstants.TopologyType.HDFS, updateTimestamp);
+        this.collector.emit(new Values(TopologyConstants.TopologyType.HDFS.toString(), result), messageId);
     }
 }

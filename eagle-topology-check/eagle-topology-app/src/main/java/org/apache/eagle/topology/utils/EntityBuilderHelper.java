@@ -19,9 +19,11 @@
 package org.apache.eagle.topology.utils;
 
 import org.apache.eagle.log.entity.GenericMetricEntity;
+import org.apache.eagle.topology.TopologyConstants;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class EntityBuilderHelper {
@@ -54,6 +56,14 @@ public class EntityBuilderHelper {
         metricEntity.setPrefix(metricName);
         metricEntity.setValue(new double[]{value});
         return metricEntity;
+    }
+
+    public static GenericMetricEntity generateMetric(String role, double value, String site, long timestamp) {
+        Map<String, String> tags = new HashMap<>();
+        tags.put(TopologyConstants.SITE_TAG, site);
+        tags.put(TopologyConstants.ROLE_TAG, role);
+        String metricName = String.format(TopologyConstants.METRIC_NAME_FORMAT, role);
+        return EntityBuilderHelper.metricWrapper(timestamp, metricName, value, tags);
     }
 
 }

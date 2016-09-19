@@ -26,7 +26,7 @@ public interface TopologyEntityParser {
      * Parse hadoop topology and return the topology entity results
      * @return the topology entity result
      */
-    public TopologyEntityParserResult parse() ;
+    public TopologyEntityParserResult parse(long timestamp) ;
 
     /**
      * Get topology type for the parser

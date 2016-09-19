@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.eagle.topology.extractor.hbase;
+package org.apache.eagle.topology.extractor.mr;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.tuple.Values;
@@ -28,16 +28,16 @@ import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HbaseTopologyCrawler implements TopologyCrawler {
+public class MRTopologyCrawler implements TopologyCrawler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HbaseTopologyCrawler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MRTopologyCrawler.class);
 
-    private HbaseTopologyEntityParser parser;
-    private SpoutOutputCollector collector;
+    private MRTopologyEntityParser parser;
+    private SpoutOutputCollector outputCollector;
 
-    public HbaseTopologyCrawler(TopologyCheckAppConfig config, SpoutOutputCollector collector) {
-        this.parser = new HbaseTopologyEntityParser(config.dataExtractorConfig.site, config.hBaseConfig);
-        this.collector = collector;
+    public MRTopologyCrawler(TopologyCheckAppConfig config, SpoutOutputCollector collector) {
+        this.parser = new MRTopologyEntityParser(config.dataExtractorConfig.site, config.mrConfig);
+        this.outputCollector = collector;
     }
 
     @Override
@@ -48,7 +48,8 @@ public class HbaseTopologyCrawler implements TopologyCrawler {
             LOG.warn("No data fetched");
             return;
         }
-        TopologyCheckMessageId messageId = new TopologyCheckMessageId(TopologyConstants.TopologyType.HBASE, updateTimestamp);
-        this.collector.emit(new Values(TopologyConstants.TopologyType.HBASE.toString(), result), messageId);
+        TopologyCheckMessageId messageId = new TopologyCheckMessageId(TopologyConstants.TopologyType.MR, updateTimestamp);
+        this.outputCollector.emit(new Values(TopologyConstants.TopologyType.MR.toString(), result), messageId);
     }
+
 }

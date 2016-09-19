@@ -89,13 +89,16 @@ public class TopologyConstants {
     public static final String HMASTER_ACTIVE_STATUS = "active";
     public static final String HMASTER_STANDBY_STATUS = "standby";
 
+    // metrics
+    public static final String METRIC_NAME_FORMAT = "hadoop.%s.liveRatio";
+
+    // stream fields
+    // field constants
+    public static final String FIELD_TOPOLOGY_TYPE = "topologyType";
+    public static final String FIELD_TOPOLOGY_DATA = "topologyData";
+
     public enum HadoopVersion {
         V2
-    }
-
-    public enum NamenodeState {
-        active,
-        standby
     }
 
     public enum TopologyType {
@@ -103,12 +106,5 @@ public class TopologyConstants {
         HBASE,
         MR
     }
-
-    public enum TopologySourceType {
-        WEB,
-        JMX,
-        YARN
-    }
-
 }
 

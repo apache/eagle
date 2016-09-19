@@ -75,10 +75,10 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
     }
 
     @Override
-    public TopologyEntityParserResult parse() {
+    public TopologyEntityParserResult parse(long timestamp) {
         for (String url : rmUrls) {
             try {
-                return doParse(PathResolverHelper.buildUrlPath(url, YARN_NODES_URL));
+                return doParse(PathResolverHelper.buildUrlPath(url, YARN_NODES_URL), timestamp);
             } catch (ServiceNotResponseException ex) {
                 // reSelect url
             }
@@ -86,8 +86,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         return null;
     }
 
-    private TopologyEntityParserResult doParse(String url) throws ServiceNotResponseException {
-
+    private TopologyEntityParserResult doParse(String url, long timestamp) throws ServiceNotResponseException {
         final TopologyEntityParserResult result = new TopologyEntityParserResult();
         result.setVersion(TopologyConstants.HadoopVersion.V2);
         result.getNodes().put(TopologyConstants.RESOURCE_MANAGER_ROLE, new ArrayList<>());
@@ -106,7 +105,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
             int unhealthyNodeCount = 0;
             final List<YarnNodeInfo> list = nodeWrapper.getNodes().getNode();
             for (YarnNodeInfo info : list) {
-                final MRServiceTopologyAPIEntity nodeManagerEntity = createEntity(NODE_MANAGER_ROLE, info.getNodeHostName(), extractRack(info));
+                final MRServiceTopologyAPIEntity nodeManagerEntity = createEntity(NODE_MANAGER_ROLE, info.getNodeHostName(), extractRack(info), timestamp);
                 if (info.getHealthReport() != null && (!info.getHealthReport().isEmpty())) {
                     nodeManagerEntity.setHealthReport(info.getHealthReport());
                 }
@@ -125,12 +124,13 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                 result.getNodes().get(TopologyConstants.NODE_MANAGER_ROLE).add(nodeManagerEntity);
             }
             LOGGER.info("Running NMs: " + runningNodeCount + ", lost NMs: " + lostNodeCount + ", unhealthy NMs: " + unhealthyNodeCount);
-            final MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE, extractMasterHost(url), null);
+            final MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE, extractMasterHost(url), null, timestamp);
             resourceManagerEntity.setStatus(TopologyConstants.RESOURCE_MANAGER_ACTIVE_STATUS);
             result.getNodes().get(TopologyConstants.NODE_MANAGER_ROLE).add(resourceManagerEntity);
+            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NODE_MANAGER_ROLE, runningNodeCount / list.size(), site, timestamp));
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             throw new ServiceNotResponseException(e);
         } finally {
             if (is != null) {
@@ -161,8 +161,9 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         return value;
     }
 
-    private MRServiceTopologyAPIEntity createEntity(String roleType, String hostname, String rack) {
+    private MRServiceTopologyAPIEntity createEntity(String roleType, String hostname, String rack, long updateTime) {
         MRServiceTopologyAPIEntity entity = new MRServiceTopologyAPIEntity();
+        entity.setTimestamp(updateTime);
         Map<String, String> tags = new HashMap<String, String>();
         entity.setTags(tags);
         tags.put(SITE_TAG, site);
