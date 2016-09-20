@@ -19,15 +19,34 @@
 (function() {
 	'use strict';
 
-	var eagleControllers = angular.module('eagleControllers');
+	var eagleComponents = angular.module('eagle.components');
 
+	eagleComponents.directive('widget', function($compile, Site) {
+		return {
+			restrict: 'AE',
+			priority: 1001,
 
-	// ======================================================================================
-	// =                                        Main                                        =
-	// ======================================================================================
-	eagleControllers.controller('siteCtrl', function ($scope, PageConfig, Site) {
-		var site = Site.current();
-		PageConfig.title = site.siteName || site.siteId;
-		PageConfig.subTitle = "home";
+			controller: function($scope, $element, $attrs) {
+			},
+			compile: function ($element) {
+				$element.contents().remove();
+
+				return {
+					post: function preLink($scope, $element) {
+						var widget = $scope.widget;
+						$scope.site = Site.current();
+
+						if(widget.renderFunc) {
+							// Prevent auto compile if return false
+							if(widget.renderFunc($element, $scope, $compile) !== false) {
+								$compile($element.contents())($scope);
+							}
+						} else {
+							$element.append("Widget don't provide render function:" + widget.application + " - " + widget.name);
+						}
+					}
+				};
+			}
+		};
 	});
-}());
+})();

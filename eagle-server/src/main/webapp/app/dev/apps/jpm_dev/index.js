@@ -57,7 +57,7 @@
 		controller: "compareCtrl"
 	});
 
-	jpmApp.portal({name: "YARN Jobs", icon: "home", list: [
+	jpmApp.portal({name: "YARN Jobs", icon: "taxi", list: [
 		{name: "Overview", path: "jpm/overview"},
 		{name: "Job Statistic", path: "jpm/statistic"},
 		{name: "Job List", path: "jpm/list"}
@@ -75,7 +75,7 @@
 		JPM.QUERY_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		JPM.QUERY_MR_JOBS = '${baseURL}/rest/mrJobs/search';
 		JPM.QUERY_JOB_LIST = '${baseURL}/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_TASK_STATISTIC = '${baseURL}/rest/mrJobs/${jobId}/taskCountsByDuration?site=${site}&timelineInSecs=${times}&top=${top}';
+		JPM.QUERY_TASK_STATISTIC = '${baseURL}/rest/mrTasks/taskCountsByDuration?jobId=${jobId}&site=${site}&timeDistInSecs=${times}&top=${top}';
 
 		JPM.QUERY_MR_JOB_COUNT = '${baseURL}/rest/mrJobs/runningJobCounts';
 		//JPM.QUERY_MR_JOB_METRIC_TOP = '${baseURL}eagle-service/rest/mrJobs/jobMetrics/entities';
@@ -84,9 +84,9 @@
 		 * Fetch query content with current site application configuration
 		 * @param {string} queryName
 		 */
-		var getQuery = JPM.getQuery = function(queryName) {
+		var getQuery = JPM.getQuery = function(queryName, siteId) {
 			var baseURL;
-			var siteId = Site.current().siteId;
+			siteId = siteId || Site.current().siteId;
 			var app = Application.find("JPM_WEB_APP", siteId)[0];
 			var host = app.configuration["service.host"];
 			var port = app.configuration["service.port"];
@@ -133,13 +133,11 @@
 		}
 
 		JPM.get = function (url, params) {
-			var promise = $http({
+			return $http({
 				url: url,
 				method: "GET",
 				params: params
 			});
-
-			return promise;
 		};
 
 		JPM.condition = function (condition) {
@@ -461,6 +459,7 @@
 	});
 
 	jpmApp.requireCSS("style/index.css");
+	jpmApp.require("widget/jobStatistic.js");
 	jpmApp.require("ctrl/overviewCtrl.js");
 	jpmApp.require("ctrl/statisticCtrl.js");
 	jpmApp.require("ctrl/listCtrl.js");

@@ -26,14 +26,6 @@
 	// ======================================================================================
 	eagleControllers.controller('homeCtrl', function ($scope, $wrapState, PageConfig) {
 		PageConfig.title = "Home";
-
-		// TODO: mock up
-		$scope.bannerList = [
-			{list: [{}, {}]},
-			{title: "Sandbox", list: [
-				{}, {}, {}
-			]}
-		];
 	});
 
 	// ======================================================================================

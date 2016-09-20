@@ -79,8 +79,16 @@ a {
 	}
 
 	.row.flex > [class*='col-'] {
+		display: -webkit-box;
+		display: -webkit-flex;
+		display: -ms-flexbox;
 		display: flex;
 		flex-direction: column;
+		flex-wrap: nowrap;
+	}
+
+	.row.flex > [class*='col-'] > * {
+		flex: auto;
 	}
 }
 
@@ -134,9 +142,29 @@ table.table.table-sm td {
 	padding: 1px 7px;
 }
 
-/* ========================================================================
- * =                                 Tab                                  =
- * ======================================================================== */
+.small-box {
+	position: relative;
+	padding-bottom: 30px;
+}
+
+.small-box > .inner a {
+	color: #FFFFFF;
+}
+
+.small-box > .inner a:hover {
+	text-decoration: underline;
+}
+
+.small-box > .small-box-footer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+	/* ========================================================================
+     * =                                 Tab                                  =
+     * ======================================================================== */
 .tab-content.keepContent > .tab-pane {
 	display: block;
 }
@@ -201,6 +229,15 @@ table.table.table-sm td {
  * ======================================================================== */
 .nav-tabs-custom .timeline li .timeline-item {
 	background: #f4f4f4;
+}
+
+/* ========================================================================
+ * =                                Widget                                =
+ * ======================================================================== */
+@media (min-width: 1200px) {
+	.row.flex div[widget] {
+		height: 100%;
+	}
 }
 
 /* ========================================================================

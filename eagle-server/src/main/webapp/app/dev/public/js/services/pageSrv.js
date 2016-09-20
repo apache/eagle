@@ -105,7 +105,8 @@
 			// Site level
 			sitePortals = {};
 			$.each(Site.list, function (i, site) {
-				sitePortals[site.siteId] = [backHome].concat($.map(sitePortalList, function (portal) {
+				var siteHome = {name: "Home", icon: "home", path: "#/site/" + site.siteId};
+				sitePortals[site.siteId] = [backHome, siteHome].concat($.map(sitePortalList, function (portal) {
 					var hasApp = !!common.array.find(portal.application, site.applicationList, "descriptor.type");
 					if(hasApp) {
 						return convertSitePortal(site, portal);

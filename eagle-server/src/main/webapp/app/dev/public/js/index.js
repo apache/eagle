@@ -64,6 +64,7 @@
 		this.queueList = [];
 		this.routeList = [];
 		this.portalList = [];
+		this.widgetList = [];
 
 		this.requireRest = 0;
 		this.requireDeferred = null;
@@ -100,6 +101,7 @@
 	 */
 	Module.prototype.portal = function (portal, isSite) {
 		this.portalList.push({portal: portal, isSite: isSite});
+		return this;
 	};
 
 	/**
@@ -121,6 +123,23 @@
 		this.routeList.push({
 			state: state,
 			config: config
+		});
+		return this;
+	};
+
+	/**
+	 * Register home page widget
+	 * @param {string} name				Widget name
+	 * @param {Function} renderFunc		Register function
+	 * @param {boolean} isSite			true will show in site page or will shown in main page
+	 */
+	Module.prototype.widget = function (name, renderFunc, isSite) {
+		this.widgetList.push({
+			widget: {
+				name: name,
+				renderFunc: renderFunc
+			},
+			isSite: isSite
 		});
 		return this;
 	};
@@ -154,7 +173,7 @@
 			$("<link/>", {
 				rel: "stylesheet",
 				type: "text/css",
-				href: _this.baseURL + "/" + styleURL
+				href: _this.baseURL + "/" + styleURL + "?_=" + _TRS()
 			}).appendTo("head");
 		}, 0);
 	};
@@ -213,10 +232,16 @@
 				config.portal.application = moduleName;
 			});
 
+			// Widget update
+			$.each(_this.widgetList, function (i, config) {
+				config.widget.application = moduleName;
+			});
+
 			deferred.resolve({
 				application: moduleName,
 				portalList: _this.portalList,
-				routeList: routeList
+				routeList: routeList,
+				widgetList: _this.widgetList
 			});
 		});
 
@@ -285,11 +310,15 @@
 				var portalList = $.map(moduleList, function (module) {
 					return module && module.portalList;
 				});
+				var widgetList = $.map(moduleList, function (module) {
+					return module && module.widgetList;
+				});
 
 				$(document).trigger("APPLICATION_READY", {
 					appList: _registerAppList,
 					routeList: routeList,
-					portalList: portalList
+					portalList: portalList,
+					widgetList: widgetList
 				});
 			});
 		});

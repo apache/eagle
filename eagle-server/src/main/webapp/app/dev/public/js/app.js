@@ -150,7 +150,7 @@ var app = {};
 				// ================================== Site ==================================
 				.state('site', {
 					url: "/site/:siteId",
-					templateUrl: "partials/site/home.html?_=" + window._TRS(),
+					templateUrl: "partials/home.html?_=" + window._TRS(),
 					controller: "siteCtrl",
 					resolve: routeResolve()
 				})
@@ -180,10 +180,11 @@ var app = {};
 		// ======================================================================================
 		// =                                   Main Controller                                  =
 		// ======================================================================================
-		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, PageConfig, Portal, Entity, Site, Application, UI, Time) {
+		eagleApp.controller('MainCtrl', function ($scope, $wrapState, $urlRouter, PageConfig, Portal, Widget, Entity, Site, Application, UI, Time) {
 			window._WrapState = $scope.$wrapState = $wrapState;
 			window._PageConfig = $scope.PageConfig = PageConfig;
 			window._Portal = $scope.Portal = Portal;
+			window._Widget = $scope.Widget = Widget;
 			window._Entity = $scope.Entity = Entity;
 			window._Site = $scope.Site = Site;
 			window._Application = $scope.Application = Application;
@@ -255,6 +256,10 @@ var app = {};
 			// ================================== Init ==================================
 			$.each(register.portalList, function (i, config) {
 				Portal.register(config.portal, config.isSite);
+			});
+
+			$.each(register.widgetList, function (i, config) {
+				Widget.register(config.widget, config.isSite);
 			});
 		});
 
