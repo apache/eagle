@@ -152,7 +152,11 @@ public class MRTaskExecutionResource {
     public List<MRTaskExecutionResponse.JobSuggestionResponse> getSuggestion(@QueryParam("site") String site,
                                                                              @QueryParam("shortJob_id") String shortDurationJobId,
                                                                              @QueryParam("longJob_id") String longDurationJobId,
-                                                                             @QueryParam("thresholdValue") long threshold) {
+                                                                             @QueryParam("mapInputThreshold") long mapInputThreshold,
+                                                                             @QueryParam("reduceInputThreshold") long reduceInputThreshold,
+                                                                             @QueryParam("mapGcThreshold") long mapGcThreshold,
+                                                                             @QueryParam("reduceGcThreshold") long reduceGcThreshold,
+                                                                             @QueryParam("mapSpillThreshold") long mapSpillThreshold) {
         List<MRTaskExecutionResponse.JobSuggestionResponse> result = new ArrayList<>();
         MRTaskExecutionResponse.TaskGroupResponse taskGroups = getTaskGroups(site, shortDurationJobId, longDurationJobId);
         if (taskGroups.errMessage != null) {
@@ -160,11 +164,11 @@ public class MRTaskExecutionResource {
             return result;
         }
         List<SuggestionFunc> suggestionFuncs = new ArrayList<>();
-        suggestionFuncs.add(new MapInputFunc(threshold));
-        suggestionFuncs.add(new ReduceInputFunc(threshold));
-        suggestionFuncs.add(new MapGCFunc(threshold));
-        suggestionFuncs.add(new ReduceGCFunc(threshold));
-        suggestionFuncs.add(new MapSpillFunc(threshold));
+        suggestionFuncs.add(new MapInputFunc(mapInputThreshold));
+        suggestionFuncs.add(new ReduceInputFunc(reduceInputThreshold));
+        suggestionFuncs.add(new MapGCFunc(mapGcThreshold));
+        suggestionFuncs.add(new ReduceGCFunc(reduceGcThreshold));
+        suggestionFuncs.add(new MapSpillFunc(mapSpillThreshold));
         try {
             for (SuggestionFunc func : suggestionFuncs) {
                 result.add(func.apply(taskGroups));
