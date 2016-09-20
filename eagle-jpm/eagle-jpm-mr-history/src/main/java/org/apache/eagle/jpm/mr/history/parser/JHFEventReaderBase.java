@@ -18,6 +18,8 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.eagle.jpm.mr.history.metrics.JobCounterMetricsGenerator;
@@ -26,6 +28,7 @@ import org.apache.eagle.jpm.mr.historyentity.*;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.JobNameNormalization;
 import org.apache.eagle.jpm.util.MRJobTagName;
+import org.apache.eagle.jpm.util.Utils;
 import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.jobhistory.EventType;
@@ -79,25 +82,9 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
 
     private JobCounterMetricsGenerator jobCounterMetricsGenerator;
 
-    public Constants.JobType fetchJobType(Configuration config) {
-        if (config.get(Constants.JobConfiguration.CASCADING_JOB) != null) {
-            return Constants.JobType.CASCADING;
-        }
-        if (config.get(Constants.JobConfiguration.HIVE_JOB) != null) {
-            return Constants.JobType.HIVE;
-        }
-        if (config.get(Constants.JobConfiguration.PIG_JOB) != null) {
-            return Constants.JobType.PIG;
-        }
-        if (config.get(Constants.JobConfiguration.SCOOBI_JOB) != null) {
-            return Constants.JobType.SCOOBI;
-        }
-        return Constants.JobType.NOTAVALIABLE;
-    }
-
     /**
      * baseTags stores the basic tag name values which might be used for persisting various entities.
-     * baseTags includes: cluster, datacenter and jobName
+     * baseTags includes: site and jobName
      * baseTags are used for all job/task related entities
      *
      * @param baseTags
@@ -119,6 +106,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         jobExecutionEntity.setTags(new HashMap<>(baseTags));
         jobExecutionEntity.setNumFailedMaps(0);
         jobExecutionEntity.setNumFailedReduces(0);
+        jobExecutionEntity.setFailedTasks(new HashMap<>());
 
         taskRunningHosts = new HashMap<>();
 
@@ -130,7 +118,7 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
         this.configuration = configuration;
 
         if (this.configuration != null && this.jobType == null) {
-            this.setJobType(fetchJobType(this.configuration).toString());
+            this.setJobType(Utils.fetchJobType(this.configuration).toString());
         }
         this.sumMapTaskDuration = 0L;
         this.sumReduceTaskDuration = 0L;
@@ -451,6 +439,15 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
             }
 
             entityCreated(entity);
+            if (entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()) != null) {
+                jobExecutionEntity.getFailedTasks().put(taskID,
+                    new HashMap<String, String>() {
+                        {
+                            put(entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()), entity.getError());
+                        }
+                    }
+                );
+            }
             taskAttemptStartTime.remove(taskAttemptID);
         } else {
             // silently ignore

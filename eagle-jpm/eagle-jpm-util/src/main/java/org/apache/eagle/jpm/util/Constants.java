@@ -182,7 +182,8 @@ public class Constants {
     public static final String JOB_LEVEL = "job";
     public static final String TASK_LEVEL = "task";
     public static final String USER_LEVEL = "user";
-    public static final String JOB_COUNT_PER_DAY = "hadoop.job.day.count";
+    public static final String JOB_COUNT_PER_DAY = "day.count";
+    public static final String JOB_COUNT_PER_HOUR = "hour.count";
 
     public static final String HADOOP_HISTORY_TOTAL_METRIC_FORMAT = "hadoop.%s.history.%s";
     public static final String HADOOP_HISTORY_MINUTE_METRIC_FORMAT = "hadoop.%s.history.minute.%s";

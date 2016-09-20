@@ -29,7 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -74,12 +76,23 @@ public class ApplicationProviderServiceImpl implements ApplicationProviderServic
     }
 
     private void validate() {
+        final Map<String, ApplicationDesc> viewPathAppDesc = new HashMap<>();
+
         for (ApplicationDesc applicationDesc : getApplicationDescs()) {
             LOG.debug("Validating {}", applicationDesc.getType());
 
             Preconditions.checkNotNull(applicationDesc.getType(), "type is null in " + applicationDesc);
             Preconditions.checkNotNull(applicationDesc.getVersion(), "version is null in " + applicationDesc);
             Preconditions.checkNotNull(applicationDesc.getName(), "name is null in " + applicationDesc);
+
+            if (applicationDesc.getViewPath() != null) {
+                if (viewPathAppDesc.containsKey(applicationDesc.getViewPath())) {
+                    throw new IllegalStateException("Duplicated view " + applicationDesc.getViewPath()
+                        + " defined in " + viewPathAppDesc.get(applicationDesc.getViewPath()).getType() + " and " + applicationDesc.getType());
+                } else {
+                    viewPathAppDesc.put(applicationDesc.getViewPath(), applicationDesc);
+                }
+            }
 
             // Validate Dependency
             LOG.debug("Validating dependency of {}", applicationDesc.getType());
@@ -103,8 +116,8 @@ public class ApplicationProviderServiceImpl implements ApplicationProviderServic
                         if (!dependency.isRequired()) {
                             LOG.warn("Unable to load dependency {} -> {}", applicationDesc.getType(), dependency, ex);
                         } else {
-                            LOG.error("Failed to load dependency {} -> {}", applicationDesc.getType(), dependency,ex);
-                            throw new IllegalStateException("Failed to load application providers due to dependency missing",ex);
+                            LOG.error("Failed to load dependency {} -> {}", applicationDesc.getType(), dependency, ex);
+                            throw new IllegalStateException("Failed to load application providers due to dependency missing " + applicationDesc.getType() + " -> " + dependency, ex);
                         }
                     }
                 }

@@ -48,7 +48,7 @@ class ApplicationXMLDescriptorLoader implements ApplicationDescLoader {
     public ApplicationDesc getApplicationDesc() {
         String descriptorPath = generateXMLDescriptorPath();
         ApplicationDesc applicationDesc = new ApplicationDesc();
-        applicationDesc.setProviderClass(this.getClass());
+        applicationDesc.setProviderClass(this.providerClass);
         ApplicationProviderDescConfig descWrapperConfig = ApplicationProviderDescConfig.loadFromXML(this.getClass(), descriptorPath);
         applicationDesc.setType(descWrapperConfig.getType());
         applicationDesc.setVersion(descWrapperConfig.getVersion());

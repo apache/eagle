@@ -21,7 +21,6 @@
     <name>Spark Running Job Monitoring</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.jpm.spark.running.SparkRunningJobApp</appClass>
-    <viewPath>/apps/jpm</viewPath>
     <configuration>
         <!-- org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig -->
         <property>

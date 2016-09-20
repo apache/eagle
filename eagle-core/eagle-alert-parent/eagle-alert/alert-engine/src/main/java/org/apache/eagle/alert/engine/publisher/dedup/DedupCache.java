@@ -16,12 +16,15 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupEventsStoreFactory.DedupEventsStoreType;
 import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 import org.slf4j.Logger;
@@ -31,15 +34,15 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.typesafe.config.Config;
 
-/*
- * it is not thread safe, we need to handle concurrency issue out of this class
- */
 public class DedupCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(DedupCache.class);
 
     private static final long CACHE_MAX_EXPIRE_TIME_IN_DAYS = 30;
     private static final long CACHE_MAX_EVENT_QUEUE_SIZE = 10;
+
+    private static final String DEDUP_COUNT = "dedupCount";
+    private static final String DEDUP_FIRST_OCCURRENCE = "dedupFirstOccurrence";
 
     private static final DedupEventsStoreType type = DedupEventsStoreType.Mongo;
 
@@ -69,7 +72,55 @@ public class DedupCache {
         return events;
     }
 
-    public DedupValue[] add(EventUniq eventEniq, String stateFieldValue, String dedupStateCloseValue) {
+    public boolean contains(EventUniq eventEniq) {
+        return this.getEvents().containsKey(eventEniq);
+    }
+
+    public void removeEvent(EventUniq eventEniq) {
+        if (this.contains(eventEniq)) {
+            this.events.remove(eventEniq);
+
+            DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
+            accessor.remove(eventEniq);
+        }
+    }
+
+    public List<AlertStreamEvent> dedup(AlertStreamEvent event, EventUniq eventEniq,
+                                        String dedupStateField, String stateFieldValue) {
+        DedupValue[] dedupValues = this.addOrUpdate(eventEniq, stateFieldValue);
+        if (dedupValues != null) {
+            // any of dedupValues won't be null
+            if (dedupValues.length == 2) {
+                // emit last event which includes count of dedup events & new state event
+                return Arrays.asList(
+                    this.mergeEventWithDedupValue(event, dedupValues[0], dedupStateField),
+                    this.mergeEventWithDedupValue(event, dedupValues[1], dedupStateField));
+            } else if (dedupValues.length == 1) {
+                //populate firstOccurrenceTime & count
+                return Arrays.asList(this.mergeEventWithDedupValue(event, dedupValues[0], dedupStateField));
+            }
+        }
+        // duplicated, will be ignored
+        return null;
+    }
+
+    public synchronized DedupValue[] addOrUpdate(EventUniq eventEniq, String stateFieldValue) {
+        Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> events = this.getEvents();
+        if (!events.containsKey(eventEniq)
+            || (events.containsKey(eventEniq)
+            && events.get(eventEniq).size() > 0
+            && !Objects.equal(stateFieldValue,
+            events.get(eventEniq).getLast().getStateFieldValue()))) {
+            DedupValue[] dedupValues = this.add(eventEniq, stateFieldValue);
+            return dedupValues;
+        } else {
+            // update count
+            this.updateCount(eventEniq);
+            return null;
+        }
+    }
+
+    private DedupValue[] add(EventUniq eventEniq, String stateFieldValue) {
         DedupValue dedupValue = null;
         DedupValue lastDedupValue = null;
         if (!events.containsKey(eventEniq)) {
@@ -91,19 +142,13 @@ public class DedupCache {
             if (dedupValues.size() > CACHE_MAX_EVENT_QUEUE_SIZE) {
                 dedupValues = new ConcurrentLinkedDeque<DedupValue>();
                 dedupValues.add(lastDedupValue);
+                LOG.info("Reset dedup key {} to value {} since meets maximum {}",
+                    eventEniq, dedupValue, CACHE_MAX_EVENT_QUEUE_SIZE);
             }
             dedupValues.add(dedupValue);
             LOG.info("Update dedup key {}, and value {}", eventEniq, dedupValue);
         }
         if (dedupValue != null) {
-            // reset the list if close state reached
-            if (StringUtils.isNotBlank(dedupStateCloseValue)
-                && Objects.equal(stateFieldValue, dedupStateCloseValue)) {
-                events.put(eventEniq, new ConcurrentLinkedDeque<DedupValue>());
-                events.get(eventEniq).add(dedupValue);
-                LOG.info("Reset dedup key {} to value {}", eventEniq, dedupValue);
-            }
-
             DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
             accessor.add(eventEniq, events.get(eventEniq));
             LOG.info("Store dedup key {}, value {} to DB", eventEniq,
@@ -119,7 +164,7 @@ public class DedupCache {
         }
     }
 
-    public DedupValue updateCount(EventUniq eventEniq) {
+    private DedupValue updateCount(EventUniq eventEniq) {
         ConcurrentLinkedDeque<DedupValue> dedupValues = events.get(eventEniq);
         if (dedupValues == null || dedupValues.size() <= 0) {
             LOG.warn("No dedup values found for {}, cannot update count", eventEniq);
@@ -131,6 +176,35 @@ public class DedupCache {
                 dedupValue.getStateFieldValue(), dedupValue.getCount());
             return dedupValue;
         }
+    }
+
+    private AlertStreamEvent mergeEventWithDedupValue(AlertStreamEvent originalEvent,
+                                                      DedupValue dedupValue, String dedupStateField) {
+        AlertStreamEvent event = new AlertStreamEvent();
+        Object[] newdata = new Object[originalEvent.getData().length];
+        for (int i = 0; i < originalEvent.getData().length; i++) {
+            newdata[i] = originalEvent.getData()[i];
+        }
+        event.setData(newdata);
+        event.setSchema(originalEvent.getSchema());
+        event.setPolicyId(originalEvent.getPolicyId());
+        event.setCreatedTime(originalEvent.getCreatedTime());
+        event.setCreatedBy(originalEvent.getCreatedBy());
+        event.setTimestamp(originalEvent.getTimestamp());
+        StreamDefinition streamDefinition = event.getSchema();
+        for (int i = 0; i < event.getData().length; i++) {
+            String colName = streamDefinition.getColumns().get(i).getName();
+            if (Objects.equal(colName, dedupStateField)) {
+                event.getData()[i] = dedupValue.getStateFieldValue();
+            }
+            if (Objects.equal(colName, DEDUP_COUNT)) {
+                event.getData()[i] = dedupValue.getCount();
+            }
+            if (Objects.equal(colName, DEDUP_FIRST_OCCURRENCE)) {
+                event.getData()[i] = dedupValue.getFirstOccurrence();
+            }
+        }
+        return event;
     }
 
 }

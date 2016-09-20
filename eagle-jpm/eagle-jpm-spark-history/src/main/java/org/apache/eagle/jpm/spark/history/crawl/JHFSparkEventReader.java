@@ -18,6 +18,7 @@
 package org.apache.eagle.jpm.spark.history.crawl;
 
 import org.apache.eagle.jpm.spark.entity.*;
+import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.service.client.EagleServiceClientException;
@@ -52,9 +53,10 @@ public class JHFSparkEventReader {
 
     private List<TaggedLogAPIEntity> createEntities;
 
+    private SparkHistoryJobAppConfig config;
     private Config conf;
 
-    public JHFSparkEventReader(Map<String, String> baseTags, SparkApplicationInfo info) {
+    public JHFSparkEventReader(SparkHistoryJobAppConfig config, Map<String, String> baseTags, SparkApplicationInfo info) {
         app = new SparkApp();
         app.setTags(new HashMap<String, String>(baseTags));
         app.setYarnState(info.getState());
@@ -66,7 +68,8 @@ public class JHFSparkEventReader {
         tasks = new HashMap<Long, SparkTask>();
         executors = new HashMap<String, SparkExecutor>();
         stageTaskStatusMap = new HashMap<>();
-        conf = ConfigFactory.load();
+        conf = config.getConfig();
+        this.config = config;
         this.initiateClient();
     }
 
@@ -694,16 +697,12 @@ public class JHFSparkEventReader {
     }
 
     private EagleServiceBaseClient initiateClient() {
-        String host = conf.getString("eagleProps.eagle.service.host");
-        int port = conf.getInt("eagleProps.eagle.service.port");
-        String userName = conf.getString("eagleProps.eagle.service.username");
-        String pwd = conf.getString("eagleProps.eagle.service.password");
-        String basePath = EagleServiceBaseClient.DEFAULT_BASE_PATH;
-        if (conf.hasPath("eagleProps.eagle.service.basePath")) {
-            basePath = conf.getString("eagleProps.eagle.service.basePath");
-        }
-        client = new EagleServiceClientImpl(host, port, basePath, userName, pwd);
-        int timeout = conf.getInt("eagleProps.eagle.service.read.timeout");
+        client = new EagleServiceClientImpl(config.eagleInfo.host,
+            config.eagleInfo.port,
+            config.eagleInfo.basePath,
+            config.eagleInfo.username,
+            config.eagleInfo.password);
+        int timeout = config.eagleInfo.timeout;
         client.getJerseyClient().setReadTimeout(timeout * 1000);
 
         return client;

@@ -56,6 +56,11 @@ public class MongoDedupStoreTest extends MongoDependencyBaseTest {
 		Assert.assertEquals(streamId, entry.getKey().streamId);
 		Assert.assertEquals(1, entry.getValue().size());
 		Assert.assertEquals(2, entry.getValue().getLast().getCount());
+		
+		store.remove(events.keySet().iterator().next());
+		events = store.getEvents();
+		Assert.assertNotNull(events);
+		Assert.assertEquals(0, events.size());
 	}
     
 }

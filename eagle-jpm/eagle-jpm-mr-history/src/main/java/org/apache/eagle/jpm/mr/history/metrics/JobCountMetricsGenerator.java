@@ -22,6 +22,7 @@ import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.parser.EagleJobStatus;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
@@ -43,12 +44,19 @@ public class JobCountMetricsGenerator {
     public void flush(String date, int year, int month, int day) throws Exception {
         List<Pair<String, String>> jobs = JobHistoryZKStateManager.instance().getProcessedJobs(date);
         final int total = jobs.size();
-        int fail = 0;
+        int succeeded = 0;
+        int killed = 0;
+
         for (Pair<String, String> job : jobs) {
-            if (!job.getRight().equals(EagleJobStatus.SUCCEEDED.toString())) {
-                ++fail;
+            if (job.getRight().equals(EagleJobStatus.KILLED.toString())) {
+                ++killed;
+            }
+
+            if (job.getRight().equals(EagleJobStatus.SUCCEEDED.toString())) {
+                ++succeeded;
             }
         }
+        int failed = total - killed - succeeded;
 
         final IEagleServiceClient client = new EagleServiceClientImpl(
             MRHistoryJobConfig.get().getEagleServiceConfig().eagleServiceHost,
@@ -59,24 +67,33 @@ public class JobCountMetricsGenerator {
 
         GregorianCalendar cal = new GregorianCalendar(year, month, day);
         cal.setTimeZone(timeZone);
-        GenericMetricEntity metricEntity = new GenericMetricEntity();
-        metricEntity.setTimestamp(cal.getTimeInMillis());
-        metricEntity.setPrefix(Constants.JOB_COUNT_PER_DAY);
-        metricEntity.setValue(new double[] {total, fail});
-        @SuppressWarnings("serial")
-        Map<String, String> baseTags = new HashMap<String, String>() {
-            {
-                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
-            }
-        };
-        metricEntity.setTags(baseTags);
+
         List<GenericMetricEntity> entities = new ArrayList<>();
-        entities.add(metricEntity);
+        entities.add(generateEntity(cal, EagleJobStatus.FAILED.toString(), failed));
+        entities.add(generateEntity(cal, EagleJobStatus.KILLED.toString(), killed));
+        entities.add(generateEntity(cal, EagleJobStatus.SUCCEEDED.toString(), succeeded));
 
         LOG.info("start flushing entities of total number " + entities.size());
         client.create(entities);
         LOG.info("finish flushing entities of total number " + entities.size());
         client.getJerseyClient().destroy();
         client.close();
+    }
+
+    private GenericMetricEntity generateEntity(GregorianCalendar calendar, String state, int count) {
+        GenericMetricEntity metricEntity = new GenericMetricEntity();
+        metricEntity.setTimestamp(calendar.getTimeInMillis());
+        metricEntity.setPrefix(String.format(Constants.HADOOP_HISTORY_TOTAL_METRIC_FORMAT, Constants.JOB_LEVEL, Constants.JOB_COUNT_PER_DAY));
+        metricEntity.setValue(new double[] {count});
+        @SuppressWarnings("serial")
+        Map<String, String> baseTags = new HashMap<String, String>() {
+            {
+                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
+                put(MRJobTagName.JOB_STATUS.toString(), state);
+            }
+        };
+        metricEntity.setTags(baseTags);
+
+        return metricEntity;
     }
 }

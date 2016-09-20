@@ -16,6 +16,10 @@
  */
 package org.apache.eagle.server.module;
 
+import com.google.inject.Module;
+import com.hubspot.dropwizard.guice.GuiceBundle;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.module.ApplicationExtensionLoader;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.service.impl.ApplicationProviderServiceImpl;
@@ -24,18 +28,13 @@ import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.persistence.MetadataStore;
 import org.apache.eagle.metadata.persistence.MetadataStoreModuleFactory;
 import org.apache.eagle.server.ServerConfig;
-
-import com.google.inject.Module;
-import com.hubspot.dropwizard.guice.GuiceBundle;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class GuideBundleLoader {
-    private static final  Logger LOGGER = LoggerFactory.getLogger(GuideBundleLoader.class);
+public class GuiceBundleLoader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GuiceBundleLoader.class);
 
     public static GuiceBundle<ServerConfig> load(List<Module> modules) {
         /*

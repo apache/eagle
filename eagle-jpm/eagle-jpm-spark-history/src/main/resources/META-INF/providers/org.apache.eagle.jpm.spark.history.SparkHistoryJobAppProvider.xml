@@ -21,7 +21,6 @@
     <name>Spark History Job Monitoring</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.jpm.spark.history.SparkHistoryJobApp</appClass>
-    <viewPath>/apps/jpm</viewPath>
     <configuration>
         <!-- org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig -->
         <property>

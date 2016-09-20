@@ -34,6 +34,12 @@ public class PublishConstants {
     public static final String TOPIC = "topic";
     public static final String BROKER_LIST = "kafka_broker";
 
+    // slack specific constants
+    public static final String TOKEN = "token";
+    public static final String CHANNELS = "channels";
+    public static final String SEVERITYS = "severitys";
+    public static final String URL_TEMPLATE = "urltemplate";
+
     public static final String ALERT_EMAIL_TIME_PROPERTY = "timestamp";
     public static final String ALERT_EMAIL_COUNT_PROPERTY = "count";
     public static final String ALERT_EMAIL_ALERTLIST_PROPERTY = "alertList";

@@ -18,12 +18,12 @@
 
 package org.apache.eagle.alert.engine.router;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.SimpleType;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.PublishSpec;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
@@ -34,26 +34,18 @@ import org.apache.eagle.alert.engine.publisher.AlertPublishPlugin;
 import org.apache.eagle.alert.engine.publisher.AlertPublisher;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupEventsStore;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupEventsStoreFactory;
-import org.apache.eagle.alert.engine.publisher.dedup.DedupValue;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublishPluginsFactory;
 import org.apache.eagle.alert.engine.publisher.impl.AlertPublisherImpl;
-import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 import org.apache.eagle.alert.engine.runner.AlertPublisherBolt;
 import org.apache.eagle.alert.engine.runner.MapComparator;
 import org.apache.eagle.alert.engine.utils.MetadataSerDeser;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Since 5/14/16.
@@ -94,7 +86,7 @@ public class TestAlertPublisherBolt {
         policy.setName("policy1");
         alert.setPolicyId(policy.getName());
         alert.setCreatedTime(System.currentTimeMillis());
-        alert.setData(new Object[] {"field_1", 2, "field_3"});
+        alert.setData(new Object[]{"field_1", 2, "field_3"});
         alert.setStreamId(streamId);
         alert.setCreatedBy(this.toString());
         return alert;
@@ -217,7 +209,6 @@ public class TestAlertPublisherBolt {
         return alert;
     }
 
-	@SuppressWarnings("unchecked")
 	@Test
     public void testCustomFieldDedupEvent() throws Exception {
         List<Publishment> pubs = loadEntities("/router/publishments.json", Publishment.class);
@@ -241,11 +232,79 @@ public class TestAlertPublisherBolt {
 
         AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(pubs.get(0), null, null);
         AlertStreamEvent event1 = createWithStreamDef("host1", "testapp1", "OPEN");
-        AlertStreamEvent event2 = createWithStreamDef("host2", "testapp2", "OPEN");
+        AlertStreamEvent event2 = createWithStreamDef("host1", "testapp1", "OPEN");
 
         Assert.assertNotNull(plugin.dedup(event1));
         Assert.assertNull(plugin.dedup(event2));
         
         Mockito.verify(store, Mockito.atLeastOnce()).add(Mockito.anyObject(), Mockito.anyObject());
+    }
+
+    private AlertStreamEvent createSeverityWithStreamDef(String hostname, String appName, String message, String severity, String docId, String df_device, String df_type, String colo) {
+        AlertStreamEvent alert = new AlertStreamEvent();
+        PolicyDefinition policy = new PolicyDefinition();
+        policy.setName("switch_check");
+        alert.setPolicyId(policy.getName());
+        alert.setCreatedTime(System.currentTimeMillis());
+        alert.setData(new Object[] {appName, hostname, message, severity, docId, df_device, df_type, colo});
+        alert.setStreamId("testAlertStream");
+        alert.setCreatedBy(this.toString());
+
+        // build stream definition
+        StreamDefinition sd = new StreamDefinition();
+        StreamColumn appColumn = new StreamColumn();
+        appColumn.setName("appname");
+        appColumn.setType(StreamColumn.Type.STRING);
+
+        StreamColumn hostColumn = new StreamColumn();
+        hostColumn.setName("hostname");
+        hostColumn.setType(StreamColumn.Type.STRING);
+
+        StreamColumn msgColumn = new StreamColumn();
+        msgColumn.setName("message");
+        msgColumn.setType(StreamColumn.Type.STRING);
+
+        StreamColumn severityColumn = new StreamColumn();
+        severityColumn.setName("severity");
+        severityColumn.setType(StreamColumn.Type.STRING);
+
+        StreamColumn docIdColumn = new StreamColumn();
+        docIdColumn.setName("docId");
+        docIdColumn.setType(StreamColumn.Type.STRING);
+
+        StreamColumn deviceColumn = new StreamColumn();
+        deviceColumn.setName("df_device");
+        deviceColumn.setType(StreamColumn.Type.STRING);
+
+        StreamColumn deviceTypeColumn = new StreamColumn();
+        deviceTypeColumn.setName("df_type");
+        deviceTypeColumn.setType(StreamColumn.Type.STRING);
+
+        StreamColumn coloColumn = new StreamColumn();
+        coloColumn.setName("dc");
+        coloColumn.setType(StreamColumn.Type.STRING);
+
+        sd.setColumns(Arrays.asList(appColumn, hostColumn, msgColumn, severityColumn, docIdColumn, deviceColumn, deviceTypeColumn, coloColumn));
+
+        alert.setSchema(sd);
+        return alert;
+    }
+
+    @Test
+    public void testSlackPublishment() throws Exception {
+        Config config = ConfigFactory.load("application-test.conf");
+        AlertPublisher publisher = new AlertPublisherImpl("alertPublishBolt");
+        publisher.init(config, new HashMap());
+        List<Publishment> pubs = loadEntities("/router/publishments-slack.json", Publishment.class);
+        publisher.onPublishChange(pubs, null, null, null);
+
+        AlertStreamEvent event1 = createSeverityWithStreamDef("switch1", "testapp1", "Memory 1 inconsistency detected", "WARNING", "docId1", "ed01", "distribution switch", "us");
+        AlertStreamEvent event2 = createSeverityWithStreamDef("switch2", "testapp2", "Memory 2 inconsistency detected", "CRITICAL", "docId2", "ed02", "distribution switch", "us");
+        AlertStreamEvent event3 = createSeverityWithStreamDef("switch2", "testapp2", "Memory 3 inconsistency detected", "WARNING", "docId3", "ed02", "distribution switch", "us");
+
+        publisher.nextEvent(event1);
+        publisher.nextEvent(event2);
+        publisher.nextEvent(event3);
+
     }
 }

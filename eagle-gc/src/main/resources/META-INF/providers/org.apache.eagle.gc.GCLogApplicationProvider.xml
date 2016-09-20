@@ -25,7 +25,6 @@
     <name>GC Log Monitoring Application</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.gc.GCLogApplication</appClass>
-    <viewPath>/apps/example</viewPath>
     <configuration>
         <!-- topology level configurations -->
         <property>
