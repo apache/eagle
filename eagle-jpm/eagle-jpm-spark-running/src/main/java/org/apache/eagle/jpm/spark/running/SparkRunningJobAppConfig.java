@@ -33,12 +33,6 @@ public class SparkRunningJobAppConfig implements Serializable {
     static final String JOB_FETCH_SPOUT_NAME = "sparkRunningJobFetchSpout";
     static final String JOB_PARSE_BOLT_NAME = "sparkRunningJobParseBolt";
 
-    public String getEnv() {
-        return env;
-    }
-
-    private String env;
-
     ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -140,7 +134,6 @@ public class SparkRunningJobAppConfig implements Serializable {
 
     private void init(Config config) {
         this.config = config;
-        this.env = config.getString("envContextConfig.env");
         this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");
         this.zkStateConfig.zkPort = config.getString("zookeeperConfig.zkPort");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeperConfig.zkSessionTimeoutMs");
@@ -170,7 +163,7 @@ public class SparkRunningJobAppConfig implements Serializable {
             this.endpointConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
         }
 
-        this.endpointConfig.rmUrls = config.getString("dataSourceConfig.rmUrls").split(",");
+        this.endpointConfig.rmUrls = config.getString("endpointConfig.rmUrls").split(",");
 
         this.topologyConfig.jobFetchSpoutParallism = config.getInt("envContextConfig.parallelismConfig." + JOB_FETCH_SPOUT_NAME);
         this.topologyConfig.jobFetchSpoutTasksNum = config.getInt("envContextConfig.tasks." + JOB_FETCH_SPOUT_NAME);
@@ -178,7 +171,6 @@ public class SparkRunningJobAppConfig implements Serializable {
         this.topologyConfig.jobParseBoltTasksNum = config.getInt("envContextConfig.tasks." + JOB_PARSE_BOLT_NAME);
 
         LOG.info("Successfully initialized SparkRunningJobAppConfig");
-        LOG.info("env: " + this.env);
         LOG.info("site: " + this.jobExtractorConfig.site);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);
         LOG.info("eagle.service.port: " + this.eagleServiceConfig.eagleServicePort);
