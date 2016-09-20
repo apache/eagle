@@ -106,6 +106,17 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>hadoop</id>
+            <name>Ebay hadoop</name>
+            <url>http://nxrepository.corp.ebay.com/nexus/content/repositories/hadoop.releases/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+        </repository>
+    </repositories>
     <build>
         <resources>
             <resource>

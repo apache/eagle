@@ -18,12 +18,15 @@
 
 package org.apache.eagle.jpm.spark.running;
 
+import com.typesafe.config.ConfigValue;
 import org.apache.eagle.common.config.ConfigOptionParser;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SparkRunningJobAppConfig implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SparkRunningJobAppConfig.class);
@@ -98,11 +101,9 @@ public class SparkRunningJobAppConfig implements Serializable {
     }
 
     public static class EndpointConfig implements Serializable {
-        public String nnEndpoint;
         public String eventLog;
         public String[] rmUrls;
-        public String principal;
-        public String keyTab;
+        public Map<String, String> hdfs;
     }
 
     public Config getConfig() {
@@ -117,6 +118,7 @@ public class SparkRunningJobAppConfig implements Serializable {
         this.eagleServiceConfig = new EagleServiceConfig();
         this.jobExtractorConfig = new JobExtractorConfig();
         this.endpointConfig = new EndpointConfig();
+        this.endpointConfig.hdfs = new HashMap<>();
         this.zkStateConfig = new ZKStateConfig();
         this.topologyConfig = new TopologyConfig();
     }
@@ -162,11 +164,11 @@ public class SparkRunningJobAppConfig implements Serializable {
         this.jobExtractorConfig.fetchRunningJobInterval = config.getInt("jobExtractorConfig.fetchRunningJobInterval");
         this.jobExtractorConfig.parseThreadPoolSize = config.getInt("jobExtractorConfig.parseThreadPoolSize");
 
-        //parse data source config
-        this.endpointConfig.eventLog = config.getString("dataSourceConfig.eventLog");
-        this.endpointConfig.nnEndpoint = config.getString("dataSourceConfig.nnEndpoint");
-        this.endpointConfig.keyTab = config.getString("dataSourceConfig.keytab");
-        this.endpointConfig.principal = config.getString("dataSourceConfig.principal");
+        //parse endpointConfig config
+        this.endpointConfig.eventLog = config.getString("endpointConfig.eventLog");
+        for (Map.Entry<String, ConfigValue> entry : config.getConfig("endpointConfig.hdfs").entrySet()) {
+            this.endpointConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
+        }
 
         this.endpointConfig.rmUrls = config.getString("dataSourceConfig.rmUrls").split(",");
 
