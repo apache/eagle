@@ -62,7 +62,7 @@ public class TopologyCheckAppSpout extends BaseRichSpout {
     public void nextTuple() {
         long currentTime = System.currentTimeMillis();
         Calendar calendar = Calendar.getInstance();
-        if (currentTime < lastFetchTime + fetchInterval) {
+        if (currentTime > lastFetchTime + fetchInterval) {
             calendar.setTimeInMillis(this.lastFetchTime);
             LOG.info("Last fetch time = {}", calendar.getTime());
             this.extractor.crawl();

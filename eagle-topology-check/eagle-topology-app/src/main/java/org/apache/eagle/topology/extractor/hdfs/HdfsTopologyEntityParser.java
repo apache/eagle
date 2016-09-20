@@ -178,7 +178,10 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         }
         result.getNodes().get(TopologyConstants.JOURNAL_NODE_ROLE).addAll(journalNodesMap.values());
 
-        double value = numLiveJournalNodes / journalNodesMap.size();
+        double value = 0;
+        if (!journalNodesMap.isEmpty()) {
+            value = numLiveJournalNodes / journalNodesMap.size();
+        }
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.JOURNAL_NODE_ROLE, value, site, updateTime));
     }
 

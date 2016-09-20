@@ -33,7 +33,9 @@ public class HadoopSecurityUtil {
     public static final String EAGLE_USER_NAME_KEY = "eagle.kerberos.principal";
 
     public static void login(Configuration kConfig) throws IOException {
-        if (kConfig.get(EAGLE_KEYTAB_FILE_KEY) == null || kConfig.get(EAGLE_USER_NAME_KEY) == null) {
+        String keytab = kConfig.get(EAGLE_KEYTAB_FILE_KEY);
+        String principal = kConfig.get(EAGLE_USER_NAME_KEY);
+        if ( keytab == null ||  principal== null || keytab.isEmpty() || principal.isEmpty()) {
             return;
         }
 
