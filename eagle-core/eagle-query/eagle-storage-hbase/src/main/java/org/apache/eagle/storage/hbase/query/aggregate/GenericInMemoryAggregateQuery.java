@@ -176,7 +176,7 @@ public class GenericInMemoryAggregateQuery implements GenericQuery {
             TimeSeriesAggregator tsAgg = new TimeSeriesAggregator(groupbyFields,
                 aggregateCondition.getAggregateFunctionTypes(), aggregateFields,
                     DateTimeUtil.humanDateToDate(searchCondition.getStartTime()).getTime(),
-                DateTimeUtil.humanDateToDate(searchCondition.getEndTime()).getTime(), aggregateCondition.getIntervalMS() * 60 * 1000);
+                DateTimeUtil.humanDateToDate(searchCondition.getEndTime()).getTime(), aggregateCondition.getIntervalMS());
             reader.register(tsAgg);
 
             // for sorting
