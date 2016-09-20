@@ -50,7 +50,6 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
 
     // class members
     private static final String YARN_NODES_URL = "/ws/v1/cluster/nodes?anonymous=true";
-    private static final String DEFAULT_RACK_PREFIX = "/default/";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MRTopologyEntityParser.class);
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
@@ -127,7 +126,8 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
             final MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE, extractMasterHost(url), null, timestamp);
             resourceManagerEntity.setStatus(TopologyConstants.RESOURCE_MANAGER_ACTIVE_STATUS);
             result.getNodes().get(TopologyConstants.NODE_MANAGER_ROLE).add(resourceManagerEntity);
-            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NODE_MANAGER_ROLE, runningNodeCount / list.size(), site, timestamp));
+            double value = runningNodeCount * 1d / list.size();
+            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NODE_MANAGER_ROLE, value, site, timestamp));
             return result;
         } catch (Exception e) {
             //e.printStackTrace();

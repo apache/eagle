@@ -25,28 +25,12 @@ public class TopologyConstants {
     public static final String HDFS_INSTANCE_SERVICE_NAME = "HdfsServiceInstance";
     public static final String HBASE_INSTANCE_SERVICE_NAME = "HbaseServiceInstance";
     public static final String MR_INSTANCE_SERVICE_NAME = "MRServiceInstance";
-    public static final String NODE_STATUS_SERVICE_NAME = "NodeStatus";
-
-    public static final String HDFS_SERVICE_SERVICE_NAME = "HdfsService";
-    public static final String HBASE_SERVICE_SERVICE_NAME = "HbaseService";
-    public static final String MR_SERVICE_SERVICE_NAME = "MRService";
-
-    public static final String HDFS_INSTANCE_RESOURCE_URL_PATH = "/topologies/hdfs_instance";
-    public static final String HBASE_INSTANCE_RESOURCE_URL_PATH = "/topologies/hbase_instance";
-    public static final String MR_INSTANCE_RESOURCE_URL_PATH = "/topologies/mrservice_instance";
-
-    public static final String NODE_STATUS_RESOURCE_URL_PATH = "/topologies/nodes";
-
-    public static final String HDFS_SERVICE_RESOURCE_URL_PATH = "/topologies/hdfs_service";
-    public static final String HBASE_SERVICE_RESOURCE_URL_PATH = "/topologies/hbase_service";
-    public static final String MR_SERVICE_RESOURCE_URL_PATH = "/topologies/mrservice_service";
-
+    public static final String JN_INSTANCE_SERVICE_NAME = "JNServiceInstance";
 
     public static final int DEFAULT_READ_TIMEOUT = 30 * 60 * 1000; // in milliseconds
     public static final Pattern HTTP_HOST_MATCH_PATTERN = Pattern.compile("^https?://(.+?):-?(\\d+)/?");
     public static final Pattern HTTP_HOST_MATCH_PATTERN_2 = Pattern.compile("^//(.+?):-?(\\d+)/");
     public static final Pattern LOCAL_HOST_MATCH_PATTERN = Pattern.compile("^///(.+?):-?(\\d+)/");
-
 
     public static final String SITE_TAG = "site";
     public static final String RACK_TAG = "rack";
@@ -94,8 +78,8 @@ public class TopologyConstants {
 
     // stream fields
     // field constants
-    public static final String FIELD_TOPOLOGY_TYPE = "topologyType";
-    public static final String FIELD_TOPOLOGY_DATA = "topologyData";
+    public static final String SERVICE_NAME_FIELD = "serviceName";
+    public static final String TOPOLOGY_DATA_FIELD = "topologyData";
 
     public enum HadoopVersion {
         V2

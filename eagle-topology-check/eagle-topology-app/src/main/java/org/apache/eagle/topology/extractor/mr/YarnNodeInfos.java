@@ -28,14 +28,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class YarnNodeInfos {
 
-	private List<YarnNodeInfo> node;
+    private List<YarnNodeInfo> node;
 
-	public List<YarnNodeInfo> getNode() {
-		return node;
-	}
+    public List<YarnNodeInfo> getNode() {
+        return node;
+    }
 
-	public void setNode(List<YarnNodeInfo> node) {
-		this.node = node;
-	}
-	
+    public void setNode(List<YarnNodeInfo> node) {
+        this.node = node;
+    }
+
 }

@@ -53,7 +53,4 @@ public class TopologyEntityParserResult {
         this.version = version;
     }
 
-
-
-
 }

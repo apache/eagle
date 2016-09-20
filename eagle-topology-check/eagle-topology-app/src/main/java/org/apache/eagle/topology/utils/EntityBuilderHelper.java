@@ -29,12 +29,15 @@ import java.util.Map;
 public class EntityBuilderHelper {
 
     public static String resolveRackByHost(String hostname) {
+        if (hostname == null) {
+            return null;
+        }
         String result = null;
         try {
             InetAddress address = InetAddress.getByName(hostname);
             result = "rack" + (int)(address.getAddress()[2] & 0xff);
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return result;
     }

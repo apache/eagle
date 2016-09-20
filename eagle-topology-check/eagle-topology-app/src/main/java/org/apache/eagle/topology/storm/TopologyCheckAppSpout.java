@@ -26,17 +26,23 @@ import backtype.storm.tuple.Fields;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
 import java.util.Map;
 
-public class HdfsTopologyExtractorSpout extends BaseRichSpout {
+public class TopologyCheckAppSpout extends BaseRichSpout {
 
-    private SpoutOutputCollector collector;
+    private TopologyDataExtractor extractor;
     private TopologyCheckAppConfig topologyCheckAppConfig;
+
     private long lastFetchTime;
     private long fetchInterval;
 
-    public HdfsTopologyExtractorSpout(TopologyCheckAppConfig topologyCheckAppConfig) {
+    private static final Logger LOG = LoggerFactory.getLogger(TopologyCheckAppSpout.class);
+
+    public TopologyCheckAppSpout(TopologyCheckAppConfig topologyCheckAppConfig) {
         this.topologyCheckAppConfig = topologyCheckAppConfig;
         this.lastFetchTime = 0;
         this.fetchInterval = topologyCheckAppConfig.dataExtractorConfig.fetchDataIntervalInSecs * DateTimeUtil.ONESECOND;
@@ -44,21 +50,24 @@ public class HdfsTopologyExtractorSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(TopologyConstants.FIELD_TOPOLOGY_TYPE, TopologyConstants.FIELD_TOPOLOGY_DATA));
+        declarer.declare(new Fields(TopologyConstants.SERVICE_NAME_FIELD, TopologyConstants.TOPOLOGY_DATA_FIELD));
     }
 
     @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
-        this.collector = collector;
+        this.extractor = new TopologyDataExtractor(topologyCheckAppConfig, collector);
     }
 
     @Override
     public void nextTuple() {
         long currentTime = System.currentTimeMillis();
+        Calendar calendar = Calendar.getInstance();
         if (currentTime < lastFetchTime + fetchInterval) {
-
+            calendar.setTimeInMillis(this.lastFetchTime);
+            LOG.info("Last fetch time = {}", calendar.getTime());
+            this.extractor.crawl();
+            lastFetchTime = currentTime;
         }
     }
-
 
 }

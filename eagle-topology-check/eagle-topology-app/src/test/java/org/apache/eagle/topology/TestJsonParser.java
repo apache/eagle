@@ -64,7 +64,7 @@ public class TestJsonParser {
             JournalNodeServiceAPIEntity entity = new JournalNodeServiceAPIEntity();
             entity.setTags(new HashMap<>());
             entity.getTags().put(TopologyConstants.HOSTNAME_TAG, statusMatcher.group(1));
-            entity.setWrittenTxidDeviation(Long.parseLong(statusMatcher.group(2)));
+            entity.setWrittenTxidDiff(Long.parseLong(statusMatcher.group(2)));
             entities.add(entity);
         }
         Assert.assertTrue(entities.size() == 5);

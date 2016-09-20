@@ -25,7 +25,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("hadoop_topology")
 @ColumnFamily("f")
-@Prefix("hoststatus")
+@Prefix("hdfsservicestatus")
 @Service(TopologyConstants.HDFS_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
 public class HdfsServiceTopologyAPIEntity extends TopologyBaseAPIEntity {

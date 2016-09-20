@@ -25,13 +25,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @Table("hadoop_topology")
 @ColumnFamily("f")
-@Prefix("hoststatus")
-@Service(TopologyConstants.HDFS_INSTANCE_SERVICE_NAME)
+@Prefix("journalnodestatus")
+@Service(TopologyConstants.JN_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
 @Tags({TopologyConstants.SITE_TAG, TopologyConstants.HOSTNAME_TAG, TopologyConstants.RACK_TAG,  TopologyConstants.ROLE_TAG})
 public class JournalNodeServiceAPIEntity extends TopologyBaseAPIEntity {
     @Column("a")
-    private long writtenTxidDeviation;
+    private long writtenTxidDiff;
     @Column("b")
     private String status;
 
@@ -44,12 +44,12 @@ public class JournalNodeServiceAPIEntity extends TopologyBaseAPIEntity {
         valueChanged("status");
     }
 
-    public long getWrittenTxidDeviation() {
-        return writtenTxidDeviation;
+    public long getWrittenTxidDiff() {
+        return writtenTxidDiff;
     }
 
-    public void setWrittenTxidDeviation(long writtenTxidDeviation) {
-        this.writtenTxidDeviation = writtenTxidDeviation;
-        valueChanged("writtenTxidDeviation");
+    public void setWrittenTxidDiff(long writtenTxidDiff) {
+        this.writtenTxidDiff = writtenTxidDiff;
+        valueChanged("writtenTxidDiff");
     }
 }

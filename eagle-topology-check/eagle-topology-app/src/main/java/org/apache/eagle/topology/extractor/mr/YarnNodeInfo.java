@@ -25,77 +25,77 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class YarnNodeInfo {
 
-	private String rack;
-	private String state;
-	private String id;
-	private String nodeHostName;
-	private String nodeHTTPAddress;
-	private String lastHealthUpdate;
-	private String healthReport;
-	private String numContainers;
-	private String usedMemoryMB;
-	private String availMemoryMB;
-	
-	
-	public String getRack() {
-		return rack;
-	}
-	public void setRack(String rack) {
-		this.rack = rack;
-	}
-	public String getState() {
-		return state;
-	}
-	public void setState(String state) {
-		this.state = state;
-	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getNodeHostName() {
-		return nodeHostName;
-	}
-	public void setNodeHostName(String nodeHostName) {
-		this.nodeHostName = nodeHostName;
-	}
-	public String getNodeHTTPAddress() {
-		return nodeHTTPAddress;
-	}
-	public void setNodeHTTPAddress(String nodeHTTPAddress) {
-		this.nodeHTTPAddress = nodeHTTPAddress;
-	}
-	public String getLastHealthUpdate() {
-		return lastHealthUpdate;
-	}
-	public void setLastHealthUpdate(String lastHealthUpdate) {
-		this.lastHealthUpdate = lastHealthUpdate;
-	}
-	public String getHealthReport() {
-		return healthReport;
-	}
-	public void setHealthReport(String healthReport) {
-		this.healthReport = healthReport;
-	}
-	public String getNumContainers() {
-		return numContainers;
-	}
-	public void setNumContainers(String numContainers) {
-		this.numContainers = numContainers;
-	}
-	public String getUsedMemoryMB() {
-		return usedMemoryMB;
-	}
-	public void setUsedMemoryMB(String usedMemoryMB) {
-		this.usedMemoryMB = usedMemoryMB;
-	}
-	public String getAvailMemoryMB() {
-		return availMemoryMB;
-	}
-	public void setAvailMemoryMB(String availMemoryMB) {
-		this.availMemoryMB = availMemoryMB;
-	}
-	
+    private String rack;
+    private String state;
+    private String id;
+    private String nodeHostName;
+    private String nodeHTTPAddress;
+    private String lastHealthUpdate;
+    private String healthReport;
+    private String numContainers;
+    private String usedMemoryMB;
+    private String availMemoryMB;
+
+
+    public String getRack() {
+        return rack;
+    }
+    public void setRack(String rack) {
+        this.rack = rack;
+    }
+    public String getState() {
+        return state;
+    }
+    public void setState(String state) {
+        this.state = state;
+    }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getNodeHostName() {
+        return nodeHostName;
+    }
+    public void setNodeHostName(String nodeHostName) {
+        this.nodeHostName = nodeHostName;
+    }
+    public String getNodeHTTPAddress() {
+        return nodeHTTPAddress;
+    }
+    public void setNodeHTTPAddress(String nodeHTTPAddress) {
+        this.nodeHTTPAddress = nodeHTTPAddress;
+    }
+    public String getLastHealthUpdate() {
+        return lastHealthUpdate;
+    }
+    public void setLastHealthUpdate(String lastHealthUpdate) {
+        this.lastHealthUpdate = lastHealthUpdate;
+    }
+    public String getHealthReport() {
+        return healthReport;
+    }
+    public void setHealthReport(String healthReport) {
+        this.healthReport = healthReport;
+    }
+    public String getNumContainers() {
+        return numContainers;
+    }
+    public void setNumContainers(String numContainers) {
+        this.numContainers = numContainers;
+    }
+    public String getUsedMemoryMB() {
+        return usedMemoryMB;
+    }
+    public void setUsedMemoryMB(String usedMemoryMB) {
+        this.usedMemoryMB = usedMemoryMB;
+    }
+    public String getAvailMemoryMB() {
+        return availMemoryMB;
+    }
+    public void setAvailMemoryMB(String availMemoryMB) {
+        this.availMemoryMB = availMemoryMB;
+    }
+
 }

@@ -20,23 +20,17 @@ package org.apache.eagle.topology.utils;
 
 import java.util.Map;
 
-/**
- * POJO class to contain MBeans information returned from Hadoop JMX servlet query
- * 
- * @author xinzli
- *
- */
 public class JMXBean {
 
-	private Map<String, Object> propertyMap;
+    private Map<String, Object> propertyMap;
 
-	public Map<String, Object> getPropertyMap() {
-		return propertyMap;
-	}
+    public Map<String, Object> getPropertyMap() {
+        return propertyMap;
+    }
 
-	public void setPropertyMap(Map<String, Object> propertyMap) {
-		this.propertyMap = propertyMap;
-	}
-	
-	
+    public void setPropertyMap(Map<String, Object> propertyMap) {
+        this.propertyMap = propertyMap;
+    }
+
+
 }

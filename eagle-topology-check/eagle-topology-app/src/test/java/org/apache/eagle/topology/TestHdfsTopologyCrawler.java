@@ -16,23 +16,21 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.topology.extractor.mr;
+package org.apache.eagle.topology;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.eagle.topology.extractor.hdfs.HdfsTopologyCrawler;
+import org.junit.Test;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class YarnNodeInfoWrapper {
+public class TestHdfsTopologyCrawler {
 
-    private YarnNodeInfos infos;
+    @Test
+    public void test() {
+        Config config = ConfigFactory.load("application-debug.conf");
 
-    public YarnNodeInfos getNodes() {
-        return infos;
+        TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
+        HdfsTopologyCrawler crawler = new HdfsTopologyCrawler(topologyCheckAppConfig, null);
+        crawler.extract();
     }
-
-    public void setNodes(YarnNodeInfos infos) {
-        this.infos = infos;
-    }
-
 }

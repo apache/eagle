@@ -19,16 +19,34 @@
 package org.apache.eagle.topology;
 
 import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.TopologyBuilder;
 import com.typesafe.config.Config;
 import org.apache.eagle.app.StormApplication;
 import org.apache.eagle.app.environment.impl.StormEnvironment;
+import org.apache.eagle.topology.storm.TopologyCheckAppSpout;
+import org.apache.eagle.topology.storm.TopologyDataPersistBolt;
 
 public class TopologyCheckApp extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
 
+        String spoutName = TopologyCheckAppConfig.TOPOLOGY_DATA_FETCH_SPOUT_NAME;
+        String persistBoltName = TopologyCheckAppConfig.TOPOLOGY_ENTITY_PERSIST_BOLT_NAME;
 
-        return null;
+        TopologyBuilder topologyBuilder = new TopologyBuilder();
+        topologyBuilder.setSpout(
+            spoutName,
+            new TopologyCheckAppSpout(topologyCheckAppConfig),
+            topologyCheckAppConfig.dataExtractorConfig.numDataFetcherSpout
+        ).setNumTasks(topologyCheckAppConfig.dataExtractorConfig.numDataFetcherSpout);
+
+        topologyBuilder.setBolt(
+            persistBoltName,
+            new TopologyDataPersistBolt(topologyCheckAppConfig),
+            topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt
+        ).setNumTasks(topologyCheckAppConfig.dataExtractorConfig.numEntityPersistBolt).shuffleGrouping(spoutName);
+
+        return topologyBuilder.createTopology();
     }
 }

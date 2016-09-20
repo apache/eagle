@@ -16,23 +16,11 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.topology.extractor.mr;
+package org.apache.eagle.topology;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+public class TopologyCheckAppMain {
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class YarnNodeInfoWrapper {
-
-    private YarnNodeInfos infos;
-
-    public YarnNodeInfos getNodes() {
-        return infos;
+    public static void main(String[] args) {
+        new TopologyCheckApp().run(args);
     }
-
-    public void setNodes(YarnNodeInfos infos) {
-        this.infos = infos;
-    }
-
 }

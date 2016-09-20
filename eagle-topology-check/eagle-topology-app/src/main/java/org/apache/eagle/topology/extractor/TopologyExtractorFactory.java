@@ -18,10 +18,13 @@
 
 package org.apache.eagle.topology.extractor;
 
+import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.hbase.HbaseTopologyCrawler;
 
+import org.apache.eagle.topology.extractor.hdfs.HdfsTopologyCrawler;
+import org.apache.eagle.topology.extractor.mr.MRTopologyCrawler;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Constructor;
@@ -40,7 +43,7 @@ public class TopologyExtractorFactory {
     private static void registerTopologyExtractor(String topologyType, Class<? extends TopologyCrawler> clazz) {
         Constructor<? extends TopologyCrawler> constructor = null;
         try {
-            constructor = clazz.getConstructor(TopologyCheckAppConfig.class);
+            constructor = clazz.getConstructor(TopologyCheckAppConfig.class, SpoutOutputCollector.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -49,11 +52,11 @@ public class TopologyExtractorFactory {
         }
     }
 
-    public static TopologyCrawler create(TopologyConstants.TopologyType topologyType, TopologyCheckAppConfig config) {
+    public static TopologyCrawler create(TopologyConstants.TopologyType topologyType, TopologyCheckAppConfig config, SpoutOutputCollector collector) {
         if (extractorMap.containsKey(topologyType.toString().toUpperCase())) {
             Constructor<? extends TopologyCrawler> constructor = extractorMap.get(topologyType.name());
             try {
-                return constructor.newInstance(config);
+                return constructor.newInstance(config, collector);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -65,7 +68,7 @@ public class TopologyExtractorFactory {
 
     static {
         registerTopologyExtractor(TopologyConstants.TopologyType.HBASE.name(), HbaseTopologyCrawler.class);
-        //registerTopologyExtractor(TopologyConstants.TopologyType.HDFS.name(), HdfsTopologyEntityParser.class);
-        //registerTopologyExtractor(TopologyConstants.TopologyType.MR.name(), MRTopologyEntityParser.class);
+        registerTopologyExtractor(TopologyConstants.TopologyType.HDFS.name(), HdfsTopologyCrawler.class);
+        registerTopologyExtractor(TopologyConstants.TopologyType.MR.name(), MRTopologyCrawler.class);
     }
 }

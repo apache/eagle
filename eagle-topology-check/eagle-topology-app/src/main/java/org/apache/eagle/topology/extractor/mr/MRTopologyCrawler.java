@@ -49,7 +49,7 @@ public class MRTopologyCrawler implements TopologyCrawler {
             return;
         }
         TopologyCheckMessageId messageId = new TopologyCheckMessageId(TopologyConstants.TopologyType.MR, updateTimestamp);
-        this.outputCollector.emit(new Values(TopologyConstants.TopologyType.MR.toString(), result), messageId);
+        this.outputCollector.emit(new Values(TopologyConstants.MR_INSTANCE_SERVICE_NAME, result), messageId);
     }
 
 }

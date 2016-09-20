@@ -49,6 +49,6 @@ public class HdfsTopologyCrawler implements TopologyCrawler {
             return;
         }
         TopologyCheckMessageId messageId = new TopologyCheckMessageId(TopologyConstants.TopologyType.HDFS, updateTimestamp);
-        this.collector.emit(new Values(TopologyConstants.TopologyType.HDFS.toString(), result), messageId);
+        this.collector.emit(new Values(TopologyConstants.HDFS_INSTANCE_SERVICE_NAME, result), messageId);
     }
 }

@@ -38,49 +38,49 @@ import java.util.Map;
  */
 public final class JMXQueryHelper {
 
-	private static final int DEFAULT_QUERY_TIMEOUT = 30 * 60 * 1000;
+    private static final int DEFAULT_QUERY_TIMEOUT = 30 * 60 * 1000;
     private static final Logger LOG = LoggerFactory.getLogger(JMXQueryHelper.class);
-	
-	public static Map<String, JMXBean> query(String jmxQueryUrl) throws JSONException, IOException {
-		LOG.info("Going to query JMX url: " + jmxQueryUrl);
-		InputStream is = null;
-		try {
-			final URLConnection connection = URLConnectionUtils.getConnection(jmxQueryUrl);
-			connection.setReadTimeout(DEFAULT_QUERY_TIMEOUT);
-			is = connection.getInputStream();
-			return parseStream(is);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		} finally {
-			if (is != null) {
-				is.close();
-			}
-		}
-	}
 
-	public static Map<String, JMXBean> parseStream(InputStream is) {
-		final Map<String, JMXBean> resultMap = new HashMap<String, JMXBean>();
-		final JSONTokener tokener = new JSONTokener(is);
-		final JSONObject jsonBeansObject = new JSONObject(tokener);
-		final JSONArray jsonArray = jsonBeansObject.getJSONArray("beans");
-		int size = jsonArray.length();
-		for (int i = 0; i < size; ++i) {
-			final JSONObject obj = (JSONObject)jsonArray.get(i);
-			final JMXBean bean = new JMXBean(); 
-			final Map<String, Object> map = new HashMap<String, Object>();
-			bean.setPropertyMap(map);
-			final JSONArray names = obj.names();
-			int jsonSize = names.length();
-			for (int j = 0 ; j < jsonSize; ++j) {
-				final String key = names.getString(j);
-				Object value = obj.get(key);
-				map.put(key, value);
-			}
-			final String nameString = (String) map.get("name");
-			resultMap.put(nameString, bean);
-		}
-		return resultMap;
-	}
-	
+    public static Map<String, JMXBean> query(String jmxQueryUrl) throws JSONException, IOException {
+        LOG.info("Going to query JMX url: " + jmxQueryUrl);
+        InputStream is = null;
+        try {
+            final URLConnection connection = URLConnectionUtils.getConnection(jmxQueryUrl);
+            connection.setReadTimeout(DEFAULT_QUERY_TIMEOUT);
+            is = connection.getInputStream();
+            return parseStream(is);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+    }
+
+    public static Map<String, JMXBean> parseStream(InputStream is) {
+        final Map<String, JMXBean> resultMap = new HashMap<String, JMXBean>();
+        final JSONTokener tokener = new JSONTokener(is);
+        final JSONObject jsonBeansObject = new JSONObject(tokener);
+        final JSONArray jsonArray = jsonBeansObject.getJSONArray("beans");
+        int size = jsonArray.length();
+        for (int i = 0; i < size; ++i) {
+            final JSONObject obj = (JSONObject)jsonArray.get(i);
+            final JMXBean bean = new JMXBean();
+            final Map<String, Object> map = new HashMap<String, Object>();
+            bean.setPropertyMap(map);
+            final JSONArray names = obj.names();
+            int jsonSize = names.length();
+            for (int j = 0 ; j < jsonSize; ++j) {
+                final String key = names.getString(j);
+                Object value = obj.get(key);
+                map.put(key, value);
+            }
+            final String nameString = (String) map.get("name");
+            resultMap.put(nameString, bean);
+        }
+        return resultMap;
+    }
+
 }

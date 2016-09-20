@@ -26,14 +26,13 @@ import java.util.List;
 
 public class TopologyCheckAppConfig implements Serializable {
 
-    final static String TOPOLOGY_DATA_FETCH_SPOUT_NAME = "topologyDataFetcherSpout";
-    final static String TOPOLOGY_ENTITY_PERSIST_BOLT_NAME = "topologyEntityPersistBolt";
+    public static final String TOPOLOGY_DATA_FETCH_SPOUT_NAME = "topologyDataFetcherSpout";
+    public static final String TOPOLOGY_ENTITY_PERSIST_BOLT_NAME = "topologyEntityPersistBolt";
 
     public DataExtractorConfig dataExtractorConfig;
     public HBaseConfig hBaseConfig;
     public HdfsConfig hdfsConfig;
     public MRConfig mrConfig;
-    public EagleInfo eagleInfo;
     public List<TopologyConstants.TopologyType> topologyTypes;
 
     public Config config;
@@ -44,7 +43,6 @@ public class TopologyCheckAppConfig implements Serializable {
         hBaseConfig = null;
         hdfsConfig = null;
         mrConfig = null;
-        eagleInfo = new EagleInfo();
         dataExtractorConfig = new DataExtractorConfig();
         topologyTypes = new ArrayList<>();
     }
@@ -56,11 +54,6 @@ public class TopologyCheckAppConfig implements Serializable {
 
     private void init(Config config) {
         this.config = config;
-
-        this.eagleInfo.host = config.getString("eagleProps.eagle.service.host");
-        this.eagleInfo.port = config.getInt("eagleProps.eagle.service.port");
-        this.eagleInfo.password = config.getString("eagleProps.eagle.service.password");
-        this.eagleInfo.username = config.getString("eagleProps.eagle.service.username");
 
         this.dataExtractorConfig.site = config.getString("dataExtractorConfig.site");
         this.dataExtractorConfig.checkRetryTime = config.getLong("dataExtractorConfig.checkRetryTime");
@@ -76,16 +69,14 @@ public class TopologyCheckAppConfig implements Serializable {
             hBaseConfig.keytab = config.getString("dataSourceConfig.hbase.keytab");
             hBaseConfig.principal = config.getString("dataSourceConfig.hbase.principal");
             hBaseConfig.zkQuorum = config.getString("dataSourceConfig.hbase.zkQuorum");
-            hBaseConfig.zkRoot = config.getString("dataSourceConfig.hbase.zkRoot");
-            hBaseConfig.zkRetryInterval = config.getInt("dataSourceConfig.hbase.zkRetryInterval");
-            hBaseConfig.zkRetryTimes = config.getInt("dataSourceConfig.hbase.zkRetryTimes");
-            hBaseConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.hbase.zkSessionTimeoutMs");
+            hBaseConfig.zkRoot = config.getString("dataSourceConfig.hbase.zkZnodeParent");
+            hBaseConfig.zkClientPort = config.getString("dataSourceConfig.hbase.zkPropertyClientPort");
         }
 
         if (config.hasPath("dataSourceConfig.mr")) {
             topologyTypes.add(TopologyConstants.TopologyType.MR);
             mrConfig = new MRConfig();
-            mrConfig.rmUrls =  config.getString("dataSourceConfig.yarn.rmUrl").split(",\\s*");
+            mrConfig.rmUrls =  config.getString("dataSourceConfig.mr.rmUrl").split(",\\s*");
         }
 
         if (config.hasPath("dataSourceConfig.hdfs")) {
@@ -107,9 +98,7 @@ public class TopologyCheckAppConfig implements Serializable {
     public static class HBaseConfig implements Serializable {
         public String zkQuorum;
         public String zkRoot;
-        public int zkSessionTimeoutMs;
-        public int zkRetryTimes;
-        public int zkRetryInterval;
+        public String zkClientPort;
         public String principal;
         public String keytab;
     }
@@ -120,13 +109,5 @@ public class TopologyCheckAppConfig implements Serializable {
 
     public static class HdfsConfig implements Serializable {
         public String [] namenodeUrls;
-    }
-
-    public static class EagleInfo implements Serializable {
-        public String host;
-        public int port;
-        public String username;
-        public String password;
-        public long readTimeOutSeconds;
     }
 }

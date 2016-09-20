@@ -49,6 +49,6 @@ public class HbaseTopologyCrawler implements TopologyCrawler {
             return;
         }
         TopologyCheckMessageId messageId = new TopologyCheckMessageId(TopologyConstants.TopologyType.HBASE, updateTimestamp);
-        this.collector.emit(new Values(TopologyConstants.TopologyType.HBASE.toString(), result), messageId);
+        this.collector.emit(new Values(TopologyConstants.HBASE_INSTANCE_SERVICE_NAME, result), messageId);
     }
 }

@@ -18,6 +18,7 @@
 
 package org.apache.eagle.topology.extractor.hdfs;
 
+import org.apache.eagle.app.utils.PathResolverHelper;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.TopologyEntityParserResult;
@@ -40,7 +41,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.eagle.topology.TopologyConstants.NAME_NODE_ACTIVE_STATUS;
+import static org.apache.eagle.topology.TopologyConstants.*;
+import static org.apache.eagle.topology.TopologyConstants.RACK_TAG;
 
 public class HdfsTopologyEntityParser implements TopologyEntityParser {
 
@@ -48,9 +50,10 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private String [] namenodeUrls;
     private String site;
 
-    private static final String JMX_URL = "jmx?anonymous=true";
+    private static final String JMX_URL = "/jmx?anonymous=true";
     private static final String JMX_FS_NAME_SYSTEM_BEAN_NAME = "Hadoop:service=NameNode,name=FSNamesystem";
     private static final String JMX_NAMENODE_INFO = "Hadoop:service=NameNode,name=NameNodeInfo";
+
     private static final String HA_STATE = "tag.HAState";
     private static final String HA_NAME = "tag.Hostname";
     private static final String CAPACITY_TOTAL_GB = "CapacityTotalGB";
@@ -58,6 +61,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private static final String BLOCKS_TOTAL = "BlocksTotal";
     private static final String LIVE_NODES = "LiveNodes";
     private static final String DEAD_NODES = "DeadNodes";
+
     private static final String JN_STATUS = "NameJournalStatus";
     private static final String JN_TRANSACTION_INFO = "JournalTransactionInfo";
     private static final String LAST_TX_ID = "LastAppliedOrWrittenTxId";
@@ -66,6 +70,8 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private static final String DATA_NODE_USED_SPACE = "usedSpace";
     private static final String DATA_NODE_CAPACITY = "capacity";
     private static final String DATA_NODE_ADMIN_STATE = "adminState";
+    private static final String DATA_NODE_FAILED_VOLUMN = "volfails";
+
     private static final String DATA_NODE_DECOMMISSIONED = "Decommissioned";
     private static final String DATA_NODE_DECOMMISSIONED_STATE = "decommissioned";
 
@@ -87,35 +93,29 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
             try {
                 final HdfsServiceTopologyAPIEntity namenodeEntity = createNamenodeEntity(url, timestamp);
                 result.getNodes().get(TopologyConstants.NAME_NODE_ROLE).add(namenodeEntity);
-                if (namenodeEntity.getTags().get(HA_STATE).equalsIgnoreCase(NAME_NODE_ACTIVE_STATUS)) {
+                if (namenodeEntity.getStatus().equalsIgnoreCase(NAME_NODE_ACTIVE_STATUS)) {
                     createSlaveNodeEntities(url, timestamp, result);
                 }
-                return result;
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
         double value = result.getNodes().get(TopologyConstants.NAME_NODE_ROLE).size() * 1d / namenodeUrls.length;
-        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.DATA_NODE_ROLE, value, site, timestamp));
+        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NAME_NODE_ROLE, value, site, timestamp));
         return result;
     }
 
     private HdfsServiceTopologyAPIEntity createNamenodeEntity(String url, long updateTime) throws JSONException, IOException {
-        final HdfsServiceTopologyAPIEntity result = new HdfsServiceTopologyAPIEntity();
-        result.setTimestamp(updateTime);
-        result.setTags(new HashMap<>());
         final String urlString = buildFSNamesystemURL(url);
         final Map<String, JMXBean> jmxBeanMap = JMXQueryHelper.query(urlString);
-        final JMXBean bean = jmxBeanMap.get(TopologyResourceURLBuilder.HDFS_JMX_FS_SYSTEM_BEAN);
+        final JMXBean bean = jmxBeanMap.get(JMX_FS_NAME_SYSTEM_BEAN_NAME);
         if (bean == null || bean.getPropertyMap() == null) {
             throw new ServiceNotResponseException("Invalid JMX format, FSNamesystem bean is null!");
         }
+        final String hostname = (String)bean.getPropertyMap().get(HA_NAME);
+        HdfsServiceTopologyAPIEntity result = createHdfsServiceEntity(TopologyConstants.NAME_NODE_ROLE, hostname, updateTime);
         final String state = (String)bean.getPropertyMap().get(HA_STATE);
         result.setStatus(state);
-        final String hostname = (String)bean.getPropertyMap().get(HA_NAME);
-        result.getTags().put(TopologyConstants.HOSTNAME_TAG, hostname);
-        result.getTags().put(TopologyConstants.RACK_TAG, EntityBuilderHelper.resolveRackByHost(hostname));
-        result.getTags().put(TopologyConstants.ROLE_TAG, TopologyConstants.NAME_NODE_ROLE);
         final Double configuredCapacityGB = (Double) bean.getPropertyMap().get(CAPACITY_TOTAL_GB);
         result.setConfiguredCapacityTB(Double.toString(configuredCapacityGB / 1024));
         final Double capacityUsedGB = (Double) bean.getPropertyMap().get(CAPACITY_USED_GB);
@@ -128,7 +128,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private void createSlaveNodeEntities(String url, long updateTime, TopologyEntityParserResult result) throws IOException {
         final String urlString = buildNamenodeInfo(url);
         final Map<String, JMXBean> jmxBeanMap = JMXQueryHelper.query(urlString);
-        final JMXBean bean = jmxBeanMap.get(TopologyResourceURLBuilder.HDFS_JMX_NAMENODE_INFO);
+        final JMXBean bean = jmxBeanMap.get(JMX_NAMENODE_INFO);
         if (bean == null || bean.getPropertyMap() == null) {
             throw new ServiceNotResponseException("Invalid JMX format, NameNodeInfo bean is null!");
         }
@@ -137,6 +137,9 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     }
 
     private void createAllJournalNodeEntities(JMXBean bean, long updateTime, TopologyEntityParserResult result) throws UnknownHostException {
+        if (bean.getPropertyMap().get(JN_TRANSACTION_INFO) == null || bean.getPropertyMap().get(JN_STATUS) == null) {
+            return;
+        }
         String jnInfoString = (String) bean.getPropertyMap().get(JN_TRANSACTION_INFO);
         JSONObject jsonObject = new JSONObject(jnInfoString);
         long lastTxId = Long.parseLong(jsonObject.getString(LAST_TX_ID));
@@ -149,13 +152,10 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         String QJM = jsonMap.getString("manager");
         Pattern qjm = Pattern.compile(QJM_PATTERN);
         Matcher jpmMatcher = qjm.matcher(QJM);
-
         while (jpmMatcher.find()) {
-            JournalNodeServiceAPIEntity entity = new JournalNodeServiceAPIEntity();
-            entity.setTimestamp(updateTime);
-            entity.setTags(new HashMap<>());
             String ip = jpmMatcher.group(1);
-            entity.getTags().put(TopologyConstants.HOSTNAME_TAG, EntityBuilderHelper.resolveHostByIp(ip));
+            String hostname = EntityBuilderHelper.resolveHostByIp(ip);
+            JournalNodeServiceAPIEntity entity = createJournalNodeEntity(TopologyConstants.JOURNAL_NODE_ROLE, hostname, updateTime);
             entity.setStatus(TopologyConstants.DATA_NODE_DEAD_STATUS);
             journalNodesMap.put(ip, entity);
         }
@@ -163,13 +163,13 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         String stream = jsonMap.getString("stream");
         Pattern status = Pattern.compile(STATUS_PATTERN);
         Matcher statusMatcher = status.matcher(stream);
+        long numLiveJournalNodes = 0;
         while (statusMatcher.find()) {
-            JournalNodeServiceAPIEntity entity = new JournalNodeServiceAPIEntity();
-            entity.setTags(new HashMap<>());
+            numLiveJournalNodes++;
             String ip = statusMatcher.group(1);
             if (journalNodesMap.containsKey(ip)) {
                 long txid = Long.parseLong(statusMatcher.group(2));
-                journalNodesMap.get(ip).setWrittenTxidDeviation(lastTxId - txid);
+                journalNodesMap.get(ip).setWrittenTxidDiff(lastTxId - txid);
                 journalNodesMap.get(ip).setStatus(TopologyConstants.DATA_NODE_LIVE_STATUS);
             }
         }
@@ -178,7 +178,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         }
         result.getNodes().get(TopologyConstants.JOURNAL_NODE_ROLE).addAll(journalNodesMap.values());
 
-        double value = statusMatcher.groupCount() / journalNodesMap.size();
+        double value = numLiveJournalNodes / journalNodesMap.size();
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.JOURNAL_NODE_ROLE, value, site, updateTime));
     }
 
@@ -195,11 +195,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         for (int i = 0; deadNodes != null && i < deadNodes.length(); ++i) {
             final String hostname = deadNodes.getString(i);
             final JSONObject deadNode = jsonNodesObject.getJSONObject(hostname);
-            final HdfsServiceTopologyAPIEntity entity = new HdfsServiceTopologyAPIEntity();
-            entity.setTags(new HashMap<String, String>());
-            entity.getTags().put(TopologyConstants.HOSTNAME_TAG, hostname);
-            entity.getTags().put(TopologyConstants.RACK_TAG, EntityBuilderHelper.resolveRackByHost(hostname));
-            entity.getTags().put(TopologyConstants.ROLE_TAG, TopologyConstants.DATA_NODE_ROLE);
+            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, hostname, updateTime);
             if (deadNode.getBoolean(DATA_NODE_DECOMMISSIONED_STATE)) {
                 ++numDeadDecommNodes;
                 entity.setStatus(TopologyConstants.DATA_NODE_DEAD_DECOMMISSIONED_STATUS);
@@ -219,20 +215,17 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
             final String hostname = liveNodes.getString(i);
             final JSONObject liveNode = jsonNodesObject.getJSONObject(hostname);
 
-            final HdfsServiceTopologyAPIEntity entity = new HdfsServiceTopologyAPIEntity();
-            entity.setTimestamp(updateTime);
-            entity.setTags(new HashMap<String, String>());
-            entity.getTags().put(TopologyConstants.HOSTNAME_TAG, hostname);
-            entity.getTags().put(TopologyConstants.ROLE_TAG, TopologyConstants.DATA_NODE_ROLE);
+            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, hostname, updateTime);
             final Number configuredCapacity = (Number) liveNode.get(DATA_NODE_CAPACITY);
             entity.setConfiguredCapacityTB(Double.toString(configuredCapacity.doubleValue() / 1024.0 / 1024.0 / 1024.0 / 1024.0));
             final Number capacityUsed = (Number) liveNode.get(DATA_NODE_USED_SPACE);
             entity.setUsedCapacityTB(Double.toString(capacityUsed.doubleValue() / 1024.0 / 1024.0 / 1024.0 / 1024.0));
             final Number blocksTotal = (Number) liveNode.get(DATA_NODE_NUM_BLOCKS);
             entity.setNumBlocks(Double.toString(blocksTotal.doubleValue()));
+            final Number volFails = (Number) liveNode.get(DATA_NODE_FAILED_VOLUMN);
+            entity.setNumFailedVolumes(Double.toString(volFails.doubleValue()));
             final String adminState = liveNode.getString(DATA_NODE_ADMIN_STATE);
             if (DATA_NODE_DECOMMISSIONED.equalsIgnoreCase(adminState)) {
-//				entity.setStatus(FeederConstants.DATA_NODE_LIVE_STATUS);
                 ++numLiveDecommNodes;
                 entity.setStatus(TopologyConstants.DATA_NODE_LIVE_DECOMMISSIONED_STATUS);
             } else {
@@ -247,12 +240,38 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.DATA_NODE_ROLE, value, site, updateTime));
     }
 
+    private HdfsServiceTopologyAPIEntity createHdfsServiceEntity(String roleType, String hostname, long updateTime) {
+        HdfsServiceTopologyAPIEntity entity = new HdfsServiceTopologyAPIEntity();
+        entity.setTimestamp(updateTime);
+        Map<String, String> tags = new HashMap<String, String>();
+        entity.setTags(tags);
+        tags.put(SITE_TAG, site);
+        tags.put(ROLE_TAG, roleType);
+        tags.put(HOSTNAME_TAG, hostname);
+        String rack = EntityBuilderHelper.resolveRackByHost(hostname);
+        tags.put(RACK_TAG, rack);
+        return entity;
+    }
+
+    private JournalNodeServiceAPIEntity createJournalNodeEntity(String roleType, String hostname, long updateTime) {
+        JournalNodeServiceAPIEntity entity = new JournalNodeServiceAPIEntity();
+        entity.setTimestamp(updateTime);
+        Map<String, String> tags = new HashMap<String, String>();
+        entity.setTags(tags);
+        tags.put(SITE_TAG, site);
+        tags.put(ROLE_TAG, roleType);
+        tags.put(HOSTNAME_TAG, hostname);
+        String rack = EntityBuilderHelper.resolveRackByHost(hostname);
+        tags.put(RACK_TAG, rack);
+        return entity;
+    }
+
     private String buildFSNamesystemURL(String url) {
-        return url + "&qry=" + JMX_FS_NAME_SYSTEM_BEAN_NAME;
+        return PathResolverHelper.buildUrlPath(url, JMX_URL + "&qry=" + JMX_FS_NAME_SYSTEM_BEAN_NAME);
     }
 
     private String buildNamenodeInfo(String url) {
-        return url + "&qry=" + JMX_NAMENODE_INFO;
+        return PathResolverHelper.buildUrlPath(url, JMX_URL + "&qry=" + JMX_NAMENODE_INFO);
     }
 
     @Override
