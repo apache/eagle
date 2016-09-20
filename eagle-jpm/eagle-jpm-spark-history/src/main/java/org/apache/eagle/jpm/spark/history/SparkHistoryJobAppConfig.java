@@ -86,8 +86,8 @@ public class SparkHistoryJobAppConfig implements Serializable {
         this.eagleInfo.password = config.getString("eagleProps.eagle.service.password");
         this.eagleInfo.timeout = config.getInt("eagleProps.eagle.service.read.timeout");
         this.eagleInfo.basePath = EagleServiceBaseClient.DEFAULT_BASE_PATH;
-        if (config.hasPath("eagleProps.eagle.service.bashPath")) {
-            this.eagleInfo.basePath = config.getString("eagleProps.eagle.service.bashPath");
+        if (config.hasPath("eagleProps.eagle.service.basePath")) {
+            this.eagleInfo.basePath = config.getString("eagleProps.eagle.service.basePath");
         }
 
         this.stormConfig.spoutPending = config.getInt("storm.pendingSpout");
