@@ -93,10 +93,11 @@ public class SparkApplicationParser implements Runnable {
         this.currentAttempt = 1;
         this.first = true;
         this.hdfsConf  = new Configuration();
-        this.hdfsConf.set("fs.defaultFS", endpointConfig.nnEndpoint);
+        for (Map.Entry<String, String> entry : endpointConfig.hdfs.entrySet()) {
+            this.hdfsConf.set(entry.getKey(), entry.getValue());
+            LOG.info("conf key {}, conf value {}", entry.getKey(), entry.getValue());
+        }
         this.hdfsConf.setBoolean("fs.hdfs.impl.disable.cache", true);
-        this.hdfsConf.set("hdfs.kerberos.principal", endpointConfig.principal);
-        this.hdfsConf.set("hdfs.keytab.file", endpointConfig.keyTab);
 
         this.commonTags.put(SparkJobTagName.SITE.toString(), jobExtractorConfig.site);
         this.commonTags.put(SparkJobTagName.SPARK_USER.toString(), app.getUser());

@@ -20,8 +20,11 @@
 package org.apache.eagle.jpm.spark.history;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigValue;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SparkHistoryJobAppConfig implements Serializable {
     static final String SPARK_HISTORY_JOB_FETCH_SPOUT_NAME = "sparkHistoryJobFetchSpout";
@@ -29,7 +32,6 @@ public class SparkHistoryJobAppConfig implements Serializable {
 
     public ZKStateConfig zkStateConfig;
     public JobHistoryEndpointConfig jobHistoryConfig;
-    public HDFSConfig hdfsConfig;
     public BasicInfo info;
     public EagleInfo eagleInfo;
     public StormConfig stormConfig;
@@ -45,7 +47,7 @@ public class SparkHistoryJobAppConfig implements Serializable {
     public SparkHistoryJobAppConfig() {
         this.zkStateConfig = new ZKStateConfig();
         this.jobHistoryConfig = new JobHistoryEndpointConfig();
-        this.hdfsConfig = new HDFSConfig();
+        this.jobHistoryConfig.hdfs = new HashMap<>();
         this.info = new BasicInfo();
         this.eagleInfo = new EagleInfo();
         this.stormConfig = new StormConfig();
@@ -59,27 +61,29 @@ public class SparkHistoryJobAppConfig implements Serializable {
     private void init(Config config) {
         this.config = config;
 
-        this.zkStateConfig.zkQuorum = config.getString("dataSourceConfig.zkQuorum");
-        this.zkStateConfig.zkRetryInterval = config.getInt("dataSourceConfig.zkRetryInterval");
-        this.zkStateConfig.zkRetryTimes = config.getInt("dataSourceConfig.zkRetryTimes");
-        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.zkSessionTimeoutMs");
-        this.zkStateConfig.zkRoot = config.getString("dataSourceConfig.zkRoot");
+        this.zkStateConfig.zkQuorum = config.getString("zkStateConfig.zkQuorum");
+        this.zkStateConfig.zkRetryInterval = config.getInt("zkStateConfig.zkRetryInterval");
+        this.zkStateConfig.zkRetryTimes = config.getInt("zkStateConfig.zkRetryTimes");
+        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zkStateConfig.zkSessionTimeoutMs");
+        this.zkStateConfig.zkRoot = config.getString("zkStateConfig.zkRoot");
 
         jobHistoryConfig.historyServerUrl = config.getString("dataSourceConfig.spark.history.server.url");
         jobHistoryConfig.historyServerUserName = config.getString("dataSourceConfig.spark.history.server.username");
         jobHistoryConfig.historyServerUserPwd = config.getString("dataSourceConfig.spark.history.server.password");
         jobHistoryConfig.rms = config.getString("dataSourceConfig.rm.url").split(",\\s*");
-
-        this.hdfsConfig.baseDir = config.getString("dataSourceConfig.hdfs.eventLog");
-        this.hdfsConfig.endpoint = config.getString("dataSourceConfig.hdfs.endPoint");
-        this.hdfsConfig.principal = config.getString("dataSourceConfig.hdfs.principal");
-        this.hdfsConfig.keytab = config.getString("dataSourceConfig.hdfs.keytab");
+        jobHistoryConfig.baseDir = config.getString("dataSourceConfig.baseDir");
+        for (Map.Entry<String, ConfigValue> entry : config.getConfig("dataSourceConfig.hdfs").entrySet()) {
+            this.jobHistoryConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
+        }
 
         info.site = config.getString("basic.cluster") + "-" + config.getString("basic.dataCenter");
         info.jobConf = config.getString("basic.jobConf.additional.info").split(",\\s*");
 
         this.eagleInfo.host = config.getString("eagleProps.eagle.service.host");
         this.eagleInfo.port = config.getInt("eagleProps.eagle.service.port");
+        this.eagleInfo.username = config.getString("eagleProps.eagle.service.username");
+        this.eagleInfo.password = config.getString("eagleProps.eagle.service.password");
+        this.eagleInfo.timeout = config.getInt("eagleProps.eagle.service.read.timeout");
 
         this.stormConfig.timeoutSec = config.getInt("storm.messageTimeoutSec");
         this.stormConfig.spoutPending = config.getInt("storm.pendingSpout");
@@ -99,13 +103,8 @@ public class SparkHistoryJobAppConfig implements Serializable {
         public String historyServerUrl;
         public String historyServerUserName;
         public String historyServerUserPwd;
-    }
-
-    public static class HDFSConfig implements Serializable {
-        public String endpoint;
         public String baseDir;
-        public String principal;
-        public String keytab;
+        public Map<String, String> hdfs;
     }
 
     public static class BasicInfo implements Serializable {
@@ -122,5 +121,8 @@ public class SparkHistoryJobAppConfig implements Serializable {
     public static class EagleInfo implements Serializable {
         public String host;
         public int port;
+        public String username;
+        public String password;
+        public int timeout;
     }
 }

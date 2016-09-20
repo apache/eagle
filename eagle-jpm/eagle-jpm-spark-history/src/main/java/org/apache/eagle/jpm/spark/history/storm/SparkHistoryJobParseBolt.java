@@ -62,10 +62,11 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
         this.hdfsConf = new Configuration();
-        this.hdfsConf.set("fs.defaultFS", config.hdfsConfig.endpoint);
         this.hdfsConf.setBoolean("fs.hdfs.impl.disable.cache", true);
-        this.hdfsConf.set("hdfs.kerberos.principal", config.hdfsConfig.principal);
-        this.hdfsConf.set("hdfs.keytab.file", config.hdfsConfig.keytab);
+        for (Map.Entry<String, String> entry : config.jobHistoryConfig.hdfs.entrySet()) {
+            this.hdfsConf.set(entry.getKey(), entry.getValue());
+            LOG.info("conf key {}, conf value {}", entry.getKey(), entry.getValue());
+        }
         this.historyServerFetcher = new SparkHistoryServerResourceFetcher(config.jobHistoryConfig.historyServerUrl,
                 config.jobHistoryConfig.historyServerUserName, config.jobHistoryConfig.historyServerUserPwd);
         this.zkState = new JobHistoryZKStateManager(config);
@@ -99,7 +100,7 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
                     LOG.info("Attempt log name: " + attemptLogName + extension);
 
                     Path attemptFile = getFilePath(attemptLogName, extension);
-                    JHFInputStreamReader reader = new SparkFilesystemInputStreamReaderImpl(config.info.site, info);
+                    JHFInputStreamReader reader = new SparkFilesystemInputStreamReaderImpl(config, info);
                     reader.read(hdfs.open(attemptFile));
                 }
             }
@@ -130,7 +131,7 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
     }
 
     private Path getFilePath(String appAttemptLogName, String extension) {
-        String attemptLogDir = this.config.hdfsConfig.baseDir + "/" + appAttemptLogName + extension;
+        String attemptLogDir = this.config.jobHistoryConfig.baseDir + "/" + appAttemptLogName + extension;
         return new Path(attemptLogDir);
     }
 

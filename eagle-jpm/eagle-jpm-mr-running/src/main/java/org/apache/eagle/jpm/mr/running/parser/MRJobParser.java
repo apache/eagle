@@ -500,6 +500,7 @@ public class MRJobParser implements Runnable {
     private Function<String, Boolean> fetchJobConfig = jobId -> {
         if (mrJobConfigs.containsKey(jobId)) {
             mrJobEntityMap.get(jobId).setJobConfig(mrJobConfigs.get(jobId));
+            mrJobEntityMap.get(jobId).getTags().put(MRJobTagName.JOB_TYPE.toString(), Utils.fetchJobType(mrJobConfigs.get(jobId)).toString());
             return true;
         }
         String confURL = app.getTrackingUrl() + Constants.MR_JOBS_URL + "/" + jobId + "/" + Constants.MR_CONF_URL + "?" + Constants.ANONYMOUS_PARAMETER;

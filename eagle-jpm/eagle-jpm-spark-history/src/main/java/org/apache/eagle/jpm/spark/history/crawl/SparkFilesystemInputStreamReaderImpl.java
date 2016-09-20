@@ -17,6 +17,7 @@
 
 package org.apache.eagle.jpm.spark.history.crawl;
 
+import org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig;
 import org.apache.eagle.jpm.util.SparkJobTagName;
 
 import java.io.File;
@@ -29,10 +30,11 @@ public class SparkFilesystemInputStreamReaderImpl implements JHFInputStreamReade
 
     private String site;
     private SparkApplicationInfo app;
+    private SparkHistoryJobAppConfig config;
 
-
-    public SparkFilesystemInputStreamReaderImpl(String site, SparkApplicationInfo app) {
-        this.site = site;
+    public SparkFilesystemInputStreamReaderImpl(SparkHistoryJobAppConfig config, SparkApplicationInfo app) {
+        this.config = config;
+        this.site = config.info.site;
         this.app = app;
     }
 
@@ -41,13 +43,13 @@ public class SparkFilesystemInputStreamReaderImpl implements JHFInputStreamReade
         Map<String, String> baseTags = new HashMap<>();
         baseTags.put(SparkJobTagName.SITE.toString(), site);
         baseTags.put(SparkJobTagName.SPARK_QUEUE.toString(), app.getQueue());
-        JHFParserBase parser = new JHFSparkParser(new JHFSparkEventReader(baseTags, this.app));
+        JHFParserBase parser = new JHFSparkParser(new JHFSparkEventReader(config, baseTags, this.app));
         parser.parse(is);
     }
 
     public static void main(String[] args) throws Exception {
-        SparkFilesystemInputStreamReaderImpl impl = new SparkFilesystemInputStreamReaderImpl("apollo-phx", new SparkApplicationInfo());
-        impl.read(new FileInputStream(new File("E:\\eagle\\application_1459803563374_535667_1")));
+        //SparkFilesystemInputStreamReaderImpl impl = new SparkFilesystemInputStreamReaderImpl("apollo-phx", new SparkApplicationInfo());
+        //impl.read(new FileInputStream(new File("E:\\eagle\\application_1459803563374_535667_1")));
     }
 
 }
