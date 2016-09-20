@@ -49,6 +49,7 @@ public class MongoDedupEventsStore implements DedupEventsStore {
     public static final String DEDUP_POLICY_ID = "policyId";
     public static final String DEDUP_CREATE_TIME = "createdTime";
     public static final String DEDUP_TIMESTAMP = "timestamp";
+    public static final String DEDUP_REMOVABLE = "removable";
     public static final String DEDUP_CUSTOM_FIELDS_VALUES = "customFieldValues";
     public static final String DEDUP_VALUES = "dedupValues";
     public static final String DEDUP_STATE_FIELD_VALUE = "stateFieldValue";

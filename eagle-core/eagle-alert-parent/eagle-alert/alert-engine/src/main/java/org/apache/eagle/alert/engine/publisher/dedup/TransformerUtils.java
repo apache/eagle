@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 
 import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 import org.bson.BsonArray;
+import org.bson.BsonBoolean;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
 import org.bson.BsonString;
@@ -48,6 +49,7 @@ public class TransformerUtils {
                     dedupCustomFieldValuesDoc.getString(MAP_VALUE).getValue());
             }
             EventUniq eventUniq = new EventUniq(streamId, policyId, timestamp, customFieldValues);
+            eventUniq.removable = doc.getBoolean(MongoDedupEventsStore.DEDUP_REMOVABLE).getValue();
             eventUniq.createdTime = doc.getInt64(
                 MongoDedupEventsStore.DEDUP_CREATE_TIME, new BsonInt64(0)).getValue();
             List<DedupValue> dedupValues = new ArrayList<DedupValue>();
@@ -77,6 +79,7 @@ public class TransformerUtils {
             doc.put(MongoDedupEventsStore.DEDUP_POLICY_ID, new BsonString(entity.getEventEniq().policyId));
             doc.put(MongoDedupEventsStore.DEDUP_CREATE_TIME, new BsonInt64(entity.getEventEniq().createdTime));
             doc.put(MongoDedupEventsStore.DEDUP_TIMESTAMP, new BsonInt64(entity.getEventEniq().timestamp));
+            doc.put(MongoDedupEventsStore.DEDUP_REMOVABLE, new BsonBoolean(entity.getEventEniq().removable));
 
             List<BsonDocument> dedupCustomFieldValues = new ArrayList<BsonDocument>();
             for (Entry<String, String> entry : entity.getEventEniq().customFieldValues.entrySet()) {
