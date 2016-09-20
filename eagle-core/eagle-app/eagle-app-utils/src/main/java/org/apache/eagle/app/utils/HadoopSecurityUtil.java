@@ -23,7 +23,6 @@ import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.IOException;
 
-
 /**
  * This class provides util methods for Eagle connector communicating
  * with secured cluster.
@@ -34,7 +33,9 @@ public class HadoopSecurityUtil {
     public static final String EAGLE_USER_NAME_KEY = "eagle.kerberos.principal";
 
     public static void login(Configuration kConfig) throws IOException {
-        if (kConfig.get(EAGLE_KEYTAB_FILE_KEY) == null || kConfig.get(EAGLE_USER_NAME_KEY) == null) return;
+        if (kConfig.get(EAGLE_KEYTAB_FILE_KEY) == null || kConfig.get(EAGLE_USER_NAME_KEY) == null) {
+            return;
+        }
 
         kConfig.setBoolean("hadoop.security.authorization", true);
         kConfig.set("hadoop.security.authentication", "kerberos");

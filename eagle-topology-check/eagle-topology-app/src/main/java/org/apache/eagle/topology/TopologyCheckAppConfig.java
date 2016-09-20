@@ -29,6 +29,8 @@ public class TopologyCheckAppConfig implements Serializable {
     public static final String TOPOLOGY_DATA_FETCH_SPOUT_NAME = "topologyDataFetcherSpout";
     public static final String TOPOLOGY_ENTITY_PERSIST_BOLT_NAME = "topologyEntityPersistBolt";
 
+    private static final int MAX_NUM_THREADS = 10;
+
     public DataExtractorConfig dataExtractorConfig;
     public HBaseConfig hBaseConfig;
     public HdfsConfig hdfsConfig;
@@ -58,7 +60,10 @@ public class TopologyCheckAppConfig implements Serializable {
         this.dataExtractorConfig.site = config.getString("dataExtractorConfig.site");
         this.dataExtractorConfig.checkRetryTime = config.getLong("dataExtractorConfig.checkRetryTime");
         this.dataExtractorConfig.fetchDataIntervalInSecs = config.getLong("dataExtractorConfig.fetchDataIntervalInSecs");
-        this.dataExtractorConfig.parseThreadPoolSize = config.getInt("dataExtractorConfig.parseThreadPoolSize");
+        this.dataExtractorConfig.parseThreadPoolSize = MAX_NUM_THREADS;
+        if (config.hasPath("dataExtractorConfig.parseThreadPoolSize")) {
+            this.dataExtractorConfig.parseThreadPoolSize = config.getInt("dataExtractorConfig.parseThreadPoolSize");
+        }
         this.dataExtractorConfig.numDataFetcherSpout = config.getInt("dataExtractorConfig.numDataFetcherSpout");
         this.dataExtractorConfig.numEntityPersistBolt = config.getInt("dataExtractorConfig.numEntityPersistBolt");
 
@@ -91,7 +96,7 @@ public class TopologyCheckAppConfig implements Serializable {
         public int numDataFetcherSpout;
         public int numEntityPersistBolt;
         public long fetchDataIntervalInSecs;
-        public long parseThreadPoolSize;
+        public int parseThreadPoolSize;
         public long checkRetryTime;
     }
 

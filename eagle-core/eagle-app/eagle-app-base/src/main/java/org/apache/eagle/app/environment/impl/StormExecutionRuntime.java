@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app.environment.impl;
 
+import backtype.storm.utils.Utils;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
@@ -129,6 +130,9 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         } else {
             LOG.info("Submitting as local mode ...");
             getLocalCluster().submitTopology(topologyName, conf, topology);
+            Utils.sleep(600000); // sleep 600s
+            _localCluster.killTopology(topologyName);
+            _localCluster.shutdown();
             LOG.info("Submitted");
         }
         LOG.info("Started {} ({})",topologyName,executor.getClass().getCanonicalName());

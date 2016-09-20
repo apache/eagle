@@ -21,13 +21,14 @@ package org.apache.eagle.topology;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.topology.extractor.hbase.HbaseTopologyCrawler;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestHbaseTopologyCrawler {
 
-    @Test
+    @Test @Ignore
     public void test() {
-        Config config = ConfigFactory.load("application-debug.conf");
+        Config config = ConfigFactory.load();
 
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
         HbaseTopologyCrawler crawler = new HbaseTopologyCrawler(topologyCheckAppConfig, null);

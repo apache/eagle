@@ -34,9 +34,7 @@ import static org.apache.eagle.topology.TopologyConstants.*;
 public class TopologyDataExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopologyDataExtractor.class);
-    private static final int MAX_NUM_THREADS = 10;
     private static final int MAX_WAIT_TIME = 10;
-    private static final String DEFAULT_SITE = "sandbox";
 
     private TopologyCheckAppConfig config;
     private List<TopologyCrawler> extractors;
@@ -45,7 +43,7 @@ public class TopologyDataExtractor {
     public TopologyDataExtractor(TopologyCheckAppConfig topologyCheckAppConfig, SpoutOutputCollector collector) {
         this.config = topologyCheckAppConfig;
         extractors = getExtractors(collector);
-        executorService = Executors.newFixedThreadPool(MAX_NUM_THREADS);
+        executorService = Executors.newFixedThreadPool(topologyCheckAppConfig.dataExtractorConfig.parseThreadPoolSize);
     }
 
     public void crawl() {

@@ -48,7 +48,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(TopologyDataPersistBolt.class);
 
     public TopologyDataPersistBolt(TopologyCheckAppConfig config) {
-        this. config = config;
+        this.config = config;
     }
 
     @Override

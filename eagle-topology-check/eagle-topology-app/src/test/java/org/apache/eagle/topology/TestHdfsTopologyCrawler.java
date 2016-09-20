@@ -21,13 +21,14 @@ package org.apache.eagle.topology;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.topology.extractor.hdfs.HdfsTopologyCrawler;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestHdfsTopologyCrawler {
 
-    @Test
+    @Test @Ignore
     public void test() {
-        Config config = ConfigFactory.load("application-debug.conf");
+        Config config = ConfigFactory.load();
 
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
         HdfsTopologyCrawler crawler = new HdfsTopologyCrawler(topologyCheckAppConfig, null);
