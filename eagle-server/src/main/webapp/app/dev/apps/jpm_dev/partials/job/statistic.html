@@ -24,6 +24,12 @@
 		<li ng-class="{active: type === 'hourly'}"><a ng-click="switchType('hourly')">Hourly</a></li>
 	</ul>
 	<div class="tab-content">
+		<div class="jpm-chart">
+			<div chart class="jpm-chart-container" series="jobDistributionSeries" category-func="jobDistributionCategoryFunc" option="jobDistributionSeriesOption"></div>
+			<div ng-if="(jobDistributionSeries || []).length === 0" class="overlay">
+				<i class="fa fa-refresh fa-spin"></i>
+			</div>
+		</div>
 	</div>
 	<div class="box-body no-padding">
 		<div class="row border-split">

@@ -42,6 +42,7 @@
 				title: "@?title",
 				series: "=",
 				category: "=?category",
+				categoryFunc: "=?categoryFunc",
 				xTitle: "@?xTitle",
 				yTitle: "@?yTitle",
 
@@ -71,6 +72,9 @@
 									preDate = time.date();
 									return Time.format(point.x, "MMM.D HH:mm");
 								}*/
+								if($scope.categoryFunc) {
+									return $scope.categoryFunc(point.x);
+								}
 								return Time.format(point.x, "HH:mm");
 							});
 						}

@@ -67,7 +67,7 @@ var app = {};
 			return resolve;
 		}
 
-		eagleApp.config(function ($stateProvider, $urlRouterProvider, $animateProvider) {
+		eagleApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $animateProvider) {
 			$urlRouterProvider.otherwise("/");
 			$stateProvider
 			// ================================== Home ==================================
@@ -174,6 +174,47 @@ var app = {};
 				config.resolve = $.extend(routeResolve(resolveConfig), resolve);
 
 				$stateProvider.state(route.state, config);
+			});
+
+			/*$httpProvider.responseInterceptors.push(function () {
+				return function (promise) {
+					function success(response) {
+						console.log(">>>", response);
+						return response;
+					}
+
+					function error(response) {
+						return response;
+					}
+
+					return promise.then(success, error);
+				}
+			});*/
+			$httpProvider.interceptors.push(function() {
+				function eagleRequestHandle(res) {
+					var data = res.data || {
+							exception: "",
+							message: ""
+						};
+					if(data.success === false || res.status === 404) {
+						$.dialog({
+							title: "AJAX Error",
+							content: $("<pre>")
+								.text(
+									"url:\n" + common.getValueByPath(res, ["config", "url"]) + "\n\n" +
+									"status:\n" + res.status + "\n\n" +
+									"exception:\n" + data.exception + "\n\n" +
+									"message:\n" + data.message
+								)
+						});
+					}
+					return res;
+				}
+
+				return {
+					response: eagleRequestHandle,
+					responseError: eagleRequestHandle
+				};
 			});
 		});
 

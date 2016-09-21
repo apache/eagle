@@ -21,6 +21,13 @@
 	 * `register` without params will load the module which using require
 	 */
 	register(function (jpmApp) {
+		var colorMap = {
+			"SUCCEEDED": "#00a65a",
+			"FAILED": "#dd4b39",
+			"KILLED": "#CCCCCC",
+			"ERROR": "#f39c12"
+		};
+
 		jpmApp.controller("statisticCtrl", function ($wrapState, $element, $scope, PageConfig, Time, Entity, JPM) {
 			$scope.site = $wrapState.param.siteId;
 
@@ -30,10 +37,74 @@
 
 			$scope.switchType = function (type) {
 				$scope.type = type;
-				$scope.refresh();
+				$scope.refreshDistribution();
 			};
 
-			$scope.commonChartOption = {
+			// Time level distribution
+			var distributionCache = {};
+
+			$scope.jobDistributionSeriesOption = {};
+
+			$scope.refreshDistribution = function () {
+				var startTime, endTime;
+				var metric, minInterval, field;
+
+				switch ($scope.type) {
+					case "weekly":
+						endTime = Time("weekEnd");
+						startTime = Time("week").subtract(7 * 12, "day");
+						metric = "hadoop.job.history.day.count";
+						minInterval = 1440 * 7;
+						field = "sum(value)";
+						break;
+					case "daily":
+						endTime = Time("dayEnd");
+						startTime = Time("day").subtract(31, "day");
+						metric = "hadoop.job.history.day.count";
+						minInterval = 1440;
+						field = "max(value)";
+						break;
+					case "hourly":
+						endTime = Time("hourEnd");
+						startTime = Time("day").subtract(2, "day");
+						metric = "hadoop.job.history.hour.count";
+						minInterval = 60;
+						field = "sum(value)";
+						break;
+				}
+
+				$scope.jobDistributionSeries = [];
+				$scope.jobDistributionCategoryFunc = function (value) {
+					if($scope.type === "hourly") {
+						return Time.format(value, "HH:mm");
+					}
+					return Time.format(value, "MM-DD");
+				};
+				var promise = distributionCache[$scope.type] = distributionCache[$scope.type] || JPM.aggMetricsToEntities(
+					JPM.aggMetrics({site: $scope.site}, metric, ["jobStatus"], field, minInterval, startTime, endTime)
+				)._promise.then(function (list) {
+					var series = $.map(list, function (metrics) {
+						return JPM.metricsToSeries(metrics[0].tags["jobStatus"], metrics, {
+							stack: "stack",
+							type: "bar"
+						});
+					});
+					common.array.doSort(series, "name", true, ["SUCCEEDED", "FAILED", "KILLED", "ERROR"]);
+					$scope.jobDistributionSeriesOption.color = $.map(series, function (series) {
+						return colorMap[series.name];
+					});
+
+					return series;
+				});
+
+				promise.then(function(series) {
+					$scope.jobDistributionSeries = series;
+				});
+			};
+
+			$scope.refreshDistribution();
+
+			/*$scope.commonChartOption = {
 				grid: {
 					top: 60
 				}
@@ -64,7 +135,7 @@
 			};
 
 			Time.onReload($scope.refresh, $scope);
-			$scope.refresh();
+			$scope.refresh();*/
 		});
 	});
 })();

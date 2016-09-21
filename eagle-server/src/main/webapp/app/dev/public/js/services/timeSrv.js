@@ -45,10 +45,29 @@
 					return startTime;
 				case "endTime":
 					return endTime;
+				case "week":
+					_mom = new moment();
+					_mom.utcOffset($Time.UTC_OFFSET);
+					_mom.weekday(0).hours(0).minutes(0).seconds(0);
+					break;
+				case "weekEnd":
+					_mom = $Time("week").add(7, "d").subtract(1, "s");
+					break;
 				case "day":
 					_mom = new moment();
 					_mom.utcOffset($Time.UTC_OFFSET);
 					_mom.hours(0).minutes(0).seconds(0);
+					break;
+				case "dayEnd":
+					_mom = $Time("day").add(1, "d").subtract(1, "s");
+					break;
+				case "hour":
+					_mom = new moment();
+					_mom.utcOffset($Time.UTC_OFFSET);
+					_mom.minutes(0).seconds(0);
+					break;
+				case "hourEnd":
+					_mom = $Time("hour").add(1, "h").subtract(1, "s");
 					break;
 				default:
 					// Parse string number

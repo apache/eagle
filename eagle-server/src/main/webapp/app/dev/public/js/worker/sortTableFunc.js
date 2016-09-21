@@ -85,31 +85,7 @@ var __sortTable_generateFilteredList;
 		}
 
 		if (order) {
-			if (orderAsc) {
-				_list.sort(function (obj1, obj2) {
-					var val1 = common.getValueByPath(obj1, order);
-					var val2 = common.getValueByPath(obj2, order);
-
-					if (val1 === val2) {
-						return 0;
-					} else if (val1 === null || val1 === undefined || val1 < val2) {
-						return -1;
-					}
-					return 1;
-				});
-			} else {
-				_list.sort(function (obj1, obj2) {
-					var val1 = common.getValueByPath(obj1, order);
-					var val2 = common.getValueByPath(obj2, order);
-
-					if (val1 === val2) {
-						return 0;
-					} else if (val1 === null || val1 === undefined || val1 < val2) {
-						return 1;
-					}
-					return -1;
-				});
-			}
+			common.array.doSort(_list, order, orderAsc);
 		}
 
 		return _list;

@@ -21,11 +21,13 @@
 
 	var serviceModule = angular.module('eagle.service');
 
-	serviceModule.service('Widget', function($wrapState, Site) {
+	serviceModule.service('Widget', function($wrapState, Site, Application) {
 		var Widget = {};
 
 		var mainWidgetList = [];
 		var siteWidgetList = [];
+
+		var displayWidgetList = [];
 		var siteWidgets = {};
 
 		Widget.register = function (widget, isSite) {
@@ -33,6 +35,15 @@
 		};
 
 		Widget.refresh = function () {
+			// Common widget
+			displayWidgetList = $.map(mainWidgetList, function (widget) {
+				var hasApp = !!common.array.find(widget.application, Application.list, "descriptor.type");
+				if(hasApp) {
+					return widget;
+				}
+			});
+
+			// Site widget
 			siteWidgets = {};
 			$.each(Site.list, function (i, site) {
 				siteWidgets[site.siteId] = $.map(siteWidgetList, function (widget) {
@@ -48,7 +59,7 @@
 			get: function () {
 				var site = Site.current();
 				if(!site) {
-					return mainWidgetList;
+					return displayWidgetList;
 				} else if(site.siteId) {
 					return siteWidgets[site.siteId];
 				} else {

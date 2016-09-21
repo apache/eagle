@@ -181,18 +181,34 @@
 	// ============================ Array =============================
 	common.array = {};
 
-	common.array.find = function(val, list, path, findAll, caseSensitive) {
-		path = path || "";
-		val = caseSensitive === false ? (val || "").toUpperCase() : val;
+	common.array.findIndex = function(val, list, path, findAll, caseSensitive) {
+		var _list = [];
+		val = caseSensitive === false ? (val + "").toUpperCase() : val;
 
-		var _list = $.grep(list, function(unit) {
-			if(caseSensitive === false) {
-				return val === (common.getValueByPath(unit, path) || "").toUpperCase();
-			} else {
-				return val === common.getValueByPath(unit, path);
+		for(var i = 0 ; i < list.length ; i += 1) {
+			var unit = list[i];
+			var _val = common.getValueByPath(unit, path);
+			_val = caseSensitive === false ? (_val + "").toUpperCase() : _val;
+
+			if(_val === val) {
+				if(!findAll) return i;
+				_list.push(i);
 			}
-		});
-		return findAll ? _list : (_list.length === 0 ? null : _list[0]);
+		}
+
+		return findAll ? _list: -1;
+	};
+
+	common.array.find = function(val, list, path, findAll, caseSensitive) {
+		var index = common.array.findIndex(val, list, path, findAll, caseSensitive);
+
+		if(findAll) {
+			return $.map(index, function (index) {
+				return list[index];
+			});
+		} else {
+			return index === -1 ? null : list[index];
+		}
 	};
 
 	common.array.minus = function (list1, list2, path1, path2) {
@@ -205,6 +221,61 @@
 			}
 		});
 		return list;
+	};
+
+	common.array.doSort = function (list, path, asc, sortList) {
+		var sortFunc;
+		sortList = sortList || [];
+
+		if(asc !== false) {
+			sortFunc = function (obj1, obj2) {
+				var val1 = common.getValueByPath(obj1, path);
+				var val2 = common.getValueByPath(obj2, path);
+
+				var index1 = common.array.findIndex(val1, sortList);
+				var index2 = common.array.findIndex(val2, sortList);
+
+				if(index1 !== -1 && index2 === -1) {
+					return -1;
+				} else if(index1 == -1 && index2 !== -1) {
+					return 1;
+				} else if(index1 !== -1 && index2 !== -1) {
+					return index1 - index2;
+				}
+
+				if (val1 === val2) {
+					return 0;
+				} else if (val1 === null || val1 === undefined || val1 < val2) {
+					return -1;
+				}
+				return 1;
+			}
+		} else {
+			sortFunc = function (obj1, obj2) {
+				var val1 = common.getValueByPath(obj1, path);
+				var val2 = common.getValueByPath(obj2, path);
+
+				var index1 = common.array.findIndex(val1, sortList);
+				var index2 = common.array.findIndex(val2, sortList);
+
+				if(index1 !== -1 && index2 === -1) {
+					return -1;
+				} else if(index1 == -1 && index2 !== -1) {
+					return 1;
+				} else if(index1 !== -1 && index2 !== -1) {
+					return index1 - index2;
+				}
+
+				if (val1 === val2) {
+					return 0;
+				} else if (val1 === null || val1 === undefined || val1 < val2) {
+					return 1;
+				}
+				return -1;
+			}
+		}
+
+		return list.sort(sortFunc);
 	};
 
 	// =========================== Deferred ===========================

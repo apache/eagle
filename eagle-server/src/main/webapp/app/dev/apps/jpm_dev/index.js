@@ -35,7 +35,7 @@
 		controller: "overviewCtrl",
 		resolve: { time: true }
 	}).route("jpmStatistic", {
-		url: "/jpm/statistic?startTime&endTime",
+		url: "/jpm/statistic",
 		site: true,
 		templateUrl: "partials/job/statistic.html",
 		controller: "statisticCtrl"
@@ -64,7 +64,7 @@
 	]}, true);
 
 	jpmApp.service("JPM", function ($q, $http, Time, Site, Application) {
-		var JPM = {};
+		var JPM = window._JPM = {};
 
 		// TODO: timestamp support
 		JPM.QUERY_LIST = '${baseURL}/rest/entities?query=${query}[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
