@@ -345,11 +345,14 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     }
 
     private MultiScheme createMultiScheme(Map conf, String topic, String schemeClsName) throws Exception {
-        Scheme scheme = SchemeBuilder.buildFromClsName(schemeClsName, topic, conf);
+        Object scheme = SchemeBuilder.buildFromClsName(schemeClsName, topic, conf);
         if (scheme instanceof MultiScheme) {
             return (MultiScheme) scheme;
+        } else if (scheme instanceof  Scheme){
+            return new SchemeAsMultiScheme((Scheme)scheme);
         } else {
-            return new SchemeAsMultiScheme(scheme);
+            LOG.error("create spout scheme failed.");
+            throw new IllegalArgumentException("create spout scheme failed.");
         }
     }
 
