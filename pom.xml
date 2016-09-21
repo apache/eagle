@@ -244,7 +244,7 @@
         <mapr-storm-kafka.version>0.9.3</mapr-storm-kafka.version>
         <mapr-storm.version>0.9.3-mapr-1509</mapr-storm.version>
 
-        <curator.version>2.8.0</curator.version>
+        <curator.version>2.5.0</curator.version>
         <curator.test.version>2.5.0</curator.test.version>
         <zkclient.version>0.3</zkclient.version>
 

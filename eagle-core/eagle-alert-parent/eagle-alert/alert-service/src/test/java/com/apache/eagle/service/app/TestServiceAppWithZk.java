@@ -68,7 +68,7 @@ public class TestServiceAppWithZk {
         zkEmbed.shutdown();
     }
 
-    @Test @Ignore
+    @Test
     public void testMain() throws Exception {
         try {
             Thread.sleep(15000);
