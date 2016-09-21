@@ -30,6 +30,7 @@ public class TopologyCheckAppConfig implements Serializable {
     public static final String TOPOLOGY_ENTITY_PERSIST_BOLT_NAME = "topologyEntityPersistBolt";
 
     private static final int MAX_NUM_THREADS = 10;
+    private static final String HBASE_ZOOKEEPER_CLIENT_PORT = "2181";
 
     public DataExtractorConfig dataExtractorConfig;
     public HBaseConfig hBaseConfig;
@@ -71,11 +72,15 @@ public class TopologyCheckAppConfig implements Serializable {
         if (config.hasPath("dataSourceConfig.hbase")) {
             topologyTypes.add(TopologyConstants.TopologyType.HBASE);
             hBaseConfig = new HBaseConfig();
-            hBaseConfig.keytab = config.getString("dataSourceConfig.hbase.keytab");
-            hBaseConfig.principal = config.getString("dataSourceConfig.hbase.principal");
+            hBaseConfig.eagleKeytab = config.getString("dataSourceConfig.hbase.kerberos.eagle.keytab");
+            hBaseConfig.eaglePrincipal = config.getString("dataSourceConfig.hbase.kerberos.eagle.principal");
+            hBaseConfig.hbaseMasterPrincipal = config.getString("dataSourceConfig.hbase.kerberos.master.principal");
             hBaseConfig.zkQuorum = config.getString("dataSourceConfig.hbase.zkQuorum");
             hBaseConfig.zkRoot = config.getString("dataSourceConfig.hbase.zkZnodeParent");
-            hBaseConfig.zkClientPort = config.getString("dataSourceConfig.hbase.zkPropertyClientPort");
+            hBaseConfig.zkClientPort = HBASE_ZOOKEEPER_CLIENT_PORT;
+            if (config.hasPath("dataSourceConfig.hbase.zkPropertyClientPort")) {
+                hBaseConfig.zkClientPort = config.getString("dataSourceConfig.hbase.zkPropertyClientPort");
+            }
         }
 
         if (config.hasPath("dataSourceConfig.mr")) {
@@ -104,8 +109,9 @@ public class TopologyCheckAppConfig implements Serializable {
         public String zkQuorum;
         public String zkRoot;
         public String zkClientPort;
-        public String principal;
-        public String keytab;
+        public String hbaseMasterPrincipal;
+        public String eaglePrincipal;
+        public String eagleKeytab;
     }
 
     public static class MRConfig implements Serializable {

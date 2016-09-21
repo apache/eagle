@@ -65,12 +65,12 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
         String serviceName = input.getStringByField(TopologyConstants.SERVICE_NAME_FIELD);
         TopologyEntityParserResult result = (TopologyEntityParserResult) input.getValueByField(TopologyConstants.TOPOLOGY_DATA_FIELD);
         Set<String> availableHostnames = new HashSet<String>();
-        List<TopologyBaseAPIEntity> entitiesForDeletion = new ArrayList<TopologyBaseAPIEntity>();
-        List<TopologyBaseAPIEntity> entitiesToWrite = new ArrayList<TopologyBaseAPIEntity>();
+        List<TopologyBaseAPIEntity> entitiesForDeletion = new ArrayList<>();
+        List<TopologyBaseAPIEntity> entitiesToWrite = new ArrayList<>();
         for (Map.Entry<String, List<TopologyBaseAPIEntity>> entry : result.getNodes().entrySet()) {
             List<TopologyBaseAPIEntity> entities = entry.getValue();
             for (TopologyBaseAPIEntity entity : entities) {
-                availableHostnames.add(entity.getTags().toString());
+                availableHostnames.add(generateKey(entity));
                 entitiesToWrite.add(entity);
             }
         }
@@ -80,14 +80,14 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             GenericServiceAPIResponseEntity<TopologyBaseAPIEntity> response = client.search().query(query).pageSize(Integer.MAX_VALUE).send();
             if (response.isSuccess() && response.getObj() != null) {
                 for (TopologyBaseAPIEntity entity : response.getObj()) {
-                    if (!availableHostnames.contains(entity.getTags().toString())) {
+                    if (!availableHostnames.contains(generateKey(entity))) {
                         entitiesForDeletion.add(entity);
                     }
                 }
             }
-            deleteEntities(entitiesForDeletion);
-            writeEntities(entitiesToWrite);
-            writeEntities(result.getMetrics());
+            deleteEntities(entitiesForDeletion, serviceName);
+            writeEntities(entitiesToWrite, serviceName);
+            writeEntities(result.getMetrics(), serviceName);
         } catch (EagleServiceClientException e) {
             e.printStackTrace();
             this.collector.fail(input);
@@ -100,13 +100,13 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
 
     }
 
-    private void deleteEntities(List<TopologyBaseAPIEntity> entities) {
+    private void deleteEntities(List<TopologyBaseAPIEntity> entities, String serviceName) {
         try {
             GenericServiceAPIResponseEntity response = client.delete(entities);
             if (!response.isSuccess()) {
                 LOG.error("Got exception from eagle service: " + response.getException());
             } else {
-                LOG.info("Successfully delete " + entities.size() + " entities");
+                LOG.info("Successfully delete {} entities for {}", entities.size(), serviceName);
             }
         } catch (EagleServiceClientException e) {
             e.printStackTrace();
@@ -116,18 +116,24 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
         entities.clear();
     }
 
-    private void writeEntities(List<? extends TaggedLogAPIEntity> entities) {
+    private void writeEntities(List<? extends TaggedLogAPIEntity> entities, String serviceName) {
         try {
             GenericServiceAPIResponseEntity response = client.create(entities);
             if (!response.isSuccess()) {
                 LOG.error("Got exception from eagle service: " + response.getException());
             } else {
-                LOG.info("Successfully wrote " + entities.size() + " entities");
+                LOG.info("Successfully wrote {} entities for {}", entities.size(), serviceName);
             }
         } catch (Exception e) {
             LOG.error("cannot create entities successfully", e);
         }
         entities.clear();
+    }
+
+    private String generateKey(TopologyBaseAPIEntity entity) {
+        return String.format("%s-%s-%s-%s", entity.getTags().get(TopologyConstants.SITE_TAG),
+                entity.getTags().get(TopologyConstants.RACK_TAG), entity.getTags().get(TopologyConstants.HOSTNAME_TAG),
+                entity.getTags().get(TopologyConstants.ROLE_TAG));
     }
 
 }

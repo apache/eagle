@@ -34,6 +34,17 @@ public class JournalNodeServiceAPIEntity extends TopologyBaseAPIEntity {
     private long writtenTxidDiff;
     @Column("b")
     private String status;
+    @Column("c")
+    private long lastUpdateTime;
+
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+        valueChanged("lastUpdateTime");
+    }
 
     public String getStatus() {
         return status;

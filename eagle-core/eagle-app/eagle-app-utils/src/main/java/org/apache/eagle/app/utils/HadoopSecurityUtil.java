@@ -30,19 +30,19 @@ import java.io.IOException;
 public class HadoopSecurityUtil {
 
     public static final String EAGLE_KEYTAB_FILE_KEY = "eagle.keytab.file";
-    public static final String EAGLE_USER_NAME_KEY = "eagle.kerberos.principal";
+    public static final String EAGLE_PRINCIPAL_KEY = "eagle.kerberos.principal";
 
     public static void login(Configuration kConfig) throws IOException {
         String keytab = kConfig.get(EAGLE_KEYTAB_FILE_KEY);
-        String principal = kConfig.get(EAGLE_USER_NAME_KEY);
-        if ( keytab == null ||  principal== null || keytab.isEmpty() || principal.isEmpty()) {
+        String principal = kConfig.get(EAGLE_PRINCIPAL_KEY);
+        if ( keytab == null ||  principal == null || keytab.isEmpty() || principal.isEmpty()) {
             return;
         }
 
         kConfig.setBoolean("hadoop.security.authorization", true);
         kConfig.set("hadoop.security.authentication", "kerberos");
         UserGroupInformation.setConfiguration(kConfig);
-        UserGroupInformation.loginUserFromKeytab(kConfig.get(EAGLE_USER_NAME_KEY), kConfig.get(EAGLE_KEYTAB_FILE_KEY));
+        UserGroupInformation.loginUserFromKeytab(kConfig.get(EAGLE_PRINCIPAL_KEY), kConfig.get(EAGLE_KEYTAB_FILE_KEY));
     }
 
 }

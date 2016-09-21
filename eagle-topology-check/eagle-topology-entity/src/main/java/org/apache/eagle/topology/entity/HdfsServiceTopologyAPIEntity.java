@@ -29,59 +29,61 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(TopologyConstants.HDFS_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
 public class HdfsServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
-	@Column("status")
-	private String status;
-	@Column("configuredCapacityTB")
-	private String configuredCapacityTB;
-	@Column("usedCapacityTB")
-	private String usedCapacityTB;
-	@Column("numBlocks")
-	private String numBlocks;
-	@Column("numFailedVolumes")
-	private String numFailedVolumes;
-	@Column("remediationStatus")
-	private String remediationStatus;
+    @Column("a")
+    private String status;
+    @Column("b")
+    private String configuredCapacityTB;
+    @Column("c")
+    private String usedCapacityTB;
+    @Column("d")
+    private String numBlocks;
+    @Column("e")
+    private String numFailedVolumes;
+    @Column("f")
+    private long lastUpdateTime;
 
-	public String getRemediationStatus() {
-		return remediationStatus;
-	}
-	public void setRemediationStatus(String remediationStatus) {
-		this.remediationStatus = remediationStatus;
-		valueChanged("remediationStatus");
-	}
-	public String getNumFailedVolumes() {
-		return numFailedVolumes;
-	}
-	public void setNumFailedVolumes(String numFailedVolumes) {
-		this.numFailedVolumes = numFailedVolumes;
-		valueChanged("numFailedVolumes");
-	}
-	public String getNumBlocks() {
-		return numBlocks;
-	}
-	public void setNumBlocks(String numBlocks) {
-		this.numBlocks = numBlocks;
-		valueChanged("numBlocks");
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-		valueChanged("status");
-	}
-	public String getConfiguredCapacityTB() {
-		return configuredCapacityTB;
-	}
-	public void setConfiguredCapacityTB(String configuredCapacityTB) {
-		this.configuredCapacityTB = configuredCapacityTB;
-		valueChanged("configuredCapacityTB");
-	}
-	public String getUsedCapacityTB() {
-		return usedCapacityTB;
-	}
-	public void setUsedCapacityTB(String usedCapacityTB) {
-		this.usedCapacityTB = usedCapacityTB;
-		valueChanged("usedCapacityTB");
-	}
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+        valueChanged("lastUpdateTime");
+    }
+
+    public String getNumFailedVolumes() {
+        return numFailedVolumes;
+    }
+    public void setNumFailedVolumes(String numFailedVolumes) {
+        this.numFailedVolumes = numFailedVolumes;
+        valueChanged("numFailedVolumes");
+    }
+    public String getNumBlocks() {
+        return numBlocks;
+    }
+    public void setNumBlocks(String numBlocks) {
+        this.numBlocks = numBlocks;
+        valueChanged("numBlocks");
+    }
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+        valueChanged("status");
+    }
+    public String getConfiguredCapacityTB() {
+        return configuredCapacityTB;
+    }
+    public void setConfiguredCapacityTB(String configuredCapacityTB) {
+        this.configuredCapacityTB = configuredCapacityTB;
+        valueChanged("configuredCapacityTB");
+    }
+    public String getUsedCapacityTB() {
+        return usedCapacityTB;
+    }
+    public void setUsedCapacityTB(String usedCapacityTB) {
+        this.usedCapacityTB = usedCapacityTB;
+        valueChanged("usedCapacityTB");
+    }
 }

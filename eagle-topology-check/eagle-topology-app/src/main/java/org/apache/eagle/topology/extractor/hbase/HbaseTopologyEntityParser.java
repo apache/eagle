@@ -19,12 +19,10 @@
 package org.apache.eagle.topology.extractor.hbase;
 
 import org.apache.eagle.app.utils.HadoopSecurityUtil;
-import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.TopologyEntityParserResult;
 import org.apache.eagle.topology.entity.HBaseServiceTopologyAPIEntity;
-import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
 import org.apache.eagle.topology.utils.EntityBuilderHelper;
 import org.apache.hadoop.conf.Configuration;
@@ -50,10 +48,14 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
         this.site = site;
         this.hBaseConfiguration = HBaseConfiguration.create();
         this.hBaseConfiguration.set("hbase.zookeeper.quorum", hBaseConfig.zkQuorum);
-        this.hBaseConfiguration.set("hbase.zookeeper.property.clientPort", "2181");
+        this.hBaseConfiguration.set("hbase.zookeeper.property.clientPort", hBaseConfig.zkClientPort);
         this.hBaseConfiguration.set("zookeeper.znode.parent", hBaseConfig.zkRoot);
-        this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_USER_NAME_KEY, hBaseConfig.principal);
-        this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_KEYTAB_FILE_KEY, hBaseConfig.keytab);
+        this.hBaseConfiguration.set("hbase.client.retries.number", "10");
+        // kerberos authentication
+        this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_PRINCIPAL_KEY, hBaseConfig.eaglePrincipal);
+        this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_KEYTAB_FILE_KEY, hBaseConfig.eagleKeytab);
+        this.hBaseConfiguration.set("hbase.security.authentication", "kerberos");
+        this.hBaseConfiguration.set("hbase.master.kerberos.principal", hBaseConfig.hbaseMasterPrincipal);
     }
 
     private HBaseAdmin getHBaseAdmin() throws IOException {

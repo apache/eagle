@@ -29,42 +29,53 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Service(TopologyConstants.MR_INSTANCE_SERVICE_NAME)
 @TimeSeries(false)
 public class MRServiceTopologyAPIEntity  extends TopologyBaseAPIEntity {
-	@Column("status")
-	private String status;
-	@Column("numConfiguredMapSlots")
-	private String numConfiguredMapSlots;
-	@Column("numConfiguredReduceSlots")
-	private String numConfiguredReduceSlots;
-	@Column("healthReport")
-	private String healthReport;
-	
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-		valueChanged("status");
-	}
-	public String getNumConfiguredMapSlots() {
-		return numConfiguredMapSlots;
-	}
-	public void setNumConfiguredMapSlots(String numConfiguredMapSlots) {
-		this.numConfiguredMapSlots = numConfiguredMapSlots;
-		valueChanged("numConfiguredMapSlots");
-	}
-	public String getNumConfiguredReduceSlots() {
-		return numConfiguredReduceSlots;
-	}
-	public void setNumConfiguredReduceSlots(String numConfiguredReduceSlots) {
-		this.numConfiguredReduceSlots = numConfiguredReduceSlots;
-		valueChanged("numConfiguredReduceSlots");
-	}
-	public String getHealthReport() {
-		return healthReport;
-	}
-	public void setHealthReport(String healthReport) {
-		this.healthReport = healthReport;
-		valueChanged("healthReport");
-	}
-	
+    @Column("a")
+    private String status;
+    @Column("b")
+    private String numConfiguredMapSlots;
+    @Column("c")
+    private String numConfiguredReduceSlots;
+    @Column("d")
+    private String healthReport;
+    @Column("e")
+    private long lastUpdateTime;
+
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+        valueChanged("lastUpdateTime");
+    }
+
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+        valueChanged("status");
+    }
+    public String getNumConfiguredMapSlots() {
+        return numConfiguredMapSlots;
+    }
+    public void setNumConfiguredMapSlots(String numConfiguredMapSlots) {
+        this.numConfiguredMapSlots = numConfiguredMapSlots;
+        valueChanged("numConfiguredMapSlots");
+    }
+    public String getNumConfiguredReduceSlots() {
+        return numConfiguredReduceSlots;
+    }
+    public void setNumConfiguredReduceSlots(String numConfiguredReduceSlots) {
+        this.numConfiguredReduceSlots = numConfiguredReduceSlots;
+        valueChanged("numConfiguredReduceSlots");
+    }
+    public String getHealthReport() {
+        return healthReport;
+    }
+    public void setHealthReport(String healthReport) {
+        this.healthReport = healthReport;
+        valueChanged("healthReport");
+    }
+
 }

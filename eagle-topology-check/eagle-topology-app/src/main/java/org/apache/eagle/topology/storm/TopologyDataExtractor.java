@@ -34,7 +34,8 @@ import static org.apache.eagle.topology.TopologyConstants.*;
 public class TopologyDataExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopologyDataExtractor.class);
-    private static final int MAX_WAIT_TIME = 10;
+    private static final int MIN_WAIT_TIME_SECS = 60;
+    private static final double FETCH_TIMEOUT_FACTOR = 0.8;
 
     private TopologyCheckAppConfig config;
     private List<TopologyCrawler> extractors;
@@ -51,9 +52,10 @@ public class TopologyDataExtractor {
         for (TopologyCrawler topologyExtractor : extractors) {
             futures.add(executorService.submit(new DataFetchRunnableWrapper(topologyExtractor)));
         }
+        long fetchTimeoutSecs = (long) Math.max(config.dataExtractorConfig.fetchDataIntervalInSecs * FETCH_TIMEOUT_FACTOR, MIN_WAIT_TIME_SECS);
         futures.forEach(future -> {
             try {
-                future.get(MAX_WAIT_TIME, TimeUnit.SECONDS);
+                future.get(fetchTimeoutSecs, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 LOGGER.info("Caught an overtime exception with message" + e.getMessage());
                 e.printStackTrace();

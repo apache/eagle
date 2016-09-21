@@ -96,7 +96,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
                 if (namenodeEntity.getStatus().equalsIgnoreCase(NAME_NODE_ACTIVE_STATUS)) {
                     createSlaveNodeEntities(url, timestamp, result);
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
@@ -182,7 +182,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         }
         result.getNodes().get(TopologyConstants.JOURNAL_NODE_ROLE).addAll(journalNodesMap.values());
 
-        double value = numLiveJournalNodes / journalNodesMap.size();;
+        double value = numLiveJournalNodes * 1d / journalNodesMap.size();;
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.JOURNAL_NODE_ROLE, value, site, updateTime));
     }
 
@@ -226,8 +226,10 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
             entity.setUsedCapacityTB(Double.toString(capacityUsed.doubleValue() / 1024.0 / 1024.0 / 1024.0 / 1024.0));
             final Number blocksTotal = (Number) liveNode.get(DATA_NODE_NUM_BLOCKS);
             entity.setNumBlocks(Double.toString(blocksTotal.doubleValue()));
-            final Number volFails = (Number) liveNode.get(DATA_NODE_FAILED_VOLUMN);
-            entity.setNumFailedVolumes(Double.toString(volFails.doubleValue()));
+            if (liveNode.has(DATA_NODE_FAILED_VOLUMN)) {
+                final Number volFails = (Number) liveNode.get(DATA_NODE_FAILED_VOLUMN);
+                entity.setNumFailedVolumes(Double.toString(volFails.doubleValue()));
+            }
             final String adminState = liveNode.getString(DATA_NODE_ADMIN_STATE);
             if (DATA_NODE_DECOMMISSIONED.equalsIgnoreCase(adminState)) {
                 ++numLiveDecommNodes;
@@ -259,7 +261,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
 
     private JournalNodeServiceAPIEntity createJournalNodeEntity(String roleType, String hostname, long updateTime) {
         JournalNodeServiceAPIEntity entity = new JournalNodeServiceAPIEntity();
-        entity.setTimestamp(updateTime);
+        entity.setLastUpdateTime(updateTime);
         Map<String, String> tags = new HashMap<String, String>();
         entity.setTags(tags);
         tags.put(SITE_TAG, site);
