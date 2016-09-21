@@ -115,6 +115,9 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
     }
 
     private void parseServerLoad(HBaseServiceTopologyAPIEntity entity, ServerLoad load) {
+        if (load == null) {
+            return;
+        }
         entity.setMaxHeapMB(load.getMaxHeapMB());
         entity.setUsedHeapMB(load.getUsedHeapMB());
         entity.setNumRegions(load.getNumberOfRegions());

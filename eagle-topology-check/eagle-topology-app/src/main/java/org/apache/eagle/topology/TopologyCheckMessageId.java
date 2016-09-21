@@ -21,6 +21,8 @@ package org.apache.eagle.topology;
 import com.google.common.base.Objects;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import java.util.Calendar;
+
 public class TopologyCheckMessageId {
     private String topologyType;
     private Long timestamp;
@@ -47,6 +49,8 @@ public class TopologyCheckMessageId {
 
     @Override
     public String toString() {
-        return String.format("topologyType=%s, timestamp=%d", topologyType, timestamp);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        return String.format("topologyType=%s, timestamp=%s", topologyType, calendar.getTime());
     }
 }

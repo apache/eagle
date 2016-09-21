@@ -159,6 +159,10 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
             entity.setStatus(TopologyConstants.DATA_NODE_DEAD_STATUS);
             journalNodesMap.put(ip, entity);
         }
+        if (journalNodesMap.isEmpty()) {
+            LOG.warn("Fail to find journal node info in JMX");
+            return;
+        }
 
         String stream = jsonMap.getString("stream");
         Pattern status = Pattern.compile(STATUS_PATTERN);
@@ -178,10 +182,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         }
         result.getNodes().get(TopologyConstants.JOURNAL_NODE_ROLE).addAll(journalNodesMap.values());
 
-        double value = 0;
-        if (!journalNodesMap.isEmpty()) {
-            value = numLiveJournalNodes / journalNodesMap.size();
-        }
+        double value = numLiveJournalNodes / journalNodesMap.size();;
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.JOURNAL_NODE_ROLE, value, site, updateTime));
     }
 

@@ -90,6 +90,7 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             writeEntities(result.getMetrics());
         } catch (EagleServiceClientException e) {
             e.printStackTrace();
+            this.collector.fail(input);
         }
         this.collector.ack(input);
     }

@@ -23,6 +23,8 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
+import backtype.storm.utils.Utils;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
@@ -68,6 +70,16 @@ public class TopologyCheckAppSpout extends BaseRichSpout {
             this.extractor.crawl();
             lastFetchTime = currentTime;
         }
+    }
+
+    @Override
+    public void fail(Object msgId) {
+        LOG.warn("ack {}", msgId.toString());
+    }
+
+    @Override
+    public void ack(Object msgId) {
+        LOG.info("ack {}", msgId.toString());
     }
 
 }
