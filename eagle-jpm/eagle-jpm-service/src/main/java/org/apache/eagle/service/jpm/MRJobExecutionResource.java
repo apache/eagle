@@ -204,17 +204,15 @@ public class MRJobExecutionResource {
             response.errMessage = String.format("IllegalArgument: intervalInSecs=%s is invalid", intervalInSecs);
             return response;
         }
-        long startTimeInMills;
         String searchStartTime = startTime;
         String searchEndTime = endTime;
         try {
-            startTimeInMills = DateTimeUtil.humanDateToSeconds(startTime) * DateTimeUtil.ONESECOND;
             searchStartTime = helper.moveTimeForwardOneDay(searchStartTime);
         } catch (Exception e) {
             response.errMessage = e.getMessage();
             return response;
         }
-        String query = String.format("%s[@site=\"%s\" AND @endTime>=%s]{@startTime,@endTime,@jobType,@jobId}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site, startTimeInMills);
+        String query = String.format("%s[@site=\"%s\"]{@startTime,@endTime,@jobType,@jobId}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site);
         GenericServiceAPIResponseEntity<JobExecutionAPIEntity> historyRes = ResourceUtils.getQueryResult(query, searchStartTime, searchEndTime);
         if (!historyRes.isSuccess() || historyRes.getObj() == null) {
             response.errMessage = String.format("Catch an exception during fetch history jobs: %s with query=%s", historyRes.getException(), query);
@@ -324,12 +322,12 @@ public class MRJobExecutionResource {
     @Path("jobCountsByDuration")
     @Produces(MediaType.APPLICATION_JSON)
     public JobCountResponse getJobCountGroupByDuration(@QueryParam("site") String site,
-                                                       @QueryParam("timelineInSecs") String timeList,
-                                                       @QueryParam("jobStartTimeBegin") String startTime,
-                                                       @QueryParam("jobStartTimeEnd") String endTime) {
+                                                       @QueryParam("timeDistInSecs") String timeList,
+                                                       @QueryParam("startTime") String startTime,
+                                                       @QueryParam("endTime") String endTime) {
         JobCountResponse response = new JobCountResponse();
         if (site == null || startTime == null || endTime == null || timeList == null) {
-            response.errMessage = "IllegalArgument: site, jobStartTimeBegin, jobStartTimeEnd, or timelineInSecs is null";
+            response.errMessage = "IllegalArgument: site, startTime, endTime, or timeDistInSecs is null";
             return response;
         }
         String query = String.format("%s[@site=\"%s\"]{@durationTime,@jobType}", Constants.JPA_JOB_EXECUTION_SERVICE_NAME, site);

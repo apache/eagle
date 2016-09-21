@@ -55,11 +55,14 @@ public class MRJobCountImpl {
         Set<String> jobTypes = new HashSet<>();
         Set<String> jobIds = new HashSet<>();
         initJobCountList(jobCounts, startTimeInSecs, endTimeInSecs, intervalInSecs);
+        long startTimeInMs = startTimeInSecs * DateTimeUtil.ONESECOND;
         for (JobExecutionAPIEntity job: historyJobs) {
             jobIds.add(job.getTags().get(MRJobTagName.JOB_ID.toString()));
-            String jobType = job.getTags().get(MRJobTagName.JOB_TYPE.toString());
-            jobTypes.add(jobType);
-            countJob(jobCounts, job.getStartTime() / DateTimeUtil.ONESECOND, job.getEndTime() / DateTimeUtil.ONESECOND, intervalInSecs, jobType);
+            if (job.getEndTime() >= startTimeInMs) {
+                String jobType = job.getTags().get(MRJobTagName.JOB_TYPE.toString());
+                jobTypes.add(jobType);
+                countJob(jobCounts, job.getStartTime() / DateTimeUtil.ONESECOND, job.getEndTime() / DateTimeUtil.ONESECOND, intervalInSecs, jobType);
+            }
         }
         for (org.apache.eagle.jpm.mr.runningentity.JobExecutionAPIEntity job : runningJobs) {
             if (!ResourceUtils.isDuplicate(jobIds, job.getTags().get(MRJobTagName.JOB_ID.toString()))) {
