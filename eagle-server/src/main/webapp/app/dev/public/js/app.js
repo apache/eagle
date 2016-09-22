@@ -193,10 +193,16 @@ var app = {};
 			$httpProvider.interceptors.push(function() {
 				function eagleRequestHandle(res) {
 					var data = res.data || {
-							exception: "",
-							message: ""
-						};
-					if(data.success === false || res.status === 404) {
+						exception: "",
+						message: ""
+					};
+					if(res.status === -1) {
+						$.dialog({
+							title: "AJAX Failed",
+							content: $("<pre>")
+								.text("url:\n" + common.getValueByPath(res, ["config", "url"]))
+						});
+					} else if(data.success === false || res.status === 404) {
 						$.dialog({
 							title: "AJAX Error",
 							content: $("<pre>")

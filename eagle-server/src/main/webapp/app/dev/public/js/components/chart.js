@@ -21,9 +21,16 @@
 
 	var eagleComponents = angular.module('eagle.components');
 
+	eagleComponents.service('Chart', function () {
+		return {
+			color: [ "#0073b7", "#dd4b39", "#00a65a", "#f39c12", "#605ca8", "#001F3F", "#39CCCC", "#D81B60", "#3c8dbc", "#f56954", "#00c0ef", "#3D9970", "#FF851B"  , "#01FF70", "#F012BE"],
+			//color: ['#4285f4', '#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'],
+			charts: {}
+		};
+	});
 
-	eagleComponents.directive('chart', function($compile) {
-		var charts = window.charts = {};
+	eagleComponents.directive('chart', function(Chart) {
+		var charts = Chart.charts;
 
 		function chartResize() {
 			setTimeout(function () {
@@ -98,8 +105,7 @@
 					}
 
 					var option = {
-						color: [ "#0073b7", "#dd4b39", "#00a65a", "#f39c12", "#605ca8", "#001F3F", "#39CCCC", "#D81B60", "#3c8dbc", "#f56954", "#00c0ef", "#3D9970", "#FF851B"  , "#01FF70", "#F012BE"],
-						//color: ['#4285f4', '#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'],
+						color: Chart.color.concat(),
 						title: [{text: $scope.title}],
 						tooltip: {trigger: 'axis'},
 						legend: [{
@@ -133,16 +139,20 @@
 				var chartClick = false;
 				chart.on("click", function (e) {
 					if($scope.click) {
-						$scope.click(e);
+						if($scope.click(e)) {
+							refreshChart();
+						}
 					}
 					chartClick = true;
 				});
 
 				chart.getZr().on('click', function () {
 					if(!chartClick && $scope.click) {
-						$scope.click($.extend({
+						if($scope.click($.extend({
 							componentType: "tooltip"
-						}, lastTooltipEvent));
+						}, lastTooltipEvent))) {
+							refreshChart();
+						}
 					}
 					chartClick = false;
 				});

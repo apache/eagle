@@ -18,35 +18,67 @@
 
 <div class="nav-tabs-custom">
 	<ul class="nav nav-tabs">
-		<li ng-class="{active: type === 'monthly'}"><a ng-click="switchType('monthly')">Monthly</a></li>
-		<li ng-class="{active: type === 'weekly'}"><a ng-click="switchType('weekly')">Weekly</a></li>
-		<li ng-class="{active: type === 'daily'}"><a ng-click="switchType('daily')">Daily</a></li>
 		<li ng-class="{active: type === 'hourly'}"><a ng-click="switchType('hourly')">Hourly</a></li>
+		<li ng-class="{active: type === 'daily'}"><a ng-click="switchType('daily')">Daily</a></li>
+		<li ng-class="{active: type === 'weekly'}"><a ng-click="switchType('weekly')">Weekly</a></li>
+		<li ng-class="{active: type === 'monthly'}"><a ng-click="switchType('monthly')">Monthly</a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="jpm-chart">
-			<div chart class="jpm-chart-container" series="jobDistributionSeries" category-func="jobDistributionCategoryFunc" option="jobDistributionSeriesOption"></div>
+			<h3 class="text-center">Number of Submitted Jobs</h3>
+			<div chart class="jpm-chart-container"
+				 series="jobDistributionSeries"
+				 category-func="jobDistributionCategoryFunc"
+				 option="jobDistributionSeriesOption"
+				 ng-click="distributionClick"></div>
 			<div ng-if="(jobDistributionSeries || []).length === 0" class="overlay">
 				<i class="fa fa-refresh fa-spin"></i>
 			</div>
 		</div>
 	</div>
-	<div class="box-body no-padding">
+	<div class="box-body no-padding" ng-show="distributionSelectedIndex !== -1">
 		<div class="row border-split">
 			<div class="col-sm-12 col-md-6">
 				<div class="jpm-chart overlay-wrapper">
-					<h3 class="text-center">Top Job Count By User</h3>
-					<div chart class="jpm-chart-container" series="topUserJobCountSeries" option="commonChartOption"></div>
-					<div ng-if="!topUserJobCountSeries._done" class="overlay">
+					<h3 class="text-center">[{{distributionSelectedType}}] Top Job Count By User</h3>
+					<div chart class="jpm-chart-container" series="topUserJobCountSeries" category="topUserJobCountSeriesCategory" option="commonChartOption"></div>
+					<div ng-if="topUserJobCountSeries.length === 0" class="overlay">
 						<i class="fa fa-refresh fa-spin"></i>
 					</div>
 				</div>
 			</div>
 			<div class="col-sm-12 col-md-6">
 				<div class="jpm-chart overlay-wrapper">
-					<h3 class="text-center">Top Job Count By Type</h3>
-					<div chart class="jpm-chart-container" series="topTypeJobCountSeries" option="commonChartOption"></div>
-					<div ng-if="!topTypeJobCountSeries._done" class="overlay">
+					<h3 class="text-center">[{{distributionSelectedType}}] Top Job Count By Type</h3>
+					<div chart class="jpm-chart-container" series="topTypeJobCountSeries" category="topTypeJobCountSeriesCategory" option="commonChartOption"></div>
+					<div ng-if="topUserJobCountSeries.length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart overlay-wrapper">
+					<h3 class="text-center">[{{distributionSelectedType}}] Top Job Count Trend By User</h3>
+					<div chart class="jpm-chart-container" series="topUserJobCountTrendSeries" category-func="drillDownCategoryFunc" option="commonTrendChartOption"></div>
+					<div ng-if="topUserJobCountTrendSeries.length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart overlay-wrapper">
+					<h3 class="text-center">[{{distributionSelectedType}}] Top Job Count Trend By Type</h3>
+					<div chart class="jpm-chart-container" series="topTypeJobCountTrendSeries" category-func="drillDownCategoryFunc" option="commonTrendChartOption"></div>
+					<div ng-if="topUserJobCountTrendSeries.length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart overlay-wrapper">
+					<h3 class="text-center">[{{distributionSelectedType}}] Job Duration Distribution</h3>
+					<div chart class="jpm-chart-container" series="jobDurationDistributionSeries" category="bucketDurationCategory" option="commonChartOption"></div>
+					<div ng-if="jobDurationDistributionSeries.length === 0" class="overlay">
 						<i class="fa fa-refresh fa-spin"></i>
 					</div>
 				</div>

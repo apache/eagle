@@ -45,10 +45,18 @@
 					return startTime;
 				case "endTime":
 					return endTime;
+				case "month":
+					_mom = new moment();
+					_mom.utcOffset($Time.UTC_OFFSET);
+					_mom.date(1).hours(0).minutes(0).seconds(0).millisecond(0);
+					break;
+				case "monthEnd":
+					_mom = $Time("month").add(1, "month").subtract(1, "s");
+					break;
 				case "week":
 					_mom = new moment();
 					_mom.utcOffset($Time.UTC_OFFSET);
-					_mom.weekday(0).hours(0).minutes(0).seconds(0);
+					_mom.weekday(0).hours(0).minutes(0).seconds(0).millisecond(0);
 					break;
 				case "weekEnd":
 					_mom = $Time("week").add(7, "d").subtract(1, "s");
@@ -56,7 +64,7 @@
 				case "day":
 					_mom = new moment();
 					_mom.utcOffset($Time.UTC_OFFSET);
-					_mom.hours(0).minutes(0).seconds(0);
+					_mom.hours(0).minutes(0).seconds(0).millisecond(0);
 					break;
 				case "dayEnd":
 					_mom = $Time("day").add(1, "d").subtract(1, "s");
@@ -64,7 +72,7 @@
 				case "hour":
 					_mom = new moment();
 					_mom.utcOffset($Time.UTC_OFFSET);
-					_mom.minutes(0).seconds(0);
+					_mom.minutes(0).seconds(0).millisecond(0);
 					break;
 				case "hourEnd":
 					_mom = $Time("hour").add(1, "h").subtract(1, "s");
