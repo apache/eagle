@@ -73,13 +73,13 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
     public TopologyEntityParserResult parse(long timestamp) throws IOException {
         long deadServers = 0;
         long liveServers = 0;
+        TopologyEntityParserResult result = new TopologyEntityParserResult();
         HBaseAdmin admin = null;
         try {
             admin = getHBaseAdmin();
             ClusterStatus status = admin.getClusterStatus();
             deadServers = status.getDeadServers();
             liveServers = status.getServersSize();
-            TopologyEntityParserResult result = new TopologyEntityParserResult();
             result.setVersion(HadoopVersion.V2);
             for (ServerName liveServer : status.getServers()) {
                 ServerLoad load = status.getLoad(liveServer);
@@ -112,7 +112,7 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
                 }
             }
         }
-        return null;
+        return result;
     }
 
     private HBaseServiceTopologyAPIEntity parseServer(ServerName serverName, ServerLoad serverLoad, String role, String status, long timestamp) {

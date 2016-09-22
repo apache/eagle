@@ -25,6 +25,7 @@ import org.apache.eagle.topology.TopologyCheckMessageId;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
+import org.apache.eagle.topology.utils.EntityBuilderHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +37,11 @@ public class HbaseTopologyCrawler implements TopologyCrawler {
 
     private HbaseTopologyEntityParser parser;
     private SpoutOutputCollector collector;
+    private String site;
 
     public HbaseTopologyCrawler(TopologyCheckAppConfig config, SpoutOutputCollector collector) {
-        this.parser = new HbaseTopologyEntityParser(config.dataExtractorConfig.site, config.hBaseConfig);
+        this.site = config.dataExtractorConfig.site;
+        this.parser = new HbaseTopologyEntityParser(this.site, config.hBaseConfig);
         this.collector = collector;
     }
 
@@ -48,13 +51,15 @@ public class HbaseTopologyCrawler implements TopologyCrawler {
         TopologyEntityParserResult result = null;
         try {
             result = parser.parse(updateTimestamp);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return;
         }
-        if (result == null || result.getMasterNodes().isEmpty()) {
+        if (result == null) {
             LOG.warn("No data fetched");
-            return;
+            result = new TopologyEntityParserResult();
+        }
+        if (result.getMasterNodes().isEmpty()) {
+            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HMASTER_ROLE, 0, site, updateTimestamp));
         }
         TopologyCheckMessageId messageId = new TopologyCheckMessageId(TopologyConstants.TopologyType.HBASE, updateTimestamp);
         this.collector.emit(new Values(TopologyConstants.HBASE_INSTANCE_SERVICE_NAME, result), messageId);

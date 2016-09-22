@@ -88,22 +88,28 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                 // reSelect url
             }
         }
+        if (result.getMasterNodes().isEmpty()) {
+            result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.RESOURCE_MANAGER_ROLE, 0, site, timestamp));
+        }
+        doCheckHistoryServer(timestamp, result);
+        return result;
+    }
+
+    private void doCheckHistoryServer(long updateTime, TopologyEntityParserResult result) {
         if (historyServerUrl == null || historyServerUrl.isEmpty()) {
-            return result;
+            return;
         }
         String hsUrl = PathResolverHelper.buildUrlPath(historyServerUrl, YARN_HISTORY_SERVER_URL);
         double liveCount = 1;
         try {
-            InputStream is = getInputStream(hsUrl, AppConstants.CompressionType.NONE);
-            if (is == null) {
-                return result;
-            }
-        } catch (ServiceNotResponseException e) {
-            //e.printStackTrace();
+            InputStreamUtils.getInputStream(hsUrl, null, AppConstants.CompressionType.NONE);
+        } catch (ConnectException e) {
             liveCount = 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
         }
-        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HISTORY_SERVER_ROLE, liveCount, site, timestamp));
-        return result;
+        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HISTORY_SERVER_ROLE, liveCount, site, updateTime));
     }
 
     private InputStream getInputStream(String url, AppConstants.CompressionType type) throws ServiceNotResponseException {
@@ -112,8 +118,6 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
             is = InputStreamUtils.getInputStream(url, null, type);
         } catch (ConnectException e) {
             throw new ServiceNotResponseException(e);
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
