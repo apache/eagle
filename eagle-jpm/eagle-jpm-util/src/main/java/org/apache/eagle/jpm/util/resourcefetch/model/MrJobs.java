@@ -31,7 +31,7 @@ public class MrJobs {
         return job;
     }
 
-    public void setJobs(List<MRJob> job) {
+    public void setJob(List<MRJob> job) {
         this.job = job;
     }
 

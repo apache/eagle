@@ -18,6 +18,7 @@ package org.apache.eagle.app.spi;
 
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.config.ApplicationProviderDescConfig;
+import org.apache.eagle.app.utils.DynamicJarPathFinder;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 
 /**
@@ -54,6 +55,7 @@ class ApplicationXMLDescriptorLoader implements ApplicationDescLoader {
         applicationDesc.setVersion(descWrapperConfig.getVersion());
         applicationDesc.setName(descWrapperConfig.getName());
         applicationDesc.setDocs(descWrapperConfig.getDocs());
+        applicationDesc.setJarPath(DynamicJarPathFinder.findPath(applicationClass));
         if (applicationClass != null) {
             applicationDesc.setAppClass(applicationClass);
             if (!Application.class.isAssignableFrom(applicationDesc.getAppClass())) {

@@ -67,7 +67,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
 
     private static final String WORKERS = "workers";
 
-    private backtype.storm.Config getStormConfig() {
+    private backtype.storm.Config getStormConfig(com.typesafe.config.Config config) {
         backtype.storm.Config conf = new backtype.storm.Config();
         conf.put(RichSpoutBatchExecutor.MAX_BATCH_SIZE_CONF, Int.box(64 * 1024));
         conf.put(backtype.storm.Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, Int.box(8));
@@ -92,12 +92,12 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         conf.put(backtype.storm.Config.NIMBUS_HOST, nimbusHost);
         conf.put(backtype.storm.Config.NIMBUS_THRIFT_PORT, nimbusThriftPort);
         conf.put(Config.STORM_THRIFT_TRANSPORT_PLUGIN, "backtype.storm.security.auth.SimpleTransportPlugin");
-        if (environment.config().hasPath(WORKERS)) {
-            conf.setNumWorkers(environment.config().getInt(WORKERS));
+        if (config.hasPath(WORKERS)) {
+            conf.setNumWorkers(config.getInt(WORKERS));
         }
 
-        if (environment.config().hasPath(TOPOLOGY_MESSAGE_TIMEOUT_SECS)) {
-            conf.put(TOPOLOGY_MESSAGE_TIMEOUT_SECS, environment.config().getInt(TOPOLOGY_MESSAGE_TIMEOUT_SECS));
+        if (config.hasPath(TOPOLOGY_MESSAGE_TIMEOUT_SECS)) {
+            conf.put(TOPOLOGY_MESSAGE_TIMEOUT_SECS, config.getInt(TOPOLOGY_MESSAGE_TIMEOUT_SECS));
         }
         return conf;
     }
@@ -108,7 +108,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         Preconditions.checkNotNull(topologyName,"[appId] is required by null for " + executor.getClass().getCanonicalName());
         StormTopology topology = executor.execute(config, environment);
         LOG.info("Starting {} ({}), mode: {}",topologyName, executor.getClass().getCanonicalName(), config.getString("mode"));
-        Config conf = getStormConfig();
+        Config conf = getStormConfig(config);
         if (ApplicationEntity.Mode.CLUSTER.name().equalsIgnoreCase(config.getString("mode"))) {
             String jarFile = config.hasPath("jarPath") ? config.getString("jarPath") : null;
             if (jarFile == null) {
@@ -139,7 +139,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         String appId = config.getString("appId");
         LOG.info("Stopping topology {} ..." + appId);
         if (Objects.equals(config.getString("mode"), ApplicationEntity.Mode.CLUSTER.name())) {
-            Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig()).getClient();
+            Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig(config)).getClient();
             try {
                 stormClient.killTopology(appId);
             } catch (NotAliveException | TException e) {
