@@ -156,9 +156,9 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
 
-        <!-- =========================================================================================================
-             TODO: Decouple following specific application related dependencies into independent module: eagle-develop
-             ========================================================================================================= -->
+            <!-- =========================================================================================================
+                 TODO: Decouple following specific application related dependencies into independent module: eagle-develop
+                 ========================================================================================================= -->
 
             <dependencies>
                 <!-- App: Oozie  Auditlog monitoring -->
@@ -206,6 +206,11 @@
                 <dependency>
                     <groupId>org.apache.eagle</groupId>
                     <artifactId>eagle-jpm-mr-running</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.eagle</groupId>
+                    <artifactId>eagle-jpm-service</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>

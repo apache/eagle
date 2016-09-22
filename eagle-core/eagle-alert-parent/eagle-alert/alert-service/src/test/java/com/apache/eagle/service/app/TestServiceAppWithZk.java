@@ -31,18 +31,12 @@ import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.apache.eagle.alert.utils.ZookeeperEmbedded;
 import org.apache.eagle.service.app.ServiceApp;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import com.google.common.base.Joiner;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-/**
- * @author xiancli
- */
 public class TestServiceAppWithZk {
 
     ZookeeperEmbedded zkEmbed;

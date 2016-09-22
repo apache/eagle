@@ -47,14 +47,9 @@ public class JHFSparkParser implements JHFParserBase {
                 isValidJson = true;
                 JSONObject eventObj = parseAndValidateJSON(line);
                 if (isValidJson) {
-                    try {
-                        this.eventReader.read(eventObj);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    this.eventReader.read(eventObj);
                 }
             }
-
             this.eventReader.clearReader();
         }
     }

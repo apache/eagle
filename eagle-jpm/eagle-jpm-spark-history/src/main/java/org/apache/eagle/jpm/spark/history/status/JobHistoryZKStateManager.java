@@ -70,9 +70,9 @@ public class JobHistoryZKStateManager {
     public List<String> loadApplications(int limit) {
         String jobPath = zkRoot + "/jobs";
         List<String> apps = new ArrayList<>();
-        InterProcessLock lock = new InterProcessReadWriteLock(curator,jobPath).writeLock();
+        //InterProcessLock lock = new InterProcessReadWriteLock(curator,jobPath).writeLock();
         try {
-            lock.acquire();
+            //lock.acquire();
             Iterator<String> iter = curator.getChildren().forPath(jobPath).iterator();
             while (iter.hasNext()) {
                 String appId = iter.next();
@@ -91,11 +91,11 @@ public class JobHistoryZKStateManager {
             LOG.error("fail to read unprocessed jobs", e);
             throw new RuntimeException(e);
         } finally {
-            try {
+           /* try {
                 lock.release();
             } catch (Exception e) {
                 LOG.error("fail to release lock", e);
-            }
+            }*/
 
         }
     }

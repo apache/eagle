@@ -699,6 +699,7 @@ public class JHFSparkEventReader {
     private EagleServiceBaseClient initiateClient() {
         client = new EagleServiceClientImpl(config.eagleInfo.host,
             config.eagleInfo.port,
+            config.eagleInfo.basePath,
             config.eagleInfo.username,
             config.eagleInfo.password);
         int timeout = config.eagleInfo.timeout;

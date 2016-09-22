@@ -152,12 +152,6 @@
             <value>http://sandbox.hortonworks.com:8088</value>
         </property>
         <property>
-            <name>storm.messageTimeoutSec</name>
-            <displayName>messageTimeoutSec</displayName>
-            <description>Message timeout (in seconds)</description>
-            <value>3000</value>
-        </property>
-        <property>
             <name>storm.pendingSpout</name>
             <displayName>pendingSpout</displayName>
             <value>1000</value>
