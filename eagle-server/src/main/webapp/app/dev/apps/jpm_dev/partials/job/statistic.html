@@ -84,29 +84,35 @@
 				</div>
 			</div>
 			<div class="col-sm-12 col-md-12" ng-show="jobList">
-				<div sort-table="jobList" style="margin-top: 10px;">
-					<table class="table table-bordered table-striped">
-						<thead>
-							<tr>
-								<th>Job Id</th>
-								<th>Job Name</th>
-								<th>Type</th>
-								<th>User</th>
-								<th width="135">Start Time</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>
-									<a ui-sref="jpmDetail({siteId: site, jobId: item.tags.jobId})" target="_blank">{{item.tags.jobId}}</a>
-								</td>
-								<td>{{item.tags.jobName}}</td>
-								<td>{{item.tags.jobType}}</td>
-								<td>{{item.tags.user}}</td>
-								<td>{{Time.format(item.startTime)}}</td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="overlay-wrapper">
+					<div sort-table="jobList" style="margin-top: 10px;">
+						<table class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>Job Id</th>
+									<th>Job Name</th>
+									<th>Type</th>
+									<th>User</th>
+									<th width="135">Start Time</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<a ui-sref="jpmDetail({siteId: site, jobId: item.tags.jobId})" target="_blank">{{item.tags.jobId}}</a>
+									</td>
+									<td>{{item.tags.jobName}}</td>
+									<td>{{item.tags.jobType}}</td>
+									<td>{{item.tags.user}}</td>
+									<td>{{Time.format(item.startTime)}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div ng-if="!jobList._done" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
 				</div>
 			</div>
 		</div>

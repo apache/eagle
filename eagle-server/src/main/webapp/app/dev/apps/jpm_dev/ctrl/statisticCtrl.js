@@ -331,7 +331,7 @@
 
 				if($scope.distributionSelectedType === "FAILED") {
 					// ====================== Failure Job List ======================
-					$scope.jobList = JPM.jobList({site: $scope.site}, startTime, endTime, [
+					$scope.jobList = JPM.jobList({site: $scope.site, currentState: "FAILED"}, startTime, endTime, [
 						"jobId",
 						"jobName",
 						"user",
