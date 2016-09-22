@@ -16,10 +16,14 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 
 /**
@@ -38,7 +42,7 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-public class PolicyWorkerQueue {
+public class PolicyWorkerQueue implements Serializable {
 
     private StreamPartition partition;
     private List<WorkSlot> workers;
@@ -56,6 +60,7 @@ public class PolicyWorkerQueue {
         this.partition = partition;
     }
 
+
     public StreamPartition getPartition() {
         return partition;
     }
@@ -70,6 +75,24 @@ public class PolicyWorkerQueue {
 
     public void setWorkers(List<WorkSlot> workers) {
         this.workers = workers;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof PolicyWorkerQueue)) {
+            return false;
+        }
+        PolicyWorkerQueue that = (PolicyWorkerQueue) other;
+        return Objects.equals(partition, that.partition) &&
+                CollectionUtils.isEqualCollection(workers, that.workers);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(partition).append(workers).build();
     }
 
     public String toString() {

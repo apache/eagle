@@ -16,6 +16,8 @@
  */
 package org.apache.eagle.alert.engine.sorter;
 
+import java.io.Serializable;
+
 /**
  * The time clock per stream
  *
@@ -23,7 +25,7 @@ package org.apache.eagle.alert.engine.sorter;
  *
  * By default, we currently simple support event timestamp now
  */
-public interface StreamTimeClock {
+public interface StreamTimeClock extends Serializable {
     /**
      * Get stream id
      *

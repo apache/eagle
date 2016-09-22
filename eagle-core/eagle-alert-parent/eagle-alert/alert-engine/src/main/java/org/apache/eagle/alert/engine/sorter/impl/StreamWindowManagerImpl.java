@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.sorter.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -35,14 +36,14 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StreamWindowManagerImpl implements StreamWindowManager {
+public class StreamWindowManagerImpl implements StreamWindowManager, Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(StreamWindowManagerImpl.class);
     private final TreeMap<Long,StreamWindow> windowBuckets;
-    private final PartitionedEventCollector collector;
+    private PartitionedEventCollector collector;
     private final Period windowPeriod;
     private final long windowMargin;
     @SuppressWarnings("unused")
-    private final Comparator<PartitionedEvent> comparator;
+    private transient final Comparator<PartitionedEvent> comparator;
     private long rejectTime;
 
     public StreamWindowManagerImpl(Period windowPeriod, long windowMargin, Comparator<PartitionedEvent> comparator, PartitionedEventCollector collector){
@@ -169,5 +170,9 @@ public class StreamWindowManagerImpl implements StreamWindowManager {
             stopWatch.stop();
             LOG.info("Closed {} windows in {} ms", count, stopWatch.getTime());
         }
+    }
+
+    public void updateOutputCollector(PartitionedEventCollector outputCollector) {
+        this.collector = outputCollector;
     }
 }

@@ -38,21 +38,26 @@ public final class StreamTimeClockManagerImpl implements StreamTimeClockManager 
     private final Map<StreamTimeClockListener,String> listenerStreamIdMap;
     private final static AtomicInteger num = new AtomicInteger();
 
-    public StreamTimeClockManagerImpl(){
-        listenerStreamIdMap = new HashMap<>();
-        streamIdTimeClockMap = new HashMap<>();
-        timer = new Timer("StreamScheduler-"+num.getAndIncrement());
+    public StreamTimeClockManagerImpl() {
+        this(new HashMap<>(), new HashMap<>());
+    }
+
+    public StreamTimeClockManagerImpl(Map<StreamTimeClockListener, String> listenerStreamIdMap, Map<String, StreamTimeClock> streamIdTimeClockMap) {
+
+        this.listenerStreamIdMap = listenerStreamIdMap;
+        this.streamIdTimeClockMap = streamIdTimeClockMap;
+
+        timer = new Timer("StreamScheduler-" + num.getAndIncrement());
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 // Make sure the timer tick happens one by one
-                    triggerTickOnAll();
+                triggerTickOnAll();
             }
-        },1000,1000);
+        }, 1000, 1000);
     }
 
     /**
-     *
      * By default, we could keep the current time clock in memory,
      * Eventually we may need to consider the global time synchronization across all nodes
      *
@@ -88,6 +93,16 @@ public final class StreamTimeClockManagerImpl implements StreamTimeClockManager 
             }
             return streamIdTimeClockMap.get(streamId);
         }
+    }
+
+    @Override
+    public Map<String, StreamTimeClock> getAllStreamTimeClock() {
+        return this.streamIdTimeClockMap;
+    }
+
+    @Override
+    public Map<StreamTimeClockListener, String> getAllListenerStreamIdMap() {
+        return this.listenerStreamIdMap;
     }
 
     /**

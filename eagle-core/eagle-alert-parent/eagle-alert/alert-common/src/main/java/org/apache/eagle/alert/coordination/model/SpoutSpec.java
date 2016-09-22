@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.coordination.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.Optional;
  * @since Apr 18, 2016
  *
  */
-public class SpoutSpec {
+public class SpoutSpec implements Serializable {
     private String version;
 
 //    private String spoutId;

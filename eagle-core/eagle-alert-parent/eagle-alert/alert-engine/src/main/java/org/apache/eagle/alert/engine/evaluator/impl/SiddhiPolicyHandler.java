@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.eagle.alert.engine.Collector;
@@ -34,13 +35,13 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 
-public class SiddhiPolicyHandler implements PolicyStreamHandler {
+public class SiddhiPolicyHandler implements PolicyStreamHandler, Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(SiddhiPolicyHandler.class);
-    private ExecutionPlanRuntime executionRuntime;
-    private SiddhiManager siddhiManager;
+    private transient ExecutionPlanRuntime executionRuntime;
+    private transient SiddhiManager siddhiManager;
     private Map<String, StreamDefinition> sds;
     private PolicyDefinition policy;
-    private PolicyHandlerContext context;
+    private transient PolicyHandlerContext context;
 
     public SiddhiPolicyHandler(Map<String, StreamDefinition> sds){
         this.sds = sds;

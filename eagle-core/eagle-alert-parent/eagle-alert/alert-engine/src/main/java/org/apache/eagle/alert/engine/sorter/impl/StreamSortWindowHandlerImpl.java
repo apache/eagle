@@ -17,6 +17,7 @@
 package org.apache.eagle.alert.engine.sorter.impl;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.eagle.alert.engine.PartitionedEventCollector;
 import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
@@ -30,7 +31,7 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StreamSortWindowHandlerImpl implements StreamSortHandler {
+public class StreamSortWindowHandlerImpl implements StreamSortHandler, Serializable {
     private final static Logger LOG = LoggerFactory.getLogger(StreamSortWindowHandlerImpl.class);
     private StreamWindowManager windowManager;
     private StreamSortSpec streamSortSpecSpec;
@@ -108,6 +109,14 @@ public class StreamSortWindowHandlerImpl implements StreamSortHandler {
             throw new NullPointerException("streamSortSpec is null");
         }else{
             return streamSortSpecSpec.hashCode();
+        }
+    }
+
+    public void updateOutputCollector(PartitionedEventCollector outputCollector) {
+        this.outputCollector = outputCollector;
+        if (this.windowManager != null) {
+            StreamWindowManagerImpl windowImpl = (StreamWindowManagerImpl)this.windowManager;
+            windowImpl.updateOutputCollector(outputCollector);
         }
     }
 }

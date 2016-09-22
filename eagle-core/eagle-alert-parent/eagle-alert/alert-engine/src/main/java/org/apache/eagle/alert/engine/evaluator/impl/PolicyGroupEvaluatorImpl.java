@@ -56,6 +56,28 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
         Thread.currentThread().setName(policyEvaluatorId);
     }
 
+    public void init(StreamContext context, AlertStreamCollector collector, Map<String, PolicyDefinition> policyDefinitionMap, Map<String, PolicyStreamHandler> policyStreamHandlerMap) {
+        this.collector = collector;
+        this.policyStreamHandlerMap = policyStreamHandlerMap;
+        this.policyDefinitionMap = policyDefinitionMap;
+        this.context = context;
+        this.policyStreamHandlerMap.forEach((k, v) -> {
+            PolicyHandlerContext policyHandlerContext = new PolicyHandlerContext();
+            policyHandlerContext.setPolicyCounter(this.context.counter());
+            PolicyDefinition policyDefinition = policyDefinitionMap.get(k);
+            policyHandlerContext.setPolicyDefinition(policyDefinition);
+            policyHandlerContext.setPolicyEvaluator(this);
+            policyHandlerContext.setPolicyEvaluatorId(policyEvaluatorId);
+            try {
+                v.prepare(this.collector, policyHandlerContext);
+            } catch (Exception e) {
+                LOG.error("Initialized policy handler for policy error: {}", policyDefinition);
+            }
+            LOG.info("Initialized policy handler for policy : {}", policyDefinition);
+        });
+        Thread.currentThread().setName(policyEvaluatorId);
+    }
+
     public void nextEvent(PartitionedEvent event) {
         this.context.counter().scope("receive_count").incr();
         dispatch(event);
@@ -168,5 +190,13 @@ public class PolicyGroupEvaluatorImpl implements PolicyGroupEvaluator {
         } else {
             LOG.error("metadata calculation error, try to remove nonexisting PolicyDefinition: "+policy);
         }
+    }
+
+    public Map<String, PolicyDefinition> getPolicyDefinitionMap() {
+        return this.policyDefinitionMap;
+    }
+
+    public Map<String, PolicyStreamHandler> getPolicyStreamHandlerMap() {
+        return this.policyStreamHandlerMap;
     }
 }
