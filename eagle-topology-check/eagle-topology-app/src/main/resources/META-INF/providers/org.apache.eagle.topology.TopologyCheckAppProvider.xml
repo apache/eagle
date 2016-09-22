@@ -24,244 +24,127 @@
     <appClass>org.apache.eagle.topology.TopologyCheckApp</appClass>
     <viewPath>/apps/jpm</viewPath>
     <configuration>
-        <!-- org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig -->
+        <!-- org.apache.eagle.topology.TopologyCheckApp -->
         <property>
-            <name>basic.cluster</name>
-            <displayName>cluster</displayName>
-            <description>Cluster Name</description>
+            <name>dataExtractorConfig.site</name>
+            <displayName>site</displayName>
+            <description>Site</description>
             <value>sandbox</value>
         </property>
         <property>
-            <name>basic.dataCenter</name>
-            <displayName>dataCenter</displayName>
-            <description>Data Center</description>
-            <value>sandbox</value>
+            <name>dataExtractorConfig.fetchDataIntervalInSecs</name>
+            <displayName>FetchDataIntervalInSecs</displayName>
+            <description>Fetch Data Interval in Secs</description>
+            <value>300</value>
         </property>
         <property>
-            <name>basic.jobConf.additional.info</name>
-            <displayName>jobConf.additional.info</displayName>
-            <description>Additional info in Job Configs</description>
-            <value></value>
+            <name>dataExtractorConfig.parseThreadPoolSize</name>
+            <displayName>parseThreadPoolSize</displayName>
+            <description>Parser Thread Pool Size</description>
+            <value>5</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkQuorum</name>
+            <name>dataExtractorConfig.numDataFetcherSpout</name>
+            <displayName>numDataFetcherSpout</displayName>
+            <description>Spout Task Number</description>
+            <value>1</value>
+        </property>
+        <property>
+            <name>dataExtractorConfig.numEntityPersistBolt</name>
+            <displayName>numEntityPersistBolt</displayName>
+            <description>Bolt Task Number</description>
+            <value>1</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.zkQuorum</name>
             <displayName>zkQuorum</displayName>
             <description>Zookeeper Quorum</description>
             <value>sandbox.hortonworks.com:2181</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkRoot</name>
-            <displayName>zkRoot</displayName>
-            <description>Zookeeper Root</description>
-            <value>/sparkHistoryJob</value>
+            <name>dataSourceConfig.hbase.zkZnodeParent</name>
+            <displayName>zkZnodeParent</displayName>
+            <description>Hbase Zookeeper Znode Parent Root</description>
+            <value>/hbase-unsecure</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkPort</name>
-            <displayName>zkPort</displayName>
-            <description>Zookeeper Port</description>
+            <name>dataSourceConfig.hbase.zkPropertyClientPort</name>
+            <displayName>zkPropertyClientPort</displayName>
+            <description>Hbase Zookeeper Client Port</description>
             <value>2181</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkSessionTimeoutMs</name>
-            <displayName>zkSessionTimeoutMs</displayName>
-            <description>Zookeeper session timeoutMs</description>
-            <value>15000</value>
+            <name>dataSourceConfig.hbase.kerberos.master.principal</name>
+            <displayName>hbaseMasterPrincipal</displayName>
+            <description>Hbase Master Principal</description>
+            <value>hadoop/_HOST@EXAMPLE.COM</value>
         </property>
         <property>
-            <name>zookeeperConfig.zkRetryTimes</name>
-            <displayName>zkRetryTimes</displayName>
-            <description>zookeeperConfig.zkRetryTimes</description>
-            <value>3</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRetryInterval</name>
-            <displayName>zkRetryInterval</displayName>
-            <description>zookeeperConfig.zkRetryInterval</description>
-            <value>20000</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.spark.history.server.url</name>
-            <displayName>spark.history.server.url</displayName>
-            <description>Spark History Server URL</description>
-            <value>http://sandbox.hortonworks.com:18080</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.spark.history.server.username</name>
-            <displayName>spark.history.server.username</displayName>
-            <description>Spark History Server Auth Username</description>
+            <name>dataSourceConfig.hbase.kerberos.eagle.keytab</name>
+            <displayName>eagleKeytab</displayName>
+            <description>Eagle keytab</description>
             <value></value>
         </property>
         <property>
-            <name>dataSourceConfig.spark.history.server.password</name>
-            <displayName>spark.history.server.password</displayName>
-            <description>Spark History Server Auth Password</description>
+            <name>dataSourceConfig.hbase.kerberos.master.principal</name>
+            <displayName>hbaseMasterPrincipal</displayName>
+            <description>Hbase Master Principal</description>
+            <value>hadoop/_HOST@EXAMPLE.COM</value>
+        </property>
+
+        <property>
+            <name>dataSourceConfig.hdfs.namenodeUrl</name>
+            <displayName>hdfsNamenodeUrl</displayName>
+            <description>Hdfs Namenode Web URL</description>
+            <value>http://sandbox.hortonworks.com:50070</value>
+        </property>
+
+        <property>
+            <name>dataSourceConfig.mr.rmUrl</name>
+            <displayName>resourceManagerUrl</displayName>
+            <description>Resource Manager URL</description>
+            <value>http://sandbox.hortonworks.com:8088</value>
+        </property>
+
+        <property>
+            <name>dataSourceConfig.mr.historyServerUrl</name>
+            <displayName>historyServerUrl</displayName>
+            <description>History Server URL</description>
             <value></value>
         </property>
+
         <property>
-            <name>eagleProps.eagle.service.host</name>
-            <description>eagleProps.eagle.service.host</description>
-            <value>sandbox.hortonworks.com</value>
+            <name>eagleProps.eagleService.host</name>
+            <description>eagleProps.eagleService.host</description>
+            <value>localhost</value>
         </property>
         <property>
-            <name>eagleProps.eagle.service.port</name>
-            <description>eagleProps.eagle.service.port</description>
-            <value>9099</value>
+            <name>eagleProps.eagleService.port</name>
+            <description>eagleProps.eagleService.port</description>
+            <value>9090</value>
         </property>
         <property>
-            <name>eagleProps.eagle.service.username</name>
-            <description>eagleProps.eagle.service.username</description>
+            <name>eagleProps.eagleService.username</name>
+            <description>eagleProps.eagleService.username</description>
             <value>admin</value>
         </property>
         <property>
-            <name>eagleProps.eagle.service.password</name>
-            <description>eagleProps.eagle.service.password</description>
+            <name>eagleProps.eagleService.password</name>
+            <description>eagleProps.eagleService.password</description>
             <value>secret</value>
         </property>
         <property>
-            <name>eagleProps.eagle.service.read.timeout</name>
-            <displayName>eagleProps.eagle.service.read.timeout</displayName>
+            <name>eagleProps.eagleService.basePath</name>
+            <description>eagleProps.eagleService.basePath</description>
+            <value>/rest</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.readTimeOutSeconds</name>
+            <displayName>eagleProps.eagleService.readTimeOutSeconds</displayName>
             <description>The maximum amount of time (in seconds) the app is trying to read from eagle service</description>
             <value>2</value>
         </property>
-        <property>
-            <name>eagleProps.eagleService.maxFlushNum</name>
-            <displayName>eagleProps.eagleService.maxFlushNum</displayName>
-            <value>500</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hdfs.eventLog</name>
-            <displayName>dataSourceConfig.hdfs.eventLog</displayName>
-            <value>/spark-history</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hdfs.endpoint</name>
-            <displayName>dataSourceConfig.hdfs.endpoint</displayName>
-            <value>hdfs://sandbox.hortonworks.com:8020</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hdfs.keytab</name>
-            <displayName>dataSourceConfig.hdfs.keytab</displayName>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.hdfs.principal</name>
-            <displayName>dataSourceConfig.hdfs.principal</displayName>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.rmUrl</name>
-            <displayName>dataSourceConfig.rmUrl</displayName>
-            <value>http://sandbox.hortonworks.com:8088</value>
-        </property>
-        <property>
-            <name>storm.mode</name>
-            <displayName>mode</displayName>
-            <description>Storm Mode: local or cluster</description>
-            <value>local</value>
-        </property>
-        <property>
-            <name>storm.worker.num</name>
-            <displayName>worker.num</displayName>
-            <description>The number of workers</description>
-            <value>2</value>
-        </property>
-        <property>
-            <name>name</name>
-            <displayName>name</displayName>
-            <description>Name of the topology</description>
-            <value>sparkHistoryJob</value>
-        </property>
-        <property>
-            <name>storm.messageTimeoutSec</name>
-            <displayName>messageTimeoutSec</displayName>
-            <description>Message timeout (in seconds)</description>
-            <value>3000</value>
-        </property>
-        <property>
-            <name>storm.pendingSpout</name>
-            <displayName>pendingSpout</displayName>
-            <value>1000</value>
-        </property>
-        <property>
-            <name>storm.spoutCrawlInterval</name>
-            <displayName>spoutCrawlInterval</displayName>
-            <description>Spout crawl interval (in milliseconds)</description>
-            <value>10000</value>
-        </property>
-        <property>
-            <name>storm.parallelismConfig.sparkHistoryJobFetchSpout</name>
-            <displayName>parallelismConfig.sparkHistoryJobFetchSpout</displayName>
-            <description>Parallelism of sparkHistoryJobFetchSpout </description>
-            <value>1</value>
-        </property>
-        <property>
-            <name>storm.tasks.sparkHistoryJobFetchSpout</name>
-            <displayName>tasks.sparkHistoryJobFetchSpout</displayName>
-            <description>Tasks Num of sparkHistoryJobFetchSpout </description>
-            <value>4</value>
-        </property>
-        <property>
-            <name>storm.parallelismConfig.sparkHistoryJobParseBolt</name>
-            <displayName>parallelismConfig.sparkHistoryJobParseBolt</displayName>
-            <description>Parallelism of sparkHistoryJobParseBolt </description>
-            <value>1</value>
-        </property>
-        <property>
-            <name>storm.tasks.sparkHistoryJobParseBolt</name>
-            <displayName>parallelismConfig.sparkHistoryJobParseBolt</displayName>
-            <description>Tasks Num of sparkHistoryJobParseBolt</description>
-            <value>4</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.executor.memory</name>
-            <displayName>spark.executor.memory</displayName>
-            <value>1g</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.driver.memory</name>
-            <displayName>spark.driver.memory</displayName>
-            <value>1g</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.driver.cores</name>
-            <displayName>spark.driver.cores</displayName>
-            <value>1</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.executor.cores</name>
-            <displayName>spark.executor.cores</displayName>
-            <value>1</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.yarn.am.memory</name>
-            <displayName>spark.yarn.am.memory</displayName>
-            <value>512m</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.yarn.am.cores</name>
-            <displayName>spark.yarn.am.cores</displayName>
-            <value>1</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.yarn.executor.memoryOverhead.factor</name>
-            <displayName>spark.yarn.executor.memoryOverhead.factor</displayName>
-            <value>10</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.yarn.driver.memoryOverhead.factor</name>
-            <displayName>spark.yarn.driver.memoryOverhead.factor</displayName>
-            <value>10</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.yarn.am.memoryOverhead.factor</name>
-            <displayName>spark.yarn.am.memoryOverhead.factor</displayName>
-            <value>10</value>
-        </property>
-        <property>
-            <name>spark.defaultVal.spark.yarn.overhead.min</name>
-            <displayName>spark.yarn.overhead.min</displayName>
-            <value>384m</value>
-        </property>
+
     </configuration>
     <docs>
         <install>
