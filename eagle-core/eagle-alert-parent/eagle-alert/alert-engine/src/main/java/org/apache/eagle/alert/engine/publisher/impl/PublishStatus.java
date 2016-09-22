@@ -19,7 +19,7 @@
 package org.apache.eagle.alert.engine.publisher.impl;
 
 /**
- * Object that holds the status of Notification Posted to Notification Plugin  
+ * Object that holds the status of Notification Posted to Notification Plugin
  */
 public class PublishStatus {
 	public boolean successful;

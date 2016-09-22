@@ -17,6 +17,7 @@
 
 package org.apache.eagle.alert.engine.spark.function;
 
+import backtype.storm.metric.api.MultiCountMetric;
 import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
 import org.apache.eagle.alert.engine.StreamContextImpl;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
@@ -30,19 +31,12 @@ import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.runner.MapComparator;
 import org.apache.eagle.alert.engine.spark.model.PolicyState;
 import org.apache.eagle.alert.engine.utils.Constants;
-
 import org.apache.spark.api.java.function.PairFlatMapFunction;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-import backtype.storm.metric.api.MultiCountMetric;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AlertBoltFunction implements PairFlatMapFunction<Iterator<Tuple2<Integer, PartitionedEvent>>, String, AlertStreamEvent> {

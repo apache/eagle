@@ -18,10 +18,7 @@
 package org.apache.eagle.alert.engine.utils;
 
 public class Constants {
-    public static final String ADDED = "added";
-    public static final String REMOVED = "removed";
-    public static final String MODIFIED = "modified";
     public static final int UNKNOW_PARTITION = -1;
+    public static final String UNKNOW_STREAMID = "xx";
     public static final String ALERTBOLTNAME_PREFIX = "alertBolt";
-    public static final String BEFORE_MODIFIED = "beforemodified";
 }

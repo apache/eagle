@@ -19,10 +19,10 @@ package org.apache.eagle.alert.engine.spark.model;
 
 import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
+import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.apache.eagle.alert.engine.router.StreamRoutePartitioner;
 import org.apache.eagle.alert.engine.router.impl.SparkStreamRouterBoltOutputCollector;
 import org.apache.eagle.alert.engine.spark.accumulator.MapAccum;
-
 import org.apache.spark.Accumulator;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;
@@ -39,14 +39,23 @@ public class RouteState implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(RouteState.class);
     private AtomicReference<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> routeSpecMapRef = new AtomicReference<>();
     private AtomicReference<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerMapRef = new AtomicReference<>();
+    private AtomicReference<Map<Integer, Map<StreamPartition, StreamSortSpec>>> cachedSSSRef = new AtomicReference<>();
+    private AtomicReference<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> cachedSRSRef = new AtomicReference<>();
+
+    private Accumulator<Map<Integer, Map<StreamPartition, StreamSortSpec>>> cachedSSSAccm;
+    private Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> cachedSRSAccm;
     private Accumulator<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerAccum;
     private Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> routeSpecMapAccum;
 
     public RouteState(JavaStreamingContext jssc) {
         Accumulator<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerAccum = jssc.sparkContext().accumulator(new HashMap<>(), "routePartitionerAccum", new MapAccum());
         Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> routeSpecMapAccum = jssc.sparkContext().accumulator(new HashMap<>(), "routeSpecAccum", new MapAccum());
+        Accumulator<Map<Integer, Map<StreamPartition, StreamSortSpec>>> cachedSSSAccm = jssc.sparkContext().accumulator(new HashMap<>(), "cachedSSSAccm", new MapAccum());
+        Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> cachedSRSAccm = jssc.sparkContext().accumulator(new HashMap<>(), "cachedSRSAccm", new MapAccum());
         this.routePartitionerAccum = routePartitionerAccum;
         this.routeSpecMapAccum = routeSpecMapAccum;
+        this.cachedSSSAccm = cachedSSSAccm;
+        this.cachedSRSAccm = cachedSRSAccm;
     }
 
     public RouteState(Accumulator<Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>>> routePartitionerAccum, Accumulator<Map<Integer, Map<StreamPartition, StreamRouterSpec>>> routeSpecMapAccum) {
@@ -57,8 +66,12 @@ public class RouteState implements Serializable {
     public void recover() {
         routeSpecMapRef.set(routeSpecMapAccum.value());
         routePartitionerMapRef.set(routePartitionerAccum.value());
+        cachedSSSRef.set(cachedSSSAccm.value());
+        cachedSRSRef.set(cachedSRSAccm.value());
         LOG.info("---------routeSpecMapRef----------" + routeSpecMapRef.get());
         LOG.info("---------routePartitionerMapRef----------" + routePartitionerMapRef.get());
+        LOG.info("---------cachedSSSRef----------" + cachedSSSRef.get());
+        LOG.info("---------cachedSRSRef----------" + cachedSRSRef.get());
     }
 
     public Map<StreamPartition, StreamRouterSpec> getRouteSpecMapByPartition(int partitionNum) {
@@ -82,7 +95,27 @@ public class RouteState implements Serializable {
         return routePartitioner;
     }
 
-    public void store(SparkStreamRouterBoltOutputCollector routeCollector, int partitionNum) {
+    public Map<StreamPartition, StreamSortSpec> getCachedSSSMapByPartition(int partitionNum) {
+        Map<Integer, Map<StreamPartition, StreamSortSpec>> cachedSSSMap =  cachedSSSRef.get();
+        LOG.info("---RouteState----getCachedSSSMapByPartition----------" + (cachedSSSMap));
+        Map<StreamPartition, StreamSortSpec> cachedSSS = cachedSSSMap.get(partitionNum);
+        if (cachedSSS == null) {
+            cachedSSS = new HashMap<>();
+        }
+        return cachedSSS;
+    }
+
+    public Map<StreamPartition, StreamRouterSpec> getCachedSRSMapByPartition(int partitionNum) {
+        Map<Integer, Map<StreamPartition, StreamRouterSpec>> cachedSRSMap =  cachedSRSRef.get();
+        LOG.info("---RouteState----getCachedSRSMapByPartition----------" + (cachedSRSMap));
+        Map<StreamPartition, StreamRouterSpec> cachedSRS = cachedSRSMap.get(partitionNum);
+        if (cachedSRS == null) {
+            cachedSRS = new HashMap<>();
+        }
+        return cachedSRS;
+    }
+
+    public void store(SparkStreamRouterBoltOutputCollector routeCollector, Map<StreamPartition, StreamSortSpec> cachedSSS, Map<StreamPartition, StreamRouterSpec> cachedSRS, int partitionNum) {
 
         Map<Integer, Map<StreamPartition, StreamRouterSpec>> newRouteSpecMap = new HashMap<>();
         newRouteSpecMap.put(partitionNum, routeCollector.getRouteSpecMap());
@@ -91,5 +124,14 @@ public class RouteState implements Serializable {
         Map<Integer, Map<StreamPartition, List<StreamRoutePartitioner>>> newRoutePartitionerMap = new HashMap<>();
         newRoutePartitionerMap.put(partitionNum, routeCollector.getRoutePartitionerMap());
         routePartitionerAccum.add(newRoutePartitionerMap);
+
+
+        Map<Integer, Map<StreamPartition, StreamSortSpec>> newCachedSSSMap = new HashMap<>();
+        newCachedSSSMap.put(partitionNum, cachedSSS);
+        cachedSSSAccm.add(newCachedSSSMap);
+
+        Map<Integer, Map<StreamPartition, StreamRouterSpec>> newCachedSRSMap = new HashMap<>();
+        newCachedSRSMap.put(partitionNum, cachedSRS);
+        cachedSRSAccm.add(newCachedSRSMap);
     }
 }

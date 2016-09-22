@@ -24,6 +24,7 @@ import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.spark.function.*;
 import org.apache.eagle.alert.engine.spark.model.PolicyState;
+import org.apache.eagle.alert.engine.spark.model.PublishState;
 import org.apache.eagle.alert.engine.spark.model.RouteState;
 import org.apache.eagle.alert.engine.spark.model.WindowState;
 
@@ -62,14 +63,8 @@ public class UnitSparkTopologyRunner implements Serializable {
     private final AtomicReference<SpoutSpec> spoutSpecRef = new AtomicReference<>();
     private final AtomicReference<AlertBoltSpec> alertBoltSpecRef = new AtomicReference<>();
     private final AtomicReference<HashSet<String>> topicsRef = new AtomicReference<>();
-    //route config ref
-    private final AtomicReference<Map<StreamPartition, StreamSortSpec>> cachedSSSRef = new AtomicReference<>(new HashMap<>());
-    private final AtomicReference<Map<StreamPartition, StreamRouterSpec>> cachedSRSRef = new AtomicReference<>(new HashMap<>());
-    private final AtomicReference<Map<String, Map<StreamPartition, StreamSortSpec>>> sssChangInfoRef = new AtomicReference<>();
-    private final AtomicReference<Map<String, Collection<StreamRouterSpec>>> srsChangInfoRef = new AtomicReference<>();
-    //publishments config ref
-    private final AtomicReference<Map<String, List<Publishment>>> publishmentsChangInfoRef = new AtomicReference<>();
-    private AtomicReference<Map<String, Publishment>> cachedPublishmentsRef = new AtomicReference<>(new HashMap<>());
+    private final AtomicReference<RouterSpec> routerSpecRef = new AtomicReference<>();
+    private final AtomicReference<PublishSpec> publishSpecRef = new AtomicReference<>();
     private String groupId;
     //Zookeeper server string: host1:port1[,host2:port2,...]
     private String zkServers = null;
@@ -150,6 +145,7 @@ public class UnitSparkTopologyRunner implements Serializable {
         WindowState winstate = new WindowState(jssc);
         RouteState routeState = new RouteState(jssc);
         PolicyState policyState = new PolicyState(jssc);
+        PublishState publishState = new PublishState(jssc);
 
         JavaPairDStream<String, String> pairDStream = messages
                 .transform(new ProcessSpecFunction(offsetRanges,
@@ -157,33 +153,30 @@ public class UnitSparkTopologyRunner implements Serializable {
                         sdsRef,
                         alertBoltSpecRef,
                         topicsRef,
+                        routerSpecRef,
                         config,
-                        cachedSSSRef,
-                        cachedSRSRef,
-                        sssChangInfoRef,
-                        srsChangInfoRef,
                         winstate,
                         routeState,
                         policyState,
-                        cachedPublishmentsRef,
-                        publishmentsChangInfoRef))
+                        publishState,
+                        publishSpecRef))
                 .mapToPair(km -> new Tuple2<>(km.topic(), km.message()));
 
         pairDStream
                 .window(Durations.seconds(windowDurations), Durations.seconds(slideDurations))
                 .flatMapToPair(new CorrelationSpoutSparkFunction(numOfRouter, spoutSpecRef, sdsRef))
                 .transformToPair(new ChangePartitionTo(numOfRouter))
-                .mapPartitionsToPair(new StreamRouteBoltFunction("streamBolt", sdsRef, sssChangInfoRef, srsChangInfoRef, winstate, routeState))
+                .mapPartitionsToPair(new StreamRouteBoltFunction("streamBolt", sdsRef, routerSpecRef, winstate, routeState))
                 .transformToPair(new ChangePartitionTo(numOfAlertBolts))
                 .mapPartitionsToPair(new AlertBoltFunction(sdsRef, alertBoltSpecRef, policyState))
                 .repartition(numOfPublishTasks)
-                .foreachRDD(new Publisher(alertPublishBoltName, kafkaCluster, groupId, offsetRanges,publishmentsChangInfoRef));
+                .foreachRDD(new Publisher(alertPublishBoltName, kafkaCluster, groupId, offsetRanges, publishState, publishSpecRef));
     }
 
     private void prepareKafkaConfig(Config config) {
         String inputBroker = config.getString("spout.kafkaBrokerZkQuorum");
         this.kafkaParams.put("metadata.broker.list", inputBroker);
-        this.groupId = config.getString("topology.groupId");
+        this.groupId = "eagle" + new Random(10).nextInt();
         this.kafkaParams.put("group.id", this.groupId);
         this.kafkaParams.put("auto.offset.reset", "largest");
         // Newer version of metadata.broker.list:

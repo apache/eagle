@@ -20,7 +20,6 @@ package org.apache.eagle.alert.engine.spark.model;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
 import org.apache.eagle.alert.engine.spark.accumulator.MapAccum;
-
 import org.apache.spark.Accumulator;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.slf4j.Logger;

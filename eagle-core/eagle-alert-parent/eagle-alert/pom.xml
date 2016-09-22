@@ -26,6 +26,7 @@
 	<modules>
 		<module>alert-common</module>
 		<module>alert-engine</module>
+		<module>alert-spark</module>
 		<module>alert-metadata-parent</module>
 		<module>alert-coordinator</module>
 		<module>alert-assembly</module>

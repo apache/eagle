@@ -47,6 +47,19 @@ public class AlertPublisherImpl implements AlertPublisher {
         this.name = name;
     }
 
+    public AlertPublisherImpl(String name, List<Publishment> publishments) {
+        this.name = name;
+        for (Publishment publishment : publishments) {
+            AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
+            if (plugin != null) {
+                publishPluginMapping.put(publishment.getName(), plugin);
+                onPolicyAdded(publishment.getPolicyIds(), publishment.getName());
+            } else {
+                LOG.error("Initialized alertPublisher {} failed due to invalid format", publishment);
+            }
+        }
+    }
+
     @Override
     public void init(Config config, Map conf) {
         this.config = config;
@@ -60,21 +73,21 @@ public class AlertPublisherImpl implements AlertPublisher {
 
     @Override
     public void nextEvent(AlertStreamEvent event) {
-        if(LOG.isDebugEnabled())
+        if (LOG.isDebugEnabled())
             LOG.debug(event.toString());
         notifyAlert(event);
     }
 
     private void notifyAlert(AlertStreamEvent event) {
         String policyId = event.getPolicyId();
-        if(policyId == null || !policyPublishPluginMapping.containsKey(policyId)) {
+        if (policyId == null || !policyPublishPluginMapping.containsKey(policyId)) {
             LOG.warn("Policy {} does NOT subscribe any publishments", policyId);
             return;
         }
-        for(String id: policyPublishPluginMapping.get(policyId)) {
+        for (String id : policyPublishPluginMapping.get(policyId)) {
             AlertPublishPlugin plugin = publishPluginMapping.get(id);
             try {
-                if(LOG.isDebugEnabled()) LOG.debug("Execute alert publisher " + plugin.getClass().getCanonicalName());
+                if (LOG.isDebugEnabled()) LOG.debug("Execute alert publisher " + plugin.getClass().getCanonicalName());
                 plugin.onAlert(event);
             } catch (Exception ex) {
                 LOG.error("Fail invoking publisher's onAlert, continue ", ex);
@@ -109,7 +122,7 @@ public class AlertPublisherImpl implements AlertPublisher {
             }
 
             AlertPublishPlugin plugin = AlertPublishPluginsFactory.createNotificationPlugin(publishment, config, conf);
-            if(plugin != null) {
+            if (plugin != null) {
                 publishPluginMapping.put(publishment.getName(), plugin);
                 onPolicyAdded(publishment.getPolicyIds(), publishment.getName());
             } else {
@@ -127,7 +140,7 @@ public class AlertPublisherImpl implements AlertPublisher {
             List<String> newPolicies = afterModified.get(i).getPolicyIds();
             List<String> oldPolicies = beforeModified.get(i).getPolicyIds();
 
-            if (! newPolicies.equals(oldPolicies)) {
+            if (!newPolicies.equals(oldPolicies)) {
                 List<String> deletedPolicies = ListUtils.subtract(oldPolicies, newPolicies);
                 onPolicyDeleted(deletedPolicies, pubName);
                 List<String> addedPolicies = ListUtils.subtract(newPolicies, oldPolicies);

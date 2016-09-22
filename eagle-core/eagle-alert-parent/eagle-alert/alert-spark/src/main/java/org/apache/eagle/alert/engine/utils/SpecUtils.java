@@ -17,10 +17,9 @@
 
 package org.apache.eagle.alert.engine.utils;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.service.SpecMetadataServiceClientImpl;
-
-import com.typesafe.config.Config;
 
 import java.util.Collections;
 import java.util.Set;
