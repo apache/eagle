@@ -62,10 +62,11 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
         this.hdfsConf = new Configuration();
-        this.hdfsConf.set("fs.defaultFS", config.hdfsConfig.endpoint);
         this.hdfsConf.setBoolean("fs.hdfs.impl.disable.cache", true);
-        this.hdfsConf.set("hdfs.kerberos.principal", config.hdfsConfig.principal);
-        this.hdfsConf.set("hdfs.keytab.file", config.hdfsConfig.keytab);
+        for (Map.Entry<String, String> entry : config.jobHistoryConfig.hdfs.entrySet()) {
+            this.hdfsConf.set(entry.getKey(), entry.getValue());
+            LOG.info("conf key {}, conf value {}", entry.getKey(), entry.getValue());
+        }
         this.historyServerFetcher = new SparkHistoryServerResourceFetcher(config.jobHistoryConfig.historyServerUrl,
                 config.jobHistoryConfig.historyServerUserName, config.jobHistoryConfig.historyServerUserPwd);
         this.zkState = new JobHistoryZKStateManager(config);
@@ -99,17 +100,17 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
                     LOG.info("Attempt log name: " + attemptLogName + extension);
 
                     Path attemptFile = getFilePath(attemptLogName, extension);
-                    JHFInputStreamReader reader = new SparkFilesystemInputStreamReaderImpl(config.info.site, info);
+                    JHFInputStreamReader reader = new SparkFilesystemInputStreamReaderImpl(config, info);
                     reader.read(hdfs.open(attemptFile));
                 }
             }
 
-            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
+            //zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
             LOG.info("Successfully parse application {}", appId);
             collector.ack(tuple);
         } catch (RuntimeException e) {
             LOG.warn("fail to process application {} due to RuntimeException, ignore it", appId, e);
-            zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
+            //zkState.updateApplicationStatus(appId, ZKStateConstant.AppStatus.FINISHED);
             collector.ack(tuple);
         } catch (Exception e) {
             LOG.error("Fail to process application {}, and retry", appId, e);
@@ -130,7 +131,7 @@ public class SparkHistoryJobParseBolt extends BaseRichBolt {
     }
 
     private Path getFilePath(String appAttemptLogName, String extension) {
-        String attemptLogDir = this.config.hdfsConfig.baseDir + "/" + appAttemptLogName + extension;
+        String attemptLogDir = this.config.jobHistoryConfig.baseDir + "/" + appAttemptLogName + extension;
         return new Path(attemptLogDir);
     }
 

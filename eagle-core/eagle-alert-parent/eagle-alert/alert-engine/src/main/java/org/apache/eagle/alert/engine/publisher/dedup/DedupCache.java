@@ -17,10 +17,15 @@
 package org.apache.eagle.alert.engine.publisher.dedup;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -57,6 +62,28 @@ public class DedupCache {
         if (INSTANCE == null) {
             INSTANCE = new DedupCache();
             INSTANCE.config = config;
+
+            // create daemon to clean up old removable events periodically
+            ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread t = new Thread(r);
+                    t.setDaemon(true);
+                    return t;
+                }
+            });
+            scheduleSrv.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    HashSet<EventUniq> eventUniqs = new HashSet<EventUniq>(INSTANCE.getEvents().keySet());
+                    for (EventUniq one : eventUniqs) {
+                        if (one.removable && one.createdTime < System.currentTimeMillis() - 3600000 * 24) {
+                            INSTANCE.removeEvent(one);
+                            LOG.info("Remove dedup key {} from cache & db", one);
+                        }
+                    }
+                }
+            }, 5, 60, TimeUnit.MINUTES);
         }
         return INSTANCE;
     }
@@ -162,6 +189,13 @@ public class DedupCache {
         } else {
             return new DedupValue[] {dedupValue};
         }
+    }
+
+    public void persistUpdatedEventUniq(EventUniq eventEniq) {
+        DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
+        accessor.add(eventEniq, events.get(eventEniq));
+        LOG.info("Store dedup key {}, value {} to DB", eventEniq,
+            Joiner.on(",").join(events.get(eventEniq)));
     }
 
     private DedupValue updateCount(EventUniq eventEniq) {

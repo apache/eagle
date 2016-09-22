@@ -16,17 +16,12 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.running.entities;
+package org.apache.eagle.service.jpm.suggestion;
 
-import org.apache.eagle.log.entity.repo.EntityRepository;
+import org.apache.eagle.service.jpm.MRTaskExecutionResponse.JobSuggestionResponse;
+import org.apache.eagle.service.jpm.MRTaskExecutionResponse.TaskGroupResponse;
 
-public class JPMEntityRepository extends EntityRepository {
-    public JPMEntityRepository() {
-        entitySet.add(SparkAppEntity.class);
-        entitySet.add(SparkJobEntity.class);
-        entitySet.add(SparkStageEntity.class);
-        entitySet.add(SparkTaskEntity.class);
-        entitySet.add(SparkExecutorEntity.class);
-        serDeserMap.put(JobConfig.class, new JobConfigSerDeser());
-    }
+public interface SuggestionFunc {
+
+    JobSuggestionResponse apply(TaskGroupResponse data);
 }

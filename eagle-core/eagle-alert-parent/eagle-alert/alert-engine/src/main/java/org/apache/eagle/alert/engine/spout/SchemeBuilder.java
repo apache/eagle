@@ -19,8 +19,6 @@
 
 package org.apache.eagle.alert.engine.spout;
 
-import backtype.storm.spout.Scheme;
-
 import java.util.Map;
 
 
@@ -32,8 +30,8 @@ import java.util.Map;
 public class SchemeBuilder {
 
     @SuppressWarnings("rawtypes")
-    public static Scheme buildFromClsName(String clsName, String topic, Map conf) throws Exception {
+    public static Object buildFromClsName(String clsName, String topic, Map conf) throws Exception {
         Object o = Class.forName(clsName).getConstructor(String.class, Map.class).newInstance(topic, conf);
-        return (Scheme) o;
+        return o;
     }
 }

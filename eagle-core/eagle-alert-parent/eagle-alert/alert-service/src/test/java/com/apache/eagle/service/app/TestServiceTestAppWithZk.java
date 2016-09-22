@@ -16,46 +16,50 @@
  */
 package com.apache.eagle.service.app;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition.Definition;
-import org.apache.eagle.service.metadata.resource.MetadataResource;
-
-import com.sun.jersey.api.client.Client;
-import io.dropwizard.testing.junit.ResourceTestRule;
+import org.apache.eagle.alert.service.IMetadataServiceClient;
+import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
-public class TestAlertService {
-
-    @Rule
-    public final ResourceTestRule resources = ResourceTestRule.builder()
-        .addResource(new MetadataResource())
-        .build();
-
-    @SuppressWarnings("unchecked")
+public class TestServiceTestAppWithZk extends AlertServiceTestBase {
     @Test
-    public void testPolicyAddAndListRequest() throws Exception {
-        Client client = resources.client();
+    public void testMain() throws Exception {
+        System.setProperty("coordinator.zkConfig.zkQuorum", "localhost:" + getBindZkPort());
+        Config config = ConfigFactory.load().getConfig("coordinator");
+        // build dynamic policy loader
+        String host = config.getString("metadataService.host");
+        String context = config.getString("metadataService.context");
+        IMetadataServiceClient client = new MetadataServiceClientImpl(host, getBindServerPort(), context);
 
-        List<PolicyDefinition> policies =  resources.client().resource("/metadata/policies").get(List.class);
+        List<PolicyDefinition> policies = client.listPolicies();
 
         Assert.assertEquals(0, policies.size());
 
         PolicyDefinition def = new PolicyDefinition();
         def.setName("test-policy-1");
-        def.setInputStreams(Arrays.asList("testStreamDef"));
-        def.setOutputStreams(Arrays.asList("test-datasource-1"));
+        def.setInputStreams(Collections.singletonList("testStreamDef"));
+        def.setOutputStreams(Collections.singletonList("test-datasource-1"));
         def.setParallelismHint(5);
         def.setDefinition(new Definition());
-        resources.client().resource("/metadata/policies")
-             .entity(def)
-             .header("Content-Type","application/json")
-             .post();
-        policies = client.resource("/metadata/policies").get(List.class);
+        client.addPolicy(def);
+
+        policies = client.listPolicies();
+
         Assert.assertEquals(1, policies.size());
+
+        try {
+            client.close();
+        } catch (IOException e) {
+            // ignore
+        }
     }
+
 }

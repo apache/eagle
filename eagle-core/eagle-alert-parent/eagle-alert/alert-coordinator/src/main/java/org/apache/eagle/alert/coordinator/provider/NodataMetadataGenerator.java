@@ -213,11 +213,14 @@ public class NodataMetadataGenerator {
 
     private PolicyDefinition buildDynamicNodataPolicy(String streamName, String policyName,
                                                       String columnName, String expression, List<String> inputStream) {
-        PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
         //expression, something like "PT5S,dynamic,1,host"
         def.setValue(expression);
         def.setType(NODATA_ALERT_AGGR_POLICY_TYPE);
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("nodataColumnName", columnName);
+        def.setProperties(properties);
+        PolicyDefinition pd = new PolicyDefinition();
         pd.setDefinition(def);
         pd.setInputStreams(inputStream);
         pd.setOutputStreams(Arrays.asList(NODATA_ALERT_AGGR_STREAM));

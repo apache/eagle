@@ -51,10 +51,9 @@ public class CoordinatorTest {
 
     @BeforeClass
     public static void setup() throws Exception {
-
         zkEmbed = new ZookeeperEmbedded(2181);
-        zkEmbed.start();
-
+        int zkPort = zkEmbed.start();
+        System.setProperty("coordinator.zkConfig.zkQuorum","localhost:"+ zkPort);
     }
 
     @AfterClass
@@ -127,7 +126,6 @@ public class CoordinatorTest {
     @Test
     public void test_main() throws Exception {
         before();
-
         Coordinator.main(null);
     }
 

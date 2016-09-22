@@ -16,17 +16,24 @@
  *  limitations under the License.
  */
 
-package org.apache.eagle.jpm.spark.running.entities;
+package org.apache.eagle.service.jpm.suggestion;
 
-import org.apache.eagle.log.entity.repo.EntityRepository;
+import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.jobcounter.JobCounters;
+import org.apache.eagle.service.jpm.MRTaskExecutionResponse;
 
-public class JPMEntityRepository extends EntityRepository {
-    public JPMEntityRepository() {
-        entitySet.add(SparkAppEntity.class);
-        entitySet.add(SparkJobEntity.class);
-        entitySet.add(SparkStageEntity.class);
-        entitySet.add(SparkTaskEntity.class);
-        entitySet.add(SparkExecutorEntity.class);
-        serDeserMap.put(JobConfig.class, new JobConfigSerDeser());
+public class ReduceInputFunc extends AbstractInputFunc {
+
+    public ReduceInputFunc() {
+        super(JobCounters.CounterName.REDUCE_SHUFFLE_BYTES, Constants.SuggestionType.ReduceInput);
+    }
+
+    public ReduceInputFunc(double threshold) {
+        super(JobCounters.CounterName.REDUCE_SHUFFLE_BYTES, Constants.SuggestionType.ReduceInput, threshold);
+    }
+
+    @Override
+    protected MRTaskExecutionResponse.TaskGroup getTasks(MRTaskExecutionResponse.TaskGroupResponse tasks) {
+        return tasks.tasksGroupByType.get(Constants.TaskType.REDUCE.toString());
     }
 }

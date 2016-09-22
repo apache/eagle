@@ -30,10 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class JobHistoryDAOImpl extends AbstractJobHistoryDAO {
     private static final Logger LOG = LoggerFactory.getLogger(JobHistoryDAOImpl.class);
@@ -44,13 +41,12 @@ public class JobHistoryDAOImpl extends AbstractJobHistoryDAO {
 
     public JobHistoryDAOImpl(JobHistoryEndpointConfig endpointConfig) throws Exception {
         super(endpointConfig.basePath, endpointConfig.pathContainsJobTrackerName, endpointConfig.jobTrackerName);
-        this.conf.set("fs.defaultFS", endpointConfig.nnEndpoint);
-        this.conf.setBoolean("fs.hdfs.impl.disable.cache", true);
-        if (!endpointConfig.principal.equals("")) {
-            this.conf.set("hdfs.kerberos.principal", endpointConfig.principal);
-            this.conf.set("hdfs.keytab.file", endpointConfig.keyTab);
+        for (Map.Entry<String, String> entry : endpointConfig.hdfs.entrySet()) {
+            this.conf.set(entry.getKey(), entry.getValue());
+            LOG.info("conf key {}, conf value {}", entry.getKey(), entry.getValue());
         }
-        LOG.info("file system:" + endpointConfig.nnEndpoint);
+        this.conf.setBoolean("fs.hdfs.impl.disable.cache", true);
+
         hdfs = HDFSUtil.getFileSystem(conf);
     }
 
