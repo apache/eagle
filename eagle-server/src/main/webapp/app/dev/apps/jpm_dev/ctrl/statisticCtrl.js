@@ -169,6 +169,9 @@
 					bottom: 60,
 					containLabel: false
 				},
+				yAxis: [{
+					minInterval: 1
+				}],
 				xAxis: {
 					axisLabel: {
 						interval: 0
@@ -176,6 +179,9 @@
 				}
 			};
 			$scope.commonTrendChartOption = {
+				yAxis: [{
+					minInterval: 1
+				}],
 				grid: {
 					top: 60,
 					left: 42,
@@ -287,6 +293,7 @@
 
 				var intervalMin = Time.diffInterval(startTime, endTime) / 1000 / 60;
 
+				// ===================== Top User Job Count =====================
 				$scope.topUserJobCountSeries = [];
 				$scope.topUserJobCountTrendSeries = [];
 				JPM.aggMetricsToEntities(
@@ -304,6 +311,7 @@
 					$scope.topUserJobCountSeriesCategory = flatten.category;
 				});
 
+				// ===================== Top Type Job Count =====================
 				$scope.topTypeJobCountSeries = [];
 				$scope.topTypeJobCountTrendSeries = [];
 				JPM.aggMetricsToEntities(
@@ -321,34 +329,48 @@
 					$scope.topTypeJobCountSeriesCategory = flatten.category;
 				});
 
-				$scope.jobDurationDistributionSeries = [];
-				/**
-				 * @param {{}} res
-				 * @param {{}} res.data
-				 * @param {[]} res.data.jobTypes
-				 * @param {[]} res.data.jobCounts
-				 */
-				JPM.jobDistribution($scope.site, DURATION_BUCKETS.join(","), startTime, endTime).then(function (res) {
-					var data = res.data;
-					var jobTypes = {};
-					$.each(data.jobTypes, function (i, type) {
-						jobTypes[type] = [];
-					});
-					$.each(data.jobCounts, function (index, statistic) {
-						$.each(statistic.jobCountByType, function (type, value) {
-							jobTypes[type][index] = value;
+				if($scope.distributionSelectedType === "FAILED") {
+					// ====================== Failure Job List ======================
+					$scope.jobList = JPM.jobList({site: $scope.site}, startTime, endTime, [
+						"jobId",
+						"jobName",
+						"user",
+						"startTime",
+						"jobType"
+					]);
+				} else {
+					// ============== Job Duration Distribution Count ===============
+					$scope.jobList = null;
+
+					$scope.jobDurationDistributionSeries = [];
+					/**
+					 * @param {{}} res
+					 * @param {{}} res.data
+					 * @param {[]} res.data.jobTypes
+					 * @param {[]} res.data.jobCounts
+					 */
+					JPM.jobDistribution($scope.site, DURATION_BUCKETS.join(","), startTime, endTime).then(function (res) {
+						var data = res.data;
+						var jobTypes = {};
+						$.each(data.jobTypes, function (i, type) {
+							jobTypes[type] = [];
+						});
+						$.each(data.jobCounts, function (index, statistic) {
+							$.each(statistic.jobCountByType, function (type, value) {
+								jobTypes[type][index] = value;
+							});
+						});
+
+						$scope.jobDurationDistributionSeries = $.map(jobTypes, function (list, type) {
+							return {
+								name: type,
+								data: list,
+								type: "bar",
+								stack: "jobType"
+							};
 						});
 					});
-
-					$scope.jobDurationDistributionSeries = $.map(jobTypes, function (list, type) {
-						return {
-							name: type,
-							data: list,
-							type: "bar",
-							stack: "jobType"
-						};
-					});
-				});
+				}
 
 				return true;
 			};
