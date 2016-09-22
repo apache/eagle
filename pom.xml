@@ -522,16 +522,6 @@
                 <artifactId>json</artifactId>
                 <version>${org.json.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.codehaus.jackson</groupId>-->
-            <!--<artifactId>jackson-jaxrs</artifactId>-->
-            <!--<version>${codehaus-jackson.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.codehaus.jackson</groupId>-->
-            <!--<artifactId>jackson-xc</artifactId>-->
-            <!--<version>${codehaus-jackson.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
@@ -975,9 +965,6 @@
 
         <profile>
             <id>mapr</id>
-            <!--<activation>-->
-            <!--<activeByDefault>true</activeByDefault>-->
-            <!--</activation>-->
             <repositories>
                 <repository>
                     <id>mapr-releases</id>
@@ -1235,7 +1222,6 @@
                                 <!-- External dependency script -->
                                 <exclude>**/resource/serf/etc/ambari.json</exclude>
 
-                                <!-- TODO: fix it -->
                                 <exclude>**/webapp/**</exclude>
                                 <exclude>**/*.pid</exclude>
                             </excludes>
