@@ -65,7 +65,7 @@ public class EntityBuilderHelper {
         Map<String, String> tags = new HashMap<>();
         tags.put(TopologyConstants.SITE_TAG, site);
         tags.put(TopologyConstants.ROLE_TAG, role);
-        String metricName = String.format(TopologyConstants.METRIC_NAME_FORMAT, role);
+        String metricName = String.format(TopologyConstants.METRIC_LIVE_RATIO_NAME_FORMAT, role);
         return EntityBuilderHelper.metricWrapper(timestamp, metricName, value, tags);
     }
 

@@ -40,6 +40,8 @@ public class HdfsServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
     @Column("e")
     private String numFailedVolumes;
     @Column("f")
+    private long writtenTxidDiff;
+    @Column("g")
     private long lastUpdateTime;
 
     public long getLastUpdateTime() {
@@ -86,4 +88,14 @@ public class HdfsServiceTopologyAPIEntity extends TopologyBaseAPIEntity {
         this.usedCapacityTB = usedCapacityTB;
         valueChanged("usedCapacityTB");
     }
+
+    public long getWrittenTxidDiff() {
+        return writtenTxidDiff;
+    }
+
+    public void setWrittenTxidDiff(long writtenTxidDiff) {
+        this.writtenTxidDiff = writtenTxidDiff;
+        valueChanged("writtenTxidDiff");
+    }
 }
+

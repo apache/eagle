@@ -21,9 +21,8 @@ package org.apache.eagle.topology.extractor.hdfs;
 import org.apache.eagle.app.utils.PathResolverHelper;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.TopologyEntityParserResult;
+import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.entity.HdfsServiceTopologyAPIEntity;
-import org.apache.eagle.topology.entity.JournalNodeServiceAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
 import org.apache.eagle.topology.utils.*;
 
@@ -84,23 +83,25 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     }
 
     @Override
-    public TopologyEntityParserResult parse(long timestamp) {
+    public TopologyEntityParserResult parse(long timestamp) throws IOException {
         final TopologyEntityParserResult result = new TopologyEntityParserResult();
         result.setVersion(TopologyConstants.HadoopVersion.V2);
-        result.getNodes().put(TopologyConstants.NAME_NODE_ROLE, new ArrayList<>());
-        result.getNodes().put(TopologyConstants.DATA_NODE_ROLE, new ArrayList<>());
+        int numNamenode = 0;
         for (String url : namenodeUrls) {
             try {
                 final HdfsServiceTopologyAPIEntity namenodeEntity = createNamenodeEntity(url, timestamp);
-                result.getNodes().get(TopologyConstants.NAME_NODE_ROLE).add(namenodeEntity);
+                result.getMasterNodes().add(namenodeEntity);
+                numNamenode++;
                 if (namenodeEntity.getStatus().equalsIgnoreCase(NAME_NODE_ACTIVE_STATUS)) {
                     createSlaveNodeEntities(url, timestamp, result);
                 }
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 ex.printStackTrace();
+            } catch (IOException e) {
+                LOG.warn("Catch an IOException with url: {}", url);
             }
         }
-        double value = result.getNodes().get(TopologyConstants.NAME_NODE_ROLE).size() * 1d / namenodeUrls.length;
+        double value = numNamenode * 1d / namenodeUrls.length;
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NAME_NODE_ROLE, value, site, timestamp));
         return result;
     }
@@ -148,14 +149,14 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         JSONArray jsonArray = new JSONArray(journalnodeString);
         JSONObject jsonMap = (JSONObject) jsonArray.get(0);
 
-        Map<String, JournalNodeServiceAPIEntity> journalNodesMap = new HashMap<>();
+        Map<String, HdfsServiceTopologyAPIEntity> journalNodesMap = new HashMap<>();
         String QJM = jsonMap.getString("manager");
         Pattern qjm = Pattern.compile(QJM_PATTERN);
         Matcher jpmMatcher = qjm.matcher(QJM);
         while (jpmMatcher.find()) {
             String ip = jpmMatcher.group(1);
             String hostname = EntityBuilderHelper.resolveHostByIp(ip);
-            JournalNodeServiceAPIEntity entity = createJournalNodeEntity(TopologyConstants.JOURNAL_NODE_ROLE, hostname, updateTime);
+            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.JOURNAL_NODE_ROLE, hostname, updateTime);
             entity.setStatus(TopologyConstants.DATA_NODE_DEAD_STATUS);
             journalNodesMap.put(ip, entity);
         }
@@ -177,12 +178,9 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
                 journalNodesMap.get(ip).setStatus(TopologyConstants.DATA_NODE_LIVE_STATUS);
             }
         }
-        if (!result.getNodes().containsKey(TopologyConstants.JOURNAL_NODE_ROLE)) {
-            result.getNodes().put(TopologyConstants.JOURNAL_NODE_ROLE, new ArrayList<>());
-        }
-        result.getNodes().get(TopologyConstants.JOURNAL_NODE_ROLE).addAll(journalNodesMap.values());
+        result.getMasterNodes().addAll(journalNodesMap.values());
 
-        double value = numLiveJournalNodes * 1d / journalNodesMap.size();;
+        double value = numLiveJournalNodes * 1d / journalNodesMap.size();
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.JOURNAL_NODE_ROLE, value, site, updateTime));
     }
 
@@ -207,7 +205,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
                 entity.setStatus(TopologyConstants.DATA_NODE_DEAD_STATUS);
             }
             ++numDeadNodes;
-            result.getNodes().get(TopologyConstants.DATA_NODE_ROLE).add(entity);
+            result.getSlaveNodes().add(entity);
         }
         LOG.info("Dead nodes " + numDeadNodes + ", dead but decommissioned nodes: " + numDeadDecommNodes);
 
@@ -238,30 +236,17 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
                 entity.setStatus(TopologyConstants.DATA_NODE_LIVE_STATUS);
             }
             numLiveNodes++;
-            result.getNodes().get(TopologyConstants.DATA_NODE_ROLE).add(entity);
+            result.getSlaveNodes().add(entity);
         }
         LOG.info("Live nodes " + numLiveNodes + ", live but decommissioned nodes: " + numLiveDecommNodes);
 
-        double value = numLiveNodes * 1.0d / result.getNodes().get(TopologyConstants.DATA_NODE_ROLE).size();
+        double value = numLiveNodes * 1.0d / result.getSlaveNodes().size();
         result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.DATA_NODE_ROLE, value, site, updateTime));
     }
 
     private HdfsServiceTopologyAPIEntity createHdfsServiceEntity(String roleType, String hostname, long updateTime) {
         HdfsServiceTopologyAPIEntity entity = new HdfsServiceTopologyAPIEntity();
         entity.setTimestamp(updateTime);
-        Map<String, String> tags = new HashMap<String, String>();
-        entity.setTags(tags);
-        tags.put(SITE_TAG, site);
-        tags.put(ROLE_TAG, roleType);
-        tags.put(HOSTNAME_TAG, hostname);
-        String rack = EntityBuilderHelper.resolveRackByHost(hostname);
-        tags.put(RACK_TAG, rack);
-        return entity;
-    }
-
-    private JournalNodeServiceAPIEntity createJournalNodeEntity(String roleType, String hostname, long updateTime) {
-        JournalNodeServiceAPIEntity entity = new JournalNodeServiceAPIEntity();
-        entity.setLastUpdateTime(updateTime);
         Map<String, String> tags = new HashMap<String, String>();
         entity.setTags(tags);
         tags.put(SITE_TAG, site);

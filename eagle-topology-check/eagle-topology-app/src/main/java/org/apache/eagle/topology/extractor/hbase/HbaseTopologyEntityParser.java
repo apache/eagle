@@ -21,7 +21,7 @@ package org.apache.eagle.topology.extractor.hbase;
 import org.apache.eagle.app.utils.HadoopSecurityUtil;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.TopologyEntityParserResult;
+import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.entity.HBaseServiceTopologyAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
 import org.apache.eagle.topology.utils.EntityBuilderHelper;
@@ -33,7 +33,6 @@ import org.apache.hadoop.hbase.ServerName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +42,7 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
 
     private Configuration hBaseConfiguration;
     private String site;
+    private Boolean kerberosEnable = false;
 
     public  HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig) {
         this.site = site;
@@ -54,17 +54,23 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
         // kerberos authentication
         this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_PRINCIPAL_KEY, hBaseConfig.eaglePrincipal);
         this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_KEYTAB_FILE_KEY, hBaseConfig.eagleKeytab);
-        this.hBaseConfiguration.set("hbase.security.authentication", "kerberos");
-        this.hBaseConfiguration.set("hbase.master.kerberos.principal", hBaseConfig.hbaseMasterPrincipal);
+        if (hBaseConfig.eaglePrincipal != null && hBaseConfig.eagleKeytab != null
+                && !hBaseConfig.eaglePrincipal.isEmpty() && !hBaseConfig.eagleKeytab.isEmpty()) {
+            this.kerberosEnable = true;
+            this.hBaseConfiguration.set("hbase.security.authentication", "kerberos");
+            this.hBaseConfiguration.set("hbase.master.kerberos.principal", hBaseConfig.hbaseMasterPrincipal);
+        }
     }
 
     private HBaseAdmin getHBaseAdmin() throws IOException {
-        HadoopSecurityUtil.login(hBaseConfiguration);
+        if (this.kerberosEnable) {
+            HadoopSecurityUtil.login(hBaseConfiguration);
+        }
         return new HBaseAdmin(this.hBaseConfiguration);
     }
 
     @Override
-    public TopologyEntityParserResult parse(long timestamp) {
+    public TopologyEntityParserResult parse(long timestamp) throws IOException {
         long deadServers = 0;
         long liveServers = 0;
         HBaseAdmin admin = null;
@@ -75,34 +81,27 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
             liveServers = status.getServersSize();
             TopologyEntityParserResult result = new TopologyEntityParserResult();
             result.setVersion(HadoopVersion.V2);
-            result.getNodes().put(TopologyConstants.HMASTER_ROLE, new ArrayList<>());
-            result.getNodes().put(TopologyConstants.REGIONSERVER_ROLE, new ArrayList<>());
-            for (ServerName server : status.getServers()) {
-                HBaseServiceTopologyAPIEntity entity = createEntity(TopologyConstants.REGIONSERVER_ROLE, server.getHostname(), timestamp);
-                ServerLoad load = status.getLoad(server);
-                parseServerLoad(entity, load);
-                entity.setStatus(TopologyConstants.REGIONSERVER_LIVE_STATUS);
-                result.getNodes().get(TopologyConstants.REGIONSERVER_ROLE).add(entity);
+            for (ServerName liveServer : status.getServers()) {
+                ServerLoad load = status.getLoad(liveServer);
+                result.getSlaveNodes().add(parseServer(liveServer, load, TopologyConstants.REGIONSERVER_ROLE, TopologyConstants.REGIONSERVER_LIVE_STATUS, timestamp));
+            }
+            for (ServerName deadServer : status.getDeadServerNames()) {
+                ServerLoad load = status.getLoad(deadServer);
+                result.getSlaveNodes().add(parseServer(deadServer, load, TopologyConstants.REGIONSERVER_ROLE, TopologyConstants.REGIONSERVER_DEAD_STATUS, timestamp));
             }
             ServerName master = status.getMaster();
             if (master != null) {
-                HBaseServiceTopologyAPIEntity masterEntity = createEntity(TopologyConstants.HMASTER_ROLE, master.getHostname(), timestamp);
                 ServerLoad load = status.getLoad(master);
-                parseServerLoad(masterEntity, load);
-                masterEntity.setStatus(TopologyConstants.HMASTER_ACTIVE_STATUS);
-                result.getNodes().get(TopologyConstants.HMASTER_ROLE).add(masterEntity);
+                result.getMasterNodes().add(parseServer(master, load, TopologyConstants.HMASTER_ROLE, TopologyConstants.HMASTER_ACTIVE_STATUS, timestamp));
             }
-            for (ServerName server : status.getBackupMasters()) {
-                HBaseServiceTopologyAPIEntity entity = createEntity(TopologyConstants.HMASTER_ROLE, server.getHostname(), timestamp);
-                ServerLoad load = status.getLoad(server);
-                parseServerLoad(entity, load);
-                entity.setStatus(TopologyConstants.HMASTER_STANDBY_STATUS);
-                result.getNodes().get(TopologyConstants.REGIONSERVER_ROLE).add(entity);
+            for (ServerName backupMaster : status.getBackupMasters()) {
+                ServerLoad load = status.getLoad(backupMaster);
+                result.getMasterNodes().add(parseServer(backupMaster, load, TopologyConstants.HMASTER_ROLE, TopologyConstants.HMASTER_STANDBY_STATUS, timestamp));
             }
             double liveRatio = liveServers * 1d / (liveServers + deadServers);
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.REGIONSERVER_ROLE, liveRatio, site, timestamp));
             return result;
-        } catch (IOException e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
             if (admin != null) {
@@ -114,6 +113,16 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
             }
         }
         return null;
+    }
+
+    private HBaseServiceTopologyAPIEntity parseServer(ServerName serverName, ServerLoad serverLoad, String role, String status, long timestamp) {
+        if (serverName == null) {
+            return null;
+        }
+        HBaseServiceTopologyAPIEntity entity = createEntity(role, serverName.getHostname(), timestamp);
+        parseServerLoad(entity, serverLoad);
+        entity.setStatus(status);
+        return entity;
     }
 
     private void parseServerLoad(HBaseServiceTopologyAPIEntity entity, ServerLoad load) {

@@ -23,7 +23,7 @@ import backtype.storm.tuple.Values;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyCheckMessageId;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.TopologyEntityParserResult;
+import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class MRTopologyCrawler implements TopologyCrawler {
     public void extract() {
         long updateTimestamp = System.currentTimeMillis();
         TopologyEntityParserResult result = parser.parse(updateTimestamp);
-        if (result == null) {
+        if (result == null || result.getMasterNodes().isEmpty()) {
             LOG.warn("No data fetched");
             return;
         }

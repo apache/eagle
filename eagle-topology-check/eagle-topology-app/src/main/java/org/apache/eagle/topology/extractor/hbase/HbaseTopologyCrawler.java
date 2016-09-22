@@ -23,10 +23,12 @@ import backtype.storm.tuple.Values;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyCheckMessageId;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.TopologyEntityParserResult;
+import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class HbaseTopologyCrawler implements TopologyCrawler {
 
@@ -43,8 +45,14 @@ public class HbaseTopologyCrawler implements TopologyCrawler {
     @Override
     public void extract() {
         long updateTimestamp = System.currentTimeMillis();
-        TopologyEntityParserResult result = parser.parse(updateTimestamp);
-        if (result == null) {
+        TopologyEntityParserResult result = null;
+        try {
+            result = parser.parse(updateTimestamp);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        if (result == null || result.getMasterNodes().isEmpty()) {
             LOG.warn("No data fetched");
             return;
         }

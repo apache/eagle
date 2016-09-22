@@ -43,6 +43,7 @@ public class TopologyConstants {
     public static final String JOURNAL_NODE_ROLE = "journalnode";
     public static final String RESOURCE_MANAGER_ROLE = "resourcemanager";
     public static final String NODE_MANAGER_ROLE = "nodemanager";
+    public static final String HISTORY_SERVER_ROLE = "historyserver";
     public static final String REGIONSERVER_ROLE = "regionserver";
     public static final String HMASTER_ROLE = "hmaster";
 
@@ -74,7 +75,8 @@ public class TopologyConstants {
     public static final String HMASTER_STANDBY_STATUS = "standby";
 
     // metrics
-    public static final String METRIC_NAME_FORMAT = "hadoop.%s.liveRatio";
+    public static final String METRIC_LIVE_RATIO_NAME_FORMAT = "hadoop.%s.live.ratio";
+    public static final String METRIC_LIVE_COUNT_NAME_FORMAT = "hadoop.%s.live.count";
 
     // stream fields
     // field constants

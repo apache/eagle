@@ -77,16 +77,14 @@ public class TopologyCheckAppConfig implements Serializable {
             hBaseConfig.hbaseMasterPrincipal = config.getString("dataSourceConfig.hbase.kerberos.master.principal");
             hBaseConfig.zkQuorum = config.getString("dataSourceConfig.hbase.zkQuorum");
             hBaseConfig.zkRoot = config.getString("dataSourceConfig.hbase.zkZnodeParent");
-            hBaseConfig.zkClientPort = HBASE_ZOOKEEPER_CLIENT_PORT;
-            if (config.hasPath("dataSourceConfig.hbase.zkPropertyClientPort")) {
-                hBaseConfig.zkClientPort = config.getString("dataSourceConfig.hbase.zkPropertyClientPort");
-            }
+            hBaseConfig.zkClientPort = getOptionalConfig("dataSourceConfig.hbase.zkPropertyClientPort", HBASE_ZOOKEEPER_CLIENT_PORT);
         }
 
         if (config.hasPath("dataSourceConfig.mr")) {
             topologyTypes.add(TopologyConstants.TopologyType.MR);
             mrConfig = new MRConfig();
             mrConfig.rmUrls =  config.getString("dataSourceConfig.mr.rmUrl").split(",\\s*");
+            mrConfig.historyServerUrl = getOptionalConfig("dataSourceConfig.mr.historyServerUrl", null);
         }
 
         if (config.hasPath("dataSourceConfig.hdfs")) {
@@ -116,9 +114,18 @@ public class TopologyCheckAppConfig implements Serializable {
 
     public static class MRConfig implements Serializable {
         public String [] rmUrls;
+        public String historyServerUrl;
     }
 
     public static class HdfsConfig implements Serializable {
         public String [] namenodeUrls;
+    }
+
+    private String getOptionalConfig(String key, String defaultValue) {
+        if (this.config.hasPath(key)) {
+            return config.getString(key);
+        } else {
+            return defaultValue;
+        }
     }
 }

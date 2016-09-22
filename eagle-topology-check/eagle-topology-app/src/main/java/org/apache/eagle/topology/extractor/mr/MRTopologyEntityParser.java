@@ -23,7 +23,7 @@ import org.apache.eagle.app.utils.PathResolverHelper;
 import org.apache.eagle.app.utils.connection.InputStreamUtils;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.TopologyEntityParserResult;
+import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
 import org.apache.eagle.topology.utils.EntityBuilderHelper;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +46,11 @@ import static org.apache.eagle.topology.TopologyConstants.*;
 public class MRTopologyEntityParser implements TopologyEntityParser {
 
     private String [] rmUrls;
+    private String historyServerUrl;
     private String site;
 
-    // class members
     private static final String YARN_NODES_URL = "/ws/v1/cluster/nodes?anonymous=true";
+    private static final String YARN_HISTORY_SERVER_URL = "/ws/v1/history/info";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MRTopologyEntityParser.class);
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
@@ -61,6 +62,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
     public MRTopologyEntityParser(String site, TopologyCheckAppConfig.MRConfig config) {
         this.site = site;
         this.rmUrls = config.rmUrls;
+        this.historyServerUrl = config.historyServerUrl;
     }
 
     @Override
@@ -75,26 +77,55 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
 
     @Override
     public TopologyEntityParserResult parse(long timestamp) {
+        final TopologyEntityParserResult result = new TopologyEntityParserResult();
+        result.setVersion(TopologyConstants.HadoopVersion.V2);
+
         for (String url : rmUrls) {
             try {
-                return doParse(PathResolverHelper.buildUrlPath(url, YARN_NODES_URL), timestamp);
+                doParse(PathResolverHelper.buildUrlPath(url, YARN_NODES_URL), timestamp, result);
             } catch (ServiceNotResponseException ex) {
+                LOGGER.warn("Catch a ServiceNotResponseException with url: {}", url);
                 // reSelect url
             }
         }
-        return null;
+        if (historyServerUrl == null || historyServerUrl.isEmpty()) {
+            return result;
+        }
+        String hsUrl = PathResolverHelper.buildUrlPath(historyServerUrl, YARN_HISTORY_SERVER_URL);
+        double liveCount = 1;
+        try {
+            InputStream is = getInputStream(hsUrl, AppConstants.CompressionType.NONE);
+            if (is == null) {
+                return result;
+            }
+        } catch (ServiceNotResponseException e) {
+            //e.printStackTrace();
+            liveCount = 0;
+        }
+        result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.HISTORY_SERVER_ROLE, liveCount, site, timestamp));
+        return result;
     }
 
-    private TopologyEntityParserResult doParse(String url, long timestamp) throws ServiceNotResponseException {
-        final TopologyEntityParserResult result = new TopologyEntityParserResult();
-        result.setVersion(TopologyConstants.HadoopVersion.V2);
-        result.getNodes().put(TopologyConstants.RESOURCE_MANAGER_ROLE, new ArrayList<>());
-        result.getNodes().put(TopologyConstants.NODE_MANAGER_ROLE, new ArrayList<>());
+    private InputStream getInputStream(String url, AppConstants.CompressionType type) throws ServiceNotResponseException {
+        InputStream is = null;
+        try {
+            is = InputStreamUtils.getInputStream(url, null, type);
+        } catch (ConnectException e) {
+            throw new ServiceNotResponseException(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return is;
+    }
+
+    private void doParse(String url, long timestamp, TopologyEntityParserResult result) throws ServiceNotResponseException {
+
         InputStream is = null;
         try {
             LOGGER.info("Going to query URL: " + url);
             is = InputStreamUtils.getInputStream(url, null, AppConstants.CompressionType.NONE);
-
             YarnNodeInfoWrapper nodeWrapper = OBJ_MAPPER.readValue(is, YarnNodeInfoWrapper.class);
             if (nodeWrapper.getNodes() == null || nodeWrapper.getNodes().getNode() == null) {
                 throw new ServiceNotResponseException("Invalid result of URL: " + url);
@@ -120,18 +151,20 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                         ++unhealthyNodeCount;
                     }
                 }
-                result.getNodes().get(TopologyConstants.NODE_MANAGER_ROLE).add(nodeManagerEntity);
+                result.getSlaveNodes().add(nodeManagerEntity);
             }
             LOGGER.info("Running NMs: " + runningNodeCount + ", lost NMs: " + lostNodeCount + ", unhealthy NMs: " + unhealthyNodeCount);
             final MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE, extractMasterHost(url), null, timestamp);
             resourceManagerEntity.setStatus(TopologyConstants.RESOURCE_MANAGER_ACTIVE_STATUS);
-            result.getNodes().get(TopologyConstants.NODE_MANAGER_ROLE).add(resourceManagerEntity);
+            result.getMasterNodes().add(resourceManagerEntity);
             double value = runningNodeCount * 1d / list.size();
             result.getMetrics().add(EntityBuilderHelper.generateMetric(TopologyConstants.NODE_MANAGER_ROLE, value, site, timestamp));
-            return result;
-        } catch (Exception e) {
-            //e.printStackTrace();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             throw new ServiceNotResponseException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             if (is != null) {
                 try {

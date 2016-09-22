@@ -16,20 +16,36 @@
  *
  */
 
-package org.apache.eagle.topology;
+package org.apache.eagle.topology.extractor;
 
 import org.apache.eagle.log.entity.GenericMetricEntity;
+import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TopologyEntityParserResult {
     private TopologyConstants.HadoopVersion version;
-    private Map<String, List<TopologyBaseAPIEntity>> nodes = new HashMap<>();
+    private List<TopologyBaseAPIEntity> masterNodes = new ArrayList<>();
+    private List<TopologyBaseAPIEntity> slaveNodes = new ArrayList<>();
     private List<GenericMetricEntity> metrics = new ArrayList<>();
+
+    public List<TopologyBaseAPIEntity> getSlaveNodes() {
+        return slaveNodes;
+    }
+
+    public void setSlaveNodes(List<TopologyBaseAPIEntity> slaveNodes) {
+        this.slaveNodes = slaveNodes;
+    }
+
+    public List<TopologyBaseAPIEntity> getMasterNodes() {
+        return masterNodes;
+    }
+
+    public void setMasterNodes(List<TopologyBaseAPIEntity> masterNodes) {
+        this.masterNodes = masterNodes;
+    }
 
     public List<GenericMetricEntity> getMetrics() {
         return metrics;
@@ -37,13 +53,6 @@ public class TopologyEntityParserResult {
 
     public void setMetrics(List<GenericMetricEntity> metrics) {
         this.metrics = metrics;
-    }
-
-    public void setNodes(Map<String, List<TopologyBaseAPIEntity>> nodes) {
-        this.nodes = nodes;
-    }
-    public Map<String, List<TopologyBaseAPIEntity>> getNodes() {
-        return nodes;
     }
 
     public TopologyConstants.HadoopVersion getVersion() {

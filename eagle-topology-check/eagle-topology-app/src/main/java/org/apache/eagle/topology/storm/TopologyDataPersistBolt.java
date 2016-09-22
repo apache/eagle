@@ -31,7 +31,7 @@ import org.apache.eagle.service.client.IEagleServiceClient;
 import org.apache.eagle.service.client.impl.EagleServiceClientImpl;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.TopologyEntityParserResult;
+import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,13 +67,9 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
         Set<String> availableHostnames = new HashSet<String>();
         List<TopologyBaseAPIEntity> entitiesForDeletion = new ArrayList<>();
         List<TopologyBaseAPIEntity> entitiesToWrite = new ArrayList<>();
-        for (Map.Entry<String, List<TopologyBaseAPIEntity>> entry : result.getNodes().entrySet()) {
-            List<TopologyBaseAPIEntity> entities = entry.getValue();
-            for (TopologyBaseAPIEntity entity : entities) {
-                availableHostnames.add(generateKey(entity));
-                entitiesToWrite.add(entity);
-            }
-        }
+
+        filterEntitiesToWrite(entitiesToWrite, availableHostnames, result.getMasterNodes());
+        filterEntitiesToWrite(entitiesToWrite, availableHostnames, result.getSlaveNodes());
 
         String query = String.format("%s[@site=\"%s\"]{*}", serviceName, this.config.dataExtractorConfig.site);
         try {
@@ -88,11 +84,18 @@ public class TopologyDataPersistBolt extends BaseRichBolt {
             deleteEntities(entitiesForDeletion, serviceName);
             writeEntities(entitiesToWrite, serviceName);
             writeEntities(result.getMetrics(), serviceName);
-        } catch (EagleServiceClientException e) {
+            this.collector.ack(input);
+        } catch (Exception e) {
             e.printStackTrace();
             this.collector.fail(input);
         }
-        this.collector.ack(input);
+    }
+
+    private void filterEntitiesToWrite(List<TopologyBaseAPIEntity> entitiesToWrite, Set<String> availableHostnames, List<TopologyBaseAPIEntity> entities) {
+        for (TopologyBaseAPIEntity entity : entities) {
+            availableHostnames.add(generateKey(entity));
+            entitiesToWrite.add(entity);
+        }
     }
 
     @Override

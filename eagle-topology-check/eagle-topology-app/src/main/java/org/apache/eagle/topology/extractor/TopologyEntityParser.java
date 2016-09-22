@@ -19,14 +19,15 @@
 package org.apache.eagle.topology.extractor;
 
 import org.apache.eagle.topology.TopologyConstants;
-import org.apache.eagle.topology.TopologyEntityParserResult;
+
+import java.io.IOException;
 
 public interface TopologyEntityParser {
     /**
      * Parse hadoop topology and return the topology entity results
      * @return the topology entity result
      */
-    public TopologyEntityParserResult parse(long timestamp) ;
+    public TopologyEntityParserResult parse(long timestamp) throws IOException;
 
     /**
      * Get topology type for the parser
