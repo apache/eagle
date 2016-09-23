@@ -249,7 +249,7 @@
 					return -1;
 				}
 				return 1;
-			}
+			};
 		} else {
 			sortFunc = function (obj1, obj2) {
 				var val1 = common.getValueByPath(obj1, path);
@@ -272,7 +272,7 @@
 					return 1;
 				}
 				return -1;
-			}
+			};
 		}
 
 		return list.sort(sortFunc);
