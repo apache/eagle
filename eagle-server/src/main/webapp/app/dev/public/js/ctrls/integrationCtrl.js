@@ -153,7 +153,7 @@
 					siteId: $scope.site.siteId,
 					appType: application.type,
 					configuration: entity
-				})._then(function () {
+				})._then(function (res) {
 					refreshApplications();
 					closeFunc();
 				}, function (res) {

@@ -176,7 +176,7 @@ var app = {};
 				$stateProvider.state(route.state, config);
 			});
 
-			$httpProvider.interceptors.push(function() {
+			$httpProvider.interceptors.push(function($q) {
 				function eagleRequestHandle(res) {
 					var data = res.data || {
 						exception: "",
@@ -205,7 +205,9 @@ var app = {};
 
 				return {
 					response: eagleRequestHandle,
-					responseError: eagleRequestHandle
+					responseError: function(res) {
+						return $q.reject(eagleRequestHandle(res));
+					}
 				};
 			});
 		});
