@@ -24,7 +24,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Queue {
-    private String type;
     private double capacity;
     private double usedCapacity;
     private double maxCapacity;
@@ -119,15 +118,6 @@ public class Queue {
 
     public void setUserLimitFactor(int userLimitFactor) {
         this.userLimitFactor = userLimitFactor;
-    }
-
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public ResourcesUsed getResourcesUsed() {
