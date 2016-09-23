@@ -80,9 +80,9 @@
 	// ======================================================================================
 	function connectPolicyEditController(entity, args) {
 		var newArgs = [entity];
-		args = Array.prototype.push.apply(newArgs, args);
+		Array.prototype.push.apply(newArgs, args);
 		/* jshint validthis: true */
-		policyEditController.apply(this, args);
+		policyEditController.apply(this, newArgs);
 	}
 	function policyEditController(policy, $scope, $wrapState, PageConfig, Entity) {
 		$scope.policy = policy;

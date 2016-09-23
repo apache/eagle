@@ -176,20 +176,6 @@ var app = {};
 				$stateProvider.state(route.state, config);
 			});
 
-			/*$httpProvider.responseInterceptors.push(function () {
-				return function (promise) {
-					function success(response) {
-						console.log(">>>", response);
-						return response;
-					}
-
-					function error(response) {
-						return response;
-					}
-
-					return promise.then(success, error);
-				}
-			});*/
 			$httpProvider.interceptors.push(function() {
 				function eagleRequestHandle(res) {
 					var data = res.data || {

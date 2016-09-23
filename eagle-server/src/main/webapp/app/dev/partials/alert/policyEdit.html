@@ -17,92 +17,13 @@
   -->
 
 <div class="box-body">
-	<ul class="timeline">
-		<!-- Base Info -->
-		<li class="time-label">
-			<span class="bg-blue">#1. Basic Information</span>
+	<ul class="stepGuide">
+		<li>
+			<span class="icon bg-green">1</span>
+			<span class="title">This is the title!!!</span>
 		</li>
 		<li>
-			<span class="fa fa-file-text bg-aqua"></span>
-			<div class="timeline-item">
-				<div class="timeline-body">
-					<div class="form-group">
-						<label>Policy Name</label>
-						<input type="text" class="form-control" ng-model="policy.name" />
-					</div>
-					<div class="form-group">
-						<label>Severity</label>
-						<select class="form-control" ng-model="policy.severity">
-							<option>WARNING</option>
-							<option>CRITICAL</option>
-							<option>DANGER</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label>Description</label>
-						<textarea class="form-control" ng-model="policy.description" rows="3"></textarea>
-					</div>
-				</div>
-			</div>
-		</li>
-
-		<!-- Alert Stream -->
-		<li class="time-label">
-			<span class="bg-blue">#2. Alert Stream</span>
-		</li>
-		<li>
-			<span class="fa fa-rocket bg-aqua"></span>
-			<div class="timeline-item">
-				<div class="timeline-body">
-					<div class="form-group">
-						<label>App Integration</label>
-						<select class="form-control"></select>
-					</div>
-					<div class="form-group">
-						<label>Alert Stream</label>
-						<select class="form-control"></select>
-					</div>
-				</div>
-			</div>
-		</li>
-
-		<!-- Streaming Logic -->
-		<li class="time-label">
-			<span class="bg-blue">#3. Streaming Logic</span>
-		</li>
-		<li>
-			<span class="fa fa-trophy bg-aqua"></span>
-			<div class="timeline-item">
-				<div class="timeline-body">
-					<div class="form-group">
-						<label>Policy Type</label>
-						<select class="form-control"></select>
-					</div>
-					<div class="form-group">
-						<label>Policy Logic</label>
-						<textarea class="form-control" rows="5"></textarea>
-					</div>
-				</div>
-			</div>
-		</li>
-
-		<!-- Publication Configuration -->
-		<li class="time-label">
-			<span class="bg-blue">#4. Publication Configuration</span>
-		</li>
-		<li>
-			<span class="fa fa-envelope bg-aqua"></span>
-			<div class="timeline-item">
-				<div class="timeline-body">
-					<div class="form-group">
-						<label>Publication Type</label>
-						<select class="form-control">
-							<option>NOTIFICATION</option>
-						</select>
-					</div>
-					<a>+ New Publication</a>
-				</div>
-			</div>
+			<span class="icon">2</span>
 		</li>
 	</ul>
 </div>

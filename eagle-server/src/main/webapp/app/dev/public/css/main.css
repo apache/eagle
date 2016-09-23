@@ -135,6 +135,49 @@ table.table.table-sm td {
 }
 
 /* ========================================================================
+ * =                              Step Guide                              =
+ * ======================================================================== */
+ul.stepGuide {
+	padding: 0;
+	position: relative;
+	display: inline-block;
+}
+ul.stepGuide:before {
+	display: block;
+	height: 6px;
+	background: #f4f4f4;
+	content: "";
+	position: absolute;
+	top: 12px;
+	left: 5px;
+	right: 5px;
+}
+
+ul.stepGuide li {
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	text-align: center;
+}
+ul.stepGuide li:not(:first-child) {
+	margin-left: 15px;
+}
+
+ul.stepGuide li > .icon {
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	background: #f4f4f4;
+	border-radius: 100%;
+}
+
+ul.stepGuide li > .title {
+	display: block;
+}
+
+/* ========================================================================
  * =                                 Box                                  =
  * ======================================================================== */
 .box .box-title .label {
