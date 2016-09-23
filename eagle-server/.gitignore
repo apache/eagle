@@ -1,5 +1,6 @@
 /bin/
 /target/
+/src/main/webapp/app/dev/apps
 node_modules
 ui
 tmp
