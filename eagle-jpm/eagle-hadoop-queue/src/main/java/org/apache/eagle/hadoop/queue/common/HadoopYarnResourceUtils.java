@@ -18,17 +18,23 @@
 
 package org.apache.eagle.hadoop.queue.common;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.connection.InputStreamUtils;
 import com.typesafe.config.Config;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 public class HadoopYarnResourceUtils {
 
     private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
+
+    private static final String YARN4785_ORI = "[\"capacitySchedulerLeafQueueInfo\"]";
+    private static final String YARN4785_NOW = "\"capacitySchedulerLeafQueueInfo\"";
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -39,6 +45,7 @@ public class HadoopYarnResourceUtils {
         Object o = null;
         try {
             is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.GZIP);
+            is = workaroundYARN4785(is);
             o = OBJ_MAPPER.readValue(is, clazz);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Fetch resource %s failed", urlString), e);
@@ -56,5 +63,23 @@ public class HadoopYarnResourceUtils {
         } else {
             return defaultValue;
         }
+    }
+
+    /**
+     * https://issues.apache.org/jira/browse/YARN-4785
+     * @param in
+     * @return
+     * @throws Exception
+     */
+    private static InputStream workaroundYARN4785(InputStream in) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int i;
+        while ((i = in.read()) != -1) {
+            baos.write(i);
+        }
+        String str = baos.toString();
+        str = StringUtils.replace(str, YARN4785_ORI, YARN4785_NOW);
+        in = new ByteArrayInputStream(str.getBytes());
+        return in;
     }
 }
