@@ -25,6 +25,8 @@ import org.apache.eagle.topology.extractor.hbase.HbaseTopologyCrawler;
 
 import org.apache.eagle.topology.extractor.hdfs.HdfsTopologyCrawler;
 import org.apache.eagle.topology.extractor.mr.MRTopologyCrawler;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
+import org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Constructor;
@@ -43,7 +45,7 @@ public class TopologyExtractorFactory {
     private static void registerTopologyExtractor(String topologyType, Class<? extends TopologyCrawler> clazz) {
         Constructor<? extends TopologyCrawler> constructor = null;
         try {
-            constructor = clazz.getConstructor(TopologyCheckAppConfig.class, SpoutOutputCollector.class);
+            constructor = clazz.getConstructor(TopologyCheckAppConfig.class, TopologyRackResolver.class, SpoutOutputCollector.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -52,11 +54,11 @@ public class TopologyExtractorFactory {
         }
     }
 
-    public static TopologyCrawler create(TopologyConstants.TopologyType topologyType, TopologyCheckAppConfig config, SpoutOutputCollector collector) {
+    public static TopologyCrawler create(TopologyConstants.TopologyType topologyType, TopologyCheckAppConfig config, TopologyRackResolver rackResolver, SpoutOutputCollector collector) {
         if (extractorMap.containsKey(topologyType.toString().toUpperCase())) {
             Constructor<? extends TopologyCrawler> constructor = extractorMap.get(topologyType.name());
             try {
-                return constructor.newInstance(config, collector);
+                return constructor.newInstance(config, rackResolver, collector);
             } catch (Exception e) {
                 e.printStackTrace();
             }

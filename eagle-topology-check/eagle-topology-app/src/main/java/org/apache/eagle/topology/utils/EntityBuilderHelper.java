@@ -20,27 +20,17 @@ package org.apache.eagle.topology.utils;
 
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.TopologyConstants;
+import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
+import org.apache.eagle.topology.entity.TopologyBaseAPIEntity;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EntityBuilderHelper {
+import static org.apache.eagle.topology.TopologyConstants.*;
 
-    public static String resolveRackByHost(String hostname) {
-        if (hostname == null) {
-            return null;
-        }
-        String result = null;
-        try {
-            InetAddress address = InetAddress.getByName(hostname);
-            result = "rack" + (int)(address.getAddress()[2] & 0xff);
-        } catch (UnknownHostException e) {
-            //e.printStackTrace();
-        }
-        return result;
-    }
+public class EntityBuilderHelper {
 
     public static String resolveHostByIp(String ip) {
         InetAddress addr = null;

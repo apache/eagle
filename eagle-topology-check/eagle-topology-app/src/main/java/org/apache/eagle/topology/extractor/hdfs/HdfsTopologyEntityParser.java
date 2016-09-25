@@ -24,6 +24,7 @@ import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.entity.HdfsServiceTopologyAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.utils.*;
 
 import org.json.JSONArray;
@@ -48,6 +49,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(HdfsTopologyEntityParser.class);
     private String [] namenodeUrls;
     private String site;
+    private TopologyRackResolver rackResolver;
 
     private static final String JMX_URL = "/jmx?anonymous=true";
     private static final String JMX_FS_NAME_SYSTEM_BEAN_NAME = "Hadoop:service=NameNode,name=FSNamesystem";
@@ -77,9 +79,10 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
     private static final String STATUS_PATTERN = "([\\d\\.]+):\\d+\\s+\\([\\D]+(\\d+)\\)";
     private static final String QJM_PATTERN = "([\\d\\.]+):\\d+";
 
-    public HdfsTopologyEntityParser(String site, TopologyCheckAppConfig.HdfsConfig hdfsConfig) {
+    public HdfsTopologyEntityParser(String site, TopologyCheckAppConfig.HdfsConfig hdfsConfig, TopologyRackResolver rackResolver) {
         this.namenodeUrls = hdfsConfig.namenodeUrls;
         this.site = site;
+        this.rackResolver = rackResolver;
     }
 
     @Override
@@ -252,7 +255,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         tags.put(SITE_TAG, site);
         tags.put(ROLE_TAG, roleType);
         tags.put(HOSTNAME_TAG, hostname);
-        String rack = EntityBuilderHelper.resolveRackByHost(hostname);
+        String rack = rackResolver.resolve(hostname);
         tags.put(RACK_TAG, rack);
         return entity;
     }

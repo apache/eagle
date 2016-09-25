@@ -19,6 +19,10 @@
 package org.apache.eagle.topology;
 
 import com.typesafe.config.Config;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
+import org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,6 +35,8 @@ public class TopologyCheckAppConfig implements Serializable {
 
     private static final int MAX_NUM_THREADS = 10;
     private static final String HBASE_ZOOKEEPER_CLIENT_PORT = "2181";
+
+    private static final Logger LOG = LoggerFactory.getLogger(TopologyCheckAppConfig.class);
 
     public DataExtractorConfig dataExtractorConfig;
     public HBaseConfig hBaseConfig;
@@ -59,7 +65,6 @@ public class TopologyCheckAppConfig implements Serializable {
         this.config = config;
 
         this.dataExtractorConfig.site = config.getString("dataExtractorConfig.site");
-        this.dataExtractorConfig.checkRetryTime = config.getLong("dataExtractorConfig.checkRetryTime");
         this.dataExtractorConfig.fetchDataIntervalInSecs = config.getLong("dataExtractorConfig.fetchDataIntervalInSecs");
         this.dataExtractorConfig.parseThreadPoolSize = MAX_NUM_THREADS;
         if (config.hasPath("dataExtractorConfig.parseThreadPoolSize")) {
@@ -67,7 +72,14 @@ public class TopologyCheckAppConfig implements Serializable {
         }
         this.dataExtractorConfig.numDataFetcherSpout = config.getInt("dataExtractorConfig.numDataFetcherSpout");
         this.dataExtractorConfig.numEntityPersistBolt = config.getInt("dataExtractorConfig.numEntityPersistBolt");
-
+        String resolveCls = config.getString("dataExtractorConfig.rackResolverCls");
+        try {
+            this.dataExtractorConfig.resolverCls = (Class<? extends TopologyRackResolver>) Class.forName(resolveCls);
+        } catch (ClassNotFoundException e) {
+            LOG.warn("{} is not found, will use DefaultTopologyRackResolver instead", resolveCls);
+            this.dataExtractorConfig.resolverCls = DefaultTopologyRackResolver.class;
+            //e.printStackTrace();
+        }
 
         if (config.hasPath("dataSourceConfig.hbase")) {
             topologyTypes.add(TopologyConstants.TopologyType.HBASE);
@@ -78,6 +90,7 @@ public class TopologyCheckAppConfig implements Serializable {
             hBaseConfig.zkQuorum = config.getString("dataSourceConfig.hbase.zkQuorum");
             hBaseConfig.zkRoot = config.getString("dataSourceConfig.hbase.zkZnodeParent");
             hBaseConfig.zkClientPort = getOptionalConfig("dataSourceConfig.hbase.zkPropertyClientPort", HBASE_ZOOKEEPER_CLIENT_PORT);
+            hBaseConfig.zkRetryTimes = getOptionalConfig("dataSourceConfig.hbase.zkRetryTimes", "5");
         }
 
         if (config.hasPath("dataSourceConfig.mr")) {
@@ -100,13 +113,14 @@ public class TopologyCheckAppConfig implements Serializable {
         public int numEntityPersistBolt;
         public long fetchDataIntervalInSecs;
         public int parseThreadPoolSize;
-        public long checkRetryTime;
+        public Class<? extends TopologyRackResolver> resolverCls;
     }
 
     public static class HBaseConfig implements Serializable {
         public String zkQuorum;
         public String zkRoot;
         public String zkClientPort;
+        public String zkRetryTimes;
         public String hbaseMasterPrincipal;
         public String eaglePrincipal;
         public String eagleKeytab;

@@ -21,6 +21,8 @@ package org.apache.eagle.topology;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.topology.extractor.hdfs.HdfsTopologyCrawler;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
+import org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -31,7 +33,8 @@ public class TestHdfsTopologyCrawler {
         Config config = ConfigFactory.load();
 
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
-        HdfsTopologyCrawler crawler = new HdfsTopologyCrawler(topologyCheckAppConfig, null);
+        TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
+        HdfsTopologyCrawler crawler = new HdfsTopologyCrawler(topologyCheckAppConfig, rackResolver, null);
         crawler.extract();
     }
 }

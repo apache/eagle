@@ -24,6 +24,7 @@ import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.entity.HBaseServiceTopologyAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.utils.EntityBuilderHelper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.ClusterStatus;
@@ -43,14 +44,16 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
     private Configuration hBaseConfiguration;
     private String site;
     private Boolean kerberosEnable = false;
+    private TopologyRackResolver rackResolver;
 
-    public  HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig) {
+    public  HbaseTopologyEntityParser(String site, TopologyCheckAppConfig.HBaseConfig hBaseConfig, TopologyRackResolver resolver) {
         this.site = site;
+        this.rackResolver = resolver;
         this.hBaseConfiguration = HBaseConfiguration.create();
         this.hBaseConfiguration.set("hbase.zookeeper.quorum", hBaseConfig.zkQuorum);
         this.hBaseConfiguration.set("hbase.zookeeper.property.clientPort", hBaseConfig.zkClientPort);
         this.hBaseConfiguration.set("zookeeper.znode.parent", hBaseConfig.zkRoot);
-        this.hBaseConfiguration.set("hbase.client.retries.number", "10");
+        this.hBaseConfiguration.set("hbase.client.retries.number", hBaseConfig.zkRetryTimes);
         // kerberos authentication
         this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_PRINCIPAL_KEY, hBaseConfig.eaglePrincipal);
         this.hBaseConfiguration.set(HadoopSecurityUtil.EAGLE_KEYTAB_FILE_KEY, hBaseConfig.eagleKeytab);
@@ -142,7 +145,7 @@ public class HbaseTopologyEntityParser implements TopologyEntityParser {
         tags.put(SITE_TAG, site);
         tags.put(ROLE_TAG, roleType);
         tags.put(HOSTNAME_TAG, hostname);
-        String rack = EntityBuilderHelper.resolveRackByHost(hostname);
+        String rack = rackResolver.resolve(hostname);
         tags.put(RACK_TAG, rack);
         entity.setLastUpdateTime(timestamp);
         entity.setTimestamp(timestamp);

@@ -25,6 +25,7 @@ import org.apache.eagle.topology.TopologyCheckMessageId;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +36,8 @@ public class MRTopologyCrawler implements TopologyCrawler {
     private MRTopologyEntityParser parser;
     private SpoutOutputCollector outputCollector;
 
-    public MRTopologyCrawler(TopologyCheckAppConfig config, SpoutOutputCollector collector) {
-        this.parser = new MRTopologyEntityParser(config.dataExtractorConfig.site, config.mrConfig);
+    public MRTopologyCrawler(TopologyCheckAppConfig config, TopologyRackResolver rackResolver, SpoutOutputCollector collector) {
+        this.parser = new MRTopologyEntityParser(config.dataExtractorConfig.site, config.mrConfig, rackResolver);
         this.outputCollector = collector;
     }
 

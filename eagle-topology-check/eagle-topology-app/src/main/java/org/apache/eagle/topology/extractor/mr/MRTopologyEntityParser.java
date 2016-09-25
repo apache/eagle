@@ -26,6 +26,7 @@ import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
 import org.apache.eagle.topology.extractor.TopologyEntityParser;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.apache.eagle.topology.utils.EntityBuilderHelper;
 import org.apache.eagle.topology.utils.ServiceNotResponseException;
 import org.codehaus.jackson.JsonParser;
@@ -48,6 +49,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
     private String [] rmUrls;
     private String historyServerUrl;
     private String site;
+    private TopologyRackResolver rackResolver;
 
     private static final String YARN_NODES_URL = "/ws/v1/cluster/nodes?anonymous=true";
     private static final String YARN_HISTORY_SERVER_URL = "/ws/v1/history/info";
@@ -59,10 +61,11 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public MRTopologyEntityParser(String site, TopologyCheckAppConfig.MRConfig config) {
+    public MRTopologyEntityParser(String site, TopologyCheckAppConfig.MRConfig config, TopologyRackResolver rackResolver) {
         this.site = site;
         this.rmUrls = config.rmUrls;
         this.historyServerUrl = config.historyServerUrl;
+        this.rackResolver = rackResolver;
     }
 
     @Override
@@ -139,7 +142,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
             int unhealthyNodeCount = 0;
             final List<YarnNodeInfo> list = nodeWrapper.getNodes().getNode();
             for (YarnNodeInfo info : list) {
-                final MRServiceTopologyAPIEntity nodeManagerEntity = createEntity(NODE_MANAGER_ROLE, info.getNodeHostName(), extractRack(info), timestamp);
+                final MRServiceTopologyAPIEntity nodeManagerEntity = createEntity(NODE_MANAGER_ROLE, info.getNodeHostName(), timestamp);
                 if (info.getHealthReport() != null && (!info.getHealthReport().isEmpty())) {
                     nodeManagerEntity.setHealthReport(info.getHealthReport());
                 }
@@ -158,7 +161,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
                 result.getSlaveNodes().add(nodeManagerEntity);
             }
             LOGGER.info("Running NMs: " + runningNodeCount + ", lost NMs: " + lostNodeCount + ", unhealthy NMs: " + unhealthyNodeCount);
-            final MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE, extractMasterHost(url), null, timestamp);
+            final MRServiceTopologyAPIEntity resourceManagerEntity = createEntity(TopologyConstants.RESOURCE_MANAGER_ROLE, extractMasterHost(url), timestamp);
             resourceManagerEntity.setStatus(TopologyConstants.RESOURCE_MANAGER_ACTIVE_STATUS);
             result.getMasterNodes().add(resourceManagerEntity);
             double value = runningNodeCount * 1d / list.size();
@@ -198,7 +201,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         return value;
     }
 
-    private MRServiceTopologyAPIEntity createEntity(String roleType, String hostname, String rack, long updateTime) {
+    private MRServiceTopologyAPIEntity createEntity(String roleType, String hostname, long updateTime) {
         MRServiceTopologyAPIEntity entity = new MRServiceTopologyAPIEntity();
         entity.setLastUpdateTime(updateTime);
         Map<String, String> tags = new HashMap<String, String>();
@@ -206,9 +209,7 @@ public class MRTopologyEntityParser implements TopologyEntityParser {
         tags.put(SITE_TAG, site);
         tags.put(ROLE_TAG, roleType);
         tags.put(HOSTNAME_TAG, hostname);
-        if (rack == null) {
-            rack = EntityBuilderHelper.resolveRackByHost(hostname);
-        }
+        String rack = rackResolver.resolve(hostname);
         tags.put(RACK_TAG, rack);
         return entity;
     }

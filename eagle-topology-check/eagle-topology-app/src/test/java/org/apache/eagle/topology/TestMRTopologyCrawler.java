@@ -21,6 +21,8 @@ package org.apache.eagle.topology;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.topology.extractor.mr.MRTopologyCrawler;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
+import org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -31,7 +33,8 @@ public class TestMRTopologyCrawler {
         Config config = ConfigFactory.load();
 
         TopologyCheckAppConfig topologyCheckAppConfig = TopologyCheckAppConfig.getInstance(config);
-        MRTopologyCrawler crawler = new MRTopologyCrawler(topologyCheckAppConfig, null);
+        TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
+        MRTopologyCrawler crawler = new MRTopologyCrawler(topologyCheckAppConfig, rackResolver, null);
         crawler.extract();
     }
 }

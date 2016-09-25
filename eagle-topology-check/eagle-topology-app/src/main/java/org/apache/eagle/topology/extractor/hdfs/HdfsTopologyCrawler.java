@@ -25,6 +25,7 @@ import org.apache.eagle.topology.TopologyCheckMessageId;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.extractor.TopologyEntityParserResult;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,8 @@ public class HdfsTopologyCrawler implements TopologyCrawler {
     private HdfsTopologyEntityParser parser;
     private SpoutOutputCollector collector;
 
-    public HdfsTopologyCrawler(TopologyCheckAppConfig config, SpoutOutputCollector collector) {
-        this.parser = new HdfsTopologyEntityParser(config.dataExtractorConfig.site, config.hdfsConfig);
+    public HdfsTopologyCrawler(TopologyCheckAppConfig config, TopologyRackResolver rackResolver, SpoutOutputCollector collector) {
+        this.parser = new HdfsTopologyEntityParser(config.dataExtractorConfig.site, config.hdfsConfig, rackResolver);
         this.collector = collector;
     }
 

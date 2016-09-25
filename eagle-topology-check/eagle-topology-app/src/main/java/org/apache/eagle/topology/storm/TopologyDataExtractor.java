@@ -22,6 +22,8 @@ import backtype.storm.spout.SpoutOutputCollector;
 import org.apache.eagle.topology.TopologyCheckAppConfig;
 import org.apache.eagle.topology.extractor.TopologyCrawler;
 import org.apache.eagle.topology.extractor.TopologyExtractorFactory;
+import org.apache.eagle.topology.resolver.TopologyRackResolver;
+import org.apache.eagle.topology.resolver.impl.DefaultTopologyRackResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,9 +71,19 @@ public class TopologyDataExtractor {
 
     private List<TopologyCrawler> getExtractors(SpoutOutputCollector collector) {
         List<TopologyCrawler> extractors = new ArrayList<>();
+        TopologyRackResolver rackResolver = new DefaultTopologyRackResolver();
+        if (config.dataExtractorConfig.resolverCls != null) {
+            try {
+                rackResolver = config.dataExtractorConfig.resolverCls.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         for (TopologyType type : config.topologyTypes) {
             try {
-                extractors.add(TopologyExtractorFactory.create(type, config, collector));
+                extractors.add(TopologyExtractorFactory.create(type, config, rackResolver, collector));
             } catch (Exception e) {
                 e.printStackTrace();
             }
