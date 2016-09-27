@@ -200,8 +200,16 @@ public class DedupCache {
         } else {
             DedupValue dedupValue = dedupValues.getLast();
             dedupValue.setCount(dedupValue.getCount() + 1);
-            LOG.info("Update count for dedup key {}, value {} and count {}", eventEniq,
+            String updateMsg = String.format(
+                "Update count for dedup key {}, value %s and count %s", eventEniq,
                 dedupValue.getStateFieldValue(), dedupValue.getCount());
+            if (dedupValue.getCount() > 0 && dedupValue.getCount() % 100 == 0) {
+                LOG.info(updateMsg);
+                DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
+                accessor.add(eventEniq, dedupValues);
+            } else if (LOG.isDebugEnabled()) {
+                LOG.debug(updateMsg);
+            }
             return dedupValue;
         }
     }

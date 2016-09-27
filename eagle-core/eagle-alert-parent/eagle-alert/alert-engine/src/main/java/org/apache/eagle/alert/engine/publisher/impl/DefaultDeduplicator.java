@@ -117,8 +117,8 @@ public class DefaultDeduplicator implements AlertDeduplicator {
             event.getPolicyId(), event.getCreatedTime(), customFieldValues), stateFiledValue);
         if (outputEvents != null && outputEvents.size() > 0) {
             return outputEvents;
-        } else if (LOG.isDebugEnabled()) {
-            LOG.debug("Alert event is skipped because it's duplicated: {}", event.toString());
+        } else if (LOG.isInfoEnabled()) {
+            LOG.info("Alert event is skipped because it's duplicated: {}", event.toString());
         }
         return null;
     }

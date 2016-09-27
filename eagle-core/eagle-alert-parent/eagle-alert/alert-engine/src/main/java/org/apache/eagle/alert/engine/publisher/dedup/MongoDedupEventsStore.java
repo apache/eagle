@@ -74,8 +74,12 @@ public class MongoDedupEventsStore implements DedupEventsStore {
     public MongoDedupEventsStore(Config config) {
         this.config = config;
         this.connection = this.config.getString("connection");
-        this.client = new MongoClient(new MongoClientURI(this.connection));
-        init();
+        try {
+            this.client = new MongoClient(new MongoClientURI(this.connection));
+            init();
+        } catch (Throwable t) {
+            LOG.error(String.format("initialize mongodb %s client failed", this.connection), t);
+        }
     }
 
     private void init() {
