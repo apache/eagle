@@ -28,6 +28,8 @@ public class DedupEventsStoreFactory {
 
     private static DedupEventsStore customizedStore;
 
+    private static MongoDedupEventsStore accessor;
+
     public static void customizeStore(DedupEventsStore store) {
         customizedStore = store;
     }
@@ -36,13 +38,13 @@ public class DedupEventsStoreFactory {
         if (customizedStore != null) {
             return customizedStore;
         }
-        DedupEventsStore accessor = null;
         switch (type) {
             case Mongo:
-                accessor = new MongoDedupEventsStore(config);
+                if (accessor == null) {
+                    accessor = new MongoDedupEventsStore(config);
+                }
                 break;
             case ElasticSearch:
-                break;
             default:
                 break;
         }

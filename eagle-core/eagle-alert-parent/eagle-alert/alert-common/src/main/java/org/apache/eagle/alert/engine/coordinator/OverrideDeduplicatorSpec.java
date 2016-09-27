@@ -19,7 +19,10 @@ package org.apache.eagle.alert.engine.coordinator;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.base.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OverrideDeduplicatorSpec implements Serializable {
@@ -43,6 +46,21 @@ public class OverrideDeduplicatorSpec implements Serializable {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof OverrideDeduplicatorSpec) {
+            OverrideDeduplicatorSpec spec = (OverrideDeduplicatorSpec) obj;
+            return Objects.equal(className, spec.getClassName())
+                && Objects.equal(properties, spec.getProperties());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(className).append(properties).build();
     }
 
 }
