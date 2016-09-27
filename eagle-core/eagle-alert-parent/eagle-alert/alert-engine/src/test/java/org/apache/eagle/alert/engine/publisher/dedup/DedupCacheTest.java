@@ -114,7 +114,7 @@ public class DedupCacheTest {
 		dedupCountColumn.setType(StreamColumn.Type.LONG);
 		
 		StreamColumn dedupFirstOccurrenceColumn = new StreamColumn();
-		dedupFirstOccurrenceColumn.setName("dedupFirstOccurrence");
+		dedupFirstOccurrenceColumn.setName(DedupCache.DEDUP_FIRST_OCCURRENCE);
 		dedupFirstOccurrenceColumn.setType(StreamColumn.Type.LONG);
 		
 		sd.setColumns(Arrays.asList(tsColumn, hostColumn, alertKeyColumn, stateColumn, dedupCountColumn, dedupFirstOccurrenceColumn));

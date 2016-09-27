@@ -21,7 +21,8 @@
 package org.apache.eagle.alert.engine.publisher.impl;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.storm.guava.base.Joiner;
+
+import com.google.common.base.Joiner;
 
 import java.util.HashMap;
 

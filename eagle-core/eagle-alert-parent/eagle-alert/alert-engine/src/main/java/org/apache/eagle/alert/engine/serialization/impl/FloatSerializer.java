@@ -22,14 +22,17 @@ import java.io.IOException;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class FloatSerializer implements Serializer<Float> {
+public class FloatSerializer implements Serializer<Object> {
     @Override
-    public void serialize(Float value, DataOutput dataOutput) throws IOException {
-        dataOutput.writeFloat(value);
+    public void serialize(Object value, DataOutput dataOutput) throws IOException {
+        if (value instanceof Number) {
+            value = ((Number)value).floatValue();
+        }
+        dataOutput.writeFloat((float)value);
     }
 
     @Override
-    public Float deserialize(DataInput dataInput) throws IOException {
+    public Object deserialize(DataInput dataInput) throws IOException {
         return dataInput.readFloat();
     }
 }

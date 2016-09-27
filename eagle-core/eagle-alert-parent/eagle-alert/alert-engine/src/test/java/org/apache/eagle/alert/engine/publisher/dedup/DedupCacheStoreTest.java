@@ -16,11 +16,8 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -31,8 +28,10 @@ import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class DedupCacheStoreTest extends MongoDependencyBaseTest {
 
@@ -109,7 +108,7 @@ public class DedupCacheStoreTest extends MongoDependencyBaseTest {
 		dedupCountColumn.setType(StreamColumn.Type.LONG);
 		
 		StreamColumn dedupFirstOccurrenceColumn = new StreamColumn();
-		dedupFirstOccurrenceColumn.setName("dedupFirstOccurrence");
+		dedupFirstOccurrenceColumn.setName(DedupCache.DEDUP_FIRST_OCCURRENCE);
 		dedupFirstOccurrenceColumn.setType(StreamColumn.Type.LONG);
 		
 		sd.setColumns(Arrays.asList(tsColumn, hostColumn, alertKeyColumn, stateColumn, dedupCountColumn, dedupFirstOccurrenceColumn));
