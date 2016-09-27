@@ -26,6 +26,8 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MRRunningJobApplication extends StormApplication {
@@ -34,7 +36,11 @@ public class MRRunningJobApplication extends StormApplication {
         //1. trigger init conf
         MRRunningJobConfig mrRunningJobConfig = MRRunningJobConfig.getInstance(config);
 
-        List<String> confKeyKeys = mrRunningJobConfig.getConfig().getStringList("MRConfigureKeys.jobConfigKey");
+        String[] confKeyPatternsSplit = mrRunningJobConfig.getConfig().getString("MRConfigureKeys.jobConfigKey").split(",");
+        List<String> confKeyKeys = new ArrayList<>(confKeyPatternsSplit.length);
+        for (String confKeyPattern : confKeyPatternsSplit) {
+            confKeyKeys.add(confKeyPattern.trim());
+        }
         confKeyKeys.add(Constants.JobConfiguration.CASCADING_JOB);
         confKeyKeys.add(Constants.JobConfiguration.HIVE_JOB);
         confKeyKeys.add(Constants.JobConfiguration.PIG_JOB);

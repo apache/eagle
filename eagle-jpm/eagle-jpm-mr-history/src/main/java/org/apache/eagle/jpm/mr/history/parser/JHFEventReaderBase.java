@@ -443,7 +443,8 @@ public abstract class JHFEventReaderBase extends JobEntityCreationPublisher impl
                 jobExecutionEntity.getFailedTasks().put(taskID,
                     new HashMap<String, String>() {
                         {
-                            put(entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()), entity.getError());
+                            put(entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()),
+                                entity.getTags().get(MRJobTagName.ERROR_CATEGORY.toString()));//decide later
                         }
                     }
                 );
