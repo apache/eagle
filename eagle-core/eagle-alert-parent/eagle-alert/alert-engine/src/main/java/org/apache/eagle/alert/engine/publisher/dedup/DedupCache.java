@@ -16,17 +16,9 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
+import com.typesafe.config.Config;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -35,9 +27,11 @@ import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.typesafe.config.Config;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class DedupCache {
 
@@ -46,8 +40,8 @@ public class DedupCache {
     private static final long CACHE_MAX_EXPIRE_TIME_IN_DAYS = 30;
     private static final long CACHE_MAX_EVENT_QUEUE_SIZE = 10;
 
-    private static final String DEDUP_COUNT = "dedupCount";
-    private static final String DEDUP_FIRST_OCCURRENCE = "dedupFirstOccurrence";
+    public static final String DEDUP_COUNT = "dedupCount";
+    public static final String DEDUP_FIRST_OCCURRENCE = "dedupFirstOccurrenceTime";
 
     private static final DedupEventsStoreType type = DedupEventsStoreType.Mongo;
 

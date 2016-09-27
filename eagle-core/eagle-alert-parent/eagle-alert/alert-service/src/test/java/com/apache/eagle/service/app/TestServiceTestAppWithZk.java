@@ -23,6 +23,7 @@ import org.apache.eagle.alert.engine.coordinator.PolicyDefinition.Definition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class TestServiceTestAppWithZk extends AlertServiceTestBase {
+    @Ignore
     @Test
     public void testMain() throws Exception {
         System.setProperty("coordinator.zkConfig.zkQuorum", "localhost:" + getBindZkPort());
