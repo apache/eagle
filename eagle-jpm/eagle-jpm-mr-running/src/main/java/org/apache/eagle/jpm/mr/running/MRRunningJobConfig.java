@@ -29,12 +29,6 @@ import java.io.Serializable;
 public class MRRunningJobConfig implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRRunningJobConfig.class);
 
-    public String getEnv() {
-        return env;
-    }
-
-    private String env;
-
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -120,7 +114,6 @@ public class MRRunningJobConfig implements Serializable {
 
     private void init(Config config) {
         this.config = config;
-        this.env = config.getString("envContextConfig.env");
 
         //parse eagle zk
         this.zkStateConfig.zkQuorum = config.getString("zookeeperConfig.zkQuorum");
@@ -148,7 +141,6 @@ public class MRRunningJobConfig implements Serializable {
         this.endpointConfig.rmUrls = config.getString("dataSourceConfig.rmUrls").split(",");
 
         LOG.info("Successfully initialized MRRunningJobConfig");
-        LOG.info("env: " + this.env);
         LOG.info("site: " + this.jobExtractorConfig.site);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);
         LOG.info("eagle.service.port: " + this.eagleServiceConfig.eagleServicePort);

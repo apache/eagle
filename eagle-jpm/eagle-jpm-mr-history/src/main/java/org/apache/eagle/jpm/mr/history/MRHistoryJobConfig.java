@@ -37,12 +37,6 @@ public class MRHistoryJobConfig implements Serializable {
 
     private static final String JOB_CONFIGURE_KEY_CONF_FILE = "JobConfigKeys.conf";
 
-    public String getEnv() {
-        return env;
-    }
-
-    private String env;
-
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -150,7 +144,6 @@ public class MRHistoryJobConfig implements Serializable {
      */
     private void init(Config config) {
         this.config = config;
-        this.env = config.getString("envContextConfig.env");
         //parse eagle job extractor
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
         this.jobExtractorConfig.mrVersion = config.getString("jobExtractorConfig.mrVersion");
@@ -193,7 +186,6 @@ public class MRHistoryJobConfig implements Serializable {
         this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
 
         LOG.info("Successfully initialized MRHistoryJobConfig");
-        LOG.info("env: " + this.env);
         LOG.info("zookeeper.quorum: " + this.zkStateConfig.zkQuorum);
         LOG.info("zookeeper.property.clientPort: " + this.zkStateConfig.zkPort);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);

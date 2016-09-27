@@ -34,6 +34,9 @@ public class HDFSUtil {
 
     public static void login(Configuration kConfig) throws IOException {
         if (kConfig.get("hdfs.kerberos.principal") == null || kConfig.get("hdfs.kerberos.principal").isEmpty()) {
+            if (kConfig.get("hadoop.job.ugi") != null) {
+                System.setProperty("HADOOP_USER_NAME", kConfig.get("hadoop.job.ugi"));
+            }
             return;
         }
         kConfig.setBoolean("hadoop.security.authorization", true);
