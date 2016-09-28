@@ -74,7 +74,13 @@ public class AlertPublisherImpl implements AlertPublisher {
             LOG.warn("policyId cannot be null for event to be published");
             return;
         }
-        for (String pubId : policyPublishPluginMapping.get(policyId)) {
+        List<String> pubIds = policyPublishPluginMapping.get(policyId);
+        if (pubIds == null) {
+            LOG.warn("Policy {} does *NOT* subscribe any publishment!", policyId);
+            return;
+        }
+
+        for (String pubId : pubIds) {
             AlertPublishPlugin plugin = pubId != null ? publishPluginMapping.get(pubId) : null;
             if (plugin == null) {
                 LOG.warn("Policy {} does *NOT* subscribe any publishment!", policyId);
