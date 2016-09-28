@@ -24,17 +24,28 @@ import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 
 public class DedupEntity {
 
+    private String publishName;
     private EventUniq eventEniq;
     private List<DedupValue> dedupValues = new ArrayList<DedupValue>();
 
-    public DedupEntity(EventUniq eventEniq, ConcurrentLinkedDeque<DedupValue> dedupValues) {
+    public DedupEntity(String publishName, EventUniq eventEniq, ConcurrentLinkedDeque<DedupValue> dedupValues) {
+        this.publishName = publishName;
         this.eventEniq = eventEniq;
         this.dedupValues.addAll(dedupValues);
     }
 
-    public DedupEntity(EventUniq eventEniq, List<DedupValue> dedupValues) {
+    public DedupEntity(String publishName, EventUniq eventEniq, List<DedupValue> dedupValues) {
+        this.publishName = publishName;
         this.eventEniq = eventEniq;
         this.dedupValues = dedupValues;
+    }
+
+    public String getPublishName() {
+        return publishName;
+    }
+
+    public void setPublishName(String publishName) {
+        this.publishName = publishName;
     }
 
     public EventUniq getEventEniq() {

@@ -47,7 +47,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
     @SuppressWarnings("rawtypes")
     @Override
     public void init(Config config, Publishment publishment, Map conf) throws Exception {
-        DedupCache dedupCache = new DedupCache(config);
+        DedupCache dedupCache = new DedupCache(config, publishment.getName());
         OverrideDeduplicatorSpec spec = publishment.getOverrideDeduplicator();
         if (spec != null && StringUtils.isNotBlank(spec.getClassName())) {
             try {

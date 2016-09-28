@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
 import org.bson.BsonArray;
 import org.bson.BsonBoolean;
@@ -65,7 +66,8 @@ public class TransformerUtils {
                     MongoDedupEventsStore.DEDUP_FIRST_OCCURRENCE).getValue());
                 dedupValues.add(dedupValue);
             }
-            return (T) new DedupEntity(eventUniq, dedupValues);
+            String publishId = doc.getString(MongoDedupEventsStore.DEDUP_PUBLISH_ID).getValue();
+            return (T) new DedupEntity(publishId, eventUniq, dedupValues);
         }
         throw new RuntimeException(String.format("Unknow object type %s, cannot transform", klass.getName()));
     }
@@ -74,8 +76,9 @@ public class TransformerUtils {
         if (obj instanceof DedupEntity) {
             BsonDocument doc = new BsonDocument();
             DedupEntity entity = (DedupEntity) obj;
-            doc.put(MongoDedupEventsStore.DEDUP_ID, new BsonInt64(entity.getEventEniq().hashCode()));
+            doc.put(MongoDedupEventsStore.DEDUP_ID, new BsonInt64(getUniqueId(entity.getPublishName(), entity.getEventEniq())));
             doc.put(MongoDedupEventsStore.DEDUP_STREAM_ID, new BsonString(entity.getEventEniq().streamId));
+            doc.put(MongoDedupEventsStore.DEDUP_PUBLISH_ID, new BsonString(entity.getPublishName()));
             doc.put(MongoDedupEventsStore.DEDUP_POLICY_ID, new BsonString(entity.getEventEniq().policyId));
             doc.put(MongoDedupEventsStore.DEDUP_CREATE_TIME, new BsonInt64(entity.getEventEniq().createdTime));
             doc.put(MongoDedupEventsStore.DEDUP_TIMESTAMP, new BsonInt64(entity.getEventEniq().timestamp));
@@ -105,6 +108,11 @@ public class TransformerUtils {
             return doc;
         }
         throw new RuntimeException(String.format("Unknow object type %s, cannot transform", obj.getClass().getName()));
+    }
+
+    public static int getUniqueId(String publishName, EventUniq eventEniq) {
+        HashCodeBuilder builder = new HashCodeBuilder().append(eventEniq).append(publishName);
+        return builder.build();
     }
 
 }
