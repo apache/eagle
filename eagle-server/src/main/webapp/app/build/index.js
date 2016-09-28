@@ -92,15 +92,16 @@
 							options: {
 								separator: '\n'
 							},
-							src: jsList.requireList.concat('tmp/public/js/project.min.js'),
-							dest: 'tmp/public/js/doc.js'
+							src: jsList.requireList,
+							dest: 'tmp/public/js/modules.js'
 						},
 						project: {
 							options: {
-								separator: '\n'
+								separator: '\n',
+								sourceMap :true
 							},
 							src: jsList.projectList,
-							dest: 'tmp/public/js/project.js'
+							dest: 'tmp/public/js/doc.js'
 						}
 					},
 					css: {

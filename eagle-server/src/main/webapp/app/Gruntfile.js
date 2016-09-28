@@ -125,12 +125,13 @@ module.exports = function (grunt) {
 			project: {
 				options: {
 					mangle: false,
-					sourceMap: true
+					sourceMap: true,
+					sourceMapIncludeSources: true
 				},
 				files: [
 					{
-						src: 'tmp/public/js/project.js',
-						dest: 'tmp/public/js/project.min.js'
+						src: 'tmp/public/js/doc.js',
+						dest: 'tmp/public/js/doc.min.js'
 					}
 				]
 			}
@@ -169,11 +170,11 @@ module.exports = function (grunt) {
 		'clean:build',
 
 		// Compress JS
+		'concat:js_require',
 		'copy:worker',
 		'concat:js_project',
 		'regex-replace:strict',
 		'uglify',
-		'concat:js_require',
 
 		// Compress CSS
 		'cssmin:project',

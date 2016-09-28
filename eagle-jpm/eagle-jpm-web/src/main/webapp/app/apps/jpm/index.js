@@ -96,7 +96,7 @@
 				baseURL = "";
 			} else {
 				if(host === "localhost" || !host) {
-					host = location.host;
+					host = location.hostname;
 				}
 				if(!port) {
 					port = location.port;
