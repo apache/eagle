@@ -17,3 +17,24 @@
 
 echo "=============== Web APP Building Start ==============="
 echo "Environment Check..."
+# Pre-build check
+if [ -z "$(command -v git)" ]
+then
+	echo "git not installed!"
+	exit 1
+fi
+if [ -z "$(command -v npm)" ]
+then
+	echo "npm not installed!"
+	exit 1
+fi
+echo "Environment Check...Pass"
+
+# npm install
+cd src/main/webapp/app
+echo "npm install..."
+npm install
+
+# grunt build
+echo "building..."
+npm run build

@@ -1,0 +1,60 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<!--div class="row" ng-repeat="banner in bannerList track by $index">
+	<div class="col-sm-12" ng-if="banner.title">
+		<h3>{{banner.title}}</h3>
+	</div>
+	<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="widget in banner.list track by $index">
+		<div class="small-box {{widget.color || 'bg-aqua'}}">
+			<div class="inner">
+				<h3>{{widget.title || "Untitled"}}</h3>
+				<p>{{widget.description || "-"}}</p>
+				<p>{{widget.additionalTips || "&nbsp;"}}</p>
+			</div>
+			<div class="icon">
+				<i class="fa fa-question-circle"></i>
+			</div>
+			<a class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+		</div>
+	</div>
+</div-->
+<div class="row flex">
+	<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="widget in Widget.list track by $index">
+		<div widget="widget"></div>
+	</div>
+</div>
+
+<!--div class="row flex">
+	<div class="col-md-4">
+		<div style="background: red; height: 200px;">111</div>
+	</div>
+	<div class="col-md-4">
+		<div style="background: green;">222</div>
+		<div style="background: blue;">222</div>
+	</div>
+	<div class="col-md-4">
+		<div style="background: red;">333</div>
+	</div>
+	<div class="col-md-4">
+		<div style="background: green;">444</div>
+	</div>
+	<div class="col-md-4">
+		<div style="background: red;">555</div>
+	</div>
+</div-->

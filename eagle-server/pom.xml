@@ -223,9 +223,30 @@
         </profile>
     </profiles>
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>exec-ui-install</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>bash</executable>
+                            <arguments>
+                                <argument>${basedir}/ui-build.sh</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <resources>
             <resource>
-                <directory>src/main/webapp/app</directory>
+                <directory>src/main/webapp/app/ui</directory>
                 <targetPath>assets</targetPath>
             </resource>
             <resource>
