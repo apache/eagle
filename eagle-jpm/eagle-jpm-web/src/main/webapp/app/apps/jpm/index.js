@@ -75,7 +75,7 @@
 		JPM.QUERY_METRICS_INTERVAL = '${baseURL}/rest/entities?query=GenericMetricService[${condition}]<${groups}>{${field}}${order}${top}&metricName=${metric}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}&intervalmin=${intervalMin}&timeSeries=true';
 		JPM.QUERY_MR_JOBS = '${baseURL}/rest/mrJobs/search';
 		JPM.QUERY_JOB_LIST = '${baseURL}/rest/mrJobs?query=%s[${condition}]{${fields}}&pageSize=${limit}&startTime=${startTime}&endTime=${endTime}';
-		JPM.QUERY_JOB_STATISTIC = '${baseURL}/rest/mrJobs/jobCountsByDuration?site=${site}&timeDistInSecs=${times}&startTime=${startTime}&endTime=${endTime}';
+		JPM.QUERY_JOB_STATISTIC = '${baseURL}/rest/mrJobs/jobCountsByDuration?site=${site}&timeDistInSecs=${times}&startTime=${startTime}&endTime=${endTime}&jobType=${jobType}';
 		JPM.QUERY_TASK_STATISTIC = '${baseURL}/rest/mrTasks/taskCountsByDuration?jobId=${jobId}&site=${site}&timeDistInSecs=${times}&top=${top}';
 
 		JPM.QUERY_MR_JOB_COUNT = '${baseURL}/rest/mrJobs/runningJobCounts';
@@ -354,13 +354,15 @@
 		/**
 		 * Fetch job duration distribution
 		 * @param {string} site
+		 * @param {string} jobType
 		 * @param {string} times
 		 * @param {{}} startTime
 		 * @param {{}} endTime
 		 */
-		JPM.jobDistribution = function (site, times, startTime, endTime) {
+		JPM.jobDistribution = function (site, jobType, times, startTime, endTime) {
 			var url = common.template(getQuery("JOB_STATISTIC"), {
 				site: site,
+				jobType: jobType,
 				times: times,
 				startTime: Time.format(startTime),
 				endTime: Time.format(endTime)

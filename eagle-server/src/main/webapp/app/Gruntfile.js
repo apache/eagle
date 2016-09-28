@@ -18,9 +18,35 @@
 'use strict';
 
 module.exports = function (grunt) {
-	// Project configuration.
+	// ==========================================================
+	// =                     Parse Resource                     =
+	// ==========================================================
+	/*console.log('Generating resource tree...');
+
+	var env = require('jsdom').env;
+	var fs = require('fs');
+
+	var html = fs.readFileSync('dev/index.html', 'utf8');
+
+	console.log("1111", env);
+	env(html, function (err, window) {
+		console.log(">>>!!!");
+		if (err) console.log(err);
+
+		var $ = require('jquery')(window);
+		var $cssList = $('link[href][rel="stylesheet"]');
+		var cssList = $.map($cssList, function (ele) {
+			return $(ele).attr("href");
+		});
+
+		console.log(">>>", cssList);
+	});
+	console.log(">>>222");*/
+
+	// ==========================================================
+	// =                      Grunt Config                      =
+	// ==========================================================
 	grunt.initConfig({
-		pkg: grunt.file.readJSON('package.json'),
 		config: grunt.file.readJSON('grunt.json'),
 
 		jshint: {
@@ -33,7 +59,7 @@ module.exports = function (grunt) {
 				}
 			},
 			all: [
-				'app/**/*.js'
+				'dev/**/*.js'
 			]
 		},
 
@@ -42,42 +68,42 @@ module.exports = function (grunt) {
 			tmp: ['tmp/'],
 			ui: ['ui/']
 		},
-		concat: {
-			app: {
-				src: [
-					'app/public/js/app.js',
 
-					'app/public/js/srv/main.js',
-					'app/public/js/srv/**.js',
-
-					'app/public/js/app.*.js',
-
-					'app/public/js/common.js',
-
-					'app/public/js/components/main.js',
-					'app/public/js/components/**.js',
-					'app/public/js/components/**/**.js',
-
-					'app/public/js/ctrl/main.js',
-					'app/public/js/ctrl/*.js'
-				],
-				dest: 'tmp/public/js/scripts.js'
+		copy: {
+			worker: {
+				files: [
+					{expand: true, cwd: 'dev/', src: '<%= config.copy.js.worker %>', dest: 'tmp'}
+				]
 			},
-			js: '<%= config.concat.js %>',
-			css: {
-				options: {
-					process: function(src, filepath) {
-						return "@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);" +
-						src.replace('@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);', '');
-					}
-				},
-				src: '<%= config.concat.css.src %>',
-				dest: '<%= config.concat.css.dest %>'
+			ui: {
+				files: [
+					{expand: true, cwd: 'tmp/', src: ['**'], dest: 'ui'},
+					{expand: true, cwd: 'dev/', src: ['public/images/**', 'partials/**'], dest: 'ui'},
+					{expand: true, cwd: 'node_modules/font-awesome/', src: ['fonts/**'], dest: 'ui/public'},
+					{expand: true, cwd: 'node_modules/bootstrap/', src: ['fonts/**'], dest: 'ui/public'}
+				]
 			}
 		},
+
+		concat: {
+			js_project: '<%= config.concat.js.project %>',
+			js_require: '<%= config.concat.js.require %>',
+			css_require: {
+				options: {
+					separator: '\n',
+					process: function(src) {
+						return "@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);" +
+							src.replace('@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);', '');
+					}
+				},
+				src: '<%= config.concat.css.require.src %>',
+				dest: '<%= config.concat.css.require.dest %>'
+			}
+		},
+
 		'regex-replace': {
 			strict: {
-				src: ['tmp/public/js/scripts.js'],
+				src: ['tmp/public/js/project.js'],
 				actions: [
 					{
 						name: 'use strict',
@@ -87,60 +113,43 @@ module.exports = function (grunt) {
 					},
 					{
 						name: 'build timestamp',
-						search: '\\/\\/ GRUNT REPLACEMENT\\: eagleApp\\.buildTimestamp \\= TIMESTAMP',
-						replace: 'eagleApp.buildTimestamp = ' + (+new Date()) + ';',
+						search: '\\/\\/ GRUNT REPLACEMENT\\: Module\\.buildTimestamp \\= TIMESTAMP',
+						replace: 'Module.buildTimestamp = ' + (+new Date()) + ';',
 						flags: 'gmi'
 					}
 				]
 			}
 		},
+
 		uglify: {
-			ui: {
+			project: {
 				options: {
-					mangle: false
+					mangle: false,
+					sourceMap: true
 				},
 				files: [
 					{
-						src: 'tmp/public/js/scripts.js',
-						dest: 'tmp/public/js/scripts.min.js'
-					},
-					{
-						expand: true,
-						src: '**/*.js',
-						dest: 'tmp/feature',
-						cwd: 'app/public/feature'
+						src: 'tmp/public/js/project.js',
+						dest: 'tmp/public/js/project.min.js'
 					}
 				]
 			}
 		},
+
 		cssmin: {
-			ui: {
+			project: {
 				files: {
-					'tmp/public/css/styles.css': ['app/public/css/main.css', 'app/public/css/animation.css']
+					'tmp/public/css/project.min.css': '<%= config.concat.css.project.src %>',
 				}
 			}
 		},
+
 		htmlrefs: {
-			ui: {
-				src: 'app/index.html',
+			project: {
+				src: 'dev/index.html',
 				dest: "tmp/index.html"
 			}
 		},
-		copy: {
-			feature: {
-				files: [
-					{expand: true, cwd: 'app/', src: ['public/feature/**'], dest: 'tmp'}
-				]
-			},
-			ui: {
-				files: [
-					{expand: true, cwd: 'tmp/', src: ['**'], dest: 'ui'},
-					{expand: true, cwd: 'app/', src: ['public/images/**', 'partials/**'], dest: 'ui'},
-					{expand: true, cwd: 'node_modules/font-awesome/', src: ['fonts/**'], dest: 'ui/public'},
-					{expand: true, cwd: 'node_modules/bootstrap/', src: ['fonts/**'], dest: 'ui/public'}
-				]
-			}
-		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -155,20 +164,25 @@ module.exports = function (grunt) {
 	grunt.registerTask('default', [
 		// jshint
 		'jshint:all',
+
 		// Clean Env
 		'clean:build',
+
 		// Compress JS
-		'copy:feature',
-		'concat:app',
+		'copy:worker',
+		'concat:js_project',
 		'regex-replace:strict',
 		'uglify',
-		'concat:js',
+		'concat:js_require',
+
 		// Compress CSS
-		'cssmin',
-		'concat:css',
+		'cssmin:project',
+		'concat:css_require',
+
 		// Pass HTML Resources
 		'htmlrefs',
 		'copy:ui',
+
 		// Clean Env
 		'clean:tmp'
 	]);

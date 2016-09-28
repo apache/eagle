@@ -30,11 +30,13 @@
 		env(html, function (err, window) {
 			if (err) console.log(err);
 
+			// Get js / css resource
 			var $ = require('jquery')(window);
 			function getResList(match, attr) {
 				var $eleList = $(match);
 				var requireList = [];
 				var projectList = [];
+				var list = [];
 
 				$.each($eleList, function (i, ele) {
 					var path = $(ele).attr(attr);
@@ -43,12 +45,15 @@
 
 					if(path.match(/node_modules/)) {
 						requireList.push(path.replace(/\.\.\//, ""));
+						list.push(path.replace(/\.\.\//, ""));
 					} else {
 						projectList.push("dev/" + path);
+						list.push("dev/" + path);
 					}
 				});
 
 				return {
+					list: list,
 					requireList: requireList,
 					projectList: projectList
 				};
@@ -57,6 +62,29 @@
 			var cssList = getResList('link[href][rel="stylesheet"]', 'href');
 			var jsList = getResList('script[src]', 'src');
 
+			// JS Worker process
+			var workerFolderPath = 'dev/public/js/worker/';
+			var workerList = fs.readdirSync(workerFolderPath);
+			var workerRequireList = [];
+
+			workerList = workerList.map(function (path) {
+				if(!/\w+Worker\.js/.test(path)) return;
+
+				var workerPath = workerFolderPath + path;
+				var content = fs.readFileSync(workerPath, 'utf8');
+				var regex = /self\.importScripts\(["']([^"']*)["']\)/g;
+				var match;
+				while ((match = regex.exec(content)) !== null) {
+					var modulePath = match[1];
+					workerRequireList.push((workerFolderPath + modulePath).replace(/^dev\//, ""));
+				}
+
+				return workerPath.replace(/^dev\//, "");
+			}).filter(function (path) {
+				return !!path;
+			});
+
+			// Parse grunt config
 			var resJson = {
 				concat: {
 					js: {
@@ -77,10 +105,7 @@
 					},
 					css: {
 						require: {
-							options: {
-								separator: '\n'
-							},
-							src: cssList.requireList.concat('tmp/public/css/project.css'),
+							src: cssList.requireList.concat('tmp/public/css/project.min.css'),
 							dest: 'tmp/public/css/doc.css'
 						},
 						project: {
@@ -88,8 +113,13 @@
 								separator: '\n'
 							},
 							src: cssList.projectList,
-							dest: 'tmp/public/js/project.css'
+							dest: 'tmp/public/js/project.min.css'
 						}
+					}
+				},
+				copy: {
+					js: {
+						worker: workerList.concat(workerRequireList)
 					}
 				}
 			};

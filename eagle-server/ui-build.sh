@@ -31,10 +31,10 @@ fi
 echo "Environment Check...Pass"
 
 # npm install
-cd src/main/webapp
+cd src/main/webapp/app
 echo "npm install..."
 npm install
 
 # grunt build
-echo "grunt building..."
-npm run grunt
+echo "building..."
+npm run build
