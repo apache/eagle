@@ -90,6 +90,18 @@ public class ApplicationResource {
         return RESTResponse.async(() -> entityService.getByUUID(appUuid)).get();
     }
 
+    @POST
+    @Path("/status")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<ApplicationEntity.Status> checkApplicationStatusByUUID(ApplicationOperations.CheckStatusOperation operation) {
+        return RESTResponse.<ApplicationEntity.Status>async((response) -> {
+            ApplicationEntity.Status status = (entityService.getByUUIDOrAppId(null, operation.getAppId())).getStatus();
+            response.success(true).message("Successfully fetched application status");
+            response.data(status);
+        }).get();
+    }
+
     /**
      * <b>Request:</b>
      * <pre>
@@ -148,7 +160,7 @@ public class ApplicationResource {
     public RESTResponse<Void> startApplication(ApplicationOperations.StartOperation operation) {
         return RESTResponse.<Void>async((response) -> {
             ApplicationEntity entity = applicationManagementService.start(operation);
-            response.success(true).message("Successfully started application " + entity.getUuid());
+            response.success(true).message("Starting application " + entity.getUuid());
         }).get();
     }
 
@@ -169,7 +181,8 @@ public class ApplicationResource {
     public RESTResponse<Void> stopApplication(ApplicationOperations.StopOperation operation) {
         return RESTResponse.<Void>async((response) -> {
             ApplicationEntity entity = applicationManagementService.stop(operation);
-            response.success(true).message("Successfully stopped application " + entity.getUuid());
+            response.success(true).message("Stopping application " + entity.getUuid());
         }).get();
     }
+
 }

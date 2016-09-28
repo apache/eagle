@@ -26,6 +26,7 @@ import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationOperationContext;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.spi.ApplicationProvider;
+import org.apache.eagle.metadata.exceptions.ApplicationWrongStatusException;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.*;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
@@ -117,38 +118,100 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     }
 
     @Override
-    public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) {
+    public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) throws ApplicationWrongStatusException {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
         ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
             applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
             applicationEntity, config, alertMetadataService);
-        // TODO: Check status, skip stop if already STOPPED
+
+        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
         try {
-            applicationOperationContext.onStop();
+            if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
+                applicationOperationContext.onUninstall();
+                return applicationEntityService.delete(applicationEntity);
+            } else {
+                throw new ApplicationWrongStatusException("App: " + applicationEntity.getAppId() + " status is" + currentStatus + ", uninstall operation is not allowed");
+            }
         } catch (Throwable throwable) {
             LOGGER.error(throwable.getMessage(), throwable);
+            throw throwable;
         }
-        applicationOperationContext.onUninstall();
-        return applicationEntityService.delete(applicationEntity);
     }
 
     @Override
-    public ApplicationEntity start(ApplicationOperations.StartOperation operation) {
+    public ApplicationEntity start(ApplicationOperations.StartOperation operation) throws ApplicationWrongStatusException {
+        ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
+        try {
+            if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
+                ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
+                    applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
+                    applicationEntity, config, alertMetadataService);
+
+                applicationOperationContext.onStart();
+                //Only when topology submitted successfully can the state change to STARTING
+                applicationEntityService.delete(applicationEntity);
+                applicationEntity.setStatus(ApplicationEntity.Status.STARTING);
+                return applicationEntityService.create(applicationEntity);
+            } else {
+                throw new ApplicationWrongStatusException("App: " + applicationEntity.getAppId() + " status is " + currentStatus + " start operation is not allowed");
+            }
+        } catch (ApplicationWrongStatusException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            LOGGER.error("Failed to start app " + applicationEntity.getAppId(), e);
+            throw e;
+        } catch (Throwable throwable) {
+            LOGGER.error(throwable.getMessage(), throwable);
+            throw throwable;
+        }
+
+    }
+
+    @Override
+    public ApplicationEntity stop(ApplicationOperations.StopOperation operation) throws ApplicationWrongStatusException {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
         ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
             applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
             applicationEntity, config, alertMetadataService);
-        applicationOperationContext.onStart();
-        return applicationEntity;
+        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
+        try {
+            if (currentStatus == ApplicationEntity.Status.RUNNING) {
+                applicationOperationContext.onStop();
+                //stop -> directly killed
+                applicationEntityService.delete(applicationEntity);
+                applicationEntity.setStatus(ApplicationEntity.Status.STOPPING);
+                return applicationEntityService.create(applicationEntity);
+            } else {
+                throw new ApplicationWrongStatusException("App: " + applicationEntity.getAppId() + " status is " + currentStatus + ", stop operation is not allowed.");
+            }
+        } catch (ApplicationWrongStatusException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+        } catch (RuntimeException e) {
+            LOGGER.error("Failed to stop app " + applicationEntity.getAppId(), e);
+            throw e;
+        } catch (Throwable throwable) {
+            LOGGER.error(throwable.getMessage(), throwable);
+            throw throwable;
+        }
     }
 
     @Override
-    public ApplicationEntity stop(ApplicationOperations.StopOperation operation) {
-        ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
-        ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-            applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-            applicationEntity, config, alertMetadataService);
-        applicationOperationContext.onStop();
-        return applicationEntity;
+    public ApplicationEntity.Status getStatus(ApplicationOperations.CheckStatusOperation operation)  {
+        ApplicationEntity applicationEntity = null;
+        try {
+            applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+            ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
+                applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
+                applicationEntity, config, alertMetadataService);
+            ApplicationEntity.Status topologyStatus = applicationOperationContext.getStatus();
+            return topologyStatus;
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("application id not exist", e);
+            throw e;
+        }
     }
+
 }

@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import scala.Int;
 import storm.trident.spout.RichSpoutBatchExecutor;
 
+import java.util.List;
 import java.util.Objects;
 
 public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,StormTopology> {
@@ -144,6 +145,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
                 stormClient.killTopology(appId);
             } catch (NotAliveException | TException e) {
                 LOG.error("Failed to kill topology named {}, due to: {}",appId,e.getMessage(),e.getCause());
+                throw new RuntimeException(e.getMessage(),e);
             }
         } else {
             KillOptions killOptions = new KillOptions();
@@ -154,9 +156,33 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     }
 
     @Override
-    public void status(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
-        // TODO: Not implemented yet!
-        throw new RuntimeException("TODO: Not implemented yet!");
+    public ApplicationEntity.Status status(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
+        String appId = config.getString("appId");
+        LOG.info("Fetching status of topology {} ..." + appId);
+        List<TopologySummary> topologySummaries ;
+        try {
+            if (Objects.equals(config.getString("mode"), ApplicationEntity.Mode.CLUSTER.name())) {
+                Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig(config)).getClient();
+                topologySummaries = stormClient.getClusterInfo().get_topologies();
+            } else {
+                topologySummaries = getLocalCluster().getClusterInfo().get_topologies();
+            }
+            for (TopologySummary topologySummary : topologySummaries) {
+                if (topologySummary.get_name().equalsIgnoreCase(appId)) {
+                    if (topologySummary.get_status().equalsIgnoreCase("ACTIVE")) {
+                        return ApplicationEntity.Status.RUNNING;
+                    } else if (topologySummary.get_status().equalsIgnoreCase("INACTIVE")) {
+                        return ApplicationEntity.Status.STOPPED;
+                    } else if (topologySummary.get_status().equalsIgnoreCase("KILLED")) {
+                        return ApplicationEntity.Status.REMOVED;
+                    }
+                }
+            }
+            //If not exist, return removed
+            return ApplicationEntity.Status.REMOVED;
+        } catch (TException e) {
+            return ApplicationEntity.Status.UNKNOWN;
+        }
     }
 
     public static class Provider implements ExecutionRuntimeProvider<StormEnvironment,StormTopology> {

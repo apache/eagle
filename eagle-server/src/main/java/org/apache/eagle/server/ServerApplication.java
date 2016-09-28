@@ -15,11 +15,15 @@
  * limitations under the License.
  */
 package org.apache.eagle.server;
-
+import com.google.inject.Injector;
+import com.hubspot.dropwizard.guice.GuiceBundle;
+import io.dropwizard.lifecycle.Managed;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
+import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
+import org.apache.eagle.server.managedtask.ApplicationTask;
 import org.apache.eagle.server.module.GuiceBundleLoader;
 
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -34,9 +38,12 @@ import java.util.EnumSet;
 import javax.servlet.DispatcherType;
 
 class ServerApplication extends Application<ServerConfig> {
+    private GuiceBundle guiceBundle;
+
     @Override
     public void initialize(Bootstrap<ServerConfig> bootstrap) {
-        bootstrap.addBundle(GuiceBundleLoader.load());
+        guiceBundle = GuiceBundleLoader.load();
+        bootstrap.addBundle(guiceBundle);
         bootstrap.addBundle(new AssetsBundle("/assets", "/", "index.html", "/"));
     }
 
@@ -74,5 +81,11 @@ class ServerApplication extends Application<ServerConfig> {
 
         // context listener
         environment.servlets().addServletListeners(new CoordinatorListener());
+
+        // run application status service in background
+        Injector injector = guiceBundle.getInjector();
+        ApplicationStatusUpdateService applicationStatusUpdateService = injector.getInstance(ApplicationStatusUpdateService.class);
+        Managed updateAppStatusTask = new ApplicationTask(applicationStatusUpdateService);
+        environment.lifecycle().manage(updateAppStatusTask);
     }
 }
