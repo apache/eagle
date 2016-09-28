@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -31,19 +32,23 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 public class DefaultDeduplicator implements AlertDeduplicator {
 
     private static Logger LOG = LoggerFactory.getLogger(DefaultDeduplicator.class);
 
-    @SuppressWarnings("unused")
-    private long dedupIntervalMin;
+    private long dedupIntervalSec;
     private List<String> customDedupFields = new ArrayList<>();
     private String dedupStateField;
 
     private DedupCache dedupCache;
 
+    private Cache<EventUniq, String> withoutStatesCache;
+
     public DefaultDeduplicator() {
-        this.dedupIntervalMin = 0;
+        this.dedupIntervalSec = 0;
     }
 
     public DefaultDeduplicator(String intervalMin) {
@@ -51,7 +56,7 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     }
 
     public DefaultDeduplicator(long intervalMin) {
-        this.dedupIntervalMin = intervalMin;
+        this.dedupIntervalSec = intervalMin;
     }
 
     public DefaultDeduplicator(String intervalMin, List<String> customDedupFields,
@@ -64,6 +69,9 @@ public class DefaultDeduplicator implements AlertDeduplicator {
             this.dedupStateField = dedupStateField;
         }
         this.dedupCache = dedupCache;
+
+        withoutStatesCache = CacheBuilder.newBuilder().expireAfterWrite(
+            this.dedupIntervalSec, TimeUnit.SECONDS).build();
     }
 
     /*
@@ -74,6 +82,16 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         if (StringUtils.isBlank(stateFiledValue)) {
             // without state field, we cannot determine whether it is duplicated
             // without custom filed values, we cannot determine whether it is duplicated
+            synchronized (withoutStatesCache) {
+                if (withoutStatesCache != null && withoutStatesCache.getIfPresent(key) != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Alert event {} with key {} is skipped since it is duplicated", event, key);
+                    }
+                    return null;
+                } else if (withoutStatesCache != null) {
+                    withoutStatesCache.put(key, "");
+                }
+            }
             return Arrays.asList(event);
         }
         return dedupCache.dedup(event, key, dedupStateField, stateFiledValue);
@@ -126,15 +144,15 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     @Override
     public void setDedupIntervalMin(String newDedupIntervalMin) {
         if (newDedupIntervalMin == null || newDedupIntervalMin.isEmpty()) {
-            dedupIntervalMin = 0;
+            dedupIntervalSec = 0;
             return;
         }
         try {
             Period period = Period.parse(newDedupIntervalMin);
-            this.dedupIntervalMin = period.toStandardMinutes().getMinutes();
+            this.dedupIntervalSec = period.toStandardSeconds().getSeconds();
         } catch (Exception e) {
             LOG.warn("Fail to pares deDupIntervalMin, will disable deduplication instead", e);
-            this.dedupIntervalMin = 0;
+            this.dedupIntervalSec = 0;
         }
     }
 

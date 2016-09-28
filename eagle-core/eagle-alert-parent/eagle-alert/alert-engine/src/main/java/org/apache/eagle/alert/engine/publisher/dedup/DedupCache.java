@@ -48,38 +48,45 @@ public class DedupCache {
     private long lastUpdated = -1;
     private Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> events = new ConcurrentHashMap<EventUniq, ConcurrentLinkedDeque<DedupValue>>();
 
+    private static final ConcurrentLinkedDeque<DedupCache> caches = new ConcurrentLinkedDeque<DedupCache>();
+
     private Config config;
 
-    private static DedupCache INSTANCE;
-
-    public static synchronized DedupCache getInstance(Config config) {
-        if (INSTANCE == null) {
-            INSTANCE = new DedupCache();
-            INSTANCE.config = config;
-
-            // create daemon to clean up old removable events periodically
-            ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(1, new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    Thread t = new Thread(r);
-                    t.setDaemon(true);
-                    return t;
-                }
-            });
-            scheduleSrv.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    HashSet<EventUniq> eventUniqs = new HashSet<EventUniq>(INSTANCE.getEvents().keySet());
-                    for (EventUniq one : eventUniqs) {
-                        if (one.removable && one.createdTime < System.currentTimeMillis() - 3600000 * 24) {
-                            INSTANCE.removeEvent(one);
-                            LOG.info("Remove dedup key {} from cache & db", one);
+    public DedupCache(Config config) {
+        this.config = config;
+        // only happens during startup, won't introduce perf issue here
+        synchronized (caches) {
+            if (caches.size() == 0) {
+                // create daemon to clean up old removable events periodically
+                ScheduledExecutorService scheduleSrv = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        Thread t = new Thread(r);
+                        t.setDaemon(true);
+                        return t;
+                    }
+                });
+                scheduleSrv.scheduleAtFixedRate(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (DedupCache cache : caches) {
+                            if (cache == null || cache.getEvents() == null) {
+                                continue;
+                            }
+                            HashSet<EventUniq> eventUniqs = new HashSet<EventUniq>(cache.getEvents().keySet());
+                            for (EventUniq one : eventUniqs) {
+                                if (one.removable && one.createdTime < System.currentTimeMillis() - 3600000 * 24) {
+                                    cache.removeEvent(one);
+                                    LOG.info("Remove dedup key {} from cache & db", one);
+                                }
+                            }
                         }
                     }
-                }
-            }, 5, 60, TimeUnit.MINUTES);
+                }, 5, 60, TimeUnit.MINUTES);
+            }
+            caches.add(this);
         }
-        return INSTANCE;
+        LOG.info("Create daemon to clean up old removable events periodicall");
     }
 
     public Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> getEvents() {
@@ -201,7 +208,7 @@ public class DedupCache {
             DedupValue dedupValue = dedupValues.getLast();
             dedupValue.setCount(dedupValue.getCount() + 1);
             String updateMsg = String.format(
-                "Update count for dedup key {}, value %s and count %s", eventEniq,
+                "Update count for dedup key %s, value %s and count %s", eventEniq,
                 dedupValue.getStateFieldValue(), dedupValue.getCount());
             if (dedupValue.getCount() > 0 && dedupValue.getCount() % 100 == 0) {
                 LOG.info(updateMsg);
