@@ -25,12 +25,14 @@ import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupEventsStoreFactory.DedupEventsStoreType;
 import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
+import org.apache.storm.guava.base.Joiner;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class DedupCacheStoreTest extends MongoDependencyBaseTest {
@@ -50,15 +52,18 @@ public class DedupCacheStoreTest extends MongoDependencyBaseTest {
 		
 		System.setProperty("config.resource", "/application-mongo-statestore.conf");
 		Config config = ConfigFactory.load();
-		DedupCache cache = new DedupCache(config);
+		DedupCache cache = new DedupCache(config, "testPublishment");
 		cache.addOrUpdate(eventUniq, (String) event.getData()[event.getSchema().getColumnIndex("state")]);
 		
-		DedupEventsStore accessor = DedupEventsStoreFactory.getStore(DedupEventsStoreType.Mongo, config);
+		DedupEventsStore accessor = DedupEventsStoreFactory.getStore(DedupEventsStoreType.Mongo, config, "testPublishment");
 		Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> events = accessor.getEvents();
 		for (EventUniq one : events.keySet()) {
 			if (one.equals(eventUniq)) {
 				Assert.assertEquals(false, one.removable);
 			}
+		}
+		for (Entry<EventUniq, ConcurrentLinkedDeque<DedupValue>> entry : events.entrySet()) {
+			System.out.println(entry.getKey() + " >>> " + Joiner.on("\n\t").join(entry.getValue()));
 		}
 		
 		eventUniq.removable = true;
@@ -69,6 +74,10 @@ public class DedupCacheStoreTest extends MongoDependencyBaseTest {
 			if (one.equals(eventUniq)) {
 				Assert.assertEquals(true, one.removable);
 			}
+		}
+		
+		for (Entry<EventUniq, ConcurrentLinkedDeque<DedupValue>> entry : events.entrySet()) {
+			System.out.println(entry.getKey() + " >>> " + Joiner.on("\n\t").join(entry.getValue()));
 		}
 	}
 	

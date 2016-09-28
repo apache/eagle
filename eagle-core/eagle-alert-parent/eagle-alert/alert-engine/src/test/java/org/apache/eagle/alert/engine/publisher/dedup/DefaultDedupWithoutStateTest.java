@@ -42,7 +42,7 @@ public class DefaultDedupWithoutStateTest {
 		// assume state: OPEN, WARN, CLOSE
 		System.setProperty("config.resource", "/application-mongo-statestore.conf");
 		Config config = ConfigFactory.load();
-		DedupCache dedupCache = new DedupCache(config);
+		DedupCache dedupCache = new DedupCache(config, "testPublishment");
 		DefaultDeduplicator deduplicator = new DefaultDeduplicator(
 				"PT10S", Arrays.asList(new String[] { "alertKey" }), null, dedupCache);
 		

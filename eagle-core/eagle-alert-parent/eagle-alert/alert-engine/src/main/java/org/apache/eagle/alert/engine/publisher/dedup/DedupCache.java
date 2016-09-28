@@ -52,8 +52,11 @@ public class DedupCache {
 
     private Config config;
 
-    public DedupCache(Config config) {
+    private String publishName;
+    
+    public DedupCache(Config config, String publishName) {
         this.config = config;
+        this.publishName = publishName;
         // only happens during startup, won't introduce perf issue here
         synchronized (caches) {
             if (caches.size() == 0) {
@@ -94,7 +97,7 @@ public class DedupCache {
             || System.currentTimeMillis() - lastUpdated > CACHE_MAX_EXPIRE_TIME_IN_DAYS * DateUtils.MILLIS_PER_DAY
             || events.size() <= 0) {
             lastUpdated = System.currentTimeMillis();
-            DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
+            DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config, this.publishName);
             events = accessor.getEvents();
         }
         return events;
@@ -108,7 +111,7 @@ public class DedupCache {
         if (this.contains(eventEniq)) {
             this.events.remove(eventEniq);
 
-            DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
+            DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config, this.publishName);
             accessor.remove(eventEniq);
         }
     }
@@ -177,7 +180,7 @@ public class DedupCache {
             LOG.info("Update dedup key {}, and value {}", eventEniq, dedupValue);
         }
         if (dedupValue != null) {
-            DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
+            DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config, this.publishName);
             accessor.add(eventEniq, events.get(eventEniq));
             LOG.info("Store dedup key {}, value {} to DB", eventEniq,
                 Joiner.on(",").join(events.get(eventEniq)));
@@ -193,11 +196,11 @@ public class DedupCache {
     }
 
     public void persistUpdatedEventUniq(EventUniq eventEniq) {
-        DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
+        DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config, this.publishName);
         accessor.add(eventEniq, events.get(eventEniq));
         LOG.info("Store dedup key {}, value {} to DB", eventEniq,
             Joiner.on(",").join(events.get(eventEniq)));
-    }
+    } 
 
     private DedupValue updateCount(EventUniq eventEniq) {
         ConcurrentLinkedDeque<DedupValue> dedupValues = events.get(eventEniq);
@@ -212,7 +215,7 @@ public class DedupCache {
                 dedupValue.getStateFieldValue(), dedupValue.getCount());
             if (dedupValue.getCount() > 0 && dedupValue.getCount() % 100 == 0) {
                 LOG.info(updateMsg);
-                DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config);
+                DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config, this.publishName);
                 accessor.add(eventEniq, dedupValues);
             } else if (LOG.isDebugEnabled()) {
                 LOG.debug(updateMsg);

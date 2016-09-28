@@ -34,14 +34,14 @@ public class DedupEventsStoreFactory {
         customizedStore = store;
     }
 
-    public static DedupEventsStore getStore(DedupEventsStoreType type, Config config) {
+    public static DedupEventsStore getStore(DedupEventsStoreType type, Config config, String publishName) {
         if (customizedStore != null) {
             return customizedStore;
         }
         switch (type) {
             case Mongo:
                 if (accessor == null) {
-                    accessor = new MongoDedupEventsStore(config);
+                    accessor = new MongoDedupEventsStore(config, publishName);
                 }
                 break;
             case ElasticSearch:
