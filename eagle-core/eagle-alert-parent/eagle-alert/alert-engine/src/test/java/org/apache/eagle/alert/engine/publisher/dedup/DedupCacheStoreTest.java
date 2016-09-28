@@ -50,7 +50,7 @@ public class DedupCacheStoreTest extends MongoDependencyBaseTest {
 		
 		System.setProperty("config.resource", "/application-mongo-statestore.conf");
 		Config config = ConfigFactory.load();
-		DedupCache cache = DedupCache.getInstance(config);
+		DedupCache cache = new DedupCache(config);
 		cache.addOrUpdate(eventUniq, (String) event.getData()[event.getSchema().getColumnIndex("state")]);
 		
 		DedupEventsStore accessor = DedupEventsStoreFactory.getStore(DedupEventsStoreType.Mongo, config);

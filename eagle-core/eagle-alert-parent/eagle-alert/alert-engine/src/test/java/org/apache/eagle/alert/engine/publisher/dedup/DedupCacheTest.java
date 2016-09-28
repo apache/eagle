@@ -55,7 +55,7 @@ public class DedupCacheTest {
 	@Test
 	public void testNormal() throws Exception {
 		Config config = ConfigFactory.load();
-		DedupCache dedupCache = DedupCache.getInstance(config);
+		DedupCache dedupCache = new DedupCache(config);
 		
 		StreamDefinition stream = createStream();
 		PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
