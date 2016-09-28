@@ -17,26 +17,26 @@
 package org.apache.eagle.app;
 
 import com.typesafe.config.Config;
-import org.apache.eagle.app.environment.impl.WebExecutionContainer;
+import org.apache.eagle.app.environment.impl.StaticApplicationExecutor;
 import org.apache.eagle.app.environment.impl.WebEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Static Web Application without executable process.
+ * Static Application without executable process.
  */
-public class StaticWebApplication implements Application<WebEnvironment, WebExecutionContainer> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StaticWebApplication.class);
-    private final String webViewPath;
+public class StaticApplication implements Application<WebEnvironment, StaticApplicationExecutor> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaticApplication.class);
+    private final String name;
 
-    public StaticWebApplication(String webViewPath) {
-        this.webViewPath = webViewPath;
+    public StaticApplication(String name) {
+        this.name = name;
     }
 
     @Override
-    public WebExecutionContainer execute(Config config, WebEnvironment environment) {
-        LOGGER.warn("Executing web application");
-        return new WebExecutionContainer(this);
+    public StaticApplicationExecutor execute(Config config, WebEnvironment environment) {
+        LOGGER.warn("Executing Static application");
+        return new StaticApplicationExecutor(this);
     }
 
     @Override
@@ -49,12 +49,8 @@ public class StaticWebApplication implements Application<WebEnvironment, WebExec
         return false;
     }
 
-    public String getWebViewPath() {
-        return webViewPath;
-    }
-
     @Override
     public String toString() {
-        return String.format("StaticWebApplication(%s)",this.getWebViewPath());
+        return String.format("StaticApplication(%s)",this.name);
     }
 }

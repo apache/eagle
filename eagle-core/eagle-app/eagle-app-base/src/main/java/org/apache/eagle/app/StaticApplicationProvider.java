@@ -14,21 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.app.environment.impl;
+package org.apache.eagle.app;
 
-import org.apache.eagle.app.StaticWebApplication;
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
 /**
- * Web Application Container.
+ * Static Web Application Provider.
  */
-public class WebExecutionContainer {
-    private final StaticWebApplication webApplication;
-
-    public WebExecutionContainer(StaticWebApplication webApplication) {
-        this.webApplication = webApplication;
+public abstract class StaticApplicationProvider extends AbstractApplicationProvider<StaticApplication> {
+    @Override
+    public StaticApplication getApplication() {
+        return new StaticApplication(this.getApplicationDesc().getType());
     }
 
-    public StaticWebApplication getWebApplication() {
-        return webApplication;
+    @Override
+    public final Class<StaticApplication> getApplicationClass() {
+        return StaticApplication.class;
     }
 }

@@ -24,7 +24,6 @@ import org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.ApplicationLifecycle;
-import org.apache.eagle.app.StaticWebApplication;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.sink.KafkaStreamSinkConfig;

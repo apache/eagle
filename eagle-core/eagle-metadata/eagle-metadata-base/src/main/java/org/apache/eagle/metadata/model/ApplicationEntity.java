@@ -17,6 +17,7 @@
 
 package org.apache.eagle.metadata.model;
 
+import com.google.common.base.Preconditions;
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
@@ -98,8 +99,14 @@ public class ApplicationEntity extends PersistenceEntity {
     @Override
     public void ensureDefault() {
         super.ensureDefault();
+
+        Preconditions.checkNotNull(this.getSite(),"site is null");
+        Preconditions.checkNotNull(this.getSite().getSiteId(),"siteId is null");
+        Preconditions.checkNotNull(this.getDescriptor(),"descriptor is null");
+        Preconditions.checkNotNull(this.getDescriptor().getType(),"descriptor type is null");
+
         if (this.appId == null) {
-            this.appId = String.format("%s-%s", this.getDescriptor().getType(), this.getSite().getSiteId());
+            this.appId = String.format("EAGLE_%s_%s", this.getSite().getSiteId(),this.getDescriptor().getType()).toUpperCase();
         }
         if (this.status == null) {
             this.status = Status.INITIALIZED;
