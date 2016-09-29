@@ -223,11 +223,31 @@ public class MongoImplTest {
         SpoutSpec spoutSpec1 = new SpoutSpec();
         String topologyId1 = "testUnitTopology1_" + timestamp;
         spoutSpec1.setTopologyId(topologyId1);
+
+        Map<String, Kafka2TupleMetadata> kafka2TupleMetadataMap = new HashMap<>();
+        Kafka2TupleMetadata kafka2TupleMetadata = new Kafka2TupleMetadata();
+        kafka2TupleMetadata.setType("KAFKA");
+        kafka2TupleMetadataMap.put("preprocess.network-sherlock.events", kafka2TupleMetadata);
+        spoutSpec1.setKafka2TupleMetadataMap(kafka2TupleMetadataMap);
+
+        Map<String, List<StreamRepartitionMetadata>> streamRepartitionMetadataMap= new HashMap<>();
+        List<StreamRepartitionMetadata> StreamRepartitionMetadataList = new ArrayList<>();
+        StreamRepartitionMetadata streamRepartitionMetadata = new StreamRepartitionMetadata();
+        List<StreamRepartitionStrategy> groupingStrategies = new ArrayList();
+        StreamRepartitionStrategy streamRepartitionStrategy = new StreamRepartitionStrategy();
+        streamRepartitionStrategy.setStartSequence(4);
+        groupingStrategies.add(streamRepartitionStrategy);
+        streamRepartitionMetadata.setGroupingStrategies(groupingStrategies);
+        StreamRepartitionMetadataList.add(streamRepartitionMetadata);
+        streamRepartitionMetadataMap.put("preprocess.network-nervecenter.events", StreamRepartitionMetadataList);
+        spoutSpec1.setStreamRepartitionMetadataMap(streamRepartitionMetadataMap);
         spoutSpecsMap.put(topologyId1, spoutSpec1);
 
         SpoutSpec spoutSpec2 = new SpoutSpec();
         String topologyId2 = "testUnitTopology2_" + timestamp;
         spoutSpec2.setTopologyId(topologyId2);
+        spoutSpec2.setKafka2TupleMetadataMap(kafka2TupleMetadataMap);
+        spoutSpec2.setStreamRepartitionMetadataMap(streamRepartitionMetadataMap);
         spoutSpecsMap.put(topologyId2, spoutSpec2);
 
         // Alert Spec

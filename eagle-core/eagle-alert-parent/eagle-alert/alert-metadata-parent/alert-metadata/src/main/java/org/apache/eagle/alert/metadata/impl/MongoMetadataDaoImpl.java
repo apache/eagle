@@ -48,10 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @since Apr 11, 2016.
@@ -98,7 +95,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     private void init() {
         db = client.getDatabase(DB_NAME);
-        IndexOptions io = new IndexOptions().background(true).unique(true).name("nameIndex");
+        IndexOptions io = new IndexOptions().background(true).name("nameIndex");
         BsonDocument doc = new BsonDocument();
         doc.append("name", new BsonInt32(1));
         cluster = db.getCollection("clusters");
@@ -128,14 +125,14 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
         // below is for schedule_specs and its splitted collections
         BsonDocument doc1 = new BsonDocument();
-        IndexOptions io1 = new IndexOptions().background(true).unique(true).name("versionIndex");
+        IndexOptions io1 = new IndexOptions().background(true).name("versionIndex");
         doc1.append("version", new BsonInt32(1));
         scheduleStates = db.getCollection("schedule_specs");
         scheduleStates.createIndex(doc1, io1);
 
         spoutSpecs = db.getCollection("spoutSpecs");
         {
-            IndexOptions ioInternal = new IndexOptions().background(true).unique(true).name("topologyIdIndex");
+            IndexOptions ioInternal = new IndexOptions().background(true).name("topologyIdIndex");
             BsonDocument docInternal = new BsonDocument();
             docInternal.append("topologyId", new BsonInt32(1));
             spoutSpecs.createIndex(docInternal, ioInternal);
@@ -143,7 +140,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
         alertSpecs = db.getCollection("alertSpecs");
         {
-            IndexOptions ioInternal = new IndexOptions().background(true).unique(true).name("topologyNameIndex");
+            IndexOptions ioInternal = new IndexOptions().background(true).name("topologyNameIndex");
             BsonDocument docInternal = new BsonDocument();
             docInternal.append("topologyName", new BsonInt32(1));
             alertSpecs.createIndex(docInternal, ioInternal);
@@ -304,15 +301,57 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
 
     private <T> OpResult addOne(MongoCollection<Document> collection, T t) {
         OpResult result = new OpResult();
+        String json = "";
         try {
-            String json = mapper.writeValueAsString(t);
+            json = mapper.writeValueAsString(t);
             collection.insertOne(Document.parse(json));
             result.code = 200;
-            result.message = String.format("add one document to collection %s succeed!", collection.getNamespace());
+            result.message = String.format("add one document [%s] to collection [%s] succeed!", json, collection.getNamespace());
+            LOG.info(result.message);
         } catch (Exception e) {
             result.code = 400;
             result.message = e.getMessage();
-            LOG.error("", e);
+            LOG.error(String.format("Add one document [%s] to collection [%s] failed!", json, collection.getNamespace()), e);
+        }
+        return result;
+    }
+
+    /**
+     * Due to some field name in SpoutSpec contains dot(.) which is invalid Mongo Field name, we need to transform the
+     * format to store in Mongo.
+     * @return opresult
+     */
+    private <T> OpResult addOneSpoutSpec(T t) {
+        OpResult result = new OpResult();
+        String json = "";
+        try {
+            json = mapper.writeValueAsString(t);
+            Document doc = Document.parse(json);
+
+            String [] metadataMapArrays = {"kafka2TupleMetadataMap", "tuple2StreamMetadataMap", "streamRepartitionMetadataMap"};
+            for (String metadataMapName: metadataMapArrays) {
+                Document _metadataMapDoc = (Document) doc.get(metadataMapName);
+                doc.remove(metadataMapName);
+
+                ArrayList<Document> _metadataMapArray = new ArrayList<>();
+
+                for ( String key : _metadataMapDoc.keySet()) {
+                    Document _subDoc = new Document();
+                    _subDoc.put("topicName", key);
+                    _subDoc.put(metadataMapName, _metadataMapDoc.get(key));
+                    _metadataMapArray.add(_subDoc);
+                }
+                doc.append(metadataMapName, _metadataMapArray);
+            }
+
+            spoutSpecs.insertOne(doc);
+            result.code = 200;
+            result.message = String.format("add one document [%s] to collection [%s] succeed!", doc.toJson(), spoutSpecs.getNamespace());
+            LOG.info(result.message);
+        } catch (Exception e) {
+            result.code = 400;
+            result.message = e.getMessage();
+            LOG.error(String.format("Add one document [%s] to collection [%s] failed!", json, spoutSpecs.getNamespace()), e);
         }
         return result;
     }
@@ -427,7 +466,26 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             public void apply(Document document) {
                 String json = document.toJson();
                 try {
-                    maps.put(document.getString(mapKey), mapper.readValue(json, clz));
+                    //Due to some field name in SpoutSpec contains dot(.) which is invalid Mongo Field name,
+                    // we need to transform the format while reading from Mongo.
+                    if (clz == SpoutSpec.class) {
+                        Document doc = Document.parse(json);
+                        String [] metadataMapArrays = {"kafka2TupleMetadataMap", "tuple2StreamMetadataMap", "streamRepartitionMetadataMap"};
+                        for (String metadataMapName: metadataMapArrays) {
+                            ArrayList<Document> subDocs = (ArrayList) doc.get(metadataMapName);
+                            doc.remove(metadataMapName);
+
+                            Document replaceDoc = new Document();
+                            for ( Document subDoc : subDocs) {
+                                replaceDoc.put((String) subDoc.get("topicName"), subDoc.get(metadataMapName));
+                            }
+                            doc.put(metadataMapName, replaceDoc);
+                        }
+
+                        json = doc.toJson();
+                    }
+                    T t = mapper.readValue(json, clz);
+                    maps.put(document.getString(mapKey), t);
                 } catch (IOException e) {
                     LOG.error("deserialize config item failed!", e);
                 }
@@ -487,7 +545,7 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
         try {
             for (String key : state.getSpoutSpecs().keySet()) {
                 SpoutSpec spoutSpec = state.getSpoutSpecs().get(key);
-                addOne(spoutSpecs, spoutSpec);
+                addOneSpoutSpec(spoutSpec);
             }
 
             for (String key : state.getAlertSpecs().keySet()) {
@@ -522,8 +580,8 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
             }
 
             ScheduleStateBase stateBase = new ScheduleStateBase(
-                state.getVersion(), state.getGenerateTime(), state.getCode(),
-                state.getMessage(), state.getScheduleTimeMillis());
+                    state.getVersion(), state.getGenerateTime(), state.getCode(),
+                    state.getMessage(), state.getScheduleTimeMillis());
 
             addOne(scheduleStates, stateBase);
 
@@ -581,4 +639,5 @@ public class MongoMetadataDaoImpl implements IMetadataDao {
     public void close() throws IOException {
         client.close();
     }
+
 }
