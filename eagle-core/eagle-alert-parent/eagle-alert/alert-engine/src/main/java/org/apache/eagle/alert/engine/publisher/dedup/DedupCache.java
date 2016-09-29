@@ -20,6 +20,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.typesafe.config.Config;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupEventsStoreFactory.DedupEventsStoreType;
@@ -53,7 +54,7 @@ public class DedupCache {
     private Config config;
 
     private String publishName;
-    
+
     public DedupCache(Config config, String publishName) {
         this.config = config;
         this.publishName = publishName;
@@ -86,10 +87,10 @@ public class DedupCache {
                         }
                     }
                 }, 5, 60, TimeUnit.MINUTES);
+                LOG.info("Create daemon to clean up old removable events periodically");
             }
             caches.add(this);
         }
-        LOG.info("Create daemon to clean up old removable events periodicall");
     }
 
     public Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> getEvents() {
@@ -140,7 +141,7 @@ public class DedupCache {
         if (!events.containsKey(eventEniq)
             || (events.containsKey(eventEniq)
             && events.get(eventEniq).size() > 0
-            && !Objects.equal(stateFieldValue,
+            && !StringUtils.equalsIgnoreCase(stateFieldValue,
             events.get(eventEniq).getLast().getStateFieldValue()))) {
             DedupValue[] dedupValues = this.add(eventEniq, stateFieldValue);
             return dedupValues;
@@ -162,8 +163,8 @@ public class DedupCache {
             dedupValues.add(dedupValue);
             // skip the event which put failed due to concurrency
             events.put(eventEniq, dedupValues);
-            LOG.info("Add new dedup key {}, and value {}", eventEniq, dedupValues);
-        } else if (!Objects.equal(stateFieldValue,
+            LOG.info("{} Add new dedup key {}, and value {}", this.publishName, eventEniq, dedupValues);
+        } else if (!StringUtils.equalsIgnoreCase(stateFieldValue,
             events.get(eventEniq).getLast().getStateFieldValue())) {
             lastDedupValue = events.get(eventEniq).getLast();
             dedupValue = new DedupValue();
@@ -173,16 +174,16 @@ public class DedupCache {
             if (dedupValues.size() > CACHE_MAX_EVENT_QUEUE_SIZE) {
                 dedupValues = new ConcurrentLinkedDeque<DedupValue>();
                 dedupValues.add(lastDedupValue);
-                LOG.info("Reset dedup key {} to value {} since meets maximum {}",
-                    eventEniq, dedupValue, CACHE_MAX_EVENT_QUEUE_SIZE);
+                LOG.info("{} Reset dedup key {} to value {} since meets maximum {}",
+                    this.publishName, eventEniq, dedupValue, CACHE_MAX_EVENT_QUEUE_SIZE);
             }
             dedupValues.add(dedupValue);
-            LOG.info("Update dedup key {}, and value {}", eventEniq, dedupValue);
+            LOG.info("{} Update dedup key {}, and value {}", this.publishName, eventEniq, dedupValue);
         }
         if (dedupValue != null) {
             DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config, this.publishName);
             accessor.add(eventEniq, events.get(eventEniq));
-            LOG.info("Store dedup key {}, value {} to DB", eventEniq,
+            LOG.info("{} Store dedup key {}, value {} to DB", this.publishName, eventEniq,
                 Joiner.on(",").join(events.get(eventEniq)));
         }
         if (dedupValue == null) {
@@ -198,20 +199,20 @@ public class DedupCache {
     public void persistUpdatedEventUniq(EventUniq eventEniq) {
         DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config, this.publishName);
         accessor.add(eventEniq, events.get(eventEniq));
-        LOG.info("Store dedup key {}, value {} to DB", eventEniq,
+        LOG.info("{} Store dedup key {}, value {} to DB", this.publishName, eventEniq,
             Joiner.on(",").join(events.get(eventEniq)));
-    } 
+    }
 
     private DedupValue updateCount(EventUniq eventEniq) {
         ConcurrentLinkedDeque<DedupValue> dedupValues = events.get(eventEniq);
         if (dedupValues == null || dedupValues.size() <= 0) {
-            LOG.warn("No dedup values found for {}, cannot update count", eventEniq);
+            LOG.warn("{} No dedup values found for {}, cannot update count", this.publishName, eventEniq);
             return null;
         } else {
             DedupValue dedupValue = dedupValues.getLast();
             dedupValue.setCount(dedupValue.getCount() + 1);
             String updateMsg = String.format(
-                "Update count for dedup key %s, value %s and count %s", eventEniq,
+                "{} Update count for dedup key %s, value %s and count %s", this.publishName, eventEniq,
                 dedupValue.getStateFieldValue(), dedupValue.getCount());
             if (dedupValue.getCount() > 0 && dedupValue.getCount() % 100 == 0) {
                 LOG.info(updateMsg);
