@@ -21,6 +21,7 @@ import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +54,9 @@ public class WebExecutionRuntime implements ExecutionRuntime<WebEnvironment,WebE
     }
 
     @Override
-    public void status(Application<WebEnvironment, WebExecutionContainer> executor, Config config) {
+    public ApplicationEntity.Status status(Application<WebEnvironment, WebExecutionContainer> executor, Config config) {
         LOGGER.warn("Checking status {}, do nothing",executor);
+        return ApplicationEntity.Status.INITIALIZED;
     }
 
     public static class Provider implements ExecutionRuntimeProvider<WebEnvironment,WebExecutionContainer> {

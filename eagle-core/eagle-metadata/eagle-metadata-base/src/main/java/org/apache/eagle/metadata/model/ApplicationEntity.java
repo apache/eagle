@@ -159,7 +159,10 @@ public class ApplicationEntity extends PersistenceEntity {
         STARTING("STARTING"),
         RUNNING("RUNNING"),
         STOPPING("STOPPING"),
-        STOPPED("STOPPED");
+        //Todo: currently "stopped" is not used, because "STOP" operation in Eagle equals to "KILL"
+        STOPPED("STOPPED"),
+        REMOVED("REMOVED"),
+        UNKNOWN("UNKNOWN");
 
         private final String status;
 

@@ -18,6 +18,7 @@ package org.apache.eagle.app.environment;
 
 import org.apache.eagle.app.Application;
 import com.typesafe.config.Config;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 
 /**
  * Execution Runtime Adapter.
@@ -54,6 +55,7 @@ public interface ExecutionRuntime<E extends Environment, P> {
      *
      * @param executor
      * @param config
+     * @return status
      */
-    void status(Application<E, P> executor, Config config);
+    ApplicationEntity.Status status(Application<E, P> executor, Config config);
 }
