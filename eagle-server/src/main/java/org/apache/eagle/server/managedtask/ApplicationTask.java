@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ApplicationTask implements Managed {
-    private final static Logger LOG = LoggerFactory.getLogger(ApplicationStatusUpdateServiceImpl.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ApplicationTask.class);
     private final AbstractScheduledService service;
 
     public ApplicationTask(AbstractScheduledService service){

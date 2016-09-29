@@ -36,9 +36,9 @@ public class ApplicationStatusUpdateServiceImpl extends  ApplicationStatusUpdate
     private final ApplicationEntityService applicationEntityService;
     private final ApplicationManagementServiceImpl applicationManagementService;
 
-    // default value 10, 10
-    private  int initialDelay = 10;
-    private  int period = 10;
+    // default value 30, 30
+    private  int initialDelay = 30;
+    private  int period = 30;
 
 
     @Inject
@@ -62,13 +62,6 @@ public class ApplicationStatusUpdateServiceImpl extends  ApplicationStatusUpdate
 
     @Override
     protected Scheduler scheduler() {
-        try {
-            Config config = ConfigFactory.load();
-            initialDelay = config.getInt("application.updateStatus.initialDelay");
-            period = config.getInt("application.updateStatus.period");
-        } catch (Exception e) {
-            LOG.error("Failed to get configuration for application updateStatus service, using default value", e);
-        }
         return Scheduler.newFixedRateSchedule(initialDelay, period, TimeUnit.SECONDS);
     }
 
