@@ -69,7 +69,7 @@ public class StreamSortedWindowInMapDB extends BaseStreamWindow {
      * First of all, always try to put with created event directly
      * </li>
      * <li>
-     * If not absent (key already exists), then append and replace,
+     * If not ABSENT (key already exists), then append and replace,
      * replace operation will cause more consumption
      * </li>
      * </ol>

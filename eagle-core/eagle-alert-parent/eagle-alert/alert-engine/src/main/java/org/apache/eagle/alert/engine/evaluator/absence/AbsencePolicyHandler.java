@@ -91,7 +91,7 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
         String policyValue = policyDef.getDefinition().getValue();
 
         // Assume that absence alert policy value consists of
-        // "numOfFields, f1_name, f2_name, f1_value, f2_value, absence_window_rule_type, startTimeOffset, endTimeOffset"
+        // "numOfFields, f1_name, f2_name, f1_value, f2_value, absenceWindowRuleType, startTimeOffset, endTimeOffset"
         String[] segments = policyValue.split(",\\s*");
         int offset = 0;
         // populate wisb field names
@@ -106,16 +106,45 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
             expectValues.add(fn);
         }
         offset += numOfFields;
+
         String absenceWindowRuleType = segments[offset++];
-        AbsenceDailyRule rule = new AbsenceDailyRule();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date t1 = sdf.parse(segments[offset++]);
-        rule.startOffset = t1.getTime();
-        Date t2 = sdf.parse(segments[offset++]);
-        rule.endOffset = t2.getTime();
-        AbsenceWindowGenerator generator = new AbsenceWindowGenerator(rule);
-        driver = new AbsenceAlertDriver(expectValues, generator);
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        // Check rule type.
+        if (AbsenceConstants.AbsenceRule.HOURLY_RULE.toString().equalsIgnoreCase(absenceWindowRuleType)) {
+            // HOURLY_RULE
+            // "numOfFields, f1_name, f2_name, f1_value, f2_value, absenceWindowRuleType, startTime, endTime, interval"
+            AbsenceHourlyRule rule = new AbsenceHourlyRule();
+
+            // Parse startTime and endTime "2016-09-09 12:00:00"
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date d = dateFormat.parse(segments[offset]);
+            rule.setStartTime(d.getTime());
+            offset++;
+            d = dateFormat.parse(segments[offset]);
+            rule.setEndTime(d.getTime());
+            offset++;
+            d = timeFormat.parse(segments[offset]);
+            rule.setInterval(d.getTime());
+
+            AbsenceWindowGenerator generator = new AbsenceWindowGenerator(rule);
+            driver = new AbsenceAlertDriver(expectValues, generator);
+        } else if (AbsenceConstants.AbsenceRule.DAILY_RULE.toString().equalsIgnoreCase(absenceWindowRuleType)) {
+            // DAILY_RULE
+            AbsenceDailyRule rule = new AbsenceDailyRule();
+            Date d = timeFormat.parse(segments[offset]);
+            rule.startOffset = d.getTime();
+            offset++;
+            d = timeFormat.parse(segments[offset]);
+            rule.endOffset = d.getTime();
+
+            AbsenceWindowGenerator generator = new AbsenceWindowGenerator(rule);
+            driver = new AbsenceAlertDriver(expectValues, generator);
+        } else {
+            throw new UnsupportedOperationException("Not supported rule type: " + absenceWindowRuleType);
+        }
     }
 
     @Override
@@ -133,6 +162,7 @@ public class AbsencePolicyHandler implements PolicyStreamHandler {
         // Publishing alerts.
         if (isAbsenceAlert) {
             AlertStreamEvent alertEvent = AlertStreamUtils.createAlertEvent(event, context, sds);
+            LOG.info("Publishing absence alert...");
             collector.emit(alertEvent);
         }
     }

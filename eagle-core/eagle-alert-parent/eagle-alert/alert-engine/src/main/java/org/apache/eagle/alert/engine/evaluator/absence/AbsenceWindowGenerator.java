@@ -20,10 +20,10 @@ package org.apache.eagle.alert.engine.evaluator.absence;
  * Since 7/7/16.
  */
 public class AbsenceWindowGenerator {
-    private AbsenceRule rule;
+    private AbsenceRule absenceRule;
 
     public AbsenceWindowGenerator(AbsenceRule rule) {
-        this.rule = rule;
+        this.absenceRule = rule;
     }
 
     /**
@@ -33,20 +33,30 @@ public class AbsenceWindowGenerator {
      */
     public AbsenceWindow nextWindow(long currTime) {
         AbsenceWindow window = new AbsenceWindow();
-        if (rule instanceof AbsenceDailyRule) {
-            AbsenceDailyRule r = (AbsenceDailyRule) rule;
-            long adjustment = 0; // if today's window already expires, then adjust to tomorrow's window
-            if (currTime % AbsenceDailyRule.DAY_MILLI_SECONDS > r.startOffset) {
-                adjustment = AbsenceDailyRule.DAY_MILLI_SECONDS;
-            }
+        if (absenceRule instanceof AbsenceDailyRule) {
+            AbsenceDailyRule rule = (AbsenceDailyRule) absenceRule;
+            long modDailyTime = currTime % AbsenceDailyRule.DAY_MILLI_SECONDS;
             // use current timestamp to round down to day
-            long day = currTime - currTime % AbsenceDailyRule.DAY_MILLI_SECONDS;
-            day += adjustment;
-            window.startTime = day + r.startOffset;
-            window.endTime = day + r.endOffset;
+            long day = currTime - modDailyTime;
+            // if today's window already expires, then adjust to tomorrow's window
+            if (modDailyTime > rule.startOffset) {
+                day += AbsenceDailyRule.DAY_MILLI_SECONDS;
+            }
+            window.startTime = day + rule.startOffset;
+            window.endTime = day + rule.endOffset;
+            return window;
+        } else if (absenceRule instanceof AbsenceHourlyRule) {
+            AbsenceHourlyRule rule = (AbsenceHourlyRule) absenceRule;
+            long modTime = (currTime - rule.getStartTime()) % rule.getInterval();
+            long newStartTime = currTime - modTime;
+            if (modTime > 0) {
+                newStartTime += rule.getInterval();
+            }
+            window.startTime = newStartTime;
+            window.endTime = newStartTime + rule.getEndTime() - rule.getStartTime();
             return window;
         } else {
-            throw new UnsupportedOperationException("not supported rule " + rule);
+            throw new UnsupportedOperationException("Not supported absenceRule " + absenceRule);
         }
     }
 }

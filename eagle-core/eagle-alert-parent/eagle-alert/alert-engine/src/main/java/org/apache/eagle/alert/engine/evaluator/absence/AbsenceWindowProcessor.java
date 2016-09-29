@@ -31,12 +31,12 @@ public class AbsenceWindowProcessor {
     private List<Object> expectAttrs;
     private AbsenceWindow window;
     private boolean expired; // to mark if the time range has been went through
-    private OccurStatus status = OccurStatus.not_sure;
+    private OccurStatus status = OccurStatus.NOT_SURE;
 
     public enum OccurStatus {
-        not_sure,
-        occured,
-        absent
+        NOT_SURE,
+        OCCURRED,
+        ABSENT
     }
 
     public AbsenceWindowProcessor(List<Object> expectAttrs, AbsenceWindow window) {
@@ -50,23 +50,22 @@ public class AbsenceWindowProcessor {
      */
     public void process(List<Object> appearAttrs, long occurTime) {
         if (expired) {
-            throw new IllegalStateException("Expired window can't recieve events");
+            throw new IllegalStateException("Expired window can't receive events");
         }
         switch (status) {
-            case not_sure:
+            case NOT_SURE:
                 if (occurTime < window.startTime) {
                     break;
-                } else if (occurTime >= window.startTime
-                    && occurTime <= window.endTime) {
+                } else if (occurTime >= window.startTime && occurTime <= window.endTime) {
                     if (expectAttrs.equals(appearAttrs)) {
-                        status = OccurStatus.occured;
+                        status = OccurStatus.OCCURRED;
                     }
                     break;
                 } else {
-                    status = OccurStatus.absent;
+                    status = OccurStatus.ABSENT;
                     break;
                 }
-            case occured:
+            case OCCURRED:
                 if (occurTime > window.endTime) {
                     expired = true;
                 }
@@ -75,7 +74,7 @@ public class AbsenceWindowProcessor {
                 break;
         }
         // reset status
-        if (status == OccurStatus.absent) {
+        if (status == OccurStatus.ABSENT) {
             expired = true;
         }
     }

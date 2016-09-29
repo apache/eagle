@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Since 7/8/16.
@@ -43,7 +44,32 @@ public class TestAbsencePolicyHandler {
 
     @Test
     public void test() throws Exception {
-        test(buildPolicyDef_provided());
+        String value = "1,jobID,job1,daily_rule,14:00:00,15:00:00";
+        test(buildPolicyDef_provided(value));
+    }
+
+    @Test
+    public void testHourlyRule() throws Exception {
+        // "numOfFields, f1_name, f2_name, f1_value, f2_value, absenceWindowRuleType, startTime, endTime, interval"
+        String value = "1,jobID,job1,hourly_rule,2016-09-09 12:00:00,2016-09-09 13:00:00,10:00:00";
+        PolicyDefinition pd = buildPolicyDef_provided(value);
+
+        Map<String, StreamDefinition> sds = new HashMap<>();
+        StreamDefinition sd = buildStreamDef();
+        sds.put("testInputStream", sd);
+        AbsencePolicyHandler handler = new AbsencePolicyHandler(sds);
+
+        PolicyHandlerContext context = new PolicyHandlerContext();
+        context.setPolicyDefinition(pd);
+        handler.prepare(new TestCollector(), context);
+
+        // window=[startTime=3600000 (1970-01-01 01:00:00), endTime=7200000 (1970-01-01 02:00:00)]
+        handler.send(buildStreamEvt(0, "job1", "running"));
+
+        TimeUnit.SECONDS.sleep(1);
+        
+        // window=[startTime=39600000 (1970-01-01 11:00:00), endTime=43200000 (1970-01-01 12:00:00)]s
+        handler.send(buildStreamEvt(7210000, "job1", "running"));
     }
 
     public void test(PolicyDefinition pd) throws Exception {
@@ -64,15 +90,15 @@ public class TestAbsencePolicyHandler {
         public void emit(Object o) {
             AlertStreamEvent e = (AlertStreamEvent) o;
             Object[] data = e.getData();
-            Assert.assertEquals("host2", data[1]);
+            Assert.assertEquals("job1", data[1]);
             LOG.info(e.toString());
         }
     }
 
-    private PolicyDefinition buildPolicyDef_provided() {
+    private PolicyDefinition buildPolicyDef_provided(String value) {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
-        def.setValue("1,jobID,job1,daily_rule,14:00:00,15:00:00");
+        def.setValue(value);
         def.setType("absencealert");
         pd.setDefinition(def);
         pd.setInputStreams(Arrays.asList(inputStream));

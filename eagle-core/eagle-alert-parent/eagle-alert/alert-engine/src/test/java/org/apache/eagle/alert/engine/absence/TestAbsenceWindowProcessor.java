@@ -36,15 +36,15 @@ public class TestAbsenceWindowProcessor {
         window.endTime = 200L;
         AbsenceWindowProcessor processor = new AbsenceWindowProcessor(expectedHosts, window);
         processor.process(Arrays.asList("host2"), 90);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.not_sure);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.NOT_SURE);
         processor.process(Arrays.asList("host3"), 101);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.not_sure);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.NOT_SURE);
         processor.process(Arrays.asList("host3"), 138);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.not_sure);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.NOT_SURE);
         processor.process(Arrays.asList("host2"), 189);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.not_sure);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.NOT_SURE);
         processor.process(Arrays.asList("host2"), 201);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.absent);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.ABSENT);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -55,15 +55,15 @@ public class TestAbsenceWindowProcessor {
         window.endTime = 200L;
         AbsenceWindowProcessor processor = new AbsenceWindowProcessor(expectedHosts, window);
         processor.process(Arrays.asList("host2"), 90);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.not_sure);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.NOT_SURE);
         processor.process(Arrays.asList("host3"), 101);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.not_sure);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.NOT_SURE);
         processor.process(Arrays.asList("host1"), 138);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.occured);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.OCCURRED);
         processor.process(Arrays.asList("host2"), 189);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.occured);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.OCCURRED);
         processor.process(Arrays.asList("host2"), 201);
-        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.occured);
+        Assert.assertEquals(processor.checkStatus(), AbsenceWindowProcessor.OccurStatus.OCCURRED);
         Assert.assertEquals(processor.checkExpired(), true);
         processor.process(Arrays.asList("host2"), 225);
     }

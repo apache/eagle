@@ -14,25 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.eagle.alert.engine.evaluator.absence;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
 /**
- * Since 7/7/16.
+ * Created on 9/2/16.
  */
-public class AbsenceWindow {
-    public long startTime;
-    public long endTime;
+public class AbsenceHourlyRule implements AbsenceRule {
+    private long startTime;
+    private long endTime;
+    private long interval;
 
-    public String toString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String t1 = sdf.format(new Date(startTime));
-        String t2 = sdf.format(new Date(endTime));
-        return "startTime=" + startTime + " (" + t1 + "), "
-                + "endTime=" + endTime + " (" + t2 + ")";
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public long getInterval() {
+        return interval;
+    }
+
+    public void setInterval(long interval) {
+        this.interval = interval;
     }
 }

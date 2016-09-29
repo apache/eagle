@@ -47,7 +47,7 @@ public class AbsenceAlertDriver {
         boolean expired = processor.checkExpired();
         boolean isAbsenceAlert = false;
         if (expired) {
-            if (status == AbsenceWindowProcessor.OccurStatus.absent) {
+            if (status == AbsenceWindowProcessor.OccurStatus.ABSENT) {
                 // send alert
                 LOG.info("===================");
                 LOG.info("|| Absence Alert ||");
