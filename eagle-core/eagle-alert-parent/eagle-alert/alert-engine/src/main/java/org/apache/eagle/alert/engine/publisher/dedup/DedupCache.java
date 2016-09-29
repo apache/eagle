@@ -212,7 +212,7 @@ public class DedupCache {
             DedupValue dedupValue = dedupValues.getLast();
             dedupValue.setCount(dedupValue.getCount() + 1);
             String updateMsg = String.format(
-                "{} Update count for dedup key %s, value %s and count %s", this.publishName, eventEniq,
+                "%s Update count for dedup key %s, value %s and count %s", this.publishName, eventEniq,
                 dedupValue.getStateFieldValue(), dedupValue.getCount());
             if (dedupValue.getCount() > 0 && dedupValue.getCount() % 100 == 0) {
                 LOG.info(updateMsg);
@@ -233,6 +233,7 @@ public class DedupCache {
             newdata[i] = originalEvent.getData()[i];
         }
         event.setData(newdata);
+        event.setStreamId(originalEvent.getStreamId());
         event.setSchema(originalEvent.getSchema());
         event.setPolicyId(originalEvent.getPolicyId());
         event.setCreatedTime(originalEvent.getCreatedTime());

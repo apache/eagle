@@ -57,14 +57,16 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
                     Map.class,
                     List.class,
                     String.class,
-                    DedupCache.class).newInstance(
+                    DedupCache.class,
+                    String.class).newInstance(
                     config,
                     spec.getProperties(),
                     publishment.getDedupFields(),
                     publishment.getDedupStateField(),
-                    dedupCache);
-                getLogger().info("initiliazed extended deduplicator {} with properties {} successfully",
-                    spec.getClassName(), Joiner.on(",").withKeyValueSeparator(">").join(
+                    dedupCache,
+                    publishment.getName());
+                getLogger().info("{} initiliazed extended deduplicator {} with properties {} successfully",
+                    publishment.getName(), spec.getClassName(), Joiner.on(",").withKeyValueSeparator(">").join(
                         spec.getProperties() == null ? new HashMap<String, String>() : spec.getProperties()));
             } catch (Throwable t) {
                 getLogger().error(String.format("initialize extended deduplicator %s failed", spec.getClassName()), t);
