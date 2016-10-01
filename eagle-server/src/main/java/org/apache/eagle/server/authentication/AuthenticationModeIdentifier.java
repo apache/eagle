@@ -33,8 +33,8 @@ public class AuthenticationModeIdentifier {
     private static final String LDAP_MODE_REALM = "LDAP_AUTHENTICATION";
 
     private static final String MODE_KEY = "auth.mode";
-    private static final String ACCEPTED_USERNAME_KEY = "auth.basic.username";
-    private static final String ACCEPTED_PASSWORD_KEY = "auth.basic.password";
+    private static final String ACCEPTED_USERNAME_KEY = "auth.simple.username";
+    private static final String ACCEPTED_PASSWORD_KEY = "auth.simple.password";
     private static final String CACHE_POLICY_KEY = "auth.cachePolicy";
     private static final String AUTHORIZE_KEY = "auth.authorize";
     private static final String CACHE_KEY = "auth.cache";
