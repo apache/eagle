@@ -68,7 +68,7 @@ class ServerApplication extends Application<ServerConfig> {
 
         BeanConfig swaggerConfig = new BeanConfig();
         swaggerConfig.setTitle(ServerConfig.getServerName());
-        swaggerConfig.setVersion(ServerConfig.getServerVersion());
+        swaggerConfig.setVersion(ServerConfig.getBuildNumber());
         swaggerConfig.setBasePath(ServerConfig.getApiBasePath());
         swaggerConfig.setResourcePackage(ServerConfig.getResourcePackage());
         swaggerConfig.setLicense(ServerConfig.getLicense());
