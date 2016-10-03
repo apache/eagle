@@ -18,14 +18,7 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
@@ -34,7 +27,13 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class AlertKafkaPublisher extends AbstractPublishPlugin {
 
@@ -77,8 +76,10 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             LOG.warn("Namespace column {} is not found, the found index {} is invalid",
                 namespaceLabel, namespaceColumnIndex);
         } else {
-            event.getData()[namespaceColumnIndex] = namespaceValue;
-            outputEvents.add(event);
+            // copy raw event to be duped
+            AlertStreamEvent newEvent = new AlertStreamEvent(event);
+            newEvent.getData()[namespaceColumnIndex] = namespaceValue;
+            outputEvents.add(newEvent);
         }
 
         List<AlertStreamEvent> dedupResults = dedup(event);
