@@ -16,10 +16,9 @@
  */
 package org.apache.eagle.alert.engine.model;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.utils.DateTimeUtil;
-
+import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,21 +32,6 @@ public class AlertStreamEvent extends StreamEvent {
     private StreamDefinition schema;
     private String createdBy;
     private long createdTime;
-
-    public AlertStreamEvent() {
-    }
-
-    public AlertStreamEvent(AlertStreamEvent event) {
-        this.policyId = event.policyId;
-        this.schema = event.schema;
-        this.createdBy = event.createdBy;
-        this.createdTime = event.createdTime;
-        this.setTimestamp(event.getTimestamp());
-        this.setData(new Object[event.data.length]);
-        System.arraycopy(event.data, 0, this.data, 0, event.data.length);
-        this.setStreamId(event.getStreamId());
-        this.setMetaVersion(event.getMetaVersion());
-    }
 
     public void setPolicyId(String policyId) {
         this.policyId = policyId;

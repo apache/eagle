@@ -42,7 +42,7 @@ public class DefaultDeduplicatorTest extends MongoDependencyBaseTest {
 		Config config = ConfigFactory.load();
 		DedupCache dedupCache = new DedupCache(config, "testPublishment");
 		DefaultDeduplicator deduplicator = new DefaultDeduplicator(
-				"PT1M", Arrays.asList(new String[] { "alertKey" }), "state", dedupCache);
+				"PT1M", Arrays.asList(new String[] { "alertKey" }), "state", "close", dedupCache);
 		
 		StreamDefinition stream = createStream();
 		PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");

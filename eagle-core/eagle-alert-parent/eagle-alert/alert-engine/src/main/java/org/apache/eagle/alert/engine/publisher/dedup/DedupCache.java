@@ -42,6 +42,7 @@ public class DedupCache {
     private static final long CACHE_MAX_EVENT_QUEUE_SIZE = 10;
 
     public static final String DEDUP_COUNT = "dedupCount";
+    public static final String DOC_ID = "docId";
     public static final String DEDUP_FIRST_OCCURRENCE = "dedupFirstOccurrenceTime";
 
     private static final DedupEventsStoreType type = DedupEventsStoreType.Mongo;
@@ -118,8 +119,9 @@ public class DedupCache {
     }
 
     public List<AlertStreamEvent> dedup(AlertStreamEvent event, EventUniq eventEniq,
-                                        String dedupStateField, String stateFieldValue) {
-        DedupValue[] dedupValues = this.addOrUpdate(eventEniq, stateFieldValue);
+                                        String dedupStateField, String stateFieldValue,
+                                        String stateCloseValue) {
+        DedupValue[] dedupValues = this.addOrUpdate(eventEniq, event, stateFieldValue, stateCloseValue);
         if (dedupValues != null) {
             // any of dedupValues won't be null
             if (dedupValues.length == 2) {
@@ -136,14 +138,14 @@ public class DedupCache {
         return null;
     }
 
-    public synchronized DedupValue[] addOrUpdate(EventUniq eventEniq, String stateFieldValue) {
+    public synchronized DedupValue[] addOrUpdate(EventUniq eventEniq, AlertStreamEvent event, String stateFieldValue, String stateCloseValue) {
         Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> events = this.getEvents();
         if (!events.containsKey(eventEniq)
             || (events.containsKey(eventEniq)
-            && events.get(eventEniq).size() > 0
-            && !StringUtils.equalsIgnoreCase(stateFieldValue,
-            events.get(eventEniq).getLast().getStateFieldValue()))) {
-            DedupValue[] dedupValues = this.add(eventEniq, stateFieldValue);
+                && events.get(eventEniq).size() > 0
+                && !StringUtils.equalsIgnoreCase(stateFieldValue,
+                    events.get(eventEniq).getLast().getStateFieldValue()))) {
+            DedupValue[] dedupValues = this.add(eventEniq, event, stateFieldValue, stateCloseValue);
             return dedupValues;
         } else {
             // update count
@@ -152,34 +154,23 @@ public class DedupCache {
         }
     }
 
-    private DedupValue[] add(EventUniq eventEniq, String stateFieldValue) {
+    private DedupValue[] add(EventUniq eventEniq, AlertStreamEvent event, String stateFieldValue, String stateCloseValue) {
         DedupValue dedupValue = null;
-        DedupValue lastDedupValue = null;
         if (!events.containsKey(eventEniq)) {
-            dedupValue = new DedupValue();
-            dedupValue.setFirstOccurrence(eventEniq.timestamp);
-            dedupValue.setStateFieldValue(stateFieldValue);
-            ConcurrentLinkedDeque<DedupValue> dedupValues = new ConcurrentLinkedDeque<DedupValue>();
+            dedupValue = createDedupValue(eventEniq, event, stateFieldValue);
+            ConcurrentLinkedDeque<DedupValue> dedupValues = new ConcurrentLinkedDeque<>();
             dedupValues.add(dedupValue);
             // skip the event which put failed due to concurrency
             events.put(eventEniq, dedupValues);
             LOG.info("{} Add new dedup key {}, and value {}", this.publishName, eventEniq, dedupValues);
         } else if (!StringUtils.equalsIgnoreCase(stateFieldValue,
-            events.get(eventEniq).getLast().getStateFieldValue())) {
-            lastDedupValue = events.get(eventEniq).getLast();
-            dedupValue = new DedupValue();
-            dedupValue.setFirstOccurrence(eventEniq.timestamp);
-            dedupValue.setStateFieldValue(stateFieldValue);
-            ConcurrentLinkedDeque<DedupValue> dedupValues = events.get(eventEniq);
-            if (dedupValues.size() > CACHE_MAX_EVENT_QUEUE_SIZE) {
-                dedupValues = new ConcurrentLinkedDeque<DedupValue>();
-                dedupValues.add(lastDedupValue);
-                LOG.info("{} Reset dedup key {} to value {} since meets maximum {}",
-                    this.publishName, eventEniq, dedupValue, CACHE_MAX_EVENT_QUEUE_SIZE);
-            }
-            dedupValues.add(dedupValue);
+                events.get(eventEniq).getLast().getStateFieldValue())) {
+            // existing a de-dup value, try update or reset
+            DedupValue lastDedupValue = events.get(eventEniq).getLast();
+            dedupValue = updateDedupValue(lastDedupValue, eventEniq, event, stateFieldValue, stateCloseValue);
             LOG.info("{} Update dedup key {}, and value {}", this.publishName, eventEniq, dedupValue);
         }
+
         if (dedupValue != null) {
             DedupEventsStore accessor = DedupEventsStoreFactory.getStore(type, this.config, this.publishName);
             accessor.add(eventEniq, events.get(eventEniq));
@@ -189,11 +180,43 @@ public class DedupCache {
         if (dedupValue == null) {
             return null;
         }
-        if (lastDedupValue != null) {
-            return new DedupValue[] {lastDedupValue, dedupValue};
-        } else {
-            return new DedupValue[] {dedupValue};
+        return new DedupValue[] {dedupValue};
+    }
+
+    private DedupValue updateDedupValue(DedupValue lastDedupValue, EventUniq eventEniq, AlertStreamEvent event, String stateFieldValue, String stateCloseValue) {
+        if (lastDedupValue.getFirstOccurrence() >= eventEniq.timestamp) {
+            // if dedup value happens later then event, dedup state changes.
+            return null;
         }
+
+        if (lastDedupValue.getStateFieldValue().equals(stateCloseValue)
+                && eventEniq.timestamp < lastDedupValue.getCloseTime()) {
+            DedupValue dv = createDedupValue(eventEniq, event, stateFieldValue);
+            lastDedupValue.resetTo(dv);
+        } else {
+            // update lastDedupValue, set closeTime when close
+            lastDedupValue.setStateFieldValue(stateFieldValue);
+            if (stateFieldValue.equals(stateCloseValue)) {
+                lastDedupValue.setCloseTime(eventEniq.timestamp); // when close an event, set closeTime for further check
+            }
+        }
+        return lastDedupValue;
+    }
+
+    private DedupValue createDedupValue(EventUniq eventEniq, AlertStreamEvent event, String stateFieldValue) {
+        DedupValue dedupValue;
+        dedupValue = new DedupValue();
+        dedupValue.setFirstOccurrence(eventEniq.timestamp);
+        int idx = event.getSchema().getColumnIndex(DOC_ID);
+        if (idx >= 0 ) {
+            dedupValue.setDocId(event.getData()[idx].toString());
+        } else {
+            dedupValue.setDocId("");
+        }
+        dedupValue.setCount(1);
+        dedupValue.setCloseTime(0);
+        dedupValue.setStateFieldValue(stateFieldValue);
+        return dedupValue;
     }
 
     public void persistUpdatedEventUniq(EventUniq eventEniq) {
@@ -250,6 +273,9 @@ public class DedupCache {
             }
             if (Objects.equal(colName, DEDUP_FIRST_OCCURRENCE)) {
                 event.getData()[i] = dedupValue.getFirstOccurrence();
+            }
+            if (Objects.equal(colName, DOC_ID)) {
+                event.getData()[i] = dedupValue.getDocId();
             }
         }
         return event;

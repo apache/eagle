@@ -44,7 +44,7 @@ public class DefaultDedupWithoutStateTest {
 		Config config = ConfigFactory.load();
 		DedupCache dedupCache = new DedupCache(config, "testPublishment");
 		DefaultDeduplicator deduplicator = new DefaultDeduplicator(
-				"PT10S", Arrays.asList(new String[] { "alertKey" }), null, dedupCache);
+				"PT10S", Arrays.asList(new String[] { "alertKey" }), null, null, dedupCache);
 		
 		StreamDefinition stream = createStream();
 		PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");

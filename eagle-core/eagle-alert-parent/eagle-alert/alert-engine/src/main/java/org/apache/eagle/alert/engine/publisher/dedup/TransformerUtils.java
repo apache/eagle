@@ -16,18 +16,14 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
+import org.bson.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
-import org.bson.BsonArray;
-import org.bson.BsonBoolean;
-import org.bson.BsonDocument;
-import org.bson.BsonInt64;
-import org.bson.BsonString;
 
 public class TransformerUtils {
 
@@ -64,6 +60,10 @@ public class TransformerUtils {
                     MongoDedupEventsStore.DEDUP_COUNT).getValue());
                 dedupValue.setFirstOccurrence(dedupValuesDoc.getInt64(
                     MongoDedupEventsStore.DEDUP_FIRST_OCCURRENCE).getValue());
+                dedupValue.setCloseTime(dedupValuesDoc.getInt64(
+                    MongoDedupEventsStore.DEDUP_CLOSE_TIME).getValue());
+                dedupValue.setDocId(dedupValuesDoc.getString(
+                    MongoDedupEventsStore.DOC_ID).getValue());
                 dedupValues.add(dedupValue);
             }
             String publishId = doc.getString(MongoDedupEventsStore.DEDUP_PUBLISH_ID).getValue();
@@ -96,12 +96,11 @@ public class TransformerUtils {
             List<BsonDocument> dedupValuesDocs = new ArrayList<BsonDocument>();
             for (DedupValue dedupValue : entity.getDedupValues()) {
                 BsonDocument dedupValuesDoc = new BsonDocument();
-                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_STATE_FIELD_VALUE,
-                    new BsonString(dedupValue.getStateFieldValue()));
-                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_COUNT,
-                    new BsonInt64(dedupValue.getCount()));
-                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_FIRST_OCCURRENCE,
-                    new BsonInt64(dedupValue.getFirstOccurrence()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_STATE_FIELD_VALUE, new BsonString(dedupValue.getStateFieldValue()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_COUNT, new BsonInt64(dedupValue.getCount()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_FIRST_OCCURRENCE,new BsonInt64(dedupValue.getFirstOccurrence()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_CLOSE_TIME, new BsonInt64(dedupValue.getCloseTime()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DOC_ID, new BsonString(dedupValue.getDocId()));
                 dedupValuesDocs.add(dedupValuesDoc);
             }
             doc.put(MongoDedupEventsStore.DEDUP_VALUES, new BsonArray(dedupValuesDocs));
