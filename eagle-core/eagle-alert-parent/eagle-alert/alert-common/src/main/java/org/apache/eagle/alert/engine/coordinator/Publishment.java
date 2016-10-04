@@ -35,6 +35,7 @@ public class Publishment {
     private String dedupIntervalMin;
     private List<String> dedupFields;
     private String dedupStateField;
+    private String dedupStateCloseValue;
     private OverrideDeduplicatorSpec overrideDeduplicator;
     private Map<String, String> properties;
     // the class name to extend the IEventSerializer interface
@@ -54,6 +55,14 @@ public class Publishment {
 
     public void setDedupStateField(String dedupStateField) {
         this.dedupStateField = dedupStateField;
+    }
+
+    public String getDedupStateCloseValue() {
+        return dedupStateCloseValue;
+    }
+
+    public void setDedupStateCloseValue(String dedupStateCloseValue) {
+        this.dedupStateCloseValue = dedupStateCloseValue;
     }
 
     public OverrideDeduplicatorSpec getOverrideDeduplicator() {

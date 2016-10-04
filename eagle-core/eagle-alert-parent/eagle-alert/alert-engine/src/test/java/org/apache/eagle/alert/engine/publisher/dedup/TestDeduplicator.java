@@ -71,7 +71,7 @@ public class TestDeduplicator extends ExtendedDeduplicator {
         LOG.info("event key: " + eventkey);
         LOG.info("dedup field: " + this.getDedupStateField());
         LOG.info("dedup value: " + stateFiledValue);
-        List<AlertStreamEvent> result = this.getDedupCache().dedup(event, eventkey, this.getDedupStateField(), stateFiledValue);
+        List<AlertStreamEvent> result = this.getDedupCache().dedup(event, eventkey, this.getDedupStateField(), stateFiledValue, "closed");
         return result;
     }
 

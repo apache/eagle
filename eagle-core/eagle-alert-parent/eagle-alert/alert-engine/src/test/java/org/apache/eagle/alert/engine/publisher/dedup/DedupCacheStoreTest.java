@@ -53,7 +53,7 @@ public class DedupCacheStoreTest extends MongoDependencyBaseTest {
 		System.setProperty("config.resource", "/application-mongo-statestore.conf");
 		Config config = ConfigFactory.load();
 		DedupCache cache = new DedupCache(config, "testPublishment");
-		cache.addOrUpdate(eventUniq, (String) event.getData()[event.getSchema().getColumnIndex("state")]);
+		cache.addOrUpdate(eventUniq, event, (String) event.getData()[event.getSchema().getColumnIndex("state")], "closed");
 		
 		DedupEventsStore accessor = DedupEventsStoreFactory.getStore(DedupEventsStoreType.Mongo, config, "testPublishment");
 		Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> events = accessor.getEvents();

@@ -16,20 +16,6 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
-import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
-import org.bson.BsonDocument;
-import org.bson.BsonInt32;
-import org.bson.BsonInt64;
-import org.bson.BsonString;
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.Block;
@@ -40,6 +26,15 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.InsertOneOptions;
 import com.typesafe.config.Config;
+import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
+import org.bson.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class MongoDedupEventsStore implements DedupEventsStore {
 
@@ -47,6 +42,7 @@ public class MongoDedupEventsStore implements DedupEventsStore {
 
     public static final String DEDUP_ID = "dedupId";
     public static final String DEDUP_STREAM_ID = "streamId";
+    public static final String DOC_ID = "docId";
     public static final String DEDUP_POLICY_ID = "policyId";
     public static final String DEDUP_CREATE_TIME = "createdTime";
     public static final String DEDUP_TIMESTAMP = "timestamp";
@@ -56,6 +52,7 @@ public class MongoDedupEventsStore implements DedupEventsStore {
     public static final String DEDUP_STATE_FIELD_VALUE = "stateFieldValue";
     public static final String DEDUP_COUNT = "count";
     public static final String DEDUP_FIRST_OCCURRENCE = "firstOccurrence";
+    public static final String DEDUP_CLOSE_TIME = "closeTime";
     public static final String DEDUP_PUBLISH_ID = "publishId";
 
     private static final ObjectMapper mapper = new ObjectMapper();

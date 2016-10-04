@@ -16,10 +16,8 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Joiner;
+import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.codec.IEventSerializer;
 import org.apache.eagle.alert.engine.coordinator.OverrideDeduplicatorSpec;
@@ -31,8 +29,9 @@ import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
 import org.apache.eagle.alert.engine.publisher.dedup.ExtendedDeduplicator;
 import org.slf4j.Logger;
 
-import com.google.common.base.Joiner;
-import com.typesafe.config.Config;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @since Jun 3, 2016.
@@ -73,7 +72,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
             }
         } else {
             this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(),
-                publishment.getDedupFields(), publishment.getDedupStateField(), dedupCache);
+                publishment.getDedupFields(), publishment.getDedupStateField(), publishment.getDedupStateCloseValue(), dedupCache);
             this.pubName = publishment.getName();
         }
         String serializerClz = publishment.getSerializer();

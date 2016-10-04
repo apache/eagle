@@ -71,7 +71,7 @@ public class DedupCacheTest {
 			List<AlertStreamEvent> result = dedupCache.dedup(event, 
 					new EventUniq(event.getStreamId(), event.getPolicyId(), event.getCreatedTime(), dedupFieldValues), 
 					"state", 
-					(String) event.getData()[event.getSchema().getColumnIndex("state")]);
+					(String) event.getData()[event.getSchema().getColumnIndex("state")], "closed");
 			System.out.println((i + 1) + " >>>> " + ToStringBuilder.reflectionToString(result));
 		}
 		

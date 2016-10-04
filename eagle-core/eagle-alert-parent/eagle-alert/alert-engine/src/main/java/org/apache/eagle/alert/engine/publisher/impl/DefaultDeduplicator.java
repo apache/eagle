@@ -17,12 +17,8 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -32,8 +28,11 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class DefaultDeduplicator implements AlertDeduplicator {
 
@@ -42,6 +41,7 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     private long dedupIntervalSec;
     private List<String> customDedupFields = new ArrayList<>();
     private String dedupStateField;
+    private String dedupStateCloseValue;
 
     private DedupCache dedupCache;
 
@@ -60,13 +60,16 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     }
 
     public DefaultDeduplicator(String intervalMin, List<String> customDedupFields,
-                               String dedupStateField, DedupCache dedupCache) {
+                               String dedupStateField, String dedupStateCloseValue, DedupCache dedupCache) {
         setDedupIntervalMin(intervalMin);
         if (customDedupFields != null) {
             this.customDedupFields = customDedupFields;
         }
         if (StringUtils.isNotBlank(dedupStateField)) {
             this.dedupStateField = dedupStateField;
+        }
+        if (StringUtils.isNoneBlank(dedupStateCloseValue)) {
+            this.dedupStateCloseValue = dedupStateCloseValue;
         }
         this.dedupCache = dedupCache;
 
@@ -94,7 +97,7 @@ public class DefaultDeduplicator implements AlertDeduplicator {
             }
             return Arrays.asList(event);
         }
-        return dedupCache.dedup(event, key, dedupStateField, stateFiledValue);
+        return dedupCache.dedup(event, key, dedupStateField, stateFiledValue, dedupStateCloseValue);
     }
 
     public List<AlertStreamEvent> dedup(AlertStreamEvent event) {
