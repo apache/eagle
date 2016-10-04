@@ -68,7 +68,7 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         if (StringUtils.isNotBlank(dedupStateField)) {
             this.dedupStateField = dedupStateField;
         }
-        if (StringUtils.isNoneBlank(dedupStateCloseValue)) {
+        if (StringUtils.isNotBlank(dedupStateCloseValue)) {
             this.dedupStateCloseValue = dedupStateCloseValue;
         }
         this.dedupCache = dedupCache;
