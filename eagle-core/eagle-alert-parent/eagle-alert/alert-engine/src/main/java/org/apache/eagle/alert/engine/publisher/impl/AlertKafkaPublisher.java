@@ -77,8 +77,10 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             LOG.warn("Namespace column {} is not found, the found index {} is invalid",
                 namespaceLabel, namespaceColumnIndex);
         } else {
-            event.getData()[namespaceColumnIndex] = namespaceValue;
-            outputEvents.add(event);
+            // copy raw event to be duped
+            AlertStreamEvent newEvent = new AlertStreamEvent(event);
+            newEvent.getData()[namespaceColumnIndex] = namespaceValue;
+            outputEvents.add(newEvent);
         }
 
         List<AlertStreamEvent> dedupResults = dedup(event);
