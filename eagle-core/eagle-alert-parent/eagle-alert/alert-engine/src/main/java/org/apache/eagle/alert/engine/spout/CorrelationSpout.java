@@ -183,7 +183,9 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         // decode and get topic
         KafkaMessageIdWrapper id = (KafkaMessageIdWrapper) msgId;
         KafkaSpoutWrapper spout = kafkaSpoutList.get(id.topic);
-        spout.ack(id.id);
+        if (spout !=  null) {
+            spout.ack(id.id);
+        }
     }
 
     @Override
@@ -192,7 +194,9 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         KafkaMessageIdWrapper id = (KafkaMessageIdWrapper) msgId;
         LOG.error("Failing message {}, with topic {}", msgId, id.topic);
         KafkaSpoutWrapper spout = kafkaSpoutList.get(id.topic);
-        spout.fail(id.id);
+        if (spout !=  null) {
+            spout.fail(id.id);
+        }
     }
 
     @Override
