@@ -81,6 +81,46 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-commit</id>
+                        <configuration>
+                            <buildNumberPropertyName>build.commit</buildNumberPropertyName>
+                            <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                            <useLastCommittedRevision>true</useLastCommittedRevision>
+                            <revisionOnScmFailure>unknown</revisionOnScmFailure>
+                            <format>{0}</format>
+                            <items>
+                                <item>scmVersion</item>
+                            </items>
+                        </configuration>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>build-timestamp</id>
+                        <configuration>
+                            <buildNumberPropertyName>build.timestamp</buildNumberPropertyName>
+                            <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                            <useLastCommittedRevision>true</useLastCommittedRevision>
+                            <revisionOnScmFailure>unknown</revisionOnScmFailure>
+                            <format>{0,date,yyyy-MM-dd HH:mm:ss a, z}</format>
+                            <items>
+                                <item>timestamp</item>
+                            </items>
+                        </configuration>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
