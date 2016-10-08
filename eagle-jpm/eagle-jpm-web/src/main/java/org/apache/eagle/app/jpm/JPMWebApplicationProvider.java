@@ -16,8 +16,8 @@
  */
 package org.apache.eagle.app.jpm;
 
-import org.apache.eagle.app.StaticWebApplicationProvider;
+import org.apache.eagle.app.StaticApplicationProvider;
 
-public class JPMWebApplicationProvider extends StaticWebApplicationProvider {
+public class JPMWebApplicationProvider extends StaticApplicationProvider {
     // JPMWebApplicationProvider SPI Interface
 }

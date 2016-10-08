@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * WebExecutionRuntime.
  */
-public class WebExecutionRuntime implements ExecutionRuntime<WebEnvironment,WebExecutionContainer> {
+public class WebExecutionRuntime implements ExecutionRuntime<WebEnvironment,StaticApplicationExecutor> {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebExecutionRuntime.class);
 
     private WebEnvironment environment;
@@ -44,24 +44,24 @@ public class WebExecutionRuntime implements ExecutionRuntime<WebEnvironment,WebE
     }
 
     @Override
-    public void start(Application<WebEnvironment, WebExecutionContainer> executor, Config config) {
+    public void start(Application<WebEnvironment, StaticApplicationExecutor> executor, Config config) {
         LOGGER.warn("Starting {}, do nothing",executor);
     }
 
     @Override
-    public void stop(Application<WebEnvironment, WebExecutionContainer> executor, Config config) {
+    public void stop(Application<WebEnvironment, StaticApplicationExecutor> executor, Config config) {
         LOGGER.warn("Stopping {}, do nothing",executor);
     }
 
     @Override
-    public ApplicationEntity.Status status(Application<WebEnvironment, WebExecutionContainer> executor, Config config) {
+    public ApplicationEntity.Status status(Application<WebEnvironment, StaticApplicationExecutor> executor, Config config) {
         LOGGER.warn("Checking status {}, do nothing",executor);
         return ApplicationEntity.Status.INITIALIZED;
     }
 
-    public static class Provider implements ExecutionRuntimeProvider<WebEnvironment,WebExecutionContainer> {
+    public static class Provider implements ExecutionRuntimeProvider<WebEnvironment,StaticApplicationExecutor> {
         @Override
-        public ExecutionRuntime<WebEnvironment, WebExecutionContainer> get() {
+        public ExecutionRuntime<WebEnvironment, StaticApplicationExecutor> get() {
             return new WebExecutionRuntime();
         }
     }
