@@ -83,12 +83,11 @@ public class ApplicationOperationContext implements Serializable, ApplicationLif
 
     /**
      * Generate global unique streamId to install.
-     *
      * TODO refactor with streamId and siteId
      */
-    private static String generateUniqueStreamId(String siteId,String streamTypeId){
+    private static String generateUniqueStreamId(String siteId,String streamTypeId) {
         return String.format("%s_%s",streamTypeId,siteId).toUpperCase();
-    }
+    }   
 
     @Override
     public void onInstall() {

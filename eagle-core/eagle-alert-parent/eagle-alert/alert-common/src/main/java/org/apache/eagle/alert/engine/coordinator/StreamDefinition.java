@@ -131,7 +131,7 @@ public class StreamDefinition implements Serializable {
         this.siteId = siteId;
     }
 
-    public StreamDefinition copy(){
+    public StreamDefinition copy() {
         StreamDefinition copied = new StreamDefinition();
         copied.setColumns(this.getColumns());
         copied.setDataSource(this.getDataSource());
