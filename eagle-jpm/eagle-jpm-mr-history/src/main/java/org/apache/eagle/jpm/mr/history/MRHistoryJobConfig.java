@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.mr.history;
 
+import com.typesafe.config.ConfigValue;
 import org.apache.eagle.common.config.ConfigOptionParser;
 import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
 import org.apache.eagle.jpm.util.JobIdPartitioner;
@@ -27,17 +28,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MRHistoryJobConfig implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobConfig.class);
 
     private static final String JOB_CONFIGURE_KEY_CONF_FILE = "JobConfigKeys.conf";
-
-    public String getEnv() {
-        return env;
-    }
-
-    private String env;
 
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
@@ -85,13 +83,11 @@ public class MRHistoryJobConfig implements Serializable {
     }
 
     public static class JobHistoryEndpointConfig implements Serializable {
-        public String nnEndpoint;
         public String mrHistoryServerUrl;
         public String basePath;
         public boolean pathContainsJobTrackerName;
         public String jobTrackerName;
-        public String principal;
-        public String keyTab;
+        public Map<String, String> hdfs;
     }
 
     public static class ControlConfig implements Serializable {
@@ -124,6 +120,7 @@ public class MRHistoryJobConfig implements Serializable {
     private MRHistoryJobConfig() {
         this.zkStateConfig = new ZKStateConfig();
         this.jobHistoryEndpointConfig = new JobHistoryEndpointConfig();
+        this.jobHistoryEndpointConfig.hdfs = new HashMap<>();
         this.controlConfig = new ControlConfig();
         this.jobExtractorConfig = new JobExtractorConfig();
         this.eagleServiceConfig = new EagleServiceConfig();
@@ -147,32 +144,30 @@ public class MRHistoryJobConfig implements Serializable {
      */
     private void init(Config config) {
         this.config = config;
-        this.env = config.getString("envContextConfig.env");
         //parse eagle job extractor
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
         this.jobExtractorConfig.mrVersion = config.getString("jobExtractorConfig.mrVersion");
         this.jobExtractorConfig.readTimeoutSeconds = config.getInt("jobExtractorConfig.readTimeOutSeconds");
         //parse eagle zk
-        this.zkStateConfig.zkQuorum = config.getString("dataSourceConfig.zkQuorum");
-        this.zkStateConfig.zkPort = config.getString("dataSourceConfig.zkPort");
-        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("dataSourceConfig.zkSessionTimeoutMs");
-        this.zkStateConfig.zkRetryTimes = config.getInt("dataSourceConfig.zkRetryTimes");
-        this.zkStateConfig.zkRetryInterval = config.getInt("dataSourceConfig.zkRetryInterval");
-        this.zkStateConfig.zkRoot = config.getString("dataSourceConfig.zkRoot");
+        this.zkStateConfig.zkQuorum = config.getString("zkStateConfig.zkQuorum");
+        this.zkStateConfig.zkPort = config.getString("zkStateConfig.zkPort");
+        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zkStateConfig.zkSessionTimeoutMs");
+        this.zkStateConfig.zkRetryTimes = config.getInt("zkStateConfig.zkRetryTimes");
+        this.zkStateConfig.zkRetryInterval = config.getInt("zkStateConfig.zkRetryInterval");
+        this.zkStateConfig.zkRoot = config.getString("zkStateConfig.zkRoot");
 
         //parse job history endpoint
-        this.jobHistoryEndpointConfig.basePath = config.getString("dataSourceConfig.basePath");
-        this.jobHistoryEndpointConfig.jobTrackerName = config.getString("dataSourceConfig.jobTrackerName");
-        this.jobHistoryEndpointConfig.nnEndpoint = config.getString("dataSourceConfig.nnEndpoint");
-        this.jobHistoryEndpointConfig.mrHistoryServerUrl = config.getString("dataSourceConfig.mrHistoryServerUrl");
-        this.jobHistoryEndpointConfig.pathContainsJobTrackerName = config.getBoolean("dataSourceConfig.pathContainsJobTrackerName");
-        this.jobHistoryEndpointConfig.principal = config.getString("dataSourceConfig.principal");
-        this.jobHistoryEndpointConfig.keyTab = config.getString("dataSourceConfig.keytab");
-
+        this.jobHistoryEndpointConfig.basePath = config.getString("endpointConfig.basePath");
+        this.jobHistoryEndpointConfig.jobTrackerName = config.getString("endpointConfig.jobTrackerName");
+        this.jobHistoryEndpointConfig.mrHistoryServerUrl = config.getString("endpointConfig.mrHistoryServerUrl");
+        this.jobHistoryEndpointConfig.pathContainsJobTrackerName = config.getBoolean("endpointConfig.pathContainsJobTrackerName");
+        for (Map.Entry<String, ConfigValue> entry : config.getConfig("endpointConfig.hdfs").entrySet()) {
+            this.jobHistoryEndpointConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
+        }
         //parse control config
-        this.controlConfig.dryRun = config.getBoolean("dataSourceConfig.dryRun");
+        this.controlConfig.dryRun = config.getBoolean("controlConfig.dryRun");
         try {
-            this.controlConfig.partitionerCls = (Class<? extends JobIdPartitioner>) Class.forName(config.getString("dataSourceConfig.partitionerCls"));
+            this.controlConfig.partitionerCls = (Class<? extends JobIdPartitioner>) Class.forName(config.getString("controlConfig.partitionerCls"));
             assert this.controlConfig.partitionerCls != null;
         } catch (Exception e) {
             LOG.warn("can not initialize partitioner class, use org.apache.eagle.jpm.util.DefaultJobIdPartitioner", e);
@@ -180,8 +175,8 @@ public class MRHistoryJobConfig implements Serializable {
         } finally {
             LOG.info("Loaded partitioner class: {}", this.controlConfig.partitionerCls);
         }
-        this.controlConfig.zeroBasedMonth = config.getBoolean("dataSourceConfig.zeroBasedMonth");
-        this.controlConfig.timeZone = config.getString("dataSourceConfig.timeZone");
+        this.controlConfig.zeroBasedMonth = config.getBoolean("controlConfig.zeroBasedMonth");
+        this.controlConfig.timeZone = config.getString("controlConfig.timeZone");
 
         // parse eagle service endpoint
         this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
@@ -191,7 +186,6 @@ public class MRHistoryJobConfig implements Serializable {
         this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
 
         LOG.info("Successfully initialized MRHistoryJobConfig");
-        LOG.info("env: " + this.env);
         LOG.info("zookeeper.quorum: " + this.zkStateConfig.zkQuorum);
         LOG.info("zookeeper.property.clientPort: " + this.zkStateConfig.zkPort);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);

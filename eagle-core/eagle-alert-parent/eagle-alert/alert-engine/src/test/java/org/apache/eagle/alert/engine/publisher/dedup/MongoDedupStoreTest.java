@@ -16,14 +16,14 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
+import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedDeque;
-
-import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class MongoDedupStoreTest extends MongoDependencyBaseTest {
 
@@ -44,6 +44,8 @@ public class MongoDedupStoreTest extends MongoDependencyBaseTest {
 		DedupValue one = new DedupValue();
 		one.setStateFieldValue("OPEN");
 		one.setCount(2);
+		one.setCloseTime(0);
+		one.setDocId("doc-id-...");
 		one.setFirstOccurrence(System.currentTimeMillis());
 		dedupStateValues.add(one);
 		store.add(eventEniq, dedupStateValues);
@@ -56,6 +58,11 @@ public class MongoDedupStoreTest extends MongoDependencyBaseTest {
 		Assert.assertEquals(streamId, entry.getKey().streamId);
 		Assert.assertEquals(1, entry.getValue().size());
 		Assert.assertEquals(2, entry.getValue().getLast().getCount());
+		
+		store.remove(events.keySet().iterator().next());
+		events = store.getEvents();
+		Assert.assertNotNull(events);
+		Assert.assertEquals(0, events.size());
 	}
     
 }

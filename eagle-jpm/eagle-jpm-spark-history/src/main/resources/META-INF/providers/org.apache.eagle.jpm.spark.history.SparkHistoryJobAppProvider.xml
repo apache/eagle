@@ -21,7 +21,6 @@
     <name>Spark History Job Monitoring</name>
     <version>0.5.0-incubating</version>
     <appClass>org.apache.eagle.jpm.spark.history.SparkHistoryJobApp</appClass>
-    <viewPath>/apps/jpm</viewPath>
     <configuration>
         <!-- org.apache.eagle.jpm.spark.history.SparkHistoryJobAppConfig -->
         <property>
@@ -156,12 +155,6 @@
             <name>dataSourceConfig.rmUrl</name>
             <displayName>dataSourceConfig.rmUrl</displayName>
             <value>http://sandbox.hortonworks.com:8088</value>
-        </property>
-        <property>
-            <name>storm.messageTimeoutSec</name>
-            <displayName>messageTimeoutSec</displayName>
-            <description>Message timeout (in seconds)</description>
-            <value>3000</value>
         </property>
         <property>
             <name>storm.pendingSpout</name>

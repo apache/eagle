@@ -22,14 +22,17 @@ import java.io.IOException;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class DoubleSerializer implements Serializer<Double> {
+public class DoubleSerializer implements Serializer<Object> {
     @Override
-    public void serialize(Double value, DataOutput dataOutput) throws IOException {
-        dataOutput.writeDouble(value);
+    public void serialize(Object value, DataOutput dataOutput) throws IOException {
+        if (value instanceof Number) {
+            value = ((Number)value).doubleValue();
+        }
+        dataOutput.writeDouble((double)value);
     }
 
     @Override
-    public Double deserialize(DataInput dataInput) throws IOException {
+    public Object deserialize(DataInput dataInput) throws IOException {
         return dataInput.readDouble();
     }
 }

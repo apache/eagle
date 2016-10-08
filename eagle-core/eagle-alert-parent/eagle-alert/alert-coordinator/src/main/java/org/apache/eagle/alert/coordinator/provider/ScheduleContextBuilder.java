@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.coordinator.provider;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.WorkSlot;
@@ -30,7 +31,6 @@ import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +59,7 @@ public class ScheduleContextBuilder {
     private Map<String, StreamDefinition> streamDefinitions;
     private Map<StreamGroup, MonitoredStream> monitoredStreamMap;
     private Map<String, TopologyUsage> usages;
+    private IScheduleContext builtContext;
 
     public ScheduleContextBuilder(Config config) {
         this.config = config;
@@ -104,8 +105,13 @@ public class ScheduleContextBuilder {
         usages = buildTopologyUsage();
 
         // copy to shedule context now
-        return new InMemScheduleConext(topologies, assignments, kafkaSources, policies, publishments,
+        builtContext = new InMemScheduleConext(topologies, assignments, kafkaSources, policies, publishments,
             streamDefinitions, monitoredStreamMap, usages);
+        return builtContext;
+    }
+
+    public IScheduleContext getBuiltContext() {
+        return builtContext;
     }
 
     /**
@@ -228,7 +234,7 @@ public class ScheduleContextBuilder {
         return result;
     }
 
-    private <T, K> Map<K, T> listToMap(List<T> collections) {
+    public static <T, K> Map<K, T> listToMap(List<T> collections) {
         Map<K, T> maps = new HashMap<K, T>(collections.size());
         for (T t : collections) {
             maps.put(getKey(t), t);
@@ -240,7 +246,7 @@ public class ScheduleContextBuilder {
      * One drawback, once we add class, this code need to be changed!
      */
     @SuppressWarnings("unchecked")
-    private <T, K> K getKey(T t) {
+    private static <T, K> K getKey(T t) {
         if (t instanceof Topology) {
             return (K) ((Topology) t).getName();
         } else if (t instanceof PolicyAssignment) {

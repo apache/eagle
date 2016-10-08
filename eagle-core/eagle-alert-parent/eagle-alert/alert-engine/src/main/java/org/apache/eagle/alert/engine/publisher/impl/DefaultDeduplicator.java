@@ -17,44 +17,38 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.AlertDeduplicator;
 import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
-import org.apache.eagle.alert.engine.publisher.dedup.DedupValue;
-import org.apache.storm.guava.base.Objects;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.typesafe.config.Config;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class DefaultDeduplicator implements AlertDeduplicator {
 
     private static Logger LOG = LoggerFactory.getLogger(DefaultDeduplicator.class);
 
-    @SuppressWarnings("unused")
-    private long dedupIntervalMin;
+    private long dedupIntervalSec;
     private List<String> customDedupFields = new ArrayList<>();
     private String dedupStateField;
     private String dedupStateCloseValue;
-    private Config config;
-
-    private static final String DEDUP_COUNT = "dedupCount";
-    private static final String DEDUP_FIRST_OCCURRENCE = "dedupFirstOccurrence";
 
     private DedupCache dedupCache;
 
+    private Cache<EventUniq, String> withoutStatesCache;
+
     public DefaultDeduplicator() {
-        this.dedupIntervalMin = 0;
+        this.dedupIntervalSec = 0;
     }
 
     public DefaultDeduplicator(String intervalMin) {
@@ -62,11 +56,11 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     }
 
     public DefaultDeduplicator(long intervalMin) {
-        this.dedupIntervalMin = intervalMin;
+        this.dedupIntervalSec = intervalMin;
     }
 
     public DefaultDeduplicator(String intervalMin, List<String> customDedupFields,
-                               String dedupStateField, String dedupStateCloseValue, Config config) {
+                               String dedupStateField, String dedupStateCloseValue, DedupCache dedupCache) {
         setDedupIntervalMin(intervalMin);
         if (customDedupFields != null) {
             this.customDedupFields = customDedupFields;
@@ -77,8 +71,10 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         if (StringUtils.isNotBlank(dedupStateCloseValue)) {
             this.dedupStateCloseValue = dedupStateCloseValue;
         }
-        this.config = config;
-        this.dedupCache = DedupCache.getInstance(this.config);
+        this.dedupCache = dedupCache;
+
+        withoutStatesCache = CacheBuilder.newBuilder().expireAfterWrite(
+            this.dedupIntervalSec, TimeUnit.SECONDS).build();
     }
 
     /*
@@ -88,63 +84,20 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     public List<AlertStreamEvent> checkDedup(AlertStreamEvent event, EventUniq key, String stateFiledValue) {
         if (StringUtils.isBlank(stateFiledValue)) {
             // without state field, we cannot determine whether it is duplicated
+            // without custom filed values, we cannot determine whether it is duplicated
+            synchronized (withoutStatesCache) {
+                if (withoutStatesCache != null && withoutStatesCache.getIfPresent(key) != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Alert event {} with key {} is skipped since it is duplicated", event, key);
+                    }
+                    return null;
+                } else if (withoutStatesCache != null) {
+                    withoutStatesCache.put(key, "");
+                }
+            }
             return Arrays.asList(event);
         }
-        synchronized (dedupCache) {
-            Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> events = dedupCache.getEvents();
-            if (!events.containsKey(key)
-                || (events.containsKey(key)
-                && events.get(key).size() > 0
-                && !Objects.equal(stateFiledValue,
-                        events.get(key).getLast().getStateFieldValue()))) {
-                DedupValue[] dedupValues = dedupCache.add(key, stateFiledValue, dedupStateCloseValue);
-                if (dedupValues != null) {
-                    // any of dedupValues won't be null
-                    if (dedupValues.length == 2) {
-                        // emit last event which includes count of dedup events & new state event
-                        return Arrays.asList(
-                            mergeEventWithDedupValue(event, dedupValues[0]),
-                            mergeEventWithDedupValue(event, dedupValues[1]));
-                    } else if (dedupValues.length == 1) {
-                        //populate firstOccurrenceTime & count
-                        return Arrays.asList(mergeEventWithDedupValue(event, dedupValues[0]));
-                    }
-                }
-            } else {
-                // update count
-                dedupCache.updateCount(key);
-            }
-        }
-        // duplicated, will be ignored
-        return null;
-    }
-
-    private AlertStreamEvent mergeEventWithDedupValue(AlertStreamEvent originalEvent, DedupValue dedupValue) {
-        AlertStreamEvent event = new AlertStreamEvent();
-        Object[] newdata = new Object[originalEvent.getData().length];
-        for (int i = 0; i < originalEvent.getData().length; i++) {
-            newdata[i] = originalEvent.getData()[i];
-        }
-        event.setData(newdata);
-        event.setSchema(originalEvent.getSchema());
-        event.setPolicyId(originalEvent.getPolicyId());
-        event.setCreatedTime(originalEvent.getCreatedTime());
-        event.setCreatedBy(originalEvent.getCreatedBy());
-        event.setTimestamp(originalEvent.getTimestamp());
-        StreamDefinition streamDefinition = event.getSchema();
-        for (int i = 0; i < event.getData().length; i++) {
-            String colName = streamDefinition.getColumns().get(i).getName();
-            if (Objects.equal(colName, dedupStateField)) {
-                event.getData()[i] = dedupValue.getStateFieldValue();
-            }
-            if (Objects.equal(colName, DEDUP_COUNT)) {
-                event.getData()[i] = dedupValue.getCount();
-            }
-            if (Objects.equal(colName, DEDUP_FIRST_OCCURRENCE)) {
-                event.getData()[i] = dedupValue.getFirstOccurrence();
-            }
-        }
-        return event;
+        return dedupCache.dedup(event, key, dedupStateField, stateFiledValue, dedupStateCloseValue);
     }
 
     public List<AlertStreamEvent> dedup(AlertStreamEvent event) {
@@ -168,10 +121,15 @@ public class DefaultDeduplicator implements AlertDeduplicator {
                 stateFiledValue = event.getData()[i].toString();
             }
 
-            for (String field : customDedupFields) {
-                if (colName.equals(field)) {
-                    customFieldValues.put(field, event.getData()[i].toString());
-                    break;
+            // make all of the field as unique key if no custom dedup field provided
+            if (customDedupFields == null || customDedupFields.size() <= 0) {
+                customFieldValues.put(colName, event.getData()[i].toString());
+            } else {
+                for (String field : customDedupFields) {
+                    if (colName.equals(field)) {
+                        customFieldValues.put(field, event.getData()[i].toString());
+                        break;
+                    }
                 }
             }
         }
@@ -180,8 +138,8 @@ public class DefaultDeduplicator implements AlertDeduplicator {
             event.getPolicyId(), event.getCreatedTime(), customFieldValues), stateFiledValue);
         if (outputEvents != null && outputEvents.size() > 0) {
             return outputEvents;
-        } else if (LOG.isDebugEnabled()) {
-            LOG.debug("Alert event is skipped because it's duplicated: {}", event.toString());
+        } else if (LOG.isInfoEnabled()) {
+            LOG.info("Alert event is skipped because it's duplicated: {}", event.toString());
         }
         return null;
     }
@@ -189,15 +147,15 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     @Override
     public void setDedupIntervalMin(String newDedupIntervalMin) {
         if (newDedupIntervalMin == null || newDedupIntervalMin.isEmpty()) {
-            dedupIntervalMin = 0;
+            dedupIntervalSec = 0;
             return;
         }
         try {
             Period period = Period.parse(newDedupIntervalMin);
-            this.dedupIntervalMin = period.toStandardMinutes().getMinutes();
+            this.dedupIntervalSec = period.toStandardSeconds().getSeconds();
         } catch (Exception e) {
             LOG.warn("Fail to pares deDupIntervalMin, will disable deduplication instead", e);
-            this.dedupIntervalMin = 0;
+            this.dedupIntervalSec = 0;
         }
     }
 

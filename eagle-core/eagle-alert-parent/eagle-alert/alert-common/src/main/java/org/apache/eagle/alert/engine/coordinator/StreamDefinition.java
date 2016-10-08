@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * This is actually a data source schema.
@@ -29,11 +29,26 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  */
 public class StreamDefinition implements Serializable {
     private static final long serialVersionUID = 2352202882328931825L;
+
+    // Stream unique ID
     private String streamId;
-    private String dataSource;
+
+    // Stream description
     private String description;
+
+    // Is validateable or not
     private boolean validate;
+
+    // Is timeseries-based stream or not
     private boolean timeseries;
+
+    // TODO: Decouple dataSource and siteId from stream definition
+
+    // Stream data source ID
+    private String dataSource;
+
+    // Tenant (Site) ID
+    private String siteId;
 
     private List<StreamColumn> columns = new ArrayList<>();
 
@@ -106,5 +121,25 @@ public class StreamDefinition implements Serializable {
             i++;
         }
         return -1;
+    }
+
+    public String getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
+    }
+
+    public StreamDefinition copy() {
+        StreamDefinition copied = new StreamDefinition();
+        copied.setColumns(this.getColumns());
+        copied.setDataSource(this.getDataSource());
+        copied.setDescription(this.getDescription());
+        copied.setSiteId(this.getSiteId());
+        copied.setStreamId(this.getStreamId());
+        copied.setTimeseries(this.isTimeseries());
+        copied.setValidate(this.isValidate());
+        return copied;
     }
 }

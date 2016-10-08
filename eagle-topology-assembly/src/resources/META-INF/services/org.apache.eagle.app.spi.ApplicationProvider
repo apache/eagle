@@ -15,4 +15,6 @@
 
 org.apache.eagle.security.hbase.HBaseAuditLogAppProvider
 org.apache.eagle.app.example.ExampleApplicationProvider
-org.apache.eagle.app.jpm.JPMApplicationProvider
+org.apache.eagle.app.jpm.JPMWebApplicationProvider
+org.apache.eagle.jpm.mr.history.MRHistoryJobApplicationProvider
+org.apache.eagle.jpm.mr.running.MRRunningJobApplicationProvider

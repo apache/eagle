@@ -1,0 +1,274 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="row flex">
+	<div class="col-sm-12 col-md-3">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					Summary
+				</h3>
+			</div>
+			<div class="box-body">
+				<table class="table table-striped">
+					<tbody>
+						<tr>
+							<th>Def Id</th>
+							<td class="text-break">{{jobDefId}}</td>
+						</tr>
+						<tr>
+							<th>Type</th>
+							<td>{{jobList[0].tags.jobType}}</td>
+						</tr>
+						<tr>
+							<th>Site</th>
+							<td>{{jobList[0].tags.site}}</td>
+						</tr>
+						<tr>
+							<th>Owner</th>
+							<td>{{jobList[0].tags.user}}</td>
+						</tr>
+						<tr>
+							<th>Queue</th>
+							<td>{{jobList[0].tags.queue}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-12 col-md-9">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					Comparison
+					<small>
+						Click to compare job
+						(ctrl + click: set <strong>from Job</strong>, shift + click: set <strong>to Job</strong>)
+					</small>
+				</h3>
+			</div>
+			<div class="box-body">
+				<div class="jpm-chart">
+					<div chart="trendChart" class="jpm-chart-container" series="jobTrendSeries" category="jobTrendCategory"
+						 ng-click="compareJobSelect" option="jobTrendOption"></div>
+					<div ng-if="(jobTrendSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="box box-primary" ng-if="fromJob && toJob">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Comparison
+		</h3>
+		<div class="box-tools pull-right">
+			<button type="button" class="btn btn-box-tool" data-widget="collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+		<table class="table table-striped">
+			<thead>
+			<tr>
+				<th>Field</th>
+				<th>From</th>
+				<th>To</th>
+				<th>Field</th>
+				<th>From</th>
+				<th>To</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<th>
+					Job Id
+					<a class="fa fa-retweet" ng-click="exchangeJobs()"></a>
+				</th>
+				<td><a ui-sref="jpmDetail({siteId: site, jobId: fromJob.tags.jobId})">{{fromJob.tags.jobId}}</a></td>
+				<td><a ui-sref="jpmDetail({siteId: site, jobId: toJob.tags.jobId})">{{toJob.tags.jobId}}</a></td>
+				<th>Duration</th>
+				<td>{{Time.diffStr(fromJob.durationTime)}}</td>
+				<td>
+					{{Time.diffStr(toJob.durationTime)}}
+					<span class="{{jobCompareClass('durationTime')}}">{{jobCompareValue('durationTime')}}</span>
+				</td>
+			</tr>
+			<tr>
+				<th>Total Maps</th>
+				<td>{{common.number.toFixed(fromJob.numTotalMaps)}}</td>
+				<td>
+					{{common.number.toFixed(toJob.numTotalMaps)}}
+					<span class="{{jobCompareClass('numTotalMaps')}}">{{jobCompareValue('numTotalMaps')}}</span>
+				</td>
+				<th>Total Reduces</th>
+				<td>{{common.number.toFixed(fromJob.numTotalReduces)}}</td>
+				<td>
+					{{common.number.toFixed(toJob.numTotalReduces)}}
+					<span class="{{jobCompareClass('numTotalReduces')}}">{{jobCompareValue('numTotalReduces')}}</span>
+				</td>
+			</tr>
+			<tr>
+				<th>HDFS Read Bytes</th>
+				<td>{{common.number.toFixed(fromJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)}}</td>
+				<td>
+					{{common.number.toFixed(toJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)}}
+					<span class="{{jobCompareClass(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','HDFS_BYTES_READ'])}}">
+							{{jobCompareValue(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','HDFS_BYTES_READ'])}}
+						</span>
+				</td>
+				<th>HDFS Write Bytes</th>
+				<td>{{common.number.toFixed(fromJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}</td>
+				<td>
+					{{common.number.toFixed(toJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}
+					<span class="{{jobCompareClass(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','HDFS_BYTES_WRITTEN'])}}">
+							{{jobCompareValue(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','HDFS_BYTES_WRITTEN'])}}
+						</span>
+				</td>
+			</tr>
+			<tr>
+				<th>Local Read Bytes</th>
+				<td>{{common.number.toFixed(fromJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_READ)}}</td>
+				<td>
+					{{common.number.toFixed(toJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_READ)}}
+					<span class="{{jobCompareClass(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','FILE_BYTES_READ'])}}">
+							{{jobCompareValue(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','FILE_BYTES_READ'])}}
+						</span>
+				</td>
+				<th>Local Write Bytes</th>
+				<td>{{common.number.toFixed(fromJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_WRITTEN)}}</td>
+				<td>
+					{{common.number.toFixed(toJob.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_WRITTEN)}}
+					<span class="{{jobCompareClass(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','FILE_BYTES_WRITTEN'])}}">
+							{{jobCompareValue(['jobCounters','counters','org.apache.hadoop.mapreduce.FileSystemCounter','FILE_BYTES_WRITTEN'])}}
+						</span>
+				</td>
+			</tr>
+			<tr>
+				<th>Last Map Duration</th>
+				<td>{{common.number.toFixed(fromJob.lastMapDuration)}}</td>
+				<td>
+					{{common.number.toFixed(toJob.lastMapDuration)}}
+					<span class="{{jobCompareClass('lastMapDuration')}}">{{jobCompareValue('lastMapDuration')}}</span>
+				</td>
+				<th>Last Reduce Duration</th>
+				<td>{{common.number.toFixed(fromJob.lastReduceDuration)}}</td>
+				<td>
+					{{common.number.toFixed(toJob.lastReduceDuration)}}
+					<span class="{{jobCompareClass('lastReduceDuration')}}">{{jobCompareValue('lastReduceDuration')}}</span>
+				</td>
+			</tr>
+			<tr>
+				<th>Data Local Maps</th>
+				<td>{{common.number.toFixed(fromJob.dataLocalMapsPercentage * 100)}}%</td>
+				<td>
+					{{common.number.toFixed(toJob.dataLocalMapsPercentage * 100)}}%
+					<span class="{{jobCompareClass('dataLocalMapsPercentage')}}">{{jobCompareValue('dataLocalMapsPercentage')}}</span>
+				</td>
+				<th>Rack Local Maps</th>
+				<td>{{common.number.toFixed(fromJob.rackLocalMapsPercentage * 100)}}%</td>
+				<td>
+					{{common.number.toFixed(toJob.rackLocalMapsPercentage * 100)}}%
+					<span class="{{jobCompareClass('rackLocalMapsPercentage')}}">{{jobCompareValue('rackLocalMapsPercentage')}}</span>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+
+		<div class="row">
+			<div class="col-lg-6 col-md-12">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="comparisonChart_Container.series"
+						 category="comparisonChart_Container.categories"></div>
+					<div ng-if="(comparisonChart_Container.series || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-12">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="comparisonChart_allocatedMB.series"
+						 category="comparisonChart_allocatedMB.categories"></div>
+					<div ng-if="(comparisonChart_allocatedMB.series || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-12">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="comparisonChart_vCores.series"
+						 category="comparisonChart_vCores.categories"></div>
+					<div ng-if="(comparisonChart_vCores.series || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-12">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="comparisonChart_taskDistribution.series"
+						 category="comparisonChart_taskDistribution.categories"></div>
+					<div ng-if="(comparisonChart_taskDistribution.series || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="box box-primary" ng-if="jobList.length">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			History Jobs
+		</h3>
+	</div>
+	<div class="box-body">
+		<div sort-table="jobList" sortpath="-startTime">
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th width="10" sortpath="currentState">Status</th>
+						<th sortpath="tags.jobId">Id</th>
+						<th sortpath="tags.jobName">Name</th>
+						<th width="140" sortpath="startTime">Start Time</th>
+						<th width="140" sortpath="durationTime">Duration</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><span class="label label-{{getStateClass(item.currentState)}}">{{item.currentState}}</span></td>
+						<td class="text-no-break">
+							<span ng-if="item.tags.jobId === fromJob.tags.jobId">[From]</span>
+							<span ng-if="item.tags.jobId === toJob.tags.jobId">[To]</span>
+							<a ng-click="compareJobSelect($event, item)">{{item.tags.jobId}}</a>
+							<a class="fa fa-link" ui-sref="jpmDetail({siteId: site, jobId: item.tags.jobId})" target="_blank"></a>
+						</td>
+						<td class="text-break">{{item.tags.jobName}}</td>
+						<td>{{Time.format(item.startTime)}}</td>
+						<td>{{Time.diffStr(item.durationTime)}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

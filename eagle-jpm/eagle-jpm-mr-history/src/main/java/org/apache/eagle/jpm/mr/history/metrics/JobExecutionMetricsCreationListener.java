@@ -20,10 +20,12 @@ package org.apache.eagle.jpm.mr.history.metrics;
 
 import org.apache.eagle.jpm.mr.historyentity.JobExecutionAPIEntity;
 import org.apache.eagle.jpm.util.Constants;
+import org.apache.eagle.jpm.util.MRJobTagName;
 import org.apache.eagle.jpm.util.metrics.AbstractMetricsCreationListener;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +63,14 @@ public class JobExecutionMetricsCreationListener extends AbstractMetricsCreation
                     }
                 }
             }
+
+            //generate Constants.JOB_COUNT_PER_HOUR data
+            Map<String, String> baseTags = new HashMap<>(tags);
+            baseTags.put(MRJobTagName.JOB_STATUS.toString(), entity.getCurrentState());
+            metrics.add(metricWrapper(timeStamp / 3600000 * 3600000,
+                Constants.JOB_COUNT_PER_HOUR,
+                new double[]{1},
+                baseTags));
         }
         return metrics;
     }

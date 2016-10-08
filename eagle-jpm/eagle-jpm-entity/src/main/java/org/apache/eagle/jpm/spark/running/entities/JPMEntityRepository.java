@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.spark.running.entities;
 
-import org.apache.eagle.jpm.mr.runningentity.JobConfigSerDeser;
 import org.apache.eagle.log.entity.repo.EntityRepository;
 
 public class JPMEntityRepository extends EntityRepository {

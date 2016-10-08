@@ -133,6 +133,10 @@
  			<artifactId>de.flapdoodle.embed.mongo</artifactId>
  			<scope>test</scope>
  		</dependency>
+        <dependency>
+            <groupId>com.ullink.slack</groupId>
+            <artifactId>simpleslackapi</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

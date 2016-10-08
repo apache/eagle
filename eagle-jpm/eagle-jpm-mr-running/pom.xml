@@ -68,7 +68,6 @@
                     <artifactId>asm</artifactId>
                 </exclusion>
             </exclusions>
-
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>

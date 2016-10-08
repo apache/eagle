@@ -23,6 +23,8 @@ import org.apache.eagle.jpm.util.jobcounter.JobCounters;
 import org.apache.eagle.log.entity.meta.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import java.util.Map;
+
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Table("eaglejpa")
 @ColumnFamily("f")
@@ -91,6 +93,8 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     private int failedReduceAttempts;
     @Column("ad")
     private String trackingUrl;
+    @Column("ae")
+    private Map<String, Map<String, String>> failedTasks;
 
     public String getTrackingUrl() {
         return trackingUrl;
@@ -342,5 +346,14 @@ public class JobExecutionAPIEntity extends JobBaseAPIEntity {
     public void setFailedReduceAttempts(int failedReduceAttempts) {
         this.failedReduceAttempts = failedReduceAttempts;
         valueChanged("failedReduceAttempts");
+    }
+
+    public Map<String, Map<String, String>> getFailedTasks() {
+        return failedTasks;
+    }
+
+    public void setFailedTasks(Map<String, Map<String, String>> failedTasks) {
+        this.failedTasks = failedTasks;
+        valueChanged("failedTasks");
     }
 }

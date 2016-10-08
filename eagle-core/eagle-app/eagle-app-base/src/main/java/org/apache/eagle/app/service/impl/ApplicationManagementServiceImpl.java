@@ -16,23 +16,21 @@
  */
 package org.apache.eagle.app.service.impl;
 
-import org.apache.eagle.alert.metadata.IMetadataDao;
-import org.apache.eagle.app.service.ApplicationContext;
-import org.apache.eagle.app.service.ApplicationManagementService;
-import org.apache.eagle.app.service.ApplicationOperations;
-import org.apache.eagle.app.service.ApplicationProviderService;
-import org.apache.eagle.app.spi.ApplicationProvider;
-import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
-import org.apache.eagle.metadata.model.ApplicationDesc;
-import org.apache.eagle.metadata.model.ApplicationEntity;
-import org.apache.eagle.metadata.model.Property;
-import org.apache.eagle.metadata.model.SiteEntity;
-import org.apache.eagle.metadata.service.ApplicationEntityService;
-import org.apache.eagle.metadata.service.SiteEntityService;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
+import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.app.service.ApplicationManagementService;
+import org.apache.eagle.app.service.ApplicationOperations;
+import org.apache.eagle.app.service.ApplicationOperationContext;
+import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.spi.ApplicationProvider;
+import org.apache.eagle.metadata.exceptions.ApplicationWrongStatusException;
+import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
+import org.apache.eagle.metadata.model.*;
+import org.apache.eagle.metadata.service.ApplicationEntityService;
+import org.apache.eagle.metadata.service.SiteEntityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +65,6 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     public ApplicationEntity install(ApplicationOperations.InstallOperation operation) throws EntityNotFoundException {
         Preconditions.checkNotNull(operation.getSiteId(), "siteId is null");
         Preconditions.checkNotNull(operation.getAppType(), "appType is null");
-        if (operation.getMode().equals(ApplicationEntity.Mode.CLUSTER)) {
-            Preconditions.checkNotNull(operation.getJarPath(), "jarPath is null when mode is CLUSTER");
-        }
         SiteEntity siteEntity = siteEntityService.getBySiteId(operation.getSiteId());
         Preconditions.checkNotNull(siteEntity, "Site with ID: " + operation.getSiteId() + " is not found");
         ApplicationDesc appDesc = applicationProviderService.getApplicationDescByType(operation.getAppType());
@@ -78,66 +73,145 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         applicationEntity.setDescriptor(appDesc);
         applicationEntity.setSite(siteEntity);
         applicationEntity.setMode(operation.getMode());
-        applicationEntity.setJarPath(operation.getJarPath());
+        applicationEntity.setJarPath(operation.getJarPath() == null ? appDesc.getJarPath() : operation.getJarPath());
         applicationEntity.ensureDefault();
 
-        /**
-         *  calculate application config based on
-         *   1) default values in metadata.xml
-         *   2) user's config value override default configurations
-         *   3) some metadata, for example siteId, mode, appId in ApplicationContext
-         */
+        // Calculate application config based on:
+        //
+        //  1) default values in metadata.xml.
+        //  2) user's config value override default configurations.
+        //  3) fill runtime information, for example siteId, mode, appId in ApplicationOperationContext.
+
         Map<String, Object> appConfig = new HashMap<>();
         ApplicationProvider provider = applicationProviderService.getApplicationProviderByType(operation.getAppType());
 
-        List<Property> propertyList = provider.getApplicationDesc().getConfiguration().getProperties();
-        for (Property p : propertyList) {
-            appConfig.put(p.getName(), p.getValue());
-        }
-        if (operation.getConfiguration() != null) {
-            appConfig.putAll(operation.getConfiguration());
+        ApplicationDesc applicationDesc = provider.getApplicationDesc();
+
+        if (applicationDesc.getConfiguration() != null) {
+            List<Property> propertyList = provider.getApplicationDesc().getConfiguration().getProperties();
+            for (Property p : propertyList) {
+                appConfig.put(p.getName(), p.getValue());
+            }
+            if (operation.getConfiguration() != null) {
+                appConfig.putAll(operation.getConfiguration());
+            }
         }
         applicationEntity.setConfiguration(appConfig);
-        ApplicationContext applicationContext = new ApplicationContext(
+
+        validateDependingApplicationInstalled(applicationEntity);
+
+        ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
             applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
             applicationEntity, config, alertMetadataService);
-        applicationContext.onInstall();
+        applicationOperationContext.onInstall();
         return applicationEntityService.create(applicationEntity);
     }
 
+    private void validateDependingApplicationInstalled(ApplicationEntity applicationEntity) {
+        if (applicationEntity.getDescriptor().getDependencies() != null) {
+            for (ApplicationDependency dependency : applicationEntity.getDescriptor().getDependencies()) {
+                if (dependency.isRequired() && applicationEntityService.getBySiteIdAndAppType(applicationEntity.getSite().getSiteId(), dependency.getType()) == null) {
+                    throw new IllegalStateException("Required dependency " + dependency.toString() + " of " + applicationEntity.getDescriptor().getType() + " was not installed");
+                }
+            }
+        }
+    }
+
     @Override
-    public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) {
+    public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) throws ApplicationWrongStatusException {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
-        ApplicationContext applicationContext = new ApplicationContext(
+        ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
             applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
             applicationEntity, config, alertMetadataService);
-        // TODO: Check status, skip stop if already STOPPED
+
+        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
         try {
-            applicationContext.onStop();
+            if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
+                applicationOperationContext.onUninstall();
+                return applicationEntityService.delete(applicationEntity);
+            } else {
+                throw new ApplicationWrongStatusException("App: " + applicationEntity.getAppId() + " status is" + currentStatus + ", uninstall operation is not allowed");
+            }
         } catch (Throwable throwable) {
             LOGGER.error(throwable.getMessage(), throwable);
+            throw throwable;
         }
-        applicationContext.onUninstall();
-        return applicationEntityService.delete(applicationEntity);
     }
 
     @Override
-    public ApplicationEntity start(ApplicationOperations.StartOperation operation) {
+    public ApplicationEntity start(ApplicationOperations.StartOperation operation) throws ApplicationWrongStatusException {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
-        ApplicationContext applicationContext = new ApplicationContext(
-            applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-            applicationEntity, config, alertMetadataService);
-        applicationContext.onStart();
-        return applicationEntity;
+        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
+        try {
+            if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
+                ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
+                    applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
+                    applicationEntity, config, alertMetadataService);
+
+                applicationOperationContext.onStart();
+                //Only when topology submitted successfully can the state change to STARTING
+                applicationEntityService.delete(applicationEntity);
+                applicationEntity.setStatus(ApplicationEntity.Status.STARTING);
+                return applicationEntityService.create(applicationEntity);
+            } else {
+                throw new ApplicationWrongStatusException("App: " + applicationEntity.getAppId() + " status is " + currentStatus + " start operation is not allowed");
+            }
+        } catch (ApplicationWrongStatusException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            LOGGER.error("Failed to start app " + applicationEntity.getAppId(), e);
+            throw e;
+        } catch (Throwable throwable) {
+            LOGGER.error(throwable.getMessage(), throwable);
+            throw throwable;
+        }
+
     }
 
     @Override
-    public ApplicationEntity stop(ApplicationOperations.StopOperation operation) {
+    public ApplicationEntity stop(ApplicationOperations.StopOperation operation) throws ApplicationWrongStatusException {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
-        ApplicationContext applicationContext = new ApplicationContext(
+        ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
             applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
             applicationEntity, config, alertMetadataService);
-        applicationContext.onStop();
-        return applicationEntity;
+        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
+        try {
+            if (currentStatus == ApplicationEntity.Status.RUNNING) {
+                applicationOperationContext.onStop();
+                //stop -> directly killed
+                applicationEntityService.delete(applicationEntity);
+                applicationEntity.setStatus(ApplicationEntity.Status.STOPPING);
+                return applicationEntityService.create(applicationEntity);
+            } else {
+                throw new ApplicationWrongStatusException("App: " + applicationEntity.getAppId() + " status is " + currentStatus + ", stop operation is not allowed.");
+            }
+        } catch (ApplicationWrongStatusException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+        } catch (RuntimeException e) {
+            LOGGER.error("Failed to stop app " + applicationEntity.getAppId(), e);
+            throw e;
+        } catch (Throwable throwable) {
+            LOGGER.error(throwable.getMessage(), throwable);
+            throw throwable;
+        }
     }
+
+    @Override
+    public ApplicationEntity.Status getStatus(ApplicationOperations.CheckStatusOperation operation)  {
+        ApplicationEntity applicationEntity = null;
+        try {
+            applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+            ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
+                applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
+                applicationEntity, config, alertMetadataService);
+            ApplicationEntity.Status topologyStatus = applicationOperationContext.getStatus();
+            return topologyStatus;
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("application id not exist", e);
+            throw e;
+        }
+    }
+
 }

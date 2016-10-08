@@ -16,16 +16,14 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
+import org.bson.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-
-import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
-import org.bson.BsonArray;
-import org.bson.BsonDocument;
-import org.bson.BsonInt64;
-import org.bson.BsonString;
 
 public class TransformerUtils {
 
@@ -48,6 +46,7 @@ public class TransformerUtils {
                     dedupCustomFieldValuesDoc.getString(MAP_VALUE).getValue());
             }
             EventUniq eventUniq = new EventUniq(streamId, policyId, timestamp, customFieldValues);
+            eventUniq.removable = doc.getBoolean(MongoDedupEventsStore.DEDUP_REMOVABLE).getValue();
             eventUniq.createdTime = doc.getInt64(
                 MongoDedupEventsStore.DEDUP_CREATE_TIME, new BsonInt64(0)).getValue();
             List<DedupValue> dedupValues = new ArrayList<DedupValue>();
@@ -61,9 +60,14 @@ public class TransformerUtils {
                     MongoDedupEventsStore.DEDUP_COUNT).getValue());
                 dedupValue.setFirstOccurrence(dedupValuesDoc.getInt64(
                     MongoDedupEventsStore.DEDUP_FIRST_OCCURRENCE).getValue());
+                dedupValue.setCloseTime(dedupValuesDoc.getInt64(
+                    MongoDedupEventsStore.DEDUP_CLOSE_TIME).getValue());
+                dedupValue.setDocId(dedupValuesDoc.getString(
+                    MongoDedupEventsStore.DOC_ID).getValue());
                 dedupValues.add(dedupValue);
             }
-            return (T) new DedupEntity(eventUniq, dedupValues);
+            String publishId = doc.getString(MongoDedupEventsStore.DEDUP_PUBLISH_ID).getValue();
+            return (T) new DedupEntity(publishId, eventUniq, dedupValues);
         }
         throw new RuntimeException(String.format("Unknow object type %s, cannot transform", klass.getName()));
     }
@@ -72,11 +76,13 @@ public class TransformerUtils {
         if (obj instanceof DedupEntity) {
             BsonDocument doc = new BsonDocument();
             DedupEntity entity = (DedupEntity) obj;
-            doc.put(MongoDedupEventsStore.DEDUP_ID, new BsonInt64(entity.getEventEniq().hashCode()));
+            doc.put(MongoDedupEventsStore.DEDUP_ID, new BsonInt64(getUniqueId(entity.getPublishName(), entity.getEventEniq())));
             doc.put(MongoDedupEventsStore.DEDUP_STREAM_ID, new BsonString(entity.getEventEniq().streamId));
+            doc.put(MongoDedupEventsStore.DEDUP_PUBLISH_ID, new BsonString(entity.getPublishName()));
             doc.put(MongoDedupEventsStore.DEDUP_POLICY_ID, new BsonString(entity.getEventEniq().policyId));
             doc.put(MongoDedupEventsStore.DEDUP_CREATE_TIME, new BsonInt64(entity.getEventEniq().createdTime));
             doc.put(MongoDedupEventsStore.DEDUP_TIMESTAMP, new BsonInt64(entity.getEventEniq().timestamp));
+            doc.put(MongoDedupEventsStore.DEDUP_REMOVABLE, new BsonBoolean(entity.getEventEniq().removable));
 
             List<BsonDocument> dedupCustomFieldValues = new ArrayList<BsonDocument>();
             for (Entry<String, String> entry : entity.getEventEniq().customFieldValues.entrySet()) {
@@ -90,18 +96,22 @@ public class TransformerUtils {
             List<BsonDocument> dedupValuesDocs = new ArrayList<BsonDocument>();
             for (DedupValue dedupValue : entity.getDedupValues()) {
                 BsonDocument dedupValuesDoc = new BsonDocument();
-                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_STATE_FIELD_VALUE,
-                    new BsonString(dedupValue.getStateFieldValue()));
-                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_COUNT,
-                    new BsonInt64(dedupValue.getCount()));
-                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_FIRST_OCCURRENCE,
-                    new BsonInt64(dedupValue.getFirstOccurrence()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_STATE_FIELD_VALUE, new BsonString(dedupValue.getStateFieldValue()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_COUNT, new BsonInt64(dedupValue.getCount()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_FIRST_OCCURRENCE,new BsonInt64(dedupValue.getFirstOccurrence()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DEDUP_CLOSE_TIME, new BsonInt64(dedupValue.getCloseTime()));
+                dedupValuesDoc.put(MongoDedupEventsStore.DOC_ID, new BsonString(dedupValue.getDocId()));
                 dedupValuesDocs.add(dedupValuesDoc);
             }
             doc.put(MongoDedupEventsStore.DEDUP_VALUES, new BsonArray(dedupValuesDocs));
             return doc;
         }
         throw new RuntimeException(String.format("Unknow object type %s, cannot transform", obj.getClass().getName()));
+    }
+
+    public static int getUniqueId(String publishName, EventUniq eventEniq) {
+        HashCodeBuilder builder = new HashCodeBuilder().append(eventEniq).append(publishName);
+        return builder.build();
     }
 
 }

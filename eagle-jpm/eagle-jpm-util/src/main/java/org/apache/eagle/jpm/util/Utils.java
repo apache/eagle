@@ -18,6 +18,7 @@
 
 package org.apache.eagle.jpm.util;
 
+import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,9 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Utils {
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
@@ -85,5 +89,27 @@ public class Utils {
         LOG.warn("Cannot parse memory info " +  memory);
 
         return 0L;
+    }
+    
+    public static Constants.JobType fetchJobType(Map config) {
+        if (config.get(Constants.JobConfiguration.CASCADING_JOB) != null) {
+            return Constants.JobType.CASCADING;
+        }
+        if (config.get(Constants.JobConfiguration.HIVE_JOB) != null) {
+            return Constants.JobType.HIVE;
+        }
+        if (config.get(Constants.JobConfiguration.PIG_JOB) != null) {
+            return Constants.JobType.PIG;
+        }
+        if (config.get(Constants.JobConfiguration.SCOOBI_JOB) != null) {
+            return Constants.JobType.SCOOBI;
+        }
+        return Constants.JobType.NOTAVALIABLE;
+    }
+
+    public static Constants.JobType fetchJobType(Configuration config) {
+        Map<String, String> mapConfig = new HashMap<>();
+        config.forEach(entry -> mapConfig.put(entry.getKey(), entry.getValue()));
+        return fetchJobType(mapConfig);
     }
 }

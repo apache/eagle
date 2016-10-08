@@ -45,6 +45,10 @@ public class EagleServiceClientImpl extends EagleServiceBaseClient {
         super(host, port, username, password);
     }
 
+    public EagleServiceClientImpl(String host, int port, String basePath, String username, String password){
+        super(host, port, basePath, username, password);
+    }
+
     private String getWholePath(String urlString){
     	return getBaseEndpoint() + urlString;
     }

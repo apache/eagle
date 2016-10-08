@@ -29,12 +29,16 @@ public class MRJobTaskCountResponse {
         public List<UnitTaskCount> finishedTaskCount;
     }
 
+    public static class HistoryTaskCountResponse extends MRJobTaskCountResponse {
+        public List<UnitTaskCount> taskCount;
+    }
+
     public static class JobCountResponse extends MRJobTaskCountResponse {
         public Set<String> jobTypes;
         public List<UnitJobCount> jobCounts;
     }
 
-    static class UnitTaskCount {
+    public static class UnitTaskCount {
         public long timeBucket;
         public int taskCount;
         public int mapTaskCount;
@@ -42,7 +46,7 @@ public class MRJobTaskCountResponse {
         public Set entities;
         public List topEntities;
 
-        UnitTaskCount(long timeBucket, Comparator comparator) {
+        public UnitTaskCount(long timeBucket, Comparator comparator) {
             this.timeBucket = timeBucket;
             this.taskCount = 0;
             this.mapTaskCount = 0;
@@ -52,12 +56,12 @@ public class MRJobTaskCountResponse {
         }
     }
 
-    static class UnitJobCount {
+    public static class UnitJobCount {
         public long timeBucket;
         public long jobCount;
         public Map<String, Long> jobCountByType;
 
-        UnitJobCount(long timeBucket) {
+        public UnitJobCount(long timeBucket) {
             this.timeBucket = timeBucket;
             this.jobCount = 0;
             this.jobCountByType = new HashMap<>();

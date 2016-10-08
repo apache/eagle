@@ -16,6 +16,14 @@
  */
 package org.apache.eagle.alert.engine.evaluator.nodata;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -24,13 +32,11 @@ import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.utils.TimePeriodUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.storm.guava.base.Joiner;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import com.google.common.base.Joiner;
 
 public class NoDataPolicyTimeBatchHandler implements PolicyStreamHandler {
 
@@ -65,9 +71,6 @@ public class NoDataPolicyTimeBatchHandler implements PolicyStreamHandler {
             throw new IllegalArgumentException("policy outputStream size has to be 1 for no data alert");
         }
 
-        String is = inputStreams.get(0);
-        StreamDefinition sd = sds.get(is);
-
         String policyValue = policyDef.getDefinition().getValue();
         // assume that no data alert policy value consists of "windowPeriod,
         // type, numOfFields, f1_name, f2_name, f1_value, f2_value, f1_value,
@@ -76,19 +79,23 @@ public class NoDataPolicyTimeBatchHandler implements PolicyStreamHandler {
         this.wisbType = NoDataWisbType.valueOf(segments[1]);
         // for provided wisb values, need to parse, for dynamic wisb values, it
         // is computed through a window
-        @SuppressWarnings("rawtypes")
-        Set wisbValues = null;
+        Set<String> wisbValues = new HashSet<String>();
         if (wisbType == NoDataWisbType.provided) {
-            wisbValues = new NoDataWisbProvidedParser().parse(segments);
+            for (int i = 2; i < segments.length; i++) {
+                wisbValues.add(segments[i]);
+            }
         }
+        
         long windowPeriod = TimePeriodUtils.getMillisecondsOfPeriod(Period.parse(segments[0]));
         distinctWindow = new DistinctValuesInTimeBatchWindow(this, windowPeriod, wisbValues);
         // populate wisb field names
-        int numOfFields = Integer.parseInt(segments[2]);
-        for (int i = 3; i < 3 + numOfFields; i++) {
-            String fn = segments[i];
-            wisbFieldIndices.add(sd.getColumnIndex(fn));
+        String is = inputStreams.get(0);
+        StreamDefinition sd = sds.get(is);
+        String nodataColumnNameKey = "nodataColumnName";
+        if (!policyDef.getDefinition().getProperties().containsKey(nodataColumnNameKey)) {
+            throw new IllegalArgumentException("policy nodata column name has to be defined for no data alert");
         }
+        wisbFieldIndices.add(sd.getColumnIndex((String) policyDef.getDefinition().getProperties().get(nodataColumnNameKey)));
     }
 
     @Override

@@ -21,7 +21,8 @@
 package org.apache.eagle.alert.engine.publisher.impl;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.storm.guava.base.Joiner;
+
+import com.google.common.base.Joiner;
 
 import java.util.HashMap;
 
@@ -34,6 +35,7 @@ public class EventUniq {
     public Long timestamp;     // event's createTimestamp
     public long createdTime; // created time, for cache removal;
     public HashMap<String, String> customFieldValues;
+    public boolean removable = false;
 
     public EventUniq(String streamId, String policyId, long timestamp) {
         this.streamId = streamId;
@@ -75,7 +77,7 @@ public class EventUniq {
 
     @Override
     public String toString() {
-        return String.format("EventUniq[streamId: %s, policyId: %s, timestamp: %s, customFieldValues: %s]",
-            streamId, policyId, timestamp, Joiner.on(",").withKeyValueSeparator(">").join(customFieldValues));
+        return String.format("EventUniq[streamId: %s, policyId: %s, timestamp: %s, removable: %s, customFieldValues: %s]",
+            streamId, policyId, timestamp, removable, Joiner.on(",").withKeyValueSeparator(">").join(customFieldValues));
     }
 }

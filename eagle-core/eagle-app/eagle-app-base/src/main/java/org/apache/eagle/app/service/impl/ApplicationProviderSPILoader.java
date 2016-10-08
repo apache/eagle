@@ -16,11 +16,11 @@
  */
 package org.apache.eagle.app.service.impl;
 
+import com.typesafe.config.Config;
 import org.apache.eagle.app.config.ApplicationProviderConfig;
 import org.apache.eagle.app.service.ApplicationProviderLoader;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.app.utils.DynamicJarPathFinder;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +30,9 @@ import java.net.URLClassLoader;
 import java.util.ServiceLoader;
 import java.util.function.Function;
 
+/**
+ * Load Application Provider with SPI, by default from current class loader.
+ */
 public class ApplicationProviderSPILoader extends ApplicationProviderLoader {
     private final String appProviderExtDir;
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationProviderSPILoader.class);
@@ -79,9 +82,15 @@ public class ApplicationProviderSPILoader extends ApplicationProviderLoader {
                 providerConfig.setJarPath(jarFileSupplier.apply(applicationProvider));
                 applicationProvider.prepare(providerConfig, getConfig());
                 registerProvider(applicationProvider);
+                LOG.warn("Loaded {}:{} ({}) from {}",
+                    applicationProvider.getApplicationDesc().getType(),
+                    applicationProvider.getApplicationDesc().getVersion(),
+                    applicationProvider.getApplicationDesc().getName(),
+                    providerConfig.getJarPath()
+                );
             }
         } catch (Throwable ex) {
-            LOG.warn("Failed to register application provider", ex);
+            LOG.error("Failed to register application provider", ex);
             throw new IllegalStateException(ex);
         }
     }

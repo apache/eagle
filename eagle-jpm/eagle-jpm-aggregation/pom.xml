@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
-            <artifactId>eagle-jpm-app</artifactId>
+            <artifactId>eagle-app-base</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

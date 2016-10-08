@@ -20,8 +20,6 @@
     <type>MR_RUNNING_JOB_APP</type>
     <name>MR Running Job Monitoring</name>
     <version>0.5.0-incubating</version>
-    <appClass>org.apache.eagle.jpm.mr.running.MRRunningJobApplication</appClass>
-    <viewPath>/apps/jpm</viewPath>
     <configuration>
         <!-- org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig -->
         <property>

@@ -22,7 +22,7 @@
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>14</version>
-    </parent> 
+    </parent>
     <groupId>org.apache.eagle</groupId>
     <artifactId>eagle-parent</artifactId>
     <version>0.5.0-incubating-SNAPSHOT</version>
@@ -245,7 +245,7 @@
         <mapr-storm-kafka.version>0.9.3</mapr-storm-kafka.version>
         <mapr-storm.version>0.9.3-mapr-1509</mapr-storm.version>
 
-        <curator.version>2.8.0</curator.version>
+        <curator.version>2.5.0</curator.version>
         <curator.test.version>2.5.0</curator.test.version>
         <zkclient.version>0.3</zkclient.version>
 
@@ -304,6 +304,7 @@
         <metrics-elasticsearch-reporter.version>2.2.0</metrics-elasticsearch-reporter.version>
 
         <common.cli.version>1.3.1</common.cli.version>
+        <ullink.slack.version>0.6.0</ullink.slack.version>
 
         <!-- dropwizard -->
         <dropwizard.version>0.7.1</dropwizard.version>
@@ -522,16 +523,6 @@
                 <artifactId>json</artifactId>
                 <version>${org.json.version}</version>
             </dependency>
-            <!--<dependency>-->
-                <!--<groupId>org.codehaus.jackson</groupId>-->
-                <!--<artifactId>jackson-jaxrs</artifactId>-->
-                <!--<version>${codehaus-jackson.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>org.codehaus.jackson</groupId>-->
-                <!--<artifactId>jackson-xc</artifactId>-->
-                <!--<version>${codehaus-jackson.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
@@ -846,6 +837,11 @@
                 <version>${dropwizard.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-testing</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.hubspot.dropwizard</groupId>
                 <artifactId>dropwizard-guice</artifactId>
                 <version>${dropwizard-guice.version}</version>
@@ -970,9 +966,6 @@
 
         <profile>
             <id>mapr</id>
-            <!--<activation>-->
-            <!--<activeByDefault>true</activeByDefault>-->
-            <!--</activation>-->
             <repositories>
                 <repository>
                     <id>mapr-releases</id>
@@ -1230,7 +1223,6 @@
                                 <!-- External dependency script -->
                                 <exclude>**/resource/serf/etc/ambari.json</exclude>
 
-                                <!-- TODO: fix it -->
                                 <exclude>**/webapp/**</exclude>
                                 <exclude>**/*.pid</exclude>
                             </excludes>

@@ -93,6 +93,7 @@ public class TaskFailureListener implements HistoryJobEntityCreationListener {
         //TODO need optimize, match and then capture the data
         final String errCategory = classifier.classifyError(e.getError());
         tags.put(MRJobTagName.ERROR_CATEGORY.toString(), errCategory);
+        entity.getTags().put(MRJobTagName.ERROR_CATEGORY.toString(), errCategory);
 
         failureTask.setError(e.getError());
         failureTask.setFailureCount(1); // hard coded to 1 unless we do pre-aggregation in the future

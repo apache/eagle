@@ -60,7 +60,7 @@ public abstract class ApplicationProviderLoader {
         if (providers.containsKey(type)) {
             return providers.get(type);
         } else {
-            throw new IllegalArgumentException("Unknown Application Type: " + type);
+            throw new IllegalArgumentException("Illegal Application Type: " + type);
         }
     }
 

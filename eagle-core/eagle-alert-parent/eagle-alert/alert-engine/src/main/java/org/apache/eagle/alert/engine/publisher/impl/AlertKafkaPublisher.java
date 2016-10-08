@@ -18,6 +18,7 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +29,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.eagle.alert.engine.coordinator.Publishment;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.publisher.PublishConstants;
-import com.typesafe.config.Config;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import com.typesafe.config.Config;
 
 public class AlertKafkaPublisher extends AbstractPublishPlugin {
 
@@ -49,6 +45,8 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
     private KafkaProducer producer;
     private String brokerList;
     private String topic;
+    private String namespaceLabel;
+    private String namespaceValue;
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -60,6 +58,8 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             brokerList = kafkaConfig.get(PublishConstants.BROKER_LIST).trim();
             producer = KafkaProducerManager.INSTANCE.getProducer(brokerList, kafkaConfig);
             topic = kafkaConfig.get(PublishConstants.TOPIC).trim();
+            namespaceLabel = kafkaConfig.getOrDefault(PublishConstants.RAW_ALERT_NAMESPACE_LABEL, "namespace");
+            namespaceValue = kafkaConfig.getOrDefault(PublishConstants.RAW_ALERT_NAMESPACE_VALUE, "network");
         }
     }
 
@@ -70,9 +70,22 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             LOG.warn("KafkaProducer is null due to the incorrect configurations");
             return;
         }
-        List<AlertStreamEvent> outputEvents = dedup(event);
-        if (outputEvents == null) {
-            return;
+        List<AlertStreamEvent> outputEvents = new ArrayList<AlertStreamEvent>();
+
+        int namespaceColumnIndex = event.getSchema().getColumnIndex(namespaceLabel);
+        if (namespaceColumnIndex < 0 || namespaceColumnIndex >= event.getData().length) {
+            LOG.warn("Namespace column {} is not found, the found index {} is invalid",
+                namespaceLabel, namespaceColumnIndex);
+        } else {
+            // copy raw event to be duped
+            AlertStreamEvent newEvent = new AlertStreamEvent(event);
+            newEvent.getData()[namespaceColumnIndex] = namespaceValue;
+            outputEvents.add(newEvent);
+        }
+
+        List<AlertStreamEvent> dedupResults = dedup(event);
+        if (dedupResults != null) {
+            outputEvents.addAll(dedupResults);
         }
         PublishStatus status = new PublishStatus();
         try {

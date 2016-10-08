@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.eagle.metadata.model;
 
+import com.google.common.base.Preconditions;
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
@@ -24,15 +26,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Site app management entity
+ * Site app management entity.
  */
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApplicationEntity extends PersistenceEntity {
     private String appId;
     private SiteEntity site;
-
     private ApplicationDesc descriptor;
+    private boolean executable = true;
 
     private Map<String, Object> configuration = new HashMap<>();
     private Map<String, String> context = new HashMap<>();
@@ -45,8 +46,7 @@ public class ApplicationEntity extends PersistenceEntity {
     }
 
     public ApplicationEntity(String siteId, String appType) {
-        SiteEntity siteEntity = new SiteEntity("", siteId);
-        this.site = siteEntity;
+        this.site = new SiteEntity("", siteId);
         ApplicationDesc applicationDesc = new ApplicationDesc();
         applicationDesc.setType(appType);
         this.descriptor = applicationDesc;
@@ -99,8 +99,14 @@ public class ApplicationEntity extends PersistenceEntity {
     @Override
     public void ensureDefault() {
         super.ensureDefault();
+
+        Preconditions.checkNotNull(this.getSite(),"site is null");
+        Preconditions.checkNotNull(this.getSite().getSiteId(),"siteId is null");
+        Preconditions.checkNotNull(this.getDescriptor(),"descriptor is null");
+        Preconditions.checkNotNull(this.getDescriptor().getType(),"descriptor type is null");
+
         if (this.appId == null) {
-            this.appId = String.format("%s-%s", this.getDescriptor().getType(), this.getSite().getSiteId());
+            this.appId = String.format("%s_%s", this.getDescriptor().getType(), this.getSite().getSiteId()).toUpperCase();
         }
         if (this.status == null) {
             this.status = Status.INITIALIZED;
@@ -147,12 +153,23 @@ public class ApplicationEntity extends PersistenceEntity {
         this.streams = streams;
     }
 
+    public boolean isExecutable() {
+        return executable;
+    }
+
+    public void setExecutable(boolean executable) {
+        this.executable = executable;
+    }
+
     public static enum Status {
         INITIALIZED("INITIALIZED"),
         STARTING("STARTING"),
         RUNNING("RUNNING"),
         STOPPING("STOPPING"),
-        STOPPED("STOPPED");
+        //Todo: currently "stopped" is not used, because "STOP" operation in Eagle equals to "KILL"
+        STOPPED("STOPPED"),
+        REMOVED("REMOVED"),
+        UNKNOWN("UNKNOWN");
 
         private final String status;
 

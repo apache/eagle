@@ -24,7 +24,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Queue {
-    private String type;
+    //private String type;   workaround the YARN-4785,the field's value is based on the "type" field of SchedulerInfo.java, then its getter and setter function is never used.
     private double capacity;
     private double usedCapacity;
     private double maxCapacity;
@@ -122,13 +122,13 @@ public class Queue {
     }
 
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+    //    public String getType() {
+    //        return type;
+    //    }
+    //
+    //    public void setType(String type) {
+    //        this.type = type;
+    //    }
 
     public ResourcesUsed getResourcesUsed() {
         return resourcesUsed;
