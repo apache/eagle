@@ -119,7 +119,13 @@
 
 		// TODO: metadata will be removed
 		Entity.queryMetadata = function (url) {
-			return Entity.query('metadata/' +  url);
+			var metaList = Entity.query('metadata/' +  url);
+			metaList._then(function (res) {
+				metaList.splice(0);
+				Array.prototype.push.apply(metaList, res.data);
+			});
+
+			return metaList;
 		};
 
 		Entity.deleteMetadata = function (url) {

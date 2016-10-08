@@ -17,13 +17,142 @@
   -->
 
 <div class="box-body">
-	<ul class="stepGuide">
+	<!--ul class="stepGuide">
 		<li>
 			<span class="icon bg-green">1</span>
-			<span class="title">This is the title!!!</span>
+			<span class="title">Define</span>
 		</li>
 		<li>
 			<span class="icon">2</span>
 		</li>
+	</ul-->
+	<ul class="timeline">
+		<!-- Base Info -->
+		<li class="time-label">
+			<span class="bg-blue">#1. Basic Information</span>
+		</li>
+		<li>
+			<span class="fa fa-file-text bg-aqua"></span>
+			<div class="timeline-item">
+				<div class="timeline-body">
+					<div class="form-group">
+						<label>* Policy Name</label>
+						<input type="text" class="form-control" ng-model="policy.name" />
+					</div>
+					<div class="form-group">
+						<label>Description</label>
+						<textarea class="form-control" ng-model="policy.description" rows="3"></textarea>
+					</div>
+				</div>
+			</div>
+		</li>
+
+		<!-- Alert Stream -->
+		<li class="time-label" ng-class="{disabled: !checkBasicInfo()}">
+			<span class="bg-blue">#2. Alert Stream</span>
+		</li>
+		<li ng-class="{disabled: !checkBasicInfo()}">
+			<span class="fa fa-rocket bg-aqua"></span>
+			<div class="timeline-item">
+				<div class="timeline-body">
+					<label>Alert Stream</label>
+					<ul class="list-unstyled with-margin">
+						<li ng-repeat="stream in policy.inputStreams track by $index">
+							[<a class="fa fa-times" ng-click="removeStream(stream)"></a>] {{stream}}
+						</li>
+						<li ng-if="policy.inputStreams.length === 0"><span class="fa fa-ban"></span> (empty list)</li>
+					</ul>
+					<!--div class="input-group">
+						<select class="form-control" ng-model="selectedStream">
+							<option ng-repeat="stream in getStreamList() track by $index" value="{{stream.streamId}}">
+								{{stream.streamId}}
+								({{stream.siteId}})
+							</option>
+						</select>
+
+						<div class="input-group-btn">
+							<button class="btn btn-success" ng-click="addStream()" ng-disabled="!selectedStream">
+								<span class="fa fa-plus"></span> Add Stream
+							</button>
+						</div>
+					</div-->
+
+					<div class="inner-block">
+						<div class="form-group">
+							<label>Application</label>
+							<select class="form-control" ng-model="selectedApplication" ng-change="refreshStreamSelect()">
+								<option ng-repeat="(app, list) in applications track by $index" value="{{app}}">
+									{{app}}
+								</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Stream</label>
+							<select class="form-control" ng-model="selectedStream">
+								<option ng-repeat="stream in applications[selectedApplication] track by $index" value="{{stream.streamId}}">
+									[{{stream.siteId}}]
+									{{stream.streamId}}
+									{{checkAddStream(stream.streamId) ? '(Already Added)' : ''}}
+								</option>
+							</select>
+						</div>
+						<button class="btn btn-success" ng-click="addStream()" ng-disabled="checkAddStream(selectedStream)">
+							<span class="fa fa-plus"></span> Add Stream
+						</button>
+					</div>
+				</div>
+			</div>
+		</li>
+
+		<!-- Definition -->
+		<li class="time-label" ng-class="{disabled: !checkAlertStream()}">
+			<span class="bg-blue">#3. Definition</span>
+		</li>
+		<li ng-class="{disabled: !checkAlertStream()}">
+			<span class="fa fa-pencil bg-aqua"></span>
+			<div class="timeline-item">
+				<div class="timeline-body">
+					<div class="form-group">
+						<label>Definition</label>
+						<textarea class="form-control" ng-model="policy.definition.value" rows="8"></textarea>
+					</div>
+
+					<label>Partition</label>
+					<ul class="list-unstyled with-margin">
+						<li ng-repeat="partition in policy.partitionSpec track by $index">
+							[<a class="fa fa-times" ng-click="removeStream(partition)"></a>] {{partition}}
+						</li>
+						<li ng-if="policy.partition.length === 0"><span class="fa fa-ban"></span> (empty list)</li>
+					</ul>
+
+					<div class="inner-block">
+						<div class="form-group">
+							<label>Stream</label>
+							<select class="form-control" ng-model="partitionStream">
+								<option ng-repeat="stream in policy.inputStreams track by $index" value="{{stream}}">
+									{{stream}}
+								</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Type</label>
+							<select class="form-control" ng-model="partitionType">
+								<option>GROUPBY</option>
+								<option>GLOBAL</option>
+								<option>SHUFFLE</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Columns</label>
+							<label class="checkbox-inline">
+								<input type="checkbox" id="inlineCheckbox1" value="option1"> 1
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</li>
 	</ul>
+
+	<pre>{{policy | json : "\t"}}</pre>
 </div>

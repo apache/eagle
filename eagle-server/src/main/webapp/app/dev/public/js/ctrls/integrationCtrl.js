@@ -196,6 +196,9 @@
 	// =                                     Application                                    =
 	// ======================================================================================
 	eagleControllers.controller('integrationApplicationListCtrl', function ($sce, $scope, $wrapState, PageConfig, Application) {
+		PageConfig.title = "Integration";
+		PageConfig.subTitle = "Applications";
+
 		$scope.showAppDetail = function(application) {
 			var docs = application.docs || {install: "", uninstall: ""};
 			$scope.application = application;
