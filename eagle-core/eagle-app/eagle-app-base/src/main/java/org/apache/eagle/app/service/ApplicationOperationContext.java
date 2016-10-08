@@ -80,22 +80,34 @@ public class ApplicationOperationContext implements Serializable, ApplicationLif
         this.alertMetadataService = alertMetadataService;
     }
 
+    /**
+     * Generate global unique streamId to install.
+     * TODO refactor with streamId and siteId
+     */
+    private static String generateUniqueStreamId(String siteId,String streamTypeId) {
+        return String.format("%s_%s",streamTypeId,siteId).toUpperCase();
+    }   
+
     @Override
     public void onInstall() {
         metadata.setExecutable(application.isExecutable());
         if (metadata.getDescriptor().getStreams() != null) {
-            List<StreamDesc> streamDescCollection = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
-                StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(streamDefinition.getStreamId(), this.config);
+            List<StreamDesc> streamDescToInstall = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
+                StreamDefinition copied = streamDefinition.copy();
+                copied.setSiteId(metadata.getSite().getSiteId());
+                copied.setStreamId(generateUniqueStreamId(metadata.getSite().getSiteId(),copied.getStreamId()));
+                StreamSinkConfig streamSinkConfig = this.runtime.environment().streamSink().getSinkConfig(copied.getStreamId(), this.config);
                 StreamDesc streamDesc = new StreamDesc();
-                streamDesc.setSchema(streamDefinition);
+                streamDesc.setSchema(copied);
                 streamDesc.setSink(streamSinkConfig);
-                streamDesc.setStreamId(streamDefinition.getStreamId());
+                streamDesc.setStreamId(copied.getStreamId());
                 return streamDesc;
             })).collect(Collectors.toList());
-            metadata.setStreams(streamDescCollection);
+            metadata.setStreams(streamDescToInstall);
 
+            // TODO: Decouple converting from StreamSink to Alert DataSource
             // iterate each stream descriptor and create alert datasource for each
-            for (StreamDesc streamDesc : streamDescCollection) {
+            for (StreamDesc streamDesc : streamDescToInstall) {
                 // only take care of Kafka sink
                 if (streamDesc.getSink() instanceof KafkaStreamSinkConfig) {
                     KafkaStreamSinkConfig kafkaCfg = (KafkaStreamSinkConfig) streamDesc.getSink();
