@@ -16,19 +16,6 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
-import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
-import org.bson.BsonDocument;
-import org.bson.BsonInt32;
-import org.bson.BsonInt64;
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.Block;
@@ -39,6 +26,15 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.InsertOneOptions;
 import com.typesafe.config.Config;
+import org.apache.eagle.alert.engine.publisher.impl.EventUniq;
+import org.bson.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class MongoDedupEventsStore implements DedupEventsStore {
 
@@ -46,6 +42,7 @@ public class MongoDedupEventsStore implements DedupEventsStore {
 
     public static final String DEDUP_ID = "dedupId";
     public static final String DEDUP_STREAM_ID = "streamId";
+    public static final String DOC_ID = "docId";
     public static final String DEDUP_POLICY_ID = "policyId";
     public static final String DEDUP_CREATE_TIME = "createdTime";
     public static final String DEDUP_TIMESTAMP = "timestamp";
@@ -55,6 +52,8 @@ public class MongoDedupEventsStore implements DedupEventsStore {
     public static final String DEDUP_STATE_FIELD_VALUE = "stateFieldValue";
     public static final String DEDUP_COUNT = "count";
     public static final String DEDUP_FIRST_OCCURRENCE = "firstOccurrence";
+    public static final String DEDUP_CLOSE_TIME = "closeTime";
+    public static final String DEDUP_PUBLISH_ID = "publishId";
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -67,15 +66,21 @@ public class MongoDedupEventsStore implements DedupEventsStore {
     private MongoClient client;
     private MongoDatabase db;
     private MongoCollection<Document> stateCollection;
+    private String publishName;
 
     private static final String DB_NAME = "ump_alert_dedup";
     private static final String ALERT_STATE_COLLECTION = "alert_dedup";
 
-    public MongoDedupEventsStore(Config config) {
+    public MongoDedupEventsStore(Config config, String publishName) {
         this.config = config;
+        this.publishName = publishName;
         this.connection = this.config.getString("connection");
-        this.client = new MongoClient(new MongoClientURI(this.connection));
-        init();
+        try {
+            this.client = new MongoClient(new MongoClientURI(this.connection));
+            init();
+        } catch (Throwable t) {
+            LOG.error(String.format("initialize mongodb %s client failed", this.connection), t);
+        }
     }
 
     private void init() {
@@ -92,7 +97,9 @@ public class MongoDedupEventsStore implements DedupEventsStore {
     public Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> getEvents() {
         try {
             Map<EventUniq, ConcurrentLinkedDeque<DedupValue>> result = new ConcurrentHashMap<EventUniq, ConcurrentLinkedDeque<DedupValue>>();
-            stateCollection.find().forEach(new Block<Document>() {
+            BsonDocument filter = new BsonDocument();
+            filter.append(DEDUP_PUBLISH_ID, new BsonString(this.publishName));
+            stateCollection.find(filter).forEach(new Block<Document>() {
                 @Override
                 public void apply(final Document doc) {
                     DedupEntity entity = TransformerUtils.transform(DedupEntity.class, BsonDocument.parse(doc.toJson()));
@@ -112,9 +119,9 @@ public class MongoDedupEventsStore implements DedupEventsStore {
     @Override
     public void add(EventUniq eventEniq, ConcurrentLinkedDeque<DedupValue> dedupStateValues) {
         try {
-            BsonDocument doc = TransformerUtils.transform(new DedupEntity(eventEniq, dedupStateValues));
+            BsonDocument doc = TransformerUtils.transform(new DedupEntity(this.publishName, eventEniq, dedupStateValues));
             BsonDocument filter = new BsonDocument();
-            filter.append(DEDUP_ID, new BsonInt64(eventEniq.hashCode()));
+            filter.append(DEDUP_ID, new BsonInt64(TransformerUtils.getUniqueId(this.publishName, eventEniq)));
             Document returnedDoc = stateCollection.findOneAndReplace(filter, Document.parse(doc.toJson()));
             if (returnedDoc == null) {
                 InsertOneOptions option = new InsertOneOptions();
@@ -129,7 +136,7 @@ public class MongoDedupEventsStore implements DedupEventsStore {
     public void remove(EventUniq eventEniq) {
         try {
             BsonDocument filter = new BsonDocument();
-            filter.append(DEDUP_ID, new BsonInt64(eventEniq.hashCode()));
+            filter.append(DEDUP_ID, new BsonInt64(TransformerUtils.getUniqueId(this.publishName, eventEniq)));
             stateCollection.deleteOne(filter);
         } catch (Exception e) {
             LOG.error("delete dedup state failed, but the state in memory is good, could be ingored.", e);

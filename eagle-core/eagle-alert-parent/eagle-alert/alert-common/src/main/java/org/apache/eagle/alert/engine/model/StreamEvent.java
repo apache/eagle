@@ -16,10 +16,11 @@
  */
 package org.apache.eagle.alert.engine.model;
 
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+import org.apache.eagle.alert.utils.DateTimeUtil;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,10 +33,10 @@ import java.util.Objects;
 public class StreamEvent implements Serializable {
     private static final long serialVersionUID = 2765116509856609763L;
 
-    private String streamId;
-    private Object[] data;
-    private long timestamp;
-    private String metaVersion;
+    protected String streamId;
+    protected Object[] data;
+    protected long timestamp;
+    protected String metaVersion;
 
     public StreamEvent() {
     }

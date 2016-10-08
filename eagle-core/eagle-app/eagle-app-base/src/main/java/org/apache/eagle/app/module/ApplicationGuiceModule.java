@@ -19,10 +19,12 @@ package org.apache.eagle.app.module;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.service.impl.ApplicationManagementServiceImpl;
+import org.apache.eagle.app.service.impl.ApplicationStatusUpdateServiceImpl;
 import org.apache.eagle.metadata.service.ApplicationDescService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.util.Providers;
+import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 
 public class ApplicationGuiceModule extends AbstractModule {
     private ApplicationProviderService appProviderInst;
@@ -36,5 +38,6 @@ public class ApplicationGuiceModule extends AbstractModule {
         bind(ApplicationProviderService.class).toProvider(Providers.of(appProviderInst));
         bind(ApplicationDescService.class).toProvider(Providers.of(appProviderInst));
         bind(ApplicationManagementService.class).to(ApplicationManagementServiceImpl.class).in(Singleton.class);
+        bind(ApplicationStatusUpdateService.class).to(ApplicationStatusUpdateServiceImpl.class).in(Singleton.class);
     }
 }

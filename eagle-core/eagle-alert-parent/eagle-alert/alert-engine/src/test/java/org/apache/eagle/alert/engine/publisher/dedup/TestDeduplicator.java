@@ -33,8 +33,8 @@ import java.util.Map;
 public class TestDeduplicator extends ExtendedDeduplicator {
 
     public TestDeduplicator(Config config, Map<String, String> properties, List<String> customDedupFields,
-			String dedupStateField, DedupCache dedupCache) {
-		super(config, properties, customDedupFields, dedupStateField, dedupCache);
+			String dedupStateField, DedupCache dedupCache, String publishName) {
+		super(config, properties, customDedupFields, dedupStateField, dedupCache, publishName);
 	}
 
 	private static final Logger LOG = LoggerFactory.getLogger(TestDeduplicator.class);
@@ -71,7 +71,7 @@ public class TestDeduplicator extends ExtendedDeduplicator {
         LOG.info("event key: " + eventkey);
         LOG.info("dedup field: " + this.getDedupStateField());
         LOG.info("dedup value: " + stateFiledValue);
-        List<AlertStreamEvent> result = this.getDedupCache().dedup(event, eventkey, this.getDedupStateField(), stateFiledValue);
+        List<AlertStreamEvent> result = this.getDedupCache().dedup(event, eventkey, this.getDedupStateField(), stateFiledValue, "closed");
         return result;
     }
 

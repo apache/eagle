@@ -19,6 +19,7 @@ package org.apache.eagle.alert.coordinator.resource;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordinator.Coordinator;
 import org.apache.eagle.alert.coordinator.ScheduleOption;
+import org.apache.eagle.alert.coordinator.ValidateState;
 import org.apache.eagle.alert.utils.JsonUtils;
 
 import javax.ws.rs.GET;
@@ -51,6 +52,13 @@ public class CoordinatorResource {
     public String build() throws Exception {
         ScheduleOption option = new ScheduleOption();
         ScheduleState state = alertCoordinator.schedule(option);
+        return JsonUtils.writeValueAsString(state);
+    }
+
+    @POST
+    @Path("/validate")
+    public String validate() throws Exception {
+        ValidateState state = alertCoordinator.validate();
         return JsonUtils.writeValueAsString(state);
     }
 

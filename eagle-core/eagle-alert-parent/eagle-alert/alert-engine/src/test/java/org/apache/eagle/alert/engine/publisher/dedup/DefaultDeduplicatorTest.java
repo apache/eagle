@@ -40,9 +40,9 @@ public class DefaultDeduplicatorTest extends MongoDependencyBaseTest {
 		// assume state: OPEN, WARN, CLOSE
 		System.setProperty("config.resource", "/application-mongo-statestore.conf");
 		Config config = ConfigFactory.load();
-		DedupCache dedupCache = DedupCache.getInstance(config);
+		DedupCache dedupCache = new DedupCache(config, "testPublishment");
 		DefaultDeduplicator deduplicator = new DefaultDeduplicator(
-				"PT1M", Arrays.asList(new String[] { "alertKey" }), "state", dedupCache);
+				"PT1M", Arrays.asList(new String[] { "alertKey" }), "state", "close", dedupCache);
 		
 		StreamDefinition stream = createStream();
 		PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");

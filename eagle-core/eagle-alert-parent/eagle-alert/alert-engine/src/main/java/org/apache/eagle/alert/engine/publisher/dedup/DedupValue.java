@@ -23,12 +23,18 @@ public class DedupValue {
     private long firstOccurrence;
     private String stateFieldValue;
     private long count;
+    private long closeTime;
+    private String docId;
 
     public DedupValue() {
     }
 
-    public DedupValue(String stateFieldValue) {
-        this.stateFieldValue = stateFieldValue;
+    public void resetTo(DedupValue dv) {
+        this.docId = dv.docId;
+        this.firstOccurrence = dv.firstOccurrence;
+        this.count = dv.count;
+        this.closeTime = dv.closeTime;
+        this.stateFieldValue = dv.stateFieldValue;
     }
 
     public long getCount() {
@@ -39,12 +45,28 @@ public class DedupValue {
         this.count = count;
     }
 
+    public String getDocId() {
+        return docId;
+    }
+
+    public void setDocId(String docId) {
+        this.docId = docId;
+    }
+
     public long getFirstOccurrence() {
         return firstOccurrence;
     }
 
     public void setFirstOccurrence(long firstOccurence) {
         this.firstOccurrence = firstOccurence;
+    }
+
+    public void setCloseTime(long closeTime) {
+        this.closeTime = closeTime;
+    }
+
+    public long getCloseTime() {
+        return closeTime;
     }
 
     public String getStateFieldValue() {

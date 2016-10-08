@@ -17,11 +17,8 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -31,19 +28,27 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 public class DefaultDeduplicator implements AlertDeduplicator {
 
     private static Logger LOG = LoggerFactory.getLogger(DefaultDeduplicator.class);
 
-    @SuppressWarnings("unused")
-    private long dedupIntervalMin;
+    private long dedupIntervalSec;
     private List<String> customDedupFields = new ArrayList<>();
     private String dedupStateField;
+    private String dedupStateCloseValue;
 
     private DedupCache dedupCache;
 
+    private Cache<EventUniq, String> withoutStatesCache;
+
     public DefaultDeduplicator() {
-        this.dedupIntervalMin = 0;
+        this.dedupIntervalSec = 0;
     }
 
     public DefaultDeduplicator(String intervalMin) {
@@ -51,11 +56,11 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     }
 
     public DefaultDeduplicator(long intervalMin) {
-        this.dedupIntervalMin = intervalMin;
+        this.dedupIntervalSec = intervalMin;
     }
 
     public DefaultDeduplicator(String intervalMin, List<String> customDedupFields,
-                               String dedupStateField, DedupCache dedupCache) {
+                               String dedupStateField, String dedupStateCloseValue, DedupCache dedupCache) {
         setDedupIntervalMin(intervalMin);
         if (customDedupFields != null) {
             this.customDedupFields = customDedupFields;
@@ -63,7 +68,13 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         if (StringUtils.isNotBlank(dedupStateField)) {
             this.dedupStateField = dedupStateField;
         }
+        if (StringUtils.isNotBlank(dedupStateCloseValue)) {
+            this.dedupStateCloseValue = dedupStateCloseValue;
+        }
         this.dedupCache = dedupCache;
+
+        withoutStatesCache = CacheBuilder.newBuilder().expireAfterWrite(
+            this.dedupIntervalSec, TimeUnit.SECONDS).build();
     }
 
     /*
@@ -74,9 +85,19 @@ public class DefaultDeduplicator implements AlertDeduplicator {
         if (StringUtils.isBlank(stateFiledValue)) {
             // without state field, we cannot determine whether it is duplicated
             // without custom filed values, we cannot determine whether it is duplicated
+            synchronized (withoutStatesCache) {
+                if (withoutStatesCache != null && withoutStatesCache.getIfPresent(key) != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Alert event {} with key {} is skipped since it is duplicated", event, key);
+                    }
+                    return null;
+                } else if (withoutStatesCache != null) {
+                    withoutStatesCache.put(key, "");
+                }
+            }
             return Arrays.asList(event);
         }
-        return dedupCache.dedup(event, key, dedupStateField, stateFiledValue);
+        return dedupCache.dedup(event, key, dedupStateField, stateFiledValue, dedupStateCloseValue);
     }
 
     public List<AlertStreamEvent> dedup(AlertStreamEvent event) {
@@ -117,8 +138,8 @@ public class DefaultDeduplicator implements AlertDeduplicator {
             event.getPolicyId(), event.getCreatedTime(), customFieldValues), stateFiledValue);
         if (outputEvents != null && outputEvents.size() > 0) {
             return outputEvents;
-        } else if (LOG.isDebugEnabled()) {
-            LOG.debug("Alert event is skipped because it's duplicated: {}", event.toString());
+        } else if (LOG.isInfoEnabled()) {
+            LOG.info("Alert event is skipped because it's duplicated: {}", event.toString());
         }
         return null;
     }
@@ -126,15 +147,15 @@ public class DefaultDeduplicator implements AlertDeduplicator {
     @Override
     public void setDedupIntervalMin(String newDedupIntervalMin) {
         if (newDedupIntervalMin == null || newDedupIntervalMin.isEmpty()) {
-            dedupIntervalMin = 0;
+            dedupIntervalSec = 0;
             return;
         }
         try {
             Period period = Period.parse(newDedupIntervalMin);
-            this.dedupIntervalMin = period.toStandardMinutes().getMinutes();
+            this.dedupIntervalSec = period.toStandardSeconds().getSeconds();
         } catch (Exception e) {
             LOG.warn("Fail to pares deDupIntervalMin, will disable deduplication instead", e);
-            this.dedupIntervalMin = 0;
+            this.dedupIntervalSec = 0;
         }
     }
 

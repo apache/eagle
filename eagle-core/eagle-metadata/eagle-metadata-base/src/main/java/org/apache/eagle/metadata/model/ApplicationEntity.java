@@ -106,7 +106,7 @@ public class ApplicationEntity extends PersistenceEntity {
         Preconditions.checkNotNull(this.getDescriptor().getType(),"descriptor type is null");
 
         if (this.appId == null) {
-            this.appId = String.format("EAGLE_%s_%s", this.getSite().getSiteId(),this.getDescriptor().getType()).toUpperCase();
+            this.appId = String.format("%s_%s", this.getDescriptor().getType(), this.getSite().getSiteId()).toUpperCase();
         }
         if (this.status == null) {
             this.status = Status.INITIALIZED;
@@ -166,7 +166,10 @@ public class ApplicationEntity extends PersistenceEntity {
         STARTING("STARTING"),
         RUNNING("RUNNING"),
         STOPPING("STOPPING"),
-        STOPPED("STOPPED");
+        //Todo: currently "stopped" is not used, because "STOP" operation in Eagle equals to "KILL"
+        STOPPED("STOPPED"),
+        REMOVED("REMOVED"),
+        UNKNOWN("UNKNOWN");
 
         private final String status;
 

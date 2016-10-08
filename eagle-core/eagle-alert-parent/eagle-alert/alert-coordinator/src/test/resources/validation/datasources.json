@@ -1,0 +1,86 @@
+[
+  {
+    "type":"KAFKA",
+    "name":"network_syslog_event_datasource",
+    "properties":{
+
+    },
+    "topic":"preprocess.network-syslog.events",
+    "schemeCls":"EventSignalScheme",
+    "codec":{
+      "activeStreamNames":[
+
+      ],
+      "streamNameSelectorProp":{
+        "userProvidedStreamName":"syslogEventStream",
+        "streamNameFormat":"%s"
+      },
+      "streamNameSelectorCls":"org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn":"timestamp",
+      "timestampFormat":""
+    }
+  },
+  {
+    "type":"KAFKA",
+    "name":"network_NC_alert_datasource",
+    "properties":{
+
+    },
+    "topic":"preprocess.network-nervecenter.events",
+    "schemeCls":"EventSignalScheme",
+    "codec":{
+      "activeStreamNames":[
+
+      ],
+      "streamNameSelectorProp":{
+        "userProvidedStreamName":"ncAlertStream",
+        "streamNameFormat":"%s"
+      },
+      "streamNameSelectorCls":"org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn":"timestamp",
+      "timestampFormat":""
+    }
+  },
+  {
+    "type":"KAFKA",
+    "name":"network_sherlock_alert_datasource",
+    "properties":{
+
+    },
+    "topic":"preprocess.network-sherlock.events",
+    "schemeCls":"EventSignalScheme",
+    "codec":{
+      "activeStreamNames":[
+
+      ],
+      "streamNameSelectorProp":{
+        "userProvidedStreamName":"sherlockAlertStream",
+        "streamNameFormat":"%s"
+      },
+      "streamNameSelectorCls":"org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn":"timestamp",
+      "timestampFormat":""
+    }
+  },
+  {
+    "type":"KAFKA",
+    "name":"network_aggregate_alert_output_datasource",
+    "properties":{
+
+    },
+    "topic":"process.network.alerts",
+    "schemeCls":"EventSignalScheme",
+    "codec":{
+      "activeStreamNames":[
+
+      ],
+      "streamNameSelectorProp":{
+        "fieldNamesToInferStreamName":"streamName",
+        "streamNameFormat":"%s"
+      },
+      "streamNameSelectorCls":"org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector",
+      "timestampColumn":"timestamp",
+      "timestampFormat":""
+    }
+  }
+]

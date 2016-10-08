@@ -33,6 +33,21 @@ public class AlertStreamEvent extends StreamEvent {
     private String createdBy;
     private long createdTime;
 
+    public AlertStreamEvent() {
+    }
+
+    public AlertStreamEvent(AlertStreamEvent event) {
+        this.policyId = event.policyId;
+        this.schema = event.schema;
+        this.createdBy = event.createdBy;
+        this.createdTime = event.createdTime;
+        this.setTimestamp(event.getTimestamp());
+        this.setData(new Object[event.data.length]);
+        System.arraycopy(event.data, 0, this.data, 0, event.data.length);
+        this.setStreamId(event.getStreamId());
+        this.setMetaVersion(event.getMetaVersion());
+    }
+
     public void setPolicyId(String policyId) {
         this.policyId = policyId;
     }

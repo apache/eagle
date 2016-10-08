@@ -54,7 +54,7 @@ public abstract class MongoDependencyBaseTest {
         ConfigFactory.invalidateCaches();
         config = ConfigFactory.load();
         
-        store = new MongoDedupEventsStore(config);
+        store = new MongoDedupEventsStore(config, "testPublishment");
     }
 
     @AfterClass

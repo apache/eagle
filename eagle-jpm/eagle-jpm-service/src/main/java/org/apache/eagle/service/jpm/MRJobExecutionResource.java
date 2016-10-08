@@ -324,7 +324,8 @@ public class MRJobExecutionResource {
     public JobCountResponse getJobCountGroupByDuration(@QueryParam("site") String site,
                                                        @QueryParam("timeDistInSecs") String timeList,
                                                        @QueryParam("startTime") String startTime,
-                                                       @QueryParam("endTime") String endTime) {
+                                                       @QueryParam("endTime") String endTime,
+                                                       @QueryParam("jobType") String jobType) {
         JobCountResponse response = new JobCountResponse();
         if (site == null || startTime == null || endTime == null || timeList == null) {
             response.errMessage = "IllegalArgument: site, startTime, endTime, or timeDistInSecs is null";
@@ -337,7 +338,17 @@ public class MRJobExecutionResource {
             return response;
         }
         try {
-            return helper.getHistoryJobCountGroupByDuration(historyRes.getObj(), timeList);
+            if (jobType != null) {
+                List<JobExecutionAPIEntity> jobs = new ArrayList<>();
+                for (JobExecutionAPIEntity o : historyRes.getObj()) {
+                    if (o.getTags().get(MRJobTagName.JOB_TYPE.toString()).equalsIgnoreCase(jobType)) {
+                        jobs.add(o);
+                    }
+                }
+                return helper.getHistoryJobCountGroupByDuration(jobs, timeList);
+            } else {
+                return helper.getHistoryJobCountGroupByDuration(historyRes.getObj(), timeList);
+            }
         } catch (Exception e) {
             response.errMessage = e.getMessage();
             return response;

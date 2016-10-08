@@ -16,10 +16,8 @@
  */
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Joiner;
+import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.engine.codec.IEventSerializer;
 import org.apache.eagle.alert.engine.coordinator.OverrideDeduplicatorSpec;
@@ -31,8 +29,9 @@ import org.apache.eagle.alert.engine.publisher.dedup.DedupCache;
 import org.apache.eagle.alert.engine.publisher.dedup.ExtendedDeduplicator;
 import org.slf4j.Logger;
 
-import com.google.common.base.Joiner;
-import com.typesafe.config.Config;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @since Jun 3, 2016.
@@ -47,8 +46,7 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
     @SuppressWarnings("rawtypes")
     @Override
     public void init(Config config, Publishment publishment, Map conf) throws Exception {
-        DedupCache dedupCache = DedupCache.getInstance(config);
-
+        DedupCache dedupCache = new DedupCache(config, publishment.getName());
         OverrideDeduplicatorSpec spec = publishment.getOverrideDeduplicator();
         if (spec != null && StringUtils.isNotBlank(spec.getClassName())) {
             try {
@@ -58,21 +56,23 @@ public abstract class AbstractPublishPlugin implements AlertPublishPlugin {
                     Map.class,
                     List.class,
                     String.class,
-                    DedupCache.class).newInstance(
+                    DedupCache.class,
+                    String.class).newInstance(
                     config,
                     spec.getProperties(),
                     publishment.getDedupFields(),
                     publishment.getDedupStateField(),
-                    dedupCache);
-                getLogger().info("initiliazed extended deduplicator {} with properties {} successfully",
-                    spec.getClassName(), Joiner.on(",").withKeyValueSeparator(">").join(
+                    dedupCache,
+                    publishment.getName());
+                getLogger().info("{} initiliazed extended deduplicator {} with properties {} successfully",
+                    publishment.getName(), spec.getClassName(), Joiner.on(",").withKeyValueSeparator(">").join(
                         spec.getProperties() == null ? new HashMap<String, String>() : spec.getProperties()));
             } catch (Throwable t) {
                 getLogger().error(String.format("initialize extended deduplicator %s failed", spec.getClassName()), t);
             }
         } else {
             this.deduplicator = new DefaultDeduplicator(publishment.getDedupIntervalMin(),
-                publishment.getDedupFields(), publishment.getDedupStateField(), dedupCache);
+                publishment.getDedupFields(), publishment.getDedupStateField(), publishment.getDedupStateCloseValue(), dedupCache);
             this.pubName = publishment.getName();
         }
         String serializerClz = publishment.getSerializer();
