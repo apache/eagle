@@ -99,6 +99,11 @@
 			parallelismHint: 2
 		}, policy);
 
+		$scope.policy.definition = {
+			type: $scope.policy.definition.type,
+			value: $scope.policy.definition.value
+		};
+
 		console.log("\n\n\n>>>", $scope.policy);
 
 		// =========================================================
@@ -287,9 +292,9 @@
 		// =========================================================
 		// =                         Mock                          =
 		// =========================================================
-		$scope.policy.name = "Mock";
+		/*$scope.policy.name = "Mock";
 		$scope.policy.inputStreams = ["hbase_audit_log_stream"];
 		$scope.policy.outputStreams = ["hbase_audit_log_stream"];
-		$scope.policy.definition.value = "test";
+		$scope.policy.definition.value = "test";*/
 	}
 })();

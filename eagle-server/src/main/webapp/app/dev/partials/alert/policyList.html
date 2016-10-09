@@ -31,14 +31,14 @@
 				<tbody>
 					<tr>
 						<td>
-							<a ng-href="#/alert/policyEdit/{{item.name}}">{{item.name}}</a>
+							{{item.name}}
 						</td>
 						<td class="text-center"><span class="label label-primary">{{item.definition.type}}</span></td>
 						<td>{{item.description}}</td>
 						<td class="text-center">
 							<div class="btn-group btn-group-xs">
 								<button class="btn btn-default"><span class="fa fa-play"></span></button>
-								<button class="btn btn-default"><span class="fa fa-pencil"></span></button>
+								<a ng-href="#/alert/policyEdit/{{item.name}}" class="btn btn-default"><span class="fa fa-pencil"></span></a>
 								<button class="btn btn-danger" ng-click="deletePolicy(item)"><span class="fa fa-trash"></span></button>
 							</div>
 						</td>

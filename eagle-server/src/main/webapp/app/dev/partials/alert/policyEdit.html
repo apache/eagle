@@ -233,6 +233,6 @@
 
 <div class="box-footer text-right">
 	<button class="btn btn-primary" ng-disabled="!checkDefinition() || policyLock" ng-click="createPolicy()">
-		New Policy
+		{{newPolicy ? 'New' : 'Update'}} Policy
 	</button>
 </div>
