@@ -29,6 +29,7 @@ import com.google.inject.Inject;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.*;
 
 /**
@@ -44,7 +45,6 @@ public class MetadataResource {
 
     public MetadataResource() {
         this.dao = MetadataDaoFactory.getInstance().getMetadataDao();
-        ;
     }
 
     @Inject
@@ -210,6 +210,20 @@ public class MetadataResource {
     @DELETE
     public OpResult removePolicy(@PathParam("policyId") String policyId) {
         return dao.removePolicy(policyId);
+    }
+
+    @Path("/policies/{policyId}/publishments")
+    @GET
+    public List<Publishment> getPolicyPublishments(@PathParam("policyId") String policyId) {
+        return dao.listPublishment().stream().filter(ps ->
+            ps.getPolicyIds() != null && ps.getPolicyIds().contains(policyId)
+        ).collect(Collectors.toList());
+    }
+
+    @Path("/policies/{policyId}")
+    @GET
+    public List<PolicyDefinition> getPolicyByID(@PathParam("policyId") String policyId) {
+        return dao.listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).collect(Collectors.toList());
     }
 
     @Path("/policies")
