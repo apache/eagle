@@ -8,8 +8,7 @@
     "properties": {
       "token": "your token",
       "channels": "your channel1, your channel2",
-      "severitys": "CRITICAL",
-      "urltemplate": "your template/?id=%s"
+      "severitys": "CRITICAL"
     },
     "dedupIntervalMin": "PT1M",
     "dedupFields": [

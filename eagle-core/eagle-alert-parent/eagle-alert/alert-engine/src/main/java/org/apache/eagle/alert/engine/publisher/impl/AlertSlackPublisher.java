@@ -44,7 +44,6 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
 
     private SlackSession session;
     private String slackChannels;
-    private String urlTemplate;
     private String severitys;
 
     @Override
@@ -55,7 +54,6 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
             Map<String, String> slackConfig = new HashMap<>(publishment.getProperties());
             final String token = slackConfig.get(PublishConstants.TOKEN).trim();
             slackChannels = slackConfig.get(PublishConstants.CHANNELS).trim();
-            urlTemplate = slackConfig.get(PublishConstants.URL_TEMPLATE).trim();
             severitys = slackConfig.get(PublishConstants.SEVERITYS).trim();
 
             if (StringUtils.isNotEmpty(token)) {
@@ -82,11 +80,6 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
         for (AlertStreamEvent outputEvent: outputEvents) {
             String message = "";
             String severity = "";
-            String docId = "";
-            String device = "";
-            String deviceType = "";
-            String colo = "";
-            String component = "";
             String color = "";
             // only user defined severity level alert will send to Slack;
             boolean publishToSlack = false;
@@ -107,21 +100,6 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
                 if (colName.equalsIgnoreCase("message")) {
                     message = outputEvent.getData()[i].toString();
                 }
-                if (colName.equalsIgnoreCase("docId")) {
-                    docId = outputEvent.getData()[i].toString();
-                }
-                if (colName.equalsIgnoreCase("df_device") || colName.equalsIgnoreCase("entity") || colName.equalsIgnoreCase("hostname")) {
-                    device = outputEvent.getData()[i].toString();
-                }
-                if (colName.equalsIgnoreCase("df_type") || colName.equalsIgnoreCase("entityType")) {
-                    deviceType = outputEvent.getData()[i].toString();
-                }
-                if (colName.equalsIgnoreCase("dc")) {
-                    colo = outputEvent.getData()[i].toString();
-                }
-                if (colName.equalsIgnoreCase("component")) {
-                    component = outputEvent.getData()[i].toString();
-                }
             }
 
             if (publishToSlack) {
@@ -139,28 +117,14 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
                             break;
                     }
 
-                    String messageToSlack = String.format("*New Alert from Device [%s] and Component [%s]!*", device, component);
+                    // here to be generic, only publish message like "CRITICAL  port-1 is down" to Slack
+                    String messageToSlack = String.format("%s %s", severity, message);
                     SlackAttachment attachment = new SlackAttachment();
                     attachment.setColor(color);
-                    attachment.setFooter("Alert Engine");
-                    attachment.addField("Severity", severity, false);
-                    attachment.addField("Message", message, false);
-                    attachment.addField("Device", device, false);
-                    attachment.addField("Device Type", deviceType, false);
-                    attachment.addField("Colo", colo, false);
-                    attachment.addField("Alert Policy", event.getPolicyId(), false);
-                    attachment.addField("Doc Id", docId, false);
-
-                    if (StringUtils.isNotEmpty(urlTemplate)) {
-                        try {
-                            attachment.addField("Link to Alert Console", String.format(urlTemplate, docId), false);
-                        } catch (Exception e) {
-                            LOG.warn("There's an error when processing Alert Console Link!");
-                        }
-                    }
+                    attachment.setText(messageToSlack);
 
                     for (String slackChannel: slackChannels.split(",")) {
-                        sendMessageToAChannel(session, slackChannel, messageToSlack, attachment);
+                        sendMessageToAChannel(session, slackChannel, null, attachment);
                     }
                 } catch (Exception e) {
                     status.successful = false;
