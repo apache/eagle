@@ -517,7 +517,7 @@ public class TestAlertBolt {
         Tuple input2 = new TupleImpl(context, Collections.singletonList(partitionedEvent2), taskId, "default");
         bolt.execute(input);
         bolt.execute(input2);
-        Assert.assertTrue("Timeout to acquire mutex in 5s", mutex.tryAcquire(1, 5, TimeUnit.SECONDS));
+        Assert.assertTrue("Timeout to acquire mutex in 10s", mutex.tryAcquire(1, 10, TimeUnit.SECONDS));
         Assert.assertEquals(3, alertCount.get());
         bolt.cleanup();
     }
