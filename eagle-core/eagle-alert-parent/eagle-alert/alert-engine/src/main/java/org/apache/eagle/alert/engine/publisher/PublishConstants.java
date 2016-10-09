@@ -51,7 +51,4 @@ public class PublishConstants {
     public static final String ALERT_EMAIL_POLICY = "policyId";
     public static final String ALERT_EMAIL_CREATOR = "creator";
     
-    public static final String RAW_ALERT_NAMESPACE_LABEL = "rawAlertNamespaceLabel";
-    public static final String RAW_ALERT_NAMESPACE_VALUE = "rawAlertNamespaceValue";
-
 }
