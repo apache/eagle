@@ -18,7 +18,6 @@
 
 package org.apache.eagle.alert.engine.publisher.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +44,6 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
     private KafkaProducer producer;
     private String brokerList;
     private String topic;
-    private String namespaceLabel;
-    private String namespaceValue;
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -58,61 +55,17 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
             brokerList = kafkaConfig.get(PublishConstants.BROKER_LIST).trim();
             producer = KafkaProducerManager.INSTANCE.getProducer(brokerList, kafkaConfig);
             topic = kafkaConfig.get(PublishConstants.TOPIC).trim();
-            namespaceLabel = kafkaConfig.getOrDefault(PublishConstants.RAW_ALERT_NAMESPACE_LABEL, "namespace");
-            namespaceValue = kafkaConfig.getOrDefault(PublishConstants.RAW_ALERT_NAMESPACE_VALUE, "network");
         }
     }
 
-    @SuppressWarnings( {"unchecked", "rawtypes"})
     @Override
     public void onAlert(AlertStreamEvent event) throws Exception {
         if (producer == null) {
             LOG.warn("KafkaProducer is null due to the incorrect configurations");
             return;
         }
-        List<AlertStreamEvent> outputEvents = new ArrayList<AlertStreamEvent>();
 
-        int namespaceColumnIndex = event.getSchema().getColumnIndex(namespaceLabel);
-        if (namespaceColumnIndex < 0 || namespaceColumnIndex >= event.getData().length) {
-            LOG.warn("Namespace column {} is not found, the found index {} is invalid",
-                namespaceLabel, namespaceColumnIndex);
-        } else {
-            // copy raw event to be duped
-            AlertStreamEvent newEvent = new AlertStreamEvent(event);
-            newEvent.getData()[namespaceColumnIndex] = namespaceValue;
-            outputEvents.add(newEvent);
-        }
-
-        List<AlertStreamEvent> dedupResults = dedup(event);
-        if (dedupResults != null) {
-            outputEvents.addAll(dedupResults);
-        }
-        PublishStatus status = new PublishStatus();
-        try {
-            for (AlertStreamEvent outputEvent : outputEvents) {
-                ProducerRecord record = createRecord(outputEvent, topic);
-                if (record == null) {
-                    LOG.error(" Alert serialize return null, ignored message! ");
-                    return;
-                }
-                Future<?> future = producer.send(record);
-                future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-            }
-            status.successful = true;
-            status.errorMessage = "";
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Successfully send message to Kafka: " + brokerList);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            status.successful = false;
-            status.errorMessage = String.format("Failed to send message to %s, due to:%s", brokerList, e);
-            LOG.error(status.errorMessage, e);
-        } catch (Exception ex) {
-            LOG.error("fail writing alert to Kafka bus", ex);
-            status.successful = false;
-            status.errorMessage = ex.getMessage();
-        }
-        this.status = status;
+        this.emit(this.topic, this.dedup(event));
     }
 
     @SuppressWarnings("rawtypes")
@@ -138,6 +91,51 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
     @Override
     public void close() {
         producer.close();
+    }
+
+    @SuppressWarnings( {"rawtypes", "unchecked"})
+    protected PublishStatus emit(String topic, List<AlertStreamEvent> outputEvents) {
+        // we need to check producer here since the producer is invisable to extended kafka publisher
+        if (producer == null) {
+            LOG.warn("KafkaProducer is null due to the incorrect configurations");
+            return null;
+        }
+        if (outputEvents == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Alert stream events list in publishment is empty");
+            }
+            return null;
+        }
+        this.status = new PublishStatus();
+        try {
+            for (AlertStreamEvent outputEvent : outputEvents) {
+                ProducerRecord record = createRecord(outputEvent, topic);
+                if (record == null) {
+                    LOG.error("Alert serialize return null, ignored message! ");
+                    return null;
+                }
+                Future<?> future = producer.send(record);
+                future.get(MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            }
+            status.successful = true;
+            status.errorMessage = "";
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Successfully send message to Kafka: " + brokerList);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            status.successful = false;
+            status.errorMessage = String.format("Failed to send message to %s, due to:%s", brokerList, e);
+            LOG.error(status.errorMessage, e);
+        } catch (Exception ex) {
+            LOG.error("fail writing alert to Kafka bus", ex);
+            status.successful = false;
+            status.errorMessage = ex.getMessage();
+        }
+        return status;
+    }
+
+    protected String getTopic() {
+        return this.topic;
     }
 
     private ProducerRecord<String, Object> createRecord(AlertStreamEvent event, String topic) throws Exception {
