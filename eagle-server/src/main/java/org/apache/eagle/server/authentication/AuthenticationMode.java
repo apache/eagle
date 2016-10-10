@@ -42,29 +42,9 @@ public abstract class AuthenticationMode<P extends Principal> {
         return identifier.cacheRequired()? cache(authenticator): authenticator;
     }
 
-    // just keep this method as commented for sake of future upgrade of dropwizard
-    /*AuthFilter.AuthFilterBuilder<BasicCredentials, P, BasicCredentialAuthFilter<P>> getFilterBuilder() {
-        Authenticator<BasicCredentials, P> authenticator = getAuthenticator();
-        AuthFilter.AuthFilterBuilder<BasicCredentials, P, BasicCredentialAuthFilter<P>> builder = new BasicCredentialAuthFilter.Builder<P>()
-                .setAuthenticator(authenticator)
-                .setRealm(getRealm())
-                .setPrefix(PREFIX_VALUE);
-        if (identifier.authorizationRequired())
-            builder.setAuthorizer(createAuthorizer());
-        return builder;
-    }*/
-
     private Authenticator<BasicCredentials, P> cache(Authenticator<BasicCredentials, P> authenticator) {
         return new CachingAuthenticator<BasicCredentials, P>(identifier.getMetricRegistry(), authenticator, identifier.getCacheBuilderSpec());
     }
-
-    // just keep this method as commented for sake of future upgrade of dropwizard
-    /*Authorizer<P> createAuthorizer() {
-        return (principal, role) -> {
-            // TODO need to implement this method when we need authorization, authorization may vary
-            return true;
-        };
-    }*/
 
     AuthenticationModeIdentifier getIdentifier() {
         return identifier;

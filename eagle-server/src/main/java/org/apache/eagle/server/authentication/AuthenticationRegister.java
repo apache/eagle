@@ -37,32 +37,6 @@ public class AuthenticationRegister<P extends Principal> {
     public void register() {
         AuthenticationMode<User> mode = AuthenticationModeIdentifier.initiate(serverConfig.getConfig(), environment).identify();
 
-        // the registration way in the following single statement is just for dropwizard 0.7.1
         environment.jersey().register(new BasicAuthProvider<>(mode.getAuthenticator(), mode.getRealm()));
-
-
-        /* ========== need to uncommented when upgrade to dropwizard 1.0.0+ with new api involved ========== */
-        // AuthFilter filter = AuthenticationFilterProvider.byDefault(mode).getFilter();
-
-        // boolean authorizationRequired = mode.getIdentifier().authorizationRequired();
-
-        // boolean parameterAnnotationEnabled = mode.getIdentifier().parameterAnnotationEnabled();
-
-        // register authentication filter according to configuration
-        /*environment.jersey().register(
-                (authorizationRequired || parameterAnnotationEnabled) ? new AuthDynamicFeature(filter): filter
-        );*/
-
-        /*
-         * RolesAllowedDynamicFeature enables authorization, if we need authorization,
-         * we can uncomment below line, and set an authorizer instance in filters
-         */
-        /*if (authorizationRequired)
-            environment.jersey().register(RolesAllowedDynamicFeature.class);*/
-
-        // while we want to use @Auth to inject a custom Principal type into your resource
-        /*if (parameterAnnotationEnabled)
-            environment.jersey().register(new AuthValueFactoryProvider.Binder(principalClass));*/
-        /* ========== ^ need to uncommented when upgrade to dropwizard 1.0.0+ with new api involved ^ ========== */
     }
 }
