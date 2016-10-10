@@ -51,14 +51,14 @@
 	});
 
 	// ======================================================================================
-	// =                                        List                                        =
+	// =                                        Alert                                       =
 	// ======================================================================================
 	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig) {
 		PageConfig.subTitle = "Explore Alerts";
 	});
 
 	// ======================================================================================
-	// =                                     Policy List                                    =
+	// =                                       Policy                                       =
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
 		PageConfig.subTitle = "Manage Policies";
@@ -73,5 +73,31 @@
 				});
 			});
 		};
+	});
+
+	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
+		PageConfig.title = $wrapState.param.name;
+		PageConfig.subTitle = "Detail";
+		PageConfig.navPath = [
+			{title: "Policy List", path: "/alert/policyList"},
+			{title: "Detail"}
+		];
+
+		var policyList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name));
+		policyList._promise.then(function () {
+			$scope.policy = policyList[0];
+			console.log("[Policy]", $scope.policy);
+
+			if(!$scope.policy) {
+				$.dialog({
+					title: "OPS",
+					content: "Policy '" + $wrapState.param.name + "' not found!"
+				}, function () {
+					$wrapState.go("alert.policyList");
+				});
+			} else {
+				$scope.publisherList = Entity.queryMetadata("policies/" + encodeURIComponent($scope.policy.name) + "/publishments");
+			}
+		});
 	});
 }());

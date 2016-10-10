@@ -46,11 +46,10 @@
 		var args = arguments;
 
 		// TODO: Wait for backend data update
-		$scope.policyList = Entity.queryMetadata("policies");
+		$scope.policyList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name));
+
 		$scope.policyList._promise.then(function () {
-			var policy = $scope.policyList.find(function (entity) {
-				return entity.name === $wrapState.param.name;
-			});
+			var policy = $scope.policyList[0];
 
 			if(policy) {
 				connectPolicyEditController(policy, args);
@@ -104,7 +103,7 @@
 			value: $scope.policy.definition.value
 		};
 
-		console.log("\n\n\n>>>", $scope.policy);
+		console.log("[Policy]", $scope.policy);
 
 		// =========================================================
 		// =                      Check Logic                      =
@@ -235,6 +234,10 @@
 		// =========================================================
 		$scope.publisherList = [];
 
+		if(!$scope.newPolicy) {
+			$scope.publisherList = Entity.queryMetadata("policies/" + encodeURIComponent($scope.policy.name) + "/publishments");
+		}
+
 		$scope.addPublisher = function () {
 			var publisherProps = {};
 			$.each($scope.publisherTypes[$scope.publisherType], function (i, field) {
@@ -288,13 +291,5 @@
 				$scope.policyLock = false;
 			});
 		};
-
-		// =========================================================
-		// =                         Mock                          =
-		// =========================================================
-		/*$scope.policy.name = "Mock";
-		$scope.policy.inputStreams = ["hbase_audit_log_stream"];
-		$scope.policy.outputStreams = ["hbase_audit_log_stream"];
-		$scope.policy.definition.value = "test";*/
 	}
 })();
