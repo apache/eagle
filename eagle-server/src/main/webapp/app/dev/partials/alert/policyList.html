@@ -22,6 +22,7 @@
 			<table class="table table-bordered">
 				<thead>
 					<tr>
+						<th sortpath="policyStatus" width="10"></th>
 						<th sortpath="name" width="20%">Name</th>
 						<th sortpath="definition.type" width="70">Type</th>
 						<th>Description</th>
@@ -31,15 +32,23 @@
 				<tbody>
 					<tr>
 						<td>
+							<span class="fa fa-square" ng-class="item.policyStatus === 'ENABLED' ? 'text-green' : 'text-muted'"></span>
+						</td>
+						<td>
 							<a ui-sref="policyDetail({name: item.name})" target="_blank">{{item.name}}</a>
 						</td>
 						<td class="text-center"><span class="label label-primary">{{item.definition.type}}</span></td>
 						<td>{{item.description}}</td>
 						<td class="text-center">
 							<div class="btn-group btn-group-xs">
-								<button class="btn btn-default"><span class="fa fa-play"></span></button>
-								<a ui-sref="alert.policyEdit({name: item.name})" target="_blank" class="btn btn-default"><span class="fa fa-pencil"></span></a>
-								<button class="btn btn-danger" ng-click="deletePolicy(item)"><span class="fa fa-trash"></span></button>
+								<button class="btn btn-default opt" ng-if="item.policyStatus !== 'ENABLED'" ng-click="startPolicy(item)">
+									<span class="fa fa-play"></span>
+								</button>
+								<button class="btn btn-default opt" ng-if="item.policyStatus === 'ENABLED'" ng-click="stopPolicy(item)">
+									<span class="fa fa-stop"></span>
+								</button>
+								<a ui-sref="alert.policyEdit({name: item.name})" target="_blank" class="btn btn-default opt"><span class="fa fa-pencil"></span></a>
+								<button class="btn btn-danger opt" ng-click="deletePolicy(item)"><span class="fa fa-trash"></span></button>
 							</div>
 						</td>
 					</tr>

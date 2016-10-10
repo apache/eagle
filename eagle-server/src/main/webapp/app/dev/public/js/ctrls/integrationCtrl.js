@@ -132,39 +132,90 @@
 			$("#appMDL").modal();
 		};
 
+		// ================================================================
+		// =                         Installation                         =
+		// ================================================================
+		$scope.tmpApp = {};
+		$scope.tmpAppConfigFields = [];
+		$scope.installLock = false;
+
+		$scope.newField = function () {
+			UI.fieldConfirm({
+				title: "New Field"
+			}, null, [{
+				field: "name",
+				name: "Field Name"
+			}])(function (entity, closeFunc, unlock) {
+				if(common.array.find(entity.name, $scope.tmpAppConfigFields, "field")) {
+					$.dialog({
+						title: "OPS",
+						content: "Field already exist!"
+					});
+
+					unlock();
+				} else {
+					$scope.tmpAppConfigFields.push({
+						name: entity.name,
+						_customize: true,
+						required: true
+					});
+
+					closeFunc();
+				}
+			});
+		};
+
+		$scope.removeField = function (field) {
+			$scope.tmpAppConfigFields = common.array.remove(field, $scope.tmpAppConfigFields);
+		};
+
+		$scope.checkFields = function () {
+			var pass = true;
+			var config = common.getValueByPath($scope, ["tmpApp", "configuration"]);
+			$.each($scope.tmpAppConfigFields, function (i, field) {
+				if(field.required && !config[field.name]) {
+					pass = false;
+					return false;
+				}
+			});
+			return pass;
+		};
+
+		$scope.installAppConfirm = function () {
+			$scope.installLock = true;
+
+			Entity.create("apps/install", $scope.tmpApp)._then(function () {
+				refreshApplications();
+				$("#installMDL").modal("hide");
+			}, function (res) {
+				$.dialog({
+					title: "OPS",
+					content: res.data.message
+				});
+				$scope.installLock = false;
+			});
+		};
+
 		// Install application
 		$scope.installApp = function (application) {
 			application = application.origin;
-			var fields = common.getValueByPath(application, "configuration.properties", []);
-			fields = $.map(fields, function (prop) {
-				return {
-					field: prop.name,
-					name: prop.displayName,
-					description: prop.description,
-					defaultValue: prop.value,
-					optional: prop.required === false
-				};
+			$scope.installLock = false;
+			$scope.application = application;
+			$scope.tmpApp = {
+				siteId: $scope.site.siteId,
+				appType: application.type,
+				mode: "CLUSTER",
+				jarPath: application.jarPath,
+				configuration: {}
+			};
+
+			$scope.tmpAppConfigFields = common.getValueByPath(application, "configuration.properties", []);
+			$.each($scope.tmpAppConfigFields, function (i, field) {
+				$scope.tmpApp.configuration[field.name] = field.value;
 			});
 
-			UI.fieldConfirm({
-				title: "Install '" + application.type + "'",
-				addable: true
-			}, null, fields)(function (entity, closeFunc, unlock) {
-				Entity.create("apps/install", {
-					siteId: $scope.site.siteId,
-					appType: application.type,
-					configuration: entity
-				})._then(function (res) {
-					refreshApplications();
-					closeFunc();
-				}, function (res) {
-					$.dialog({
-						title: "OPS",
-						content: res.data.message
-					});
-					unlock();
-				});
-			});
+			$("#installMDL").modal();
+			$("a[data-id='configTab']").click();
 		};
 
 		// Uninstall application

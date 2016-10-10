@@ -71,7 +71,7 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">×</span>
 				</button>
-				<h4 class="modal-title" id="myModalLabel">{{application.name}}</h4>
+				<h4 class="modal-title">{{application.name}}</h4>
 			</div>
 			<div class="modal-body">
 				<ul class="nav nav-tabs">
@@ -89,6 +89,56 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: Application information -->
+<div class="modal fade" role="dialog" id="installMDL">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">Install '{{application.name}}'</h4>
+			</div>
+			<div class="modal-body">
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="[data-id='environment']" data-toggle="tab">Environment</a></li>
+					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Configuration</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" data-id="environment">
+						<div class="form-group">
+							<label>Mode</label>
+							<select class="form-control" ng-model="tmpApp.mode">
+								<option>CLUSTER</option>
+								<option>LOCAL</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>jar Path</label>
+							<input type="text" class="form-control" ng-model="tmpApp.jarPath" />
+						</div>
+					</div>
+					<div class="tab-pane" data-id="configuration">
+						<div class="form-group" ng-repeat="field in tmpAppConfigFields track by $index">
+							<label>
+								<a class="fa fa-times" ng-click="removeField(field)" ng-if="field._customize"></a>
+								{{field.displayName || field.name}}
+								<small ng-if="!field.required" class="text-muted">[optional]</small>
+							</label>
+							<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
+						</div>
+						<a ng-click="newField()">+ New Field</a>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" ng-disabled="installLock" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" ng-disabled="installLock || !checkFields()" ng-click="installAppConfirm()">Install</button>
 			</div>
 		</div>
 	</div>
