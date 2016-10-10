@@ -62,14 +62,14 @@ public class UnitTopologyMain {
         Config config = ConfigFactory.load();
 
         // load config and start
-        String topologyId = config.getString("topology.name");
+        String topologyId = getTopologyName(config);
         ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
         new UnitTopologyRunner(changeNotifyService).run(topologyId, config);
     }
 
     public static void runTopology(Config config, backtype.storm.Config stormConfig) {
         // load config and start
-        String topologyId = config.getString("topology.name");
+        String topologyId = getTopologyName(config);
         ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
         new UnitTopologyRunner(changeNotifyService, stormConfig).run(topologyId, config);
     }
@@ -81,9 +81,22 @@ public class UnitTopologyMain {
     }
 
     public static StormTopology createTopology(Config config) {
-        String topologyId = config.getString("topology.name");
+        String topologyId = getTopologyName(config);
         ZKMetadataChangeNotifyService changeNotifyService = createZKNotifyService(config, topologyId);
 
         return new UnitTopologyRunner(changeNotifyService).buildTopology(topologyId, config);
+    }
+
+    /**
+     * Try to get topology name from app framework .e.g "appId" or "topology.name"
+     */
+    private static String getTopologyName(Config config) {
+        if (config.hasPath("topology.name")) {
+            return config.getString("topology.name");
+        } else if (config.hasPath("appId")) {
+            return config.getString("appId");
+        } else {
+            throw new IllegalStateException("Not topology.name or appId provided from config: " + config.toString());
+        }
     }
 }
