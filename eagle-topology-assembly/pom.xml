@@ -16,6 +16,13 @@
   ~ limitations under the License.
   -->
 
+<!--
+  ~ eagle-topology-assembly supports multi version of Hadoop
+  ~ In this pom, we add two versions
+  ~ When you compile, you can you -PXXX to use the Hadoop version that you need to support
+  ~ like mvn clean install -Phadoop-2.7
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -33,6 +40,12 @@
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-server</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-server</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.eagle</groupId>
@@ -51,6 +64,92 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>hadoop-2.7</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-hdfs-nfs</artifactId>
+                    <version>${hadoop.2.7.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                    <version>${hadoop.2.7.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <version>${hadoop.2.7.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <version>${hadoop.2.7.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-auth</artifactId>
+                    <version>${hadoop.2.7.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-app</artifactId>
+                    <version>${hadoop.2.7.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <version>${hadoop.2.7.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hadoop-2.6</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                    <version>${hadoop.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <version>${hadoop.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <version>${hadoop.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-auth</artifactId>
+                    <version>${hadoop.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-app</artifactId>
+                    <version>${hadoop.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <version>${hadoop.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    <repositories>
+        <repository>
+            <id>hadoop.releases</id>
+            <url>http://repo.hortonworks.com/content/groups/public</url>
+        </repository>
+    </repositories>
     <build>
         <resources>
             <resource>

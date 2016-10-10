@@ -91,6 +91,9 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
                 apps = resourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
                 LOG.info("get {} apps from resource manager", apps.size());
                 Set<String> running = new HashSet<>();
+                for (AppInfo appInfo : apps) {
+                    running.add(appInfo.getId());
+                }
                 Iterator<String> appIdIterator = this.runningYarnApps.iterator();
                 while (appIdIterator.hasNext()) {
                     String appId = appIdIterator.next();
@@ -99,7 +102,6 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
                         if (appId.equals(appInfo.getId())) {
                             hasFinished = false;
                         }
-                        running.add(appInfo.getId());
                     }
 
                     if (hasFinished) {
