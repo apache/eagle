@@ -80,6 +80,18 @@
 			}));
 		};
 
+		Entity.put = function (url, entity) {
+			var list = [];
+			return wrapList(list, $http({
+				method: 'PUT',
+				url: _host + "/rest/" + url,
+				headers: {
+					"Content-Type": "application/json"
+				},
+				data: entity
+			}));
+		};
+
 		Entity.delete = function (url, uuid) {
 			var list = [];
 			return wrapList(list, $http({

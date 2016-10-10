@@ -280,12 +280,13 @@
 			});
 			common.deferred.all(publisherPromiseList.concat(policyPromise)).then(function () {
 				$.dialog({
-					title: "Create Success",
-					content: "Create Success. Click confirm to go to the policy detail page."
+					title: "Done",
+					content: "Click confirm to go to the policy detail page."
 				});
+				$wrapState.go("policyDetail", {name: $scope.policy.name});
 			}, function (failedList) {
 				$.dialog({
-					title: "Create Failed",
+					title: "OPS",
 					content: $("<pre>").text(JSON.stringify(failedList, null, "\t"))
 				});
 				$scope.policyLock = false;

@@ -63,7 +63,15 @@
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
 		PageConfig.subTitle = "Manage Policies";
 
-		$scope.policyList = Entity.queryMetadata("policies");
+		$scope.policyList = [];
+
+		function updateList() {
+			var list = Entity.queryMetadata("policies");
+			list._then(function () {
+				$scope.policyList = list;
+			});
+		}
+		updateList();
 
 		$scope.deletePolicy = function (item) {
 			UI.deleteConfirm(item.name)(function (entity, closeFunc) {
@@ -72,6 +80,18 @@
 					$scope.policyList._refresh();
 				});
 			});
+		};
+
+		$scope.startPolicy = function (policy) {
+			Entity
+				.put("metadata/policies/" + encodeURIComponent(policy.name) + "/status/ENABLED", {})
+				._then(updateList);
+		};
+
+		$scope.stopPolicy = function (policy) {
+			Entity
+				.put("metadata/policies/" + encodeURIComponent(policy.name) + "/status/DISABLED", {})
+				._then(updateList);
 		};
 	});
 
