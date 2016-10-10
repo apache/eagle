@@ -116,6 +116,11 @@
             <value>secret</value>
         </property>
         <property>
+            <name>eagleProps.eagle.service.basePath</name>
+            <description>eagleProps.eagle.service.basePath</description>
+            <value>/rest</value>
+        </property>
+        <property>
             <name>eagleProps.eagle.service.read.timeout</name>
             <displayName>eagleProps.eagle.service.read.timeout</displayName>
             <description>The maximum amount of time (in seconds) the app is trying to read from eagle service</description>

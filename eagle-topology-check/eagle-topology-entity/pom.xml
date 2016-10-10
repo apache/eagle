@@ -17,35 +17,23 @@
   ~
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>eagle-core</artifactId>
+        <artifactId>eagle-topology-check</artifactId>
         <groupId>org.apache.eagle</groupId>
         <version>0.5.0-incubating-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>eagle-app-parent</artifactId>
-    <packaging>pom</packaging>
-    <description>Eagle Applications</description>
 
-    <modules>
-        <module>eagle-app-base</module>
-        <module>eagle-app-utils</module>
-    </modules>
+    <artifactId>eagle-topology-entity</artifactId>
+    <packaging>jar</packaging>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <failOnViolation>true</failOnViolation>
-                    <failsOnError>true</failsOnError>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+
 </project>

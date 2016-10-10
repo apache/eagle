@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  ~
+  -->
+
+<application>
+    <type>TOPOLOGY_HEALTH_CHECK_APP</type>
+    <name>Topology Health Check</name>
+    <version>0.5.0-incubating</version>
+    <appClass>org.apache.eagle.topology.TopologyCheckApp</appClass>
+    <viewPath>/apps/jpm</viewPath>
+    <configuration>
+        <!-- org.apache.eagle.topology.TopologyCheckApp -->
+        <property>
+            <name>dataExtractorConfig.site</name>
+            <displayName>site</displayName>
+            <description>Site</description>
+            <value>sandbox</value>
+        </property>
+        <property>
+            <name>dataExtractorConfig.fetchDataIntervalInSecs</name>
+            <displayName>FetchDataIntervalInSecs</displayName>
+            <description>Fetch Data Interval in Secs</description>
+            <value>300</value>
+        </property>
+        <property>
+            <name>dataExtractorConfig.parseThreadPoolSize</name>
+            <displayName>parseThreadPoolSize</displayName>
+            <description>Parser Thread Pool Size</description>
+            <value>5</value>
+        </property>
+        <property>
+            <name>dataExtractorConfig.numDataFetcherSpout</name>
+            <displayName>numDataFetcherSpout</displayName>
+            <description>Spout Task Number</description>
+            <value>1</value>
+        </property>
+        <property>
+            <name>dataExtractorConfig.numEntityPersistBolt</name>
+            <displayName>numEntityPersistBolt</displayName>
+            <description>Bolt Task Number</description>
+            <value>1</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.zkQuorum</name>
+            <displayName>zkQuorum</displayName>
+            <description>Zookeeper Quorum</description>
+            <value>sandbox.hortonworks.com:2181</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.zkZnodeParent</name>
+            <displayName>zkZnodeParent</displayName>
+            <description>Hbase Zookeeper Znode Parent Root</description>
+            <value>/hbase-unsecure</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.zkPropertyClientPort</name>
+            <displayName>zkPropertyClientPort</displayName>
+            <description>Hbase Zookeeper Client Port</description>
+            <value>2181</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.kerberos.master.principal</name>
+            <displayName>hbaseMasterPrincipal</displayName>
+            <description>Hbase Master Principal</description>
+            <value>hadoop/_HOST@EXAMPLE.COM</value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.kerberos.eagle.keytab</name>
+            <displayName>eagleKeytab</displayName>
+            <description>Eagle keytab</description>
+            <value></value>
+        </property>
+        <property>
+            <name>dataSourceConfig.hbase.kerberos.master.principal</name>
+            <displayName>hbaseMasterPrincipal</displayName>
+            <description>Hbase Master Principal</description>
+            <value>hadoop/_HOST@EXAMPLE.COM</value>
+        </property>
+
+        <property>
+            <name>dataSourceConfig.hdfs.namenodeUrl</name>
+            <displayName>hdfsNamenodeUrl</displayName>
+            <description>Hdfs Namenode Web URL</description>
+            <value>http://sandbox.hortonworks.com:50070</value>
+        </property>
+
+        <property>
+            <name>dataSourceConfig.mr.rmUrl</name>
+            <displayName>resourceManagerUrl</displayName>
+            <description>Resource Manager URL</description>
+            <value>http://sandbox.hortonworks.com:8088</value>
+        </property>
+
+        <property>
+            <name>dataSourceConfig.mr.historyServerUrl</name>
+            <displayName>historyServerUrl</displayName>
+            <description>History Server URL</description>
+            <value></value>
+        </property>
+
+        <property>
+            <name>eagleProps.eagleService.host</name>
+            <description>eagleProps.eagleService.host</description>
+            <value>localhost</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.port</name>
+            <description>eagleProps.eagleService.port</description>
+            <value>9090</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.username</name>
+            <description>eagleProps.eagleService.username</description>
+            <value>admin</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.password</name>
+            <description>eagleProps.eagleService.password</description>
+            <value>secret</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.basePath</name>
+            <description>eagleProps.eagleService.basePath</description>
+            <value>/rest</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.readTimeOutSeconds</name>
+            <displayName>eagleProps.eagleService.readTimeOutSeconds</displayName>
+            <description>The maximum amount of time (in seconds) the app is trying to read from eagle service</description>
+            <value>2</value>
+        </property>
+
+    </configuration>
+    <docs>
+        <install>
+        </install>
+        <uninstall>
+        </uninstall>
+    </docs>
+</application>

@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app.environment.impl;
 
+import backtype.storm.utils.Utils;
 import org.apache.eagle.app.Application;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeProvider;
