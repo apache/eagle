@@ -64,9 +64,6 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <hadoop.2.7.version>2.7.1.2.4.2.0-258</hadoop.2.7.version>
-    </properties>
     <profiles>
         <profile>
             <id>hadoop-2.7</id>

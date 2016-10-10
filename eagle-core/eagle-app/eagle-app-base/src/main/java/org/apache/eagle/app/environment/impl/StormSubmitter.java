@@ -42,6 +42,9 @@ import backtype.storm.Config;
  * copy from storm StormSubmitter
  * just rewrite StormSubmitter that does not support summit other jars once submittedJar is set.
  * Our implementation will not add this restrict.
+ * Use this class to submit topologies to run on the Storm cluster. You should run your program
+ * with the "storm jar" command from the command-line, and then use this class to
+ * submit your topologies.
  */
 
 public class StormSubmitter {
