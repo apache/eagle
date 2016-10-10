@@ -89,6 +89,12 @@ public class StreamEventSerializer implements Serializer<StreamEvent> {
         String metaVersionStreamId = dataInput.readUTF();
         String streamId = metaVersionStreamId.split("/")[1];
         String metaVersion = metaVersionStreamId.split("/")[0];
+        // sometimes metaVersionStreamId will be "null/id", then metaVersion will be "null" rather than null
+        // need to handle it for future use
+        if (metaVersion.equals("null")) {
+            metaVersion = null;
+        }
+
         event.setStreamId(streamId);
         event.setMetaVersion(metaVersion);
 
