@@ -115,6 +115,13 @@ var app = {};
 					controller: "policyEditCtrl",
 					resolve: routeResolve()
 				})
+
+				.state('policyDetail', {
+					url: "/policyDetail/{name}",
+					templateUrl: "partials/alert/policyDetail.html?_=" + window._TRS(),
+					controller: "policyDetailCtrl",
+					resolve: routeResolve()
+				})
 				// =============================== Integration ==============================
 				.state('integration', {
 					abstract: true,
@@ -229,7 +236,8 @@ var app = {};
 
 			Object.defineProperty(window, "scope", {
 				get: function () {
-					return angular.element("#content .ng-scope").scope();
+					var ele = $("#content .nav-tabs-custom.ng-scope .ng-scope[ui-view], #content .ng-scope[ui-view]").last();
+					return angular.element(ele).scope();
 				}
 			});
 

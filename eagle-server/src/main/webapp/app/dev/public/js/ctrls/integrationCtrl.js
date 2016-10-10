@@ -147,7 +147,8 @@
 			});
 
 			UI.fieldConfirm({
-				title: "Install '" + application.type + "'"
+				title: "Install '" + application.type + "'",
+				addable: true
 			}, null, fields)(function (entity, closeFunc, unlock) {
 				Entity.create("apps/install", {
 					siteId: $scope.site.siteId,
@@ -196,6 +197,9 @@
 	// =                                     Application                                    =
 	// ======================================================================================
 	eagleControllers.controller('integrationApplicationListCtrl', function ($sce, $scope, $wrapState, PageConfig, Application) {
+		PageConfig.title = "Integration";
+		PageConfig.subTitle = "Applications";
+
 		$scope.showAppDetail = function(application) {
 			var docs = application.docs || {install: "", uninstall: ""};
 			$scope.application = application;

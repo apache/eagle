@@ -126,6 +126,8 @@ table.table pre.inline {
 	border: 0;
 	border-radius: 0;
 	background: transparent;
+	font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 14px;
 }
 
 table.table.table-sm th,
@@ -270,8 +272,40 @@ ul.stepGuide li > .title {
 /* ========================================================================
  * =                               Timeline                               =
  * ======================================================================== */
+.nav-tabs-custom .timeline li.disabled {
+	opacity: .5;
+	pointer-events: none;
+}
+
 .nav-tabs-custom .timeline li .timeline-item {
 	background: #f4f4f4;
+}
+
+.nav-tabs-custom .timeline li .timeline-item ul.with-margin {
+	margin: 0 0 10px 15px;
+}
+
+.nav-tabs-custom .timeline li .timeline-item .inner-block {
+	border: 1px solid #CCC;
+	padding: 10px;
+	margin: 0 0 15px 15px;
+}
+
+.nav-tabs-custom .timeline li .timeline-item ul.block-list li {
+	margin-bottom: 10px;
+}
+.nav-tabs-custom .timeline li .timeline-item ul.block-list li:last-child {
+	margin-bottom: 0;
+}
+
+.nav-tabs-custom .timeline li .timeline-item ul.block-list li:not(.no-decorate) {
+	background: #DEDEDE;
+	padding: 10px;
+	line-height: 150%;
+}
+
+.nav-tabs-custom .timeline li .timeline-item ul.block-list li:not(.no-decorate) p {
+	margin: 0;
 }
 
 /* ========================================================================

@@ -51,14 +51,14 @@
 	});
 
 	// ======================================================================================
-	// =                                        List                                        =
+	// =                                        Alert                                       =
 	// ======================================================================================
 	eagleControllers.controller('alertListCtrl', function ($scope, $wrapState, PageConfig) {
 		PageConfig.subTitle = "Explore Alerts";
 	});
 
 	// ======================================================================================
-	// =                                     Policy List                                    =
+	// =                                       Policy                                       =
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
 		PageConfig.subTitle = "Manage Policies";
@@ -75,45 +75,29 @@
 		};
 	});
 
-	// ======================================================================================
-	// =                                    Policy Create                                   =
-	// ======================================================================================
-	function connectPolicyEditController(entity, args) {
-		var newArgs = [entity];
-		Array.prototype.push.apply(newArgs, args);
-		/* jshint validthis: true */
-		policyEditController.apply(this, newArgs);
-	}
-	function policyEditController(policy, $scope, $wrapState, PageConfig, Entity) {
-		$scope.policy = policy;
-	}
+	eagleControllers.controller('policyDetailCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {
+		PageConfig.title = $wrapState.param.name;
+		PageConfig.subTitle = "Detail";
+		PageConfig.navPath = [
+			{title: "Policy List", path: "/alert/policyList"},
+			{title: "Detail"}
+		];
 
-	eagleControllers.controller('policyCreateCtrl', function ($scope, $wrapState, PageConfig, Entity) {
-		PageConfig.subTitle = "Define Alert Policy";
-		connectPolicyEditController({}, arguments);
-	});
-	eagleControllers.controller('policyEditCtrl', function ($scope, $wrapState, PageConfig, Entity) {
-		PageConfig.subTitle = "Edit Alert Policy";
-		var args = arguments;
+		var policyList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name));
+		policyList._promise.then(function () {
+			$scope.policy = policyList[0];
+			console.log("[Policy]", $scope.policy);
 
-		// TODO: Wait for backend data update
-		$scope.policyList = Entity.queryMetadata("policies");
-		$scope.policyList._promise.then(function () {
-			var policy = $scope.policyList.find(function (entity) {
-				return entity.name === $wrapState.param.name;
-			});
-
-			if(policy) {
-				connectPolicyEditController(policy, args);
-			} else {
+			if(!$scope.policy) {
 				$.dialog({
 					title: "OPS",
 					content: "Policy '" + $wrapState.param.name + "' not found!"
 				}, function () {
 					$wrapState.go("alert.policyList");
 				});
+			} else {
+				$scope.publisherList = Entity.queryMetadata("policies/" + encodeURIComponent($scope.policy.name) + "/publishments");
 			}
 		});
-
 	});
 }());

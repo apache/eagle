@@ -154,6 +154,12 @@
 		return mergedObj;
 	};
 
+	common.getKeys = function (obj) {
+		return $.map(obj, function (val, key) {
+			return key;
+		});
+	};
+
 	// ============================ String ============================
 	common.string = {};
 	common.string.safeText = function (str) {
@@ -223,6 +229,12 @@
 		return list;
 	};
 
+	common.array.remove = function (val, list, path) {
+		return $.grep(list, function (obj) {
+			return common.getValueByPath(obj, path) !== val;
+		});
+	};
+
 	common.array.doSort = function (list, path, asc, sortList) {
 		var sortFunc;
 		sortList = sortList || [];
@@ -281,7 +293,6 @@
 	// =========================== Deferred ===========================
 	common.deferred = {};
 
-
 	common.deferred.all = function (deferredList) {
 		var deferred = $.Deferred();
 		var successList = [];
@@ -301,12 +312,17 @@
 
 		$.each(deferredList, function (i, deferred) {
 			if(deferred && deferred.then) {
-				deferred.then(function (data) {
+				var promise = deferred.then(function (data) {
 					successList[i] = data;
 				}, function (data) {
 					failureList[i] = data;
 					hasFailure = true;
-				}).always(doCheck);
+				});
+				if(promise.always) {
+					promise.always(doCheck);
+				} else if(promise.finally) {
+					promise.finally(doCheck);
+				}
 			} else {
 				successList[i] = deferred;
 				doCheck();

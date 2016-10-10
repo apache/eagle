@@ -134,7 +134,11 @@
 
 					<ol class="breadcrumb">
 						<li ng-repeat="navPath in PageConfig.navPath">
-							<a ng-href="#{{navPath.path}}">
+							<span ng-if="!navPath.path">
+								<span class="fa fa-home" ng-if="$first"></span>
+								{{navPath.title || navPath.path}}
+							</span>
+							<a ng-if="navPath.path" ng-href="#{{navPath.path}}">
 								<span class="fa fa-home" ng-if="$first"></span>
 								{{navPath.title || navPath.path}}
 							</a>
@@ -243,6 +247,7 @@
 		<script src="public/js/ctrls/main.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/mainCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/alertCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/alertEditCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/integrationCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<script src="public/js/ctrls/siteCtrl.js" type="text/javascript" charset="utf-8"></script>
 		<!-- endref -->
