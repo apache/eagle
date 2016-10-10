@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo "=============== Web APP Building Start ==============="
+echo "=============== Building Web UI ==============="
+
 echo "Environment Check..."
 # Pre-build check
 if [ -z "$(command -v git)" ]
@@ -38,3 +39,5 @@ npm install
 # grunt build
 echo "building..."
 npm run build
+
+echo "=============== Finished ==============="
