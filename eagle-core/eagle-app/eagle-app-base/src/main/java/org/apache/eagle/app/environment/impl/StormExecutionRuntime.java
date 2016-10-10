@@ -157,7 +157,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     @Override
     public ApplicationEntity.Status status(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         String appId = config.getString("appId");
-        LOG.info("Fetching status of topology {} ..." + appId);
+        LOG.info("Fetching status of topology {} ...", appId);
         List<TopologySummary> topologySummaries ;
         try {
             if (Objects.equals(config.getString("mode"), ApplicationEntity.Mode.CLUSTER.name())) {
