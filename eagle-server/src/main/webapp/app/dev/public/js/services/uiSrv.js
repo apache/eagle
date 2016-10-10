@@ -62,7 +62,7 @@
 			$scope = $rootScope.$new(true);
 			$scope.name = name;
 			$scope.entity = _entity;
-			$scope.fieldList = fieldList;
+			$scope.fieldList = fieldList.concat();
 			$scope.checkFunc = checkFunc;
 			$scope.lock = false;
 			$scope.create = create;
@@ -112,6 +112,35 @@
 				});
 			};
 
+			$scope.newField = function () {
+				UI.fieldConfirm({
+					title: "New Field"
+				}, null, [{
+					field: "field",
+					name: "Field Name"
+				}])(function (entity, closeFunc, unlock) {
+					if(common.array.find(entity.field, $scope.fieldList, "field")) {
+						$.dialog({
+							title: "OPS",
+							content: "Field already exist!"
+						});
+
+						unlock();
+					} else {
+						$scope.fieldList.push({
+							field: entity.field,
+							_customize: true
+						});
+
+						closeFunc();
+					}
+				});
+			};
+
+			$scope.removeField = function (field) {
+				$scope.fieldList = common.array.remove(field, $scope.fieldList);
+			};
+
 			$scope.confirm = function() {
 				$scope.lock = true;
 				_deferred.notify({
@@ -155,6 +184,7 @@
 		 * @param {object} config						- Configuration object
 		 * @param {string} config.title						- Title of dialog box
 		 * @param {string=} config.size						- "large". Set dialog size
+		 * @param {boolean=} config.addable					- Set add customize field
 		 * @param {boolean=} config.confirm					- Display or not confirm button
 		 * @param {string=} config.confirmDesc				- Confirm button display description
 		 * @param {object} entity						- bind entity
@@ -225,30 +255,32 @@
 		'<div class="modal-dialog" ng-class="{\'modal-lg\': config.size === \'large\'}" role="document">' +
 		'<div class="modal-content">' +
 		'<div class="modal-header">' +
-		'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-		'<span aria-hidden="true">&times;</span>' +
-		'</button>' +
-		'<h4 class="modal-title">{{config.title || (create ? "New" : "Update") + " " + name}}</h4>' +
+			'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+				'<span aria-hidden="true">&times;</span>' +
+			'</button>' +
+			'<h4 class="modal-title">{{config.title || (create ? "New" : "Update") + " " + name}}</h4>' +
 		'</div>' +
 		'<div class="modal-body">' +
-		'<div class="form-group" ng-repeat="field in fieldList" ng-switch="field.type">' +
-		'<label for="featureName">' +
-		'<span ng-if="!field.optional">*</span> ' +
-		'{{field.name || field.field}}' +
-		'</label>' +
-		'<textarea class="form-control" placeholder="{{getFieldDescription(field)}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
-		'<select class="form-control" ng-model="entity[field.field]" ng-init="entity[field.field] = entity[field.field] || field.valueList[0]" ng-switch-when="select">' +
-		'<option ng-repeat="value in field.valueList">{{value}}</option>' +
-		'</select>' +
-		'<input type="text" class="form-control" placeholder="{{getFieldDescription(field)}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
-		'</div>' +
+			'<div class="form-group" ng-repeat="field in fieldList" ng-switch="field.type">' +
+				'<label for="featureName">' +
+					'<span ng-if="!field.optional && !field._customize">*</span> ' +
+					'<a ng-if="field._customize" class="fa fa-times" ng-click="removeField(field)"></a> ' +
+					'{{field.name || field.field}}' +
+				'</label>' +
+				'<textarea class="form-control" placeholder="{{getFieldDescription(field)}}" ng-model="entity[field.field]" rows="{{ field.rows || 10 }}" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-when="blob"></textarea>' +
+				'<select class="form-control" ng-model="entity[field.field]" ng-init="entity[field.field] = entity[field.field] || field.valueList[0]" ng-switch-when="select">' +
+				'<option ng-repeat="value in field.valueList">{{value}}</option>' +
+				'</select>' +
+				'<input type="text" class="form-control" placeholder="{{getFieldDescription(field)}}" ng-model="entity[field.field]" ng-readonly="field.readonly" ng-disabled="lock" ng-switch-default>' +
+			'</div>' +
+			'<a ng-if="config.addable" ng-click="newField()">+ New field</a>' +
 		'</div>' +
 		'<div class="modal-footer">' +
-		'<p class="pull-left text-danger">{{checkFunc(entity)}}</p>' +
-		'<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="lock">Close</button>' +
-		'<button type="button" class="btn btn-primary confirmBtn" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || lock" ng-if="config.confirm !== false">' +
-		'{{config.confirmDesc || (create ? "Create" : "Update")}}' +
-		'</button>' +
+			'<p class="pull-left text-danger">{{checkFunc(entity)}}</p>' +
+			'<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="lock">Close</button>' +
+			'<button type="button" class="btn btn-primary confirmBtn" ng-click="confirm()" ng-disabled="checkFunc(entity) || emptyFieldList().length || lock" ng-if="config.confirm !== false">' +
+				'{{config.confirmDesc || (create ? "Create" : "Update")}}' +
+			'</button>' +
 		'</div>' +
 		'</div>' +
 		'</div>' +
