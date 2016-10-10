@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
+import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -26,6 +27,8 @@ import org.apache.eagle.alert.metadata.impl.MetadataDaoFactory;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
 import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +42,8 @@ import javax.ws.rs.*;
 @Produces("application/json")
 @Consumes("application/json")
 public class MetadataResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MetadataResource.class);
 
     //    private IMetadataDao dao = MetadataDaoFactory.getInstance().getMetadataDao();
     private final IMetadataDao dao;
@@ -222,8 +227,37 @@ public class MetadataResource {
 
     @Path("/policies/{policyId}")
     @GET
-    public List<PolicyDefinition> getPolicyByID(@PathParam("policyId") String policyId) {
-        return dao.listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).collect(Collectors.toList());
+    public PolicyDefinition getPolicyByID(@PathParam("policyId") String policyId) {
+        Preconditions.checkNotNull(policyId,"policyId");
+        return dao.listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).findAny().orElseGet(() -> {
+            LOG.error("Policy (policyId " + policyId + ") not found");
+            throw new IllegalArgumentException("Policy (policyId " + policyId + ") not found");
+        });
+    }
+
+    @Path("/policies/{policyId}/status/{status}")
+    @PUT
+    public OpResult updatePolicyStatusByID(@PathParam("policyId") String policyId, @PathParam("status")PolicyDefinition.PolicyStatus status) {
+        OpResult result = new OpResult();
+        try {
+            PolicyDefinition policyDefinition = getPolicyByID(policyId);
+            policyDefinition.setPolicyStatus(status);
+            OpResult updateResult  = addPolicy(policyDefinition);
+            result.code = updateResult.code;
+
+            if (result.code == OpResult.SUCCESS) {
+                result.message = "Successfully updated status of " + policyId + " as " + status;
+                LOG.info(result.message);
+            } else {
+                result.message = updateResult.message;
+                LOG.error(result.message);
+            }
+        } catch (Exception e) {
+            LOG.error("Error: " + e.getMessage(),e);
+            result.code = OpResult.FAILURE;
+            result.message = e.getMessage();
+        }
+        return result;
     }
 
     @Path("/policies")
