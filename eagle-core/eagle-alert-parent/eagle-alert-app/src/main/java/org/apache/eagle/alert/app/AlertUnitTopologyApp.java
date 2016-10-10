@@ -34,7 +34,6 @@ public class AlertUnitTopologyApp extends StormApplication {
     }
 
     public static void main(String[] args) {
-        Config config = ConfigFactory.load();
         AlertUnitTopologyApp app = new AlertUnitTopologyApp();
         app.run(args);
     }
