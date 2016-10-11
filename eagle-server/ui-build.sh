@@ -36,8 +36,13 @@ cd src/main/webapp/app
 echo "npm install..."
 npm install
 
-# grunt build
 echo "building..."
 npm run build
+STATUS=$?
 
-echo "=============== Finished ==============="
+if [ $STATUS -eq 0 ]; then
+	echo "=============== Finished ==============="
+else
+	echo "=============== Failed ==============="
+	exit 1
+fi

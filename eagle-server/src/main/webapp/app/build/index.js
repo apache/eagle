@@ -135,9 +135,10 @@
 
 				grunt.stdout.pipe(process.stdout);
 				grunt.stderr.pipe(process.stdout);
-				grunt.on('exit', function() {
-					process.exit()
-				})
+				grunt.on('exit', function(code) {
+					console.log("Grunt Exit Code:", code);
+					process.exit(code)
+				});
 			});
 		});
 	});
