@@ -236,8 +236,8 @@ public class MetadataResource {
     }
 
     @Path("/policies/{policyId}/status/{status}")
-    @PUT
-    public OpResult updatePolicyStatusByID(@PathParam("policyId") String policyId, @PathParam("status")PolicyDefinition.PolicyStatus status) {
+    @POST
+    public OpResult updatePolicyStatusByID(@PathParam("policyId") String policyId, @PathParam("status") PolicyDefinition.PolicyStatus status) {
         OpResult result = new OpResult();
         try {
             PolicyDefinition policyDefinition = getPolicyByID(policyId);
