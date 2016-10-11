@@ -205,11 +205,11 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 
     @Override
     public ApplicationEntity.Status getStatus(ApplicationOperations.CheckStatusOperation operation)  {
-        ApplicationEntity applicationEntity = null;
-        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
-        Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
         try {
-            applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+            ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+            Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
+            Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
+
             ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
                     application, applicationEntity, config, alertMetadataService);
             ApplicationEntity.Status topologyStatus = applicationOperationContext.getStatus();
