@@ -23,19 +23,19 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
-public class ApplicationOperationContextTest {
+public class ApplicationActionTest {
     /**
      * appConfig.withFallback(envConfig): appConfig will override envConfig, envConfig is used as default config
      */
     @Test
     public void testTypeSafeConfigMerge(){
         Config appConfig = ConfigFactory.parseMap(new HashMap<String,String>(){{
-            put("APP_CONFIG",ApplicationOperationContextTest.this.getClass().getCanonicalName());
+            put("APP_CONFIG",ApplicationActionTest.this.getClass().getCanonicalName());
             put("SCOPE","APP");
         }});
 
         Config envConfig = ConfigFactory.parseMap(new HashMap<String,String>(){{
-            put("ENV_CONFIG",ApplicationOperationContextTest.this.getClass().getCanonicalName());
+            put("ENV_CONFIG",ApplicationActionTest.this.getClass().getCanonicalName());
             put("SCOPE","ENV");
         }});
 

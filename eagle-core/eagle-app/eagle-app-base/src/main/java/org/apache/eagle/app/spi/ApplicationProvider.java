@@ -21,8 +21,10 @@ import org.apache.eagle.app.Application;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.model.ApplicationDesc;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Optional;
 
 /**
  * Application Service Provider Interface.
@@ -62,7 +64,7 @@ public interface ApplicationProvider<T extends Application> {
     /**
      * @return application lifecycle listeners type.
      */
-    ApplicationListener getApplicationListener();
+    Optional<ApplicationListener> getApplicationListener(ApplicationEntity applicationEntity);
 
     /**
      * Extend application modules like Web Resource, Metadata Store, etc.

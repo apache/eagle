@@ -65,7 +65,7 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     }
 
     @Override
-    public void onInstall() {
+    public void afterInstall() {
         ensureTopicCreated();
     }
 
@@ -85,7 +85,7 @@ public class KafkaStreamSink extends StormStreamSink<KafkaStreamSinkConfig> {
     }
 
     @Override
-    public void onUninstall() {
+    public void afterUninstall() {
         ensureTopicDeleted();
     }
 

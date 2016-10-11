@@ -27,6 +27,7 @@ import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.common.module.ModuleScope;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationDocs;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.Configuration;
 import org.apache.eagle.metadata.persistence.MetadataStore;
 import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
@@ -37,6 +38,7 @@ import javax.xml.bind.JAXBException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Describe Application metadata with XML descriptor configuration in path of:  /META-INF/providers/${ApplicationProviderClassName}.xml.
@@ -115,8 +117,8 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     }
 
     @Override
-    public ApplicationListener getApplicationListener() {
-        return null;
+    public Optional<ApplicationListener> getApplicationListener(ApplicationEntity applicationEntity) {
+        return Optional.empty();
     }
 
     protected void onRegister() {

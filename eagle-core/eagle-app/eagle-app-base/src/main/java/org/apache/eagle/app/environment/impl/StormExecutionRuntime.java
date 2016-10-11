@@ -137,7 +137,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
     @Override
     public void stop(Application<StormEnvironment, StormTopology> executor, com.typesafe.config.Config config) {
         String appId = config.getString("appId");
-        LOG.info("Stopping topology {} ..." + appId);
+        LOG.info("Stopping topology {} ...", appId);
         if (Objects.equals(config.getString("mode"), ApplicationEntity.Mode.CLUSTER.name())) {
             Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig(config)).getClient();
             try {
@@ -151,7 +151,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
             killOptions.set_wait_secs(0);
             getLocalCluster().killTopologyWithOpts(appId,killOptions);
         }
-        LOG.info("Stopped topology {} ..." + appId);
+        LOG.info("Stopped topology {}", appId);
     }
 
     @Override

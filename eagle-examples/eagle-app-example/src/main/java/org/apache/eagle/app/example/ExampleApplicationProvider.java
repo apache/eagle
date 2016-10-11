@@ -26,6 +26,8 @@ import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 /**
  * Define application provider pragmatically
  */
@@ -38,36 +40,30 @@ public class ExampleApplicationProvider extends AbstractApplicationProvider<Exam
     }
 
     @Override
-    public ApplicationListener getApplicationListener() {
-        return new ApplicationListener() {
-            private ApplicationEntity application;
+    public Optional<ApplicationListener> getApplicationListener(ApplicationEntity applicationEntity) {
+        return Optional.of(new ApplicationListener() {
+            private ApplicationEntity application = applicationEntity;
 
             @Override
-            public void init(ApplicationEntity application) {
-                this.application = application;
-                LOG.info("init {}",this.application);
+            public void afterInstall() {
+                LOG.info("afterInstall {}", this.application);
             }
 
             @Override
-            public void onInstall() {
-                LOG.info("onInstall {}",this.application);
+            public void afterUninstall() {
+                LOG.info("afterUninstall {}", this.application);
             }
 
             @Override
-            public void onUninstall() {
-                LOG.info("onUninstall {}",this.application);
+            public void beforeStart() {
+                LOG.info("beforeStart {}", this.application);
             }
 
             @Override
-            public void onStart() {
-                LOG.info("onStart {}",this.application);
+            public void afterStop() {
+                LOG.info("afterStop {}", this.application);
             }
-
-            @Override
-            public void onStop() {
-                LOG.info("onStop {}",this.application);
-            }
-        };
+        });
     }
 
     @Override

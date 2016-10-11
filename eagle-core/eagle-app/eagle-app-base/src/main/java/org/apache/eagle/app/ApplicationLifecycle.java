@@ -16,28 +16,35 @@
  */
 package org.apache.eagle.app;
 
+/**
+ * Application Lifecycle Listener/Callback
+ */
 public interface ApplicationLifecycle {
     /**
-     * on application installed.
+     * After Application Installed. (Callback)
      */
-    default void onInstall() {
+    default void afterInstall() {
+        // Do nothing by default
     }
 
     /**
-     * on application uninstalled.
+     * After Application Uninstalled. (Callback)
      */
-    default void onUninstall() {
+    default void afterUninstall() {
+        // Do nothing by default
     }
 
     /**
-     * onStart.
+     * Before Application Start. (Prepare)
      */
-    default void onStart() {
+    default void beforeStart() {
+        // Do nothing by default
     }
 
     /**
-     * onStop.
+     * After Application Stopped. (Callback)
      */
-    default void onStop() {
+    default void afterStop() {
+        // Do nothing by default
     }
 }
