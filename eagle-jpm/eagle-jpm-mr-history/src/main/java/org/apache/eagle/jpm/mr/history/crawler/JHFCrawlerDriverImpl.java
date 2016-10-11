@@ -52,7 +52,6 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     private Set<String> processedJobFileNames = new HashSet<>();
 
     private final JobProcessDate processDate = new JobProcessDate();
-    private boolean dryRun;
     private JHFInputStreamCallback reader;
     protected boolean zeroBasedMonth = true;
 
@@ -65,10 +64,6 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     public JHFCrawlerDriverImpl(JHFInputStreamCallback reader,
                                 JobHistoryLCM historyLCM, JobIdFilter jobFilter, int partitionId) throws Exception {
         this.zeroBasedMonth = MRHistoryJobConfig.get().getControlConfig().zeroBasedMonth;
-        this.dryRun = MRHistoryJobConfig.get().getControlConfig().dryRun;
-        if (this.dryRun)  {
-            LOG.info("this is a dry run");
-        }
         this.reader = reader;
         jhfLCM = historyLCM;//new JobHistoryDAOImpl(jobHistoryConfig);
         this.partitionId = partitionId;
@@ -169,15 +164,15 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
             LOG.warn("illegal job history file name : " + jobHistoryFile);
             return -1;
         }
-        if (!dryRun) {
-            jhfLCM.readFileContent(
-                    processDate.year,
-                    getActualMonth(processDate.month),
-                    processDate.day,
-                    Integer.valueOf(serialNumber),
-                    jobHistoryFile,
+
+        jhfLCM.readFileContent(
+                processDate.year,
+                getActualMonth(processDate.month),
+                processDate.day,
+                Integer.valueOf(serialNumber),
+                jobHistoryFile,
                 reader);
-        }
+
         JobHistoryZKStateManager.instance().addProcessedJob(String.format(FORMAT_JOB_PROCESS_DATE,
                 this.processDate.year,
                 this.processDate.month + 1,

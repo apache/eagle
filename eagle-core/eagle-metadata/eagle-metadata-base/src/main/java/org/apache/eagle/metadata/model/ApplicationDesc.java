@@ -36,6 +36,15 @@ public class ApplicationDesc implements Serializable {
     private Configuration configuration;
     private List<StreamDefinition> streams;
     private ApplicationDocs docs;
+    private boolean executable;
+
+    public boolean isExecutable() {
+        return executable;
+    }
+
+    public void setExecutable(boolean executable) {
+        this.executable = executable;
+    }
 
     private List<ApplicationDependency> dependencies;
 

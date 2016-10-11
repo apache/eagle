@@ -85,13 +85,10 @@ public class MRHistoryJobConfig implements Serializable {
     public static class JobHistoryEndpointConfig implements Serializable {
         public String mrHistoryServerUrl;
         public String basePath;
-        public boolean pathContainsJobTrackerName;
-        public String jobTrackerName;
         public Map<String, String> hdfs;
     }
 
     public static class ControlConfig implements Serializable {
-        public boolean dryRun;
         public Class<? extends JobIdPartitioner> partitionerCls;
         public boolean zeroBasedMonth;
         public String timeZone;
@@ -158,14 +155,11 @@ public class MRHistoryJobConfig implements Serializable {
 
         //parse job history endpoint
         this.jobHistoryEndpointConfig.basePath = config.getString("endpointConfig.basePath");
-        this.jobHistoryEndpointConfig.jobTrackerName = config.getString("endpointConfig.jobTrackerName");
         this.jobHistoryEndpointConfig.mrHistoryServerUrl = config.getString("endpointConfig.mrHistoryServerUrl");
-        this.jobHistoryEndpointConfig.pathContainsJobTrackerName = config.getBoolean("endpointConfig.pathContainsJobTrackerName");
         for (Map.Entry<String, ConfigValue> entry : config.getConfig("endpointConfig.hdfs").entrySet()) {
             this.jobHistoryEndpointConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
         }
         //parse control config
-        this.controlConfig.dryRun = config.getBoolean("controlConfig.dryRun");
         try {
             this.controlConfig.partitionerCls = (Class<? extends JobIdPartitioner>) Class.forName(config.getString("controlConfig.partitionerCls"));
             assert this.controlConfig.partitionerCls != null;
