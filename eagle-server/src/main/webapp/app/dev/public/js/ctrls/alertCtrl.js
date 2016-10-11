@@ -84,13 +84,13 @@
 
 		$scope.startPolicy = function (policy) {
 			Entity
-				.put("metadata/policies/" + encodeURIComponent(policy.name) + "/status/ENABLED", {})
+				.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/ENABLED", {})
 				._then(updateList);
 		};
 
 		$scope.stopPolicy = function (policy) {
 			Entity
-				.put("metadata/policies/" + encodeURIComponent(policy.name) + "/status/DISABLED", {})
+				.post("metadata/policies/" + encodeURIComponent(policy.name) + "/status/DISABLED", {})
 				._then(updateList);
 		};
 	});

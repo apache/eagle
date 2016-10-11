@@ -80,18 +80,6 @@
 			}));
 		};
 
-		Entity.put = function (url, entity) {
-			var list = [];
-			return wrapList(list, $http({
-				method: 'PUT',
-				url: _host + "/rest/" + url,
-				headers: {
-					"Content-Type": "application/json"
-				},
-				data: entity
-			}));
-		};
-
 		Entity.delete = function (url, uuid) {
 			var list = [];
 			return wrapList(list, $http({
@@ -133,8 +121,13 @@
 		Entity.queryMetadata = function (url) {
 			var metaList = Entity.query('metadata/' +  url);
 			metaList._then(function (res) {
+				var data = res.data;
+				if(!$.isArray(data)) {
+					data = [data];
+				}
+
 				metaList.splice(0);
-				Array.prototype.push.apply(metaList, res.data);
+				Array.prototype.push.apply(metaList, data);
 			});
 
 			return metaList;
