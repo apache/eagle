@@ -18,10 +18,16 @@
 package org.apache.eagle.app.service;
 
 import org.apache.eagle.app.ApplicationLifecycle;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 
 /**
  * Application Lifecycle/Management Listener (Guice Aware).
+ *
+ * Currently only listen on application lifecycle , may extend to more later.
  */
 public interface ApplicationListener extends ApplicationLifecycle {
-    // Currently only listen on application lifecycle , may extend to more later.
+    /**
+     * @param applicationEntity ApplicationEntity
+     */
+    void init(ApplicationEntity applicationEntity);
 }

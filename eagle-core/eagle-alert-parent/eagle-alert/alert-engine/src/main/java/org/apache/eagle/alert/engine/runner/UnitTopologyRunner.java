@@ -19,6 +19,7 @@
 
 package org.apache.eagle.alert.engine.runner;
 
+import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.coordinator.impl.ZKMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.spout.CorrelationSpout;
@@ -40,6 +41,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * By default
@@ -76,19 +79,77 @@ public class UnitTopologyRunner {
         this.givenStormConfig = stormConfig;
     }
 
+    // -----------------------------
+    // Storm Topology Submit Helper
+    // -----------------------------
+
+    private void run(String topologyId,
+                     int numOfTotalWorkers,
+                     int numOfSpoutTasks,
+                     int numOfRouterBolts,
+                     int numOfAlertBolts,
+                     int numOfPublishTasks,
+                     Config config,
+                     boolean localMode) {
+
+        backtype.storm.Config stormConfig = givenStormConfig == null ? new backtype.storm.Config() : givenStormConfig;
+        // TODO: Configurable metric consumer instance number
+
+        int messageTimeoutSecs = config.hasPath(MESSAGE_TIMEOUT_SECS) ? config.getInt(MESSAGE_TIMEOUT_SECS) : DEFAULT_MESSAGE_TIMEOUT_SECS;
+        LOG.info("Set topology.message.timeout.secs as {}", messageTimeoutSecs);
+        stormConfig.setMessageTimeoutSecs(messageTimeoutSecs);
+
+        if (config.hasPath("metric")) {
+            stormConfig.registerMetricsConsumer(StormMetricTaggedConsumer.class, config.root().render(ConfigRenderOptions.concise()), 1);
+        }
+
+        stormConfig.setNumWorkers(numOfTotalWorkers);
+        StormTopology topology = buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
+
+        if (localMode) {
+            LOG.info("Submitting as local mode");
+            LocalCluster cluster = new LocalCluster();
+            cluster.submitTopology(topologyId, stormConfig, topology);
+            Utils.sleep(Long.MAX_VALUE);
+        } else {
+            LOG.info("Submitting as cluster mode");
+            try {
+                StormSubmitter.submitTopologyWithProgressBar(topologyId, stormConfig, topology);
+            } catch (Exception ex) {
+                LOG.error("fail submitting topology {}", topology, ex);
+                throw new IllegalStateException(ex);
+            }
+        }
+    }
+
+    public void run(String topologyId, Config config) {
+        int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
+        int numOfRouterBolts = config.getInt(ROUTER_TASK_NUM);
+        int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
+        int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
+        boolean localMode = config.getBoolean(LOCAL_MODE);
+        int numOfTotalWorkers = config.getInt(TOTAL_WORKER_NUM);
+        run(topologyId, numOfTotalWorkers, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config, localMode);
+    }
+
+    public IMetadataChangeNotifyService getMetadataChangeNotifyService() {
+        return metadataChangeNotifyService;
+    }
+
+    // ---------------------------
+    // Build Storm Topology
+    // ---------------------------
+
     public StormTopology buildTopology(String topologyId,
                                        int numOfSpoutTasks,
                                        int numOfRouterBolts,
                                        int numOfAlertBolts,
                                        int numOfPublishTasks,
                                        Config config) {
-
         StreamRouterBolt[] routerBolts = new StreamRouterBolt[numOfRouterBolts];
         AlertBolt[] alertBolts = new AlertBolt[numOfAlertBolts];
 
-
         TopologyBuilder builder = new TopologyBuilder();
-
 
         // construct Spout object
         CorrelationSpout spout = new CorrelationSpout(config, topologyId, getMetadataChangeNotifyService(), numOfRouterBolts, spoutName, streamRouterBoltNamePrefix);
@@ -147,63 +208,66 @@ public class UnitTopologyRunner {
     }
 
     public StormTopology buildTopology(String topologyId, Config config) {
-        int numOfSpoutTasks = config.getInt("topology.numOfSpoutTasks");
-        int numOfRouterBolts = config.getInt("topology.numOfRouterBolts");
-        int numOfAlertBolts = config.getInt("topology.numOfAlertBolts");
-        int numOfPublishTasks = config.getInt("topology.numOfPublishTasks");
-        return buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
-    }
-
-    private void run(String topologyId,
-                     int numOfTotalWorkers,
-                     int numOfSpoutTasks,
-                     int numOfRouterBolts,
-                     int numOfAlertBolts,
-                     int numOfPublishTasks,
-                     Config config,
-                     boolean localMode) {
-
-        backtype.storm.Config stormConfig = givenStormConfig == null ? new backtype.storm.Config() : givenStormConfig;
-        // TODO: Configurable metric consumer instance number
-
-        int messageTimeoutSecs = config.hasPath(MESSAGE_TIMEOUT_SECS) ? config.getInt(MESSAGE_TIMEOUT_SECS) : DEFAULT_MESSAGE_TIMEOUT_SECS;
-        LOG.info("Set topology.message.timeout.secs as {}", messageTimeoutSecs);
-        stormConfig.setMessageTimeoutSecs(messageTimeoutSecs);
-
-        if (config.hasPath("metric")) {
-            stormConfig.registerMetricsConsumer(StormMetricTaggedConsumer.class, config.root().render(ConfigRenderOptions.concise()), 1);
-        }
-
-        stormConfig.setNumWorkers(numOfTotalWorkers);
-        StormTopology topology = buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
-
-        if (localMode) {
-            LOG.info("Submitting as local mode");
-            LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology(topologyId, stormConfig, topology);
-            Utils.sleep(Long.MAX_VALUE);
-        } else {
-            LOG.info("Submitting as cluster mode");
-            try {
-                StormSubmitter.submitTopologyWithProgressBar(topologyId, stormConfig, topology);
-            } catch (Exception ex) {
-                LOG.error("fail submitting topology {}", topology, ex);
-                throw new IllegalStateException(ex);
-            }
-        }
-    }
-
-    public void run(String topologyId, Config config) {
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
         int numOfRouterBolts = config.getInt(ROUTER_TASK_NUM);
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
         int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
-        boolean localMode = config.getBoolean(LOCAL_MODE);
-        int numOfTotalWorkers = config.getInt(TOTAL_WORKER_NUM);
-        run(topologyId, numOfTotalWorkers, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config, localMode);
+
+        return buildTopology(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
     }
 
-    public IMetadataChangeNotifyService getMetadataChangeNotifyService() {
-        return metadataChangeNotifyService;
+    // ---------------------------
+    // Build Topology Metadata
+    // ---------------------------
+
+    public static Topology buildTopologyMetadata(String topologyId, Config config){
+        int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
+        int numOfRouterBolts = config.getInt(ROUTER_TASK_NUM);
+        int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
+        int numOfPublishTasks = config.getInt(PUBLISH_TASK_NUM);
+
+        return buildTopologyMetadata(topologyId, numOfSpoutTasks, numOfRouterBolts, numOfAlertBolts, numOfPublishTasks, config);
+    }
+
+    public static Topology buildTopologyMetadata(String topologyId,
+                                                 int numOfSpoutTasks,
+                                                 int numOfRouterBolts,
+                                                 int numOfAlertBolts,
+                                                 int numOfPublishTasks,
+                                                 Config config){
+        Topology topology = new Topology();
+        topology.setName(topologyId);
+        topology.setNumOfSpout(numOfSpoutTasks);
+        topology.setNumOfAlertBolt(numOfAlertBolts);
+        topology.setNumOfGroupBolt(numOfRouterBolts);
+        topology.setNumOfPublishBolt(numOfPublishTasks);
+
+        // Set Spout ID
+        topology.setSpoutId(spoutName);
+
+        // Set Router (Group) ID
+        Set<String> streamRouterBoltNames = new TreeSet<>();
+        for (int i = 0; i < numOfRouterBolts; i++) {
+            streamRouterBoltNames.add(streamRouterBoltNamePrefix + i);
+        }
+        topology.setGroupNodeIds(streamRouterBoltNames);
+
+        // Set Alert Bolt ID
+        Set<String> alertBoltIds = new TreeSet<>();
+        for (int i = 0; i < numOfAlertBolts; i++) {
+            alertBoltIds.add(alertBoltNamePrefix + i);
+        }
+        topology.setAlertBoltIds(alertBoltIds);
+
+        // Set Publisher ID
+        topology.setPubBoltId(alertPublishBoltName);
+
+        // TODO: Load bolts' parallelism from configuration, currently keep 1 by default.
+
+        topology.setSpoutParallelism(1);
+        topology.setGroupParallelism(1);
+        topology.setAlertParallelism(1);
+
+        return topology;
     }
 }

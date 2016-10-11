@@ -23,8 +23,10 @@ import org.apache.eagle.app.example.extensions.ExampleEntityServiceMemoryImpl;
 import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
 import org.apache.eagle.metadata.model.ApplicationEntity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.inject.Inject;
 
 import java.util.Optional;
 
@@ -40,9 +42,18 @@ public class ExampleApplicationProvider extends AbstractApplicationProvider<Exam
     }
 
     @Override
-    public Optional<ApplicationListener> getApplicationListener(ApplicationEntity applicationEntity) {
+    public Optional<ApplicationListener> getApplicationListener() {
         return Optional.of(new ApplicationListener() {
-            private ApplicationEntity application = applicationEntity;
+
+            @Inject ExampleEntityService entityService;
+
+            private ApplicationEntity application;
+
+            @Override
+            public void init(ApplicationEntity applicationEntity) {
+                this.application = applicationEntity;
+                entityService.getEntities();
+            }
 
             @Override
             public void afterInstall() {

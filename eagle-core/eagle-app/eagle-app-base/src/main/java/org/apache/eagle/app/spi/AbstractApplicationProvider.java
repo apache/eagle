@@ -117,7 +117,7 @@ public abstract class AbstractApplicationProvider<T extends Application> impleme
     }
 
     @Override
-    public Optional<ApplicationListener> getApplicationListener(ApplicationEntity applicationEntity) {
+    public Optional<ApplicationListener> getApplicationListener() {
         return Optional.empty();
     }
 

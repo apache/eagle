@@ -16,7 +16,10 @@
  */
 
 package org.apache.eagle.alert.app;
+import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
+
+import java.util.Optional;
 
 /**
  * since 8/25/16.
@@ -25,5 +28,10 @@ public class AlertUnitTopologyAppProvider extends AbstractApplicationProvider<Al
     @Override
     public AlertUnitTopologyApp getApplication() {
         return new AlertUnitTopologyApp();
+    }
+
+    @Override
+    public Optional<ApplicationListener> getApplicationListener() {
+        return Optional.of(new AlertUnitTopologyAppListener());
     }
 }

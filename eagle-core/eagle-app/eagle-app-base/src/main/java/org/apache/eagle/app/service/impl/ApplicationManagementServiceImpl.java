@@ -18,6 +18,7 @@ package org.apache.eagle.app.service.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.metadata.IMetadataDao;
@@ -38,12 +39,15 @@ import java.util.Map;
 
 @Singleton
 public class ApplicationManagementServiceImpl implements ApplicationManagementService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationManagementServiceImpl.class);
+
     private final SiteEntityService siteEntityService;
     private final ApplicationProviderService applicationProviderService;
     private final ApplicationEntityService applicationEntityService;
     private final IMetadataDao alertMetadataService;
     private final Config config;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationManagementServiceImpl.class);
+
+    @Inject private Injector currentInjector;
 
     @Inject
     public ApplicationManagementServiceImpl(
@@ -109,7 +113,11 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         ApplicationEntity result =  applicationEntityService.create(applicationEntity);
 
         // AfterInstall Callback
-        applicationProvider.getApplicationListener(result).ifPresent((ApplicationListener::afterInstall));
+        applicationProvider.getApplicationListener().ifPresent((listener) -> {
+            currentInjector.injectMembers(listener);
+            listener.init(result);
+            listener.afterInstall();
+        });
 
         return result;
     }
@@ -135,7 +143,11 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
             if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
                 // AfterUninstall Callback
                 appAction.doUninstall();
-                appProvider.getApplicationListener(appEntity).ifPresent((ApplicationListener::afterUninstall));
+                appProvider.getApplicationListener().ifPresent((listener) -> {
+                    currentInjector.injectMembers(listener);
+                    listener.init(appEntity);
+                    listener.afterUninstall();
+                });
                 return applicationEntityService.delete(appEntity);
             } else {
                 throw new ApplicationWrongStatusException("App: " + appEntity.getAppId() + " status is" + currentStatus + ", uninstall operation is not allowed");
@@ -157,7 +169,12 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         try {
             if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
                 ApplicationAction applicationAction = new ApplicationAction(application, appEntity, config, alertMetadataService);
-                appProvider.getApplicationListener(appEntity).ifPresent(ApplicationListener::beforeStart);
+                // AfterInstall Callback
+                appProvider.getApplicationListener().ifPresent((listener) -> {
+                    currentInjector.injectMembers(listener);
+                    listener.init(appEntity);
+                    listener.beforeStart();
+                });
                 applicationAction.doStart();
 
                 //TODO: Only when topology submitted successfully can the state change to STARTING
@@ -191,7 +208,11 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         try {
             if (currentStatus == ApplicationEntity.Status.RUNNING) {
                 applicationAction.doStop();
-                appProvider.getApplicationListener(applicationEntity).ifPresent(ApplicationListener::afterStop);
+                appProvider.getApplicationListener().ifPresent((listener) -> {
+                    currentInjector.injectMembers(listener);
+                    listener.init(applicationEntity);
+                    listener.afterStop();
+                });
                 //stop -> directly killed
                 applicationEntityService.delete(applicationEntity);
                 applicationEntity.setStatus(ApplicationEntity.Status.STOPPING);
@@ -218,14 +239,11 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
             Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
             Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
 
-            ApplicationAction applicationAction = new ApplicationAction(
-                    application, applicationEntity, config, alertMetadataService);
-            ApplicationEntity.Status topologyStatus = applicationAction.getStatus();
-            return topologyStatus;
+            ApplicationAction applicationAction = new ApplicationAction(application, applicationEntity, config, alertMetadataService);
+            return applicationAction.getStatus();
         } catch (IllegalArgumentException e) {
             LOGGER.error("application id not exist", e);
             throw e;
         }
     }
-
 }
