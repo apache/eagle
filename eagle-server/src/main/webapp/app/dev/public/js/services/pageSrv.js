@@ -43,10 +43,10 @@
 	// ============================================================
 	var defaultPortalList = [
 		{name: "Home", icon: "home", path: "#/"},
-		{name: "Insight", icon: "heartbeat", list: [
+		/*{name: "Insight", icon: "heartbeat", list: [
 			{name: "Dashboards"},
 			{name: "Metrics"}
-		]},
+		]},*/
 		{name: "Alert", icon: "bell", list: [
 			{name: "Explore Alerts", path: "#/alert/"},
 			{name: "Manage Policies", path: "#/alert/policyList"},
