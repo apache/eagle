@@ -22,12 +22,11 @@ import org.apache.eagle.metadata.model.ApplicationEntity;
 
 /**
  * Application Lifecycle/Management Listener (Guice Aware).
- *
  * Currently only listen on application lifecycle , may extend to more later.
  */
 public interface ApplicationListener extends ApplicationLifecycle {
     /**
-     * @param applicationEntity ApplicationEntity
+     * @param applicationEntity ApplicationEntity.
      */
     void init(ApplicationEntity applicationEntity);
 }

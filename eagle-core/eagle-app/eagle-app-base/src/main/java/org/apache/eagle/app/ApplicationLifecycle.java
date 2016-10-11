@@ -17,7 +17,7 @@
 package org.apache.eagle.app;
 
 /**
- * Application Lifecycle Listener/Callback
+ * Application Lifecycle Listener/Callback.
  */
 public interface ApplicationLifecycle {
     /**

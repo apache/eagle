@@ -159,6 +159,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         String appId = config.getString("appId");
         LOG.info("Fetching status of topology {} ...", appId);
         List<TopologySummary> topologySummaries ;
+        ApplicationEntity.Status status;
         try {
             if (Objects.equals(config.getString("mode"), ApplicationEntity.Mode.CLUSTER.name())) {
                 Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig(config)).getClient();
@@ -166,22 +167,26 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
             } else {
                 topologySummaries = getLocalCluster().getClusterInfo().get_topologies();
             }
+
             for (TopologySummary topologySummary : topologySummaries) {
                 if (topologySummary.get_name().equalsIgnoreCase(appId)) {
                     if (topologySummary.get_status().equalsIgnoreCase("ACTIVE")) {
-                        return ApplicationEntity.Status.RUNNING;
+                        status = ApplicationEntity.Status.RUNNING;
                     } else if (topologySummary.get_status().equalsIgnoreCase("INACTIVE")) {
-                        return ApplicationEntity.Status.STOPPED;
+                        status = ApplicationEntity.Status.STOPPED;
                     } else if (topologySummary.get_status().equalsIgnoreCase("KILLED")) {
-                        return ApplicationEntity.Status.REMOVED;
+                        status = ApplicationEntity.Status.REMOVED;
                     }
                 }
             }
             //If not exist, return removed
-            return ApplicationEntity.Status.REMOVED;
+            status = ApplicationEntity.Status.REMOVED;
         } catch (TException e) {
-            return ApplicationEntity.Status.UNKNOWN;
+            LOG.error("Got error to fetch status of {}", appId, e);
+            status = ApplicationEntity.Status.UNKNOWN;
         }
+        LOG.info("Latest status of {} is {}", appId, status);
+        return status;
     }
 
     public static class Provider implements ExecutionRuntimeProvider<StormEnvironment,StormTopology> {

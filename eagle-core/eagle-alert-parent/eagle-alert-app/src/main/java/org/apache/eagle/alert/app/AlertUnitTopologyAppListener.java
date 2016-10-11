@@ -66,25 +66,25 @@ class AlertUnitTopologyAppListener implements ApplicationListener {
     // Internal RPC
     // -------------
 
-    private void updateTopologyMetadata(){
+    private void updateTopologyMetadata() {
         LOG.info("Update topology metadata {}", this.applicationEntity.getAppId());
         OpResult result = metadataDao.addTopology(createTopologyMeta(this.applicationEntity));
-        if(result.code == OpResult.FAILURE) {
+        if (result.code == OpResult.FAILURE) {
             LOG.error(result.message);
             throw new IllegalStateException(result.message);
         }
     }
 
-    private void removeTopologyMetadata(){
+    private void removeTopologyMetadata() {
         LOG.info("Remove topology metadata {}", this.applicationEntity.getAppId());
         OpResult result = metadataDao.removeTopology(createTopologyMeta(this.applicationEntity).getName());
-        if(result.code == OpResult.FAILURE) {
+        if (result.code == OpResult.FAILURE) {
             LOG.error(result.message);
             throw new IllegalStateException(result.message);
         }
     }
 
-    private Topology createTopologyMeta(ApplicationEntity applicationEntity){
+    private Topology createTopologyMeta(ApplicationEntity applicationEntity) {
         return UnitTopologyRunner.buildTopologyMetadata(applicationEntity.getAppId(),ConfigFactory.parseMap(applicationEntity.getConfiguration()));
     }
 }

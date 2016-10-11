@@ -64,7 +64,9 @@ public class ExecutionRuntimeManager {
             ExecutionRuntime<E, P> runtime = ((ExecutionRuntimeProvider<E, P>) executionRuntimeProviders.get(environment.getClass())).get();
             runtime.prepare(environment);
             executionRuntimeCache.put(environment, runtime);
-            LOGGER.info("Created new execution runtime {} for environment: {}", runtime, environment);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Created new execution runtime {} for environment: {}", runtime, environment);
+            }
             return runtime;
         } else {
             LOGGER.error("No matched execution runtime found for environment: " + environment);

@@ -220,7 +220,7 @@ public class UnitTopologyRunner {
     // Build Topology Metadata
     // ---------------------------
 
-    public static Topology buildTopologyMetadata(String topologyId, Config config){
+    public static Topology buildTopologyMetadata(String topologyId, Config config) {
         int numOfSpoutTasks = config.getInt(SPOUT_TASK_NUM);
         int numOfRouterBolts = config.getInt(ROUTER_TASK_NUM);
         int numOfAlertBolts = config.getInt(ALERT_TASK_NUM);
@@ -234,7 +234,7 @@ public class UnitTopologyRunner {
                                                  int numOfRouterBolts,
                                                  int numOfAlertBolts,
                                                  int numOfPublishTasks,
-                                                 Config config){
+                                                 Config config) {
         Topology topology = new Topology();
         topology.setName(topologyId);
         topology.setNumOfSpout(numOfSpoutTasks);
