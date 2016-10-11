@@ -18,12 +18,12 @@ package org.apache.eagle.server.authentication;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.cache.CacheBuilderSpec;
-import com.typesafe.config.Config;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Environment;
 import org.apache.eagle.server.authentication.authenticator.LdapAuthenticator;
 import org.apache.eagle.server.authentication.authenticator.SimpleAuthenticator;
+import org.apache.eagle.server.authentication.config.AuthenticationSettings;
 import org.apache.eagle.server.authentication.principal.User;
 
 public class AuthenticationModeIdentifier {
@@ -32,23 +32,15 @@ public class AuthenticationModeIdentifier {
     private static final String LDAP_MODE_KEYWORD = "ldap";
     private static final String LDAP_MODE_REALM = "LDAP_AUTHENTICATION";
 
-    private static final String MODE_KEY = "auth.mode";
-    private static final String ACCEPTED_USERNAME_KEY = "auth.simple.username";
-    private static final String ACCEPTED_PASSWORD_KEY = "auth.simple.password";
-    private static final String CACHE_POLICY_KEY = "auth.cachePolicy";
-    private static final String AUTHORIZE_KEY = "auth.authorize";
-    private static final String CACHE_KEY = "auth.cache";
-    private static final String AUTH_PARAMETER_ANNOTATION_KEY = "auth.parameter.annotation";
-
-    private Config config = null;
+    private AuthenticationSettings config = null;
     private Environment environment = null;
 
-    private AuthenticationModeIdentifier(Config config, Environment environment) {
+    private AuthenticationModeIdentifier(AuthenticationSettings config, Environment environment) {
         this.config = config;
         this.environment = environment;
     }
 
-    static AuthenticationModeIdentifier initiate(Config config, Environment environment) {
+    static AuthenticationModeIdentifier initiate(AuthenticationSettings config, Environment environment) {
         return new AuthenticationModeIdentifier(config, environment);
     }
 
@@ -58,8 +50,8 @@ public class AuthenticationModeIdentifier {
             return new AuthenticationMode<User>(this) {
                 public Authenticator<BasicCredentials, User> createAuthenticator() {
                     return new SimpleAuthenticator(
-                            getIdentifier().getConfig().getString(AuthenticationModeIdentifier.ACCEPTED_USERNAME_KEY),
-                            getIdentifier().getConfig().getString(AuthenticationModeIdentifier.ACCEPTED_PASSWORD_KEY)
+                            getIdentifier().getConfig().getSimple().getUsername(),
+                            getIdentifier().getConfig().getSimple().getPassword()
                     );
                 }
 
@@ -87,22 +79,22 @@ public class AuthenticationModeIdentifier {
     }
 
     boolean cacheRequired() {
-        return config.getBoolean(CACHE_KEY);
+        return config.needsCaching();
     }
 
     boolean authorizationRequired() {
-        return config.getBoolean(AUTHORIZE_KEY);
+        return config.needsAuthorization();
     }
 
     boolean parameterAnnotationEnabled() {
-        return config.getBoolean(AUTH_PARAMETER_ANNOTATION_KEY);
+        return config.byAnnotated();
     }
 
     CacheBuilderSpec getCacheBuilderSpec() {
-        return CacheBuilderSpec.parse(config.getString(CACHE_POLICY_KEY));
+        return CacheBuilderSpec.parse(config.getCachePolicy());
     }
 
-    private Config getConfig() {
+    private AuthenticationSettings getConfig() {
         return config;
     }
 
@@ -111,6 +103,6 @@ public class AuthenticationModeIdentifier {
     }
 
     private String getModeKeyword() {
-        return config.getString(MODE_KEY);
+        return config.getMode();
     }
 }

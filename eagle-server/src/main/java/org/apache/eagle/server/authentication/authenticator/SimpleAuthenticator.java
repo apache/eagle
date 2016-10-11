@@ -31,7 +31,6 @@ public class SimpleAuthenticator implements Authenticator<BasicCredentials, User
         this.acceptedPassword = acceptedPassword;
     }
 
-    @Override
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
         String username = credentials.getUsername();
         if (acceptedUsername.equals(username) && acceptedPassword.equals(credentials.getPassword())) {

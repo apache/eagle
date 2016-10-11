@@ -35,7 +35,7 @@ public class AuthenticationRegister<P extends Principal> {
     }
 
     public void register() {
-        AuthenticationMode<User> mode = AuthenticationModeIdentifier.initiate(serverConfig.getConfig(), environment).identify();
+        AuthenticationMode<User> mode = AuthenticationModeIdentifier.initiate(serverConfig.getAuth(), environment).identify();
 
         environment.jersey().register(new BasicAuthProvider<>(mode.getAuthenticator(), mode.getRealm()));
     }

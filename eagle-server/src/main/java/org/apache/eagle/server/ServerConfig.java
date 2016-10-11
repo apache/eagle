@@ -19,6 +19,8 @@ package org.apache.eagle.server;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dropwizard.Configuration;
+import org.apache.eagle.server.authentication.config.AuthenticationSettings;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class ServerConfig extends Configuration {
     private static final String SERVER_NAME = "Apache Eagle";
@@ -29,8 +31,20 @@ public class ServerConfig extends Configuration {
     private static final String LICENSE = "Apache License (Version 2.0)";
     private static final String LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0";
 
+    private AuthenticationSettings auth = new AuthenticationSettings();
+
     public Config getConfig() {
         return ConfigFactory.load();
+    }
+
+    @JsonProperty("auth")
+    public AuthenticationSettings getAuth() {
+        return auth;
+    }
+
+    @JsonProperty("auth")
+    public void setAuth(AuthenticationSettings auth) {
+        this.auth = auth;
     }
 
     static String getServerName() {
