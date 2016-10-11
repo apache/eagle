@@ -83,7 +83,6 @@ public class ApplicationSimulatorImpl extends ApplicationSimulator {
     public void start(Class<? extends ApplicationProvider> appProviderClass, Map<String, Object> appConfig) {
         try {
             ApplicationProvider applicationProvider = appProviderClass.newInstance();
-            applicationProvider.prepare(new ApplicationProviderConfig(DynamicJarPathFinder.findPath(appProviderClass), appProviderClass), config);
             start(applicationProvider.getApplicationDesc().getType(), appConfig);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalStateException(e.getMessage(), e);

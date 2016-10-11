@@ -99,7 +99,6 @@ public class ApplicationProviderConfigLoader extends ApplicationProviderLoader {
             throw new RuntimeException("providerClassName is not implementation of " + ApplicationProvider.class.getCanonicalName());
         }
         ApplicationProvider provider = (ApplicationProvider) providerClass.newInstance();
-        provider.prepare(providerConfig, this.getConfig());
         Preconditions.checkNotNull(provider.getApplicationDesc(), "appDesc is null");
         Preconditions.checkNotNull(provider.getApplicationDesc().getType(), "type is null");
         registerProvider(provider);

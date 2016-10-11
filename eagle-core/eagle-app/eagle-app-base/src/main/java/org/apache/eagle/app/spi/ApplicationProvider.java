@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.eagle.app.spi;
 
-import com.typesafe.config.Config;
 import org.apache.eagle.app.Application;
-import org.apache.eagle.app.config.ApplicationProviderConfig;
+import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.common.module.ModuleRegistry;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 
@@ -30,13 +30,6 @@ import java.lang.reflect.ParameterizedType;
  * @param <T> Application Type.
  */
 public interface ApplicationProvider<T extends Application> {
-
-    /**
-     * Prepare Application Provider before loading.
-     */
-    default void prepare(ApplicationProviderConfig providerConfig, Config envConfig) {
-        // Do nothing by default.
-    }
 
     /**
      * @return application descriptor.
@@ -65,6 +58,11 @@ public interface ApplicationProvider<T extends Application> {
      * @return application instance.
      */
     T getApplication();
+
+    /**
+     * @return application lifecycle listeners type.
+     */
+    ApplicationListener getApplicationListener();
 
     /**
      * Extend application modules like Web Resource, Metadata Store, etc.

@@ -72,13 +72,8 @@ public class TestStormApplication extends StormApplication{
         }
 
         @Override
-        public void register(ModuleRegistry registry) {
-            registry.register(MemoryMetadataStore.class, new AbstractModule() {
-                @Override
-                protected void configure() {
-                    bind(ExtendedDao.class).to(ExtendedDaoImpl.class);
-                }
-            });
+        public void onRegister() {
+            bindToMemoryMetaStore(ExtendedDao.class,ExtendedDaoImpl.class);
         }
     }
 
