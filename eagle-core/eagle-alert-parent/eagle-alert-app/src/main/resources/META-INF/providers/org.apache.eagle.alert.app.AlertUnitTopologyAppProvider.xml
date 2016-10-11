@@ -25,6 +25,12 @@
     <configuration>
        <!-- alert topology sizing parameters -->
         <property>
+            <name>topology.name</name>
+            <displayName>topology.name</displayName>
+            <value>alertUnitTopology_1</value>
+            <description>alert topology name</description>
+        </property>
+        <property>
             <name>topology.numOfTotalWorkers</name>
             <displayName>topology.numOfTotalWorkers</displayName>
             <value>2</value>
