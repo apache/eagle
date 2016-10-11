@@ -27,7 +27,11 @@
 	<table class="table table-bordered table-hover">
 		<thead>
 			<tr>
-				<th>App</th>
+				<th>
+					<small class="pull-right"><a ng-click="refreshApplications()">Refresh</a></small>
+					App
+					<span class="fa fa-refresh fa-spin no-animate" ng-show="!Application.list._done"></span>
+				</th>
 				<th width="10">Status</th>
 				<th>Version</th>
 				<th>Description</th>

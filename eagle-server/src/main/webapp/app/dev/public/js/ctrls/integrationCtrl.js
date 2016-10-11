@@ -62,7 +62,7 @@
 		};
 	});
 
-	eagleControllers.controller('integrationSiteCtrl', function ($sce, $scope, $wrapState, PageConfig, Entity, UI, Site, Application) {
+	eagleControllers.controller('integrationSiteCtrl', function ($sce, $scope, $wrapState, $interval, PageConfig, Entity, UI, Site, Application) {
 		PageConfig.title = "Site";
 		PageConfig.subTitle = $wrapState.param.id;
 
@@ -94,9 +94,9 @@
 		mapApplications();
 
 		// Application refresh
-		function refreshApplications() {
+		var refreshApplications = $scope.refreshApplications = function() {
 			Application.reload().getPromise().then(mapApplications);
-		}
+		};
 
 		// Application status class
 		$scope.getAppStatusClass = function (application) {
@@ -242,6 +242,14 @@
 				refreshApplications();
 			});
 		};
+
+		// ================================================================
+		// =                         Installation                         =
+		// ================================================================
+		var refreshInterval = $interval(refreshApplications, 1000 * 60);
+		$scope.$on('$destroy', function() {
+			$interval.cancel(refreshInterval);
+		});
 	});
 
 	// ======================================================================================

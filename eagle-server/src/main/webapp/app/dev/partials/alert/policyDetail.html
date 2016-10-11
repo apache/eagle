@@ -81,6 +81,9 @@
 			</table>
 		</div>
 		<div class="tab-pane" id="publisher">
+			<p ng-if="publisherList.length === 0" class="text-muted">
+				<span class="fa fa-exclamation-triangle"></span> No publisher configured
+			</p>
 			<table class="table table-bordered" ng-repeat="publisher in publisherList track by publisher.name">
 				<tbody>
 					<tr>
