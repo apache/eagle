@@ -28,73 +28,73 @@
             <value>sandbox</value>
         </property>
         <property>
+            <name>workers</name>
+            <displayName>storm worker number</displayName>
+            <value>4</value>
+        </property>
+        <property>
+            <name>envContextConfig.parallelismConfig.mrHistoryJobExecutor</name>
+            <value>4</value>
+        </property>
+        <property>
+            <name>envContextConfig.tasks.mrHistoryJobExecutor</name>
+            <value>4</value>
+        </property>
+        <property>
             <name>jobExtractorConfig.mrVersion</name>
             <value>MRVer2</value>
         </property>
         <property>
             <name>jobExtractorConfig.readTimeOutSeconds</name>
-            <displayName>zkPort</displayName>
-            <value>10</value>
+            <value>60</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkQuorum</name>
+            <name>zkStateConfig.zkQuorum</name>
             <value>sandbox.hortonworks.com:2181</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkPort</name>
+            <name>zkStateConfig.zkPort</name>
             <value>2181</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkSessionTimeoutMs</name>
+            <name>zkStateConfig.zkRoot</name>
+            <value>/mrjobhistory_sandbox</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkSessionTimeoutMs</name>
             <value>15000</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkRetryTimes</name>
+            <name>zkStateConfig.zkRetryTimes</name>
             <value>3</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkRetryInterval</name>
+            <name>zkStateConfig.zkRetryInterval</name>
             <value>20000</value>
         </property>
         <property>
-            <name>dataSourceConfig.zkRoot</name>
-            <value>/test_mrjobhistory</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.basePath</name>
-            <value>/mr-history/done</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.jobTrackerName</name>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.nnEndpoint</name>
-            <value>hdfs://sandbox.hortonworks.com:8020</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.pathContainsJobTrackerName</name>
+            <name>controlConfig.zeroBasedMonth</name>
             <value>false</value>
         </property>
         <property>
-            <name>dataSourceConfig.principal</name>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.keytab</name>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.dryRun</name>
-            <value>false</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.partitionerCls</name>
+            <name>controlConfig.partitionerCls</name>
             <value>org.apache.eagle.jpm.util.DefaultJobIdPartitioner</value>
         </property>
         <property>
-            <name>dataSourceConfig.zeroBasedMonth</name>
-            <value>false</value>
+            <name>controlConfig.timeZone</name>
+            <value>Etc/GMT+7</value>
+        </property>
+        <property>
+            <name>endpointConfig.mrHistoryServerUrl</name>
+            <value>http://sandbox.hortonworks.com:19888</value>
+        </property>
+        <property>
+            <name>endpointConfig.basePath</name>
+            <value>/mr-history/done</value>
+        </property>
+        <property>
+            <name>endpointConfig.hdfs.fs.defaultFS</name>
+            <value>hdfs://sandbox.hortonworks.com:8020</value>
         </property>
         <property>
             <name>MRConfigureKeys.jobConfigKey</name>
@@ -113,14 +113,6 @@
         <property>
             <name>MRConfigureKeys.jobNameKey</name>
             <value>eagle.job.name</value>
-        </property>
-        <property>
-            <name>envContextConfig.parallelismConfig.mrHistoryJobExecutor</name>
-            <value>6</value>
-        </property>
-        <property>
-            <name>envContextConfig.tasks.mrHistoryJobExecutor</name>
-            <value>6</value>
         </property>
         <property>
             <name>eagleProps.eagleService.host</name>

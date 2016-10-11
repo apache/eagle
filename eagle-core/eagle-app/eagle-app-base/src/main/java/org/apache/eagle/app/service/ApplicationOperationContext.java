@@ -90,7 +90,6 @@ public class ApplicationOperationContext implements Serializable, ApplicationLif
 
     @Override
     public void onInstall() {
-        metadata.setExecutable(application.isExecutable());
         if (metadata.getDescriptor().getStreams() != null) {
             List<StreamDesc> streamDescToInstall = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
                 StreamDefinition copied = streamDefinition.copy();

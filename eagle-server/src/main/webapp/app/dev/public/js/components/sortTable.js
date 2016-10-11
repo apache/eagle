@@ -132,7 +132,7 @@
 				$scope.$watch($attrs.sortTable + ".___SORT_TABLE___", function () {
 					var fullList = $scope.$parent[$attrs.sortTable];
 					if(fullList && !fullList.___SORT_TABLE___) {
-						fullList.___SORT_TABLE___ = +new Date;
+						fullList.___SORT_TABLE___ = +new Date();
 						cacheFilteredList = null;
 					}
 				});

@@ -45,35 +45,19 @@ public abstract class AbstractJobHistoryDAO implements JobHistoryLCM {
     protected static final Pattern JOBID_PATTERN = Pattern.compile("job_\\d+_\\d+");
 
     protected final String basePath;
-    protected volatile String jobTrackerName;
 
     public  static final String JOB_CONF_POSTFIX = "_conf.xml";
 
     private static final Timer timer = new Timer(true);
     private static final long JOB_TRACKER_SYNC_DURATION = 10 * 60 * 1000; // 10 minutes
 
-    private boolean pathContainsJobTrackerName;
-
-    public AbstractJobHistoryDAO(String basePath, boolean pathContainsJobTrackerName, String startingJobTrackerName) throws Exception {
+    public AbstractJobHistoryDAO(String basePath) throws Exception {
         this.basePath = basePath;
-        this.pathContainsJobTrackerName = pathContainsJobTrackerName;
-        jobTrackerName = startingJobTrackerName;
-        if (this.pathContainsJobTrackerName) {
-            if (startingJobTrackerName == null || startingJobTrackerName.isEmpty()) {
-                throw new IllegalStateException("startingJobTrackerName should not be null or empty");
-            }
-            // start background thread to check what is current job tracker
-            startThread(this.basePath);
-        }
     }
 
     protected String buildWholePathToYearMonthDay(int year, int month, int day) {
         StringBuilder sb = new StringBuilder();
         sb.append(basePath);
-        if (!pathContainsJobTrackerName && jobTrackerName != null && !jobTrackerName.isEmpty()) {
-            sb.append("/");
-            sb.append(jobTrackerName);
-        }
         sb.append(String.format(YEAR_MONTH_DAY_URL_FORMAT, year, month, day));
         return sb.toString();
     }
@@ -109,30 +93,6 @@ public abstract class AbstractJobHistoryDAO implements JobHistoryLCM {
         LOG.warn("Illegal job history file name: " + jobHistFileName);
         return null;
     }
-
-    private void startThread(final String basePath) throws Exception {
-        LOG.info("start an every-" + JOB_TRACKER_SYNC_DURATION / (60 * 1000) + "min timer task to check current jobTrackerName in background");
-        // Automatically update current job tracker name in background every 30 minutes
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    LOG.info("regularly checking current jobTrackerName in background");
-                    final String _jobTrackerName = calculateJobTrackerName(basePath);
-                    if (_jobTrackerName != null && !_jobTrackerName.equals(jobTrackerName)) {
-                        LOG.info("jobTrackerName changed from " + jobTrackerName + " to " + _jobTrackerName);
-                        jobTrackerName = _jobTrackerName;
-                    }
-                    LOG.info("Current jobTrackerName is: " + jobTrackerName);
-                } catch (Exception e) {
-                    LOG.error("failed to figure out current job tracker name that is not configured due to: " + e.getMessage(), e);
-                } catch (Throwable t) {
-                    LOG.error("failed to figure out current job tracker name that is not configured due to: " + t.getMessage(), t);
-                }
-            }
-        }, JOB_TRACKER_SYNC_DURATION, JOB_TRACKER_SYNC_DURATION);
-    }
-
 
     @Override
     public void readFileContent(int year, int month, int day, int serialNumber, String jobHistoryFileName, JHFInputStreamCallback reader) throws Exception {

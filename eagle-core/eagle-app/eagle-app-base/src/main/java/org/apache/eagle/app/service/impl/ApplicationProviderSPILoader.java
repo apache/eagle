@@ -80,6 +80,7 @@ public class ApplicationProviderSPILoader extends ApplicationProviderLoader {
                 ApplicationProviderConfig providerConfig = new ApplicationProviderConfig();
                 providerConfig.setClassName(applicationProvider.getClass().getCanonicalName());
                 providerConfig.setJarPath(jarFileSupplier.apply(applicationProvider));
+                applicationProvider.getApplicationDesc().setExecutable(applicationProvider.getApplication().isExecutable());
                 registerProvider(applicationProvider);
                 LOG.warn("Loaded {}:{} ({}) from {}",
                     applicationProvider.getApplicationDesc().getType(),
