@@ -27,6 +27,12 @@
     <configuration>
         <!-- topology related configurations -->
         <property>
+            <name>workers</name>
+            <displayName>workers</displayName>
+            <value>1</value>
+            <description>number of topology workers</description>
+        </property>
+        <property>
             <name>topology.numOfSpoutTasks</name>
             <displayName>topology.numOfSpoutTasks</displayName>
             <value>2</value>
@@ -39,10 +45,16 @@
             <description>number of parser tasks</description>
         </property>
         <property>
-            <name>topology.numOfJoinTasks</name>
-            <displayName>topology.numOfJoinTasks</displayName>
+            <name>topology.numOfSensitivityJoinTasks</name>
+            <displayName>topology.numOfSensitivityJoinTasks</displayName>
             <value>2</value>
-            <description>number of external join tasks</description>
+            <description>number of sensitivity join tasks</description>
+        </property>
+        <property>
+            <name>topology.numOfIPZoneJoinTasks</name>
+            <displayName>topology.numOfIPZoneJoinTasks</displayName>
+            <value>2</value>
+            <description>number of ip zone join tasks</description>
         </property>
         <property>
             <name>topology.numOfSinkTasks</name>
