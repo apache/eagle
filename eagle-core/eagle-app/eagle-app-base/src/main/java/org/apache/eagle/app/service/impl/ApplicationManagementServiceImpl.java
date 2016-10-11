@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.metadata.IMetadataDao;
+import org.apache.eagle.app.Application;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationOperationContext;
@@ -141,12 +142,14 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     @Override
     public ApplicationEntity start(ApplicationOperations.StartOperation operation) throws ApplicationWrongStatusException {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
+        Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
+
         ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
         try {
             if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
                 ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-                    applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-                    applicationEntity, config, alertMetadataService);
+                        application, applicationEntity, config, alertMetadataService);
 
                 applicationOperationContext.onStart();
                 //Only when topology submitted successfully can the state change to STARTING
@@ -172,9 +175,11 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     @Override
     public ApplicationEntity stop(ApplicationOperations.StopOperation operation) throws ApplicationWrongStatusException {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
+        Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
+
         ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-            applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-            applicationEntity, config, alertMetadataService);
+                application, applicationEntity, config, alertMetadataService);
         ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
         try {
             if (currentStatus == ApplicationEntity.Status.RUNNING) {
@@ -201,11 +206,12 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
     @Override
     public ApplicationEntity.Status getStatus(ApplicationOperations.CheckStatusOperation operation)  {
         ApplicationEntity applicationEntity = null;
+        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
+        Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
         try {
             applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
             ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-                applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-                applicationEntity, config, alertMetadataService);
+                    application, applicationEntity, config, alertMetadataService);
             ApplicationEntity.Status topologyStatus = applicationOperationContext.getStatus();
             return topologyStatus;
         } catch (IllegalArgumentException e) {

@@ -159,8 +159,8 @@ public class RunningJobManager implements Serializable {
         appInfo.put("startedTime", app.getStartedTime() + "");
         appInfo.put("finishedTime", app.getFinishedTime() + "");
         appInfo.put("elapsedTime", app.getElapsedTime() + "");
-        appInfo.put("amContainerLogs", app.getAmContainerLogs());
-        appInfo.put("amHostHttpAddress", app.getAmHostHttpAddress());
+        appInfo.put("amContainerLogs", app.getAmContainerLogs() == null ? "" : app.getAmContainerLogs());
+        appInfo.put("amHostHttpAddress", app.getAmHostHttpAddress() == null ? "" : app.getAmHostHttpAddress());
         appInfo.put("allocatedMB", app.getAllocatedMB() + "");
         appInfo.put("allocatedVCores", app.getAllocatedVCores() + "");
         appInfo.put("runningContainers", app.getRunningContainers() + "");

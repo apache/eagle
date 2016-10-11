@@ -33,7 +33,6 @@ public class ApplicationEntity extends PersistenceEntity {
     private String appId;
     private SiteEntity site;
     private ApplicationDesc descriptor;
-    private boolean executable = true;
 
     private Map<String, Object> configuration = new HashMap<>();
     private Map<String, String> context = new HashMap<>();
@@ -153,15 +152,7 @@ public class ApplicationEntity extends PersistenceEntity {
         this.streams = streams;
     }
 
-    public boolean isExecutable() {
-        return executable;
-    }
-
-    public void setExecutable(boolean executable) {
-        this.executable = executable;
-    }
-
-    public static enum Status {
+    public enum Status {
         INITIALIZED("INITIALIZED"),
         STARTING("STARTING"),
         RUNNING("RUNNING"),

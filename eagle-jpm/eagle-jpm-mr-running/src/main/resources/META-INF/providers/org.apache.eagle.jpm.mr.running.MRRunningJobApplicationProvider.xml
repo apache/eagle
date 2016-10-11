@@ -23,10 +23,30 @@
     <configuration>
         <!-- org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig -->
         <property>
-            <name>envContextConfig.env</name>
-            <value>local</value>
-            <displayName>Environment</displayName>
-            <description>Execution environment</description>
+            <name>jobExtractorConfig.site</name>
+            <displayName>Site ID</displayName>
+            <value>sandbox</value>
+        </property>
+        <property>
+            <name>workers</name>
+            <displayName>storm worker number</displayName>
+            <value>4</value>
+        </property>
+        <property>
+            <name>envContextConfig.parallelismConfig.mrRunningJobFetchSpout</name>
+            <value>1</value>
+        </property>
+        <property>
+            <name>envContextConfig.parallelismConfig.mrRunningJobParseBolt</name>
+            <value>8</value>
+        </property>
+        <property>
+            <name>envContextConfig.tasks.mrRunningJobFetchSpout</name>
+            <value>1</value>
+        </property>
+        <property>
+            <name>envContextConfig.tasks.mrRunningJobParseBolt</name>
+            <value>8</value>
         </property>
         <property>
             <name>zookeeperConfig.zkQuorum</name>
@@ -60,7 +80,7 @@
         </property>
         <property>
             <name>zookeeperConfig.zkRoot</name>
-            <value>/apps/mr/running</value>
+            <value>/apps/mr/runningSandbox</value>
         </property>
         <property>
             <name>eagleProps.eagleService.host</name>
@@ -85,26 +105,21 @@
         <property>
             <name>eagleProps.eagleService.readTimeOutSeconds</name>
             <description>eagleProps.eagleService.readTimeOutSeconds</description>
-            <value>20</value>
+            <value>60</value>
         </property>
         <property>
             <name>eagleProps.eagleService.maxFlushNum</name>
             <description>eagleProps.eagleService.maxFlushNum</description>
-            <value>500</value>
-        </property>
-        <property>
-            <name>jobExtractorConfig.site</name>
-            <description>jobExtractorConfig.site</description>
-            <value>sandbox</value>
+            <value>1000</value>
         </property>
         <property>
             <name>jobExtractorConfig.fetchRunningJobInterval</name>
             <description>jobExtractorConfig.fetchRunningJobInterval</description>
-            <value>15</value>
+            <value>60</value>
         </property>
         <property>
-            <name>jobExtractorConfig.parseThreadPoolSize</name>
-            <description>jobExtractorConfig.parseThreadPoolSize</description>
+            <name>jobExtractorConfig.parseJobThreadPoolSize</name>
+            <description>jobExtractorConfig.parseJobThreadPoolSize</description>
             <value>5</value>
         </property>
         <property>
@@ -115,27 +130,25 @@
         <property>
             <name>dataSourceConfig.rmUrls</name>
             <description>dataSourceConfig.rmUrls</description>
-            <value>http://sandbox.hortonworks.com:50030</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.nnEndpoint</name>
-            <description>dataSourceConfig.nnEndpoint</description>
-            <value>hdfs://sandbox.hortonworks.com:8020</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.keytab</name>
-            <description>dataSourceConfig.keytab</description>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.principal</name>
-            <description>dataSourceConfig.principal</description>
-            <value></value>
-        </property>
-        <property>
-            <name>dataSourceConfig.rmUrls</name>
-            <description>dataSourceConfig.rmUrls</description>
             <value>http://sandbox.hortonworks.com:8088</value>
+        </property>
+        <property>
+            <name>MRConfigureKeys.jobConfigKey</name>
+            <value>mapreduce.map.output.compress,
+                mapreduce.map.output.compress.codec,
+                mapreduce.output.fileoutputformat.compress,
+                mapreduce.output.fileoutputformat.compress.type,
+                mapreduce.output.fileoutputformat.compress.codec,
+                mapred.output.format.class,
+                dataplatform.etl.info,
+                mapreduce.map.memory.mb,
+                mapreduce.reduce.memory.mb,
+                mapreduce.map.java.opts,
+                mapreduce.reduce.java.opts</value>
+        </property>
+        <property>
+            <name>MRConfigureKeys.jobNameKey</name>
+            <value>eagle.job.name</value>
         </property>
     </configuration>
     <docs>
