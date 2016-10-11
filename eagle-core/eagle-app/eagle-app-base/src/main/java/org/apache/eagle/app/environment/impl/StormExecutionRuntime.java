@@ -159,7 +159,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
         String appId = config.getString("appId");
         LOG.info("Fetching status of topology {} ...", appId);
         List<TopologySummary> topologySummaries ;
-        ApplicationEntity.Status status;
+        ApplicationEntity.Status status = null;
         try {
             if (Objects.equals(config.getString("mode"), ApplicationEntity.Mode.CLUSTER.name())) {
                 Nimbus.Client stormClient = NimbusClient.getConfiguredClient(getStormConfig(config)).getClient();
@@ -180,7 +180,9 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
                 }
             }
             //If not exist, return removed
-            status = ApplicationEntity.Status.REMOVED;
+            if (status == null) {
+                status = ApplicationEntity.Status.REMOVED;
+            }
         } catch (TException e) {
             LOG.error("Got error to fetch status of {}", appId, e);
             status = ApplicationEntity.Status.UNKNOWN;
