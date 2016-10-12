@@ -184,19 +184,11 @@ public class ApplicationEntity extends PersistenceEntity {
      * Update mutable fields from another ApplicationEntity
      */
     public void updateMutable(ApplicationEntity entityToUpdate){
-        if (entityToUpdate.getJarPath() != null) {
-            this.setJarPath(entityToUpdate.getJarPath());
-        }
-        if (entityToUpdate.getMode() != null) {
-            this.setMode(entityToUpdate.getMode());
-        }
-        if (entityToUpdate.getConfiguration() != null) {
-            this.setConfiguration(entityToUpdate.getConfiguration());
-        }
-        if (entityToUpdate.getStatus() != null) {
-            this.setStatus(entityToUpdate.getStatus());
-        }
-        this.setModifiedTime(System.currentTimeMillis());
+        this.ensureDefault();
+
+        this.setJarPath(entityToUpdate.getJarPath());
+        this.setMode(entityToUpdate.getMode());
+        this.setConfiguration(entityToUpdate.getConfiguration());
     }
 
     public static enum Mode {

@@ -113,6 +113,41 @@ public final class ApplicationOperations {
         }
     }
 
+    public static class UpdateOperation implements Operation {
+        private ApplicationEntity.Mode mode = ApplicationEntity.Mode.LOCAL;
+        private String jarPath;
+        private Map<String, Object> configuration;
+
+        public Map<String, Object> getConfiguration() {
+            return configuration;
+        }
+
+        public void setConfiguration(Map<String, Object> configuration) {
+            this.configuration = configuration;
+        }
+
+        public ApplicationEntity.Mode getMode() {
+            return mode;
+        }
+
+        public void setMode(ApplicationEntity.Mode mode) {
+            this.mode = mode;
+        }
+
+        public String getJarPath() {
+            return jarPath;
+        }
+
+        public void setJarPath(String jarPath) {
+            this.jarPath = jarPath;
+        }
+
+        @Override
+        public String getType() {
+            return INSTALL;
+        }
+    }
+
     public static class UninstallOperation implements Operation {
         private String uuid;
         private String appId;
