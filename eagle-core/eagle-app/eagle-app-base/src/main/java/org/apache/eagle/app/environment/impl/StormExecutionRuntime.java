@@ -187,7 +187,7 @@ public class StormExecutionRuntime implements ExecutionRuntime<StormEnvironment,
             LOG.error("Got error to fetch status of {}", appId, e);
             status = ApplicationEntity.Status.UNKNOWN;
         }
-        LOG.info("Latest status of {} is {}", appId, status);
+        LOG.info("Status of {}: {}", appId, status);
         return status;
     }
 
