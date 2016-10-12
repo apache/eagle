@@ -116,6 +116,14 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
         return entity;
     }
 
+    /**
+     * TODO: UPDATE ApplicationEntity through JDBC is not supported yet
+     */
+    @Override
+    public ApplicationEntity update(ApplicationEntity entity) {
+        throw new UnsupportedOperationException("UPDATE ApplicationEntity through JDBC is not supported yet");
+    }
+
     @Override
     public Collection<ApplicationEntity> findAll() {
         List<ApplicationEntity> results = new ArrayList<>();
@@ -144,7 +152,6 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
 
     @Override
     public ApplicationEntity create(ApplicationEntity entity) {
-
         entity.ensureDefault();
         if (getBySiteIdAndAppType(entity.getSite().getSiteId(), entity.getDescriptor().getType()) != null) {
             throw new IllegalArgumentException("Duplicated appId: " + entity.getAppId());

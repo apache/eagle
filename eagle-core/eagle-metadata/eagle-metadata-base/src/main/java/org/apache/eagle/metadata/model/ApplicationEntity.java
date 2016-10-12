@@ -180,6 +180,17 @@ public class ApplicationEntity extends PersistenceEntity {
         }
     }
 
+    /**
+     * Update mutable fields from another ApplicationEntity
+     */
+    public void updateMutable(ApplicationEntity entityToUpdate){
+        this.ensureDefault();
+
+        this.setJarPath(entityToUpdate.getJarPath());
+        this.setMode(entityToUpdate.getMode());
+        this.setConfiguration(entityToUpdate.getConfiguration());
+    }
+
     public static enum Mode {
         LOCAL("LOCAL"),
         CLUSTER("CLUSTER");

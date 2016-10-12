@@ -91,6 +91,20 @@ public class ApplicationResource {
     }
 
     @POST
+    @Path("/{appUuid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<ApplicationEntity> updateApplicationEntity(@PathParam("appUuid") String appUuid, ApplicationOperations.UpdateOperation updateOperation) {
+        return RESTResponse.async(() -> {
+            ApplicationEntity applicationEntity = new ApplicationEntity();
+            applicationEntity.setUuid(appUuid);
+            applicationEntity.setJarPath(updateOperation.getJarPath());
+            applicationEntity.setMode(updateOperation.getMode());
+            applicationEntity.setConfiguration(updateOperation.getConfiguration());
+            return entityService.update(applicationEntity);
+        }).get();
+    }
+
+    @POST
     @Path("/status")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
