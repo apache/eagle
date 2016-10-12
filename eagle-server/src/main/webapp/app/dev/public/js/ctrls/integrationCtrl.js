@@ -77,6 +77,9 @@
 			});
 			return;
 		}
+		console.log("[Site]", $scope.site);
+
+		$scope.siteName = $scope.site.siteId + ($scope.site.siteName ? "(" + $scope.site.siteName + ")" : "");
 
 		// Map applications
 		function mapApplications() {
@@ -167,6 +170,7 @@
 
 		$scope.removeField = function (field) {
 			$scope.tmpAppConfigFields = common.array.remove(field, $scope.tmpAppConfigFields);
+			delete $scope.tmpApp.configuration[field.name];
 		};
 
 		$scope.checkFields = function () {
@@ -197,7 +201,8 @@
 		};
 
 		// Install application
-		$scope.installApp = function (application) {
+		$scope.installApp = function (application, entity) {
+			entity = entity || {};
 			application = application.origin;
 			$scope.installLock = false;
 			$scope.application = application;
@@ -209,9 +214,22 @@
 				configuration: {}
 			};
 
-			$scope.tmpAppConfigFields = common.getValueByPath(application, "configuration.properties", []);
-			$.each($scope.tmpAppConfigFields, function (i, field) {
+			var fields = $scope.tmpAppConfigFields = common.getValueByPath(application, "configuration.properties", []).concat();
+
+			$.each(fields, function (i, field) {
 				$scope.tmpApp.configuration[field.name] = field.value;
+			});
+
+			// Fill miss field of entity
+			common.merge($scope.tmpApp, entity);
+			$.each(entity.configuration || {}, function (key) {
+				if(!common.array.find(key, fields, ["name"])) {
+					fields.push({
+						name: key,
+						_customize: true,
+						required: true
+					});
+				}
 			});
 
 			$("#installMDL").modal();
@@ -243,8 +261,20 @@
 			});
 		};
 
+		$scope.editApp = function (application) {
+			var type = application.descriptor.type;
+			var provider = Application.findProvider(type);
+
+			$scope.installApp({origin: provider}, {
+				mode: application.mode,
+				jarPath: application.jarPath,
+				uuid: application.uuid,
+				configuration: $.extend({}, application.configuration)
+			});
+		};
+
 		// ================================================================
-		// =                         Installation                         =
+		// =                             Sync                             =
 		// ================================================================
 		var refreshInterval = $interval(refreshApplications, 1000 * 60);
 		$scope.$on('$destroy', function() {

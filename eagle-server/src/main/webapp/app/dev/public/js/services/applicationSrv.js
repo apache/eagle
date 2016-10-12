@@ -57,6 +57,10 @@
 			});
 		});
 
+		Application.findProvider = function (type) {
+			return common.array.find(type, Application.providerList, ["type"]);
+		};
+
 		Application.getPromise = function () {
 			return Application.list._promise.then(function() {
 				return Application;
