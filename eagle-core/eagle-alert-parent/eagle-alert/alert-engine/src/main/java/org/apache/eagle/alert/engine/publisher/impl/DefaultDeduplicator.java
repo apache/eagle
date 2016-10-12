@@ -116,19 +116,22 @@ public class DefaultDeduplicator implements AlertDeduplicator {
                 continue;
             }
             String colName = streamDefinition.getColumns().get(i).getName();
+            Object colValue = event.getData()[i];
 
-            if (colName.equals(dedupStateField)) {
-                stateFiledValue = event.getData()[i].toString();
+            if (colName.equals(dedupStateField) && colValue != null) {
+                stateFiledValue = colValue.toString();
             }
 
             // make all of the field as unique key if no custom dedup field provided
-            if (customDedupFields == null || customDedupFields.size() <= 0) {
-                customFieldValues.put(colName, event.getData()[i].toString());
-            } else {
-                for (String field : customDedupFields) {
-                    if (colName.equals(field)) {
-                        customFieldValues.put(field, event.getData()[i].toString());
-                        break;
+            if (colValue != null) {
+                if (customDedupFields == null || customDedupFields.size() <= 0) {
+                    customFieldValues.put(colName, colValue.toString());
+                } else {
+                    for (String field : customDedupFields) {
+                        if (colName.equals(field)) {
+                            customFieldValues.put(field, colValue.toString());
+                            break;
+                        }
                     }
                 }
             }
