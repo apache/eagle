@@ -17,7 +17,6 @@
 package org.apache.eagle.app.resource;
 
 
-import com.google.common.base.Preconditions;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationProviderService;
