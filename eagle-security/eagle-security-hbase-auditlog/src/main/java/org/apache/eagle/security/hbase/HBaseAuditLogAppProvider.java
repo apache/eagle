@@ -32,11 +32,6 @@ public class HBaseAuditLogAppProvider extends AbstractApplicationProvider<HBaseA
         return new HBaseAuditLogApplication();
     }
 
-    @Override
-    public void register(ModuleRegistry registry) {
-
-    }
-
     private static class MyModule extends AbstractModule {
         @Override
         protected void configure() {

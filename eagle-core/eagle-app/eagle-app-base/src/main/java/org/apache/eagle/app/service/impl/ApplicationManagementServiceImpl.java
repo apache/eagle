@@ -18,14 +18,12 @@ package org.apache.eagle.app.service.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.typesafe.config.Config;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.app.Application;
-import org.apache.eagle.app.service.ApplicationManagementService;
-import org.apache.eagle.app.service.ApplicationOperations;
-import org.apache.eagle.app.service.ApplicationOperationContext;
-import org.apache.eagle.app.service.ApplicationProviderService;
+import org.apache.eagle.app.service.*;
 import org.apache.eagle.app.spi.ApplicationProvider;
 import org.apache.eagle.metadata.exceptions.ApplicationWrongStatusException;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
@@ -41,12 +39,15 @@ import java.util.Map;
 
 @Singleton
 public class ApplicationManagementServiceImpl implements ApplicationManagementService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationManagementServiceImpl.class);
+
     private final SiteEntityService siteEntityService;
     private final ApplicationProviderService applicationProviderService;
     private final ApplicationEntityService applicationEntityService;
     private final IMetadataDao alertMetadataService;
     private final Config config;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationManagementServiceImpl.class);
+
+    @Inject private Injector currentInjector;
 
     @Inject
     public ApplicationManagementServiceImpl(
@@ -99,13 +100,26 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
         }
         applicationEntity.setConfiguration(appConfig);
 
+        // Validate Dependency
         validateDependingApplicationInstalled(applicationEntity);
 
-        ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-            applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-            applicationEntity, config, alertMetadataService);
-        applicationOperationContext.onInstall();
-        return applicationEntityService.create(applicationEntity);
+        ApplicationProvider<?> applicationProvider = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType());
+
+        // DoInstall
+        ApplicationAction applicationAction = new ApplicationAction(applicationProvider.getApplication(), applicationEntity, config, alertMetadataService);
+        applicationAction.doInstall();
+
+        // UpdateMetadata
+        ApplicationEntity result =  applicationEntityService.create(applicationEntity);
+
+        // AfterInstall Callback
+        applicationProvider.getApplicationListener().ifPresent((listener) -> {
+            currentInjector.injectMembers(listener);
+            listener.init(result);
+            listener.afterInstall();
+        });
+
+        return result;
     }
 
     private void validateDependingApplicationInstalled(ApplicationEntity applicationEntity) {
@@ -120,18 +134,23 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 
     @Override
     public ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) throws ApplicationWrongStatusException {
-        ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
-        ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-            applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication(),
-            applicationEntity, config, alertMetadataService);
+        ApplicationEntity appEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+        ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
 
-        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
+        ApplicationAction appAction = new ApplicationAction(appProvider.getApplication(), appEntity, config, alertMetadataService);
+        ApplicationEntity.Status currentStatus = appEntity.getStatus();
         try {
             if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
-                applicationOperationContext.onUninstall();
-                return applicationEntityService.delete(applicationEntity);
+                // AfterUninstall Callback
+                appAction.doUninstall();
+                appProvider.getApplicationListener().ifPresent((listener) -> {
+                    currentInjector.injectMembers(listener);
+                    listener.init(appEntity);
+                    listener.afterUninstall();
+                });
+                return applicationEntityService.delete(appEntity);
             } else {
-                throw new ApplicationWrongStatusException("App: " + applicationEntity.getAppId() + " status is" + currentStatus + ", uninstall operation is not allowed");
+                throw new ApplicationWrongStatusException("App: " + appEntity.getAppId() + " status is" + currentStatus + ", uninstall operation is not allowed");
             }
         } catch (Throwable throwable) {
             LOGGER.error(throwable.getMessage(), throwable);
@@ -141,49 +160,59 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
 
     @Override
     public ApplicationEntity start(ApplicationOperations.StartOperation operation) throws ApplicationWrongStatusException {
-        ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
-        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
+        ApplicationEntity appEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
+        ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(appEntity.getDescriptor().getType());
+        Application application = appProvider.getApplication();
         Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
 
-        ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
+        ApplicationEntity.Status currentStatus = appEntity.getStatus();
         try {
             if (currentStatus == ApplicationEntity.Status.INITIALIZED || currentStatus == ApplicationEntity.Status.STOPPED) {
-                ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-                        application, applicationEntity, config, alertMetadataService);
+                ApplicationAction applicationAction = new ApplicationAction(application, appEntity, config, alertMetadataService);
+                // AfterInstall Callback
+                appProvider.getApplicationListener().ifPresent((listener) -> {
+                    currentInjector.injectMembers(listener);
+                    listener.init(appEntity);
+                    listener.beforeStart();
+                });
+                applicationAction.doStart();
 
-                applicationOperationContext.onStart();
-                //Only when topology submitted successfully can the state change to STARTING
-                applicationEntityService.delete(applicationEntity);
-                applicationEntity.setStatus(ApplicationEntity.Status.STARTING);
-                return applicationEntityService.create(applicationEntity);
+                //TODO: Only when topology submitted successfully can the state change to STARTING
+                applicationEntityService.delete(appEntity);
+                appEntity.setStatus(ApplicationEntity.Status.STARTING);
+                return applicationEntityService.create(appEntity);
             } else {
-                throw new ApplicationWrongStatusException("App: " + applicationEntity.getAppId() + " status is " + currentStatus + " start operation is not allowed");
+                throw new ApplicationWrongStatusException("App: " + appEntity.getAppId() + " status is " + currentStatus + " start operation is not allowed");
             }
         } catch (ApplicationWrongStatusException e) {
             LOGGER.error(e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            LOGGER.error("Failed to start app " + applicationEntity.getAppId(), e);
+            LOGGER.error("Failed to start app " + appEntity.getAppId(), e);
             throw e;
         } catch (Throwable throwable) {
             LOGGER.error(throwable.getMessage(), throwable);
             throw throwable;
         }
-
     }
 
     @Override
     public ApplicationEntity stop(ApplicationOperations.StopOperation operation) throws ApplicationWrongStatusException {
         ApplicationEntity applicationEntity = applicationEntityService.getByUUIDOrAppId(operation.getUuid(), operation.getAppId());
-        Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
+        ApplicationProvider<?> appProvider = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType());
+        Application application = appProvider.getApplication();
         Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
 
-        ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-                application, applicationEntity, config, alertMetadataService);
+        ApplicationAction applicationAction = new ApplicationAction(application, applicationEntity, config, alertMetadataService);
         ApplicationEntity.Status currentStatus = applicationEntity.getStatus();
         try {
             if (currentStatus == ApplicationEntity.Status.RUNNING) {
-                applicationOperationContext.onStop();
+                applicationAction.doStop();
+                appProvider.getApplicationListener().ifPresent((listener) -> {
+                    currentInjector.injectMembers(listener);
+                    listener.init(applicationEntity);
+                    listener.afterStop();
+                });
                 //stop -> directly killed
                 applicationEntityService.delete(applicationEntity);
                 applicationEntity.setStatus(ApplicationEntity.Status.STOPPING);
@@ -210,14 +239,11 @@ public class ApplicationManagementServiceImpl implements ApplicationManagementSe
             Application application = applicationProviderService.getApplicationProviderByType(applicationEntity.getDescriptor().getType()).getApplication();
             Preconditions.checkArgument(application.isExecutable(), "Application is not executable");
 
-            ApplicationOperationContext applicationOperationContext = new ApplicationOperationContext(
-                    application, applicationEntity, config, alertMetadataService);
-            ApplicationEntity.Status topologyStatus = applicationOperationContext.getStatus();
-            return topologyStatus;
+            ApplicationAction applicationAction = new ApplicationAction(application, applicationEntity, config, alertMetadataService);
+            return applicationAction.getStatus();
         } catch (IllegalArgumentException e) {
             LOGGER.error("application id not exist", e);
             throw e;
         }
     }
-
 }

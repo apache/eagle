@@ -39,6 +39,12 @@ public class ApplicationEntity extends PersistenceEntity {
     private List<StreamDesc> streams;
     private Mode mode = Mode.CLUSTER;
     private String jarPath;
+
+    @Override
+    public String toString() {
+        return String.format("Application[appId=%s,siteId=%s,UUID=%s]", appId, descriptor.getType(), this.getUuid());
+    }
+
     private Status status = Status.INITIALIZED;
 
     public ApplicationEntity() {

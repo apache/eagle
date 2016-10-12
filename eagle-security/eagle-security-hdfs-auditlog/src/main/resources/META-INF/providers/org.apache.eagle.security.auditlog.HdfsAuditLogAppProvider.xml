@@ -73,13 +73,13 @@
         <property>
             <name>dataSourceConfig.zkConnection</name>
             <displayName>dataSourceConfig.zkConnection</displayName>
-            <value>server.eagle.apache.org</value>
+            <value>localhost</value>
             <description>zk connection</description>
         </property>
         <property>
             <name>dataSourceConfig.txZkServers</name>
             <displayName>dataSourceConfig.txZkServers</displayName>
-            <value>server.eagle.apache.org:2181</value>
+            <value>localhost:2181</value>
             <description>zookeeper server for offset transaction</description>
         </property>
         <property>
@@ -133,7 +133,7 @@
         <property>
             <name>dataSinkConfig.brokerList</name>
             <displayName>dataSinkConfig.brokerList</displayName>
-            <value>server.eagle.apache.org:6667</value>
+            <value>localhost:6667</value>
             <description>kafka broker list</description>
         </property>
         <property>
@@ -153,7 +153,7 @@
         <property>
             <name>fs.defaultFS</name>
             <displayName>fs.defaultFS</displayName>
-            <value>hdfs://server.eagle.apache.org:8020</value>
+            <value>hdfs://localhost:8020</value>
             <description>hdfs endpoint</description>
         </property>
     </configuration>

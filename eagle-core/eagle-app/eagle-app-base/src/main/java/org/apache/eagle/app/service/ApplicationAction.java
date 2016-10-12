@@ -16,6 +16,9 @@
  */
 package org.apache.eagle.app.service;
 
+import com.google.common.base.Preconditions;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
@@ -23,16 +26,12 @@ import org.apache.eagle.alert.engine.scheme.JsonScheme;
 import org.apache.eagle.alert.engine.scheme.JsonStringStreamNameSelector;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.app.Application;
-import org.apache.eagle.app.ApplicationLifecycle;
 import org.apache.eagle.app.environment.ExecutionRuntime;
 import org.apache.eagle.app.environment.ExecutionRuntimeManager;
 import org.apache.eagle.app.sink.KafkaStreamSinkConfig;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.StreamDesc;
 import org.apache.eagle.metadata.model.StreamSinkConfig;
-import com.google.common.base.Preconditions;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -42,14 +41,14 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
- * Managed Application Interface: org.apache.eagle.app.service.ApplicationOperationContext
+ * Managed Application Action: org.apache.eagle.app.service.ApplicationAction
  * <ul>
  * <li>Application Metadata Entity (Persistence): org.apache.eagle.metadata.model.ApplicationEntity</li>
  * <li>Application Processing Logic (Execution): org.apache.eagle.app.Application</li>
  * <li>Application Lifecycle Listener (Installation): org.apache.eagle.app.ApplicationLifecycle</li>
  * </ul>
  */
-public class ApplicationOperationContext implements Serializable, ApplicationLifecycle {
+public class ApplicationAction implements Serializable {
     private final Config config;
     private final Application application;
     private final ExecutionRuntime runtime;
@@ -60,7 +59,7 @@ public class ApplicationOperationContext implements Serializable, ApplicationLif
      * @param metadata    ApplicationEntity.
      * @param application Application.
      */
-    public ApplicationOperationContext(Application application, ApplicationEntity metadata, Config envConfig, IMetadataDao alertMetadataService) {
+    public ApplicationAction(Application application, ApplicationEntity metadata, Config envConfig, IMetadataDao alertMetadataService) {
         Preconditions.checkNotNull(application, "Application is null");
         Preconditions.checkNotNull(metadata, "ApplicationEntity is null");
         this.application = application;
@@ -88,8 +87,7 @@ public class ApplicationOperationContext implements Serializable, ApplicationLif
         return String.format("%s_%s",streamTypeId,siteId).toUpperCase();
     }   
 
-    @Override
-    public void onInstall() {
+    public void doInstall() {
         if (metadata.getDescriptor().getStreams() != null) {
             List<StreamDesc> streamDescToInstall = metadata.getDescriptor().getStreams().stream().map((streamDefinition -> {
                 StreamDefinition copied = streamDefinition.copy();
@@ -132,8 +130,7 @@ public class ApplicationOperationContext implements Serializable, ApplicationLif
         }
     }
 
-    @Override
-    public void onUninstall() {
+    public void doUninstall() {
         // we should remove alert data source and stream definition while we do uninstall
         if (metadata.getStreams() == null) {
             return;
@@ -145,15 +142,12 @@ public class ApplicationOperationContext implements Serializable, ApplicationLif
         }
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public void onStart() {
+    public void doStart() {
         this.runtime.start(this.application, this.config);
     }
 
     @SuppressWarnings("unchecked")
-    @Override
-    public void onStop() {
+    public void doStop() {
         this.runtime.stop(this.application, this.config);
     }
 

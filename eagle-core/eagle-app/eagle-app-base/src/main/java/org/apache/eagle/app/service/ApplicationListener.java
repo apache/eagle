@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,23 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.eagle.alert.app;
-import org.apache.eagle.app.service.ApplicationListener;
-import org.apache.eagle.app.spi.AbstractApplicationProvider;
+package org.apache.eagle.app.service;
 
-import java.util.Optional;
+import org.apache.eagle.app.ApplicationLifecycle;
+import org.apache.eagle.metadata.model.ApplicationEntity;
 
 /**
- * since 8/25/16.
+ * Application Lifecycle/Management Listener (Guice Aware).
+ * Currently only listen on application lifecycle , may extend to more later.
  */
-public class AlertUnitTopologyAppProvider extends AbstractApplicationProvider<AlertUnitTopologyApp> {
-    @Override
-    public AlertUnitTopologyApp getApplication() {
-        return new AlertUnitTopologyApp();
-    }
-
-    @Override
-    public Optional<ApplicationListener> getApplicationListener() {
-        return Optional.of(new AlertUnitTopologyAppListener());
-    }
+public interface ApplicationListener extends ApplicationLifecycle {
+    /**
+     * @param applicationEntity ApplicationEntity.
+     */
+    void init(ApplicationEntity applicationEntity);
 }

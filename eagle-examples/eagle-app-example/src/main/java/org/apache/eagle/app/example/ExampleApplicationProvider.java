@@ -16,23 +16,25 @@
  */
 package org.apache.eagle.app.example;
 
-import com.google.inject.AbstractModule;
 import org.apache.eagle.app.example.extensions.ExampleCommonService;
 import org.apache.eagle.app.example.extensions.ExampleCommonServiceImpl;
 import org.apache.eagle.app.example.extensions.ExampleEntityService;
 import org.apache.eagle.app.example.extensions.ExampleEntityServiceMemoryImpl;
+import org.apache.eagle.app.service.ApplicationListener;
 import org.apache.eagle.app.spi.AbstractApplicationProvider;
-import org.apache.eagle.common.module.GlobalScope;
-import org.apache.eagle.common.module.ModuleRegistry;
-import org.apache.eagle.metadata.service.memory.MemoryMetadataStore;
+import org.apache.eagle.metadata.model.ApplicationEntity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.inject.Inject;
+
+import java.util.Optional;
 
 /**
  * Define application provider pragmatically
  */
 public class ExampleApplicationProvider extends AbstractApplicationProvider<ExampleStormApplication> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ExampleApplicationProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExampleApplicationProvider.class);
 
     @Override
     public ExampleStormApplication getApplication() {
@@ -40,21 +42,44 @@ public class ExampleApplicationProvider extends AbstractApplicationProvider<Exam
     }
 
     @Override
-    public void register(ModuleRegistry registry) {
-        registry.register(MemoryMetadataStore.class, new AbstractModule() {
-            @Override
-            protected void configure() {
-                LOGGER.info("Load memory metadata modules ...");
-                bind(ExampleEntityService.class).to(ExampleEntityServiceMemoryImpl.class);
-            }
-        });
+    public Optional<ApplicationListener> getApplicationListener() {
+        return Optional.of(new ApplicationListener() {
 
-        registry.register(new AbstractModule() {
+            @Inject ExampleEntityService entityService;
+
+            private ApplicationEntity application;
+
             @Override
-            protected void configure() {
-                LOGGER.info("Load global modules ...");
-                bind(ExampleCommonService.class).to(ExampleCommonServiceImpl.class);
+            public void init(ApplicationEntity applicationEntity) {
+                this.application = applicationEntity;
+                entityService.getEntities();
+            }
+
+            @Override
+            public void afterInstall() {
+                LOG.info("afterInstall {}", this.application);
+            }
+
+            @Override
+            public void afterUninstall() {
+                LOG.info("afterUninstall {}", this.application);
+            }
+
+            @Override
+            public void beforeStart() {
+                LOG.info("beforeStart {}", this.application);
+            }
+
+            @Override
+            public void afterStop() {
+                LOG.info("afterStop {}", this.application);
             }
         });
+    }
+
+    @Override
+    protected void onRegister() {
+        bindToMemoryMetaStore(ExampleEntityService.class,ExampleEntityServiceMemoryImpl.class);
+        bind(ExampleCommonService.class,ExampleCommonServiceImpl.class);
     }
 }
