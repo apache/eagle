@@ -17,6 +17,7 @@
 package org.apache.eagle.app.resource;
 
 
+import com.google.common.base.Preconditions;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.service.ApplicationProviderService;
@@ -88,6 +89,14 @@ public class ApplicationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public RESTResponse<ApplicationEntity> getApplicationEntityByUUID(@PathParam("appUuid") String appUuid) {
         return RESTResponse.async(() -> entityService.getByUUID(appUuid)).get();
+    }
+
+    @POST
+    @Path("/{appUuid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public RESTResponse<ApplicationEntity> updateApplicationEntity(@PathParam("appUuid") String appUuid, ApplicationEntity applicationEntity) {
+        applicationEntity.setUuid(appUuid);
+        return RESTResponse.async(() -> entityService.update(applicationEntity)).get();
     }
 
     @POST
