@@ -185,6 +185,7 @@ public class Coordinator {
         for (String topo : state.getPublishSpecs().keySet()) {
             producer.send(MessageFormat.format(ZK_ALERT_CONFIG_PUBLISHER, topo), value);
         }
+
     }
 
     public ScheduleState getState() {
