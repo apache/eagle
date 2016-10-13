@@ -39,11 +39,9 @@ public abstract class AbstractSwitchableAuthenticator<C, P> implements Authentic
                 unauthenticatedPrincipal = principalClass.newInstance();
             }
             return unauthenticatedPrincipal;
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
             throw new RuntimeException(String.format("Filed to instantiate %s", principalClass.getName()), e);
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(String.format("Illegal access to %s", principalClass.getName()), e);
         }
     }

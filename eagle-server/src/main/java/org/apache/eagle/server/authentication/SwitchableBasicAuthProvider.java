@@ -38,12 +38,13 @@ public class SwitchableBasicAuthProvider<P> extends BasicAuthProvider<P> {
     }
 
     public Injectable<?> getInjectable(ComponentContext ic, Auth a, Parameter c) {
-        if (switchableAuthenticator != null && !switchableAuthenticator.getSettings().isEnabled())
+        if (switchableAuthenticator != null && !switchableAuthenticator.getSettings().isEnabled()) {
             return new AbstractHttpContextInjectable<P>() {
                 public P getValue(HttpContext c) {
                     return switchableAuthenticator.getUnauthenticatedPrincipal();
                 }
             };
+        }
         return super.getInjectable(ic, a, c);
     }
 }

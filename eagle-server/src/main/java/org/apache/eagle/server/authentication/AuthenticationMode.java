@@ -37,7 +37,7 @@ public abstract class AuthenticationMode<P> {
     abstract String getRealm();
 
     Authenticator<BasicCredentials, P> getAuthenticator() {
-        return identifier.cacheRequired()? cache(authenticator): authenticator;
+        return identifier.cacheRequired() ? cache(authenticator) : authenticator;
     }
 
     private Authenticator<BasicCredentials, P> cache(Authenticator<BasicCredentials, P> authenticator) {

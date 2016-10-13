@@ -32,8 +32,9 @@ public class LdapBasicAuthenticator extends AbstractSwitchableAuthenticator<Basi
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
         // TODO need to implement ldap authentication logic
         boolean pass = true;
-        if (pass)
+        if (pass) {
             return Optional.of(new User("ldap.username"));
+        }
         return Optional.absent();
     }
 }
