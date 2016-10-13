@@ -159,7 +159,8 @@
 									<td colspan="3">
 										<ul>
 											<li ng-repeat="dep in application.dependencies track by $index">
-												{{dep.type}}
+												{{Application.findProvider(dep.type).name}}
+												({{dep.type}})
 											</li>
 										</ul>
 									</td>
@@ -205,11 +206,28 @@
 			</div>
 			<div class="modal-body">
 				<ul class="nav nav-tabs">
-					<li class="active"><a href="[data-id='environment']" data-toggle="tab">Environment</a></li>
+					<li><a href="[data-id='guide']" data-toggle="tab" data-id="guideTab">Guide</a></li>
+					<li><a href="[data-id='environment']" data-toggle="tab">Environment</a></li>
 					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Configuration</a></li>
 				</ul>
 				<div class="tab-content">
-					<div class="tab-pane active" data-id="environment">
+					<div class="tab-pane" data-id="guide">
+						<label>Dependencies</label>
+						<ul>
+							<li ng-repeat="dep in application.dependencies track by $index">
+								<strong class="text-success" ng-if="!!Application.find(dep.type, site.siteId)[0]">[ Installed ]</strong>
+								<strong class="text-danger" ng-if="!Application.find(dep.type, site.siteId)[0]">[
+									<span class="fa fa-exclamation-triangle"></span> Require
+								]</strong>
+								{{Application.findProvider(dep.type).name}}
+								({{dep.type}})
+							</li>
+						</ul>
+
+						<label>Install</label>
+						<pre ng-bind-html="installHTML"></pre>
+					</div>
+					<div class="tab-pane" data-id="environment">
 						<div class="form-group">
 							<label>Mode</label>
 							<select class="form-control" ng-model="tmpApp.mode">

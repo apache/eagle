@@ -178,7 +178,7 @@
 
 		$scope.checkFields = function () {
 			var pass = true;
-			var config = common.getValueByPath($scope, ["tmpApp", "configuration"]);
+			var config = common.getValueByPath($scope, ["tmpApp", "configuration"], {});
 			$.each($scope.tmpAppConfigFields, function (i, field) {
 				if(field.required && !config[field.name]) {
 					pass = false;
@@ -256,8 +256,21 @@
 				}
 			});
 
+			// Dependencies check
+			var missDep = false;
+			$.each(application.dependencies, function (i, dep) {
+				if(!Application.find(dep.type, $scope.site.siteId)[0]) {
+					missDep = true;
+					return false;
+				}
+			});
+
 			$("#installMDL").modal();
-			$("a[data-id='configTab']").click();
+			if(missDep) {
+				$("a[data-id='guideTab']").click();
+			} else {
+				$("a[data-id='configTab']").click();
+			}
 		};
 
 		// Uninstall application
@@ -271,6 +284,9 @@
 			});
 		};
 
+		// ================================================================
+		// =                          Management                          =
+		// ================================================================
 		// Start application
 		$scope.startApp = function (application) {
 			Entity.post("apps/start", { uuid: application.uuid })._then(function () {
