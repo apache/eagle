@@ -139,15 +139,18 @@ public class PolicyDefinition implements Serializable {
         if (that == this) {
             return true;
         }
+
         if (!(that instanceof PolicyDefinition)) {
             return false;
         }
+
         PolicyDefinition another = (PolicyDefinition) that;
+
         if (Objects.equals(another.name, this.name)
             && Objects.equals(another.description, this.description)
             && CollectionUtils.isEqualCollection(another.inputStreams, this.inputStreams)
             && CollectionUtils.isEqualCollection(another.outputStreams, this.outputStreams)
-            && another.definition.equals(this.definition)
+            && (another.definition != null && another.definition.equals(this.definition))
             && Objects.equals(this.definition, another.definition)
             && CollectionUtils.isEqualCollection(another.partitionSpec, this.partitionSpec)
             // && another.parallelismHint == this.parallelismHint
