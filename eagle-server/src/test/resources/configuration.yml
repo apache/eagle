@@ -19,3 +19,48 @@ server:
   adminConnectors:
     - type: http
       port: 9091
+
+# ---------------------------------------------
+# Eagle Authentication Configuration
+# ---------------------------------------------
+auth:
+  # indicating if authentication is enabled, true for enabled, false for disabled
+  enabled: false
+
+  # indicating authentication mode, "simple" or "ldap"
+  mode: simple
+
+  # indicating whether to use cache: cache is usually used for authentications that may
+  # not handle high throughput (an RDBMS or LDAP server, for example)
+  caching: false
+
+  # indicating the cache policy, containing maximumSize and expireAfterWrite, e.g. maximumSize=10000, expireAfterWrite=10m
+  cachePolicy: maximumSize=10000, expireAfterWrite=1m
+
+  # indicating whether authorization is needed
+  authorization: false
+
+  # indicating whether @Auth annotation on parameters is needed
+  annotated: true
+
+  # for basic authentication, effective only when auth.mode=simple
+  simple:
+    # username for basic authentication, effective only when auth.mode=simple
+    username: admin
+    # password for basic authentication, effective only when auth.mode=simple
+    password: secret
+
+  # for ldap authentication, effective only when auth.mode=ldap
+  ldap:
+    uri: ldaps://ldap.server.address:636
+    userFilter: ou=x,dc=y,dc=z
+    groupFilter: ou=x,dc=y,dc=z
+    userNameAttribute: cn
+    groupNameAttribute: cn
+    groupMembershipAttribute: memberUid
+    groupClassName: posixGroup
+    restrictToGroups:
+      - user
+      - admin
+    connectTimeout: 500ms
+    readTimeout: 500ms
