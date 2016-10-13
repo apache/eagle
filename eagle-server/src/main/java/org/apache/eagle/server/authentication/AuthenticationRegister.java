@@ -16,10 +16,9 @@
  */
 package org.apache.eagle.server.authentication;
 
-import io.dropwizard.auth.basic.BasicAuthProvider;
 import io.dropwizard.setup.Environment;
+import org.apache.eagle.common.authentication.User;
 import org.apache.eagle.server.ServerConfig;
-import org.apache.eagle.server.authentication.principal.User;
 
 import java.security.Principal;
 
@@ -37,6 +36,6 @@ public class AuthenticationRegister<P extends Principal> {
     public void register() {
         AuthenticationMode<User> mode = AuthenticationModeIdentifier.initiate(serverConfig.getAuth(), environment).identify();
 
-        environment.jersey().register(new BasicAuthProvider<>(mode.getAuthenticator(), mode.getRealm()));
+        environment.jersey().register(new SwitchableBasicAuthProvider(mode.getAuthenticator(), mode.getRealm()));
     }
 }

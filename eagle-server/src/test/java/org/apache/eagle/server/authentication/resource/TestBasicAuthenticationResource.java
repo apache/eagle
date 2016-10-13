@@ -17,8 +17,8 @@
 package org.apache.eagle.server.authentication.resource;
 
 import io.dropwizard.auth.Auth;
+import org.apache.eagle.common.authentication.User;
 import org.apache.eagle.metadata.resource.RESTResponse;
-import org.apache.eagle.server.authentication.principal.User;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

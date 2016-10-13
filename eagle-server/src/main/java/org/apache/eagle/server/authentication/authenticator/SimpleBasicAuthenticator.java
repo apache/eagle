@@ -18,22 +18,26 @@ package org.apache.eagle.server.authentication.authenticator;
 
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
-import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
+import org.apache.eagle.common.authentication.User;
 import org.apache.eagle.server.authentication.config.AuthenticationSettings;
-import org.apache.eagle.server.authentication.principal.User;
 
-public class LdapAuthenticator implements Authenticator<BasicCredentials, User> {
-    private AuthenticationSettings config = null;
-    public LdapAuthenticator(AuthenticationSettings config) {
-        this.config = config;
+public class SimpleBasicAuthenticator extends AbstractSwitchableAuthenticator<BasicCredentials, User> {
+    private String acceptedUsername = null;
+    private String acceptedPassword = null;
+
+    public SimpleBasicAuthenticator(AuthenticationSettings settings) {
+        super(settings, User.class);
+        acceptedUsername = settings.getSimple().getUsername();
+        acceptedPassword = settings.getSimple().getPassword();
     }
 
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
-        // TODO need to implement ldap authentication logic
-        boolean pass = true;
-        if (pass)
-            return Optional.of(new User("ldap.username"));
+        String username = credentials.getUsername();
+        if (acceptedUsername.equals(username) && acceptedPassword.equals(credentials.getPassword())) {
+            return Optional.of(new User(username));
+        }
         return Optional.absent();
     }
+
 }

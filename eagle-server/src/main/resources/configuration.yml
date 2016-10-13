@@ -26,6 +26,9 @@ server:
 # Eagle Authentication Configuration
 # ---------------------------------------------
 auth:
+  # indicating if authentication is enabled, true for enabled, false for disabled
+  enabled: false
+
   # indicating authentication mode, "simple" or "ldap"
   mode: simple
 

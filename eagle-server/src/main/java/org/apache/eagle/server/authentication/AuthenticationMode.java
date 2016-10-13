@@ -20,9 +20,7 @@ import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.CachingAuthenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 
-import java.security.Principal;
-
-public abstract class AuthenticationMode<P extends Principal> {
+public abstract class AuthenticationMode<P> {
     private static final String PREFIX_VALUE = "Basic";
 
     protected AuthenticationModeIdentifier identifier = null;

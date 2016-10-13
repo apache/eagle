@@ -27,11 +27,11 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
+import org.apache.eagle.common.authentication.User;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.apache.eagle.server.authentication.AuthenticationRegister;
-import org.apache.eagle.server.authentication.principal.User;
 import org.apache.eagle.server.managedtask.ApplicationTask;
 import org.apache.eagle.server.module.GuiceBundleLoader;
 

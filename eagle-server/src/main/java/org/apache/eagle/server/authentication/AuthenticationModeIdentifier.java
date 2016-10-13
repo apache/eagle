@@ -21,10 +21,10 @@ import com.google.common.cache.CacheBuilderSpec;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Environment;
-import org.apache.eagle.server.authentication.authenticator.LdapAuthenticator;
-import org.apache.eagle.server.authentication.authenticator.SimpleAuthenticator;
+import org.apache.eagle.common.authentication.User;
+import org.apache.eagle.server.authentication.authenticator.LdapBasicAuthenticator;
+import org.apache.eagle.server.authentication.authenticator.SimpleBasicAuthenticator;
 import org.apache.eagle.server.authentication.config.AuthenticationSettings;
-import org.apache.eagle.server.authentication.principal.User;
 
 public class AuthenticationModeIdentifier {
     private static final String SIMPLE_MODE_KEYWORD = "simple";
@@ -32,11 +32,11 @@ public class AuthenticationModeIdentifier {
     private static final String LDAP_MODE_KEYWORD = "ldap";
     private static final String LDAP_MODE_REALM = "LDAP_AUTHENTICATION";
 
-    private AuthenticationSettings config = null;
+    private AuthenticationSettings settings = null;
     private Environment environment = null;
 
-    private AuthenticationModeIdentifier(AuthenticationSettings config, Environment environment) {
-        this.config = config;
+    private AuthenticationModeIdentifier(AuthenticationSettings settings, Environment environment) {
+        this.settings = settings;
         this.environment = environment;
     }
 
@@ -49,10 +49,7 @@ public class AuthenticationModeIdentifier {
         if (SIMPLE_MODE_KEYWORD.equalsIgnoreCase(modeKeyword)) {
             return new AuthenticationMode<User>(this) {
                 public Authenticator<BasicCredentials, User> createAuthenticator() {
-                    return new SimpleAuthenticator(
-                            getIdentifier().getConfig().getSimple().getUsername(),
-                            getIdentifier().getConfig().getSimple().getPassword()
-                    );
+                    return new SimpleBasicAuthenticator(getIdentifier().getSettings());
                 }
 
                 public String getRealm() {
@@ -63,7 +60,7 @@ public class AuthenticationModeIdentifier {
         if (LDAP_MODE_KEYWORD.equalsIgnoreCase(modeKeyword)) {
             return new AuthenticationMode<User>(this) {
                 public Authenticator<BasicCredentials, User> createAuthenticator() {
-                    return new LdapAuthenticator(getIdentifier().getConfig());
+                    return new LdapBasicAuthenticator(getIdentifier().getSettings());
                 }
 
                 public String getRealm() {
@@ -79,23 +76,23 @@ public class AuthenticationModeIdentifier {
     }
 
     boolean cacheRequired() {
-        return config.needsCaching();
+        return settings.needsCaching();
     }
 
     boolean authorizationRequired() {
-        return config.needsAuthorization();
+        return settings.needsAuthorization();
     }
 
     boolean parameterAnnotationEnabled() {
-        return config.byAnnotated();
+        return settings.byAnnotated();
     }
 
     CacheBuilderSpec getCacheBuilderSpec() {
-        return CacheBuilderSpec.parse(config.getCachePolicy());
+        return CacheBuilderSpec.parse(settings.getCachePolicy());
     }
 
-    private AuthenticationSettings getConfig() {
-        return config;
+    AuthenticationSettings getSettings() {
+        return settings;
     }
 
     private Environment getEnvironment() {
@@ -103,6 +100,6 @@ public class AuthenticationModeIdentifier {
     }
 
     private String getModeKeyword() {
-        return config.getMode();
+        return settings.getMode();
     }
 }

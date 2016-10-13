@@ -20,6 +20,7 @@ import io.dropwizard.Configuration;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class AuthenticationSettings extends Configuration {
+    private boolean enabled = false;
     private String mode = null;
     private boolean caching = false;
     private String cachePolicy = null;
@@ -27,6 +28,17 @@ public class AuthenticationSettings extends Configuration {
     private boolean annotated = true;
     private SimpleSettings simple = new SimpleSettings();
     private LdapSettings ldap = new LdapSettings();
+
+    @JsonProperty
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @JsonProperty
+    public AuthenticationSettings setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        return this;
+    }
 
     @JsonProperty
     public String getMode() {
