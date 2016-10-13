@@ -66,7 +66,8 @@ public class DynamicPolicyLoader implements Runnable {
 
             List<String> reallyModifiedPolicies = new ArrayList<>();
             for (String updatedPolicy : potentiallyModifiedPolicies) {
-                if (!currPolicies.get(updatedPolicy).equals(cachedPolicies.get(updatedPolicy))) {
+                if (currPolicies.get(updatedPolicy) != null
+                        && !currPolicies.get(updatedPolicy).equals(cachedPolicies.get(updatedPolicy))) {
                     reallyModifiedPolicies.add(updatedPolicy);
                 }
             }
