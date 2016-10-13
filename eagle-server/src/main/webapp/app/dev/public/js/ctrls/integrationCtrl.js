@@ -127,6 +127,9 @@
 
 		// Application detail
 		$scope.showAppDetail = function (application) {
+			$("a[data-id='introTab']").click();
+
+			$scope.tmpApp = application;
 			application = application.origin;
 			var docs = application.docs || {install: "", uninstall: ""};
 			$scope.application = application;

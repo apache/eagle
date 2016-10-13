@@ -106,11 +106,79 @@
 			</div>
 			<div class="modal-body">
 				<ul class="nav nav-tabs">
-					<li class="active"><a href="[data-id='install']" data-toggle="tab">Install</a></li>
+					<li><a href="[data-id='intro']" data-toggle="tab" data-id="introTab">Application</a></li>
+					<li><a href="[data-id='install']" data-toggle="tab">Install</a></li>
 					<li><a href="[data-id='uninstall']" data-toggle="tab">Uninstall</a></li>
 				</ul>
 				<div class="tab-content">
-					<div class="tab-pane active" data-id="install">
+					<div class="tab-pane" data-id="intro">
+						<table class="table">
+							<tbody>
+								<tr>
+									<th>Application Name</th>
+									<td>{{application.name}}</td>
+									<th>Type</th>
+									<td>{{application.type}}</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Application Id</th>
+									<td>{{tmpApp.appId}}</td>
+									<th>UUID</th>
+									<td>{{tmpApp.uuid}}</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Mode</th>
+									<td>{{tmpApp.mode}}</td>
+									<th>Status</th>
+									<td>{{tmpApp.status}}</td>
+								</tr>
+								<tr>
+									<th>View Path</th>
+									<td>{{application.viewPath}}</td>
+									<th>Version</th>
+									<td>{{application.version}}</td>
+								</tr>
+								<tr>
+									<th>Jar Path</th>
+									<td colspan="3">{{tmpApp.jarPath || application.jarPath}}</td>
+								</tr>
+								<tr>
+									<th>Application Class</th>
+									<td colspan="3">{{application.appClass}}</td>
+								</tr>
+								<tr>
+									<th>Provider Class</th>
+									<td colspan="3">{{application.providerClass}}</td>
+								</tr>
+								<tr>
+									<th>Description</th>
+									<td colspan="3">{{application.description}}</td>
+								</tr>
+								<tr>
+									<th>Dependencies</th>
+									<td colspan="3">
+										<ul>
+											<li ng-repeat="dep in application.dependencies track by $index">
+												{{dep.type}}
+											</li>
+										</ul>
+									</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Configuration</th>
+									<td colspan="3">
+										<ul>
+											<li ng-repeat="(key, value) in tmpApp.configuration track by $index">
+												<strong>{{key}}:</strong>
+												{{value}}
+											</li>
+										</ul>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="tab-pane" data-id="install">
 						<pre ng-bind-html="installHTML"></pre>
 					</div>
 					<div class="tab-pane" data-id="uninstall">
