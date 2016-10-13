@@ -188,16 +188,32 @@
 		$scope.installAppConfirm = function () {
 			$scope.installLock = true;
 
-			Entity.create("apps/install", $scope.tmpApp)._then(function () {
-				refreshApplications();
-				$("#installMDL").modal("hide");
-			}, function (res) {
-				$.dialog({
-					title: "OPS",
-					content: res.data.message
+			var uuid = $scope.tmpApp.uuid;
+			delete $scope.tmpApp.uuid;
+
+			if(uuid) {
+				Entity.create("apps/" + uuid, $scope.tmpApp)._then(function () {
+					refreshApplications();
+					$("#installMDL").modal("hide");
+				}, function (res) {
+					$.dialog({
+						title: "OPS",
+						content: res.data.message
+					});
+					$scope.installLock = false;
 				});
-				$scope.installLock = false;
-			});
+			} else {
+				Entity.create("apps/install", $scope.tmpApp)._then(function () {
+					refreshApplications();
+					$("#installMDL").modal("hide");
+				}, function (res) {
+					$.dialog({
+						title: "OPS",
+						content: res.data.message
+					});
+					$scope.installLock = false;
+				});
+			}
 		};
 
 		// Install application
@@ -207,12 +223,17 @@
 			$scope.installLock = false;
 			$scope.application = application;
 			$scope.tmpApp = {
-				siteId: $scope.site.siteId,
-				appType: application.type,
 				mode: "CLUSTER",
 				jarPath: application.jarPath,
 				configuration: {}
 			};
+
+			if(!entity.uuid) {
+				common.merge($scope.tmpApp, {
+					siteId: $scope.site.siteId,
+					appType: application.type
+				});
+			}
 
 			var fields = $scope.tmpAppConfigFields = common.getValueByPath(application, "configuration.properties", []).concat();
 
