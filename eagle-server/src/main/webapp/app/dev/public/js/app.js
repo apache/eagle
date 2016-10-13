@@ -103,6 +103,12 @@ var app = {};
 					controller: "policyListCtrl",
 					resolve: routeResolve()
 				})
+				.state('alert.streamList', {
+					url: "streamList",
+					templateUrl: "partials/alert/streamList.html?_=" + window._TRS(),
+					controller: "alertStreamListCtrl",
+					resolve: routeResolve()
+				})
 				.state('alert.policyCreate', {
 					url: "policyCreate",
 					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
@@ -122,6 +128,7 @@ var app = {};
 					controller: "policyDetailCtrl",
 					resolve: routeResolve()
 				})
+
 				// =============================== Integration ==============================
 				.state('integration', {
 					abstract: true,
@@ -148,12 +155,7 @@ var app = {};
 					controller: "integrationApplicationListCtrl",
 					resolve: routeResolve({ application: false })
 				})
-				.state('integration.streamList', {
-					url: "streamList",
-					templateUrl: "partials/integration/streamList.html?_=" + window._TRS(),
-					controller: "integrationStreamListCtrl",
-					resolve: routeResolve()
-				})
+
 				// ================================== Site ==================================
 				.state('site', {
 					url: "/site/:siteId",

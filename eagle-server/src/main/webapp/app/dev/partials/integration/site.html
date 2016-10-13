@@ -217,7 +217,7 @@
 							<li ng-repeat="dep in application.dependencies track by $index">
 								<strong class="text-success" ng-if="!!Application.find(dep.type, site.siteId)[0]">[ Installed ]</strong>
 								<strong class="text-danger" ng-if="!Application.find(dep.type, site.siteId)[0]">[
-									<span class="fa fa-exclamation-triangle"></span> Require
+									<span class="fa fa-exclamation-triangle"></span>Require
 								]</strong>
 								{{Application.findProvider(dep.type).name}}
 								({{dep.type}})

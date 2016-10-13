@@ -58,6 +58,25 @@
 	});
 
 	// ======================================================================================
+	// =                                       Stream                                       =
+	// ======================================================================================
+	eagleControllers.controller('alertStreamListCtrl', function ($scope, $wrapState, PageConfig, Application) {
+		PageConfig.title = "Alert";
+		PageConfig.subTitle = "Streams";
+
+		$scope.streamList = $.map(Application.list, function (app) {
+			return (app.streams || []).map(function (stream) {
+				return {
+					streamId: stream.streamId,
+					appType: app.descriptor.type,
+					siteId: app.site.siteId,
+					schema: stream.schema
+				};
+			});
+		});
+	});
+
+	// ======================================================================================
 	// =                                       Policy                                       =
 	// ======================================================================================
 	eagleControllers.controller('policyListCtrl', function ($scope, $wrapState, PageConfig, Entity, UI) {

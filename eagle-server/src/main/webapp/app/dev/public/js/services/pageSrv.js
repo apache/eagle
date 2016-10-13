@@ -49,15 +49,15 @@
 		]},*/
 		{name: "Alert", icon: "bell", list: [
 			{name: "Explore Alerts", path: "#/alert/"},
-			{name: "Manage Policies", path: "#/alert/policyList"},
+			{name: "Policies", path: "#/alert/policyList"},
+			{name: "Streams", path: "#/alert/streamList"},
 			{name: "Define Policy", path: "#/alert/policyCreate"}
 		]}
 	];
 	var adminPortalList = [
 		{name: "Integration", icon: "puzzle-piece", list: [
 			{name: "Sites", path: "#/integration/siteList"},
-			{name: "Applications", path: "#/integration/applicationList"},
-			{name: "Streams", path: "#/integration/streamList"}
+			{name: "Applications", path: "#/integration/applicationList"}
 		]}
 	];
 
