@@ -281,9 +281,10 @@
 			common.deferred.all(publisherPromiseList.concat(policyPromise)).then(function () {
 				$.dialog({
 					title: "Done",
-					content: "Click confirm to go to the policy detail page."
+					content: "Close dialog to go to the policy detail page."
+				}, function () {
+					$wrapState.go("policyDetail", {name: $scope.policy.name});
 				});
-				$wrapState.go("policyDetail", {name: $scope.policy.name});
 			}, function (failedList) {
 				$.dialog({
 					title: "OPS",

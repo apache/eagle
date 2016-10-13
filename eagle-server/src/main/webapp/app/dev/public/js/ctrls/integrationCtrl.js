@@ -62,7 +62,7 @@
 		};
 	});
 
-	eagleControllers.controller('integrationSiteCtrl', function ($sce, $scope, $wrapState, PageConfig, Entity, UI, Site, Application) {
+	eagleControllers.controller('integrationSiteCtrl', function ($sce, $scope, $wrapState, $interval, PageConfig, Entity, UI, Site, Application) {
 		PageConfig.title = "Site";
 		PageConfig.subTitle = $wrapState.param.id;
 
@@ -77,6 +77,9 @@
 			});
 			return;
 		}
+		console.log("[Site]", $scope.site);
+
+		$scope.siteName = $scope.site.siteId + ($scope.site.siteName ? "(" + $scope.site.siteName + ")" : "");
 
 		// Map applications
 		function mapApplications() {
@@ -94,9 +97,9 @@
 		mapApplications();
 
 		// Application refresh
-		function refreshApplications() {
+		var refreshApplications = $scope.refreshApplications = function() {
 			Application.reload().getPromise().then(mapApplications);
-		}
+		};
 
 		// Application status class
 		$scope.getAppStatusClass = function (application) {
@@ -124,6 +127,9 @@
 
 		// Application detail
 		$scope.showAppDetail = function (application) {
+			$("a[data-id='introTab']").click();
+
+			$scope.tmpApp = application;
 			application = application.origin;
 			var docs = application.docs || {install: "", uninstall: ""};
 			$scope.application = application;
@@ -167,11 +173,12 @@
 
 		$scope.removeField = function (field) {
 			$scope.tmpAppConfigFields = common.array.remove(field, $scope.tmpAppConfigFields);
+			delete $scope.tmpApp.configuration[field.name];
 		};
 
 		$scope.checkFields = function () {
 			var pass = true;
-			var config = common.getValueByPath($scope, ["tmpApp", "configuration"]);
+			var config = common.getValueByPath($scope, ["tmpApp", "configuration"], {});
 			$.each($scope.tmpAppConfigFields, function (i, field) {
 				if(field.required && !config[field.name]) {
 					pass = false;
@@ -184,38 +191,86 @@
 		$scope.installAppConfirm = function () {
 			$scope.installLock = true;
 
-			Entity.create("apps/install", $scope.tmpApp)._then(function () {
-				refreshApplications();
-				$("#installMDL").modal("hide");
-			}, function (res) {
-				$.dialog({
-					title: "OPS",
-					content: res.data.message
+			var uuid = $scope.tmpApp.uuid;
+			delete $scope.tmpApp.uuid;
+
+			if(uuid) {
+				Entity.create("apps/" + uuid, $scope.tmpApp)._then(function () {
+					refreshApplications();
+					$("#installMDL").modal("hide");
+				}, function (res) {
+					$.dialog({
+						title: "OPS",
+						content: res.data.message
+					});
+					$scope.installLock = false;
 				});
-				$scope.installLock = false;
-			});
+			} else {
+				Entity.create("apps/install", $scope.tmpApp)._then(function () {
+					refreshApplications();
+					$("#installMDL").modal("hide");
+				}, function (res) {
+					$.dialog({
+						title: "OPS",
+						content: res.data.message
+					});
+					$scope.installLock = false;
+				});
+			}
 		};
 
 		// Install application
-		$scope.installApp = function (application) {
+		$scope.installApp = function (application, entity) {
+			entity = entity || {};
 			application = application.origin;
 			$scope.installLock = false;
 			$scope.application = application;
 			$scope.tmpApp = {
-				siteId: $scope.site.siteId,
-				appType: application.type,
 				mode: "CLUSTER",
 				jarPath: application.jarPath,
 				configuration: {}
 			};
 
-			$scope.tmpAppConfigFields = common.getValueByPath(application, "configuration.properties", []);
-			$.each($scope.tmpAppConfigFields, function (i, field) {
+			if(!entity.uuid) {
+				common.merge($scope.tmpApp, {
+					siteId: $scope.site.siteId,
+					appType: application.type
+				});
+			}
+
+			var fields = $scope.tmpAppConfigFields = common.getValueByPath(application, "configuration.properties", []).concat();
+
+			$.each(fields, function (i, field) {
 				$scope.tmpApp.configuration[field.name] = field.value;
 			});
 
+			// Fill miss field of entity
+			common.merge($scope.tmpApp, entity);
+			$.each(entity.configuration || {}, function (key) {
+				if(!common.array.find(key, fields, ["name"])) {
+					fields.push({
+						name: key,
+						_customize: true,
+						required: true
+					});
+				}
+			});
+
+			// Dependencies check
+			var missDep = false;
+			$.each(application.dependencies, function (i, dep) {
+				if(!Application.find(dep.type, $scope.site.siteId)[0]) {
+					missDep = true;
+					return false;
+				}
+			});
+
 			$("#installMDL").modal();
-			$("a[data-id='configTab']").click();
+			if(missDep) {
+				$("a[data-id='guideTab']").click();
+			} else {
+				$("a[data-id='configTab']").click();
+			}
 		};
 
 		// Uninstall application
@@ -229,6 +284,9 @@
 			});
 		};
 
+		// ================================================================
+		// =                          Management                          =
+		// ================================================================
 		// Start application
 		$scope.startApp = function (application) {
 			Entity.post("apps/start", { uuid: application.uuid })._then(function () {
@@ -242,6 +300,26 @@
 				refreshApplications();
 			});
 		};
+
+		$scope.editApp = function (application) {
+			var type = application.descriptor.type;
+			var provider = Application.findProvider(type);
+
+			$scope.installApp({origin: provider}, {
+				mode: application.mode,
+				jarPath: application.jarPath,
+				uuid: application.uuid,
+				configuration: $.extend({}, application.configuration)
+			});
+		};
+
+		// ================================================================
+		// =                             Sync                             =
+		// ================================================================
+		var refreshInterval = $interval(refreshApplications, 1000 * 60);
+		$scope.$on('$destroy', function() {
+			$interval.cancel(refreshInterval);
+		});
 	});
 
 	// ======================================================================================
@@ -258,24 +336,5 @@
 			$scope.uninstallHTML = $sce.trustAsHtml(docs.uninstall);
 			$("#appMDL").modal();
 		};
-	});
-
-	// ======================================================================================
-	// =                                       Stream                                       =
-	// ======================================================================================
-	eagleControllers.controller('integrationStreamListCtrl', function ($scope, $wrapState, PageConfig, Application) {
-		PageConfig.title = "Integration";
-		PageConfig.subTitle = "Streams";
-
-		$scope.streamList = $.map(Application.list, function (app) {
-			return (app.streams || []).map(function (stream) {
-				return {
-					streamId: stream.streamId,
-					appType: app.descriptor.type,
-					siteId: app.site.siteId,
-					schema: stream.schema
-				};
-			});
-		});
 	});
 }());

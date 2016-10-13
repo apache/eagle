@@ -17,17 +17,33 @@
   -->
 
 <div class="box-body">
-	<p class="text-danger" ng-if="site.applicationList.length === 0">
-		<span class="fa fa-exclamation-triangle"></span> Site must install at least one application to start up.
-	</p>
-	<p class="text-warning" ng-if="site.applicationList.length !== 0 && getStartedAppCount() === 0">
-		<span class="fa fa-exclamation-triangle"></span> No application started.
-	</p>
+
+
+	<div class="form-group">
+		<label>Site</label>
+		<input type="text" class="form-control" readonly ng-model="siteName">
+	</div>
+	<div class="form-group">
+		<label>Description</label>
+		<textarea class="form-control" readonly ng-model="site.description" rows="2"></textarea>
+	</div>
+
+	<label>Application</label>
+	<span class="text-danger" ng-if="site.applicationList.length === 0">
+		(<span class="fa fa-exclamation-triangle"></span> Site must install at least one application to start up.)
+	</span>
+	<span class="text-warning" ng-if="site.applicationList.length !== 0 && getStartedAppCount() === 0">
+		(<span class="fa fa-exclamation-triangle"></span> No application started.)
+	</span>
 
 	<table class="table table-bordered table-hover">
 		<thead>
 			<tr>
-				<th>App</th>
+				<th>
+					<small class="pull-right"><a ng-click="refreshApplications()">Refresh</a></small>
+					Name
+					<span class="fa fa-refresh fa-spin no-animate" ng-show="!Application.list._done"></span>
+				</th>
 				<th width="10">Status</th>
 				<th>Version</th>
 				<th>Description</th>
@@ -48,9 +64,24 @@
 				<td class="text-center">
 					<div class="btn-group btn-group-xs" ng-if="app.installed">
 						<!--button class="btn btn-default btn-sm">Monitor</button-->
-						<button class="btn btn-default btn-sm" ng-click="startApp(app)">Start</button>
-						<button class="btn btn-default btn-sm" ng-click="stopApp(app)">Stop</button>
-						<button class="btn btn-default btn-sm" ng-click="uninstallApp(app)">Uninstall</button>
+						<button class="btn btn-default btn-sm" ng-click="startApp(app)" ng-if="app.descriptor.executable">
+							<span class="fa fa-play"></span>
+						</button>
+						<button class="btn btn-default btn-sm" ng-click="stopApp(app)" ng-if="app.descriptor.executable">
+							<span class="fa fa-stop"></span>
+						</button>
+						<button class="btn btn-default btn-sm" disabled="disabled" ng-if="!app.descriptor.executable">
+							<span class="fa fa-ban"></span>
+						</button>
+						<button class="btn btn-default btn-sm" disabled="disabled" ng-if="!app.descriptor.executable">
+							<span class="fa fa-ban"></span>
+						</button>
+						<button class="btn btn-default btn-sm" ng-click="editApp(app)">
+							<span class="fa fa-pencil"></span>
+						</button>
+						<button class="btn btn-danger btn-sm" ng-click="uninstallApp(app)">
+							<span class="fa fa-trash"></span>
+						</button>
 					</div>
 					<div class="btn-group btn-group-xs" ng-if="!app.installed">
 						<button class="btn btn-primary btn-sm" ng-click="installApp(app)">Install Application</button>
@@ -75,11 +106,80 @@
 			</div>
 			<div class="modal-body">
 				<ul class="nav nav-tabs">
-					<li class="active"><a href="[data-id='install']" data-toggle="tab">Install</a></li>
+					<li><a href="[data-id='intro']" data-toggle="tab" data-id="introTab">Application</a></li>
+					<li><a href="[data-id='install']" data-toggle="tab">Install</a></li>
 					<li><a href="[data-id='uninstall']" data-toggle="tab">Uninstall</a></li>
 				</ul>
 				<div class="tab-content">
-					<div class="tab-pane active" data-id="install">
+					<div class="tab-pane" data-id="intro">
+						<table class="table">
+							<tbody>
+								<tr>
+									<th>Application Name</th>
+									<td>{{application.name}}</td>
+									<th>Type</th>
+									<td>{{application.type}}</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Application Id</th>
+									<td>{{tmpApp.appId}}</td>
+									<th>UUID</th>
+									<td>{{tmpApp.uuid}}</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Mode</th>
+									<td>{{tmpApp.mode}}</td>
+									<th>Status</th>
+									<td>{{tmpApp.status}}</td>
+								</tr>
+								<tr>
+									<th>View Path</th>
+									<td>{{application.viewPath}}</td>
+									<th>Version</th>
+									<td>{{application.version}}</td>
+								</tr>
+								<tr>
+									<th>Jar Path</th>
+									<td colspan="3">{{tmpApp.jarPath || application.jarPath}}</td>
+								</tr>
+								<tr>
+									<th>Application Class</th>
+									<td colspan="3">{{application.appClass}}</td>
+								</tr>
+								<tr>
+									<th>Provider Class</th>
+									<td colspan="3">{{application.providerClass}}</td>
+								</tr>
+								<tr>
+									<th>Description</th>
+									<td colspan="3">{{application.description}}</td>
+								</tr>
+								<tr>
+									<th>Dependencies</th>
+									<td colspan="3">
+										<ul>
+											<li ng-repeat="dep in application.dependencies track by $index">
+												{{Application.findProvider(dep.type).name}}
+												({{dep.type}})
+											</li>
+										</ul>
+									</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Configuration</th>
+									<td colspan="3">
+										<ul>
+											<li ng-repeat="(key, value) in tmpApp.configuration track by $index">
+												<strong>{{key}}:</strong>
+												{{value}}
+											</li>
+										</ul>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="tab-pane" data-id="install">
 						<pre ng-bind-html="installHTML"></pre>
 					</div>
 					<div class="tab-pane" data-id="uninstall">
@@ -106,11 +206,28 @@
 			</div>
 			<div class="modal-body">
 				<ul class="nav nav-tabs">
-					<li class="active"><a href="[data-id='environment']" data-toggle="tab">Environment</a></li>
+					<li><a href="[data-id='guide']" data-toggle="tab" data-id="guideTab">Guide</a></li>
+					<li><a href="[data-id='environment']" data-toggle="tab">Environment</a></li>
 					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Configuration</a></li>
 				</ul>
 				<div class="tab-content">
-					<div class="tab-pane active" data-id="environment">
+					<div class="tab-pane" data-id="guide">
+						<label>Dependencies</label>
+						<ul>
+							<li ng-repeat="dep in application.dependencies track by $index">
+								<strong class="text-success" ng-if="!!Application.find(dep.type, site.siteId)[0]">[ Installed ]</strong>
+								<strong class="text-danger" ng-if="!Application.find(dep.type, site.siteId)[0]">[
+									<span class="fa fa-exclamation-triangle"></span>Require
+								]</strong>
+								{{Application.findProvider(dep.type).name}}
+								({{dep.type}})
+							</li>
+						</ul>
+
+						<label>Install</label>
+						<pre ng-bind-html="installHTML"></pre>
+					</div>
+					<div class="tab-pane" data-id="environment">
 						<div class="form-group">
 							<label>Mode</label>
 							<select class="form-control" ng-model="tmpApp.mode">

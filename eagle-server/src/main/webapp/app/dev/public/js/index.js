@@ -26,7 +26,7 @@
 	var _app = {};
 	if(localStorage) {
 		_host = localStorage.getItem("host") || "";
-		_app = common.parseJSON(localStorage.getItem("app") || "") || {};
+		_app = common.parseJSON(localStorage.getItem("app"), {});
 	}
 
 	window._host = function (host) {
@@ -49,6 +49,13 @@
 			}
 		}
 		return _app;
+	};
+
+	window._app.clear = function () {
+		if(localStorage) {
+			_app = {};
+			localStorage.removeItem("app");
+		}
 	};
 
 	// ======================================================================================

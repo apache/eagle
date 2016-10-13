@@ -97,15 +97,17 @@
 	};
 
 	common.parseJSON = function (str, defaultVal) {
-		try {
-			str = (str + "").trim();
-			if(Number(str).toString() === str) throw "Number format";
-			return JSON.parse(str);
-		} catch(err) {
-			if(defaultVal === undefined) {
-				console.warn("Can't parse JSON: " + str);
-			}
+		if(str && Number(str).toString() !== str) {
+			try {
+				str = (str + "").trim();
+				return JSON.parse(str);
+			} catch(err) {}
 		}
+
+		if(arguments.length === 1) {
+			console.warn("Can't parse JSON: " + str);
+		}
+
 		return defaultVal === undefined ? null : defaultVal;
 	};
 
