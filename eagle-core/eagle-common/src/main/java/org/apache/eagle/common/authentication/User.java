@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.server.authentication.principal;
+package org.apache.eagle.common.authentication;
 
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Set;
 
 public class User implements Principal, Serializable {
-    private String username = null;
+    private String username = "Unauthenticated";
     private Set<String> roles = null;
+
+    public User() {}
 
     public User(String username) {
         this.username = username;
