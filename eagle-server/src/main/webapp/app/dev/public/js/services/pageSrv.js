@@ -73,7 +73,7 @@
 		var connectedMainPortalList = [];
 		var sitePortals = {};
 
-		var backHome = {name: "Back home", icon: "arrow-left", path: "#/"};
+		var backHome = {name: "Back", icon: "arrow-left", path: "#/"};
 
 		Portal.register = function (portal, isSite) {
 			(isSite ? sitePortalList : mainPortalList).push(portal);
@@ -109,7 +109,7 @@
 			// Site level
 			sitePortals = {};
 			$.each(Site.list, function (i, site) {
-				var siteHome = {name: "Home", icon: "home", path: "#/site/" + site.siteId};
+				var siteHome = {name: site.siteName || site.siteId + " Home", icon: "home", path: "#/site/" + site.siteId};
 				sitePortals[site.siteId] = [backHome, siteHome].concat($.map(sitePortalList, function (portal) {
 					var hasApp = !!common.array.find(portal.application, site.applicationList, "descriptor.type");
 					if(hasApp) {
