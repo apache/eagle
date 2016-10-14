@@ -16,45 +16,27 @@
   limitations under the License.
   -->
 
-<!--div class="row" ng-repeat="banner in bannerList track by $index">
-	<div class="col-sm-12" ng-if="banner.title">
-		<h3>{{banner.title}}</h3>
-	</div>
-	<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="widget in banner.list track by $index">
-		<div class="small-box {{widget.color || 'bg-aqua'}}">
+<div class="row">
+	<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="site in Site.list track by $index">
+		<div class="small-box bg-aqua">
 			<div class="inner">
-				<h3>{{widget.title || "Untitled"}}</h3>
-				<p>{{widget.description || "-"}}</p>
-				<p>{{widget.additionalTips || "&nbsp;"}}</p>
+				<h3>{{site.siteName || site.siteId}}</h3>
+
+				<p>{{site.applicationList.length}} Applications</p>
 			</div>
 			<div class="icon">
-				<i class="fa fa-question-circle"></i>
+				<i class="fa fa-certificate"></i>
 			</div>
-			<a class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+			<a ui-sref="site({siteId: site.siteId})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
 		</div>
-	</div>
-</div-->
-<div class="row flex">
-	<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="widget in Widget.list track by $index">
-		<div widget="widget"></div>
 	</div>
 </div>
 
-<!--div class="row flex">
-	<div class="col-md-4">
-		<div style="background: red; height: 200px;">111</div>
+<div ng-if="Widget.list.length">
+	<h3>Widgets</h3>
+	<div class="row flex">
+		<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="widget in Widget.list track by $index">
+			<div widget="widget"></div>
+		</div>
 	</div>
-	<div class="col-md-4">
-		<div style="background: green;">222</div>
-		<div style="background: blue;">222</div>
-	</div>
-	<div class="col-md-4">
-		<div style="background: red;">333</div>
-	</div>
-	<div class="col-md-4">
-		<div style="background: green;">444</div>
-	</div>
-	<div class="col-md-4">
-		<div style="background: red;">555</div>
-	</div>
-</div-->
+</div>

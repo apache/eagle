@@ -159,7 +159,7 @@ var app = {};
 				// ================================== Site ==================================
 				.state('site', {
 					url: "/site/:siteId",
-					templateUrl: "partials/home.html?_=" + window._TRS(),
+					templateUrl: "partials/site/home.html?_=" + window._TRS(),
 					controller: "siteCtrl",
 					resolve: routeResolve()
 				})
