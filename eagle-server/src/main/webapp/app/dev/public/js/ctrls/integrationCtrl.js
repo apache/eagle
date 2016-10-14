@@ -188,6 +188,15 @@
 			return pass;
 		};
 
+		$scope.checkJarPath = function () {
+			var jarPath = ($scope.tmpApp || {}).jarPath;
+			if(/\.jar$/.test(jarPath)) {
+				$scope.tmpApp.mode = "CLUSTER";
+			} else if(/\.class/.test(jarPath)) {
+				$scope.tmpApp.mode = "LOCAL";
+			}
+		};
+
 		$scope.installAppConfirm = function () {
 			$scope.installLock = true;
 
@@ -236,6 +245,7 @@
 					siteId: $scope.site.siteId,
 					appType: application.type
 				});
+				$scope.checkJarPath();
 			}
 
 			var fields = $scope.tmpAppConfigFields = common.getValueByPath(application, "configuration.properties", []).concat();
