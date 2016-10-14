@@ -102,8 +102,13 @@
         </property>
         <property>
             <name>aggregate.counters.groupBys</name>
+<<<<<<< HEAD
             <description>groupBys that each metric need to aggregate. If group by many columns, then split them by ,</description>
             <value>site, jobType; site, user; site</value>
+=======
+            <description>groupBys that each metric need to aggregate. If group by many columns, then split them by &</description>
+            <value>site&jobType, site&user, site</value>
+>>>>>>> f3204bcafc345edc9b600715776af77d0d1f4496
         </property>
     </configuration>
     <docs>

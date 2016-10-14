@@ -94,6 +94,10 @@
 					entity: _entity
 				});
 				$mdl.remove();
+
+				if ($(".modal-backdrop").length) {
+					$("body").addClass("modal-open");
+				}
 			});
 
 			// Function
@@ -225,6 +229,10 @@
 					name: name
 				});
 				$mdl.remove();
+
+				if ($(".modal-backdrop").length) {
+					$("body").addClass("modal-open");
+				}
 			});
 
 			// Function
