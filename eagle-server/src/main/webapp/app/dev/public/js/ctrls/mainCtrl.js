@@ -26,6 +26,13 @@
 	// ======================================================================================
 	eagleControllers.controller('homeCtrl', function ($scope, $wrapState, PageConfig) {
 		PageConfig.title = "Home";
+
+		$scope.colorList = [
+			"bg-aqua",
+			"bg-green",
+			"bg-yellow",
+			"bg-red"
+		];
 	});
 
 	// ======================================================================================
