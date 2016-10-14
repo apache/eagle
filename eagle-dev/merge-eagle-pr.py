@@ -105,9 +105,11 @@ def clean_up():
     print "Restoring head pointer to %s" % original_head
     run_cmd("git checkout %s" % original_head)
 
+    ansi_escape = re.compile(r'\x1b[^m]*m')
     branches = run_cmd("git branch").replace(" ", "").split("\n")
 
     for branch in filter(lambda x: x.startswith(BRANCH_PREFIX), branches):
+        branch = ansi_escape.sub('', branch)
         print "Deleting local branch %s" % branch
         run_cmd("git branch -D %s" % branch)
 
