@@ -210,6 +210,7 @@
 					<li><a href="[data-id='environment']" data-toggle="tab">Environment</a></li>
 					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Configuration</a></li>
 				</ul>
+
 				<div class="tab-content">
 					<div class="tab-pane" data-id="guide">
 						<label>Dependencies</label>
@@ -227,6 +228,7 @@
 						<label>Install</label>
 						<pre ng-bind-html="installHTML"></pre>
 					</div>
+
 					<div class="tab-pane" data-id="environment">
 						<div class="form-group">
 							<label>Mode</label>
@@ -240,8 +242,9 @@
 							<input type="text" class="form-control" ng-model="tmpApp.jarPath" ng-change="checkJarPath()" />
 						</div>
 					</div>
+
 					<div class="tab-pane" data-id="configuration">
-						<div class="form-group" ng-repeat="field in tmpAppConfigFields track by $index">
+						<div class="form-group" ng-class="{'has-warning': field.required && !tmpApp.configuration[field.name]}" ng-repeat="field in tmpAppConfigFields track by $index">
 							<label>
 								<a class="fa fa-times" ng-click="removeField(field)" ng-if="field._customize"></a>
 								{{field.displayName || field.name}}
