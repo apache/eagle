@@ -38,11 +38,8 @@ public class AggregationApplication extends StormApplication {
             metricNames.add(metricNamesArr[i]);
         }
         List<String> groupByColumns = new ArrayList<>();
-<<<<<<< HEAD
+
         String[] groupByColumnsArr = config.getString("aggregate.counters.groupBys").split(";");
-=======
-        String[] groupByColumnsArr = config.getString("aggregate.counters.groupBys").split(",");
->>>>>>> f3204bcafc345edc9b600715776af77d0d1f4496
         for (int i = 0; i < groupByColumnsArr.length; i++) {
             groupByColumns.add(groupByColumnsArr[i]);
         }
@@ -51,7 +48,7 @@ public class AggregationApplication extends StormApplication {
         for (String metric : metricNames) {
             metrics.put(metric, new ArrayList<>());
             for (String cols : groupByColumns) {
-                metrics.get(metric).add(Arrays.asList(cols.replaceAll(" ", "").split("&")));
+                metrics.get(metric).add(Arrays.asList(cols.replaceAll(" ", "").split(",")));
             }
         }
 
