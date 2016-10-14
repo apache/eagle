@@ -25,10 +25,10 @@
     <configuration>
        <!-- alert topology sizing parameters -->
         <property>
-            <name>topology.numOfTotalWorkers</name>
-            <displayName>topology.numOfTotalWorkers</displayName>
-            <value>2</value>
-            <description>number of total storm workers</description>
+            <name>workers</name>
+            <displayName>workers</displayName>
+            <value>1</value>
+            <description>number of topology workers</description>
         </property>
         <property>
             <name>topology.numOfSpoutTasks</name>
