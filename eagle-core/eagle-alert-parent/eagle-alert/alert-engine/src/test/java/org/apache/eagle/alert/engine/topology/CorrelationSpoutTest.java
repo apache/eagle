@@ -104,8 +104,8 @@ public class CorrelationSpoutTest {
                 Assert.assertEquals(1, streamMetadatas.getStreamRepartitionMetadataMap().size());
                 Assert.assertTrue(streamMetadatas.getStream("s1") != null);
                 Assert.assertTrue(streamMetadatas.getStream("s2") != null);
-                Assert.assertEquals(dataSourceName, streamMetadatas.getStream("s1").getTopicName());
-                Assert.assertEquals(dataSourceName, streamMetadatas.getStream("s2").getTopicName());
+                Assert.assertEquals(topicName, streamMetadatas.getStream("s1").getTopicName());
+                Assert.assertEquals(topicName, streamMetadatas.getStream("s2").getTopicName());
                 LOG.info("successfully verified new topic and streams");
                 verified.set(true);
                 return null;
