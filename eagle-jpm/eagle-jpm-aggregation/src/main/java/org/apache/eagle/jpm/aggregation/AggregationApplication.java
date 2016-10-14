@@ -35,13 +35,13 @@ public class AggregationApplication extends StormApplication {
         List<String> metricNames = new ArrayList<>();
         String[] metricNamesArr = config.getString("aggregate.counters.metrics").split(",");
         for (int i = 0; i < metricNamesArr.length; i++) {
-            metricNames.add(metricNamesArr[i]);
+            metricNames.add(metricNamesArr[i].trim());
         }
         List<String> groupByColumns = new ArrayList<>();
 
         String[] groupByColumnsArr = config.getString("aggregate.counters.groupBys").split(";");
         for (int i = 0; i < groupByColumnsArr.length; i++) {
-            groupByColumns.add(groupByColumnsArr[i]);
+            groupByColumns.add(groupByColumnsArr[i].trim());
         }
 
         Map<String, List<List<String>>> metrics = new HashMap<>();
