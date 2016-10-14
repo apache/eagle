@@ -92,4 +92,13 @@
             </includes>
         </fileSet>
     </fileSets>
+
+    <files>
+        <file>
+            <source>${project.basedir}/../VERSION</source>
+            <outputDirectory>/</outputDirectory>
+            <destName>RELEASE</destName>
+            <filtered>true</filtered>
+        </file>
+    </files>
 </assembly>

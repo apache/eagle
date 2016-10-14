@@ -167,6 +167,17 @@
                 <configuration>
                     <descriptor>src/assembly/eagle-topology-assembly.xml</descriptor>
                     <finalName>eagle-topology-${project.version}</finalName>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <!-- Adds ${buildNumber} as an entry in the manifest file -->
+                            <Build-Branch>${scmBranch}</Build-Branch>
+                            <Build-Commit>${buildNumber}</Build-Commit>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
                 <executions>
                     <execution>
@@ -177,6 +188,27 @@
                         <configuration>
                             <tarLongFileMode>posix</tarLongFileMode>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <configuration>
+                    <format>{0}</format>
+                    <items>
+                        <item>scmVersion</item>
+                    </items>
+                    <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                    <useLastCommittedRevision>true</useLastCommittedRevision>
+                    <revisionOnScmFailure>unknown</revisionOnScmFailure>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
