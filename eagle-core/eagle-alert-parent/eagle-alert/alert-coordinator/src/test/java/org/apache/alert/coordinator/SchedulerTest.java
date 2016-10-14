@@ -16,27 +16,16 @@
  */
 package org.apache.alert.coordinator;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.SimpleType;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.alert.coordinator.mock.TestTopologyMgmtService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.eagle.alert.coordination.model.AlertBoltSpec;
-import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
-import org.apache.eagle.alert.coordination.model.PolicyWorkerQueue;
-import org.apache.eagle.alert.coordination.model.RouterSpec;
-import org.apache.eagle.alert.coordination.model.ScheduleState;
-import org.apache.eagle.alert.coordination.model.SpoutSpec;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;
-import org.apache.eagle.alert.coordination.model.StreamRepartitionStrategy;
-import org.apache.eagle.alert.coordination.model.StreamRouterSpec;
-import org.apache.eagle.alert.coordination.model.Tuple2StreamMetadata;
-import org.apache.eagle.alert.coordination.model.WorkSlot;
+import org.apache.eagle.alert.coordination.model.*;
 import org.apache.eagle.alert.coordination.model.internal.MonitoredStream;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
 import org.apache.eagle.alert.coordination.model.internal.StreamWorkSlotQueue;
@@ -48,26 +37,17 @@ import org.apache.eagle.alert.coordinator.model.AlertBoltUsage;
 import org.apache.eagle.alert.coordinator.model.GroupBoltUsage;
 import org.apache.eagle.alert.coordinator.model.TopologyUsage;
 import org.apache.eagle.alert.coordinator.provider.InMemScheduleConext;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
+import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition.Definition;
-import org.apache.eagle.alert.engine.coordinator.Publishment;
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn.Type;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamPartition;
-import org.apache.eagle.alert.engine.coordinator.StreamSortSpec;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.io.File;
+import java.util.*;
 
 /**
  * @since Apr 22, 2016
@@ -130,7 +110,7 @@ public class SchedulerTest {
 
                 StreamRepartitionMetadata streamMeta = metas.iterator().next();
                 Assert.assertEquals(STREAM1, streamMeta.getStreamId());
-                Assert.assertEquals(DS_NAME, streamMeta.getTopicName());
+                Assert.assertEquals(TEST_TOPIC, streamMeta.getTopicName());
                 Assert.assertEquals(1, streamMeta.groupingStrategies.size());
 
                 StreamRepartitionStrategy gs = streamMeta.groupingStrategies.iterator().next();
@@ -326,7 +306,7 @@ public class SchedulerTest {
 
                 StreamRepartitionMetadata streamMeta = metas.iterator().next();
                 Assert.assertEquals(STREAM1, streamMeta.getStreamId());
-                Assert.assertEquals(DS_NAME, streamMeta.getTopicName());
+                Assert.assertEquals(TEST_TOPIC, streamMeta.getTopicName());
                 Assert.assertEquals(1, streamMeta.groupingStrategies.size());
 
                 StreamRepartitionStrategy gs = streamMeta.groupingStrategies.iterator().next();
@@ -353,7 +333,7 @@ public class SchedulerTest {
 
                 StreamRepartitionMetadata streamMeta = metas.iterator().next();
                 Assert.assertEquals(STREAM2, streamMeta.getStreamId());
-                Assert.assertEquals(DS_NAME, streamMeta.getTopicName());
+                Assert.assertEquals(TEST_TOPIC, streamMeta.getTopicName());
                 Assert.assertEquals(1, streamMeta.groupingStrategies.size());
 
                 StreamRepartitionStrategy gs = streamMeta.groupingStrategies.iterator().next();
@@ -432,7 +412,7 @@ public class SchedulerTest {
 
                 StreamRepartitionMetadata streamMeta = metas.iterator().next();
                 Assert.assertEquals(STREAM1, streamMeta.getStreamId());
-                Assert.assertEquals(DS_NAME, streamMeta.getTopicName());
+                Assert.assertEquals(TEST_TOPIC, streamMeta.getTopicName());
                 Assert.assertEquals(1, streamMeta.groupingStrategies.size());
 
                 StreamRepartitionStrategy gs = streamMeta.groupingStrategies.iterator().next();
