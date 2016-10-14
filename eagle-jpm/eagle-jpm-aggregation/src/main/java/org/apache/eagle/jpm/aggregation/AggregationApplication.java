@@ -31,22 +31,30 @@ import java.util.*;
 public class AggregationApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
-        AggregationConfig aggregationConfig = AggregationConfig.getInstance(config);
-
         //TODO
-        List<String> metricNames = config.getStringList("aggregate.counters.metrics");
-        List<String> groupByColumns = config.getStringList("aggregate.counters.groupByColumns");
+        List<String> metricNames = new ArrayList<>();
+        String[] metricNamesArr = config.getString("aggregate.counters.metrics").split(",");
+        for (int i = 0; i < metricNamesArr.length; i++) {
+            metricNames.add(metricNamesArr[i]);
+        }
+        List<String> groupByColumns = new ArrayList<>();
+        String[] groupByColumnsArr = config.getString("aggregate.counters.groupBys").split(",");
+        for (int i = 0; i < groupByColumnsArr.length; i++) {
+            groupByColumns.add(groupByColumnsArr[i]);
+        }
+
         Map<String, List<List<String>>> metrics = new HashMap<>();
         for (String metric : metricNames) {
             metrics.put(metric, new ArrayList<>());
             for (String cols : groupByColumns) {
-                metrics.get(metric).add(Arrays.asList(cols.replaceAll(" ", "").split(",")));
+                metrics.get(metric).add(Arrays.asList(cols.replaceAll(" ", "").split("&")));
             }
         }
 
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String spoutName = "mrHistoryAggregationSpout";
         String boltName = "mrHistoryAggregationBolt";
+        AggregationConfig aggregationConfig = AggregationConfig.getInstance(config);
         int parallelism = aggregationConfig.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
         int tasks = aggregationConfig.getConfig().getInt("envContextConfig.tasks." + spoutName);
         if (parallelism > tasks) {

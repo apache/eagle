@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<application>
+    <type>MR_JPM_AGGREGATION_APP</type>
+    <name>Map Job Monitoring Aggregation Application</name>
+    <version>0.5.0-incubating</version>
+    <configuration>
+        <property>
+            <name>jobExtractorConfig.site</name>
+            <displayName>Site ID</displayName>
+            <value>sandbox</value>
+        </property>
+        <property>
+            <name>workers</name>
+            <displayName>storm worker number</displayName>
+            <value>4</value>
+        </property>
+        <property>
+            <name>envContextConfig.parallelismConfig.mrHistoryAggregationSpout</name>
+            <value>1</value>
+        </property>
+        <property>
+            <name>envContextConfig.tasks.mrHistoryAggregationSpout</name>
+            <value>1</value>
+        </property>
+        <property>
+            <name>envContextConfig.parallelismConfig.mrHistoryAggregationBolt</name>
+            <value>6</value>
+        </property>
+        <property>
+            <name>envContextConfig.tasks.mrHistoryAggregationBolt</name>
+            <value>6</value>
+        </property>
+        <property>
+            <name>jobExtractorConfig.aggregationDuration</name>
+            <description>seconds, each bolt process metrics from [start, start + aggregationDuration]</description>
+            <value>3600</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkQuorum</name>
+            <value>sandbox.hortonworks.com:2181</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkPort</name>
+            <value>2181</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkRoot</name>
+            <value>/aggregation/mr/sandbox</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkSessionTimeoutMs</name>
+            <value>15000</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkRetryTimes</name>
+            <value>3</value>
+        </property>
+        <property>
+            <name>zkStateConfig.zkRetryInterval</name>
+            <value>20000</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.host</name>
+            <description>eagleProps.eagleService.host</description>
+            <value>sandbox.hortonworks.com</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.port</name>
+            <description>eagleProps.eagleService.port</description>
+            <value>9099</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.username</name>
+            <description>eagleProps.eagleService.username</description>
+            <value>admin</value>
+        </property>
+        <property>
+            <name>eagleProps.eagleService.password</name>
+            <description>eagleProps.eagleService.password</description>
+            <value>secret</value>
+        </property>
+        <property>
+            <name>aggregate.counters.metrics</name>
+            <value>cpu_milliseconds, file_bytes_read, file_bytes_written, hdfs_bytes_read, hdfs_bytes_written, hdfs_read_ops, hdfs_write_ops</value>
+        </property>
+        <property>
+            <name>aggregate.counters.groupBys</name>
+            <description>groupBys that each metric need to aggregate. If group by many columns, then split them by &</description>
+            <value>site&jobType, site&user, site</value>
+        </property>
+    </configuration>
+    <docs>
+        <install>
+        </install>
+        <uninstall>
+        </uninstall>
+    </docs>
+</application>

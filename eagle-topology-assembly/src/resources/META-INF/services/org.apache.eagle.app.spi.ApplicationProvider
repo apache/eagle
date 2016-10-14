@@ -18,3 +18,4 @@ org.apache.eagle.app.example.ExampleApplicationProvider
 org.apache.eagle.app.jpm.JPMWebApplicationProvider
 org.apache.eagle.jpm.mr.history.MRHistoryJobApplicationProvider
 org.apache.eagle.jpm.mr.running.MRRunningJobApplicationProvider
+org.apache.eagle.jpm.aggregation.AggregationApplicationProvider

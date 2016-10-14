@@ -26,12 +26,6 @@ import java.io.Serializable;
 public class AggregationConfig implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(AggregationConfig.class);
 
-    public String getEnv() {
-        return env;
-    }
-
-    private String env;
-
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -67,7 +61,6 @@ public class AggregationConfig implements Serializable {
 
     public static class JobExtractorConfig implements Serializable {
         public String site;
-        public int readTimeoutSeconds;
         public long aggregationDuration;
     }
 
@@ -104,10 +97,8 @@ public class AggregationConfig implements Serializable {
      */
     private void init(Config config) {
         this.config = config;
-        this.env = config.getString("envContextConfig.env");
         //parse eagle job extractor
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
-        this.jobExtractorConfig.readTimeoutSeconds = config.getInt("jobExtractorConfig.readTimeOutSeconds");
         this.jobExtractorConfig.aggregationDuration = config.getLong("jobExtractorConfig.aggregationDuration");
 
         //parse eagle zk
@@ -126,7 +117,6 @@ public class AggregationConfig implements Serializable {
         this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
 
         LOG.info("Successfully initialized MRHistoryJobConfig");
-        LOG.info("env: " + this.env);
         LOG.info("zookeeper.quorum: " + this.zkStateConfig.zkQuorum);
         LOG.info("zookeeper.property.clientPort: " + this.zkStateConfig.zkPort);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);
