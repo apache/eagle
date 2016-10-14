@@ -248,6 +248,7 @@
 							<label>
 								<a class="fa fa-times" ng-click="removeField(field)" ng-if="field._customize"></a>
 								{{field.displayName || field.name}}
+								<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="{{field.description}}"></span>
 								<small ng-if="!field.required" class="text-muted">[optional]</small>
 							</label>
 							<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
