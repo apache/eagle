@@ -41,27 +41,31 @@
 	// ============================================================
 	// =                          Portal                          =
 	// ============================================================
-	var defaultPortalList = [
-		{name: "Home", icon: "home", path: "#/"},
-		/*{name: "Insight", icon: "heartbeat", list: [
-			{name: "Dashboards"},
-			{name: "Metrics"}
-		]},*/
-		{name: "Alert", icon: "bell", list: [
-			{name: "Explore Alerts", path: "#/alert/"},
-			{name: "Policies", path: "#/alert/policyList"},
-			{name: "Streams", path: "#/alert/streamList"},
-			{name: "Define Policy", path: "#/alert/policyCreate"}
-		]}
-	];
-	var adminPortalList = [
-		{name: "Integration", icon: "puzzle-piece", list: [
-			{name: "Sites", path: "#/integration/siteList"},
-			{name: "Applications", path: "#/integration/applicationList"}
-		]}
-	];
+	serviceModule.service('Portal', function($wrapState, Site, Application) {
+		function checkSite() {
+			return Site.list.length !== 0;
+		}
 
-	serviceModule.service('Portal', function($wrapState, Site) {
+		function checkApplication() {
+			return checkSite() && Application.list.length !== 0;
+		}
+
+		var defaultPortalList = [
+			{name: "Home", icon: "home", path: "#/"},
+			{name: "Alert", icon: "bell", showFunc: checkApplication, list: [
+				{name: "Explore Alerts", path: "#/alert/"},
+				{name: "Policies", path: "#/alert/policyList"},
+				{name: "Streams", path: "#/alert/streamList"},
+				{name: "Define Policy", path: "#/alert/policyCreate"}
+			]}
+		];
+		var adminPortalList = [
+			{name: "Integration", icon: "puzzle-piece", showFunc: checkSite, list: [
+				{name: "Sites", path: "#/integration/siteList"},
+				{name: "Applications", path: "#/integration/applicationList"}
+			]}
+		];
+
 		var Portal = {};
 
 		var mainPortalList = [];
@@ -100,7 +104,7 @@
 					path: "#/site/" + site.siteId
 				};
 			});
-			connectedMainPortalList.push({name: "Sites", icon: "server", list: siteList});
+			connectedMainPortalList.push({name: "Sites", icon: "server", showFunc: checkApplication, list: siteList});
 
 			// Site level
 			sitePortals = {};
