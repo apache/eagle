@@ -18,6 +18,9 @@
  */
 package org.apache.eagle.alert.engine.spout;
 
+import backtype.storm.spout.ISpoutOutputCollector;
+import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.eagle.alert.coordination.model.SpoutSpec;
 import org.apache.eagle.alert.coordination.model.StreamRepartitionMetadata;
 import org.apache.eagle.alert.coordination.model.StreamRepartitionStrategy;
@@ -29,9 +32,6 @@ import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
 import org.apache.eagle.alert.utils.StreamIdConversion;
-import backtype.storm.spout.ISpoutOutputCollector;
-import backtype.storm.spout.SpoutOutputCollector;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +121,9 @@ public class SpoutOutputCollectorWrapper extends SpoutOutputCollector implements
             phase 2: stream repartition
         */
         for (StreamRepartitionMetadata md : streamRepartitionMetadataList) {
+            if (!event.getStreamId().equals(md.getStreamId())) {
+                continue;
+            }
             // one stream may have multiple group-by strategies, each strategy is for a specific group-by
             for (StreamRepartitionStrategy groupingStrategy : md.groupingStrategies) {
                 int hash = 0;

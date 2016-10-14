@@ -265,7 +265,7 @@ public class MonitorMetadataGenerator {
             }
         }
         if (targetSm == null) {
-            targetSm = new StreamRepartitionMetadata(datasourceName, schema.getStreamId());
+            targetSm = new StreamRepartitionMetadata(topicName, schema.getStreamId());
             dsStreamMeta.add(targetSm);
         }
         if (!targetSm.groupingStrategies.contains(gs)) {
