@@ -213,6 +213,8 @@
 
 				<div class="tab-content">
 					<div class="tab-pane" data-id="guide">
+						<div ng-bind-html="installHTML"></div>
+
 						<div ng-if="application.dependencies.length > 0">
 							<label>Dependencies ({{application.dependencies.length}} Apps)</label>
 							<ul>
@@ -226,9 +228,6 @@
 								</li>
 							</ul>
 						</div>
-
-						<label>Installation Guide</label>
-						<div ng-bind-html="installHTML"></div>
 					</div>
 
 					<div class="tab-pane" data-id="environment">
