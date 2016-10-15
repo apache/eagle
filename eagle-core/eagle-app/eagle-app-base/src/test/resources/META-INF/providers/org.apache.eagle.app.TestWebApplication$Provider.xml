@@ -27,4 +27,12 @@
             <version>0.5.0-incubating</version>
         </dependency>
     </dependencies>
+    <docs>
+        <install>
+            <h1>Installation Guide</h1>
+        </install>
+        <uninstall>
+            <h1>Un-installation Guide</h1>
+        </uninstall>
+    </docs>
 </application>
