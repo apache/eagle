@@ -44,6 +44,15 @@ public class ClusterMetrics {
     private int rebootedNodes;
     private int activeNodes;
 
+    // available in hadoop 2.7.x or higher
+    private long totalVirtualCores;
+    // available in hadoop 2.7.x or higher
+    private long reservedVirtualCores;
+    // available in hadoop 2.7.x or higher
+    private long availableVirtualCores;
+    // available in hadoop 2.7.x or higher
+    private long allocatedVirtualCores;
+
     public int getAppsSubmitted() {
         return appsSubmitted;
     }
@@ -194,5 +203,37 @@ public class ClusterMetrics {
 
     public void setActiveNodes(int activeNodes) {
         this.activeNodes = activeNodes;
+    }
+
+    public long getTotalVirtualCores() {
+        return totalVirtualCores;
+    }
+
+    public void setTotalVirtualCores(long totalVirtualCores) {
+        this.totalVirtualCores = totalVirtualCores;
+    }
+
+    public long getReservedVirtualCores() {
+        return reservedVirtualCores;
+    }
+
+    public void setReservedVirtualCores(long reservedVirtualCores) {
+        this.reservedVirtualCores = reservedVirtualCores;
+    }
+
+    public long getAvailableVirtualCores() {
+        return availableVirtualCores;
+    }
+
+    public void setAvailableVirtualCores(long availableVirtualCores) {
+        this.availableVirtualCores = availableVirtualCores;
+    }
+
+    public long getAllocatedVirtualCores() {
+        return allocatedVirtualCores;
+    }
+
+    public void setAllocatedVirtualCores(long allocatedVirtualCores) {
+        this.allocatedVirtualCores = allocatedVirtualCores;
     }
 }
