@@ -26,7 +26,7 @@ import java.util.*;
 
 public class PolicyValidatorTest {
     @Test
-    public void testValidPolicy(){
+    public void testValidPolicy() {
         PolicyDefinition policyDefinition = new PolicyDefinition();
         policyDefinition.setName("test_policy");
         policyDefinition.setInputStreams(Collections.singletonList("INPUT_STREAM_1"));
@@ -39,24 +39,24 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition,new HashMap<String, StreamDefinition>(){
+        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
-                put("INPUT_STREAM_1",createStreamDefinition("INPUT_STREAM_1"));
-                put("INPUT_STREAM_2",createStreamDefinition("INPUT_STREAM_2"));
-                put("INPUT_STREAM_3",createStreamDefinition("INPUT_STREAM_3"));
-                put("INPUT_STREAM_4",createStreamDefinition("INPUT_STREAM_4"));
+                put("INPUT_STREAM_1", createStreamDefinition("INPUT_STREAM_1"));
+                put("INPUT_STREAM_2", createStreamDefinition("INPUT_STREAM_2"));
+                put("INPUT_STREAM_3", createStreamDefinition("INPUT_STREAM_3"));
+                put("INPUT_STREAM_4", createStreamDefinition("INPUT_STREAM_4"));
             }
         });
         Assert.assertTrue(validation.isSuccess());
-        Assert.assertEquals(1,validation.getValidInputStreams().size());
-        Assert.assertEquals(1,validation.getValidOutputStreams().size());
+        Assert.assertEquals(1, validation.getValidInputStreams().size());
+        Assert.assertEquals(1, validation.getValidOutputStreams().size());
     }
 
     @Test
-    public void testValidPolicyWithTooManyInputStreams(){
+    public void testValidPolicyWithTooManyInputStreams() {
         PolicyDefinition policyDefinition = new PolicyDefinition();
         policyDefinition.setName("test_policy");
-        policyDefinition.setInputStreams(Arrays.asList("INPUT_STREAM_1","INPUT_STREAM_2"));
+        policyDefinition.setInputStreams(Arrays.asList("INPUT_STREAM_1", "INPUT_STREAM_2"));
         policyDefinition.setOutputStreams(Collections.singletonList("OUTPUT_STREAM_1"));
 
         PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
@@ -66,47 +66,47 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition,new HashMap<String, StreamDefinition>(){
+        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
-                put("INPUT_STREAM_1",createStreamDefinition("INPUT_STREAM_1"));
-                put("INPUT_STREAM_2",createStreamDefinition("INPUT_STREAM_2"));
+                put("INPUT_STREAM_1", createStreamDefinition("INPUT_STREAM_1"));
+                put("INPUT_STREAM_2", createStreamDefinition("INPUT_STREAM_2"));
             }
         });
         Assert.assertTrue(validation.isSuccess());
-        Assert.assertEquals(2,validation.getValidInputStreams().size());
-        Assert.assertEquals(1,validation.getValidOutputStreams().size());
+        Assert.assertEquals(2, validation.getValidInputStreams().size());
+        Assert.assertEquals(1, validation.getValidOutputStreams().size());
     }
 
     @Test
-    public void testValidPolicyWithTooFewOutputStreams(){
+    public void testValidPolicyWithTooFewOutputStreams() {
         PolicyDefinition policyDefinition = new PolicyDefinition();
         policyDefinition.setName("test_policy");
-        policyDefinition.setInputStreams(Arrays.asList("INPUT_STREAM_1","INPUT_STREAM_2"));
+        policyDefinition.setInputStreams(Arrays.asList("INPUT_STREAM_1", "INPUT_STREAM_2"));
         policyDefinition.setOutputStreams(Collections.singletonList("OUTPUT_STREAM_1"));
 
         PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
         definition.setType("siddhi");
         definition.setValue(
-            "from INPUT_STREAM_1[value > 90.0] select * group by name insert into OUTPUT_STREAM_1;"+
-            "from INPUT_STREAM_1[value < 90.0] select * group by name insert into OUTPUT_STREAM_2;"
+            "from INPUT_STREAM_1[value > 90.0] select * group by name insert into OUTPUT_STREAM_1;"
+                + "from INPUT_STREAM_1[value < 90.0] select * group by name insert into OUTPUT_STREAM_2;"
         );
         definition.setInputStreams(policyDefinition.getInputStreams());
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition,new HashMap<String, StreamDefinition>(){
+        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
-                put("INPUT_STREAM_1",createStreamDefinition("INPUT_STREAM_1"));
-                put("INPUT_STREAM_2",createStreamDefinition("INPUT_STREAM_2"));
+                put("INPUT_STREAM_1", createStreamDefinition("INPUT_STREAM_1"));
+                put("INPUT_STREAM_2", createStreamDefinition("INPUT_STREAM_2"));
             }
         });
         Assert.assertTrue(validation.isSuccess());
-        Assert.assertEquals(2,validation.getValidInputStreams().size());
-        Assert.assertEquals(2,validation.getValidOutputStreams().size());
+        Assert.assertEquals(2, validation.getValidInputStreams().size());
+        Assert.assertEquals(2, validation.getValidOutputStreams().size());
     }
 
     @Test
-    public void testInvalidPolicyForSyntaxError(){
+    public void testInvalidPolicyForSyntaxError() {
         PolicyDefinition policyDefinition = new PolicyDefinition();
         policyDefinition.setName("test_policy");
         policyDefinition.setInputStreams(Collections.singletonList("INPUT_STREAM"));
@@ -119,16 +119,16 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition,new HashMap<String, StreamDefinition>(){
+        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
-                put("INPUT_STREAM",createStreamDefinition("INPUT_STREAM"));
+                put("INPUT_STREAM", createStreamDefinition("INPUT_STREAM"));
             }
         });
         Assert.assertFalse(validation.isSuccess());
     }
 
     @Test
-    public void testInvalidPolicyForNotDefinedInputStream(){
+    public void testInvalidPolicyForNotDefinedInputStream() {
         PolicyDefinition policyDefinition = new PolicyDefinition();
         policyDefinition.setName("test_policy");
         policyDefinition.setInputStreams(Collections.singletonList("INPUT_STREAM_1"));
@@ -141,16 +141,16 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition,new HashMap<String, StreamDefinition>(){
+        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
-                put("INPUT_STREAM_2",createStreamDefinition("INPUT_STREAM_2"));
+                put("INPUT_STREAM_2", createStreamDefinition("INPUT_STREAM_2"));
             }
         });
         Assert.assertFalse(validation.isSuccess());
     }
 
     @Test
-    public void testInvalidPolicyForNotDefinedOutputStream(){
+    public void testInvalidPolicyForNotDefinedOutputStream() {
         PolicyDefinition policyDefinition = new PolicyDefinition();
         policyDefinition.setName("test_policy");
         policyDefinition.setInputStreams(Collections.singletonList("INPUT_STREAM_1"));
@@ -163,9 +163,9 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition,new HashMap<String, StreamDefinition>(){
+        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
-                put("INPUT_STREAM_1",createStreamDefinition("INPUT_STREAM_1"));
+                put("INPUT_STREAM_1", createStreamDefinition("INPUT_STREAM_1"));
             }
         });
         Assert.assertFalse(validation.isSuccess());

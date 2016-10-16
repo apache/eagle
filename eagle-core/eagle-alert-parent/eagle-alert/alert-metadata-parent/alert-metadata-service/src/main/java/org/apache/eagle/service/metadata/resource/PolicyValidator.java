@@ -37,7 +37,7 @@ import java.util.Map;
 public class PolicyValidator {
     private static final Logger LOG = LoggerFactory.getLogger(PolicyValidator.class);
 
-    public static PolicyValidation validate(PolicyDefinition policy, Map<String,StreamDefinition> allStreamDefinitions) {
+    public static PolicyValidation validate(PolicyDefinition policy, Map<String, StreamDefinition> allStreamDefinitions) {
         PolicyValidation policyValidation = new PolicyValidation();
         policyValidation.setPolicyDefinition(policy);
 
@@ -48,7 +48,7 @@ public class PolicyValidator {
         try {
             // Validate inputStreams are valid
             Preconditions.checkNotNull(policy.getInputStreams(), "No inputStreams to connect from");
-            Map<String,StreamDefinition> currentDefinitions = new HashMap<>();
+            Map<String, StreamDefinition> currentDefinitions = new HashMap<>();
             for (String streamId : policy.getInputStreams()) {
                 if (allStreamDefinitions.containsKey(streamId)) {
                     currentDefinitions.put(streamId, allStreamDefinitions.get(streamId));
@@ -66,23 +66,23 @@ public class PolicyValidator {
             policyValidation.setValidExecutionPlan(executionPlan);
 
             // Siddhi runtime active stream definitions
-            Map<String,AbstractDefinition> definitionMap = executionRuntime.getStreamDefinitionMap();
+            Map<String, AbstractDefinition> definitionMap = executionRuntime.getStreamDefinitionMap();
 
-            Map<String,StreamDefinition> validInputStreams = new HashMap<>();
-            Map<String,StreamDefinition> validOutputStreams = new HashMap<>();
+            Map<String, StreamDefinition> validInputStreams = new HashMap<>();
+            Map<String, StreamDefinition> validOutputStreams = new HashMap<>();
 
-            for (Map.Entry<String,AbstractDefinition> entry : definitionMap.entrySet()) {
+            for (Map.Entry<String, AbstractDefinition> entry : definitionMap.entrySet()) {
                 if (currentDefinitions.containsKey(entry.getKey())) {
-                    validInputStreams.put(entry.getKey(),currentDefinitions.get(entry.getKey()));
+                    validInputStreams.put(entry.getKey(), currentDefinitions.get(entry.getKey()));
                 } else {
-                    validOutputStreams.put(entry.getKey(),SiddhiDefinitionAdapter.convertFromSiddiDefinition(entry.getValue()));
+                    validOutputStreams.put(entry.getKey(), SiddhiDefinitionAdapter.convertFromSiddiDefinition(entry.getValue()));
                 }
             }
             policyValidation.setValidInputStreams(validInputStreams);
 
             // Validate outputStreams
             policyValidation.setValidOutputStreams(validOutputStreams);
-            if (policy.getOutputStreams()!=null) {
+            if (policy.getOutputStreams() != null) {
                 for (String outputStream : policy.getOutputStreams()) {
                     if (!validOutputStreams.containsKey(outputStream)) {
                         throw new StreamNotDefinedException("Output stream " + outputStream + " not defined");
@@ -97,18 +97,18 @@ public class PolicyValidator {
         } catch (SiddhiParserException parserException) {
             LOG.error("Got error to parse policy execution plan: \n{}", executionPlan, parserException);
             policyValidation.setSuccess(false);
-            policyValidation.setMessage("Parser Error: "+parserException.getMessage());
+            policyValidation.setMessage("Parser Error: " + parserException.getMessage());
             policyValidation.setException(ExceptionUtils.getStackTrace(parserException));
         } catch (Exception exception) {
             LOG.error("Got Error to validate policy definition", exception);
             policyValidation.setSuccess(false);
-            policyValidation.setMessage("Validation Error: "+exception.getMessage());
+            policyValidation.setMessage("Validation Error: " + exception.getMessage());
             policyValidation.setException(ExceptionUtils.getStackTrace(exception));
         } finally {
-            if (executionRuntime!=null) {
+            if (executionRuntime != null) {
                 executionRuntime.shutdown();
             }
-            if (siddhiManager!=null) {
+            if (siddhiManager != null) {
                 siddhiManager.shutdown();
             }
         }
@@ -116,10 +116,10 @@ public class PolicyValidator {
     }
 
     public static PolicyValidation validate(PolicyDefinition policy, IMetadataDao metadataDao) {
-        Map<String,StreamDefinition> allDefinitions = new HashMap<>();
-        for (StreamDefinition definition:metadataDao.listStreams()){
-            allDefinitions.put(definition.getStreamId(),definition);
+        Map<String, StreamDefinition> allDefinitions = new HashMap<>();
+        for (StreamDefinition definition : metadataDao.listStreams()) {
+            allDefinitions.put(definition.getStreamId(), definition);
         }
-        return validate(policy,allDefinitions);
+        return validate(policy, allDefinitions);
     }
 }

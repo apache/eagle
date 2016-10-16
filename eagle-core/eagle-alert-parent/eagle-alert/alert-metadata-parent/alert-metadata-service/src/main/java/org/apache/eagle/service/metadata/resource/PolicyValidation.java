@@ -23,14 +23,14 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Map;
 
-@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class PolicyValidation {
     private boolean success;
     private String message;
     private String exception;
 
-    private Map<String,StreamDefinition> validInputStreams;
-    private Map<String,StreamDefinition> validOutputStreams;
+    private Map<String, StreamDefinition> validInputStreams;
+    private Map<String, StreamDefinition> validOutputStreams;
     private PolicyDefinition policyDefinition;
     private String validExecutionPlan;
 
@@ -58,6 +58,7 @@ public class PolicyValidation {
     public void setException(String exception) {
         this.exception = exception;
     }
+
     public void setException(Exception exception) {
         this.exception = ExceptionUtils.getStackTrace(exception);
     }
