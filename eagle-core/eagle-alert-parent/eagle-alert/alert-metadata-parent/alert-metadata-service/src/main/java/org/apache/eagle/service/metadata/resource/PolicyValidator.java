@@ -16,13 +16,13 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
-import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamNotDefinedException;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiDefinitionAdapter;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
