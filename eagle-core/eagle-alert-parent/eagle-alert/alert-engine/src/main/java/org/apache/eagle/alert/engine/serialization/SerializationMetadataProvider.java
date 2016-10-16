@@ -17,7 +17,7 @@
 package org.apache.eagle.alert.engine.serialization;
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
+import org.apache.eagle.alert.engine.coordinator.StreamNotDefinedException;
 
 /**
  * Integration interface to provide stream definition for serializer.
@@ -27,6 +27,6 @@ public interface SerializationMetadataProvider {
      * @param streamId
      * @return StreamDefinition or null if not exist.
      */
-    StreamDefinition getStreamDefinition(String streamId) throws StreamDefinitionNotFoundException;
+    StreamDefinition getStreamDefinition(String streamId) throws StreamNotDefinedException;
 
 }
