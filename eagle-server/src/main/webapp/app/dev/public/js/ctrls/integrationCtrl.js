@@ -234,6 +234,10 @@
 			application = application.origin;
 			$scope.installLock = false;
 			$scope.application = application;
+
+			var docs = application.docs || {install: "", uninstall: ""};
+			$scope.installHTML = $sce.trustAsHtml(docs.install);
+
 			$scope.tmpApp = {
 				mode: "CLUSTER",
 				jarPath: application.jarPath,

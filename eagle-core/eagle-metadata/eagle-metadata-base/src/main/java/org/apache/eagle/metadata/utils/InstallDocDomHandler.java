@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,33 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.eagle.metadata.model;
+package org.apache.eagle.metadata.utils;
 
-import org.apache.eagle.metadata.utils.InstallDocDomHandler;
-import org.apache.eagle.metadata.utils.UninstallDocDomHandler;
-
-import javax.xml.bind.annotation.XmlAnyElement;
-
-public class ApplicationDocs {
-    private String install;
-
-    private String uninstall;
-
-    public String getInstall() {
-        return install;
-    }
-
-    @XmlAnyElement(value=InstallDocDomHandler.class)
-    public void setInstall(String install) {
-        this.install = install;
-    }
-
-    @XmlAnyElement(value= UninstallDocDomHandler.class)
-    public String getUninstall() {
-        return uninstall;
-    }
-
-    public void setUninstall(String uninstall) {
-        this.uninstall = uninstall;
+public class InstallDocDomHandler extends InnerDomAsTextHandler {
+    public InstallDocDomHandler() {
+        super("install");
     }
 }

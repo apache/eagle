@@ -29,20 +29,11 @@
     <name>eagle-server-assembly</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-        <!--<dependency>-->
-        <!--<groupId>org.slf4j</groupId>-->
-        <!--<artifactId>slf4j-api</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.eagle</groupId>
             <artifactId>eagle-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.apache.eagle</groupId>-->
-        <!--<artifactId>eagle-topology-assembly</artifactId>-->
-        <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>
