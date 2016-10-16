@@ -23,7 +23,6 @@ import org.apache.eagle.alert.engine.evaluator.impl.SiddhiDefinitionAdapter;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
@@ -98,12 +97,12 @@ public class PolicyValidator {
             LOG.error("Got error to parse policy execution plan: \n{}", executionPlan, parserException);
             policyValidation.setSuccess(false);
             policyValidation.setMessage("Parser Error: " + parserException.getMessage());
-            policyValidation.setException(ExceptionUtils.getStackTrace(parserException));
+            policyValidation.setStackTrace(parserException);
         } catch (Exception exception) {
             LOG.error("Got Error to validate policy definition", exception);
             policyValidation.setSuccess(false);
             policyValidation.setMessage("Validation Error: " + exception.getMessage());
-            policyValidation.setException(ExceptionUtils.getStackTrace(exception));
+            policyValidation.setStackTrace(exception);
         } finally {
             if (executionRuntime != null) {
                 executionRuntime.shutdown();

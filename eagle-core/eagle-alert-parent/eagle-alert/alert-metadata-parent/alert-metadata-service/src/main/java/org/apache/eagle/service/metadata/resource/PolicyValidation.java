@@ -59,8 +59,8 @@ public class PolicyValidation {
         this.exception = exception;
     }
 
-    public void setException(Exception exception) {
-        this.exception = ExceptionUtils.getStackTrace(exception);
+    public void setStackTrace(Throwable throwable) {
+        this.exception = ExceptionUtils.getStackTrace(throwable);
     }
 
     public Map<String, StreamDefinition> getValidOutputStreams() {
