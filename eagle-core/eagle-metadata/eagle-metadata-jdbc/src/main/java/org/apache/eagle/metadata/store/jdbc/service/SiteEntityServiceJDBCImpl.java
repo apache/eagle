@@ -158,7 +158,7 @@ public class SiteEntityServiceJDBCImpl implements SiteEntityService {
             queryService.insert(insertSql, entities, new SiteEntityToRelation());
         } catch (SQLException e) {
             LOGGER.error("Error to insert SiteEntity: {}", entity, e);
-            throw new IllegalArgumentException("MayBe Duplicated siteId: " + entity.getSiteId());
+            throw new IllegalArgumentException("Error to insert SiteEntity: " + entity + e);
         }
         return entity;
     }
