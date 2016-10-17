@@ -17,6 +17,7 @@
 package org.apache.eagle.service.metadata.resource;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -30,8 +31,10 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.*;
 
@@ -229,6 +232,46 @@ public class MetadataResource {
         return dao.listPublishment().stream().filter(ps ->
             ps.getPolicyIds() != null && ps.getPolicyIds().contains(policyId)
         ).collect(Collectors.toList());
+    }
+
+    @Path("/policies/{policyId}/publishments")
+    @POST
+    public OpResult addPublishmentsToPolicy(@PathParam("policyId") String policyId, List<String> publishmentIds) {
+        OpResult result = new OpResult();
+        try {
+            getPolicyByID(policyId);
+            Map<String,Publishment> publishmentMap = new HashMap<>();
+            listPublishment().forEach((pub) -> publishmentMap.put(pub.getName(),pub));
+            for (String publishmentId : publishmentIds) {
+                if (publishmentMap.containsKey(publishmentId)) {
+                    Publishment publishment = publishmentMap.get(publishmentId);
+                    if (publishment.getPolicyIds().contains(policyId)) {
+                        LOG.warn("Policy {} was already bound with publisher {}",policyId, publishmentId);
+                    } else {
+                        publishment.getPolicyIds().add(policyId);
+                    }
+                    OpResult opResult = addPublishment(publishment);
+                    if (opResult.code == OpResult.FAILURE) {
+                        LOG.error("Failed to add publisher {} to policy {}: {}", publishmentId, policyId, opResult.message);
+                        return opResult;
+                    } else {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug(opResult.message);
+                        }
+                    }
+                } else {
+                    throw new IllegalArgumentException("Publishsment (name: " + publishmentId + ") not found");
+                }
+            }
+            result.code = OpResult.SUCCESS;
+            result.message = "Successfully add " + publishmentIds.size() + " publishments: [" + StringUtils.join(publishmentIds,",") + "] to policy: " + policyId;
+            LOG.info(result.message);
+        } catch (Exception ex) {
+            result.code = OpResult.FAILURE;
+            result.message = "Failed to add publishments: [" + StringUtils.join(publishmentIds,",") + "] to policy: " + policyId + ", cause: " + ex.getMessage();
+            LOG.error(result.message,ex);
+        }
+        return result;
     }
 
     @Path("/policies/{policyId}")
