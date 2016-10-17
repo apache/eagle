@@ -142,17 +142,25 @@
 		// =                         Installation                         =
 		// ================================================================
 		$scope.tmpApp = {};
-		$scope.tmpAppConfigFields = [];
+		$scope.generalFields = [];
+		$scope.advancedFields = [];
+		$scope.customizeFields = [];
 		$scope.installLock = false;
 
+		// =================== Fields ===================
 		$scope.newField = function () {
 			UI.fieldConfirm({
 				title: "New Field"
 			}, null, [{
 				field: "name",
 				name: "Field Name"
+			}, {
+				field: "value",
+				name: "Field Value",
+				optional: true
 			}])(function (entity, closeFunc, unlock) {
-				if(common.array.find(entity.name, $scope.tmpAppConfigFields, "field")) {
+				var fullList = $scope.generalFields.concat($scope.advancedFields).concat($scope.customizeFields);
+				if(common.array.find(entity.name, fullList, "field")) {
 					$.dialog({
 						title: "OPS",
 						content: "Field already exist!"
@@ -160,11 +168,12 @@
 
 					unlock();
 				} else {
-					$scope.tmpAppConfigFields.push({
+					$scope.customizeFields.push({
 						name: entity.name,
 						_customize: true,
 						required: true
 					});
+					$scope.tmpApp.configuration[entity.name] = entity.value;
 
 					closeFunc();
 				}
@@ -172,22 +181,11 @@
 		};
 
 		$scope.removeField = function (field) {
-			$scope.tmpAppConfigFields = common.array.remove(field, $scope.tmpAppConfigFields);
+			$scope.customizeFields = common.array.remove(field, $scope.customizeFields);
 			delete $scope.tmpApp.configuration[field.name];
 		};
 
-		$scope.checkFields = function () {
-			var pass = true;
-			var config = common.getValueByPath($scope, ["tmpApp", "configuration"], {});
-			$.each($scope.tmpAppConfigFields, function (i, field) {
-				if(field.required && !config[field.name]) {
-					pass = false;
-					return false;
-				}
-			});
-			return pass;
-		};
-
+		// =================== Check ===================
 		$scope.checkJarPath = function () {
 			var jarPath = ($scope.tmpApp || {}).jarPath;
 			if(/\.jar$/.test(jarPath)) {
@@ -197,6 +195,62 @@
 			}
 		};
 
+		$scope.collapseCheck = function () {
+			setTimeout(function() {
+				$scope.$apply();
+			}, 400);
+		};
+
+		$scope.isCollapsed = function (dataId) {
+			return !$("[data-id='" + dataId + "']").hasClass("in");
+		};
+
+		$scope.checkFields = function () {
+			var pass = true;
+			var config = common.getValueByPath($scope, ["tmpApp", "configuration"], {});
+			$.each($scope.generalFields, function (i, field) {
+				if (field.required && !config[field.name]) {
+					pass = false;
+					return false;
+				}
+			});
+			return pass;
+		};
+
+		// =================== Config ===================
+		$scope.getCustomFields = function (configuration) {
+			var fields = common.getValueByPath($scope.application, "configuration.properties", []).concat();
+			return $.map(configuration || {}, function (value, key) {
+				if(!common.array.find(key, fields, ["name"])) {
+					return {
+						name: key,
+						_customize: true,
+						required: true
+					};
+				}
+			});
+		};
+
+		$scope.configByJSON = function () {
+			UI.fieldConfirm({
+				title: "Configuration"
+			}, {
+				json: JSON.stringify($scope.tmpApp.configuration, null, "\t")
+			}, [{
+				field: "json",
+				name: "JSON Configuration",
+				type: "blob"
+			}], function (entity) {
+				var json = common.parseJSON(entity.json, false);
+				if(!json) return 'Require JSON format';
+			})(function (entity, closeFunc) {
+				$scope.tmpApp.configuration = common.parseJSON(entity.json, {});
+				$scope.customizeFields = $scope.getCustomFields($scope.tmpApp.configuration);
+				closeFunc();
+			});
+		};
+
+		// =================== Install ===================
 		$scope.installAppConfirm = function () {
 			$scope.installLock = true;
 
@@ -252,23 +306,31 @@
 				$scope.checkJarPath();
 			}
 
-			var fields = $scope.tmpAppConfigFields = common.getValueByPath(application, "configuration.properties", []).concat();
+			var fields = common.getValueByPath(application, "configuration.properties", []).concat();
+			$scope.generalFields = [];
+			$scope.advancedFields = [];
+			$scope.customizeFields = [];
+
+			$("[data-id='appEnvironment']").attr("class","collapse in").removeAttr("style");
+			$("[data-id='appGeneral']").attr("class","collapse in").removeAttr("style");
+			$("[data-id='appAdvanced']").attr("class","collapse").removeAttr("style");
+			$("[data-id='appCustomize']").attr("class","collapse in").removeAttr("style");
 
 			$.each(fields, function (i, field) {
+				// Fill default value
 				$scope.tmpApp.configuration[field.name] = field.value;
+
+				// Reassign the fields
+				if(field.required) {
+					$scope.generalFields.push(field);
+				} else {
+					$scope.advancedFields.push(field);
+				}
 			});
 
 			// Fill miss field of entity
 			common.merge($scope.tmpApp, entity);
-			$.each(entity.configuration || {}, function (key) {
-				if(!common.array.find(key, fields, ["name"])) {
-					fields.push({
-						name: key,
-						_customize: true,
-						required: true
-					});
-				}
-			});
+			$scope.customizeFields = $scope.getCustomFields(entity.configuration);
 
 			// Dependencies check
 			var missDep = false;
