@@ -41,7 +41,12 @@ public class BasicAuthProviderBuilder {
 
     public BasicAuthProvider build() {
         if (authSettings.isEnabled()) {
-            return MAPPING.get(authSettings.getMode());
+            String mode = authSettings.getMode();
+            if (MAPPING.containsKey(mode)) {
+                return MAPPING.get(mode);
+            } else {
+                throw new RuntimeException(String.format("No matching mode found: %s", mode));
+            }
         } else {
             return new BasicAuthProvider<User>(null, "") {
                 public Injectable<?> getInjectable(ComponentContext ic, Auth a, Parameter c) {
