@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.antlr.runtime.RecognitionException;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.ParseException;
 import org.junit.Assert;
@@ -67,7 +68,7 @@ public class TestParser {
     }
   }
 
-  public void printQueryAST(String query) throws ParseException {
+  public void printQueryAST(String query) throws RecognitionException {
     ASTNode root = parser.generateAST(query);
     printTree(root, 0);
   }
