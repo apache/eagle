@@ -25,6 +25,7 @@ import org.apache.eagle.app.module.ApplicationGuiceModule;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.service.impl.ApplicationProviderServiceImpl;
 import org.apache.eagle.common.module.CommonGuiceModule;
+import org.apache.eagle.metadata.store.jdbc.JDBCMetadataStore;
 import org.junit.After;
 import org.junit.Before;
 
@@ -39,8 +40,7 @@ public class JDBCMetadataTestBase {
 
     @Before
     public void setUp(){
-        ApplicationProviderService instance = new ApplicationProviderServiceImpl(ConfigFactory.load());
-        injector = Guice.createInjector(new JDBCMetadataStore(),new ApplicationGuiceModule(instance),new CommonGuiceModule());
+        injector = Guice.createInjector(new JDBCMetadataStore(),new ApplicationGuiceModule(),new CommonGuiceModule());
         injector.injectMembers(this);
     }
 

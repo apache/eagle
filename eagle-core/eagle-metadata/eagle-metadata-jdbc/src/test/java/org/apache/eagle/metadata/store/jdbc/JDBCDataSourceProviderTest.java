@@ -26,7 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class JDBCDataSourceProviderTest extends JDBCMetadataTestBase{
+public class JDBCDataSourceProviderTest extends JDBCMetadataTestBase {
     @Inject
     private DataSource dataSource;
     @Inject

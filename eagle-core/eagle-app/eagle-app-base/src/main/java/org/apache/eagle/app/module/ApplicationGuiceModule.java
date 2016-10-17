@@ -16,9 +16,11 @@
  */
 package org.apache.eagle.app.module;
 
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.app.service.ApplicationManagementService;
 import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.app.service.impl.ApplicationManagementServiceImpl;
+import org.apache.eagle.app.service.impl.ApplicationProviderServiceImpl;
 import org.apache.eagle.app.service.impl.ApplicationStatusUpdateServiceImpl;
 import org.apache.eagle.metadata.service.ApplicationDescService;
 import com.google.inject.AbstractModule;
@@ -27,10 +29,14 @@ import com.google.inject.util.Providers;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 
 public class ApplicationGuiceModule extends AbstractModule {
-    private ApplicationProviderService appProviderInst;
+    private final ApplicationProviderService appProviderInst;
 
     public ApplicationGuiceModule(ApplicationProviderService appProviderInst) {
         this.appProviderInst = appProviderInst;
+    }
+
+    public ApplicationGuiceModule() {
+        this.appProviderInst = new ApplicationProviderServiceImpl(ConfigFactory.load());
     }
 
     @Override

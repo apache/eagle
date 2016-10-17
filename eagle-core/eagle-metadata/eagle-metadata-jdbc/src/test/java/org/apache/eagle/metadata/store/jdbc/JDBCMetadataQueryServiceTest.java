@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import java.sql.SQLException;
 import java.util.List;
 
-public class JDBCMetadataQueryServiceTest extends JDBCMetadataTestBase{
+public class JDBCMetadataQueryServiceTest extends JDBCMetadataTestBase {
     @Inject
     JDBCMetadataQueryService queryService;
 

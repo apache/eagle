@@ -19,6 +19,7 @@
 
 package org.apache.eagle.security.service;
 
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,7 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
     private final String OOZIE_INSERT_STATEMENT = "INSERT INTO oozie_sensitivity_entity (site, filedir, sensitivity_type) VALUES (?, ?, ?)";
 
     // get connection url from config
+    @Inject
     public JDBCSecurityMetadataDAO(Config config){
         this.config = config;
     }
@@ -259,9 +261,13 @@ public class JDBCSecurityMetadataDAO implements ISecurityMetadataDAO  {
     private Connection getJdbcConnection() throws Exception {
         Connection connection;
         try {
-            connection = DriverManager.getConnection(config.getString("metadata.jdbc.url"),
-                    config.getString("metadata.jdbc.username"),
-                    config.getString("metadata.jdbc.password"));
+            if (config.hasPath("metadata.jdbc.username")) {
+                connection = DriverManager.getConnection(config.getString("metadata.jdbc.url"),
+                        config.getString("metadata.jdbc.username"),
+                        config.getString("metadata.jdbc.password"));
+            } else {
+                connection = DriverManager.getConnection(config.getString("metadata.jdbc.url"));
+            }
         } catch (Exception e) {
             LOG.error("error get connection for {}", config.getString("metadata.jdbc.url"), e);
             throw e;
