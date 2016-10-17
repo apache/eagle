@@ -197,7 +197,7 @@
 
 		$scope.collapseCheck = function () {
 			setTimeout(function() {
-				$scope.$apply()
+				$scope.$apply();
 			}, 400);
 		};
 
