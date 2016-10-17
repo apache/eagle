@@ -126,7 +126,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
 
     @Override
     public ApplicationEntity update(ApplicationEntity entity) {
-        String updateSql = "update applicationentity set ";
+        String updateSql = "update applications set ";
         if (entity.getSite() != null && StringUtils.isNotBlank(entity.getSite().getSiteId())) {
             updateSql += "siteid = ?, ";
         }
