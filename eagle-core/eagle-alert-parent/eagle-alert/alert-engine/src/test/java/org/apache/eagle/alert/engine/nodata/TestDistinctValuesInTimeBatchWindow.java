@@ -21,6 +21,7 @@ import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyTimeBatchHandl
 import org.apache.eagle.alert.engine.model.StreamEvent;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.mockito.Matchers.anyObject;
@@ -41,7 +42,7 @@ public class TestDistinctValuesInTimeBatchWindow {
     public void teardown() {
     }
 
-    @Test
+    @Test @Ignore
     public void testNormal() throws Exception {
         // wisb is null since it is dynamic mode
         DistinctValuesInTimeBatchWindow window = new DistinctValuesInTimeBatchWindow(handler, 5 * 1000, null);

@@ -16,27 +16,21 @@
   limitations under the License.
   -->
 
-<div class="row">
-	<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="site in Site.list track by $index">
-		<div class="small-box bg-aqua">
-			<div class="inner">
-				<h3>{{site.siteName || site.siteId}}</h3>
+<div class="row flex">
+	<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="widget in Widget.list track by $index">
+		<div widget="widget"></div>
+	</div>
 
-				<p>{{site.applicationList.length}} Applications</p>
+	<div class="col-sm-6 col-md-4 col-lg-3" ng-if="Widget.list.length === 0">
+		<div class="small-box bg-gray">
+			<div class="inner">
+				<h3>No Widget</h3>
+
+				<p>No widget provided by Application</p>
 			</div>
 			<div class="icon">
-				<i class="fa fa-certificate"></i>
+				<i class="fa fa-info-circle"></i>
 			</div>
-			<a ui-sref="site({siteId: site.siteId})" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-		</div>
-	</div>
-</div>
-
-<div ng-if="Widget.list.length">
-	<h3>Widgets</h3>
-	<div class="row flex">
-		<div class="col-sm-6 col-md-4 col-lg-3" ng-repeat="widget in Widget.list track by $index">
-			<div widget="widget"></div>
 		</div>
 	</div>
 </div>

@@ -21,6 +21,7 @@ import org.apache.eagle.common.function.ThrowableConsumer2;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -47,6 +48,10 @@ public class ApplicationEntityToRelation implements ThrowableConsumer2<PreparedS
         }
         if (entity.getStatus() != null && StringUtils.isNotBlank(entity.getStatus().name())) {
             statement.setString(parameterIndex, entity.getStatus().name());
+            parameterIndex++;
+        }
+        if (entity.getConfiguration() != null && !entity.getConfiguration().isEmpty()) {
+            statement.setString(parameterIndex, JSONObject.toJSONString(entity.getConfiguration()));
             parameterIndex++;
         }
         if (entity.getCreatedTime() > 0) {

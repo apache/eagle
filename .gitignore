@@ -83,5 +83,4 @@ logs/
 *.orig
 **/*.pyc
 
-site/
 **/*.db

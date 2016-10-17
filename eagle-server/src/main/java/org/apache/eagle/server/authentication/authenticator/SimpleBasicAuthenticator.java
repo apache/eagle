@@ -18,18 +18,18 @@ package org.apache.eagle.server.authentication.authenticator;
 
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
+import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import org.apache.eagle.common.authentication.User;
-import org.apache.eagle.server.authentication.config.AuthenticationSettings;
+import org.apache.eagle.server.authentication.config.SimpleSettings;
 
-public class SimpleBasicAuthenticator extends AbstractSwitchableAuthenticator<BasicCredentials, User> {
+public class SimpleBasicAuthenticator implements Authenticator<BasicCredentials, User> {
     private String acceptedUsername = null;
     private String acceptedPassword = null;
 
-    public SimpleBasicAuthenticator(AuthenticationSettings settings) {
-        super(settings, User.class);
-        acceptedUsername = settings.getSimple().getUsername();
-        acceptedPassword = settings.getSimple().getPassword();
+    public SimpleBasicAuthenticator(SimpleSettings settings) {
+        acceptedUsername = settings.getUsername();
+        acceptedPassword = settings.getPassword();
     }
 
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {

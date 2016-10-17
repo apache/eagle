@@ -21,12 +21,20 @@ import org.apache.eagle.common.function.ThrowableFunction;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
+import org.apache.eagle.metadata.store.jdbc.service.ApplicationEntityServiceJDBCImpl;
+import org.codehaus.jettison.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class RelationToApplicationEntity implements ThrowableFunction<ResultSet, ApplicationEntity, SQLException> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RelationToApplicationEntity.class);
     @Override
     public ApplicationEntity apply(ResultSet resultSet) throws SQLException {
 
@@ -35,12 +43,12 @@ public class RelationToApplicationEntity implements ThrowableFunction<ResultSet,
         applicationDesc.setType(appType);
 
         SiteEntity siteEntity = new SiteEntity();
-        siteEntity.setUuid(resultSet.getString(10));
-        siteEntity.setSiteId(resultSet.getString(11));
-        siteEntity.setSiteName(resultSet.getString(12));
-        siteEntity.setDescription(resultSet.getString(13));
-        siteEntity.setCreatedTime(resultSet.getLong(14));
-        siteEntity.setModifiedTime(resultSet.getLong(15));
+        siteEntity.setUuid(resultSet.getString(11));
+        siteEntity.setSiteId(resultSet.getString(12));
+        siteEntity.setSiteName(resultSet.getString(13));
+        siteEntity.setDescription(resultSet.getString(14));
+        siteEntity.setCreatedTime(resultSet.getLong(15));
+        siteEntity.setModifiedTime(resultSet.getLong(16));
 
 
         ApplicationEntity resultEntity = new ApplicationEntity();
@@ -51,8 +59,20 @@ public class RelationToApplicationEntity implements ThrowableFunction<ResultSet,
         resultEntity.setMode(ApplicationEntity.Mode.valueOf(resultSet.getString(5)));
         resultEntity.setJarPath(resultSet.getString(6));
         resultEntity.setStatus(ApplicationEntity.Status.valueOf(resultSet.getString(7)));
-        resultEntity.setCreatedTime(resultSet.getLong(8));
-        resultEntity.setModifiedTime(resultSet.getLong(9));
+        try {
+            JSONObject jsonObject = new JSONObject(resultSet.getString(8));
+            Map<String, Object> items = new java.util.HashMap<>();
+            Iterator<String> keyItemItr = jsonObject.keys();
+            while (keyItemItr.hasNext()) {
+                String itemKey = keyItemItr.next();
+                items.put(itemKey, jsonObject.get(itemKey));
+            }
+            resultEntity.setConfiguration(items);
+        } catch (Exception e) {
+            LOG.warn("{}", e);
+        }
+        resultEntity.setCreatedTime(resultSet.getLong(9));
+        resultEntity.setModifiedTime(resultSet.getLong(10));
 
         return resultEntity;
     }

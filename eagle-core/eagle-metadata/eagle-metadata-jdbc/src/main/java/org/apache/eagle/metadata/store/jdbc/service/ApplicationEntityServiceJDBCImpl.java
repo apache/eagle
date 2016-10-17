@@ -18,6 +18,8 @@
 package org.apache.eagle.metadata.store.jdbc.service;
 
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.service.ApplicationEntityService;
 import org.apache.eagle.metadata.store.jdbc.JDBCMetadataQueryService;
@@ -25,6 +27,7 @@ import org.apache.eagle.metadata.store.jdbc.service.orm.ApplicationEntityToRelat
 import org.apache.eagle.metadata.store.jdbc.service.orm.RelationToApplicationEntity;
 
 import com.google.inject.Singleton;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +43,18 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationEntityServiceJDBCImpl.class);
 
-    private static final String insertSql = "INSERT INTO applicationentity (siteid, apptype, appmode, jarpath, appstatus, createdtime, modifiedtime, uuid, appid ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String selectSql = "SELECT * FROM applicationentity a INNER JOIN siteentity s on  a.siteid = s.siteid";
-    private static final String selectSqlBySiteIdAndAppType = "SELECT * FROM applicationentity  a INNER JOIN siteentity s on  a.siteid = s.siteid where a.siteid = ? and a.apptype = ?";
-    private static final String selectSqlBySiteId = "SELECT * FROM applicationentity  a INNER JOIN siteentity s on  a.siteid = s.siteid where a.siteid = ?";
-    private static final String selectSqlByUUId = "SELECT * FROM applicationentity  a INNER JOIN siteentity s on  a.siteid = s.siteid where a.uuid = ?";
-    private static final String selectSqlByAppId = "SELECT * FROM applicationentity  a INNER JOIN siteentity s on  a.siteid = s.siteid where a.appid = ?";
-    private static final String deleteSqlByUUID = "DELETE FROM applicationentity where uuid = ?";
+    private static final String insertSql = "INSERT INTO applications (siteid, apptype, appmode, jarpath, appstatus, configuration, createdtime, modifiedtime, uuid, appid ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String selectSql = "SELECT * FROM applications a INNER JOIN sites s on  a.siteid = s.siteid";
+    private static final String selectSqlBySiteIdAndAppType = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.siteid = ? and a.apptype = ?";
+    private static final String selectSqlBySiteId = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.siteid = ?";
+    private static final String selectSqlByUUId = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.uuid = ?";
+    private static final String selectSqlByAppId = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.appid = ?";
+    private static final String deleteSqlByUUID = "DELETE FROM applications where uuid = ?";
 
     @Inject
     JDBCMetadataQueryService queryService;
+    @Inject
+    ApplicationProviderService applicationProviderService;
 
     @Override
     public Collection<ApplicationEntity> findBySiteId(String siteId) {
@@ -61,6 +66,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
             LOGGER.error("Error to getBySiteIdAndAppType ApplicationEntity: {}", e);
             return results;
         }
+        fillApplicationDesc(results);
         return results;
     }
 
@@ -80,6 +86,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
             return null;
         }
 
+        fillApplicationDesc(results);
         return results.get(0);
     }
 
@@ -101,6 +108,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
         if (results.isEmpty()) {
             throw new IllegalArgumentException("Application with appId: " + appId + " not found");
         }
+        fillApplicationDesc(results);
         return results.get(0);
     }
 
@@ -116,12 +124,49 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
         return entity;
     }
 
-    /**
-     * TODO: UPDATE ApplicationEntity through JDBC is not supported yet
-     */
     @Override
     public ApplicationEntity update(ApplicationEntity entity) {
-        throw new UnsupportedOperationException("UPDATE ApplicationEntity through JDBC is not supported yet");
+        String updateSql = "update applications set ";
+        if (entity.getSite() != null && StringUtils.isNotBlank(entity.getSite().getSiteId())) {
+            updateSql += "siteid = ?, ";
+        }
+        if (entity.getDescriptor() != null && StringUtils.isNotBlank(entity.getDescriptor().getType())) {
+            updateSql += "apptype = ?, ";
+        }
+        if (entity.getMode() != null && StringUtils.isNotBlank(entity.getMode().name())) {
+            updateSql += "appmode = ?, ";
+        }
+        if (StringUtils.isNotBlank(entity.getJarPath())) {
+            updateSql += "jarpath = ?, ";
+        }
+        if (entity.getStatus() != null && StringUtils.isNotBlank(entity.getStatus().name())) {
+            updateSql += "appstatus = ?, ";
+        }
+        if (entity.getConfiguration() != null && !entity.getConfiguration().isEmpty()) {
+            updateSql += "configuration = ?, ";
+        }
+        if (entity.getCreatedTime() > 0) {
+            updateSql += "createdtime = ?, ";
+        }
+        if (entity.getModifiedTime() > 0) {
+            updateSql += "modifiedtime = ?, ";
+        }
+        updateSql = updateSql.substring(0, updateSql.length() - 2);
+        if (StringUtils.isNotBlank(entity.getUuid())) {
+            updateSql += " where uuid = ?";
+        }
+        if (StringUtils.isNotBlank(entity.getAppId())) {
+            updateSql += " and appid = ?";
+        }
+
+        try {
+            if (queryService.update(updateSql, entity, new ApplicationEntityToRelation()) == 0) {
+                LOGGER.warn("failed to execute {}", updateSql);
+            }
+        } catch (SQLException e) {
+            LOGGER.warn("failed to execute {}, {}", updateSql, e);
+        }
+        return getByUUID(entity.getUuid());
     }
 
     @Override
@@ -132,7 +177,14 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
         } catch (SQLException e) {
             LOGGER.error("Error to findAll ApplicationEntity: {}", e);
         }
+        fillApplicationDesc(results);
         return results;
+    }
+
+    private void fillApplicationDesc(List<ApplicationEntity> entities) {
+        for (ApplicationEntity entity : entities) {
+            entity.setDescriptor(applicationProviderService.getApplicationDescByType(entity.getDescriptor().getType()));
+        }
     }
 
     @Override
@@ -147,6 +199,7 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
         if (results.isEmpty()) {
             throw new IllegalArgumentException("Application (UUID: " + uuid + ") is not found");
         }
+        fillApplicationDesc(results);
         return results.get(0);
     }
 

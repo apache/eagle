@@ -128,8 +128,26 @@
     </configuration>
     <docs>
         <install>
+            <div>
+                <label>Perquisites</label>
+                <ol>
+                    <li>Require permission to READ/WRITE/CREATE on kafka topic</li>
+                </ol>
+                <label>Usage Steps</label>
+                <ol>
+                    <li>Configure kafka connection in <b>settings</b></li>
+                    <li>Install and start alert engine</li>
+                    <li>Integrate streams and define policy</li>
+                </ol>
+            </div>
         </install>
         <uninstall>
+            <div>
+                <label>After uninstalled</label>
+                <ol>
+                    <li>Clean up kafka topics automatically created by alert engine</li>
+                </ol>
+            </div>
         </uninstall>
     </docs>
 </application>

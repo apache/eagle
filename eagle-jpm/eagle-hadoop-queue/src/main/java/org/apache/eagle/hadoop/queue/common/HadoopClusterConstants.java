@@ -44,6 +44,7 @@ public class HadoopClusterConstants {
         public static final String HADOOP_CLUSTER_TOTAL_MEMORY = "hadoop.cluster.totalmemory";
         public static final String HADOOP_CLUSTER_AVAILABLE_MEMORY = "hadoop.cluster.availablememory";
         public static final String HADOOP_CLUSTER_RESERVED_MEMORY = "hadoop.cluster.reservedmemory";
+        public static final String HADOOP_CLUSTER_TOTAL_VIRTUAL_CORES = "hadoop.cluster.totalvirtualcores";
 
         // metrics from scheduler info
         public static final String HADOOP_CLUSTER_CAPACITY = "hadoop.cluster.capacity";

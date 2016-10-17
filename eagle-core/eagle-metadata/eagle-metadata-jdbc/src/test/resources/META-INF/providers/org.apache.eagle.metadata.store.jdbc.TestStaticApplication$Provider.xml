@@ -17,22 +17,15 @@
   -->
 
 <application>
-    <type>TEST_WEB_APPLICATION</type>
-    <name>Test Monitoring Web Application</name>
+    <type>TEST_APP</type>
+    <name>Test app</name>
     <version>0.5.0-incubating</version>
-    <viewPath>/apps/test_web_app</viewPath>
-    <dependencies>
-        <dependency>
-            <type>TEST_APPLICATION</type>
-            <version>0.5.0-incubating</version>
-        </dependency>
-    </dependencies>
-    <docs>
-        <install>
-            <h1>Installation Guide</h1>
-        </install>
-        <uninstall>
-            <h1>Un-installation Guide</h1>
-        </uninstall>
-    </docs>
+    <configuration>
+        <!-- org.apache.eagle.jpm.mr.history.MRHistoryJobConfig -->
+        <property>
+            <name>jobExtractorConfig.site</name>
+            <displayName>Site ID</displayName>
+            <value>sandbox</value>
+        </property>
+    </configuration>
 </application>

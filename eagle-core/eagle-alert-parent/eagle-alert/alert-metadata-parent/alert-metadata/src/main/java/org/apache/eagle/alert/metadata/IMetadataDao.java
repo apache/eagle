@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.metadata;
 
+import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.coordination.model.Kafka2TupleMetadata;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
 import org.apache.eagle.alert.coordination.model.internal.PolicyAssignment;
@@ -23,9 +24,13 @@ import org.apache.eagle.alert.coordination.model.internal.Topology;
 import org.apache.eagle.alert.engine.coordinator.*;
 import org.apache.eagle.alert.metadata.resource.Models;
 import org.apache.eagle.alert.metadata.resource.OpResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface IMetadataDao extends Closeable {
 
@@ -63,6 +68,7 @@ public interface IMetadataDao extends Closeable {
 
     OpResult addPublishment(Publishment publishment);
 
+
     OpResult removePublishment(String pubId);
 
     List<PublishmentType> listPublishmentType();
@@ -88,4 +94,17 @@ public interface IMetadataDao extends Closeable {
 
     OpResult importModels(Models models);
 
+    // -----------------------------------------------------------
+    //  Extended Metadata DAO Methods with default implementation
+    // -----------------------------------------------------------
+
+    Logger LOG = LoggerFactory.getLogger(IMetadataDao.class);
+
+    default PolicyDefinition getPolicyByID(String policyId) {
+        Preconditions.checkNotNull(policyId,"policyId");
+        return listPolicies().stream().filter(pc -> pc.getName().equals(policyId)).findAny().orElseGet(() -> {
+            LOG.error("Policy (policyId " + policyId + ") not found");
+            throw new IllegalArgumentException("Policy (policyId " + policyId + ") not found");
+        });
+    }
 }
