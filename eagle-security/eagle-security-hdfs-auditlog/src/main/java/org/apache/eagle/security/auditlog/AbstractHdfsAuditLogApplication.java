@@ -59,11 +59,11 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         int numOfIPZoneJoinTasks = config.getInt(IPZONE_JOIN_TASK_NUM);
         int numOfSinkTasks = config.getInt(SINK_TASK_NUM);
 
-        builder.setSpout("ingest", spout, numOfSpoutTasks);
+        builder.setSpout("ingest", spout, numOfSpoutTasks).setNumTasks(numOfSpoutTasks);
 
 
         BaseRichBolt parserBolt = getParserBolt();
-        BoltDeclarer boltDeclarer = builder.setBolt("parserBolt", parserBolt, numOfParserTasks);
+        BoltDeclarer boltDeclarer = builder.setBolt("parserBolt", parserBolt, numOfParserTasks).setNumTasks(numOfParserTasks);
 
         Boolean useDefaultPartition = !config.hasPath("eagleProps.useDefaultPartition") || config.getBoolean("eagleProps.useDefaultPartition");
         if(useDefaultPartition){
@@ -73,15 +73,15 @@ public abstract class AbstractHdfsAuditLogApplication extends StormApplication {
         }
 
         HdfsSensitivityDataEnrichBolt sensitivityDataJoinBolt = new HdfsSensitivityDataEnrichBolt(config);
-        BoltDeclarer sensitivityDataJoinBoltDeclarer = builder.setBolt("sensitivityJoin", sensitivityDataJoinBolt, numOfSensitivityJoinTasks);
+        BoltDeclarer sensitivityDataJoinBoltDeclarer = builder.setBolt("sensitivityJoin", sensitivityDataJoinBolt, numOfSensitivityJoinTasks).setNumTasks(numOfSensitivityJoinTasks);
         sensitivityDataJoinBoltDeclarer.fieldsGrouping("parserBolt", new Fields("f1"));
 
         IPZoneDataEnrichBolt ipZoneDataJoinBolt = new IPZoneDataEnrichBolt(config);
-        BoltDeclarer ipZoneDataJoinBoltDeclarer = builder.setBolt("ipZoneJoin", ipZoneDataJoinBolt, numOfIPZoneJoinTasks);
+        BoltDeclarer ipZoneDataJoinBoltDeclarer = builder.setBolt("ipZoneJoin", ipZoneDataJoinBolt, numOfIPZoneJoinTasks).setNumTasks(numOfIPZoneJoinTasks);
         ipZoneDataJoinBoltDeclarer.fieldsGrouping("sensitivityJoin", new Fields("user"));
 
         StormStreamSink sinkBolt = environment.getStreamSink("hdfs_audit_log_stream",config);
-        BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", sinkBolt, numOfSinkTasks);
+        BoltDeclarer kafkaBoltDeclarer = builder.setBolt("kafkaSink", sinkBolt, numOfSinkTasks).setNumTasks(numOfSinkTasks);
         kafkaBoltDeclarer.fieldsGrouping("ipZoneJoin", new Fields("user"));
         return builder.createTopology();
 
