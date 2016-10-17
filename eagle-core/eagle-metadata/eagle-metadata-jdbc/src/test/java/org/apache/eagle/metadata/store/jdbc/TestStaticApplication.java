@@ -17,9 +17,15 @@
 package org.apache.eagle.metadata.store.jdbc;
 
 import org.apache.eagle.app.StaticApplicationProvider;
+import org.junit.Test;
 
 public class TestStaticApplication {
     public static class Provider extends StaticApplicationProvider {
+
+    }
+
+    @Test
+    public void f() {
 
     }
 }
