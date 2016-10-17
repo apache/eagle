@@ -16,7 +16,7 @@
 --  *
 --  */
 
-CREATE TABLE IF NOT EXISTS applicationentity (
+CREATE TABLE IF NOT EXISTS applications (
   uuid varchar(50) PRIMARY KEY,
   appid varchar(100) DEFAULT NULL,
   siteid varchar(100) DEFAULT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS applicationentity (
   modifiedtime  bigint(20) DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS siteentity (
+CREATE TABLE IF NOT EXISTS sites (
   uuid varchar(50) PRIMARY KEY,
   siteid varchar(100) DEFAULT NULL,
   sitename varchar(100) DEFAULT NULL,

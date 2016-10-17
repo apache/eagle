@@ -43,13 +43,13 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationEntityServiceJDBCImpl.class);
 
-    private static final String insertSql = "INSERT INTO applicationentity (siteid, apptype, appmode, jarpath, appstatus, configuration, createdtime, modifiedtime, uuid, appid ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String selectSql = "SELECT * FROM applicationentity a INNER JOIN siteentity s on  a.siteid = s.siteid";
-    private static final String selectSqlBySiteIdAndAppType = "SELECT * FROM applicationentity  a INNER JOIN siteentity s on  a.siteid = s.siteid where a.siteid = ? and a.apptype = ?";
-    private static final String selectSqlBySiteId = "SELECT * FROM applicationentity  a INNER JOIN siteentity s on  a.siteid = s.siteid where a.siteid = ?";
-    private static final String selectSqlByUUId = "SELECT * FROM applicationentity  a INNER JOIN siteentity s on  a.siteid = s.siteid where a.uuid = ?";
-    private static final String selectSqlByAppId = "SELECT * FROM applicationentity  a INNER JOIN siteentity s on  a.siteid = s.siteid where a.appid = ?";
-    private static final String deleteSqlByUUID = "DELETE FROM applicationentity where uuid = ?";
+    private static final String insertSql = "INSERT INTO applications (siteid, apptype, appmode, jarpath, appstatus, configuration, createdtime, modifiedtime, uuid, appid ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String selectSql = "SELECT * FROM applications a INNER JOIN sites s on  a.siteid = s.siteid";
+    private static final String selectSqlBySiteIdAndAppType = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.siteid = ? and a.apptype = ?";
+    private static final String selectSqlBySiteId = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.siteid = ?";
+    private static final String selectSqlByUUId = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.uuid = ?";
+    private static final String selectSqlByAppId = "SELECT * FROM applications  a INNER JOIN sites s on  a.siteid = s.siteid where a.appid = ?";
+    private static final String deleteSqlByUUID = "DELETE FROM applications where uuid = ?";
 
     @Inject
     JDBCMetadataQueryService queryService;

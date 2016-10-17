@@ -39,13 +39,13 @@ import javax.inject.Inject;
 public class SiteEntityServiceJDBCImpl implements SiteEntityService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SiteEntityServiceJDBCImpl.class);
-    private static final String insertSql = "INSERT INTO siteentity (siteid, sitename, description, createdtime, modifiedtime, uuid) VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String selectSql = "SELECT * FROM siteentity";
-    private static final String selectSqlByUUID = "SELECT * FROM siteentity where uuid = ?";
-    private static final String selectSqlBySiteId = "SELECT * FROM siteentity where siteid = ?";
-    private static final String deleteSqlByUUID = "DELETE FROM siteentity where uuid = ?";
-    private static final String deleteSqlBySiteId = "DELETE FROM siteentity where siteid = ?";
-    private static final String updateSqlByUUID = "UPDATE siteentity SET siteid = ? , sitename = ? , description = ? , createdtime = ? , modifiedtime = ?  where uuid = ?";
+    private static final String insertSql = "INSERT INTO sites (siteid, sitename, description, createdtime, modifiedtime, uuid) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String selectSql = "SELECT * FROM sites";
+    private static final String selectSqlByUUID = "SELECT * FROM sites where uuid = ?";
+    private static final String selectSqlBySiteId = "SELECT * FROM sites where siteid = ?";
+    private static final String deleteSqlByUUID = "DELETE FROM sites where uuid = ?";
+    private static final String deleteSqlBySiteId = "DELETE FROM sites where siteid = ?";
+    private static final String updateSqlByUUID = "UPDATE sites SET siteid = ? , sitename = ? , description = ? , createdtime = ? , modifiedtime = ?  where uuid = ?";
     @Inject
     JDBCMetadataQueryService queryService;
 
