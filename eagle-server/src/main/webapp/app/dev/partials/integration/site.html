@@ -21,7 +21,7 @@
 
 	<div class="form-group">
 		<label>Site</label>
-		<input type="text" class="form-control" readonly ng-model="site.siteName">
+		<input type="text" class="form-control" readonly ng-model="siteName">
 	</div>
 	<div class="form-group">
 		<label>Description</label>
@@ -48,7 +48,7 @@
 				<th>Version</th>
 				<th>Description</th>
 				<!--th>Quick Links</th-->
-				<th width="150">Actions</th>
+				<th width="110">Actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -84,7 +84,7 @@
 						</button>
 					</div>
 					<div class="btn-group btn-group-xs" ng-if="!app.installed">
-						<button class="btn btn-primary btn-sm" ng-click="installApp(app)">Install</button>
+						<button class="btn btn-primary btn-sm" ng-click="installApp(app)">Install Application</button>
 					</div>
 				</td>
 			</tr>
@@ -207,8 +207,7 @@
 			<div class="modal-body">
 				<ul class="nav nav-tabs">
 					<li><a href="[data-id='guide']" data-toggle="tab" data-id="guideTab">Installation</a></li>
-					<li><a href="[data-id='environment']" data-toggle="tab">Environment</a></li>
-					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Configuration</a></li>
+					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Setting</a></li>
 				</ul>
 
 				<div class="tab-content">
@@ -230,31 +229,85 @@
 						</div>
 					</div>
 
-					<div class="tab-pane" data-id="environment">
-						<div class="form-group">
-							<label>Mode</label>
-							<select class="form-control" ng-model="tmpApp.mode">
-								<option>CLUSTER</option>
-								<option>LOCAL</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label>jar Path</label>
-							<input type="text" class="form-control" ng-model="tmpApp.jarPath" ng-change="checkJarPath()" />
-						</div>
-					</div>
-
 					<div class="tab-pane" data-id="configuration">
-						<div class="form-group" ng-class="{'has-warning': field.required && !tmpApp.configuration[field.name]}" ng-repeat="field in tmpAppConfigFields track by $index">
-							<label>
-								<a class="fa fa-times" ng-click="removeField(field)" ng-if="field._customize"></a>
-								{{field.displayName || field.name}}
-								<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="{{field.description}}"></span>
-								<small ng-if="!field.required" class="text-muted">[optional]</small>
-							</label>
-							<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
+						<!-- Environment -->
+						<h3>
+							<a class="text-primary" data-toggle="collapse" href="[data-id='appEnvironment']" ng-click="collapseCheck()">
+								<span class="fa {{isCollapsed('appEnvironment') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-down'}}"></span>
+								Environment
+							</a>
+						</h3>
+						<div data-id="appEnvironment" class="collapse in">
+							<div class="form-group">
+								<label>Mode</label>
+								<select class="form-control" ng-model="tmpApp.mode">
+									<option>CLUSTER</option>
+									<option>LOCAL</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label>jar Path</label>
+								<input type="text" class="form-control" ng-model="tmpApp.jarPath" ng-change="checkJarPath()" />
+							</div>
 						</div>
-						<a ng-click="newField()">+ New Field</a>
+
+						<hr/>
+
+						<!-- General -->
+						<a class="pull-right" ng-click="configByJSON()">Config By JSON</a>
+						<h3>
+							<a class="text-primary" data-toggle="collapse" href="[data-id='appGeneral']" ng-click="collapseCheck()">
+								<span class="fa {{isCollapsed('appGeneral') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-down'}}"></span>
+								General
+							</a>
+						</h3>
+						<div data-id="appGeneral" class="collapse in">
+							<span class="text-muted" ng-if="generalFields.length === 0">N/A</span>
+							<div class="form-group" ng-class="{'has-warning': !tmpApp.configuration[field.name]}" ng-repeat="field in generalFields track by $index">
+								<label>
+									{{field.displayName || field.name}}
+									<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="[ {{field.name}} ] {{field.description}}"></span>
+								</label>
+								<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
+							</div>
+						</div>
+
+						<!-- Advanced -->
+						<h3>
+							<a class="text-primary" data-toggle="collapse" href="[data-id='appAdvanced']" ng-click="collapseCheck()">
+								<span class="fa {{isCollapsed('appAdvanced') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-down'}}"></span>
+								Advanced
+							</a>
+						</h3>
+						<div data-id="appAdvanced" class="collapse in">
+							<span class="text-muted" ng-if="advancedFields.length === 0">N/A</span>
+							<div class="form-group" ng-repeat="field in advancedFields track by $index">
+								<label>
+									{{field.displayName || field.name}}
+									<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="[ {{field.name}} ] {{field.description}}"></span>
+								</label>
+								<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
+							</div>
+						</div>
+
+						<h3>
+							<a class="text-primary" data-toggle="collapse" href="[data-id='appCustomize']" ng-click="collapseCheck()">
+								<span class="fa {{isCollapsed('appCustomize') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-down'}}"></span>
+								Customize
+							</a>
+						</h3>
+						<div data-id="appCustomize" class="collapse in">
+							<div class="form-group" ng-class="{'has-warning': !tmpApp.configuration[field.name]}" ng-repeat="field in customizeFields track by $index">
+								<label>
+									<a class="fa fa-times" ng-click="removeField(field)" ng-if="field._customize"></a>
+									{{field.displayName || field.name}}
+								</label>
+								<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
+							</div>
+							<a ng-click="newField()">+ New Field</a>
+						</div>
+
+
 					</div>
 				</div>
 			</div>

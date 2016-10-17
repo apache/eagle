@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.apache.eagle.server;
+
 import com.google.inject.Injector;
 import com.hubspot.dropwizard.guice.GuiceBundle;
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -27,11 +28,10 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import org.apache.eagle.alert.coordinator.CoordinatorListener;
 import org.apache.eagle.alert.resource.SimpleCORSFiler;
-import org.apache.eagle.common.authentication.User;
 import org.apache.eagle.log.base.taggedlog.EntityJsonModule;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
-import org.apache.eagle.server.authentication.AuthenticationRegister;
+import org.apache.eagle.server.authentication.BasicAuthProviderBuilder;
 import org.apache.eagle.server.managedtask.ApplicationTask;
 import org.apache.eagle.server.module.GuiceBundleLoader;
 
@@ -80,8 +80,8 @@ class ServerApplication extends Application<ServerConfig> {
         environment.servlets().addFilter(SimpleCORSFiler.class.getName(), new SimpleCORSFiler())
             .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
-        // add authentication filters
-        new AuthenticationRegister<>(configuration, environment, User.class).register();
+        // register authentication provider
+        environment.jersey().register(new BasicAuthProviderBuilder(configuration.getAuth(), environment).build());
 
         // context listener
         environment.servlets().addServletListeners(new CoordinatorListener());

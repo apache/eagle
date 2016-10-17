@@ -18,15 +18,16 @@ package org.apache.eagle.server.authentication.authenticator;
 
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
+import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import org.apache.eagle.common.authentication.User;
-import org.apache.eagle.server.authentication.config.AuthenticationSettings;
+import org.apache.eagle.server.authentication.config.LdapSettings;
 
-public class LdapBasicAuthenticator extends AbstractSwitchableAuthenticator<BasicCredentials, User> {
-    private AuthenticationSettings config = null;
+public class LdapBasicAuthenticator implements Authenticator<BasicCredentials, User> {
+    private LdapSettings settings = null;
 
-    public LdapBasicAuthenticator(AuthenticationSettings settings) {
-        super(settings, User.class);
+    public LdapBasicAuthenticator(LdapSettings settings) {
+        this.settings = settings;
     }
 
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {

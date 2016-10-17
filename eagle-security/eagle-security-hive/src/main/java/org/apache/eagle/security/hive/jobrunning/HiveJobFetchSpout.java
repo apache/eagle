@@ -22,6 +22,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.dataproc.impl.storm.ValuesArray;
 import org.apache.eagle.jpm.util.*;
 import org.apache.eagle.jpm.util.jobrecover.RunningJobManager;
@@ -35,12 +36,14 @@ import org.apache.eagle.security.hive.config.RunningJobCrawlConfig;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.TextNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
@@ -62,6 +65,7 @@ public class HiveJobFetchSpout extends BaseRichSpout {
     private Long lastFinishAppTime;
     private RunningJobManager runningJobManager;
     private int partitionId;
+
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
@@ -91,22 +95,22 @@ public class HiveJobFetchSpout extends BaseRichSpout {
         // sanity verify 0<=partitionId<=numTotalPartitions-1
         if (partitionId < 0 || partitionId > crawlConfig.controlConfig.numTotalPartitions) {
             throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId " +
-                    partitionId + " and numTotalPartitions " + crawlConfig.controlConfig.numTotalPartitions);
+                partitionId + " and numTotalPartitions " + crawlConfig.controlConfig.numTotalPartitions);
         }
         Class<? extends JobIdPartitioner> partitionerCls = crawlConfig.controlConfig.partitionerCls;
         try {
             this.jobFilter = new JobIdFilterByPartition(partitionerCls.newInstance(),
-                    crawlConfig.controlConfig.numTotalPartitions, partitionId);
+                crawlConfig.controlConfig.numTotalPartitions, partitionId);
         } catch (Exception e) {
             LOG.error("failing instantiating job partitioner class " + partitionerCls.getCanonicalName());
             throw new IllegalStateException(e);
         }
         this.collector = collector;
         this.runningJobManager = new RunningJobManager(crawlConfig.zkStateConfig.zkQuorum,
-                crawlConfig.zkStateConfig.zkSessionTimeoutMs,
-                crawlConfig.zkStateConfig.zkRetryTimes,
-                crawlConfig.zkStateConfig.zkRetryInterval,
-                crawlConfig.zkStateConfig.zkRoot);
+            crawlConfig.zkStateConfig.zkSessionTimeoutMs,
+            crawlConfig.zkStateConfig.zkRetryTimes,
+            crawlConfig.zkStateConfig.zkRetryInterval,
+            crawlConfig.zkStateConfig.zkRoot);
         this.lastFinishAppTime = this.runningJobManager.recoverLastFinishedTime(partitionId);
         if (this.lastFinishAppTime == 0l) {
             this.lastFinishAppTime = Calendar.getInstance().getTimeInMillis() - 24 * 60 * 60000l;//one day ago
@@ -119,7 +123,7 @@ public class HiveJobFetchSpout extends BaseRichSpout {
         LOG.info("start to fetch job list");
         try {
             List<AppInfo> apps = rmResourceFetcher.getResource(Constants.ResourceType.RUNNING_MR_JOB);
-            if(apps == null){
+            if (apps == null) {
                 apps = new ArrayList<>();
             }
             handleApps(apps, true);
@@ -127,7 +131,7 @@ public class HiveJobFetchSpout extends BaseRichSpout {
             long fetchTime = Calendar.getInstance().getTimeInMillis();
             if (fetchTime - this.lastFinishAppTime > 60000l) {
                 apps = rmResourceFetcher.getResource(Constants.ResourceType.COMPLETE_MR_JOB, Long.toString(this.lastFinishAppTime));
-                if(apps == null){
+                if (apps == null) {
                     apps = new ArrayList<>();
                 }
                 handleApps(apps, false);
@@ -230,6 +234,7 @@ public class HiveJobFetchSpout extends BaseRichSpout {
                 LOG.info("fetch job conf from {}", urlString);
                 is = InputStreamUtils.getInputStream(urlString, null, Constants.CompressionType.NONE);
                 final org.jsoup.nodes.Document doc = Jsoup.parse(is, "UTF-8", urlString);
+                doc.outputSettings().prettyPrint(false);
                 org.jsoup.select.Elements elements = doc.select("table[id=conf]").select("tbody").select("tr");
                 Map<String, String> hiveQueryLog = new HashMap<>();
                 Iterator<org.jsoup.nodes.Element> iter = elements.iterator();
@@ -237,7 +242,19 @@ public class HiveJobFetchSpout extends BaseRichSpout {
                     org.jsoup.nodes.Element element = iter.next();
                     org.jsoup.select.Elements tds = element.children();
                     String key = tds.get(0).text();
-                    String value = tds.get(1).text();
+                    String value = "";
+                    org.jsoup.nodes.Element valueElement = tds.get(1);
+                    if (Constants.HIVE_QUERY_STRING.equals(key)) {
+                        for (org.jsoup.nodes.Node child : valueElement.childNodes()) {
+                            if (child instanceof TextNode) {
+                                TextNode valueTextNode = (TextNode) child;
+                                value = valueTextNode.getWholeText();
+                                value = StringUtils.strip(value);
+                            }
+                        }
+                    } else {
+                        value = valueElement.text();
+                    }
                     hiveQueryLog.put(key, value);
                 }
                 if (hiveQueryLog.containsKey(Constants.HIVE_QUERY_STRING)) {

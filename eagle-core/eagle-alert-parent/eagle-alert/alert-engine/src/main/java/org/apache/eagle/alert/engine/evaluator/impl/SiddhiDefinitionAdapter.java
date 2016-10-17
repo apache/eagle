@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.alert.engine.evaluator.impl;
 
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import com.google.common.base.Preconditions;
@@ -77,6 +78,28 @@ public class SiddhiDefinitionAdapter {
         }
 
         throw new IllegalArgumentException("Unknown siddhi type: " + type);
+    }
+
+    public static String buildSiddhiExecutionPlan(PolicyDefinition policyDefinition, Map<String, StreamDefinition> sds) {
+        StringBuilder builder = new StringBuilder();
+        PolicyDefinition.Definition coreDefinition = policyDefinition.getDefinition();
+        // init if not present
+        if (coreDefinition.getInputStreams() == null || coreDefinition.getInputStreams().isEmpty()) {
+            coreDefinition.setInputStreams(policyDefinition.getInputStreams());
+        }
+        if (coreDefinition.getOutputStreams() == null || coreDefinition.getOutputStreams().isEmpty()) {
+            coreDefinition.setOutputStreams(policyDefinition.getOutputStreams());
+        }
+
+        for (String inputStream : coreDefinition.getInputStreams()) {
+            builder.append(SiddhiDefinitionAdapter.buildStreamDefinition(sds.get(inputStream)));
+            builder.append("\n");
+        }
+        builder.append(coreDefinition.value);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Generated siddhi execution plan: {} from definition: {}", builder.toString(), coreDefinition);
+        }
+        return builder.toString();
     }
 
     /**

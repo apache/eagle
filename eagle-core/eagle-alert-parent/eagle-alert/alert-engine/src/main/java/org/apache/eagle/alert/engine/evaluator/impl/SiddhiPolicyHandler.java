@@ -19,7 +19,7 @@ package org.apache.eagle.alert.engine.evaluator.impl;
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
+import org.apache.eagle.alert.engine.coordinator.StreamNotDefinedException;
 import org.apache.eagle.alert.engine.evaluator.PolicyHandlerContext;
 import org.apache.eagle.alert.engine.evaluator.PolicyStreamHandler;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
@@ -48,26 +48,8 @@ public class SiddhiPolicyHandler implements PolicyStreamHandler {
         this.currentIndex = index;
     }
 
-    protected String generateExecutionPlan(PolicyDefinition policyDefinition, Map<String, StreamDefinition> sds) throws StreamDefinitionNotFoundException {
-        StringBuilder builder = new StringBuilder();
-        PolicyDefinition.Definition coreDefinition = policyDefinition.getDefinition();
-        // init if not present
-        if (coreDefinition.getInputStreams() == null || coreDefinition.getInputStreams().isEmpty()) {
-            coreDefinition.setInputStreams(policyDefinition.getInputStreams());
-        }
-        if (coreDefinition.getOutputStreams() == null || coreDefinition.getOutputStreams().isEmpty()) {
-            coreDefinition.setOutputStreams(policyDefinition.getOutputStreams());
-        }
-
-        for (String inputStream : coreDefinition.getInputStreams()) {
-            builder.append(SiddhiDefinitionAdapter.buildStreamDefinition(sds.get(inputStream)));
-            builder.append("\n");
-        }
-        builder.append(coreDefinition.value);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Generated siddhi execution plan: {} from definition: {}", builder.toString(), coreDefinition);
-        }
-        return builder.toString();
+    protected String generateExecutionPlan(PolicyDefinition policyDefinition, Map<String, StreamDefinition> sds) throws StreamNotDefinedException {
+        return SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(policyDefinition,sds);
     }
 
     @Override
