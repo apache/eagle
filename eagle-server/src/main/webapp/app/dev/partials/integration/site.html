@@ -207,7 +207,7 @@
 			<div class="modal-body">
 				<ul class="nav nav-tabs">
 					<li><a href="[data-id='guide']" data-toggle="tab" data-id="guideTab">Installation</a></li>
-					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Setting</a></li>
+					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Settings</a></li>
 				</ul>
 
 				<div class="tab-content">
@@ -231,22 +231,24 @@
 
 					<div class="tab-pane" data-id="configuration">
 						<!-- Environment -->
-						<h3>
+						<h5>
 							<a class="text-primary" data-toggle="collapse" href="[data-id='appEnvironment']" ng-click="collapseCheck()">
 								<span class="fa {{isCollapsed('appEnvironment') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-down'}}"></span>
 								Environment
 							</a>
-						</h3>
+						</h5>
 						<div data-id="appEnvironment" class="collapse in">
 							<div class="form-group">
-								<label>Mode</label>
+								<label>Execution Mode</label>
 								<select class="form-control" ng-model="tmpApp.mode">
-									<option>CLUSTER</option>
-									<option>LOCAL</option>
+									<option value="CLUSTER">Submit as Remote Mode</option>
+									<option VALUE="LOCAL">Submit as Local Mode</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label>jar Path</label>
+								<label>Execution File
+									<span class="fa fa-question-circle" uib-tooltip="Application jar or class file full path"></span>
+								</label>
 								<input type="text" class="form-control" ng-model="tmpApp.jarPath" ng-change="checkJarPath()" />
 							</div>
 						</div>
@@ -254,13 +256,13 @@
 						<hr/>
 
 						<!-- General -->
-						<a class="pull-right" ng-click="configByJSON()">Config By JSON</a>
-						<h3>
+						<a class="pull-right" ng-click="configByJSON()">Import Settings</a>
+						<h5>
 							<a class="text-primary" data-toggle="collapse" href="[data-id='appGeneral']" ng-click="collapseCheck()">
 								<span class="fa {{isCollapsed('appGeneral') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-down'}}"></span>
-								General
+								General Settings
 							</a>
-						</h3>
+						</h5>
 						<div data-id="appGeneral" class="collapse in">
 							<span class="text-muted" ng-if="generalFields.length === 0">N/A</span>
 							<div class="form-group" ng-class="{'has-warning': !tmpApp.configuration[field.name]}" ng-repeat="field in generalFields track by $index">
@@ -273,12 +275,12 @@
 						</div>
 
 						<!-- Advanced -->
-						<h3>
+						<h5>
 							<a class="text-primary" data-toggle="collapse" href="[data-id='appAdvanced']" ng-click="collapseCheck()">
 								<span class="fa {{isCollapsed('appAdvanced') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-down'}}"></span>
-								Advanced
+								Advanced Settings
 							</a>
-						</h3>
+						</h5>
 						<div data-id="appAdvanced" class="collapse in">
 							<span class="text-muted" ng-if="advancedFields.length === 0">N/A</span>
 							<div class="form-group" ng-repeat="field in advancedFields track by $index">
@@ -290,12 +292,12 @@
 							</div>
 						</div>
 
-						<h3>
+						<h5>
 							<a class="text-primary" data-toggle="collapse" href="[data-id='appCustomize']" ng-click="collapseCheck()">
 								<span class="fa {{isCollapsed('appCustomize') ? 'fa-chevron-circle-right' : 'fa-chevron-circle-down'}}"></span>
-								Customize
+								Customized Settings
 							</a>
-						</h3>
+						</h5>
 						<div data-id="appCustomize" class="collapse in">
 							<div class="form-group" ng-class="{'has-warning': !tmpApp.configuration[field.name]}" ng-repeat="field in customizeFields track by $index">
 								<label>
@@ -304,10 +306,8 @@
 								</label>
 								<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
 							</div>
-							<a ng-click="newField()">+ New Field</a>
+							<a ng-click="newField()">+ Add Property</a>
 						</div>
-
-
 					</div>
 				</div>
 			</div>

@@ -257,6 +257,16 @@
                     <groupId>org.apache.eagle</groupId>
                     <artifactId>eagle-security-oozie-web</artifactId>
                     <version>${project.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-simple</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
 
                 <!-- App: hdfs audit log monitoring -->
