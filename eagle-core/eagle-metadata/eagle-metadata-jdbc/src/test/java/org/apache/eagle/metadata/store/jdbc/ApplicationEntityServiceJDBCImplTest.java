@@ -113,7 +113,7 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         applicationEntity.setSite(siteEntity);
         applicationEntity.setDescriptor(applicationDesc);
         applicationEntity.setMode(ApplicationEntity.Mode.LOCAL);
-        applicationEntity.setJarPath("c://");
+        applicationEntity.setJarPath(applicationDesc.getJarPath());
         Map<String, Object> configure = new HashedMap();
         configure.put("a", "b");
         applicationEntity.setConfiguration(configure);
@@ -144,7 +144,7 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         applicationEntity.setSite(siteEntity);
         applicationEntity.setDescriptor(applicationDesc);
         applicationEntity.setMode(ApplicationEntity.Mode.LOCAL);
-        applicationEntity.setJarPath("c://");
+        applicationEntity.setJarPath(applicationDesc.getJarPath());
         Map<String, Object> configure = new HashedMap();
         configure.put("a", "b");
         applicationEntity.setConfiguration(configure);
