@@ -157,7 +157,7 @@ public class MockSampleMetadataFactory {
                     put("value", 60.0);
                     put("unknown", "unknown column value");
                 }}).build();
-        } catch (StreamDefinitionNotFoundException e) {
+        } catch (StreamNotDefinedException e) {
             e.printStackTrace();
         }
         PartitionedEvent pEvent = new PartitionedEvent();
@@ -241,7 +241,7 @@ public class MockSampleMetadataFactory {
 //                        put("value5", SAMPLE_STREAM_VALUE_OPTIONS[RANDOM.nextInt(SAMPLE_STREAM_VALUE_OPTIONS.length)]);
                     put("unknown", "unknown column value");
                 }}).build();
-        } catch (StreamDefinitionNotFoundException e) {
+        } catch (StreamNotDefinedException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
         return event;

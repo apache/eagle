@@ -19,7 +19,7 @@ package org.apache.eagle.alert.engine.runner;
 import org.apache.eagle.alert.engine.StreamContext;
 import org.apache.eagle.alert.engine.coordinator.IMetadataChangeNotifyService;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
+import org.apache.eagle.alert.engine.coordinator.StreamNotDefinedException;
 import org.apache.eagle.alert.engine.model.PartitionedEvent;
 import org.apache.eagle.alert.engine.serialization.PartitionedEventSerializer;
 import org.apache.eagle.alert.engine.serialization.SerializationMetadataProvider;
@@ -129,11 +129,11 @@ public abstract class AbstractStreamBolt extends BaseRichBolt implements Seriali
     }
 
     @Override
-    public StreamDefinition getStreamDefinition(String streamId) throws StreamDefinitionNotFoundException {
+    public StreamDefinition getStreamDefinition(String streamId) throws StreamNotDefinedException {
         if (sdf.containsKey(streamId)) {
             return sdf.get(streamId);
         } else {
-            throw new StreamDefinitionNotFoundException(streamId, specVersion);
+            throw new StreamNotDefinedException(streamId, specVersion);
         }
     }
 

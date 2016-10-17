@@ -18,7 +18,7 @@ package org.apache.eagle.alert.engine.evaluator.impl;
 
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
+import org.apache.eagle.alert.engine.coordinator.StreamNotDefinedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class SiddhiPolicyStateHandler extends SiddhiPolicyHandler {
     }
 
     @Override
-    protected String generateExecutionPlan(PolicyDefinition policyDefinition, Map<String, StreamDefinition> sds) throws StreamDefinitionNotFoundException {
+    protected String generateExecutionPlan(PolicyDefinition policyDefinition, Map<String, StreamDefinition> sds) throws StreamNotDefinedException {
         StringBuilder builder = new StringBuilder();
         PolicyDefinition.Definition stateDefiniton = policyDefinition.getStateDefinition();
         for (String inputStream : stateDefiniton.getInputStreams()) { // the state stream follow the output stream of the policy definition

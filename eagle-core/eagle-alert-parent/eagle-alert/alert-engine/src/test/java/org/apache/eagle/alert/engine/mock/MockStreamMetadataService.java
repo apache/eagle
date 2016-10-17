@@ -17,7 +17,7 @@
 package org.apache.eagle.alert.engine.mock;
 
 import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinitionNotFoundException;
+import org.apache.eagle.alert.engine.coordinator.StreamNotDefinedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,11 +25,11 @@ import java.util.Map;
 public class MockStreamMetadataService {
     private final Map<String, StreamDefinition> streamSchemaMap = new HashMap<>();
 
-    public StreamDefinition getStreamDefinition(String streamId) throws StreamDefinitionNotFoundException {
+    public StreamDefinition getStreamDefinition(String streamId) throws StreamNotDefinedException {
         if (streamSchemaMap.containsKey(streamId)) {
             return streamSchemaMap.get(streamId);
         } else {
-            throw new StreamDefinitionNotFoundException(streamId);
+            throw new StreamNotDefinedException(streamId);
         }
     }
 
