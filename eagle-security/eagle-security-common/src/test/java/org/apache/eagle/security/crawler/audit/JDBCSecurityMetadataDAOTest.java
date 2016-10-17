@@ -17,6 +17,7 @@
 package org.apache.eagle.security.crawler.audit;
 
 import com.google.inject.Inject;
+import org.apache.eagle.app.module.ApplicationGuiceModule;
 import org.apache.eagle.common.module.CommonGuiceModule;
 import org.apache.eagle.common.module.GuiceJUnitRunner;
 import org.apache.eagle.common.module.Modules;
@@ -26,6 +27,7 @@ import org.apache.eagle.security.service.HBaseSensitivityEntity;
 import org.apache.eagle.security.service.JDBCSecurityMetadataDAO;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,13 +36,20 @@ import java.util.Collection;
 import java.util.Collections;
 
 @RunWith(GuiceJUnitRunner.class)
-@Modules({JDBCMetadataStore.class, CommonGuiceModule.class})
+@Modules({
+    JDBCMetadataStore.class, CommonGuiceModule.class, ApplicationGuiceModule.class
+})
 public class JDBCSecurityMetadataDAOTest {
     @Inject
     private JDBCSecurityMetadataDAO metadataDAO;
 
     @Inject
     private JDBCMetadataQueryService queryService;
+
+    @Before
+    public void setUp() throws SQLException {
+        queryService.execute("create table hbase_sensitivity_entity (site varchar(20), hbase_resource varchar(100), sensitivity_type varchar(20), primary key (site, hbase_resource));");
+    }
 
     @Test
     public void testJDBCSecurityMetadataDAO(){

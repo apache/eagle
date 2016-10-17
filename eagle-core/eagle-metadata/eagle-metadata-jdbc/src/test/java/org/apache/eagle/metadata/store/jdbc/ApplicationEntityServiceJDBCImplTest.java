@@ -17,6 +17,8 @@
 
 package org.apache.eagle.metadata.store.jdbc;
 
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.eagle.app.service.ApplicationProviderService;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -29,12 +31,14 @@ import org.junit.Test;
 import javax.inject.Inject;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Map;
 
 public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
 
     @Inject
     ApplicationEntityService applicationEntityService;
-
+    @Inject
+    ApplicationProviderService applicationProviderService;
     @Inject
     SiteEntityService siteEntityService;
 
@@ -49,16 +53,16 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         String siteuuid = siteEntity.getUuid();
         long sitecreateTime = siteEntity.getCreatedTime();
         long sitemodifiedTime = siteEntity.getModifiedTime();
-        ApplicationDesc applicationDesc = new ApplicationDesc();
-        applicationDesc.setType("testtype");
-
+        ApplicationDesc applicationDesc = applicationProviderService.getApplicationDescByType("TEST_APP");
 
         ApplicationEntity applicationEntity = new ApplicationEntity();
         applicationEntity.setSite(siteEntity);
         applicationEntity.setDescriptor(applicationDesc);
         applicationEntity.setMode(ApplicationEntity.Mode.LOCAL);
-        applicationEntity.setJarPath("c://");
-
+        applicationEntity.setJarPath(applicationDesc.getJarPath());
+        Map<String, Object> configure = new HashedMap();
+        configure.put("a", "b");
+        applicationEntity.setConfiguration(configure);
         applicationEntityService.create(applicationEntity);
         String appuuid = applicationEntity.getUuid();
         String appId = applicationEntity.getAppId();
@@ -67,7 +71,7 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
 
         Collection<ApplicationEntity> results = applicationEntityService.findAll();
         Assert.assertEquals(1, results.size());
-        ApplicationEntity applicationEntityFromDB = applicationEntityService.getBySiteIdAndAppType("testsiteid", "testtype");
+        ApplicationEntity applicationEntityFromDB = applicationEntityService.getBySiteIdAndAppType("testsiteid", "TEST_APP");
         Assert.assertTrue(applicationEntityFromDB != null);
         results = applicationEntityService.findBySiteId("testsiteid");
         Assert.assertEquals(1, results.size());
@@ -86,9 +90,9 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
 
         Assert.assertEquals(appuuid, applicationEntityFromDB.getUuid());
         Assert.assertEquals(appId, applicationEntityFromDB.getAppId());
-        Assert.assertEquals("testtype", applicationEntityFromDB.getDescriptor().getType());
+        Assert.assertEquals("TEST_APP", applicationEntityFromDB.getDescriptor().getType());
         Assert.assertEquals(ApplicationEntity.Mode.LOCAL, applicationEntityFromDB.getMode());
-        Assert.assertEquals("c://", applicationEntityFromDB.getJarPath());
+        Assert.assertEquals(applicationDesc.getJarPath(), applicationEntityFromDB.getJarPath());
         Assert.assertEquals(ApplicationEntity.Status.INITIALIZED, applicationEntityFromDB.getStatus());
         Assert.assertEquals(createTime, applicationEntityFromDB.getCreatedTime());
         Assert.assertEquals(modifiedTime, applicationEntityFromDB.getModifiedTime());
@@ -103,16 +107,16 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         siteEntity.setSiteName("testsitename");
         siteEntity.setDescription("testdesc");
         siteEntityService.create(siteEntity);
-        ApplicationDesc applicationDesc = new ApplicationDesc();
-        applicationDesc.setType("testtype");
-
+        ApplicationDesc applicationDesc = applicationProviderService.getApplicationDescByType("TEST_APP");
 
         ApplicationEntity applicationEntity = new ApplicationEntity();
         applicationEntity.setSite(siteEntity);
         applicationEntity.setDescriptor(applicationDesc);
         applicationEntity.setMode(ApplicationEntity.Mode.LOCAL);
-        applicationEntity.setJarPath("c://");
-
+        applicationEntity.setJarPath(applicationDesc.getJarPath());
+        Map<String, Object> configure = new HashedMap();
+        configure.put("a", "b");
+        applicationEntity.setConfiguration(configure);
         applicationEntityService.create(applicationEntity);
         applicationEntityService.create(applicationEntity);
     }
@@ -133,15 +137,17 @@ public class ApplicationEntityServiceJDBCImplTest extends JDBCMetadataTestBase {
         siteEntity.setSiteName("testsitename");
         siteEntity.setDescription("testdesc");
         siteEntityService.create(siteEntity);
-        ApplicationDesc applicationDesc = new ApplicationDesc();
-        applicationDesc.setType("testtype");
+        ApplicationDesc applicationDesc = applicationProviderService.getApplicationDescByType("TEST_APP");
 
 
         ApplicationEntity applicationEntity = new ApplicationEntity();
         applicationEntity.setSite(siteEntity);
         applicationEntity.setDescriptor(applicationDesc);
         applicationEntity.setMode(ApplicationEntity.Mode.LOCAL);
-        applicationEntity.setJarPath("c://");
+        applicationEntity.setJarPath(applicationDesc.getJarPath());
+        Map<String, Object> configure = new HashedMap();
+        configure.put("a", "b");
+        applicationEntity.setConfiguration(configure);
         applicationEntityService.create(applicationEntity);
         Collection<ApplicationEntity> results = applicationEntityService.findAll();
         Assert.assertEquals(1, results.size());
