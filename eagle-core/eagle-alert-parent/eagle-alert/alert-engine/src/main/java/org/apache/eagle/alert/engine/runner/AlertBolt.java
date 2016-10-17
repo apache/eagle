@@ -107,11 +107,12 @@ public class AlertBolt extends AbstractStreamBolt implements AlertBoltSpecListen
         try {
             PartitionedEvent pe = deserialize(input.getValueByField(AlertConstants.FIELD_0));
             String streamEventVersion = pe.getEvent().getMetaVersion();
-            if (streamEventVersion != null && !streamEventVersion.equals(specVersion)) {
-                if (streamEventVersion == null) {
-                    // if stream event version is null, need to initialize it
-                    pe.getEvent().setMetaVersion(specVersion);
-                } else if (specVersion != null && streamEventVersion != null
+
+            if (streamEventVersion == null) {
+                // if stream event version is null, need to initialize it
+                pe.getEvent().setMetaVersion(specVersion);
+            } else if (streamEventVersion != null && !streamEventVersion.equals(specVersion)) {
+                if (specVersion != null && streamEventVersion != null
                     && specVersion.contains("spec_version_") && streamEventVersion.contains("spec_version_")) {
                     // check if specVersion is older than stream_event_version
                     // Long timestamp_of_specVersion = Long.valueOf(specVersion.split("spec_version_")[1]);

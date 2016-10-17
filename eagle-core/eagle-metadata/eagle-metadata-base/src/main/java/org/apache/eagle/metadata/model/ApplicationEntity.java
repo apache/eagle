@@ -17,6 +17,7 @@
 
 package org.apache.eagle.metadata.model;
 
+import com.google.common.base.Preconditions;
 import org.apache.eagle.metadata.persistence.PersistenceEntity;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
@@ -32,13 +33,18 @@ public class ApplicationEntity extends PersistenceEntity {
     private String appId;
     private SiteEntity site;
     private ApplicationDesc descriptor;
-    private boolean executable = true;
 
     private Map<String, Object> configuration = new HashMap<>();
     private Map<String, String> context = new HashMap<>();
     private List<StreamDesc> streams;
     private Mode mode = Mode.CLUSTER;
     private String jarPath;
+
+    @Override
+    public String toString() {
+        return String.format("Application[appId=%s,siteId=%s,UUID=%s]", appId, descriptor.getType(), this.getUuid());
+    }
+
     private Status status = Status.INITIALIZED;
 
     public ApplicationEntity() {
@@ -98,8 +104,14 @@ public class ApplicationEntity extends PersistenceEntity {
     @Override
     public void ensureDefault() {
         super.ensureDefault();
+
+        Preconditions.checkNotNull(this.getSite(),"site is null");
+        Preconditions.checkNotNull(this.getSite().getSiteId(),"siteId is null");
+        Preconditions.checkNotNull(this.getDescriptor(),"descriptor is null");
+        Preconditions.checkNotNull(this.getDescriptor().getType(),"descriptor type is null");
+
         if (this.appId == null) {
-            this.appId = String.format("%s-%s", this.getDescriptor().getType(), this.getSite().getSiteId());
+            this.appId = String.format("%s_%s", this.getDescriptor().getType(), this.getSite().getSiteId()).toUpperCase();
         }
         if (this.status == null) {
             this.status = Status.INITIALIZED;
@@ -146,20 +158,15 @@ public class ApplicationEntity extends PersistenceEntity {
         this.streams = streams;
     }
 
-    public boolean isExecutable() {
-        return executable;
-    }
-
-    public void setExecutable(boolean executable) {
-        this.executable = executable;
-    }
-
-    public static enum Status {
+    public enum Status {
         INITIALIZED("INITIALIZED"),
         STARTING("STARTING"),
         RUNNING("RUNNING"),
         STOPPING("STOPPING"),
-        STOPPED("STOPPED");
+        //Todo: currently "stopped" is not used, because "STOP" operation in Eagle equals to "KILL"
+        STOPPED("STOPPED"),
+        REMOVED("REMOVED"),
+        UNKNOWN("UNKNOWN");
 
         private final String status;
 
@@ -171,6 +178,17 @@ public class ApplicationEntity extends PersistenceEntity {
         public String toString() {
             return status;
         }
+    }
+
+    /**
+     * Update mutable fields from another ApplicationEntity
+     */
+    public void updateMutable(ApplicationEntity entityToUpdate){
+        this.ensureDefault();
+
+        this.setJarPath(entityToUpdate.getJarPath());
+        this.setMode(entityToUpdate.getMode());
+        this.setConfiguration(entityToUpdate.getConfiguration());
     }
 
     public static enum Mode {

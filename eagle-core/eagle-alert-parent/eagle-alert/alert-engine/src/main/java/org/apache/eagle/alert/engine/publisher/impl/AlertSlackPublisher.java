@@ -19,6 +19,7 @@
 package org.apache.eagle.alert.engine.publisher.impl;
 
 import com.typesafe.config.Config;
+import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
@@ -43,7 +44,6 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
 
     private SlackSession session;
     private String slackChannels;
-    private String urlTemplate;
     private String severitys;
 
     @Override
@@ -54,7 +54,6 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
             Map<String, String> slackConfig = new HashMap<>(publishment.getProperties());
             final String token = slackConfig.get(PublishConstants.TOKEN).trim();
             slackChannels = slackConfig.get(PublishConstants.CHANNELS).trim();
-            urlTemplate = slackConfig.get(PublishConstants.URL_TEMPLATE).trim();
             severitys = slackConfig.get(PublishConstants.SEVERITYS).trim();
 
             if (StringUtils.isNotEmpty(token)) {
@@ -81,10 +80,7 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
         for (AlertStreamEvent outputEvent: outputEvents) {
             String message = "";
             String severity = "";
-            String docId = "";
-            String device = "";
-            String deviceType = "";
-            String colo = "";
+            String color = "";
             // only user defined severity level alert will send to Slack;
             boolean publishToSlack = false;
 
@@ -104,42 +100,31 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
                 if (colName.equalsIgnoreCase("message")) {
                     message = outputEvent.getData()[i].toString();
                 }
-                if (colName.equalsIgnoreCase("docId")) {
-                    docId = outputEvent.getData()[i].toString();
-                }
-                if (colName.equalsIgnoreCase("df_device")) {
-                    device = outputEvent.getData()[i].toString();
-                }
-                if (colName.equalsIgnoreCase("df_type")) {
-                    deviceType = outputEvent.getData()[i].toString();
-                }
-                if (colName.equalsIgnoreCase("dc")) {
-                    colo = outputEvent.getData()[i].toString();
-                }
-            }
-
-            StringBuilder messageToSlack = new StringBuilder();
-            messageToSlack.append("Message: " + message + "\n");
-            messageToSlack.append("Severity: " + severity + "\n");
-            messageToSlack.append("Device: " + device + "\n");
-            messageToSlack.append("Device Type: " + deviceType + "\n");
-            messageToSlack.append("Colo: " + colo + "\n");
-            messageToSlack.append("Alert Policy: " + event.getPolicyId() + "\n");
-            messageToSlack.append("Doc Id: " + docId + "\n");
-
-            if (StringUtils.isNotEmpty(urlTemplate)) {
-                try {
-                    messageToSlack.append("Link to Alert Console: " + String.format(urlTemplate, docId) + "\n");
-                } catch (Exception e) {
-                    LOG.warn("There's an error when processing Alert Console Link!");
-                }
-
             }
 
             if (publishToSlack) {
                 try {
+                    // get hex color code from severity
+                    switch (severity) {
+                        case "CRITICAL":
+                            color = "#dd3333"; //red
+                            break;
+                        case "WARNING":
+                            color = "#ffc04c"; //yellow
+                            break;
+                        default:
+                            color = "#439FE0"; //blue
+                            break;
+                    }
+
+                    // here to be generic, only publish message like "CRITICAL  port-1 is down" to Slack
+                    String messageToSlack = String.format("%s %s", severity, message);
+                    SlackAttachment attachment = new SlackAttachment();
+                    attachment.setColor(color);
+                    attachment.setText(messageToSlack);
+
                     for (String slackChannel: slackChannels.split(",")) {
-                        sendMessageToAChannel(session, slackChannel, messageToSlack.toString());
+                        sendMessageToAChannel(session, slackChannel, null, attachment);
                     }
                 } catch (Exception e) {
                     status.successful = false;
@@ -165,9 +150,9 @@ public class AlertSlackPublisher extends AbstractPublishPlugin {
         return LOG;
     }
 
-    private void sendMessageToAChannel(SlackSession session, String channelName, String message) {
+    private void sendMessageToAChannel(SlackSession session, String channelName, String message, SlackAttachment attachment) {
         //get a channel
         SlackChannel channel = session.findChannelByName(channelName);
-        session.sendMessage(channel, message);
+        session.sendMessage(channel, message, attachment);
     }
 }

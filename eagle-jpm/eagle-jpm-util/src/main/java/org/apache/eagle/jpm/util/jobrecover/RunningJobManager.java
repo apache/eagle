@@ -70,10 +70,10 @@ public class RunningJobManager implements Serializable {
         Map<String, Pair<Map<String, String>, AppInfo>> result = new HashMap<>();
         String path = this.zkRoot + "/" + yarnAppId;
         List<String> jobIds = curator.getChildren().forPath(path);
-        /*if (jobIds.size() == 0) {
+        if (jobIds.size() == 0) {
             LOG.info("delete empty path {}", path);
             delete(yarnAppId);
-        }*/
+        }
 
         for (String jobId : jobIds) {
             String jobPath = path + "/" + jobId;
@@ -104,8 +104,8 @@ public class RunningJobManager implements Serializable {
             appInfo.setStartedTime(Long.parseLong(appInfoMap.get("startedTime")));
             appInfo.setFinishedTime(Long.parseLong(appInfoMap.get("finishedTime")));
             appInfo.setElapsedTime(Long.parseLong(appInfoMap.get("elapsedTime")));
-            appInfo.setAmContainerLogs(appInfoMap.get("amContainerLogs"));
-            appInfo.setAmHostHttpAddress(appInfoMap.get("amHostHttpAddress"));
+            appInfo.setAmContainerLogs(appInfoMap.get("amContainerLogs") == null ? "" : appInfoMap.get("amContainerLogs"));
+            appInfo.setAmHostHttpAddress(appInfoMap.get("amHostHttpAddress") == null ? "" : appInfoMap.get("amHostHttpAddress"));
             appInfo.setAllocatedMB(Long.parseLong(appInfoMap.get("allocatedMB")));
             appInfo.setAllocatedVCores(Integer.parseInt(appInfoMap.get("allocatedVCores")));
             appInfo.setRunningContainers(Integer.parseInt(appInfoMap.get("runningContainers")));
@@ -159,8 +159,8 @@ public class RunningJobManager implements Serializable {
         appInfo.put("startedTime", app.getStartedTime() + "");
         appInfo.put("finishedTime", app.getFinishedTime() + "");
         appInfo.put("elapsedTime", app.getElapsedTime() + "");
-        appInfo.put("amContainerLogs", app.getAmContainerLogs());
-        appInfo.put("amHostHttpAddress", app.getAmHostHttpAddress());
+        appInfo.put("amContainerLogs", app.getAmContainerLogs() == null ? "" : app.getAmContainerLogs());
+        appInfo.put("amHostHttpAddress", app.getAmHostHttpAddress() == null ? "" : app.getAmHostHttpAddress());
         appInfo.put("allocatedMB", app.getAllocatedMB() + "");
         appInfo.put("allocatedVCores", app.getAllocatedVCores() + "");
         appInfo.put("runningContainers", app.getRunningContainers() + "");

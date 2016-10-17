@@ -1,0 +1,72 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="box box-solid">
+	<div class="box-body">
+		<div sort-table="policyList" ng-show="policyList.length">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th sortpath="policyStatus" width="10"></th>
+						<th sortpath="name" width="20%">Name</th>
+						<th sortpath="definition.type" width="70">Type</th>
+						<th>Description</th>
+						<th width="85">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<span class="fa fa-square" ng-class="item.policyStatus === 'ENABLED' ? 'text-green' : 'text-muted'"></span>
+						</td>
+						<td>
+							<a ui-sref="policyDetail({name: item.name})" target="_blank">{{item.name}}</a>
+						</td>
+						<td class="text-center"><span class="label label-primary">{{item.definition.type}}</span></td>
+						<td>{{item.description}}</td>
+						<td class="text-center">
+							<div class="btn-group btn-group-xs">
+								<button class="btn btn-default opt" ng-if="item.policyStatus !== 'ENABLED'" ng-click="startPolicy(item)">
+									<span class="fa fa-play"></span>
+								</button>
+								<button class="btn btn-default opt" ng-if="item.policyStatus === 'ENABLED'" ng-click="stopPolicy(item)">
+									<span class="fa fa-stop"></span>
+								</button>
+								<a ui-sref="alert.policyEdit({name: item.name})" target="_blank" class="btn btn-default opt"><span class="fa fa-pencil"></span></a>
+								<button class="btn btn-danger opt" ng-click="deletePolicy(item)"><span class="fa fa-trash"></span></button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="callout callout-warning no-margin" ng-show="policyList._done && policyList.length === 0">
+			<h4>No Policy yet</h4>
+			<p>You have not create policy yet. Click <a href="#/alert/policyCreate">here</a> to create a new policy.</p>
+		</div>
+	</div>
+
+	<div class="overlay" ng-if="!policyList._done">
+		<i class="fa fa-refresh fa-spin"></i>
+	</div>
+
+	<div class="box-footer text-right">
+		<a href="#/alert/policyCreate" class="btn btn-primary">New Policy</a>
+	</div>
+</div>

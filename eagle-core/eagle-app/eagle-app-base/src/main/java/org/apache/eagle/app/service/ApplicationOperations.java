@@ -52,10 +52,18 @@ public final class ApplicationOperations {
             this.setMode(mode);
         }
 
-        public InstallOperation(String siteId, String appType, ApplicationEntity.Mode mode, Map<String, Object> configuration) {
+        public InstallOperation(String siteId, String appType, ApplicationEntity.Mode mode, String jarPath) {
             this.setSiteId(siteId);
             this.setAppType(appType);
             this.setMode(mode);
+            this.setJarPath(jarPath);
+        }
+
+        public InstallOperation(String siteId, String appType, ApplicationEntity.Mode mode, String jarPath, Map<String, Object> configuration) {
+            this.setSiteId(siteId);
+            this.setAppType(appType);
+            this.setMode(mode);
+            this.setJarPath(jarPath);
             this.setConfiguration(configuration);
         }
 
@@ -74,6 +82,41 @@ public final class ApplicationOperations {
         public void setAppType(String appType) {
             this.appType = appType;
         }
+
+        public Map<String, Object> getConfiguration() {
+            return configuration;
+        }
+
+        public void setConfiguration(Map<String, Object> configuration) {
+            this.configuration = configuration;
+        }
+
+        public ApplicationEntity.Mode getMode() {
+            return mode;
+        }
+
+        public void setMode(ApplicationEntity.Mode mode) {
+            this.mode = mode;
+        }
+
+        public String getJarPath() {
+            return jarPath;
+        }
+
+        public void setJarPath(String jarPath) {
+            this.jarPath = jarPath;
+        }
+
+        @Override
+        public String getType() {
+            return INSTALL;
+        }
+    }
+
+    public static class UpdateOperation implements Operation {
+        private ApplicationEntity.Mode mode = ApplicationEntity.Mode.LOCAL;
+        private String jarPath;
+        private Map<String, Object> configuration;
 
         public Map<String, Object> getConfiguration() {
             return configuration;
@@ -216,6 +259,44 @@ public final class ApplicationOperations {
         @Override
         public String getType() {
             return STOP;
+        }
+    }
+
+    public static class CheckStatusOperation implements Operation {
+        private String uuid;
+        private String appId;
+
+        public CheckStatusOperation() {
+        }
+
+        public CheckStatusOperation(String uuid) {
+            this.setUuid(uuid);
+        }
+
+        public CheckStatusOperation(String uuid, String appId) {
+            this.setUuid(uuid);
+            this.setAppId(appId);
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getAppId() {
+            return appId;
+        }
+
+        public void setAppId(String appId) {
+            this.appId = appId;
+        }
+
+        @Override
+        public String getType() {
+            return START;
         }
     }
 }

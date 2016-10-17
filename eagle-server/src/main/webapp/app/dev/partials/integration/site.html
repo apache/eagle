@@ -1,0 +1,267 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="box-body">
+
+
+	<div class="form-group">
+		<label>Site</label>
+		<input type="text" class="form-control" readonly ng-model="site.siteName">
+	</div>
+	<div class="form-group">
+		<label>Description</label>
+		<textarea class="form-control" readonly ng-model="site.description" rows="2"></textarea>
+	</div>
+
+	<label>Application</label>
+	<span class="text-danger" ng-if="site.applicationList.length === 0">
+		(<span class="fa fa-exclamation-triangle"></span> Site must install at least one application to start up.)
+	</span>
+	<span class="text-warning" ng-if="site.applicationList.length !== 0 && getStartedAppCount() === 0">
+		(<span class="fa fa-exclamation-triangle"></span> No application started.)
+	</span>
+
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+				<th>
+					<small class="pull-right"><a ng-click="refreshApplications()">Refresh</a></small>
+					Name
+					<span class="fa fa-refresh fa-spin no-animate" ng-show="!Application.list._done"></span>
+				</th>
+				<th width="10">Status</th>
+				<th>Version</th>
+				<th>Description</th>
+				<!--th>Quick Links</th-->
+				<th width="150">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="app in applicationList track by $index">
+				<td><a ng-click="showAppDetail(app)">{{app.origin.name}}</a></td>
+				<td class="text-center">
+					<span class="label label-{{getAppStatusClass(app)}}" ng-if="app.installed">{{app.status}}</span>
+					<span class="label label-default" ng-if="!app.installed">UNINSTALLED</span>
+				</td>
+				<td>{{app.origin.version}}</td>
+				<td>{{app.description}}</td>
+				<!--td>TODO: ui link</td-->
+				<td class="text-center">
+					<div class="btn-group btn-group-xs" ng-if="app.installed">
+						<!--button class="btn btn-default btn-sm">Monitor</button-->
+						<button class="btn btn-default btn-sm" ng-click="startApp(app)" ng-if="app.descriptor.executable">
+							<span class="fa fa-play"></span>
+						</button>
+						<button class="btn btn-default btn-sm" ng-click="stopApp(app)" ng-if="app.descriptor.executable">
+							<span class="fa fa-stop"></span>
+						</button>
+						<button class="btn btn-default btn-sm" disabled="disabled" ng-if="!app.descriptor.executable">
+							<span class="fa fa-ban"></span>
+						</button>
+						<button class="btn btn-default btn-sm" disabled="disabled" ng-if="!app.descriptor.executable">
+							<span class="fa fa-ban"></span>
+						</button>
+						<button class="btn btn-default btn-sm" ng-click="editApp(app)">
+							<span class="fa fa-pencil"></span>
+						</button>
+						<button class="btn btn-danger btn-sm" ng-click="uninstallApp(app)">
+							<span class="fa fa-trash"></span>
+						</button>
+					</div>
+					<div class="btn-group btn-group-xs" ng-if="!app.installed">
+						<button class="btn btn-primary btn-sm" ng-click="installApp(app)">Install</button>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+
+<!-- Modal: Application information -->
+<div class="modal fade" role="dialog" id="appMDL">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">{{application.name}}</h4>
+			</div>
+			<div class="modal-body">
+				<ul class="nav nav-tabs">
+					<li><a href="[data-id='intro']" data-toggle="tab" data-id="introTab">Introduction</a></li>
+					<li><a href="[data-id='install']" data-toggle="tab">Installation</a></li>
+					<li><a href="[data-id='uninstall']" data-toggle="tab">Uninstallation</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane" data-id="intro">
+						<table class="table">
+							<tbody>
+								<tr>
+									<th>Application Name</th>
+									<td>{{application.name}}</td>
+									<th>Type</th>
+									<td>{{application.type}}</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Application Id</th>
+									<td>{{tmpApp.appId}}</td>
+									<th>UUID</th>
+									<td>{{tmpApp.uuid}}</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Mode</th>
+									<td>{{tmpApp.mode}}</td>
+									<th>Status</th>
+									<td>{{tmpApp.status}}</td>
+								</tr>
+								<tr>
+									<th>View Path</th>
+									<td>{{application.viewPath}}</td>
+									<th>Version</th>
+									<td>{{application.version}}</td>
+								</tr>
+								<tr>
+									<th>Jar Path</th>
+									<td colspan="3">{{tmpApp.jarPath || application.jarPath}}</td>
+								</tr>
+								<tr>
+									<th>Application Class</th>
+									<td colspan="3">{{application.appClass}}</td>
+								</tr>
+								<tr>
+									<th>Provider Class</th>
+									<td colspan="3">{{application.providerClass}}</td>
+								</tr>
+								<tr>
+									<th>Description</th>
+									<td colspan="3">{{application.description}}</td>
+								</tr>
+								<tr>
+									<th>Dependencies</th>
+									<td colspan="3">
+										<ul>
+											<li ng-repeat="dep in application.dependencies track by $index">
+												{{Application.findProvider(dep.type).name}}
+												({{dep.type}})
+											</li>
+										</ul>
+									</td>
+								</tr>
+								<tr ng-if="tmpApp.uuid">
+									<th>Configuration</th>
+									<td colspan="3">
+										<ul>
+											<li ng-repeat="(key, value) in tmpApp.configuration track by $index">
+												<strong>{{key}}:</strong>
+												{{value}}
+											</li>
+										</ul>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="tab-pane" data-id="install">
+						<div ng-bind-html="installHTML"></div>
+					</div>
+					<div class="tab-pane" data-id="uninstall">
+						<div ng-bind-html="uninstallHTML"></div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: Application information -->
+<div class="modal fade" role="dialog" id="installMDL">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">Install '{{application.name}}'</h4>
+			</div>
+			<div class="modal-body">
+				<ul class="nav nav-tabs">
+					<li><a href="[data-id='guide']" data-toggle="tab" data-id="guideTab">Installation</a></li>
+					<li><a href="[data-id='environment']" data-toggle="tab">Environment</a></li>
+					<li><a href="[data-id='configuration']" data-toggle="tab" data-id="configTab">Configuration</a></li>
+				</ul>
+
+				<div class="tab-content">
+					<div class="tab-pane" data-id="guide">
+						<div ng-bind-html="installHTML"></div>
+
+						<div ng-if="application.dependencies.length > 0">
+							<label>Dependencies ({{application.dependencies.length}} Apps)</label>
+							<ul>
+								<li ng-repeat="dep in application.dependencies track by $index">
+									<strong class="text-success" ng-if="!!Application.find(dep.type, site.siteId)[0]">[ Installed ]</strong>
+									<strong class="text-danger" ng-if="!Application.find(dep.type, site.siteId)[0]">[
+										<span class="fa fa-exclamation-triangle"></span>Missing
+									]</strong>
+									{{Application.findProvider(dep.type).name}}
+									({{dep.type}})
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="tab-pane" data-id="environment">
+						<div class="form-group">
+							<label>Mode</label>
+							<select class="form-control" ng-model="tmpApp.mode">
+								<option>CLUSTER</option>
+								<option>LOCAL</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>jar Path</label>
+							<input type="text" class="form-control" ng-model="tmpApp.jarPath" ng-change="checkJarPath()" />
+						</div>
+					</div>
+
+					<div class="tab-pane" data-id="configuration">
+						<div class="form-group" ng-class="{'has-warning': field.required && !tmpApp.configuration[field.name]}" ng-repeat="field in tmpAppConfigFields track by $index">
+							<label>
+								<a class="fa fa-times" ng-click="removeField(field)" ng-if="field._customize"></a>
+								{{field.displayName || field.name}}
+								<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="{{field.description}}"></span>
+								<small ng-if="!field.required" class="text-muted">[optional]</small>
+							</label>
+							<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
+						</div>
+						<a ng-click="newField()">+ New Field</a>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" ng-disabled="installLock" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" ng-disabled="installLock || !checkFields()" ng-click="installAppConfirm()">Install</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,256 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="row flex">
+	<div class="col-lg-6 col-md-12">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					Job Info
+					<span class="label label-{{getStateClass(job.currentState)}}">{{job.currentState}}</span>
+				</h3>
+				<div class="pull-right box-tools">
+					<a ui-sref="jpmCompare({siteId: site, jobDefId: job.tags.jobDefId, to: job.tags.jobId})" class="btn btn-primary btn-xs">
+						<span class="fa fa-code-fork"></span>
+						Compare
+					</a>
+				</div>
+			</div>
+			<div class="box-body">
+				<table class="table table-striped">
+					<tbody>
+						<tr>
+							<th>Job Name</th>
+							<td class="text-break">{{job.tags.jobName}}</td>
+							<th>Job Def Id</th>
+							<td class="text-break">{{job.tags.jobDefId}}</td>
+						</tr>
+						<tr>
+							<th>Job Id</th>
+							<td class="text-break">
+								{{job.tags.jobId}}
+								<a class="fa fa-link" href="{{job.trackingUrl}}" target="_blank" ng-if="job.trackingUrl"></a>
+							</td>
+							<th>Job Exec Id</th>
+							<td class="text-break">{{job.tags.jobExecId}}</td>
+						</tr>
+						<tr>
+							<th>User</th>
+							<td>{{job.tags.user}}</td>
+							<th>Queue</th>
+							<td>{{job.tags.queue}}</td>
+						</tr>
+						<tr>
+							<th>Site</th>
+							<td>{{job.tags.site}}</td>
+							<th>Job Type</th>
+							<td>{{job.tags.jobType}}</td>
+						</tr>
+						<tr>
+							<th>Submission Time</th>
+							<td>{{Time.format(job.submissionTime)}}</td>
+							<th>Duration</th>
+							<td class="text-light-blue">{{Time.diffStr(job.durationTime)}}</td>
+						</tr>
+						<tr>
+							<th>Start Time</th>
+							<td>{{Time.format(job.startTime)}}</td>
+							<th>End Time</th>
+							<td>{{Time.format(job.endTime)}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div ng-if="!job" class="overlay">
+				<i class="fa fa-refresh fa-spin"></i>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-12">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					Map Reduce
+				</h3>
+			</div>
+			<div class="box-body">
+				<table class="table table-striped">
+					<tbody>
+						<tr>
+							<th>Finished Maps</th>
+							<td class="text-success">{{common.number.toFixed(job.numFinishedMaps)}}</td>
+							<th>Failed Maps</th>
+							<td class="text-danger">{{common.number.toFixed(job.numFailedMaps)}}</td>
+							<th>Total Maps</th>
+							<td>{{common.number.toFixed(job.numTotalMaps)}}</td>
+						</tr>
+						<tr>
+							<th>Finished Reduces</th>
+							<td class="text-success">{{common.number.toFixed(job.numFinishedReduces)}}</td>
+							<th>Failed Reduces</th>
+							<td class="text-danger">{{common.number.toFixed(job.numFailedReduces)}}</td>
+							<th>Total Reduces</th>
+							<td>{{common.number.toFixed(job.numTotalReduces)}}</td>
+						</tr>
+						<tr>
+							<th>Data Local Maps</th>
+							<td>
+								{{common.number.toFixed(job.dataLocalMaps)}}
+								({{common.number.toFixed(job.dataLocalMapsPercentage * 100)}}%)
+							</td>
+							<th>Rack Local Maps</th>
+							<td>
+								{{common.number.toFixed(job.rackLocalMaps)}}
+								({{common.number.toFixed(job.rackLocalMapsPercentage * 100)}}%)
+							</td>
+							<th>Total Launched Maps</th>
+							<td>{{common.number.toFixed(job.totalLaunchedMaps)}}</td>
+						</tr>
+						<tr>
+							<th>Map vCores</th>
+							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.JobCounter"].VCORES_MILLIS_MAPS)}}</td>
+							<th>Map CPU</th>
+							<td>{{common.number.toFixed(job.jobCounters.counters.MapTaskAttemptCounter.CPU_MILLISECONDS)}}</td>
+							<th>HDFS Read Bytes</th>
+							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)}}</td>
+						</tr>
+						<tr>
+							<th>Reduce vCores</th>
+							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.JobCounter"].VCORES_MILLIS_REDUCES)}}</td>
+							<th>Map CPU</th>
+							<td>{{common.number.toFixed(job.jobCounters.counters.ReduceTaskAttemptCounter.CPU_MILLISECONDS)}}</td>
+							<th>HDFS Write Bytes</th>
+							<td>{{common.number.toFixed(job.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}</td>
+						</tr>
+						<tr ng-if="!isRunning">
+							<th>Last Map Duration</th>
+							<td>{{Time.diffStr(job.lastMapDuration)}}</td>
+							<th>Last Reduce Duration</th>
+							<td>{{Time.diffStr(job.lastReduceDuration)}}</td>
+							<th></th>
+							<td></td>
+						</tr>
+						<tr ng-if="isRunning">
+							<th>Map Progress</th>
+							<td>{{common.number.toFixed(job.mapProgress)}}%</td>
+							<th>Reduce Progress</th>
+							<td>{{common.number.toFixed(job.reduceProgress)}}%</td>
+							<th></th>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div ng-if="!job" class="overlay">
+				<i class="fa fa-refresh fa-spin"></i>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">
+			Dashboards
+		</h3>
+		<div class="pull-right box-tools">
+			<a ui-sref="jpmJobTask({siteId: site, jobId: job.tags.jobId, startTime: startTimestamp, endTime: endTimestamp})"
+			   class="btn btn-primary btn-xs" target="_blank" ng-if="!isRunning">
+				<span class="fa fa-map"></span>
+				Task Statistic
+			</a>
+		</div>
+	</div>
+	<div class="box-body">
+		<div class="row">
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="allocatedSeries"></div>
+					<div ng-if="(allocatedSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="vCoresSeries"></div>
+					<div ng-if="(vCoresSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-12 col-md-6" ng-hide="taskBucket">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="taskSeries" category="taskCategory" ng-click="taskSeriesClick"></div>
+					<div ng-if="(taskSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-12 col-md-6" ng-show="taskBucket">
+				<div class="jpm-chart">
+					<div class="jpm-chart-container scroll">
+						<h3>
+							<a class="fa fa-arrow-circle-o-left" ng-click="backToTaskSeries()"></a>
+							Top Tasks
+						</h3>
+
+						<table class="table table-sm table-bordered no-margin">
+							<thead>
+								<tr>
+									<!--th>Task</th-->
+									<th>Host</th>
+									<th>HDFS Read</th>
+									<th>HDFS Write</th>
+									<th>Local Read</th>
+									<th>Local Write</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="task in taskBucket.topEntities track by $index">
+									<!--td>{{task.tags.taskId}}</td-->
+									<td>{{task.host || "[" + task.tags.taskId + "]"}}</td>
+									<td>{{common.number.format(task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_READ)}}</td>
+									<td>{{common.number.format(task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].HDFS_BYTES_WRITTEN)}}</td>
+									<td>{{common.number.format(task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_READ)}}</td>
+									<td>{{common.number.format(task.jobCounters.counters["org.apache.hadoop.mapreduce.FileSystemCounter"].FILE_BYTES_WRITTEN)}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-12 col-md-6">
+				<div class="jpm-chart">
+					<div chart class="jpm-chart-container" series="nodeTaskCountSeries" category="nodeTaskCountCategory"
+					></div>
+					<div ng-if="(nodeTaskCountSeries || []).length === 0" class="overlay">
+						<i class="fa fa-refresh fa-spin"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

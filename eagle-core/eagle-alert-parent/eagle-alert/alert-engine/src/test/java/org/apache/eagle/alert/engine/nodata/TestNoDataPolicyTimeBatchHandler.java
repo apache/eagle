@@ -16,6 +16,10 @@
  */
 package org.apache.eagle.alert.engine.nodata;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.eagle.alert.engine.Collector;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
@@ -24,15 +28,10 @@ import org.apache.eagle.alert.engine.evaluator.PolicyHandlerContext;
 import org.apache.eagle.alert.engine.evaluator.nodata.NoDataPolicyTimeBatchHandler;
 import org.apache.eagle.alert.engine.model.AlertStreamEvent;
 import org.apache.eagle.alert.engine.model.StreamEvent;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TestNoDataPolicyTimeBatchHandler {
 
@@ -96,8 +95,11 @@ public class TestNoDataPolicyTimeBatchHandler {
     private PolicyDefinition buildPolicyDef_dynamic() {
         PolicyDefinition pd = new PolicyDefinition();
         PolicyDefinition.Definition def = new PolicyDefinition.Definition();
-        def.setValue("PT5S,dynamic,1,host");
+        def.setValue("PT5S,dynamic");
         def.setType("nodataalert");
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("nodataColumnName", "host");
+        def.setProperties(properties);
         pd.setDefinition(def);
         pd.setInputStreams(Arrays.asList(inputStream));
         pd.setOutputStreams(Arrays.asList(outputStream));

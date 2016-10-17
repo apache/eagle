@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.metadata.service.memory;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.eagle.metadata.model.ApplicationEntity;
@@ -101,5 +102,13 @@ public class ApplicationEntityServiceMemoryImpl implements ApplicationEntityServ
     public ApplicationEntity delete(ApplicationEntity applicationEntity) {
         ApplicationEntity entity = getByUUIDOrAppId(applicationEntity.getUuid(), applicationEntity.getAppId());
         return applicationEntityMap.remove(entity.getUuid());
+    }
+
+    @Override
+    public ApplicationEntity update(ApplicationEntity entity) {
+        Preconditions.checkNotNull(entity.getUuid(),"UUID");
+        ApplicationEntity origin = getByUUID(entity.getUuid());
+        origin.updateMutable(entity);
+        return origin;
     }
 }

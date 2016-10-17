@@ -116,6 +116,11 @@
             <value>secret</value>
         </property>
         <property>
+            <name>eagleProps.eagle.service.basePath</name>
+            <description>eagleProps.eagle.service.basePath</description>
+            <value>/rest</value>
+        </property>
+        <property>
             <name>eagleProps.eagle.service.read.timeout</name>
             <displayName>eagleProps.eagle.service.read.timeout</displayName>
             <description>The maximum amount of time (in seconds) the app is trying to read from eagle service</description>
@@ -150,12 +155,6 @@
             <name>dataSourceConfig.rmUrl</name>
             <displayName>dataSourceConfig.rmUrl</displayName>
             <value>http://sandbox.hortonworks.com:8088</value>
-        </property>
-        <property>
-            <name>storm.messageTimeoutSec</name>
-            <displayName>messageTimeoutSec</displayName>
-            <description>Message timeout (in seconds)</description>
-            <value>3000</value>
         </property>
         <property>
             <name>storm.pendingSpout</name>

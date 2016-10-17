@@ -25,8 +25,8 @@ import java.io.IOException;
 public class LongSerializer implements Serializer<Object> {
     @Override
     public void serialize(Object value, DataOutput dataOutput) throws IOException {
-        if (value instanceof Integer) {
-            value = ((Integer) value).longValue();
+        if (value instanceof Number) {
+            value = ((Number) value).longValue();
         }
         dataOutput.writeLong((long) value);
     }

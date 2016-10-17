@@ -27,13 +27,13 @@ public class LoggingStreamSink extends StormStreamSink<DefaultStreamSinkConfig> 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaStreamSink.class);
 
     @Override
-    public void onInstall() {
-        LOGGER.info("Executing onInstall callback, do nothing");
+    public void afterInstall() {
+        LOGGER.info("Executing afterInstall callback, do nothing");
     }
 
     @Override
-    public void onUninstall() {
-        LOGGER.info("Executing onUninstall callback, do nothing");
+    public void afterUninstall() {
+        LOGGER.info("Executing afterUninstall callback, do nothing");
     }
 
     @Override

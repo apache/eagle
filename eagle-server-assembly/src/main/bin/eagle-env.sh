@@ -26,7 +26,7 @@ export OS_TYPE="linux"
 export CLASSPATH_DELIMITER=":"
 
 case `which uname >/dev/null && uname -s` in
-    CYGWIN_NT-*)
+    CYGWIN_NT-* | MINGW64_NT-*)
         OS_TYPE="windows"
         CLASSPATH_DELIMITER=";"
         ;;

@@ -55,7 +55,7 @@ public class DedupCacheTest {
 	@Test
 	public void testNormal() throws Exception {
 		Config config = ConfigFactory.load();
-		DedupCache dedupCache = DedupCache.getInstance(config);
+		DedupCache dedupCache = new DedupCache(config, "testPublishment");
 		
 		StreamDefinition stream = createStream();
 		PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
@@ -71,7 +71,7 @@ public class DedupCacheTest {
 			List<AlertStreamEvent> result = dedupCache.dedup(event, 
 					new EventUniq(event.getStreamId(), event.getPolicyId(), event.getCreatedTime(), dedupFieldValues), 
 					"state", 
-					(String) event.getData()[event.getSchema().getColumnIndex("state")]);
+					(String) event.getData()[event.getSchema().getColumnIndex("state")], "closed");
 			System.out.println((i + 1) + " >>>> " + ToStringBuilder.reflectionToString(result));
 		}
 		
@@ -114,7 +114,7 @@ public class DedupCacheTest {
 		dedupCountColumn.setType(StreamColumn.Type.LONG);
 		
 		StreamColumn dedupFirstOccurrenceColumn = new StreamColumn();
-		dedupFirstOccurrenceColumn.setName("dedupFirstOccurrence");
+		dedupFirstOccurrenceColumn.setName(DedupCache.DEDUP_FIRST_OCCURRENCE);
 		dedupFirstOccurrenceColumn.setType(StreamColumn.Type.LONG);
 		
 		sd.setColumns(Arrays.asList(tsColumn, hostColumn, alertKeyColumn, stateColumn, dedupCountColumn, dedupFirstOccurrenceColumn));

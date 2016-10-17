@@ -16,11 +16,15 @@
  */
 package org.apache.eagle.alert.coordinator;
 
+import com.google.common.base.Stopwatch;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.eagle.alert.config.ConfigBusProducer;
 import org.apache.eagle.alert.config.ConfigValue;
 import org.apache.eagle.alert.config.ZKConfig;
 import org.apache.eagle.alert.config.ZKConfigBuilder;
 import org.apache.eagle.alert.coordination.model.ScheduleState;
+import org.apache.eagle.alert.coordinator.impl.MetadataValdiator;
 import org.apache.eagle.alert.coordinator.provider.ScheduleContextBuilder;
 import org.apache.eagle.alert.coordinator.trigger.CoordinatorTrigger;
 import org.apache.eagle.alert.coordinator.trigger.DynamicPolicyLoader;
@@ -28,9 +32,6 @@ import org.apache.eagle.alert.coordinator.trigger.PolicyChangeListener;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.service.IMetadataServiceClient;
 import org.apache.eagle.alert.service.MetadataServiceClientImpl;
-import com.google.common.base.Stopwatch;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,10 +185,15 @@ public class Coordinator {
         for (String topo : state.getPublishSpecs().keySet()) {
             producer.send(MessageFormat.format(ZK_ALERT_CONFIG_PUBLISHER, topo), value);
         }
+
     }
 
     public ScheduleState getState() {
         return currentState;
+    }
+
+    public ValidateState validate() {
+        return new MetadataValdiator(client).validate();
     }
 
     /**

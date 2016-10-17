@@ -28,6 +28,7 @@ import org.apache.eagle.metadata.model.ApplicationDesc;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
+import org.apache.eagle.metadata.service.ApplicationStatusUpdateService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,6 +46,8 @@ public class ExampleApplicationProviderTest extends ApplicationTestBase {
     private ApplicationSimulator simulator;
     @Inject
     private ExampleResource exampleResource;
+    @Inject
+    ApplicationStatusUpdateService statusUpdateService;
 
     @Test
     public void testApplicationProviderLoading() {
@@ -86,8 +89,10 @@ public class ExampleApplicationProviderTest extends ApplicationTestBase {
         ApplicationEntity applicationEntity = applicationResource.installApplication(installOperation).getData();
         // Start application
         applicationResource.startApplication(new ApplicationOperations.StartOperation(applicationEntity.getUuid()));
+        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
         // Stop application
         applicationResource.stopApplication(new ApplicationOperations.StopOperation(applicationEntity.getUuid()));
+        statusUpdateService.updateApplicationEntityStatus(applicationEntity);
         // Uninstall application
         applicationResource.uninstallApplication(new ApplicationOperations.UninstallOperation(applicationEntity.getUuid()));
         try {

@@ -52,7 +52,7 @@ public class HdfsAuditLogParserBolt extends BaseRichBolt {
 
         HDFSAuditLogParser parser = new HDFSAuditLogParser();
         HDFSAuditLogObject entity = null;
-        try{
+        try {
             entity = parser.parse(logLine);
             Map<String, Object> map = new TreeMap<String, Object>();
             map.put("src", entity.src);
@@ -63,9 +63,9 @@ public class HdfsAuditLogParserBolt extends BaseRichBolt {
             map.put("user", entity.user);
             map.put("cmd", entity.cmd);
             collector.emit(Arrays.asList(map));
-        }catch(Exception ex){
-            LOG.error("Failing parse audit log message", ex);
-        }finally {
+        } catch (Exception ex) {
+            LOG.error("Failing parse audit log message {}", logLine, ex);
+        } finally {
             collector.ack(input);
         }
     }

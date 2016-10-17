@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.app.service;
 
+import org.apache.eagle.metadata.exceptions.ApplicationWrongStatusException;
 import org.apache.eagle.metadata.exceptions.EntityNotFoundException;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 
@@ -34,7 +35,7 @@ public interface ApplicationManagementService {
      * @param operation
      * @return
      */
-    ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation);
+    ApplicationEntity uninstall(ApplicationOperations.UninstallOperation operation) throws ApplicationWrongStatusException;
 
     /**
      * Start application.
@@ -42,7 +43,7 @@ public interface ApplicationManagementService {
      * @param operation
      * @return
      */
-    ApplicationEntity start(ApplicationOperations.StartOperation operation);
+    ApplicationEntity start(ApplicationOperations.StartOperation operation) throws ApplicationWrongStatusException;
 
     /**
      * Stop application.
@@ -50,5 +51,14 @@ public interface ApplicationManagementService {
      * @param operation
      * @return
      */
-    ApplicationEntity stop(ApplicationOperations.StopOperation operation);
+    ApplicationEntity stop(ApplicationOperations.StopOperation operation) throws ApplicationWrongStatusException;
+
+    /**
+     * get application status.
+     *
+     * @param operation
+     * @return
+     */
+    ApplicationEntity.Status getStatus(ApplicationOperations.CheckStatusOperation operation) throws EntityNotFoundException;
+
 }

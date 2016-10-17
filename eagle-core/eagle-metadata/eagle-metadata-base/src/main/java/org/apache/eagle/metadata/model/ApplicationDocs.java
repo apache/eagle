@@ -16,18 +16,26 @@
  */
 package org.apache.eagle.metadata.model;
 
+import org.apache.eagle.metadata.utils.InstallDocDomHandler;
+import org.apache.eagle.metadata.utils.UninstallDocDomHandler;
+
+import javax.xml.bind.annotation.XmlAnyElement;
+
 public class ApplicationDocs {
     private String install;
+
     private String uninstall;
 
     public String getInstall() {
         return install;
     }
 
+    @XmlAnyElement(value=InstallDocDomHandler.class)
     public void setInstall(String install) {
         this.install = install;
     }
 
+    @XmlAnyElement(value= UninstallDocDomHandler.class)
     public String getUninstall() {
         return uninstall;
     }

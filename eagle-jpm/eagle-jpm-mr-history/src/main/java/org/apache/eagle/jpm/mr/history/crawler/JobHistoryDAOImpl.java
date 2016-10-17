@@ -40,7 +40,7 @@ public class JobHistoryDAOImpl extends AbstractJobHistoryDAO {
     private FileSystem hdfs;
 
     public JobHistoryDAOImpl(JobHistoryEndpointConfig endpointConfig) throws Exception {
-        super(endpointConfig.basePath, endpointConfig.pathContainsJobTrackerName, endpointConfig.jobTrackerName);
+        super(endpointConfig.basePath);
         for (Map.Entry<String, String> entry : endpointConfig.hdfs.entrySet()) {
             this.conf.set(entry.getKey(), entry.getValue());
             LOG.info("conf key {}, conf value {}", entry.getKey(), entry.getValue());

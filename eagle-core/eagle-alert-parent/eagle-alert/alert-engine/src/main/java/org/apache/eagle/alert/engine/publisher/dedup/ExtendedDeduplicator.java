@@ -31,12 +31,14 @@ public abstract class ExtendedDeduplicator implements AlertDeduplicator {
     private List<String> customDedupFields;
     private String dedupStateField;
     private Config config;
+    private String publishName;
 
     public ExtendedDeduplicator(Config config,
                                 Map<String, String> properties,
                                 List<String> customDedupFields,
                                 String dedupStateField,
-                                DedupCache dedupCache) {
+                                DedupCache dedupCache,
+                                String publishName) {
         this.properties = properties;
         if (this.properties == null) {
             this.properties = new HashMap<String, String>();
@@ -45,6 +47,7 @@ public abstract class ExtendedDeduplicator implements AlertDeduplicator {
         this.customDedupFields = customDedupFields;
         this.dedupStateField = dedupStateField;
         this.config = config;
+        this.publishName = publishName;
     }
 
     public Map<String, String> getProperties() {
@@ -65,6 +68,14 @@ public abstract class ExtendedDeduplicator implements AlertDeduplicator {
 
     public Config getConfig() {
         return config;
+    }
+
+    public String getPublishName() {
+        return publishName;
+    }
+
+    public void setPublishName(String publishName) {
+        this.publishName = publishName;
     }
 
 }

@@ -65,13 +65,13 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
     @SuppressWarnings("unchecked")
     @Override
     public void nextTuple() {
-        LOG.info("Start to run tuple");
+        //LOG.info("Start to run tuple");
         try {
             Calendar calendar = Calendar.getInstance();
             long fetchTime = calendar.getTimeInMillis();
             calendar.setTimeInMillis(this.lastFinishAppTime);
-            LOG.info("Last finished time = {}", calendar.getTime());
             if (fetchTime - this.lastFinishAppTime > this.config.stormConfig.spoutCrawlInterval) {
+                LOG.info("Last finished time = {}", calendar.getTime());
                 List<AppInfo> appInfos = rmFetch.getResource(Constants.ResourceType.COMPLETE_SPARK_JOB, Long.toString(lastFinishAppTime));
                 if (appInfos != null) {
                     LOG.info("Get " + appInfos.size() + " from yarn resource manager.");
@@ -94,7 +94,7 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
             }
 
             if (appIds.isEmpty()) {
-                this.takeRest(10);
+                this.takeRest(5);
             } else {
                 LOG.info("{} apps sent.", appIds.size());
             }
@@ -107,7 +107,7 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
         try {
             Thread.sleep(seconds * 1000);
         } catch (InterruptedException e) {
-            LOG.warn("exception found {}", e);
+            LOG.warn("exception found", e);
         }
     }
 
@@ -119,15 +119,16 @@ public class SparkHistoryJobSpout extends BaseRichSpout {
     @Override
     public void fail(Object msgId) {
         // Sleep 3 seconds and retry.
-        Utils.sleep(3000);
-
+        // Utils.sleep(3000);
         collector.emit(new Values(msgId), msgId);
-        zkState.updateApplicationStatus((String)msgId, ZKStateConstant.AppStatus.SENT_FOR_PARSE);
+        zkState.updateApplicationStatus((String)msgId, ZKStateConstant.AppStatus.FAILED);
+        LOG.warn("fail {}", msgId.toString());
     }
 
     @Override
     public void ack(Object msgId) {
-
+        zkState.updateApplicationStatus((String)msgId, ZKStateConstant.AppStatus.FINISHED);
+        LOG.info("ack {}", msgId.toString());
     }
 
     @Override

@@ -50,5 +50,5 @@ public class PublishConstants {
     public static final String ALERT_EMAIL_TIMESTAMP = "alertTime";
     public static final String ALERT_EMAIL_POLICY = "policyId";
     public static final String ALERT_EMAIL_CREATOR = "creator";
-
+    
 }

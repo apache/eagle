@@ -21,6 +21,7 @@ package org.apache.eagle.jpm.spark.history;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValue;
+import org.apache.eagle.service.client.impl.EagleServiceBaseClient;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -84,8 +85,11 @@ public class SparkHistoryJobAppConfig implements Serializable {
         this.eagleInfo.username = config.getString("eagleProps.eagle.service.username");
         this.eagleInfo.password = config.getString("eagleProps.eagle.service.password");
         this.eagleInfo.timeout = config.getInt("eagleProps.eagle.service.read.timeout");
+        this.eagleInfo.basePath = EagleServiceBaseClient.DEFAULT_BASE_PATH;
+        if (config.hasPath("eagleProps.eagle.service.basePath")) {
+            this.eagleInfo.basePath = config.getString("eagleProps.eagle.service.basePath");
+        }
 
-        this.stormConfig.timeoutSec = config.getInt("storm.messageTimeoutSec");
         this.stormConfig.spoutPending = config.getInt("storm.pendingSpout");
         this.stormConfig.spoutCrawlInterval = config.getInt("storm.spoutCrawlInterval");
     }
@@ -113,7 +117,6 @@ public class SparkHistoryJobAppConfig implements Serializable {
     }
 
     public static class StormConfig implements Serializable {
-        public int timeoutSec;
         public int spoutPending;
         public int spoutCrawlInterval;
     }
@@ -123,6 +126,7 @@ public class SparkHistoryJobAppConfig implements Serializable {
         public int port;
         public String username;
         public String password;
+        public String basePath;
         public int timeout;
     }
 }

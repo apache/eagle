@@ -22,14 +22,17 @@ import java.io.IOException;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class IntegerSerializer implements Serializer<Integer> {
+public class IntegerSerializer implements Serializer<Object> {
     @Override
-    public void serialize(Integer value, DataOutput dataOutput) throws IOException {
-        dataOutput.writeInt(value);
+    public void serialize(Object value, DataOutput dataOutput) throws IOException {
+        if (value instanceof Number) {
+            value = ((Number) value).intValue();
+        }
+        dataOutput.writeInt((int) value);
     }
 
     @Override
-    public Integer deserialize(DataInput dataInput) throws IOException {
+    public Object deserialize(DataInput dataInput) throws IOException {
         return dataInput.readInt();
     }
 }

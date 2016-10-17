@@ -183,7 +183,9 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         // decode and get topic
         KafkaMessageIdWrapper id = (KafkaMessageIdWrapper) msgId;
         KafkaSpoutWrapper spout = kafkaSpoutList.get(id.topic);
-        spout.ack(id.id);
+        if (spout !=  null) {
+            spout.ack(id.id);
+        }
     }
 
     @Override
@@ -192,7 +194,9 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
         KafkaMessageIdWrapper id = (KafkaMessageIdWrapper) msgId;
         LOG.error("Failing message {}, with topic {}", msgId, id.topic);
         KafkaSpoutWrapper spout = kafkaSpoutList.get(id.topic);
-        spout.fail(id.id);
+        if (spout !=  null) {
+            spout.fail(id.id);
+        }
     }
 
     @Override
@@ -345,11 +349,14 @@ public class CorrelationSpout extends BaseRichSpout implements SpoutSpecListener
     }
 
     private MultiScheme createMultiScheme(Map conf, String topic, String schemeClsName) throws Exception {
-        Scheme scheme = SchemeBuilder.buildFromClsName(schemeClsName, topic, conf);
+        Object scheme = SchemeBuilder.buildFromClsName(schemeClsName, topic, conf);
         if (scheme instanceof MultiScheme) {
             return (MultiScheme) scheme;
+        } else if (scheme instanceof  Scheme) {
+            return new SchemeAsMultiScheme((Scheme)scheme);
         } else {
-            return new SchemeAsMultiScheme(scheme);
+            LOG.error("create spout scheme failed.");
+            throw new IllegalArgumentException("create spout scheme failed.");
         }
     }
 

@@ -16,10 +16,8 @@
  */
 package org.apache.eagle.alert.engine.publisher.dedup;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 import org.apache.eagle.alert.engine.coordinator.StreamColumn;
@@ -30,8 +28,9 @@ import org.apache.eagle.alert.engine.publisher.impl.DefaultDeduplicator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class DefaultDeduplicatorTest extends MongoDependencyBaseTest {
 
@@ -41,9 +40,9 @@ public class DefaultDeduplicatorTest extends MongoDependencyBaseTest {
 		// assume state: OPEN, WARN, CLOSE
 		System.setProperty("config.resource", "/application-mongo-statestore.conf");
 		Config config = ConfigFactory.load();
-		DedupCache dedupCache = DedupCache.getInstance(config);
+		DedupCache dedupCache = new DedupCache(config, "testPublishment");
 		DefaultDeduplicator deduplicator = new DefaultDeduplicator(
-				"PT1M", Arrays.asList(new String[] { "alertKey" }), "state", dedupCache);
+				"PT1M", Arrays.asList(new String[] { "alertKey" }), "state", "close", dedupCache);
 		
 		StreamDefinition stream = createStream();
 		PolicyDefinition policy = createPolicy(stream.getStreamId(), "testPolicy");
@@ -194,7 +193,7 @@ public class DefaultDeduplicatorTest extends MongoDependencyBaseTest {
 		dedupCountColumn.setType(StreamColumn.Type.LONG);
 		
 		StreamColumn dedupFirstOccurrenceColumn = new StreamColumn();
-		dedupFirstOccurrenceColumn.setName("dedupFirstOccurrence");
+		dedupFirstOccurrenceColumn.setName(DedupCache.DEDUP_FIRST_OCCURRENCE);
 		dedupFirstOccurrenceColumn.setType(StreamColumn.Type.LONG);
 		
 		sd.setColumns(Arrays.asList(tsColumn, hostColumn, alertKeyColumn, stateColumn, dedupCountColumn, dedupFirstOccurrenceColumn));

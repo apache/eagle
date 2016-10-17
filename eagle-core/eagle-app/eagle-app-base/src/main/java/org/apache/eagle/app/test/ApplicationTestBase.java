@@ -29,7 +29,7 @@ public class ApplicationTestBase {
         injector.injectMembers(this);
     }
 
-    public Injector injector() {
+    protected Injector injector() {
         return injector;
     }
 }

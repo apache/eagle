@@ -27,4 +27,5 @@ public interface ApplicationEntityService extends PersistenceService<Application
     ApplicationEntity getBySiteIdAndAppType(String siteId,String appType);
     ApplicationEntity getByUUIDOrAppId(String uuid,String appId);
     ApplicationEntity delete(ApplicationEntity applicationEntity);
+    ApplicationEntity update(ApplicationEntity entity);
 }

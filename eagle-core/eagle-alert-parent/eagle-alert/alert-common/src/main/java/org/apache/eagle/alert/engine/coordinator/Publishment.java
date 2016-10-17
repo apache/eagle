@@ -16,13 +16,12 @@
  */
 package org.apache.eagle.alert.engine.coordinator;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @since Apr 11, 2016.
@@ -36,6 +35,7 @@ public class Publishment {
     private String dedupIntervalMin;
     private List<String> dedupFields;
     private String dedupStateField;
+    private String dedupStateCloseValue;
     private OverrideDeduplicatorSpec overrideDeduplicator;
     private Map<String, String> properties;
     // the class name to extend the IEventSerializer interface
@@ -55,6 +55,14 @@ public class Publishment {
 
     public void setDedupStateField(String dedupStateField) {
         this.dedupStateField = dedupStateField;
+    }
+
+    public String getDedupStateCloseValue() {
+        return dedupStateCloseValue;
+    }
+
+    public void setDedupStateCloseValue(String dedupStateCloseValue) {
+        this.dedupStateCloseValue = dedupStateCloseValue;
     }
 
     public OverrideDeduplicatorSpec getOverrideDeduplicator() {
@@ -119,6 +127,9 @@ public class Publishment {
             Publishment p = (Publishment) obj;
             return (Objects.equals(name, p.getName()) && Objects.equals(type, p.getType())
                 && Objects.equals(dedupIntervalMin, p.getDedupIntervalMin())
+                && Objects.equals(dedupFields, p.getDedupFields())
+                && Objects.equals(dedupStateField, p.getDedupStateField())
+                && Objects.equals(overrideDeduplicator, p.getOverrideDeduplicator())
                 && Objects.equals(policyIds, p.getPolicyIds()) && properties.equals(p.getProperties()));
         }
         return false;

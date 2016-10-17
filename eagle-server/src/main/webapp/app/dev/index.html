@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<html ng-controller="MainCtrl">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta charset="UTF-8">
+		<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+		<link rel="shortcut icon" href="public/images/favicon.png">
+
+		<title>Eagle</title>
+		<link rel="shortcut icon" type="image/png" href="public/images/favicon.png">
+
+		<!-- ref:css public/css/doc.css -->
+		<link href="../node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="../node_modules/zombiej-bootstrap-components/bootstrap-components/css/bootstrap-components.css" rel="stylesheet" type="text/css" media="screen">
+
+		<link href="../node_modules/zombiej-nvd3/build/nv.d3.css" rel="stylesheet" type="text/css" />
+
+		<link href="../node_modules/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
+
+		<link href="../node_modules/admin-lte/dist/css/AdminLTE.css" rel="stylesheet" type="text/css" />
+		<link href="../node_modules/admin-lte/dist/css/skins/skin-blue.css" rel="stylesheet" type="text/css" />
+
+		<link href="public/css/animation.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="public/css/sortTable.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="public/css/main.css" rel="stylesheet" type="text/css" media="screen">
+		<!-- endref -->
+	</head>
+	<body class="skin-blue sidebar-mini" ng-class="{'no-sidebar' : PageConfig.hideSidebar}">
+		<!-- Site wrapper -->
+		<div class="wrapper">
+			<header class="main-header">
+				<a href="#/" class="logo">
+					<span class="logo-mini"><img src="public/images/favicon_white.png" /></span>
+					<span class="logo-lg">Apache Eagle</span>
+				</a>
+				<!-- Header Navbar: style can be found in header.less -->
+				<nav class="navbar navbar-static-top" role="navigation">
+					<!-- Sidebar toggle button-->
+					<a ng-hide="PageConfig.hideSidebar" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
+
+					<div class="navbar-custom-menu">
+						<ul class="nav navbar-nav">
+							<li class="dropdown time-picker" ng-if="Time.pickerType === Time.TIME_RANGE_PICKER">
+								<a data-toggle="dropdown" aria-expanded="false">
+									<i class="fa fa-calendar"></i>
+									{{Time.format("startTime", Time.SHORT_FORMAT)}} ~ {{Time.format("endTime", Time.SHORT_FORMAT)}}
+								</a>
+								<ul class="dropdown-menu">
+									<li><a ng-click="setLastDuration(2)"><i class="fa fa-clock-o"></i>Last 2 Hours</a></li>
+									<li><a ng-click="setLastDuration(6)"><i class="fa fa-clock-o"></i>Last 6 Hours</a></li>
+									<li><a ng-click="setLastDuration(12)"><i class="fa fa-clock-o"></i>Last 12 Hours</a></li>
+									<li><a ng-click="setLastDuration(24)"><i class="fa fa-clock-o"></i>Last 24 Hours</a></li>
+									<li><a ng-click="customizeTimeRange()"><i class="fa fa-clock-o"></i>Customize</a></li>
+								</ul>
+							</li>
+							<li>
+								<a data-toggle="dropdown" aria-expanded="false">
+									<i class="glyphicon glyphicon-question-sign"></i>
+								</a>
+
+								<ul class="dropdown-menu">
+									<li><a>How to start using eagle</a></li>
+									<li><a>How to register new site</a></li>
+									<li><a>How to install application</a></li>
+									<li><a>How to manage application</a></li>
+									<li><a>How to develop application</a></li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</header>
+
+			<!-- =============================================== -->
+			<!-- Left side column. contains the side bar -->
+			<aside class="main-sidebar" ng-hide="PageConfig.hideSidebar">
+				<!-- side bar: style can be found in sidebar.less -->
+				<section class="sidebar">
+					<ul class="sidebar-menu">
+						<li ng-repeat="portal in Portal.list track by $index" ng-class="{treeview: portal.list}" ng-if="portal.showFunc ? portal.showFunc() : true">
+							<a ng-href="{{portal.path}}">
+								<i class="fa fa-{{portal.icon || 'circle-o'}}"></i>
+								<span>{{portal.name}}</span>
+								<i class="fa fa-angle-left pull-right" ng-if="portal.list"></i>
+							</a>
+							<ul class="treeview-menu" ng-if="portal.list">
+								<li ng-repeat="subPortal in portal.list track by $index" ng-class="{active: getNavClass(subPortal)}">
+									<a ng-href="{{subPortal.path}}">
+										<i class="fa fa-{{subPortal.icon || 'circle-o'}}"></i>
+										<span>{{subPortal.name}}</span>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<!-- /.sidebar -->
+			</aside>
+
+			<!-- =============================================== -->
+			<!-- Right side column. Contains the navbar and content of the page -->
+			<div class="content-wrapper">
+				<!-- Content Header (Page header) -->
+				<section class="content-header" ng-hide="PageConfig.hideTitle">
+					<h1>
+						<span class="pageTitle">{{PageConfig.title}}</span>
+						<small class="pageSubTitle">{{PageConfig.subTitle}}</small>
+					</h1>
+
+
+					<ol class="breadcrumb">
+						<li ng-repeat="navPath in PageConfig.navPath">
+							<span ng-if="!navPath.path">
+								<span class="fa fa-home" ng-if="$first"></span>
+								{{navPath.title || navPath.path}}
+							</span>
+							<a ng-if="navPath.path" ng-href="#{{navPath.path}}">
+								<span class="fa fa-home" ng-if="$first"></span>
+								{{navPath.title || navPath.path}}
+							</a>
+						</li>
+					</ol>
+				</section>
+
+				<!-- Main content -->
+				<section class="content">
+					<div id="content">
+						<div ui-view></div>
+					</div>
+				</section><!-- /.content -->
+			</div><!-- /.content-wrapper -->
+
+			<footer class="main-footer">
+				<div class="pull-right hidden-xs">
+					<b>License</b>
+					<a href="http://www.apache.org/licenses/LICENSE-2.0" class="text-muted">Apache-2.0</a>
+				</div>
+				<strong>
+					Apache Eagle
+					<a target="_blank" href="https://eagle.incubator.apache.org/">Home</a> /
+					<a target="_blank" href="https://eagle.incubator.apache.org/docs/community.html">Community</a> /
+					<a target="_blank" href="https://cwiki.apache.org/confluence/display/EAG/FAQ">FAQ</a>
+				</strong>
+			</footer>
+		</div><!-- ./wrapper -->
+
+		<!-- Modal: Time Range Picker -->
+		<div class="modal fade" tabindex="-1" role="dialog" id="eagleTimeRangeMDL">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Customize Time Range</h4>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label for="eagleStartTime">Start Time</label>
+									<input type="text" class="form-control" data-container="body" data-toggle="datepicker" id="eagleStartTime">
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label for="eagleEndTime">End Time</label>
+									<input type="text" class="form-control" data-container="body" data-toggle="datepicker" id="eagleEndTime" data-position="right">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" ng-click="updateTimeRange()">Change</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ref:js public/js/modules.js -->
+		<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="../node_modules/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+		<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="../node_modules/zombiej-bootstrap-components/bootstrap-components/js/bootstrap-components.min.js"></script>
+		<script src="../node_modules/moment/min/moment-with-locales.min.js"></script>
+		<script src="../node_modules/moment-timezone/builds/moment-timezone-with-data.min.js"></script>
+		<script src="../node_modules/echarts/dist/echarts.min.js"></script>
+		<script src="../node_modules/admin-lte/dist/js/app.min.js"></script>
+		<script src="../node_modules/angular/angular.min.js"></script>
+		<script src="../node_modules/angular-resource/angular-resource.min.js"></script>
+		<script src="../node_modules/angular-route/angular-route.min.js"></script>
+		<script src="../node_modules/angular-animate/angular-animate.min.js"></script>
+		<script src="../node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+		<script src="../node_modules/angular-ui-router/release/angular-ui-router.min.js"></script>
+		<!-- endref -->
+
+		<!-- ref:js public/js/doc.min.js -->
+		<!-- Worker -->
+		<script src="public/js/worker/sortTableFunc.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- Application -->
+		<script src="public/js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/index.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/app.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- Service -->
+		<script src="public/js/services/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/timeSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/pageSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/widgetSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/wrapStateSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/entitySrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/siteSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/applicationSrv.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/services/uiSrv.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- Components -->
+		<script src="public/js/components/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/sortTable.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/chart.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/components/widget.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- Controllers -->
+		<script src="public/js/ctrls/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/mainCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/alertCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/alertEditCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/integrationCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<script src="public/js/ctrls/siteCtrl.js" type="text/javascript" charset="utf-8"></script>
+		<!-- endref -->
+	</body>
+</html>

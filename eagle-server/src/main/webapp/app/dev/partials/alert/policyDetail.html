@@ -1,0 +1,115 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="nav-tabs-custom">
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#basic" data-toggle="tab">Basic</a></li>
+		<li><a href="#definition" data-toggle="tab">Definition</a></li>
+		<li><a href="#publisher" data-toggle="tab">Publisher</a></li>
+
+		<li class="pull-right">
+			<a>
+				<span class="label" ng-class="{'label-default': policy.policyStatus !== 'ENABLED', 'label-success': policy.policyStatus === 'ENABLED'}">
+					{{policy.policyStatus}}
+				</span>
+			</a>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" id="basic">
+			<table class="table">
+				<tbody>
+					<tr>
+						<th>Name</th>
+						<td>{{policy.name}}</td>
+						<th>Parallelism Hint</th>
+						<td>{{policy.parallelismHint}}</td>
+					</tr>
+					<tr>
+						<th>Description</th>
+						<td colspan="3"><pre class="inline">{{policy.description}}</pre></td>
+					</tr>
+					<tr>
+						<th>Input Streams</th>
+						<td>
+							<ul class="no-margin">
+								<li ng-repeat="stream in policy.inputStreams track by $index">
+									{{stream}}
+								</li>
+							</ul>
+						</td>
+						<th>Output Streams</th>
+						<td>
+							<ul class="no-margin">
+								<li ng-repeat="stream in policy.outputStreams track by $index">
+									{{stream}}
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="tab-pane" id="definition">
+			<label>Definition</label>
+			<pre>{{policy.definition.value}}</pre>
+
+			<label>Partition</label>
+			<ul class="no-margin">
+				<li ng-repeat="partition in policy.partitionSpec track by $index">
+					[<span class="text-primary">{{partition.type}}</span>]
+					{{partition.streamId}}:
+					<strong class="text-success">{{partition.columns.join(", ")}}</strong>
+				</li>
+				<li ng-if="policy.partitionSpec.length === 0" class="text-muted">
+					No partition
+				</li>
+			</ul>
+		</div>
+		<div class="tab-pane" id="publisher">
+			<p ng-if="publisherList.length === 0" class="text-muted">
+				<span class="fa fa-exclamation-triangle"></span> No publisher configured
+			</p>
+			<table class="table table-bordered" ng-repeat="publisher in publisherList track by publisher.name">
+				<tbody>
+					<tr>
+						<th width="100" class="text-no-break">Name</th>
+						<td>{{publisher.name}}</td>
+						<th width="150" class="text-no-break">DeDup Interval Min</th>
+						<td>{{publisher.dedupIntervalMin}}</td>
+					</tr>
+					<tr>
+						<th>Type</th>
+						<td colspan="3">{{publisher.type}}</td>
+					</tr>
+					<tr>
+						<th>Properties</th>
+						<td colspan="3">
+							<ul class="no-margin">
+								<li ng-repeat="(key, value) in publisher.properties track by key">
+									<strong>{{key}}:</strong>
+									{{value}}
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

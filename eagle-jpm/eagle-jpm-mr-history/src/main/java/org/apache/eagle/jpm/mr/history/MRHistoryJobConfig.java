@@ -37,12 +37,6 @@ public class MRHistoryJobConfig implements Serializable {
 
     private static final String JOB_CONFIGURE_KEY_CONF_FILE = "JobConfigKeys.conf";
 
-    public String getEnv() {
-        return env;
-    }
-
-    private String env;
-
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
     }
@@ -91,13 +85,10 @@ public class MRHistoryJobConfig implements Serializable {
     public static class JobHistoryEndpointConfig implements Serializable {
         public String mrHistoryServerUrl;
         public String basePath;
-        public boolean pathContainsJobTrackerName;
-        public String jobTrackerName;
         public Map<String, String> hdfs;
     }
 
     public static class ControlConfig implements Serializable {
-        public boolean dryRun;
         public Class<? extends JobIdPartitioner> partitionerCls;
         public boolean zeroBasedMonth;
         public String timeZone;
@@ -150,7 +141,6 @@ public class MRHistoryJobConfig implements Serializable {
      */
     private void init(Config config) {
         this.config = config;
-        this.env = config.getString("envContextConfig.env");
         //parse eagle job extractor
         this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
         this.jobExtractorConfig.mrVersion = config.getString("jobExtractorConfig.mrVersion");
@@ -165,14 +155,11 @@ public class MRHistoryJobConfig implements Serializable {
 
         //parse job history endpoint
         this.jobHistoryEndpointConfig.basePath = config.getString("endpointConfig.basePath");
-        this.jobHistoryEndpointConfig.jobTrackerName = config.getString("endpointConfig.jobTrackerName");
         this.jobHistoryEndpointConfig.mrHistoryServerUrl = config.getString("endpointConfig.mrHistoryServerUrl");
-        this.jobHistoryEndpointConfig.pathContainsJobTrackerName = config.getBoolean("endpointConfig.pathContainsJobTrackerName");
         for (Map.Entry<String, ConfigValue> entry : config.getConfig("endpointConfig.hdfs").entrySet()) {
             this.jobHistoryEndpointConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
         }
         //parse control config
-        this.controlConfig.dryRun = config.getBoolean("controlConfig.dryRun");
         try {
             this.controlConfig.partitionerCls = (Class<? extends JobIdPartitioner>) Class.forName(config.getString("controlConfig.partitionerCls"));
             assert this.controlConfig.partitionerCls != null;
@@ -193,7 +180,6 @@ public class MRHistoryJobConfig implements Serializable {
         this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
 
         LOG.info("Successfully initialized MRHistoryJobConfig");
-        LOG.info("env: " + this.env);
         LOG.info("zookeeper.quorum: " + this.zkStateConfig.zkQuorum);
         LOG.info("zookeeper.property.clientPort: " + this.zkStateConfig.zkPort);
         LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);

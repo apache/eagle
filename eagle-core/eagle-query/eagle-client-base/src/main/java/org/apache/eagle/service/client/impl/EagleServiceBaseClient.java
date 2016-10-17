@@ -67,7 +67,7 @@ public abstract class EagleServiceBaseClient implements IEagleServiceClient {
 
     private final static Logger LOG = LoggerFactory.getLogger(EagleServiceBaseClient.class);
 
-    protected static final String DEFAULT_BASE_PATH = "/rest";
+    public static final String DEFAULT_BASE_PATH = "/rest";
     protected static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
     protected static final String DEFAULT_HTTP_HEADER_CONTENT_TYPE = "application/json";
     protected static final String CONTENT_TYPE = "Content-Type";
