@@ -81,6 +81,82 @@
 		</div>
 	</div>
 	<div class="col-md-8">
-		<label>Policy</label>
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<span class="fa fa-pencil"></span>
+				<h3 class="box-title">Policy</h3>
+			</div>
+			<div class="box-body">
+				<p ng-show="policy.inputStreams.length === 0" class="text-muted">No stream selected yet.</p>
+				<div ng-show="policy.inputStreams.length > 0">
+					<div class="form-group">
+						<label>Definition</label>
+						<textarea class="form-control" ng-model="policy.definition.value" rows="10" ng-change="checkDefinition()"></textarea>
+					</div>
+					<label>
+						Stream Partition
+					</label>
+					<div>
+						<ul ng-show="policy.partitionSpec.length > 0">
+							<li ng-repeat="partition in policy.partitionSpec track by $index">
+								[<a class="fa fa-times" ng-click="removePartition(partition)"></a>]
+								[<span class="text-primary">{{partition.type}}</span>]
+								{{partition.streamId}}:
+								<strong class="text-success">{{partition.columns.join(", ")}}</strong>
+							</li>
+						</ul>
+						<a ng-click="newPartition()">+ New Partition</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!------------------------- Modal: Partition ------------------------->
+<div class="modal fade" tabindex="-1" data-id="partitionMDL">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Add Partition</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<label>Stream</label>
+					<select class="form-control" ng-model="partition.streamId">
+						<option ng-repeat="stream in policy.inputStreams track by stream">{{stream}}</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Type</label>
+					<select class="form-control" ng-model="partition.type">
+						<option value="GROUPBY">GroupBy</option>
+						<option value="GLOBAL">Global</option>
+						<option value="SHUFFLE">Shuffle</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>columns</label>
+					<ul class="list-unstyled">
+						<li ng-repeat="column in streams[partition.streamId].columns track by $index">
+							<label>
+								<input type="checkbox" ng-checked="newPartitionCheckColumn(column.name)"
+									   ng-click="newPartitionClickColumn(column.name)" />
+								<span class="text-primary">[{{column.type}}]</span>
+								{{column.name}}
+							</label>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal"
+						ng-disabled="partition.columns.length === 0" ng-click="addPartitionConfirm()">Add</button>
+			</div>
+		</div>
 	</div>
 </div>

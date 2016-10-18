@@ -185,7 +185,7 @@ var app = {};
 				$stateProvider.state(route.state, config);
 			});
 
-			$httpProvider.interceptors.push(function($q) {
+			/* $httpProvider.interceptors.push(function($q) {
 				function eagleRequestHandle(res) {
 					var data = res.data || {
 						exception: "",
@@ -218,7 +218,7 @@ var app = {};
 						return $q.reject(eagleRequestHandle(res));
 					}
 				};
-			});
+			}); */
 		});
 
 		// ======================================================================================

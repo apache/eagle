@@ -37,11 +37,11 @@
 		policyEditController.apply(this, newArgs);
 	}
 
-	eagleControllers.controller('policyCreateCtrl', function ($scope, $wrapState, PageConfig, Entity) {
+	eagleControllers.controller('policyCreateCtrl', function ($scope, $wrapState, $timeout, PageConfig, Entity) {
 		PageConfig.title = "Define Policy";
 		connectPolicyEditController({}, arguments);
 	});
-	eagleControllers.controller('policyEditCtrl', function ($scope, $wrapState, PageConfig, Entity) {
+	eagleControllers.controller('policyEditCtrl', function ($scope, $wrapState, $timeout, PageConfig, Entity) {
 		PageConfig.title = "Edit Policy";
 		var args = arguments;
 
@@ -62,11 +62,19 @@
 		});
 	});
 
-	function policyEditController(policy, $scope, $wrapState, PageConfig, Entity) {
+	function policyEditController(policy, $scope, $wrapState, $timeout, PageConfig, Entity) {
 		$scope.policy = policy;
 		$scope.policy = common.merge({
+			name: "",
+			description: "",
 			inputStreams: [],
-			outputStreams: []
+			outputStreams: [],
+			definition: {
+				type: "siddhi",
+				value: ""
+			},
+			partitionSpec: [],
+			parallelismHint: 2
 		}, $scope.policy);
 		console.log("[Policy]", $scope.policy);
 
@@ -135,6 +143,54 @@
 			} else {
 				$scope.policy.inputStreams.push(streamId);
 			}
+		};
+
+		// ==============================================================
+		// =                         Definition                         =
+		// ==============================================================
+		var checkPromise;
+		$scope.checkDefinition = function () {
+			$timeout.cancel(checkPromise);
+			checkPromise = $timeout(function () {
+				/* Entity.post("metadata/policies/validate", $scope.policy)._then(function (res) {
+					// TODO: Wait for OPT
+					console.log("Validate:", res.data.message);
+				}); */
+			}, 350);
+		};
+
+		// ==============================================================
+		// =                         Partition                          =
+		// ==============================================================
+		$scope.partition = {};
+
+		$scope.newPartition = function () {
+			$scope.partition = {
+				streamId: $scope.policy.inputStreams[0],
+				type: "GROUPBY",
+				columns: []
+			};
+			$(".modal[data-id='partitionMDL']").modal();
+		};
+
+		$scope.newPartitionCheckColumn = function (column) {
+			return $.inArray(column, $scope.partition.columns) >= 0;
+		};
+
+		$scope.newPartitionClickColumn = function (column) {
+			if($scope.newPartitionCheckColumn(column)) {
+				$scope.partition.columns = common.array.remove(column, $scope.partition.columns);
+			} else {
+				$scope.partition.columns.push(column);
+			}
+		};
+
+		$scope.addPartitionConfirm = function () {
+			$scope.policy.partitionSpec.push($scope.partition);
+		};
+
+		$scope.removePartition = function (partition) {
+			$scope.policy.partitionSpec = common.array.remove(partition, $scope.policy.partitionSpec);
 		};
 	}
 })();
