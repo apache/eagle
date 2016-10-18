@@ -119,11 +119,11 @@ public class MRHistoryJobConfig implements Serializable {
         this.config = config;
 
         //parse eagle zk
-        this.zkStateConfig.zkQuorum = config.getString("zkStateConfig.zkQuorum");
-        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zkStateConfig.zkSessionTimeoutMs");
-        this.zkStateConfig.zkRetryTimes = config.getInt("zkStateConfig.zkRetryTimes");
-        this.zkStateConfig.zkRetryInterval = config.getInt("zkStateConfig.zkRetryInterval");
-        this.zkStateConfig.zkRoot = config.getString("zkStateConfig.zkRoot");
+        this.zkStateConfig.zkQuorum = config.getString("zookeeper.zkQuorum");
+        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
+        this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
+        this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
+        this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
 
         //parse job history endpoint
         this.jobHistoryEndpointConfig.site = config.getString("siteId");
@@ -135,12 +135,12 @@ public class MRHistoryJobConfig implements Serializable {
         this.jobHistoryEndpointConfig.timeZone = config.getString("endpointConfig.timeZone");
 
         // parse eagle service endpoint
-        this.eagleServiceConfig.eagleServiceHost = config.getString("eagleService.host");
-        String port = config.getString("eagleService.port");
+        this.eagleServiceConfig.eagleServiceHost = config.getString("service.host");
+        String port = config.getString("service.port");
         this.eagleServiceConfig.eagleServicePort = (port == null ? 8080 : Integer.parseInt(port));
-        this.eagleServiceConfig.username = config.getString("eagleService.username");
-        this.eagleServiceConfig.password = config.getString("eagleService.password");
-        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("eagleService.readTimeOutSeconds");
+        this.eagleServiceConfig.username = config.getString("service.username");
+        this.eagleServiceConfig.password = config.getString("service.password");
+        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("service.readTimeOutSeconds");
 
         LOG.info("Successfully initialized MRHistoryJobConfig");
         LOG.info("zkStateConfig.zkQuorum: " + this.zkStateConfig.zkQuorum);
