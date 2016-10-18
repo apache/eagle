@@ -48,14 +48,6 @@ import java.util.stream.Collectors;
 public class PolicyCompiler {
     private static final Logger LOG = LoggerFactory.getLogger(PolicyCompiler.class);
 
-    /**
-     * Quick parseExecutionPlan policy.
-     */
-    public static PolicyExecutionPlan parseExecutionPlan(String policyDefinition, Map<String, StreamDefinition> inputStreamDefinitions) throws Exception {
-        // Validate inputStreams are valid
-        Preconditions.checkNotNull(inputStreamDefinitions, "No inputStreams to connect from");
-        return parseExecutionPlan(SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(policyDefinition, inputStreamDefinitions));
-    }
 
     public static PolicyParseResult parse(String executionPlanQuery) {
         PolicyParseResult policyParseResult = new PolicyParseResult();
@@ -70,6 +62,15 @@ public class PolicyCompiler {
             policyParseResult.setStackTrace(exception);
         }
         return policyParseResult;
+    }
+
+    /**
+     * Quick parseExecutionPlan policy.
+     */
+    public static PolicyExecutionPlan parseExecutionPlan(String policyDefinition, Map<String, StreamDefinition> inputStreamDefinitions) throws Exception {
+        // Validate inputStreams are valid
+        Preconditions.checkNotNull(inputStreamDefinitions, "No inputStreams to connect from");
+        return parseExecutionPlan(SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(policyDefinition, inputStreamDefinitions));
     }
 
     public static PolicyExecutionPlan parseExecutionPlan(String executionPlanQuery) throws Exception {
@@ -98,13 +99,13 @@ public class PolicyCompiler {
                     InputStream inputStream = ((Query) executionElement).getInputStream();
                     Selector selector = ((Query) executionElement).getSelector();
 
-                    for (String streamId: inputStream.getUniqueStreamIds()) {
+                    for (String streamId : inputStream.getUniqueStreamIds()) {
                         if (!actualInputStreams.containsKey(streamId)) {
                             org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = executionPlan.getStreamDefinitionMap().get(streamId);
                             if (streamDefinition != null) {
                                 actualInputStreams.put(streamId, SiddhiDefinitionAdapter.convertFromSiddiDefinition(streamDefinition).getColumns());
                             } else {
-                                actualInputStreams.put(streamId,null);
+                                actualInputStreams.put(streamId, null);
                             }
                         }
                     }
@@ -123,14 +124,14 @@ public class PolicyCompiler {
                         List<Variable> groupBy = selector.getGroupByList();
 
                         if (windows.size() > 0 || groupBy.size() >= 0) {
-                            partitions.add(convertSingleStreamWindowAndGroupByToPartition(((SingleInputStream) inputStream).getStreamId(),windows,groupBy));
+                            partitions.add(convertSingleStreamWindowAndGroupByToPartition(((SingleInputStream) inputStream).getStreamId(), windows, groupBy));
                         }
-                    } else if(inputStream instanceof JoinInputStream) {
-                        // TODO: Parse multiple stream join
-
-                    } else if(inputStream instanceof StateInputStream) {
-                        // TODO: Parse StateInputStream
                     }
+                    //    else if(inputStream instanceof JoinInputStream) {
+                    //        // TODO: Parse multiple stream join
+                    //    } else if(inputStream instanceof StateInputStream) {
+                    //        // TODO: Parse StateInputStream
+                    //    }
 
                     // Output streams
                     OutputStream outputStream = ((Query) executionElement).getOutputStream();
@@ -161,7 +162,7 @@ public class PolicyCompiler {
 
         if (windows.size() > 0) {
             sortSpec = new StreamSortSpec();
-            for (Window window:windows) {
+            for (Window window : windows) {
                 if (window.getFunction().equals("timeBatch")) {
                     sortSpec.setWindowPeriodMillis(((TimeConstant) window.getParameters()[0]).getValue().intValue());
                     sortSpec.setWindowMargin(sortSpec.getWindowPeriodMillis() / 3);
@@ -191,7 +192,7 @@ public class PolicyCompiler {
         PolicyValidationResult policyValidationResult = new PolicyValidationResult();
         policyValidationResult.setPolicyDefinition(policy);
         try {
-            if (policy.getInputStreams() != null ) {
+            if (policy.getInputStreams() != null) {
                 for (String streamId : policy.getInputStreams()) {
                     if (allDefinitions.containsKey(streamId)) {
                         inputDefinitions.put(streamId, allDefinitions.get(streamId));
