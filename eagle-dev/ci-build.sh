@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -15,13 +16,16 @@
 # limitations under the License.
 #
 # Continuous Integration
-# Go to eagle project root directoy
+# Go to eagle project root directory
+
 cd "$(dirname $0)/../"
+
 # Check whether COVERALLS_EAGLE_TOKEN is set
 if [ -z "$COVERALLS_EAGLE_TOKEN" ];then
     echo "Error: COVERALLS_EAGLE_TOKEN is not set, get token from https://coveralls.io/github/apache/incubator-eagle" 1>&2
     exit 1
 fi
+
 # build and report to coveralls
 mvn clean test cobertura:cobertura coveralls:report -DrepoToken=$COVERALLS_EAGLE_TOKEN -Dmaven.javadoc.skip=true -P!ui
 echo "Check report at https://coveralls.io/github/apache/incubator-eagle"
