@@ -88,7 +88,7 @@ public class JobCountMetricsGenerator {
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
+                put("site", MRHistoryJobConfig.get().getJobHistoryEndpointConfig().site);
                 put(MRJobTagName.JOB_STATUS.toString(), state);
             }
         };

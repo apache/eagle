@@ -43,7 +43,7 @@ public class DefaultJHFInputStreamCallback implements JHFInputStreamCallback {
         @SuppressWarnings("serial")
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
+                put("site", MRHistoryJobConfig.get().getJobHistoryEndpointConfig().site);
             }
         };
 

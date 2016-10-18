@@ -49,18 +49,6 @@ public class MRHistoryJobConfig implements Serializable {
 
     private JobHistoryEndpointConfig jobHistoryEndpointConfig;
 
-    public ControlConfig getControlConfig() {
-        return controlConfig;
-    }
-
-    private ControlConfig controlConfig;
-
-    public JobExtractorConfig getJobExtractorConfig() {
-        return jobExtractorConfig;
-    }
-
-    private JobExtractorConfig jobExtractorConfig;
-
     public EagleServiceConfig getEagleServiceConfig() {
         return eagleServiceConfig;
     }
@@ -79,25 +67,14 @@ public class MRHistoryJobConfig implements Serializable {
         public int zkSessionTimeoutMs;
         public int zkRetryTimes;
         public int zkRetryInterval;
-        public String zkPort;
     }
 
     public static class JobHistoryEndpointConfig implements Serializable {
         public String mrHistoryServerUrl;
         public String basePath;
         public Map<String, String> hdfs;
-    }
-
-    public static class ControlConfig implements Serializable {
-        public Class<? extends JobIdPartitioner> partitionerCls;
-        public boolean zeroBasedMonth;
         public String timeZone;
-    }
-
-    public static class JobExtractorConfig implements Serializable {
         public String site;
-        public String mrVersion;
-        public int readTimeoutSeconds;
     }
 
     public static class EagleServiceConfig implements Serializable {
@@ -105,6 +82,7 @@ public class MRHistoryJobConfig implements Serializable {
         public int eagleServicePort;
         public String username;
         public String password;
+        public int readTimeoutSeconds;
     }
 
     private static MRHistoryJobConfig manager = new MRHistoryJobConfig();
@@ -118,8 +96,6 @@ public class MRHistoryJobConfig implements Serializable {
         this.zkStateConfig = new ZKStateConfig();
         this.jobHistoryEndpointConfig = new JobHistoryEndpointConfig();
         this.jobHistoryEndpointConfig.hdfs = new HashMap<>();
-        this.controlConfig = new ControlConfig();
-        this.jobExtractorConfig = new JobExtractorConfig();
         this.eagleServiceConfig = new EagleServiceConfig();
         this.config = null;
     }
@@ -141,48 +117,34 @@ public class MRHistoryJobConfig implements Serializable {
      */
     private void init(Config config) {
         this.config = config;
-        //parse eagle job extractor
-        this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
-        this.jobExtractorConfig.mrVersion = config.getString("jobExtractorConfig.mrVersion");
-        this.jobExtractorConfig.readTimeoutSeconds = config.getInt("jobExtractorConfig.readTimeOutSeconds");
+
         //parse eagle zk
         this.zkStateConfig.zkQuorum = config.getString("zkStateConfig.zkQuorum");
-        this.zkStateConfig.zkPort = config.getString("zkStateConfig.zkPort");
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zkStateConfig.zkSessionTimeoutMs");
         this.zkStateConfig.zkRetryTimes = config.getInt("zkStateConfig.zkRetryTimes");
         this.zkStateConfig.zkRetryInterval = config.getInt("zkStateConfig.zkRetryInterval");
         this.zkStateConfig.zkRoot = config.getString("zkStateConfig.zkRoot");
 
         //parse job history endpoint
+        this.jobHistoryEndpointConfig.site = config.getString("siteId");
         this.jobHistoryEndpointConfig.basePath = config.getString("endpointConfig.basePath");
         this.jobHistoryEndpointConfig.mrHistoryServerUrl = config.getString("endpointConfig.mrHistoryServerUrl");
         for (Map.Entry<String, ConfigValue> entry : config.getConfig("endpointConfig.hdfs").entrySet()) {
             this.jobHistoryEndpointConfig.hdfs.put(entry.getKey(), entry.getValue().unwrapped().toString());
         }
-        //parse control config
-        try {
-            this.controlConfig.partitionerCls = (Class<? extends JobIdPartitioner>) Class.forName(config.getString("controlConfig.partitionerCls"));
-            assert this.controlConfig.partitionerCls != null;
-        } catch (Exception e) {
-            LOG.warn("can not initialize partitioner class, use org.apache.eagle.jpm.util.DefaultJobIdPartitioner", e);
-            this.controlConfig.partitionerCls = DefaultJobIdPartitioner.class;
-        } finally {
-            LOG.info("Loaded partitioner class: {}", this.controlConfig.partitionerCls);
-        }
-        this.controlConfig.zeroBasedMonth = config.getBoolean("controlConfig.zeroBasedMonth");
-        this.controlConfig.timeZone = config.getString("controlConfig.timeZone");
+        this.jobHistoryEndpointConfig.timeZone = config.getString("endpointConfig.timeZone");
 
         // parse eagle service endpoint
-        this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
-        String port = config.getString("eagleProps.eagleService.port");
+        this.eagleServiceConfig.eagleServiceHost = config.getString("eagleService.host");
+        String port = config.getString("eagleService.port");
         this.eagleServiceConfig.eagleServicePort = (port == null ? 8080 : Integer.parseInt(port));
-        this.eagleServiceConfig.username = config.getString("eagleProps.eagleService.username");
-        this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
+        this.eagleServiceConfig.username = config.getString("eagleService.username");
+        this.eagleServiceConfig.password = config.getString("eagleService.password");
+        this.eagleServiceConfig.readTimeoutSeconds = config.getInt("eagleService.readTimeOutSeconds");
 
         LOG.info("Successfully initialized MRHistoryJobConfig");
-        LOG.info("zookeeper.quorum: " + this.zkStateConfig.zkQuorum);
-        LOG.info("zookeeper.property.clientPort: " + this.zkStateConfig.zkPort);
-        LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);
-        LOG.info("eagle.service.port: " + this.eagleServiceConfig.eagleServicePort);
+        LOG.info("zkStateConfig.zkQuorum: " + this.zkStateConfig.zkQuorum);
+        LOG.info("eagleService.host: " + this.eagleServiceConfig.eagleServiceHost);
+        LOG.info("eagleService.port: " + this.eagleServiceConfig.eagleServicePort);
     }
 }
