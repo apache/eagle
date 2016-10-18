@@ -133,7 +133,7 @@
         </property>
         <property>
             <name>metadataService.port</name>
-            <displayName>Metadata Service PORT</displayName>
+            <displayName>Metadata Service Port</displayName>
             <value>9090</value>
             <description>Metadata service port</description>
             <required>true</required>
