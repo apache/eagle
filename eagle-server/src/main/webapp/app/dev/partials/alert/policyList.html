@@ -47,7 +47,7 @@
 								<button class="btn btn-default opt" ng-if="item.policyStatus === 'ENABLED'" ng-click="stopPolicy(item)">
 									<span class="fa fa-stop"></span>
 								</button>
-								<a ui-sref="alert.policyEdit({name: item.name})" target="_blank" class="btn btn-default opt"><span class="fa fa-pencil"></span></a>
+								<a ui-sref="policyEdit({name: item.name})" target="_blank" class="btn btn-default opt"><span class="fa fa-pencil"></span></a>
 								<button class="btn btn-danger opt" ng-click="deletePolicy(item)"><span class="fa fa-trash"></span></button>
 							</div>
 						</td>
@@ -58,7 +58,7 @@
 
 		<div class="callout callout-warning no-margin" ng-show="policyList._done && policyList.length === 0">
 			<h4>No Policy yet</h4>
-			<p>You have not create policy yet. Click <a href="#/alert/policyCreate">here</a> to create a new policy.</p>
+			<p>You have not create policy yet. Click <a ui-sref="policyCreate()">here</a> to create a new policy.</p>
 		</div>
 	</div>
 
@@ -67,6 +67,6 @@
 	</div>
 
 	<div class="box-footer text-right">
-		<a href="#/alert/policyCreate" class="btn btn-primary">New Policy</a>
+		<a ui-sref="policyCreate()" class="btn btn-primary">New Policy</a>
 	</div>
 </div>

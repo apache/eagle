@@ -109,15 +109,15 @@ var app = {};
 					controller: "alertStreamListCtrl",
 					resolve: routeResolve()
 				})
-				.state('alert.policyCreate', {
-					url: "policyCreate",
-					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
+				.state('policyCreate', {
+					url: "/alert/policyCreate",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyCreateCtrl",
 					resolve: routeResolve()
 				})
-				.state('alert.policyEdit', {
-					url: "policyEdit/{name}",
-					templateUrl: "partials/alert/policyEdit.html?_=" + window._TRS(),
+				.state('policyEdit', {
+					url: "/alert/policyEdit/{name}",
+					templateUrl: "partials/alert/policyEdit/main.html?_=" + window._TRS(),
 					controller: "policyEditCtrl",
 					resolve: routeResolve()
 				})
