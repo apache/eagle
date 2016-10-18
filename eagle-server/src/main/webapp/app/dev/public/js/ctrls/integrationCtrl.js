@@ -150,20 +150,20 @@
 		// =================== Fields ===================
 		$scope.newField = function () {
 			UI.fieldConfirm({
-				title: "New Field"
+				title: "New Property"
 			}, null, [{
 				field: "name",
-				name: "Field Name"
+				name: "Property Name"
 			}, {
 				field: "value",
-				name: "Field Value",
+				name: "Property Value",
 				optional: true
 			}])(function (entity, closeFunc, unlock) {
 				var fullList = $scope.generalFields.concat($scope.advancedFields).concat($scope.customizeFields);
 				if(common.array.find(entity.name, fullList, "field")) {
 					$.dialog({
 						title: "OPS",
-						content: "Field already exist!"
+						content: "Property already exist!"
 					});
 
 					unlock();
