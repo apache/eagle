@@ -17,8 +17,6 @@
   -->
 
 <div class="box-body">
-
-
 	<div class="form-group">
 		<label>Site</label>
 		<input type="text" class="form-control" readonly ng-model="siteName">
@@ -239,15 +237,17 @@
 						</h5>
 						<div data-id="appEnvironment" class="collapse in">
 							<div class="form-group">
-								<label>Execution Mode</label>
+								<label>Execution Mode
+									<span class="fa fa-question-circle" uib-tooltip="Application execution mode: LOCAL/CLUSTER"></span>
+								</label>
 								<select class="form-control" ng-model="tmpApp.mode">
-									<option value="CLUSTER">Submit as Remote Mode</option>
+									<option value="CLUSTER">Submit as Cluster Mode</option>
 									<option VALUE="LOCAL">Submit as Local Mode</option>
 								</select>
 							</div>
 							<div class="form-group">
 								<label>Execution File
-									<span class="fa fa-question-circle" uib-tooltip="Application jar or class file full path"></span>
+									<span class="fa fa-question-circle" uib-tooltip="Full path of Application Jar or Class file on eagle server host"></span>
 								</label>
 								<input type="text" class="form-control" ng-model="tmpApp.jarPath" ng-change="checkJarPath()" />
 							</div>
@@ -268,7 +268,7 @@
 							<div class="form-group" ng-class="{'has-warning': !tmpApp.configuration[field.name]}" ng-repeat="field in generalFields track by $index">
 								<label>
 									{{field.displayName || field.name}}
-									<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="[ {{field.name}} ] {{field.description}}"></span>
+									<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="{{field.description}} ({{field.name}})"></span>
 								</label>
 								<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
 							</div>
@@ -286,7 +286,7 @@
 							<div class="form-group" ng-repeat="field in advancedFields track by $index">
 								<label>
 									{{field.displayName || field.name}}
-									<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="[ {{field.name}} ] {{field.description}}"></span>
+									<span class="fa fa-question-circle" ng-if="field.description" uib-tooltip="{{field.description}} ({{field.name}})"></span>
 								</label>
 								<input type="text" class="form-control" placeholder="{{field.description}}" ng-model="tmpApp.configuration[field.name]" />
 							</div>
