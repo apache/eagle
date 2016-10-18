@@ -32,7 +32,7 @@ For more details, please visit [https://eagle.incubator.apache.org](https://eagl
 ### Branches
 | name | build | coverage | description |
 | :---:| :---: | :---: | :--- |
-| **master** | [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-main)](https://builds.apache.org/job/incubator-eagle-main/) | [![Coverage Status](https://coveralls.io/repos/github/apache/incubator-eagle/badge.svg)](https://coveralls.io/github/apache/incubator-eagle) | 0.5.0-incubating-SNAPSHOT | Branch for continuous development. |
+| [**master**](https://github.com/apache/incubator-eagle/tree/master) | [![Build Status](https://builds.apache.org/buildStatus/icon?job=incubator-eagle-main)](https://builds.apache.org/job/incubator-eagle-main/) | [![Coverage Status](https://coveralls.io/repos/github/apache/incubator-eagle/badge.svg)](https://coveralls.io/github/apache/incubator-eagle) | 0.5.0-incubating-SNAPSHOT | Branch for continuous development. |
 
 ### Latest Release
 
