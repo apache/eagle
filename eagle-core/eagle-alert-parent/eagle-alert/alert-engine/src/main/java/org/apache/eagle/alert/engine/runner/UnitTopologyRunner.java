@@ -185,13 +185,13 @@ public class UnitTopologyRunner {
              * TODO potentially one route bolt may have multiple tasks, so that is field grouping by groupby fields
              * that means we need a separate field to become groupby field
              */
-            builder.setBolt(boltName, routerBolts[i]).fieldsGrouping(spoutName, streamId, new Fields()).setNumTasks(numOfRouterBolts);
+            builder.setBolt(boltName, routerBolts[i]).fieldsGrouping(spoutName, streamId, new Fields()).setNumTasks(1);
         }
 
         // connect router bolt and alert bolt, also define output streams for downstreaming alert publish bolt
         for (int i = 0; i < numOfAlertBolts; i++) {
             String boltName = alertBoltNamePrefix + i;
-            BoltDeclarer boltDeclarer = builder.setBolt(boltName, alertBolts[i]).setNumTasks(numOfAlertBolts);
+            BoltDeclarer boltDeclarer = builder.setBolt(boltName, alertBolts[i]).setNumTasks(1);
             for (int j = 0; j < numOfRouterBolts; j++) {
                 String streamId = StreamIdConversion.generateStreamIdBetween(streamRouterBoltNamePrefix + j, boltName);
                 boltDeclarer.fieldsGrouping(streamRouterBoltNamePrefix + j, streamId, new Fields());
