@@ -36,38 +36,10 @@
         </property>
 
         <property>
-            <name>zkStateConfig.zkQuorum</name>
-            <displayName>Zookeeper Servers</displayName>
-            <description>list of zookeeper servers to connect to</description>
-            <value>sandbox.hortonworks.com:2181</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>zkStateConfig.zkRoot</name>
+            <name>zookeeper.zkRoot</name>
             <displayName>Zookeeper Root Path</displayName>
             <description>zkRoot that used to save context for this application</description>
             <value>/mrjobhistory_sandbox</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>zkStateConfig.zkSessionTimeoutMs</name>
-            <displayName>Zookeeper Session Timeout</displayName>
-            <description>session timeout</description>
-            <value>15000</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>zkStateConfig.zkRetryTimes</name>
-            <displayName>Zookeeper Retry Times</displayName>
-            <description>retry policy to use - retry times</description>
-            <value>3</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>zkStateConfig.zkRetryInterval</name>
-            <displayName>Zookeeper Retry Interval</displayName>
-            <description>retry policy to use - retry interval</description>
-            <value>20000</value>
             <required>true</required>
         </property>
 
@@ -121,40 +93,6 @@
             <displayName>Map Reduce Job Name Key</displayName>
             <description>User use -Dkey=value to specify name of a job when submit. use this to extract job name from job configuration</description>
             <value>eagle.job.name</value>
-        </property>
-        <property>
-            <name>eagleService.host</name>
-            <displayName>Eagle Server Host</displayName>
-            <description>eagle server host</description>
-            <value>sandbox.hortonworks.com</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>eagleService.port</name>
-            <displayName>Eagle Server Port</displayName>
-            <description>eagle server port</description>
-            <value>9099</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>eagleService.username</name>
-            <displayName>Eagle Server UserName</displayName>
-            <description>eagle server username used to login</description>
-            <value>admin</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>eagleService.password</name>
-            <displayName>Eagle Server Password</displayName>
-            <description>eagle server password used to login</description>
-            <value>secret</value>
-            <required>true</required>
-        </property>
-        <property>
-            <name>eagleService.readTimeOutSeconds</name>
-            <displayName>Eagle Server Read TimeOut(seconds)</displayName>
-            <description>eagle server read time out(seconds)</description>
-            <value>60</value>
         </property>
     </configuration>
     <docs>
