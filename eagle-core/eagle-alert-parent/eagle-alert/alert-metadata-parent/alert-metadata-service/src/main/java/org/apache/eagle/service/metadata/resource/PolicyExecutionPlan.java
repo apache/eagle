@@ -44,7 +44,7 @@ public class PolicyExecutionPlan {
     /**
      * Execution plan.
      */
-    private ExecutionPlan executionPlan;
+    private ExecutionPlan internalExecutionPlan;
 
     private String executionPlanDesc;
 
@@ -58,12 +58,12 @@ public class PolicyExecutionPlan {
         this.executionPlanSource = executionPlanSource;
     }
 
-    public ExecutionPlan getExecutionPlan() {
-        return executionPlan;
+    public ExecutionPlan getInternalExecutionPlan() {
+        return internalExecutionPlan;
     }
 
-    public void setExecutionPlan(ExecutionPlan executionPlan) {
-        this.executionPlan = executionPlan;
+    public void setInternalExecutionPlan(ExecutionPlan internalExecutionPlan) {
+        this.internalExecutionPlan = internalExecutionPlan;
     }
 
     public String getExecutionPlanDesc() {

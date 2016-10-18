@@ -18,6 +18,7 @@ package org.apache.eagle.service.metadata.resource;
 
 import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.engine.coordinator.*;
+import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiDefinitionAdapter;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.slf4j.Logger;
@@ -48,15 +49,30 @@ public class PolicyCompiler {
     private static final Logger LOG = LoggerFactory.getLogger(PolicyCompiler.class);
 
     /**
-     * Quick parse policy.
+     * Quick parseExecutionPlan policy.
      */
-    public static PolicyExecutionPlan parse(String policyDefinition, Map<String, StreamDefinition> inputStreamDefinitions) {
+    public static PolicyExecutionPlan parseExecutionPlan(String policyDefinition, Map<String, StreamDefinition> inputStreamDefinitions) throws Exception {
         // Validate inputStreams are valid
         Preconditions.checkNotNull(inputStreamDefinitions, "No inputStreams to connect from");
-        return parse(SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(policyDefinition, inputStreamDefinitions));
+        return parseExecutionPlan(SiddhiDefinitionAdapter.buildSiddhiExecutionPlan(policyDefinition, inputStreamDefinitions));
     }
 
-    public static PolicyExecutionPlan parse(String executionPlanQuery) {
+    public static PolicyParseResult parse(String executionPlanQuery) {
+        PolicyParseResult policyParseResult = new PolicyParseResult();
+        try {
+            policyParseResult.setPolicyExecutionPlan(parseExecutionPlan(executionPlanQuery));
+            policyParseResult.setSuccess(true);
+            policyParseResult.setMessage("Parsed successfully");
+        } catch (Exception exception) {
+            LOG.error("Got error to parse policy: {}", executionPlanQuery, exception);
+            policyParseResult.setSuccess(false);
+            policyParseResult.setMessage(exception.getMessage());
+            policyParseResult.setStackTrace(exception);
+        }
+        return policyParseResult;
+    }
+
+    public static PolicyExecutionPlan parseExecutionPlan(String executionPlanQuery) throws Exception {
         PolicyExecutionPlan policyExecutionPlan = new PolicyExecutionPlan();
         try {
             ExecutionPlan executionPlan = SiddhiCompiler.parse(executionPlanQuery);
@@ -65,7 +81,7 @@ public class PolicyCompiler {
 
             // Set current execution plan as valid
             policyExecutionPlan.setExecutionPlanSource(executionPlanQuery);
-            policyExecutionPlan.setExecutionPlan(executionPlan);
+            policyExecutionPlan.setInternalExecutionPlan(executionPlan);
 
             Map<String, List<StreamColumn>> actualInputStreams = new HashMap<>();
             Map<String, List<StreamColumn>> actualOutputStreams = new HashMap<>();
@@ -84,7 +100,12 @@ public class PolicyCompiler {
 
                     for (String streamId: inputStream.getUniqueStreamIds()) {
                         if (!actualInputStreams.containsKey(streamId)) {
-                            actualInputStreams.put(streamId,SiddhiDefinitionAdapter.convertFromSiddiDefinition(executionPlan.getStreamDefinitionMap().get(streamId)).getColumns());
+                            org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition = executionPlan.getStreamDefinitionMap().get(streamId);
+                            if (streamDefinition != null) {
+                                actualInputStreams.put(streamId, SiddhiDefinitionAdapter.convertFromSiddiDefinition(streamDefinition).getColumns());
+                            } else {
+                                actualInputStreams.put(streamId,null);
+                            }
                         }
                     }
 
@@ -127,7 +148,7 @@ public class PolicyCompiler {
             // Validate outputStreams
             policyExecutionPlan.setOutputStreams(actualOutputStreams);
         } catch (Exception ex) {
-            LOG.error("Got error to parse policy execution plan: \n{}", executionPlanQuery, ex);
+            LOG.error("Got error to parseExecutionPlan policy execution plan: \n{}", executionPlanQuery, ex);
             throw ex;
         }
         return policyExecutionPlan;
@@ -157,7 +178,7 @@ public class PolicyCompiler {
         return partition;
     }
 
-    public static PolicyValidation validate(PolicyDefinition policy, IMetadataDao metadataDao) {
+    public static PolicyValidationResult validate(PolicyDefinition policy, IMetadataDao metadataDao) {
         Map<String, StreamDefinition> allDefinitions = new HashMap<>();
         for (StreamDefinition definition : metadataDao.listStreams()) {
             allDefinitions.put(definition.getStreamId(), definition);
@@ -165,10 +186,10 @@ public class PolicyCompiler {
         return validate(policy, allDefinitions);
     }
 
-    public static PolicyValidation validate(PolicyDefinition policy, Map<String, StreamDefinition> allDefinitions) {
+    public static PolicyValidationResult validate(PolicyDefinition policy, Map<String, StreamDefinition> allDefinitions) {
         Map<String, StreamDefinition> inputDefinitions = new HashMap<>();
-        PolicyValidation policyValidation = new PolicyValidation();
-        policyValidation.setPolicyDefinition(policy);
+        PolicyValidationResult policyValidationResult = new PolicyValidationResult();
+        policyValidationResult.setPolicyDefinition(policy);
         try {
             if (policy.getInputStreams() != null ) {
                 for (String streamId : policy.getInputStreams()) {
@@ -180,7 +201,7 @@ public class PolicyCompiler {
                 }
             }
 
-            PolicyExecutionPlan policyExecutionPlan = parse(policy.getDefinition().getValue(), inputDefinitions);
+            PolicyExecutionPlan policyExecutionPlan = parseExecutionPlan(policy.getDefinition().getValue(), inputDefinitions);
             // Validate output
             if (policy.getOutputStreams() != null) {
                 for (String outputStream : policy.getOutputStreams()) {
@@ -189,17 +210,17 @@ public class PolicyCompiler {
                     }
                 }
             }
-            policyValidation.setPolicyExecutionPlan(policyExecutionPlan);
-            policyValidation.setSuccess(true);
-            policyValidation.setMessage("Validated successfully");
+            policyValidationResult.setPolicyExecutionPlan(policyExecutionPlan);
+            policyValidationResult.setSuccess(true);
+            policyValidationResult.setMessage("Validated successfully");
         } catch (Exception exception) {
             LOG.error("Got error to validate policy definition: {}", policy, exception);
-            policyValidation.setSuccess(false);
-            policyValidation.setMessage(exception.getMessage());
-            policyValidation.setStackTrace(exception);
+            policyValidationResult.setSuccess(false);
+            policyValidationResult.setMessage(exception.getMessage());
+            policyValidationResult.setStackTrace(exception);
         }
 
-        return policyValidation;
+        return policyValidationResult;
     }
 
     private static List<StreamColumn> convertOutputStreamColumns(List<OutputAttribute> outputAttributeList) {

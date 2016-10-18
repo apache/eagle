@@ -16,19 +16,16 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class PolicyValidation {
+public class PolicyParseResult {
     private boolean success;
     private String message;
     private String exception;
 
     private PolicyExecutionPlan policyExecutionPlan;
-    private PolicyDefinition policyDefinition;
 
     public String getException() {
         return exception;
@@ -64,13 +61,5 @@ public class PolicyValidation {
 
     public void setPolicyExecutionPlan(PolicyExecutionPlan policyExecutionPlan) {
         this.policyExecutionPlan = policyExecutionPlan;
-    }
-
-    public PolicyDefinition getPolicyDefinition() {
-        return policyDefinition;
-    }
-
-    public void setPolicyDefinition(PolicyDefinition policyDefinition) {
-        this.policyDefinition = policyDefinition;
     }
 }
