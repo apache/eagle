@@ -206,7 +206,7 @@ public class MetadataResource {
 
     @Path("/policies/validate")
     @POST
-    public PolicyExecutionPlan validatePolicy(PolicyDefinition policy) {
+    public PolicyValidation validatePolicy(PolicyDefinition policy) {
         return PolicyCompiler.validate(policy,dao);
     }
 

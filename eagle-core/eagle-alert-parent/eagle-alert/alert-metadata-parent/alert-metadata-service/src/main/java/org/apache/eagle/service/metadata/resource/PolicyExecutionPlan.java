@@ -16,12 +16,8 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamColumn;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.eagle.alert.engine.coordinator.StreamColumn;
 import org.apache.eagle.alert.engine.coordinator.StreamPartition;
 import org.wso2.siddhi.query.api.ExecutionPlan;
 
@@ -30,10 +26,6 @@ import java.util.Map;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class PolicyExecutionPlan {
-    private boolean success;
-    private String message;
-    private String exception;
-
     /**
      * Actual input streams.
      */
@@ -57,35 +49,6 @@ public class PolicyExecutionPlan {
     private String executionPlanDesc;
 
     private List<StreamPartition> streamPartitions;
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getException() {
-        return exception;
-    }
-
-    public void setException(String exception) {
-        this.exception = exception;
-    }
-
-    public void setStackTrace(Throwable throwable) {
-        this.exception = ExceptionUtils.getStackTrace(throwable);
-    }
-
 
     public String getExecutionPlanSource() {
         return executionPlanSource;
