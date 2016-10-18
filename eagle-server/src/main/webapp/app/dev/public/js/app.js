@@ -236,6 +236,8 @@ var app = {};
 			window._Time = $scope.Time = Time;
 			$scope.common = common;
 
+			$scope._TRS = window._TRS();
+
 			Object.defineProperty(window, "scope", {
 				get: function () {
 					var ele = $("#content .nav-tabs-custom.ng-scope .ng-scope[ui-view], #content .ng-scope[ui-view]").last();

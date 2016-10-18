@@ -38,16 +38,14 @@
 	}
 
 	eagleControllers.controller('policyCreateCtrl', function ($scope, $wrapState, PageConfig, Entity) {
-		PageConfig.subTitle = "Define Alert Policy";
+		PageConfig.title = "Define Policy";
 		connectPolicyEditController({}, arguments);
 	});
 	eagleControllers.controller('policyEditCtrl', function ($scope, $wrapState, PageConfig, Entity) {
-		PageConfig.subTitle = "Edit Alert Policy";
+		PageConfig.title = "Edit Policy";
 		var args = arguments;
 
-		// TODO: Wait for backend data update
 		$scope.policyList = Entity.queryMetadata("policies/" + encodeURIComponent($wrapState.param.name));
-
 		$scope.policyList._promise.then(function () {
 			var policy = $scope.policyList[0];
 
@@ -65,89 +63,55 @@
 	});
 
 	function policyEditController(policy, $scope, $wrapState, PageConfig, Entity) {
-		$scope.newPolicy = !policy.name;
-		$scope.policyLock = false;
-
-		$scope.publisherTypes = publisherTypes;
-
-		$scope.selectedApplication = null;
-		$scope.selectedStream = null;
-
-		$scope.outputStream = "";
-
-		$scope.partitionStream = null;
-		$scope.partitionType = "GROUPBY";
-		$scope.partitionColumns = {};
-
-		$scope.publisherType = "org.apache.eagle.alert.engine.publisher.impl.AlertEmailPublisher";
-		$scope.publisher = {
-			dedupIntervalMin: "PT1M"
-		};
-		$scope.publisherProps = {};
-
+		$scope.policy = policy;
 		$scope.policy = common.merge({
-			name: "",
-			description: "",
 			inputStreams: [],
-			outputStreams: [],
-			definition: {
-				type: "siddhi",
-				value: ""
-			},
-			partitionSpec: [],
-			parallelismHint: 2
-		}, policy);
-
-		$scope.policy.definition = {
-			type: $scope.policy.definition.type,
-			value: $scope.policy.definition.value
-		};
-
+			outputStreams: []
+		}, $scope.policy);
 		console.log("[Policy]", $scope.policy);
 
-		// =========================================================
-		// =                      Check Logic                      =
-		// =========================================================
-		$scope.checkBasicInfo = function () {
-			return !!$scope.policy.name;
+		var cacheSearchSourceKey;
+		var searchApplications;
+		$scope.searchSourceKey = "";
+		$scope.applications = {};
+
+		// ==============================================================
+		// =                             UI                             =
+		// ==============================================================
+		$scope.sourceTab = "all";
+		$scope.setSourceTab = function (tab) {
+			$scope.sourceTab = tab;
 		};
 
-		$scope.checkAlertStream = function () {
-			return $scope.checkBasicInfo() &&
-				$scope.policy.inputStreams.length > 0 &&
-				$scope.policy.outputStreams.length > 0;
-		};
+		// ==============================================================
+		// =                           Stream                           =
+		// ==============================================================
+		$scope.getSearchApplication = function() {
+			if(cacheSearchSourceKey !== $scope.searchSourceKey.toUpperCase()) {
+				cacheSearchSourceKey = $scope.searchSourceKey.toUpperCase();
 
-		$scope.checkNumber = function (str) {
-			str = (str + "").trim();
-			return str !== "" && common.number.isNumber(Number(str));
-		};
+				searchApplications = {};
+				$.each($scope.applications, function (appName, streams) {
+					if(appName.toUpperCase().indexOf(cacheSearchSourceKey) >= 0) {
+						searchApplications[appName] = streams;
+					} else {
+						var streamList = [];
+						$.each(streams, function (i, stream) {
+							if(stream.streamId.toUpperCase().indexOf(cacheSearchSourceKey) >= 0) {
+								streamList.push(stream);
+							}
+						});
 
-		$scope.checkDefinition = function () {
-			return $scope.checkAlertStream() &&
-				!!$scope.policy.definition.value.trim() &&
-				$scope.policy.parallelismHint > 0;
-		};
-
-		// =========================================================
-		// =                        Stream                         =
-		// =========================================================
-		$scope.refreshStreamSelect = function() {
-			var appStreamList;
-
-			if(!$scope.selectedApplication) {
-				$scope.selectedApplication = common.getKeys($scope.applications)[0];
+						if(streamList.length > 0) {
+							searchApplications[appName] = streamList;
+						}
+					}
+				});
 			}
-
-			appStreamList = $scope.applications[$scope.selectedApplication] || [];
-			if(!common.array.find($scope.selectedStream, appStreamList)) {
-				$scope.selectedStream = appStreamList[0].streamId;
-			}
-			if(!common.array.find($scope.partitionStream, $scope.policy.inputStreams)) {
-				$scope.partitionStream = $scope.policy.inputStreams[0];
-			}
+			return searchApplications;
 		};
 
+		$scope.streams = {};
 		$scope.streamList = Entity.queryMetadata("streams");
 		$scope.streamList._then(function () {
 			$scope.applications = {};
@@ -155,143 +119,22 @@
 			$.each($scope.streamList, function (i, stream) {
 				var list = $scope.applications[stream.dataSource] = $scope.applications[stream.dataSource] || [];
 				list.push(stream);
+				$scope.streams[stream.streamId] = stream;
 			});
 
-			console.log("=>", $scope.streamList);
-			$scope.refreshStreamSelect();
+			console.log($scope.applications);
 		});
 
-		$scope.getStreamList = function () {
-			return common.array.minus($scope.streamList, $scope.policy.inputStreams, "streamId", "");
+		$scope.isInputStreamSelected = function (streamId) {
+			return $.inArray(streamId, $scope.policy.inputStreams) >= 0;
 		};
 
-		$scope.addStream = function () {
-			$scope.policy.inputStreams.push($scope.selectedStream);
-			$scope.refreshStreamSelect();
-		};
-
-		$scope.removeStream = function (streamId) {
-			$scope.policy.inputStreams = common.array.remove(streamId, $scope.policy.inputStreams);
-			$scope.refreshStreamSelect();
-		};
-
-		$scope.checkAddStream = function (streamId) {
-			return !common.array.find(streamId, $scope.policy.inputStreams);
-		};
-
-		$scope.addOutputStream = function () {
-			$scope.policy.outputStreams.push($scope.outputStream);
-			$scope.outputStream = "";
-		};
-
-		$scope.removeOutputStream = function (streamId) {
-			$scope.policy.outputStreams = common.array.remove(streamId, $scope.policy.outputStreams);
-		};
-
-		$scope.checkAddOutputStream = function () {
-			return $scope.outputStream !== "" && !common.array.find($scope.outputStream, $scope.policy.outputStreams);
-		};
-
-		// =========================================================
-		// =                      Definition                       =
-		// =========================================================
-		$scope.getPartitionColumns = function () {
-			var stream = common.array.find($scope.partitionStream, $scope.streamList, "streamId");
-			return (stream || {}).columns;
-		};
-
-		$scope.addPartition = function () {
-			$scope.policy.partitionSpec.push({
-				streamId: $scope.partitionStream,
-				type: $scope.partitionType,
-				columns: $.map($scope.getPartitionColumns(), function (column) {
-					return $scope.partitionColumns[column.name] ? column.name : null;
-				})
-			});
-
-			$scope.partitionColumns = {};
-		};
-
-		$scope.checkAddPartition = function () {
-			var match = false;
-
-			$.each($scope.getPartitionColumns(), function (i, column) {
-				if($scope.partitionColumns[column.name]) {
-					match = true;
-					return false;
-				}
-			});
-
-			return match;
-		};
-
-		$scope.removePartition = function (partition) {
-			$scope.policy.partitionSpec = common.array.remove(partition, $scope.policy.partitionSpec);
-		};
-
-		// =========================================================
-		// =                       Publisher                       =
-		// =========================================================
-		$scope.publisherList = [];
-
-		if(!$scope.newPolicy) {
-			$scope.publisherList = Entity.queryMetadata("policies/" + encodeURIComponent($scope.policy.name) + "/publishments");
-		}
-
-		$scope.addPublisher = function () {
-			var publisherProps = {};
-			$.each($scope.publisherTypes[$scope.publisherType], function (i, field) {
-				publisherProps[field] = $scope.publisherProps[field] || "";
-			});
-			$scope.publisherList.push({
-				name: $scope.publisher.name,
-				type: $scope.publisherType,
-				policyIds: [$scope.policy.name],
-				properties: publisherProps,
-				dedupIntervalMin: $scope.publisher.dedupIntervalMin,
-				serializer : "org.apache.eagle.alert.engine.publisher.impl.StringEventSerializer"
-			});
-			$scope.publisher = {
-				dedupIntervalMin: "PT1M"
-			};
-			$scope.publisherProps = {};
-		};
-
-		$scope.removePublisher = function (publisher) {
-			$scope.publisherList = common.array.remove(publisher, $scope.publisherList);
-		};
-
-		$scope.checkAddPublisher = function () {
-			return $scope.publisher.name &&
-				!common.array.find($scope.publisher.name, $scope.publisherList, "name");
-		};
-
-		// =========================================================
-		// =                         Policy                        =
-		// =========================================================
-		$scope.createPolicy = function () {
-			// TODO: Need check the policy or publisher exist.
-
-			$scope.policyLock = true;
-
-			var policyPromise = Entity.create("metadata/policies", $scope.policy)._promise;
-			var publisherPromiseList = $.map($scope.publisherList, function (publisher) {
-				return Entity.create("metadata/publishments", publisher)._promise;
-			});
-			common.deferred.all(publisherPromiseList.concat(policyPromise)).then(function () {
-				$.dialog({
-					title: "Done",
-					content: "Close dialog to go to the policy detail page."
-				}, function () {
-					$wrapState.go("policyDetail", {name: $scope.policy.name});
-				});
-			}, function (failedList) {
-				$.dialog({
-					title: "OPS",
-					content: $("<pre>").text(JSON.stringify(failedList, null, "\t"))
-				});
-				$scope.policyLock = false;
-			});
+		$scope.checkInputStream = function (streamId) {
+			if($scope.isInputStreamSelected(streamId)) {
+				$scope.policy.inputStreams = common.array.remove(streamId, $scope.policy.inputStreams);
+			} else {
+				$scope.policy.inputStreams.push(streamId);
+			}
 		};
 	}
 })();

@@ -1,0 +1,86 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<div class="row">
+	<div class="col-md-4">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<span class="fa fa-rocket"></span>
+				<h3 class="box-title">
+					Source
+					<span ng-if="policy.inputStreams.length > 0">({{policy.inputStreams.length}})</span>
+				</h3>
+				<div class="box-tools pull-right">
+					<div class="btn-group" data-toggle="btn-toggle">
+						<button class="btn btn-default btn-sm" ng-class="{active: sourceTab === 'all'}" ng-click="setSourceTab('all')">
+							All
+						</button>
+						<button class="btn btn-default btn-sm" ng-class="{active: sourceTab === 'selected'}" ng-click="setSourceTab('selected')">
+							Selected
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="box-body">
+				<div ng-show="sourceTab === 'all'">
+					<div class="input-with-icon">
+						<input type="text" class="form-control" placeholder="Search..." ng-model="searchSourceKey" />
+						<span class="fa fa-search"></span>
+					</div>
+					<div ng-repeat="(app, streams) in getSearchApplication() track by app" class="policy-app-list">
+						<a data-toggle="collapse" href="[data-id='SP_{{app}}']">
+							<strong>{{app}}</strong>
+						</a>
+						<ul data-id="SP_{{app}}" class="collapse in list-unstyled">
+							<li ng-repeat="stream in streams track by stream.streamId">
+								<input type="checkbox" ng-checked="isInputStreamSelected(stream.streamId)"
+									   ng-click="checkInputStream(stream.streamId)" />
+								<a data-toggle="collapse" href="[data-id='SP_{{app}}_{{stream.streamId}}']">
+									{{stream.streamId}}
+								</a>
+								<ul data-id="SP_{{app}}_{{stream.streamId}}" class="collapse in">
+									<li ng-repeat="column in stream.columns track by $index">
+										<span class="text-primary">[{{column.type}}]</span>
+										{{column.name}}
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div ng-show="sourceTab === 'selected'">
+					<div ng-repeat="stream in policy.inputStreams">
+						<a data-toggle="collapse" href="[data-id='SS_{{stream}}']">
+							<strong>{{stream}}</strong>
+						</a>
+						<ul class="sm-padding collapse in" data-id="SS_{{stream}}">
+							<li ng-repeat="column in streams[stream].columns track by $index">
+								<span class="text-primary">[{{column.type}}]</span>
+								{{column.name}}
+							</li>
+						</ul>
+					</div>
+					<p class="text-muted" ng-if="policy.inputStreams.length === 0">No Stream selected</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-8">
+		<label>Policy</label>
+	</div>
+</div>
