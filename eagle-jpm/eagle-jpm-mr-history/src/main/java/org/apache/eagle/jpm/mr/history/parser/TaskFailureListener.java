@@ -114,7 +114,7 @@ public class TaskFailureListener implements HistoryJobEntityCreationListener {
             MRHistoryJobConfig.get().getEagleServiceConfig().username,
             MRHistoryJobConfig.get().getEagleServiceConfig().password);
 
-        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getJobExtractorConfig().readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getEagleServiceConfig().readTimeoutSeconds * 1000);
 
         int tried = 0;
         while (tried <= MAX_RETRY_TIMES) {

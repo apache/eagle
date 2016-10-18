@@ -53,7 +53,6 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
 
     private final JobProcessDate processDate = new JobProcessDate();
     private JHFInputStreamCallback reader;
-    protected boolean zeroBasedMonth = true;
 
     private JobHistoryLCM jhfLCM;
     private JobIdFilter jobFilter;
@@ -63,12 +62,11 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
 
     public JHFCrawlerDriverImpl(JHFInputStreamCallback reader,
                                 JobHistoryLCM historyLCM, JobIdFilter jobFilter, int partitionId) throws Exception {
-        this.zeroBasedMonth = MRHistoryJobConfig.get().getControlConfig().zeroBasedMonth;
         this.reader = reader;
         jhfLCM = historyLCM;//new JobHistoryDAOImpl(jobHistoryConfig);
         this.partitionId = partitionId;
         this.jobFilter = jobFilter;
-        timeZone = TimeZone.getTimeZone(MRHistoryJobConfig.get().getControlConfig().timeZone);
+        timeZone = TimeZone.getTimeZone(MRHistoryJobConfig.get().getJobHistoryEndpointConfig().timeZone);
         jobCountMetricsGenerator = new JobCountMetricsGenerator(timeZone);
     }
 
@@ -198,7 +196,7 @@ public class JHFCrawlerDriverImpl implements JHFCrawlerDriver {
     }
 
     private int getActualMonth(int month) {
-        return zeroBasedMonth ? processDate.month : processDate.month + 1;
+        return processDate.month + 1;
     }
 
     private static class JobProcessDate {

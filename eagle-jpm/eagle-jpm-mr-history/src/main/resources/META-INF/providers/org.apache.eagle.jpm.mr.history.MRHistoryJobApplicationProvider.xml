@@ -17,88 +17,93 @@
   -->
 
 <application>
-
     <type>MR_HISTORY_JOB_APP</type>
     <name>Map Reduce History Job Monitoring</name>
     <version>0.5.0-incubating</version>
     <configuration>
         <!-- org.apache.eagle.jpm.mr.history.MRHistoryJobConfig -->
         <property>
-            <name>jobExtractorConfig.site</name>
-            <displayName>Site ID</displayName>
-            <value>sandbox</value>
-        </property>
-        <property>
             <name>workers</name>
-            <displayName>storm worker number</displayName>
+            <displayName>Worker Number</displayName>
+            <description>the number of storm workers will be used</description>
             <value>4</value>
         </property>
         <property>
-            <name>envContextConfig.parallelismConfig.mrHistoryJobExecutor</name>
+            <name>stormConfig.mrHistoryJobSpoutTasks</name>
+            <displayName>Read Task Number</displayName>
+            <description>the number tasks of the spout will be assigned</description>
             <value>4</value>
         </property>
-        <property>
-            <name>envContextConfig.tasks.mrHistoryJobExecutor</name>
-            <value>4</value>
-        </property>
-        <property>
-            <name>jobExtractorConfig.mrVersion</name>
-            <value>MRVer2</value>
-        </property>
-        <property>
-            <name>jobExtractorConfig.readTimeOutSeconds</name>
-            <value>60</value>
-        </property>
+
         <property>
             <name>zkStateConfig.zkQuorum</name>
+            <displayName>Zookeeper Servers</displayName>
+            <description>list of zookeeper servers to connect to</description>
             <value>sandbox.hortonworks.com:2181</value>
-        </property>
-        <property>
-            <name>zkStateConfig.zkPort</name>
-            <value>2181</value>
+            <required>true</required>
         </property>
         <property>
             <name>zkStateConfig.zkRoot</name>
+            <displayName>Zookeeper Root Path</displayName>
+            <description>zkRoot that used to save context for this application</description>
             <value>/mrjobhistory_sandbox</value>
+            <required>true</required>
         </property>
         <property>
             <name>zkStateConfig.zkSessionTimeoutMs</name>
+            <displayName>Zookeeper Session Timeout</displayName>
+            <description>session timeout</description>
             <value>15000</value>
+            <required>true</required>
         </property>
         <property>
             <name>zkStateConfig.zkRetryTimes</name>
+            <displayName>Zookeeper Retry Times</displayName>
+            <description>retry policy to use - retry times</description>
             <value>3</value>
+            <required>true</required>
         </property>
         <property>
             <name>zkStateConfig.zkRetryInterval</name>
+            <displayName>Zookeeper Retry Interval</displayName>
+            <description>retry policy to use - retry interval</description>
             <value>20000</value>
+            <required>true</required>
         </property>
+
         <property>
-            <name>controlConfig.zeroBasedMonth</name>
-            <value>false</value>
-        </property>
-        <property>
-            <name>controlConfig.partitionerCls</name>
-            <value>org.apache.eagle.jpm.util.DefaultJobIdPartitioner</value>
-        </property>
-        <property>
-            <name>controlConfig.timeZone</name>
+            <name>endpointConfig.timeZone</name>
+            <displayName>Time Zone</displayName>
+            <description>which time zone do hdfs data nodes locate in</description>
             <value>Etc/GMT+7</value>
+            <required>true</required>
         </property>
         <property>
             <name>endpointConfig.mrHistoryServerUrl</name>
+            <displayName>Map Reduce History Server</displayName>
+            <description>map reduce history server url address</description>
             <value>http://sandbox.hortonworks.com:19888</value>
+            <required>true</required>
         </property>
         <property>
             <name>endpointConfig.basePath</name>
+            <displayName>Map Reduce History Log File Path</displayName>
+            <description>which directory do map reduce history job files locate in</description>
             <value>/mr-history/done</value>
+            <required>true</required>
         </property>
         <property>
             <name>endpointConfig.hdfs.fs.defaultFS</name>
+            <displayName>HDFS Address</displayName>
+            <description>The name of the default file system.  Either the literal string "local" or a host:port for NDFS</description>
             <value>hdfs://sandbox.hortonworks.com:8020</value>
+            <required>true</required>
         </property>
+
         <property>
             <name>MRConfigureKeys.jobConfigKey</name>
+            <displayName>Map Reduce Extracted Configuration Keys</displayName>
+            <description>which configures will be extracted from map reduce job configurations</description>
             <value>mapreduce.map.output.compress,
                 mapreduce.map.output.compress.codec,
                 mapreduce.output.fileoutputformat.compress,
@@ -113,27 +118,43 @@
         </property>
         <property>
             <name>MRConfigureKeys.jobNameKey</name>
+            <displayName>Map Reduce Job Name Key</displayName>
+            <description>User use -Dkey=value to specify name of a job when submit. use this to extract job name from job configuration</description>
             <value>eagle.job.name</value>
         </property>
         <property>
-            <name>eagleProps.eagleService.host</name>
-            <description>eagleProps.eagleService.host</description>
+            <name>eagleService.host</name>
+            <displayName>Eagle Server Host</displayName>
+            <description>eagle server host</description>
             <value>sandbox.hortonworks.com</value>
+            <required>true</required>
         </property>
         <property>
-            <name>eagleProps.eagleService.port</name>
-            <description>eagleProps.eagleService.port</description>
+            <name>eagleService.port</name>
+            <displayName>Eagle Server Port</displayName>
+            <description>eagle server port</description>
             <value>9099</value>
+            <required>true</required>
         </property>
         <property>
-            <name>eagleProps.eagleService.username</name>
-            <description>eagleProps.eagleService.username</description>
+            <name>eagleService.username</name>
+            <displayName>Eagle Server UserName</displayName>
+            <description>eagle server username used to login</description>
             <value>admin</value>
+            <required>true</required>
         </property>
         <property>
-            <name>eagleProps.eagleService.password</name>
-            <description>eagleProps.eagleService.password</description>
+            <name>eagleService.password</name>
+            <displayName>Eagle Server Password</displayName>
+            <description>eagle server password used to login</description>
             <value>secret</value>
+            <required>true</required>
+        </property>
+        <property>
+            <name>eagleService.readTimeOutSeconds</name>
+            <displayName>Eagle Server Read TimeOut(seconds)</displayName>
+            <description>eagle server read time out(seconds)</description>
+            <value>60</value>
         </property>
     </configuration>
     <docs>

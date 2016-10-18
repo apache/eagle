@@ -18,7 +18,6 @@
 
 package org.apache.eagle.jpm.mr.history.parser;
 
-import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.JobHistoryContentFilter;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
@@ -31,41 +30,14 @@ public class JHFParserFactory {
     private static final Logger LOG = LoggerFactory.getLogger(JHFParserFactory.class);
 
     public static JHFParserBase getParser(Map<String, String> baseTags, Configuration configuration, JobHistoryContentFilter filter) {
-        String format = MRHistoryJobConfig.get().getJobExtractorConfig().mrVersion;
-        JHFParserBase parser;
-        JHFFormat f;
-        try {
-            if (format == null) {
-                f = JHFFormat.MRVer1;
-            } else {
-                f = JHFFormat.valueOf(format);
-            }
-        } catch (IllegalArgumentException ex) {
-            f = JHFFormat.MRVer1; // fall back to version 1 unless it's specified as version 2
-        }
+        JHFMRVer2EventReader reader2 = new JHFMRVer2EventReader(baseTags, configuration, filter);
+        reader2.addListener(new JobEntityCreationEagleServiceListener());
+        reader2.addListener(new TaskFailureListener());
+        reader2.addListener(new TaskAttemptCounterListener());
+        reader2.addListener(new JobConfigurationCreationServiceListener());
 
-        switch (f) {
-            case MRVer2:
-                JHFMRVer2EventReader reader2 = new JHFMRVer2EventReader(baseTags, configuration, filter);
-                reader2.addListener(new JobEntityCreationEagleServiceListener());
-                reader2.addListener(new TaskFailureListener());
-                reader2.addListener(new TaskAttemptCounterListener());
-                reader2.addListener(new JobConfigurationCreationServiceListener());
-
-                reader2.register(new JobEntityLifecycleAggregator());
-                parser = new JHFMRVer2Parser(reader2);
-                break;
-            case MRVer1:
-            default:
-                JHFMRVer1EventReader reader1 = new JHFMRVer1EventReader(baseTags, configuration, filter);
-                reader1.addListener(new JobEntityCreationEagleServiceListener());
-                reader1.addListener(new TaskFailureListener());
-                reader1.addListener(new TaskAttemptCounterListener());
-
-                reader1.register(new JobEntityLifecycleAggregator());
-                parser = new JHFMRVer1Parser(reader1);
-                break;
-        }
+        reader2.register(new JobEntityLifecycleAggregator());
+        JHFParserBase parser = new JHFMRVer2Parser(reader2);
         return parser;
     }
 }

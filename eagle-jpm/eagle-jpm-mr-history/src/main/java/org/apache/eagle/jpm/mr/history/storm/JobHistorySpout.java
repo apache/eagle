@@ -22,6 +22,7 @@ import org.apache.eagle.jpm.mr.history.MRHistoryJobConfig;
 import org.apache.eagle.jpm.mr.history.crawler.*;
 import org.apache.eagle.jpm.mr.history.zkres.JobHistoryZKStateManager;
 import org.apache.eagle.jpm.mr.historyentity.JobProcessTimeStampEntity;
+import org.apache.eagle.jpm.util.DefaultJobIdPartitioner;
 import org.apache.eagle.jpm.util.JobIdFilter;
 import org.apache.eagle.jpm.util.JobIdFilterByPartition;
 import org.apache.eagle.jpm.util.JobIdPartitioner;
@@ -134,15 +135,7 @@ public class JobHistorySpout extends BaseRichSpout {
             throw new IllegalStateException("partitionId should be less than numTotalPartitions with partitionId "
                 + partitionId + " and numTotalPartitions " + numTotalPartitions);
         }
-        Class<? extends JobIdPartitioner> partitionerCls = MRHistoryJobConfig.get().getControlConfig().partitionerCls;
-        JobIdPartitioner partitioner;
-        try {
-            partitioner = partitionerCls.newInstance();
-        } catch (Exception e) {
-            LOG.error("failing instantiating job partitioner class " + partitionerCls, e);
-            throw new IllegalStateException(e);
-        }
-        JobIdFilter jobIdFilter = new JobIdFilterByPartition(partitioner, numTotalPartitions, partitionId);
+        JobIdFilter jobIdFilter = new JobIdFilterByPartition(new DefaultJobIdPartitioner(), numTotalPartitions, partitionId);
         JobHistoryZKStateManager.instance().init(MRHistoryJobConfig.get().getZkStateConfig());
         JobHistoryZKStateManager.instance().ensureJobPartitions(numTotalPartitions);
         interceptor.setSpoutOutputCollector(collector);
@@ -232,7 +225,7 @@ public class JobHistorySpout extends BaseRichSpout {
         LOG.info("update process time stamp {}", minTimeStamp);
         Map<String, String> baseTags = new HashMap<String, String>() {
             {
-                put("site", MRHistoryJobConfig.get().getJobExtractorConfig().site);
+                put("site", MRHistoryJobConfig.get().getJobHistoryEndpointConfig().site);
             }
         };
         JobProcessTimeStampEntity entity = new JobProcessTimeStampEntity();
@@ -246,7 +239,7 @@ public class JobHistorySpout extends BaseRichSpout {
             MRHistoryJobConfig.get().getEagleServiceConfig().username,
             MRHistoryJobConfig.get().getEagleServiceConfig().password);
 
-        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getJobExtractorConfig().readTimeoutSeconds * 1000);
+        client.getJerseyClient().setReadTimeout(MRHistoryJobConfig.get().getEagleServiceConfig().readTimeoutSeconds * 1000);
 
         List<JobProcessTimeStampEntity> entities = new ArrayList<>();
         entities.add(entity);

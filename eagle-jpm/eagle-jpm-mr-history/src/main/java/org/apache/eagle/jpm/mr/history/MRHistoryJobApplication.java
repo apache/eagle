@@ -59,16 +59,12 @@ public class MRHistoryJobApplication extends StormApplication {
         JobHistoryContentFilter filter = builder.build();
         //3. init topology
         TopologyBuilder topologyBuilder = new TopologyBuilder();
-        String spoutName = "mrHistoryJobExecutor";
-        int parallelism = jhfAppConf.getInt("envContextConfig.parallelismConfig." + spoutName);
-        int tasks = jhfAppConf.getInt("envContextConfig.tasks." + spoutName);
-        if (parallelism > tasks) {
-            parallelism = tasks;
-        }
+        String spoutName = "mrHistoryJobSpout";
+        int tasks = jhfAppConf.getInt("stormConfig.mrHistoryJobSpoutTasks");
         topologyBuilder.setSpout(
-            spoutName,
-            new JobHistorySpout(filter, config),
-            parallelism
+                spoutName,
+                new JobHistorySpout(filter, config),
+                tasks
         ).setNumTasks(tasks);
         return topologyBuilder.createTopology();
     }
