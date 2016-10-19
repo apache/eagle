@@ -32,6 +32,7 @@ import org.apache.eagle.alert.engine.sorter.impl.StreamTimeClockInLocalMemory;
 import org.apache.eagle.alert.utils.DateTimeUtil;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +136,7 @@ public class StreamSortHandlerTest {
      *
      * @throws InterruptedException
      */
-    @Test
+    @Test @Ignore("Igored heavy benchmark test in unit test")
     public void testWithUnsortedEventsInLargeWindowBenchmark() throws InterruptedException {
         metricReporter.report();
         testWithUnsortedEventsIn1hWindow(1000);
@@ -146,8 +147,8 @@ public class StreamSortHandlerTest {
         metricReporter.report();
         testWithUnsortedEventsIn1hWindow(1000000);
         metricReporter.report();
-//        testWithUnsortedEventsIn1hWindow(10000000);
-//        metricReporter.report();
+        testWithUnsortedEventsIn1hWindow(10000000);
+        metricReporter.report();
     }
 
     public void testWithUnsortedEventsIn1hWindow(int count) throws InterruptedException {

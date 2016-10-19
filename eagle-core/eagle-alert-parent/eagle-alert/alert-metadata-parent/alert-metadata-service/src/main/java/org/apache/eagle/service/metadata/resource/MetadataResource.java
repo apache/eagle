@@ -207,13 +207,13 @@ public class MetadataResource {
     @Path("/policies/validate")
     @POST
     public PolicyValidationResult validatePolicy(PolicyDefinition policy) {
-        return PolicyCompiler.validate(policy,dao);
+        return PolicyInterpreter.validate(policy,dao);
     }
 
     @Path("/policies/parse")
     @POST
     public PolicyParseResult parsePolicy(String policyDefinition) {
-        return PolicyCompiler.parse(policyDefinition);
+        return PolicyInterpreter.parse(policyDefinition);
     }
 
     @Path("/policies/batch")

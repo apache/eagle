@@ -18,7 +18,6 @@ package org.apache.eagle.service.metadata.resource;
 
 import com.google.common.base.Preconditions;
 import org.apache.eagle.alert.engine.coordinator.*;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
 import org.apache.eagle.alert.engine.evaluator.impl.SiddhiDefinitionAdapter;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.slf4j.Logger;
@@ -29,9 +28,7 @@ import org.wso2.siddhi.query.api.execution.query.Query;
 import org.wso2.siddhi.query.api.execution.query.input.handler.StreamHandler;
 import org.wso2.siddhi.query.api.execution.query.input.handler.Window;
 import org.wso2.siddhi.query.api.execution.query.input.stream.InputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.JoinInputStream;
 import org.wso2.siddhi.query.api.execution.query.input.stream.SingleInputStream;
-import org.wso2.siddhi.query.api.execution.query.input.stream.StateInputStream;
 import org.wso2.siddhi.query.api.execution.query.output.stream.OutputStream;
 import org.wso2.siddhi.query.api.execution.query.selection.OutputAttribute;
 import org.wso2.siddhi.query.api.execution.query.selection.Selector;
@@ -45,9 +42,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class PolicyCompiler {
-    private static final Logger LOG = LoggerFactory.getLogger(PolicyCompiler.class);
+/**
+ * PolicyInterpreter:
+ * <ul>
+ * <li>Parse: parse siddhi query and generate static execution plan</li>
+ * <li>Validate: validate policy definition with execution plan and metadata</li>
+ * </ul>
+ * @see <a href="https://docs.wso2.com/display/CEP300/WSO2+Complex+Event+Processor+Documentation">WSO2 Complex Event Processor Documentation</a>
+ */
+public class PolicyInterpreter {
+    private static final Logger LOG = LoggerFactory.getLogger(PolicyInterpreter.class);
 
+    /**
+     * See https://docs.wso2.com/display/CEP300/Windows#Windows-ExternalTimeWindow.
+     */
+    private static final String WINDOW_EXTERNAL_TIME = "externalTime";
 
     public static PolicyParseResult parse(String executionPlanQuery) {
         PolicyParseResult policyParseResult = new PolicyParseResult();
@@ -161,10 +170,10 @@ public class PolicyCompiler {
         StreamSortSpec sortSpec = null;
 
         if (windows.size() > 0) {
-            sortSpec = new StreamSortSpec();
             for (Window window : windows) {
-                if (window.getFunction().equals("timeBatch")) {
-                    sortSpec.setWindowPeriodMillis(((TimeConstant) window.getParameters()[0]).getValue().intValue());
+                if (window.getFunction().equals(WINDOW_EXTERNAL_TIME)) {
+                    sortSpec = new StreamSortSpec();
+                    sortSpec.setWindowPeriodMillis(((TimeConstant) window.getParameters()[1]).getValue().intValue());
                     sortSpec.setWindowMargin(sortSpec.getWindowPeriodMillis() / 3);
                 }
             }
