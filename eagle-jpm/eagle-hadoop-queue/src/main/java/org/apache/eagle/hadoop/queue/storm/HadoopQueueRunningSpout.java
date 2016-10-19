@@ -18,6 +18,8 @@
 
 package org.apache.eagle.hadoop.queue.storm;
 
+import org.apache.eagle.hadoop.queue.HadoopQueueRunningApp;
+import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
 import org.apache.eagle.hadoop.queue.common.HadoopClusterConstants;
 import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
 
@@ -35,18 +37,16 @@ import java.util.Map;
 public class HadoopQueueRunningSpout extends BaseRichSpout {
 
     private static final Logger LOG = LoggerFactory.getLogger(HadoopQueueRunningSpout.class);
-    private static final String FETCH_INTERVAL_CONF = "dataSourceConfig.FetchIntervalSec";
-    private static final String DEFAULT_FETCH_INTERVAL_SECONDS = "10";
 
     private long fetchIntervalSec;
     private long lastFetchTime = 0;
 
     private HadoopQueueRunningExtractor extractor;
-    private Config config;
+    private HadoopQueueRunningAppConfig config;
 
-    public HadoopQueueRunningSpout(Config config) {
+    public HadoopQueueRunningSpout(HadoopQueueRunningAppConfig config) {
         this.config = config;
-        fetchIntervalSec = Long.parseLong(HadoopYarnResourceUtils.getConfigValue(config, FETCH_INTERVAL_CONF, DEFAULT_FETCH_INTERVAL_SECONDS));
+        fetchIntervalSec = Long.parseLong(config.dataSourceConfig.fetchIntervalSec);
     }
 
     @Override

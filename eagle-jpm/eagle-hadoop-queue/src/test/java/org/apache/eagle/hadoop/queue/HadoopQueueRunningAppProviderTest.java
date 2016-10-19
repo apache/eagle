@@ -16,10 +16,17 @@
  */
 package org.apache.eagle.hadoop.queue;
 
-public class HadoopQueueRunningMain {
+import com.google.inject.Inject;
+import org.apache.eagle.app.test.ApplicationSimulator;
+import org.apache.eagle.app.test.ApplicationTestBase;
+import org.junit.Test;
 
-    public static void main(String[] args) {
-        new HadoopQueueRunningApp().run(args);
+public class HadoopQueueRunningAppProviderTest extends ApplicationTestBase {
+    @Inject
+    private ApplicationSimulator simulator;
+
+    @Test
+    public void testRunAsManagedApplicationWithSimulator() {
+        simulator.start(HadoopQueueRunningAppProvider.class);
     }
-
 }

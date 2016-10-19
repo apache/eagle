@@ -16,10 +16,12 @@
  */
 package org.apache.eagle.hadoop.queue;
 
-public class HadoopQueueRunningMain {
+import com.typesafe.config.ConfigFactory;
+import org.junit.Test;
 
-    public static void main(String[] args) {
-        new HadoopQueueRunningApp().run(args);
+public class HadoopQueueRunningAppTest {
+    @Test
+    public void testRun(){
+        new HadoopQueueRunningApp().run(ConfigFactory.load());
     }
-
 }
