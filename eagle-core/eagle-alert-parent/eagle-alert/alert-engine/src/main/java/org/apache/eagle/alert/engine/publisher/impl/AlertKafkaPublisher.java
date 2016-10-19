@@ -75,7 +75,9 @@ public class AlertKafkaPublisher extends AbstractPublishPlugin {
         String newBrokerList = pluginProperties.get(PublishConstants.BROKER_LIST).trim();
         String newTopic = pluginProperties.get(PublishConstants.TOPIC).trim();
         if (!newBrokerList.equals(this.brokerList)) {
-            producer.close();
+            if (producer != null) {
+                producer.close();
+            }
             brokerList = newBrokerList;
             KafkaProducer newProducer = null;
             try {
