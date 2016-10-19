@@ -31,11 +31,10 @@ import java.util.*;
 public class AggregationApplication extends StormApplication {
     @Override
     public StormTopology execute(Config config, StormEnvironment environment) {
-        //TODO
         List<String> metricNames = new ArrayList<>();
         String[] metricNamesArr = config.getString("aggregate.counters.metrics").split(",");
         for (int i = 0; i < metricNamesArr.length; i++) {
-            metricNames.add(metricNamesArr[i].trim());
+            metricNames.add(metricNamesArr[i].trim().toLowerCase());
         }
         List<String> groupByColumns = new ArrayList<>();
 
@@ -56,25 +55,17 @@ public class AggregationApplication extends StormApplication {
         String spoutName = "mrHistoryAggregationSpout";
         String boltName = "mrHistoryAggregationBolt";
         AggregationConfig aggregationConfig = AggregationConfig.getInstance(config);
-        int parallelism = aggregationConfig.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
-        int tasks = aggregationConfig.getConfig().getInt("envContextConfig.tasks." + spoutName);
-        if (parallelism > tasks) {
-            parallelism = tasks;
-        }
+        int tasks = aggregationConfig.getConfig().getInt("stormConfig." + spoutName + "Tasks");
         topologyBuilder.setSpout(
             spoutName,
             new AggregationSpout(config, new MRMetricsAggregateContainer(metrics)),
-            parallelism
+            tasks
         ).setNumTasks(tasks);
 
-        parallelism = aggregationConfig.getConfig().getInt("envContextConfig.parallelismConfig." + boltName);
-        tasks = aggregationConfig.getConfig().getInt("envContextConfig.tasks." + boltName);
-        if (parallelism > tasks) {
-            parallelism = tasks;
-        }
+        tasks = aggregationConfig.getConfig().getInt("stormConfig." + boltName + "Tasks");
         topologyBuilder.setBolt(boltName,
             new AggregationBolt(config, new MRMetricsAggregateContainer(metrics)),
-            parallelism).setNumTasks(tasks).shuffleGrouping(spoutName);
+            tasks).setNumTasks(tasks).shuffleGrouping(spoutName);
 
         return topologyBuilder.createTopology();
     }
