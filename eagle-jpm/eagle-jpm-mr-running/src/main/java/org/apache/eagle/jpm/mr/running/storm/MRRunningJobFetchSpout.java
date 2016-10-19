@@ -41,7 +41,6 @@ import java.util.*;
 
 public class MRRunningJobFetchSpout extends BaseRichSpout {
     private static final Logger LOG = LoggerFactory.getLogger(MRRunningJobFetchSpout.class);
-    private MRRunningJobConfig.JobExtractorConfig jobExtractorConfig;
     private MRRunningJobConfig.EndpointConfig endpointConfig;
     private MRRunningJobConfig.ZKStateConfig zkStateConfig;
     private ResourceFetcher resourceFetcher;
@@ -50,10 +49,8 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
     private transient MRRunningJobManager runningJobManager;
     private Set<String> runningYarnApps;
 
-    public MRRunningJobFetchSpout(MRRunningJobConfig.JobExtractorConfig jobExtractorConfig,
-                                  MRRunningJobConfig.EndpointConfig endpointConfig,
+    public MRRunningJobFetchSpout(MRRunningJobConfig.EndpointConfig endpointConfig,
                                   MRRunningJobConfig.ZKStateConfig zkStateConfig) {
-        this.jobExtractorConfig = jobExtractorConfig;
         this.endpointConfig = endpointConfig;
         this.zkStateConfig = zkStateConfig;
         this.init = false;
@@ -140,7 +137,7 @@ public class MRRunningJobFetchSpout extends BaseRichSpout {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utils.sleep(jobExtractorConfig.fetchRunningJobInterval);
+            Utils.sleep(endpointConfig.fetchRunningJobInterval);
         }
     }
 
