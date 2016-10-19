@@ -52,7 +52,7 @@ public class AggregationBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
         Long startTime = tuple.getLongByField("startTime");
         LOG.info("get startTime {}", startTime);
-        Long endTime = startTime + AggregationConfig.get().getJobExtractorConfig().aggregationDuration * 1000;
+        Long endTime = startTime + AggregationConfig.get().getStormConfig().aggregationDuration * 1000;
 
         if (metricsAggregateContainer.aggregate(startTime, endTime)) {
             collector.ack(tuple);

@@ -58,7 +58,7 @@ public class MRMetricsAggregateContainer implements MetricsAggregateContainer, S
 
             String query = String.format("%s[@site=\"%s\"]<@site>{max(currentTimeStamp)}",
                 Constants.JPA_JOB_PROCESS_TIME_STAMP_NAME,
-                AggregationConfig.get().getJobExtractorConfig().site);
+                AggregationConfig.get().getStormConfig().site);
 
             GenericServiceAPIResponseEntity response = client
                 .search(query)

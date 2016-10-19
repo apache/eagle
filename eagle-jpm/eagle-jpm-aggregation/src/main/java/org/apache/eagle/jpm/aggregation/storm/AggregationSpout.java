@@ -90,7 +90,7 @@ public class AggregationSpout extends BaseRichSpout {
             for (Long startTime = lastUpdateTime; startTime < lastUpdateTime + MAX_SAFE_TIME;) {
                 collector.emit(new Values(startTime), startTime);
                 this.processStartTime.add(startTime);
-                startTime += AggregationConfig.get().getJobExtractorConfig().aggregationDuration * 1000;
+                startTime += AggregationConfig.get().getStormConfig().aggregationDuration * 1000;
             }
         } catch (Exception e) {
             LOG.warn("{}", e);

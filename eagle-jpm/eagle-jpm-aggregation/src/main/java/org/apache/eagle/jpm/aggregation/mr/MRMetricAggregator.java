@@ -57,7 +57,7 @@ public class MRMetricAggregator implements MetricAggregator, Serializable {
 
         String query = String.format("%s[@site=\"%s\"]{*}",
             Constants.GENERIC_METRIC_SERVICE,
-            AggregationConfig.get().getJobExtractorConfig().site);
+            AggregationConfig.get().getStormConfig().site);
 
         GenericServiceAPIResponseEntity response;
         try {

@@ -32,17 +32,17 @@ public class AggregationConfig implements Serializable {
 
     private ZKStateConfig zkStateConfig;
 
-    public JobExtractorConfig getJobExtractorConfig() {
-        return jobExtractorConfig;
-    }
-
-    private JobExtractorConfig jobExtractorConfig;
-
     public EagleServiceConfig getEagleServiceConfig() {
         return eagleServiceConfig;
     }
 
     private EagleServiceConfig eagleServiceConfig;
+
+    public StormConfig getStormConfig() {
+        return stormConfig;
+    }
+
+    private StormConfig stormConfig;
 
     public Config getConfig() {
         return config;
@@ -56,10 +56,9 @@ public class AggregationConfig implements Serializable {
         public int zkSessionTimeoutMs;
         public int zkRetryTimes;
         public int zkRetryInterval;
-        public String zkPort;
     }
 
-    public static class JobExtractorConfig implements Serializable {
+    public static class StormConfig implements Serializable {
         public String site;
         public long aggregationDuration;
     }
@@ -75,7 +74,7 @@ public class AggregationConfig implements Serializable {
 
     private AggregationConfig() {
         this.zkStateConfig = new ZKStateConfig();
-        this.jobExtractorConfig = new JobExtractorConfig();
+        this.stormConfig = new StormConfig();
         this.eagleServiceConfig = new EagleServiceConfig();
         this.config = null;
     }
@@ -97,29 +96,27 @@ public class AggregationConfig implements Serializable {
      */
     private void init(Config config) {
         this.config = config;
-        //parse eagle job extractor
-        this.jobExtractorConfig.site = config.getString("jobExtractorConfig.site");
-        this.jobExtractorConfig.aggregationDuration = config.getLong("jobExtractorConfig.aggregationDuration");
+        //parse stormConfig
+        this.stormConfig.site = config.getString("siteId");
+        this.stormConfig.aggregationDuration = config.getLong("stormConfig.aggregationDuration");
 
         //parse eagle zk
-        this.zkStateConfig.zkQuorum = config.getString("zkStateConfig.zkQuorum");
-        this.zkStateConfig.zkPort = config.getString("zkStateConfig.zkPort");
-        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zkStateConfig.zkSessionTimeoutMs");
-        this.zkStateConfig.zkRetryTimes = config.getInt("zkStateConfig.zkRetryTimes");
-        this.zkStateConfig.zkRetryInterval = config.getInt("zkStateConfig.zkRetryInterval");
-        this.zkStateConfig.zkRoot = config.getString("zkStateConfig.zkRoot");
+        this.zkStateConfig.zkQuorum = config.getString("zookeeper.zkQuorum");
+        this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
+        this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
+        this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
+        this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
 
         // parse eagle service endpoint
-        this.eagleServiceConfig.eagleServiceHost = config.getString("eagleProps.eagleService.host");
-        String port = config.getString("eagleProps.eagleService.port");
+        this.eagleServiceConfig.eagleServiceHost = config.getString("service.host");
+        String port = config.getString("service.port");
         this.eagleServiceConfig.eagleServicePort = (port == null ? 8080 : Integer.parseInt(port));
-        this.eagleServiceConfig.username = config.getString("eagleProps.eagleService.username");
-        this.eagleServiceConfig.password = config.getString("eagleProps.eagleService.password");
+        this.eagleServiceConfig.username = config.getString("service.username");
+        this.eagleServiceConfig.password = config.getString("service.password");
 
-        LOG.info("Successfully initialized MRHistoryJobConfig");
+        LOG.info("Successfully initialized Aggregation Config");
         LOG.info("zookeeper.quorum: " + this.zkStateConfig.zkQuorum);
-        LOG.info("zookeeper.property.clientPort: " + this.zkStateConfig.zkPort);
-        LOG.info("eagle.service.host: " + this.eagleServiceConfig.eagleServiceHost);
-        LOG.info("eagle.service.port: " + this.eagleServiceConfig.eagleServicePort);
+        LOG.info("service.host: " + this.eagleServiceConfig.eagleServiceHost);
+        LOG.info("service.port: " + this.eagleServiceConfig.eagleServicePort);
     }
 }
