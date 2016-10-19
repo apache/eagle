@@ -16,13 +16,13 @@
   limitations under the License.
   -->
 
-<div class="row">
+<div class="row flex">
 	<div class="col-md-4">
 		<div class="box box-primary">
 			<div class="box-header with-border">
 				<span class="fa fa-rocket"></span>
 				<h3 class="box-title">
-					Source
+					Source Stream
 					<span ng-if="policy.inputStreams.length > 0">({{policy.inputStreams.length}})</span>
 				</h3>
 				<div class="box-tools pull-right">
@@ -93,20 +93,32 @@
 						<label>Definition</label>
 						<textarea class="form-control" ng-model="policy.definition.value" rows="10" ng-change="checkDefinition()"></textarea>
 					</div>
+
 					<label>
 						Stream Partition
 					</label>
 					<div>
-						<ul ng-show="policy.partitionSpec.length > 0">
+						<ul class="sm-padding">
 							<li ng-repeat="partition in policy.partitionSpec track by $index">
 								[<a class="fa fa-times" ng-click="removePartition(partition)"></a>]
 								[<span class="text-primary">{{partition.type}}</span>]
 								{{partition.streamId}}:
 								<strong class="text-success">{{partition.columns.join(", ")}}</strong>
 							</li>
+							<li>
+								<a ng-click="newPartition()">+ New Partition</a>
+							</li>
 						</ul>
-						<a ng-click="newPartition()">+ New Partition</a>
 					</div>
+
+					<label>
+						Alert Stream
+					</label>
+					<div></div>
+
+					<label>
+						Publisher
+					</label>
 				</div>
 			</div>
 		</div>
