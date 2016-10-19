@@ -102,6 +102,19 @@ public class SiddhiDefinitionAdapter {
         return builder.toString();
     }
 
+    public static String buildSiddhiExecutionPlan(String policyDefinition, Map<String, StreamDefinition> inputStreamDefinitions) {
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String,StreamDefinition> entry: inputStreamDefinitions.entrySet()) {
+            builder.append(SiddhiDefinitionAdapter.buildStreamDefinition(entry.getValue()));
+            builder.append("\n");
+        }
+        builder.append(policyDefinition);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Generated siddhi execution plan: {}", builder.toString());
+        }
+        return builder.toString();
+    }
+
     /**
      * public enum Type {
      * STRING, INT, LONG, FLOAT, DOUBLE, BOOL, OBJECT

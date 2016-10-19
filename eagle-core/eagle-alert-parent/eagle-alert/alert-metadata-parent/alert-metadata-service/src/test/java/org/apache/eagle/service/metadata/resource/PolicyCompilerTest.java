@@ -24,7 +24,15 @@ import org.junit.Test;
 
 import java.util.*;
 
-public class PolicyValidatorTest {
+public class PolicyCompilerTest {
+    @Test
+    public void parseFullPolicyQuery() throws Exception {
+        PolicyExecutionPlan executionPlan = PolicyCompiler.parseExecutionPlan("from HDFS_AUDIT_LOG_ENRICHED_STREAM_SANDBOX#window.timeBatch(2 min) "
+            + "select cmd, user, count() as total_count group by cmd,user insert into HDFS_AUDIT_LOG_ENRICHED_STREAM_SANDBOX_OUT");
+        Assert.assertEquals("HDFS_AUDIT_LOG_ENRICHED_STREAM_SANDBOX", executionPlan.getInputStreams().keySet().toArray()[0]);
+        Assert.assertEquals("HDFS_AUDIT_LOG_ENRICHED_STREAM_SANDBOX_OUT", executionPlan.getOutputStreams().keySet().toArray()[0]);
+    }
+
     @Test
     public void testValidPolicy() {
         PolicyDefinition policyDefinition = new PolicyDefinition();
@@ -34,12 +42,12 @@ public class PolicyValidatorTest {
 
         PolicyDefinition.Definition definition = new PolicyDefinition.Definition();
         definition.setType("siddhi");
-        definition.setValue("from INPUT_STREAM_1[value > 90.0] select * group by name insert into OUTPUT_STREAM_1;");
+        definition.setValue("from INPUT_STREAM_1#window.timeBatch(2 min) select name, sum(value) as total group by name insert into OUTPUT_STREAM_1 ;");
         definition.setInputStreams(policyDefinition.getInputStreams());
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
+        PolicyValidationResult validation = PolicyCompiler.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
                 put("INPUT_STREAM_1", createStreamDefinition("INPUT_STREAM_1"));
                 put("INPUT_STREAM_2", createStreamDefinition("INPUT_STREAM_2"));
@@ -48,8 +56,8 @@ public class PolicyValidatorTest {
             }
         });
         Assert.assertTrue(validation.isSuccess());
-        Assert.assertEquals(1, validation.getValidInputStreams().size());
-        Assert.assertEquals(1, validation.getValidOutputStreams().size());
+        Assert.assertEquals(1, validation.getPolicyExecutionPlan().getInputStreams().size());
+        Assert.assertEquals(1, validation.getPolicyExecutionPlan().getOutputStreams().size());
     }
 
     @Test
@@ -66,15 +74,15 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
+        PolicyValidationResult validation = PolicyCompiler.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
                 put("INPUT_STREAM_1", createStreamDefinition("INPUT_STREAM_1"));
                 put("INPUT_STREAM_2", createStreamDefinition("INPUT_STREAM_2"));
             }
         });
         Assert.assertTrue(validation.isSuccess());
-        Assert.assertEquals(2, validation.getValidInputStreams().size());
-        Assert.assertEquals(1, validation.getValidOutputStreams().size());
+        Assert.assertEquals(1, validation.getPolicyExecutionPlan().getInputStreams().size());
+        Assert.assertEquals(1, validation.getPolicyExecutionPlan().getOutputStreams().size());
     }
 
     @Test
@@ -94,15 +102,15 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
+        PolicyValidationResult validation = PolicyCompiler.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
                 put("INPUT_STREAM_1", createStreamDefinition("INPUT_STREAM_1"));
                 put("INPUT_STREAM_2", createStreamDefinition("INPUT_STREAM_2"));
             }
         });
         Assert.assertTrue(validation.isSuccess());
-        Assert.assertEquals(2, validation.getValidInputStreams().size());
-        Assert.assertEquals(2, validation.getValidOutputStreams().size());
+        Assert.assertEquals(1, validation.getPolicyExecutionPlan().getInputStreams().size());
+        Assert.assertEquals(2, validation.getPolicyExecutionPlan().getOutputStreams().size());
     }
 
     @Test
@@ -119,7 +127,7 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
+        PolicyValidationResult validation = PolicyCompiler.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
                 put("INPUT_STREAM", createStreamDefinition("INPUT_STREAM"));
             }
@@ -141,7 +149,7 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
+        PolicyValidationResult validation = PolicyCompiler.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
                 put("INPUT_STREAM_2", createStreamDefinition("INPUT_STREAM_2"));
             }
@@ -163,7 +171,7 @@ public class PolicyValidatorTest {
         definition.setOutputStreams(policyDefinition.getOutputStreams());
         policyDefinition.setDefinition(definition);
 
-        PolicyValidation validation = PolicyValidator.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
+        PolicyValidationResult validation = PolicyCompiler.validate(policyDefinition, new HashMap<String, StreamDefinition>() {
             {
                 put("INPUT_STREAM_1", createStreamDefinition("INPUT_STREAM_1"));
             }

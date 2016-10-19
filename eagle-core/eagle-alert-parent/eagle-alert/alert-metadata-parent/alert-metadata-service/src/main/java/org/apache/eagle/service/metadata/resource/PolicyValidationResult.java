@@ -16,30 +16,26 @@
  */
 package org.apache.eagle.service.metadata.resource;
 
-import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
-import org.apache.eagle.alert.engine.coordinator.StreamDefinition;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import java.util.Map;
+import org.apache.eagle.alert.engine.coordinator.PolicyDefinition;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class PolicyValidation {
+public class PolicyValidationResult {
     private boolean success;
     private String message;
     private String exception;
 
-    private Map<String, StreamDefinition> validInputStreams;
-    private Map<String, StreamDefinition> validOutputStreams;
+    private PolicyExecutionPlan policyExecutionPlan;
     private PolicyDefinition policyDefinition;
-    private String validExecutionPlan;
 
-    public boolean isSuccess() {
-        return success;
+    public String getException() {
+        return exception;
     }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
+    public void setException(String exception) {
+        this.exception = exception;
     }
 
     public String getMessage() {
@@ -50,33 +46,24 @@ public class PolicyValidation {
         this.message = message;
     }
 
-
-    public String getException() {
-        return exception;
-    }
-
-    public void setException(String exception) {
-        this.exception = exception;
-    }
-
     public void setStackTrace(Throwable throwable) {
-        this.exception = ExceptionUtils.getStackTrace(throwable);
+        this.setException(ExceptionUtils.getStackTrace(throwable));
     }
 
-    public Map<String, StreamDefinition> getValidOutputStreams() {
-        return validOutputStreams;
+    public boolean isSuccess() {
+        return success;
     }
 
-    public void setValidOutputStreams(Map<String, StreamDefinition> validOutputStreams) {
-        this.validOutputStreams = validOutputStreams;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
-    public Map<String, StreamDefinition> getValidInputStreams() {
-        return validInputStreams;
+    public PolicyExecutionPlan getPolicyExecutionPlan() {
+        return policyExecutionPlan;
     }
 
-    public void setValidInputStreams(Map<String, StreamDefinition> validInputStreams) {
-        this.validInputStreams = validInputStreams;
+    public void setPolicyExecutionPlan(PolicyExecutionPlan policyExecutionPlan) {
+        this.policyExecutionPlan = policyExecutionPlan;
     }
 
     public PolicyDefinition getPolicyDefinition() {
@@ -85,13 +72,5 @@ public class PolicyValidation {
 
     public void setPolicyDefinition(PolicyDefinition policyDefinition) {
         this.policyDefinition = policyDefinition;
-    }
-
-    public String getValidExecutionPlan() {
-        return validExecutionPlan;
-    }
-
-    public void setValidExecutionPlan(String validExecutionPlan) {
-        this.validExecutionPlan = validExecutionPlan;
     }
 }
