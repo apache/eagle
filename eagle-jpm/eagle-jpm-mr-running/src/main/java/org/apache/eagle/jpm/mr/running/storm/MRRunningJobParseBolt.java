@@ -42,7 +42,6 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(MRRunningJobParseBolt.class);
 
     private MRRunningJobConfig.EndpointConfig endpointConfig;
-    private MRRunningJobConfig.JobExtractorConfig jobExtractorConfig;
     private MRRunningJobConfig.ZKStateConfig zkStateConfig;
     private ExecutorService executorService;
     private Map<String, MRJobParser> runningMRParsers;
@@ -53,12 +52,10 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
 
     public MRRunningJobParseBolt(MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                                  MRRunningJobConfig.EndpointConfig endpointConfig,
-                                 MRRunningJobConfig.JobExtractorConfig jobExtractorConfig,
                                  MRRunningJobConfig.ZKStateConfig zkStateConfig,
                                  List<String> configKeys) {
         this.eagleServiceConfig = eagleServiceConfig;
         this.endpointConfig = endpointConfig;
-        this.jobExtractorConfig = jobExtractorConfig;
         this.runningMRParsers = new HashMap<>();
         this.zkStateConfig = zkStateConfig;
         this.configKeys = configKeys;
@@ -66,7 +63,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        this.executorService = Executors.newFixedThreadPool(jobExtractorConfig.parseJobThreadPoolSize);
+        this.executorService = Executors.newFixedThreadPool(endpointConfig.parseJobThreadPoolSize);
 
         this.runningJobManager = new MRRunningJobManager(zkStateConfig);
         this.resourceFetcher = new RMResourceFetcher(endpointConfig.rmUrls);
@@ -81,7 +78,7 @@ public class MRRunningJobParseBolt extends BaseRichBolt {
 
         MRJobParser applicationParser;
         if (!runningMRParsers.containsKey(appInfo.getId())) {
-            applicationParser = new MRJobParser(jobExtractorConfig, eagleServiceConfig,
+            applicationParser = new MRJobParser(endpointConfig, eagleServiceConfig,
                     appInfo, mrJobs, runningJobManager, this.resourceFetcher, configKeys);
             runningMRParsers.put(appInfo.getId(), applicationParser);
             LOG.info("create application parser for {}", appInfo.getId());

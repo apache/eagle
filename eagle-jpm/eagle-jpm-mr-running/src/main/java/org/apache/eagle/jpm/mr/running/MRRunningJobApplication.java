@@ -27,7 +27,6 @@ import backtype.storm.tuple.Fields;
 import com.typesafe.config.Config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MRRunningJobApplication extends StormApplication {
@@ -51,33 +50,24 @@ public class MRRunningJobApplication extends StormApplication {
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String spoutName = "mrRunningJobFetchSpout";
         String boltName = "mrRunningJobParseBolt";
-        int parallelism = mrRunningJobConfig.getConfig().getInt("envContextConfig.parallelismConfig." + spoutName);
-        int tasks = mrRunningJobConfig.getConfig().getInt("envContextConfig.tasks." + spoutName);
-        if (parallelism > tasks) {
-            parallelism = tasks;
-        }
+        int tasks = mrRunningJobConfig.getConfig().getInt("stormConfig." + spoutName + "Tasks");
+
         topologyBuilder.setSpout(
             spoutName,
-            new MRRunningJobFetchSpout(
-                mrRunningJobConfig.getJobExtractorConfig(),
-                mrRunningJobConfig.getEndpointConfig(),
-                mrRunningJobConfig.getZkStateConfig()),
-            parallelism
+            new MRRunningJobFetchSpout(mrRunningJobConfig.getEndpointConfig(),
+                    mrRunningJobConfig.getZkStateConfig()),
+            tasks
         ).setNumTasks(tasks);
 
-        parallelism = mrRunningJobConfig.getConfig().getInt("envContextConfig.parallelismConfig." + boltName);
-        tasks = mrRunningJobConfig.getConfig().getInt("envContextConfig.tasks." + boltName);
-        if (parallelism > tasks) {
-            parallelism = tasks;
-        }
+        tasks = mrRunningJobConfig.getConfig().getInt("stormConfig." + boltName + "Tasks");
+
         topologyBuilder.setBolt(boltName,
             new MRRunningJobParseBolt(
                 mrRunningJobConfig.getEagleServiceConfig(),
                 mrRunningJobConfig.getEndpointConfig(),
-                mrRunningJobConfig.getJobExtractorConfig(),
                 mrRunningJobConfig.getZkStateConfig(),
                 confKeyKeys),
-            parallelism).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
+                tasks).setNumTasks(tasks).fieldsGrouping(spoutName, new Fields("appId"));
         return topologyBuilder.createTopology();
     }
 }

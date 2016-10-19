@@ -40,6 +40,7 @@ public class MRJobEntityCreationHandler {
     private MRRunningJobConfig.EagleServiceConfig eagleServiceConfig;
     private JobExecutionMetricsCreationListener jobMetricsListener;
     private TaskExecutionMetricsCreationListener taskMetricsListener;
+    private static final int MAX_FLUSH_NUM = 1000;
 
     public MRJobEntityCreationHandler(MRRunningJobConfig.EagleServiceConfig eagleServiceConfig) {
         this.eagleServiceConfig = eagleServiceConfig;
@@ -61,7 +62,7 @@ public class MRJobEntityCreationHandler {
             metricEntities = jobMetricsListener.generateMetrics((JobExecutionAPIEntity) entity);
             entities.addAll(metricEntities);
         }
-        if (entities.size() >= eagleServiceConfig.maxFlushNum) {
+        if (entities.size() >= MAX_FLUSH_NUM) {
             this.flush();
         }
     }

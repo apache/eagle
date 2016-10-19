@@ -77,18 +77,19 @@ public class MRJobParser implements Runnable {
     private boolean first;
     private Set<String> finishedTaskIds;
     private List<String> configKeys;
-    private MRRunningJobConfig.JobExtractorConfig jobExtractorConfig;
+    private MRRunningJobConfig.EndpointConfig endpointConfig;
+    private static final int TOP_BOTTOM_TASKS_BY_ELASPED_TIME = 10;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
     }
 
-    public MRJobParser(MRRunningJobConfig.JobExtractorConfig jobExtractorConfig,
+    public MRJobParser(MRRunningJobConfig.EndpointConfig endpointConfig,
                        MRRunningJobConfig.EagleServiceConfig eagleServiceConfig,
                        AppInfo app, Map<String, JobExecutionAPIEntity> mrJobMap,
                        MRRunningJobManager runningJobManager, ResourceFetcher rmResourceFetcher,
                        List<String> configKeys) {
-        this.jobExtractorConfig = jobExtractorConfig;
+        this.endpointConfig = endpointConfig;
         this.app = app;
         this.mrJobEntityMap = new HashMap<>();
         this.mrJobEntityMap = mrJobMap;
@@ -99,7 +100,7 @@ public class MRJobParser implements Runnable {
 
         this.mrJobEntityCreationHandler = new MRJobEntityCreationHandler(eagleServiceConfig);
 
-        this.commonTags.put(MRJobTagName.SITE.toString(), jobExtractorConfig.site);
+        this.commonTags.put(MRJobTagName.SITE.toString(), endpointConfig.site);
         this.commonTags.put(MRJobTagName.USER.toString(), app.getUser());
         this.commonTags.put(MRJobTagName.JOB_QUEUE.toString(), app.getQueue());
         this.runningJobManager = runningJobManager;
@@ -403,7 +404,7 @@ public class MRJobParser implements Runnable {
             .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
             .sorted(byElapsedTimeIncrease).iterator();
         int i = 0;
-        while (taskIteratorIncrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
+        while (taskIteratorIncrease.hasNext() && i < TOP_BOTTOM_TASKS_BY_ELASPED_TIME) {
             MRTask mrTask = taskIteratorIncrease.next();
             if (mrTask.getElapsedTime() > 0) {
                 i++;
@@ -415,7 +416,7 @@ public class MRJobParser implements Runnable {
             .filter(task -> task.getState().equals(Constants.TaskState.SUCCEEDED.toString()))
             .sorted(byElapsedTimeDecrease).iterator();
         i = 0;
-        while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
+        while (taskIteratorDecrease.hasNext() && i < TOP_BOTTOM_TASKS_BY_ELASPED_TIME) {
             MRTask mrTask = taskIteratorDecrease.next();
             if (mrTask.getElapsedTime() > 0) {
                 i++;
@@ -427,7 +428,7 @@ public class MRJobParser implements Runnable {
             .filter(task -> task.getState().equals(Constants.TaskState.RUNNING.toString()))
             .sorted(byElapsedTimeDecrease).iterator();
         i = 0;
-        while (taskIteratorDecrease.hasNext() && i < jobExtractorConfig.topAndBottomTaskByElapsedTime) {
+        while (taskIteratorDecrease.hasNext() && i < TOP_BOTTOM_TASKS_BY_ELASPED_TIME) {
             MRTask mrTask = taskIteratorDecrease.next();
             if (mrTask.getElapsedTime() > 0) {
                 i++;

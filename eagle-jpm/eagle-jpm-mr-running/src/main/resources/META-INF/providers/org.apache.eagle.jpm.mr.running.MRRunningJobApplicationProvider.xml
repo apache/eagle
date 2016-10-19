@@ -18,122 +18,60 @@
 
 <application>
     <type>MR_RUNNING_JOB_APP</type>
-    <name>MR Running Job Monitoring</name>
+    <name>Map Reduce Running Job Monitoring</name>
     <version>0.5.0-incubating</version>
     <configuration>
-        <!-- org.apache.eagle.jpm.spark.running.SparkRunningJobAppConfig -->
-        <property>
-            <name>jobExtractorConfig.site</name>
-            <displayName>Site ID</displayName>
-            <value>sandbox</value>
-        </property>
         <property>
             <name>workers</name>
-            <displayName>storm worker number</displayName>
+            <displayName>Worker Number</displayName>
+            <description>the number of storm workers will be used</description>
             <value>4</value>
         </property>
         <property>
-            <name>envContextConfig.parallelismConfig.mrRunningJobFetchSpout</name>
+            <name>stormConfig.mrRunningJobFetchSpoutTasks</name>
+            <displayName>Read Task Number</displayName>
+            <description>number of tasks to fetch map reduce running jobs from resource manager</description>
             <value>1</value>
         </property>
         <property>
-            <name>envContextConfig.parallelismConfig.mrRunningJobParseBolt</name>
-            <value>8</value>
+            <name>stormConfig.mrRunningJobParseBoltTasks</name>
+            <displayName>Parse Task Number</displayName>
+            <description>number of tasks to parse map reduce running jobs got from resource manager</description>
+            <value>5</value>
         </property>
+
         <property>
-            <name>envContextConfig.tasks.mrRunningJobFetchSpout</name>
-            <value>1</value>
-        </property>
-        <property>
-            <name>envContextConfig.tasks.mrRunningJobParseBolt</name>
-            <value>8</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkQuorum</name>
-            <displayName>zkQuorum</displayName>
-            <description>Zookeeper Quorum</description>
-            <value>sandbox.hortonworks.com:2181</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkPort</name>
-            <displayName>zkPort</displayName>
-            <description>Zookeeper Port</description>
-            <value>2181</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkSessionTimeoutMs</name>
-            <displayName>zkSessionTimeoutMs</displayName>
-            <description>Zookeeper session timeoutMs</description>
-            <value>15000</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRetryTimes</name>
-            <displayName>zkRetryTimes</displayName>
-            <description>zookeeperConfig.zkRetryTimes</description>
-            <value>3</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRetryInterval</name>
-            <displayName>zkRetryInterval</displayName>
-            <description>zookeeperConfig.zkRetryInterval</description>
-            <value>20000</value>
-        </property>
-        <property>
-            <name>zookeeperConfig.zkRoot</name>
+            <name>zookeeper.zkRoot</name>
+            <displayName>Zookeeper Root Path</displayName>
+            <description>zkRoot that used to save context for this application</description>
             <value>/apps/mr/runningSandbox</value>
+            <required>true</required>
         </property>
+
         <property>
-            <name>eagleProps.eagleService.host</name>
-            <description>eagleProps.eagleService.host</description>
-            <value>sandbox.hortonworks.com</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.port</name>
-            <description>eagleProps.eagleService.port</description>
-            <value>9099</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.username</name>
-            <description>eagleProps.eagleService.username</description>
-            <value>admin</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.password</name>
-            <description>eagleProps.eagleService.password</description>
-            <value>secret</value>
-        </property>
-        <property>
-            <name>eagleProps.eagleService.readTimeOutSeconds</name>
-            <description>eagleProps.eagleService.readTimeOutSeconds</description>
+            <name>endpointConfig.fetchRunningJobInterval</name>
+            <displayName>Interval of Fetch Running Job From Resource Manager</displayName>
+            <description>interval of fetch map reduce running jobs from resource manager</description>
             <value>60</value>
         </property>
         <property>
-            <name>eagleProps.eagleService.maxFlushNum</name>
-            <description>eagleProps.eagleService.maxFlushNum</description>
-            <value>1000</value>
-        </property>
-        <property>
-            <name>jobExtractorConfig.fetchRunningJobInterval</name>
-            <description>jobExtractorConfig.fetchRunningJobInterval</description>
-            <value>60</value>
-        </property>
-        <property>
-            <name>jobExtractorConfig.parseJobThreadPoolSize</name>
-            <description>jobExtractorConfig.parseJobThreadPoolSize</description>
+            <name>endpointConfig.parseJobThreadPoolSize</name>
+            <displayName>Parse Job ThreadPool Size in Each Parse Task</displayName>
+            <description>parse job thread pool size in each parse task</description>
             <value>5</value>
         </property>
         <property>
-            <name>jobExtractorConfig.topAndBottomTaskByElapsedTime</name>
-            <description>jobExtractorConfig.topAndBottomTaskByElapsedTime</description>
-            <value>5</value>
-        </property>
-        <property>
-            <name>dataSourceConfig.rmUrls</name>
-            <description>dataSourceConfig.rmUrls</description>
+            <name>endpointConfig.rmUrls</name>
+            <displayName>Resource Manager URLs</displayName>
+            <description>resource manager urls of this site</description>
             <value>http://sandbox.hortonworks.com:8088</value>
+            <required>true</required>
         </property>
+
         <property>
             <name>MRConfigureKeys.jobConfigKey</name>
+            <displayName>Map Reduce Extracted Configuration Keys</displayName>
+            <description>which configures will be extracted from map reduce job configurations</description>
             <value>mapreduce.map.output.compress,
                 mapreduce.map.output.compress.codec,
                 mapreduce.output.fileoutputformat.compress,
@@ -148,6 +86,8 @@
         </property>
         <property>
             <name>MRConfigureKeys.jobNameKey</name>
+            <displayName>Map Reduce Job Name Key</displayName>
+            <description>User use -Dkey=value to specify name of a job when submit. use this to extract job name from job configuration</description>
             <value>eagle.job.name</value>
         </property>
     </configuration>
