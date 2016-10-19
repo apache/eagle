@@ -18,7 +18,8 @@
 
 package org.apache.eagle.hadoop.queue.storm;
 
-import org.apache.eagle.hadoop.queue.common.HadoopYarnResourceUtils;
+import backtype.storm.spout.SpoutOutputCollector;
+import org.apache.eagle.hadoop.queue.HadoopQueueRunningAppConfig;
 import org.apache.eagle.hadoop.queue.common.YarnClusterResourceURLBuilder;
 import org.apache.eagle.hadoop.queue.common.YarnURLSelectorImpl;
 import org.apache.eagle.hadoop.queue.crawler.ClusterMetricsCrawler;
@@ -26,9 +27,6 @@ import org.apache.eagle.hadoop.queue.crawler.RunningAppsCrawler;
 import org.apache.eagle.hadoop.queue.crawler.SchedulerInfoCrawler;
 import org.apache.eagle.jpm.util.Constants;
 import org.apache.eagle.jpm.util.resourcefetch.ha.HAURLSelector;
-
-import backtype.storm.spout.SpoutOutputCollector;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +40,6 @@ public class HadoopQueueRunningExtractor {
     private static final Logger LOGGER = LoggerFactory.getLogger(HadoopQueueRunningExtractor.class);
     private static final int MAX_NUM_THREADS = 10;
     private static final int MAX_WAIT_TIME = 10;
-    private static final String DEFAULT_SITE = "sandbox";
 
     private String site;
     private String urlBases;
@@ -51,9 +48,9 @@ public class HadoopQueueRunningExtractor {
     private ExecutorService executorService;
     private SpoutOutputCollector collector;
 
-    public HadoopQueueRunningExtractor(Config eagleConf, SpoutOutputCollector collector) {
-        site = HadoopYarnResourceUtils.getConfigValue(eagleConf, "eagleProps.site", DEFAULT_SITE);
-        urlBases = HadoopYarnResourceUtils.getConfigValue(eagleConf, "dataSourceConfig.RMEndPoints", "");
+    public HadoopQueueRunningExtractor(HadoopQueueRunningAppConfig eagleConf, SpoutOutputCollector collector) {
+        site = eagleConf.eagleProps.site;
+        urlBases = eagleConf.dataSourceConfig.rMEndPoints;
         if (urlBases == null) {
             throw new IllegalArgumentException(site + ".baseurl is null");
         }

@@ -16,10 +16,10 @@
  */
 package org.apache.eagle.hadoop.queue;
 
-public class HadoopQueueRunningMain {
+import org.apache.eagle.app.spi.AbstractApplicationProvider;
 
-    public static void main(String[] args) {
-        new HadoopQueueRunningApp().run(args);
+public class HadoopQueueRunningAppProvider extends AbstractApplicationProvider<HadoopQueueRunningApp> {
+    public HadoopQueueRunningApp getApplication() {
+        return new HadoopQueueRunningApp();
     }
-
 }
