@@ -52,14 +52,6 @@
             <description>seconds, each bolt process metrics from [start, start + aggregationDuration]</description>
             <value>3600</value>
         </property>
-
-        <property>
-            <name>zookeeper.zkRoot</name>
-            <value>/aggregation/mr/sandbox</value>
-            <displayName>Zookeeper Root</displayName>
-            <description>zkRoot that used to save context for this application</description>
-            <required>true</required>
-        </property>
         <property>
             <name>aggregate.counters.metrics</name>
             <value>cpu_milliseconds, file_bytes_read, file_bytes_written, hdfs_bytes_read, hdfs_bytes_written, hdfs_read_ops, hdfs_write_ops</value>

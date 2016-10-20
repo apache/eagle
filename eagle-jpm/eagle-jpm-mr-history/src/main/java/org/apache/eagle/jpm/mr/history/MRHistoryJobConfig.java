@@ -35,7 +35,7 @@ import java.util.Map;
 public class MRHistoryJobConfig implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MRHistoryJobConfig.class);
 
-    private static final String JOB_CONFIGURE_KEY_CONF_FILE = "JobConfigKeys.conf";
+    private static final String ZK_ROOT_PREFIX = "/apps/mr/history";
 
     public ZKStateConfig getZkStateConfig() {
         return zkStateConfig;
@@ -123,7 +123,7 @@ public class MRHistoryJobConfig implements Serializable {
         this.zkStateConfig.zkSessionTimeoutMs = config.getInt("zookeeper.zkSessionTimeoutMs");
         this.zkStateConfig.zkRetryTimes = config.getInt("zookeeper.zkRetryTimes");
         this.zkStateConfig.zkRetryInterval = config.getInt("zookeeper.zkRetryInterval");
-        this.zkStateConfig.zkRoot = config.getString("zookeeper.zkRoot");
+        this.zkStateConfig.zkRoot = ZK_ROOT_PREFIX + "/" + config.getString("siteId");
 
         //parse job history endpoint
         this.jobHistoryEndpointConfig.site = config.getString("siteId");
