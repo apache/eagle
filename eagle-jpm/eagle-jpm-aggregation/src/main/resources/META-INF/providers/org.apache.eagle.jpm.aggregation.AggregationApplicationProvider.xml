@@ -25,7 +25,7 @@
             <name>workers</name>
             <displayName>Worker Number</displayName>
             <description>the number of storm workers will be used</description>
-            <value>4</value>
+            <value>2</value>
         </property>
         <property>
             <name>stormConfig.mrHistoryAggregationSpoutTasks</name>
