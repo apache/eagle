@@ -74,11 +74,11 @@ public class MRJobParser implements Runnable {
     private MRRunningJobManager runningJobManager;
     private ParserStatus parserStatus;
     private ResourceFetcher rmResourceFetcher;
-    private boolean first;
     private Set<String> finishedTaskIds;
     private List<String> configKeys;
     private MRRunningJobConfig.EndpointConfig endpointConfig;
     private static final int TOP_BOTTOM_TASKS_BY_ELASPED_TIME = 10;
+    private static final int FLUSH_TASKS_EVERY_TIME = 5;
 
     static {
         OBJ_MAPPER.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
@@ -106,7 +106,6 @@ public class MRJobParser implements Runnable {
         this.runningJobManager = runningJobManager;
         this.parserStatus  = ParserStatus.FINISHED;
         this.rmResourceFetcher = rmResourceFetcher;
-        this.first = true;
         this.finishedTaskIds = new HashSet<>();
         this.configKeys = configKeys;
     }
@@ -150,11 +149,10 @@ public class MRJobParser implements Runnable {
         List<Function<String, Boolean>> functions = new ArrayList<>();
         functions.add(fetchJobConfig);
         functions.add(fetchJobCounters);
-        if (!this.first) { //do not fetch these info below for the first time
+        if ((int)(Math.random() * 10) % FLUSH_TASKS_EVERY_TIME == 0) {
             functions.add(fetchTasks);
         }
 
-        this.first = false;
         for (String jobId : mrJobEntityMap.keySet()) {
             for (Function<String, Boolean> function : functions) {
                 int i = 0;
