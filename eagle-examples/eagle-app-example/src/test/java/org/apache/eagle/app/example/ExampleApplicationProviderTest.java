@@ -103,16 +103,6 @@ public class ExampleApplicationProviderTest extends ApplicationTestBase {
         }
     }
 
-    @Test
-    public void testApplicationQuickRunWithAppType() {
-        simulator.start("EXAMPLE_APPLICATION", getConf());
-    }
-
-    @Test
-    public void testApplicationQuickRunWithAppProvider() throws Exception {
-        simulator.start(ExampleApplicationProvider.class, getConf());
-    }
-
     private Map<String, Object> getConf() {
         Map<String, Object> conf = new HashMap<>();
         conf.put("dataSinkConfig.topic", "testTopic");
