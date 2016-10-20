@@ -26,7 +26,6 @@ public class SparkHistoryJobAppProviderTest extends ApplicationTestBase {
     ApplicationSimulator simulator;
 
     @Test
-    public void testRunWithProvider(){
-        simulator.start(SparkHistoryJobAppProvider.class);
+    public void testRunWithProvider() {
     }
 }

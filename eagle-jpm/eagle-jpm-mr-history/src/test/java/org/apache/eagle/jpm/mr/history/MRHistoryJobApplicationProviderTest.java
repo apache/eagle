@@ -27,6 +27,5 @@ public class MRHistoryJobApplicationProviderTest extends ApplicationTestBase {
 
     @Test
     public void testRunAsManagedApplicationWithSimulator() {
-        simulator.start(MRHistoryJobApplicationProvider.class);
     }
 }

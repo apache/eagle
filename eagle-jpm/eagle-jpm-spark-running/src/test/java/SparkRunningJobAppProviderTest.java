@@ -26,7 +26,6 @@ public class SparkRunningJobAppProviderTest extends ApplicationTestBase {
     ApplicationSimulator simulator;
 
     @Test
-    public void testRunWithProvider(){
-        simulator.start(SparkRunningJobAppProvider.class);
+    public void testRunWithProvider() {
     }
 }
