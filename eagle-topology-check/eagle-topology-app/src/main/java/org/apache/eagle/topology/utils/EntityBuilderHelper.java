@@ -18,6 +18,7 @@
 
 package org.apache.eagle.topology.utils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.eagle.log.entity.GenericMetricEntity;
 import org.apache.eagle.topology.TopologyConstants;
 import org.apache.eagle.topology.entity.MRServiceTopologyAPIEntity;
@@ -57,6 +58,13 @@ public class EntityBuilderHelper {
         tags.put(TopologyConstants.ROLE_TAG, role);
         String metricName = String.format(TopologyConstants.METRIC_LIVE_RATIO_NAME_FORMAT, role);
         return EntityBuilderHelper.metricWrapper(timestamp, metricName, value, tags);
+    }
+    
+    public static String getValidHostName(String key){
+    	if(StringUtils.isBlank(key)){
+    		throw new IllegalArgumentException("key can not be empty");
+    	}    	
+    	return key.indexOf(TopologyConstants.COLON) > 0 ? key.substring(0,key.indexOf(TopologyConstants.COLON)) : key;    	
     }
 
 }

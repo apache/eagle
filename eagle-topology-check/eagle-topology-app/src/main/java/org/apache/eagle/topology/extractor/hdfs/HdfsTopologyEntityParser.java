@@ -200,7 +200,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
         for (int i = 0; deadNodes != null && i < deadNodes.length(); ++i) {
             final String hostname = deadNodes.getString(i);
             final JSONObject deadNode = jsonNodesObject.getJSONObject(hostname);
-            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, hostname, updateTime);
+            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, EntityBuilderHelper.getValidHostName(hostname), updateTime);
             if (deadNode.getBoolean(DATA_NODE_DECOMMISSIONED_STATE)) {
                 ++numDeadDecommNodes;
                 entity.setStatus(TopologyConstants.DATA_NODE_DEAD_DECOMMISSIONED_STATUS);
@@ -220,7 +220,7 @@ public class HdfsTopologyEntityParser implements TopologyEntityParser {
             final String hostname = liveNodes.getString(i);
             final JSONObject liveNode = jsonNodesObject.getJSONObject(hostname);
 
-            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, hostname, updateTime);
+            HdfsServiceTopologyAPIEntity entity = createHdfsServiceEntity(TopologyConstants.DATA_NODE_ROLE, EntityBuilderHelper.getValidHostName(hostname), updateTime);
             final Number configuredCapacity = (Number) liveNode.get(DATA_NODE_CAPACITY);
             entity.setConfiguredCapacityTB(Double.toString(configuredCapacity.doubleValue() / 1024.0 / 1024.0 / 1024.0 / 1024.0));
             final Number capacityUsed = (Number) liveNode.get(DATA_NODE_USED_SPACE);
