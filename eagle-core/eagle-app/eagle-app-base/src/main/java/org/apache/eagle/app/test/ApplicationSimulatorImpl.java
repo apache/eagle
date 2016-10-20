@@ -16,16 +16,14 @@
  */
 package org.apache.eagle.app.test;
 
-import org.apache.eagle.app.config.ApplicationProviderConfig;
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
 import org.apache.eagle.app.resource.ApplicationResource;
 import org.apache.eagle.app.service.ApplicationOperations;
 import org.apache.eagle.app.spi.ApplicationProvider;
-import org.apache.eagle.app.utils.DynamicJarPathFinder;
 import org.apache.eagle.metadata.model.ApplicationEntity;
 import org.apache.eagle.metadata.model.SiteEntity;
 import org.apache.eagle.metadata.resource.SiteResource;
-import com.google.inject.Inject;
-import com.typesafe.config.Config;
 import org.junit.Assert;
 
 import java.util.HashMap;
