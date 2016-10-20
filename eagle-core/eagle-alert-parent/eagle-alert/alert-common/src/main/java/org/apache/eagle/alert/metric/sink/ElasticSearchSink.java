@@ -32,7 +32,7 @@ public class ElasticSearchSink implements MetricSink {
 
     @Override
     public void prepare(Config config, MetricRegistry registry) {
-        LOG.debug("Preparing elasticsearch-sink");
+        LOG.info("Preparing elasticsearch-sink");
         try {
             ElasticsearchReporter.Builder builder = ElasticsearchReporter.forRegistry(registry);
             if (config.hasPath("hosts")) {

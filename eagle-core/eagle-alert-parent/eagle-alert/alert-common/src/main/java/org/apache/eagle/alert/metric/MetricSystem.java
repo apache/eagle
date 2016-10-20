@@ -34,8 +34,8 @@ public class MetricSystem implements IMetricSystem {
     private Map<MetricSink, Config> sinks = new HashMap<>();
     //    private Map<String,MetricSource> sources = new HashMap<>();
     private MetricRegistry registry = new MetricRegistry();
-    private boolean running;
-    private boolean initialized;
+    private volatile boolean running;
+    private volatile boolean initialized;
     private static final Logger LOG = LoggerFactory.getLogger(MetricSystem.class);
     private final Map<String, Object> metricTags = new HashMap<>();
 

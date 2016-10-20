@@ -45,7 +45,7 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
     @Override
     public void prepare(Map stormConf, Object registrationArgument, TopologyContext context, IErrorReporter errorReporter) {
         this.config = ConfigFactory.parseString((String) registrationArgument, ConfigParseOptions.defaults());
-        topologyName = config.getString("topology.name");
+        topologyName = config.getString("appId");
         stormId = context.getStormId();
         metricSystems = new HashMap<>();
     }
@@ -61,7 +61,7 @@ public class StormMetricTaggedConsumer implements IMetricsConsumer {
                 metricSystems.put(uniqueTaskKey, metricSystem);
                 metricSystem.tags(new HashMap<String, Object>() {
                     {
-                        put("topology", topologyName);
+                        put("appId", topologyName);
                         put("stormId", stormId);
                         put("component", taskInfo.srcComponentId);
                         put("task", taskInfo.srcTaskId);
