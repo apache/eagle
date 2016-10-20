@@ -136,8 +136,6 @@ public class ApplicationEntityServiceJDBCImpl implements ApplicationEntityServic
         if (entity.getMode() != null && StringUtils.isNotBlank(entity.getMode().name())) {
             updateSql += "appmode = ?, ";
         }
-        entity.getContext().put("mode", entity.getMode().name());
-        entity.getContext().put("jarPath", entity.getJarPath());
         if (StringUtils.isNotBlank(entity.getJarPath())) {
             updateSql += "jarpath = ?, ";
         }
