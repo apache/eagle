@@ -18,6 +18,7 @@
 package org.apache.eagle.alert.app;
 
 import org.apache.eagle.alert.coordination.model.internal.Topology;
+import org.apache.eagle.alert.coordinator.Coordinator;
 import org.apache.eagle.alert.engine.runner.UnitTopologyRunner;
 import org.apache.eagle.alert.metadata.IMetadataDao;
 import org.apache.eagle.alert.metadata.resource.OpResult;
@@ -73,6 +74,7 @@ class AlertUnitTopologyAppListener implements ApplicationListener {
             LOG.error(result.message);
             throw new IllegalStateException(result.message);
         }
+        Coordinator.startSchedule();
     }
 
     private void removeTopologyMetadata() {

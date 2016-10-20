@@ -60,7 +60,7 @@ public class KafkaSpoutProvider implements StormSpoutProvider {
         // Kafka broker zk connection
         String zkConnString = context.getString("zkConnection");
         // Kafka fetch size
-        int fetchSize = context.hasPath("fetchSize") ? context.getInt("fetchSize") : 1048586;
+        int fetchSize = context.hasPath("fetchSize") ? context.getInt("fetchSize") : 1048576;
         LOG.info(String.format("Use topic : %s, zkConnection : %s , fetchSize : %d", topic, zkConnString, fetchSize));
 
         /*
@@ -97,6 +97,8 @@ public class KafkaSpoutProvider implements StormSpoutProvider {
         spoutConfig.stateUpdateIntervalMs = context.hasPath("transactionStateUpdateMS") ? context.getLong("transactionStateUpdateMS") : 2000;
         // Kafka fetch size
         spoutConfig.fetchSizeBytes = fetchSize;
+        spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+
         // "startOffsetTime" is for test usage, prod should not use this
         if (context.hasPath("startOffsetTime")) {
             spoutConfig.startOffsetTime = context.getInt("startOffsetTime");
