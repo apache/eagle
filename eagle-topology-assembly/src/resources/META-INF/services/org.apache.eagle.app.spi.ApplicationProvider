@@ -20,3 +20,4 @@ org.apache.eagle.jpm.mr.history.MRHistoryJobApplicationProvider
 org.apache.eagle.jpm.mr.running.MRRunningJobApplicationProvider
 org.apache.eagle.jpm.aggregation.AggregationApplicationProvider
 org.apache.eagle.hadoop.queue.HadoopQueueRunningAppProvider
+org.apache.eagle.topology.TopologyCheckAppProvider
