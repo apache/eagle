@@ -16,23 +16,23 @@
  */
 package org.apache.eagle.service.embedded.tomcat;
 
-import java.io.File;
-
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 public class EmbeddedServer {
-	
-	private static EmbeddedServer server;
-	private Tomcat tomcat;
-	private String webappDirLocation;
-	private int port;
-	private static int DEFAULT_TOMCAT_PORT = 38080;
-	private static final Logger LOG = LoggerFactory.getLogger(EmbeddedServer.class);
-		
-	public static void main(String[] args) {
+
+    private static EmbeddedServer server;
+    private Tomcat tomcat;
+    private String webappDirLocation;
+    private int port;
+    private static int DEFAULT_TOMCAT_PORT = 38080;
+    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedServer.class);
+
+    public static void main(String[] args) {
         // args: webappLocation, port
         int tomcatPort;
         if (args.length > 1) {
@@ -41,69 +41,68 @@ public class EmbeddedServer {
             tomcatPort = DEFAULT_TOMCAT_PORT;
         }
         new EmbeddedServer(args[0], tomcatPort).start();
-	}
-
-	private EmbeddedServer(String webappDirLocation) {
-		this(webappDirLocation, DEFAULT_TOMCAT_PORT);
-	}
-	
-	private EmbeddedServer(String webappDirLocation, int port) {
-		this.webappDirLocation = webappDirLocation;
-		this.port = port;
-	}
-	
-    public static EmbeddedServer getInstance(String webappDirLocation) {
-    	if (server == null) {
-    		synchronized(EmbeddedServer.class) {
-    			if (server == null) {
-    				server = new EmbeddedServer(webappDirLocation);
-    				server.start();   						
-    			}
-    		}
-    	}
-    	return server;
     }
 
-	public int getPort() {
-		return port;
-	}
-	
-	public void start() {
-		tomcat = new Tomcat();
-		tomcat.setHostname("localhost");
-		tomcat.setPort(port);
-		try {
-			tomcat.addWebapp("/eagle-service", new File(webappDirLocation).getAbsolutePath());
-			tomcat.start();
+    private EmbeddedServer(String webappDirLocation) {
+        this(webappDirLocation, DEFAULT_TOMCAT_PORT);
+    }
 
-		} catch (Exception ex) {
-			LOG.error("Got an exception " + ex.getMessage());
-		}
+    private EmbeddedServer(String webappDirLocation, int port) {
+        this.webappDirLocation = webappDirLocation;
+        this.port = port;
+    }
+
+    public static EmbeddedServer getInstance(String webappDirLocation) {
+        if (server == null) {
+            synchronized (EmbeddedServer.class) {
+                if (server == null) {
+                    server = new EmbeddedServer(webappDirLocation);
+                    server.start();
+                }
+            }
+        }
+        return server;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void start() {
+        tomcat = new Tomcat();
+        tomcat.setHostname("localhost");
+        tomcat.setPort(port);
+        try {
+            tomcat.addWebapp("/eagle-service", new File(webappDirLocation).getAbsolutePath());
+            tomcat.start();
+
+        } catch (Exception ex) {
+            LOG.error("Got an exception " + ex.getMessage());
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-            	try {            		
-            		shutdown();
-            	}
-            	catch (Throwable t) {
-            		LOG.error("Got an exception why shutting down..." + t.getMessage());
-            	}
+                try {
+                    shutdown();
+                } catch (Throwable t) {
+                    LOG.error("Got an exception why shutting down..." + t.getMessage());
+                }
             }
         });
-		try {
-			Thread.sleep(10000000);
-		}catch(Exception ex){
-			ex.printStackTrace();
-		}
-	}
-	
-	public void shutdown() throws Throwable {
-	  	if (tomcat.getServer() != null && tomcat.getServer().getState() != LifecycleState.DESTROYED) {
-	        if (tomcat.getServer().getState() != LifecycleState.STOPPED) {
-	        	tomcat.stop();
-	        }
-	        tomcat.destroy();
-	    }
-	}
+        try {
+            Thread.sleep(10000000);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void shutdown() throws Throwable {
+        if (tomcat.getServer() != null && tomcat.getServer().getState() != LifecycleState.DESTROYED) {
+            if (tomcat.getServer().getState() != LifecycleState.STOPPED) {
+                tomcat.stop();
+            }
+            tomcat.destroy();
+        }
+    }
 }
